@@ -431,7 +431,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 * @return
 	 */
-	public AbstractMapping<?, ?> getMaping(String name) {
+	public AbstractMapping<?, ?> getMapping(String name) {
 		return this.mappings.get(name);
 	}
 

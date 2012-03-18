@@ -224,7 +224,7 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 				break;
 			case ASSOCIATION:
 				final boolean eager = this.fetchType == FetchType.EAGER;
-				if (!this.many || StringUtils.isNotBlank(this.mappedBy)) {
+				if (!this.many && StringUtils.isNotBlank(this.mappedBy)) {
 					this.mapping = new OwnedOneToOneMapping<X, T>(this, path, this.orphanRemoval, eager);
 				}
 				else if (!this.many) {

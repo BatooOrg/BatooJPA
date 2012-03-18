@@ -101,7 +101,7 @@ public class Configuration {
 		catch (final Throwable e) {
 			LOG.error(e, "Cannot create EntityManagerFactory: {0}", e.getMessage());
 
-			return null;
+			throw new MappingException("Cannot create EntityManagerFactory", e);
 		}
 	}
 

@@ -53,6 +53,7 @@ public class PersistenceProvider implements javax.persistence.spi.PersistencePro
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public EntityManagerFactory createContainerEntityManagerFactory(PersistenceUnitInfo info, @SuppressWarnings("rawtypes") Map map) {
 		map = this.sanitize(map);
 
@@ -71,6 +72,7 @@ public class PersistenceProvider implements javax.persistence.spi.PersistencePro
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public EntityManagerFactory createEntityManagerFactory(String emName, @SuppressWarnings("rawtypes") Map map) {
 		map = this.sanitize(map);
@@ -80,7 +82,7 @@ public class PersistenceProvider implements javax.persistence.spi.PersistencePro
 			return this.createContainerEntityManagerFactory(info, info.getProperties());
 		}
 		catch (final BatooException e) {
-			PersistenceProvider.LOG.error("Unable to build EntityManagerFactory", e);
+			PersistenceProvider.LOG.error(e, "Unable to build EntityManagerFactory");
 		}
 
 		return null;
@@ -90,6 +92,7 @@ public class PersistenceProvider implements javax.persistence.spi.PersistencePro
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public ProviderUtil getProviderUtil() {
 		return null;
 	}

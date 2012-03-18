@@ -41,9 +41,13 @@ import org.batoo.jpa.core.impl.types.SingularAttributeImpl;
 public class OwnerManyToOneMapping<X, T> extends OwnerAssociationMapping<X, T> implements Association<X, T> {
 
 	/**
+	 * Sanitizes the column templates
+	 * 
 	 * @param declaringAttribute
+	 *            the declaring attribute
 	 * @param columns
-	 * @return
+	 *            the column templates
+	 * @return the sanitized column templates
 	 * 
 	 * @since $version
 	 * @author hceylan

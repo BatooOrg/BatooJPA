@@ -70,6 +70,8 @@ public class PreparedStatementImpl implements PreparedStatement {
 
 	private final String sql;
 
+	private Object[] parameters;
+
 	/**
 	 * @param connection
 	 *            the connection
@@ -302,7 +304,8 @@ public class PreparedStatementImpl implements PreparedStatement {
 		final long executeNo = ++this.executeNo;
 		this.executes++;
 
-		LOG.debug("{0}:{1}:{2} executeUpdate(){3}", this.connection.connNo, this.statementNo, executeNo, BLogger.lazyBoxed(this.sql));
+		LOG.debug("{0}:{1}:{2} executeUpdate(){3}", this.connection.connNo, this.statementNo, executeNo,
+			BLogger.lazyBoxed(this.sql, this.parameters));
 
 		final long start = System.currentTimeMillis();
 		try {
@@ -465,7 +468,13 @@ public class PreparedStatementImpl implements PreparedStatement {
 
 		final long start = System.currentTimeMillis();
 		try {
-			return this.statement.getParameterMetaData();
+			final ParameterMetaData metaData = this.statement.getParameterMetaData();
+
+			if (this.parameters == null) {
+				this.parameters = new Object[metaData.getParameterCount()];
+			}
+
+			return metaData;
 		}
 		finally {
 			final long time = System.currentTimeMillis() - start;
@@ -976,6 +985,8 @@ public class PreparedStatementImpl implements PreparedStatement {
 	 */
 	@Override
 	public void setNull(int parameterIndex, int sqlType) throws SQLException {
+		this.parameters[parameterIndex - 1] = null;
+
 		this.statement.setNull(parameterIndex, sqlType);
 	}
 
@@ -994,6 +1005,8 @@ public class PreparedStatementImpl implements PreparedStatement {
 	 */
 	@Override
 	public void setObject(int parameterIndex, Object x) throws SQLException {
+		this.parameters[parameterIndex - 1] = x;
+
 		this.statement.setObject(parameterIndex, x);
 	}
 

@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.mapping;
 
+import java.util.Collection;
 import java.util.Deque;
 import java.util.Set;
 
@@ -40,11 +41,38 @@ import org.batoo.jpa.core.impl.types.SingularAttributeImpl;
 public class OwnerOneToOneMapping<X, T> extends OwnerAssociationMapping<X, T> implements Association<X, T> {
 
 	/**
+	 * Sanitizes the column templates
+	 * 
+	 * @param declaringAttribute
+	 *            the declaring attribute
+	 * @param columns
+	 *            the column templates
+	 * @return the sanitized column templates
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private static <X, T> Set<ColumnTemplate<X, T>> sanitize(SingularAttributeImpl<X, T> declaringAttribute,
+		Set<ColumnTemplate<X, T>> columns) {
+
+		if (columns.isEmpty()) {
+			final EntityTypeImpl<T> type = (EntityTypeImpl<T>) declaringAttribute.getType();
+
+			final Collection<BasicMapping<?, ?>> mappings = type.getIdMappings();
+			for (final BasicMapping<?, ?> mapping : mappings) {
+				columns.add(new JoinColumnTemplate<X, T>(declaringAttribute, mapping));
+			}
+		}
+
+		return columns;
+	}
+
+	/**
 	 * @param declaringAttribute
 	 *            the attribute which declares the mapping
 	 * @param path
 	 *            the path to the declaringAttribute
-	 * @param columnTemplates
+	 * @param columns
 	 *            the set of column templates of the mapping
 	 * @param eager
 	 *            if association is annotated with {@link FetchType#EAGER}
@@ -53,9 +81,9 @@ public class OwnerOneToOneMapping<X, T> extends OwnerAssociationMapping<X, T> im
 	 * @since $version
 	 * @author hceylan
 	 */
-	public OwnerOneToOneMapping(AttributeImpl<X, T> declaringAttribute, Deque<AttributeImpl<?, ?>> path,
-		Set<ColumnTemplate<X, T>> columnTemplates, boolean eager) throws MappingException {
-		super(AssociationType.ONE, declaringAttribute, path, columnTemplates, eager);
+	public OwnerOneToOneMapping(SingularAttributeImpl<X, T> declaringAttribute, Deque<AttributeImpl<?, ?>> path,
+		Set<ColumnTemplate<X, T>> columns, boolean eager) throws MappingException {
+		super(AssociationType.ONE, declaringAttribute, path, OwnerOneToOneMapping.sanitize(declaringAttribute, columns), eager);
 	}
 
 	/**

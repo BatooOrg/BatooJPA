@@ -648,10 +648,13 @@ public class MetamodelImpl implements Metamodel {
 	/**
 	 * Links the associations with the opposites.
 	 * 
+	 * @throws MappingException
+	 *             thrown if the bidirectional relation is not valid
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void linkAssociations() {
+	public void linkAssociations() throws MappingException {
 		for (final Association<?, ?> association : this.associations) {
 			if (association instanceof OwnedAssociation) {
 				final OwnedAssociation<?, ?> ownedAssociation = (OwnedAssociation<?, ?>) association;

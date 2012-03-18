@@ -135,7 +135,7 @@ public abstract class OwnedAssociationMapping<X, T> extends AbstractMapping<X, T
 	@SuppressWarnings("unchecked")
 	public OwnerAssociation<T, X> getOpposite() {
 		final String mappedBy = this.getDeclaringAttribute().getMappedBy();
-		return (OwnerAssociation<T, X>) this.getType().getMaping(mappedBy);
+		return (OwnerAssociation<T, X>) this.getType().getMapping(mappedBy);
 	}
 
 	/**
@@ -159,11 +159,17 @@ public abstract class OwnedAssociationMapping<X, T> extends AbstractMapping<X, T
 	 * {@inheritDoc}
 	 * 
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
-	public void link() {
+	@SuppressWarnings("unchecked")
+	public void link() throws MappingException {
 		final String mappedBy = this.getDeclaringAttribute().getMappedBy();
-		this.opposite = (OwnerAssociation<T, X>) this.getType().getMaping(mappedBy);
+		final AbstractMapping<?, ?> mapping = this.getType().getMapping(mappedBy);
+
+		if (!(mapping instanceof OwnerAssociation)) {
+			throw new MappingException("Both sides of the OneToOne mapping is marked with mappedBy, Only one side can be the owner");
+		}
+
+		this.opposite = (OwnerAssociation<T, X>) mapping;
 
 		if (this.opposite != null) {
 			this.opposite.setOpposite(this);
