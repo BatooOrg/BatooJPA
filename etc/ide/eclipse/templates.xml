@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><templates><template autoinsert="true" context="java" deleted="false" description="Inserts a logger" enabled="true" name="log">private static final BLogger LOG = BLogger.getLogger(${primary_type_name}.class);</template></templates>

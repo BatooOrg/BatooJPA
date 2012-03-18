@@ -1,0 +1,23 @@
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence"
+	version="1.0">
+
+	<persistence-unit name="insert" transaction-type="RESOURCE_LOCAL">
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+
+		<class>org.batoo.jpa.benchmark.insert.Country</class>
+		<class>org.batoo.jpa.benchmark.insert.Person</class>
+		<class>org.batoo.jpa.benchmark.insert.Address</class>
+		<class>org.batoo.jpa.benchmark.insert.Phone</class>
+	
+		<properties>
+			<property name="hibernate.dialect" value="org.hibernate.dialect.DerbyTenSevenDialect" />
+			<property name="hibernate.hbm2ddl.auto" value="update" />
+			<property name="hibernate.connection.driver_class" value="org.apache.derby.jdbc.Driver40" />
+			<property name="hibernate.connection.username" value="sa" />
+			<property name="hibernate.connection.password" value="" />
+			<property name="hibernate.connection.url" value="jdbc:derby:memory:H;create=true" />
+		</properties>
+	</persistence-unit>
+</persistence>
