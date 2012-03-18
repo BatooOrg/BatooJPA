@@ -20,6 +20,7 @@ package org.batoo.jpa.core;
 
 import java.io.StringReader;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -79,15 +80,12 @@ public class BLogger {
 
 	private static final Object[] NULL_ARRAY = new Object[] {};
 
-	/**
-	 * @param block
-	 * @return
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	protected static String boxed(String block) {
+	private static String boxed(String block, Object[] parameters) {
 		try {
+			if ((parameters != null) && (parameters.length > 0)) {
+				block += "\n\n" + Arrays.toString(parameters);
+			}
+
 			block = block.replaceAll("\\t", "    ");
 			final List<String> lines = IOUtils.readLines(new StringReader(block));
 			int max = 0;
@@ -157,10 +155,27 @@ public class BLogger {
 	 * @author hceylan
 	 */
 	public static Object lazyBoxed(final String block) {
+		return BLogger.lazyBoxed(block, null);
+	}
+
+	/**
+	 * Returns an object that lazily boxes the block.
+	 * 
+	 * @param block
+	 *            the block to box
+	 * @param array
+	 *            of parameters
+	 * @return the object
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public static Object lazyBoxed(final String block, final Object[] parameters) {
 		return new Callable<String>() {
 
+			@Override
 			public String call() throws Exception {
-				return BLogger.boxed(block);
+				return BLogger.boxed(block, parameters);
 			}
 
 			@Override

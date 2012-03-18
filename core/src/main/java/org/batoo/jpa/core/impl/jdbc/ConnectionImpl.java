@@ -486,7 +486,7 @@ public class ConnectionImpl implements Connection {
 					time, BLogger.lazyBoxed(sql));
 			}
 			else {
-				LOG.trace("{0}:{1} {2} msecs, prepareStatement(String sql)", this.connNo, callNo, time);
+				LOG.debug("{0}:{1} {2} msecs, prepareStatement(String sql)", this.connNo, callNo, time);
 			}
 		}
 	}
