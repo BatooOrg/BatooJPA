@@ -26,31 +26,32 @@ import javax.persistence.PersistenceException;
 
 import org.batoo.jpa.core.impl.EntityManagerImpl;
 import org.batoo.jpa.core.impl.SessionImpl;
-import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
+import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.mapping.Association;
-import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 
 /**
- * Operation to make an entity managed and persistent.
+ * Operation to find an entity.
  * 
  * @author hceylan
  * @since $version
  */
 public class FindOperation<X> extends AbstractOperation<X> {
 
+	private final ManagedId<X> managedId;
+
 	/**
 	 * @param entityManager
 	 *            the entity manager
-	 * @param entityType
-	 *            the type of the entity
-	 * @param primaryKey
-	 *            the primary key
+	 * @param managedId
+	 *            the entity
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public FindOperation(EntityManagerImpl entityManager, EntityTypeImpl<X> entityType, Object primaryKey) {
-		super(entityManager, entityType.newInstanceWithId(entityManager.getSession(), primaryKey));
+	public FindOperation(EntityManagerImpl entityManager, ManagedId<X> managedId) {
+		super(entityManager, managedId.getInstance());
+
+		this.managedId = managedId;
 	}
 
 	/**
@@ -79,10 +80,9 @@ public class FindOperation<X> extends AbstractOperation<X> {
 	protected boolean prepare(SessionImpl session) {
 		this.managedInstance = this.em.getSession().get(this.instance);
 
-		if (this.managedInstance.getStatus() == Status.NEW) {
+		if (this.managedInstance == null) {
 			try {
-				final EntityTypeImpl<X> type = this.managedInstance.getType();
-				this.managedInstance = type.performSelect(session, this.managedInstance);
+				this.managedInstance = this.managedId.performSelect(session);
 			}
 			catch (final SQLException e) {
 				throw new PersistenceException("Entity cannot be loaded", e);

@@ -185,10 +185,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 		Class<? super X> clazz = this.getJavaType().getSuperclass();
 		do {
 			// get the type for the class
-			try {
-				type = this.metaModel.identifiableType(clazz);
-			}
-			catch (final Exception e) {} // ignore
+			type = this.metaModel.identifiableType0(clazz);
 		}
 		while (((clazz = clazz.getSuperclass()) != null) && (type == null));
 

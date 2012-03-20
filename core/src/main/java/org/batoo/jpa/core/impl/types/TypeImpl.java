@@ -60,33 +60,6 @@ public abstract class TypeImpl<X> implements Type<X> {
 	 * 
 	 */
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (this.getClass() != obj.getClass()) {
-			return false;
-		}
-		final TypeImpl<?> other = (TypeImpl<?>) obj;
-		if (this.name == null) {
-			if (other.name != null) {
-				return false;
-			}
-		}
-		else if (!this.name.equals(other.name)) {
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public Class<X> getJavaType() {
 		return this.javaType;
 	}
@@ -121,11 +94,7 @@ public abstract class TypeImpl<X> implements Type<X> {
 			return this.h;
 		}
 
-		final int prime = 31;
-		final int result = 1;
-		this.h = (prime * result) + ((this.name == null) ? 0 : this.name.hashCode());
-
-		return this.h;
+		return this.h = super.hashCode();
 	}
 
 	protected void throwNotImplemented() {

@@ -18,11 +18,12 @@
  */
 package org.batoo.jpa.core.impl.instance;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map;
 
+import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
-import org.batoo.jpa.core.impl.types.IdentifiableTypeImpl;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -37,13 +38,17 @@ import com.google.common.collect.Collections2;
 public class ManagedId<X> {
 
 	private final EntityTypeImpl<X> type;
-	private final Object entity;
+	private final SessionImpl session;
+	private final X instance;
+
 	private final Map<String, BasicResolver<X>> resolvers;
+
+	private int h;
 
 	/**
 	 * @param type
 	 *            the type of the entity
-	 * @param entity
+	 * @param instance
 	 *            the entity insance
 	 * @param resolvers
 	 *            id resolvers of the instance
@@ -51,11 +56,12 @@ public class ManagedId<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedId(EntityTypeImpl<X> type, X entity, Map<String, BasicResolver<X>> resolvers) {
+	public ManagedId(EntityTypeImpl<X> type, SessionImpl session, X instance, Map<String, BasicResolver<X>> resolvers) {
 		super();
 
 		this.type = type;
-		this.entity = entity;
+		this.session = session;
+		this.instance = instance;
 		this.resolvers = resolvers;
 	}
 
@@ -71,24 +77,14 @@ public class ManagedId<X> {
 		if (obj == null) {
 			return false;
 		}
-		if (this.getClass() != obj.getClass()) {
-			return false;
-		}
 		final ManagedId<?> other = (ManagedId<?>) obj;
-		if (this.type == null) {
-			if (other.type != null) {
-				return false;
-			}
-		}
-		else if (!this.type.equals(other.type)) {
+		if (!this.type.equals(other.type)) {
 			return false;
 		}
-		if (this.resolvers == null) {
-			if (other.resolvers != null) {
-				return false;
-			}
+		if (!this.session.equals(other.session)) {
+			return false;
 		}
-		else if (!this.resolvers.equals(other.resolvers)) {
+		if (!this.resolvers.equals(other.resolvers)) {
 			return false;
 		}
 		return true;
@@ -107,23 +103,23 @@ public class ManagedId<X> {
 	}
 
 	/**
-	 * Returns the entity.
+	 * Returns the instance.
 	 * 
-	 * @return the entity
+	 * @return the instance
 	 * @since $version
 	 */
-	public Object getEntity() {
-		return this.entity;
+	public X getInstance() {
+		return this.instance;
 	}
 
 	/**
-	 * Returns the resolvers.
+	 * Returns the session.
 	 * 
-	 * @return the resolvers
+	 * @return the session
 	 * @since $version
 	 */
-	public Map<String, BasicResolver<X>> getResolvers() {
-		return this.resolvers;
+	public SessionImpl getSession() {
+		return this.session;
 	}
 
 	/**
@@ -132,7 +128,7 @@ public class ManagedId<X> {
 	 * @return the type
 	 * @since $version
 	 */
-	public IdentifiableTypeImpl<?> getType() {
+	public EntityTypeImpl<X> getType() {
 		return this.type;
 	}
 
@@ -142,12 +138,30 @@ public class ManagedId<X> {
 	 */
 	@Override
 	public int hashCode() {
+		if (this.h != 0) {
+			return this.h;
+		}
+
 		final int prime = 31;
 		int result = 1;
-		result = (prime * result) + this.resolvers.hashCode();
-		result = (prime * result) + this.type.hashCode();
+		result = (prime * result) + ((this.resolvers == null) ? 0 : this.resolvers.hashCode());
+		result = (prime * result) + ((this.session == null) ? 0 : this.session.hashCode());
+		return this.h = (prime * result) + ((this.type == null) ? 0 : this.type.hashCode());
+	}
 
-		return result;
+	/**
+	 * Performs a select for the managed id.
+	 * 
+	 * @param session
+	 *            the session
+	 * @return the managed instance
+	 * @throws SQLException
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ManagedInstance<? super X> performSelect(SessionImpl session) throws SQLException {
+		return this.type.performSelect(session, this);
 	}
 
 	/**
@@ -161,7 +175,11 @@ public class ManagedId<X> {
 	 */
 	public void populate(Object id) {
 		for (final BasicResolver<X> resolver : this.resolvers.values()) {
-			resolver.setValue(id);
+			synchronized (resolver) {
+				resolver.unlock();
+				resolver.setValue(id);
+				resolver.relock();
+			}
 		}
 	}
 

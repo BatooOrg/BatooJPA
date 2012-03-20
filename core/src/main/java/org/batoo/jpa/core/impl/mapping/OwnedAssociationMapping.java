@@ -39,7 +39,14 @@ public abstract class OwnedAssociationMapping<X, T> extends AbstractMapping<X, T
 
 	private final HashSet<CascadeType> cascadeTypes;
 	private final boolean orpanRemoval;
+
 	private final boolean eager;
+	private final boolean cascadeDetach;
+	private final boolean cascadeMerge;
+	private final boolean cascadePersist;
+	private final boolean cascadeRefresh;
+	private final boolean cascadeRemove;
+
 	private OwnerAssociation<T, X> opposite;
 
 	/**
@@ -67,11 +74,14 @@ public abstract class OwnedAssociationMapping<X, T> extends AbstractMapping<X, T
 		this.eager = eager;
 
 		this.getOwner().addMapping(this);
-	}
 
-	private boolean cascadeAll() {
-		return this.cascadeTypes.contains(CascadeType.ALL);
-	};
+		final boolean cascadeAll = this.cascadeTypes.contains(CascadeType.ALL);
+		this.cascadeDetach = cascadeAll || this.cascadeTypes.contains(CascadeType.DETACH);
+		this.cascadeMerge = cascadeAll || this.cascadeTypes.contains(CascadeType.MERGE);
+		this.cascadePersist = cascadeAll || this.cascadeTypes.contains(CascadeType.PERSIST);
+		this.cascadeRefresh = cascadeAll || this.cascadeTypes.contains(CascadeType.REFRESH);
+		this.cascadeRemove = cascadeAll || this.cascadeTypes.contains(CascadeType.REMOVE);
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -79,7 +89,7 @@ public abstract class OwnedAssociationMapping<X, T> extends AbstractMapping<X, T
 	 */
 	@Override
 	public final boolean cascadeDetach() {
-		return this.cascadeAll() || this.cascadeTypes.contains(CascadeType.DETACH);
+		return this.cascadeDetach;
 	}
 
 	/**
@@ -88,7 +98,7 @@ public abstract class OwnedAssociationMapping<X, T> extends AbstractMapping<X, T
 	 */
 	@Override
 	public final boolean cascadeMerge() {
-		return this.cascadeAll() || this.cascadeTypes.contains(CascadeType.MERGE);
+		return this.cascadeMerge;
 	}
 
 	/**
@@ -97,7 +107,7 @@ public abstract class OwnedAssociationMapping<X, T> extends AbstractMapping<X, T
 	 */
 	@Override
 	public final boolean cascadePersist() {
-		return this.cascadeAll() || this.cascadeTypes.contains(CascadeType.PERSIST);
+		return this.cascadePersist;
 	}
 
 	/**
@@ -106,7 +116,7 @@ public abstract class OwnedAssociationMapping<X, T> extends AbstractMapping<X, T
 	 */
 	@Override
 	public final boolean cascadeRefresh() {
-		return this.cascadeAll() || this.cascadeTypes.contains(CascadeType.REFRESH);
+		return this.cascadeRefresh;
 	}
 
 	/**
@@ -115,7 +125,7 @@ public abstract class OwnedAssociationMapping<X, T> extends AbstractMapping<X, T
 	 */
 	@Override
 	public final boolean cascadeRemove() {
-		return this.cascadeAll() || this.cascadeTypes.contains(CascadeType.REMOVE);
+		return this.cascadeRemove;
 	}
 
 	/**

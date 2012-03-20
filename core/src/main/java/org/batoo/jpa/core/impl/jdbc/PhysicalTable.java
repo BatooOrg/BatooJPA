@@ -572,7 +572,7 @@ public class PhysicalTable implements Table {
 		final List<Object> params = Lists.transform(this.insertColumns, new Function<PhysicalColumn, Object>() {
 			@Override
 			public Object apply(PhysicalColumn input) {
-				return input.getPhysicalValue(managedInstance);
+				return input.getPhysicalValue(managedInstance.getSession(), managedInstance.getInstance());
 			}
 		});
 

@@ -31,8 +31,12 @@ import org.batoo.jpa.core.impl.types.EntityTypeImpl;
  */
 public class SessionImpl {
 
+	private static volatile int nextSessionId = 0;
+
 	private Repository repository;
 	private final EntityManagerImpl em;
+
+	private final int sessionId;
 
 	/**
 	 * @since $version
@@ -43,6 +47,7 @@ public class SessionImpl {
 
 		this.em = entityManager;
 		this.clear();
+		this.sessionId = ++nextSessionId;
 	}
 
 	/**
@@ -65,14 +70,24 @@ public class SessionImpl {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public <X> ManagedInstance<X> get(X instance) {
-		final ManagedInstance<X> newManagedInstance = ManagedInstance.create(this, instance);
+	public <X> ManagedInstance<? extends X> get(ManagedId<X> id) {
+		return this.repository.get(id.getType()).get(id);
+	}
 
-		final ManagedId<X> managedId = newManagedInstance.getId();
-		final EntityTypeImpl<? super X> entityType = newManagedInstance.getType();
-		final ManagedInstance<X> oldManagedInstance = this.repository.get(entityType).get(managedId);
-
-		return oldManagedInstance != null ? oldManagedInstance : newManagedInstance;
+	/**
+	 * Returns the managed instance in the session.
+	 * 
+	 * @param instance
+	 *            the instance.
+	 * @return managed instance or a new unmanaged instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	public <X> ManagedInstance<? super X> get(X entity) {
+		final EntityTypeImpl<? super X> type = this.em.getMetamodel().entity((Class<X>) entity.getClass());
+		return (ManagedInstance<? super X>) this.get(type.getManagedIdForInstance(this, entity));
 	}
 
 	/**
@@ -100,6 +115,15 @@ public class SessionImpl {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int hashCode() {
+		return this.sessionId;
+	}
+
+	/**
 	 * Puts the instance into session, marking the instance as managed.
 	 * 
 	 * @param type
@@ -110,8 +134,9 @@ public class SessionImpl {
 	 * 
 	 * @since $version
 	 * @author hceylan
+	 * @return
 	 */
-	public <X> ManagedInstance<X> put(ManagedInstance<X> managedInstance) {
-		return this.repository.get(managedInstance.getType()).put(managedInstance);
+	public <X> void put(ManagedInstance<X> managedInstance) {
+		this.repository.get(managedInstance.getType().getTopType()).put(managedInstance);
 	}
 }

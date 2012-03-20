@@ -27,6 +27,7 @@ import java.util.Map;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.lang.NotImplementedException;
 import org.batoo.jpa.core.BLogger;
+import org.batoo.jpa.core.impl.OperationTookLongTimeWarning;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
@@ -48,14 +49,16 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 
 	private static final BLogger LOG = BLogger.getLogger(SingleSelectHandler.class);
 
+	private static volatile int nextOperationNo = 0;
+
+	private final SessionImpl session;
+
 	private final EntityTypeImpl<X> rootType;
 	private final BiMap<String, PhysicalColumn> columnAliases;
 	private final Map<String, PhysicalTable> tableAliases;
 	private final Map<String, PhysicalTable> primaryTableAliases;
 	private final List<Deque<Association<?, ?>>> entityPaths;
 	private final Map<String, PhysicalTable> secondarytableAliases;
-
-	private final SessionImpl session;
 
 	/**
 	 * @param session
@@ -123,7 +126,10 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 			}
 
 			// get it from the session
-			managedInstance = session.get(managedInstance.getInstance());
+			final ManagedInstance<?> existing = session.get(managedInstance.getInstance());
+			if (existing != null) {
+				managedInstance = existing;
+			}
 
 			// put it into the cache
 			cache.put(managedInstance.getId(), managedInstance);
@@ -149,16 +155,31 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 	@Override
 	@SuppressWarnings("unchecked")
 	public ManagedInstance<X> handle(ResultSet rs) throws SQLException {
-		LOG.debug("Starting to load resultset...");
+		final int operationNo = nextOperationNo++;
 
-		final Map<ManagedId<?>, ManagedInstance<?>> cache = Maps.newHashMap();
-		ManagedInstance<X> managedInstance = null;
-		while (rs.next()) {
-			final X root = managedInstance != null ? managedInstance.getInstance() : null;
-			managedInstance = (ManagedInstance<X>) this.processRow(this.session, rs, cache, root, 0);
+		LOG.debug("{0}: handle()", operationNo);
+
+		final long start = System.currentTimeMillis();
+
+		try {
+			final Map<ManagedId<?>, ManagedInstance<?>> cache = Maps.newHashMap();
+			ManagedInstance<X> managedInstance = null;
+			while (rs.next()) {
+				final X root = managedInstance != null ? managedInstance.getInstance() : null;
+				managedInstance = (ManagedInstance<X>) this.processRow(this.session, rs, cache, root, 0);
+			}
+
+			return managedInstance;
 		}
-
-		return managedInstance;
+		finally {
+			final long time = System.currentTimeMillis() - start;
+			if (time > DataSourceImpl.MAX_WAIT) {
+				LOG.warn(new OperationTookLongTimeWarning(), "{0}: {1} msecs, handle()", operationNo, time);
+			}
+			else {
+				LOG.debug("{0}: {1} msecs, handle()", operationNo, time);
+			}
+		}
 	}
 
 	/**

@@ -31,6 +31,7 @@ import org.batoo.jpa.core.impl.OperationTookLongTimeWarning;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.mapping.Association;
+import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -51,13 +52,20 @@ public abstract class AbstractOperation<X> implements Comparable<AbstractOperati
 
 	private static final BLogger LOG = BLogger.getLogger(AbstractOperation.class);
 
+	private static volatile long nextOperationNo = 0;
+
 	protected final EntityManagerImpl em;
+	protected EntityTypeImpl<X> type;
 	protected final X instance;
 	private boolean requiresFlush;
-	protected ManagedInstance<X> managedInstance;
-	private final List<AbstractOperation<?>> dependencies = Lists.newArrayList();
+	protected ManagedInstance<? super X> managedInstance;
 
+	private long operationNo;
+
+	private final List<AbstractOperation<?>> dependencies = Lists.newArrayList();
 	private Status status;
+
+	private int h;
 
 	/**
 	 * @param entityManager
@@ -80,16 +88,19 @@ public abstract class AbstractOperation<X> implements Comparable<AbstractOperati
 	 * @param instance
 	 *            the entity
 	 * 
-	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
+	@SuppressWarnings("unchecked")
 	public AbstractOperation(EntityManagerImpl entityManager, X instance) {
 		super();
 
 		this.em = entityManager;
 		this.instance = instance;
 		this.status = Status.PENDING;
+		this.type = this.em.getMetamodel().entity((Class<X>) instance.getClass());
+
+		this.operationNo = nextOperationNo++;
 	}
 
 	/**
@@ -123,7 +134,7 @@ public abstract class AbstractOperation<X> implements Comparable<AbstractOperati
 	 */
 	@Override
 	public int compareTo(AbstractOperation<?> o) {
-		final ManagedInstance<X> thisInstance = this.managedInstance;
+		final ManagedInstance<? super X> thisInstance = this.managedInstance;
 		final ManagedInstance<?> otherInstance = o.managedInstance;
 
 		switch (thisInstance.compareTo(otherInstance)) {
@@ -144,8 +155,24 @@ public abstract class AbstractOperation<X> implements Comparable<AbstractOperati
 	 * @return the managedInstance
 	 * @since $version
 	 */
-	public ManagedInstance<X> getManagedInstance() {
+	public ManagedInstance<? super X> getManagedInstance() {
 		return this.managedInstance;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int hashCode() {
+		if (this.h != 0) {
+			return this.h;
+		}
+
+		final int prime = 31;
+		final int result = 1;
+
+		return this.h = (prime * result) + (int) (this.operationNo ^ (this.operationNo >>> 32));
 	}
 
 	/**
@@ -192,7 +219,7 @@ public abstract class AbstractOperation<X> implements Comparable<AbstractOperati
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract void perform(Connection connection) throws SQLException;
+	public abstract <Y> void perform(Connection connection) throws SQLException;
 
 	/**
 	 * Subclasses implement to provide their own operations.
@@ -310,4 +337,5 @@ public abstract class AbstractOperation<X> implements Comparable<AbstractOperati
 
 		return null;
 	}
+
 }

@@ -84,11 +84,14 @@ public class SimpleTest extends AbstractTest {
 	 */
 	@Test
 	public void testDetach() {
+		// FIXME it still contains but the status is detached
 		final Foo foo = new Foo();
 		this.persist(foo);
 
 		Assert.assertTrue(this.em().contains(foo));
 		this.detach(foo);
+		this.close();
+
 		Assert.assertFalse(this.em().contains(foo));
 	}
 

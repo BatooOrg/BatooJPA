@@ -56,9 +56,8 @@ public class SubRepository<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
-	public synchronized <Y extends X> ManagedInstance<Y> get(ManagedId<Y> id) {
-		return (ManagedInstance<Y>) this.repository.get(id);
+	public synchronized ManagedInstance<? extends X> get(ManagedId<? extends X> id) {
+		return this.repository.get(id);
 	}
 
 	/**
@@ -70,16 +69,16 @@ public class SubRepository<X> {
 	 * 
 	 * @since $version
 	 * @author hceylan
+	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public synchronized <Y extends X> ManagedInstance<Y> put(ManagedInstance<Y> instance) {
-		final ManagedInstance<Y> old = (ManagedInstance<Y>) this.repository.putIfAbsent(instance.getId(), instance);
+	public synchronized void put(ManagedInstance<? extends X> instance) {
+		final ManagedId<? extends X> id = (ManagedId<? extends X>) instance.getId();
+		final ManagedInstance<? extends X> old = this.repository.putIfAbsent(id, instance);
 
 		if (instance.equals(old)) {
 			throw new PersistenceException("Type " + instance.getType().getName() + " with id " + instance.getId()
 				+ " already exists in session");
 		}
-
-		return old;
 	}
 }

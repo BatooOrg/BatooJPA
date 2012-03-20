@@ -147,6 +147,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		this.metamodel.preFillGenerators(this.datasource);
 
 		this.open = true;
+		this.metamodel.markDeployed();
 	}
 
 	private void assertOpen() {

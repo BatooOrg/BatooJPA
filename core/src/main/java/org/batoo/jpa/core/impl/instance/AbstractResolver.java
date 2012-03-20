@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.instance;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.batoo.jpa.core.impl.mapping.AbstractMapping;
 
 /**
@@ -52,26 +53,20 @@ public abstract class AbstractResolver<X> {
 	 * 
 	 */
 	@Override
-	public boolean equals(Object obj) {
+	public final boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
 		}
 		if (obj == null) {
 			return false;
 		}
-		if (this.getClass() != obj.getClass()) {
-			return false;
-		}
+
 		final AbstractResolver<?> other = (AbstractResolver<?>) obj;
-		if (this.mapping == null) {
-			if (other.mapping != null) {
-				return false;
-			}
-		}
-		else if (!this.mapping.equals(other.mapping)) {
+		if (!this.mapping.equals(other.mapping)) {
 			return false;
 		}
-		return true;
+
+		return ObjectUtils.equals(this.getValue(), other.getValue());
 	}
 
 	/**
@@ -125,7 +120,7 @@ public abstract class AbstractResolver<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public final void setValue(Object value) {
+	public void setValue(Object value) {
 		this.mapping.setValue(this.instance, value);
 	}
 

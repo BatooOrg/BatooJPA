@@ -39,6 +39,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.batoo.jpa.core.BJPASettings;
 import org.batoo.jpa.core.BLogger;
@@ -55,8 +56,8 @@ public class ConnectionImpl implements Connection {
 
 	private static AtomicLong no = new AtomicLong(0);
 
-	private final GenericObjectPool<Connection> pool;
 	private Connection connection;
+	private final GenericObjectPool<ConnectionImpl> pool;
 
 	final long connNo;
 	private final long opened;
@@ -66,20 +67,26 @@ public class ConnectionImpl implements Connection {
 	volatile long executes = 0;
 	private volatile long transactions = 0;
 
+	private final GenericKeyedObjectPool<String, PreparedStatementImpl> preparedStatementPool;
+
 	/**
+	 * @param connection
+	 *            the connection
 	 * @param pool
 	 *            the datasource
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ConnectionImpl(GenericObjectPool<Connection> pool) {
+	public ConnectionImpl(Connection connection, GenericObjectPool<ConnectionImpl> pool) {
 		super();
-
+		this.connection = connection;
 		this.pool = pool;
 
 		this.connNo = no.incrementAndGet();
 		this.opened = System.currentTimeMillis();
+		this.preparedStatementPool = new GenericKeyedObjectPool<String, PreparedStatementImpl>(new PreparedStatementFactory(this));
+		this.preparedStatementPool.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_GROW);
 	}
 
 	/**
@@ -107,6 +114,21 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public void close() throws SQLException {
+		if (this.pool != null) {
+			try {
+				this.pool.returnObject(this);
+			}
+			catch (final Exception e) {
+				if (e instanceof SQLException) {
+					throw (SQLException) e;
+				}
+
+				throw new SQLException(e);
+			}
+		}
+	}
+
+	/* package */void close0() throws SQLException {
 		final long callNo = ++this.callNo;
 
 		LOG.trace("{0}:{1} close()", this.connNo, callNo);
@@ -115,7 +137,7 @@ public class ConnectionImpl implements Connection {
 		try {
 			try {
 				if (this.connection != null) {
-					this.pool.returnObject(this.connection);
+					this.pool.returnObject(this);
 				}
 			}
 			catch (final Exception e) {
@@ -149,7 +171,7 @@ public class ConnectionImpl implements Connection {
 
 		final long start = System.currentTimeMillis();
 		try {
-			this.getConnection().commit();
+			this.connection.commit();
 		}
 		finally {
 			final long time = System.currentTimeMillis() - start;
@@ -291,18 +313,6 @@ public class ConnectionImpl implements Connection {
 	public String getClientInfo(String name) throws SQLException {
 		this.throwNotImplemented();
 		return null;
-	}
-
-	private synchronized Connection getConnection() throws SQLException {
-		if (this.connection == null) {
-			try {
-				this.connection = this.pool.borrowObject();
-			}
-			catch (final Exception e) {
-				this.handlePoolException(e);
-			}
-		}
-		return this.connection;
 	}
 
 	/**
@@ -470,24 +480,18 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public PreparedStatement prepareStatement(String sql) throws SQLException {
-		final long callNo = ++this.callNo;
-
-		LOG.trace("{0}:{1} prepareStatement(String sql): {2}", this.connNo, callNo, BLogger.lazyBoxed(sql));
-
-		final long start = System.currentTimeMillis();
-		try {
-			return new PreparedStatementImpl(this, sql, this.getConnection().prepareStatement(sql));
+		if (this.preparedStatementPool == null) {
+			return this.prepareStatement0(sql);
 		}
-		finally {
-			final long time = System.currentTimeMillis() - start;
+		try {
+			return this.preparedStatementPool.borrowObject(sql);
+		}
+		catch (final Exception e) {
+			if (e instanceof SQLException) {
+				throw (SQLException) e;
+			}
 
-			if (time > BJPASettings.WARN_TIME) {
-				LOG.warn(new OperationTookLongTimeWarning(), "{0}:{1} {2} msecs, prepareStatement(String sql): {3}", this.connNo, callNo,
-					time, BLogger.lazyBoxed(sql));
-			}
-			else {
-				LOG.debug("{0}:{1} {2} msecs, prepareStatement(String sql)", this.connNo, callNo, time);
-			}
+			throw new SQLException(e);
 		}
 	}
 
@@ -542,6 +546,28 @@ public class ConnectionImpl implements Connection {
 		return null;
 	}
 
+	/* package */PreparedStatementImpl prepareStatement0(String sql) throws SQLException {
+		final long callNo = ++this.callNo;
+
+		LOG.trace("{0}:{1} prepareStatement(String sql): {2}", this.connNo, callNo, BLogger.lazyBoxed(sql));
+
+		final long start = System.currentTimeMillis();
+		try {
+			return new PreparedStatementImpl(this, sql, this.connection.prepareStatement(sql), this.preparedStatementPool);
+		}
+		finally {
+			final long time = System.currentTimeMillis() - start;
+
+			if (time > BJPASettings.WARN_TIME) {
+				LOG.warn(new OperationTookLongTimeWarning(), "{0}:{1} {2} msecs, prepareStatement(String sql): {3}", this.connNo, callNo,
+					time, BLogger.lazyBoxed(sql));
+			}
+			else {
+				LOG.debug("{0}:{1} {2} msecs, prepareStatement(String sql)", this.connNo, callNo, time);
+			}
+		}
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * 
@@ -565,7 +591,7 @@ public class ConnectionImpl implements Connection {
 		final long start = System.currentTimeMillis();
 		try {
 			if (this.connection != null) {
-				this.getConnection().rollback();
+				this.connection.rollback();
 			}
 		}
 		finally {
@@ -602,7 +628,7 @@ public class ConnectionImpl implements Connection {
 
 		final long start = System.currentTimeMillis();
 		try {
-			this.getConnection().setAutoCommit(autoCommit);
+			this.connection.setAutoCommit(autoCommit);
 		}
 		finally {
 			final long time = System.currentTimeMillis() - start;

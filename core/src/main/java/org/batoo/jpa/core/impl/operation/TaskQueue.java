@@ -95,7 +95,7 @@ public class TaskQueue {
 		// sort the operations based on their dependencies
 		Collections.sort(operations);
 
-		Lists.newArrayList();
+		// final List<Future<?>> futures = Lists.newArrayList();
 		for (final AbstractOperation<?> operation : operations) {
 			// futures.add(this.executor.submit(new Runnable() {
 			//
@@ -105,7 +105,7 @@ public class TaskQueue {
 			// }
 			// }));
 		}
-
+		//
 		// for (final Future<?> future : futures) {
 		// try {
 		// future.get();

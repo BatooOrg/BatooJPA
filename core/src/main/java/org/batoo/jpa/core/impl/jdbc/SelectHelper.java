@@ -27,6 +27,7 @@ import java.util.Map;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.SessionImpl;
+import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.mapping.OwnedAssociation;
@@ -292,7 +293,7 @@ public class SelectHelper<X> {
 	 * 
 	 * @param session
 	 *            the session
-	 * @param managedInstance
+	 * @param managedId
 	 *            the managed instance
 	 * @throws SQLException
 	 * 
@@ -300,14 +301,14 @@ public class SelectHelper<X> {
 	 * @author hceylan
 	 * @return
 	 */
-	public ManagedInstance<X> select(SessionImpl session, final ManagedInstance<? extends X> managedInstance) throws SQLException {
+	public ManagedInstance<X> select(SessionImpl session, final ManagedId<X> managedId) throws SQLException {
 		// Do not inline, generation of the select SQL will initialize the predicates!
 		final String selectSql = this.getSelectSql();
 
 		final Collection<Object> params = Collections2.transform(this.predicates.values(), new Function<PhysicalColumn, Object>() {
 			@Override
 			public Object apply(PhysicalColumn input) {
-				return input.getPhysicalValue(managedInstance);
+				return input.getPhysicalValue(managedId.getSession(), managedId.getInstance());
 			}
 		});
 

@@ -43,6 +43,7 @@ import java.util.Calendar;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.batoo.jpa.core.BJPASettings;
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.impl.OperationTookLongTimeWarning;
@@ -72,6 +73,10 @@ public class PreparedStatementImpl implements PreparedStatement {
 
 	private Object[] parameters;
 
+	private final GenericKeyedObjectPool<String, PreparedStatementImpl> pool;
+
+	private ParameterMetaData parameterMetaData;
+
 	/**
 	 * @param connection
 	 *            the connection
@@ -84,13 +89,16 @@ public class PreparedStatementImpl implements PreparedStatement {
 	 * 
 	 * @since $version
 	 * @author hceylan
+	 * @param pool
 	 */
-	public PreparedStatementImpl(ConnectionImpl connection, String sql, PreparedStatement statement) {
+	public PreparedStatementImpl(ConnectionImpl connection, String sql, PreparedStatement statement,
+		GenericKeyedObjectPool<String, PreparedStatementImpl> pool) {
 		super();
 
 		this.connection = connection;
 		this.sql = sql;
 		this.statement = statement;
+		this.pool = pool;
 
 		this.statementNo = no.incrementAndGet();
 		this.opened = System.currentTimeMillis();
@@ -162,6 +170,24 @@ public class PreparedStatementImpl implements PreparedStatement {
 	 */
 	@Override
 	public void close() throws SQLException {
+		if (this.pool == null) { // we are pooled
+			this.close0();
+		}
+		else {
+			try {
+				this.pool.returnObject(this.sql, this);
+			}
+			catch (final Exception e) {
+				if (e instanceof SQLException) {
+					throw (SQLException) e;
+				}
+
+				throw new SQLException(e);
+			}
+		}
+	}
+
+	/* package */void close0() throws SQLException {
 		final long executeNo = ++this.executeNo;
 
 		LOG.trace("{0}:{1}:{2} close()", this.connection.connNo, this.statementNo, executeNo);
@@ -462,19 +488,23 @@ public class PreparedStatementImpl implements PreparedStatement {
 	 */
 	@Override
 	public ParameterMetaData getParameterMetaData() throws SQLException {
+		if (this.parameterMetaData != null) {
+			return this.parameterMetaData;
+		}
+
 		final long executeNo = ++this.executeNo;
 
 		LOG.trace("{0}:{1}:{2} getParameterMetaData()", this.connection.connNo, this.statementNo, executeNo);
 
 		final long start = System.currentTimeMillis();
 		try {
-			final ParameterMetaData metaData = this.statement.getParameterMetaData();
+			this.parameterMetaData = this.statement.getParameterMetaData();
 
 			if (this.parameters == null) {
-				this.parameters = new Object[metaData.getParameterCount()];
+				this.parameters = new Object[this.parameterMetaData.getParameterCount()];
 			}
 
-			return metaData;
+			return this.parameterMetaData;
 		}
 		finally {
 			final long time = System.currentTimeMillis() - start;

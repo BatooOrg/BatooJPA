@@ -20,30 +20,29 @@ package org.batoo.jpa.core.impl.jdbc;
 
 import java.sql.SQLException;
 
-import org.apache.commons.pool.BasePoolableObjectFactory;
-import org.batoo.jpa.core.BLogger;
+import org.apache.commons.pool.BaseKeyedPoolableObjectFactory;
 
 /**
+ * A Factory to implement preparation of {@link PreparedStatementImpl}s
  * 
  * @author hceylan
  * @since $version
  */
-public class ConnectionFactory extends BasePoolableObjectFactory<ConnectionImpl> {
+public class PreparedStatementFactory extends BaseKeyedPoolableObjectFactory<String, PreparedStatementImpl> {
 
-	private static final BLogger LOG = BLogger.getLogger(ConnectionFactory.class);
-	private final DataSourceImpl dataSource;
+	private final ConnectionImpl connection;
 
 	/**
-	 * @param dataSource
-	 *            the datasource
+	 * @param connection
+	 *            the connection
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ConnectionFactory(DataSourceImpl dataSource) {
+	public PreparedStatementFactory(ConnectionImpl connection) {
 		super();
 
-		this.dataSource = dataSource;
+		this.connection = connection;
 	}
 
 	/**
@@ -51,7 +50,7 @@ public class ConnectionFactory extends BasePoolableObjectFactory<ConnectionImpl>
 	 * 
 	 */
 	@Override
-	public void destroyObject(ConnectionImpl obj) throws Exception {
+	public void destroyObject(String key, PreparedStatementImpl obj) throws SQLException {
 		obj.close0();
 	}
 
@@ -60,36 +59,8 @@ public class ConnectionFactory extends BasePoolableObjectFactory<ConnectionImpl>
 	 * 
 	 */
 	@Override
-	public ConnectionImpl makeObject() throws SQLException {
-		return this.dataSource.getConnection0();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public void passivateObject(ConnectionImpl obj) throws Exception {
-		try {
-			obj.setAutoCommit(true);
-		}
-		catch (final Exception e) {
-			LOG.error(e, "Error while returning connection");
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public boolean validateObject(ConnectionImpl obj) {
-		try {
-			return obj.isValid(DataSourceImpl.MAX_WAIT);
-		}
-		catch (final SQLException e) {
-			return false;
-		}
+	public PreparedStatementImpl makeObject(String key) throws SQLException {
+		return this.connection.prepareStatement0(key);
 	}
 
 }

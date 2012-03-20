@@ -89,7 +89,7 @@ public class PersistOperation<X> extends AbstractOperation<X> {
 	 */
 	@Override
 	public void perform(Connection connection) throws SQLException {
-		this.managedInstance.getType().performInsert(connection, this.managedInstance);
+		this.managedInstance.performInsert(connection);
 
 		// Entities with identity id types are put to session after their id is fetched from the database post to an insert statement.
 		if (this.requiresFlush()) {
@@ -104,6 +104,10 @@ public class PersistOperation<X> extends AbstractOperation<X> {
 	@Override
 	protected boolean prepare(SessionImpl session) {
 		this.managedInstance = this.em.getSession().get(this.instance);
+
+		if (this.managedInstance == null) {
+			this.managedInstance = this.type.getManagedInstance(session, this.instance);
+		}
 
 		switch (this.managedInstance.getStatus()) {
 			case MANAGED: // entities already managed is ignored by cascades run as usual

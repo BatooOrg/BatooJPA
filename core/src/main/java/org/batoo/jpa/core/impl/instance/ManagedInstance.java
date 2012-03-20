@@ -18,11 +18,12 @@
  */
 package org.batoo.jpa.core.impl.instance;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.batoo.jpa.core.impl.SessionImpl;
-import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 
 import com.google.common.collect.Maps;
@@ -63,20 +64,11 @@ public final class ManagedInstance<X> implements Comparable<ManagedInstance<?>> 
 		DETACHED
 	}
 
-	@SuppressWarnings("unchecked")
-	public static final <X> ManagedInstance<X> create(SessionImpl session, X instance) {
-		final MetamodelImpl metamodel = session.getEntityManager().getMetamodel();
-
-		final EntityTypeImpl<X> type = metamodel.entity(((Class<X>) instance.getClass()));
-
-		return type.getManagedInstance(session, instance);
-	}
-
 	private final EntityTypeImpl<X> type;
 	private final SessionImpl session;
 	private final X instance;
 
-	private final ManagedId<X> id;
+	private final ManagedId<? super X> id;
 
 	private final Map<String, AbstractResolver<X>> resolvers;
 	private Map<String, AssociateResolver<X>> associateResolvers;
@@ -93,7 +85,7 @@ public final class ManagedInstance<X> implements Comparable<ManagedInstance<?>> 
 	 * @author hceylan
 	 * @param session
 	 */
-	public ManagedInstance(EntityTypeImpl<X> type, SessionImpl session, X instance, ManagedId<X> id,
+	public ManagedInstance(EntityTypeImpl<X> type, SessionImpl session, X instance, ManagedId<? super X> id,
 		Map<String, AbstractResolver<X>> resolvers) {
 		super();
 
@@ -185,7 +177,7 @@ public final class ManagedInstance<X> implements Comparable<ManagedInstance<?>> 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedId<X> getId() {
+	public ManagedId<? super X> getId() {
 		return this.id;
 	}
 
@@ -227,6 +219,19 @@ public final class ManagedInstance<X> implements Comparable<ManagedInstance<?>> 
 	 */
 	public EntityTypeImpl<X> getType() {
 		return this.type;
+	}
+
+	/**
+	 * Performs insert for the managed instance
+	 * 
+	 * @param connection
+	 * @throws SQLException
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void performInsert(Connection connection) throws SQLException {
+		this.type.performInsert(connection, this);
 	}
 
 	/**

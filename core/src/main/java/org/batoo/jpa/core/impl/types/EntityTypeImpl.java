@@ -83,6 +83,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 	private static final BLogger LOG = BLogger.getLogger(EntityTypeImpl.class);
 
+	private static final Object NO_TOP_TYPE = new Object();
+
 	private final Map<String, AbstractMapping<?, ?>> mappings = Maps.newHashMap();
 	private final Map<String, Association<?, ?>> associations = Maps.newHashMap();
 	private final Map<String, OwnedAssociation<?, ?>> ownedAssociations = Maps.newHashMap();
@@ -96,7 +98,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private PhysicalTable primaryTable;
 	private final Map<String, PhysicalTable> tables = Maps.newHashMap();
 
-	private EntityTypeImpl<? super X> topType;
+	private Object topType;
 
 	private final SelectHelper<X> selectHelper;
 
@@ -357,20 +359,29 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
-	 * Returns the managed id for the instance.
-	 * if the instance is null then a new instance is created.
+	 * Returns the managed id for the id.
 	 * 
 	 * @param instance
 	 *            the instance to create managed id or null
 	 * @return managed id for the instance
+	 * @throws NullPointerException
+	 *             thrown if the id is null
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedId<X> getManagedId(final X instance) {
-		final X theInstance = instance != null ? instance : this.newInstance();
+	public ManagedId<? super X> getManagedId(SessionImpl session, final Object id) {
+		if (id == null) {
+			throw new NullPointerException();
+		}
 
-		final Map<String, BasicResolver<X>> ids = Maps.transformValues(this.idMappings,
+		if ((this.getTopType() != null) && (this.getTopType() != this)) {
+			return this.getTopType().getManagedId(session, id);
+		}
+
+		final X instance = this.newInstance();
+
+		final Map<String, BasicResolver<X>> resolvers = Maps.transformValues(this.idMappings,
 			new Function<BasicMapping<?, ?>, BasicResolver<X>>() {
 
 				private BasicResolver<X> resolver;
@@ -378,7 +389,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				@Override
 				public BasicResolver<X> apply(BasicMapping<?, ?> input) {
 					if (this.resolver == null) {
-						this.resolver = input.createResolver(theInstance);
+						this.resolver = input.createResolver(instance);
 					}
 
 					return this.resolver;
@@ -386,7 +397,51 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 			});
 
-		return new ManagedId<X>(this, theInstance, ids);
+		final ManagedId<X> managedId = new ManagedId<X>(this, session, instance, resolvers);
+
+		managedId.populate(id);
+
+		return managedId;
+	}
+
+	/**
+	 * Returns the managed id for the instance.
+	 * 
+	 * @param instance
+	 *            the instance to create managed id or null
+	 * @return managed id for the instance
+	 * @throws NullPointerException
+	 *             thrown if the instance is null
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ManagedId<? super X> getManagedIdForInstance(SessionImpl session, final X instance) {
+		if (instance == null) {
+			throw new NullPointerException();
+		}
+
+		if ((this.getTopType() != null) && (this.getTopType() != this)) {
+			return this.getTopType().getManagedIdForInstance(session, instance);
+		}
+
+		final Map<String, BasicResolver<X>> resolvers = Maps.transformValues(this.idMappings,
+			new Function<BasicMapping<?, ?>, BasicResolver<X>>() {
+
+				private BasicResolver<X> resolver;
+
+				@Override
+				public BasicResolver<X> apply(BasicMapping<?, ?> input) {
+					if (this.resolver == null) {
+						this.resolver = input.createResolver(instance);
+					}
+
+					return this.resolver;
+				}
+
+			});
+
+		return new ManagedId<X>(this, session, instance, resolvers);
 	}
 
 	/**
@@ -400,6 +455,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * 
 	 * @since $version
 	 * @author hceylan
+	 * @param <Y>
 	 */
 	public ManagedInstance<X> getManagedInstance(SessionImpl session, final X instance) {
 		final Map<String, AbstractResolver<X>> resolvers = Maps.transformValues(this.mappings,
@@ -418,7 +474,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 			});
 
-		return new ManagedInstance<X>(this, session, instance, this.getManagedId(instance), resolvers);
+		return new ManagedInstance<X>(this, session, instance, this.getManagedIdForInstance(session, instance), resolvers);
 	}
 
 	/**
@@ -498,6 +554,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
+	@SuppressWarnings("unchecked")
 	public EntityTypeImpl<? super X> getTopType() {
 		if (this.topType == null) {
 			final IdentifiableTypeImpl<? super X> supertype = this.getSupertype();
@@ -511,7 +568,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			}
 		}
 
-		return this.topType;
+		return this.topType != NO_TOP_TYPE ? (EntityTypeImpl<? super X>) this.topType : null;
 	}
 
 	/**
@@ -580,10 +637,10 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedInstance<X> newInstanceWithId(SessionImpl session, Object id) {
+	public ManagedInstance<? super X> newInstanceWithId(SessionImpl session, Object id) {
 		final X instance = this.newInstance();
 
-		final ManagedInstance<X> managedInstance = this.getManagedInstance(session, instance);
+		final ManagedInstance<? super X> managedInstance = this.getManagedInstance(session, instance);
 		managedInstance.getId().populate(id);
 
 		return managedInstance;
@@ -591,8 +648,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 	/**
 	 * {@inheritDoc}
-	 * 
-	 * @return
 	 * 
 	 */
 	@Override
@@ -652,7 +707,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performInsert(Connection connection, ManagedInstance<? extends X> managedInstance) throws SQLException {
+	public void performInsert(Connection connection, ManagedInstance<X> managedInstance) throws SQLException {
 		// first insert to the primary table
 		this.primaryTable.performInsert(connection, managedInstance);
 		managedInstance.setExecuted();
@@ -672,16 +727,16 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * 
 	 * @param session
 	 *            the session to use
-	 * @param managedInstance
-	 *            the managed instance to perform insert for
-	 * @return returns the actual managed instance
+	 * @param managedId
+	 *            the managed id to perform select for
+	 * @return returns the managed instance
 	 * @throws SQLException
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedInstance<X> performSelect(SessionImpl session, ManagedInstance<? extends X> managedInstance) throws SQLException {
-		return this.selectHelper.select(session, managedInstance);
+	public ManagedInstance<X> performSelect(SessionImpl session, ManagedId<X> managedId) throws SQLException {
+		return this.selectHelper.select(session, managedId);
 	}
 
 	private void putTable(final PhysicalTable table) {

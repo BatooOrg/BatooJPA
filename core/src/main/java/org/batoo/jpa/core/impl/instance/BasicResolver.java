@@ -28,6 +28,10 @@ import org.batoo.jpa.core.impl.mapping.BasicMapping;
  */
 public class BasicResolver<X> extends AbstractResolver<X> {
 
+	private final boolean id;
+	private int h;
+	private boolean locked;
+
 	/**
 	 * @param mapping
 	 *            the mapping
@@ -39,6 +43,9 @@ public class BasicResolver<X> extends AbstractResolver<X> {
 	 */
 	public BasicResolver(BasicMapping<?, ?> mapping, X instance) {
 		super(mapping, instance);
+
+		this.id = this.getMapping().getDeclaringAttribute().isId();
+		this.locked = this.id;
 	}
 
 	/**
@@ -48,6 +55,10 @@ public class BasicResolver<X> extends AbstractResolver<X> {
 	 * @author hceylan
 	 */
 	public void fillValue() {
+		if (!this.id) {
+			throw new IllegalStateException("Not an id attribute");
+		}
+
 		this.getMapping().fillValue(this.instance);
 	}
 
@@ -60,4 +71,55 @@ public class BasicResolver<X> extends AbstractResolver<X> {
 		return (BasicMapping<?, ?>) this.mapping;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int hashCode() {
+		if (this.h != 0) {
+			return this.h;
+		}
+
+		if (this.id) {
+			this.h = super.hashCode();
+
+			return this.h;
+		}
+
+		return super.hashCode();
+	}
+
+	/**
+	 * Lock the resolver so that id values cannot be set.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void relock() {
+		this.locked = this.id;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void setValue(Object value) {
+		if (this.id && this.locked) {
+			throw new IllegalStateException("Id attributes cannot set value");
+		}
+
+		super.setValue(value);
+	}
+
+	/**
+	 * Unlocks the resolver so that id value can be set.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void unlock() {
+		this.locked = false;
+	}
 }

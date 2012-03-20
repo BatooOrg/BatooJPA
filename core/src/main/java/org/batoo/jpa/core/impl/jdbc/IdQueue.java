@@ -20,9 +20,7 @@ package org.batoo.jpa.core.impl.jdbc;
 
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.jdbc.adapter.JDBCAdapter;
@@ -34,6 +32,19 @@ import org.batoo.jpa.core.jdbc.adapter.JDBCAdapter;
  */
 public abstract class IdQueue extends LinkedBlockingQueue<Integer> {
 
+	/**
+	 * 
+	 * @author hceylan
+	 * @since $version
+	 */
+	private final class TopUpTask implements Runnable {
+
+		@Override
+		public void run() {
+			IdQueue.this.doTopUp(this);
+		}
+	}
+
 	private static final long serialVersionUID = 1L;
 
 	private static final BLogger LOG = BLogger.getLogger(IdQueue.class);
@@ -44,9 +55,9 @@ public abstract class IdQueue extends LinkedBlockingQueue<Integer> {
 	protected final String name;
 	private final int allocationSize;
 
-	private volatile Future<?> topUpTask;
+	private final int topupSize;
 
-	private final String type;
+	private TopUpTask topUpTask;
 
 	/**
 	 * /**
@@ -72,25 +83,34 @@ public abstract class IdQueue extends LinkedBlockingQueue<Integer> {
 		this.datasource = datasource;
 		this.idExecuter = idExecuter;
 		this.name = name;
-		this.type = this.getClass().getSimpleName();
 		this.allocationSize = allocationSize;
+		this.topupSize = allocationSize / 2;
+
+		idExecuter.execute(this.topUpTask = new TopUpTask());
 	}
 
 	protected void doTopUp(Runnable runnable) {
-		LOG.debug("Ids will be fetched for {0} from the database...", this.name);
 
-		try {
-			final int nextSequence = this.getNextId();
-			for (int i = 0; i < this.allocationSize; i++) {
-				this.put(nextSequence + i);
+		while (this.size() <= (this.topupSize)) {
+			LOG.debug("Ids will be fetched for {0} from the database...", this.name);
+
+			try {
+				final int nextSequence = this.getNextId();
+				for (int i = 0; i < this.allocationSize; i++) {
+					this.put(nextSequence + i);
+				}
+			}
+			catch (final Throwable e) {
+				LOG.fatal(e, "Cannot get next id from the database!");
 			}
 		}
-		catch (final Throwable e) {
-			LOG.fatal(e, "Cannot get next id from the database!");
+
+		try {
+			Thread.sleep(1);
 		}
-		finally {
-			this.topUpTask = null;
-		}
+		catch (final InterruptedException e) {}
+
+		this.idExecuter.execute(this.topUpTask);
 	}
 
 	/**
@@ -103,49 +123,5 @@ public abstract class IdQueue extends LinkedBlockingQueue<Integer> {
 	 * @author hceylan
 	 */
 	protected abstract Integer getNextId() throws SQLException;
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Integer poll() {
-		throw new IllegalArgumentException("Infinite IdQueue.poll() is prohibited");
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Integer poll(long timeout, TimeUnit unit) throws InterruptedException {
-		this.refillIfNecessary();
-
-		return super.poll(timeout, unit);
-	}
-
-	private synchronized void refillIfNecessary() {
-		LOG.debug("{0} Queue {1} size is {2}", this.type, this.name, this.size());
-
-		if (this.size() <= (this.allocationSize / 2)) {
-			this.topUp();
-		}
-	}
-
-	protected void topUp() {
-		// if (this.topUpTask != null) {
-		// return;
-		// }
-
-		LOG.debug("Topping up Sequence Queue {0} by {1}", this.name, this.allocationSize);
-
-		this.topUpTask = this.idExecuter.submit(new Runnable() {
-
-			@Override
-			public void run() {
-				IdQueue.this.doTopUp(this);
-			};
-		});
-	}
 
 }

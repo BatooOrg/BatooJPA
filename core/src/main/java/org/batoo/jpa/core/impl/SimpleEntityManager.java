@@ -33,7 +33,7 @@ import javax.sql.DataSource;
 import org.apache.commons.lang.NotImplementedException;
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.BatooException;
-import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
+import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
 import org.batoo.jpa.core.impl.operation.DetachOperation;
 import org.batoo.jpa.core.impl.operation.FindOperation;
@@ -171,19 +171,18 @@ public abstract class SimpleEntityManager implements EntityManager {
 	public boolean contains(Object entity) {
 		this.assertOpen();
 
-		return this.getSession().get(entity).getStatus() == Status.MANAGED;
+		return this.getSession().get(entity) != null;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 * 
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void detach(Object entity) {
 		this.assertOpen();
 
-		OperationManager.prepare(this.getSession(), new DetachOperation((EntityManagerImpl) this, entity));
+		OperationManager.prepare(this.getSession(), new DetachOperation<Object>((EntityManagerImpl) this, entity));
 	}
 
 	/**
@@ -191,11 +190,15 @@ public abstract class SimpleEntityManager implements EntityManager {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <T> T find(Class<T> entityClass, Object primaryKey) {
 		this.assertOpen();
 
-		final EntityTypeImpl<T> entityType = this.getMetamodel().entity(entityClass);
-		final FindOperation<T> operation = new FindOperation<T>((EntityManagerImpl) this, entityType, primaryKey);
+		final EntityTypeImpl<T> type = this.getMetamodel().entity(entityClass);
+		final ManagedId<? super T> managedId = type.getManagedId(this.session, primaryKey);
+
+		@SuppressWarnings("rawtypes")
+		final FindOperation<T> operation = new FindOperation((EntityManagerImpl) this, managedId);
 
 		try {
 			OperationManager.prepare(this.getSession(), operation);
@@ -210,7 +213,7 @@ public abstract class SimpleEntityManager implements EntityManager {
 			throw e;
 		}
 
-		return operation.getManagedInstance().getInstance();
+		return (T) operation.getManagedInstance().getInstance();
 	}
 
 	/**
@@ -470,7 +473,7 @@ public abstract class SimpleEntityManager implements EntityManager {
 	public void persist(Object entity) {
 		this.assertTransaction();
 
-		OperationManager.prepare(this.getSession(), new PersistOperation((EntityManagerImpl) this, entity));
+		OperationManager.prepare(this.getSession(), new PersistOperation<Object>((EntityManagerImpl) this, entity));
 	}
 
 	/**

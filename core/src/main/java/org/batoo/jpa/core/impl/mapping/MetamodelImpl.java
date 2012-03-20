@@ -219,6 +219,8 @@ public class MetamodelImpl implements Metamodel {
 
 	private ExecutorService idGeneratorExecuter;
 
+	private boolean deployed;
+
 	/**
 	 * @since $version
 	 * @author hceylan
@@ -601,41 +603,50 @@ public class MetamodelImpl implements Metamodel {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
 	public <X> IdentifiableTypeImpl<X> identifiableType(Class<X> cls) {
-		if (this.entities.containsKey(cls)) {
-			return (EntityTypeImpl<X>) this.entities.get(cls);
-		}
+		final IdentifiableTypeImpl<X> type = this.identifiableType0(cls);
 
-		if (this.mappedSuperclasses.containsKey(cls)) {
-			return (MappedSuperclassTypeImpl<X>) this.mappedSuperclasses.get(cls);
+		if (type != null) {
+			return type;
 		}
 
 		return this.throwNotFound(cls);
 	}
 
+	@SuppressWarnings("unchecked")
+	public <X> IdentifiableTypeImpl<X> identifiableType0(Class<X> cls) {
+		final EntityType<?> entityType = this.entities.get(cls);
+		if (entityType != null) {
+			return (IdentifiableTypeImpl<X>) entityType;
+		}
+
+		return (IdentifiableTypeImpl<X>) this.mappedSuperclasses.get(cls);
+	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private synchronized <X> BasicTypeImpl<X> lazyCreateBasicType(Class<X> cls, boolean strict) {
-		BasicType<?> basicType = this.basics.get(cls);
+		if (this.deployed) {
+			if (!strict) {
+				return null;
+			}
 
-		if (basicType != null) {
-			return (BasicTypeImpl<X>) basicType;
+			return this.throwNotFound(cls);
 		}
 
 		// skip if annotated with @Entity, @MappedSuperClass or @Embeddable
-		if ((cls.getAnnotation(Entity.class) != null //
-			)
-			|| (cls.getAnnotation(MappedSuperclass.class) != null //
-			) || (cls.getAnnotation(Embeddable.class) != null)) {
+		if ((cls.getAnnotation(Entity.class) != null) //
+			|| (cls.getAnnotation(MappedSuperclass.class) != null) //
+			|| (cls.getAnnotation(Embeddable.class) != null)) {
+
 			return null;
 		}
 
 		if (Serializable.class.isAssignableFrom(cls) || cls.isPrimitive()) {
-			basicType = new BasicTypeImpl(this, cls);
+			final BasicTypeImpl basicType = new BasicTypeImpl(this, cls);
 			this.basics.put(cls, basicType);
 			this._basics.put(basicType, cls);
 
-			return (BasicTypeImpl<X>) basicType;
+			return basicType;
 		}
 
 		if (!strict) {
@@ -670,16 +681,19 @@ public class MetamodelImpl implements Metamodel {
 	@Override
 	@SuppressWarnings("unchecked")
 	public <X> ManagedTypeImpl<X> managedType(Class<X> cls) {
-		if (this.entities.containsKey(cls)) {
-			return (EntityTypeImpl<X>) this.entities.get(cls);
+		final EntityType<?> entityType = this.entities.get(cls);
+		if (entityType != null) {
+			return (ManagedTypeImpl<X>) entityType;
 		}
 
-		if (this.embeddables.containsKey(cls)) {
-			return (EmbeddableTypeImpl<X>) this.embeddables.get(cls);
+		final EmbeddableType<?> embeddableType = this.embeddables.get(cls);
+		if (embeddableType != null) {
+			return (EmbeddableTypeImpl<X>) embeddableType;
 		}
 
-		if (this.mappedSuperclasses.containsKey(cls)) {
-			return (MappedSuperclassTypeImpl<X>) this.mappedSuperclasses.get(cls);
+		final MappedSuperclassType<?> mappedSuperclassType = this.mappedSuperclasses.get(cls);
+		if (mappedSuperclassType != null) {
+			return (MappedSuperclassTypeImpl<X>) mappedSuperclassType;
 		}
 
 		return this.throwNotFound(cls);
@@ -705,6 +719,16 @@ public class MetamodelImpl implements Metamodel {
 		}
 
 		return this.throwNotFound(cls);
+	}
+
+	/**
+	 * Seals the metamodel.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void markDeployed() {
+		this.deployed = true;
 	}
 
 	/**

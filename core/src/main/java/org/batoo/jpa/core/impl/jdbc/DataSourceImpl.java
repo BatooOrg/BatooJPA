@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.jdbc;
 
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.logging.Logger;
@@ -29,7 +30,9 @@ import javax.sql.DataSource;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.pool.impl.GenericObjectPool;
+import org.batoo.jpa.core.BJPASettings;
 import org.batoo.jpa.core.BLogger;
+import org.batoo.jpa.core.impl.OperationTookLongTimeWarning;
 
 /**
  * 
@@ -43,16 +46,14 @@ public class DataSourceImpl implements DataSource {
 	static final int MAX_WAIT = 1000;
 
 	private final String jdbcUrl;
+	private final String jdbcUser;
+	private final String jdbcPassword;
+
+	private final GenericObjectPool<ConnectionImpl> pool;
+	private Connection keepaliveConnection; // Kept to keep in memory databases open
 
 	private PrintWriter printer;
 	private int loginTimeout;
-
-	private boolean active;
-	private final Connection keepaliveConnection; // Kept to keep in memory databases open
-
-	private final ConnectionFactory connectionFactory;
-
-	private final GenericObjectPool<Connection> pool;
 
 	/**
 	 * @param jdbcUrl
@@ -70,11 +71,11 @@ public class DataSourceImpl implements DataSource {
 		super();
 
 		this.jdbcUrl = jdbcUrl;
+		this.jdbcUser = jdbcUser;
+		this.jdbcPassword = jdbcPassword;
 
-		this.active = true;
-		this.connectionFactory = new ConnectionFactory(this.jdbcUrl, jdbcUser, jdbcPassword);
-		this.pool = new GenericObjectPool<Connection>(this.connectionFactory);
-		this.pool.setMaxWait(MAX_WAIT);
+		this.pool = new GenericObjectPool<ConnectionImpl>(new ConnectionFactory(this));
+		this.pool.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_GROW);
 
 		this.keepaliveConnection = this.getConnection();
 
@@ -82,7 +83,7 @@ public class DataSourceImpl implements DataSource {
 	}
 
 	private void assertActive() {
-		if (!this.active) {
+		if (this.keepaliveConnection != null) {
 			throw new IllegalStateException("Datasource closed!");
 		}
 	}
@@ -98,7 +99,8 @@ public class DataSourceImpl implements DataSource {
 
 		LOG.info("Datasource closed: {0}", this.jdbcUrl);
 
-		this.active = false;
+		DbUtils.closeQuietly(this.keepaliveConnection);
+		this.keepaliveConnection = null;
 		try {
 			this.pool.close();
 		}
@@ -116,7 +118,11 @@ public class DataSourceImpl implements DataSource {
 	@Override
 	public Connection getConnection() throws SQLException {
 		try {
-			return new ConnectionImpl(this.pool);
+			if (this.pool == null) {
+				return this.getConnection0();
+			}
+
+			return this.pool.borrowObject();
 		}
 		catch (final Exception e) {
 			if (e instanceof SQLException) {
@@ -134,6 +140,35 @@ public class DataSourceImpl implements DataSource {
 	@Override
 	public Connection getConnection(String username, String password) throws SQLException {
 		throw new NotImplementedException();
+	}
+
+	/**
+	 * 
+	 * @see #getConnection()
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	/* package */ConnectionImpl getConnection0() throws SQLException {
+		LOG.trace("getConnection()");
+
+		final long start = System.currentTimeMillis();
+		try {
+			final Connection connection = DriverManager.getConnection(this.jdbcUrl, this.jdbcUser, this.jdbcPassword);
+
+			return new ConnectionImpl(connection, this.pool);
+		}
+		finally {
+			final long time = System.currentTimeMillis() - start;
+
+			if (time > BJPASettings.WARN_TIME) {
+				LOG.warn(new OperationTookLongTimeWarning(), "{0} msecs, getConnection()", time);
+			}
+			else {
+				LOG.trace("{0} msecs, getConnection()", time);
+			}
+		}
+
 	}
 
 	/**

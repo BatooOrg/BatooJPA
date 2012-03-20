@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.jdbc;
 import javax.persistence.PersistenceException;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
 import org.batoo.jpa.core.impl.mapping.AbstractPhysicalMapping;
@@ -239,14 +240,14 @@ public class PhysicalColumn implements Column {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Object getPhysicalValue(ManagedInstance<?> instance) {
-		Object value = this.mapping.getValue(instance.getInstance());
+	public Object getPhysicalValue(SessionImpl session, Object instance) {
+		Object value = this.mapping.getValue(instance);
 
 		if ((value != null) && (this.referencedColumn != null)) {
-			final ManagedInstance<Object> reference = instance.getSession().get(value);
+			final ManagedInstance<? super Object> reference = session.get(value);
 			if ((reference == null) || (reference.getStatus() != Status.MANAGED)) {
 				throw new PersistenceException(instance + " has a reference with " + this.mapping.getPathAsString() + " to " + value
-					+ " that is not managed (" + reference.getStatus() + ")");
+					+ " that is not managed (" + (reference != null ? reference.getStatus() : Status.NEW) + ")");
 			}
 
 			value = this.referencedColumn.getMapping().getValue(value);
