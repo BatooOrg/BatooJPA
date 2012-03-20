@@ -43,9 +43,13 @@ public class Playground {
 	private static final String PU_NAME = "insert";
 
 	@BeforeClass
-	public static void boot() throws SQLException {
+	public static void boot() throws SQLException, InterruptedException {
 		DriverManager.getConnection("jdbc:derby:memory:testDB;create=true");
+
+		Thread.sleep(5000);
 	}
+
+	private Country country;
 
 	private Person createPerson() {
 		final Person person = new Person();
@@ -56,9 +60,7 @@ public class Playground {
 		address.setCity("Istanbul");
 		address.setPerson(person);
 
-		final Country country = new Country();
-		country.setName("Turkey");
-		address.setCountry(country);
+		address.setCountry(this.country);
 
 		person.getAddresses().add(address);
 
@@ -69,28 +71,40 @@ public class Playground {
 		this.doTest(Type.BATOO);
 	}
 
-	private void dofind(final EntityManagerFactory emf, final Person person) {
-		final EntityManager em = emf.createEntityManager();
-
-		Person person2 = em.find(Person.class, person.getId());
-
-		em.close();
+	@Test
+	public void doBatoo() throws InterruptedException {
+		this.dobatoo();
 	}
 
-	private void dohibernate() {
+	private void doFind(final EntityManagerFactory emf, final Person person) {
+		for (int i = 0; i < 50; i++) {
+			final EntityManager em = emf.createEntityManager();
+			em.find(Person.class, person.getId());
+			em.close();
+		}
+	}
+
+	@Test
+	public void dohibernate() {
 		this.doTest(Type.HIBERNATE);
 	}
 
-	private Person dopersist(final EntityManagerFactory emf) {
+	private Person doPersist(final EntityManagerFactory emf) {
 		final EntityManager em = emf.createEntityManager();
+
 		final EntityTransaction tx = em.getTransaction();
 
 		tx.begin();
 
-		final Person person = this.createPerson();
-		em.persist(person);
+		Person person = null;
+		for (int i = 0; i < 10; i++) {
+			person = this.createPerson();
+			em.persist(person);
+
+		}
 
 		tx.commit();
+
 		em.close();
 
 		return person;
@@ -114,23 +128,16 @@ public class Playground {
 		}
 	}
 
-	@Test
-	public void insertALotInOneSession() throws InterruptedException {
-		this.dohibernate();
-
-		this.dobatoo();
-	}
-
 	private void singleTest(final EntityManagerFactory emf) {
-		final Person person = this.dopersist(emf);
+		final Person person = this.doPersist(emf);
 
-		this.dofind(emf, person);
+		this.doFind(emf, person);
 	}
 
 	private void test(Type type, final EntityManagerFactory emf) {
 		final long start = System.currentTimeMillis();
 
-		for (int i = 0; i < 100000; i++) {
+		for (int i = 0; i < 10000; i++) {
 			this.singleTest(emf);
 		}
 
