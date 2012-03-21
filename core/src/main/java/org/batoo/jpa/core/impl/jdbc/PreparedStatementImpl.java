@@ -43,10 +43,10 @@ import java.util.Calendar;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 import org.batoo.jpa.core.BJPASettings;
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.impl.OperationTookLongTimeWarning;
+import org.batoo.jpa.core.pool.GenericKeyedPool;
 
 /**
  * 
@@ -73,7 +73,7 @@ public class PreparedStatementImpl implements PreparedStatement {
 
 	private Object[] parameters;
 
-	private final GenericKeyedObjectPool<String, PreparedStatementImpl> pool;
+	private final GenericKeyedPool<String, PreparedStatementImpl> pool;
 
 	private ParameterMetaData parameterMetaData;
 
@@ -92,7 +92,7 @@ public class PreparedStatementImpl implements PreparedStatement {
 	 * @param pool
 	 */
 	public PreparedStatementImpl(ConnectionImpl connection, String sql, PreparedStatement statement,
-		GenericKeyedObjectPool<String, PreparedStatementImpl> pool) {
+		GenericKeyedPool<String, PreparedStatementImpl> pool) {
 		super();
 
 		this.connection = connection;

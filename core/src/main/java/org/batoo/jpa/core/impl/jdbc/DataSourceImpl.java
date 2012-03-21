@@ -29,10 +29,11 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.pool.impl.GenericObjectPool;
+import org.apache.commons.pool.ObjectPool;
 import org.batoo.jpa.core.BJPASettings;
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.impl.OperationTookLongTimeWarning;
+import org.batoo.jpa.core.pool.GenericPool;
 
 /**
  * 
@@ -49,7 +50,7 @@ public class DataSourceImpl implements DataSource {
 	private final String jdbcUser;
 	private final String jdbcPassword;
 
-	private final GenericObjectPool<ConnectionImpl> pool;
+	private final ObjectPool<ConnectionImpl> pool;
 	private Connection keepaliveConnection; // Kept to keep in memory databases open
 
 	private PrintWriter printer;
@@ -74,8 +75,7 @@ public class DataSourceImpl implements DataSource {
 		this.jdbcUser = jdbcUser;
 		this.jdbcPassword = jdbcPassword;
 
-		this.pool = new GenericObjectPool<ConnectionImpl>(new ConnectionFactory(this));
-		this.pool.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_GROW);
+		this.pool = new GenericPool<ConnectionImpl>(new ConnectionFactory(this));
 
 		this.keepaliveConnection = this.getConnection();
 

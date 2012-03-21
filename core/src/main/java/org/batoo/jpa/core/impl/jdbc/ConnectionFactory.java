@@ -23,11 +23,14 @@ import java.sql.SQLException;
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.batoo.jpa.core.BLogger;
 
+import com.google.common.annotations.Beta;
+
 /**
  * 
  * @author hceylan
  * @since $version
  */
+@Beta
 public class ConnectionFactory extends BasePoolableObjectFactory<ConnectionImpl> {
 
 	private static final BLogger LOG = BLogger.getLogger(ConnectionFactory.class);

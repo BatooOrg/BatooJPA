@@ -22,12 +22,15 @@ import java.sql.SQLException;
 
 import org.apache.commons.pool.BaseKeyedPoolableObjectFactory;
 
+import com.google.common.annotations.Beta;
+
 /**
  * A Factory to implement preparation of {@link PreparedStatementImpl}s
  * 
  * @author hceylan
  * @since $version
  */
+@Beta
 public class PreparedStatementFactory extends BaseKeyedPoolableObjectFactory<String, PreparedStatementImpl> {
 
 	private final ConnectionImpl connection;

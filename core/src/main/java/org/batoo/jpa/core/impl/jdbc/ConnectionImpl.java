@@ -39,11 +39,11 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.pool.impl.GenericKeyedObjectPool;
-import org.apache.commons.pool.impl.GenericObjectPool;
+import org.apache.commons.pool.ObjectPool;
 import org.batoo.jpa.core.BJPASettings;
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.impl.OperationTookLongTimeWarning;
+import org.batoo.jpa.core.pool.GenericKeyedPool;
 
 /**
  * 
@@ -57,7 +57,7 @@ public class ConnectionImpl implements Connection {
 	private static AtomicLong no = new AtomicLong(0);
 
 	private Connection connection;
-	private final GenericObjectPool<ConnectionImpl> pool;
+	private final ObjectPool<ConnectionImpl> pool;
 
 	final long connNo;
 	private final long opened;
@@ -67,7 +67,7 @@ public class ConnectionImpl implements Connection {
 	volatile long executes = 0;
 	private volatile long transactions = 0;
 
-	private final GenericKeyedObjectPool<String, PreparedStatementImpl> preparedStatementPool;
+	private final GenericKeyedPool<String, PreparedStatementImpl> preparedStatementPool;
 
 	/**
 	 * @param connection
@@ -78,15 +78,14 @@ public class ConnectionImpl implements Connection {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ConnectionImpl(Connection connection, GenericObjectPool<ConnectionImpl> pool) {
+	public ConnectionImpl(Connection connection, ObjectPool<ConnectionImpl> pool) {
 		super();
 		this.connection = connection;
 		this.pool = pool;
 
 		this.connNo = no.incrementAndGet();
 		this.opened = System.currentTimeMillis();
-		this.preparedStatementPool = new GenericKeyedObjectPool<String, PreparedStatementImpl>(new PreparedStatementFactory(this));
-		this.preparedStatementPool.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_GROW);
+		this.preparedStatementPool = new GenericKeyedPool<String, PreparedStatementImpl>(new PreparedStatementFactory(this));
 	}
 
 	/**
