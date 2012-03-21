@@ -316,6 +316,8 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 
 		final boolean id = ReflectHelper.getAnnotation(member, Id.class) != null;
 		if (id) {
+			this.idType = IdType.MANUAL;
+
 			// Check if the type is identifiable
 			if (!(this.declaringType instanceof IdentifiableTypeImpl)) {
 				throw new MappingException("Id can only be specified on Entities and MapperSuperclasses. Specified on "
