@@ -5,13 +5,11 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class HashMapBug {
 
 	@Test
-	@Ignore
 	public void hashMapBug() {
 		final Map<String, Integer> map1 = new HashMap<String, Integer>();
 		final Map<String, Integer> map2 = new HashMap<String, Integer>();

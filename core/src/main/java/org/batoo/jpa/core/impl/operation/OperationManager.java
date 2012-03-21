@@ -18,12 +18,15 @@
  */
 package org.batoo.jpa.core.impl.operation;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.batoo.jpa.core.BJPASettings;
 import org.batoo.jpa.core.BLogger;
+import org.batoo.jpa.core.impl.EntityManagerImpl;
 import org.batoo.jpa.core.impl.OperationTookLongTimeWarning;
-import org.batoo.jpa.core.impl.SessionImpl;
+
+import com.google.common.collect.Lists;
 
 /**
  * Manager for the persistence operations.
@@ -40,15 +43,15 @@ public class OperationManager {
 	/**
 	 * Replays the list of operations.
 	 * 
-	 * @param session
-	 *            the session
+	 * @param entityManager
+	 *            the entity manager
 	 * @param operations
 	 *            the operations to replay
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public static void prepare(SessionImpl session, AbstractOperation<?>... operations) {
+	public static void replay(EntityManagerImpl entityManager, AbstractOperation<?>... operations) {
 		if ((operations == null) || (operations.length == 0)) {
 			return;
 		}
@@ -59,9 +62,7 @@ public class OperationManager {
 
 		final long start = System.currentTimeMillis();
 		try {
-			for (final AbstractOperation<?> operation : operations) {
-				OperationManager.prepare(session, operation.internalPrepare(session));
-			}
+			OperationManager.prepare0(entityManager, Lists.newArrayList(operations));
 		}
 		finally {
 			final long time = System.currentTimeMillis() - start;
@@ -73,6 +74,12 @@ public class OperationManager {
 			else {
 				LOG.trace("{0}: {1} msecs, replay() {2} atomic operations", callNo, time, operations.length);
 			}
+		}
+	}
+
+	private static void prepare0(EntityManagerImpl entityManager, List<AbstractOperation<?>> operations) {
+		for (final AbstractOperation<?> operation : operations) {
+			OperationManager.prepare0(entityManager, operation.internalPrepare(entityManager));
 		}
 	}
 

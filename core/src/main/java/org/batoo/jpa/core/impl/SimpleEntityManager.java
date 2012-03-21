@@ -182,7 +182,7 @@ public abstract class SimpleEntityManager implements EntityManager {
 	public void detach(Object entity) {
 		this.assertOpen();
 
-		OperationManager.prepare(this.getSession(), new DetachOperation<Object>((EntityManagerImpl) this, entity));
+		OperationManager.replay((EntityManagerImpl) this, new DetachOperation<Object>((EntityManagerImpl) this, entity));
 	}
 
 	/**
@@ -201,7 +201,7 @@ public abstract class SimpleEntityManager implements EntityManager {
 		final FindOperation<T> operation = new FindOperation((EntityManagerImpl) this, managedId);
 
 		try {
-			OperationManager.prepare(this.getSession(), operation);
+			OperationManager.replay((EntityManagerImpl) this, operation);
 		}
 		catch (final RuntimeException e) {
 			LOG.error(e, "Find operation encountered an error");
@@ -469,11 +469,10 @@ public abstract class SimpleEntityManager implements EntityManager {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void persist(Object entity) {
 		this.assertTransaction();
 
-		OperationManager.prepare(this.getSession(), new PersistOperation<Object>((EntityManagerImpl) this, entity));
+		OperationManager.replay((EntityManagerImpl) this, new PersistOperation<Object>((EntityManagerImpl) this, entity));
 	}
 
 	/**

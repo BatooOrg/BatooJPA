@@ -67,9 +67,9 @@ public class PhysicalTable implements Table {
 	private final UniqueConstraint[] uniqueConstraints;
 	private final PrimaryKeyJoinColumn[] primaryKeyJoinColumns;
 
-	private final List<PhysicalColumn> columns = Lists.newArrayList();
-	private final List<PhysicalColumn> identityColumns = Lists.newArrayList();
+	private PhysicalColumn identityColumn;
 	private final List<PhysicalColumn> primaryKeys = Lists.newArrayList();
+	private final List<PhysicalColumn> columns = Lists.newArrayList();
 	private final List<ForeignKey> foreignKeys = Lists.newArrayList();
 
 	private String insertSql;
@@ -85,11 +85,12 @@ public class PhysicalTable implements Table {
 	 *            the owner entity
 	 * @param jdbcAdapter
 	 *            the JDBC Adapter
+	 * @throws MappingException
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PhysicalTable(EntityTypeImpl<?> entity, JDBCAdapter jdbcAdapter) {
+	public PhysicalTable(EntityTypeImpl<?> entity, JDBCAdapter jdbcAdapter) throws MappingException {
 		super();
 
 		this.owner = entity;
@@ -134,15 +135,25 @@ public class PhysicalTable implements Table {
 	 * 
 	 * @param column
 	 *            the mapping
+	 * @throws MappingException
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void addColumn(PhysicalColumn column) {
+	public void addColumn(PhysicalColumn column) throws MappingException {
 		this.columns.add(column);
 
 		if (column.isId()) {
 			this.primaryKeys.add(column);
+		}
+
+		if (column.getIdType() == IdType.IDENTITY) {
+			if (this.identityColumn != null) {
+				throw new MappingException("Multiple identity columns: " + this.identityColumn.getName() + ", " + column.getName() + " on "
+					+ this.owner.getJavaType().getCanonicalName());
+			}
+
+			this.identityColumn = column;
 		}
 	}
 
@@ -566,6 +577,8 @@ public class PhysicalTable implements Table {
 	 * @author hceylan
 	 */
 	public void performInsert(Connection connection, final ManagedInstance<?> managedInstance) throws SQLException {
+		final QueryRunner runner = new QueryRunner();
+
 		// Do not inline, generation of the insert sql will initialize the insertColumns!
 		final String insertSql = this.getInsertSql();
 
@@ -576,7 +589,14 @@ public class PhysicalTable implements Table {
 			}
 		});
 
-		new QueryRunner().update(connection, insertSql, params.toArray());
+		runner.update(connection, insertSql, params.toArray());
+
+		if (this.identityColumn != null) {
+			final String selectLastIdSql = this.jdbcAdapter.getSelectLastIdentitySql();
+			final Number id = runner.query(connection, selectLastIdSql, new SingleValueHandler<Number>());
+
+			this.identityColumn.getMapping().setValue(managedInstance.getInstance(), id);
+		}
 	}
 
 	/**
@@ -604,7 +624,6 @@ public class PhysicalTable implements Table {
 
 		Collections.sort(this.primaryKeys, c);
 		Collections.sort(this.columns, c);
-		Collections.sort(this.identityColumns, c);
 	}
 
 	/**

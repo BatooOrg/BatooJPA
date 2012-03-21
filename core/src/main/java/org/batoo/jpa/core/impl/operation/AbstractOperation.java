@@ -21,7 +21,6 @@ package org.batoo.jpa.core.impl.operation;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Set;
 
 import org.batoo.jpa.core.BJPASettings;
 import org.batoo.jpa.core.BLogger;
@@ -34,7 +33,6 @@ import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 /**
  * Abstract base class for operations.
@@ -178,19 +176,23 @@ public abstract class AbstractOperation<X> implements Comparable<AbstractOperati
 	/**
 	 * Subclasses cannot not override!
 	 * 
-	 * @param session
-	 *            the session
+	 * @param entityManager
+	 *            the entity manager
 	 * @return the array of cascaded operations
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public final AbstractOperation<?>[] internalPrepare(SessionImpl session) {
-		final Set<AbstractOperation<?>> cascades = Sets.newHashSet();
+	public final List<AbstractOperation<?>> internalPrepare(EntityManagerImpl entityManager) {
+		final List<AbstractOperation<?>> cascades = Lists.newArrayList();
 
 		try {
-			if (this.prepare(session)) {
+			if (this.prepare(entityManager.getSession())) {
 				this.em.getTaskQueue().add(this);
+
+				if (this.requiresFlush) {
+					entityManager.flush();
+				}
 			}
 
 			for (final Association<?, ?> association : this.managedInstance.getType().getAssociations()) {
@@ -200,7 +202,7 @@ public abstract class AbstractOperation<X> implements Comparable<AbstractOperati
 				}
 			}
 
-			return cascades.toArray(new AbstractOperation<?>[cascades.size()]);
+			return cascades;
 		}
 		catch (final InterruptedException e) {
 			// no cascading

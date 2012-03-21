@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.jdbc;
 import javax.persistence.PersistenceException;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
@@ -80,12 +81,13 @@ public class PhysicalColumn implements Column {
 	 *            if column is nullable
 	 * @param unique
 	 *            if column is unique
+	 * @throws MappingException
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	private PhysicalColumn(AbstractPhysicalMapping<?, ?> mapping, PhysicalColumn referencedColumn, PhysicalTable table, String name,
-		IdType idType, int sqlType, int length, int precision, int scale, boolean nullable, boolean unique) {
+		IdType idType, int sqlType, int length, int precision, int scale, boolean nullable, boolean unique) throws MappingException {
 		super();
 
 		this.mapping = mapping;
@@ -117,11 +119,13 @@ public class PhysicalColumn implements Column {
 	 *            the template to use
 	 * @param sqlType
 	 *            the SQL type of the column
+	 * @throws MappingException
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PhysicalColumn(AbstractPhysicalMapping<?, ?> mapping, PhysicalTable table, BasicColumnTemplate<?, ?> basic, int sqlType) {
+	public PhysicalColumn(AbstractPhysicalMapping<?, ?> mapping, PhysicalTable table, BasicColumnTemplate<?, ?> basic, int sqlType)
+		throws MappingException {
 		this(mapping, null, table, basic.getName(), basic.getIdType(), sqlType, basic.getLength(), basic.getPrecision(), basic.getScale(),
 			basic.isNullable(), basic.isUnique());
 
@@ -139,12 +143,13 @@ public class PhysicalColumn implements Column {
 	 *            the referenced physical column, may be null
 	 * @param sqlType
 	 *            the SQL type of the column
+	 * @throws MappingException
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	public PhysicalColumn(AbstractPhysicalMapping<?, ?> mapping, PhysicalTable table, JoinColumnTemplate<?, ?> join,
-		PhysicalColumn referencedColumn, int sqlType) {
+		PhysicalColumn referencedColumn, int sqlType) throws MappingException {
 		this(mapping, referencedColumn, table, join.getName(), null, sqlType, referencedColumn.getLength(),
 			referencedColumn.getPrecision(), referencedColumn.getScale(), join.isNullable(), join.isUnique());
 	}

@@ -55,8 +55,10 @@ public class FieldAccessor<Y> implements Accessor<Y> {
 	private static final Object INT_0 = new Integer(0);
 
 	private final Field field;
-	private final PrimitiveType primitiveType;
 	private final long fieldOffset;
+	private final PrimitiveType primitiveType;
+
+	private Class<?> numberType;
 
 	/**
 	 * 
@@ -71,6 +73,10 @@ public class FieldAccessor<Y> implements Accessor<Y> {
 		this.field = field;
 		this.primitiveType = this.getPrimitiveType();
 		this.fieldOffset = ReflectHelper.unsafe.objectFieldOffset(field);
+
+		if (Number.class.isAssignableFrom(this.field.getType())) {
+			this.numberType = this.field.getType();
+		}
 	}
 
 	/**
@@ -131,7 +137,14 @@ public class FieldAccessor<Y> implements Accessor<Y> {
 	@SuppressWarnings("restriction")
 	public void set(Object instance, Y value) {
 		if (this.primitiveType == null) {
-			ReflectHelper.unsafe.putObject(instance, this.fieldOffset, value);
+			if ((this.numberType != null) && (value != null) && (this.numberType != value.getClass())) {
+				final Number number = ReflectHelper.convertNumber((Number) value, this.numberType);
+
+				ReflectHelper.unsafe.putObject(instance, this.fieldOffset, number);
+			}
+			else {
+				ReflectHelper.unsafe.putObject(instance, this.fieldOffset, value);
+			}
 		}
 		else {
 			switch (this.primitiveType) {

@@ -176,6 +176,44 @@ public class ReflectHelper {
 		return Class.forName(name);
 	}
 
+	/**
+	 * Converts the number into number Type
+	 * 
+	 * @param value
+	 * @param numberType
+	 * @return
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public static Number convertNumber(Number value, Class<?> numberType) {
+		if (numberType == Integer.class) {
+			return value.intValue();
+		}
+
+		if (numberType == Long.class) {
+			return value.longValue();
+		}
+
+		if (numberType == Short.class) {
+			return value.shortValue();
+		}
+
+		if (numberType == Byte.class) {
+			return value.byteValue();
+		}
+
+		if (numberType == Float.class) {
+			return value.floatValue();
+		}
+
+		if (numberType == Double.class) {
+			return value.doubleValue();
+		}
+
+		throw new IllegalArgumentException(numberType + " not supported");
+	}
+
 	static Map<Class<?>, ObjectConstructor<?>> createConstructors() {
 		final Map<Class<?>, ObjectConstructor<?>> constructors = Maps.newHashMap();
 
