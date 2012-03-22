@@ -55,30 +55,6 @@ public abstract class AbstractTest {
 		this.tx().begin();
 	}
 
-	/**
-	 * Cleans up the test
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@After
-	public void teardown() {
-		this.cleanupTx();
-
-		this.cleanUpEm();
-
-		if ((this.emf != null) && this.emf.isOpen()) {
-			try {
-				this.emf.close();
-			}
-			catch (final Exception e) {}
-			this.emf = null;
-		}
-
-		Thread.currentThread().setContextClassLoader(this.oldContextClassLoader);
-		this.oldContextClassLoader = null;
-	}
-
 	private void cleanUpEm() {
 		if ((this.em != null) && this.em.isOpen()) {
 			try {
@@ -167,6 +143,20 @@ public abstract class AbstractTest {
 	}
 
 	/**
+	 * Returns the Entity Manager Factory.
+	 * 
+	 * @return the Entity Manager Factory
+	 * @since $version
+	 */
+	public EntityManagerFactory emf() {
+		if (this.emf == null) {
+			this.setupEmf();
+		}
+
+		return this.emf;
+	}
+
+	/**
 	 * @since $version
 	 * @author hceylan
 	 */
@@ -203,16 +193,6 @@ public abstract class AbstractTest {
 	}
 
 	/**
-	 * Returns the Entity Manager Factory.
-	 * 
-	 * @return the Entity Manager Factory
-	 * @since $version
-	 */
-	public EntityManagerFactory emf() {
-		return this.emf;
-	}
-
-	/**
 	 * @return the name of the persistence unit name
 	 * 
 	 * @since $version
@@ -242,25 +222,17 @@ public abstract class AbstractTest {
 	}
 
 	/**
-	 * Builds the session factory.
+	 * If the entity manager factory will be created by the test itself.
+	 * <p>
+	 * Useful for mapping tests.
+	 * 
+	 * @return false to lazy setup the entity manager factory
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	@Before
-	public void setup() {
-		final PersistenceProvider persistence = new PersistenceProvider();
-
-		final Thread currentThread = Thread.currentThread();
-		this.oldContextClassLoader = currentThread.getContextClassLoader();
-
-		final TestClassLoader cl = new TestClassLoader(this.oldContextClassLoader);
-		currentThread.setContextClassLoader(cl);
-		cl.setRoot(this.getRootPackage());
-
-		this.emf = persistence.createEntityManagerFactory(this.getPersistenceUnitName(), this.getProperties());
-
-		Assert.assertNotNull("EntityManagerFactory is null", this.emf);
+	protected boolean lazySetup() {
+		return false;
 	}
 
 	/**
@@ -287,6 +259,58 @@ public abstract class AbstractTest {
 		this.tx().rollback();
 
 		this.tx = null;
+	}
+
+	/**
+	 * Builds the session factory.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Before
+	public void setup() {
+		if (!this.lazySetup()) {
+			this.setupEmf();
+		}
+	}
+
+	private void setupEmf() {
+		final PersistenceProvider persistence = new PersistenceProvider();
+
+		final Thread currentThread = Thread.currentThread();
+		this.oldContextClassLoader = currentThread.getContextClassLoader();
+
+		final TestClassLoader cl = new TestClassLoader(this.oldContextClassLoader);
+		currentThread.setContextClassLoader(cl);
+		cl.setRoot(this.getRootPackage());
+
+		this.emf = persistence.createEntityManagerFactory(this.getPersistenceUnitName(), this.getProperties());
+
+		Assert.assertNotNull("EntityManagerFactory is null", this.emf);
+	}
+
+	/**
+	 * Cleans up the test
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@After
+	public void teardown() {
+		this.cleanupTx();
+
+		this.cleanUpEm();
+
+		if ((this.emf != null) && this.emf.isOpen()) {
+			try {
+				this.emf.close();
+			}
+			catch (final Exception e) {}
+			this.emf = null;
+		}
+
+		Thread.currentThread().setContextClassLoader(this.oldContextClassLoader);
+		this.oldContextClassLoader = null;
 	}
 
 	protected EntityTransaction tx() {

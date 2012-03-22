@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.UniqueConstraint;
@@ -44,6 +45,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * Template of a single table.
@@ -68,6 +70,8 @@ public class PhysicalTable implements Table {
 	private final List<PhysicalColumn> primaryKeys = Lists.newArrayList();
 	private final List<PhysicalColumn> columns = Lists.newArrayList();
 	private final List<ForeignKey> foreignKeys = Lists.newArrayList();
+
+	private final Map<String, PhysicalColumn> columnNames = Maps.newHashMap();
 
 	private String insertSql;
 	private String deleteSql;
@@ -112,7 +116,14 @@ public class PhysicalTable implements Table {
 	 * @author hceylan
 	 */
 	public void addColumn(PhysicalColumn column) throws MappingException {
+		if (this.columnNames.keySet().contains(column.getPhysicalName())) {
+			final PhysicalColumn other = this.columnNames.get(column.getPhysicalName());
+			throw new MappingException("Duplicate column on entity " + this.getOwner().getJavaType().getCanonicalName() + ", "
+				+ other.getMapping().getPathAsString() + " - " + column.getMapping().getPathAsString());
+		}
+
 		this.columns.add(column);
+		this.columnNames.put(column.getPhysicalName(), column);
 
 		if (column.isId()) {
 			this.primaryKeys.add(column);
