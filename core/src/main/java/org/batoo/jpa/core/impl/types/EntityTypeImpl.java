@@ -284,9 +284,14 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			for (final PhysicalTable table : this.tables.values()) {
 				if (firstPass) {
 					if (!table.isPrimary()) {
+						final List<PhysicalColumn> keyColumns = Lists.newArrayList();
 						for (final PhysicalColumn column : this.primaryTable.getPrimaryKeys()) {
-							new PhysicalColumn(table, column);
+							keyColumns.add(new PhysicalColumn(table, column));
 						}
+
+						final ForeignKey foreignKey = new ForeignKey(table.getPhysicalName(), this.primaryTable.getPhysicalName(),
+							this.primaryTable.getPhysicalName(), keyColumns);
+						table.addForeignKey(foreignKey);
 					}
 				}
 
@@ -778,10 +783,10 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	private void vlinkTables() throws MappingException {
-		// vlink this entities tables
+		// first do the self defined tables
 		for (final TableTemplate template : this.getTableTemplates()) {
 			final PhysicalTable table = new PhysicalTable(this, template, this.metaModel.getJdbcAdapter());
-			if (table.isPrimary()) {
+			if (template.isPrimary()) {
 				this.primaryTable = table;
 			}
 

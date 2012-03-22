@@ -26,7 +26,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.dbutils.QueryRunner;
@@ -61,11 +60,9 @@ public class PhysicalTable implements Table {
 	private final String name;
 	private final String physicalName;
 	private final String physicalSchema;
+	private final UniqueConstraint[] uniqueConstraints;
 
 	private final boolean primary;
-
-	private final UniqueConstraint[] uniqueConstraints;
-	private final PrimaryKeyJoinColumn[] primaryKeyJoinColumns;
 
 	private PhysicalColumn identityColumn;
 	private final List<PhysicalColumn> primaryKeys = Lists.newArrayList();
@@ -79,31 +76,6 @@ public class PhysicalTable implements Table {
 	private final List<PhysicalColumn> insertColumns = Lists.newArrayList();
 
 	private int h;
-
-	/**
-	 * @param entityTypeImpl
-	 *            the owner entity
-	 * @param jdbcAdapter
-	 *            the JDBC Adapter
-	 * @throws MappingException
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public PhysicalTable(EntityTypeImpl<?> entity, JDBCAdapter jdbcAdapter) throws MappingException {
-		super();
-
-		this.owner = entity;
-		this.jdbcAdapter = jdbcAdapter;
-
-		this.primary = true;
-		this.schema = null;
-		this.physicalSchema = null;
-		this.name = entity.getName();
-		this.physicalName = this.jdbcAdapter.escape(entity.getName());
-		this.uniqueConstraints = new UniqueConstraint[] {};
-		this.primaryKeyJoinColumns = new PrimaryKeyJoinColumn[] {};
-	}
 
 	/**
 	 * @param entity
@@ -127,7 +99,6 @@ public class PhysicalTable implements Table {
 		this.name = template.getName() != null ? template.getName() : entity.getName();
 		this.physicalName = jdbcAdapter.escape(this.name);
 		this.uniqueConstraints = template.getUniqueConstraints();
-		this.primaryKeyJoinColumns = template.getPrimaryKeyJoinColumns();
 	}
 
 	/**
@@ -424,16 +395,6 @@ public class PhysicalTable implements Table {
 				return input.getPhysicalName();
 			}
 		});
-	}
-
-	/**
-	 * Returns the primaryKeyJoinColumns.
-	 * 
-	 * @return the primaryKeyJoinColumns
-	 * @since $version
-	 */
-	public PrimaryKeyJoinColumn[] getPrimaryKeyJoinColumns() {
-		return this.primaryKeyJoinColumns;
 	}
 
 	/**

@@ -204,8 +204,7 @@ public class SelectHelper<X> {
 				final String left = "T" + parentTableNo;
 				final String right = "T" + tableNo;
 
-				return left + "." + input.getPhysicalName() + " = " + right + "."
-					+ input.getReferencedPrimaryTableColumn().getPhysicalName();
+				return left + "." + input.getPhysicalName() + " = " + right + "." + input.getReferencedColumn().getPhysicalName();
 			}
 		});
 

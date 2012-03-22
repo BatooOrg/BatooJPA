@@ -61,7 +61,7 @@ public class SecondaryTableTest extends AbstractTest {
 	public void testCreateTable() throws SQLException {
 		final Set<EntityType<?>> entities = this.em().getMetamodel().getEntities();
 
-		Assert.assertEquals(3, entities.size());
+		Assert.assertEquals(4, entities.size());
 
 		final DataSource dataSource = this.em().unwrap(DataSource.class);
 		new QueryRunner(dataSource).query("SELECT * FROM FOO", new NullResultSetHandler());
