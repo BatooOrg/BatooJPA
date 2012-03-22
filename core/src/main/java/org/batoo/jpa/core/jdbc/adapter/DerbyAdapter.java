@@ -26,11 +26,11 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
-import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.PhysicalColumn;
+import org.batoo.jpa.core.impl.jdbc.PhysicalTableGenerator;
 import org.batoo.jpa.core.impl.jdbc.SingleValueHandler;
 import org.batoo.jpa.core.jdbc.Column;
 import org.batoo.jpa.core.jdbc.IdType;
@@ -124,16 +124,40 @@ public class DerbyAdapter extends JDBCAdapter {
 	 */
 	@Override
 	public void createSequenceIfNecessary(DataSource datasource, SequenceGenerator sequence) throws SQLException {
+		final String schema = this.schemaOf(datasource, sequence.schema());
+
 		final boolean exists = new QueryRunner(datasource) //
-		.query("SELECT SEQUENCENAME FROM SYS.SYSSEQUENCES WHERE SEQUENCENAME = ?", //
-			new SingleValueHandler<String>(), sequence.sequenceName()) != null;
+		.query("SELECT SEQUENCENAME FROM SYS.SYSSCHEMAS S\n" + //
+			"\tINNER JOIN SYS.SYSSEQUENCES Q ON S.SCHEMAID = Q.SCHEMAID\n" + //
+			"WHERE SCHEMANAME = ? AND SEQUENCENAME = ?", //
+			new SingleValueHandler<String>(), schema, sequence.sequenceName()) != null;
 
 		if (!exists) {
 			final String sql = "CREATE SEQUENCE " //
-				+ (StringUtils.isNotBlank(sequence.schema()) ? sequence.schema() + "." : "") //
-				+ sequence.sequenceName() // ;
+				+ schema + "." + sequence.sequenceName() // ;
 				+ " START WITH " + sequence.initialValue() //
 				+ " INCREMENT BY " + sequence.allocationSize();
+
+			new QueryRunner(datasource).update(sql);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void createTableGeneratorIfNecessary(DataSource datasource, PhysicalTableGenerator table) throws SQLException {
+		final String schema = this.schemaOf(datasource, table.getSchema());
+
+		if (new QueryRunner(datasource).query("SELECT TABLENAME FROM SYS.SYSSCHEMAS S\n" + //
+			"\tINNER JOIN SYS.SYSTABLES T ON S.SCHEMAID = T.SCHEMAID\n" + //
+			"WHERE SCHEMANAME = ?", new SingleValueHandler<String>(), schema) == null) {
+
+			final String sql = "CREATE TABLE " + schema + "." + table.getTable() + " ("//
+				+ "\n\t" + table.getPkColumnName() + " VARCHAR(255)," //
+				+ "\n\t" + table.getValueColumnName() + " BIGINT," //
+				+ "\nPRIMARY KEY(" + table.getPkColumnName() + "))";
 
 			new QueryRunner(datasource).update(sql);
 		}
@@ -153,7 +177,7 @@ public class DerbyAdapter extends JDBCAdapter {
 			final List<Object[]> foreignKeys = runner.query("SELECT T.TABLENAME, C.CONSTRAINTNAME FROM SYS.SYSSCHEMAS S\n" + //
 				"\tINNER JOIN SYS.SYSTABLES T ON T.SCHEMAID = S.SCHEMAID\n" + //
 				"\tINNER JOIN SYS.SYSCONSTRAINTS C ON C.TABLEID = T.TABLEID\n" + //
-				"WHERE S.SCHEMANAME = '" + schema + "' AND C.TYPE = 'F'", new ArrayListHandler());
+				"WHERE S.SCHEMANAME = ? AND C.TYPE = 'F'", new ArrayListHandler(), schema);
 
 			for (final Object[] foreignKey : foreignKeys) {
 				runner.update("ALTER TABLE " + schema + "." + foreignKey[0] + " DROP FOREIGN KEY " + foreignKey[1]);
@@ -162,7 +186,7 @@ public class DerbyAdapter extends JDBCAdapter {
 			// Drop tables
 			final List<Object[]> tables = runner.query("SELECT TABLENAME FROM SYS.SYSSCHEMAS S\n" + //
 				"\tINNER JOIN SYS.SYSTABLES T ON S.SCHEMAID = T.SCHEMAID\n" + //
-				"WHERE SCHEMANAME = '" + schema + "'", new ArrayListHandler());
+				"WHERE SCHEMANAME = ?", new ArrayListHandler(), schema);
 
 			for (final Object[] table : tables) {
 				runner.update("DROP TABLE " + schema + "." + table[0]);
@@ -171,7 +195,7 @@ public class DerbyAdapter extends JDBCAdapter {
 			// Drop sequences
 			final List<Object[]> sequences = runner.query("SELECT SEQUENCENAME FROM SYS.SYSSCHEMAS S\n" + //
 				"\tINNER JOIN SYS.SYSSEQUENCES Q ON S.SCHEMAID = Q.SCHEMAID\n" + //
-				"WHERE SCHEMANAME = '" + schema + "'", new ArrayListHandler());
+				"WHERE SCHEMANAME = ?", new ArrayListHandler(), schema);
 
 			for (final Object[] sequence : sequences) {
 				runner.update("DROP SEQUENCE " + schema + "." + sequence[0] + " RESTRICT");

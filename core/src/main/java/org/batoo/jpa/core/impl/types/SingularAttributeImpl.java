@@ -41,6 +41,7 @@ import javax.persistence.metamodel.SingularAttribute;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.MappingException;
+import org.batoo.jpa.core.impl.jdbc.PhysicalTableGenerator;
 import org.batoo.jpa.core.impl.mapping.BasicColumnTemplate;
 import org.batoo.jpa.core.impl.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.mapping.EmbeddedMapping;
@@ -398,7 +399,7 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 			}
 
 			// is it unique
-			if (!metaModel.addTableGenerator(tableGenerator)) {
+			if (!metaModel.addTableGenerator(new PhysicalTableGenerator(tableGenerator, this.jdbcAdapter))) {
 				throw new MappingException("An existing sequence generator with name " + tableGenerator.name() + " already refefined on "
 					+ ReflectHelper.createMemberName(member));
 			}

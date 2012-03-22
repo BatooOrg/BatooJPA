@@ -18,7 +18,6 @@
  */
 package org.batoo.jpa.core.impl.manager;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -28,13 +27,11 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.persistence.SequenceGenerator;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.Type;
 
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.BatooException;
-import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
@@ -107,29 +104,6 @@ public class DDLManager extends DeploymentManager {
 
 	}
 
-	private class PerformSequenceTask implements Runnable {
-
-		private final SequenceGenerator sequence;
-		private final Set<String> schemas;
-
-		private PerformSequenceTask(Set<String> schemas, SequenceGenerator generator) {
-			super();
-
-			this.schemas = schemas;
-			this.sequence = generator;
-		}
-
-		@Override
-		public void run() {
-			try {
-				DDLManager.this.metamodel.ddl(this.schemas, DDLManager.this.datasource, this.sequence, DDLManager.this.ddlMode);
-			}
-			catch (final MappingException e) {
-				throw new RuntimeException(e);
-			}
-		}
-	}
-
 	private static final BLogger LOG = BLogger.getLogger(DDLManager.class);
 
 	public static void perform(DataSourceImpl datasource, MetamodelImpl metamodel, DDLMode ddlMode) throws BatooException {
@@ -165,10 +139,10 @@ public class DDLManager extends DeploymentManager {
 
 		final Set<String> schemas = Sets.<String> newHashSet();
 		try {
-			this.metamodel.createTableGeneratorTables();
 
 			if (this.firstPass) {
-				this.performSequences(schemas);
+				this.metamodel.performSequencesDdl(schemas, this.datasource, this.ddlMode);
+				this.metamodel.performGeneratorTablesDdl(schemas, this.datasource, this.ddlMode);
 			}
 
 			this.performTypes(schemas);
@@ -178,21 +152,6 @@ public class DDLManager extends DeploymentManager {
 		}
 
 		LOG.debug("DDL Operations took {0} msecs", System.currentTimeMillis() - start);
-	}
-
-	private void performSequences(Set<String> schemas) throws BatooException {
-		this.waitFor(this.performSequences(schemas, this.metamodel.getSequences()));
-	}
-
-	private List<Future<?>> performSequences(Set<String> schemas, Collection<SequenceGenerator> set) {
-		final List<Future<?>> futures = Lists.newArrayList();
-
-		for (final SequenceGenerator sequence : set) {
-			final Future<?> future = this.executer.submit(new PerformSequenceTask(schemas, sequence));
-			futures.add(future);
-		}
-
-		return futures;
 	}
 
 	private void performTypes(Set<String> schemas) throws BatooException {

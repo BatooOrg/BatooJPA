@@ -41,6 +41,7 @@ import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.MappingException;
+import org.batoo.jpa.core.impl.jdbc.PhysicalTableGenerator;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
 import org.batoo.jpa.core.impl.mapping.TableTemplate;
 
@@ -314,7 +315,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 			}
 
 			// is it unique
-			if (!this.getMetaModel().addTableGenerator(this.tableGenerator)) {
+			if (!this.metaModel.addTableGenerator(new PhysicalTableGenerator(this.tableGenerator, this.metaModel.getJdbcAdapter()))) {
 				throw new MappingException("An existing TequenceGenerator with name " + this.tableGenerator.name()
 					+ " already refefined on " + this.getJavaType());
 			}

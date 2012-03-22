@@ -183,7 +183,7 @@ public class PhysicalTable implements Table {
 			// Sort columns to look nice
 			this.sortColumns();
 
-			JDBCAdapter.dropAndCreateSchemaIfNecessary(jdbcAdapter, datasource, schemas, ddlMode, this.schema);
+			this.jdbcAdapter.dropAndCreateSchemaIfNecessary(jdbcAdapter, datasource, schemas, ddlMode, this.schema);
 
 			runner.update(this.createCreateTableStatement(jdbcAdapter));
 		}

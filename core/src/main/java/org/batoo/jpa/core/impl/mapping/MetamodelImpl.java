@@ -21,7 +21,6 @@ package org.batoo.jpa.core.impl.mapping;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -38,8 +37,6 @@ import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PersistenceException;
 import javax.persistence.SequenceGenerator;
-import javax.persistence.TableGenerator;
-import javax.persistence.UniqueConstraint;
 import javax.persistence.metamodel.BasicType;
 import javax.persistence.metamodel.EmbeddableType;
 import javax.persistence.metamodel.EntityType;
@@ -49,10 +46,10 @@ import javax.persistence.metamodel.MappedSuperclassType;
 import javax.persistence.metamodel.Metamodel;
 import javax.sql.DataSource;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
+import org.batoo.jpa.core.impl.jdbc.PhysicalTableGenerator;
 import org.batoo.jpa.core.impl.jdbc.SequenceQueue;
 import org.batoo.jpa.core.impl.jdbc.TableIdQueue;
 import org.batoo.jpa.core.impl.types.BasicTypeImpl;
@@ -133,65 +130,6 @@ public class MetamodelImpl implements Metamodel {
 		}
 	};
 
-	private static final TableGenerator BATOO_TABLE = new TableGenerator() {
-
-		@Override
-		public int allocationSize() {
-			return 50;
-		}
-
-		@Override
-		public Class<? extends Annotation> annotationType() {
-			return TableGenerator.class;
-		}
-
-		@Override
-		public String catalog() {
-			return "";
-		}
-
-		@Override
-		public int initialValue() {
-			return 1;
-		}
-
-		@Override
-		public String name() {
-			return "batoo_id";
-		}
-
-		@Override
-		public String pkColumnName() {
-			return "default";
-		}
-
-		@Override
-		public String pkColumnValue() {
-			return "key";
-		}
-
-		@Override
-		public String schema() {
-			return "";
-		}
-
-		@Override
-		public String table() {
-			return "batoo_id";
-		}
-
-		@Override
-		public UniqueConstraint[] uniqueConstraints() {
-			return new UniqueConstraint[] {};
-		}
-
-		@Override
-		public String valueColumnName() {
-			return "id";
-		}
-
-	};
-
 	// TODO Consider making this configurable
 	private static final long POLL_TIMEOUT = 60;
 
@@ -209,11 +147,12 @@ public class MetamodelImpl implements Metamodel {
 	private final Set<Association<?, ?>> associations = Sets.newHashSet();
 
 	private final Map<Class<?>, MappedSuperclassType<?>> mappedSuperclasses = Maps.newHashMap();
+
 	private final Map<String, SequenceGenerator> sequenceGenerators = Maps.newHashMap();
 	private final Map<String, SequenceQueue> sequenceQueues = Maps.newHashMap();
 
+	private final Map<String, PhysicalTableGenerator> tableGenerators = Maps.newHashMap();
 	private final Map<String, TableIdQueue> tableIdQueues = Maps.newHashMap();
-	private final Map<String, TableGenerator> tableGenerators = Maps.newHashMap();
 
 	private final Map<String, TableTemplate> tables = Maps.newConcurrentMap();
 
@@ -316,18 +255,21 @@ public class MetamodelImpl implements Metamodel {
 	}
 
 	/**
-	 * @param tableGenerator
-	 * @return
+	 * Adds a table generator to the metamodel
+	 * 
+	 * @param generator
+	 *            the table generator declaration
+	 * @return true if the generator already exists.
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public boolean addTableGenerator(TableGenerator tableGenerator) {
-		if (this.tableGenerators.containsKey(tableGenerator.name())) {
+	public boolean addTableGenerator(PhysicalTableGenerator generator) {
+		if (this.tableGenerators.containsKey(generator.getName())) {
 			return false;
 		}
 
-		this.tableGenerators.put(tableGenerator.name(), tableGenerator);
+		this.tableGenerators.put(generator.getName(), generator);
 
 		return true;
 	}
@@ -356,48 +298,6 @@ public class MetamodelImpl implements Metamodel {
 		}
 
 		return this.lazyCreateBasicType(cls, strict);
-	}
-
-	/**
-	 * Creates the Table Id Generators.
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void createTableGeneratorTables() {
-		for (final TableGenerator generator : this.tableGenerators.values()) {
-			throw new NotImplementedException();
-		}
-	}
-
-	/**
-	 * Creates the sequence if not exists.
-	 * 
-	 * @param schemas
-	 *            the list of schemas recreated
-	 * @param datasource
-	 *            datasource to use
-	 * @param ddlMode
-	 *            the DDL mode
-	 * 
-	 * @param sequence
-	 *            the generator
-	 * @throws MappingException
-	 *             thrown if sequence cannot be created
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public synchronized void ddl(Set<String> schemas, DataSource datasource, SequenceGenerator sequence, DDLMode ddlMode)
-		throws MappingException {
-		try {
-			JDBCAdapter.dropAndCreateSchemaIfNecessary(this.jdbcAdapter, datasource, schemas, ddlMode, sequence.schema());
-
-			this.jdbcAdapter.createSequenceIfNecessary(datasource, sequence);
-		}
-		catch (final SQLException e) {
-			throw new MappingException("Unable to create sequence " + sequence.name(), e);
-		}
 	}
 
 	/**
@@ -450,12 +350,13 @@ public class MetamodelImpl implements Metamodel {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public TableGenerator getDefaultTableIdGenerator() {
-		if (!this.tableGenerators.containsKey(BATOO_TABLE.name())) {
-			this.tableGenerators.put(BATOO_TABLE.name(), BATOO_TABLE);
+	public PhysicalTableGenerator getDefaultTableIdGenerator() {
+		if (!this.tableGenerators.containsKey("")) {
+			final PhysicalTableGenerator generator = new PhysicalTableGenerator(null, this.jdbcAdapter);
+			this.tableGenerators.put(generator.getName(), generator);
 		}
 
-		return BATOO_TABLE;
+		return this.tableGenerators.get(PhysicalTableGenerator.DEFAULT_NAME);
 	}
 
 	/**
@@ -550,21 +451,15 @@ public class MetamodelImpl implements Metamodel {
 	 */
 	public Object getNextTableValue(String generator) {
 		try {
+			if (StringUtils.isBlank(generator)) {
+				generator = PhysicalTableGenerator.DEFAULT_NAME;
+			}
+
 			return this.tableIdQueues.get(generator).poll(POLL_TIMEOUT, TimeUnit.SECONDS);
 		}
 		catch (final InterruptedException e) {
 			throw new PersistenceException("Unable to retrieve next sequence " + generator + " in allowed " + POLL_TIMEOUT + " seconds");
 		}
-	}
-
-	/**
-	 * Returns the sequences.
-	 * 
-	 * @return the sequences
-	 * @since $version
-	 */
-	public Collection<SequenceGenerator> getSequences() {
-		return this.sequenceGenerators.values();
 	}
 
 	/**
@@ -732,6 +627,64 @@ public class MetamodelImpl implements Metamodel {
 	}
 
 	/**
+	 * Creates the generator tables if not exist.
+	 * 
+	 * @param schemas
+	 *            the list of schemas recreated
+	 * @param datasource
+	 *            datasource to use
+	 * @param ddlMode
+	 *            the DDL mode
+	 * 
+	 * @throws MappingException
+	 *             thrown if a table generator cannot be created
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public synchronized void performGeneratorTablesDdl(Set<String> schemas, DataSource datasource, DDLMode ddlMode) throws MappingException {
+		for (final PhysicalTableGenerator table : this.tableGenerators.values()) {
+			try {
+				this.jdbcAdapter.dropAndCreateSchemaIfNecessary(this.jdbcAdapter, datasource, schemas, ddlMode, table.getSchema());
+
+				this.jdbcAdapter.createTableGeneratorIfNecessary(datasource, table);
+			}
+			catch (final SQLException e) {
+				throw new MappingException("Unable to create table generator " + table.getName(), e);
+			}
+		}
+	}
+
+	/**
+	 * Creates the sequences if not exist.
+	 * 
+	 * @param schemas
+	 *            the list of schemas recreated
+	 * @param datasource
+	 *            datasource to use
+	 * @param ddlMode
+	 *            the DDL mode
+	 * 
+	 * @throws MappingException
+	 *             thrown if a sequence cannot be created
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public synchronized void performSequencesDdl(Set<String> schemas, DataSource datasource, DDLMode ddlMode) throws MappingException {
+		for (final SequenceGenerator sequence : this.sequenceGenerators.values()) {
+			try {
+				this.jdbcAdapter.dropAndCreateSchemaIfNecessary(this.jdbcAdapter, datasource, schemas, ddlMode, sequence.schema());
+
+				this.jdbcAdapter.createSequenceIfNecessary(datasource, sequence);
+			}
+			catch (final SQLException e) {
+				throw new MappingException("Unable to create sequence " + sequence.name(), e);
+			}
+		}
+	}
+
+	/**
 	 * Prefills the id generators.
 	 * 
 	 * @param datasource
@@ -755,11 +708,8 @@ public class MetamodelImpl implements Metamodel {
 					generator.allocationSize()));
 		}
 
-		for (final TableGenerator generator : this.tableGenerators.values()) {
-			this.tableIdQueues.put(
-				generator.name(),
-				new TableIdQueue(this.jdbcAdapter, datasource, this.idGeneratorExecuter, generator.pkColumnValue(),
-					generator.allocationSize()));
+		for (final PhysicalTableGenerator generator : this.tableGenerators.values()) {
+			this.tableIdQueues.put(generator.getName(), new TableIdQueue(this.jdbcAdapter, datasource, this.idGeneratorExecuter, generator));
 		}
 	}
 

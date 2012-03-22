@@ -21,7 +21,7 @@ package org.batoo.jpa.core.impl.jdbc;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.jdbc.adapter.JDBCAdapter;
 
@@ -37,6 +37,12 @@ public class TableIdQueue extends IdQueue {
 
 	private static final BLogger LOG = BLogger.getLogger(TableIdQueue.class);
 
+	private final PhysicalTableGenerator generator;
+
+	private String selectSql;
+	private String insertSql;
+	private String updateSql;
+
 	/**
 	 * @param jdbcAdapter
 	 *            the jdbc adapter
@@ -44,16 +50,24 @@ public class TableIdQueue extends IdQueue {
 	 *            the datasource to use
 	 * @param idExecuter
 	 *            the executor service to submit refill tasks
-	 * @param keyName
-	 *            the key for the table id
-	 * @param allocationSize
-	 *            the allocations size
+	 * @param generator
+	 *            the table generator
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public TableIdQueue(JDBCAdapter jdbcAdapter, DataSourceImpl datasource, ExecutorService idExecuter, String keyName, int allocationSize) {
-		super(jdbcAdapter, datasource, idExecuter, keyName, allocationSize);
+	public TableIdQueue(JDBCAdapter jdbcAdapter, DataSourceImpl datasource, ExecutorService idExecuter, PhysicalTableGenerator generator) {
+		super(jdbcAdapter, datasource, idExecuter, generator.getPkColumnValue(), generator.getAllocationSize());
+
+		this.generator = generator;
+	}
+
+	private String getInsertSql() {
+		if (this.insertSql == null) {
+			this.insertSql = "INSERT INTO " + this.generator.getQualifiedPhysicalName() + "\nVALUES (?, ?)";
+		}
+
+		return this.insertSql;
 	}
 
 	/**
@@ -62,6 +76,45 @@ public class TableIdQueue extends IdQueue {
 	 */
 	@Override
 	protected Integer getNextId() throws SQLException {
-		throw new NotImplementedException();
+		final QueryRunner runner = new QueryRunner(this.datasource);
+
+		Integer nextId;
+
+		nextId = runner.query(this.getSelectSql(), new SingleValueHandler<Integer>(), this.generator.getPkColumnValue());
+		if (nextId == null) {
+			runner.update(this.getInsertSql(), this.generator.getPkColumnValue(), this.generator.getInitialValue() + 1);
+			nextId = 1;
+		}
+		else {
+			runner.update(this.getUpdateSql(), nextId + this.generator.getAllocationSize(), this.generator.getPkColumnValue());
+		}
+
+		return nextId;
+	}
+
+	private String getSelectSql() {
+		if (this.selectSql == null) {
+			this.selectSql = "SELECT " + this.generator.getValueColumnName() + //
+				"\nFROM " + this.generator.getQualifiedPhysicalName() + //
+				"\nWHERE " + this.generator.getPkColumnName() + " = ?";
+		}
+
+		return this.selectSql;
+	}
+
+	/**
+	 * @return
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private String getUpdateSql() {
+		if (this.updateSql == null) {
+			this.updateSql = "UPDATE " + this.generator.getQualifiedPhysicalName() + //
+				"\nSET " + this.generator.getValueColumnName() + " = ?" + //
+				"\nWHERE " + this.generator.getPkColumnName() + " = ?";
+		}
+
+		return this.updateSql;
 	}
 }

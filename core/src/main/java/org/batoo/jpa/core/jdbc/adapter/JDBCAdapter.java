@@ -35,6 +35,7 @@ import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.jdbc.AbstractJDBCAdapter;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
+import org.batoo.jpa.core.impl.jdbc.PhysicalTableGenerator;
 import org.batoo.jpa.core.jdbc.Column;
 import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.IdType;
@@ -51,48 +52,6 @@ import com.google.common.collect.Lists;
  * @since $version
  */
 public abstract class JDBCAdapter extends AbstractJDBCAdapter {
-
-	/**
-	 * Recreates the schema.
-	 * <p>
-	 * if DDL mode is DDLMode#DROP then first the schema is dropped. To keep track of whether a schema is previously dropped, schemas
-	 * consulted.
-	 * 
-	 * @param jdbcAdapter
-	 *            the JDBC adapter
-	 * @param datasource
-	 *            the datasource to use
-	 * @param schemas
-	 *            the set of schemas already dropped / created
-	 * @param ddlMode
-	 *            the DDL mode
-	 * @param schema
-	 *            the name of the current schema, may be null to indicate the default schema
-	 * @return
-	 * @throws SQLException
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public static String dropAndCreateSchemaIfNecessary(JDBCAdapter jdbcAdapter, DataSource datasource, Set<String> schemas,
-		DDLMode ddlMode, String schema) throws SQLException {
-		if (StringUtils.isBlank(schema)) {
-			schema = jdbcAdapter.getDefaultSchema(datasource);
-		}
-
-		synchronized (schemas) {
-			if (!schemas.contains(schema)) {
-				if (ddlMode == DDLMode.DROP) {
-					jdbcAdapter.dropSchema(datasource, schema);
-				}
-
-				jdbcAdapter.createSchemaIfNecessary(datasource, schema);
-				schemas.add(schema);
-			}
-		}
-
-		return schema;
-	}
 
 	private List<String> words;
 
@@ -136,7 +95,7 @@ public abstract class JDBCAdapter extends AbstractJDBCAdapter {
 		final String keys = Joiner.on(", ").join(table.getPrimaryKeyColumns());
 
 		final String qn = StringUtils.isNotBlank(table.getSchema()) ? table.getSchema() + "." + table.getName() : table.getName();
-		return "CREATE TABLE " + qn + "(\n\t" // table part
+		return "CREATE TABLE " + qn + " (\n\t" // table part
 			+ columns // columns part
 			+ "\nPRIMARY KEY(" + keys + "))"; // primary key part
 	}
@@ -183,6 +142,60 @@ public abstract class JDBCAdapter extends AbstractJDBCAdapter {
 	 * @author hceylan
 	 */
 	public abstract void createSequenceIfNecessary(DataSource datasource, SequenceGenerator sequence) throws SQLException;
+
+	/**
+	 * Creates the table generator if not exists.
+	 * 
+	 * @param datasource
+	 *            the datasource to use
+	 * @param sequence
+	 *            the sequence to create
+	 * @throws SQLException
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract void createTableGeneratorIfNecessary(DataSource datasource, PhysicalTableGenerator table) throws SQLException;
+
+	/**
+	 * Recreates the schema.
+	 * <p>
+	 * if DDL mode is DDLMode#DROP then first the schema is dropped. To keep track of whether a schema is previously dropped, schemas
+	 * consulted.
+	 * 
+	 * @param jdbcAdapter
+	 *            the JDBC adapter
+	 * @param datasource
+	 *            the datasource to use
+	 * @param schemas
+	 *            the set of schemas already dropped / created
+	 * @param ddlMode
+	 *            the DDL mode
+	 * @param schema
+	 *            the name of the current schema, may be null to indicate the default schema
+	 * @return
+	 * @throws SQLException
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String dropAndCreateSchemaIfNecessary(JDBCAdapter jdbcAdapter, DataSource datasource, Set<String> schemas, DDLMode ddlMode,
+		String schema) throws SQLException {
+		schema = this.schemaOf(datasource, schema);
+
+		synchronized (schemas) {
+			if (!schemas.contains(schema)) {
+				if (ddlMode == DDLMode.DROP) {
+					jdbcAdapter.dropSchema(datasource, schema);
+				}
+
+				jdbcAdapter.createSchemaIfNecessary(datasource, schema);
+				schemas.add(schema);
+			}
+		}
+
+		return schema;
+	}
 
 	/**
 	 * Drops the schema if exists
@@ -332,6 +345,26 @@ public abstract class JDBCAdapter extends AbstractJDBCAdapter {
 	}
 
 	/**
+	 * Returns the schema if it is set otherwise falls back to the default schema.
+	 * 
+	 * @param datasource
+	 *            the datasource to use
+	 * @param schema
+	 *            the schema name
+	 * @return the proper schema name
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected String schemaOf(DataSource datasource, String schema) {
+		if (StringUtils.isBlank(schema)) {
+			schema = this.getDefaultSchema(datasource);
+		}
+
+		return schema;
+	}
+
+	/**
 	 * Returns the id type supported.
 	 * <p>
 	 * If the idType is null, the adapter should suggest an {@link IdType} in return.
@@ -347,4 +380,5 @@ public abstract class JDBCAdapter extends AbstractJDBCAdapter {
 	 * @author hceylan
 	 */
 	public abstract IdType supports(IdType idType);
+
 }
