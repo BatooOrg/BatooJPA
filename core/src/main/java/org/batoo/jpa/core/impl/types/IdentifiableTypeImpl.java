@@ -77,11 +77,12 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 *            the meta model
 	 * @param javaType
 	 *            the java type this type corresponds to
+	 * @throws MappingException
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public IdentifiableTypeImpl(MetamodelImpl metamodelImpl, Class<X> javaType) {
+	public IdentifiableTypeImpl(MetamodelImpl metamodelImpl, Class<X> javaType) throws MappingException {
 		super(metamodelImpl, javaType);
 	}
 

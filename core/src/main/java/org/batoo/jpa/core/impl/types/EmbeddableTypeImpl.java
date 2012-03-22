@@ -18,9 +18,15 @@
  */
 package org.batoo.jpa.core.impl.types;
 
+import java.lang.annotation.Annotation;
+import java.util.Set;
+
+import javax.persistence.Embeddable;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.EmbeddableType;
 
+import org.batoo.jpa.core.BatooException;
+import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
 
 /**
@@ -36,11 +42,12 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	 *            the meta model
 	 * @param javaType
 	 *            the java type this type corresponds to
+	 * @throws MappingException
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EmbeddableTypeImpl(MetamodelImpl metaModel, Class<X> clazz) {
+	public EmbeddableTypeImpl(MetamodelImpl metaModel, Class<X> clazz) throws MappingException {
 		super(metaModel, clazz);
 
 		metaModel.addEmbeddable(this);
@@ -74,6 +81,36 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	@Override
 	public PersistenceType getPersistenceType() {
 		return PersistenceType.EMBEDDABLE;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Set<Class<? extends Annotation>> parse() throws BatooException {
+		final Set<Class<? extends Annotation>> annotations = super.parse();
+
+		final Class<X> type = this.getJavaType();
+
+		final Embeddable embeddable = type.getAnnotation(Embeddable.class);
+		if (embeddable == null) {
+			throw new MappingException("Type is not an embeddable " + type);
+		}
+		annotations.add(Embeddable.class);
+
+		this.performClassChecks(type);
+
+		return annotations;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "EmbeddableTypeImpl [name=" + this.name + ", attributes=" + this.attributes + "]";
 	}
 
 }

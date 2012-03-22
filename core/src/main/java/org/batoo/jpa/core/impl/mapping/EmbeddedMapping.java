@@ -26,7 +26,7 @@ import org.apache.commons.lang.NotImplementedException;
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.instance.AbstractResolver;
 import org.batoo.jpa.core.impl.types.AttributeImpl;
-import org.batoo.jpa.core.impl.types.IdentifiableTypeImpl;
+import org.batoo.jpa.core.impl.types.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.types.SingularAttributeImpl;
 
 /**
@@ -78,12 +78,12 @@ public class EmbeddedMapping<X, T> extends AbstractMapping<X, T> {
 	 * 
 	 */
 	@Override
-	public IdentifiableTypeImpl<T> getType() {
-		return (IdentifiableTypeImpl<T>) this.getDeclaringAttribute().getType();
+	public EmbeddableTypeImpl<T> getType() {
+		return (EmbeddableTypeImpl<T>) this.getDeclaringAttribute().getType();
 	}
 
 	private void linkAttributes() throws MappingException {
-		for (final Attribute<?, ?> attribute : this.getType().getAttributes()) {
+		for (final Attribute<?, ?> attribute : this.getType().getDeclaredAttributes()) {
 			((AttributeImpl<?, ?>) attribute).link(this.getPath());
 		}
 	}

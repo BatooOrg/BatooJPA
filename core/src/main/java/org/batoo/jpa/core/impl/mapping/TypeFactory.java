@@ -415,19 +415,19 @@ public class TypeFactory {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void forType(MetamodelImpl metaModel, Class<? extends Annotation> annotation, Class<?> type) throws MappingException {
 		if (annotation == Entity.class) {
-			LOG.trace("Found Entity: {0}", type.getCanonicalName());
+			LOG.debug("Found Entity: {0}", type.getCanonicalName());
 
 			new EntityTypeImpl(metaModel, type);
 		}
 
 		if (annotation == MappedSuperclass.class) {
-			LOG.trace("Found MappedSuperType: {0}", type.getCanonicalName());
+			LOG.debug("Found MappedSuperType: {0}", type.getCanonicalName());
 
 			new MappedSuperclassTypeImpl(metaModel, type);
 		}
 
 		if (annotation == Embeddable.class) {
-			LOG.trace("Found EmbeddableType: {0}", type.getCanonicalName());
+			LOG.debug("Found EmbeddableType: {0}", type.getCanonicalName());
 
 			new EmbeddableTypeImpl(metaModel, type);
 		}
@@ -621,8 +621,8 @@ public class TypeFactory {
 		for (final String className : managedClassNames) {
 			try {
 				final Class<?> clazz = Class.forName(className);
-				if (clazz.getAnnotation(Embedded.class) != null) {
-					TypeFactory.forType(metaModel, Embedded.class, clazz);
+				if (clazz.getAnnotation(Embeddable.class) != null) {
+					TypeFactory.forType(metaModel, Embeddable.class, clazz);
 				}
 				else if (clazz.getAnnotation(MappedSuperclass.class) != null) {
 					TypeFactory.forType(metaModel, MappedSuperclass.class, clazz);
@@ -632,7 +632,7 @@ public class TypeFactory {
 				}
 				else {
 					throw new MappingException(
-						"Class doe not have neither of the @Embedded, @MappedSuperClass, @Entity annotations declared");
+						"Class doe not have neither of the @Embeddable, @MappedSuperClass, @Entity annotations declared");
 				}
 			}
 			catch (final ClassNotFoundException e) {

@@ -19,10 +19,6 @@
 package org.batoo.jpa.core.impl.types;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -63,7 +59,6 @@ import org.batoo.jpa.core.impl.mapping.OwnedAssociation;
 import org.batoo.jpa.core.impl.mapping.OwnerAssociationMapping;
 import org.batoo.jpa.core.impl.mapping.TableTemplate;
 import org.batoo.jpa.core.impl.mapping.TypeFactory;
-import org.batoo.jpa.core.impl.reflect.ReflectHelper;
 import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.IdType;
 
@@ -91,8 +86,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private final Map<String, BasicMapping<?, ?>> idMappings = Maps.newHashMap();
 	private final Map<String, BasicMapping<?, ?>> identityMappings = Maps.newHashMap();
 
-	private final Constructor<X> constructor;
-
 	private final Set<PhysicalColumn> columns = Sets.newHashSet();
 
 	private PhysicalTable primaryTable;
@@ -119,7 +112,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 		metaModel.addEntity(this);
 
-		this.constructor = this.getDefaultConstructor(javaType);
 		this.selectHelper = new SelectHelper<X>(this);
 	}
 
@@ -332,31 +324,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	@Override
 	public BindableType getBindableType() {
 		return BindableType.ENTITY_TYPE;
-	}
-
-	private Constructor<X> getDefaultConstructor(final Class<X> javaType) throws MappingException {
-		final Constructor<X> constructor = AccessController.doPrivileged(new PrivilegedAction<Constructor<X>>() {
-			@Override
-			public Constructor<X> run() {
-				try {
-					return javaType.getConstructor();
-				}
-				catch (final NoSuchMethodException e) {
-					return null;
-				}
-				catch (final SecurityException e) {
-					return null;
-				}
-			}
-		});
-
-		if (constructor == null) {
-			throw new MappingException("Class " + javaType + " must have a default constructor");
-		}
-
-		ReflectHelper.makeAccessible(constructor);
-
-		return constructor;
 	}
 
 	/**
@@ -622,25 +589,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
-	 * Creates a new instance.
-	 * 
-	 * @return a new instance
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public X newInstance() {
-		try {
-			return this.constructor.newInstance();
-		}
-		catch (final Exception e) {
-			// Not possible
-		}
-
-		return null;
-	}
-
-	/**
 	 * Returns a new managed instance with its id populated from id.
 	 * 
 	 * @param id
@@ -675,35 +623,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		}
 		annotations.add(Entity.class);
 
-		final String error = AccessController.doPrivileged(new PrivilegedAction<String>() {
-
-			@Override
-			public String run() {
-				try {
-					type.getConstructor();
-				}
-				catch (final SecurityException e) {
-					// not likely
-				}
-				catch (final NoSuchMethodException e) {
-					return "Type " + type + " does not have a default constructor";
-				}
-
-				if (type.isInterface() || type.isAnnotation() || type.isEnum()) {
-					return "Type " + type + " is not a regular class";
-				}
-
-				if (Modifier.isFinal(type.getModifiers())) {
-					return "Type " + type + " must not be final";
-				}
-
-				return null;
-			}
-		});
-
-		if (error != null) {
-			throw new MappingException(error);
-		}
+		this.performClassChecks(type);
 
 		return annotations;
 	}

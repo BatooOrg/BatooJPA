@@ -109,12 +109,11 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 	protected CascadeType[] cascadeType; // the cascade type
 
 	protected FetchType fetchType; // the fetch type
-	protected boolean orphanRemoval;
-	protected String mappedBy;
-	// extra attribute information for temporal and enum attributes
+	protected boolean orphanRemoval; // the orphan removal strategy
+	protected String mappedBy; // the mapped by information
 	private TemporalType temporalType; // the temporal type of the attribute, applicable to data / time type attributes
-
 	private EnumType enumType; // the enum type of the attribute, applicable to
+
 	protected AbstractMapping<?, ?> mapping; // the mapping of the attribute
 
 	private boolean charType;
@@ -299,6 +298,16 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 	 */
 	public final String getMappedBy() {
 		return this.mappedBy;
+	}
+
+	/**
+	 * Returns the mapping.
+	 * 
+	 * @return the mapping
+	 * @since $version
+	 */
+	public AbstractMapping<?, ?> getMapping() {
+		return this.mapping;
 	}
 
 	/**

@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.impl.types;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
@@ -38,8 +39,10 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.BatooException;
+import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
 import org.batoo.jpa.core.impl.mapping.TypeFactory;
+import org.batoo.jpa.core.impl.reflect.ReflectHelper;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
@@ -61,23 +64,29 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	protected final Map<String, Attribute<X, ?>> declaredAttributes = Maps.newHashMap();
 	protected final Set<Attribute<X, ?>> setDeclaredAttributes = Sets.newHashSet();
 
+	final Constructor<X> constructor;
+
 	/**
 	 * @param metaModel
 	 *            the meta model
 	 * @param javaType
 	 *            the java type this type corresponds to
+	 * @throws MappingException
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedTypeImpl(MetamodelImpl metaModel, Class<X> javaType) {
+	public ManagedTypeImpl(MetamodelImpl metaModel, Class<X> javaType) throws MappingException {
 		super(metaModel, javaType);
+
+		this.constructor = this.getDefaultConstructor(javaType);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public Attribute<? super X, ?> getAttribute(String name) {
 		final Attribute<? super X, ?> attribute = this.attributes.get(name);
 
@@ -92,6 +101,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public Set<Attribute<? super X, ?>> getAttributes() {
 		return this.setAttributes;
 	}
@@ -100,6 +110,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public CollectionAttribute<? super X, ?> getCollection(String name) {
 		final Attribute<? super X, ?> attribute = this.getAttribute(name);
@@ -115,6 +126,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public <E> CollectionAttribute<? super X, E> getCollection(String name, Class<E> elementType) {
 		final CollectionAttribute<? super X, ?> attribute = this.getCollection(name);
@@ -130,6 +142,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public Attribute<X, ?> getDeclaredAttribute(String name) {
 		final Attribute<X, ?> attribute = this.declaredAttributes.get(name);
 
@@ -144,6 +157,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public Set<Attribute<X, ?>> getDeclaredAttributes() {
 		return this.setDeclaredAttributes;
 	}
@@ -152,6 +166,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public CollectionAttribute<X, ?> getDeclaredCollection(String name) {
 		final Attribute<? super X, ?> attribute = this.getAttribute(name);
@@ -167,6 +182,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public <E> CollectionAttribute<X, E> getDeclaredCollection(String name, Class<E> elementType) {
 		final CollectionAttribute<? super X, ?> attribute = this.getDeclaredCollection(name);
@@ -182,6 +198,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public ListAttribute<X, ?> getDeclaredList(String name) {
 		final Attribute<? super X, ?> attribute = this.getAttribute(name);
@@ -197,6 +214,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public <E> ListAttribute<X, E> getDeclaredList(String name, Class<E> elementType) {
 		final ListAttribute<X, ?> attribute = this.getDeclaredList(name);
@@ -212,6 +230,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public MapAttribute<X, ?, ?> getDeclaredMap(String name) {
 		final Attribute<? super X, ?> attribute = this.getAttribute(name);
@@ -227,6 +246,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public <K, V> MapAttribute<X, K, V> getDeclaredMap(String name, Class<K> keyType, Class<V> valueType) {
 		final MapAttribute<X, ?, ?> attribute = this.getDeclaredMap(name);
@@ -242,10 +262,12 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public Set<PluralAttribute<X, ?, ?>> getDeclaredPluralAttributes() {
 		final Predicate<? super Attribute<X, ?>> predicate = new Predicate<Attribute<X, ?>>() {
 
+			@Override
 			public boolean apply(Attribute<X, ?> input) {
 				return input instanceof PluralAttribute;
 			}
@@ -263,6 +285,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public SetAttribute<X, ?> getDeclaredSet(String name) {
 		final Attribute<? super X, ?> attribute = this.getAttribute(name);
@@ -278,6 +301,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public <E> SetAttribute<X, E> getDeclaredSet(String name, Class<E> elementType) {
 		final SetAttribute<X, ?> attribute = this.getDeclaredSet(name);
@@ -293,6 +317,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public SingularAttribute<X, ?> getDeclaredSingularAttribute(String name) {
 		final Attribute<X, ?> attribute = this.getDeclaredAttribute(name);
 
@@ -307,6 +332,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public <Y> SingularAttribute<X, Y> getDeclaredSingularAttribute(String name, Class<Y> type) {
 		final SingularAttribute<X, ?> attribute = this.getDeclaredSingularAttribute(name);
@@ -322,10 +348,12 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public Set<SingularAttribute<X, ?>> getDeclaredSingularAttributes() {
 		final Predicate<? super Attribute<X, ?>> predicate = new Predicate<Attribute<X, ?>>() {
 
+			@Override
 			public boolean apply(Attribute<X, ?> input) {
 				return input instanceof SingularAttribute;
 			}
@@ -339,10 +367,36 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 		return singulars;
 	}
 
+	protected Constructor<X> getDefaultConstructor(final Class<X> javaType) throws MappingException {
+		final Constructor<X> constructor = AccessController.doPrivileged(new PrivilegedAction<Constructor<X>>() {
+			@Override
+			public Constructor<X> run() {
+				try {
+					return javaType.getConstructor();
+				}
+				catch (final NoSuchMethodException e) {
+					return null;
+				}
+				catch (final SecurityException e) {
+					return null;
+				}
+			}
+		});
+
+		if (constructor == null) {
+			throw new MappingException("Class " + javaType + " must have a default constructor");
+		}
+
+		ReflectHelper.makeAccessible(constructor);
+
+		return constructor;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public ListAttribute<? super X, ?> getList(String name) {
 		final Attribute<? super X, ?> attribute = this.getAttribute(name);
@@ -358,6 +412,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public <E> ListAttribute<? super X, E> getList(String name, Class<E> elementType) {
 		final ListAttribute<? super X, ?> attribute = this.getList(name);
@@ -373,6 +428,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public MapAttribute<? super X, ?, ?> getMap(String name) {
 		final Attribute<? super X, ?> attribute = this.getAttribute(name);
@@ -388,6 +444,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public <K, V> MapAttribute<? super X, K, V> getMap(String name, Class<K> keyType, Class<V> valueType) {
 		final MapAttribute<? super X, ?, ?> attribute = this.getMap(name);
@@ -403,6 +460,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public javax.persistence.metamodel.Type.PersistenceType getPersistenceType() {
 		// TODO Auto-generated method stub
 		return null;
@@ -412,10 +470,12 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public Set<PluralAttribute<? super X, ?, ?>> getPluralAttributes() {
 		final Predicate<? super Attribute<? super X, ?>> predicate = new Predicate<Attribute<? super X, ?>>() {
 
+			@Override
 			public boolean apply(Attribute<? super X, ?> input) {
 				return input instanceof PluralAttribute;
 			}
@@ -433,6 +493,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public SetAttribute<? super X, ?> getSet(String name) {
 		final Attribute<? super X, ?> attribute = this.getAttribute(name);
@@ -448,6 +509,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public <E> SetAttribute<? super X, E> getSet(String name, Class<E> elementType) {
 		final SetAttribute<? super X, ?> attribute = this.getSet(name);
@@ -463,6 +525,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public SingularAttribute<? super X, ?> getSingularAttribute(String name) {
 		final Attribute<? super X, ?> attribute = this.getAttribute(name);
 
@@ -477,6 +540,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public <Y> SingularAttribute<? super X, Y> getSingularAttribute(String name, Class<Y> type) {
 		final SetAttribute<? super X, ?> attribute = this.getSet(name);
@@ -492,10 +556,12 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public Set<SingularAttribute<? super X, ?>> getSingularAttributes() {
 		final Predicate<? super Attribute<? super X, ?>> predicate = new Predicate<Attribute<? super X, ?>>() {
 
+			@Override
 			public boolean apply(Attribute<? super X, ?> input) {
 				return input instanceof SingularAttribute;
 			}
@@ -507,6 +573,25 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 		plurals.addAll((Collection<? extends SingularAttribute<X, ?>>) set);
 
 		return plurals;
+	}
+
+	/**
+	 * Creates a new instance.
+	 * 
+	 * @return a new instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public X newInstance() {
+		try {
+			return this.constructor.newInstance();
+		}
+		catch (final Exception e) {
+			// Not possible
+		}
+
+		return null;
 	}
 
 	/**
@@ -524,6 +609,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 
 		final Field[] fields = AccessController.doPrivileged(new PrivilegedAction<Field[]>() {
 
+			@Override
 			public Field[] run() {
 				return ManagedTypeImpl.this.getJavaType().getDeclaredFields();
 			}
@@ -553,6 +639,38 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 		}
 
 		return Sets.newHashSet();
+	}
+
+	protected void performClassChecks(final Class<X> type) throws MappingException {
+		final String error = AccessController.doPrivileged(new PrivilegedAction<String>() {
+
+			@Override
+			public String run() {
+				try {
+					type.getConstructor();
+				}
+				catch (final SecurityException e) {
+					// not likely
+				}
+				catch (final NoSuchMethodException e) {
+					return "Type " + type + " does not have a default constructor";
+				}
+
+				if (type.isInterface() || type.isAnnotation() || type.isEnum()) {
+					return "Type " + type + " is not a regular class";
+				}
+
+				if (Modifier.isFinal(type.getModifiers())) {
+					return "Type " + type + " must not be final";
+				}
+
+				return null;
+			}
+		});
+
+		if (error != null) {
+			throw new MappingException(error);
+		}
 	}
 
 	/**

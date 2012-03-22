@@ -25,6 +25,7 @@ import java.util.LinkedList;
 
 import org.batoo.jpa.core.impl.instance.AbstractResolver;
 import org.batoo.jpa.core.impl.types.AttributeImpl;
+import org.batoo.jpa.core.impl.types.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 
 import com.google.common.base.Function;
@@ -226,12 +227,20 @@ public abstract class AbstractMapping<X, T> implements Mapping<X, T> {
 		while (i.hasNext()) {
 			final AttributeImpl<?, ?> attribute = i.next();
 
-			if (i.hasNext()) { // we are not there yet
-				instance = attribute.get(instance);
-				continue;
+			if (!i.hasNext()) { // we have reached the destination
+				attribute.set(instance, value);
+				return;
 			}
 
-			attribute.set(instance, value);
+			Object nextInstance = attribute.get(instance);
+			if (nextInstance == null) {
+				final EmbeddableTypeImpl<?> type = (EmbeddableTypeImpl<?>) attribute.getMapping().getType();
+
+				nextInstance = type.newInstance();
+				attribute.set(instance, nextInstance);
+			}
+
+			instance = nextInstance;
 		}
 	}
 
