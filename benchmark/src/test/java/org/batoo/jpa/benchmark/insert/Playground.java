@@ -59,10 +59,24 @@ public class Playground {
 		final Address address = new Address();
 		address.setCity("Istanbul");
 		address.setPerson(person);
-
 		address.setCountry(this.country);
-
 		person.getAddresses().add(address);
+
+		final Address address2 = new Address();
+		address2.setCity("Istanbul");
+		address2.setPerson(person);
+		address2.setCountry(this.country);
+		person.getAddresses().add(address2);
+
+		final Phone phone = new Phone();
+		phone.setPhoneNo("111 222-3344");
+		phone.setPerson(person);
+		person.getPhones().add(phone);
+
+		final Phone phone2 = new Phone();
+		phone2.setPhoneNo("111 222-3344");
+		phone2.setPerson(person);
+		person.getPhones().add(phone2);
 
 		return person;
 	}

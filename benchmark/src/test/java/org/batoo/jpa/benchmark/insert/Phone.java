@@ -19,6 +19,8 @@
 package org.batoo.jpa.benchmark.insert;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
@@ -31,10 +33,13 @@ import javax.persistence.ManyToOne;
 public class Phone {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Integer id;
 
 	@ManyToOne
 	private Person person;
+
+	private String phoneNo;
 
 	/**
 	 * Returns the id.
@@ -57,6 +62,16 @@ public class Phone {
 	}
 
 	/**
+	 * Returns the phoneNo.
+	 * 
+	 * @return the phoneNo
+	 * @since $version
+	 */
+	public String getPhoneNo() {
+		return this.phoneNo;
+	}
+
+	/**
 	 * Sets the id.
 	 * 
 	 * @param id
@@ -76,6 +91,17 @@ public class Phone {
 	 */
 	public void setPerson(Person person) {
 		this.person = person;
+	}
+
+	/**
+	 * Sets the phoneNo.
+	 * 
+	 * @param phoneNo
+	 *            the phoneNo to set
+	 * @since $version
+	 */
+	public void setPhoneNo(String phoneNo) {
+		this.phoneNo = phoneNo;
 	}
 
 }
