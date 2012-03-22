@@ -41,12 +41,35 @@ public class TableTemplate {
 
 	private final String schema;
 	private final String name;
+	private final boolean primary;
 
 	private final UniqueConstraint[] uniqueConstraints;
 	private final PrimaryKeyJoinColumn[] primaryKeyJoinColumns;
 
 	private final List<PhysicalColumn> columns = Lists.newArrayList();
 	private final List<PhysicalColumn> primaryKeys = Lists.newArrayList();
+
+	/**
+	 * @param schemaName
+	 *            the unescaped schema name
+	 * @param tableName
+	 *            The unescaped table name, must be null for primary table
+	 * @param uniqueConstraints
+	 *            the unique constraints for the table
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public TableTemplate(IdentifiableTypeImpl<?> identifiableTypeImpl, String schema, String name, UniqueConstraint[] uniqueConstraints) {
+		super();
+
+		this.owner = identifiableTypeImpl;
+		this.schema = schema;
+		this.name = name;
+		this.primary = true;
+		this.uniqueConstraints = uniqueConstraints;
+		this.primaryKeyJoinColumns = null;
+	}
 
 	/**
 	 * @param schemaName
@@ -68,6 +91,7 @@ public class TableTemplate {
 		this.owner = identifiableTypeImpl;
 		this.schema = schema;
 		this.name = name;
+		this.primary = false;
 		this.uniqueConstraints = uniqueConstraints;
 		this.primaryKeyJoinColumns = primaryKeyJoinColumns;
 	}
@@ -182,6 +206,6 @@ public class TableTemplate {
 	 * @since $version
 	 */
 	public boolean isPrimary() {
-		return this.name == null;
+		return this.primary;
 	}
 }

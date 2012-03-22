@@ -548,7 +548,7 @@ public class ConnectionImpl implements Connection {
 	/* package */PreparedStatementImpl prepareStatement0(String sql) throws SQLException {
 		final long callNo = ++this.callNo;
 
-		LOG.trace("{0}:{1} prepareStatement(String sql): {2}", this.connNo, callNo, BLogger.lazyBoxed(sql));
+		LOG.trace("{0}:{1} prepareStatement(String): {2}", this.connNo, callNo, BLogger.lazyBoxed(sql));
 
 		final long start = System.currentTimeMillis();
 		try {
@@ -558,11 +558,11 @@ public class ConnectionImpl implements Connection {
 			final long time = System.currentTimeMillis() - start;
 
 			if (time > BJPASettings.WARN_TIME) {
-				LOG.warn(new OperationTookLongTimeWarning(), "{0}:{1} {2} msecs, prepareStatement(String sql): {3}", this.connNo, callNo,
-					time, BLogger.lazyBoxed(sql));
+				LOG.warn(new OperationTookLongTimeWarning(), "{0}:{1} {2} msecs, prepareStatement(String): {3}", this.connNo, callNo, time,
+					BLogger.lazyBoxed(sql));
 			}
 			else {
-				LOG.debug("{0}:{1} {2} msecs, prepareStatement(String sql)", this.connNo, callNo, time);
+				LOG.debug("{0}:{1} {2} msecs, prepareStatement(String)", this.connNo, callNo, time);
 			}
 		}
 	}

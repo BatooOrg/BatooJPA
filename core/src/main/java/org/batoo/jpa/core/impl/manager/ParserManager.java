@@ -18,7 +18,6 @@
  */
 package org.batoo.jpa.core.impl.manager;
 
-import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -48,6 +47,7 @@ public class ParserManager extends DeploymentManager {
 
 	private class ParserThreadFactory implements ThreadFactory {
 
+		@Override
 		public Thread newThread(Runnable r) {
 			return new Thread(r, "Batoo Parser [" + ParserManager.this.nextThreadNo.incrementAndGet() + "]");
 		}
@@ -62,11 +62,10 @@ public class ParserManager extends DeploymentManager {
 			this.type = type;
 		}
 
+		@Override
 		public void run() {
 			try {
-				final Set<Class<? extends Annotation>> annotations = this.type.parse();
-
-				ReflectHelper.checkAnnotations(this.type.getJavaType(), annotations);
+				ReflectHelper.checkAnnotations(this.type.getJavaType(), this.type.parse());
 			}
 			catch (final Exception e) {
 				throw new RuntimeException(e);

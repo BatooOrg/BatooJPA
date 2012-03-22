@@ -55,10 +55,7 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 
 	private final EntityTypeImpl<X> rootType;
 	private final BiMap<String, PhysicalColumn> columnAliases;
-	private final Map<String, PhysicalTable> tableAliases;
-	private final Map<String, PhysicalTable> primaryTableAliases;
 	private final List<Deque<Association<?, ?>>> entityPaths;
-	private final Map<String, PhysicalTable> secondarytableAliases;
 
 	/**
 	 * @param session
@@ -69,9 +66,6 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 	 *            the aliases for the columns
 	 * @param tableAliases
 	 *            the aliases for all the tables
-	 * @param primaryTableAliases
-	 *            the aliases for
-	 * @param secondarytableAliases
 	 * @param entityPaths
 	 *            the entity path
 	 * 
@@ -79,16 +73,12 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 	 * @author hceylan
 	 */
 	public SingleSelectHandler(SessionImpl session, EntityTypeImpl<X> rootType, BiMap<String, PhysicalColumn> columnAliases,
-		Map<String, PhysicalTable> tableAliases, Map<String, PhysicalTable> primaryTableAliases,
-		Map<String, PhysicalTable> secondarytableAliases, List<Deque<Association<?, ?>>> entityPaths) {
+		List<Deque<Association<?, ?>>> entityPaths) {
 		super();
 
 		this.session = session;
 		this.rootType = rootType;
 		this.columnAliases = columnAliases;
-		this.tableAliases = tableAliases;
-		this.primaryTableAliases = primaryTableAliases;
-		this.secondarytableAliases = secondarytableAliases;
 		this.entityPaths = entityPaths;
 	}
 
@@ -101,7 +91,7 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 	 *            the current depth
 	 * @param currentType
 	 *            the current entity type
-	 * @return
+	 * @return the managed instance
 	 * @throws SQLException
 	 * 
 	 * @since $version
@@ -111,9 +101,8 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 	private ManagedInstance<?> createManagedInstance(SessionImpl session, ResultSet rs, Map<ManagedId<?>, ManagedInstance<?>> cache,
 		int depth, EntityTypeImpl<?> currentType) throws SQLException {
 		if (currentType.hasSingleIdAttribute()) {
-			final String tableAlias = "T" + depth;
-			final PhysicalTable table = this.tableAliases.get(tableAlias);
-			final PhysicalColumn primaryKey = table.getPrimaryKeys().iterator().next();
+			final PhysicalTable primaryTable = currentType.getPrimaryTable();
+			final PhysicalColumn primaryKey = primaryTable.getPrimaryKeys().iterator().next();
 			final Object primaryKeyValue = this.getColumnValue(rs, primaryKey);
 
 			// Create a model of the instance

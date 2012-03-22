@@ -36,6 +36,7 @@ import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.HashBiMap;
@@ -62,9 +63,6 @@ public class SelectHelper<X> {
 	private final EntityTypeImpl<X> type;
 
 	private final BiMap<String, PhysicalColumn> columnAliases = HashBiMap.create();
-	private final Map<String, PhysicalTable> tableAliases = HashBiMap.create();
-	private final Map<String, PhysicalTable> secondarytableAliases = HashBiMap.create();
-	private final Map<String, PhysicalTable> primaryTableAliases = HashBiMap.create();
 	private final List<Deque<Association<?, ?>>> entityPaths = Lists.newArrayList();
 
 	private final Map<String, PhysicalColumn> predicates = Maps.newHashMap();
@@ -99,7 +97,23 @@ public class SelectHelper<X> {
 	private void addFields(List<String> fieldsBuffer, PhysicalTable table, final int tableNo) {
 		table.sortColumns();
 
-		final List<String> fields = Lists.transform(table.getColumns(), new Function<PhysicalColumn, String>() {
+		// Filter out the secondary table columns
+		final Collection<PhysicalColumn> filteredColumns;
+
+		if (table.isPrimary()) {
+			filteredColumns = table.getColumns();
+		}
+		else {
+			filteredColumns = Collections2.filter(table.getColumns(), new Predicate<PhysicalColumn>() {
+
+				@Override
+				public boolean apply(PhysicalColumn input) {
+					return !input.isId();
+				}
+			});
+		}
+
+		final Collection<String> fields = Collections2.transform(filteredColumns, new Function<PhysicalColumn, String>() {
 
 			int fieldNo = 0;
 
@@ -143,7 +157,6 @@ public class SelectHelper<X> {
 	 */
 	private void addPrimaryJoin(List<String> joinsBuffer, final int parentTableNo, final int tableNo, final Association<?, ?> association) {
 		OwnerAssociation<?, ?> ownerAssociation;
-
 		// find the owner side of the association
 		if (association instanceof OwnerAssociation) {
 			ownerAssociation = (OwnerAssociation<?, ?>) association;
@@ -166,6 +179,37 @@ public class SelectHelper<X> {
 		});
 
 		this.composeJoin(joinsBuffer, association.getType().getPrimaryTable(), tableNo, restrictions);
+	}
+
+	/**
+	 * Adds a join for secondary table
+	 * 
+	 * @param joinsBuffer
+	 *            the joins buffer
+	 * @param parentTableNo
+	 *            the no of the parent table
+	 * @param tableNo
+	 *            the no of the table
+	 * @param table
+	 *            the secondary table
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void addSecondaryJoin(List<String> joinsBuffer, final int parentTableNo, final int tableNo, PhysicalTable table) {
+		final Collection<String> restrictions = Collections2.transform(table.getPrimaryKeys(), new Function<PhysicalColumn, String>() {
+
+			@Override
+			public String apply(PhysicalColumn input) {
+				final String left = "T" + parentTableNo;
+				final String right = "T" + tableNo;
+
+				return left + "." + input.getPhysicalName() + " = " + right + "."
+					+ input.getReferencedPrimaryTableColumn().getPhysicalName();
+			}
+		});
+
+		this.composeJoin(joinsBuffer, table, tableNo, restrictions);
 	}
 
 	/**
@@ -233,12 +277,10 @@ public class SelectHelper<X> {
 			// initialize the table number
 			final int tableNo = 0;
 
-			final PhysicalTable primaryTable = this.type.getPrimaryTable();
-
 			this.processType(fieldsBuffer, joinsBuffer, null, this.type, Lists.<Association<?, ?>> newLinkedList(), tableNo, tableNo);
 
 			// compose and return the final query
-			this.selectSql = this.compose(fieldsBuffer, joinsBuffer, primaryTable);
+			this.selectSql = this.compose(fieldsBuffer, joinsBuffer, this.type.getPrimaryTable());
 		}
 
 		return this.selectSql;
@@ -246,28 +288,27 @@ public class SelectHelper<X> {
 
 	private void processType(final List<String> fieldsBuffer, final List<String> joinsBuffer, EntityTypeImpl<?> parentType,
 		EntityTypeImpl<?> type, Deque<Association<?, ?>> path, int parentTableNo, int tableNo) {
+
+		// handle the primary table
+		final PhysicalTable primaryTable = type.getPrimaryTable();
+		this.addFields(fieldsBuffer, primaryTable, tableNo);
+
+		if (parentType != null) { // we are not the root entity
+			this.addPrimaryJoin(joinsBuffer, parentTableNo, tableNo, path.getLast());
+		}
+
+		parentTableNo = tableNo;
+
+		// handle the secondary tables;
 		for (final PhysicalTable table : type.getTables().values()) {
-
-			// add fields
-			this.addFields(fieldsBuffer, table, tableNo);
-
-			this.tableAliases.put("T" + tableNo, table);
-
-			if (table.isPrimary()) {
-				if (parentType != null) { // we are not the root entity
-					this.addPrimaryJoin(joinsBuffer, parentTableNo, tableNo, path.getLast());
-				}
-
-				parentTableNo = tableNo;
-				this.primaryTableAliases.put("T" + tableNo, table);
-			}
-			else {
-				this.secondarytableAliases.put("T" + tableNo, table);
-				// this.addSecondaryJoin(joinsBuffer, table, primaryTableNo, tableNo);
+			if (table.isPrimary()) { // increment the tableNo index
+				continue;
 			}
 
-			// increment the tableNo index
 			tableNo++;
+
+			this.addFields(fieldsBuffer, table, tableNo);
+			this.addSecondaryJoin(joinsBuffer, parentTableNo, tableNo, table);
 		}
 
 		// process the associations
@@ -283,7 +324,7 @@ public class SelectHelper<X> {
 				path.addLast(child);
 				this.entityPaths.add(path);
 
-				this.processType(fieldsBuffer, joinsBuffer, child.getOwner(), child.getType(), path, parentTableNo, tableNo);
+				this.processType(fieldsBuffer, joinsBuffer, child.getOwner(), child.getType(), path, parentTableNo, ++tableNo);
 			}
 		}
 	}
@@ -312,8 +353,7 @@ public class SelectHelper<X> {
 			}
 		});
 
-		final SingleSelectHandler<X> rsHandler = new SingleSelectHandler<X>(session, this.type, this.columnAliases, this.tableAliases,
-			this.primaryTableAliases, this.secondarytableAliases, this.entityPaths);
+		final SingleSelectHandler<X> rsHandler = new SingleSelectHandler<X>(session, this.type, this.columnAliases, this.entityPaths);
 
 		return new QueryRunner().query(session.getConnection(), selectSql, rsHandler, params.toArray());
 	}

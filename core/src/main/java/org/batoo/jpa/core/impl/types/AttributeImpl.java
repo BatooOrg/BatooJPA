@@ -143,10 +143,9 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 		this.jdbcAdapter = this.declaringType.getMetaModel().getJdbcAdapter();
 		this.attributeType = AtrributeType.BASIC;
 
-		final Set<Class<? extends Annotation>> annotations = this.parse();
-
-		ReflectHelper.checkAnnotations(javaMember, annotations);
 		ReflectHelper.makeAccessible(this.javaMember);
+
+		ReflectHelper.checkAnnotations(javaMember, this.parse());
 	}
 
 	/**
@@ -327,7 +326,7 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 			return ((PluralAttributeImpl<X, ?, Y>) this).getElementType();
 		}
 		else {
-			return (TypeImpl<Y>) ((SingularAttributeImpl<X, Y>) this).getType();
+			return ((SingularAttributeImpl<X, Y>) this).getType();
 		}
 	}
 

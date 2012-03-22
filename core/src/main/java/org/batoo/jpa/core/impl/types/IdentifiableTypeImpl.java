@@ -58,9 +58,9 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 
 	private Class<?> idJavaType;
 
+	protected final Map<String, TableTemplate> tableTemplates = Maps.newHashMap();
 	private TableTemplate primaryTableTemplate;
 
-	protected final Map<String, TableTemplate> tableTemplates = Maps.newHashMap();
 	protected final Map<String, SingularAttributeImpl<X, ?>> declaredIdAttributes = Maps.newHashMap();
 	protected final Map<String, SingularAttributeImpl<? super X, ?>> idAttributes = Maps.newHashMap();
 	protected final Map<String, SingularAttributeImpl<? super X, ?>> versionAttributes = Maps.newHashMap();
@@ -329,7 +329,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 			annotations.add(Table.class);
 		}
 		else if ((this.getSupertype() == null) || (this.getSupertype().getPrimaryTableTemplate() == null)) {
-			this.putTable(true, null, this.name, null, null);
+			this.putTable(true, "", this.name, null, null);
 		}
 	}
 
@@ -348,6 +348,8 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 		if (secondaryTable != null) {
 			this.putTable(false, secondaryTable.schema(), secondaryTable.name(), secondaryTable.uniqueConstraints(),
 				secondaryTable.pkJoinColumns());
+
+			annotations.add(SecondaryTable.class);
 		}
 	}
 
@@ -376,14 +378,16 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 			throw new MappingException("Table name cannot be null, spesified on " + this.javaType);
 		}
 
-		final TableTemplate table = new TableTemplate(this, schema, name, uniqueConstraints, primaryKeyJoinColumns);
-		this.tableTemplates.put(schema + "." + name, table);
-
-		if (!primary && (primaryKeyJoinColumns.length == 0)) {
-			throw new MappingException("Secondary tables must declare the primaryKeyJoinColumns, declared on " + this.javaType);
+		TableTemplate table;
+		if (primary) {
+			table = new TableTemplate(this, schema, name, uniqueConstraints);
+			this.primaryTableTemplate = table;
+		}
+		else {
+			table = new TableTemplate(this, schema, name, uniqueConstraints, primaryKeyJoinColumns);
 		}
 
-		this.primaryTableTemplate = table;
+		this.tableTemplates.put(schema + "." + name, table);
 	}
 
 	/**

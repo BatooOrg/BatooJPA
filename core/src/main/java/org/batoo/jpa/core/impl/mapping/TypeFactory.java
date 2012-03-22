@@ -60,7 +60,10 @@ import javax.persistence.MapKeyJoinColumns;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.SecondaryTable;
+import javax.persistence.SecondaryTables;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -121,7 +124,7 @@ public class TypeFactory {
 	 * @author hceylan
 	 */
 	public static Set<Class<? extends Annotation>> conflictsFor(Class<? extends Annotation> annotation) {
-		final Set<Class<? extends Annotation>> elements = CONFLICTS.get(annotation.getInterfaces()[0]);
+		final Set<Class<? extends Annotation>> elements = CONFLICTS.get(annotation);
 
 		if (elements == null) {
 			return Collections.emptySet();
@@ -336,6 +339,21 @@ public class TypeFactory {
 		// @TableGenerator
 		conflicts.put(TableGenerator.class, items = Sets.newHashSet());
 		items.add(SequenceGenerator.class);
+
+		// @SecondaryTables
+		conflicts.put(SecondaryTables.class, items = Sets.newHashSet());
+		items.add(SecondaryTable.class);
+
+		// @Entity
+		conflicts.put(Entity.class, items = Sets.newHashSet());
+		items.add(MappedSuperclass.class);
+
+		// @Entity
+		conflicts.put(Embeddable.class, items = Sets.newHashSet());
+		items.add(Entity.class);
+		items.add(MappedSuperclass.class);
+		items.add(SecondaryTable.class);
+		items.add(Table.class);
 
 		return conflicts;
 	}

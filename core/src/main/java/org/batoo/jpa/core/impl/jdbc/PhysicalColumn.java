@@ -41,19 +41,20 @@ public class PhysicalColumn implements Column {
 
 	private final AbstractPhysicalMapping<?, ?> mapping;
 	private final PhysicalColumn referencedColumn;
+	private final PhysicalColumn referencedPrimaryTableColumn;
 
 	private final PhysicalTable table;
+
 	private final String name;
 	private final String physicalName;
-
 	private final IdType idType;
 
 	private final int sqlType;
+
 	private final int length;
 	private final int precision;
 	private final int scale;
 	private final boolean nullable;
-
 	private final boolean unique;
 
 	private int h;
@@ -86,12 +87,14 @@ public class PhysicalColumn implements Column {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private PhysicalColumn(AbstractPhysicalMapping<?, ?> mapping, PhysicalColumn referencedColumn, PhysicalTable table, String name,
-		IdType idType, int sqlType, int length, int precision, int scale, boolean nullable, boolean unique) throws MappingException {
+	private PhysicalColumn(AbstractPhysicalMapping<?, ?> mapping, PhysicalColumn referencedColumn,
+		PhysicalColumn referencedPrimaryTableColumn, PhysicalTable table, String name, IdType idType, int sqlType, int length,
+		int precision, int scale, boolean nullable, boolean unique) throws MappingException {
 		super();
 
 		this.mapping = mapping;
 		this.referencedColumn = referencedColumn;
+		this.referencedPrimaryTableColumn = referencedPrimaryTableColumn;
 
 		this.table = table;
 		this.name = StringUtils.isNotBlank(name) ? name : mapping.getDeclaringAttribute().getName();
@@ -105,7 +108,6 @@ public class PhysicalColumn implements Column {
 		this.unique = unique;
 
 		table.addColumn(this);
-		this.mapping.addColumn(this);
 	}
 
 	/**
@@ -126,9 +128,10 @@ public class PhysicalColumn implements Column {
 	 */
 	public PhysicalColumn(AbstractPhysicalMapping<?, ?> mapping, PhysicalTable table, BasicColumnTemplate<?, ?> basic, int sqlType)
 		throws MappingException {
-		this(mapping, null, table, basic.getName(), basic.getIdType(), sqlType, basic.getLength(), basic.getPrecision(), basic.getScale(),
-			basic.isNullable(), basic.isUnique());
+		this(mapping, null, null, table, basic.getName(), basic.getIdType(), sqlType, basic.getLength(), basic.getPrecision(),
+			basic.getScale(), basic.isNullable(), basic.isUnique());
 
+		this.mapping.addColumn(this);
 		basic.setPhysicalColumn(this);
 	}
 
@@ -150,8 +153,27 @@ public class PhysicalColumn implements Column {
 	 */
 	public PhysicalColumn(AbstractPhysicalMapping<?, ?> mapping, PhysicalTable table, JoinColumnTemplate<?, ?> join,
 		PhysicalColumn referencedColumn, int sqlType) throws MappingException {
-		this(mapping, referencedColumn, table, join.getName(), null, sqlType, referencedColumn.getLength(),
+		this(mapping, referencedColumn, null, table, join.getName(), null, sqlType, referencedColumn.getLength(),
 			referencedColumn.getPrecision(), referencedColumn.getScale(), join.isNullable(), join.isUnique());
+
+		this.mapping.addColumn(this);
+	}
+
+	/**
+	 * Constructor used for secondary table primary key columns
+	 * 
+	 * @param table
+	 *            the name
+	 * @param column
+	 *            the original primary key column
+	 * @throws MappingException
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public PhysicalColumn(PhysicalTable table, PhysicalColumn column) throws MappingException {
+		this(column.getMapping(), null, column, table, column.getName(), IdType.MANUAL, column.getSqlType(), column.getLength(),
+			column.getPrecision(), column.getScale(), false, false);
 	}
 
 	/**
@@ -278,6 +300,16 @@ public class PhysicalColumn implements Column {
 	 */
 	public PhysicalColumn getReferencedColumn() {
 		return this.referencedColumn;
+	}
+
+	/**
+	 * Returns the referencedPrimaryTableColumn.
+	 * 
+	 * @return the referencedPrimaryTableColumn
+	 * @since $version
+	 */
+	public PhysicalColumn getReferencedPrimaryTableColumn() {
+		return this.referencedPrimaryTableColumn;
 	}
 
 	/**

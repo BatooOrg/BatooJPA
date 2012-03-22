@@ -126,8 +126,6 @@ public class SimpleTest extends AbstractTest {
 		final Foo foo = new Foo();
 		this.persist(foo);
 
-		this.flush();
-
 		this.commit();
 
 		this.close();

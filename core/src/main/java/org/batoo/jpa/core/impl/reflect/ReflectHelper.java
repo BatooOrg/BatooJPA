@@ -49,6 +49,7 @@ import org.reflections.util.ClasspathHelper;
 
 import sun.misc.Unsafe;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -121,29 +122,39 @@ public class ReflectHelper {
 	}
 
 	private static void checkAnnotations(Set<Class<? extends Annotation>> parsed, final Set<Pair<Class<? extends Annotation>>> conflicts,
-		final List<Annotation> annotations, String string) throws MappingException {
-		for (final Annotation annotation : annotations) {
-			final Class<? extends Annotation> annotationClass = annotation.getClass();
-			final Set<Class<? extends Annotation>> forbidden = TypeFactory.conflictsFor(annotationClass);
+		final List<Annotation> annotationList, String name) throws MappingException {
+
+		final List<Class<? extends Annotation>> annotations = Lists.transform(annotationList,
+			new Function<Annotation, Class<? extends Annotation>>() {
+
+				@SuppressWarnings("unchecked")
+				@Override
+				public Class<? extends Annotation> apply(Annotation input) {
+					return (Class<? extends Annotation>) input.getClass().getInterfaces()[0];
+				}
+			});
+
+		for (final Class<? extends Annotation> annotation : annotations) {
+			final Set<Class<? extends Annotation>> forbidden = TypeFactory.conflictsFor(annotation);
 			forbidden.retainAll(annotations);
 
 			for (final Class<? extends Annotation> conflict : forbidden) {
-				conflicts.add(new Pair<Class<? extends Annotation>>(annotationClass, conflict));
+				conflicts.add(new Pair<Class<? extends Annotation>>(annotation, conflict));
 			}
 		}
 
 		if (conflicts.size() > 0) {
-			throw new MappingException(string, conflicts);
+			throw new MappingException(name, conflicts);
 		}
 
-		for (final Iterator<Annotation> i = annotations.iterator(); i.hasNext();) {
-			if (parsed.contains(i.next().getClass().getInterfaces()[0])) {
+		for (final Iterator<Class<? extends Annotation>> i = annotations.iterator(); i.hasNext();) {
+			if (parsed.contains(i.next())) {
 				i.remove();
 			}
 		}
 
 		if (annotations.size() > 0) {
-			throw new MappingException(string, annotations);
+			throw new MappingException(name, annotationList);
 		}
 	}
 

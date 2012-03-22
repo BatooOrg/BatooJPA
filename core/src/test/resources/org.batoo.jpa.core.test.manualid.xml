@@ -15,7 +15,6 @@
 			<property name="javax.persistence.jdbc.password" value="" />
 
 			<property name="org.batoo.jpa.ddl" value="DROP" />
-			<property name="org.batoo.jpa.root_url" value="org.batoo.jpa.core.test.annotations.base"/>
 		</properties>
 
 	</persistence-unit>

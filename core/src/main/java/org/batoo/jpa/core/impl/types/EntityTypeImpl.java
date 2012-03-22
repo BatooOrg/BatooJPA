@@ -282,6 +282,14 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 		try {
 			for (final PhysicalTable table : this.tables.values()) {
+				if (firstPass) {
+					if (!table.isPrimary()) {
+						for (final PhysicalColumn column : this.primaryTable.getPrimaryKeys()) {
+							new PhysicalColumn(table, column);
+						}
+					}
+				}
+
 				table.ddl(this.metaModel.getJdbcAdapter(), datasource, ddlMode, schemas, firstPass);
 			}
 		}
@@ -739,13 +747,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		return this.selectHelper.select(session, managedId);
 	}
 
-	private void putTable(final PhysicalTable table) {
-		this.tables.put(table.getName(), table);
-		if ((this.primaryTable == null) && table.isPrimary()) {
-			this.primaryTable = table;
-		}
-	}
-
 	/**
 	 * {@inheritDoc}
 	 * 
@@ -777,6 +778,16 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	private void vlinkTables() throws MappingException {
+		// vlink this entities tables
+		for (final TableTemplate template : this.getTableTemplates()) {
+			final PhysicalTable table = new PhysicalTable(this, template, this.metaModel.getJdbcAdapter());
+			if (table.isPrimary()) {
+				this.primaryTable = table;
+			}
+
+			this.tables.put(table.getName(), table);
+		}
+
 		final IdentifiableTypeImpl<? super X> supertype = this.getSupertype();
 		if ((supertype != null) && (supertype instanceof MappedSuperclassTypeImpl)) {
 			for (final TableTemplate template : supertype.getTableTemplates()) {
@@ -787,12 +798,13 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				}
 
 				final PhysicalTable table = new PhysicalTable(this, template, this.metaModel.getJdbcAdapter());
-				this.putTable(table);
+				if (table.isPrimary()) {
+					this.primaryTable = table;
+				}
+
+				this.tables.put(table.getName(), table);
 			}
 		}
 
-		if (this.primaryTable == null) {
-			this.putTable(new PhysicalTable(this, this.metaModel.getJdbcAdapter()));
-		}
 	}
 }

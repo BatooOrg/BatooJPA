@@ -121,7 +121,7 @@ public class PhysicalTable implements Table {
 		this.owner = entity;
 		this.jdbcAdapter = jdbcAdapter;
 
-		this.primary = this.name == null;
+		this.primary = template.isPrimary();
 		this.schema = template.getSchema();
 		this.physicalSchema = this.jdbcAdapter.escape(this.schema);
 		this.name = template.getName() != null ? template.getName() : entity.getName();
