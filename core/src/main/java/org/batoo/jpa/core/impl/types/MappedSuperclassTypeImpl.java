@@ -69,7 +69,7 @@ public class MappedSuperclassTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 	 */
 	@Override
 	public Set<Class<? extends Annotation>> parse() throws BatooException {
-		final Set<Class<? extends Annotation>> annotations = super.parse();
+		final Set<Class<? extends Annotation>> parsed = super.parse();
 
 		final Class<X> type = this.getJavaType();
 		final MappedSuperclass mappedSuperclass = type.getAnnotation(MappedSuperclass.class);
@@ -77,9 +77,9 @@ public class MappedSuperclassTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 			throw new MappingException("Type is not a mapped super class " + type);
 		}
 
-		annotations.add(MappedSuperclass.class);
+		parsed.add(MappedSuperclass.class);
 
-		return annotations;
+		return parsed;
 	}
 
 }

@@ -23,11 +23,11 @@ import java.lang.reflect.Member;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.Map;
 import java.util.Set;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
 import javax.persistence.CollectionTable;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -40,12 +40,16 @@ import javax.persistence.metamodel.PluralAttribute;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.MappingException;
+import org.batoo.jpa.core.impl.mapping.ColumnTemplate;
 import org.batoo.jpa.core.impl.mapping.JoinColumnTemplate;
 import org.batoo.jpa.core.impl.mapping.OwnedManyToManyMapping;
 import org.batoo.jpa.core.impl.mapping.OwnedOneToManyMapping;
 import org.batoo.jpa.core.impl.mapping.OwnerManyToManyMapping;
 import org.batoo.jpa.core.impl.reflect.ReflectHelper;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 /**
@@ -171,7 +175,10 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 * 
 	 */
 	@Override
-	public void link(Deque<AttributeImpl<?, ?>> path) throws MappingException {
+	public void link(Deque<AttributeImpl<?, ?>> path, Map<String, Column> attributeOverrides) throws MappingException {
+		path = Lists.newLinkedList(path);
+		path.addLast(this);
+
 		switch (this.attributeType) {
 			case EMBEDDED:
 				throw new NotImplementedException();
@@ -185,10 +192,37 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 						this.mapping = new OwnedManyToManyMapping<X, C, E>(this, path, this.orphanRemoval, eager);
 					}
 					else {
-						this.mapping = new OwnerManyToManyMapping<X, C, E>(this, path, this.columns, eager);
+						this.mapping = new OwnerManyToManyMapping<X, C, E>(this, path, this.overrideColumns(attributeOverrides), eager);
 					}
 				}
 		}
+	}
+
+	/**
+	 * Applies the overrides to the column templates.
+	 * 
+	 * @param attributeOverrides
+	 *            the attribute overrides
+	 * @return the overridden column templates
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private Collection<ColumnTemplate<X, C>> overrideColumns(final Map<String, Column> attributeOverrides) {
+		if ((attributeOverrides == null) || (attributeOverrides.size() == 0)) {
+			return this.columns;
+		}
+
+		return Collections2.transform(this.columns, new Function<ColumnTemplate<X, C>, ColumnTemplate<X, C>>() {
+
+			@Override
+			public ColumnTemplate<X, C> apply(ColumnTemplate<X, C> input) {
+				final Column column = attributeOverrides.get(input.getName());
+				if (column != null) {}
+
+				return input;
+			}
+		});
 	}
 
 	/**
@@ -247,22 +281,6 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 			this.cascadeType = manyToMany.cascade();
 
 			parsed.add(ManyToMany.class);
-		}
-
-		final AttributeOverrides attributeOverrides = ReflectHelper.getAnnotation(member, AttributeOverrides.class);
-		if (attributeOverrides != null) {
-			for (final AttributeOverride attributeOverride : attributeOverrides.value()) {
-				this.attributeOverrides.put(attributeOverride.name(), attributeOverride.column());
-			}
-
-			parsed.add(AttributeOverrides.class);
-		}
-
-		final AttributeOverride attributeOverride = ReflectHelper.getAnnotation(member, AttributeOverride.class);
-		if (attributeOverride != null) {
-			this.attributeOverrides.put(attributeOverride.name(), attributeOverride.column());
-
-			parsed.add(AttributeOverrides.class);
 		}
 
 		return parsed;

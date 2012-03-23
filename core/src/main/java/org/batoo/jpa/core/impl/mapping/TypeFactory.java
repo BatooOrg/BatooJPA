@@ -29,6 +29,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -76,6 +77,7 @@ import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.reflect.ReflectHelper;
+import org.batoo.jpa.core.impl.types.AttributeImpl;
 import org.batoo.jpa.core.impl.types.CollectionAttributeImpl;
 import org.batoo.jpa.core.impl.types.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
@@ -90,6 +92,9 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -602,6 +607,28 @@ public class TypeFactory {
 			|| java.sql.Time.class.isAssignableFrom(cls) //
 			|| java.sql.Timestamp.class.isAssignableFrom(cls) //
 			|| Serializable.class.isAssignableFrom(cls);
+	}
+
+	/**
+	 * Returns path as string seperated with dots
+	 * 
+	 * @param path
+	 *            the path
+	 * @return the path as string
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public static String pathAsString(Deque<AttributeImpl<?, ?>> path) {
+		final Collection<String> parts = Collections2.transform(path, new Function<AttributeImpl<?, ?>, String>() {
+
+			@Override
+			public String apply(AttributeImpl<?, ?> input) {
+				return input.getName();
+			}
+		});
+
+		return Joiner.on(".").join(parts);
 	}
 
 	/**

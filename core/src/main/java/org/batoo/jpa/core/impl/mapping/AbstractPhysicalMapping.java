@@ -18,9 +18,9 @@
  */
 package org.batoo.jpa.core.impl.mapping;
 
+import java.util.Collection;
 import java.util.Deque;
 import java.util.Map;
-import java.util.Set;
 
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.jdbc.PhysicalColumn;
@@ -36,7 +36,7 @@ import com.google.common.collect.Maps;
  */
 public abstract class AbstractPhysicalMapping<X, T> extends AbstractMapping<X, T> implements PhysicalMapping<X, T> {
 
-	private final Set<ColumnTemplate<X, T>> columnTemplates;
+	private final Collection<ColumnTemplate<X, T>> columnTemplates;
 
 	private final Map<String, PhysicalColumn> physicalColumns = Maps.newHashMap();
 
@@ -55,7 +55,7 @@ public abstract class AbstractPhysicalMapping<X, T> extends AbstractMapping<X, T
 	 * @author hceylan
 	 */
 	public AbstractPhysicalMapping(AssociationType associationType, AttributeImpl<X, T> declaringAttribute,
-		Deque<AttributeImpl<?, ?>> path, Set<ColumnTemplate<X, T>> columnTemplates) throws MappingException {
+		Deque<AttributeImpl<?, ?>> path, Collection<ColumnTemplate<X, T>> columnTemplates) throws MappingException {
 		super(associationType, declaringAttribute, path);
 
 		this.columnTemplates = columnTemplates;
@@ -77,7 +77,7 @@ public abstract class AbstractPhysicalMapping<X, T> extends AbstractMapping<X, T
 	 * 
 	 */
 	@Override
-	public final Set<ColumnTemplate<X, T>> getColumnTemplates() {
+	public final Collection<ColumnTemplate<X, T>> getColumnTemplates() {
 		return this.columnTemplates;
 	}
 

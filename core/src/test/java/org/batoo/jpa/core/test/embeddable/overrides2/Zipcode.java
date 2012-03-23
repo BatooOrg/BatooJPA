@@ -16,45 +16,61 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.mapping;
+package org.batoo.jpa.core.test.embeddable.overrides2;
 
-import java.util.Collection;
-import java.util.Map;
-
-import org.batoo.jpa.core.impl.jdbc.PhysicalColumn;
+import javax.persistence.Embeddable;
 
 /**
- * Interface for mappings with physical storage.
  * 
  * @author hceylan
  * @since $version
  */
-public interface PhysicalMapping<X, T> extends Mapping<X, T> {
+@Embeddable
+public class Zipcode {
+
+	private String zip;
+
+	private String plusfour;
 
 	/**
-	 * Adds the physical column
+	 * Returns the plusfour.
 	 * 
-	 * @param physicalColumn
-	 *            the physical column to add
-	 * 
+	 * @return the plusfour
 	 * @since $version
-	 * @author hceylan
 	 */
-	void addColumn(PhysicalColumn physicalColumn);
+	public String getPlusfour() {
+		return this.plusfour;
+	}
 
 	/**
-	 * Returns the columnTemplates.
+	 * Returns the zip.
 	 * 
-	 * @return the columnTemplates
+	 * @return the zip
 	 * @since $version
 	 */
-	Collection<ColumnTemplate<X, T>> getColumnTemplates();
+	public String getZip() {
+		return this.zip;
+	}
 
 	/**
-	 * Returns the physicalColumns.
+	 * Sets the plusfour.
 	 * 
-	 * @return the physicalColumns
+	 * @param plusfour
+	 *            the plusfour to set
 	 * @since $version
 	 */
-	Map<String, PhysicalColumn> getPhysicalColumns();
+	public void setPlusfour(String plusfour) {
+		this.plusfour = plusfour;
+	}
+
+	/**
+	 * Sets the zip.
+	 * 
+	 * @param zip
+	 *            the zip to set
+	 * @since $version
+	 */
+	public void setZip(String zip) {
+		this.zip = zip;
+	}
 }

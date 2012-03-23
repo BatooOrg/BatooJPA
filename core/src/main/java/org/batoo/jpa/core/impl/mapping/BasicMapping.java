@@ -18,8 +18,8 @@
  */
 package org.batoo.jpa.core.impl.mapping;
 
+import java.util.Collection;
 import java.util.Deque;
-import java.util.Set;
 
 import javax.persistence.metamodel.BasicType;
 
@@ -42,17 +42,14 @@ public final class BasicMapping<X, T> extends AbstractPhysicalMapping<X, T> {
 	 * 
 	 * @param attribute
 	 * @param templates
-	 * @return
-	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	private static <X, T> Set<ColumnTemplate<X, T>> sanitize(SingularAttributeImpl<X, T> attribute, Set<ColumnTemplate<X, T>> templates) {
+	public static <X, T> void sanitize(SingularAttributeImpl<X, T> attribute, Collection<ColumnTemplate<X, T>> templates) {
+
 		if (templates.isEmpty()) {
 			templates.add(new BasicColumnTemplate<X, T>(attribute, attribute.getIdType(), attribute.getGeneratorName()));
 		}
-
-		return templates;
 	}
 
 	/**
@@ -68,8 +65,8 @@ public final class BasicMapping<X, T> extends AbstractPhysicalMapping<X, T> {
 	 * @author hceylan
 	 */
 	public BasicMapping(SingularAttributeImpl<X, T> declaringAttribute, Deque<AttributeImpl<?, ?>> path,
-		Set<ColumnTemplate<X, T>> columnTemplates) throws MappingException {
-		super(AssociationType.BASIC, declaringAttribute, path, BasicMapping.sanitize(declaringAttribute, columnTemplates));
+		Collection<ColumnTemplate<X, T>> columnTemplates) throws MappingException {
+		super(AssociationType.BASIC, declaringAttribute, path, columnTemplates);
 	}
 
 	/**

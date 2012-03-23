@@ -20,7 +20,10 @@ package org.batoo.jpa.core.impl.types;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
+import java.util.Collection;
 import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.Basic;
@@ -44,6 +47,7 @@ import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.jdbc.PhysicalTableGenerator;
 import org.batoo.jpa.core.impl.mapping.BasicColumnTemplate;
 import org.batoo.jpa.core.impl.mapping.BasicMapping;
+import org.batoo.jpa.core.impl.mapping.ColumnTemplate;
 import org.batoo.jpa.core.impl.mapping.EmbeddedMapping;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
 import org.batoo.jpa.core.impl.mapping.OwnedOneToOneMapping;
@@ -52,6 +56,11 @@ import org.batoo.jpa.core.impl.mapping.OwnerOneToOneMapping;
 import org.batoo.jpa.core.impl.mapping.TypeFactory;
 import org.batoo.jpa.core.impl.reflect.ReflectHelper;
 import org.batoo.jpa.core.jdbc.IdType;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * The implementation of {@link SingularAttribute}.
@@ -214,14 +223,21 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 	 * 
 	 */
 	@Override
-	public final void link(Deque<AttributeImpl<?, ?>> path) throws MappingException {
+	public void link(Deque<AttributeImpl<?, ?>> path, Map<String, Column> attributeOverrides) throws MappingException {
+		path = Lists.newLinkedList(path);
+		path.addLast(this);
+
+		attributeOverrides = Maps.newHashMap(attributeOverrides);
+		attributeOverrides.putAll(this.attributeOverrides);
+
 		switch (this.attributeType) {
 			case LOB:
 			case BASIC:
-				this.mapping = new BasicMapping<X, T>(this, path, this.columns);
+				BasicMapping.sanitize(this, this.columns);
+				this.mapping = new BasicMapping<X, T>(this, path, this.overrideColumns(path, attributeOverrides));
 				break;
 			case EMBEDDED:
-				this.mapping = new EmbeddedMapping<X, T>(this, path);
+				this.mapping = new EmbeddedMapping<X, T>(this, path, attributeOverrides);
 				break;
 			case ASSOCIATION:
 				final boolean eager = this.fetchType == FetchType.EAGER;
@@ -229,12 +245,49 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 					this.mapping = new OwnedOneToOneMapping<X, T>(this, path, this.orphanRemoval, eager);
 				}
 				else if (!this.many) {
-					this.mapping = new OwnerOneToOneMapping<X, T>(this, path, this.columns, eager);
+					OwnerOneToOneMapping.sanitize(this, this.columns);
+					this.mapping = new OwnerOneToOneMapping<X, T>(this, path, this.overrideColumns(path, attributeOverrides), eager);
 				}
 				else {
-					this.mapping = new OwnerManyToOneMapping<X, T>(this, path, this.columns, eager);
+					OwnerManyToOneMapping.sanitize(this, this.columns);
+					this.mapping = new OwnerManyToOneMapping<X, T>(this, path, this.overrideColumns(path, attributeOverrides), eager);
 				}
 		}
+	}
+
+	/**
+	 * Applies the overrides to the column templates.
+	 * 
+	 * @param path
+	 *            the path
+	 * @param attributeOverrides
+	 *            the attribute overrides
+	 * @return the overridden column templates
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private Collection<ColumnTemplate<X, T>> overrideColumns(Deque<AttributeImpl<?, ?>> path, final Map<String, Column> attributeOverrides) {
+		if ((attributeOverrides == null) || (attributeOverrides.size() == 0)) {
+			return this.columns;
+		}
+
+		final LinkedList<AttributeImpl<?, ?>> localPath = Lists.newLinkedList(path);
+		localPath.pop();
+
+		return Collections2.transform(this.columns, new Function<ColumnTemplate<X, T>, ColumnTemplate<X, T>>() {
+
+			@Override
+			public ColumnTemplate<X, T> apply(ColumnTemplate<X, T> input) {
+				final Column column = attributeOverrides.get(TypeFactory.pathAsString(localPath));
+				if (column != null) {
+					return new BasicColumnTemplate<X, T>(SingularAttributeImpl.this, SingularAttributeImpl.this.idType,
+						SingularAttributeImpl.this.generatorName, column);
+				}
+
+				return input;
+			}
+		});
 	}
 
 	/**

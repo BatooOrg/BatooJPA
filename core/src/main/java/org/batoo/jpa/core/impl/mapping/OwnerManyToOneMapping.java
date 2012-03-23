@@ -20,7 +20,6 @@ package org.batoo.jpa.core.impl.mapping;
 
 import java.util.Collection;
 import java.util.Deque;
-import java.util.Set;
 
 import javax.persistence.FetchType;
 import javax.persistence.OneToOne;
@@ -47,13 +46,10 @@ public class OwnerManyToOneMapping<X, T> extends OwnerAssociationMapping<X, T> i
 	 *            the declaring attribute
 	 * @param columns
 	 *            the column templates
-	 * @return the sanitized column templates
-	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	private static <X, T> Set<ColumnTemplate<X, T>> sanitize(SingularAttributeImpl<X, T> declaringAttribute,
-		Set<ColumnTemplate<X, T>> columns) {
+	public static <X, T> void sanitize(SingularAttributeImpl<X, T> declaringAttribute, Collection<ColumnTemplate<X, T>> columns) {
 
 		if (columns.isEmpty()) {
 			final EntityTypeImpl<T> type = (EntityTypeImpl<T>) declaringAttribute.getType();
@@ -63,8 +59,6 @@ public class OwnerManyToOneMapping<X, T> extends OwnerAssociationMapping<X, T> i
 				columns.add(new JoinColumnTemplate<X, T>(declaringAttribute, mapping));
 			}
 		}
-
-		return columns;
 	}
 
 	/**
@@ -84,8 +78,8 @@ public class OwnerManyToOneMapping<X, T> extends OwnerAssociationMapping<X, T> i
 	 * @author hceylan
 	 */
 	public OwnerManyToOneMapping(SingularAttributeImpl<X, T> declaringAttribute, Deque<AttributeImpl<?, ?>> path,
-		Set<ColumnTemplate<X, T>> columns, boolean eager) throws MappingException {
-		super(AssociationType.MANY, declaringAttribute, path, OwnerManyToOneMapping.sanitize(declaringAttribute, columns), eager);
+		Collection<ColumnTemplate<X, T>> columns, boolean eager) throws MappingException {
+		super(AssociationType.MANY, declaringAttribute, path, columns, eager);
 	}
 
 	/**

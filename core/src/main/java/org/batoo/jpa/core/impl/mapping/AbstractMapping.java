@@ -18,7 +18,6 @@
  */
 package org.batoo.jpa.core.impl.mapping;
 
-import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -27,10 +26,6 @@ import org.batoo.jpa.core.impl.instance.AbstractResolver;
 import org.batoo.jpa.core.impl.types.AttributeImpl;
 import org.batoo.jpa.core.impl.types.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
-
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Collections2;
 
 /**
  * Abstract base class for Mappings.
@@ -72,7 +67,6 @@ public abstract class AbstractMapping<X, T> implements Mapping<X, T> {
 		this.declaringAttribute = declaringAttribute;
 
 		this.path = new LinkedList<AttributeImpl<?, ?>>(path);
-		this.path.addLast(declaringAttribute);
 	}
 
 	/**
@@ -171,15 +165,7 @@ public abstract class AbstractMapping<X, T> implements Mapping<X, T> {
 	 */
 	public String getPathAsString() {
 		if (this.strPath == null) {
-			final Collection<String> parts = Collections2.transform(this.path, new Function<AttributeImpl<?, ?>, String>() {
-
-				@Override
-				public String apply(AttributeImpl<?, ?> input) {
-					return input.getName();
-				}
-			});
-
-			this.strPath = Joiner.on(".").join(parts);
+			this.strPath = TypeFactory.pathAsString(this.path);
 		}
 
 		return this.strPath;

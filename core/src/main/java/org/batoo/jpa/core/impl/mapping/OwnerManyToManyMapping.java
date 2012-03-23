@@ -20,7 +20,6 @@ package org.batoo.jpa.core.impl.mapping;
 
 import java.util.Collection;
 import java.util.Deque;
-import java.util.Set;
 
 import javax.persistence.FetchType;
 import javax.persistence.OneToOne;
@@ -55,7 +54,7 @@ public class OwnerManyToManyMapping<X, C, E> extends OwnerAssociationMapping<X, 
 	 * @author hceylan
 	 */
 	public OwnerManyToManyMapping(PluralAttributeImpl<X, C, E> declaringAttribute, Deque<AttributeImpl<?, ?>> path,
-		Set<ColumnTemplate<X, C>> columnTemplates, boolean eager) throws MappingException {
+		Collection<ColumnTemplate<X, C>> columnTemplates, boolean eager) throws MappingException {
 		super(AssociationType.MANY, declaringAttribute, path, columnTemplates, eager);
 	}
 

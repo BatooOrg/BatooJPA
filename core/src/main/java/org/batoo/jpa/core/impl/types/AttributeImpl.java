@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.types;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.Map;
 import java.util.Set;
@@ -103,7 +104,7 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 	protected boolean many; // if this a many to one field, relevant only with RELATIONAL AttributeType
 
 	// Column definitions
-	protected final Set<ColumnTemplate<X, Y>> columns = Sets.newHashSet(); // column templates
+	protected Collection<ColumnTemplate<X, Y>> columns = Sets.newHashSet(); // column templates
 	protected final Map<String, Column> attributeOverrides = Maps.newHashMap(); // overrides to attributes
 
 	protected CascadeType[] cascadeType; // the cascade type
@@ -249,7 +250,7 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 	 * @return the columns
 	 * @since $version
 	 */
-	public Set<ColumnTemplate<X, Y>> getColumns() {
+	public Collection<ColumnTemplate<X, Y>> getColumns() {
 		return this.columns;
 	}
 
@@ -361,16 +362,18 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 	/**
 	 * Links the attribute to persistent types. Called at horizontal linking phase.
 	 * <p>
-	 * Subclasses must re-implement to provide their own SQL meatada.
+	 * Subclasses must re-implement to provide their own SQL metadata.
 	 * 
 	 * @param path
 	 *            the path to this attribute
+	 * @param attributeOverrides
+	 *            the attribute overrides
 	 * @throws MappingException
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract void link(Deque<AttributeImpl<?, ?>> path) throws MappingException;
+	public abstract void link(Deque<AttributeImpl<?, ?>> path, Map<String, Column> attributeOverrides) throws MappingException;
 
 	/**
 	 * Subclasses should re-implement to parse their own persistence annotations. They must call the super() before processing.

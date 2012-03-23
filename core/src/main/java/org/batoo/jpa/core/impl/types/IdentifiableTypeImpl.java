@@ -262,20 +262,20 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 */
 	@Override
 	public Set<Class<? extends Annotation>> parse() throws BatooException {
-		final Set<Class<? extends Annotation>> annotations = super.parse();
+		final Set<Class<? extends Annotation>> parsed = super.parse();
 
 		final IdClass idClass = this.getJavaType().getAnnotation(IdClass.class);
 		if (idClass != null) {
 			this.idJavaType = idClass.value();
 
-			annotations.add(IdClass.class);
+			parsed.add(IdClass.class);
 		}
 
 		this.parseGenerators();
 
-		this.parsePrimaryTable(annotations);
+		this.parsePrimaryTable(parsed);
 
-		this.parseSecondaryTables(annotations);
+		this.parseSecondaryTables(parsed);
 
 		for (final Attribute<X, ?> attribute : this.setDeclaredAttributes) {
 			if (attribute instanceof SingularAttribute) {
@@ -290,7 +290,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 			}
 		}
 
-		return annotations;
+		return parsed;
 	}
 
 	private void parseGenerators() throws MappingException {

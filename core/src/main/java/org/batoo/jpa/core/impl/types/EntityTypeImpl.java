@@ -27,6 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
@@ -85,6 +88,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private final Map<String, OwnedAssociation<?, ?>> ownedAssociations = Maps.newHashMap();
 	private final Map<String, BasicMapping<?, ?>> idMappings = Maps.newHashMap();
 	private final Map<String, BasicMapping<?, ?>> identityMappings = Maps.newHashMap();
+	private final Map<String, Column> attributeOverrides = Maps.newHashMap();
 
 	private final Set<PhysicalColumn> columns = Sets.newHashSet();
 
@@ -583,7 +587,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			final boolean association = attribute.getPersistentAttributeType() != PersistentAttributeType.BASIC;
 
 			if (association ^ basic) {
-				((AttributeImpl<? super X, ?>) attribute).link(new LinkedList<AttributeImpl<?, ?>>());
+				((AttributeImpl<? super X, ?>) attribute).link(new LinkedList<AttributeImpl<?, ?>>(), this.attributeOverrides);
 			}
 		}
 	}
@@ -613,7 +617,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 */
 	@Override
 	public Set<Class<? extends Annotation>> parse() throws BatooException {
-		final Set<Class<? extends Annotation>> annotations = super.parse();
+		final Set<Class<? extends Annotation>> parsed = super.parse();
 
 		final Class<X> type = this.getJavaType();
 
@@ -621,11 +625,31 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		if (entity == null) {
 			throw new MappingException("Type is not an entity " + type);
 		}
-		annotations.add(Entity.class);
+		parsed.add(Entity.class);
+
+		this.parseAttributeOverrides(type, parsed);
 
 		this.performClassChecks(type);
 
-		return annotations;
+		return parsed;
+	}
+
+	private void parseAttributeOverrides(Class<X> type, final Set<Class<? extends Annotation>> parsed) {
+		final AttributeOverrides attributeOverrides = type.getAnnotation(AttributeOverrides.class);
+		if (attributeOverrides != null) {
+			for (final AttributeOverride attributeOverride : attributeOverrides.value()) {
+				this.attributeOverrides.put(attributeOverride.name(), attributeOverride.column());
+			}
+
+			parsed.add(AttributeOverrides.class);
+		}
+
+		final AttributeOverride attributeOverride = type.getAnnotation(AttributeOverride.class);
+		if (attributeOverride != null) {
+			this.attributeOverrides.put(attributeOverride.name(), attributeOverride.column());
+
+			parsed.add(AttributeOverride.class);
+		}
 	}
 
 	/**

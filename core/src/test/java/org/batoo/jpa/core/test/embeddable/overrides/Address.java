@@ -16,45 +16,60 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.mapping;
+package org.batoo.jpa.core.test.embeddable.overrides;
 
-import java.util.Collection;
-import java.util.Map;
-
-import org.batoo.jpa.core.impl.jdbc.PhysicalColumn;
+import javax.persistence.Embeddable;
 
 /**
- * Interface for mappings with physical storage.
  * 
  * @author hceylan
  * @since $version
  */
-public interface PhysicalMapping<X, T> extends Mapping<X, T> {
+@Embeddable
+public class Address {
+
+	private String street;
+	private String city;
 
 	/**
-	 * Adds the physical column
+	 * Returns the city.
 	 * 
-	 * @param physicalColumn
-	 *            the physical column to add
-	 * 
+	 * @return the city
 	 * @since $version
-	 * @author hceylan
 	 */
-	void addColumn(PhysicalColumn physicalColumn);
+	public String getCity() {
+		return this.city;
+	}
 
 	/**
-	 * Returns the columnTemplates.
+	 * Returns the street.
 	 * 
-	 * @return the columnTemplates
+	 * @return the street
 	 * @since $version
 	 */
-	Collection<ColumnTemplate<X, T>> getColumnTemplates();
+	public String getStreet() {
+		return this.street;
+	}
 
 	/**
-	 * Returns the physicalColumns.
+	 * Sets the city.
 	 * 
-	 * @return the physicalColumns
+	 * @param city
+	 *            the city to set
 	 * @since $version
 	 */
-	Map<String, PhysicalColumn> getPhysicalColumns();
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	/**
+	 * Sets the street.
+	 * 
+	 * @param street
+	 *            the street to set
+	 * @since $version
+	 */
+	public void setStreet(String street) {
+		this.street = street;
+	}
 }

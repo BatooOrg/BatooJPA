@@ -18,9 +18,9 @@
  */
 package org.batoo.jpa.core.impl.mapping;
 
+import java.util.Collection;
 import java.util.Deque;
 import java.util.HashSet;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
@@ -60,7 +60,7 @@ public abstract class OwnerAssociationMapping<X, T> extends AbstractPhysicalMapp
 	 * @author hceylan
 	 */
 	public OwnerAssociationMapping(AssociationType associationType, AttributeImpl<X, T> declaringAttribute,
-		Deque<AttributeImpl<?, ?>> path, Set<ColumnTemplate<X, T>> columnTemplates, boolean eager) throws MappingException {
+		Deque<AttributeImpl<?, ?>> path, Collection<ColumnTemplate<X, T>> columnTemplates, boolean eager) throws MappingException {
 		super(associationType, declaringAttribute, path, columnTemplates);
 
 		this.eager = eager;

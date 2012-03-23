@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.embeddable;
+package org.batoo.jpa.core.test.embeddable.overrides;
 
 import java.sql.SQLException;
 
@@ -35,7 +35,7 @@ import org.junit.Test;
  * 
  * @since $version
  */
-public class EmbeddableTest extends AbstractTest {
+public class EmbeddableOverridesTest extends AbstractTest {
 
 	private Foo foo() {
 		final Foo foo = new Foo();
@@ -44,7 +44,12 @@ public class EmbeddableTest extends AbstractTest {
 		final Address homeAddress = new Address();
 		homeAddress.setCity("Istanbul");
 		homeAddress.setStreet("Sweat home street");
-		foo.setAddress(homeAddress);
+		foo.setHomeAddress(homeAddress);
+
+		final Address workAddress = new Address();
+		workAddress.setCity("London");
+		workAddress.setStreet("Big Money Avenue");
+		foo.setWorkAddress(workAddress);
 
 		return foo;
 	}
@@ -67,8 +72,10 @@ public class EmbeddableTest extends AbstractTest {
 		final Foo foo2 = this.find(Foo.class, foo.getId());
 		Assert.assertEquals(foo.getId(), foo2.getId());
 		Assert.assertEquals(foo.getValue(), foo2.getValue());
-		Assert.assertEquals(foo.getAddress().getCity(), foo2.getAddress().getCity());
-		Assert.assertEquals(foo.getAddress().getStreet(), foo2.getAddress().getStreet());
+		Assert.assertEquals(foo.getHomeAddress().getCity(), foo2.getHomeAddress().getCity());
+		Assert.assertEquals(foo.getHomeAddress().getStreet(), foo2.getHomeAddress().getStreet());
+		Assert.assertEquals(foo.getWorkAddress().getCity(), foo2.getWorkAddress().getCity());
+		Assert.assertEquals(foo.getWorkAddress().getStreet(), foo2.getWorkAddress().getStreet());
 	}
 
 	/**

@@ -16,45 +16,64 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.mapping;
+package org.batoo.jpa.core.test.embeddable.overrides2;
 
-import java.util.Collection;
-import java.util.Map;
-
-import org.batoo.jpa.core.impl.jdbc.PhysicalColumn;
+import javax.persistence.Embeddable;
+import javax.persistence.Embedded;
 
 /**
- * Interface for mappings with physical storage.
  * 
  * @author hceylan
  * @since $version
  */
-public interface PhysicalMapping<X, T> extends Mapping<X, T> {
+@Embeddable
+public class Address {
+
+	@Embedded
+	private Zipcode zipcode;
+
+	private String city;
 
 	/**
-	 * Adds the physical column
+	 * Returns the city.
 	 * 
-	 * @param physicalColumn
-	 *            the physical column to add
-	 * 
+	 * @return the city
 	 * @since $version
-	 * @author hceylan
 	 */
-	void addColumn(PhysicalColumn physicalColumn);
+	public String getCity() {
+		return this.city;
+	}
 
 	/**
-	 * Returns the columnTemplates.
+	 * Returns the zipcode.
 	 * 
-	 * @return the columnTemplates
+	 * @return the zipcode
 	 * @since $version
 	 */
-	Collection<ColumnTemplate<X, T>> getColumnTemplates();
+	public Zipcode getZipcode() {
+		return this.zipcode;
+	}
 
 	/**
-	 * Returns the physicalColumns.
+	 * Sets the city.
 	 * 
-	 * @return the physicalColumns
+	 * @param city
+	 *            the city to set
 	 * @since $version
 	 */
-	Map<String, PhysicalColumn> getPhysicalColumns();
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	/**
+	 * Sets the zipcode.
+	 * 
+	 * @param zipcode
+	 *            the zipcode to set
+	 * @since $version
+	 */
+	public void setZipcode(Zipcode zipcode) {
+		this.zipcode = zipcode;
+	}
+
 }
