@@ -327,28 +327,33 @@ public class PreparedStatementImpl implements PreparedStatement {
 	 */
 	@Override
 	public int executeUpdate() throws SQLException {
-		final long executeNo = ++this.executeNo;
-		this.executes++;
+		if (LOG.isDebugEnabled()) {
+			final long executeNo = ++this.executeNo;
+			this.executes++;
 
-		LOG.debug("{0}:{1}:{2} executeUpdate(){3}", this.connection.connNo, this.statementNo, executeNo,
-			BLogger.lazyBoxed(this.sql, this.parameters));
+			LOG.debug("{0}:{1}:{2} executeUpdate(){3}", this.connection.connNo, this.statementNo, executeNo,
+				BLogger.lazyBoxed(this.sql, this.parameters));
 
-		final long start = System.currentTimeMillis();
-		try {
-			this.connection.executes++;
+			final long start = System.currentTimeMillis();
+			try {
+				this.connection.executes++;
 
-			return this.statement.executeUpdate();
+				return this.statement.executeUpdate();
+			}
+			finally {
+				final long time = System.currentTimeMillis() - start;
+
+				if (time > BJPASettings.WARN_TIME) {
+					LOG.warn(new OperationTookLongTimeWarning(), "{0}:{1}:{2} {3} msecs, executeUpdate()", this.connection.connNo,
+						this.statementNo, executeNo, time);
+				}
+				else {
+					LOG.debug("{0}:{1}:{2} {3} msecs, executeUpdate()", this.connection.connNo, this.statementNo, executeNo, time);
+				}
+			}
 		}
-		finally {
-			final long time = System.currentTimeMillis() - start;
-
-			if (time > BJPASettings.WARN_TIME) {
-				LOG.warn(new OperationTookLongTimeWarning(), "{0}:{1}:{2} {3} msecs, executeUpdate()", this.connection.connNo,
-					this.statementNo, executeNo, time);
-			}
-			else {
-				LOG.debug("{0}:{1}:{2} {3} msecs, executeUpdate()", this.connection.connNo, this.statementNo, executeNo, time);
-			}
+		else {
+			return this.statement.executeUpdate();
 		}
 	}
 

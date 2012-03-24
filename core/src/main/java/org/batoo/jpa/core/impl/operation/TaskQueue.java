@@ -20,7 +20,6 @@ package org.batoo.jpa.core.impl.operation;
 
 import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
@@ -93,7 +92,7 @@ public class TaskQueue {
 		final ArrayList<AbstractOperation<?>> operations = new ArrayList<AbstractOperation<?>>(this.queue);
 
 		// sort the operations based on their dependencies
-		Collections.sort(operations);
+		// Collections.sort(operations);
 
 		// final List<Future<?>> futures = Lists.newArrayList();
 		for (final AbstractOperation<?> operation : operations) {

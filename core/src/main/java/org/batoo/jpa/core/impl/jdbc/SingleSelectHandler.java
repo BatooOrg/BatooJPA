@@ -145,33 +145,42 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public ManagedInstance<X> handle(ResultSet rs) throws SQLException {
-		final int operationNo = nextOperationNo++;
+		if (LOG.isDebugEnabled()) {
+			final int operationNo = nextOperationNo++;
 
-		LOG.debug("{0}: handle()", operationNo);
+			LOG.debug("{0}: handle()", operationNo);
 
-		final long start = System.currentTimeMillis();
+			final long start = System.currentTimeMillis();
 
-		try {
-			final Map<ManagedId<?>, ManagedInstance<?>> cache = Maps.newHashMap();
-			ManagedInstance<X> managedInstance = null;
-			while (rs.next()) {
-				final X root = managedInstance != null ? managedInstance.getInstance() : null;
-				managedInstance = (ManagedInstance<X>) this.processRow(this.session, rs, cache, root, 0);
+			try {
+				return this.handle0(rs);
 			}
-
-			return managedInstance;
-		}
-		finally {
-			final long time = System.currentTimeMillis() - start;
-			if (time > DataSourceImpl.MAX_WAIT) {
-				LOG.warn(new OperationTookLongTimeWarning(), "{0}: {1} msecs, handle()", operationNo, time);
-			}
-			else {
-				LOG.debug("{0}: {1} msecs, handle()", operationNo, time);
+			finally {
+				final long time = System.currentTimeMillis() - start;
+				if (time > DataSourceImpl.MAX_WAIT) {
+					LOG.warn(new OperationTookLongTimeWarning(), "{0}: {1} msecs, handle()", operationNo, time);
+				}
+				else {
+					LOG.debug("{0}: {1} msecs, handle()", operationNo, time);
+				}
 			}
 		}
+		else {
+			return this.handle0(rs);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private ManagedInstance<X> handle0(ResultSet rs) throws SQLException {
+		final Map<ManagedId<?>, ManagedInstance<?>> cache = Maps.newHashMap();
+		ManagedInstance<X> managedInstance = null;
+		while (rs.next()) {
+			final X root = managedInstance != null ? managedInstance.getInstance() : null;
+			managedInstance = (ManagedInstance<X>) this.processRow(this.session, rs, cache, root, 0);
+		}
+
+		return managedInstance;
 	}
 
 	/**

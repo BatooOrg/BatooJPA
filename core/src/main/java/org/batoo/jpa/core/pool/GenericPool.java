@@ -18,14 +18,14 @@
  */
 package org.batoo.jpa.core.pool;
 
-import java.util.LinkedList;
+import java.util.Deque;
 import java.util.NoSuchElementException;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.PoolableObjectFactory;
 
 import com.google.common.annotations.Beta;
-import com.google.common.collect.Lists;
 
 /**
  * FIXME requires proper implementation
@@ -40,9 +40,7 @@ public class GenericPool<T> implements ObjectPool<T> {
 	private static final int MAX_SIZE = 15;
 
 	private final PoolableObjectFactory<T> factory;
-	private final LinkedList<T> pool;
-
-	private volatile boolean closed;
+	private final Deque<T> pool;
 
 	/**
 	 * @param factory
@@ -54,7 +52,7 @@ public class GenericPool<T> implements ObjectPool<T> {
 		super();
 
 		this.factory = factory;
-		this.pool = Lists.newLinkedList();
+		this.pool = new LinkedBlockingDeque<T>();
 	}
 
 	/**
@@ -71,11 +69,7 @@ public class GenericPool<T> implements ObjectPool<T> {
 	 * 
 	 */
 	@Override
-	public synchronized T borrowObject() throws Exception, NoSuchElementException, IllegalStateException {
-		if (this.closed) {
-			throw new IllegalStateException("Pool is closed");
-		}
-
+	public T borrowObject() throws Exception, NoSuchElementException, IllegalStateException {
 		while (this.pool.size() < MIN_SIZE) {
 			this.pool.addLast(this.factory.makeObject());
 		}
@@ -98,8 +92,6 @@ public class GenericPool<T> implements ObjectPool<T> {
 	 */
 	@Override
 	public void close() throws Exception {
-		this.closed = true;
-
 		this.shrinkTo(0);
 	}
 
@@ -135,7 +127,7 @@ public class GenericPool<T> implements ObjectPool<T> {
 	 * 
 	 */
 	@Override
-	public synchronized void returnObject(T obj) throws Exception {
+	public void returnObject(T obj) throws Exception {
 		this.pool.addLast(obj);
 
 		this.shrinkTo(MAX_SIZE);

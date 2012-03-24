@@ -45,8 +45,6 @@ public class GenericKeyedPool<K, V> implements KeyedObjectPool<K, V> {
 	private final KeyedPoolableObjectFactory<K, V> factory;
 	private final Map<K, LinkedList<V>> poolMap;
 
-	private volatile boolean closed;
-
 	/**
 	 * @param factory
 	 * 
@@ -57,7 +55,7 @@ public class GenericKeyedPool<K, V> implements KeyedObjectPool<K, V> {
 		super();
 
 		this.factory = factory;
-		this.poolMap = Maps.newHashMap();
+		this.poolMap = Maps.newConcurrentMap();
 	}
 
 	/**
@@ -75,10 +73,6 @@ public class GenericKeyedPool<K, V> implements KeyedObjectPool<K, V> {
 	 */
 	@Override
 	public synchronized V borrowObject(K key) throws Exception, NoSuchElementException, IllegalStateException {
-		if (this.closed) {
-			throw new IllegalStateException("Pool is closed");
-		}
-
 		final LinkedList<V> pool = this.getPool(key);
 
 		while (pool.size() <= MIN_SIZE) {
@@ -112,8 +106,6 @@ public class GenericKeyedPool<K, V> implements KeyedObjectPool<K, V> {
 	 */
 	@Override
 	public void close() throws Exception {
-		this.closed = true;
-
 		for (final Iterator<Entry<K, LinkedList<V>>> i = this.poolMap.entrySet().iterator(); i.hasNext();) {
 			final Entry<K, LinkedList<V>> e = i.next();
 

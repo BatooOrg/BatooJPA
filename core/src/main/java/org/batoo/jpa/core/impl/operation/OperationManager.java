@@ -21,10 +21,8 @@ package org.batoo.jpa.core.impl.operation;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.batoo.jpa.core.BJPASettings;
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.impl.EntityManagerImpl;
-import org.batoo.jpa.core.impl.OperationTookLongTimeWarning;
 
 import com.google.common.collect.Lists;
 
@@ -39,6 +37,12 @@ public class OperationManager {
 	private static final BLogger LOG = BLogger.getLogger(OperationManager.class);
 
 	private static final AtomicInteger counter = new AtomicInteger();
+
+	private static void prepare0(EntityManagerImpl entityManager, List<AbstractOperation<?>> operations) {
+		for (final AbstractOperation<?> operation : operations) {
+			OperationManager.prepare0(entityManager, operation.internalPrepare(entityManager));
+		}
+	}
 
 	/**
 	 * Replays the list of operations.
@@ -56,30 +60,22 @@ public class OperationManager {
 			return;
 		}
 
-		final int callNo = counter.incrementAndGet();
+		if (LOG.isTraceEnabled()) {
 
-		LOG.trace("{0}: replay() {1} atomic operations", callNo, operations.length);
+			final int callNo = counter.incrementAndGet();
 
-		final long start = System.currentTimeMillis();
-		try {
+			LOG.trace("{0}: replay() {1} atomic operations", callNo, operations.length);
+
+			final long start = System.currentTimeMillis();
+			try {
+				OperationManager.prepare0(entityManager, Lists.newArrayList(operations));
+			}
+			finally {
+				LOG.trace("{0}: {1} msecs, replay() {2} atomic operations", callNo, System.currentTimeMillis() - start, operations.length);
+			}
+		}
+		else {
 			OperationManager.prepare0(entityManager, Lists.newArrayList(operations));
-		}
-		finally {
-			final long time = System.currentTimeMillis() - start;
-
-			if (time > BJPASettings.WARN_TIME) {
-				LOG.warn(new OperationTookLongTimeWarning(), "{0}: {1} msecs, replay() {2} atomic operations", callNo, time,
-					operations.length);
-			}
-			else {
-				LOG.trace("{0}: {1} msecs, replay() {2} atomic operations", callNo, time, operations.length);
-			}
-		}
-	}
-
-	private static void prepare0(EntityManagerImpl entityManager, List<AbstractOperation<?>> operations) {
-		for (final AbstractOperation<?> operation : operations) {
-			OperationManager.prepare0(entityManager, operation.internalPrepare(entityManager));
 		}
 	}
 
