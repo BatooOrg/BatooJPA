@@ -20,6 +20,10 @@ package org.batoo.jpa.core.impl.jdbc;
 
 import java.util.List;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
+
 /**
  * Foreign key definition.
  * 
@@ -38,21 +42,38 @@ public class ForeignKey {
 	 *            the name of the table
 	 * @param name
 	 *            the name of the foreign key
-	 * @param referenceTableName
-	 *            the name of the reference table
 	 * @param columns
 	 *            the column
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ForeignKey(String tableName, String name, String referenceTableName, List<PhysicalColumn> columns) {
+	public ForeignKey(String tableName, String referenceTableName, List<PhysicalColumn> columns) {
 		super();
 
 		this.tableName = tableName;
-		this.name = name;
-		this.referenceTableName = referenceTableName;
 		this.columns = columns;
+		this.referenceTableName = referenceTableName;
+
+		this.name = this.generateName();
+	}
+
+	/**
+	 * @return
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private String generateName() {
+		final String columnNames = Joiner.on("_").join(Lists.transform(this.columns, new Function<PhysicalColumn, String>() {
+
+			@Override
+			public String apply(PhysicalColumn input) {
+				return input.getReferencedColumn().getPhysicalName();
+			}
+		}));
+
+		return this.referenceTableName + "_" + columnNames;
 	}
 
 	/**
@@ -93,6 +114,16 @@ public class ForeignKey {
 	 */
 	public String getTableName() {
 		return this.tableName;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "ForeignKey [tableName=" + this.tableName + ", name=" + this.name + ", referenceTableName=" + this.referenceTableName
+			+ ", columns=" + this.columns + "]";
 	}
 
 }

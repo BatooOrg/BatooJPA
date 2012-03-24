@@ -34,6 +34,7 @@ import org.apache.commons.lang.NotImplementedException;
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.impl.instance.ManagedId;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
 import org.batoo.jpa.core.impl.operation.DetachOperation;
 import org.batoo.jpa.core.impl.operation.FindOperation;
@@ -213,7 +214,8 @@ public abstract class SimpleEntityManager implements EntityManager {
 			throw e;
 		}
 
-		return (T) operation.getManagedInstance().getInstance();
+		final ManagedInstance<? super T> managedInstance = operation.getManagedInstance();
+		return (T) (managedInstance != null ? managedInstance.getInstance() : null);
 	}
 
 	/**

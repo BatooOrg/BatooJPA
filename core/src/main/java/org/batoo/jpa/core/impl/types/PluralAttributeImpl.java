@@ -45,6 +45,7 @@ import org.batoo.jpa.core.impl.mapping.JoinColumnTemplate;
 import org.batoo.jpa.core.impl.mapping.OwnedManyToManyMapping;
 import org.batoo.jpa.core.impl.mapping.OwnedOneToManyMapping;
 import org.batoo.jpa.core.impl.mapping.OwnerManyToManyMapping;
+import org.batoo.jpa.core.impl.mapping.OwnerOneToManyMapping;
 import org.batoo.jpa.core.impl.reflect.ReflectHelper;
 
 import com.google.common.base.Function;
@@ -185,7 +186,12 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 			case ASSOCIATION:
 				final boolean eager = this.fetchType == FetchType.EAGER;
 				if (!this.many) {
-					this.mapping = new OwnedOneToManyMapping<X, C, E>(this, path, this.orphanRemoval, eager);
+					if (StringUtils.isNotBlank(this.mappedBy)) {
+						this.mapping = new OwnedOneToManyMapping<X, C, E>(this, path, this.orphanRemoval, eager);
+					}
+					else {
+						this.mapping = new OwnerOneToManyMapping<X, C, E>(this, path, this.orphanRemoval, eager);
+					}
 				}
 				else {
 					if (StringUtils.isNotBlank(this.mappedBy)) {

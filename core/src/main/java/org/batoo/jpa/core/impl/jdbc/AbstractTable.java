@@ -18,7 +18,6 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,8 +31,6 @@ import javax.persistence.UniqueConstraint;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.MappingException;
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.mapping.TableTemplate;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.IdType;
@@ -48,61 +45,56 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
- * Template of a single table.
+ * Abstract base class for physical tables.
  * 
  * @author hceylan
  * @since $version
  */
-public class PhysicalTable implements Table {
+public abstract class AbstractTable implements Table {
 
-	private final EntityTypeImpl<?> owner;
-	private final JDBCAdapter jdbcAdapter;
+	protected final EntityTypeImpl<?> owner;
+	protected final JDBCAdapter jdbcAdapter;
 
-	private final String schema;
 	private final String name;
-	private final String physicalName;
-	private final String physicalSchema;
+	private final String schema;
 	private final UniqueConstraint[] uniqueConstraints;
 
-	private final boolean primary;
-
-	private PhysicalColumn identityColumn;
-	private final List<PhysicalColumn> primaryKeys = Lists.newArrayList();
-	private final List<PhysicalColumn> columns = Lists.newArrayList();
+	protected final List<PhysicalColumn> primaryKeys = Lists.newArrayList();
+	protected final List<PhysicalColumn> columns = Lists.newArrayList();
 	private final List<ForeignKey> foreignKeys = Lists.newArrayList();
 
 	private final Map<String, PhysicalColumn> columnNames = Maps.newHashMap();
 
+	private int h;
 	private String insertSql;
 	private String deleteSql;
 	private String updateSql;
-
-	private final List<PhysicalColumn> insertColumns = Lists.newArrayList();
-
-	private int h;
+	protected final List<PhysicalColumn> insertColumns = Lists.newArrayList();
 
 	/**
-	 * @param entity
+	 * @param owner
 	 *            the owner entity
-	 * @param template
-	 *            the template for the table
+	 * @param schema
+	 *            the name of the schema
+	 * @param name
+	 *            the name of the table
+	 * @param uniqueConstraints
+	 *            the unique constraints
 	 * @param jdbcAdapter
-	 *            the JDBC Adapter
+	 *            the JDBC adapter
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PhysicalTable(EntityTypeImpl<?> entity, TableTemplate template, JDBCAdapter jdbcAdapter) throws MappingException {
+	public AbstractTable(EntityTypeImpl<?> owner, String schema, String name, UniqueConstraint[] uniqueConstraints, JDBCAdapter jdbcAdapter) {
 		super();
 
-		this.owner = entity;
+		this.owner = owner;
 		this.jdbcAdapter = jdbcAdapter;
 
-		this.primary = template.isPrimary();
-		this.schema = template.getSchema();
-		this.physicalSchema = this.jdbcAdapter.escape(this.schema);
-		this.name = template.getName() != null ? template.getName() : entity.getName();
-		this.physicalName = jdbcAdapter.escape(this.name);
-		this.uniqueConstraints = template.getUniqueConstraints();
+		this.schema = this.jdbcAdapter.escape(schema);
+		this.name = this.jdbcAdapter.escape(name);
+		this.uniqueConstraints = uniqueConstraints;
 	}
 
 	/**
@@ -118,7 +110,7 @@ public class PhysicalTable implements Table {
 	public void addColumn(PhysicalColumn column) throws MappingException {
 		if (this.columnNames.keySet().contains(column.getPhysicalName())) {
 			final PhysicalColumn other = this.columnNames.get(column.getPhysicalName());
-			throw new MappingException("Duplicate column on entity " + this.getOwner().getJavaType().getCanonicalName() + ", "
+			throw new MappingException("Duplicate column on entity " + this.owner.getJavaType().getCanonicalName() + ", "
 				+ other.getMapping().getPathAsString() + " - " + column.getMapping().getPathAsString());
 		}
 
@@ -127,15 +119,6 @@ public class PhysicalTable implements Table {
 
 		if (column.isId()) {
 			this.primaryKeys.add(column);
-		}
-
-		if (column.getIdType() == IdType.IDENTITY) {
-			if (this.identityColumn != null) {
-				throw new MappingException("Multiple identity columns: " + this.identityColumn.getName() + ", " + column.getName() + " on "
-					+ this.owner.getJavaType().getCanonicalName());
-			}
-
-			this.identityColumn = column;
 		}
 	}
 
@@ -223,7 +206,7 @@ public class PhysicalTable implements Table {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		final PhysicalTable other = (PhysicalTable) obj;
+		final AbstractTable other = (AbstractTable) obj;
 		if (this.name == null) {
 			if (other.name != null) {
 				return false;
@@ -244,16 +227,6 @@ public class PhysicalTable implements Table {
 	}
 
 	/**
-	 * Returns the columns.
-	 * 
-	 * @return the columns
-	 * @since $version
-	 */
-	public List<PhysicalColumn> getColumns() {
-		return this.columns;
-	}
-
-	/**
 	 * Returns the delete statement for the table.
 	 * 
 	 * @return the delete statement
@@ -263,8 +236,6 @@ public class PhysicalTable implements Table {
 	 */
 	public synchronized String getDeleteSql() {
 		if (this.deleteSql == null) {
-			this.sortColumns();
-
 			// Prepare predicates in the form of "COL = ?"
 			final List<String> predicates = Lists.transform(this.primaryKeys, new Function<PhysicalColumn, String>() {
 
@@ -279,7 +250,7 @@ public class PhysicalTable implements Table {
 
 			// DELETE FROM SCHEMA.TABLE
 			// WHERE COL = ? [ AND COL = ?]*
-			this.deleteSql = "DELETE FROM " + this.getQualifiedPhysicalName() //
+			this.deleteSql = "DELETE FROM " + this.getQualifiedName() //
 				+ "\nWHERE " //
 				+ whereStr;
 		}
@@ -307,8 +278,6 @@ public class PhysicalTable implements Table {
 	 */
 	public synchronized String getInsertSql() {
 		if (this.insertSql == null) {
-			this.sortColumns();
-
 			// Filter out the identity columns
 			final Collection<PhysicalColumn> filteredColumns = Collections2.filter(this.columns, new Predicate<PhysicalColumn>() {
 
@@ -323,7 +292,7 @@ public class PhysicalTable implements Table {
 
 				@Override
 				public String apply(PhysicalColumn input) {
-					PhysicalTable.this.insertColumns.add(input);
+					AbstractTable.this.insertColumns.add(input);
 
 					return input.getPhysicalName();
 				}
@@ -344,7 +313,7 @@ public class PhysicalTable implements Table {
 			// INSERT INTO SCHEMA.TABLE
 			// (COL [, COL]*)
 			// VALUES (PARAM [, PARAM]*)
-			this.insertSql = "INSERT INTO " + this.getQualifiedPhysicalName() //
+			this.insertSql = "INSERT INTO " + this.getQualifiedName() //
 				+ "\n(" + columnNamesStr + ")"//
 				+ "\nVALUES (" + parametersStr + ")";
 		}
@@ -353,11 +322,10 @@ public class PhysicalTable implements Table {
 	}
 
 	/**
-	 * Returns the jdbcAdapter.
+	 * {@inheritDoc}
 	 * 
-	 * @return the jdbcAdapter
-	 * @since $version
 	 */
+	@Override
 	public JDBCAdapter getJdbcAdapter() {
 		return this.jdbcAdapter;
 	}
@@ -381,16 +349,6 @@ public class PhysicalTable implements Table {
 	 */
 	public EntityTypeImpl<?> getOwner() {
 		return this.owner;
-	}
-
-	/**
-	 * Returns the physicalName.
-	 * 
-	 * @return the physicalName
-	 * @since $version
-	 */
-	public String getPhysicalName() {
-		return this.physicalName;
 	}
 
 	/**
@@ -419,19 +377,16 @@ public class PhysicalTable implements Table {
 	}
 
 	/**
-	 * Returns the qualified physical name of the table.
+	 * {@inheritDoc}
 	 * 
-	 * @return the qualified physical name of the table
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	public String getQualifiedPhysicalName() {
-		if (StringUtils.isNotBlank(this.physicalSchema)) {
-			return this.physicalSchema + "." + this.physicalName;
+	@Override
+	public String getQualifiedName() {
+		if (StringUtils.isNotBlank(this.schema)) {
+			return this.schema + "." + this.name;
 		}
 
-		return this.physicalName;
+		return this.name;
 	}
 
 	/**
@@ -465,8 +420,6 @@ public class PhysicalTable implements Table {
 	 */
 	public synchronized String getUpdateSql() {
 		if (this.updateSql == null) {
-			this.sortColumns();
-
 			// Filter out the identity columns
 			final Collection<PhysicalColumn> filteredColumns = Collections2.filter(this.columns, new Predicate<PhysicalColumn>() {
 
@@ -500,7 +453,7 @@ public class PhysicalTable implements Table {
 			// UPDATE SCHEMA.TABLE
 			// (COL [, COL]*)
 			// VALUES (PARAM [, PARAM]*)
-			this.updateSql = "UPDATE " + this.getQualifiedPhysicalName() //
+			this.updateSql = "UPDATE " + this.getQualifiedName() //
 				+ "\n(" + columnNamesStr + ")"//
 				+ "\nVALUES (" + parametersStr + ")";
 		}
@@ -527,57 +480,12 @@ public class PhysicalTable implements Table {
 	}
 
 	/**
-	 * Returns the primary.
-	 * 
-	 * @return the primary
-	 * @since $version
-	 */
-	public boolean isPrimary() {
-		return this.primary;
-	}
-
-	/**
-	 * Performs inserts to the table for the managed instance.
-	 * 
-	 * @param connection
-	 *            the connection to use
-	 * @param managedInstance
-	 *            the managed instance to perform insert for
-	 * @throws SQLException
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void performInsert(Connection connection, final ManagedInstance<?> managedInstance) throws SQLException {
-		final QueryRunner runner = new QueryRunner();
-
-		// Do not inline, generation of the insert sql will initialize the insertColumns!
-		final String insertSql = this.getInsertSql();
-
-		final List<Object> params = Lists.transform(this.insertColumns, new Function<PhysicalColumn, Object>() {
-			@Override
-			public Object apply(PhysicalColumn input) {
-				return input.getPhysicalValue(managedInstance.getSession(), managedInstance.getInstance());
-			}
-		});
-
-		runner.update(connection, insertSql, params.toArray());
-
-		if (this.identityColumn != null) {
-			final String selectLastIdSql = this.jdbcAdapter.getSelectLastIdentitySql();
-			final Number id = runner.query(connection, selectLastIdSql, new SingleValueHandler<Number>());
-
-			this.identityColumn.getMapping().setValue(managedInstance.getInstance(), id);
-		}
-	}
-
-	/**
 	 * Sorts the columns of the table
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void sortColumns() {
+	private void sortColumns() {
 		final Comparator<PhysicalColumn> c = new Comparator<PhysicalColumn>() {
 
 			@Override
@@ -596,35 +504,6 @@ public class PhysicalTable implements Table {
 
 		Collections.sort(this.primaryKeys, c);
 		Collections.sort(this.columns, c);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String toString() {
-		final String name = this.schema != null ? this.schema + "." + this.name : this.name;
-
-		final String columns = Joiner.on(", ").join(Lists.transform(this.columns, new Function<PhysicalColumn, String>() {
-
-			@Override
-			public String apply(PhysicalColumn input) {
-				final StringBuffer out = new StringBuffer();
-				out.append(input.isId() ? "ID [" : "COL [");
-
-				out.append("name=");
-				out.append(input.getName());
-				out.append(", type=");
-				out.append(input.getSqlType());
-
-				out.append("]");
-				return out.toString();
-			}
-		}));
-
-		return "PhysicalTable [owner=" + this.owner.getName() + ", name=" + name + ", primary=" + this.primary + ", columns=[" + columns
-			+ "]]";
 	}
 
 }

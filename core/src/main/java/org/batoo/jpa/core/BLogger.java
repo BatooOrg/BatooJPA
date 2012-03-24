@@ -427,6 +427,18 @@ public class BLogger {
 	}
 
 	/**
+	 * Returns if trace is enabled.
+	 * 
+	 * @return true if enabled
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isTraceEnabled() {
+		return this.logger.isTraceEnabled();
+	}
+
+	/**
 	 * Convenience method to log a message
 	 * 
 	 * @param message

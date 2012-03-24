@@ -94,8 +94,7 @@ public abstract class JDBCAdapter extends AbstractJDBCAdapter {
 		final String columns = Joiner.on(",\n\t").join(ddlColumns) + ",";
 		final String keys = Joiner.on(", ").join(table.getPrimaryKeyColumns());
 
-		final String qn = StringUtils.isNotBlank(table.getSchema()) ? table.getSchema() + "." + table.getName() : table.getName();
-		return "CREATE TABLE " + qn + " (\n\t" // table part
+		return "CREATE TABLE " + table.getQualifiedName() + " (\n\t" // table part
 			+ columns // columns part
 			+ "\nPRIMARY KEY(" + keys + "))"; // primary key part
 	}

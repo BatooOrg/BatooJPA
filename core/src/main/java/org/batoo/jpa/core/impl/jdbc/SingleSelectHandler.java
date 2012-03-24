@@ -101,7 +101,7 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 	private ManagedInstance<?> createManagedInstance(SessionImpl session, ResultSet rs, Map<ManagedId<?>, ManagedInstance<?>> cache,
 		int depth, EntityTypeImpl<?> currentType) throws SQLException {
 		if (currentType.hasSingleIdAttribute()) {
-			final PhysicalTable primaryTable = currentType.getPrimaryTable();
+			final EntityTable primaryTable = currentType.getPrimaryTable();
 			final PhysicalColumn primaryKey = primaryTable.getPrimaryKeys().iterator().next();
 			final Object primaryKeyValue = this.getColumnValue(rs, primaryKey);
 
@@ -115,9 +115,12 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 			}
 
 			// get it from the session
-			final ManagedInstance<?> existing = session.get(managedInstance.getInstance());
+			final ManagedInstance<?> existing = session.get(managedInstance.getId());
 			if (existing != null) {
 				managedInstance = existing;
+			}
+			else {
+				session.put(managedInstance);
 			}
 
 			// put it into the cache
@@ -206,7 +209,7 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 
 		cache.put(managedInstance.getId(), managedInstance);
 
-		for (final PhysicalTable table : currentType.getTables().values()) {
+		for (final EntityTable table : currentType.getTables().values()) {
 			for (final PhysicalColumn column : table.getColumns()) {
 				if (column.getMapping() instanceof BasicMapping) {
 					if (column.isId()) { // primary key values already handled

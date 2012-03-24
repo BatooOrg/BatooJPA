@@ -56,7 +56,7 @@ public class EmbeddableOverrides2Test extends AbstractTest {
 	}
 
 	/**
-	 * Tests to {@link EntityManager#find(Class, Object)}
+	 * Tests to {@link EntityManager#find(Class, Object)} with two level deep override.
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -79,7 +79,7 @@ public class EmbeddableOverrides2Test extends AbstractTest {
 	}
 
 	/**
-	 * Tests to {@link EntityManager#persist(Object)}.
+	 * Tests to {@link EntityManager#persist(Object)} with two level deep override.
 	 * 
 	 * @since $version
 	 * @author hceylan

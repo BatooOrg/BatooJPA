@@ -20,6 +20,8 @@ package org.batoo.jpa.core.jdbc;
 
 import java.util.Collection;
 
+import org.batoo.jpa.core.jdbc.adapter.JDBCAdapter;
+
 /**
  * The deinition of a table.
  * 
@@ -27,6 +29,16 @@ import java.util.Collection;
  * @since $version
  */
 public interface Table {
+
+	/**
+	 * Returns the JDBC adapter.
+	 * 
+	 * @return the JDBC adapter
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	JDBCAdapter getJdbcAdapter();
 
 	/**
 	 * Returns the name.
@@ -45,11 +57,31 @@ public interface Table {
 	Collection<String> getPrimaryKeyColumns();
 
 	/**
+	 * Returns the qualified physical name of the table.
+	 * 
+	 * @return the qualified physical name of the table
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getQualifiedName();
+
+	/**
 	 * Returns the schema.
 	 * 
 	 * @return the schema
 	 * @since $version
 	 */
 	String getSchema();
+
+	/**
+	 * Returns if the table is primary table.
+	 * 
+	 * @return true the table is primary table
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	boolean isPrimary();
 
 }

@@ -195,20 +195,20 @@ public abstract class AbstractOperation<X> implements Comparable<AbstractOperati
 				}
 			}
 
-			for (final Association<?, ?> association : this.managedInstance.getType().getAssociations()) {
-				final List<AbstractOperation<?>> cascaded = this.cascade(association);
-				if (cascaded != null) {
-					cascades.addAll(cascaded);
+			if (this.managedInstance != null) {
+				for (final Association<?, ?> association : this.managedInstance.getType().getAssociations()) {
+					final List<AbstractOperation<?>> cascaded = this.cascade(association);
+					if (cascaded != null) {
+						cascades.addAll(cascaded);
+					}
 				}
 			}
-
-			return cascades;
 		}
 		catch (final InterruptedException e) {
 			// no cascading
 		}
 
-		return null;
+		return cascades;
 	}
 
 	/**

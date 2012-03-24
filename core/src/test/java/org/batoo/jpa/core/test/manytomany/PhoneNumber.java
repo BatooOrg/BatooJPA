@@ -16,54 +16,75 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.mapping;
+package org.batoo.jpa.core.test.manytomany;
 
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-
-import org.batoo.jpa.core.MappingException;
-import org.batoo.jpa.core.jdbc.adapter.JDBCAdapter;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 /**
- * Interface for owned associations.
  * 
  * @author hceylan
  * @since $version
  */
-public interface OwnedAssociation<X, T> extends Association<X, T> {
+@Entity
+public class PhoneNumber {
+
+	@Id
+	@GeneratedValue
+	private Integer id;
+
+	private String number;
 
 	/**
-	 * {@inheritDoc}
-	 * 
+	 * @since $version
+	 * @author hceylan
 	 */
-	@Override
-	OwnerAssociation<T, X> getOpposite();
+	public PhoneNumber() {
+		super();
+	}
 
 	/**
-	 * Links the opposite side if any exists.
-	 * 
-	 * @param jdbcAdapter
-	 *            the JDBC adapter
-	 * @throws MappingException
-	 *             thrown if the bidirectional relation is not valid
+	 * @param number
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	void link(JDBCAdapter jdbcAdapter) throws MappingException;
+	public PhoneNumber(String number) {
+		super();
+
+		this.number = number;
+	}
 
 	/**
-	 * Returns if the association removes the orphans.
-	 * <p>
-	 * This corresponds to the {@link OneToOne#orphanRemoval()} {@link OneToMany#orphanRemoval()}
-	 * <p>
-	 * This must return false if the association is the owner.
+	 * Returns the id.
 	 * 
-	 * @return true if removes.
-	 * 
+	 * @return the id
 	 * @since $version
-	 * @author hceylan
 	 */
-	boolean orphanRemoval();
+	public Integer getId() {
+		return this.id;
+	}
+
+	/**
+	 * Returns the number.
+	 * 
+	 * @return the number
+	 * @since $version
+	 */
+	public String getNumber() {
+		return this.number;
+	}
+
+	/**
+	 * Sets the number.
+	 * 
+	 * @param number
+	 *            the number to set
+	 * @since $version
+	 */
+	public void setNumber(String number) {
+		this.number = number;
+	}
 
 }

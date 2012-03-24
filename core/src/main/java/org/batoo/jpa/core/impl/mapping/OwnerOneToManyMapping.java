@@ -18,25 +18,33 @@
  */
 package org.batoo.jpa.core.impl.mapping;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Deque;
 
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
 import org.batoo.jpa.core.MappingException;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.jdbc.JoinTable;
 import org.batoo.jpa.core.impl.types.AttributeImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 import org.batoo.jpa.core.impl.types.PluralAttributeImpl;
+import org.batoo.jpa.core.jdbc.adapter.JDBCAdapter;
 
 /**
  * Implementation of {@link AssociationType#MANY} relational attributes.
  * <p>
- * This is a {@link OneToMany} type of mapping with the declaring attribute being the owned.
+ * This is a {@link OneToMany} type of mapping with the declaring attribute being the owner.
  * 
  * @author hceylan
  * @since $version
  */
-public class OwnedOneToManyMapping<X, C, E> extends OwnedAssociationMapping<X, C> implements CollectionMapping<X, C> {
+public class OwnerOneToManyMapping<X, C, E> extends OwnedAssociationMapping<X, C> implements CollectionMapping<X, C>,
+	PersistableAssociation<X, C> {
+
+	private JoinTable joinTable;
 
 	/**
 	 * @param declaringAttribute
@@ -54,7 +62,7 @@ public class OwnedOneToManyMapping<X, C, E> extends OwnedAssociationMapping<X, C
 	 * @since $version
 	 * @author hceylan
 	 */
-	public OwnedOneToManyMapping(PluralAttributeImpl<X, C, E> declaringAttribute, Deque<AttributeImpl<?, ?>> path, boolean orphanRemoval,
+	public OwnerOneToManyMapping(PluralAttributeImpl<X, C, E> declaringAttribute, Deque<AttributeImpl<?, ?>> path, boolean orphanRemoval,
 		boolean eager) throws MappingException {
 		super(AssociationType.MANY, declaringAttribute, path, orphanRemoval, eager);
 	}
@@ -67,6 +75,15 @@ public class OwnedOneToManyMapping<X, C, E> extends OwnedAssociationMapping<X, C
 	@SuppressWarnings("unchecked")
 	public PluralAttributeImpl<X, C, E> getDeclaringAttribute() {
 		return (PluralAttributeImpl<X, C, E>) super.getDeclaringAttribute();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public JoinTable getJoinTable() {
+		return this.joinTable;
 	}
 
 	/**
@@ -88,4 +105,34 @@ public class OwnedOneToManyMapping<X, C, E> extends OwnedAssociationMapping<X, C
 		return (EntityTypeImpl<C>) this.getDeclaringAttribute().getElementType();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean hasJoin() {
+		return this.joinTable != null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void link(JDBCAdapter jdbcAdapter) throws MappingException {
+		super.link(jdbcAdapter);
+
+		if (this.getOpposite() == null) {
+			this.joinTable = new JoinTable(this, jdbcAdapter);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void performInsert(Connection connection, ManagedInstance<X> managedInstance) throws SQLException {
+		this.joinTable.performInsert(connection, managedInstance);
+	}
 }

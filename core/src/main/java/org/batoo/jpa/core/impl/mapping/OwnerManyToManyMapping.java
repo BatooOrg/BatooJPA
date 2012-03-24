@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.core.impl.mapping;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Deque;
 
@@ -25,9 +27,12 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToOne;
 
 import org.batoo.jpa.core.MappingException;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.jdbc.JoinTable;
 import org.batoo.jpa.core.impl.types.AttributeImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 import org.batoo.jpa.core.impl.types.PluralAttributeImpl;
+import org.batoo.jpa.core.jdbc.adapter.JDBCAdapter;
 
 /**
  * Implementation of {@link AssociationType#MANY} relational attributes.
@@ -37,7 +42,10 @@ import org.batoo.jpa.core.impl.types.PluralAttributeImpl;
  * @author hceylan
  * @since $version
  */
-public class OwnerManyToManyMapping<X, C, E> extends OwnerAssociationMapping<X, C> implements Association<X, C>, CollectionMapping<X, C> {
+public class OwnerManyToManyMapping<X, C, E> extends OwnerAssociationMapping<X, C> implements Association<X, C>, CollectionMapping<X, C>,
+	PersistableAssociation<X, C> {
+
+	private JoinTable joinTable;
 
 	/**
 	 * @param declaringAttribute
@@ -78,6 +86,17 @@ public class OwnerManyToManyMapping<X, C, E> extends OwnerAssociationMapping<X, 
 	}
 
 	/**
+	 * Returns the joinTable.
+	 * 
+	 * @return the joinTable
+	 * @since $version
+	 */
+	@Override
+	public JoinTable getJoinTable() {
+		return this.joinTable;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -95,5 +114,36 @@ public class OwnerManyToManyMapping<X, C, E> extends OwnerAssociationMapping<X, 
 	@SuppressWarnings("unchecked")
 	public EntityTypeImpl<C> getType() {
 		return (EntityTypeImpl<C>) this.getDeclaringAttribute().getElementType();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean hasJoin() {
+		return true;
+	}
+
+	/**
+	 * Creates the join table for the association.
+	 * 
+	 * @param jdbcAdapter
+	 * @throws MappingException
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void link(JDBCAdapter jdbcAdapter) throws MappingException {
+		this.joinTable = new JoinTable(this, jdbcAdapter);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void performInsert(Connection connection, ManagedInstance<X> managedInstance) throws SQLException {
+		this.joinTable.performInsert(connection, managedInstance);
 	}
 }

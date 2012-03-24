@@ -46,9 +46,10 @@ import org.batoo.jpa.core.impl.instance.BasicResolver;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
+import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
+import org.batoo.jpa.core.impl.jdbc.JoinTable;
 import org.batoo.jpa.core.impl.jdbc.PhysicalColumn;
-import org.batoo.jpa.core.impl.jdbc.PhysicalTable;
 import org.batoo.jpa.core.impl.jdbc.SelectHelper;
 import org.batoo.jpa.core.impl.mapping.AbstractMapping;
 import org.batoo.jpa.core.impl.mapping.AbstractPhysicalMapping;
@@ -60,13 +61,13 @@ import org.batoo.jpa.core.impl.mapping.JoinColumnTemplate;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
 import org.batoo.jpa.core.impl.mapping.OwnedAssociation;
 import org.batoo.jpa.core.impl.mapping.OwnerAssociationMapping;
+import org.batoo.jpa.core.impl.mapping.OwnerManyToManyMapping;
 import org.batoo.jpa.core.impl.mapping.TableTemplate;
 import org.batoo.jpa.core.impl.mapping.TypeFactory;
 import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.IdType;
 
 import com.google.common.base.Function;
-import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -92,8 +93,9 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 	private final Set<PhysicalColumn> columns = Sets.newHashSet();
 
-	private PhysicalTable primaryTable;
-	private final Map<String, PhysicalTable> tables = Maps.newHashMap();
+	private EntityTable primaryTable;
+	private final Map<String, EntityTable> tables = Maps.newHashMap();
+	private final Map<String, JoinTable> joinTables = Maps.newHashMap();
 
 	private Object topType;
 
@@ -135,7 +137,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	public synchronized PhysicalColumn addColumn(ColumnTemplate<?, ?> template, AbstractPhysicalMapping<?, ?> mapping)
 		throws MappingException {
 		// Determine the table name
-		final PhysicalTable table = StringUtils.isNotBlank(template.getTableName()) ? this.tables.get(template.getTableName())
+		final EntityTable table = StringUtils.isNotBlank(template.getTableName()) ? this.tables.get(template.getTableName())
 			: this.getPrimaryTable();
 
 		if (table == null) {
@@ -170,19 +172,23 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	private void addForeignKey(final Association<?, ?> association, final List<PhysicalColumn> foreignKeyColumns) {
-		final String tableName = association.getType().getPrimaryTable().getQualifiedPhysicalName();
-		final String columnNames = Joiner.on("_").join(Lists.transform(foreignKeyColumns, new Function<PhysicalColumn, String>() {
+		final String tableName = association.getType().getPrimaryTable().getQualifiedName();
+		final EntityTable table = (EntityTable) foreignKeyColumns.get(0).getTable();
 
-			@Override
-			public String apply(PhysicalColumn input) {
-				return input.getReferencedColumn().getPhysicalName();
-			}
-		}));
+		table.addForeignKey(new ForeignKey(table.getName(), tableName, foreignKeyColumns));
+	}
 
-		final String foreignKeyName = tableName + "_" + columnNames;
-		final PhysicalTable table = foreignKeyColumns.get(0).getTable();
-
-		table.addForeignKey(new ForeignKey(table.getPhysicalName(), foreignKeyName, tableName, foreignKeyColumns));
+	/**
+	 * Adds a join table to the type
+	 * 
+	 * @param joinTable
+	 *            the join table
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void addJoinTable(JoinTable joinTable) {
+		this.joinTables.put(joinTable.getName(), joinTable);
 	}
 
 	/**
@@ -234,7 +240,9 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 					keyColumns.add(this.addColumn(template, associationMapping));
 				}
 
-				this.addForeignKey(association, keyColumns);
+				if (!(association instanceof OwnerManyToManyMapping)) {
+					this.addForeignKey(association, keyColumns);
+				}
 			}
 		}
 
@@ -277,7 +285,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		LOG.info("Performing DDL operations for {0}, mode {2}", this, ddlMode);
 
 		try {
-			for (final PhysicalTable table : this.tables.values()) {
+			for (final EntityTable table : this.tables.values()) {
 				if (firstPass) {
 					if (!table.isPrimary()) {
 						final List<PhysicalColumn> keyColumns = Lists.newArrayList();
@@ -285,13 +293,15 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 							keyColumns.add(new PhysicalColumn(table, column));
 						}
 
-						final ForeignKey foreignKey = new ForeignKey(table.getPhysicalName(), this.primaryTable.getPhysicalName(),
-							this.primaryTable.getPhysicalName(), keyColumns);
-						table.addForeignKey(foreignKey);
+						table.addForeignKey(new ForeignKey(table.getName(), this.primaryTable.getName(), keyColumns));
 					}
 				}
 
 				table.ddl(this.metaModel.getJdbcAdapter(), datasource, ddlMode, schemas, firstPass);
+			}
+
+			for (final JoinTable joinTable : this.joinTables.values()) {
+				joinTable.ddl(this.metaModel.getJdbcAdapter(), datasource, ddlMode, schemas, firstPass);
 			}
 		}
 		catch (final SQLException e) {
@@ -492,7 +502,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PhysicalTable getPrimaryTable() {
+	public EntityTable getPrimaryTable() {
 		if (this.primaryTable != null) {
 			return this.primaryTable;
 		}
@@ -512,7 +522,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PhysicalTable getTable(String tableName) {
+	public EntityTable getTable(String tableName) {
 		if (StringUtils.isBlank(tableName)) {
 			return this.getPrimaryTable();
 		}
@@ -526,7 +536,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the tables
 	 * @since $version
 	 */
-	public Map<String, PhysicalTable> getTables() {
+	public Map<String, EntityTable> getTables() {
 		return this.tables;
 	}
 
@@ -670,7 +680,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		managedInstance.setExecuted();
 
 		// then to the remaining tables
-		for (final PhysicalTable table : this.tables.values()) {
+		for (final EntityTable table : this.tables.values()) {
 			if (table.isPrimary()) {
 				continue;
 			}
@@ -729,7 +739,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private void vlinkTables() throws MappingException {
 		// first do the self defined tables
 		for (final TableTemplate template : this.getTableTemplates()) {
-			final PhysicalTable table = new PhysicalTable(this, template, this.metaModel.getJdbcAdapter());
+			final EntityTable table = new EntityTable(this, template, this.metaModel.getJdbcAdapter());
 			if (template.isPrimary()) {
 				this.primaryTable = table;
 			}
@@ -746,7 +756,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 					continue;
 				}
 
-				final PhysicalTable table = new PhysicalTable(this, template, this.metaModel.getJdbcAdapter());
+				final EntityTable table = new EntityTable(this, template, this.metaModel.getJdbcAdapter());
 				if (table.isPrimary()) {
 					this.primaryTable = table;
 				}

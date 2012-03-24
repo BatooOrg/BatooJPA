@@ -16,54 +16,79 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.mapping;
+package org.batoo.jpa.core.test.onetomany;
 
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-
-import org.batoo.jpa.core.MappingException;
-import org.batoo.jpa.core.jdbc.adapter.JDBCAdapter;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 /**
- * Interface for owned associations.
  * 
  * @author hceylan
  * @since $version
  */
-public interface OwnedAssociation<X, T> extends Association<X, T> {
+@Entity
+public class Address {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	private Integer id;
+
+	private String city;
 
 	/**
-	 * {@inheritDoc}
-	 * 
+	 * @since $version
+	 * @author hceylan
 	 */
-	@Override
-	OwnerAssociation<T, X> getOpposite();
+	public Address() {
+		super();
+	}
 
 	/**
-	 * Links the opposite side if any exists.
-	 * 
-	 * @param jdbcAdapter
-	 *            the JDBC adapter
-	 * @throws MappingException
-	 *             thrown if the bidirectional relation is not valid
+	 * @param person
+	 * @param city
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	void link(JDBCAdapter jdbcAdapter) throws MappingException;
+	public Address(Person person, String city) {
+		super();
+
+		this.city = city;
+
+		person.getAddresses().add(this);
+	}
 
 	/**
-	 * Returns if the association removes the orphans.
-	 * <p>
-	 * This corresponds to the {@link OneToOne#orphanRemoval()} {@link OneToMany#orphanRemoval()}
-	 * <p>
-	 * This must return false if the association is the owner.
+	 * Returns the city.
 	 * 
-	 * @return true if removes.
-	 * 
+	 * @return the city
 	 * @since $version
-	 * @author hceylan
 	 */
-	boolean orphanRemoval();
+	public String getCity() {
+		return this.city;
+	}
+
+	/**
+	 * Returns the id.
+	 * 
+	 * @return the id
+	 * @since $version
+	 */
+	public Integer getId() {
+		return this.id;
+	}
+
+	/**
+	 * Sets the city.
+	 * 
+	 * @param city
+	 *            the city to set
+	 * @since $version
+	 */
+	public void setCity(String city) {
+		this.city = city;
+	}
 
 }

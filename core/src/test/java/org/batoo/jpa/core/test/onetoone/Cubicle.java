@@ -16,54 +16,58 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.mapping;
+package org.batoo.jpa.core.test.onetoone;
 
-import javax.persistence.OneToMany;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
-import org.batoo.jpa.core.MappingException;
-import org.batoo.jpa.core.jdbc.adapter.JDBCAdapter;
-
 /**
- * Interface for owned associations.
  * 
  * @author hceylan
  * @since $version
  */
-public interface OwnedAssociation<X, T> extends Association<X, T> {
+@Entity
+public class Cubicle {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	private Integer id;
+
+	@OneToOne
+	private Employee manager;
 
 	/**
-	 * {@inheritDoc}
+	 * Returns the id.
 	 * 
-	 */
-	@Override
-	OwnerAssociation<T, X> getOpposite();
-
-	/**
-	 * Links the opposite side if any exists.
-	 * 
-	 * @param jdbcAdapter
-	 *            the JDBC adapter
-	 * @throws MappingException
-	 *             thrown if the bidirectional relation is not valid
-	 * 
+	 * @return the id
 	 * @since $version
-	 * @author hceylan
 	 */
-	void link(JDBCAdapter jdbcAdapter) throws MappingException;
+	public Integer getId() {
+		return this.id;
+	}
 
 	/**
-	 * Returns if the association removes the orphans.
-	 * <p>
-	 * This corresponds to the {@link OneToOne#orphanRemoval()} {@link OneToMany#orphanRemoval()}
-	 * <p>
-	 * This must return false if the association is the owner.
+	 * Returns the manager.
 	 * 
-	 * @return true if removes.
-	 * 
+	 * @return the manager
 	 * @since $version
-	 * @author hceylan
 	 */
-	boolean orphanRemoval();
+	public Employee getManager() {
+		return this.manager;
+	}
+
+	/**
+	 * Sets the manager.
+	 * 
+	 * @param manager
+	 *            the manager to set
+	 * @since $version
+	 */
+	public void setManager(Employee manager) {
+		this.manager = manager;
+	}
 
 }

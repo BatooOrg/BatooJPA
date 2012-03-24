@@ -563,8 +563,10 @@ public class MetamodelImpl implements Metamodel {
 	public void linkAssociations() throws MappingException {
 		for (final Association<?, ?> association : this.associations) {
 			if (association instanceof OwnedAssociation) {
-				final OwnedAssociation<?, ?> ownedAssociation = (OwnedAssociation<?, ?>) association;
-				ownedAssociation.link();
+				((OwnedAssociation<?, ?>) association).link(this.jdbcAdapter);
+			}
+			else if (association instanceof OwnerManyToManyMapping) {
+				((OwnerManyToManyMapping<?, ?, ?>) association).link(this.jdbcAdapter);
 			}
 		}
 	}

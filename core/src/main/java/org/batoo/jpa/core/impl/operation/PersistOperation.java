@@ -29,6 +29,7 @@ import org.batoo.jpa.core.impl.EntityManagerImpl;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
 import org.batoo.jpa.core.impl.mapping.Association;
+import org.batoo.jpa.core.impl.mapping.PersistableAssociation;
 
 import com.google.common.collect.Lists;
 
@@ -60,10 +61,11 @@ public class PersistOperation<X> extends AbstractOperation<X> {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	protected List<AbstractOperation<?>> cascade(Association<?, ?> association) {
+		final List<AbstractOperation<?>> cascades = Lists.newArrayList();
+
 		if (association.cascadePersist()) {
 			final Object value = association.getValue(this.managedInstance.getInstance());
 
-			final List<AbstractOperation<?>> cascades = Lists.newArrayList();
 			if (value != null) {
 				if (value instanceof Collection) {
 					final Collection<?> values = (Collection<?>) value;
@@ -75,12 +77,17 @@ public class PersistOperation<X> extends AbstractOperation<X> {
 				else {
 					cascades.add(new PersistOperation(this.em, value));
 				}
-
-				return cascades;
 			}
 		}
 
-		return null;
+		if (association instanceof PersistableAssociation) {
+			final PersistableAssociation persistableAssociation = (PersistableAssociation) association;
+			if (persistableAssociation.hasJoin()) {
+				cascades.add(new PersistAssociationOperation(this.em, this.managedInstance, persistableAssociation));
+			}
+		}
+
+		return cascades;
 	}
 
 	/**

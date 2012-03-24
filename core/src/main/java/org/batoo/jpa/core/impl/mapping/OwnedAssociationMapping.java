@@ -24,9 +24,11 @@ import java.util.HashSet;
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
 
+import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.instance.OwnedAssociateResolver;
 import org.batoo.jpa.core.impl.types.AttributeImpl;
+import org.batoo.jpa.core.jdbc.adapter.JDBCAdapter;
 
 import com.google.common.collect.Sets;
 
@@ -171,17 +173,29 @@ public abstract class OwnedAssociationMapping<X, T> extends AbstractMapping<X, T
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public void link() throws MappingException {
+	public void link(JDBCAdapter jdbcAdapter) throws MappingException {
 		final String mappedBy = this.getDeclaringAttribute().getMappedBy();
-		final AbstractMapping<?, ?> mapping = this.getType().getMapping(mappedBy);
+		AbstractMapping<?, ?> mapping = null;
 
-		if (!(mapping instanceof OwnerAssociation)) {
-			throw new MappingException("Both sides of the OneToOne mapping is marked with mappedBy, Only one side can be the owner");
+		if (StringUtils.isNotEmpty(mappedBy)) {
+			mapping = this.getType().getMapping(mappedBy);
+
+			if (mapping == null) {
+				final String thisName = this.getOwner().getJavaType().getCanonicalName() + "." + this.getDeclaringAttribute().getName();
+				throw new MappingException("Mappedby property not found: " + thisName + "(" + mappedBy + ")");
+			}
 		}
 
-		this.opposite = (OwnerAssociation<T, X>) mapping;
+		if (mapping != null) {
+			if (!(mapping instanceof OwnerAssociation)) {
+				final String thisName = this.getOwner().getJavaType().getCanonicalName() + "." + this.getDeclaringAttribute().getName();
+				final String otherName = mapping.getOwner().getJavaType().getCanonicalName() + "."
+					+ mapping.getDeclaringAttribute().getName();
+				throw new MappingException("Both sides of the OneToOne mapping is marked with mappedBy, only one side can be the owner: "
+					+ thisName + " - " + otherName);
+			}
 
-		if (this.opposite != null) {
+			this.opposite = (OwnerAssociation<T, X>) mapping;
 			this.opposite.setOpposite(this);
 		}
 	}
@@ -194,4 +208,5 @@ public abstract class OwnedAssociationMapping<X, T> extends AbstractMapping<X, T
 	public final boolean orphanRemoval() {
 		return this.orpanRemoval;
 	}
+
 }

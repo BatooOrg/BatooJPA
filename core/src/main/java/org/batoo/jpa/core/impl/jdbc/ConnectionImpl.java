@@ -623,23 +623,23 @@ public class ConnectionImpl implements Connection {
 	public void setAutoCommit(boolean autoCommit) throws SQLException {
 		final long callNo = ++this.callNo;
 
-		LOG.trace("{0}:{1} setAutoCommit(boolean): {2}", this.connNo, callNo, autoCommit);
+		if (LOG.isTraceEnabled()) {
 
-		final long start = System.currentTimeMillis();
-		try {
-			this.connection.setAutoCommit(autoCommit);
-		}
-		finally {
-			final long time = System.currentTimeMillis() - start;
+			LOG.trace("{0}:{1} setAutoCommit(boolean): {2}", this.connNo, callNo, autoCommit);
 
-			if (time > BJPASettings.WARN_TIME) {
-				LOG.warn(new OperationTookLongTimeWarning(), "{0}:{1} {2} msecs, setAutoCommit(boolan): {3}", this.connNo, callNo, time,
+			final long start = System.currentTimeMillis();
+			try {
+				this.connection.setAutoCommit(autoCommit);
+			}
+			finally {
+				LOG.trace("{0}:{1} {2} msecs, setAutoCommit(boolean): {3}", this.connNo, callNo, System.currentTimeMillis() - start,
 					autoCommit);
 			}
-			else {
-				LOG.trace("{0}:{1} {2} msecs, setAutoCommit(boolean): {3}", this.connNo, callNo, time, autoCommit);
-			}
 		}
+		else {
+			this.connection.setAutoCommit(autoCommit);
+		}
+
 	}
 
 	/**

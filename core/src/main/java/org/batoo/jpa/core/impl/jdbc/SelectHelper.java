@@ -21,8 +21,10 @@ package org.batoo.jpa.core.impl.jdbc;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.lang.StringUtils;
@@ -32,6 +34,7 @@ import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.mapping.OwnedAssociation;
 import org.batoo.jpa.core.impl.mapping.OwnerAssociation;
+import org.batoo.jpa.core.impl.mapping.PersistableAssociation;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 
 import com.google.common.base.Function;
@@ -94,9 +97,7 @@ public class SelectHelper<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private void addFields(List<String> fieldsBuffer, PhysicalTable table, final int tableNo) {
-		table.sortColumns();
-
+	private void addFields(List<String> fieldsBuffer, EntityTable table, final int tableNo) {
 		// Filter out the secondary table columns
 		final Collection<PhysicalColumn> filteredColumns;
 
@@ -167,18 +168,41 @@ public class SelectHelper<X> {
 
 		final Collection<PhysicalColumn> foreignKeys = ownerAssociation.getPhysicalColumns().values();
 
-		final Collection<String> restrictions = Collections2.transform(foreignKeys, new Function<PhysicalColumn, String>() {
+		final int left = (association instanceof OwnedAssociation ? tableNo : parentTableNo);
+		final int right = (association instanceof OwnedAssociation ? parentTableNo : tableNo);
 
-			@Override
-			public String apply(PhysicalColumn input) {
-				final String left = "T" + (association instanceof OwnedAssociation ? tableNo : parentTableNo);
-				final String right = "T" + (association instanceof OwnedAssociation ? parentTableNo : tableNo);
+		this.composeJoin(joinsBuffer, tableNo, association.getType().getPrimaryTable(), foreignKeys, left, right);
+	}
 
-				return left + "." + input.getPhysicalName() + " = " + right + "." + input.getReferencedColumn().getPhysicalName();
-			}
-		});
+	/**
+	 * Adds a join for the association with a join table.
+	 * 
+	 * @param joinsBuffer
+	 *            the joins buffer
+	 * @param parentTableNo
+	 *            the no of the parent table
+	 * @param tableNo
+	 *            the no of the table
+	 * @param association
+	 *            the association with join
+	 * @param if the association is inverse
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void addPrimaryJoin2(List<String> joinsBuffer, int parentTableNo, int tableNo, PersistableAssociation<?, ?> association,
+		boolean inverse) {
+		final JoinTable joinTable = association.getJoinTable();
 
-		this.composeJoin(joinsBuffer, association.getType().getPrimaryTable(), tableNo, restrictions);
+		final List<PhysicalColumn> firstKeys = inverse ? joinTable.getDestinationKeys() : joinTable.getSourceKeys();
+		final List<PhysicalColumn> secondKeys = inverse ? joinTable.getSourceKeys() : joinTable.getDestinationKeys();
+
+		// add join to joint table
+		this.composeJoin(joinsBuffer, -tableNo, joinTable, firstKeys, -tableNo, parentTableNo);
+		final EntityTable entityTable = inverse ? association.getOwner().getPrimaryTable() : association.getType().getPrimaryTable();
+
+		// add join to entity table
+		this.composeJoin(joinsBuffer, tableNo, entityTable, secondKeys, -tableNo, tableNo);
 	}
 
 	/**
@@ -196,7 +220,7 @@ public class SelectHelper<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private void addSecondaryJoin(List<String> joinsBuffer, final int parentTableNo, final int tableNo, PhysicalTable table) {
+	private void addSecondaryJoin(List<String> joinsBuffer, final int parentTableNo, final int tableNo, EntityTable table) {
 		final Collection<String> restrictions = Collections2.transform(table.getPrimaryKeys(), new Function<PhysicalColumn, String>() {
 
 			@Override
@@ -225,7 +249,7 @@ public class SelectHelper<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private String compose(final List<String> fieldsBuffer, final List<String> joinsBuffer, final PhysicalTable primaryTable) {
+	private String compose(final List<String> fieldsBuffer, final List<String> joinsBuffer, final EntityTable primaryTable) {
 		// Generate the where statement
 		// T1_F1 = ? [AND T1_F2 = ? [...]]
 		final String where = Joiner.on(" AND ").join(//
@@ -239,7 +263,7 @@ public class SelectHelper<X> {
 
 		final String fields = Joiner.on(",\n").join(fieldsBuffer);
 		final String join = Joiner.on("\n").join(joinsBuffer);
-		final String primaryTableName = primaryTable.getQualifiedPhysicalName();
+		final String primaryTableName = primaryTable.getQualifiedName();
 
 		// compose and return the final query
 		return "SELECT \n"//
@@ -249,10 +273,27 @@ public class SelectHelper<X> {
 			+ "\nWHERE " + where;
 	}
 
-	private void composeJoin(List<String> joinsBuffer, PhysicalTable table, int y, final Collection<String> restrictions) {
+	private void composeJoin(List<String> joinsBuffer, AbstractTable table, int tableNo, final Collection<String> restrictions) {
+		final String alias = tableNo < 0 ? "TJ" + Math.abs(tableNo) : "T" + tableNo;
+
 		// LEFT OUTER JOIN TABLE as Ty ON TX_F1 = TY_F1 [AND TX_F2 = TY_F2 [...]]
-		joinsBuffer.add("\tLEFT OUTER JOIN " + table.getQualifiedPhysicalName() + " AS T" + y + " ON "
-			+ Joiner.on(" AND ").join(restrictions));
+		joinsBuffer.add("\tLEFT OUTER JOIN " + table.getQualifiedName() + " AS " + alias + " ON " + Joiner.on(" AND ").join(restrictions));
+	}
+
+	private void composeJoin(List<String> joinsBuffer, final int tableNo, AbstractTable table,
+		final Collection<PhysicalColumn> foreignKeys, final int left, final int right) {
+		final String leftAlias = left < 0 ? "TJ" + Math.abs(left) : "T" + left;
+		final String rightAlias = right < 0 ? "TJ" + Math.abs(right) : "T" + right;
+
+		final Collection<String> restrictions = Collections2.transform(foreignKeys, new Function<PhysicalColumn, String>() {
+
+			@Override
+			public String apply(PhysicalColumn input) {
+				return leftAlias + "." + input.getPhysicalName() + " = " + rightAlias + "." + input.getReferencedColumn().getPhysicalName();
+			}
+		});
+
+		this.composeJoin(joinsBuffer, table, tableNo, restrictions);
 	}
 
 	/**
@@ -276,7 +317,8 @@ public class SelectHelper<X> {
 			// initialize the table number
 			final int tableNo = 0;
 
-			this.processType(fieldsBuffer, joinsBuffer, null, this.type, Lists.<Association<?, ?>> newLinkedList(), tableNo, tableNo);
+			this.processType(new HashSet<EntityTypeImpl<?>>(), fieldsBuffer, joinsBuffer, null, this.type,
+				Lists.<Association<?, ?>> newLinkedList(), tableNo, tableNo);
 
 			// compose and return the final query
 			this.selectSql = this.compose(fieldsBuffer, joinsBuffer, this.type.getPrimaryTable());
@@ -285,21 +327,33 @@ public class SelectHelper<X> {
 		return this.selectSql;
 	}
 
-	private void processType(final List<String> fieldsBuffer, final List<String> joinsBuffer, EntityTypeImpl<?> parentType,
-		EntityTypeImpl<?> type, Deque<Association<?, ?>> path, int parentTableNo, int tableNo) {
+	private void processType(Set<EntityTypeImpl<?>> processed, final List<String> fieldsBuffer, final List<String> joinsBuffer,
+		EntityTypeImpl<?> parentType, EntityTypeImpl<?> type, Deque<Association<?, ?>> path, int parentTableNo, int tableNo) {
+
+		processed.add(type);
 
 		// handle the primary table
-		final PhysicalTable primaryTable = type.getPrimaryTable();
+		final EntityTable primaryTable = type.getPrimaryTable();
 		this.addFields(fieldsBuffer, primaryTable, tableNo);
 
 		if (parentType != null) { // we are not the root entity
-			this.addPrimaryJoin(joinsBuffer, parentTableNo, tableNo, path.getLast());
+			final Association<?, ?> association = path.getLast();
+			if ((association instanceof PersistableAssociation) && ((PersistableAssociation<?, ?>) association).hasJoin()) {
+				this.addPrimaryJoin2(joinsBuffer, parentTableNo, tableNo, (PersistableAssociation<?, ?>) association, false);
+			}
+			else if ((association.getOpposite() != null) && (association.getOpposite() instanceof PersistableAssociation)
+				&& ((PersistableAssociation<?, ?>) association.getOpposite()).hasJoin()) {
+				this.addPrimaryJoin2(joinsBuffer, parentTableNo, tableNo, (PersistableAssociation<?, ?>) association.getOpposite(), true);
+			}
+			else {
+				this.addPrimaryJoin(joinsBuffer, parentTableNo, tableNo, association);
+			}
 		}
 
 		parentTableNo = tableNo;
 
 		// handle the secondary tables;
-		for (final PhysicalTable table : type.getTables().values()) {
+		for (final EntityTable table : type.getTables().values()) {
 			if (table.isPrimary()) { // increment the tableNo index
 				continue;
 			}
@@ -318,12 +372,16 @@ public class SelectHelper<X> {
 					continue;
 				}
 
+				if (processed.contains(child.getType())) {
+					continue;
+				}
+
 				// handle the path
 				path = Lists.newLinkedList(path);
 				path.addLast(child);
 				this.entityPaths.add(path);
 
-				this.processType(fieldsBuffer, joinsBuffer, child.getOwner(), child.getType(), path, parentTableNo, ++tableNo);
+				this.processType(processed, fieldsBuffer, joinsBuffer, child.getOwner(), child.getType(), path, parentTableNo, ++tableNo);
 			}
 		}
 	}

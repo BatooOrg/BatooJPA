@@ -30,6 +30,7 @@ import org.batoo.jpa.core.impl.mapping.BasicColumnTemplate;
 import org.batoo.jpa.core.impl.mapping.JoinColumnTemplate;
 import org.batoo.jpa.core.jdbc.Column;
 import org.batoo.jpa.core.jdbc.IdType;
+import org.batoo.jpa.core.jdbc.Table;
 
 /**
  * Implementation of {@link Column}
@@ -42,7 +43,7 @@ public class PhysicalColumn implements Column {
 	private final AbstractPhysicalMapping<?, ?> mapping;
 	private final PhysicalColumn referencedColumn;
 
-	private final PhysicalTable table;
+	private final Table table;
 
 	private final String name;
 	private final String physicalName;
@@ -57,6 +58,55 @@ public class PhysicalColumn implements Column {
 	private final boolean unique;
 
 	private int h;
+
+	/**
+	 * @param mapping
+	 *            the mapping
+	 * @param referencedColumn
+	 *            the referenced physical column, may be null
+	 * @param table
+	 *            the physical table the column belongs to
+	 * @param basic
+	 *            the template to use
+	 * @param sqlType
+	 *            the SQL type of the column
+	 * @throws MappingException
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public PhysicalColumn(AbstractPhysicalMapping<?, ?> mapping, AbstractTable table, BasicColumnTemplate<?, ?> basic, int sqlType)
+		throws MappingException {
+		this(mapping, null, table, basic.getName(), basic.getIdType(), sqlType, basic.getLength(), basic.getPrecision(), basic.getScale(),
+			basic.isNullable(), basic.isUnique());
+
+		this.mapping.addColumn(this);
+		basic.setPhysicalColumn(this);
+	}
+
+	/**
+	 * @param mapping
+	 *            the mapping
+	 * @param table
+	 *            the physical table the column belongs to
+	 * @param join
+	 *            the name of the column
+	 * @param referencedColumn
+	 *            the referenced physical column, may be null
+	 * @param sqlType
+	 *            the SQL type of the column
+	 * @throws MappingException
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public PhysicalColumn(AbstractPhysicalMapping<?, ?> mapping, AbstractTable table, JoinColumnTemplate<?, ?> join,
+		PhysicalColumn referencedColumn, int sqlType) throws MappingException {
+		this(mapping, referencedColumn, table, join.getName(), null, sqlType, referencedColumn.getLength(),
+			referencedColumn.getPrecision(), referencedColumn.getScale(), join.isNullable(), join.isUnique());
+
+		this.mapping.addColumn(this);
+	}
 
 	/**
 	 * @param mapping
@@ -86,7 +136,7 @@ public class PhysicalColumn implements Column {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private PhysicalColumn(AbstractPhysicalMapping<?, ?> mapping, PhysicalColumn referencedColumn, PhysicalTable table, String name,
+	private PhysicalColumn(AbstractPhysicalMapping<?, ?> mapping, PhysicalColumn referencedColumn, AbstractTable table, String name,
 		IdType idType, int sqlType, int length, int precision, int scale, boolean nullable, boolean unique) throws MappingException {
 		super();
 
@@ -108,55 +158,6 @@ public class PhysicalColumn implements Column {
 	}
 
 	/**
-	 * @param mapping
-	 *            the mapping
-	 * @param referencedColumn
-	 *            the referenced physical column, may be null
-	 * @param table
-	 *            the physical table the column belongs to
-	 * @param basic
-	 *            the template to use
-	 * @param sqlType
-	 *            the SQL type of the column
-	 * @throws MappingException
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public PhysicalColumn(AbstractPhysicalMapping<?, ?> mapping, PhysicalTable table, BasicColumnTemplate<?, ?> basic, int sqlType)
-		throws MappingException {
-		this(mapping, null, table, basic.getName(), basic.getIdType(), sqlType, basic.getLength(), basic.getPrecision(), basic.getScale(),
-			basic.isNullable(), basic.isUnique());
-
-		this.mapping.addColumn(this);
-		basic.setPhysicalColumn(this);
-	}
-
-	/**
-	 * @param mapping
-	 *            the mapping
-	 * @param table
-	 *            the physical table the column belongs to
-	 * @param join
-	 *            the name of the column
-	 * @param referencedColumn
-	 *            the referenced physical column, may be null
-	 * @param sqlType
-	 *            the SQL type of the column
-	 * @throws MappingException
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public PhysicalColumn(AbstractPhysicalMapping<?, ?> mapping, PhysicalTable table, JoinColumnTemplate<?, ?> join,
-		PhysicalColumn referencedColumn, int sqlType) throws MappingException {
-		this(mapping, referencedColumn, table, join.getName(), null, sqlType, referencedColumn.getLength(),
-			referencedColumn.getPrecision(), referencedColumn.getScale(), join.isNullable(), join.isUnique());
-
-		this.mapping.addColumn(this);
-	}
-
-	/**
 	 * Constructor used for secondary table primary key columns
 	 * 
 	 * @param table
@@ -168,8 +169,27 @@ public class PhysicalColumn implements Column {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PhysicalColumn(PhysicalTable table, PhysicalColumn column) throws MappingException {
+	public PhysicalColumn(AbstractTable table, PhysicalColumn column) throws MappingException {
 		this(column.getMapping(), column, table, column.getName(), IdType.MANUAL, column.getSqlType(), column.getLength(),
+			column.getPrecision(), column.getScale(), false, false);
+	}
+
+	/**
+	 * Constructor used for secondary table primary key columns
+	 * 
+	 * @param table
+	 *            the name
+	 * @param prefix
+	 *            the prefix for the column name
+	 * @param column
+	 *            the original primary key column
+	 * @throws MappingException
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public PhysicalColumn(JoinTable table, String prefix, PhysicalColumn column) throws MappingException {
+		this(column.getMapping(), column, table, prefix + "_" + column.getName(), IdType.MANUAL, column.getSqlType(), column.getLength(),
 			column.getPrecision(), column.getScale(), false, false);
 	}
 
@@ -326,7 +346,7 @@ public class PhysicalColumn implements Column {
 	 * @return the table
 	 * @since $version
 	 */
-	public final PhysicalTable getTable() {
+	public final Table getTable() {
 		return this.table;
 	}
 

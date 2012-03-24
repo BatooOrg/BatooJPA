@@ -18,52 +18,57 @@
  */
 package org.batoo.jpa.core.impl.mapping;
 
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import java.sql.Connection;
+import java.sql.SQLException;
 
-import org.batoo.jpa.core.MappingException;
-import org.batoo.jpa.core.jdbc.adapter.JDBCAdapter;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.jdbc.JoinTable;
+import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 
 /**
- * Interface for owned associations.
+ * An association that can persist the relation with a join table
  * 
  * @author hceylan
  * @since $version
  */
-public interface OwnedAssociation<X, T> extends Association<X, T> {
+public interface PersistableAssociation<X, T> extends Mapping<X, T> {
+
+	/**
+	 * Returns the joinTable.
+	 * 
+	 * @return the joinTable
+	 * @since $version
+	 */
+	JoinTable getJoinTable();
 
 	/**
 	 * {@inheritDoc}
 	 * 
 	 */
 	@Override
-	OwnerAssociation<T, X> getOpposite();
+	public EntityTypeImpl<T> getType();
 
 	/**
-	 * Links the opposite side if any exists.
+	 * Returns if the association has join table.
 	 * 
-	 * @param jdbcAdapter
-	 *            the JDBC adapter
-	 * @throws MappingException
-	 *             thrown if the bidirectional relation is not valid
+	 * @return true if the association has join table
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	void link(JDBCAdapter jdbcAdapter) throws MappingException;
+	boolean hasJoin();
 
 	/**
-	 * Returns if the association removes the orphans.
-	 * <p>
-	 * This corresponds to the {@link OneToOne#orphanRemoval()} {@link OneToMany#orphanRemoval()}
-	 * <p>
-	 * This must return false if the association is the owner.
+	 * Performs insertions for the joins.
 	 * 
-	 * @return true if removes.
+	 * @param connection
+	 *            the connection
+	 * @param managedInstance
+	 *            the managed instance
+	 * @throws SQLException
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	boolean orphanRemoval();
-
+	void performInsert(Connection connection, ManagedInstance<X> managedInstance) throws SQLException;
 }
