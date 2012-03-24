@@ -146,28 +146,23 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 	 */
 	@Override
 	public ManagedInstance<X> handle(ResultSet rs) throws SQLException {
-		if (LOG.isDebugEnabled()) {
-			final int operationNo = nextOperationNo++;
+		final int operationNo = nextOperationNo++;
 
-			LOG.debug("{0}: handle()", operationNo);
+		LOG.debug("{0}: handle()", operationNo);
 
-			final long start = System.currentTimeMillis();
+		final long start = System.currentTimeMillis();
 
-			try {
-				return this.handle0(rs);
-			}
-			finally {
-				final long time = System.currentTimeMillis() - start;
-				if (time > DataSourceImpl.MAX_WAIT) {
-					LOG.warn(new OperationTookLongTimeWarning(), "{0}: {1} msecs, handle()", operationNo, time);
-				}
-				else {
-					LOG.debug("{0}: {1} msecs, handle()", operationNo, time);
-				}
-			}
-		}
-		else {
+		try {
 			return this.handle0(rs);
+		}
+		finally {
+			final long time = System.currentTimeMillis() - start;
+			if (time > DataSourceImpl.MAX_WAIT) {
+				LOG.warn(new OperationTookLongTimeWarning(), "{0}: {1} msecs, handle()", operationNo, time);
+			}
+			else {
+				LOG.debug("{0}: {1} msecs, handle()", operationNo, time);
+			}
 		}
 	}
 

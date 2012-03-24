@@ -135,7 +135,9 @@ public class Playground {
 
 			start = System.currentTimeMillis();
 
-			this.test(type, emf);
+			for (int i = 0; i < 5; i++) {
+				this.test(type, emf);
+			}
 		}
 		finally {
 			Thread.currentThread().setContextClassLoader(old);

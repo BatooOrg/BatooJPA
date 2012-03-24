@@ -623,23 +623,15 @@ public class ConnectionImpl implements Connection {
 	public void setAutoCommit(boolean autoCommit) throws SQLException {
 		final long callNo = ++this.callNo;
 
-		if (LOG.isTraceEnabled()) {
+		LOG.trace("{0}:{1} setAutoCommit(boolean): {2}", this.connNo, callNo, autoCommit);
 
-			LOG.trace("{0}:{1} setAutoCommit(boolean): {2}", this.connNo, callNo, autoCommit);
-
-			final long start = System.currentTimeMillis();
-			try {
-				this.connection.setAutoCommit(autoCommit);
-			}
-			finally {
-				LOG.trace("{0}:{1} {2} msecs, setAutoCommit(boolean): {3}", this.connNo, callNo, System.currentTimeMillis() - start,
-					autoCommit);
-			}
-		}
-		else {
+		final long start = System.currentTimeMillis();
+		try {
 			this.connection.setAutoCommit(autoCommit);
 		}
-
+		finally {
+			LOG.trace("{0}:{1} {2} msecs, setAutoCommit(boolean): {3}", this.connNo, callNo, System.currentTimeMillis() - start, autoCommit);
+		}
 	}
 
 	/**

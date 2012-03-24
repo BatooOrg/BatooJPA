@@ -60,22 +60,16 @@ public class OperationManager {
 			return;
 		}
 
-		if (LOG.isTraceEnabled()) {
+		final int callNo = counter.incrementAndGet();
 
-			final int callNo = counter.incrementAndGet();
+		LOG.trace("{0}: replay() {1} atomic operations", callNo, operations.length);
 
-			LOG.trace("{0}: replay() {1} atomic operations", callNo, operations.length);
-
-			final long start = System.currentTimeMillis();
-			try {
-				OperationManager.prepare0(entityManager, Lists.newArrayList(operations));
-			}
-			finally {
-				LOG.trace("{0}: {1} msecs, replay() {2} atomic operations", callNo, System.currentTimeMillis() - start, operations.length);
-			}
-		}
-		else {
+		final long start = System.currentTimeMillis();
+		try {
 			OperationManager.prepare0(entityManager, Lists.newArrayList(operations));
+		}
+		finally {
+			LOG.trace("{0}: {1} msecs, replay() {2} atomic operations", callNo, System.currentTimeMillis() - start, operations.length);
 		}
 	}
 
