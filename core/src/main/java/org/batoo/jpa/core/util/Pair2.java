@@ -25,7 +25,12 @@ package org.batoo.jpa.core.util;
  */
 public class Pair2<F, S> {
 
+	public static <F, S> Pair2<F, S> create(F first, S second) {
+		return new Pair2<F, S>(first, second);
+	}
+
 	private final F first;
+
 	private final S second;
 
 	/**

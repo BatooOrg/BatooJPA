@@ -452,6 +452,10 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @param <Y>
 	 */
 	public ManagedInstance<X> getManagedInstance(SessionImpl session, final X instance) {
+		return this.getManagedInstance0(session, instance, this.getManagedIdForInstance(session, instance));
+	}
+
+	private ManagedInstance<X> getManagedInstance0(SessionImpl session, final X instance, ManagedId<? super X> managedId) {
 		final Map<String, AbstractResolver<X>> resolvers = Maps.transformValues(this.mappings,
 			new Function<AbstractMapping<?, ?>, AbstractResolver<X>>() {
 
@@ -468,7 +472,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 			});
 
-		return new ManagedInstance<X>(this, session, instance, this.getManagedIdForInstance(session, instance), resolvers);
+		return new ManagedInstance<X>(this, session, instance, managedId, resolvers);
 	}
 
 	/**
@@ -605,20 +609,16 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	/**
 	 * Returns a new managed instance with its id populated from id.
 	 * 
-	 * @param id
+	 * @param managedId
 	 *            the id for the new managed instance
 	 * @return the new managed instance
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedInstance<? super X> newInstanceWithId(SessionImpl session, Object id) {
-		final X instance = this.newInstance();
-
-		final ManagedInstance<? super X> managedInstance = this.getManagedInstance(session, instance);
-		managedInstance.getId().populate(id);
-
-		return managedInstance;
+	@SuppressWarnings("unchecked")
+	public ManagedInstance<? super X> newInstanceWithId(SessionImpl session, ManagedId<? super X> managedId) {
+		return this.getManagedInstance0(session, (X) managedId.getInstance(), managedId);
 	}
 
 	/**

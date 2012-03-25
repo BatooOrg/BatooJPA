@@ -21,10 +21,9 @@ package org.batoo.jpa.core.impl.jdbc;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Deque;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.lang.StringUtils;
@@ -36,13 +35,12 @@ import org.batoo.jpa.core.impl.mapping.OwnedAssociation;
 import org.batoo.jpa.core.impl.mapping.OwnerAssociation;
 import org.batoo.jpa.core.impl.mapping.PersistableAssociation;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.util.Pair2;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
-import com.google.common.collect.BiMap;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -63,10 +61,14 @@ import com.google.common.collect.Maps;
  */
 public class SelectHelper<X> {
 
+	private static final int MAX_PATH = 10;
+
 	private final EntityTypeImpl<X> type;
 
-	private final BiMap<String, PhysicalColumn> columnAliases = HashBiMap.create();
+	private final Map<Pair2<Integer, PhysicalColumn>, String> columnAliases = Maps.newHashMap();
 	private final List<Deque<Association<?, ?>>> entityPaths = Lists.newArrayList();
+	private final List<Deque<Association<?, ?>>> lazyPaths = Lists.newArrayList();
+	private final List<Deque<Association<?, ?>>> inversePaths = Lists.newArrayList();
 
 	private final Map<String, PhysicalColumn> predicates = Maps.newHashMap();
 
@@ -93,11 +95,13 @@ public class SelectHelper<X> {
 	 *            the table
 	 * @param tableNo
 	 *            the number of the table
+	 * @param secondaryTableNo
+	 *            the secondary table no or -1
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	private void addFields(List<String> fieldsBuffer, EntityTable table, final int tableNo) {
+	private void addFields(List<String> fieldsBuffer, EntityTable table, final int tableNo, final int secondaryTableNo) {
 		// Filter out the secondary table columns
 		final Collection<PhysicalColumn> filteredColumns;
 
@@ -114,26 +118,27 @@ public class SelectHelper<X> {
 			});
 		}
 
+		final String tableAlias = secondaryTableNo >= 0 ? "S" + tableNo + "_" + secondaryTableNo : "T" + tableNo;
+
 		final Collection<String> fields = Collections2.transform(filteredColumns, new Function<PhysicalColumn, String>() {
 
 			int fieldNo = 0;
 
 			@Override
 			public String apply(PhysicalColumn input) {
-				// create the alias as TX_FY
-				final String alias = "T" + tableNo + "_F" + this.fieldNo++;
+				final String fieldAlias = tableAlias + "_F" + this.fieldNo++;
 
 				// save the mapping
-				SelectHelper.this.columnAliases.put(alias, input);
+				SelectHelper.this.columnAliases.put(Pair2.create(tableNo, input), fieldAlias);
 
 				// if this is an id field on the primary table then add it to predicates
 				if ((tableNo == 0) && input.isId()) {
-					SelectHelper.this.predicates.put(alias, input);
+					SelectHelper.this.predicates.put(fieldAlias, input);
 				}
 
 				// form the complete field
 				// TX.[FieldNo] AS TX_FY
-				return "T" + tableNo + "." + input.getPhysicalName() + " AS " + alias;
+				return tableAlias + "." + input.getPhysicalName() + " AS " + fieldAlias;
 			}
 		});
 
@@ -219,20 +224,23 @@ public class SelectHelper<X> {
 	 * 
 	 * @since $version
 	 * @author hceylan
+	 * @param secondaryTableNo
 	 */
-	private void addSecondaryJoin(List<String> joinsBuffer, final int parentTableNo, final int tableNo, EntityTable table) {
+	private void addSecondaryJoin(List<String> joinsBuffer, final int parentTableNo, final int tableNo, final int secondaryTableNo,
+		EntityTable table) {
+		final String left = "T" + parentTableNo;
+		final String right = "S" + tableNo + "_" + secondaryTableNo;
+
 		final Collection<String> restrictions = Collections2.transform(table.getPrimaryKeys(), new Function<PhysicalColumn, String>() {
 
 			@Override
 			public String apply(PhysicalColumn input) {
-				final String left = "T" + parentTableNo;
-				final String right = "T" + tableNo;
-
 				return left + "." + input.getPhysicalName() + " = " + right + "." + input.getReferencedColumn().getPhysicalName();
 			}
 		});
 
-		this.composeJoin(joinsBuffer, table, tableNo, restrictions);
+		// LEFT OUTER JOIN TABLE as Ty ON TX_F1 = TY_F1 [AND TX_F2 = TY_F2 [...]]
+		joinsBuffer.add("\tLEFT OUTER JOIN " + table.getQualifiedName() + " AS " + right + " ON " + Joiner.on(" AND ").join(restrictions));
 	}
 
 	/**
@@ -273,13 +281,6 @@ public class SelectHelper<X> {
 			+ "\nWHERE " + where;
 	}
 
-	private void composeJoin(List<String> joinsBuffer, AbstractTable table, int tableNo, final Collection<String> restrictions) {
-		final String alias = tableNo < 0 ? "TJ" + Math.abs(tableNo) : "T" + tableNo;
-
-		// LEFT OUTER JOIN TABLE as Ty ON TX_F1 = TY_F1 [AND TX_F2 = TY_F2 [...]]
-		joinsBuffer.add("\tLEFT OUTER JOIN " + table.getQualifiedName() + " AS " + alias + " ON " + Joiner.on(" AND ").join(restrictions));
-	}
-
 	private void composeJoin(List<String> joinsBuffer, final int tableNo, AbstractTable table,
 		final Collection<PhysicalColumn> foreignKeys, final int left, final int right) {
 		final String leftAlias = left < 0 ? "TJ" + Math.abs(left) : "T" + left;
@@ -293,7 +294,10 @@ public class SelectHelper<X> {
 			}
 		});
 
-		this.composeJoin(joinsBuffer, table, tableNo, restrictions);
+		final String alias = tableNo < 0 ? "TJ" + Math.abs(tableNo) : "T" + tableNo;
+
+		// LEFT OUTER JOIN TABLE as Ty ON TX_F1 = TY_F1 [AND TX_F2 = TY_F2 [...]]
+		joinsBuffer.add("\tLEFT OUTER JOIN " + table.getQualifiedName() + " AS " + alias + " ON " + Joiner.on(" AND ").join(restrictions));
 	}
 
 	/**
@@ -317,8 +321,7 @@ public class SelectHelper<X> {
 			// initialize the table number
 			final int tableNo = 0;
 
-			this.processType(new HashSet<EntityTypeImpl<?>>(), fieldsBuffer, joinsBuffer, null, this.type,
-				Lists.<Association<?, ?>> newLinkedList(), tableNo, tableNo);
+			this.processType(fieldsBuffer, joinsBuffer, null, this.type, Lists.<Association<?, ?>> newLinkedList(), tableNo, tableNo);
 
 			// compose and return the final query
 			this.selectSql = this.compose(fieldsBuffer, joinsBuffer, this.type.getPrimaryTable());
@@ -327,14 +330,12 @@ public class SelectHelper<X> {
 		return this.selectSql;
 	}
 
-	private void processType(Set<EntityTypeImpl<?>> processed, final List<String> fieldsBuffer, final List<String> joinsBuffer,
-		EntityTypeImpl<?> parentType, EntityTypeImpl<?> type, Deque<Association<?, ?>> path, int parentTableNo, int tableNo) {
-
-		processed.add(type);
+	private void processType(final List<String> fieldsBuffer, final List<String> joinsBuffer, EntityTypeImpl<?> parentType,
+		EntityTypeImpl<?> type, Deque<Association<?, ?>> path, int parentTableNo, int tableNo) {
 
 		// handle the primary table
 		final EntityTable primaryTable = type.getPrimaryTable();
-		this.addFields(fieldsBuffer, primaryTable, tableNo);
+		this.addFields(fieldsBuffer, primaryTable, tableNo, -1);
 
 		if (parentType != null) { // we are not the root entity
 			final Association<?, ?> association = path.getLast();
@@ -352,36 +353,33 @@ public class SelectHelper<X> {
 
 		parentTableNo = tableNo;
 
+		int secondaryTableNo = 0;
 		// handle the secondary tables;
 		for (final EntityTable table : type.getTables().values()) {
 			if (table.isPrimary()) { // increment the tableNo index
 				continue;
 			}
 
-			tableNo++;
-
-			this.addFields(fieldsBuffer, table, tableNo);
-			this.addSecondaryJoin(joinsBuffer, parentTableNo, tableNo, table);
+			this.addFields(fieldsBuffer, table, tableNo, secondaryTableNo);
+			this.addSecondaryJoin(joinsBuffer, parentTableNo, tableNo, secondaryTableNo++, table);
 		}
 
 		// process the associations
 		for (final Association<?, ?> child : type.getAssociations()) {
-			if (child.isEager()) {
-				// if we already went down that road avoid circularity
-				if (path.contains(child.getOpposite())) {
-					continue;
-				}
+			// handle the path
+			final LinkedList<Association<?, ?>> childpath = Lists.newLinkedList(path);
+			childpath.addLast(child);
 
-				if (processed.contains(child.getType())) {
-					continue;
-				}
+			this.entityPaths.add(childpath);
 
-				// handle the path
-				path = Lists.newLinkedList(path);
-				path.addLast(child);
-				this.entityPaths.add(path);
-
-				this.processType(processed, fieldsBuffer, joinsBuffer, child.getOwner(), child.getType(), path, parentTableNo, ++tableNo);
+			if ((path.size() > 0) && path.getLast().equals(child.getOpposite())) {
+				this.inversePaths.add(childpath);
+			}
+			else if ((path.size() >= MAX_PATH) || !child.isEager()) {
+				this.lazyPaths.add(childpath);
+			}
+			else {
+				this.processType(fieldsBuffer, joinsBuffer, child.getOwner(), child.getType(), childpath, parentTableNo, ++tableNo);
 			}
 		}
 	}
@@ -410,7 +408,8 @@ public class SelectHelper<X> {
 			}
 		});
 
-		final SingleSelectHandler<X> rsHandler = new SingleSelectHandler<X>(session, this.type, this.columnAliases, this.entityPaths);
+		final SingleSelectHandler<X> rsHandler = new SingleSelectHandler<X>(session, this.type, this.columnAliases, this.entityPaths,
+			this.inversePaths, this.lazyPaths);
 
 		return new QueryRunner().query(session.getConnection(), selectSql, rsHandler, params.toArray());
 	}

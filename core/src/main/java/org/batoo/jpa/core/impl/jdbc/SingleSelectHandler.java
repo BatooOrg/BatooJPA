@@ -35,8 +35,8 @@ import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
 import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.util.Pair2;
 
-import com.google.common.collect.BiMap;
 import com.google.common.collect.Maps;
 
 /**
@@ -54,8 +54,11 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 	private final SessionImpl session;
 
 	private final EntityTypeImpl<X> rootType;
-	private final BiMap<String, PhysicalColumn> columnAliases;
+	private final Map<Pair2<Integer, PhysicalColumn>, String> columnAliases;
 	private final List<Deque<Association<?, ?>>> entityPaths;
+	private final List<Deque<Association<?, ?>>> lazyPaths;
+
+	private final List<Deque<Association<?, ?>>> inversePaths;
 
 	/**
 	 * @param session
@@ -68,18 +71,24 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 	 *            the aliases for all the tables
 	 * @param entityPaths
 	 *            the entity path
+	 * @param lazyPaths
+	 *            the inverse paths
+	 * @param lazyPaths
+	 *            the lazy paths
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SingleSelectHandler(SessionImpl session, EntityTypeImpl<X> rootType, BiMap<String, PhysicalColumn> columnAliases,
-		List<Deque<Association<?, ?>>> entityPaths) {
+	public SingleSelectHandler(SessionImpl session, EntityTypeImpl<X> rootType, Map<Pair2<Integer, PhysicalColumn>, String> columnAliases,
+		List<Deque<Association<?, ?>>> entityPaths, List<Deque<Association<?, ?>>> inversePaths, List<Deque<Association<?, ?>>> lazyPaths) {
 		super();
 
 		this.session = session;
 		this.rootType = rootType;
 		this.columnAliases = columnAliases;
 		this.entityPaths = entityPaths;
+		this.inversePaths = inversePaths;
+		this.lazyPaths = lazyPaths;
 	}
 
 	/**
@@ -91,43 +100,49 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 	 *            the current depth
 	 * @param currentType
 	 *            the current entity type
+	 * @param cache
+	 *            the cache
 	 * @return the managed instance
 	 * @throws SQLException
 	 * 
 	 * @since $version
 	 * @author hceylan
-	 * @param cache
 	 */
-	private ManagedInstance<?> createManagedInstance(SessionImpl session, ResultSet rs, Map<ManagedId<?>, ManagedInstance<?>> cache,
-		int depth, EntityTypeImpl<?> currentType) throws SQLException {
+	@SuppressWarnings("unchecked")
+	private <T> ManagedInstance<? super T> createManagedInstance(SessionImpl session, ResultSet rs,
+		Map<ManagedId<?>, ManagedInstance<?>> cache, int depth, EntityTypeImpl<T> currentType) throws SQLException {
 		if (currentType.hasSingleIdAttribute()) {
 			final EntityTable primaryTable = currentType.getPrimaryTable();
 			final PhysicalColumn primaryKey = primaryTable.getPrimaryKeys().iterator().next();
-			final Object primaryKeyValue = this.getColumnValue(rs, primaryKey);
+			final Object primaryKeyValue = this.getColumnValue(rs, depth, primaryKey);
 
-			// Create a model of the instance
-			ManagedInstance<?> managedInstance = currentType.newInstanceWithId(session, primaryKeyValue);
+			if (primaryKeyValue == null) {
+				return null;
+			}
+
+			final ManagedId<? super T> managedId = currentType.getManagedId(session, primaryKeyValue);
 
 			// look for it in the cache
-			final ManagedInstance<?> cached = cache.get(managedInstance.getId());
+			final ManagedInstance<? super T> cached = (ManagedInstance<? super T>) cache.get(managedId);
 			if (cached != null) { // if found return and reuse the cached instance
 				return cached;
 			}
 
 			// get it from the session
-			final ManagedInstance<?> existing = session.get(managedInstance.getId());
-			if (existing != null) {
-				managedInstance = existing;
+			final ManagedInstance<? super T> managed = (ManagedInstance<? super T>) session.get(managedId);
+			if (managed != null) { // if found in the s
+				cache.put(managed.getId(), managed);
+				return managed;
 			}
-			else {
-				session.put(managedInstance);
+			else { // new managed instances
+				final ManagedInstance<? super T> newInstance = currentType.newInstanceWithId(session, managedId);
+				newInstance.setStatus(Status.NEW);
+
+				session.put(newInstance);
+				cache.put(managedId, newInstance);
+
+				return newInstance;
 			}
-
-			// put it into the cache
-			cache.put(managedInstance.getId(), managedInstance);
-
-			// finally return it
-			return managedInstance;
 		}
 		else {
 			// TODO handle composite id.
@@ -135,8 +150,8 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 		}
 	}
 
-	private Object getColumnValue(ResultSet rs, final PhysicalColumn column) throws SQLException {
-		final String columnAlias = this.columnAliases.inverse().get(column);
+	private Object getColumnValue(ResultSet rs, int depth, final PhysicalColumn column) throws SQLException {
+		final String columnAlias = this.columnAliases.get(Pair2.create(depth, column));
 		return rs.getObject(columnAlias);
 	}
 
@@ -172,7 +187,13 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 		ManagedInstance<X> managedInstance = null;
 		while (rs.next()) {
 			final X root = managedInstance != null ? managedInstance.getInstance() : null;
-			managedInstance = (ManagedInstance<X>) this.processRow(this.session, rs, cache, root, 0);
+			managedInstance = (ManagedInstance<X>) this.processRow(this.session, rs, cache, root, 0, 0, null);
+		}
+
+		for (final ManagedInstance<?> instance : cache.values()) {
+			if (instance.getStatus() == Status.LOADING) {
+				instance.setStatus(Status.MANAGED);
+			}
 		}
 
 		return managedInstance;
@@ -190,47 +211,66 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 	 * @param depth
 	 *            the current depth
 	 * @return the managed instance
+	 * @param parent
+	 *            the parent object
 	 * @throws SQLException
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	private ManagedInstance<?> processRow(SessionImpl session, ResultSet rs, Map<ManagedId<?>, ManagedInstance<?>> cache, Object root,
-		int depth) throws SQLException {
+		int depth, int associationNo, Object parent) throws SQLException {
 		EntityTypeImpl<?> currentType;
 
 		if (depth == 0) {
 			currentType = this.rootType;
 		}
 		else {
-			currentType = this.entityPaths.get(depth - 1).getLast().getType();
+			currentType = this.entityPaths.get(associationNo - 1).getLast().getType();
 		}
 
 		final ManagedInstance<?> managedInstance = this.createManagedInstance(session, rs, cache, depth, currentType);
-		if (managedInstance.getStatus() == Status.MANAGED) {
-			return managedInstance;
-		}
+		if ((managedInstance != null) && (managedInstance.getStatus() == Status.NEW)) {
 
-		cache.put(managedInstance.getId(), managedInstance);
+			managedInstance.setStatus(Status.LOADING);
 
-		for (final EntityTable table : currentType.getTables().values()) {
-			for (final PhysicalColumn column : table.getColumns()) {
-				if (column.getMapping() instanceof BasicMapping) {
-					if (column.isId()) { // primary key values already handled
-						continue;
+			for (final EntityTable table : currentType.getTables().values()) {
+				for (final PhysicalColumn column : table.getColumns()) {
+					if (column.getMapping() instanceof BasicMapping) {
+						if (column.isId()) { // primary key values already handled
+							continue;
+						}
+
+						final Object columnValue = this.getColumnValue(rs, depth, column);
+						column.getMapping().setValue(managedInstance.getInstance(), columnValue);
 					}
-
-					final Object columnValue = this.getColumnValue(rs, column);
-					column.getMapping().setValue(managedInstance.getInstance(), columnValue);
 				}
 			}
 		}
 
-		if (this.entityPaths.size() > depth) {
-			final ManagedInstance<?> child = this.processRow(session, rs, cache, root, depth + 1);
+		if ((managedInstance != null) && (this.entityPaths.size() > associationNo)) {
+			Deque<Association<?, ?>> path = this.entityPaths.get(associationNo);
+			if (path.getLast().getOwner() == currentType) {
+				if (this.inversePaths.contains(path)) { // do lazy
+					if (managedInstance.getStatus() == Status.LOADING) {
+						path.getLast().setValue(managedInstance.getInstance(), parent);
+					}
+					associationNo++;
+				}
+				else if (this.lazyPaths.contains(path)) { // do inverse set
+					path.getLast();
+					associationNo++;
+				}
 
-			final Deque<Association<?, ?>> path = this.entityPaths.get(depth);
-			path.getLast().setValue(managedInstance.getInstance(), child.getInstance());
+				if (this.entityPaths.size() > associationNo) {
+					path = this.entityPaths.get(associationNo);
+					final ManagedInstance<?> child = this.processRow(session, rs, cache, root, ++depth, ++associationNo,
+						managedInstance.getInstance());
+					if (child != null) {
+						path.getLast().setValue(managedInstance.getInstance(), child.getInstance());
+					}
+				}
+			}
 		}
 
 		return managedInstance;

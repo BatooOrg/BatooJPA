@@ -114,6 +114,7 @@ public class PersistOperation<X> extends AbstractOperation<X> {
 
 		if (this.managedInstance == null) {
 			this.managedInstance = this.type.getManagedInstance(session, this.instance);
+			this.managedInstance.setStatus(Status.NEW);
 		}
 
 		switch (this.managedInstance.getStatus()) {

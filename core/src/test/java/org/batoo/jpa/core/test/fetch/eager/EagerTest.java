@@ -85,7 +85,7 @@ public class EagerTest extends AbstractTest {
 		Assert.assertEquals(person.getName(), person2.getName());
 		Assert.assertEquals(person.getAddresses().size(), person2.getAddresses().size());
 
-		for (final Address address : person.getAddresses()) {
+		for (final Address address : person2.getAddresses()) {
 			if ("Istanbul".equals(address.getCity())) {
 				Assert.assertEquals(address.getCountry().getId(), TR.getId());
 				break;

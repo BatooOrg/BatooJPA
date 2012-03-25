@@ -18,9 +18,14 @@
  */
 package org.batoo.jpa.core.test.manytomany;
 
+import java.util.Set;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+
+import com.google.common.collect.Sets;
 
 /**
  * 
@@ -35,6 +40,9 @@ public class PhoneNumber {
 	private Integer id;
 
 	private String number;
+
+	@ManyToMany(mappedBy = "phoneNumbers")
+	private final Set<Customer> customers = Sets.newHashSet();
 
 	/**
 	 * @since $version
@@ -54,6 +62,16 @@ public class PhoneNumber {
 		super();
 
 		this.number = number;
+	}
+
+	/**
+	 * Returns the customers.
+	 * 
+	 * @return the customers
+	 * @since $version
+	 */
+	public Set<Customer> getCustomers() {
+		return this.customers;
 	}
 
 	/**

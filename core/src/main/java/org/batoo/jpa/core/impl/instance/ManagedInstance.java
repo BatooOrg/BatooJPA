@@ -61,7 +61,12 @@ public final class ManagedInstance<X> implements Comparable<ManagedInstance<?>> 
 		/**
 		 * Instance is detached
 		 */
-		DETACHED
+		DETACHED,
+
+		/**
+		 * Instance is being loaded
+		 */
+		LOADING
 	}
 
 	private final EntityTypeImpl<X> type;
@@ -95,7 +100,7 @@ public final class ManagedInstance<X> implements Comparable<ManagedInstance<?>> 
 		this.resolvers = resolvers;
 		this.id = id;
 
-		this.status = Status.NEW;
+		this.status = Status.MANAGED;
 	}
 
 	/**

@@ -65,6 +65,10 @@
 			<groupId>commons-pool</groupId>
 			<artifactId>commons-pool</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-proxy</artifactId>
+		</dependency>
 
 	</dependencies>
 
