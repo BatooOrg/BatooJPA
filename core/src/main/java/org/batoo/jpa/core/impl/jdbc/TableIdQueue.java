@@ -43,6 +43,8 @@ public class TableIdQueue extends IdQueue {
 	private String insertSql;
 	private String updateSql;
 
+	private Integer nextId;
+
 	/**
 	 * @param jdbcAdapter
 	 *            the jdbc adapter
@@ -78,18 +80,17 @@ public class TableIdQueue extends IdQueue {
 	protected Integer getNextId() throws SQLException {
 		final QueryRunner runner = new QueryRunner(this.datasource);
 
-		Integer nextId;
-
-		nextId = runner.query(this.getSelectSql(), new SingleValueHandler<Integer>(), this.generator.getPkColumnValue());
-		if (nextId == null) {
+		this.nextId = runner.query(this.getSelectSql(), new SingleValueHandler<Integer>(), this.generator.getPkColumnValue());
+		if (this.nextId == null) {
 			runner.update(this.getInsertSql(), this.generator.getPkColumnValue(), this.generator.getInitialValue() + 1);
-			nextId = 1;
+			this.nextId = 1;
 		}
 		else {
-			runner.update(this.getUpdateSql(), nextId + this.generator.getAllocationSize(), this.generator.getPkColumnValue());
+			this.nextId += this.generator.getAllocationSize();
+			runner.update(this.getUpdateSql(), this.nextId, this.generator.getPkColumnValue());
 		}
 
-		return nextId;
+		return this.nextId;
 	}
 
 	private String getSelectSql() {
