@@ -77,6 +77,7 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 	// Link phase properties
 	private IdType idType;
 	private String generatorName;
+	private String getterName;
 
 	/**
 	 * @param declaringType
@@ -142,6 +143,22 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 	 */
 	public String getGeneratorName() {
 		return this.generatorName;
+	}
+
+	/**
+	 * Returns the getter name for the attribute.
+	 * 
+	 * @return the getter name
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getGetterName() {
+		if (this.getterName == null) {
+			this.getterName = "get" + StringUtils.capitalize(this.getName());
+		}
+
+		return this.getterName;
 	}
 
 	/**

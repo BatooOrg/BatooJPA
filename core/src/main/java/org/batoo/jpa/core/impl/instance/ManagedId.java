@@ -44,6 +44,8 @@ public class ManagedId<X> {
 	private final Map<String, BasicResolver<X>> resolvers;
 
 	private int h;
+	private X proxy;
+	private BasicResolver<X> singleId;
 
 	/**
 	 * @param type
@@ -63,6 +65,10 @@ public class ManagedId<X> {
 		this.session = session;
 		this.instance = instance;
 		this.resolvers = resolvers;
+
+		if (resolvers.size() == 1) {
+			this.singleId = this.resolvers.values().iterator().next();
+		}
 	}
 
 	/**
@@ -103,12 +109,36 @@ public class ManagedId<X> {
 	}
 
 	/**
+	 * Returns the id of the instance.
+	 * 
+	 * @return the id of the instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Object getId() {
+		return this.singleId.getValue();
+	}
+
+	/**
 	 * Returns the instance.
 	 * 
 	 * @return the instance
 	 * @since $version
 	 */
 	public X getInstance() {
+		return this.proxy != null ? this.proxy : this.instance;
+	}
+
+	/**
+	 * Returns the unproxied instance.
+	 * 
+	 * @return the unproxied instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Object getInstance0() {
 		return this.instance;
 	}
 
@@ -181,6 +211,19 @@ public class ManagedId<X> {
 				resolver.relock();
 			}
 		}
+	}
+
+	/**
+	 * Proxifies the instance with the proxy.
+	 * 
+	 * @param proxy
+	 *            the proxy to proxify with
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void proxify(X proxy) {
+		this.proxy = proxy;
 	}
 
 	/**

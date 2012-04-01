@@ -19,6 +19,9 @@
 package org.batoo.jpa.core.impl.types;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -37,6 +40,8 @@ import javax.persistence.metamodel.EntityType;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.proxy.Invoker;
+import org.apache.commons.proxy.factory.javassist.JavassistProxyFactory;
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.MappingException;
@@ -258,6 +263,56 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		return this.getName().compareTo(o.getName());
 	}
 
+	@SuppressWarnings("unchecked")
+	private X createProxy(final SessionImpl session, final X instance, final Object id) {
+		return (X) new JavassistProxyFactory().createInvokerProxy(this.javaType.getClassLoader(), new Invoker() {
+
+			private X initialized;
+			private final List<String> idMethods = Lists.newArrayList();
+
+			@Override
+			public Object invoke(Object proxy, final Method method, Object[] arguments) throws Throwable {
+				if (!method.isAccessible()) {
+					AccessController.doPrivileged(new PrivilegedAction<Void>() {
+
+						@Override
+						public Void run() {
+							method.setAccessible(true);
+							return null;
+						}
+					});
+				}
+
+				// if initialized, let go
+				if (this.initialized != null) {
+					return method.invoke(this.initialized, arguments);
+				}
+
+				method.setAccessible(true);
+
+				if (arguments.length == 0) {
+					final String methodName = method.getName();
+					if (this.idMethods.contains(methodName)) { // if known id method, let go
+						return method.invoke(instance, arguments);
+					}
+
+					if (methodName.startsWith("get") && (methodName.length() > 3)) { // check if id method
+						for (final SingularAttributeImpl<? super X, ?> attribute : EntityTypeImpl.this.idAttributes.values()) {
+							if (attribute.getGetterName().equals(method.getName())) {
+								this.idMethods.add(methodName);
+								return method.invoke(instance, arguments);
+							}
+						}
+					}
+				}
+
+				this.initialized = session.getEntityManager().find(EntityTypeImpl.this.getJavaType(), id);
+
+				return method.invoke(this.initialized, arguments);
+			}
+		}, new Class[] { this.javaType });
+	}
+
 	/**
 	 * Performs the ddl operations for the entity.
 	 * <p>
@@ -459,15 +514,9 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		final Map<String, AbstractResolver<X>> resolvers = Maps.transformValues(this.mappings,
 			new Function<AbstractMapping<?, ?>, AbstractResolver<X>>() {
 
-				private AbstractResolver<X> resolver;
-
 				@Override
 				public AbstractResolver<X> apply(AbstractMapping<?, ?> input) {
-					if (this.resolver == null) {
-						this.resolver = input.createResolver(instance);
-					}
-
-					return this.resolver;
+					return input.createResolver(instance);
 				}
 
 			});
@@ -608,16 +657,29 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 	/**
 	 * Returns a new managed instance with its id populated from id.
+	 * <p>
+	 * if lazy is true Lazy properties will be proxied.
 	 * 
 	 * @param managedId
 	 *            the id for the new managed instance
+	 * @param session
+	 *            the session
+	 * @param lazy
+	 *            if the instance will be lazy
 	 * @return the new managed instance
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public ManagedInstance<? super X> newInstanceWithId(SessionImpl session, ManagedId<? super X> managedId) {
+	public ManagedInstance<? super X> newInstanceWithId(final SessionImpl session, final ManagedId<? super X> managedId, boolean lazy) {
+		if (!lazy) {
+			return this.getManagedInstance0(session, (X) managedId.getInstance(), managedId);
+		}
+
+		final X proxy = this.createProxy(session, (X) managedId.getInstance(), managedId.getId());
+		managedId.proxify(proxy);
+
 		return this.getManagedInstance0(session, (X) managedId.getInstance(), managedId);
 	}
 

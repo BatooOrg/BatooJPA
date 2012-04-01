@@ -20,12 +20,16 @@ package org.batoo.jpa.core.impl.instance;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.batoo.jpa.core.impl.SessionImpl;
+import org.batoo.jpa.core.impl.mapping.OwnerAssociation;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.util.Pair2;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
@@ -66,17 +70,23 @@ public final class ManagedInstance<X> implements Comparable<ManagedInstance<?>> 
 		/**
 		 * Instance is being loaded
 		 */
-		LOADING
+		LOADING,
+
+		/**
+		 * Instance is in lazy state
+		 */
+		LAZY
 	}
 
 	private final EntityTypeImpl<X> type;
 	private final SessionImpl session;
-	private final X instance;
+	private X instance;
 
 	private final ManagedId<? super X> id;
 
 	private final Map<String, AbstractResolver<X>> resolvers;
 	private Map<String, AssociateResolver<X>> associateResolvers;
+	private final List<Pair2<ManagedInstance<?>, OwnerAssociation<?, ?>>> references = Lists.newArrayList();
 	private Status status;
 	private boolean executed;
 
@@ -101,6 +111,33 @@ public final class ManagedInstance<X> implements Comparable<ManagedInstance<?>> 
 		this.id = id;
 
 		this.status = Status.MANAGED;
+	}
+
+	/**
+	 * Adds a reference to the instance.
+	 * <p>
+	 * Useful to replace the lazy references once the instance is initialized.
+	 * 
+	 * @param managedInstance
+	 * @param lazy
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void addReference(ManagedInstance<?> referer, OwnerAssociation<?, ?> association) {
+		this.references.add(new Pair2<ManagedInstance<?>, OwnerAssociation<?, ?>>(referer, association));
+	}
+
+	public synchronized void clearReferences(X newInstance) {
+		for (final Pair2<ManagedInstance<?>, OwnerAssociation<?, ?>> pair : this.references) {
+			pair.getSecond().setValue(pair.getFirst().getInstance(), newInstance);
+		}
+
+		this.references.clear();
+
+		this.instance = newInstance;
+
+		this.id.proxify(null);
 	}
 
 	/**
