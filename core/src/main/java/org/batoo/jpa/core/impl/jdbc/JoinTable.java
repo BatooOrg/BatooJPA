@@ -121,8 +121,8 @@ public class JoinTable extends AbstractTable {
 	 * @since $version
 	 * @author hceylan
 	 */
+	@SuppressWarnings("unchecked")
 	public void performInsert(Connection connection, ManagedInstance<?> managedInstance) throws SQLException {
-		@SuppressWarnings("unchecked")
 		final Collection<Object> children = (Collection<Object>) this.mapping.getValue(managedInstance.getInstance());
 		for (final Object child : children) {
 			this.performInsert(connection, managedInstance, child);

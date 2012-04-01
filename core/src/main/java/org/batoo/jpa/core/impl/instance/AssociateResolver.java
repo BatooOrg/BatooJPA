@@ -42,8 +42,10 @@ public class AssociateResolver<X> extends AbstractResolver<X> {
 	}
 
 	/**
+	 * Returns if the mapping contains the instance.
+	 * 
 	 * @param instance
-	 * @return
+	 * @return true if the mapping contains the instance
 	 * 
 	 * @since $version
 	 * @author hceylan

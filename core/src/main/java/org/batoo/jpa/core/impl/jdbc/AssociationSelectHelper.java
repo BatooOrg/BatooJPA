@@ -21,8 +21,13 @@ package org.batoo.jpa.core.impl.jdbc;
 import java.sql.SQLException;
 import java.util.Collection;
 
+import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedId;
+import org.batoo.jpa.core.impl.mapping.CollectionMapping;
+import org.batoo.jpa.core.impl.mapping.Mapping;
+import org.batoo.jpa.core.impl.mapping.OwnedAssociation;
+import org.batoo.jpa.core.impl.mapping.OwnerAssociation;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 
 import com.google.common.base.Function;
@@ -30,23 +35,28 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
 
 /**
- * Select helper to select against the primary key
+ * Select helper to select against the owner entity's primary key
  * 
  * @param <X>
  * @author hceylan
  * @since $version
  */
-public class SelectHelper<X> extends BaseSelectHelper<X> {
+public class AssociationSelectHelper<X, C, E> extends BaseSelectHelper<E> {
+
+	private final CollectionMapping<X, C, E> mapping;
 
 	/**
-	 * @param type
+	 * @param mapping
 	 *            the type to select against
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SelectHelper(EntityTypeImpl<X> type) {
-		super(type, null);
+	@SuppressWarnings("unchecked")
+	public AssociationSelectHelper(CollectionMapping<X, C, E> mapping) {
+		super((EntityTypeImpl<E>) mapping.getDeclaringAttribute().getElementType(), (Mapping<E, ?>) mapping);
+
+		this.mapping = mapping;
 	}
 
 	/**
@@ -73,42 +83,46 @@ public class SelectHelper<X> extends BaseSelectHelper<X> {
 	 */
 	@Override
 	protected void preparePredicates() {
-		for (final PhysicalColumn column : this.type.getPrimaryTable().getColumns()) {
-			if (column.isId()) {
-				SelectHelper.this.predicates.add(column);
-			}
+		OwnerAssociation<?, ?> ownerAssociation;
+		if (this.mapping instanceof OwnerAssociation) {
+			ownerAssociation = (OwnerAssociation<?, ?>) this.mapping;
 		}
+		else {
+			ownerAssociation = ((OwnedAssociation<?, ?>) this.mapping).getOpposite();
+		}
+
+		this.predicates.addAll(ownerAssociation.getPhysicalColumns().values());
 	}
 
 	/**
-	 * Performs the select and populates the managed instance.
+	 * Performs the select over an association and populates the managed instances.
 	 * 
 	 * @param session
 	 *            the session
 	 * @param managedId
-	 *            the managed instance
+	 *            the managed id of the owner side of the association
+	 * @param association
+	 *            the association to select against
+	 * @return the collection of entities
 	 * @throws SQLException
 	 * 
 	 * @since $version
 	 * @author hceylan
-	 * @return
 	 */
-	public X select(SessionImpl session, final ManagedId<X> managedId) throws SQLException {
+	public Collection<E> select(SessionImpl session, final ManagedId<?> managedId) throws SQLException {
 		// Do not inline, generation of the select SQL will initialize the predicates!
 		final String selectSql = this.getSelectSql();
 
 		final Collection<Object> params = Collections2.transform(this.predicates, new Function<PhysicalColumn, Object>() {
 			@Override
 			public Object apply(PhysicalColumn input) {
-				return input.getPhysicalValue(managedId.getSession(), managedId.getInstance());
+				return input.getReferencedColumn().getPhysicalValue(managedId.getSession(), managedId.getInstance());
 			}
 		});
 
-		final SelectHandler<X> rsHandler = new SelectHandler<X>(session, this.type, this.columnAliases, this.entityPaths,
+		final SelectHandler<E> rsHandler = new SelectHandler<E>(session, this.type, this.columnAliases, this.entityPaths,
 			this.inversePaths, this.lazyPaths);
 
-		final Collection<X> result = this.runner.query(session.getConnection(), selectSql, rsHandler, params.toArray());
-
-		return (result != null) && (result.size() > 0) ? result.iterator().next() : null;
+		return new QueryRunner().query(session.getConnection(), selectSql, rsHandler, params.toArray());
 	}
 }

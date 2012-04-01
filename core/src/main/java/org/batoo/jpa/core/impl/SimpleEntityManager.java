@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
@@ -35,8 +36,10 @@ import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.mapping.CollectionMapping;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
 import org.batoo.jpa.core.impl.operation.DetachOperation;
+import org.batoo.jpa.core.impl.operation.FindAllOperation;
 import org.batoo.jpa.core.impl.operation.FindOperation;
 import org.batoo.jpa.core.impl.operation.OperationManager;
 import org.batoo.jpa.core.impl.operation.PersistOperation;
@@ -214,8 +217,7 @@ public abstract class SimpleEntityManager implements EntityManager {
 			throw e;
 		}
 
-		final ManagedInstance<? super T> managedInstance = operation.getManagedInstance();
-		return (T) (managedInstance != null ? managedInstance.getInstance() : null);
+		return operation.getInstance();
 	}
 
 	/**
@@ -246,6 +248,41 @@ public abstract class SimpleEntityManager implements EntityManager {
 	public <T> T find(Class<T> entityClass, Object primaryKey, Map<String, Object> properties) {
 		this.throwNotImplemented();
 		return null;
+	}
+
+	/**
+	 * Returns the items for the lazy association.
+	 * 
+	 * @param managedInstance
+	 *            the managed instance of which the association to be reolved
+	 * @param association
+	 *            the association to be resolved
+	 * @return the collection of items
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	public <X, C, E> Collection<E> findAll(ManagedInstance<?> managedInstance, CollectionMapping<X, C, E> association) {
+		this.assertOpen();
+
+		final FindAllOperation<X, C, E> operation = new FindAllOperation<X, C, E>((EntityManagerImpl) this,
+			(ManagedId<X>) managedInstance.getId(), association);
+
+		try {
+			OperationManager.replay((EntityManagerImpl) this, operation);
+		}
+		catch (final RuntimeException e) {
+			LOG.error(e, "Find operation encountered an error");
+
+			if ((this.transaction != null) && this.transaction.isActive()) {
+				this.transaction.setRollbackOnly();
+			}
+
+			throw e;
+		}
+
+		return operation.getCollection();
 	}
 
 	/**

@@ -123,6 +123,25 @@ public class LazyTest extends AbstractTest {
 	}
 
 	/**
+	 * Tests to {@link EntityManager#find(Class, Object)} person with phones as lazy many type association.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testFindMany() {
+		final Person person = this.person();
+		this.persist(person);
+
+		this.commit();
+		this.close();
+
+		final Person person2 = this.find(Person.class, person.getId());
+		Assert.assertEquals(person.getName(), person2.getName());
+		Assert.assertEquals(2, person2.getPhones().size());
+	}
+
+	/**
 	 * Tests to {@link EntityManager#persist(Object)} address which does not cascade to Person. PersistenceException expected.
 	 * 
 	 * @since $version

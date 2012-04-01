@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.operation;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.PersistenceException;
@@ -27,9 +28,8 @@ import javax.persistence.PersistenceException;
 import org.batoo.jpa.core.impl.EntityManagerImpl;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedId;
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
 import org.batoo.jpa.core.impl.mapping.Association;
+import org.batoo.jpa.core.impl.mapping.CollectionMapping;
 
 /**
  * Operation to find an entity.
@@ -37,23 +37,25 @@ import org.batoo.jpa.core.impl.mapping.Association;
  * @author hceylan
  * @since $version
  */
-public class FindOperation<X> extends AbstractOperation<X> {
+public class FindAllOperation<X, C, E> extends AbstractOperation<X> {
 
 	private final ManagedId<X> managedId;
+	private final CollectionMapping<X, C, E> association;
+	private Collection<E> collection;
 
 	/**
-	 * @param entityManager
-	 *            the entity manager
+	 * @param entityManagerImpl
 	 * @param managedId
-	 *            the entity
+	 * @param association
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public FindOperation(EntityManagerImpl entityManager, ManagedId<X> managedId) {
+	public FindAllOperation(EntityManagerImpl entityManager, ManagedId<X> managedId, CollectionMapping<X, C, E> association) {
 		super(entityManager, managedId.getInstance());
 
 		this.managedId = managedId;
+		this.association = association;
 	}
 
 	/**
@@ -66,13 +68,13 @@ public class FindOperation<X> extends AbstractOperation<X> {
 	}
 
 	/**
-	 * Returns the instance.
+	 * Returns the collection.
 	 * 
-	 * @return the instance
+	 * @return the collection
 	 * @since $version
 	 */
-	public X getInstance() {
-		return this.instance;
+	public Collection<E> getCollection() {
+		return this.collection;
 	}
 
 	/**
@@ -89,26 +91,15 @@ public class FindOperation<X> extends AbstractOperation<X> {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	protected boolean prepare(SessionImpl session) {
-		this.managedInstance = this.em.getSession().get(this.instance);
-
-		if ((this.managedInstance == null) || (this.managedInstance.getStatus() == Status.LAZY)) {
-			try {
-				final ManagedInstance<? super X> oldInstance = this.managedInstance;
-				this.instance = this.type.performSelect(session, this.managedId);
-				if (oldInstance != null) {
-					oldInstance.clearReferences(this.instance);
-				}
-			}
-			catch (final SQLException e) {
-				throw new PersistenceException("Entity cannot be loaded", e);
-			}
+		try {
+			this.collection = this.association.performSelect(session, this.managedId);
 		}
-		else {
-			this.instance = (X) this.managedInstance.getInstance();
+		catch (final SQLException e) {
+			throw new PersistenceException("Collection cannot be loaded", e);
 		}
 
 		return false; // NOOP
 	}
+
 }

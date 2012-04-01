@@ -34,6 +34,7 @@ import org.batoo.jpa.core.impl.mapping.PersistableAssociation;
  */
 public class PersistAssociationOperation<X> extends AbstractOperation<X> {
 
+	@SuppressWarnings("rawtypes")
 	private final PersistableAssociation association;
 
 	/**
@@ -47,6 +48,7 @@ public class PersistAssociationOperation<X> extends AbstractOperation<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
+	@SuppressWarnings("rawtypes")
 	public PersistAssociationOperation(EntityManagerImpl entityManager, ManagedInstance<X> managedInstance,
 		PersistableAssociation association) {
 		super(entityManager, managedInstance);
@@ -68,6 +70,7 @@ public class PersistAssociationOperation<X> extends AbstractOperation<X> {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <Y> void perform(Connection connection) throws SQLException {
 		this.association.performInsert(connection, this.managedInstance);
 	}

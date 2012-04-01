@@ -244,7 +244,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public boolean addSequenceGenerator(SequenceGenerator sequenceGenerator) {
+	public synchronized boolean addSequenceGenerator(SequenceGenerator sequenceGenerator) {
 		if (this.sequenceGenerators.containsKey(sequenceGenerator.name())) {
 			return false;
 		}
@@ -264,7 +264,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public boolean addTableGenerator(PhysicalTableGenerator generator) {
+	public synchronized boolean addTableGenerator(PhysicalTableGenerator generator) {
 		if (this.tableGenerators.containsKey(generator.getName())) {
 			return false;
 		}
@@ -338,7 +338,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SequenceGenerator getDefaultSequenceGenerator() {
+	public synchronized SequenceGenerator getDefaultSequenceGenerator() {
 		this.sequenceGenerators.put(BATOO_SEQUENCE.name(), BATOO_SEQUENCE);
 
 		return BATOO_SEQUENCE;
@@ -350,7 +350,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PhysicalTableGenerator getDefaultTableIdGenerator() {
+	public synchronized PhysicalTableGenerator getDefaultTableIdGenerator() {
 		if (!this.tableGenerators.containsKey("")) {
 			final PhysicalTableGenerator generator = new PhysicalTableGenerator(null, this.jdbcAdapter);
 			this.tableGenerators.put(generator.getName(), generator);
@@ -567,6 +567,9 @@ public class MetamodelImpl implements Metamodel {
 			}
 			else if (association instanceof OwnerManyToManyMapping) {
 				((OwnerManyToManyMapping<?, ?, ?>) association).link(this.jdbcAdapter);
+			}
+			else if (association instanceof OwnerOneToManyMapping) {
+				((OwnerOneToManyMapping<?, ?, ?>) association).link(this.jdbcAdapter);
 			}
 		}
 	}

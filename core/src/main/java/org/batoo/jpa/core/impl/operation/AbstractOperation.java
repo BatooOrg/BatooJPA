@@ -54,7 +54,7 @@ public abstract class AbstractOperation<X> implements Comparable<AbstractOperati
 
 	protected final EntityManagerImpl em;
 	protected EntityTypeImpl<X> type;
-	protected final X instance;
+	protected X instance;
 	private boolean requiresFlush;
 	protected ManagedInstance<? super X> managedInstance;
 

@@ -18,12 +18,17 @@
  */
 package org.batoo.jpa.core.impl.mapping;
 
+import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Deque;
 
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
 import org.batoo.jpa.core.MappingException;
+import org.batoo.jpa.core.impl.SessionImpl;
+import org.batoo.jpa.core.impl.instance.ManagedId;
+import org.batoo.jpa.core.impl.jdbc.AssociationSelectHelper;
 import org.batoo.jpa.core.impl.types.AttributeImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 import org.batoo.jpa.core.impl.types.PluralAttributeImpl;
@@ -36,7 +41,9 @@ import org.batoo.jpa.core.impl.types.PluralAttributeImpl;
  * @author hceylan
  * @since $version
  */
-public class OwnedOneToManyMapping<X, C, E> extends OwnedAssociationMapping<X, C> implements CollectionMapping<X, C> {
+public class OwnedOneToManyMapping<X, C, E> extends OwnedAssociationMapping<X, C> implements CollectionMapping<X, C, E> {
+
+	private final AssociationSelectHelper<X, C, E> selectHelper;
 
 	/**
 	 * @param declaringAttribute
@@ -57,6 +64,8 @@ public class OwnedOneToManyMapping<X, C, E> extends OwnedAssociationMapping<X, C
 	public OwnedOneToManyMapping(PluralAttributeImpl<X, C, E> declaringAttribute, Deque<AttributeImpl<?, ?>> path, boolean orphanRemoval,
 		boolean eager) throws MappingException {
 		super(AssociationType.MANY, declaringAttribute, path, orphanRemoval, eager);
+
+		this.selectHelper = new AssociationSelectHelper<X, C, E>(this);
 	}
 
 	/**
@@ -88,4 +97,12 @@ public class OwnedOneToManyMapping<X, C, E> extends OwnedAssociationMapping<X, C
 		return (EntityTypeImpl<C>) this.getDeclaringAttribute().getElementType();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Collection<E> performSelect(SessionImpl session, ManagedId<X> managedId) throws SQLException {
+		return this.selectHelper.select(session, managedId);
+	}
 }

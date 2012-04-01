@@ -36,6 +36,10 @@ import javax.persistence.metamodel.Type;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.batoo.jpa.core.MappingException;
+import org.batoo.jpa.core.impl.SessionImpl;
+import org.batoo.jpa.core.impl.collections.ManagedCollection;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.mapping.CollectionMapping;
 import org.batoo.jpa.core.impl.reflect.ReflectHelper;
 
 import com.google.common.collect.Sets;
@@ -135,6 +139,16 @@ public final class MapAttributeImpl<X, K, V> extends PluralAttributeImpl<X, Map<
 	 */
 	public Collection<MapKeyJoinColumn> getMapKeyJoinColumns() {
 		return Collections.unmodifiableCollection(this.mapKeyJoinColumns);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public ManagedCollection<V> newInstance(SessionImpl session, ManagedInstance<?> managedInstance, CollectionMapping<?, ?, ?> mapping) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**

@@ -40,6 +40,10 @@ import javax.persistence.metamodel.PluralAttribute;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.MappingException;
+import org.batoo.jpa.core.impl.SessionImpl;
+import org.batoo.jpa.core.impl.collections.ManagedCollection;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.mapping.CollectionMapping;
 import org.batoo.jpa.core.impl.mapping.ColumnTemplate;
 import org.batoo.jpa.core.impl.mapping.JoinColumnTemplate;
 import org.batoo.jpa.core.impl.mapping.OwnedManyToManyMapping;
@@ -190,7 +194,8 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 						this.mapping = new OwnedOneToManyMapping<X, C, E>(this, path, this.orphanRemoval, eager);
 					}
 					else {
-						this.mapping = new OwnerOneToManyMapping<X, C, E>(this, path, this.orphanRemoval, eager);
+						OwnerOneToManyMapping.sanitize(this, this.columns);
+						this.mapping = new OwnerOneToManyMapping<X, C, E>(this, path, this.overrideColumns(attributeOverrides), eager);
 					}
 				}
 				else {
@@ -203,6 +208,23 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 				}
 		}
 	}
+
+	/**
+	 * Returns the created managed collection for the attribute
+	 * 
+	 * @param session
+	 *            the session
+	 * @param managedInstance
+	 *            the managed instance
+	 * @param mapping
+	 *            the collection mapping
+	 * @return
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract ManagedCollection<E> newInstance(SessionImpl session, ManagedInstance<?> managedInstance,
+		CollectionMapping<?, ?, ?> mapping);
 
 	/**
 	 * Applies the overrides to the column templates.

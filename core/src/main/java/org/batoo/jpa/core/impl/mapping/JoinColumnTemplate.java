@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.mapping;
 import javax.persistence.JoinColumn;
 
 import org.batoo.jpa.core.impl.types.AttributeImpl;
+import org.batoo.jpa.core.impl.types.PluralAttributeImpl;
 import org.batoo.jpa.core.impl.types.SingularAttributeImpl;
 
 /**
@@ -30,7 +31,7 @@ import org.batoo.jpa.core.impl.types.SingularAttributeImpl;
  */
 public class JoinColumnTemplate<X, T> extends ColumnTemplate<X, T> {
 
-	private final BasicMapping<?, ?> referencedmapping;
+	private final BasicMapping<?, ?> referencedMapping;
 
 	/**
 	 * @param attribute
@@ -44,22 +45,37 @@ public class JoinColumnTemplate<X, T> extends ColumnTemplate<X, T> {
 	public JoinColumnTemplate(AttributeImpl<X, T> attribute, JoinColumn column) {
 		super(attribute, column.table(), column.name(), column.nullable(), column.unique(), column.insertable(), column.updatable());
 
-		this.referencedmapping = null;
+		this.referencedMapping = null;
 	}
 
 	/**
 	 * @param attribute
-	 *            the attribute that owns that column
-	 * @param referencedmapping
+	 *            the attribute that owns the column
+	 * @param referencedMapping
 	 *            the referenced mapping
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public JoinColumnTemplate(SingularAttributeImpl<X, T> attribute, BasicMapping<?, ?> referencedmapping) {
-		super(attribute, null, attribute.getName() + "_" + referencedmapping.getDeclaringAttribute().getName(), true, false, true, true);
+	public JoinColumnTemplate(PluralAttributeImpl<X, T, ?> attribute, BasicMapping<?, ?> referencedMapping) {
+		super(attribute, null, attribute.getName() + "_" + referencedMapping.getDeclaringAttribute().getName(), true, false, true, true);
 
-		this.referencedmapping = referencedmapping;
+		this.referencedMapping = referencedMapping;
+	}
+
+	/**
+	 * @param attribute
+	 *            the attribute that owns that column
+	 * @param referencedMapping
+	 *            the referenced mapping
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public JoinColumnTemplate(SingularAttributeImpl<X, T> attribute, BasicMapping<?, ?> referencedMapping) {
+		super(attribute, null, attribute.getName() + "_" + referencedMapping.getDeclaringAttribute().getName(), true, false, true, true);
+
+		this.referencedMapping = referencedMapping;
 	}
 
 	/**
@@ -69,6 +85,6 @@ public class JoinColumnTemplate<X, T> extends ColumnTemplate<X, T> {
 	 * @since $version
 	 */
 	public BasicMapping<?, ?> getReferencedMapping() {
-		return this.referencedmapping;
+		return this.referencedMapping;
 	}
 }

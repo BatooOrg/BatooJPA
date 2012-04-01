@@ -20,14 +20,18 @@ package org.batoo.jpa.core.impl.mapping;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Deque;
 
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
 import org.batoo.jpa.core.MappingException;
+import org.batoo.jpa.core.impl.SessionImpl;
+import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
+import org.batoo.jpa.core.impl.mapping.Mapping.AssociationType;
 import org.batoo.jpa.core.impl.types.AttributeImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 import org.batoo.jpa.core.impl.types.PluralAttributeImpl;
@@ -41,8 +45,30 @@ import org.batoo.jpa.core.jdbc.adapter.JDBCAdapter;
  * @author hceylan
  * @since $version
  */
-public class OwnerOneToManyMapping<X, C, E> extends OwnedAssociationMapping<X, C> implements CollectionMapping<X, C>,
+public class OwnerOneToManyMapping<X, C, E> extends OwnerAssociationMapping<X, C> implements CollectionMapping<X, C, E>,
 	PersistableAssociation<X, C> {
+
+	/**
+	 * Sanitizes the column templates
+	 * 
+	 * @param declaringAttribute
+	 *            the declaring attribute
+	 * @param columns
+	 *            the column templates
+	 * @since $version
+	 * @author hceylan
+	 */
+	public static <X, C, E> void sanitize(PluralAttributeImpl<X, C, E> declaringAttribute, Collection<ColumnTemplate<X, C>> columns) {
+
+		if (columns.isEmpty()) {
+			final EntityTypeImpl<E> type = (EntityTypeImpl<E>) declaringAttribute.getElementType();
+
+			final Collection<BasicMapping<?, ?>> mappings = type.getIdMappings();
+			for (final BasicMapping<?, ?> mapping : mappings) {
+				columns.add(new JoinColumnTemplate<X, C>(declaringAttribute, mapping));
+			}
+		}
+	}
 
 	private JoinTable joinTable;
 
@@ -51,10 +77,8 @@ public class OwnerOneToManyMapping<X, C, E> extends OwnedAssociationMapping<X, C
 	 *            the attribute which declares the mapping
 	 * @param path
 	 *            the path to the declaringAttribute
-	 * @param column
-	 *            the column definition of the mapping
-	 * @param orpanRemoval
-	 *            if orphans should be removed
+	 * @param columnTemplates
+	 *            the set of column templates of the mapping
 	 * @param eager
 	 *            if association is annotated with {@link FetchType#EAGER}
 	 * @throws MappingException
@@ -62,9 +86,19 @@ public class OwnerOneToManyMapping<X, C, E> extends OwnedAssociationMapping<X, C
 	 * @since $version
 	 * @author hceylan
 	 */
-	public OwnerOneToManyMapping(PluralAttributeImpl<X, C, E> declaringAttribute, Deque<AttributeImpl<?, ?>> path, boolean orphanRemoval,
-		boolean eager) throws MappingException {
-		super(AssociationType.MANY, declaringAttribute, path, orphanRemoval, eager);
+	public OwnerOneToManyMapping(PluralAttributeImpl<X, C, E> declaringAttribute, Deque<AttributeImpl<?, ?>> path,
+		Collection<ColumnTemplate<X, C>> columnTemplates, boolean eager) throws MappingException {
+		super(AssociationType.MANY, declaringAttribute, path, columnTemplates, eager);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean contains(Object instance) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	/**
@@ -91,15 +125,6 @@ public class OwnerOneToManyMapping<X, C, E> extends OwnedAssociationMapping<X, C
 	 * 
 	 */
 	@Override
-	public OwnerManyToOneMapping<C, X> getOpposite() {
-		return (OwnerManyToOneMapping<C, X>) super.getOpposite();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	@SuppressWarnings("unchecked")
 	public EntityTypeImpl<C> getType() {
 		return (EntityTypeImpl<C>) this.getDeclaringAttribute().getElementType();
@@ -118,13 +143,8 @@ public class OwnerOneToManyMapping<X, C, E> extends OwnedAssociationMapping<X, C
 	 * {@inheritDoc}
 	 * 
 	 */
-	@Override
 	public void link(JDBCAdapter jdbcAdapter) throws MappingException {
-		super.link(jdbcAdapter);
-
-		if (this.getOpposite() == null) {
-			this.joinTable = new JoinTable(this, jdbcAdapter);
-		}
+		this.joinTable = new JoinTable(this, jdbcAdapter);
 	}
 
 	/**
@@ -134,5 +154,15 @@ public class OwnerOneToManyMapping<X, C, E> extends OwnedAssociationMapping<X, C
 	@Override
 	public void performInsert(Connection connection, ManagedInstance<X> managedInstance) throws SQLException {
 		this.joinTable.performInsert(connection, managedInstance);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Collection<E> performSelect(SessionImpl session, ManagedId<X> managedId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

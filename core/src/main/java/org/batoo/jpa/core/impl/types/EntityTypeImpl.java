@@ -64,9 +64,9 @@ import org.batoo.jpa.core.impl.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.mapping.ColumnTemplate;
 import org.batoo.jpa.core.impl.mapping.JoinColumnTemplate;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
-import org.batoo.jpa.core.impl.mapping.OwnedAssociation;
 import org.batoo.jpa.core.impl.mapping.OwnerAssociationMapping;
 import org.batoo.jpa.core.impl.mapping.OwnerManyToManyMapping;
+import org.batoo.jpa.core.impl.mapping.OwnerOneToManyMapping;
 import org.batoo.jpa.core.impl.mapping.TableTemplate;
 import org.batoo.jpa.core.impl.mapping.TypeFactory;
 import org.batoo.jpa.core.jdbc.DDLMode;
@@ -91,7 +91,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 	private final Map<String, AbstractMapping<?, ?>> mappings = Maps.newHashMap();
 	private final Map<String, Association<?, ?>> associations = Maps.newHashMap();
-	private final Map<String, OwnedAssociation<?, ?>> ownedAssociations = Maps.newHashMap();
 	private final Map<String, BasicMapping<?, ?>> idMappings = Maps.newHashMap();
 	private final Map<String, BasicMapping<?, ?>> identityMappings = Maps.newHashMap();
 	private final Map<String, Column> attributeOverrides = Maps.newHashMap();
@@ -234,13 +233,10 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			this.metaModel.addAssociation(association);
 			this.associations.put(name, association);
 
-			if (mapping instanceof OwnedAssociation) {
-				this.ownedAssociations.put(name, (OwnedAssociation<?, ?>) mapping);
-			}
-			else {
-				final List<PhysicalColumn> keyColumns = Lists.newArrayList();
-
+			if ((mapping instanceof OwnerAssociationMapping) && !(mapping instanceof OwnerOneToManyMapping)) {
 				final OwnerAssociationMapping<?, ?> associationMapping = (OwnerAssociationMapping<?, ?>) association;
+
+				final List<PhysicalColumn> keyColumns = Lists.newArrayList();
 				for (final ColumnTemplate<?, ?> template : associationMapping.getColumnTemplates()) {
 					keyColumns.add(this.addColumn(template, associationMapping));
 				}
@@ -764,7 +760,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedInstance<X> performSelect(SessionImpl session, ManagedId<X> managedId) throws SQLException {
+	public X performSelect(SessionImpl session, ManagedId<X> managedId) throws SQLException {
 		return this.selectHelper.select(session, managedId);
 	}
 

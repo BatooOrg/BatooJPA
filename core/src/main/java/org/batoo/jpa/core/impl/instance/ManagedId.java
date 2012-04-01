@@ -18,7 +18,6 @@
  */
 package org.batoo.jpa.core.impl.instance;
 
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map;
 
@@ -177,21 +176,6 @@ public class ManagedId<X> {
 		result = (prime * result) + ((this.resolvers == null) ? 0 : this.resolvers.hashCode());
 		result = (prime * result) + ((this.session == null) ? 0 : this.session.hashCode());
 		return this.h = (prime * result) + ((this.type == null) ? 0 : this.type.hashCode());
-	}
-
-	/**
-	 * Performs a select for the managed id.
-	 * 
-	 * @param session
-	 *            the session
-	 * @return the managed instance
-	 * @throws SQLException
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public ManagedInstance<? super X> performSelect(SessionImpl session) throws SQLException {
-		return this.type.performSelect(session, this);
 	}
 
 	/**

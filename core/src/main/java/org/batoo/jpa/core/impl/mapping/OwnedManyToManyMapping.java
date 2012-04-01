@@ -18,12 +18,15 @@
  */
 package org.batoo.jpa.core.impl.mapping;
 
+import java.util.Collection;
 import java.util.Deque;
 
 import javax.persistence.FetchType;
 import javax.persistence.OneToOne;
 
 import org.batoo.jpa.core.MappingException;
+import org.batoo.jpa.core.impl.SessionImpl;
+import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.types.AttributeImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 import org.batoo.jpa.core.impl.types.PluralAttributeImpl;
@@ -36,7 +39,7 @@ import org.batoo.jpa.core.impl.types.PluralAttributeImpl;
  * @author hceylan
  * @since $version
  */
-public class OwnedManyToManyMapping<X, C, E> extends OwnedAssociationMapping<X, C> implements CollectionMapping<X, C> {
+public class OwnedManyToManyMapping<X, C, E> extends OwnedAssociationMapping<X, C> implements CollectionMapping<X, C, E> {
 
 	/**
 	 * @param declaringAttribute
@@ -85,6 +88,16 @@ public class OwnedManyToManyMapping<X, C, E> extends OwnedAssociationMapping<X, 
 	@SuppressWarnings("unchecked")
 	public EntityTypeImpl<C> getType() {
 		return (EntityTypeImpl<C>) this.getDeclaringAttribute().getElementType();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Collection<E> performSelect(SessionImpl session, ManagedId<X> managedId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

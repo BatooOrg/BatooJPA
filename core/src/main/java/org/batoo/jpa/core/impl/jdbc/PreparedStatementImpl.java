@@ -290,7 +290,8 @@ public class PreparedStatementImpl implements PreparedStatement {
 		this.executes++;
 		this.selects++;
 
-		LOG.debug("{0}:{1}:{2} executeQuery(){3}", this.connection.connNo, this.statementNo, executeNo, BLogger.lazyBoxed(this.sql));
+		LOG.debug("{0}:{1}:{2} executeQuery(){3}", this.connection.connNo, this.statementNo, executeNo,
+			BLogger.lazyBoxed(this.sql, this.parameters));
 
 		final long start = System.currentTimeMillis();
 		try {

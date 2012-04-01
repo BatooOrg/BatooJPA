@@ -20,12 +20,14 @@ package org.batoo.jpa.core.impl.jdbc;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.impl.OperationTookLongTimeWarning;
 import org.batoo.jpa.core.impl.SessionImpl;
@@ -34,10 +36,14 @@ import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
 import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.mapping.BasicMapping;
+import org.batoo.jpa.core.impl.mapping.CollectionMapping;
+import org.batoo.jpa.core.impl.mapping.OwnedOneToManyMapping;
 import org.batoo.jpa.core.impl.mapping.OwnerAssociation;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 import org.batoo.jpa.core.util.Pair2;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Maps;
 
 /**
@@ -46,9 +52,9 @@ import com.google.common.collect.Maps;
  * @author hceylan
  * @since $version
  */
-public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<X>> {
+public class SelectHandler<X> implements ResultSetHandler<Collection<X>> {
 
-	private static final BLogger LOG = BLogger.getLogger(SingleSelectHandler.class);
+	private static final BLogger LOG = BLogger.getLogger(SelectHandler.class);
 
 	private static volatile int nextOperationNo = 0;
 
@@ -58,7 +64,6 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 	private final Map<Pair2<Integer, PhysicalColumn>, String> columnAliases;
 	private final List<Deque<Association<?, ?>>> entityPaths;
 	private final List<Deque<Association<?, ?>>> lazyPaths;
-
 	private final List<Deque<Association<?, ?>>> inversePaths;
 
 	/**
@@ -80,7 +85,7 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SingleSelectHandler(SessionImpl session, EntityTypeImpl<X> rootType, Map<Pair2<Integer, PhysicalColumn>, String> columnAliases,
+	public SelectHandler(SessionImpl session, EntityTypeImpl<X> rootType, Map<Pair2<Integer, PhysicalColumn>, String> columnAliases,
 		List<Deque<Association<?, ?>>> entityPaths, List<Deque<Association<?, ?>>> inversePaths, List<Deque<Association<?, ?>>> lazyPaths) {
 		super();
 
@@ -94,15 +99,24 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 
 	private void createLazyInstance(SessionImpl session, ResultSet rs, Map<ManagedId<?>, ManagedInstance<?>> cache, int depth,
 		final ManagedInstance<?> managedInstance, Deque<Association<?, ?>> path) throws SQLException {
-		final OwnerAssociation<?, ?> lazy = (OwnerAssociation<?, ?>) path.getLast();
+		final Association<?, ?> association = path.getLast();
+		if (association instanceof OwnerAssociation) {
+			final OwnerAssociation<?, ?> lazyAssociation = (OwnerAssociation<?, ?>) association;
 
-		for (final PhysicalColumn column : lazy.getPhysicalColumns().values()) {
-			final Object value = this.getColumnValue(rs, depth, column);
-			if (value != null) {
-				final ManagedInstance<?> lazyInstance = this.createManagedInstance(session, cache, lazy.getType(), value, true);
-				lazyInstance.addReference(managedInstance, lazy);
-				lazy.setValue(managedInstance.getInstance(), lazyInstance.getInstance());
+			for (final PhysicalColumn column : lazyAssociation.getPhysicalColumns().values()) {
+				final Object value = this.getColumnValue(rs, depth, column);
+				if (value != null) {
+					final ManagedInstance<?> lazyInstance = this.createManagedInstance(session, cache, lazyAssociation.getType(), value,
+						true);
+					lazyInstance.addReference(managedInstance, lazyAssociation);
+					lazyAssociation.setValue(managedInstance.getInstance(), lazyInstance.getInstance());
+				}
 			}
+		}
+		else if (association instanceof OwnedOneToManyMapping) {
+			final CollectionMapping<?, ?, ?> lazyAssociation = (CollectionMapping<?, ?, ?>) association;
+			lazyAssociation.setValue(managedInstance.getInstance(),
+				lazyAssociation.getDeclaringAttribute().newInstance(session, managedInstance, lazyAssociation));
 		}
 	}
 
@@ -194,7 +208,7 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 	 * 
 	 */
 	@Override
-	public ManagedInstance<X> handle(ResultSet rs) throws SQLException {
+	public Collection<X> handle(ResultSet rs) throws SQLException {
 		final int operationNo = nextOperationNo++;
 
 		LOG.debug("{0}: handle()", operationNo);
@@ -202,7 +216,13 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 		final long start = System.currentTimeMillis();
 
 		try {
-			return this.handle0(rs);
+			return Collections2.transform(this.handle0(rs), new Function<ManagedInstance<X>, X>() {
+
+				@Override
+				public X apply(ManagedInstance<X> input) {
+					return input.getInstance();
+				}
+			});
 		}
 		finally {
 			final long time = System.currentTimeMillis() - start;
@@ -216,12 +236,15 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 	}
 
 	@SuppressWarnings("unchecked")
-	private ManagedInstance<X> handle0(ResultSet rs) throws SQLException {
+	private Collection<ManagedInstance<X>> handle0(ResultSet rs) throws SQLException {
 		final Map<ManagedId<?>, ManagedInstance<?>> cache = Maps.newHashMap();
-		ManagedInstance<X> managedInstance = null;
+
+		final Map<ManagedId<? super X>, ManagedInstance<X>> instances = Maps.newHashMap();
 		while (rs.next()) {
-			final X root = managedInstance != null ? managedInstance.getInstance() : null;
-			managedInstance = (ManagedInstance<X>) this.processRow(this.session, rs, cache, root, 0, 0, null);
+			final ManagedInstance<X> managedInstance = (ManagedInstance<X>) this.processRow(this.session, rs, cache, null, 0,
+				new MutableInt(0), null);
+			managedInstance.setStatus(Status.MANAGED);
+			instances.put(managedInstance.getId(), managedInstance);
 		}
 
 		for (final ManagedInstance<?> instance : cache.values()) {
@@ -230,7 +253,7 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 			}
 		}
 
-		return managedInstance;
+		return instances.values();
 	}
 
 	/**
@@ -253,14 +276,14 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 	 * @author hceylan
 	 */
 	private ManagedInstance<?> processRow(SessionImpl session, ResultSet rs, Map<ManagedId<?>, ManagedInstance<?>> cache, Object root,
-		int depth, int associationNo, Object parent) throws SQLException {
+		int depth, MutableInt associationNo, Object parent) throws SQLException {
 		EntityTypeImpl<?> currentType;
 
 		if (depth == 0) {
 			currentType = this.rootType;
 		}
 		else {
-			currentType = this.entityPaths.get(associationNo - 1).getLast().getType();
+			currentType = this.entityPaths.get(associationNo.intValue() - 1).getLast().getType();
 		}
 
 		final ManagedInstance<?> managedInstance = this.createManagedInstance(session, rs, cache, depth, currentType);
@@ -286,13 +309,13 @@ public class SingleSelectHandler<X> implements ResultSetHandler<ManagedInstance<
 			return null;
 		}
 
-		while (this.entityPaths.size() > associationNo) {
-			final Deque<Association<?, ?>> path = this.entityPaths.get(associationNo);
+		while (this.entityPaths.size() > associationNo.intValue()) {
+			final Deque<Association<?, ?>> path = this.entityPaths.get(associationNo.intValue());
 			if (path.getLast().getOwner() != currentType) {
 				break;
 			}
 
-			associationNo++;
+			associationNo.increment();
 
 			if (this.inversePaths.contains(path)) { // do inverse set
 				if (managedInstance.getStatus() == Status.LOADING) {

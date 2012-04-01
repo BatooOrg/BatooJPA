@@ -27,6 +27,8 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToOne;
 
 import org.batoo.jpa.core.MappingException;
+import org.batoo.jpa.core.impl.SessionImpl;
+import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
 import org.batoo.jpa.core.impl.types.AttributeImpl;
@@ -42,8 +44,8 @@ import org.batoo.jpa.core.jdbc.adapter.JDBCAdapter;
  * @author hceylan
  * @since $version
  */
-public class OwnerManyToManyMapping<X, C, E> extends OwnerAssociationMapping<X, C> implements Association<X, C>, CollectionMapping<X, C>,
-	PersistableAssociation<X, C> {
+public class OwnerManyToManyMapping<X, C, E> extends OwnerAssociationMapping<X, C> implements Association<X, C>,
+	CollectionMapping<X, C, E>, PersistableAssociation<X, C> {
 
 	private JoinTable joinTable;
 
@@ -145,5 +147,15 @@ public class OwnerManyToManyMapping<X, C, E> extends OwnerAssociationMapping<X, 
 	@Override
 	public void performInsert(Connection connection, ManagedInstance<X> managedInstance) throws SQLException {
 		this.joinTable.performInsert(connection, managedInstance);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Collection<E> performSelect(SessionImpl session, ManagedId<X> managedId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

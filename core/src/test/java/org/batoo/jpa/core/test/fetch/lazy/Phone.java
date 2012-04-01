@@ -39,10 +39,7 @@ public class Phone {
 	@ManyToOne
 	private Person person;
 
-	private String city;
-
-	@ManyToOne
-	private Country country;
+	private String phoneNo;
 
 	/**
 	 * @since $version
@@ -54,38 +51,18 @@ public class Phone {
 
 	/**
 	 * @param person
-	 * @param city
+	 * @param phoneNo
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Phone(Person person, String city) {
+	public Phone(Person person, String phoneNo) {
 		super();
 
 		this.person = person;
-		this.city = city;
+		this.phoneNo = phoneNo;
 
 		this.person.getPhones().add(this);
-	}
-
-	/**
-	 * Returns the city.
-	 * 
-	 * @return the city
-	 * @since $version
-	 */
-	public String getCity() {
-		return this.city;
-	}
-
-	/**
-	 * Returns the country.
-	 * 
-	 * @return the country
-	 * @since $version
-	 */
-	public Country getCountry() {
-		return this.country;
 	}
 
 	/**
@@ -109,25 +86,13 @@ public class Phone {
 	}
 
 	/**
-	 * Sets the city.
+	 * Returns the phoneNo.
 	 * 
-	 * @param city
-	 *            the city to set
+	 * @return the phoneNo
 	 * @since $version
 	 */
-	public void setCity(String city) {
-		this.city = city;
-	}
-
-	/**
-	 * Sets the country.
-	 * 
-	 * @param country
-	 *            the country to set
-	 * @since $version
-	 */
-	public void setCountry(Country country) {
-		this.country = country;
+	public String getPhoneNo() {
+		return this.phoneNo;
 	}
 
 	/**
@@ -139,5 +104,16 @@ public class Phone {
 	 */
 	public void setPerson(Person person) {
 		this.person = person;
+	}
+
+	/**
+	 * Sets the phoneNo.
+	 * 
+	 * @param phoneNo
+	 *            the phoneNo to set
+	 * @since $version
+	 */
+	public void setPhoneNo(String phoneNo) {
+		this.phoneNo = phoneNo;
 	}
 }

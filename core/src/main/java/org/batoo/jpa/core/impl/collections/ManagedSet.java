@@ -16,46 +16,47 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.mapping;
+package org.batoo.jpa.core.impl.collections;
 
-import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Set;
 
 import org.batoo.jpa.core.impl.SessionImpl;
-import org.batoo.jpa.core.impl.instance.ManagedId;
-import org.batoo.jpa.core.impl.types.PluralAttributeImpl;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.mapping.CollectionMapping;
+
+import com.google.common.collect.Sets;
 
 /**
- * Indicator interface for collection type mappings
  * 
  * @author hceylan
  * @since $version
  */
-public interface CollectionMapping<X, C, E> extends Mapping<X, C> {
+public class ManagedSet<E> extends ManagedCollection<E> implements Set<E> {
+
+	private final Set<E> set = Sets.newHashSet();
 
 	/**
-	 * Returns the declaring attribute.
-	 * 
-	 * @return the declaring attribute
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@Override
-	PluralAttributeImpl<X, C, E> getDeclaringAttribute();
-
-	/**
-	 * Selects the children for the mapping owned by the entity with the managedId.
-	 * 
 	 * @param session
 	 *            the session
-	 * @param managedId
-	 *            the managed id of the owner entity
-	 * @return collection of children
-	 * @throws SQLException
+	 * @param managedInstance
+	 *            the owner managed instance
+	 * @param mapping
+	 *            the mapping
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	Collection<E> performSelect(SessionImpl session, ManagedId<X> managedId) throws SQLException;
+	public ManagedSet(SessionImpl session, ManagedInstance<?> managedInstance, CollectionMapping<?, Set<E>, E> mapping) {
+		super(session, managedInstance, mapping);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	protected Collection<E> getCollection() {
+		return this.set;
+	}
 }
