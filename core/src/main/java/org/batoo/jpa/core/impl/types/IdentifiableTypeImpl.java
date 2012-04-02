@@ -57,19 +57,21 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 
 	private static final BLogger LOG = BLogger.getLogger(IdentifiableTypeImpl.class);
 
-	private Class<?> idJavaType;
+	protected Class<?> idJavaType;
+	protected TypeImpl<?> idType;
 
 	protected final Map<String, TableTemplate> tableTemplates = Maps.newHashMap();
-	private TableTemplate primaryTableTemplate;
 
+	private TableTemplate primaryTableTemplate;
 	protected final Map<String, SingularAttributeImpl<X, ?>> declaredIdAttributes = Maps.newHashMap();
+
 	protected final Map<String, SingularAttributeImpl<? super X, ?>> idAttributes = Maps.newHashMap();
 	protected final Map<String, SingularAttributeImpl<? super X, ?>> versionAttributes = Maps.newHashMap();
-
 	private SequenceGenerator sequenceGenerator;
-	private TableGenerator tableGenerator;
 
+	private TableGenerator tableGenerator;
 	private String tableName;
+
 	private volatile boolean vlinked;
 
 	/**
@@ -147,10 +149,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 */
 	@Override
 	public Type<?> getIdType() {
-		final Class<?> idJavaType = this.hasSingleIdAttribute() ? this.idAttributes.values().iterator().next().getJavaType()
-			: this.idJavaType;
-
-		return this.getMetaModel().embeddable(idJavaType);
+		return this.idType;
 	}
 
 	/**
@@ -390,6 +389,18 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 		}
 
 		this.tableTemplates.put(schema + "." + name, table);
+	}
+
+	/**
+	 * Sets the idJavaType.
+	 * 
+	 * @param type
+	 *            the idJavaType to set
+	 * @since $version
+	 */
+	public void setIdJavaType(EmbeddableTypeImpl<?> type) {
+		this.idJavaType = type.getJavaType();
+		this.idType = type;
 	}
 
 	/**

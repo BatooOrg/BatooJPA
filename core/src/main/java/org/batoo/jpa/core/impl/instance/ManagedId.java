@@ -220,11 +220,11 @@ public class ManagedId<X> {
 
 			@Override
 			public String apply(BasicResolver<X> input) {
-				return input.mapping.getPathAsString() + ": " + input.getValue();
+				return input.mapping.getPathAsString() + "= " + input.getValue();
 			}
 		});
 
-		final String idsStr = "[" + Joiner.on("= ").join(ids) + "]";
+		final String idsStr = "[" + Joiner.on(", ").join(ids) + "]";
 
 		return "ManagedId [type=" + this.type.getTopType().getName() + ", ids=" + idsStr + "]";
 	}

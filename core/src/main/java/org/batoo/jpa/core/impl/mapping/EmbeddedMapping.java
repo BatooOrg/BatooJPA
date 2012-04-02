@@ -46,17 +46,19 @@ public class EmbeddedMapping<X, T> extends AbstractMapping<X, T> {
 	 *            the path to the declaringAttribute
 	 * @param column
 	 *            the column definition of the mapping
+	 * @param id
+	 *            if this is an id mapping
 	 * @throws MappingException
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 * @param attributeOverrides
 	 */
-	public EmbeddedMapping(AttributeImpl<X, T> declaringAttribute, Deque<AttributeImpl<?, ?>> path, Map<String, Column> attributeOverrides)
-		throws MappingException {
+	public EmbeddedMapping(AttributeImpl<X, T> declaringAttribute, Deque<AttributeImpl<?, ?>> path, Map<String, Column> attributeOverrides,
+		boolean id) throws MappingException {
 		super(AssociationType.ONE, declaringAttribute, path);
 
-		this.linkAttributes(attributeOverrides);
+		this.linkAttributes(attributeOverrides, id);
 	}
 
 	/**
@@ -86,9 +88,16 @@ public class EmbeddedMapping<X, T> extends AbstractMapping<X, T> {
 		return (EmbeddableTypeImpl<T>) this.getDeclaringAttribute().getType();
 	}
 
-	private void linkAttributes(Map<String, Column> attributeOverrides) throws MappingException {
+	private void linkAttributes(Map<String, Column> attributeOverrides, boolean id) throws MappingException {
 		for (final Attribute<?, ?> attribute : this.getType().getDeclaredAttributes()) {
-			((AttributeImpl<?, ?>) attribute).link(this.getPath(), attributeOverrides);
+			if (id) { // if this is an EmbeddedId then mark the attribute as id attribute
+				if (attribute instanceof SingularAttributeImpl) {
+					((SingularAttributeImpl<?, ?>) attribute).link(this.getPath(), attributeOverrides, id);
+				}
+			}
+			else {
+				((AttributeImpl<?, ?>) attribute).link(this.getPath(), attributeOverrides);
+			}
 		}
 	}
 }

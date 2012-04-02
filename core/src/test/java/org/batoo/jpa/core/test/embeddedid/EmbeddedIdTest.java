@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.manualid;
+package org.batoo.jpa.core.test.embeddedid;
 
 import javax.persistence.EntityManager;
 
@@ -30,7 +30,7 @@ import org.junit.Test;
  * 
  * @since $version
  */
-public class IdentityTest extends AbstractTest {
+public class EmbeddedIdTest extends AbstractTest {
 
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with identity value
@@ -39,24 +39,32 @@ public class IdentityTest extends AbstractTest {
 	 * @author hceylan
 	 */
 	@Test
-	public void testIdentiy() {
-		final Foo foo = new Foo();
-		foo.setKey(1);
-		foo.setValue("Bar");
+	public void testEmbeddedId() {
+		final Foo foo1 = new Foo();
+		final FooPk pk1 = new FooPk();
+		pk1.setStrKey("key1");
+		pk1.setIntKey(1);
+		foo1.setId(pk1);
+		foo1.setValue("Bar");
 
 		final Foo foo2 = new Foo();
-		foo2.setKey(2);
+		final FooPk pk2 = new FooPk();
+		pk2.setStrKey("key1");
+		pk2.setIntKey(2);
+		foo2.setId(pk2);
 		foo2.setValue("Bar");
 
-		this.persist(foo);
+		this.persist(foo1);
 		this.persist(foo2);
 
 		this.commit();
 
 		this.close();
 
-		final Foo foo3 = this.find(Foo.class, foo.getKey());
-		Assert.assertEquals(foo.getKey(), foo3.getKey());
+		final Foo foo3 = this.find(Foo.class, foo1.getId());
+		final Foo foo4 = this.find(Foo.class, foo1.getId());
+		Assert.assertEquals(foo1.getId(), foo3.getId());
+		Assert.assertSame(foo4, foo3);
 	}
 
 }

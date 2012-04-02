@@ -29,12 +29,14 @@ import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
+import javax.persistence.EmbeddedId;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.persistence.PersistenceException;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.TableGenerator;
 import javax.persistence.Version;
@@ -241,20 +243,44 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 	 */
 	@Override
 	public void link(Deque<AttributeImpl<?, ?>> path, Map<String, Column> attributeOverrides) throws MappingException {
+		this.link(path, attributeOverrides, false);
+	}
+
+	/**
+	 * Overrides the {@link #link(Deque, Map)} to allow an attribute which is part of embeddable as id attribute, if id is true.
+	 * 
+	 * @param path
+	 * @see {@link #link(Deque, Map)}
+	 * @param attributeOverrides
+	 * @see {@link #link(Deque, Map)}
+	 * @param id
+	 *            true if this is an embeddable id attribute
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void link(Deque<AttributeImpl<?, ?>> path, Map<String, Column> attributeOverrides, boolean id) throws MappingException {
+		if (id && (this.getPersistentAttributeType() != PersistentAttributeType.BASIC)) {
+			throw new MappingException("Embeddedable declared as EmbeddedId but it has non-basic property "
+				+ ReflectHelper.createMemberName(this.javaMember));
+		}
+
 		path = Lists.newLinkedList(path);
 		path.addLast(this);
 
 		attributeOverrides = Maps.newHashMap(attributeOverrides);
 		attributeOverrides.putAll(this.attributeOverrides);
 
+		final IdType idType = id ? IdType.MANUAL : this.idType;
+
 		switch (this.attributeType) {
 			case LOB:
 			case BASIC:
-				BasicMapping.sanitize(this, this.columns);
-				this.mapping = new BasicMapping<X, T>(this, path, this.overrideColumns(path, attributeOverrides));
+				BasicMapping.sanitize(this, this.columns, idType);
+				this.mapping = new BasicMapping<X, T>(this, path, this.overrideColumns(path, attributeOverrides), idType != null);
 				break;
 			case EMBEDDED:
-				this.mapping = new EmbeddedMapping<X, T>(this, path, attributeOverrides);
+				this.mapping = new EmbeddedMapping<X, T>(this, path, attributeOverrides, this.idType != null);
 				break;
 			case ASSOCIATION:
 				final boolean eager = this.fetchType == FetchType.EAGER;
@@ -270,6 +296,7 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 					this.mapping = new OwnerManyToOneMapping<X, T>(this, path, this.overrideColumns(path, attributeOverrides), eager);
 				}
 		}
+
 	}
 
 	/**
@@ -412,6 +439,29 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 			this.supportsIdType(metaModel, identifiableType, member);
 
 			parsed.add(Id.class);
+		}
+
+		final boolean embeddedId = ReflectHelper.getAnnotation(member, EmbeddedId.class) != null;
+		if (embeddedId) {
+			this.idType = IdType.MANUAL;
+			this.attributeType = AtrributeType.EMBEDDED;
+
+			// Check if the type is identifiable
+			if (!(this.declaringType instanceof IdentifiableTypeImpl)) {
+				throw new MappingException("EmbeddedId can only be specified on Entities and MapperSuperclasses. Specified on "
+					+ ReflectHelper.createMemberName(member));
+			}
+
+			final IdentifiableTypeImpl<X> identifiableType = (IdentifiableTypeImpl<X>) this.declaringType;
+			try {
+				identifiableType.setIdJavaType(this.getDeclaringType().getMetaModel().embeddable(this.javaType));
+			}
+			catch (final PersistenceException e) {
+				throw new MappingException("EmbeddedId declared on " + ReflectHelper.createMemberName(member)
+					+ " references unknown or non-embeddable class " + ReflectHelper.getMemberType(member));
+			}
+
+			parsed.add(EmbeddedId.class);
 		}
 	}
 

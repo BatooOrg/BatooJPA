@@ -180,6 +180,9 @@ public abstract class AbstractMapping<X, T> implements Mapping<X, T> {
 	public final T getValue(Object instance) {
 		Object value = instance;
 		for (final AttributeImpl<?, ?> attribute : this.path) {
+			if (value == null) {
+				return null;
+			}
 			value = attribute.get(value);
 		}
 
@@ -214,6 +217,11 @@ public abstract class AbstractMapping<X, T> implements Mapping<X, T> {
 			final AttributeImpl<?, ?> attribute = i.next();
 
 			if (!i.hasNext()) { // we have reached the destination
+				attribute.set(instance, value);
+				return;
+			}
+
+			if ((value != null) && attribute.getJavaType().isAssignableFrom(value.getClass())) {
 				attribute.set(instance, value);
 				return;
 			}

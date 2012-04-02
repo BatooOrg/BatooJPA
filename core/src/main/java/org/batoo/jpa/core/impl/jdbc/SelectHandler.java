@@ -39,6 +39,7 @@ import org.batoo.jpa.core.impl.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.mapping.CollectionMapping;
 import org.batoo.jpa.core.impl.mapping.OwnedOneToManyMapping;
 import org.batoo.jpa.core.impl.mapping.OwnerAssociation;
+import org.batoo.jpa.core.impl.types.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 import org.batoo.jpa.core.util.Pair2;
 
@@ -186,9 +187,23 @@ public class SelectHandler<X> implements ResultSetHandler<Collection<X>> {
 	private <T> ManagedInstance<? super T> createManagedInstance(SessionImpl session, ResultSet rs,
 		Map<ManagedId<?>, ManagedInstance<?>> cache, int depth, EntityTypeImpl<T> currentType) throws SQLException {
 		if (currentType.hasSingleIdAttribute()) {
+
+			Object primaryKeyValue;
+
 			final EntityTable primaryTable = currentType.getPrimaryTable();
-			final PhysicalColumn primaryKey = primaryTable.getPrimaryKeys().iterator().next();
-			final Object primaryKeyValue = this.getColumnValue(rs, depth, primaryKey);
+			if (primaryTable.getPrimaryKey() == null) {
+				final EmbeddableTypeImpl<?> embeddable = (EmbeddableTypeImpl<?>) currentType.getIdType();
+				primaryKeyValue = embeddable.newInstance();
+
+				for (final PhysicalColumn column : currentType.getPrimaryTable().getPrimaryKeys()) {
+					final Object value = this.getColumnValue(rs, depth, column);
+					column.getMapping().getDeclaringAttribute().set(primaryKeyValue, value);
+				}
+			}
+			else {
+				final PhysicalColumn primaryKey = primaryTable.getPrimaryKey();
+				primaryKeyValue = this.getColumnValue(rs, depth, primaryKey);
+			}
 
 			return this.createManagedInstance(session, cache, currentType, primaryKeyValue, false);
 		}

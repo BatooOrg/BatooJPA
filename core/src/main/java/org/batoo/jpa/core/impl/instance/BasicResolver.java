@@ -56,7 +56,7 @@ public class BasicResolver<X> extends AbstractResolver<X> {
 	 */
 	public void fillValue() {
 		if (!this.id) {
-			throw new IllegalStateException("Not an id attribute");
+			return;
 		}
 
 		this.getMapping().fillValue(this.instance);

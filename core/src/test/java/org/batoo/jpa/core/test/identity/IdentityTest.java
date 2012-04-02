@@ -30,7 +30,7 @@ import org.junit.Test;
  * 
  * @since $version
  */
-public class ManualIdTest extends AbstractTest {
+public class IdentityTest extends AbstractTest {
 
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with identity value

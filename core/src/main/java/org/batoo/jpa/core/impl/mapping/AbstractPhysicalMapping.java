@@ -56,11 +56,32 @@ public abstract class AbstractPhysicalMapping<X, T> extends AbstractMapping<X, T
 	 */
 	public AbstractPhysicalMapping(AssociationType associationType, AttributeImpl<X, T> declaringAttribute,
 		Deque<AttributeImpl<?, ?>> path, Collection<ColumnTemplate<X, T>> columnTemplates) throws MappingException {
+		this(associationType, declaringAttribute, path, columnTemplates, false);
+	}
+
+	/**
+	 * @param associationType
+	 *            the type of the association
+	 * @param declaringAttribute
+	 *            the attribute which declares the mapping
+	 * @param path
+	 *            the path to the declaringAttribute
+	 * @param columnTemplates
+	 *            the set of column templates of the mapping
+	 * @param id
+	 *            if the attribute is an id as a part of EmbeddedId attribute
+	 * @throws MappingException
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public AbstractPhysicalMapping(AssociationType associationType, AttributeImpl<X, T> declaringAttribute,
+		Deque<AttributeImpl<?, ?>> path, Collection<ColumnTemplate<X, T>> columnTemplates, boolean id) throws MappingException {
 		super(associationType, declaringAttribute, path);
 
 		this.columnTemplates = columnTemplates;
 
-		this.getOwner().addMapping(this);
+		this.getOwner().addMapping(this, id);
 	}
 
 	/**

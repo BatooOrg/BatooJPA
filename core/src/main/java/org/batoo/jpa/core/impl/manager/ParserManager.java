@@ -99,10 +99,10 @@ public class ParserManager extends DeploymentManager {
 	private void parse() throws BatooException {
 		final long start = System.currentTimeMillis();
 
-		final List<Future<?>> futures = this.parseTypes(this.metamodel.getManagedTypes());
-
 		try {
-			this.parse(futures);
+			this.parse(this.parseTypes(this.metamodel.getEmbeddables()));
+			this.parse(this.parseTypes(this.metamodel.getMappedSuperclasses()));
+			this.parse(this.parseTypes(this.metamodel.getEntities()));
 		}
 		finally {
 			this.executer.shutdownNow();

@@ -219,7 +219,7 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 	 */
 	public final Y get(Object instance) {
 		final Y value = this.getAccessor().get(instance);
-		if (this.charType && (((Character) value).hashCode() == 0)) {
+		if ((value == null) || (this.charType && (((Character) value).hashCode() == 0))) {
 			return null;
 		}
 

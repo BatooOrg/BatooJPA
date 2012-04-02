@@ -75,7 +75,7 @@ public abstract class OwnedAssociationMapping<X, T> extends AbstractMapping<X, T
 		this.orpanRemoval = orpanRemoval;
 		this.eager = eager;
 
-		this.getOwner().addMapping(this);
+		this.getOwner().addMapping(this, false);
 
 		final boolean cascadeAll = this.cascadeTypes.contains(CascadeType.ALL);
 		this.cascadeDetach = cascadeAll || this.cascadeTypes.contains(CascadeType.DETACH);

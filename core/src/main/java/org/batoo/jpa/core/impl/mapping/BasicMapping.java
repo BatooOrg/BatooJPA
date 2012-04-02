@@ -28,6 +28,7 @@ import org.batoo.jpa.core.impl.instance.BasicResolver;
 import org.batoo.jpa.core.impl.types.AttributeImpl;
 import org.batoo.jpa.core.impl.types.BasicTypeImpl;
 import org.batoo.jpa.core.impl.types.SingularAttributeImpl;
+import org.batoo.jpa.core.jdbc.IdType;
 
 /**
  * Implementation for attributes with {@link BasicType} declarations.
@@ -41,14 +42,18 @@ public final class BasicMapping<X, T> extends AbstractPhysicalMapping<X, T> {
 	 * Sanitizes the column definitions.
 	 * 
 	 * @param attribute
+	 *            the attribute
 	 * @param templates
+	 *            the column templates
+	 * @param idType
+	 *            the id type of the attribute
 	 * @since $version
 	 * @author hceylan
 	 */
-	public static <X, T> void sanitize(SingularAttributeImpl<X, T> attribute, Collection<ColumnTemplate<X, T>> templates) {
+	public static <X, T> void sanitize(SingularAttributeImpl<X, T> attribute, Collection<ColumnTemplate<X, T>> templates, IdType idType) {
 
 		if (templates.isEmpty()) {
-			templates.add(new BasicColumnTemplate<X, T>(attribute, attribute.getIdType(), attribute.getGeneratorName()));
+			templates.add(new BasicColumnTemplate<X, T>(attribute, idType, attribute.getGeneratorName()));
 		}
 	}
 
@@ -59,14 +64,15 @@ public final class BasicMapping<X, T> extends AbstractPhysicalMapping<X, T> {
 	 *            the path to the declaringAttribute
 	 * @param columnTemplates
 	 *            the set of column templates of the mapping
+	 * @param idType
 	 * @throws MappingException
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	public BasicMapping(SingularAttributeImpl<X, T> declaringAttribute, Deque<AttributeImpl<?, ?>> path,
-		Collection<ColumnTemplate<X, T>> columnTemplates) throws MappingException {
-		super(AssociationType.BASIC, declaringAttribute, path, columnTemplates);
+		Collection<ColumnTemplate<X, T>> columnTemplates, boolean id) throws MappingException {
+		super(AssociationType.BASIC, declaringAttribute, path, columnTemplates, id);
 	}
 
 	/**

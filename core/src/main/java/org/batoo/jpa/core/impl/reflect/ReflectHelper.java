@@ -376,13 +376,16 @@ public class ReflectHelper {
 	}
 
 	/**
+	 * Returns the type class of the member
+	 * 
 	 * @param member
-	 * @return
+	 *            the member
+	 * @return the class of member
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	private static Class<?> getMemberType(Member member) {
+	public static Class<?> getMemberType(Member member) {
 		if (member instanceof Field) {
 			return ((Field) member).getType();
 		}

@@ -200,12 +200,14 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * 
 	 * @param mapping
 	 *            the mapping to add
+	 * @param id
+	 *            if the mapping is an id mapping
 	 * @throws MappingException
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void addMapping(AbstractMapping<?, ?> mapping) throws MappingException {
+	public void addMapping(AbstractMapping<?, ?> mapping, boolean id) throws MappingException {
 		final String name = mapping.getDeclaringAttribute().getName();
 
 		if (mapping instanceof BasicMapping) {
@@ -213,12 +215,12 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			final SingularAttributeImpl<?, ?> singularAttribute = basicMapping.getDeclaringAttribute();
 
 			// Separate out the identity attributes
-			if (singularAttribute.isId()) {
+			if (id || singularAttribute.isId()) {
 				this.idMappings.put(name, basicMapping);
 			}
 
 			// Separate out the identity id attributes
-			if (singularAttribute.getIdType() == IdType.IDENTITY) {
+			if ((singularAttribute.getIdType() == IdType.IDENTITY)) {
 				this.identityMappings.put(name, basicMapping);
 			}
 
@@ -647,6 +649,18 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 			if (association ^ basic) {
 				((AttributeImpl<? super X, ?>) attribute).link(new LinkedList<AttributeImpl<?, ?>>(), this.attributeOverrides);
+			}
+		}
+
+		if (!basic) {
+			if (this.idJavaType == null) {
+				if (!this.hasSingleIdAttribute()) {
+					throw new MappingException("Unless specified by IdClass, there can only be one id attribute");
+				}
+
+				final SingularAttributeImpl<? super X, ?> attribute = this.idAttributes.values().iterator().next();
+				this.idJavaType = attribute.getJavaType();
+				this.idType = this.metaModel.getType(this.idJavaType);
 			}
 		}
 	}

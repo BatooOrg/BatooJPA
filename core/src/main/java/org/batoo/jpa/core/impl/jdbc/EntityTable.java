@@ -48,6 +48,8 @@ public class EntityTable extends AbstractTable implements Table {
 
 	private PhysicalColumn identityColumn;
 
+	private PhysicalColumn primaryKey;
+
 	/**
 	 * @param owner
 	 *            the owner entity
@@ -91,6 +93,24 @@ public class EntityTable extends AbstractTable implements Table {
 	 */
 	public List<PhysicalColumn> getColumns() {
 		return this.columns;
+	}
+
+	/**
+	 * Returns the singleton primary key column.
+	 * 
+	 * @return the singleton primary key column
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public PhysicalColumn getPrimaryKey() {
+		if (this.primaryKey == null) {
+			if (this.primaryKeys.size() == 1) {
+				this.primaryKey = this.primaryKeys.iterator().next();
+			}
+		}
+
+		return this.primaryKey;
 	}
 
 	/**
