@@ -20,9 +20,14 @@ package org.batoo.jpa.core.impl.instance;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
+
+import javax.persistence.metamodel.SingularAttribute;
 
 import org.batoo.jpa.core.impl.SessionImpl;
+import org.batoo.jpa.core.impl.types.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.impl.types.SingularAttributeImpl;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -42,9 +47,13 @@ public class ManagedId<X> {
 
 	private final Map<String, BasicResolver<X>> resolvers;
 
-	private int h;
 	private X proxy;
 	private BasicResolver<X> singleId;
+
+	private int h;
+	private boolean initialized;
+	private SingularAttributeImpl<? super X, ?> embeddedAttribute;
+	private Class<?> idJavaType;
 
 	/**
 	 * @param type
@@ -64,10 +73,6 @@ public class ManagedId<X> {
 		this.session = session;
 		this.instance = instance;
 		this.resolvers = resolvers;
-
-		if (resolvers.size() == 1) {
-			this.singleId = this.resolvers.values().iterator().next();
-		}
 	}
 
 	/**
@@ -116,6 +121,31 @@ public class ManagedId<X> {
 	 * @author hceylan
 	 */
 	public Object getId() {
+		this.initialize();
+
+		if (this.embeddedAttribute != null) {
+			return this.embeddedAttribute.get(this.instance);
+		}
+
+		if (this.idJavaType != null) {
+			Object id = null;
+			try {
+				final Set<SingularAttribute<? super X, ?>> idClassAttributes = this.type.getIdClassAttributes();
+
+				id = this.idJavaType.newInstance();
+
+				for (final SingularAttribute<? super X, ?> attribute : idClassAttributes) {
+					final SingularAttributeImpl<? super X, ?> idAttribute = (SingularAttributeImpl<? super X, ?>) attribute;
+					idAttribute.set(id, idAttribute.get(this.instance));
+				}
+
+				return id;
+			}
+			catch (final Exception e) {
+				// noop
+			}
+		}
+
 		return this.singleId.getValue();
 	}
 
@@ -179,6 +209,29 @@ public class ManagedId<X> {
 	}
 
 	/**
+	 * 
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void initialize() {
+		if (!this.initialized) {
+			if (this.type.getIdType() instanceof EmbeddableTypeImpl) {
+
+				this.embeddedAttribute = (SingularAttributeImpl<? super X, ?>) this.type.getId(this.type.getIdType().getJavaType());
+			}
+			else if (this.type.getIdJavaType() != null) {
+				this.idJavaType = this.type.getIdJavaType();
+			}
+			else if (this.resolvers.size() == 1) {
+				this.singleId = this.resolvers.values().iterator().next();
+			}
+
+			this.initialized = true;
+		}
+	}
+
+	/**
 	 * Populates the instance's id with the id.
 	 * 
 	 * @param id
@@ -188,11 +241,26 @@ public class ManagedId<X> {
 	 * @author hceylan
 	 */
 	public void populate(Object id) {
-		for (final BasicResolver<X> resolver : this.resolvers.values()) {
-			synchronized (resolver) {
-				resolver.unlock();
-				resolver.setValue(id);
-				resolver.relock();
+		this.initialize();
+
+		if (this.embeddedAttribute != null) {
+			this.embeddedAttribute.set(this.instance, id);
+		}
+		else if (this.type.getIdJavaType() != null) {
+			final Set<SingularAttribute<? super X, ?>> idClassAttributes = this.type.getIdClassAttributes();
+
+			for (final SingularAttribute<? super X, ?> attribute : idClassAttributes) {
+				final SingularAttributeImpl<? super X, ?> idAttribute = (SingularAttributeImpl<? super X, ?>) attribute;
+				idAttribute.set(this.instance, idAttribute.get(id));
+			}
+		}
+		else {
+			for (final BasicResolver<X> resolver : this.resolvers.values()) {
+				synchronized (resolver) {
+					resolver.unlock();
+					resolver.setValue(id);
+					resolver.relock();
+				}
 			}
 		}
 	}

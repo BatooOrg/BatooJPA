@@ -136,6 +136,10 @@ public class FieldAccessor<Y> implements Accessor<Y> {
 	@Override
 	@SuppressWarnings("restriction")
 	public void set(Object instance, Y value) {
+		if (instance == null) {
+			throw new NullPointerException();
+		}
+
 		if (this.primitiveType == null) {
 			if ((this.numberType != null) && (value != null) && (this.numberType != value.getClass())) {
 				final Number number = ReflectHelper.convertNumber((Number) value, this.numberType);

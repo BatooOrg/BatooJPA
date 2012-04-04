@@ -659,8 +659,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				}
 
 				final SingularAttributeImpl<? super X, ?> attribute = this.idAttributes.values().iterator().next();
-				this.idJavaType = attribute.getJavaType();
-				this.idType = this.metaModel.getType(this.idJavaType);
+				this.idType = this.metaModel.getType(attribute.getJavaType());
 			}
 		}
 	}

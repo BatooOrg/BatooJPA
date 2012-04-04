@@ -63,15 +63,15 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	protected final Map<String, TableTemplate> tableTemplates = Maps.newHashMap();
 
 	private TableTemplate primaryTableTemplate;
-	protected final Map<String, SingularAttributeImpl<X, ?>> declaredIdAttributes = Maps.newHashMap();
 
+	protected final Map<String, SingularAttributeImpl<X, ?>> declaredIdAttributes = Maps.newHashMap();
 	protected final Map<String, SingularAttributeImpl<? super X, ?>> idAttributes = Maps.newHashMap();
+
 	protected final Map<String, SingularAttributeImpl<? super X, ?>> versionAttributes = Maps.newHashMap();
 	private SequenceGenerator sequenceGenerator;
-
 	private TableGenerator tableGenerator;
-	private String tableName;
 
+	private String tableName;
 	private volatile boolean vlinked;
 
 	/**
@@ -122,7 +122,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	@SuppressWarnings("unchecked")
 	public <Y> SingularAttribute<? super X, Y> getId(Class<Y> type) {
 		for (final SingularAttribute<? super X, ?> singularAttribute : this.idAttributes.values()) {
-			if (singularAttribute.getDeclaringType().getJavaType() == type) {
+			if (singularAttribute.getJavaType() == type) {
 				return (SingularAttribute<? super X, Y>) singularAttribute;
 			}
 		}
@@ -141,6 +141,16 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 		}
 
 		return new HashSet<SingularAttribute<? super X, ?>>(this.idAttributes.values());
+	}
+
+	/**
+	 * Returns the idJavaType.
+	 * 
+	 * @return the idJavaType
+	 * @since $version
+	 */
+	public Class<?> getIdJavaType() {
+		return this.idJavaType;
 	}
 
 	/**
@@ -430,6 +440,8 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 			this.setAttributes.addAll(supertype.setAttributes);
 
 			this.idAttributes.putAll(supertype.idAttributes);
+			this.idJavaType = supertype.idJavaType;
+			this.idType = supertype.idType;
 		}
 
 		this.attributes.putAll(this.declaredAttributes);

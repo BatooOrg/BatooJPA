@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.dbutils.ResultSetHandler;
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.impl.OperationTookLongTimeWarning;
@@ -208,8 +207,20 @@ public class SelectHandler<X> implements ResultSetHandler<Collection<X>> {
 			return this.createManagedInstance(session, cache, currentType, primaryKeyValue, false);
 		}
 		else {
-			// TODO handle composite id.
-			throw new NotImplementedException();
+			Object id = null;
+			try {
+				id = currentType.getIdJavaType().newInstance();
+			}
+			catch (final Exception e) {
+				// noop;
+			}
+
+			for (final PhysicalColumn column : currentType.getPrimaryTable().getPrimaryKeys()) {
+				final Object value = this.getColumnValue(rs, depth, column);
+				column.getMapping().getDeclaringAttribute().set(id, value);
+			}
+
+			return this.createManagedInstance(session, cache, currentType, id, false);
 		}
 	}
 

@@ -59,15 +59,18 @@ public class Repository {
 	public <X> SubRepository<X> get(EntityTypeImpl<X> type) {
 		final EntityTypeImpl<? super X> supr = type.getTopType();
 
-		synchronized (this) {
-			SubRepository<X> subRepository = (SubRepository<X>) this.subRepositories.get(supr);
+		SubRepository<X> subRepository = (SubRepository<X>) this.subRepositories.get(supr);
 
-			if (subRepository == null) {
-				subRepository = new SubRepository<X>();
-				this.subRepositories.put(supr, subRepository);
+		if (subRepository == null) {
+			synchronized (this) {
+				subRepository = (SubRepository<X>) this.subRepositories.get(supr);
+				if (subRepository == null) {
+					subRepository = new SubRepository<X>();
+					this.subRepositories.put(supr, subRepository);
+				}
 			}
-
-			return subRepository;
 		}
+
+		return subRepository;
 	}
 }

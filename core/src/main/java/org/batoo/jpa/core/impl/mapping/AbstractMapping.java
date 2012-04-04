@@ -221,11 +221,6 @@ public abstract class AbstractMapping<X, T> implements Mapping<X, T> {
 				return;
 			}
 
-			if ((value != null) && attribute.getJavaType().isAssignableFrom(value.getClass())) {
-				attribute.set(instance, value);
-				return;
-			}
-
 			Object nextInstance = attribute.get(instance);
 			if (nextInstance == null) {
 				final EmbeddableTypeImpl<?> type = (EmbeddableTypeImpl<?>) attribute.getMapping().getType();
