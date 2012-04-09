@@ -28,7 +28,6 @@ import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.mapping.CollectionMapping;
 import org.batoo.jpa.core.impl.reflect.ReflectHelper;
 
 /**
@@ -71,7 +70,17 @@ public final class CollectionAttributeImpl<X, E> extends PluralAttributeImpl<X, 
 	 * 
 	 */
 	@Override
-	public ManagedCollection<E> newInstance(SessionImpl session, ManagedInstance<?> managedInstance, CollectionMapping<?, ?, ?> mapping) {
+	public void initialize(ManagedInstance<?> managedInstance, SessionImpl session) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public ManagedCollection<E> newInstance(SessionImpl session, ManagedInstance<?> managedInstance) {
 		// TODO Auto-generated method stub
 		return null;
 	}

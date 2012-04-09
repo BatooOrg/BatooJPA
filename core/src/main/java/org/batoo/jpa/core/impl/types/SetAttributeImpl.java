@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.impl.types;
 
 import java.lang.reflect.Member;
+import java.util.Collection;
 import java.util.Set;
 
 import javax.persistence.metamodel.ManagedType;
@@ -26,7 +27,6 @@ import javax.persistence.metamodel.SetAttribute;
 
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.SessionImpl;
-import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.collections.ManagedSet;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.mapping.CollectionMapping;
@@ -73,9 +73,24 @@ public final class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>,
 	 * 
 	 */
 	@Override
+	public void initialize(ManagedInstance<?> managedInstance, SessionImpl session) {
+		final ManagedSet<E> managedSet = this.newInstance0(session, managedInstance, this.get(managedInstance.getInstance()));
+
+		this.set(managedInstance.getInstance(), managedSet);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public ManagedSet<E> newInstance(SessionImpl session, ManagedInstance<?> managedInstance) {
+		return this.newInstance0(session, managedInstance, null);
+	}
+
 	@SuppressWarnings("unchecked")
-	public ManagedCollection<E> newInstance(SessionImpl session, ManagedInstance<?> managedInstance, CollectionMapping<?, ?, ?> mapping) {
-		return new ManagedSet<E>(session, managedInstance, (CollectionMapping<?, Set<E>, E>) mapping);
+	private ManagedSet<E> newInstance0(SessionImpl session, ManagedInstance<?> managedInstance, Set<E> existing) {
+		return new ManagedSet<E>(session, managedInstance, (CollectionMapping<?, Set<E>, E>) this.mapping, existing);
 	}
 
 	/**
@@ -89,7 +104,10 @@ public final class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>,
 			this.getAccessor().set(instance, (Set<E>) value);
 		}
 		else {
-			this.getAccessor().get(instance).add((E) value);
+			final Collection<E> collection = ((ManagedSet<E>) this.getAccessor().get(instance)).getCollection();
+			if (!collection.contains(value)) {
+				collection.add((E) value);
+			}
 		}
 	}
 

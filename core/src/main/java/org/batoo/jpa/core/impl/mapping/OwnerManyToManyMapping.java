@@ -30,7 +30,9 @@ import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.jdbc.AssociationSelectHelper;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
+import org.batoo.jpa.core.impl.jdbc.PhysicalColumn;
 import org.batoo.jpa.core.impl.types.AttributeImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 import org.batoo.jpa.core.impl.types.PluralAttributeImpl;
@@ -49,6 +51,8 @@ public class OwnerManyToManyMapping<X, C, E> extends OwnerAssociationMapping<X, 
 
 	private JoinTable joinTable;
 
+	private final AssociationSelectHelper<X, C, E> selectHelper;
+
 	/**
 	 * @param declaringAttribute
 	 *            the attribute which declares the mapping
@@ -66,6 +70,8 @@ public class OwnerManyToManyMapping<X, C, E> extends OwnerAssociationMapping<X, 
 	public OwnerManyToManyMapping(PluralAttributeImpl<X, C, E> declaringAttribute, Deque<AttributeImpl<?, ?>> path,
 		Collection<ColumnTemplate<X, C>> columnTemplates, boolean eager) throws MappingException {
 		super(AssociationType.MANY, declaringAttribute, path, columnTemplates, eager);
+
+		this.selectHelper = new AssociationSelectHelper<X, C, E>(this);
 	}
 
 	/**
@@ -106,6 +112,15 @@ public class OwnerManyToManyMapping<X, C, E> extends OwnerAssociationMapping<X, 
 	@SuppressWarnings("unchecked")
 	public OwnedManyToManyMapping<C, X, E> getOpposite() {
 		return (OwnedManyToManyMapping<C, X, E>) super.getOpposite();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Collection<PhysicalColumn> getPhysicalColumns() {
+		return this.joinTable.getColumns();
 	}
 
 	/**
@@ -154,8 +169,16 @@ public class OwnerManyToManyMapping<X, C, E> extends OwnerAssociationMapping<X, 
 	 * 
 	 */
 	@Override
-	public Collection<E> performSelect(SessionImpl session, ManagedId<X> managedId) {
-		// TODO Auto-generated method stub
-		return null;
+	public Collection<E> performSelect(SessionImpl session, ManagedId<X> managedId) throws SQLException {
+		return this.selectHelper.select(session, managedId);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void reset(Object instance) {
+		this.getDeclaringAttribute().reset(instance);
 	}
 }

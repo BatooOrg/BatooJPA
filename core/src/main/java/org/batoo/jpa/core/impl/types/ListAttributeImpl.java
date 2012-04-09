@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.impl.types;
 
 import java.lang.reflect.Member;
+import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.metamodel.ListAttribute;
@@ -26,7 +27,6 @@ import javax.persistence.metamodel.ManagedType;
 
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.SessionImpl;
-import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.collections.ManagedList;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.mapping.CollectionMapping;
@@ -73,9 +73,24 @@ public final class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E
 	 * 
 	 */
 	@Override
+	public void initialize(ManagedInstance<?> managedInstance, SessionImpl session) {
+		final ManagedList<E> managedList = this.newInstance0(session, managedInstance, this.get(managedInstance.getInstance()));
+
+		this.set(managedInstance.getInstance(), managedList);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public ManagedList<E> newInstance(SessionImpl session, ManagedInstance<?> managedInstance) {
+		return this.newInstance0(session, managedInstance, null);
+	}
+
 	@SuppressWarnings("unchecked")
-	public ManagedCollection<E> newInstance(SessionImpl session, ManagedInstance<?> managedInstance, CollectionMapping<?, ?, ?> mapping) {
-		return new ManagedList<E>(session, managedInstance, (CollectionMapping<?, List<E>, E>) mapping);
+	private ManagedList<E> newInstance0(SessionImpl session, ManagedInstance<?> managedInstance, List<E> existing) {
+		return new ManagedList<E>(session, managedInstance, (CollectionMapping<?, List<E>, E>) this.mapping, existing);
 	}
 
 	/**
@@ -89,7 +104,10 @@ public final class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E
 			this.getAccessor().set(instance, (List<E>) value);
 		}
 		else {
-			this.getAccessor().get(instance).add((E) value);
+			final Collection<E> collection = ((ManagedList<E>) this.getAccessor().get(instance)).getCollection();
+			if (!collection.contains(value)) {
+				collection.add((E) value);
+			}
 		}
 	}
 

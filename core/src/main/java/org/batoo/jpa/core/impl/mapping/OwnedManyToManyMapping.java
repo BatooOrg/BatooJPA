@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.mapping;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Deque;
 
@@ -27,6 +28,7 @@ import javax.persistence.OneToOne;
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedId;
+import org.batoo.jpa.core.impl.jdbc.AssociationSelectHelper;
 import org.batoo.jpa.core.impl.types.AttributeImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 import org.batoo.jpa.core.impl.types.PluralAttributeImpl;
@@ -40,6 +42,8 @@ import org.batoo.jpa.core.impl.types.PluralAttributeImpl;
  * @since $version
  */
 public class OwnedManyToManyMapping<X, C, E> extends OwnedAssociationMapping<X, C> implements CollectionMapping<X, C, E> {
+
+	private final AssociationSelectHelper<X, C, E> selectHelper;
 
 	/**
 	 * @param declaringAttribute
@@ -58,6 +62,8 @@ public class OwnedManyToManyMapping<X, C, E> extends OwnedAssociationMapping<X, 
 	public OwnedManyToManyMapping(PluralAttributeImpl<X, C, E> declaringAttribute, Deque<AttributeImpl<?, ?>> path, boolean orpanRemoval,
 		boolean eager) throws MappingException {
 		super(AssociationType.MANY, declaringAttribute, path, orpanRemoval, eager);
+
+		this.selectHelper = new AssociationSelectHelper<X, C, E>(this);
 	}
 
 	/**
@@ -95,9 +101,17 @@ public class OwnedManyToManyMapping<X, C, E> extends OwnedAssociationMapping<X, 
 	 * 
 	 */
 	@Override
-	public Collection<E> performSelect(SessionImpl session, ManagedId<X> managedId) {
-		// TODO Auto-generated method stub
-		return null;
+	public Collection<E> performSelect(SessionImpl session, ManagedId<X> managedId) throws SQLException {
+		return this.selectHelper.select(session, managedId);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void reset(Object instance) {
+		this.getDeclaringAttribute().reset(instance);
 	}
 
 }

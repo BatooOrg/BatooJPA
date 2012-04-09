@@ -43,6 +43,7 @@ import org.batoo.jpa.core.impl.operation.FindAllOperation;
 import org.batoo.jpa.core.impl.operation.FindOperation;
 import org.batoo.jpa.core.impl.operation.OperationManager;
 import org.batoo.jpa.core.impl.operation.PersistOperation;
+import org.batoo.jpa.core.impl.operation.RefreshOperation;
 import org.batoo.jpa.core.impl.operation.TaskQueue;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 
@@ -194,7 +195,6 @@ public abstract class SimpleEntityManager implements EntityManager {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public <T> T find(Class<T> entityClass, Object primaryKey) {
 		this.assertOpen();
 
@@ -536,7 +536,7 @@ public abstract class SimpleEntityManager implements EntityManager {
 			this.assertOpen();
 		}
 
-		this.throwNotImplemented();
+		OperationManager.replay((EntityManagerImpl) this, new RefreshOperation<Object>((EntityManagerImpl) this, entity));
 	}
 
 	/**
@@ -546,7 +546,6 @@ public abstract class SimpleEntityManager implements EntityManager {
 	@Override
 	public void refresh(Object entity, LockModeType lockMode, Map<String, Object> properties) {
 		this.refresh(entity, lockMode);
-
 	}
 
 	/**

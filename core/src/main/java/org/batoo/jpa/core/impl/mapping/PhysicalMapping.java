@@ -19,7 +19,6 @@
 package org.batoo.jpa.core.impl.mapping;
 
 import java.util.Collection;
-import java.util.Map;
 
 import org.batoo.jpa.core.impl.jdbc.PhysicalColumn;
 
@@ -56,5 +55,5 @@ public interface PhysicalMapping<X, T> extends Mapping<X, T> {
 	 * @return the physicalColumns
 	 * @since $version
 	 */
-	Map<String, PhysicalColumn> getPhysicalColumns();
+	Collection<PhysicalColumn> getPhysicalColumns();
 }

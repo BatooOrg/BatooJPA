@@ -58,4 +58,14 @@ public interface CollectionMapping<X, C, E> extends Mapping<X, C> {
 	 * @author hceylan
 	 */
 	Collection<E> performSelect(SessionImpl session, ManagedId<X> managedId) throws SQLException;
+
+	/**
+	 * Resets the association. Useful for refresh operation.
+	 * 
+	 * @param instance
+	 *            the managed instance of which the association will be reset
+	 * @since $version
+	 * @author hceylan
+	 */
+	void reset(Object instance);
 }

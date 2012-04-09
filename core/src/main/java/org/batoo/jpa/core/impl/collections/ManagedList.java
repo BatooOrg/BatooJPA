@@ -33,7 +33,7 @@ import com.google.common.collect.Lists;
  * @author hceylan
  * @since $version
  */
-public class ManagedList<E> extends ManagedCollection<E> implements List<E> {
+public class ManagedList<E> extends AbstractManagedCollection<E> implements List<E> {
 
 	private final List<E> list = Lists.newArrayList();
 
@@ -44,12 +44,20 @@ public class ManagedList<E> extends ManagedCollection<E> implements List<E> {
 	 *            the owner managed instance
 	 * @param mapping
 	 *            the mapping
+	 * @param existing
+	 *            the existing list may be null
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedList(SessionImpl session, ManagedInstance<?> managedInstance, CollectionMapping<?, List<E>, E> association) {
-		super(session, managedInstance, association);
+	public ManagedList(SessionImpl session, ManagedInstance<?> managedInstance, CollectionMapping<?, List<E>, E> association,
+		List<E> existing) {
+		super(session, managedInstance, association, existing);
+
+		if (existing != null) {
+			this.snapshot = existing;
+			this.list.addAll(existing);
+		}
 	}
 
 	/**
@@ -71,7 +79,7 @@ public class ManagedList<E> extends ManagedCollection<E> implements List<E> {
 	public boolean addAll(int index, Collection<? extends E> c) {
 		this.initializeIfNecessary();
 
-		return this.addAll(index, c);
+		return this.list.addAll(index, c);
 	}
 
 	/**
@@ -82,7 +90,7 @@ public class ManagedList<E> extends ManagedCollection<E> implements List<E> {
 	public E get(int index) {
 		this.initializeIfNecessary();
 
-		return this.get(index);
+		return this.list.get(index);
 	}
 
 	/**
@@ -90,7 +98,7 @@ public class ManagedList<E> extends ManagedCollection<E> implements List<E> {
 	 * 
 	 */
 	@Override
-	protected Collection<E> getCollection() {
+	public Collection<E> getCollection() {
 		return this.list;
 	}
 
@@ -102,7 +110,7 @@ public class ManagedList<E> extends ManagedCollection<E> implements List<E> {
 	public int indexOf(Object o) {
 		this.initializeIfNecessary();
 
-		return this.indexOf(o);
+		return this.list.indexOf(o);
 	}
 
 	/**
@@ -113,7 +121,7 @@ public class ManagedList<E> extends ManagedCollection<E> implements List<E> {
 	public int lastIndexOf(Object o) {
 		this.initializeIfNecessary();
 
-		return this.lastIndexOf(o);
+		return this.list.lastIndexOf(o);
 	}
 
 	/**
@@ -135,7 +143,7 @@ public class ManagedList<E> extends ManagedCollection<E> implements List<E> {
 	public ListIterator<E> listIterator(int index) {
 		this.initializeIfNecessary();
 
-		return this.listIterator(index);
+		return this.list.listIterator(index);
 	}
 
 	/**
@@ -146,7 +154,7 @@ public class ManagedList<E> extends ManagedCollection<E> implements List<E> {
 	public E remove(int index) {
 		this.initializeIfNecessary();
 
-		return this.remove(index);
+		return this.list.remove(index);
 	}
 
 	/**
@@ -157,7 +165,7 @@ public class ManagedList<E> extends ManagedCollection<E> implements List<E> {
 	public E set(int index, E element) {
 		this.initializeIfNecessary();
 
-		return this.set(index, element);
+		return this.list.set(index, element);
 	}
 
 	/**
@@ -168,7 +176,17 @@ public class ManagedList<E> extends ManagedCollection<E> implements List<E> {
 	public List<E> subList(int fromIndex, int toIndex) {
 		this.initializeIfNecessary();
 
-		return this.subList(fromIndex, toIndex);
+		return this.list.subList(fromIndex, toIndex);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "ManagedList [list=" + this.list + ", session=" + this.session + ", managedInstance=" + this.managedInstance + ", snapshot="
+			+ this.snapshot + "]";
 	}
 
 }

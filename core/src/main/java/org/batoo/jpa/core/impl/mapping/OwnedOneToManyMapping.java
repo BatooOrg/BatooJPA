@@ -105,4 +105,14 @@ public class OwnedOneToManyMapping<X, C, E> extends OwnedAssociationMapping<X, C
 	public Collection<E> performSelect(SessionImpl session, ManagedId<X> managedId) throws SQLException {
 		return this.selectHelper.select(session, managedId);
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void reset(Object instance) {
+		this.getDeclaringAttribute().reset(instance);
+	}
+
 }

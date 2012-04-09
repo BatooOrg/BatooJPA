@@ -65,6 +65,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	protected final Set<Attribute<X, ?>> setDeclaredAttributes = Sets.newHashSet();
 
 	final Constructor<X> constructor;
+	private Set<PluralAttribute<? super X, ?, ?>> plurals;
 
 	/**
 	 * @param metaModel
@@ -473,6 +474,10 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	@Override
 	@SuppressWarnings("unchecked")
 	public Set<PluralAttribute<? super X, ?, ?>> getPluralAttributes() {
+		if (this.plurals != null) {
+			return this.plurals;
+		}
+
 		final Predicate<? super Attribute<? super X, ?>> predicate = new Predicate<Attribute<? super X, ?>>() {
 
 			@Override
@@ -483,10 +488,10 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 
 		final Set<Attribute<? super X, ?>> set = Sets.filter(this.setAttributes, predicate);
 
-		final Set<PluralAttribute<? super X, ?, ?>> plurals = Sets.newHashSet();
-		plurals.addAll((Collection<? extends PluralAttribute<X, ?, ?>>) set);
+		this.plurals = Sets.newHashSet();
+		this.plurals.addAll((Collection<? extends PluralAttribute<X, ?, ?>>) set);
 
-		return plurals;
+		return this.plurals;
 	}
 
 	/**

@@ -24,9 +24,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.persistence.metamodel.PluralAttribute;
+
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.mapping.OwnerAssociation;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.impl.types.PluralAttributeImpl;
 import org.batoo.jpa.core.util.Pair2;
 
 import com.google.common.collect.Lists;
@@ -111,6 +114,11 @@ public final class ManagedInstance<X> implements Comparable<ManagedInstance<?>> 
 		this.id = id;
 
 		this.status = Status.MANAGED;
+
+		// initialize the collections
+		for (final PluralAttribute<? super X, ?, ?> attribute : type.getPluralAttributes()) {
+			((PluralAttributeImpl<? super X, ?, ?>) attribute).initialize(this, session);
+		}
 	}
 
 	/**
@@ -165,6 +173,31 @@ public final class ManagedInstance<X> implements Comparable<ManagedInstance<?>> 
 		}
 
 		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		final ManagedInstance<?> other = (ManagedInstance<?>) obj;
+		if (!this.id.equals(other.id)) {
+			return false;
+		}
+		if (!this.type.equals(other.type)) {
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -261,6 +294,19 @@ public final class ManagedInstance<X> implements Comparable<ManagedInstance<?>> 
 	 */
 	public EntityTypeImpl<X> getType() {
 		return this.type;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = (prime * result) + ((this.id == null) ? 0 : this.id.hashCode());
+		result = (prime * result) + ((this.type == null) ? 0 : this.type.hashCode());
+		return result;
 	}
 
 	/**

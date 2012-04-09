@@ -20,13 +20,13 @@ package org.batoo.jpa.core.impl.mapping;
 
 import java.util.Collection;
 import java.util.Deque;
-import java.util.Map;
+import java.util.List;
 
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.jdbc.PhysicalColumn;
 import org.batoo.jpa.core.impl.types.AttributeImpl;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.Lists;
 
 /**
  * A Mapping with a physical column.
@@ -38,7 +38,7 @@ public abstract class AbstractPhysicalMapping<X, T> extends AbstractMapping<X, T
 
 	private final Collection<ColumnTemplate<X, T>> columnTemplates;
 
-	private final Map<String, PhysicalColumn> physicalColumns = Maps.newHashMap();
+	private final List<PhysicalColumn> physicalColumns = Lists.newArrayList();
 
 	/**
 	 * @param associationType
@@ -90,7 +90,7 @@ public abstract class AbstractPhysicalMapping<X, T> extends AbstractMapping<X, T
 	 */
 	@Override
 	public void addColumn(PhysicalColumn physicalColumn) {
-		this.physicalColumns.put(physicalColumn.getName(), physicalColumn);
+		this.physicalColumns.add(physicalColumn);
 	}
 
 	/**
@@ -107,7 +107,7 @@ public abstract class AbstractPhysicalMapping<X, T> extends AbstractMapping<X, T
 	 * 
 	 */
 	@Override
-	public Map<String, PhysicalColumn> getPhysicalColumns() {
+	public Collection<PhysicalColumn> getPhysicalColumns() {
 		return this.physicalColumns;
 	}
 }

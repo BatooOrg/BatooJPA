@@ -24,6 +24,7 @@ import java.util.Collection;
 import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedId;
+import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.mapping.CollectionMapping;
 import org.batoo.jpa.core.impl.mapping.Mapping;
 import org.batoo.jpa.core.impl.mapping.OwnedAssociation;
@@ -64,6 +65,15 @@ public class AssociationSelectHelper<X, C, E> extends BaseSelectHelper<E> {
 	 * 
 	 */
 	@Override
+	protected boolean cascades(Association<?, ?> association) {
+		return association.isEager();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	protected String getWhere() {
 		// Generate the where statement
 		// T1_F1 = ? [AND T1_F2 = ? [...]]
@@ -91,7 +101,7 @@ public class AssociationSelectHelper<X, C, E> extends BaseSelectHelper<E> {
 			ownerAssociation = ((OwnedAssociation<?, ?>) this.mapping).getOpposite();
 		}
 
-		this.predicates.addAll(ownerAssociation.getPhysicalColumns().values());
+		this.predicates.addAll(ownerAssociation.getPhysicalColumns());
 	}
 
 	/**

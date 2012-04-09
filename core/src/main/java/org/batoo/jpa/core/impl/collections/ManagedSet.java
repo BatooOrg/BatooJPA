@@ -32,7 +32,7 @@ import com.google.common.collect.Sets;
  * @author hceylan
  * @since $version
  */
-public class ManagedSet<E> extends ManagedCollection<E> implements Set<E> {
+public class ManagedSet<E> extends AbstractManagedCollection<E> implements Set<E> {
 
 	private final Set<E> set = Sets.newHashSet();
 
@@ -43,12 +43,19 @@ public class ManagedSet<E> extends ManagedCollection<E> implements Set<E> {
 	 *            the owner managed instance
 	 * @param mapping
 	 *            the mapping
+	 * @param existing
+	 *            the existing set may be null
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedSet(SessionImpl session, ManagedInstance<?> managedInstance, CollectionMapping<?, Set<E>, E> mapping) {
-		super(session, managedInstance, mapping);
+	public ManagedSet(SessionImpl session, ManagedInstance<?> managedInstance, CollectionMapping<?, Set<E>, E> mapping, Set<E> existing) {
+		super(session, managedInstance, mapping, existing);
+
+		if (existing != null) {
+			this.snapshot = existing;
+			this.set.addAll(existing);
+		}
 	}
 
 	/**
@@ -56,7 +63,17 @@ public class ManagedSet<E> extends ManagedCollection<E> implements Set<E> {
 	 * 
 	 */
 	@Override
-	protected Collection<E> getCollection() {
+	public Collection<E> getCollection() {
 		return this.set;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "ManagedSet [set=" + this.set + ", session=" + this.session + ", managedInstance=" + this.managedInstance + ", snapshot="
+			+ this.snapshot + "]";
 	}
 }

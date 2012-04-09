@@ -19,9 +19,6 @@
 package org.batoo.jpa.core.impl.types;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -40,14 +37,13 @@ import javax.persistence.metamodel.EntityType;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.proxy.Invoker;
-import org.apache.commons.proxy.factory.javassist.JavassistProxyFactory;
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.AbstractResolver;
 import org.batoo.jpa.core.impl.instance.BasicResolver;
+import org.batoo.jpa.core.impl.instance.InstanceInvoker;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
@@ -55,6 +51,7 @@ import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
 import org.batoo.jpa.core.impl.jdbc.PhysicalColumn;
+import org.batoo.jpa.core.impl.jdbc.RefreshHelper;
 import org.batoo.jpa.core.impl.jdbc.SelectHelper;
 import org.batoo.jpa.core.impl.mapping.AbstractMapping;
 import org.batoo.jpa.core.impl.mapping.AbstractPhysicalMapping;
@@ -105,6 +102,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 	private final SelectHelper<X> selectHelper;
 
+	private final RefreshHelper<X> refreshHelper;
+
 	/**
 	 * @param metaModel
 	 *            the meta model of the persistence
@@ -123,6 +122,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		metaModel.addEntity(this);
 
 		this.selectHelper = new SelectHelper<X>(this);
+		this.refreshHelper = new RefreshHelper<X>(this);
 	}
 
 	/**
@@ -259,56 +259,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	@Override
 	public int compareTo(EntityType<X> o) {
 		return this.getName().compareTo(o.getName());
-	}
-
-	@SuppressWarnings("unchecked")
-	private X createProxy(final SessionImpl session, final X instance, final Object id) {
-		return (X) new JavassistProxyFactory().createInvokerProxy(this.javaType.getClassLoader(), new Invoker() {
-
-			private X initialized;
-			private final List<String> idMethods = Lists.newArrayList();
-
-			@Override
-			public Object invoke(Object proxy, final Method method, Object[] arguments) throws Throwable {
-				if (!method.isAccessible()) {
-					AccessController.doPrivileged(new PrivilegedAction<Void>() {
-
-						@Override
-						public Void run() {
-							method.setAccessible(true);
-							return null;
-						}
-					});
-				}
-
-				// if initialized, let go
-				if (this.initialized != null) {
-					return method.invoke(this.initialized, arguments);
-				}
-
-				method.setAccessible(true);
-
-				if (arguments.length == 0) {
-					final String methodName = method.getName();
-					if (this.idMethods.contains(methodName)) { // if known id method, let go
-						return method.invoke(instance, arguments);
-					}
-
-					if (methodName.startsWith("get") && (methodName.length() > 3)) { // check if id method
-						for (final SingularAttributeImpl<? super X, ?> attribute : EntityTypeImpl.this.idAttributes.values()) {
-							if (attribute.getGetterName().equals(method.getName())) {
-								this.idMethods.add(methodName);
-								return method.invoke(instance, arguments);
-							}
-						}
-					}
-				}
-
-				this.initialized = session.getEntityManager().find(EntityTypeImpl.this.getJavaType(), id);
-
-				return method.invoke(this.initialized, arguments);
-			}
-		}, new Class[] { this.javaType });
 	}
 
 	/**
@@ -498,6 +448,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 *            the instance to create managed instance
 	 * @param session
 	 *            the session the instance belongs to
+	 * @param newInstance
+	 *            if the instance is new
 	 * @return managed instance for the instance
 	 * 
 	 * @since $version
@@ -681,12 +633,12 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public ManagedInstance<? super X> newInstanceWithId(final SessionImpl session, final ManagedId<? super X> managedId, boolean lazy) {
+	public ManagedInstance<X> newInstanceWithId(final SessionImpl session, final ManagedId<? super X> managedId, boolean lazy) {
 		if (!lazy) {
 			return this.getManagedInstance0(session, (X) managedId.getInstance(), managedId);
 		}
 
-		final X proxy = this.createProxy(session, (X) managedId.getInstance(), managedId.getId());
+		final X proxy = InstanceInvoker.<X> createInvoker(this.javaType.getClassLoader(), this, session, managedId);
 		managedId.proxify(proxy);
 
 		return this.getManagedInstance0(session, (X) managedId.getInstance(), managedId);
@@ -758,6 +710,22 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 			table.performInsert(connection, managedInstance);
 		}
+	}
+
+	/**
+	 * Performs refresh from each table for the managed instance.
+	 * 
+	 * @param session
+	 *            the session to use
+	 * @param managedInstance
+	 *            the managed instance to perform refresh for
+	 * @throws SQLException
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void performRefresh(SessionImpl session, ManagedInstance<X> managedInstance) throws SQLException {
+		this.refreshHelper.refresh(session, managedInstance);
 	}
 
 	/**

@@ -43,7 +43,6 @@ import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.mapping.CollectionMapping;
 import org.batoo.jpa.core.impl.mapping.ColumnTemplate;
 import org.batoo.jpa.core.impl.mapping.JoinColumnTemplate;
 import org.batoo.jpa.core.impl.mapping.OwnedManyToManyMapping;
@@ -167,6 +166,19 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	}
 
 	/**
+	 * Initializes the collection.
+	 * 
+	 * @param managedInstance
+	 *            the managed instance
+	 * @param session
+	 *            the session
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract void initialize(ManagedInstance<?> managedInstance, SessionImpl session);
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -223,8 +235,7 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract ManagedCollection<E> newInstance(SessionImpl session, ManagedInstance<?> managedInstance,
-		CollectionMapping<?, ?, ?> mapping);
+	public abstract ManagedCollection<E> newInstance(SessionImpl session, ManagedInstance<?> managedInstance);
 
 	/**
 	 * Applies the overrides to the column templates.
@@ -314,4 +325,17 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 		return parsed;
 	}
 
+	/**
+	 * Resets the association for the refresh operation.
+	 * 
+	 * @param managedInstance
+	 *            the managed instance of which the association will be reset
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	public final void reset(Object instance) {
+		((ManagedCollection<E>) this.get(instance)).reset();
+	}
 }

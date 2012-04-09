@@ -250,6 +250,18 @@ public abstract class AbstractTest {
 	}
 
 	/**
+	 * Persists the entity.
+	 * 
+	 * @param entity
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected void refresh(Object entity) {
+		this.em().refresh(entity);
+	}
+
+	/**
 	 * Rolls the transaction back.
 	 * 
 	 * @since $version

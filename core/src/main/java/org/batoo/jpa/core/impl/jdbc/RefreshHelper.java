@@ -22,7 +22,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 
 import org.batoo.jpa.core.impl.SessionImpl;
-import org.batoo.jpa.core.impl.instance.ManagedId;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 
@@ -37,7 +37,7 @@ import com.google.common.collect.Collections2;
  * @author hceylan
  * @since $version
  */
-public class SelectHelper<X> extends BaseSelectHelper<X> {
+public class RefreshHelper<X> extends BaseSelectHelper<X> {
 
 	/**
 	 * @param type
@@ -46,7 +46,7 @@ public class SelectHelper<X> extends BaseSelectHelper<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SelectHelper(EntityTypeImpl<X> type) {
+	public RefreshHelper(EntityTypeImpl<X> type) {
 		super(type, null);
 	}
 
@@ -56,7 +56,7 @@ public class SelectHelper<X> extends BaseSelectHelper<X> {
 	 */
 	@Override
 	protected boolean cascades(Association<?, ?> association) {
-		return association.isEager();
+		return association.cascadeRefresh();
 	}
 
 	/**
@@ -85,40 +85,39 @@ public class SelectHelper<X> extends BaseSelectHelper<X> {
 	protected void preparePredicates() {
 		for (final PhysicalColumn column : this.type.getPrimaryTable().getColumns()) {
 			if (column.isId()) {
-				SelectHelper.this.predicates.add(column);
+				RefreshHelper.this.predicates.add(column);
 			}
 		}
 	}
 
 	/**
-	 * Performs the select and populates the managed instance.
+	 * Performs the select and refresh the managed instance.
 	 * 
 	 * @param session
 	 *            the session
-	 * @param managedId
-	 *            the id of the managed instance
+	 * @param managedInstance
+	 *            the managed instance
 	 * @throws SQLException
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 * @return
 	 */
-	public X select(SessionImpl session, final ManagedId<X> managedId) throws SQLException {
+	public void refresh(SessionImpl session, final ManagedInstance<X> managedInstance) throws SQLException {
 		// Do not inline, generation of the select SQL will initialize the predicates!
 		final String selectSql = this.getSelectSql();
 
 		final Collection<Object> params = Collections2.transform(this.predicates, new Function<PhysicalColumn, Object>() {
 			@Override
 			public Object apply(PhysicalColumn input) {
-				return input.getPhysicalValue(managedId.getSession(), managedId.getInstance());
+				return input.getPhysicalValue(managedInstance.getSession(), managedInstance.getInstance());
 			}
 		});
 
-		final SelectHandler<X> rsHandler = new SelectHandler<X>(session, this.type, this.columnAliases, this.entityPaths,
+		final RefreshHandler<X> rsHandler = new RefreshHandler<X>(session, this.type, this.columnAliases, this.entityPaths,
 			this.inversePaths, this.lazyPaths);
 
-		final Collection<X> result = this.runner.query(session.getConnection(), selectSql, rsHandler, params.toArray());
-
-		return (result != null) && (result.size() > 0) ? result.iterator().next() : null;
+		this.runner.query(session.getConnection(), selectSql, rsHandler, params.toArray());
 	}
+
 }

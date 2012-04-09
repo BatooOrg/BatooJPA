@@ -26,35 +26,28 @@ import javax.persistence.PersistenceException;
 
 import org.batoo.jpa.core.impl.EntityManagerImpl;
 import org.batoo.jpa.core.impl.SessionImpl;
-import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
 import org.batoo.jpa.core.impl.mapping.Association;
 
 /**
- * Operation to find an entity.
  * 
  * @author hceylan
  * @since $version
  */
-public class FindOperation<X> extends AbstractOperation<X> {
-
-	private final ManagedId<X> managedId;
+public class RefreshOperation<X> extends AbstractOperation<X> {
 
 	/**
 	 * @param entityManager
 	 *            the entity manager
-	 * @param managedId
+	 * @param instance
 	 *            the entity
 	 * 
 	 * @since $version
 	 * @author hceylan
-	 * @param initialize
 	 */
-	public FindOperation(EntityManagerImpl entityManager, ManagedId<X> managedId) {
-		super(entityManager, managedId.getInstance());
-
-		this.managedId = managedId;
+	public RefreshOperation(EntityManagerImpl entityManager, X instance) {
+		super(entityManager, instance);
 	}
 
 	/**
@@ -63,17 +56,7 @@ public class FindOperation<X> extends AbstractOperation<X> {
 	 */
 	@Override
 	protected List<AbstractOperation<?>> cascade(Association<?, ?> association) {
-		return null; // NOOP
-	}
-
-	/**
-	 * Returns the instance.
-	 * 
-	 * @return the instance
-	 * @since $version
-	 */
-	public X getInstance() {
-		return this.instance;
+		return null;
 	}
 
 	/**
@@ -81,8 +64,8 @@ public class FindOperation<X> extends AbstractOperation<X> {
 	 * 
 	 */
 	@Override
-	public void perform(Connection connection) throws SQLException {
-		// NOOP
+	public <Y> void perform(Connection connection) throws SQLException {
+		// noop
 	}
 
 	/**
@@ -91,25 +74,21 @@ public class FindOperation<X> extends AbstractOperation<X> {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	protected boolean prepare(SessionImpl session) {
+	protected boolean prepare(SessionImpl session) throws InterruptedException {
 		this.managedInstance = this.em.getSession().get(this.instance);
 
-		if ((this.managedInstance == null) || (this.managedInstance.getStatus() == Status.LAZY)) {
-			try {
-				final ManagedInstance<? super X> oldInstance = this.managedInstance;
-				this.instance = this.type.performSelect(session, this.managedId);
-				if (oldInstance != null) {
-					oldInstance.clearReferences(this.instance);
-				}
-			}
-			catch (final SQLException e) {
-				throw new PersistenceException("Entity cannot be loaded", e);
-			}
+		if ((this.managedInstance == null) || (this.managedInstance.getStatus() != Status.MANAGED)) {
+			throw new IllegalArgumentException("Entity is not a managed instance");
 		}
-		else {
-			this.instance = (X) this.managedInstance.getInstance();
+
+		try {
+			this.type.performRefresh(session, (ManagedInstance<X>) this.managedInstance);
+		}
+		catch (final SQLException e) {
+			throw new PersistenceException("Entity cannot be refreshed", e);
 		}
 
 		return false; // NOOP
 	}
+
 }

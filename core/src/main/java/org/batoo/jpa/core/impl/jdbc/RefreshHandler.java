@@ -21,22 +21,27 @@ package org.batoo.jpa.core.impl.jdbc;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
 import org.batoo.jpa.core.impl.mapping.Association;
+import org.batoo.jpa.core.impl.mapping.CollectionMapping;
+import org.batoo.jpa.core.impl.mapping.Mapping;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 import org.batoo.jpa.core.util.Pair2;
 
+import com.google.common.collect.Sets;
+
 /**
- * A {@link ResultSetHandler} to load a single result from resultset.
+ * A {@link ResultSetHandler} to refresh a single result from resultset.
  * 
  * @author hceylan
  * @since $version
  */
-public class SelectHandler<X> extends BaseSelectHandler<X> {
+public class RefreshHandler<X> extends BaseSelectHandler<X> {
 
 	/**
 	 * @param session
@@ -53,10 +58,11 @@ public class SelectHandler<X> extends BaseSelectHandler<X> {
 	 *            the inverse paths
 	 * @param lazyPaths
 	 *            the lazy paths
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SelectHandler(SessionImpl session, EntityTypeImpl<X> rootType, Map<Pair2<Integer, PhysicalColumn>, String> columnAliases,
+	public RefreshHandler(SessionImpl session, EntityTypeImpl<X> rootType, Map<Pair2<Integer, PhysicalColumn>, String> columnAliases,
 		List<Deque<Association<?, ?>>> entityPaths, List<Deque<Association<?, ?>>> inversePaths, List<Deque<Association<?, ?>>> lazyPaths) {
 		super(session, rootType, columnAliases, entityPaths, inversePaths, lazyPaths);
 	}
@@ -66,8 +72,34 @@ public class SelectHandler<X> extends BaseSelectHandler<X> {
 	 * 
 	 */
 	@Override
-	protected boolean shouldHandle(ManagedInstance<?> managedInstance) {
-		return (managedInstance != null) && (managedInstance.getStatus() == Status.LAZY);
+	protected void prepareAssociation(ManagedInstance<?> managedInstance, Association<?, ?> association,
+		Map<ManagedInstance<?>, Set<Mapping<?, ?>>> associationsPrepared) {
+		// overridden to reset the association
+		if (!(association instanceof CollectionMapping)) {
+			return; // only applicable to collection mappings
+		}
+
+		Set<Mapping<?, ?>> mappings = associationsPrepared.get(managedInstance);
+		if (mappings == null) {
+			associationsPrepared.put(managedInstance, mappings = Sets.newHashSet());
+		}
+
+		if (!mappings.contains(association)) {
+			mappings.add(association);
+			((CollectionMapping<?, ?, ?>) association).reset(managedInstance.getInstance());
+		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	protected boolean shouldHandle(ManagedInstance<?> managedInstance) {
+		if (managedInstance == null) {
+			throw new IllegalArgumentException("Entity is not a managed instance");
+		}
+
+		return managedInstance.getStatus() == Status.MANAGED;
+	}
 }

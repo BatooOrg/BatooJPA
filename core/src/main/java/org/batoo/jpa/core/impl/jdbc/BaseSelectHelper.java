@@ -47,8 +47,8 @@ import com.google.common.collect.Maps;
  * Primary functionality is:
  * <ul>
  * <li>Generating a select statement that spans all the tables
- * <li>Expanding the select statement to the eager associations
- * <li>Expanding the select statement to the eager element collections.
+ * <li>Expanding the select statement to the cascaded associations
+ * <li>Expanding the select statement to the cascaded element collections.
  * <li>Executing the select
  * <li>Populating the passed managed instance with the values returned.
  * </ul>
@@ -169,7 +169,7 @@ public abstract class BaseSelectHelper<X> {
 			ownerAssociation = ((OwnedAssociation<?, ?>) association).getOpposite();
 		}
 
-		final Collection<PhysicalColumn> foreignKeys = ownerAssociation.getPhysicalColumns().values();
+		final Collection<PhysicalColumn> foreignKeys = ownerAssociation.getPhysicalColumns();
 
 		final int left = (association instanceof OwnedAssociation ? tableNo : parentTableNo);
 		final int right = (association instanceof OwnedAssociation ? parentTableNo : tableNo);
@@ -241,6 +241,8 @@ public abstract class BaseSelectHelper<X> {
 		joinsBuffer.add("\tLEFT OUTER JOIN " + table.getQualifiedName() + " AS " + right + " ON " + Joiner.on(" AND ").join(restrictions));
 	}
 
+	protected abstract boolean cascades(Association<?, ?> association);
+
 	/**
 	 * Joins all the parts and returns the final query.
 	 * 
@@ -292,8 +294,8 @@ public abstract class BaseSelectHelper<X> {
 	 * The select SQL must
 	 * <ul>
 	 * <li>Span all the tables
-	 * <li>Spans to the eager associations
-	 * <li>Spans to the eager element collections.
+	 * <li>Spans to the cascaded associations
+	 * <li>Spans to the cascaded element collections.
 	 * 
 	 * @return the generated select SQL
 	 * 
@@ -388,7 +390,7 @@ public abstract class BaseSelectHelper<X> {
 			if ((path.size() > 0) && path.getLast().equals(child.getOpposite())) {
 				this.inversePaths.add(childpath);
 			}
-			else if ((path.size() >= MAX_PATH) || !child.isEager()
+			else if ((path.size() >= MAX_PATH) || !this.cascades(child)
 				|| ((parentType == null) && (this.alwaysLazyMapping != null) && (child.getOpposite() == this.alwaysLazyMapping))) {
 				this.lazyPaths.add(childpath);
 			}

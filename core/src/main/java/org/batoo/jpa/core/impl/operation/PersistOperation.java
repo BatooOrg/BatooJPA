@@ -20,13 +20,13 @@ package org.batoo.jpa.core.impl.operation;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.EntityExistsException;
 
 import org.batoo.jpa.core.impl.EntityManagerImpl;
 import org.batoo.jpa.core.impl.SessionImpl;
+import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
 import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.mapping.PersistableAssociation;
@@ -67,9 +67,9 @@ public class PersistOperation<X> extends AbstractOperation<X> {
 			final Object value = association.getValue(this.managedInstance.getInstance());
 
 			if (value != null) {
-				if (value instanceof Collection) {
-					final Collection<?> values = (Collection<?>) value;
-					for (final Object child : values) {
+				if (value instanceof ManagedCollection) {
+					final ManagedCollection<?> values = (ManagedCollection<?>) value;
+					for (final Object child : values.getCollection()) {
 						cascades.add(new PersistOperation(this.em, child));
 					}
 

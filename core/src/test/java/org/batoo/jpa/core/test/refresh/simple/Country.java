@@ -16,33 +16,74 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.collections;
+package org.batoo.jpa.core.test.refresh.simple;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 /**
- * Interface for managed collections.
  * 
  * @author hceylan
  * @since $version
  */
-public interface ManagedCollection<T> {
+@Entity
+public class Country {
+
+	@Id
+	private Integer id;
+
+	private String name;
 
 	/**
-	 * Returns the underliying collection
-	 * 
-	 * @return
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Country() {
+		super();
+	}
+
+	/**
+	 * @param name
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	Iterable<T> getCollection();
+	public Country(Integer id, String name) {
+		super();
+
+		this.id = id;
+		this.name = name;
+	}
 
 	/**
+	 * Returns the id.
 	 * 
-	 * Resets the underlying collection
-	 * 
+	 * @return the id
 	 * @since $version
-	 * @author hceylan
 	 */
-	void reset();
+	public Integer getId() {
+		return this.id;
+	}
+
+	/**
+	 * Returns the name.
+	 * 
+	 * @return the name
+	 * @since $version
+	 */
+	public String getName() {
+		return this.name;
+	}
+
+	/**
+	 * Sets the name.
+	 * 
+	 * @param name
+	 *            the name to set
+	 * @since $version
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
 
 }

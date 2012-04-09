@@ -227,6 +227,16 @@ public abstract class AbstractTable implements Table {
 	}
 
 	/**
+	 * Returns the columns.
+	 * 
+	 * @return the columns
+	 * @since $version
+	 */
+	public List<PhysicalColumn> getColumns() {
+		return this.columns;
+	}
+
+	/**
 	 * Returns the delete statement for the table.
 	 * 
 	 * @return the delete statement

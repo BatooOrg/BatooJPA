@@ -86,16 +86,6 @@ public class EntityTable extends AbstractTable implements Table {
 	}
 
 	/**
-	 * Returns the columns.
-	 * 
-	 * @return the columns
-	 * @since $version
-	 */
-	public List<PhysicalColumn> getColumns() {
-		return this.columns;
-	}
-
-	/**
 	 * Returns the singleton primary key column.
 	 * 
 	 * @return the singleton primary key column

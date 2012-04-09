@@ -131,6 +131,16 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	}
 
 	/**
+	 * Returns the idAttributes.
+	 * 
+	 * @return the idAttributes
+	 * @since $version
+	 */
+	public Collection<SingularAttributeImpl<? super X, ?>> getIdAttributes() {
+		return this.idAttributes.values();
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */

@@ -323,13 +323,18 @@ public class MetamodelImpl implements Metamodel {
 	@Override
 	@SuppressWarnings("unchecked")
 	public <X> EntityTypeImpl<X> entity(Class<X> cls) {
-		final EntityType<?> entityType = this.entities.get(cls);
+		Class<?> clazz = cls;
+		while (clazz != Object.class) {
+			final EntityType<?> entityType = this.entities.get(clazz);
 
-		if (entityType != null) {
-			return (EntityTypeImpl<X>) entityType;
+			if (entityType != null) {
+				return (EntityTypeImpl<X>) entityType;
+			}
+
+			clazz = clazz.getSuperclass();
 		}
 
-		return this.throwNotFound(cls);
+		return this.throwNotFound(clazz);
 	}
 
 	/**

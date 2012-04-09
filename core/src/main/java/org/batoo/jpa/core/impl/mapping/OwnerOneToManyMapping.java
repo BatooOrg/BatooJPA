@@ -30,8 +30,8 @@ import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.jdbc.AssociationSelectHelper;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
-import org.batoo.jpa.core.impl.mapping.Mapping.AssociationType;
 import org.batoo.jpa.core.impl.types.AttributeImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 import org.batoo.jpa.core.impl.types.PluralAttributeImpl;
@@ -59,7 +59,6 @@ public class OwnerOneToManyMapping<X, C, E> extends OwnerAssociationMapping<X, C
 	 * @author hceylan
 	 */
 	public static <X, C, E> void sanitize(PluralAttributeImpl<X, C, E> declaringAttribute, Collection<ColumnTemplate<X, C>> columns) {
-
 		if (columns.isEmpty()) {
 			final EntityTypeImpl<E> type = (EntityTypeImpl<E>) declaringAttribute.getElementType();
 
@@ -71,6 +70,7 @@ public class OwnerOneToManyMapping<X, C, E> extends OwnerAssociationMapping<X, C
 	}
 
 	private JoinTable joinTable;
+	private final AssociationSelectHelper<X, C, E> selectHelper;
 
 	/**
 	 * @param declaringAttribute
@@ -89,6 +89,8 @@ public class OwnerOneToManyMapping<X, C, E> extends OwnerAssociationMapping<X, C
 	public OwnerOneToManyMapping(PluralAttributeImpl<X, C, E> declaringAttribute, Deque<AttributeImpl<?, ?>> path,
 		Collection<ColumnTemplate<X, C>> columnTemplates, boolean eager) throws MappingException {
 		super(AssociationType.MANY, declaringAttribute, path, columnTemplates, eager);
+
+		this.selectHelper = new AssociationSelectHelper<X, C, E>(this);
 	}
 
 	/**
@@ -161,8 +163,17 @@ public class OwnerOneToManyMapping<X, C, E> extends OwnerAssociationMapping<X, C
 	 * 
 	 */
 	@Override
-	public Collection<E> performSelect(SessionImpl session, ManagedId<X> managedId) {
-		// TODO Auto-generated method stub
-		return null;
+	public Collection<E> performSelect(SessionImpl session, ManagedId<X> managedId) throws SQLException {
+		return this.selectHelper.select(session, managedId);
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void reset(Object instance) {
+		this.getDeclaringAttribute().reset(instance);
+	}
+
 }
