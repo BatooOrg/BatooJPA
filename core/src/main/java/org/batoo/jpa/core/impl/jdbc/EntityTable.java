@@ -29,7 +29,6 @@ import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.mapping.TableTemplate;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 import org.batoo.jpa.core.jdbc.IdType;
-import org.batoo.jpa.core.jdbc.Table;
 import org.batoo.jpa.core.jdbc.adapter.JDBCAdapter;
 
 import com.google.common.base.Function;
@@ -42,7 +41,7 @@ import com.google.common.collect.Lists;
  * @author hceylan
  * @since $version
  */
-public class EntityTable extends AbstractTable implements Table {
+public final class EntityTable extends AbstractTable {
 
 	private final boolean primary;
 

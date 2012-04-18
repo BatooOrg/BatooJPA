@@ -66,7 +66,7 @@ public class DetachOperation<X> extends AbstractOperation<X> {
 
 			final List<AbstractOperation<?>> cascades = Lists.newArrayList();
 			if (value != null) {
-				if (value instanceof Collection) {
+				if (association.isCollection()) {
 					final Collection<?> values = (Collection<?>) value;
 					for (final Object child : values) {
 						cascades.add(new DetachOperation(this.em, child));

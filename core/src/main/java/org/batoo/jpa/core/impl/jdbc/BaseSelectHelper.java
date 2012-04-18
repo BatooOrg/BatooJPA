@@ -32,7 +32,6 @@ import org.batoo.jpa.core.impl.mapping.OwnedAssociation;
 import org.batoo.jpa.core.impl.mapping.OwnerAssociation;
 import org.batoo.jpa.core.impl.mapping.PersistableAssociation;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
-import org.batoo.jpa.core.util.Pair2;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -63,7 +62,7 @@ public abstract class BaseSelectHelper<X> {
 	private final Mapping<X, ?> alwaysLazyMapping;
 	protected final QueryRunner runner;
 
-	protected final Map<Pair2<Integer, PhysicalColumn>, String> columnAliases = Maps.newHashMap();
+	protected final Map<Integer, Map<PhysicalColumn, String>> columnAliases = Maps.newHashMap();
 	protected final List<Deque<Association<?, ?>>> entityPaths = Lists.newArrayList();
 	protected final List<Deque<Association<?, ?>>> lazyPaths = Lists.newArrayList();
 	protected final List<Deque<Association<?, ?>>> inversePaths = Lists.newArrayList();
@@ -132,7 +131,11 @@ public abstract class BaseSelectHelper<X> {
 				final String fieldAlias = tableAlias + "_F" + this.fieldNo++;
 
 				// save the mapping
-				BaseSelectHelper.this.columnAliases.put(Pair2.create(tableNo, input), fieldAlias);
+				Map<PhysicalColumn, String> aliasMap = BaseSelectHelper.this.columnAliases.get(tableNo);
+				if (aliasMap == null) {
+					BaseSelectHelper.this.columnAliases.put(tableNo, aliasMap = Maps.newHashMap());
+				}
+				aliasMap.put(input, fieldAlias);
 
 				// form the complete field
 				// TX.[FieldNo] AS TX_FY

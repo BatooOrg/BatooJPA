@@ -120,6 +120,40 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 	private boolean charType;
 
 	/**
+	 * Cloning constructor
+	 * 
+	 * @param declaringType
+	 *            the type redeclaring this type
+	 * @param original
+	 *            the original attribute
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public AttributeImpl(EntityTypeImpl<X> declaringType, AttributeImpl<?, Y> original) {
+		super();
+
+		this.attributeOverrides.putAll(original.attributeOverrides);
+		this.attributeType = original.attributeType;
+		this.cascadeType = original.cascadeType;
+		this.charType = original.charType;
+		this.declaringType = declaringType;
+		this.enumType = original.enumType;
+		this.fetchType = original.fetchType;
+		this.javaMember = original.javaMember;
+		this.javaType = original.javaType;
+		this.jdbcAdapter = original.jdbcAdapter;
+		this.many = original.many;
+		this.mappedBy = original.mappedBy;
+		this.orphanRemoval = original.orphanRemoval;
+		this.temporalType = original.temporalType;
+
+		for (final ColumnTemplate<?, Y> columnTemplate : this.columns) {
+			this.columns.add(columnTemplate.clone(this));
+		}
+	}
+
+	/**
 	 * @param declaringType
 	 *            the type declaring this attribute
 	 * @param javaMember
@@ -147,6 +181,18 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 
 		ReflectHelper.checkAnnotations(javaMember, this.parse());
 	}
+
+	/**
+	 * Clones this attribute so that it is bound to the new type
+	 * 
+	 * @param declaringType
+	 *            the new type
+	 * @return the new attribute
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract <T> AttributeImpl<T, Y> clone(EntityTypeImpl<T> declaringType);
 
 	/**
 	 * {@inheritDoc}
@@ -463,4 +509,5 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 	 * @author hceylan
 	 */
 	public abstract void set(Object instance, Object value);
+
 }

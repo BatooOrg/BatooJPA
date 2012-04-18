@@ -97,6 +97,18 @@ public abstract class TypeImpl<X> implements Type<X> {
 		return this.h = super.hashCode();
 	}
 
+	/**
+	 * Returns if the type is embeddable type.
+	 * 
+	 * @return true if the type is embeddable type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isEmbeddable() {
+		return false;
+	}
+
 	protected void throwNotImplemented() {
 		throw new NotImplementedException();
 	}

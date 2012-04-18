@@ -42,7 +42,7 @@ public class Repository {
 	public Repository() {
 		super();
 
-		this.subRepositories = Maps.newConcurrentMap();
+		this.subRepositories = Maps.newHashMap();
 	}
 
 	/**

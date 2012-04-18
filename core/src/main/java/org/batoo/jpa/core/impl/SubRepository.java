@@ -18,7 +18,7 @@
  */
 package org.batoo.jpa.core.impl;
 
-import java.util.concurrent.ConcurrentMap;
+import java.util.Map;
 
 import javax.persistence.PersistenceException;
 
@@ -35,7 +35,7 @@ import com.google.common.collect.Maps;
  */
 public class SubRepository<X> {
 
-	private final ConcurrentMap<ManagedId<? extends X>, ManagedInstance<? extends X>> repository = Maps.newConcurrentMap();
+	private final Map<ManagedId<? extends X>, ManagedInstance<? extends X>> repository = Maps.newHashMap();
 
 	/**
 	 * 
@@ -74,7 +74,7 @@ public class SubRepository<X> {
 	@SuppressWarnings("unchecked")
 	public synchronized void put(ManagedInstance<? extends X> instance) {
 		final ManagedId<? extends X> id = (ManagedId<? extends X>) instance.getId();
-		final ManagedInstance<? extends X> old = this.repository.putIfAbsent(id, instance);
+		final ManagedInstance<? extends X> old = this.repository.put(id, instance);
 
 		if (instance.equals(old)) {
 			throw new PersistenceException("Type " + instance.getType().getName() + " with id " + instance.getId()

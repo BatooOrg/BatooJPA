@@ -38,6 +38,21 @@ import org.batoo.jpa.core.impl.reflect.ReflectHelper;
 public final class CollectionAttributeImpl<X, E> extends PluralAttributeImpl<X, Collection<E>, E> implements CollectionAttribute<X, E> {
 
 	/**
+	 * Cloning constructor
+	 * 
+	 * @param declaringType
+	 *            the type redeclaring this attribute
+	 * @param original
+	 *            the original
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private CollectionAttributeImpl(EntityTypeImpl<X> declaringType, CollectionAttributeImpl<?, E> original) {
+		super(declaringType, original);
+	}
+
+	/**
 	 * @param declaringType
 	 *            the type declaring this attribute
 	 * @param javaMember
@@ -52,8 +67,19 @@ public final class CollectionAttributeImpl<X, E> extends PluralAttributeImpl<X, 
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public CollectionAttributeImpl(ManagedType<X> owner, Member javaMember, Class<Collection<E>> javaType) throws MappingException {
-		super(owner, javaMember, javaType, (Class<E>) ReflectHelper.getGenericType(javaMember, 0));
+	public CollectionAttributeImpl(ManagedType<X> declaringType, Member javaMember, Class<Collection<E>> javaType) throws MappingException {
+		super(declaringType, javaMember, javaType, (Class<E>) ReflectHelper.getGenericType(javaMember, 0));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @return
+	 * 
+	 */
+	@Override
+	public <T> CollectionAttributeImpl<T, E> clone(EntityTypeImpl<T> declaringType) {
+		return new CollectionAttributeImpl<T, E>(declaringType, this);
 	}
 
 	/**
@@ -98,6 +124,16 @@ public final class CollectionAttributeImpl<X, E> extends PluralAttributeImpl<X, 
 		else {
 			this.getAccessor().get(instance).add((E) value);
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public void setCollection(Object instance, ManagedCollection<?> collection) {
+		this.getAccessor().set(instance, (Collection<E>) collection);
 	}
 
 	/**

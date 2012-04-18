@@ -27,6 +27,7 @@ import javax.persistence.metamodel.ManagedType;
 
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.SessionImpl;
+import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.collections.ManagedList;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.mapping.CollectionMapping;
@@ -39,6 +40,21 @@ import org.batoo.jpa.core.impl.reflect.ReflectHelper;
  * @author hceylan
  */
 public final class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E>, E> implements ListAttribute<X, E> {
+
+	/**
+	 * Cloning constructor
+	 * 
+	 * @param declaringType
+	 *            the type redeclaring this attribute
+	 * @param original
+	 *            the original
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private ListAttributeImpl(EntityTypeImpl<X> declaringType, ListAttributeImpl<?, E> original) {
+		super(declaringType, original);
+	}
 
 	/**
 	 * @param declaringType
@@ -64,6 +80,15 @@ public final class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E
 	 * 
 	 */
 	@Override
+	public <T> ListAttributeImpl<T, E> clone(EntityTypeImpl<T> declaringType) {
+		return new ListAttributeImpl<T, E>(declaringType, this);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public CollectionType getCollectionType() {
 		return CollectionType.LIST;
 	}
@@ -76,7 +101,7 @@ public final class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E
 	public void initialize(ManagedInstance<?> managedInstance, SessionImpl session) {
 		final ManagedList<E> managedList = this.newInstance0(session, managedInstance, this.get(managedInstance.getInstance()));
 
-		this.set(managedInstance.getInstance(), managedList);
+		this.getAccessor().set(managedInstance.getInstance(), managedList);
 	}
 
 	/**
@@ -100,15 +125,20 @@ public final class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E
 	@Override
 	@SuppressWarnings("unchecked")
 	public void set(Object instance, Object value) {
-		if (value instanceof List) {
-			this.getAccessor().set(instance, (List<E>) value);
+		final Collection<E> collection = ((ManagedList<E>) this.getAccessor().get(instance)).getCollection();
+		if (!collection.contains(value)) {
+			collection.add((E) value);
 		}
-		else {
-			final Collection<E> collection = ((ManagedList<E>) this.getAccessor().get(instance)).getCollection();
-			if (!collection.contains(value)) {
-				collection.add((E) value);
-			}
-		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public void setCollection(Object instance, ManagedCollection<?> collection) {
+		this.getAccessor().set(instance, (List<E>) collection);
 	}
 
 	/**

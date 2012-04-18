@@ -41,7 +41,7 @@ import com.google.common.collect.Lists;
  * @author hceylan
  * @since $version
  */
-public class JoinTable extends AbstractTable {
+public final class JoinTable extends AbstractTable {
 
 	private final Association<?, ?> mapping;
 	protected final List<PhysicalColumn> sourceKeys = Lists.newArrayList();

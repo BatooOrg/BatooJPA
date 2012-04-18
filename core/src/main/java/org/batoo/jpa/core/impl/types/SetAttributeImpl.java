@@ -27,6 +27,7 @@ import javax.persistence.metamodel.SetAttribute;
 
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.SessionImpl;
+import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.collections.ManagedSet;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.mapping.CollectionMapping;
@@ -39,6 +40,21 @@ import org.batoo.jpa.core.impl.reflect.ReflectHelper;
  * @author hceylan
  */
 public final class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>, E> implements SetAttribute<X, E> {
+
+	/**
+	 * Cloning constructor
+	 * 
+	 * @param declaringType
+	 *            the type redeclaring this attribute
+	 * @param original
+	 *            the original
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public SetAttributeImpl(EntityTypeImpl<X> declaringType, SetAttributeImpl<?, E> original) {
+		super(declaringType, original);
+	}
 
 	/**
 	 * @param declaringType
@@ -57,6 +73,17 @@ public final class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>,
 	@SuppressWarnings("unchecked")
 	public SetAttributeImpl(ManagedType<X> owner, Member javaMember, Class<Set<E>> javaType) throws MappingException {
 		super(owner, javaMember, javaType, (Class<E>) ReflectHelper.getGenericType(javaMember, 0));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @return
+	 * 
+	 */
+	@Override
+	public <T> SetAttributeImpl<T, E> clone(EntityTypeImpl<T> declaringType) {
+		return new SetAttributeImpl<T, E>(declaringType, this);
 	}
 
 	/**
@@ -109,6 +136,16 @@ public final class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>,
 				collection.add((E) value);
 			}
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public void setCollection(Object instance, ManagedCollection<?> collection) {
+		this.getAccessor().set(instance, (Set<E>) collection);
 	}
 
 	/**

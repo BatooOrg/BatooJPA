@@ -25,6 +25,7 @@ import org.batoo.jpa.core.impl.types.PluralAttributeImpl;
 import org.batoo.jpa.core.impl.types.SingularAttributeImpl;
 
 /**
+ * Column template for Join Columns
  * 
  * @author hceylan
  * @since $version
@@ -46,6 +47,23 @@ public class JoinColumnTemplate<X, T> extends ColumnTemplate<X, T> {
 		super(attribute, column.table(), column.name(), column.nullable(), column.unique(), column.insertable(), column.updatable());
 
 		this.referencedMapping = null;
+	}
+
+	/**
+	 * Cloning constructor
+	 * 
+	 * @param attribute
+	 *            the new attribute
+	 * @param original
+	 *            the original column template
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public JoinColumnTemplate(AttributeImpl<X, T> attribute, JoinColumnTemplate<?, T> original) {
+		super(attribute, original);
+
+		this.referencedMapping = original.referencedMapping;
 	}
 
 	/**
@@ -76,6 +94,15 @@ public class JoinColumnTemplate<X, T> extends ColumnTemplate<X, T> {
 		super(attribute, null, attribute.getName() + "_" + referencedMapping.getDeclaringAttribute().getName(), true, false, true, true);
 
 		this.referencedMapping = referencedMapping;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public <Y> JoinColumnTemplate<Y, T> clone(AttributeImpl<Y, T> attribute) {
+		return new JoinColumnTemplate<Y, T>(attribute, this);
 	}
 
 	/**

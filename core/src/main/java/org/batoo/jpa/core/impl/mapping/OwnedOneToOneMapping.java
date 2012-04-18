@@ -83,4 +83,13 @@ public class OwnedOneToOneMapping<X, T> extends OwnedAssociationMapping<X, T> {
 	public EntityTypeImpl<T> getType() {
 		return (EntityTypeImpl<T>) this.getDeclaringAttribute().getType();
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isCollection() {
+		return false;
+	}
 }

@@ -27,6 +27,7 @@ import javax.persistence.OneToMany;
 
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.SessionImpl;
+import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.jdbc.AssociationSelectHelper;
 import org.batoo.jpa.core.impl.types.AttributeImpl;
@@ -102,6 +103,15 @@ public class OwnedOneToManyMapping<X, C, E> extends OwnedAssociationMapping<X, C
 	 * 
 	 */
 	@Override
+	public boolean isCollection() {
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public Collection<E> performSelect(SessionImpl session, ManagedId<X> managedId) throws SQLException {
 		return this.selectHelper.select(session, managedId);
 	}
@@ -113,6 +123,15 @@ public class OwnedOneToManyMapping<X, C, E> extends OwnedAssociationMapping<X, C
 	@Override
 	public void reset(Object instance) {
 		this.getDeclaringAttribute().reset(instance);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void setCollection(Object instance, ManagedCollection<?> collection) {
+		this.getDeclaringAttribute().setCollection(instance, collection);
 	}
 
 }

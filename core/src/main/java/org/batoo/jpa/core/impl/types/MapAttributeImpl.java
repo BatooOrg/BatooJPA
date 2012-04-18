@@ -37,6 +37,7 @@ import javax.persistence.metamodel.Type;
 import org.apache.commons.lang.NotImplementedException;
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.SessionImpl;
+import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.collections.ManagedMap;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.mapping.CollectionMapping;
@@ -57,10 +58,32 @@ public final class MapAttributeImpl<X, K, V> extends PluralAttributeImpl<X, Map<
 	// Parse phase properties
 	private String mapKey;
 	private MapKeyColumn mapKeyColumn;
-	private final Set<MapKeyJoinColumn> mapKeyJoinColumns;
+	private final Set<MapKeyJoinColumn> mapKeyJoinColumns = Sets.newHashSet();
 
 	// Link phase properties
 	private Type<K> keyType;
+
+	/**
+	 * Cloning constructor
+	 * 
+	 * @param declaringType
+	 *            the type redeclaring this attribute
+	 * @param original
+	 *            the original
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private MapAttributeImpl(EntityTypeImpl<X> declaringType, MapAttributeImpl<?, K, V> original) {
+		super(declaringType, original);
+
+		this.keyJavaType = original.keyJavaType;
+		this.mapKey = original.mapKey;
+		this.mapKeyColumn = original.mapKeyColumn;
+		this.keyType = original.keyType;
+
+		this.mapKeyJoinColumns.addAll(original.mapKeyJoinColumns);
+	}
 
 	/**
 	 * @param declaringType
@@ -80,8 +103,17 @@ public final class MapAttributeImpl<X, K, V> extends PluralAttributeImpl<X, Map<
 		super(owner, javaMember, javaType, (Class<V>) ReflectHelper.getGenericType(javaMember, 1));
 
 		this.keyJavaType = (Class<K>) ReflectHelper.getGenericType(javaMember, 0);
+	}
 
-		this.mapKeyJoinColumns = Sets.newHashSet();
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @return
+	 * 
+	 */
+	@Override
+	public <T> MapAttributeImpl<T, K, V> clone(EntityTypeImpl<T> declaringType) {
+		return new MapAttributeImpl<T, K, V>(declaringType, this);
 	}
 
 	/**
@@ -213,5 +245,15 @@ public final class MapAttributeImpl<X, K, V> extends PluralAttributeImpl<X, Map<
 	@Override
 	public void set(Object instance, Object value) {
 		throw new NotImplementedException();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public void setCollection(Object instance, ManagedCollection<?> collection) {
+		this.getAccessor().set(instance, (Map<K, V>) collection);
 	}
 }

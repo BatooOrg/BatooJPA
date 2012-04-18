@@ -19,15 +19,15 @@
 package org.batoo.jpa.core.impl.instance;
 
 import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.batoo.jpa.core.impl.SessionImpl;
-import org.batoo.jpa.core.impl.types.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 import org.batoo.jpa.core.impl.types.SingularAttributeImpl;
+import org.batoo.jpa.core.impl.types.TypeImpl;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -45,7 +45,7 @@ public class ManagedId<X> {
 	private final SessionImpl session;
 	private final X instance;
 
-	private final Map<String, BasicResolver<X>> resolvers;
+	private final List<BasicResolver<X>> resolvers;
 
 	private X proxy;
 	private BasicResolver<X> singleId;
@@ -66,7 +66,7 @@ public class ManagedId<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedId(EntityTypeImpl<X> type, SessionImpl session, X instance, Map<String, BasicResolver<X>> resolvers) {
+	public ManagedId(EntityTypeImpl<X> type, SessionImpl session, X instance, List<BasicResolver<X>> resolvers) {
 		super();
 
 		this.type = type;
@@ -107,7 +107,7 @@ public class ManagedId<X> {
 	 * @author hceylan
 	 */
 	public void fillIdValues() {
-		for (final BasicResolver<X> resolver : this.resolvers.values()) {
+		for (final BasicResolver<X> resolver : this.resolvers) {
 			resolver.fillValue();
 		}
 	}
@@ -216,7 +216,8 @@ public class ManagedId<X> {
 	 */
 	private void initialize() {
 		if (!this.initialized) {
-			if (this.type.getIdType() instanceof EmbeddableTypeImpl) {
+			final TypeImpl<?> idType = (TypeImpl<?>) this.type.getIdType();
+			if ((idType != null) && idType.isEmbeddable()) {
 
 				this.embeddedAttribute = (SingularAttributeImpl<? super X, ?>) this.type.getId(this.type.getIdType().getJavaType());
 			}
@@ -224,7 +225,7 @@ public class ManagedId<X> {
 				this.idJavaType = this.type.getIdJavaType();
 			}
 			else if (this.resolvers.size() == 1) {
-				this.singleId = this.resolvers.values().iterator().next();
+				this.singleId = this.resolvers.get(0);
 			}
 
 			this.initialized = true;
@@ -255,7 +256,7 @@ public class ManagedId<X> {
 			}
 		}
 		else {
-			for (final BasicResolver<X> resolver : this.resolvers.values()) {
+			for (final BasicResolver<X> resolver : this.resolvers) {
 				synchronized (resolver) {
 					resolver.unlock();
 					resolver.setValue(id);
@@ -284,7 +285,7 @@ public class ManagedId<X> {
 	 */
 	@Override
 	public String toString() {
-		final Collection<String> ids = Collections2.transform(this.resolvers.values(), new Function<BasicResolver<X>, String>() {
+		final Collection<String> ids = Collections2.transform(this.resolvers, new Function<BasicResolver<X>, String>() {
 
 			@Override
 			public String apply(BasicResolver<X> input) {

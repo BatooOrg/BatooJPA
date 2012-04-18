@@ -82,6 +82,27 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 	private String getterName;
 
 	/**
+	 * Cloning constructor
+	 * 
+	 * @param declaringType
+	 *            the type redeclaring this attribute
+	 * @param original
+	 *            the original
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private SingularAttributeImpl(EntityTypeImpl<X> declaringType, SingularAttributeImpl<?, T> original) {
+		super(declaringType, original);
+
+		this.optional = original.optional;
+		this.version = original.version;
+		this.idType = original.idType;
+		this.generatorName = original.generatorName;
+		this.getterName = original.getterName;
+	}
+
+	/**
 	 * @param declaringType
 	 *            the type declaring this attribute
 	 * @param member
@@ -96,6 +117,15 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 	 */
 	public SingularAttributeImpl(ManagedType<X> declaringType, Member member, Class<T> javaMember) throws MappingException {
 		super(declaringType, member, javaMember);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public <Y> SingularAttributeImpl<Y, T> clone(EntityTypeImpl<Y> declaringType) {
+		return new SingularAttributeImpl<Y, T>(declaringType, this);
 	}
 
 	/**

@@ -16,38 +16,40 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.instance;
+package org.batoo.jpa.core.test.mappedsuperclass;
 
-import org.batoo.jpa.core.impl.mapping.OwnedAssociationMapping;
+import javax.persistence.Entity;
 
 /**
- * Resolver for owned association mappings.
  * 
  * @author hceylan
  * @since $version
  */
-public class OwnedAssociateResolver<X> extends AbstractResolver<X> {
+@Entity
+public class Foo extends Bar {
+
+	private String fooValue;
 
 	/**
-	 * @param mapping
-	 *            the mapping
-	 * @param instance
-	 *            the instance
+	 * Returns the fooValue.
 	 * 
+	 * @return the fooValue
 	 * @since $version
-	 * @author hceylan
-	 */
-	public OwnedAssociateResolver(OwnedAssociationMapping<?, ?> mapping, X instance) {
-		super(mapping, instance);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
 	 */
 	@Override
-	public boolean isAssociateResolver() {
-		return true;
+	public String getFooValue() {
+		return this.fooValue;
 	}
 
+	/**
+	 * Sets the fooValue.
+	 * 
+	 * @param fooValue
+	 *            the fooValue to set
+	 * @since $version
+	 */
+	@Override
+	public void setFooValue(String fooValue) {
+		this.fooValue = fooValue;
+	}
 }

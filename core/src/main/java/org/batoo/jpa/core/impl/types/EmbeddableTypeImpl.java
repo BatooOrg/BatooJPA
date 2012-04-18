@@ -88,6 +88,15 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	 * 
 	 */
 	@Override
+	public boolean isEmbeddable() {
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public Set<Class<? extends Annotation>> parse() throws BatooException {
 		final Set<Class<? extends Annotation>> annotations = super.parse();
 
@@ -112,5 +121,4 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	public String toString() {
 		return "EmbeddableTypeImpl [name=" + this.name + ", attributes=" + this.attributes + "]";
 	}
-
 }

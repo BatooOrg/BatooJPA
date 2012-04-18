@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.mapping;
 
 import javax.persistence.Column;
 
+import org.batoo.jpa.core.impl.types.AttributeImpl;
 import org.batoo.jpa.core.impl.types.SingularAttributeImpl;
 import org.batoo.jpa.core.jdbc.IdType;
 
@@ -29,7 +30,7 @@ import org.batoo.jpa.core.jdbc.IdType;
  * @author hceylan
  * @since $version
  */
-public class BasicColumnTemplate<X, T> extends ColumnTemplate<X, T> {
+public final class BasicColumnTemplate<X, T> extends ColumnTemplate<X, T> {
 
 	private final IdType idType;
 	private final String generator;
@@ -37,6 +38,27 @@ public class BasicColumnTemplate<X, T> extends ColumnTemplate<X, T> {
 	private final int length;
 	private final int precision;
 	private final int scale;
+
+	/**
+	 * Cloning constructor
+	 * 
+	 * @param attribute
+	 *            the new attribute
+	 * @param original
+	 *            the original column template
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private BasicColumnTemplate(AttributeImpl<X, T> attribute, BasicColumnTemplate<?, T> original) {
+		super(attribute, original);
+
+		this.generator = original.generator;
+		this.idType = original.idType;
+		this.length = original.length;
+		this.precision = original.precision;
+		this.scale = original.scale;
+	}
 
 	/**
 	 * Implicit basic column template
@@ -84,6 +106,15 @@ public class BasicColumnTemplate<X, T> extends ColumnTemplate<X, T> {
 		this.length = column.length();
 		this.precision = column.precision();
 		this.scale = column.scale();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public <Y> BasicColumnTemplate<Y, T> clone(AttributeImpl<Y, T> attribute) {
+		return new BasicColumnTemplate<Y, T>(attribute, this);
 	}
 
 	/**

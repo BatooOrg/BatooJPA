@@ -28,7 +28,6 @@ import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
 import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
-import org.batoo.jpa.core.util.Pair2;
 
 /**
  * A {@link ResultSetHandler} to load a single result from resultset.
@@ -56,7 +55,7 @@ public class SelectHandler<X> extends BaseSelectHandler<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SelectHandler(SessionImpl session, EntityTypeImpl<X> rootType, Map<Pair2<Integer, PhysicalColumn>, String> columnAliases,
+	public SelectHandler(SessionImpl session, EntityTypeImpl<X> rootType, Map<Integer, Map<PhysicalColumn, String>> columnAliases,
 		List<Deque<Association<?, ?>>> entityPaths, List<Deque<Association<?, ?>>> inversePaths, List<Deque<Association<?, ?>>> lazyPaths) {
 		super(session, rootType, columnAliases, entityPaths, inversePaths, lazyPaths);
 	}

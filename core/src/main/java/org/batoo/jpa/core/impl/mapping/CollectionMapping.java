@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 
 import org.batoo.jpa.core.impl.SessionImpl;
+import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.types.PluralAttributeImpl;
 
@@ -68,4 +69,15 @@ public interface CollectionMapping<X, C, E> extends Mapping<X, C> {
 	 * @author hceylan
 	 */
 	void reset(Object instance);
+
+	/**
+	 * Sets the collection for the mapping
+	 * 
+	 * @param instance
+	 * @param newInstance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	void setCollection(Object instance, ManagedCollection<?> collection);
 }

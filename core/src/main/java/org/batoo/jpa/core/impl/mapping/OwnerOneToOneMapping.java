@@ -116,4 +116,13 @@ public class OwnerOneToOneMapping<X, T> extends OwnerAssociationMapping<X, T> im
 		return (EntityTypeImpl<T>) this.getDeclaringAttribute().getType();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isCollection() {
+		return false;
+	}
+
 }

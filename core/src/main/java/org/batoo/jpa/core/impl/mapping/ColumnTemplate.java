@@ -39,6 +39,29 @@ public abstract class ColumnTemplate<X, T> {
 	private PhysicalColumn physicalColumn;
 
 	/**
+	 * Cloning constructor
+	 * 
+	 * @param attribute
+	 *            the new attribute
+	 * @param original
+	 *            the original column template
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected ColumnTemplate(AttributeImpl<X, T> attribute, ColumnTemplate<?, T> original) {
+		super();
+
+		this.attribute = attribute;
+		this.insertable = original.insertable;
+		this.name = original.name;
+		this.nullable = original.nullable;
+		this.tableName = original.tableName;
+		this.unique = original.unique;
+		this.updatable = original.updatable;
+	}
+
+	/**
 	 * @param attribute
 	 *            the attribute that owns that column
 	 * @param tableName
@@ -69,6 +92,18 @@ public abstract class ColumnTemplate<X, T> {
 		this.insertable = insertable;
 		this.updatable = updatable;
 	}
+
+	/**
+	 * Clones this column template so that it is bound to the new attribute
+	 * 
+	 * @param attribute
+	 *            the new attribıte
+	 * @return the new column template
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract <Y> ColumnTemplate<Y, T> clone(AttributeImpl<Y, T> attribute);
 
 	/**
 	 * Returns the attribute.
@@ -172,5 +207,4 @@ public abstract class ColumnTemplate<X, T> {
 		return "ColumnTemplate [attribute=" + this.attribute + ", tableName=" + this.tableName + ", name=" + this.name + ", nullable="
 			+ this.nullable + ", unique=" + this.unique + ", insertable=" + this.insertable + ", updatable=" + this.updatable + "]";
 	}
-
 }

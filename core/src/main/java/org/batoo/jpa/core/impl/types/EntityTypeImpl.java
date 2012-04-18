@@ -70,6 +70,7 @@ import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.IdType;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -88,7 +89,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 	private final Map<String, AbstractMapping<?, ?>> mappings = Maps.newHashMap();
 	private final Map<String, Association<?, ?>> associations = Maps.newHashMap();
-	private final Map<String, BasicMapping<?, ?>> idMappings = Maps.newHashMap();
+	private final List<BasicMapping<?, ?>> idMappings = Lists.newArrayList();
 	private final Map<String, BasicMapping<?, ?>> identityMappings = Maps.newHashMap();
 	private final Map<String, Column> attributeOverrides = Maps.newHashMap();
 
@@ -216,7 +217,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 			// Separate out the identity attributes
 			if (id || singularAttribute.isId()) {
-				this.idMappings.put(name, basicMapping);
+				this.idMappings.add(basicMapping);
 			}
 
 			// Separate out the identity id attributes
@@ -352,7 +353,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public Collection<BasicMapping<?, ?>> getIdMappings() {
-		return this.idMappings.values();
+		return this.idMappings;
 	}
 
 	/**
@@ -378,21 +379,20 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 		final X instance = this.newInstance();
 
-		final Map<String, BasicResolver<X>> resolvers = Maps.transformValues(this.idMappings,
-			new Function<BasicMapping<?, ?>, BasicResolver<X>>() {
+		final List<BasicResolver<X>> resolvers = Lists.transform(this.idMappings, new Function<BasicMapping<?, ?>, BasicResolver<X>>() {
 
-				private BasicResolver<X> resolver;
+			private BasicResolver<X> resolver;
 
-				@Override
-				public BasicResolver<X> apply(BasicMapping<?, ?> input) {
-					if (this.resolver == null) {
-						this.resolver = input.createResolver(instance);
-					}
-
-					return this.resolver;
+			@Override
+			public BasicResolver<X> apply(BasicMapping<?, ?> input) {
+				if (this.resolver == null) {
+					this.resolver = input.createResolver(instance);
 				}
 
-			});
+				return this.resolver;
+			}
+
+		});
 
 		final ManagedId<X> managedId = new ManagedId<X>(this, session, instance, resolvers);
 
@@ -422,21 +422,20 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			return this.getTopType().getManagedIdForInstance(session, instance);
 		}
 
-		final Map<String, BasicResolver<X>> resolvers = Maps.transformValues(this.idMappings,
-			new Function<BasicMapping<?, ?>, BasicResolver<X>>() {
+		final List<BasicResolver<X>> resolvers = Lists.transform(this.idMappings, new Function<BasicMapping<?, ?>, BasicResolver<X>>() {
 
-				private BasicResolver<X> resolver;
+			private BasicResolver<X> resolver;
 
-				@Override
-				public BasicResolver<X> apply(BasicMapping<?, ?> input) {
-					if (this.resolver == null) {
-						this.resolver = input.createResolver(instance);
-					}
-
-					return this.resolver;
+			@Override
+			public BasicResolver<X> apply(BasicMapping<?, ?> input) {
+				if (this.resolver == null) {
+					this.resolver = input.createResolver(instance);
 				}
 
-			});
+				return this.resolver;
+			}
+
+		});
 
 		return new ManagedId<X>(this, session, instance, resolvers);
 	}
@@ -461,7 +460,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	private ManagedInstance<X> getManagedInstance0(SessionImpl session, final X instance, ManagedId<? super X> managedId) {
-		final Map<String, AbstractResolver<X>> resolvers = Maps.transformValues(this.mappings,
+		final Collection<AbstractResolver<X>> resolvers = Collections2.transform(this.mappings.values(),
 			new Function<AbstractMapping<?, ?>, AbstractResolver<X>>() {
 
 				@Override

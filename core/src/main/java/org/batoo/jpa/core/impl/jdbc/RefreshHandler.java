@@ -31,7 +31,6 @@ import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.mapping.CollectionMapping;
 import org.batoo.jpa.core.impl.mapping.Mapping;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
-import org.batoo.jpa.core.util.Pair2;
 
 import com.google.common.collect.Sets;
 
@@ -62,7 +61,7 @@ public class RefreshHandler<X> extends BaseSelectHandler<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public RefreshHandler(SessionImpl session, EntityTypeImpl<X> rootType, Map<Pair2<Integer, PhysicalColumn>, String> columnAliases,
+	public RefreshHandler(SessionImpl session, EntityTypeImpl<X> rootType, Map<Integer, Map<PhysicalColumn, String>> columnAliases,
 		List<Deque<Association<?, ?>>> entityPaths, List<Deque<Association<?, ?>>> inversePaths, List<Deque<Association<?, ?>>> lazyPaths) {
 		super(session, rootType, columnAliases, entityPaths, inversePaths, lazyPaths);
 	}

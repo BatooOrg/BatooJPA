@@ -292,9 +292,11 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 
 		this.parseGenerators();
 
-		this.parsePrimaryTable(parsed);
+		if (this instanceof EntityTypeImpl) {
+			this.parsePrimaryTable(parsed);
 
-		this.parseSecondaryTables(parsed);
+			this.parseSecondaryTables(parsed);
+		}
 
 		for (final Attribute<X, ?> attribute : this.setDeclaredAttributes) {
 			if (attribute instanceof SingularAttribute) {
@@ -342,7 +344,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 		}
 	}
 
-	private void parsePrimaryTable(final Set<Class<? extends Annotation>> annotations) throws MappingException {
+	protected void parsePrimaryTable(final Set<Class<? extends Annotation>> annotations) throws MappingException {
 		final Table table = this.getJavaType().getAnnotation(Table.class);
 		if (table != null) {
 			this.putTable(true, table.schema(), table.name(), table.uniqueConstraints(), null);
@@ -435,6 +437,10 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	public void vlink() throws BatooException {
 		LOG.debug("Vertically linking {0}", this);
 
+		this.attributes.putAll(this.declaredAttributes);
+		this.setAttributes.addAll(this.setDeclaredAttributes);
+		this.idAttributes.putAll(this.declaredIdAttributes);
+
 		final IdentifiableTypeImpl<? super X> supertype = this.getSupertype();
 		if (supertype != null) {
 
@@ -446,18 +452,29 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 				catch (final InterruptedException e) {}
 			}
 
-			this.attributes.putAll(supertype.attributes);
-			this.setAttributes.addAll(supertype.setAttributes);
+			// inherit attributes
+			for (final Attribute<?, ?> superAttribute : supertype.setAttributes) {
+				if (this.attributes.containsKey(superAttribute.getName())) {
+					continue;
+				}
 
-			this.idAttributes.putAll(supertype.idAttributes);
+				final AttributeImpl<X, ?> attribute = ((AttributeImpl<?, ?>) superAttribute).clone((EntityTypeImpl<X>) this);
+
+				this.attributes.put(attribute.getName(), attribute);
+				this.setAttributes.add(attribute);
+
+				// TODO Check id conflict
+				if (attribute instanceof SingularAttributeImpl) {
+					final SingularAttributeImpl<X, ?> singularAttribute = (SingularAttributeImpl<X, ?>) attribute;
+					if (singularAttribute.isId()) {
+						this.idAttributes.put(singularAttribute.getName(), singularAttribute);
+					}
+				}
+			}
+
 			this.idJavaType = supertype.idJavaType;
 			this.idType = supertype.idType;
 		}
-
-		this.attributes.putAll(this.declaredAttributes);
-		this.setAttributes.addAll(this.setDeclaredAttributes);
-
-		this.idAttributes.putAll(this.declaredIdAttributes);
 
 		this.vlinked = true;
 	}

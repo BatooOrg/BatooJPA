@@ -152,7 +152,7 @@ public abstract class AbstractMapping<X, T> implements Mapping<X, T> {
 	 */
 	@Override
 	public final Deque<AttributeImpl<?, ?>> getPath() {
-		return new LinkedList<AttributeImpl<?, ?>>(this.path);
+		return this.path;
 	}
 
 	/**

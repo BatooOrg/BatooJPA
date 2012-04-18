@@ -64,4 +64,12 @@ public class AssociateResolver<X> extends AbstractResolver<X> {
 		return (OwnerAssociationMapping<X, ?>) super.getMapping();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isAssociateResolver() {
+		return true;
+	}
 }

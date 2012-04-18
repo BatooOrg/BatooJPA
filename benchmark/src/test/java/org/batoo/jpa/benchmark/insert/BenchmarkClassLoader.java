@@ -33,8 +33,9 @@ import java.util.Locale;
 public class BenchmarkClassLoader extends ClassLoader {
 
 	public enum Type {
-		BATOO, //
-			HIBERNATE
+		BATOO,
+
+		HIBERNATE
 	}
 
 	private final Type type;

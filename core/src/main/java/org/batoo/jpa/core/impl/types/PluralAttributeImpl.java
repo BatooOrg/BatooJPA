@@ -73,6 +73,27 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	private final Class<E> elementJavaType;
 
 	/**
+	 * Cloning constructor
+	 * 
+	 * @param declaringType
+	 *            the type redeclaring this attribute
+	 * @param original
+	 *            the original
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public PluralAttributeImpl(EntityTypeImpl<X> declaringType, PluralAttributeImpl<?, C, E> original) {
+		super(declaringType, original);
+
+		this.collectionTableName = original.collectionTableName;
+		this.collectionTableSchema = original.collectionTableSchema;
+		this.elementJavaType = original.elementJavaType;
+
+		this.collectionTableUniqueConstraints.addAll(original.collectionTableUniqueConstraints);
+	}
+
+	/**
 	 * @param declaringType
 	 *            the type declaring this attribute
 	 * @param javaMember
@@ -338,4 +359,17 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	public final void reset(Object instance) {
 		((ManagedCollection<E>) this.get(instance)).reset();
 	}
+
+	/**
+	 * Sets the collection for the managed instance
+	 * 
+	 * @param instance
+	 *            the instance
+	 * @param collection
+	 *            the collection
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract void setCollection(Object instance, ManagedCollection<?> collection);
 }

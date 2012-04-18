@@ -18,8 +18,13 @@
  */
 package org.batoo.jpa.benchmark.insert;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -28,6 +33,8 @@ import javax.persistence.Persistence;
 
 import org.batoo.jpa.benchmark.insert.BenchmarkClassLoader.Type;
 import org.batoo.jpa.core.BLogger;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -46,10 +53,109 @@ public class Playground {
 	public static void boot() throws SQLException, InterruptedException {
 		DriverManager.getConnection("jdbc:derby:memory:testDB;create=true");
 
-		Thread.sleep(5000);
+		// Thread.sleep(5000);
 	}
 
 	private Country country;
+
+	private TimeElement element;
+
+	private boolean running;
+
+	private long oldTime;
+
+	protected void _measure(final long id) {
+		this.element = new TimeElement("");
+
+		final ThreadMXBean mxBean = ManagementFactory.getThreadMXBean();
+		this.oldTime = mxBean.getThreadCpuTime(id);
+
+		final ExecutorService pool = Executors.newFixedThreadPool(1);
+
+		while (this.running) {
+			pool.submit(new Runnable() {
+
+				@Override
+				public void run() {
+					Playground.this._measureSingleTime(id, mxBean);
+				}
+			});
+			try {
+				Thread.sleep(10);
+			}
+			catch (final InterruptedException e) {}
+		}
+
+		pool.shutdownNow();
+	}
+
+	@After
+	public void _measureAfter() {
+		this.running = false;
+
+		this.element.dump(0);
+	}
+
+	@Before
+	public void _measureBefore() {
+		final long id = Thread.currentThread().getId();
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				Playground.this.running = true;
+				Playground.this._measure(id);
+			}
+		}).start();
+	}
+
+	private void _measureSingleTime(long id, final ThreadMXBean mxBean) {
+		final ThreadInfo threadInfo = mxBean.getThreadInfo(id, Integer.MAX_VALUE);
+
+		final long newTime = mxBean.getThreadCpuTime(id);
+		if (this.oldTime == 0) {
+			this.oldTime = newTime;
+		}
+		else {
+			TimeElement child = this.element;
+			boolean gotStart = false;
+			boolean last = false;
+
+			boolean inDerby = false;
+			for (int i = threadInfo.getStackTrace().length - 1; i >= 0; i--) {
+				final StackTraceElement stElement = threadInfo.getStackTrace()[i];
+				if (stElement.getClassName().startsWith("org.apache.derby")) {
+					inDerby = true;
+					break;
+				}
+			}
+
+			for (int i = threadInfo.getStackTrace().length - 1; i >= 0; i--) {
+				final StackTraceElement stElement = threadInfo.getStackTrace()[i];
+
+				if (!gotStart && !stElement.getMethodName().startsWith("singleTest")) {
+					continue;
+				}
+
+				gotStart = true;
+
+				child = child.get(stElement.getClassName() + "." + stElement.getMethodName());
+				if (stElement.getClassName().startsWith("org.apache.derby") || (i == 0)) {
+					child.addTime(newTime - this.oldTime, true, inDerby);
+					last = true;
+				}
+				else {
+					child.addTime(newTime - this.oldTime, false, inDerby);
+				}
+				if (last) {
+					break;
+				}
+			}
+
+		}
+
+		this.oldTime = newTime;
+	}
 
 	private Person createPerson() {
 		final Person person = new Person();
@@ -151,6 +257,13 @@ public class Playground {
 	}
 
 	private void test(Type type, final EntityManagerFactory emf) {
+		while (!this.running) {
+			try {
+				Thread.sleep(1);
+			}
+			catch (final InterruptedException e) {}
+		}
+
 		final long start = System.currentTimeMillis();
 
 		for (int i = 0; i < 10000; i++) {

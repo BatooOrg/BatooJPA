@@ -28,6 +28,7 @@ import javax.persistence.OneToMany;
 
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.SessionImpl;
+import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.AssociationSelectHelper;
@@ -145,6 +146,15 @@ public class OwnerOneToManyMapping<X, C, E> extends OwnerAssociationMapping<X, C
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
+	public boolean isCollection() {
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
 	public void link(JDBCAdapter jdbcAdapter) throws MappingException {
 		this.joinTable = new JoinTable(this, jdbcAdapter);
 	}
@@ -174,6 +184,15 @@ public class OwnerOneToManyMapping<X, C, E> extends OwnerAssociationMapping<X, C
 	@Override
 	public void reset(Object instance) {
 		this.getDeclaringAttribute().reset(instance);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void setCollection(Object instance, ManagedCollection<?> collection) {
+		this.getDeclaringAttribute().setCollection(instance, collection);
 	}
 
 }

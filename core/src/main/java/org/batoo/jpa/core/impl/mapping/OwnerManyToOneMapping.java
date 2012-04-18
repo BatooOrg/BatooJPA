@@ -118,4 +118,13 @@ public class OwnerManyToOneMapping<X, T> extends OwnerAssociationMapping<X, T> i
 	public EntityTypeImpl<T> getType() {
 		return (EntityTypeImpl<T>) this.getDeclaringAttribute().getType();
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isCollection() {
+		return false;
+	}
 }

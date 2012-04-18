@@ -109,6 +109,16 @@ public interface Association<X, T> extends Mapping<X, T> {
 	public EntityTypeImpl<T> getType();
 
 	/**
+	 * Returns if the association is a collection.
+	 * 
+	 * @return true if the association is a collection
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	boolean isCollection();
+
+	/**
 	 * Returns if the association is annotated with {@link FetchType#EAGER}
 	 * 
 	 * @return
@@ -117,4 +127,14 @@ public interface Association<X, T> extends Mapping<X, T> {
 	 * @author hceylan
 	 */
 	boolean isEager();
+
+	/**
+	 * Returns if the association is owner.
+	 * 
+	 * @return true if the association is owner
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	boolean isOwner();
 }

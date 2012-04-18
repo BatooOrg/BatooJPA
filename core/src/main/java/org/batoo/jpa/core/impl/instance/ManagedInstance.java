@@ -20,9 +20,8 @@ package org.batoo.jpa.core.impl.instance;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.persistence.metamodel.PluralAttribute;
 
@@ -33,7 +32,6 @@ import org.batoo.jpa.core.impl.types.PluralAttributeImpl;
 import org.batoo.jpa.core.util.Pair2;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 /**
  * The managed instance of {@link #instance}.
@@ -87,8 +85,8 @@ public final class ManagedInstance<X> implements Comparable<ManagedInstance<?>> 
 
 	private final ManagedId<? super X> id;
 
-	private final Map<String, AbstractResolver<X>> resolvers;
-	private Map<String, AssociateResolver<X>> associateResolvers;
+	private final Collection<AbstractResolver<X>> resolvers;
+	private List<AssociateResolver<X>> associateResolvers;
 	private final List<Pair2<ManagedInstance<?>, OwnerAssociation<?, ?>>> references = Lists.newArrayList();
 	private Status status;
 	private boolean executed;
@@ -104,7 +102,7 @@ public final class ManagedInstance<X> implements Comparable<ManagedInstance<?>> 
 	 * @param session
 	 */
 	public ManagedInstance(EntityTypeImpl<X> type, SessionImpl session, X instance, ManagedId<? super X> id,
-		Map<String, AbstractResolver<X>> resolvers) {
+		Collection<AbstractResolver<X>> resolvers) {
 		super();
 
 		this.type = type;
@@ -166,7 +164,7 @@ public final class ManagedInstance<X> implements Comparable<ManagedInstance<?>> 
 	}
 
 	private boolean dependsOn(ManagedInstance<?> o) {
-		for (final AssociateResolver<X> resolver : this.getAssociateResolvers().values()) {
+		for (final AssociateResolver<X> resolver : this.getAssociateResolvers()) {
 			if (resolver.contains(o.getInstance())) {
 				return true;
 			}
@@ -230,13 +228,14 @@ public final class ManagedInstance<X> implements Comparable<ManagedInstance<?>> 
 	 * @since $version
 	 * @author hceylan
 	 */
-	private Map<String, AssociateResolver<X>> getAssociateResolvers() {
+	@SuppressWarnings("unchecked")
+	private List<AssociateResolver<X>> getAssociateResolvers() {
 		if (this.associateResolvers == null) {
-			this.associateResolvers = Maps.newHashMap();
+			this.associateResolvers = Lists.newArrayList();
 
-			for (final Entry<String, AbstractResolver<X>> entry : this.resolvers.entrySet()) {
-				if (entry.getValue() instanceof AssociateResolver) {
-					this.associateResolvers.put(entry.getKey(), (AssociateResolver<X>) entry.getValue());
+			for (final AbstractResolver<X> resolver : this.resolvers) {
+				if (resolver.isAssociateResolver()) {
+					this.associateResolvers.add((AssociateResolver<X>) resolver.getValue());
 				}
 			}
 		}

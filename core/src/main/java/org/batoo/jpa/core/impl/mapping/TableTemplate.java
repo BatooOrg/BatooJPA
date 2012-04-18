@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.mapping;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.PrimaryKeyJoinColumn;
@@ -35,7 +36,7 @@ import com.google.common.collect.Lists;
  * @author hceylan
  * @since $version
  */
-public class TableTemplate {
+public final class TableTemplate {
 
 	private final IdentifiableTypeImpl<?> owner;
 
@@ -208,4 +209,16 @@ public class TableTemplate {
 	public boolean isPrimary() {
 		return this.primary;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "TableTemplate [schema=" + this.schema + ", name=" + this.name + ", primary=" + this.primary + ", owner="
+			+ this.owner.getName() + ", primaryKeys=" + this.primaryKeys + ", columns=" + this.columns + ", uniqueConstraints="
+			+ Arrays.toString(this.uniqueConstraints) + ", primaryKeyJoinColumns=" + Arrays.toString(this.primaryKeyJoinColumns) + "]";
+	}
+
 }

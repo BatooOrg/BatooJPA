@@ -35,14 +35,12 @@ import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
 import org.batoo.jpa.core.impl.mapping.Association;
-import org.batoo.jpa.core.impl.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.mapping.CollectionMapping;
 import org.batoo.jpa.core.impl.mapping.Mapping;
-import org.batoo.jpa.core.impl.mapping.OwnedOneToManyMapping;
+import org.batoo.jpa.core.impl.mapping.Mapping.AssociationType;
 import org.batoo.jpa.core.impl.mapping.OwnerAssociation;
 import org.batoo.jpa.core.impl.types.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
-import org.batoo.jpa.core.util.Pair2;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
@@ -59,7 +57,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 	private static volatile int nextOperationNo = 0;
 	protected final SessionImpl session;
 	protected final EntityTypeImpl<X> rootType;
-	protected final Map<Pair2<Integer, PhysicalColumn>, String> columnAliases;
+	protected final Map<Integer, Map<PhysicalColumn, String>> columnAliases;
 	protected final List<Deque<Association<?, ?>>> entityPaths;
 	protected final List<Deque<Association<?, ?>>> lazyPaths;
 	protected final List<Deque<Association<?, ?>>> inversePaths;
@@ -83,7 +81,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 	 * @since $version
 	 * @author hceylan
 	 */
-	public BaseSelectHandler(SessionImpl session, EntityTypeImpl<X> rootType, Map<Pair2<Integer, PhysicalColumn>, String> columnAliases,
+	public BaseSelectHandler(SessionImpl session, EntityTypeImpl<X> rootType, Map<Integer, Map<PhysicalColumn, String>> columnAliases,
 		List<Deque<Association<?, ?>>> entityPaths, List<Deque<Association<?, ?>>> inversePaths, List<Deque<Association<?, ?>>> lazyPaths) {
 
 		this.session = session;
@@ -97,7 +95,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 	private void createLazyInstance(SessionImpl session, ResultSet rs, Map<ManagedId<?>, ManagedInstance<?>> cache, int depth,
 		final ManagedInstance<?> managedInstance, Deque<Association<?, ?>> path) throws SQLException {
 		final Association<?, ?> association = path.getLast();
-		if (association instanceof OwnerAssociation) {
+		if (association.isOwner()) {
 			final OwnerAssociation<?, ?> lazyAssociation = (OwnerAssociation<?, ?>) association;
 
 			for (final PhysicalColumn column : lazyAssociation.getPhysicalColumns()) {
@@ -110,9 +108,9 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 				}
 			}
 		}
-		else if (association instanceof OwnedOneToManyMapping) {
+		else if (association.isCollection()) {
 			final CollectionMapping<?, ?, ?> lazyAssociation = (CollectionMapping<?, ?, ?>) association;
-			lazyAssociation.setValue(managedInstance.getInstance(),
+			lazyAssociation.setCollection(managedInstance.getInstance(),
 				lazyAssociation.getDeclaringAttribute().newInstance(session, managedInstance));
 		}
 	}
@@ -222,8 +220,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 	}
 
 	private Object getColumnValue(ResultSet rs, int depth, final PhysicalColumn column) throws SQLException {
-		final String columnAlias = this.columnAliases.get(Pair2.create(depth, column));
-		return rs.getObject(columnAlias);
+		return rs.getObject(this.columnAliases.get(depth).get(column));
 	}
 
 	/**
@@ -338,7 +335,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 
 			for (final EntityTable table : currentType.getTables().values()) {
 				for (final PhysicalColumn column : table.getColumns()) {
-					if (column.getMapping() instanceof BasicMapping) {
+					if (column.getMapping().getAssociationType() == AssociationType.BASIC) {
 						if (column.isId()) { // primary key values already handled
 							continue;
 						}

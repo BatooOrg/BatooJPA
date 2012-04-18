@@ -67,7 +67,7 @@ public class PersistOperation<X> extends AbstractOperation<X> {
 			final Object value = association.getValue(this.managedInstance.getInstance());
 
 			if (value != null) {
-				if (value instanceof ManagedCollection) {
+				if (association.isCollection()) {
 					final ManagedCollection<?> values = (ManagedCollection<?>) value;
 					for (final Object child : values.getCollection()) {
 						cascades.add(new PersistOperation(this.em, child));
@@ -80,7 +80,7 @@ public class PersistOperation<X> extends AbstractOperation<X> {
 			}
 		}
 
-		if (association instanceof PersistableAssociation) {
+		if (association.isCollection() && association.isOwner()) {
 			final PersistableAssociation persistableAssociation = (PersistableAssociation) association;
 			if (persistableAssociation.hasJoin()) {
 				cascades.add(new PersistAssociationOperation(this.em, this.managedInstance, persistableAssociation));
