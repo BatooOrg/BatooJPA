@@ -8,6 +8,7 @@
 		
 		<class>org.batoo.jpa.core.test.mappedsuperclass.Foo</class>
 		<class>org.batoo.jpa.core.test.mappedsuperclass.Bar</class>
+		<class>org.batoo.jpa.core.test.mappedsuperclass.Quux</class>
 		
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.Driver40" />

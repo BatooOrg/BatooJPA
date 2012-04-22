@@ -18,10 +18,16 @@
  */
 package org.batoo.jpa.core.test.mappedsuperclass;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
+
+import com.google.common.collect.Lists;
 
 /**
  * 
@@ -38,6 +44,9 @@ public class Bar {
 	private String fooValue;
 
 	private String barValue;
+
+	@OneToMany(cascade = CascadeType.ALL)
+	private final List<Quux> quuxes = Lists.newArrayList();
 
 	/**
 	 * Returns the barValue.
@@ -67,6 +76,16 @@ public class Bar {
 	 */
 	public Integer getKey() {
 		return this.key;
+	}
+
+	/**
+	 * Returns the quuxes.
+	 * 
+	 * @return the quuxes
+	 * @since $version
+	 */
+	public List<Quux> getQuuxes() {
+		return this.quuxes;
 	}
 
 	/**

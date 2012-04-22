@@ -201,7 +201,7 @@ public abstract class SimpleEntityManager implements EntityManager {
 		final EntityTypeImpl<T> type = this.getMetamodel().entity(entityClass);
 		final ManagedId<? super T> managedId = type.getManagedId(this.session, primaryKey);
 
-		@SuppressWarnings("rawtypes")
+		@SuppressWarnings({ "rawtypes", "unchecked" })
 		final FindOperation<T> operation = new FindOperation((EntityManagerImpl) this, managedId);
 
 		try {

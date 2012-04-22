@@ -18,13 +18,11 @@
  */
 package org.batoo.jpa.core.test.mappedsuperclass;
 
-import java.util.List;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-
-import com.google.common.collect.Lists;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 /**
  * 
@@ -32,43 +30,75 @@ import com.google.common.collect.Lists;
  * @since $version
  */
 @Entity
-public class Foo extends Bar {
+public class Quux {
 
-	private String fooValue;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Integer key;
 
-	@OneToMany(cascade = CascadeType.ALL)
-	private final List<Quux> fooQuuxes = Lists.newArrayList();
+	private Integer quuxValue;
+
+	@ManyToOne
+	private Foo foo;
 
 	/**
-	 * Returns the fooQuuxes.
-	 * 
-	 * @return the fooQuuxes
 	 * @since $version
+	 * @author hceylan
 	 */
-	public List<Quux> getFooQuuxes() {
-		return this.fooQuuxes;
+	public Quux() {
+		super();
 	}
 
 	/**
-	 * Returns the fooValue.
+	 * Returns the foo.
 	 * 
-	 * @return the fooValue
+	 * @return the foo
 	 * @since $version
 	 */
-	@Override
-	public String getFooValue() {
-		return this.fooValue;
+	public Foo getFoo() {
+		return this.foo;
 	}
 
 	/**
-	 * Sets the fooValue.
+	 * Returns the key.
 	 * 
-	 * @param fooValue
-	 *            the fooValue to set
+	 * @return the key
 	 * @since $version
 	 */
-	@Override
-	public void setFooValue(String fooValue) {
-		this.fooValue = fooValue;
+	public Integer getKey() {
+		return this.key;
 	}
+
+	/**
+	 * Returns the quuxValue.
+	 * 
+	 * @return the quuxValue
+	 * @since $version
+	 */
+	public Integer getQuuxValue() {
+		return this.quuxValue;
+	}
+
+	/**
+	 * Sets the foo.
+	 * 
+	 * @param foo
+	 *            the foo to set
+	 * @since $version
+	 */
+	public void setFoo(Foo foo) {
+		this.foo = foo;
+	}
+
+	/**
+	 * Sets the quuxValue.
+	 * 
+	 * @param quuxValue
+	 *            the quuxValue to set
+	 * @since $version
+	 */
+	public void setQuuxValue(Integer quuxValue) {
+		this.quuxValue = quuxValue;
+	}
+
 }

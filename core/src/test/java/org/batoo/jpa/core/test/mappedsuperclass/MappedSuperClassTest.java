@@ -55,6 +55,28 @@ public class MappedSuperClassTest extends AbstractTest {
 		foo.setFooValue("FooValue");
 		foo.setBarValue("BarValue");
 
+		Quux quux;
+
+		quux = new Quux();
+		quux.setFoo(foo);
+		quux.setQuuxValue(1);
+		foo.getFooQuuxes().add(quux);
+
+		quux = new Quux();
+		quux.setFoo(foo);
+		quux.setQuuxValue(2);
+		foo.getFooQuuxes().add(quux);
+
+		quux = new Quux();
+		quux.setFoo(foo);
+		quux.setQuuxValue(3);
+		foo.getQuuxes().add(quux);
+
+		quux = new Quux();
+		quux.setFoo(foo);
+		quux.setQuuxValue(4);
+		foo.getQuuxes().add(quux);
+
 		return foo;
 	}
 
@@ -85,7 +107,7 @@ public class MappedSuperClassTest extends AbstractTest {
 	public void testCreateTable() throws SQLException {
 		final Set<EntityType<?>> entities = this.em().getMetamodel().getEntities();
 
-		Assert.assertEquals(1, entities.size());
+		Assert.assertEquals(2, entities.size());
 
 		final DataSource dataSource = this.em().unwrap(DataSource.class);
 		new QueryRunner(dataSource).query("SELECT * FROM Foo", new NullResultSetHandler());
