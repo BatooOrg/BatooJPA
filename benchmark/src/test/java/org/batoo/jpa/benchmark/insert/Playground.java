@@ -23,6 +23,10 @@ import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -37,6 +41,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * @author hceylan
@@ -59,9 +66,8 @@ public class Playground {
 	private Country country;
 
 	private TimeElement element;
-
+	private final HashMap<String, TimeElement> elements = Maps.newHashMap();
 	private boolean running;
-
 	private long oldTime;
 
 	protected void _measure(final long id) {
@@ -81,7 +87,7 @@ public class Playground {
 				}
 			});
 			try {
-				Thread.sleep(10);
+				Thread.sleep(1);
 			}
 			catch (final InterruptedException e) {}
 		}
@@ -93,7 +99,23 @@ public class Playground {
 	public void _measureAfter() {
 		this.running = false;
 
-		this.element.dump(0);
+		this.element.dump(0, 0);
+
+		System.out.println("\n\n\n");
+
+		final int rowNo = 0;
+		final ArrayList<TimeElement> elements = Lists.newArrayList(this.elements.values());
+		Collections.sort(elements, new Comparator<TimeElement>() {
+
+			@Override
+			public int compare(TimeElement o1, TimeElement o2) {
+				return o1.getSelf().compareTo(o2.getSelf());
+			}
+		});
+
+		for (final TimeElement element : this.elements.values()) {
+			element.dump2(rowNo);
+		}
 	}
 
 	@Before
@@ -139,14 +161,23 @@ public class Playground {
 
 				gotStart = true;
 
-				child = child.get(stElement.getClassName() + "." + stElement.getMethodName());
+				final String key = stElement.getClassName() + "." + stElement.getMethodName() + "." + stElement.getLineNumber();
+				child = child.get(key);
+				TimeElement child2 = this.elements.get(key);
+				if (child2 == null) {
+					this.elements.put(key, child2 = new TimeElement(key));
+				}
+
 				if (stElement.getClassName().startsWith("org.apache.derby") || (i == 0)) {
 					child.addTime(newTime - this.oldTime, true, inDerby);
+					child2.addTime(newTime - this.oldTime, true, inDerby);
 					last = true;
 				}
 				else {
 					child.addTime(newTime - this.oldTime, false, inDerby);
+					child2.addTime(newTime - this.oldTime, false, inDerby);
 				}
+
 				if (last) {
 					break;
 				}
@@ -264,12 +295,8 @@ public class Playground {
 			catch (final InterruptedException e) {}
 		}
 
-		final long start = System.currentTimeMillis();
-
 		for (int i = 0; i < 10000; i++) {
 			this.singleTest(emf);
 		}
-
-		LOG.info("{0} - execute {1}", type, System.currentTimeMillis() - start);
 	}
 }

@@ -66,24 +66,43 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 		return this.time > o.time ? -1 : o.time > this.time ? 1 : 0;
 	}
 
-	public void dump(int depth) {
-		if ((depth == 0) || (this.time > 10)) {
-			if (depth > 0) {
-				final String tabs = StringUtils.repeat(" ", depth);
-				System.out.println(String.format("%04d", this.hits) + //
-					" " + String.format("%04d", this.selfHit) + //
-					" " + String.format("%08d", this.time) + //
-					" " + String.format("%08d", this.timeWithoutDerby) + //
-					" " + String.format("%05d", this.self / this.hits) + //
-					" " + String.format("%08d", this.self) + tabs + this.key);
-			}
-
-			final List<TimeElement> children = Lists.newArrayList(this.values());
-			Collections.sort(children);
-			for (final TimeElement child : children) {
-				child.dump(depth + 1);
-			}
+	public int dump(int rowNo, int depth) {
+		if (depth > 0) {
+			rowNo++;
+			final String tabs = StringUtils.repeat(" ", depth);
+			System.out.println(String.format("%010d", rowNo) + //
+				" " + String.format("%010d", depth) + //
+				" " + String.format("%010d", this.hits) + //
+				" " + String.format("%010d", this.selfHit) + //
+				" " + String.format("%010d", this.time) + //
+				" " + String.format("%010d", this.timeWithoutDerby) + //
+				" " + String.format("%010d", (this.selfHit != 0 ? (this.self / this.selfHit) : 0)) + //
+				" " + String.format("%010d", this.self) + tabs + this.key);
 		}
+
+		final List<TimeElement> children = Lists.newArrayList(this.values());
+		Collections.sort(children);
+		for (final TimeElement child : children) {
+			rowNo = child.dump(rowNo, depth + 1);
+		}
+
+		return rowNo;
+	}
+
+	/**
+	 * @param rowNo
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void dump2(int rowNo) {
+		System.out.println(String.format("%010d", rowNo) + //
+			" " + String.format("%010d", this.hits) + //
+			" " + String.format("%010d", this.selfHit) + //
+			" " + String.format("%010d", this.time) + //
+			" " + String.format("%010d", this.timeWithoutDerby) + //
+			" " + String.format("%010d", (this.selfHit != 0 ? (this.self / this.selfHit) : 0)) + //
+			" " + String.format("%010d", this.self) + " " + this.key);
 	}
 
 	/**
@@ -99,5 +118,15 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 		}
 
 		return timeElement;
+	}
+
+	/**
+	 * @return
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Long getSelf() {
+		return this.self;
 	}
 }
