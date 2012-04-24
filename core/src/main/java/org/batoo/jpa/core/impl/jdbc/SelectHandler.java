@@ -25,7 +25,6 @@ import java.util.Map;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
 import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 
@@ -66,7 +65,7 @@ public class SelectHandler<X> extends BaseSelectHandler<X> {
 	 */
 	@Override
 	protected boolean shouldHandle(ManagedInstance<?> managedInstance) {
-		return (managedInstance != null) && (managedInstance.getStatus() == Status.LAZY);
+		return (managedInstance != null) && (!managedInstance.isLoaded());
 	}
 
 }

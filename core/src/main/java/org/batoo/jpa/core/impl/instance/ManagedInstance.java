@@ -67,29 +67,19 @@ public final class ManagedInstance<X> implements Comparable<ManagedInstance<?>> 
 		 * Instance is detached
 		 */
 		DETACHED,
-
-		/**
-		 * Instance is being loaded
-		 */
-		LOADING,
-
-		/**
-		 * Instance is in lazy state
-		 */
-		LAZY
 	}
 
 	private final EntityTypeImpl<X> type;
 	private final SessionImpl session;
 	private X instance;
-
+	private final Collection<AbstractResolver<X>> resolvers;
 	private final ManagedId<? super X> id;
 
-	private final Collection<AbstractResolver<X>> resolvers;
 	private List<AssociateResolver<X>> associateResolvers;
 	private final List<Pair2<ManagedInstance<?>, OwnerAssociation<?, ?>>> references = Lists.newArrayList();
 	private Status status;
 	private boolean executed;
+	private boolean loaded;
 
 	/**
 	 * @param type
@@ -309,6 +299,16 @@ public final class ManagedInstance<X> implements Comparable<ManagedInstance<?>> 
 	}
 
 	/**
+	 * Returns the loaded.
+	 * 
+	 * @return the loaded
+	 * @since $version
+	 */
+	public boolean isLoaded() {
+		return this.loaded;
+	}
+
+	/**
 	 * Performs insert for the managed instance
 	 * 
 	 * @param connection
@@ -329,6 +329,17 @@ public final class ManagedInstance<X> implements Comparable<ManagedInstance<?>> 
 	 */
 	public void setExecuted() {
 		this.executed = true;
+	}
+
+	/**
+	 * Sets the loaded.
+	 * 
+	 * @param loaded
+	 *            the loaded to set
+	 * @since $version
+	 */
+	public void setLoaded(boolean loaded) {
+		this.loaded = loaded;
 	}
 
 	/**

@@ -67,7 +67,7 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	}
 
 	public int dump(int rowNo, int depth) {
-		if (depth > 0) {
+		if ((depth > 0) && (this.time >= 10)) {
 			rowNo++;
 			final String tabs = StringUtils.repeat(" ", depth);
 			System.out.println(String.format("%010d", rowNo) + //
@@ -96,13 +96,15 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	 * @author hceylan
 	 */
 	public void dump2(int rowNo) {
-		System.out.println(String.format("%010d", rowNo) + //
-			" " + String.format("%010d", this.hits) + //
-			" " + String.format("%010d", this.selfHit) + //
-			" " + String.format("%010d", this.time) + //
-			" " + String.format("%010d", this.timeWithoutDerby) + //
-			" " + String.format("%010d", (this.selfHit != 0 ? (this.self / this.selfHit) : 0)) + //
-			" " + String.format("%010d", this.self) + " " + this.key);
+		if (this.time >= 10) {
+			System.out.println(String.format("%010d", rowNo) + //
+				" " + String.format("%010d", this.hits) + //
+				" " + String.format("%010d", this.selfHit) + //
+				" " + String.format("%010d", this.time) + //
+				" " + String.format("%010d", this.timeWithoutDerby) + //
+				" " + String.format("%010d", (this.selfHit != 0 ? (this.self / this.selfHit) : 0)) + //
+				" " + String.format("%010d", this.self) + " " + this.key);
+		}
 	}
 
 	/**

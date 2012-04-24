@@ -152,7 +152,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 		}
 		else { // new managed instances
 			final ManagedInstance<? super T> newInstance = type.newInstanceWithId(session, managedId, lazy);
-			newInstance.setStatus(Status.LAZY);
+			newInstance.setLoaded(false);
 
 			session.put(newInstance);
 			cache.put(managedId, newInstance);
@@ -269,7 +269,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 		}
 
 		for (final ManagedInstance<?> instance : cache.values()) {
-			if (instance.getStatus() == Status.LOADING) {
+			if (!instance.isLoaded()) {
 				instance.setStatus(Status.MANAGED);
 			}
 		}
@@ -331,7 +331,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 		final ManagedInstance<?> managedInstance = this.createManagedInstance(session, rs, cache, depth, currentType);
 		if (this.shouldHandle(managedInstance)) {
 
-			managedInstance.setStatus(Status.LOADING);
+			managedInstance.setLoaded(false);
 
 			for (final EntityTable table : currentType.getTables().values()) {
 				for (final PhysicalColumn column : table.getColumns()) {
@@ -360,13 +360,13 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 			associationNo.increment();
 
 			if (this.inversePaths.contains(path)) { // do inverse set
-				if (managedInstance.getStatus() == Status.LOADING) {
+				if (!managedInstance.isLoaded()) {
 					path.getLast().setValue(managedInstance.getInstance(), parent);
 				}
 				continue;
 			}
 			else if (this.lazyPaths.contains(path)) { // do lazy set
-				if (managedInstance.getStatus() == Status.LOADING) {
+				if (!managedInstance.isLoaded()) {
 					this.createLazyInstance(session, rs, cache, depth, managedInstance, path);
 				}
 				continue;

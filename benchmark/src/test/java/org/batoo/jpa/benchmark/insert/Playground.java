@@ -59,8 +59,6 @@ public class Playground {
 	@BeforeClass
 	public static void boot() throws SQLException, InterruptedException {
 		DriverManager.getConnection("jdbc:derby:memory:testDB;create=true");
-
-		// Thread.sleep(5000);
 	}
 
 	private Country country;
@@ -87,7 +85,7 @@ public class Playground {
 				}
 			});
 			try {
-				Thread.sleep(1);
+				Thread.sleep(0, 100);
 			}
 			catch (final InterruptedException e) {}
 		}
@@ -272,9 +270,7 @@ public class Playground {
 
 			start = System.currentTimeMillis();
 
-			for (int i = 0; i < 5; i++) {
-				this.test(type, emf);
-			}
+			this.test(type, emf);
 		}
 		finally {
 			Thread.currentThread().setContextClassLoader(old);

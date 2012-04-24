@@ -28,7 +28,6 @@ import org.batoo.jpa.core.impl.EntityManagerImpl;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
 import org.batoo.jpa.core.impl.mapping.Association;
 
 /**
@@ -94,7 +93,7 @@ public class FindOperation<X> extends AbstractOperation<X> {
 	protected boolean prepare(SessionImpl session) {
 		this.managedInstance = this.em.getSession().get(this.instance);
 
-		if ((this.managedInstance == null) || (this.managedInstance.getStatus() == Status.LAZY)) {
+		if ((this.managedInstance == null) || (!this.managedInstance.isLoaded())) {
 			try {
 				final ManagedInstance<? super X> oldInstance = this.managedInstance;
 				this.instance = this.type.performSelect(session, this.managedId);
