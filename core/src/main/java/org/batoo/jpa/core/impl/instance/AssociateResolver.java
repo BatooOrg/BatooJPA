@@ -26,7 +26,7 @@ import org.batoo.jpa.core.impl.mapping.OwnerAssociationMapping;
  * @author hceylan
  * @since $version
  */
-public class AssociateResolver<X> extends AbstractResolver<X> {
+public class AssociateResolver extends AbstractResolver {
 
 	/**
 	 * @param mapping
@@ -37,7 +37,7 @@ public class AssociateResolver<X> extends AbstractResolver<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AssociateResolver(OwnerAssociationMapping<?, ?> mapping, X instance) {
+	public AssociateResolver(OwnerAssociationMapping<?, ?> mapping, Object instance) {
 		super(mapping, instance);
 	}
 
@@ -59,9 +59,8 @@ public class AssociateResolver<X> extends AbstractResolver<X> {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
-	public OwnerAssociationMapping<X, ?> getMapping() {
-		return (OwnerAssociationMapping<X, ?>) super.getMapping();
+	public OwnerAssociationMapping getMapping() {
+		return (OwnerAssociationMapping) super.getMapping();
 	}
 
 	/**

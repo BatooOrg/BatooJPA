@@ -20,7 +20,6 @@ package org.batoo.jpa.core.impl.instance;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.metamodel.PluralAttribute;
@@ -39,7 +38,7 @@ import com.google.common.collect.Lists;
  * @author hceylan
  * @since $version
  */
-public final class ManagedInstance<X> implements Comparable<ManagedInstance<?>> {
+public final class ManagedInstance<X> {
 
 	/**
 	 * The states for a managed instance
@@ -72,10 +71,8 @@ public final class ManagedInstance<X> implements Comparable<ManagedInstance<?>> 
 	private final EntityTypeImpl<X> type;
 	private final SessionImpl session;
 	private X instance;
-	private final Collection<AbstractResolver<X>> resolvers;
 	private final ManagedId<? super X> id;
 
-	private List<AssociateResolver<X>> associateResolvers;
 	private final List<Pair2<ManagedInstance<?>, OwnerAssociation<?, ?>>> references = Lists.newArrayList();
 	private Status status;
 	private boolean executed;
@@ -91,14 +88,12 @@ public final class ManagedInstance<X> implements Comparable<ManagedInstance<?>> 
 	 * @author hceylan
 	 * @param session
 	 */
-	public ManagedInstance(EntityTypeImpl<X> type, SessionImpl session, X instance, ManagedId<? super X> id,
-		Collection<AbstractResolver<X>> resolvers) {
+	public ManagedInstance(EntityTypeImpl<X> type, SessionImpl session, X instance, ManagedId<? super X> id) {
 		super();
 
 		this.type = type;
 		this.session = session;
 		this.instance = instance;
-		this.resolvers = resolvers;
 		this.id = id;
 
 		this.status = Status.MANAGED;
@@ -141,39 +136,9 @@ public final class ManagedInstance<X> implements Comparable<ManagedInstance<?>> 
 	 * 
 	 */
 	@Override
-	public int compareTo(ManagedInstance<?> o) {
-		if (this.dependsOn(o)) {
-			return -1;
-		}
-
-		if (o.dependsOn(this)) {
-			return 1;
-		}
-
-		return 0;
-	}
-
-	private boolean dependsOn(ManagedInstance<?> o) {
-		for (final AssociateResolver<X> resolver : this.getAssociateResolvers()) {
-			if (resolver.contains(o.getInstance())) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
-		}
-		if (obj == null) {
-			return false;
 		}
 		if (this.getClass() != obj.getClass()) {
 			return false;
@@ -208,29 +173,6 @@ public final class ManagedInstance<X> implements Comparable<ManagedInstance<?>> 
 	 */
 	public void fillIdValues() {
 		this.id.fillIdValues();
-	}
-
-	/**
-	 * Returns the associate resolvers.
-	 * 
-	 * @return the associate resolvers
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@SuppressWarnings("unchecked")
-	private List<AssociateResolver<X>> getAssociateResolvers() {
-		if (this.associateResolvers == null) {
-			this.associateResolvers = Lists.newArrayList();
-
-			for (final AbstractResolver<X> resolver : this.resolvers) {
-				if (resolver.isAssociateResolver()) {
-					this.associateResolvers.add((AssociateResolver<X>) resolver.getValue());
-				}
-			}
-		}
-
-		return this.associateResolvers;
 	}
 
 	/**
@@ -293,8 +235,8 @@ public final class ManagedInstance<X> implements Comparable<ManagedInstance<?>> 
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = (prime * result) + ((this.id == null) ? 0 : this.id.hashCode());
-		result = (prime * result) + ((this.type == null) ? 0 : this.type.hashCode());
+		result = (prime * result) + this.id.hashCode();
+		result = (prime * result) + this.type.hashCode();
 		return result;
 	}
 

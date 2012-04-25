@@ -76,7 +76,7 @@ public class SubRepository<X> {
 		final ManagedId<? extends X> id = (ManagedId<? extends X>) instance.getId();
 		final ManagedInstance<? extends X> old = this.repository.put(id, instance);
 
-		if (instance.equals(old)) {
+		if ((old != null) && instance.equals(old)) {
 			throw new PersistenceException("Type " + instance.getType().getName() + " with id " + instance.getId()
 				+ " already exists in session");
 		}

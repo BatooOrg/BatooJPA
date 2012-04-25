@@ -135,8 +135,8 @@ public abstract class OwnedAssociationMapping<X, T> extends AbstractMapping<X, T
 	 * 
 	 */
 	@Override
-	public final <Y> OwnedAssociateResolver<Y> createResolver(Y instance) {
-		return new OwnedAssociateResolver<Y>(this, instance);
+	public final OwnedAssociateResolver createResolver(Object instance) {
+		return new OwnedAssociateResolver(this, instance);
 	}
 
 	/**
@@ -163,6 +163,7 @@ public abstract class OwnedAssociationMapping<X, T> extends AbstractMapping<X, T
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public final boolean isOwner() {
 		return false;
 	}

@@ -71,7 +71,9 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public <X> ManagedInstance<? extends X> get(ManagedId<X> id) {
-		return this.repository.get(id.getType()).get(id);
+		EntityTypeImpl<X> type = id.getType();
+		SubRepository<X> subRepository = this.repository.get(type);
+		return subRepository.get(id);
 	}
 
 	/**

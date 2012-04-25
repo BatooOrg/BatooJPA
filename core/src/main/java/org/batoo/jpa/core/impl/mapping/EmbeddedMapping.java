@@ -66,7 +66,7 @@ public class EmbeddedMapping<X, T> extends AbstractMapping<X, T> {
 	 * 
 	 */
 	@Override
-	public <Y> AbstractResolver<Y> createResolver(Y instance) {
+	public AbstractResolver createResolver(Object instance) {
 		throw new NotImplementedException();
 	}
 

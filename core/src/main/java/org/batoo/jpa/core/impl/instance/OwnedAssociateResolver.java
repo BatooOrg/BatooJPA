@@ -26,7 +26,7 @@ import org.batoo.jpa.core.impl.mapping.OwnedAssociationMapping;
  * @author hceylan
  * @since $version
  */
-public class OwnedAssociateResolver<X> extends AbstractResolver<X> {
+public class OwnedAssociateResolver extends AbstractResolver {
 
 	/**
 	 * @param mapping
@@ -37,7 +37,7 @@ public class OwnedAssociateResolver<X> extends AbstractResolver<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public OwnedAssociateResolver(OwnedAssociationMapping<?, ?> mapping, X instance) {
+	public OwnedAssociateResolver(OwnedAssociationMapping<?, ?> mapping, Object instance) {
 		super(mapping, instance);
 	}
 

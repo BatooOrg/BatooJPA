@@ -36,9 +36,10 @@ import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 public abstract class AbstractMapping<X, T> implements Mapping<X, T> {
 
 	private final AssociationType associationType;
-
 	private final AttributeImpl<X, T> declaringAttribute;
 	protected final Deque<AttributeImpl<?, ?>> path;
+	private final EntityTypeImpl<?> owner;
+
 	private int h;
 
 	private String strPath;
@@ -67,6 +68,7 @@ public abstract class AbstractMapping<X, T> implements Mapping<X, T> {
 		this.declaringAttribute = declaringAttribute;
 
 		this.path = new LinkedList<AttributeImpl<?, ?>>(path);
+		this.owner = (EntityTypeImpl<?>) this.getPath().getFirst().getDeclaringType();
 	}
 
 	/**
@@ -81,7 +83,7 @@ public abstract class AbstractMapping<X, T> implements Mapping<X, T> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract <Y> AbstractResolver<Y> createResolver(Y instance);
+	public abstract AbstractResolver createResolver(Object instance);
 
 	/**
 	 * {@inheritDoc}
@@ -143,7 +145,7 @@ public abstract class AbstractMapping<X, T> implements Mapping<X, T> {
 	 */
 	@Override
 	public final EntityTypeImpl<?> getOwner() {
-		return (EntityTypeImpl<?>) this.getPath().getFirst().getDeclaringType();
+		return this.owner;
 	}
 
 	/**

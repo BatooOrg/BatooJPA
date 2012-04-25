@@ -59,8 +59,9 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 	protected final EntityTypeImpl<X> rootType;
 	protected final Map<Integer, Map<PhysicalColumn, String>> columnAliases;
 	protected final List<Deque<Association<?, ?>>> entityPaths;
-	protected final List<Deque<Association<?, ?>>> lazyPaths;
-	protected final List<Deque<Association<?, ?>>> inversePaths;
+	protected final Set<Deque<Association<?, ?>>> lazyPaths;
+	protected final Set<Deque<Association<?, ?>>> inversePaths;
+	private boolean dbAudit;
 
 	/**
 	 * @param session
@@ -82,7 +83,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 	 * @author hceylan
 	 */
 	public BaseSelectHandler(SessionImpl session, EntityTypeImpl<X> rootType, Map<Integer, Map<PhysicalColumn, String>> columnAliases,
-		List<Deque<Association<?, ?>>> entityPaths, List<Deque<Association<?, ?>>> inversePaths, List<Deque<Association<?, ?>>> lazyPaths) {
+		List<Deque<Association<?, ?>>> entityPaths, Set<Deque<Association<?, ?>>> inversePaths, Set<Deque<Association<?, ?>>> lazyPaths) {
 
 		this.session = session;
 		this.rootType = rootType;
@@ -229,6 +230,10 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 	 */
 	@Override
 	public Collection<X> handle(ResultSet rs) throws SQLException {
+		if (!this.dbAudit) {
+			return this.handle0(rs);
+		}
+
 		final int operationNo = nextOperationNo++;
 
 		LOG.debug("{0}: handle()", operationNo);
@@ -236,13 +241,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 		final long start = System.currentTimeMillis();
 
 		try {
-			return Collections2.transform(this.handle0(rs), new Function<ManagedInstance<X>, X>() {
-
-				@Override
-				public X apply(ManagedInstance<X> input) {
-					return input.getInstance();
-				}
-			});
+			return this.handle0(rs);
 		}
 		finally {
 			final long time = System.currentTimeMillis() - start;
@@ -256,7 +255,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 	}
 
 	@SuppressWarnings("unchecked")
-	private Collection<ManagedInstance<X>> handle0(ResultSet rs) throws SQLException {
+	private Collection<X> handle0(ResultSet rs) throws SQLException {
 		final Map<ManagedId<?>, ManagedInstance<?>> cache = Maps.newHashMap();
 		final Map<ManagedInstance<?>, Set<Mapping<?, ?>>> associationsPrepared = Maps.newHashMap();
 
@@ -274,7 +273,14 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 			}
 		}
 
-		return instances.values();
+		final Collection<ManagedInstance<X>> handle0 = instances.values();
+		return Collections2.transform(handle0, new Function<ManagedInstance<X>, X>() {
+
+			@Override
+			public X apply(ManagedInstance<X> input) {
+				return input.getInstance();
+			}
+		});
 	}
 
 	/**
@@ -353,7 +359,9 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 
 		while (this.entityPaths.size() > associationNo.intValue()) {
 			final Deque<Association<?, ?>> path = this.entityPaths.get(associationNo.intValue());
-			if (path.getLast().getOwner() != currentType) {
+			final Association<?, ?> association = path.getLast();
+
+			if (association.getOwner() != currentType) {
 				break;
 			}
 
@@ -361,7 +369,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 
 			if (this.inversePaths.contains(path)) { // do inverse set
 				if (!managedInstance.isLoaded()) {
-					path.getLast().setValue(managedInstance.getInstance(), parent);
+					association.setValue(managedInstance.getInstance(), parent);
 				}
 				continue;
 			}
@@ -372,7 +380,6 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 				continue;
 			}
 
-			final Association<?, ?> association = path.getLast();
 			this.prepareAssociation(managedInstance, association, associationsPrepared);
 			final ManagedInstance<?> child = this.processRow(session, rs, cache, root, ++depth, associationNo,
 				managedInstance.getInstance(), associationsPrepared);

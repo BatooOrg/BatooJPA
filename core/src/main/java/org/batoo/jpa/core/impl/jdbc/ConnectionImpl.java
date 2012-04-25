@@ -69,6 +69,8 @@ public class ConnectionImpl implements Connection {
 
 	private final GenericKeyedPool<String, PreparedStatementImpl> preparedStatementPool;
 
+	private boolean sqlAudit;
+
 	/**
 	 * @param connection
 	 *            the connection
@@ -164,6 +166,12 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public void commit() throws SQLException {
+		if (!this.sqlAudit) {
+			this.connection.commit();
+
+			return;
+		}
+
 		final long callNo = ++this.callNo;
 
 		LOG.trace("{0}:{1} commit()", this.connNo, callNo);
@@ -546,6 +554,10 @@ public class ConnectionImpl implements Connection {
 	}
 
 	/* package */PreparedStatementImpl prepareStatement0(String sql) throws SQLException {
+		if (!this.sqlAudit) {
+			return new PreparedStatementImpl(this, sql, this.connection.prepareStatement(sql), this.preparedStatementPool);
+		}
+
 		final long callNo = ++this.callNo;
 
 		LOG.trace("{0}:{1} prepareStatement(String): {2}", this.connNo, callNo, BLogger.lazyBoxed(sql));
@@ -583,6 +595,12 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public void rollback() throws SQLException {
+		if (!this.sqlAudit) {
+			if (this.connection != null) {
+				this.connection.rollback();
+			}
+		}
+
 		final long callNo = ++this.callNo;
 
 		LOG.trace("{0}:{1} rollback()", this.connNo, callNo);
@@ -621,6 +639,12 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public void setAutoCommit(boolean autoCommit) throws SQLException {
+		if (!this.sqlAudit) {
+			this.connection.setAutoCommit(autoCommit);
+
+			return;
+		}
+
 		final long callNo = ++this.callNo;
 
 		LOG.trace("{0}:{1} setAutoCommit(boolean): {2}", this.connNo, callNo, autoCommit);

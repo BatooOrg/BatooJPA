@@ -80,8 +80,8 @@ public final class BasicMapping<X, T> extends AbstractPhysicalMapping<X, T> {
 	 * 
 	 */
 	@Override
-	public <Y> BasicResolver<Y> createResolver(Y instance) {
-		return new BasicResolver<Y>(this, instance);
+	public BasicResolver createResolver(Object instance) {
+		return new BasicResolver(this, instance);
 	}
 
 	/**

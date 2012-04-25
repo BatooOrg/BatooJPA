@@ -40,7 +40,7 @@ import com.google.common.collect.Lists;
  * @author hceylan
  * @since $version
  */
-public abstract class AbstractOperation<X> implements Comparable<AbstractOperation<?>> {
+public abstract class AbstractOperation<X> {
 
 	private enum Status {
 		PENDING,
@@ -102,19 +102,6 @@ public abstract class AbstractOperation<X> implements Comparable<AbstractOperati
 	}
 
 	/**
-	 * Adds a dependency to the operation.
-	 * 
-	 * @param dependency
-	 *            the dependency to add
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	private void addDependency(AbstractOperation<?> dependency) {
-		this.dependencies.add(dependency);
-	}
-
-	/**
 	 * Returns a cascaded operation if the operation should be cascaded for the association.
 	 * 
 	 * @param association
@@ -125,27 +112,6 @@ public abstract class AbstractOperation<X> implements Comparable<AbstractOperati
 	 * @author hceylan
 	 */
 	protected abstract List<AbstractOperation<?>> cascade(Association<?, ?> association);
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public int compareTo(AbstractOperation<?> o) {
-		final ManagedInstance<? super X> thisInstance = this.managedInstance;
-		final ManagedInstance<?> otherInstance = o.managedInstance;
-
-		switch (thisInstance.compareTo(otherInstance)) {
-			case -1:
-				this.addDependency(o);
-				return -1;
-			case 1:
-				o.addDependency(this);
-				return 1;
-		}
-
-		return 0;
-	}
 
 	/**
 	 * Returns the managedInstance.

@@ -26,7 +26,7 @@ import org.batoo.jpa.core.impl.mapping.BasicMapping;
  * @author hceylan
  * @since $version
  */
-public class BasicResolver<X> extends AbstractResolver<X> {
+public class BasicResolver extends AbstractResolver {
 
 	private final boolean id;
 	private int h;
@@ -41,7 +41,7 @@ public class BasicResolver<X> extends AbstractResolver<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public BasicResolver(BasicMapping<?, ?> mapping, X instance) {
+	public BasicResolver(BasicMapping<?, ?> mapping, Object instance) {
 		super(mapping, instance);
 
 		this.id = this.getMapping().getDeclaringAttribute().isId();

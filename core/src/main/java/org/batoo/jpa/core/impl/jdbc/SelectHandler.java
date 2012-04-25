@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.jdbc;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.batoo.jpa.core.impl.SessionImpl;
@@ -55,7 +56,7 @@ public class SelectHandler<X> extends BaseSelectHandler<X> {
 	 * @author hceylan
 	 */
 	public SelectHandler(SessionImpl session, EntityTypeImpl<X> rootType, Map<Integer, Map<PhysicalColumn, String>> columnAliases,
-		List<Deque<Association<?, ?>>> entityPaths, List<Deque<Association<?, ?>>> inversePaths, List<Deque<Association<?, ?>>> lazyPaths) {
+		List<Deque<Association<?, ?>>> entityPaths, Set<Deque<Association<?, ?>>> inversePaths, Set<Deque<Association<?, ?>>> lazyPaths) {
 		super(session, rootType, columnAliases, entityPaths, inversePaths, lazyPaths);
 	}
 

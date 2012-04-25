@@ -96,7 +96,7 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 	protected final ManagedTypeImpl<X> declaringType;
 	protected final Class<Y> javaType; // the java type of the attribute
 	protected final Member javaMember; // the java member of the attribute
-	private Accessor<Y> javaMemberAccessor; // the accessor to to use for fast get / set operations
+	private Accessor<Y> accessor; // the accessor to to use for fast get / set operations
 	protected final JDBCAdapter jdbcAdapter;
 
 	// Mapping supplied properties
@@ -218,7 +218,7 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 	}
 
 	private synchronized void createAccessor() {
-		if (this.javaMemberAccessor != null) {
+		if (this.accessor != null) {
 			return;
 		}
 
@@ -227,7 +227,7 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 			if (field.getType() == char.class) {
 				this.charType = true;
 			}
-			this.javaMemberAccessor = new FieldAccessor<Y>(field);
+			this.accessor = new FieldAccessor<Y>(field);
 		}
 	}
 
@@ -273,11 +273,11 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 	}
 
 	protected final Accessor<Y> getAccessor() {
-		if (this.javaMemberAccessor == null) {
+		if (this.accessor == null) {
 			this.createAccessor();
 		}
 
-		return this.javaMemberAccessor;
+		return this.accessor;
 	}
 
 	/**

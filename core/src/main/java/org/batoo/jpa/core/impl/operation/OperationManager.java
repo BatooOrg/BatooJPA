@@ -56,6 +56,12 @@ public class OperationManager {
 	 * @author hceylan
 	 */
 	public static void replay(EntityManagerImpl entityManager, AbstractOperation<?>... operations) {
+		if (true) {
+			OperationManager.prepare0(entityManager, Lists.newArrayList(operations));
+
+			return;
+		}
+
 		if ((operations == null) || (operations.length == 0)) {
 			return;
 		}

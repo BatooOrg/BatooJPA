@@ -85,7 +85,7 @@ public class Playground {
 				}
 			});
 			try {
-				Thread.sleep(0, 100);
+				Thread.sleep(1);
 			}
 			catch (final InterruptedException e) {}
 		}
@@ -97,11 +97,9 @@ public class Playground {
 	public void _measureAfter() {
 		this.running = false;
 
-		this.element.dump(0, 0);
-
 		System.out.println("\n\n\n");
 
-		final int rowNo = 0;
+		int rowNo = 0;
 		final ArrayList<TimeElement> elements = Lists.newArrayList(this.elements.values());
 		Collections.sort(elements, new Comparator<TimeElement>() {
 
@@ -111,7 +109,8 @@ public class Playground {
 			}
 		});
 
-		for (final TimeElement element : this.elements.values()) {
+		for (final TimeElement element : elements) {
+			rowNo++;
 			element.dump2(rowNo);
 		}
 	}
@@ -159,7 +158,8 @@ public class Playground {
 
 				gotStart = true;
 
-				final String key = stElement.getClassName() + "." + stElement.getMethodName() + "." + stElement.getLineNumber();
+				final String key = stElement.getClassName() + "." + stElement.getMethodName();
+				// final String key = stElement.getClassName() + "." + stElement.getMethodName() + "." + stElement.getLineNumber();
 				child = child.get(key);
 				TimeElement child2 = this.elements.get(key);
 				if (child2 == null) {
@@ -270,7 +270,12 @@ public class Playground {
 
 			start = System.currentTimeMillis();
 
-			this.test(type, emf);
+			for (int i = 0; i < 5; i++) {
+				this.test(type, emf);
+
+				LOG.info("\n\nRound up: " + i);
+				this.element.dump(0, 0);
+			}
 		}
 		finally {
 			Thread.currentThread().setContextClassLoader(old);

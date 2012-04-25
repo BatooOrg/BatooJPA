@@ -18,8 +18,7 @@
  */
 package org.batoo.jpa.core.impl.instance;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Set;
 
 import javax.persistence.metamodel.SingularAttribute;
@@ -29,9 +28,7 @@ import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 import org.batoo.jpa.core.impl.types.SingularAttributeImpl;
 import org.batoo.jpa.core.impl.types.TypeImpl;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Collections2;
 
 /**
  * Id of a persistent class
@@ -44,11 +41,10 @@ public class ManagedId<X> {
 	private final EntityTypeImpl<X> type;
 	private final SessionImpl session;
 	private final X instance;
-
-	private final List<BasicResolver<X>> resolvers;
+	private final BasicResolver[] resolvers;
 
 	private X proxy;
-	private BasicResolver<X> singleId;
+	private BasicResolver singleId;
 
 	private int h;
 	private boolean initialized;
@@ -66,7 +62,7 @@ public class ManagedId<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedId(EntityTypeImpl<X> type, SessionImpl session, X instance, List<BasicResolver<X>> resolvers) {
+	public ManagedId(EntityTypeImpl<X> type, SessionImpl session, X instance, BasicResolver[] resolvers) {
 		super();
 
 		this.type = type;
@@ -84,20 +80,18 @@ public class ManagedId<X> {
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null) {
-			return false;
-		}
+
 		final ManagedId<?> other = (ManagedId<?>) obj;
+
 		if (!this.type.equals(other.type)) {
 			return false;
 		}
+
 		if (!this.session.equals(other.session)) {
 			return false;
 		}
-		if (!this.resolvers.equals(other.resolvers)) {
-			return false;
-		}
-		return true;
+
+		return Arrays.equals(this.resolvers, other.resolvers);
 	}
 
 	/**
@@ -107,7 +101,7 @@ public class ManagedId<X> {
 	 * @author hceylan
 	 */
 	public void fillIdValues() {
-		for (final BasicResolver<X> resolver : this.resolvers) {
+		for (final BasicResolver resolver : this.resolvers) {
 			resolver.fillValue();
 		}
 	}
@@ -203,9 +197,9 @@ public class ManagedId<X> {
 
 		final int prime = 31;
 		int result = 1;
-		result = (prime * result) + ((this.resolvers == null) ? 0 : this.resolvers.hashCode());
-		result = (prime * result) + ((this.session == null) ? 0 : this.session.hashCode());
-		return this.h = (prime * result) + ((this.type == null) ? 0 : this.type.hashCode());
+		result = (prime * result) + Arrays.hashCode(this.resolvers);
+		result = (prime * result) + this.session.hashCode();
+		return this.h = (prime * result) + this.type.hashCode();
 	}
 
 	/**
@@ -216,7 +210,7 @@ public class ManagedId<X> {
 	 */
 	private void initialize() {
 		if (!this.initialized) {
-			final TypeImpl<?> idType = (TypeImpl<?>) this.type.getIdType();
+			final TypeImpl<?> idType = this.type.getIdType();
 			if ((idType != null) && idType.isEmbeddable()) {
 
 				this.embeddedAttribute = (SingularAttributeImpl<? super X, ?>) this.type.getId(this.type.getIdType().getJavaType());
@@ -224,8 +218,8 @@ public class ManagedId<X> {
 			else if (this.type.getIdJavaType() != null) {
 				this.idJavaType = this.type.getIdJavaType();
 			}
-			else if (this.resolvers.size() == 1) {
-				this.singleId = this.resolvers.get(0);
+			else if (this.resolvers.length == 1) {
+				this.singleId = this.resolvers[0];
 			}
 
 			this.initialized = true;
@@ -256,7 +250,7 @@ public class ManagedId<X> {
 			}
 		}
 		else {
-			for (final BasicResolver<X> resolver : this.resolvers) {
+			for (final BasicResolver resolver : this.resolvers) {
 				synchronized (resolver) {
 					resolver.unlock();
 					resolver.setValue(id);
@@ -285,13 +279,10 @@ public class ManagedId<X> {
 	 */
 	@Override
 	public String toString() {
-		final Collection<String> ids = Collections2.transform(this.resolvers, new Function<BasicResolver<X>, String>() {
-
-			@Override
-			public String apply(BasicResolver<X> input) {
-				return input.mapping.getPathAsString() + "= " + input.getValue();
-			}
-		});
+		final String[] ids = new String[this.resolvers.length];
+		for (int i = 0; i < this.resolvers.length; i++) {
+			ids[i] = this.resolvers[i].mapping.getPathAsString() + "= " + this.resolvers[i].getValue();
+		}
 
 		final String idsStr = "[" + Joiner.on(", ").join(ids) + "]";
 

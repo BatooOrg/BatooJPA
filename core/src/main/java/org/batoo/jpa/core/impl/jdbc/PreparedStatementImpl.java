@@ -77,6 +77,8 @@ public class PreparedStatementImpl implements PreparedStatement {
 
 	private ParameterMetaData parameterMetaData;
 
+	private boolean sqlAudit;
+
 	/**
 	 * @param connection
 	 *            the connection
@@ -286,6 +288,10 @@ public class PreparedStatementImpl implements PreparedStatement {
 	 */
 	@Override
 	public ResultSet executeQuery() throws SQLException {
+		if (!this.sqlAudit) {
+			return this.statement.executeQuery();
+		}
+
 		final long executeNo = ++this.executeNo;
 		this.executes++;
 		this.selects++;
@@ -328,6 +334,10 @@ public class PreparedStatementImpl implements PreparedStatement {
 	 */
 	@Override
 	public int executeUpdate() throws SQLException {
+		if (!this.sqlAudit) {
+			return this.statement.executeUpdate();
+		}
+
 		final long executeNo = ++this.executeNo;
 		this.executes++;
 
@@ -493,31 +503,13 @@ public class PreparedStatementImpl implements PreparedStatement {
 			return this.parameterMetaData;
 		}
 
-		final long executeNo = ++this.executeNo;
+		this.parameterMetaData = this.statement.getParameterMetaData();
 
-		LOG.trace("{0}:{1}:{2} getParameterMetaData()", this.connection.connNo, this.statementNo, executeNo);
-
-		final long start = System.currentTimeMillis();
-		try {
-			this.parameterMetaData = this.statement.getParameterMetaData();
-
-			if (this.parameters == null) {
-				this.parameters = new Object[this.parameterMetaData.getParameterCount()];
-			}
-
-			return this.parameterMetaData;
+		if (this.parameters == null) {
+			this.parameters = new Object[this.parameterMetaData.getParameterCount()];
 		}
-		finally {
-			final long time = System.currentTimeMillis() - start;
 
-			if (time > BJPASettings.WARN_TIME) {
-				LOG.warn(new OperationTookLongTimeWarning(), "{0}:{1}:{2} {3} msecs, getParameterMetaData()", this.connection.connNo,
-					this.statementNo, executeNo, time);
-			}
-			else {
-				LOG.trace("{0}:{1}:{2} {3} msecs, getParameterMetaData()", this.connection.connNo, this.statementNo, executeNo, time);
-			}
-		}
+		return this.parameterMetaData;
 	}
 
 	/**
@@ -1016,7 +1008,9 @@ public class PreparedStatementImpl implements PreparedStatement {
 	 */
 	@Override
 	public void setNull(int parameterIndex, int sqlType) throws SQLException {
-		this.parameters[parameterIndex - 1] = null;
+		if (this.sqlAudit) {
+			this.parameters[parameterIndex - 1] = null;
+		}
 
 		this.statement.setNull(parameterIndex, sqlType);
 	}
@@ -1036,7 +1030,9 @@ public class PreparedStatementImpl implements PreparedStatement {
 	 */
 	@Override
 	public void setObject(int parameterIndex, Object x) throws SQLException {
-		this.parameters[parameterIndex - 1] = x;
+		if (this.sqlAudit) {
+			this.parameters[parameterIndex - 1] = x;
+		}
 
 		this.statement.setObject(parameterIndex, x);
 	}

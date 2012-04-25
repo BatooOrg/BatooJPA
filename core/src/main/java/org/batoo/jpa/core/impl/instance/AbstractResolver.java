@@ -27,10 +27,10 @@ import org.batoo.jpa.core.impl.mapping.AbstractMapping;
  * @author hceylan
  * @since $version
  */
-public abstract class AbstractResolver<X> {
+public abstract class AbstractResolver {
 
 	protected final AbstractMapping<?, ?> mapping;
-	protected final X instance;
+	protected final Object instance;
 
 	/**
 	 * @param mapping
@@ -41,7 +41,7 @@ public abstract class AbstractResolver<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AbstractResolver(AbstractMapping<?, ?> mapping, X instance) {
+	public AbstractResolver(AbstractMapping<?, ?> mapping, Object instance) {
 		super();
 
 		this.mapping = mapping;
@@ -57,26 +57,13 @@ public abstract class AbstractResolver<X> {
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null) {
-			return false;
-		}
 
-		final AbstractResolver<?> other = (AbstractResolver<?>) obj;
+		final AbstractResolver other = (AbstractResolver) obj;
 		if (!this.mapping.equals(other.mapping)) {
 			return false;
 		}
 
 		return ObjectUtils.equals(this.getValue(), other.getValue());
-	}
-
-	/**
-	 * Returns the entity.
-	 * 
-	 * @return the entity
-	 * @since $version
-	 */
-	public X getEntity() {
-		return this.instance;
 	}
 
 	/**

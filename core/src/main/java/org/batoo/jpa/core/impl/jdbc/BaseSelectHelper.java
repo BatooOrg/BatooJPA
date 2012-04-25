@@ -23,6 +23,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.lang.StringUtils;
@@ -39,6 +40,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Helper class for entity selects.
@@ -64,8 +66,8 @@ public abstract class BaseSelectHelper<X> {
 
 	protected final Map<Integer, Map<PhysicalColumn, String>> columnAliases = Maps.newHashMap();
 	protected final List<Deque<Association<?, ?>>> entityPaths = Lists.newArrayList();
-	protected final List<Deque<Association<?, ?>>> lazyPaths = Lists.newArrayList();
-	protected final List<Deque<Association<?, ?>>> inversePaths = Lists.newArrayList();
+	protected final Set<Deque<Association<?, ?>>> lazyPaths = Sets.newIdentityHashSet();
+	protected final Set<Deque<Association<?, ?>>> inversePaths = Sets.newIdentityHashSet();
 	protected final List<PhysicalColumn> predicates = Lists.newArrayList();
 
 	private String selectSql;

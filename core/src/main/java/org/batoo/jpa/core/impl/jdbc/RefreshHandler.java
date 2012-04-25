@@ -62,7 +62,7 @@ public class RefreshHandler<X> extends BaseSelectHandler<X> {
 	 * @author hceylan
 	 */
 	public RefreshHandler(SessionImpl session, EntityTypeImpl<X> rootType, Map<Integer, Map<PhysicalColumn, String>> columnAliases,
-		List<Deque<Association<?, ?>>> entityPaths, List<Deque<Association<?, ?>>> inversePaths, List<Deque<Association<?, ?>>> lazyPaths) {
+		List<Deque<Association<?, ?>>> entityPaths, Set<Deque<Association<?, ?>>> inversePaths, Set<Deque<Association<?, ?>>> lazyPaths) {
 		super(session, rootType, columnAliases, entityPaths, inversePaths, lazyPaths);
 	}
 

@@ -133,8 +133,8 @@ public abstract class OwnerAssociationMapping<X, T> extends AbstractPhysicalMapp
 	 * 
 	 */
 	@Override
-	public <Y> AssociateResolver<Y> createResolver(Y instance) {
-		return new AssociateResolver<Y>(this, instance);
+	public AssociateResolver createResolver(Object instance) {
+		return new AssociateResolver(this, instance);
 	}
 
 	/**
@@ -159,6 +159,7 @@ public abstract class OwnerAssociationMapping<X, T> extends AbstractPhysicalMapp
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public final boolean isOwner() {
 		return true;
 	}

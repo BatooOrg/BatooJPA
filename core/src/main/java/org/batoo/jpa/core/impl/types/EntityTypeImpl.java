@@ -41,7 +41,6 @@ import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.SessionImpl;
-import org.batoo.jpa.core.impl.instance.AbstractResolver;
 import org.batoo.jpa.core.impl.instance.BasicResolver;
 import org.batoo.jpa.core.impl.instance.InstanceInvoker;
 import org.batoo.jpa.core.impl.instance.ManagedId;
@@ -69,8 +68,6 @@ import org.batoo.jpa.core.impl.mapping.TypeFactory;
 import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.IdType;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -102,7 +99,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private Object topType;
 
 	private final SelectHelper<X> selectHelper;
-
 	private final RefreshHelper<X> refreshHelper;
 
 	/**
@@ -379,20 +375,10 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 		final X instance = this.newInstance();
 
-		final List<BasicResolver<X>> resolvers = Lists.transform(this.idMappings, new Function<BasicMapping<?, ?>, BasicResolver<X>>() {
-
-			private BasicResolver<X> resolver;
-
-			@Override
-			public BasicResolver<X> apply(BasicMapping<?, ?> input) {
-				if (this.resolver == null) {
-					this.resolver = input.createResolver(instance);
-				}
-
-				return this.resolver;
-			}
-
-		});
+		final BasicResolver[] resolvers = new BasicResolver[this.idMappings.size()];
+		for (int i = 0; i < this.idMappings.size(); i++) {
+			resolvers[i] = this.idMappings.get(i).createResolver(instance);
+		}
 
 		final ManagedId<X> managedId = new ManagedId<X>(this, session, instance, resolvers);
 
@@ -422,20 +408,10 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			return this.getTopType().getManagedIdForInstance(session, instance);
 		}
 
-		final List<BasicResolver<X>> resolvers = Lists.transform(this.idMappings, new Function<BasicMapping<?, ?>, BasicResolver<X>>() {
-
-			private BasicResolver<X> resolver;
-
-			@Override
-			public BasicResolver<X> apply(BasicMapping<?, ?> input) {
-				if (this.resolver == null) {
-					this.resolver = input.createResolver(instance);
-				}
-
-				return this.resolver;
-			}
-
-		});
+		final BasicResolver[] resolvers = new BasicResolver[this.idMappings.size()];
+		for (int i = 0; i < this.idMappings.size(); i++) {
+			resolvers[i] = this.idMappings.get(i).createResolver(instance);
+		}
 
 		return new ManagedId<X>(this, session, instance, resolvers);
 	}
@@ -456,21 +432,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @param <Y>
 	 */
 	public ManagedInstance<X> getManagedInstance(SessionImpl session, final X instance) {
-		return this.getManagedInstance0(session, instance, this.getManagedIdForInstance(session, instance));
-	}
-
-	private ManagedInstance<X> getManagedInstance0(SessionImpl session, final X instance, ManagedId<? super X> managedId) {
-		final Collection<AbstractResolver<X>> resolvers = Collections2.transform(this.mappings.values(),
-			new Function<AbstractMapping<?, ?>, AbstractResolver<X>>() {
-
-				@Override
-				public AbstractResolver<X> apply(AbstractMapping<?, ?> input) {
-					return input.createResolver(instance);
-				}
-
-			});
-
-		return new ManagedInstance<X>(this, session, instance, managedId, resolvers);
+		return new ManagedInstance<X>(this, session, instance, this.getManagedIdForInstance(session, instance));
 	}
 
 	/**
@@ -634,13 +596,13 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	@SuppressWarnings("unchecked")
 	public ManagedInstance<X> newInstanceWithId(final SessionImpl session, final ManagedId<? super X> managedId, boolean lazy) {
 		if (!lazy) {
-			return this.getManagedInstance0(session, (X) managedId.getInstance(), managedId);
+			return new ManagedInstance<X>(this, session, (X) managedId.getInstance(), managedId);
 		}
 
 		final X proxy = InstanceInvoker.<X> createInvoker(this.javaType.getClassLoader(), this, session, managedId);
 		managedId.proxify(proxy);
 
-		return this.getManagedInstance0(session, (X) managedId.getInstance(), managedId);
+		return new ManagedInstance<X>(this, session, (X) managedId.getInstance(), managedId);
 	}
 
 	/**
