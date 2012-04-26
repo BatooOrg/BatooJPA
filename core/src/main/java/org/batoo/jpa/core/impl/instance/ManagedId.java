@@ -19,13 +19,11 @@
 package org.batoo.jpa.core.impl.instance;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.batoo.jpa.core.impl.SessionImpl;
-import org.batoo.jpa.core.impl.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 import org.batoo.jpa.core.impl.types.SingularAttributeImpl;
 import org.batoo.jpa.core.impl.types.TypeImpl;
@@ -45,10 +43,10 @@ public class ManagedId<X> {
 	private final X instance;
 	private final BasicResolver[] resolvers;
 
+	private X proxy;
 	private BasicResolver singleId;
 
 	private int h;
-
 	private boolean initialized;
 	private SingularAttributeImpl<? super X, ?> embeddedAttribute;
 	private Class<?> idJavaType;
@@ -56,48 +54,21 @@ public class ManagedId<X> {
 	/**
 	 * @param type
 	 *            the type of the entity
-	 * @param session
-	 *            the session
-	 * @param lazy
-	 *            if the instance should be lazy
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 * @param id
-	 */
-	public ManagedId(EntityTypeImpl<X> type, SessionImpl session, boolean lazy, Object id) {
-		this(type, session, null, lazy);
-
-		this.populate(id);
-	}
-
-	/**
-	 * @param type
-	 *            the type of the entity
-	 * @param session
-	 *            the session
 	 * @param instance
-	 *            the entity instance
+	 *            the entity insance
+	 * @param resolvers
+	 *            id resolvers of the instance
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedId(EntityTypeImpl<X> type, SessionImpl session, X instance) {
-		this(type, session, instance, false);
-	}
-
-	private ManagedId(EntityTypeImpl<X> type, SessionImpl session, X instance, boolean lazy) {
+	public ManagedId(EntityTypeImpl<X> type, SessionImpl session, X instance, BasicResolver[] resolvers) {
 		super();
 
 		this.type = type;
 		this.session = session;
-		this.instance = instance != null ? instance : InstanceInvoker.createInvoker(type, session, this, lazy);
-
-		final List<BasicMapping<?, ?>> idMappings = this.type.getIdMappings();
-		this.resolvers = new BasicResolver[idMappings.size()];
-		for (int i = 0; i < idMappings.size(); i++) {
-			this.resolvers[i] = idMappings.get(i).createResolver(this.instance);
-		}
+		this.instance = instance;
+		this.resolvers = resolvers;
 	}
 
 	/**
@@ -116,7 +87,7 @@ public class ManagedId<X> {
 			return false;
 		}
 
-		if (this.session != other.session) {
+		if (!this.session.equals(other.session)) {
 			return false;
 		}
 
@@ -179,6 +150,18 @@ public class ManagedId<X> {
 	 * @since $version
 	 */
 	public X getInstance() {
+		return this.proxy != null ? this.proxy : this.instance;
+	}
+
+	/**
+	 * Returns the unproxied instance.
+	 * 
+	 * @return the unproxied instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Object getInstance0() {
 		return this.instance;
 	}
 
@@ -252,7 +235,7 @@ public class ManagedId<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private void populate(Object id) {
+	public void populate(Object id) {
 		this.initialize();
 
 		if (this.embeddedAttribute != null) {
@@ -268,11 +251,26 @@ public class ManagedId<X> {
 		}
 		else {
 			for (final BasicResolver resolver : this.resolvers) {
-				resolver.unlock();
-				resolver.setValue(id);
-				resolver.relock();
+				synchronized (resolver) {
+					resolver.unlock();
+					resolver.setValue(id);
+					resolver.relock();
+				}
 			}
 		}
+	}
+
+	/**
+	 * Proxifies the instance with the proxy.
+	 * 
+	 * @param proxy
+	 *            the proxy to proxify with
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void proxify(X proxy) {
+		this.proxy = proxy;
 	}
 
 	/**

@@ -104,6 +104,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 				if (value != null) {
 					final ManagedInstance<?> lazyInstance = this.createManagedInstance(session, cache, lazyAssociation.getType(), value,
 						true);
+					lazyInstance.addReference(managedInstance, lazyAssociation);
 					lazyAssociation.setValue(managedInstance.getInstance(), lazyInstance.getInstance());
 				}
 			}
@@ -136,7 +137,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 			return null;
 		}
 
-		final ManagedId<T> managedId = type.getManagedId(session, primaryKeyValue, lazy);
+		final ManagedId<? super T> managedId = type.getManagedId(session, primaryKeyValue);
 
 		// look for it in the cache
 		final ManagedInstance<? super T> cached = (ManagedInstance<? super T>) cache.get(managedId);
