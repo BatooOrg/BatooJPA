@@ -77,8 +77,6 @@ public class PreparedStatementImpl implements PreparedStatement {
 
 	private ParameterMetaData parameterMetaData;
 
-	private boolean sqlAudit;
-
 	/**
 	 * @param connection
 	 *            the connection
@@ -288,10 +286,6 @@ public class PreparedStatementImpl implements PreparedStatement {
 	 */
 	@Override
 	public ResultSet executeQuery() throws SQLException {
-		if (!this.sqlAudit) {
-			return this.statement.executeQuery();
-		}
-
 		final long executeNo = ++this.executeNo;
 		this.executes++;
 		this.selects++;
@@ -334,10 +328,6 @@ public class PreparedStatementImpl implements PreparedStatement {
 	 */
 	@Override
 	public int executeUpdate() throws SQLException {
-		if (!this.sqlAudit) {
-			return this.statement.executeUpdate();
-		}
-
 		final long executeNo = ++this.executeNo;
 		this.executes++;
 
@@ -1008,9 +998,7 @@ public class PreparedStatementImpl implements PreparedStatement {
 	 */
 	@Override
 	public void setNull(int parameterIndex, int sqlType) throws SQLException {
-		if (this.sqlAudit) {
-			this.parameters[parameterIndex - 1] = null;
-		}
+		this.parameters[parameterIndex - 1] = null;
 
 		this.statement.setNull(parameterIndex, sqlType);
 	}
@@ -1030,9 +1018,7 @@ public class PreparedStatementImpl implements PreparedStatement {
 	 */
 	@Override
 	public void setObject(int parameterIndex, Object x) throws SQLException {
-		if (this.sqlAudit) {
-			this.parameters[parameterIndex - 1] = x;
-		}
+		this.parameters[parameterIndex - 1] = x;
 
 		this.statement.setObject(parameterIndex, x);
 	}

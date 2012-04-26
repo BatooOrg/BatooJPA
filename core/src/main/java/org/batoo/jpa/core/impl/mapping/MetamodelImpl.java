@@ -758,4 +758,5 @@ public class MetamodelImpl implements Metamodel {
 	private <T> T throwNotFound(Class<?> cls) {
 		throw new PersistenceException("Type is not persistent " + cls);
 	}
+
 }

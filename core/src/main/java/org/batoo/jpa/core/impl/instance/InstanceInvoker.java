@@ -21,15 +21,11 @@ package org.batoo.jpa.core.impl.instance;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.List;
 
 import org.apache.commons.proxy.Invoker;
 import org.apache.commons.proxy.factory.javassist.JavassistProxyFactory;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
-import org.batoo.jpa.core.impl.types.SingularAttributeImpl;
-
-import com.google.common.collect.Lists;
 
 /**
  * 
@@ -57,27 +53,28 @@ public final class InstanceInvoker<X> implements Invoker {
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public static <X> X createInvoker(ClassLoader classLoader, EntityTypeImpl<X> type, SessionImpl session, ManagedId<? super X> managedId) {
-		return (X) new JavassistProxyFactory().createInvokerProxy(classLoader, new InstanceInvoker<X>(type, session, managedId.getId(),
-			(X) managedId.getInstance()), new Class[] { type.getJavaType(), EnhancedInstance.class });
+	public static <X> X createInvoker(EntityTypeImpl<X> type, SessionImpl session, ManagedId<X> managedId, boolean lazy) {
+		final InstanceInvoker<X> invoker = new InstanceInvoker<X>(type, session, managedId, managedId.getInstance(), lazy);
+
+		return (X) new JavassistProxyFactory().createInvokerProxy(type.getClassLoader(), invoker, new Class[] { type.getJavaType(),
+			EnhancedInstance.class });
 	}
 
 	private final EntityTypeImpl<X> type;
-	private final Object id;
+	private final ManagedId<X> id;
 	private final X instance;
 	private final SessionImpl session;
 
-	private final List<String> idMethods = Lists.newArrayList();
-
 	private boolean initialized;
 
-	private InstanceInvoker(EntityTypeImpl<X> type, SessionImpl session, Object id, X instance) {
+	private InstanceInvoker(EntityTypeImpl<X> type, SessionImpl session, ManagedId<X> id, X instance, boolean lazy) {
 		super();
 
 		this.type = type;
 		this.id = id;
 		this.instance = instance;
 		this.session = session;
+		this.initialized = !lazy;
 	}
 
 	@Override
@@ -98,27 +95,11 @@ public final class InstanceInvoker<X> implements Invoker {
 		}
 
 		// if initialized, let go
-		if (this.initialized) {
+		if (this.initialized || ((arguments.length == 0) && this.type.isIdMethod(method.getName()))) {
 			return method.invoke(this.instance, arguments);
 		}
 
-		if (arguments.length == 0) {
-			final String methodName = method.getName();
-			if (this.idMethods.contains(methodName)) { // if known id method, let go
-				return method.invoke(this.instance, arguments);
-			}
-
-			if (methodName.startsWith("get") && (methodName.length() > 3)) { // check if id method
-				for (final SingularAttributeImpl<? super X, ?> attribute : this.type.getIdAttributes()) {
-					if (attribute.getGetterName().equals(method.getName())) {
-						this.idMethods.add(methodName);
-						return method.invoke(this.instance, arguments);
-					}
-				}
-			}
-		}
-
-		this.session.getEntityManager().find(this.type.getJavaType(), this.id);
+		this.session.getEntityManager().find(this.type.getJavaType(), this.id.getId());
 		this.initialized = true;
 
 		return method.invoke(this.instance, arguments);

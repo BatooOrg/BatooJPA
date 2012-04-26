@@ -20,8 +20,6 @@ package org.batoo.jpa.core.impl.reflect;
 
 import java.lang.reflect.Field;
 
-import org.batoo.jpa.core.impl.instance.InstanceInvoker.EnhancedInstance;
-
 /**
  * Accessor implemention for the {@link Field}s.
  * 
@@ -140,10 +138,6 @@ public class FieldAccessor<Y> implements Accessor<Y> {
 	public void set(Object instance, Y value) {
 		if (instance == null) {
 			throw new NullPointerException();
-		}
-
-		if (instance instanceof EnhancedInstance) {
-			instance = ((EnhancedInstance) instance).__getInstance();
 		}
 
 		if (this.primitiveType == null) {
