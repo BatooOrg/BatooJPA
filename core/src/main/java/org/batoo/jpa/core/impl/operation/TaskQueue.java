@@ -87,7 +87,7 @@ public class TaskQueue {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public synchronized void flush(final Connection connection) throws BatooException {
+	public void flush(final Connection connection) throws BatooException {
 		// get the operations
 		final ArrayList<AbstractOperation<?>> operations = new ArrayList<AbstractOperation<?>>(this.queue);
 

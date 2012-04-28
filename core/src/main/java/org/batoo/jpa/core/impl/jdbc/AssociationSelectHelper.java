@@ -136,4 +136,14 @@ public class AssociationSelectHelper<X, C, E> extends BaseSelectHelper<E> {
 
 		return new QueryRunner().query(session.getConnection(), selectSql, rsHandler, params.toArray());
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "AssociationSelectHelper [type=" + this.type.getName() + ", mapping=" + this.mapping + ", predicates="
+			+ this.getPredicatesAsString() + "]";
+	}
 }

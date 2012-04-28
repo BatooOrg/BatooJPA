@@ -43,6 +43,7 @@ public class ManagedId<X> {
 	private final X instance;
 	private final BasicResolver[] resolvers;
 
+	// TODO Remove this
 	private X proxy;
 	private BasicResolver singleId;
 
@@ -83,11 +84,11 @@ public class ManagedId<X> {
 
 		final ManagedId<?> other = (ManagedId<?>) obj;
 
-		if (!this.type.equals(other.type)) {
+		if (!this.session.equals(other.session)) {
 			return false;
 		}
 
-		if (!this.session.equals(other.session)) {
+		if (!this.type.getTopType().equals(other.type.getTopType())) {
 			return false;
 		}
 

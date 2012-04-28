@@ -27,7 +27,6 @@ import javax.persistence.PersistenceException;
 import org.batoo.jpa.core.impl.EntityManagerImpl;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedId;
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.mapping.Association;
 
 /**
@@ -95,11 +94,7 @@ public class FindOperation<X> extends AbstractOperation<X> {
 
 		if ((this.managedInstance == null) || (!this.managedInstance.isLoaded())) {
 			try {
-				final ManagedInstance<? super X> oldInstance = this.managedInstance;
 				this.instance = this.type.performSelect(session, this.managedId);
-				if (oldInstance != null) {
-					oldInstance.clearReferences(this.instance);
-				}
 			}
 			catch (final SQLException e) {
 				throw new PersistenceException("Entity cannot be loaded", e);

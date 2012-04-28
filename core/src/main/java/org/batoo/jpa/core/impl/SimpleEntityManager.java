@@ -199,10 +199,9 @@ public abstract class SimpleEntityManager implements EntityManager {
 		this.assertOpen();
 
 		final EntityTypeImpl<T> type = this.getMetamodel().entity(entityClass);
-		final ManagedId<? super T> managedId = type.getManagedId(this.session, primaryKey);
+		final ManagedId<T> managedId = type.getManagedId(this.session, primaryKey);
 
-		@SuppressWarnings({ "rawtypes", "unchecked" })
-		final FindOperation<T> operation = new FindOperation((EntityManagerImpl) this, managedId);
+		final FindOperation<T> operation = new FindOperation<T>((EntityManagerImpl) this, managedId);
 
 		try {
 			OperationManager.replay((EntityManagerImpl) this, operation);
@@ -290,7 +289,7 @@ public abstract class SimpleEntityManager implements EntityManager {
 	 * 
 	 */
 	@Override
-	public synchronized void flush() {
+	public void flush() {
 		this.assertOpen();
 
 		try {

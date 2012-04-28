@@ -71,7 +71,9 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	private TableGenerator tableGenerator;
 
 	private String tableName;
-	private volatile boolean vlinked;
+
+	protected volatile boolean vlinked;
+	protected volatile boolean parsed;
 
 	/**
 	 * @param metaModel
@@ -280,6 +282,14 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 */
 	@Override
 	public Set<Class<? extends Annotation>> parse() throws BatooException {
+		// wait till the super type is parsed
+		while ((this.getSupertype() != null) && !this.getSupertype().parsed) {
+			try {
+				Thread.sleep(1);
+			}
+			catch (final InterruptedException e) {}
+		}
+
 		final Set<Class<? extends Annotation>> parsed = super.parse();
 
 		final IdClass idClass = this.getJavaType().getAnnotation(IdClass.class);
@@ -354,7 +364,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 
 			annotations.add(Table.class);
 		}
-		else if ((this.getSupertype() == null) || (this.getSupertype().getPrimaryTableTemplate() == null)) {
+		else if (((EntityTypeImpl<X>) this).getTopType().getPrimaryTableTemplate() == null) {
 			this.putTable(true, "", this.name, null, null);
 		}
 	}
@@ -438,6 +448,14 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * @author hceylan
 	 */
 	public void vlink() throws BatooException {
+		// Sleep till the parent is done
+		while ((this.getSupertype() != null) && !this.getSupertype().vlinked) {
+			try {
+				Thread.sleep(1);
+			}
+			catch (final InterruptedException e) {}
+		}
+
 		LOG.debug("Vertically linking {0}", this);
 
 		this.attributes.putAll(this.declaredAttributes);
@@ -445,15 +463,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 		this.idAttributes.putAll(this.declaredIdAttributes);
 
 		final IdentifiableTypeImpl<? super X> supertype = this.getSupertype();
-		if (supertype != null) {
-
-			// Sleep till the parent is done
-			while (!supertype.vlinked) {
-				try {
-					Thread.sleep(1);
-				}
-				catch (final InterruptedException e) {}
-			}
+		if (supertype instanceof MappedSuperclassTypeImpl) {
 
 			// inherit attributes
 			for (final Attribute<?, ?> superAttribute : supertype.setAttributes) {
@@ -479,6 +489,5 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 			this.idType = supertype.idType;
 		}
 
-		this.vlinked = true;
 	}
 }

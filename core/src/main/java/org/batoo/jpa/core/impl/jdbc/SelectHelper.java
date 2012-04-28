@@ -84,8 +84,8 @@ public class SelectHelper<X> extends BaseSelectHelper<X> {
 	@Override
 	protected void preparePredicates() {
 		for (final PhysicalColumn column : this.type.getPrimaryTable().getColumns()) {
-			if (column.isId()) {
-				SelectHelper.this.predicates.add(column);
+			if (column.isId() || column.isDiscriminator()) {
+				this.predicates.add(column);
 			}
 		}
 	}
@@ -120,4 +120,14 @@ public class SelectHelper<X> extends BaseSelectHelper<X> {
 
 		return (result != null) && (result.size() > 0) ? result.iterator().next() : null;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "SelectHelper [type=" + this.type.getName() + ", predicates=" + this.getPredicatesAsString() + "]";
+	}
+
 }

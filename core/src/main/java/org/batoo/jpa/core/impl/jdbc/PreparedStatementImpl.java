@@ -77,7 +77,8 @@ public class PreparedStatementImpl implements PreparedStatement {
 
 	private ParameterMetaData parameterMetaData;
 
-	private boolean sqlAudit;
+	// FIXME remove
+	private final boolean sqlAudit = true;
 
 	/**
 	 * @param connection

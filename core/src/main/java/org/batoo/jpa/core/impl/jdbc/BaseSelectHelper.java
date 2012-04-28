@@ -29,6 +29,7 @@ import org.batoo.jpa.core.impl.mapping.Mapping;
 import org.batoo.jpa.core.impl.mapping.OwnedAssociation;
 import org.batoo.jpa.core.impl.mapping.OwnerAssociation;
 import org.batoo.jpa.core.impl.mapping.PersistableAssociation;
+import org.batoo.jpa.core.impl.types.AttributeImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 import org.batoo.jpa.core.util.Path;
 
@@ -101,12 +102,14 @@ public abstract class BaseSelectHelper<X> {
 	 * 
 	 * @since $version
 	 * @author hceylan
+	 * @param type
 	 */
-	private void addFields(final List<Map<PhysicalColumn, String>> columnAliases, List<String> fieldsBuffer, EntityTable table,
-		final int tableNo, final int secondaryTableNo) {
+	private void addFields(final List<Map<PhysicalColumn, String>> columnAliases, List<String> fieldsBuffer, final EntityTypeImpl<?> type,
+		EntityTable table, final int tableNo, final int secondaryTableNo) {
 		// Filter out the secondary table columns
-		final Collection<PhysicalColumn> filteredColumns;
+		Collection<PhysicalColumn> filteredColumns;
 
+		// first filter out the secondary table id fields.
 		if (table.isPrimary()) {
 			filteredColumns = table.getColumns();
 		}
@@ -119,6 +122,24 @@ public abstract class BaseSelectHelper<X> {
 				}
 			});
 		}
+
+		// second, filter out unrelated columns
+		filteredColumns = Collections2.filter(filteredColumns, new Predicate<PhysicalColumn>() {
+
+			@Override
+			public boolean apply(PhysicalColumn input) {
+				// let discriminator and id columns go
+				if (input.isDiscriminator() || input.isId()) {
+					return true;
+				}
+
+				final AttributeImpl<?, ?> root = input.getMapping().getPath().getFirst();
+				final Class<?> parent = root.getDeclaringType().getJavaType();
+				final Class<?> javaType = type.getJavaType();
+
+				return parent.isAssignableFrom(javaType);
+			}
+		});
 
 		final String tableAlias = secondaryTableNo >= 0 ? "S" + tableNo + "_" + secondaryTableNo : "T" + tableNo;
 
@@ -299,6 +320,27 @@ public abstract class BaseSelectHelper<X> {
 	}
 
 	/**
+	 * Returns the predicates as string.
+	 * <p>
+	 * Useful in toString() implementations of the extending classes.
+	 * 
+	 * @return the predicates as string
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected String getPredicatesAsString() {
+		final String predicates = Joiner.on(", ").join(Lists.transform(this.predicates, new Function<PhysicalColumn, String>() {
+
+			@Override
+			public String apply(PhysicalColumn input) {
+				return input.getTable().getName() + "." + input.getName();
+			}
+		}));
+		return "[" + predicates + "]";
+	}
+
+	/**
 	 * Generates and returns the select SQL.
 	 * The select SQL must
 	 * <ul>
@@ -362,7 +404,7 @@ public abstract class BaseSelectHelper<X> {
 
 		// handle the primary table
 		final EntityTable primaryTable = type.getPrimaryTable();
-		this.addFields(columnAliases, fieldsBuffer, primaryTable, tableNo, -1);
+		this.addFields(columnAliases, fieldsBuffer, type, primaryTable, tableNo, -1);
 
 		if (parentType != null) { // we are not the root entity
 			final Association<?, ?> association = path.getLast();
@@ -387,7 +429,7 @@ public abstract class BaseSelectHelper<X> {
 				continue;
 			}
 
-			this.addFields(columnAliases, fieldsBuffer, table, tableNo, secondaryTableNo);
+			this.addFields(columnAliases, fieldsBuffer, type, table, tableNo, secondaryTableNo);
 			this.addSecondaryJoin(joinsBuffer, parentTableNo, tableNo, secondaryTableNo++, table);
 		}
 

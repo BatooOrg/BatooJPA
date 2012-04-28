@@ -31,6 +31,7 @@ import javax.persistence.UniqueConstraint;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.MappingException;
+import org.batoo.jpa.core.impl.types.AttributeImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.IdType;
@@ -52,7 +53,7 @@ import com.google.common.collect.Maps;
  */
 public abstract class AbstractTable implements Table {
 
-	protected final EntityTypeImpl<?> owner;
+	protected final EntityTypeImpl<?> type;
 	protected final JDBCAdapter jdbcAdapter;
 
 	private final String name;
@@ -63,16 +64,15 @@ public abstract class AbstractTable implements Table {
 	protected final List<PhysicalColumn> columns = Lists.newArrayList();
 	private final List<ForeignKey> foreignKeys = Lists.newArrayList();
 
-	private final Map<String, PhysicalColumn> columnNames = Maps.newHashMap();
+	private final Map<EntityTypeImpl<?>, String> insertSqls = Maps.newHashMap();
+	protected final Map<EntityTypeImpl<?>, PhysicalColumn[]> insertColumns = Maps.newHashMap();
 
 	private int h;
-	private String insertSql;
 	private String deleteSql;
 	private String updateSql;
-	protected final List<PhysicalColumn> insertColumns = Lists.newArrayList();
 
 	/**
-	 * @param owner
+	 * @param type
 	 *            the owner entity
 	 * @param schema
 	 *            the name of the schema
@@ -86,10 +86,10 @@ public abstract class AbstractTable implements Table {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AbstractTable(EntityTypeImpl<?> owner, String schema, String name, UniqueConstraint[] uniqueConstraints, JDBCAdapter jdbcAdapter) {
+	public AbstractTable(EntityTypeImpl<?> type, String schema, String name, UniqueConstraint[] uniqueConstraints, JDBCAdapter jdbcAdapter) {
 		super();
 
-		this.owner = owner;
+		this.type = type;
 		this.jdbcAdapter = jdbcAdapter;
 
 		this.schema = this.jdbcAdapter.escape(schema);
@@ -108,14 +108,14 @@ public abstract class AbstractTable implements Table {
 	 * @author hceylan
 	 */
 	public void addColumn(PhysicalColumn column) throws MappingException {
-		if (this.columnNames.keySet().contains(column.getPhysicalName())) {
-			final PhysicalColumn other = this.columnNames.get(column.getPhysicalName());
-			throw new MappingException("Duplicate column on entity " + this.owner.getJavaType().getCanonicalName() + ", "
-				+ other.getMapping().getPathAsString() + " - " + column.getMapping().getPathAsString());
+		for (final PhysicalColumn other : this.columns) {
+			if (other.getName().equals(column.getName())) {
+				throw new MappingException("Duplicate column on entity " + this.type.getJavaType().getCanonicalName() + ", "
+					+ other.getMapping().getPathAsString() + " - " + column.getMapping().getPathAsString());
+			}
 		}
 
 		this.columns.add(column);
-		this.columnNames.put(column.getPhysicalName(), column);
 
 		if (column.isId()) {
 			this.primaryKeys.add(column);
@@ -227,6 +227,78 @@ public abstract class AbstractTable implements Table {
 	}
 
 	/**
+	 * Generates the insert statement for the type.
+	 * 
+	 * @param type
+	 *            the type to generate the insert statement for
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private synchronized void generateInsertSql(final EntityTypeImpl<?> type) {
+		String sql = this.insertSqls.get(type);
+		if (sql != null) { // other thread finished the job for us
+			return;
+		}
+
+		final List<PhysicalColumn> insertColumns = Lists.newArrayList();
+		// Filter out the identity columns
+		final Collection<PhysicalColumn> filteredColumns = type == null ? this.columns : Collections2.filter(this.columns,
+			new Predicate<PhysicalColumn>() {
+
+				@Override
+				public boolean apply(PhysicalColumn input) {
+					if (input.getIdType() == IdType.IDENTITY) {
+						return false;
+					}
+
+					if (input.isDiscriminator()) {
+						return true;
+					}
+
+					final AttributeImpl<?, ?> root = input.getMapping().getPath().getFirst();
+					final Class<?> parent = root.getDeclaringType().getJavaType();
+					final Class<?> javaType = type.getJavaType();
+
+					return parent.isAssignableFrom(javaType);
+				}
+			});
+
+		// prepare the names tuple in the form of "COLNAME [, COLNAME]*"
+		final Collection<String> columnNames = Collections2.transform(filteredColumns, new Function<PhysicalColumn, String>() {
+
+			@Override
+			public String apply(PhysicalColumn input) {
+				insertColumns.add(input);
+
+				return input.getPhysicalName();
+			}
+		});
+
+		// prepare the parameters in the form of "? [, ?]*"
+		final Collection<String> parameters = Collections2.transform(filteredColumns, new Function<PhysicalColumn, String>() {
+
+			@Override
+			public String apply(PhysicalColumn input) {
+				return "?";
+			}
+		});
+
+		final String columnNamesStr = Joiner.on(", ").join(columnNames);
+		final String parametersStr = Joiner.on(", ").join(parameters);
+
+		// INSERT INTO SCHEMA.TABLE
+		// (COL [, COL]*)
+		// VALUES (PARAM [, PARAM]*)
+		sql = "INSERT INTO " + this.getQualifiedName() //
+			+ "\n(" + columnNamesStr + ")"//
+			+ "\nVALUES (" + parametersStr + ")";
+
+		this.insertSqls.put(type, sql);
+		this.insertColumns.put(type, insertColumns.toArray(new PhysicalColumn[insertColumns.size()]));
+	}
+
+	/**
 	 * Returns the columns.
 	 * 
 	 * @return the columns
@@ -279,56 +351,24 @@ public abstract class AbstractTable implements Table {
 	}
 
 	/**
-	 * Returns the insert statement for the table.
+	 * Returns the insert statement for the table specifically.
 	 * 
+	 * @param the
+	 *            type to return insert statement for
 	 * @return the insert statement
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public synchronized String getInsertSql() {
-		if (this.insertSql == null) {
-			// Filter out the identity columns
-			final Collection<PhysicalColumn> filteredColumns = Collections2.filter(this.columns, new Predicate<PhysicalColumn>() {
+	public String getInsertSql(EntityTypeImpl<?> type) {
+		String sql = this.insertSqls.get(type);
+		if (sql == null) {
+			this.generateInsertSql(type);
 
-				@Override
-				public boolean apply(PhysicalColumn input) {
-					return input.getIdType() != IdType.IDENTITY;
-				}
-			});
-
-			// prepare the names tuple in the form of "COLNAME [, COLNAME]*"
-			final Collection<String> columnNames = Collections2.transform(filteredColumns, new Function<PhysicalColumn, String>() {
-
-				@Override
-				public String apply(PhysicalColumn input) {
-					AbstractTable.this.insertColumns.add(input);
-
-					return input.getPhysicalName();
-				}
-			});
-
-			// prepare the parameters in the form of "? [, ?]*"
-			final Collection<String> parameters = Collections2.transform(filteredColumns, new Function<PhysicalColumn, String>() {
-
-				@Override
-				public String apply(PhysicalColumn input) {
-					return "?";
-				}
-			});
-
-			final String columnNamesStr = Joiner.on(", ").join(columnNames);
-			final String parametersStr = Joiner.on(", ").join(parameters);
-
-			// INSERT INTO SCHEMA.TABLE
-			// (COL [, COL]*)
-			// VALUES (PARAM [, PARAM]*)
-			this.insertSql = "INSERT INTO " + this.getQualifiedName() //
-				+ "\n(" + columnNamesStr + ")"//
-				+ "\nVALUES (" + parametersStr + ")";
+			sql = this.insertSqls.get(type);
 		}
 
-		return this.insertSql;
+		return sql;
 	}
 
 	/**
@@ -349,16 +389,6 @@ public abstract class AbstractTable implements Table {
 	@Override
 	public String getName() {
 		return this.name;
-	}
-
-	/**
-	 * Returns the owner.
-	 * 
-	 * @return the owner
-	 * @since $version
-	 */
-	public EntityTypeImpl<?> getOwner() {
-		return this.owner;
 	}
 
 	/**

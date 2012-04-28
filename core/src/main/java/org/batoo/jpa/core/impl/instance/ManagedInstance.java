@@ -20,17 +20,12 @@ package org.batoo.jpa.core.impl.instance;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
 
 import javax.persistence.metamodel.PluralAttribute;
 
 import org.batoo.jpa.core.impl.SessionImpl;
-import org.batoo.jpa.core.impl.mapping.OwnerAssociation;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 import org.batoo.jpa.core.impl.types.PluralAttributeImpl;
-import org.batoo.jpa.core.util.Pair2;
-
-import com.google.common.collect.Lists;
 
 /**
  * The managed instance of {@link #instance}.
@@ -70,10 +65,9 @@ public final class ManagedInstance<X> {
 
 	private final EntityTypeImpl<X> type;
 	private final SessionImpl session;
-	private X instance;
+	private final X instance;
 	private final ManagedId<? super X> id;
 
-	private final List<Pair2<ManagedInstance<?>, OwnerAssociation<?, ?>>> references = Lists.newArrayList();
 	private Status status;
 	private boolean executed;
 	private boolean loaded;
@@ -102,33 +96,6 @@ public final class ManagedInstance<X> {
 		for (final PluralAttribute<? super X, ?, ?> attribute : type.getPluralAttributes()) {
 			((PluralAttributeImpl<? super X, ?, ?>) attribute).initialize(this, session);
 		}
-	}
-
-	/**
-	 * Adds a reference to the instance.
-	 * <p>
-	 * Useful to replace the lazy references once the instance is initialized.
-	 * 
-	 * @param managedInstance
-	 * @param lazy
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void addReference(ManagedInstance<?> referer, OwnerAssociation<?, ?> association) {
-		this.references.add(new Pair2<ManagedInstance<?>, OwnerAssociation<?, ?>>(referer, association));
-	}
-
-	public synchronized void clearReferences(X newInstance) {
-		for (final Pair2<ManagedInstance<?>, OwnerAssociation<?, ?>> pair : this.references) {
-			pair.getSecond().setValue(pair.getFirst().getInstance(), newInstance);
-		}
-
-		this.references.clear();
-
-		this.instance = newInstance;
-
-		this.id.proxify(null);
 	}
 
 	/**

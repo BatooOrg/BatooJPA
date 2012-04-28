@@ -64,12 +64,12 @@ public final class JoinTable extends AbstractTable {
 		this.mapping = mapping;
 
 		// add source columns
-		this.createColumns(this.owner, this.sourceKeys);
+		this.createColumns(this.type, this.sourceKeys);
 
 		// add destination columns
 		this.createColumns(this.mapping.getType(), this.destinationKeys);
 
-		this.owner.addJoinTable(this);
+		this.type.addJoinTable(this);
 	}
 
 	private void createColumns(EntityTypeImpl<?> type, List<PhysicalColumn> columns) throws MappingException {
@@ -146,20 +146,23 @@ public final class JoinTable extends AbstractTable {
 	private void performInsert(Connection connection, final ManagedInstance<?> managedInstance, final Object child) throws SQLException {
 		final QueryRunner runner = new QueryRunner();
 
-		// Do not inline, generation of the insert sql will initialize the insertColumns!
-		final String insertSql = this.getInsertSql();
-
 		final SessionImpl session = managedInstance.getSession();
 		final Object instance = managedInstance.getInstance();
-		final List<Object> params = Lists.transform(this.insertColumns, new Function<PhysicalColumn, Object>() {
-			@Override
-			public Object apply(PhysicalColumn input) {
-				final Object object = JoinTable.this.sourceKeys.contains(input) ? instance : child;
-				return input.getPhysicalValue(session, object);
-			}
-		});
 
-		runner.update(connection, insertSql, params.toArray());
+		// Do not inline, generation of the insert sql will initialize the insertColumns!
+		final String insertSql = this.getInsertSql(null);
+		final PhysicalColumn[] insertColumns = this.insertColumns.get(null);
+
+		// prepare the parameters
+		final Object[] params = new Object[insertColumns.length];
+		for (int i = 0; i < insertColumns.length; i++) {
+			final PhysicalColumn column = insertColumns[i];
+
+			final Object object = JoinTable.this.sourceKeys.contains(column) ? instance : child;
+			params[i] = column.getPhysicalValue(session, object);
+		}
+
+		runner.update(connection, insertSql, params);
 	}
 
 	/**
@@ -203,7 +206,7 @@ public final class JoinTable extends AbstractTable {
 				}
 			}));
 
-		return "JoinTable [owner=" + this.owner.getName() + ", inverse=" + this.mapping.getType().getName() + ", name="
+		return "JoinTable [owner=" + this.type.getName() + ", inverse=" + this.mapping.getType().getName() + ", name="
 			+ this.getQualifiedName() + ", sourceKeys=[" + sourceColumns + "], destinationKeys=[" + destinationColumns + "]]";
 	}
 

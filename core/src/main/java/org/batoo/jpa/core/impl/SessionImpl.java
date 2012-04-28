@@ -71,8 +71,8 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public <X> ManagedInstance<? extends X> get(ManagedId<X> id) {
-		EntityTypeImpl<X> type = id.getType();
-		SubRepository<X> subRepository = this.repository.get(type);
+		final EntityTypeImpl<X> type = id.getType();
+		final SubRepository<X> subRepository = this.repository.get(type);
 		return subRepository.get(id);
 	}
 
@@ -87,9 +87,9 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public <X> ManagedInstance<? super X> get(X entity) {
+	public <X> ManagedInstance<X> get(X entity) {
 		final EntityTypeImpl<? super X> type = this.em.getMetamodel().entity((Class<X>) entity.getClass());
-		return (ManagedInstance<? super X>) this.get(type.getManagedIdForInstance(this, entity));
+		return (ManagedInstance<X>) this.get(type.getManagedIdForInstance(this, entity));
 	}
 
 	/**

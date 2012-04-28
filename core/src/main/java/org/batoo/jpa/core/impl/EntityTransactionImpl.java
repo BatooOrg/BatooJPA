@@ -99,14 +99,11 @@ public class EntityTransactionImpl implements EntityTransaction {
 		}
 
 		try {
-			synchronized (this.em) {
+			this.em.flush();
 
-				this.em.flush();
+			this.connection.setAutoCommit(true);
 
-				this.connection.setAutoCommit(true);
-
-				this.em.clearTransaction();
-			}
+			this.em.clearTransaction();
 
 			this.active = false;
 		}

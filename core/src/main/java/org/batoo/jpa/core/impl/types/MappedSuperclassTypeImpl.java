@@ -79,7 +79,19 @@ public class MappedSuperclassTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 
 		parsed.add(MappedSuperclass.class);
 
+		this.parsed = true;
+
 		return parsed;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void vlink() throws BatooException {
+		super.vlink();
+
+		this.vlinked = true;
+	}
 }

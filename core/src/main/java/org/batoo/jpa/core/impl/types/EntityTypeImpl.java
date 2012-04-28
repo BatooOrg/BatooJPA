@@ -30,7 +30,10 @@ import java.util.Set;
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.Inheritance;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 import javax.persistence.metamodel.EntityType;
@@ -58,6 +61,7 @@ import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.mapping.BasicColumnTemplate;
 import org.batoo.jpa.core.impl.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.mapping.ColumnTemplate;
+import org.batoo.jpa.core.impl.mapping.EntityInheritence;
 import org.batoo.jpa.core.impl.mapping.JoinColumnTemplate;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
 import org.batoo.jpa.core.impl.mapping.OwnerAssociationMapping;
@@ -90,16 +94,19 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private final Map<String, BasicMapping<?, ?>> identityMappings = Maps.newHashMap();
 	private final Map<String, Column> attributeOverrides = Maps.newHashMap();
 
-	private final Set<PhysicalColumn> columns = Sets.newHashSet();
+	private EntityInheritence inheritance;
 
 	private EntityTable primaryTable;
+
 	private final Map<String, EntityTable> tables = Maps.newHashMap();
 	private final Map<String, JoinTable> joinTables = Maps.newHashMap();
-
+	private final Set<PhysicalColumn> columns = Sets.newHashSet();
 	private Object topType;
 
 	private final SelectHelper<X> selectHelper;
 	private final RefreshHelper<X> refreshHelper;
+
+	private Object discriminatorValue;
 
 	/**
 	 * @param metaModel
@@ -341,6 +348,18 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
+	 * 
+	 * Returns the discriminator value for the entity.
+	 * 
+	 * @return the discriminator value for the entity
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Object getDiscriminatorValue() {
+		return this.discriminatorValue != null ? this.discriminatorValue : this.name;
+	}
+
+	/**
 	 * Returns the id mappings of the entity.
 	 * 
 	 * @return the id mappings of the entity
@@ -350,6 +369,16 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 */
 	public Collection<BasicMapping<?, ?>> getIdMappings() {
 		return this.idMappings;
+	}
+
+	/**
+	 * Returns the inheritance.
+	 * 
+	 * @return the inheritance
+	 * @since $version
+	 */
+	public EntityInheritence getInheritance() {
+		return this.inheritance;
 	}
 
 	/**
@@ -364,20 +393,17 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedId<? super X> getManagedId(SessionImpl session, final Object id) {
+	public ManagedId<X> getManagedId(SessionImpl session, final Object id) {
 		if (id == null) {
 			throw new NullPointerException();
 		}
 
-		if ((this.getTopType() != null) && (this.getTopType() != this)) {
-			return this.getTopType().getManagedId(session, id);
-		}
-
 		final X instance = this.newInstance();
 
-		final BasicResolver[] resolvers = new BasicResolver[this.idMappings.size()];
-		for (int i = 0; i < this.idMappings.size(); i++) {
-			resolvers[i] = this.idMappings.get(i).createResolver(instance);
+		final List<BasicMapping<?, ?>> idMappings = this.getTopType().idMappings;
+		final BasicResolver[] resolvers = new BasicResolver[idMappings.size()];
+		for (int i = 0; i < idMappings.size(); i++) {
+			resolvers[i] = idMappings.get(i).createResolver(instance);
 		}
 
 		final ManagedId<X> managedId = new ManagedId<X>(this, session, instance, resolvers);
@@ -399,18 +425,15 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedId<? super X> getManagedIdForInstance(SessionImpl session, final X instance) {
+	public ManagedId<X> getManagedIdForInstance(SessionImpl session, final X instance) {
 		if (instance == null) {
 			throw new NullPointerException();
 		}
 
-		if ((this.getTopType() != null) && (this.getTopType() != this)) {
-			return this.getTopType().getManagedIdForInstance(session, instance);
-		}
-
-		final BasicResolver[] resolvers = new BasicResolver[this.idMappings.size()];
-		for (int i = 0; i < this.idMappings.size(); i++) {
-			resolvers[i] = this.idMappings.get(i).createResolver(instance);
+		final List<BasicMapping<?, ?>> idMappings = this.getTopType().idMappings;
+		final BasicResolver[] resolvers = new BasicResolver[idMappings.size()];
+		for (int i = 0; i < idMappings.size(); i++) {
+			resolvers[i] = idMappings.get(i).createResolver(instance);
 		}
 
 		return new ManagedId<X>(this, session, instance, resolvers);
@@ -565,10 +588,11 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			}
 		}
 
-		if (!basic) {
+		if (!basic && (this.getTopType() == null)) {
 			if (this.idJavaType == null) {
 				if (!this.hasSingleIdAttribute()) {
-					throw new MappingException("Unless specified by IdClass, there can only be one id attribute");
+					throw new MappingException(this.javaType
+						+ " violates id specification. Unless specified by IdClass, there can only be one id attribute");
 				}
 
 				final SingularAttributeImpl<? super X, ?> attribute = this.idAttributes.values().iterator().next();
@@ -622,8 +646,11 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		parsed.add(Entity.class);
 
 		this.parseAttributeOverrides(type, parsed);
+		this.parseInheritence(type, parsed);
 
 		this.performClassChecks(type);
+
+		this.parsed = true;
 
 		return parsed;
 	}
@@ -643,6 +670,57 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			this.attributeOverrides.put(attributeOverride.name(), attributeOverride.column());
 
 			parsed.add(AttributeOverride.class);
+		}
+	}
+
+	private void parseInheritence(Class<X> type, Set<Class<? extends Annotation>> parsed) throws MappingException {
+		final DiscriminatorColumn discriminatorColumn = type.getAnnotation(DiscriminatorColumn.class);
+		if (discriminatorColumn != null) {
+			parsed.add(DiscriminatorColumn.class);
+		}
+
+		final Inheritance inheritance = type.getAnnotation(Inheritance.class);
+		if (inheritance != null) {
+			parsed.add(Inheritance.class);
+		}
+
+		if ((discriminatorColumn != null) || (inheritance != null)) {
+			this.inheritance = new EntityInheritence(discriminatorColumn, inheritance);
+		}
+
+		final DiscriminatorValue discriminatorValue = type.getAnnotation(DiscriminatorValue.class);
+		if (discriminatorValue != null) {
+			if (this.getTopType().inheritance == null) {
+				throw new MappingException("DiscriminatorValue is not allowed for " + this.javaType + " as it is not part of inheritence");
+			}
+
+			final String value = discriminatorValue.value();
+			switch (this.getTopType().inheritance.getType()) {
+				case CHAR:
+					if (value.length() != 1) {
+						throw new MappingException("DiscriminatorValue should be exactly 1 character long for " + this.javaType
+							+ ". Value specified is " + value);
+					}
+					this.discriminatorValue = new Character(value.charAt(0));
+					break;
+				case INTEGER:
+					try {
+						final Integer intValue = Integer.valueOf(value);
+						this.discriminatorValue = intValue;
+					}
+					catch (final NumberFormatException e) {
+						throw new MappingException("DiscriminatorValue should be an integer for " + this.javaType + ". Value specified is "
+							+ value);
+					}
+					break;
+				default:
+					this.discriminatorValue = value;
+					if (value.isEmpty()) {
+						throw new MappingException("DiscriminatorValue cannot be empty for " + this.javaType);
+					}
+			}
+
+			parsed.add(DiscriminatorValue.class);
 		}
 	}
 
@@ -726,6 +804,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		super.vlink();
 
 		this.vlinkTables();
+
+		this.vlinked = true;
 	}
 
 	/**
@@ -748,22 +828,38 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		}
 
 		final IdentifiableTypeImpl<? super X> supertype = this.getSupertype();
-		if ((supertype != null) && (supertype instanceof MappedSuperclassTypeImpl)) {
-			for (final TableTemplate template : supertype.getTableTemplates()) {
+		if (supertype != null) {
+			if (supertype instanceof MappedSuperclassTypeImpl) { // extending mapped super class
+				for (final TableTemplate template : supertype.getTableTemplates()) {
 
-				// is the table overridden
-				if (this.tables.containsKey(template.getName())) {
-					continue;
+					// is the table overridden
+					if (this.tables.containsKey(template.getName())) {
+						continue;
+					}
+
+					final EntityTable table = new EntityTable(this, template, this.metaModel.getJdbcAdapter());
+					if (table.isPrimary()) {
+						this.primaryTable = table;
+					}
+
+					this.tables.put(table.getName(), table);
 				}
+			}
+			else if (supertype instanceof EntityTypeImpl) { // extending an inherited entity
+				final EntityTypeImpl<?> superEntity = (EntityTypeImpl<?>) supertype;
+				switch (superEntity.getTopType().getInheritance().getInheritenceType()) {
+					case SINGLE_TABLE:
+						this.primaryTable = superEntity.getPrimaryTable();
+						break;
 
-				final EntityTable table = new EntityTable(this, template, this.metaModel.getJdbcAdapter());
-				if (table.isPrimary()) {
-					this.primaryTable = table;
+					default:
+						break;
 				}
-
-				this.tables.put(table.getName(), table);
 			}
 		}
 
+		if (this.inheritance != null) {
+			new PhysicalColumn(this.primaryTable, this.inheritance);
+		}
 	}
 }

@@ -20,7 +20,6 @@ package org.batoo.jpa.core.impl.jdbc;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.MappingException;
@@ -77,7 +76,7 @@ public final class EntityTable extends AbstractTable {
 		if (column.getIdType() == IdType.IDENTITY) {
 			if (this.identityColumn != null) {
 				throw new MappingException("Multiple identity columns: " + this.identityColumn.getName() + ", " + column.getName() + " on "
-					+ this.owner.getJavaType().getCanonicalName());
+					+ this.type.getJavaType().getCanonicalName());
 			}
 
 			this.identityColumn = column;
@@ -129,19 +128,20 @@ public final class EntityTable extends AbstractTable {
 
 		final QueryRunner runner = new QueryRunner();
 
-		// Do not inline, generation of the insert sql will initialize the insertColumns!
-		final String insertSql = this.getInsertSql();
-
 		final SessionImpl session = managedInstance.getSession();
 		final Object instance = managedInstance.getInstance();
-		final List<Object> params = Lists.transform(this.insertColumns, new Function<PhysicalColumn, Object>() {
-			@Override
-			public Object apply(PhysicalColumn input) {
-				return input.getPhysicalValue(session, instance);
-			}
-		});
 
-		runner.update(connection, insertSql, params.toArray());
+		// Do not inline, generation of the insert sql will initialize the insertColumns!
+		final String insertSql = this.getInsertSql(managedInstance.getType());
+		final PhysicalColumn[] insertColumns = this.insertColumns.get(managedInstance.getType());
+
+		// prepare the parameters
+		final Object[] params = new Object[insertColumns.length];
+		for (int i = 0; i < insertColumns.length; i++) {
+			params[i] = insertColumns[i].getPhysicalValue(session, instance);
+		}
+
+		runner.update(connection, insertSql, params);
 
 		if (this.identityColumn != null) {
 			final String selectLastIdSql = this.jdbcAdapter.getSelectLastIdentitySql();
@@ -174,7 +174,7 @@ public final class EntityTable extends AbstractTable {
 			}
 		}));
 
-		return "EntityTable [owner=" + this.owner.getName() + ", name=" + this.getQualifiedName() + ", primary=" + this.primary
+		return "EntityTable [owner=" + this.type.getName() + ", name=" + this.getQualifiedName() + ", primary=" + this.primary
 			+ ", columns=[" + columns + "]]";
 	}
 

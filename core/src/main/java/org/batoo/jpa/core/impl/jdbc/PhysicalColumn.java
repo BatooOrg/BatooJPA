@@ -27,7 +27,10 @@ import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
 import org.batoo.jpa.core.impl.mapping.AbstractPhysicalMapping;
 import org.batoo.jpa.core.impl.mapping.BasicColumnTemplate;
+import org.batoo.jpa.core.impl.mapping.EntityInheritence;
 import org.batoo.jpa.core.impl.mapping.JoinColumnTemplate;
+import org.batoo.jpa.core.impl.mapping.TypeFactory;
+import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 import org.batoo.jpa.core.jdbc.Column;
 import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.core.jdbc.Table;
@@ -62,8 +65,6 @@ public class PhysicalColumn implements Column {
 	/**
 	 * @param mapping
 	 *            the mapping
-	 * @param referencedColumn
-	 *            the referenced physical column, may be null
 	 * @param table
 	 *            the physical table the column belongs to
 	 * @param basic
@@ -161,7 +162,7 @@ public class PhysicalColumn implements Column {
 	 * Constructor used for secondary table primary key columns
 	 * 
 	 * @param table
-	 *            the name
+	 *            the physical table the column belongs to
 	 * @param column
 	 *            the original primary key column
 	 * @throws MappingException
@@ -175,10 +176,27 @@ public class PhysicalColumn implements Column {
 	}
 
 	/**
+	 * Constructor used for discriminator columns
+	 * 
+	 * @param table
+	 *            the physical table the column belongs to
+	 * @param inheritance
+	 *            the inheritence information
+	 * @throws MappingException
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public PhysicalColumn(EntityTable table, EntityInheritence inheritance) throws MappingException {
+		this(null, null, table, inheritance.getName(), null, TypeFactory.getSqlType(inheritance), inheritance.getLength(), 0, 0, true,
+			false);
+	}
+
+	/**
 	 * Constructor used for secondary table primary key columns
 	 * 
 	 * @param table
-	 *            the name
+	 *            the physical table the column belongs to
 	 * @param prefix
 	 *            the prefix for the column name
 	 * @param column
@@ -285,6 +303,12 @@ public class PhysicalColumn implements Column {
 	 * @author hceylan
 	 */
 	public Object getPhysicalValue(SessionImpl session, Object instance) {
+		if (this.mapping == null) { // this is a discriminator column
+			final EntityTypeImpl<?> type = session.getEntityManager().getMetamodel().entity(instance.getClass());
+
+			return type.getDiscriminatorValue();
+		}
+
 		Object value = this.mapping.getValue(instance);
 
 		if ((!this.isId() && !this.getTable().isPrimary()) || this.getTable().isPrimary()) {
@@ -366,6 +390,18 @@ public class PhysicalColumn implements Column {
 		this.h = (prime * result) + ((this.table == null) ? 0 : this.table.hashCode());
 
 		return this.h;
+	}
+
+	/**
+	 * Returns if the column is a discriminator column.
+	 * 
+	 * @return true the column is a discriminator column
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isDiscriminator() {
+		return this.mapping == null;
 	}
 
 	/**

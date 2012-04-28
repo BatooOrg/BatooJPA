@@ -16,47 +16,39 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.manualid;
+package org.batoo.jpa.core.test.inheritence;
 
-import javax.persistence.EntityManager;
-
-import junit.framework.Assert;
-
-import org.batoo.jpa.core.test.AbstractTest;
-import org.junit.Test;
+import javax.persistence.Entity;
 
 /**
- * @author hceylan
  * 
+ * @author hceylan
  * @since $version
  */
-public class IdentityTest extends AbstractTest {
+@Entity
+public class FooExt2 extends Foo {
+
+	private String valueExt2;
 
 	/**
-	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with identity value
+	 * Returns the valueExt2.
 	 * 
+	 * @return the valueExt2
 	 * @since $version
-	 * @author hceylan
 	 */
-	@Test
-	public void testIdentiy() {
-		final Foo foo = new Foo();
-		foo.setKey(1);
-		foo.setValue("Bar");
+	public String getValueExt2() {
+		return this.valueExt2;
+	}
 
-		final Foo foo2 = new Foo();
-		foo2.setKey(2);
-		foo2.setValue("Bar");
-
-		this.persist(foo);
-		this.persist(foo2);
-
-		this.commit();
-
-		this.close();
-
-		final Foo foo3 = this.find(Foo.class, foo.getKey());
-		Assert.assertEquals(foo.getKey(), foo3.getKey());
+	/**
+	 * Sets the valueExt2.
+	 * 
+	 * @param valueExt2
+	 *            the valueExt2 to set
+	 * @since $version
+	 */
+	public void setValueExt2(String valueExt2) {
+		this.valueExt2 = valueExt2;
 	}
 
 }

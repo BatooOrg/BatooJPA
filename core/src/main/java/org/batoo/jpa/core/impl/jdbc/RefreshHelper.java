@@ -119,4 +119,13 @@ public class RefreshHelper<X> extends BaseSelectHelper<X> {
 		this.runner.query(session.getConnection(), selectSql, rsHandler, params.toArray());
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "RefreshHelper [type=" + this.type.getName() + ", predicates=" + this.getPredicatesAsString() + "]";
+	}
+
 }

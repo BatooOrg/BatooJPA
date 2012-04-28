@@ -572,6 +572,26 @@ public class TypeFactory {
 		throw new IllegalArgumentException("Cannot determine sql type: " + javaType);
 	}
 
+	/**
+	 * Returns the sql type for the inheritence
+	 * 
+	 * @param inheritance
+	 * @return
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public static int getSqlType(EntityInheritence inheritance) {
+		switch (inheritance.getType()) {
+			case CHAR:
+				return Types.CHAR;
+			case INTEGER:
+				return Types.INTEGER;
+			default:
+				return Types.VARCHAR;
+		}
+	}
+
 	private static boolean isBasicType(Class<?> cls, boolean array) {
 		// basic array types
 		if (Byte.class.isAssignableFrom(cls) //
