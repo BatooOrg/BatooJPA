@@ -101,7 +101,9 @@ public class AssociationSelectHelper<X, C, E> extends BaseSelectHelper<E> {
 			ownerAssociation = ((OwnedAssociation<?, ?>) this.mapping).getOpposite();
 		}
 
-		this.predicates.addAll(ownerAssociation.getPhysicalColumns());
+		for (final PhysicalColumn column : ownerAssociation.getPhysicalColumns()) {
+			this.predicates.add(column);
+		}
 	}
 
 	/**
@@ -130,8 +132,7 @@ public class AssociationSelectHelper<X, C, E> extends BaseSelectHelper<E> {
 			}
 		});
 
-		final SelectHandler<E> rsHandler = new SelectHandler<E>(session, this.type, this.columnAliases, this.entityPaths,
-			this.inversePaths, this.lazyPaths);
+		final SelectHandler<E> rsHandler = new SelectHandler<E>(session, this.type, this.columnAliases, this.entityPaths);
 
 		return new QueryRunner().query(session.getConnection(), selectSql, rsHandler, params.toArray());
 	}

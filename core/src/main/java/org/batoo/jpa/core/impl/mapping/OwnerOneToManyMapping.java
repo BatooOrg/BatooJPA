@@ -146,15 +146,6 @@ public class OwnerOneToManyMapping<X, C, E> extends OwnerAssociationMapping<X, C
 	 * {@inheritDoc}
 	 * 
 	 */
-	@Override
-	public boolean isCollection() {
-		return true;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
 	public void link(JDBCAdapter jdbcAdapter) throws MappingException {
 		this.joinTable = new JoinTable(this, jdbcAdapter);
 	}

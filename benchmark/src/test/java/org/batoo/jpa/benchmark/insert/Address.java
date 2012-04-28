@@ -18,7 +18,6 @@
  */
 package org.batoo.jpa.benchmark.insert;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -41,7 +40,7 @@ public class Address {
 	@ManyToOne
 	private Person person;
 
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Country country;
 
 	private String city;

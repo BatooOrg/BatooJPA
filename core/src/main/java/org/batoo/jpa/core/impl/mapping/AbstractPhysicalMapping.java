@@ -40,6 +40,8 @@ public abstract class AbstractPhysicalMapping<X, T> extends AbstractMapping<X, T
 
 	private final List<PhysicalColumn> physicalColumns = Lists.newArrayList();
 
+	private PhysicalColumn[] physicalColumnsArray;
+
 	/**
 	 * @param associationType
 	 *            the type of the association
@@ -107,7 +109,12 @@ public abstract class AbstractPhysicalMapping<X, T> extends AbstractMapping<X, T
 	 * 
 	 */
 	@Override
-	public Collection<PhysicalColumn> getPhysicalColumns() {
-		return this.physicalColumns;
+	public PhysicalColumn[] getPhysicalColumns() {
+		if (this.physicalColumnsArray == null) {
+			this.physicalColumnsArray = new PhysicalColumn[this.physicalColumns.size()];
+			this.physicalColumns.toArray(this.physicalColumnsArray);
+		}
+
+		return this.physicalColumnsArray;
 	}
 }

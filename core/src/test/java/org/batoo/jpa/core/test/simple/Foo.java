@@ -23,7 +23,6 @@ import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.Date;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -50,9 +49,6 @@ public class Foo {
 
 	private boolean booleanValue;
 
-	// derby fails with 254+ values
-	@Column(length = 254)
-	private char charValue;
 	private byte byteValue;
 	private short shortValue;
 	private int intValue;
@@ -65,9 +61,6 @@ public class Foo {
 	private byte[] byteArrayValue;
 
 	private Boolean booleanObjectValue;
-	// derby fails with 254+ values
-	@Column(length = 254)
-	private Character charObjectValue;
 	private Byte byteObjectValue;
 	private Short shortObjectValue;
 	private Integer intObjectValue;
@@ -191,26 +184,6 @@ public class Foo {
 	 */
 	public Character[] getCharObjectArrayValue() {
 		return this.charObjectArrayValue;
-	}
-
-	/**
-	 * Returns the charObjectValue.
-	 * 
-	 * @return the charObjectValue
-	 * @since $version
-	 */
-	public Character getCharObjectValue() {
-		return this.charObjectValue;
-	}
-
-	/**
-	 * Returns the charValue.
-	 * 
-	 * @return the charValue
-	 * @since $version
-	 */
-	public char getCharValue() {
-		return this.charValue;
 	}
 
 	/**
@@ -512,28 +485,6 @@ public class Foo {
 	 */
 	public void setCharObjectArrayValue(Character[] charObjectArrayValue) {
 		this.charObjectArrayValue = charObjectArrayValue;
-	}
-
-	/**
-	 * Sets the charObjectValue.
-	 * 
-	 * @param charObjectValue
-	 *            the charObjectValue to set
-	 * @since $version
-	 */
-	public void setCharObjectValue(Character charObjectValue) {
-		this.charObjectValue = charObjectValue;
-	}
-
-	/**
-	 * Sets the charValue.
-	 * 
-	 * @param charValue
-	 *            the charValue to set
-	 * @since $version
-	 */
-	public void setCharValue(char charValue) {
-		this.charValue = charValue;
 	}
 
 	/**

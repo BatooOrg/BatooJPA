@@ -568,9 +568,8 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public void set(Object instance, Object value) {
-		this.getAccessor().set(instance, (T) value);
+		this.accessor.set(instance, value);
 	}
 
 	private void supportsIdType(MetamodelImpl metaModel, IdentifiableTypeImpl<X> identifiableType, Member member) throws MappingException {

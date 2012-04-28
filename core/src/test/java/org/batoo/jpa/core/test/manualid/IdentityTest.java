@@ -16,40 +16,47 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.reflect;
+package org.batoo.jpa.core.test.manualid;
+
+import javax.persistence.EntityManager;
+
+import junit.framework.Assert;
+
+import org.batoo.jpa.core.test.AbstractTest;
+import org.junit.Test;
 
 /**
- * Interface for Accessors.
- * 
- * @param <Y>
  * @author hceylan
+ * 
  * @since $version
  */
-public interface Accessor<Y> {
+public class IdentityTest extends AbstractTest {
 
 	/**
-	 * Returns the value of the field.
-	 * 
-	 * @param instance
-	 *            the instance
-	 * @return the value
+	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with identity value
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	Y get(Object instance);
+	@Test
+	public void testIdentiy() {
+		final Foo foo = new Foo();
+		foo.setKey(1);
+		foo.setValue("Bar");
 
-	/**
-	 * Sets the value of the field.
-	 * 
-	 * @param instance
-	 *            the instance
-	 * @param the
-	 *            value
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	void set(Object instance, Y value);
+		final Foo foo2 = new Foo();
+		foo2.setKey(2);
+		foo2.setValue("Bar");
+
+		this.persist(foo);
+		this.persist(foo2);
+
+		this.commit();
+
+		this.close();
+
+		final Foo foo3 = this.find(Foo.class, foo.getKey());
+		Assert.assertEquals(foo.getKey(), foo3.getKey());
+	}
 
 }

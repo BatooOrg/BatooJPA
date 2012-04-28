@@ -128,10 +128,10 @@ public final class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>,
 	@SuppressWarnings("unchecked")
 	public void set(Object instance, Object value) {
 		if (value instanceof Set) {
-			this.getAccessor().set(instance, (Set<E>) value);
+			this.accessor.set(instance, (Set<E>) value);
 		}
 		else {
-			final Collection<E> collection = ((ManagedSet<E>) this.getAccessor().get(instance)).getCollection();
+			final Collection<E> collection = ((ManagedSet<E>) this.accessor.get(instance)).getCollection();
 			if (!collection.contains(value)) {
 				collection.add((E) value);
 			}
@@ -145,7 +145,7 @@ public final class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>,
 	@Override
 	@SuppressWarnings("unchecked")
 	public void setCollection(Object instance, ManagedCollection<?> collection) {
-		this.getAccessor().set(instance, (Set<E>) collection);
+		this.accessor.set(instance, (Set<E>) collection);
 	}
 
 	/**

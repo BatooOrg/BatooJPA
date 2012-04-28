@@ -289,7 +289,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 			parsed.add(IdClass.class);
 		}
 
-		this.parseGenerators();
+		this.parseGenerators(parsed);
 
 		if (this instanceof EntityTypeImpl) {
 			this.parsePrimaryTable(parsed);
@@ -313,7 +313,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 		return parsed;
 	}
 
-	private void parseGenerators() throws MappingException {
+	private void parseGenerators(Set<Class<? extends Annotation>> parsed) throws MappingException {
 		this.sequenceGenerator = this.getJavaType().getAnnotation(SequenceGenerator.class);
 		if (this.sequenceGenerator != null) {
 			// is the name ok?
@@ -326,6 +326,8 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 				throw new MappingException("An existing SequenceGenerator with name " + this.sequenceGenerator.name()
 					+ " already refefined on " + this.getJavaType());
 			}
+
+			parsed.add(SequenceGenerator.class);
 		}
 
 		this.tableGenerator = this.getJavaType().getAnnotation(TableGenerator.class);
@@ -340,6 +342,8 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 				throw new MappingException("An existing TequenceGenerator with name " + this.tableGenerator.name()
 					+ " already refefined on " + this.getJavaType());
 			}
+
+			parsed.add(TableGenerator.class);
 		}
 	}
 

@@ -16,13 +16,41 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.util;
+package org.batoo.jpa.core.test.identity;
+
+import javax.persistence.EntityManager;
+
+import junit.framework.Assert;
+
+import org.batoo.jpa.core.test.AbstractTest;
+import org.junit.Test;
 
 /**
- * 
  * @author hceylan
+ * 
  * @since $version
  */
-public class Mutable {
+public class ManualIdTest extends AbstractTest {
+
+	/**
+	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with identity value
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testIdentiy() {
+		final Foo foo = new Foo();
+		foo.setValue("Bar");
+
+		this.persist(foo);
+
+		this.commit();
+
+		this.close();
+
+		final Foo foo2 = this.find(Foo.class, foo.getKey());
+		Assert.assertEquals(foo.getKey(), foo2.getKey());
+	}
 
 }

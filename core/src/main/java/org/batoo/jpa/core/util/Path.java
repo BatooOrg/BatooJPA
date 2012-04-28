@@ -16,44 +16,82 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.mapping;
+package org.batoo.jpa.core.util;
 
-import java.util.Collection;
+import java.util.LinkedList;
 
-import org.batoo.jpa.core.impl.jdbc.PhysicalColumn;
+import org.batoo.jpa.core.impl.mapping.Association;
 
 /**
- * Interface for mappings with physical storage.
+ * Representation of a path in a select statement
  * 
  * @author hceylan
  * @since $version
  */
-public interface PhysicalMapping<X, T> extends Mapping<X, T> {
+public class Path extends LinkedList<Association<?, ?>> {
+
+	private static final long serialVersionUID = 1L;
+
+	private boolean inverse;
+	private boolean lazy;
 
 	/**
-	 * Adds the physical column
-	 * 
-	 * @param physicalColumn
-	 *            the physical column to add
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	void addColumn(PhysicalColumn physicalColumn);
+	public Path() {
+		super();
+	}
 
 	/**
-	 * Returns the columnTemplates.
+	 * @param path
 	 * 
-	 * @return the columnTemplates
 	 * @since $version
+	 * @author hceylan
 	 */
-	Collection<ColumnTemplate<X, T>> getColumnTemplates();
+	public Path(Path path) {
+		this.addAll(path);
+	}
 
 	/**
-	 * Returns the physicalColumns.
+	 * Returns if the path is inverse.
 	 * 
-	 * @return the physicalColumns
+	 * @return the inverse
 	 * @since $version
 	 */
-	PhysicalColumn[] getPhysicalColumns();
+	public boolean isInverse() {
+		return this.inverse;
+	}
+
+	/**
+	 * Returns if the path is lazy.
+	 * 
+	 * @return true if the path is lazy
+	 * @since $version
+	 */
+	public boolean isLazy() {
+		return this.lazy;
+	}
+
+	/**
+	 * Marks the path as inverse path.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setInverse() {
+		this.inverse = true;
+	}
+
+	/**
+	 * Marks the path as lazy.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setLazy() {
+		this.lazy = true;
+	}
+
 }

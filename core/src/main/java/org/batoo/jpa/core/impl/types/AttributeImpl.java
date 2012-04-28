@@ -51,7 +51,6 @@ import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.mapping.AbstractMapping;
 import org.batoo.jpa.core.impl.mapping.ColumnTemplate;
 import org.batoo.jpa.core.impl.mapping.JoinColumnTemplate;
-import org.batoo.jpa.core.impl.reflect.Accessor;
 import org.batoo.jpa.core.impl.reflect.FieldAccessor;
 import org.batoo.jpa.core.impl.reflect.ReflectHelper;
 import org.batoo.jpa.core.jdbc.adapter.JDBCAdapter;
@@ -96,7 +95,7 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 	protected final ManagedTypeImpl<X> declaringType;
 	protected final Class<Y> javaType; // the java type of the attribute
 	protected final Member javaMember; // the java member of the attribute
-	private Accessor<Y> accessor; // the accessor to to use for fast get / set operations
+	protected FieldAccessor accessor; // the accessor to to use for fast get / set operations
 	protected final JDBCAdapter jdbcAdapter;
 
 	// Mapping supplied properties
@@ -147,6 +146,7 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 		this.mappedBy = original.mappedBy;
 		this.orphanRemoval = original.orphanRemoval;
 		this.temporalType = original.temporalType;
+		this.accessor = original.accessor;
 
 		for (final ColumnTemplate<?, Y> columnTemplate : this.columns) {
 			this.columns.add(columnTemplate.clone(this));
@@ -176,7 +176,7 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 
 		this.jdbcAdapter = this.declaringType.getMetaModel().getJdbcAdapter();
 		this.attributeType = AtrributeType.BASIC;
-
+		this.accessor = new FieldAccessor((Field) this.javaMember);
 		ReflectHelper.makeAccessible(this.javaMember);
 
 		ReflectHelper.checkAnnotations(javaMember, this.parse());
@@ -217,20 +217,6 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 		return this.getName().compareTo(o.getName());
 	}
 
-	private synchronized void createAccessor() {
-		if (this.accessor != null) {
-			return;
-		}
-
-		if (this.javaMember instanceof Field) {
-			final Field field = (Field) this.javaMember;
-			if (field.getType() == char.class) {
-				this.charType = true;
-			}
-			this.accessor = new FieldAccessor<Y>(field);
-		}
-	}
-
 	/**
 	 * Returns if this attribute has type of <code>type</code> or transitively embeds the type
 	 * 
@@ -263,21 +249,14 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 	 * @since $version
 	 * @author hceylan
 	 */
+	@SuppressWarnings("unchecked")
 	public final Y get(Object instance) {
-		final Y value = this.getAccessor().get(instance);
+		final Y value = (Y) this.accessor.get(instance);
 		if ((value == null) || (this.charType && (((Character) value).hashCode() == 0))) {
 			return null;
 		}
 
 		return value;
-	}
-
-	protected final Accessor<Y> getAccessor() {
-		if (this.accessor == null) {
-			this.createAccessor();
-		}
-
-		return this.accessor;
 	}
 
 	/**

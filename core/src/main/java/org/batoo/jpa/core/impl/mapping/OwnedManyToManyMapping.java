@@ -102,15 +102,6 @@ public class OwnedManyToManyMapping<X, C, E> extends OwnedAssociationMapping<X, 
 	 * 
 	 */
 	@Override
-	public boolean isCollection() {
-		return true;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public Collection<E> performSelect(SessionImpl session, ManagedId<X> managedId) throws SQLException {
 		return this.selectHelper.select(session, managedId);
 	}

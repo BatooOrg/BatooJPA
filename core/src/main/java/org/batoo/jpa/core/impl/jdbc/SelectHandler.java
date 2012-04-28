@@ -18,16 +18,14 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
-import java.util.Deque;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.util.Path;
 
 /**
  * A {@link ResultSetHandler} to load a single result from resultset.
@@ -48,16 +46,12 @@ public class SelectHandler<X> extends BaseSelectHandler<X> {
 	 *            the aliases for all the tables
 	 * @param entityPaths
 	 *            the entity path
-	 * @param lazyPaths
-	 *            the inverse paths
-	 * @param lazyPaths
-	 *            the lazy paths
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SelectHandler(SessionImpl session, EntityTypeImpl<X> rootType, Map<Integer, Map<PhysicalColumn, String>> columnAliases,
-		List<Deque<Association<?, ?>>> entityPaths, Set<Deque<Association<?, ?>>> inversePaths, Set<Deque<Association<?, ?>>> lazyPaths) {
-		super(session, rootType, columnAliases, entityPaths, inversePaths, lazyPaths);
+	public SelectHandler(SessionImpl session, EntityTypeImpl<X> rootType, Map<PhysicalColumn, String>[] columnAliases,
+		List<Path> entityPaths) {
+		super(session, rootType, columnAliases, entityPaths);
 	}
 
 	/**

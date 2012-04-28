@@ -101,7 +101,7 @@ public final class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E
 	public void initialize(ManagedInstance<?> managedInstance, SessionImpl session) {
 		final ManagedList<E> managedList = this.newInstance0(session, managedInstance, this.get(managedInstance.getInstance()));
 
-		this.getAccessor().set(managedInstance.getInstance(), managedList);
+		this.accessor.set(managedInstance.getInstance(), managedList);
 	}
 
 	/**
@@ -125,7 +125,7 @@ public final class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E
 	@Override
 	@SuppressWarnings("unchecked")
 	public void set(Object instance, Object value) {
-		final Collection<E> collection = ((ManagedList<E>) this.getAccessor().get(instance)).getCollection();
+		final Collection<E> collection = ((ManagedList<E>) this.accessor.get(instance)).getCollection();
 		if (!collection.contains(value)) {
 			collection.add((E) value);
 		}
@@ -136,9 +136,8 @@ public final class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public void setCollection(Object instance, ManagedCollection<?> collection) {
-		this.getAccessor().set(instance, (List<E>) collection);
+		this.accessor.set(instance, collection);
 	}
 
 	/**

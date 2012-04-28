@@ -154,7 +154,11 @@ public class ReflectHelper {
 		}
 
 		if (annotations.size() > 0) {
-			throw new MappingException(name, annotationList);
+			for (final Class<? extends Annotation> annotation : annotations) {
+				if (annotation.getPackage().getName().startsWith("javax.persistence")) {
+					throw new MappingException(name, annotationList);
+				}
+			}
 		}
 	}
 

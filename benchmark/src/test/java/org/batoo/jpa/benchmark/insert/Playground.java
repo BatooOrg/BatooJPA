@@ -97,6 +97,8 @@ public class Playground {
 	public void _measureAfter() {
 		this.running = false;
 
+		this.element.dump(0, 0);
+
 		System.out.println("\n\n\n");
 
 		int rowNo = 0;
@@ -228,6 +230,7 @@ public class Playground {
 	private void doFind(final EntityManagerFactory emf, final Person person) {
 		for (int i = 0; i < 50; i++) {
 			final EntityManager em = emf.createEntityManager();
+
 			em.find(Person.class, person.getId());
 			em.close();
 		}
@@ -270,12 +273,8 @@ public class Playground {
 
 			start = System.currentTimeMillis();
 
-			for (int i = 0; i < 5; i++) {
-				this.test(type, emf);
+			this.test(type, emf);
 
-				LOG.info("\n\nRound up: " + i);
-				this.element.dump(0, 0);
-			}
 		}
 		finally {
 			Thread.currentThread().setContextClassLoader(old);
@@ -296,7 +295,7 @@ public class Playground {
 			catch (final InterruptedException e) {}
 		}
 
-		for (int i = 0; i < 10000; i++) {
+		for (int i = 0; i < 25000; i++) {
 			this.singleTest(emf);
 		}
 	}

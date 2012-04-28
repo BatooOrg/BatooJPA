@@ -114,8 +114,7 @@ public class RefreshHelper<X> extends BaseSelectHelper<X> {
 			}
 		});
 
-		final RefreshHandler<X> rsHandler = new RefreshHandler<X>(session, this.type, this.columnAliases, this.entityPaths,
-			this.inversePaths, this.lazyPaths);
+		final RefreshHandler<X> rsHandler = new RefreshHandler<X>(session, this.type, this.columnAliases, this.entityPaths);
 
 		this.runner.query(session.getConnection(), selectSql, rsHandler, params.toArray());
 	}

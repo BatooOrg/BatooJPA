@@ -28,6 +28,7 @@ import org.batoo.jpa.core.impl.EntityManagerImpl;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
 import org.batoo.jpa.core.impl.mapping.Association;
+import org.batoo.jpa.core.impl.mapping.CollectionMapping;
 
 import com.google.common.collect.Lists;
 
@@ -66,7 +67,7 @@ public class DetachOperation<X> extends AbstractOperation<X> {
 
 			final List<AbstractOperation<?>> cascades = Lists.newArrayList();
 			if (value != null) {
-				if (association.isCollection()) {
+				if (association instanceof CollectionMapping) {
 					final Collection<?> values = (Collection<?>) value;
 					for (final Object child : values) {
 						cascades.add(new DetachOperation(this.em, child));

@@ -96,12 +96,10 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	 * @author hceylan
 	 */
 	public void dump2(int rowNo) {
-		if (this.self >= 10000) {
-			System.out.println(String.format("%010d", rowNo) + //
-				" " + String.format("%010d", this.hits) + //
-				" " + String.format("%010d", this.selfHit) + //
-				" " + this.key);
-		}
+		System.out.println(String.format("%010d", rowNo) + //
+			" " + String.format("%010d", this.hits) + //
+			" " + String.format("%010d", this.selfHit) + //
+			" " + this.key);
 	}
 
 	/**

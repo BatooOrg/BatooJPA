@@ -254,6 +254,6 @@ public final class MapAttributeImpl<X, K, V> extends PluralAttributeImpl<X, Map<
 	@Override
 	@SuppressWarnings("unchecked")
 	public void setCollection(Object instance, ManagedCollection<?> collection) {
-		this.getAccessor().set(instance, (Map<K, V>) collection);
+		this.accessor.set(instance, (Map<K, V>) collection);
 	}
 }

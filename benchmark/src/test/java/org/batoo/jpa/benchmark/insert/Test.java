@@ -16,44 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.mapping;
+package org.batoo.jpa.benchmark.insert;
 
-import java.util.Collection;
-
-import org.batoo.jpa.core.impl.jdbc.PhysicalColumn;
+import javassist.ClassPool;
+import javassist.NotFoundException;
 
 /**
- * Interface for mappings with physical storage.
  * 
  * @author hceylan
  * @since $version
  */
-public interface PhysicalMapping<X, T> extends Mapping<X, T> {
+public class Test {
 
-	/**
-	 * Adds the physical column
-	 * 
-	 * @param physicalColumn
-	 *            the physical column to add
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	void addColumn(PhysicalColumn physicalColumn);
-
-	/**
-	 * Returns the columnTemplates.
-	 * 
-	 * @return the columnTemplates
-	 * @since $version
-	 */
-	Collection<ColumnTemplate<X, T>> getColumnTemplates();
-
-	/**
-	 * Returns the physicalColumns.
-	 * 
-	 * @return the physicalColumns
-	 * @since $version
-	 */
-	PhysicalColumn[] getPhysicalColumns();
+	public static void main(String[] args) throws NotFoundException {
+		final ClassPool classPool = new ClassPool();
+		classPool.makeClass(Person.class.getCanonicalName() + "");
+	}
 }

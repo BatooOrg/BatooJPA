@@ -71,6 +71,7 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 
 	// Link Phase properties
 	private final Class<E> elementJavaType;
+	private final TypeImpl<E> elementType;
 
 	/**
 	 * Cloning constructor
@@ -89,6 +90,7 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 		this.collectionTableName = original.collectionTableName;
 		this.collectionTableSchema = original.collectionTableSchema;
 		this.elementJavaType = original.elementJavaType;
+		this.elementType = original.elementType;
 
 		this.collectionTableUniqueConstraints.addAll(original.collectionTableUniqueConstraints);
 	}
@@ -107,10 +109,12 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 * @since $version
 	 * @author hceylan
 	 */
+	@SuppressWarnings("unchecked")
 	public PluralAttributeImpl(ManagedType<X> owner, Member member, Class<C> javaMember, Class<E> elementJavaType) throws MappingException {
 		super(owner, member, javaMember);
 
 		this.elementJavaType = elementJavaType;
+		this.elementType = (TypeImpl<E>) this.getDeclaringType().getMetaModel().getType(this.elementJavaType);
 	}
 
 	/**
@@ -166,9 +170,8 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public final TypeImpl<E> getElementType() {
-		return (TypeImpl<E>) this.getDeclaringType().getMetaModel().getType(this.elementJavaType);
+		return this.elementType;
 	}
 
 	/**

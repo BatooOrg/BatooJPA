@@ -114,8 +114,7 @@ public class SelectHelper<X> extends BaseSelectHelper<X> {
 			}
 		});
 
-		final SelectHandler<X> rsHandler = new SelectHandler<X>(session, this.type, this.columnAliases, this.entityPaths,
-			this.inversePaths, this.lazyPaths);
+		final SelectHandler<X> rsHandler = new SelectHandler<X>(session, this.type, this.columnAliases, this.entityPaths);
 
 		final Collection<X> result = this.runner.query(session.getConnection(), selectSql, rsHandler, params.toArray());
 

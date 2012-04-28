@@ -29,6 +29,8 @@ import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
 import org.batoo.jpa.core.impl.mapping.Association;
+import org.batoo.jpa.core.impl.mapping.CollectionMapping;
+import org.batoo.jpa.core.impl.mapping.OwnerAssociationMapping;
 import org.batoo.jpa.core.impl.mapping.PersistableAssociation;
 
 import com.google.common.collect.Lists;
@@ -67,7 +69,7 @@ public class PersistOperation<X> extends AbstractOperation<X> {
 			final Object value = association.getValue(this.managedInstance.getInstance());
 
 			if (value != null) {
-				if (association.isCollection()) {
+				if (association instanceof CollectionMapping) {
 					final ManagedCollection<?> values = (ManagedCollection<?>) value;
 					for (final Object child : values.getCollection()) {
 						cascades.add(new PersistOperation(this.em, child));
@@ -80,7 +82,7 @@ public class PersistOperation<X> extends AbstractOperation<X> {
 			}
 		}
 
-		if (association.isCollection() && association.isOwner()) {
+		if ((association instanceof CollectionMapping) && (association instanceof OwnerAssociationMapping)) {
 			final PersistableAssociation persistableAssociation = (PersistableAssociation) association;
 			if (persistableAssociation.hasJoin()) {
 				cascades.add(new PersistAssociationOperation(this.em, this.managedInstance, persistableAssociation));

@@ -28,7 +28,7 @@ import org.batoo.jpa.core.impl.instance.InstanceInvoker.EnhancedInstance;
  * @author hceylan
  * @since $version
  */
-public class FieldAccessor<Y> implements Accessor<Y> {
+public class FieldAccessor {
 
 	private enum PrimitiveType {
 		BOOLEAN(boolean.class),
@@ -85,30 +85,29 @@ public class FieldAccessor<Y> implements Accessor<Y> {
 	 * {@inheritDoc}
 	 * 
 	 */
-	@Override
 	@SuppressWarnings({ "unchecked", "restriction" })
-	public Y get(Object instance) {
+	public Object get(Object instance) {
 		if (this.primitiveType == null) {
-			return (Y) ReflectHelper.unsafe.getObject(instance, this.fieldOffset);
+			return ReflectHelper.unsafe.getObject(instance, this.fieldOffset);
 		}
 
 		switch (this.primitiveType) {
 			case BOOLEAN:
-				return (Y) Boolean.valueOf(ReflectHelper.unsafe.getBoolean(instance, this.fieldOffset));
+				return Boolean.valueOf(ReflectHelper.unsafe.getBoolean(instance, this.fieldOffset));
 			case INTEGER:
-				return (Y) Integer.valueOf(ReflectHelper.unsafe.getInt(instance, this.fieldOffset));
+				return Integer.valueOf(ReflectHelper.unsafe.getInt(instance, this.fieldOffset));
 			case FLOAT:
-				return (Y) Float.valueOf(ReflectHelper.unsafe.getFloat(instance, this.fieldOffset));
+				return Float.valueOf(ReflectHelper.unsafe.getFloat(instance, this.fieldOffset));
 			case DOUBLE:
-				return (Y) Double.valueOf(ReflectHelper.unsafe.getDouble(instance, this.fieldOffset));
+				return Double.valueOf(ReflectHelper.unsafe.getDouble(instance, this.fieldOffset));
 			case LONG:
-				return (Y) Long.valueOf(ReflectHelper.unsafe.getLong(instance, this.fieldOffset));
+				return Long.valueOf(ReflectHelper.unsafe.getLong(instance, this.fieldOffset));
 			case SHORT:
-				return (Y) Boolean.valueOf(ReflectHelper.unsafe.getBoolean(instance, this.fieldOffset));
+				return Boolean.valueOf(ReflectHelper.unsafe.getBoolean(instance, this.fieldOffset));
 			case BYTE:
-				return (Y) Byte.valueOf(ReflectHelper.unsafe.getByte(instance, this.fieldOffset));
+				return Byte.valueOf(ReflectHelper.unsafe.getByte(instance, this.fieldOffset));
 			default: // CHAR
-				return (Y) Character.valueOf(ReflectHelper.unsafe.getChar(instance, this.fieldOffset));
+				return Character.valueOf(ReflectHelper.unsafe.getChar(instance, this.fieldOffset));
 		}
 	}
 
@@ -135,9 +134,8 @@ public class FieldAccessor<Y> implements Accessor<Y> {
 	 * {@inheritDoc}
 	 * 
 	 */
-	@Override
 	@SuppressWarnings("restriction")
-	public void set(Object instance, Y value) {
+	public void set(Object instance, Object value) {
 		if (instance == null) {
 			throw new NullPointerException();
 		}

@@ -31,6 +31,7 @@ import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.impl.OperationTookLongTimeWarning;
 import org.batoo.jpa.core.impl.SessionImpl;
+import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
@@ -38,9 +39,10 @@ import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.mapping.CollectionMapping;
 import org.batoo.jpa.core.impl.mapping.Mapping;
 import org.batoo.jpa.core.impl.mapping.Mapping.AssociationType;
-import org.batoo.jpa.core.impl.mapping.OwnerAssociation;
+import org.batoo.jpa.core.impl.mapping.OwnerAssociationMapping;
 import org.batoo.jpa.core.impl.types.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.util.Path;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
@@ -57,10 +59,8 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 	private static volatile int nextOperationNo = 0;
 	protected final SessionImpl session;
 	protected final EntityTypeImpl<X> rootType;
-	protected final Map<Integer, Map<PhysicalColumn, String>> columnAliases;
-	protected final List<Deque<Association<?, ?>>> entityPaths;
-	protected final Set<Deque<Association<?, ?>>> lazyPaths;
-	protected final Set<Deque<Association<?, ?>>> inversePaths;
+	protected final Map<PhysicalColumn, String>[] columnAliases;
+	protected final List<Path> entityPaths;
 	private boolean dbAudit;
 
 	/**
@@ -82,22 +82,20 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 	 * @since $version
 	 * @author hceylan
 	 */
-	public BaseSelectHandler(SessionImpl session, EntityTypeImpl<X> rootType, Map<Integer, Map<PhysicalColumn, String>> columnAliases,
-		List<Deque<Association<?, ?>>> entityPaths, Set<Deque<Association<?, ?>>> inversePaths, Set<Deque<Association<?, ?>>> lazyPaths) {
+	public BaseSelectHandler(SessionImpl session, EntityTypeImpl<X> rootType, Map<PhysicalColumn, String>[] columnAliases,
+		List<Path> entityPaths) {
 
 		this.session = session;
 		this.rootType = rootType;
 		this.columnAliases = columnAliases;
 		this.entityPaths = entityPaths;
-		this.inversePaths = inversePaths;
-		this.lazyPaths = lazyPaths;
 	}
 
 	private void createLazyInstance(SessionImpl session, ResultSet rs, Map<ManagedId<?>, ManagedInstance<?>> cache, int depth,
 		final ManagedInstance<?> managedInstance, Deque<Association<?, ?>> path) throws SQLException {
 		final Association<?, ?> association = path.getLast();
-		if (association.isOwner()) {
-			final OwnerAssociation<?, ?> lazyAssociation = (OwnerAssociation<?, ?>) association;
+		if (association instanceof OwnerAssociationMapping) {
+			final OwnerAssociationMapping<?, ?> lazyAssociation = (OwnerAssociationMapping<?, ?>) association;
 
 			for (final PhysicalColumn column : lazyAssociation.getPhysicalColumns()) {
 				final Object value = this.getColumnValue(rs, depth, column);
@@ -109,10 +107,10 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 				}
 			}
 		}
-		else if (association.isCollection()) {
+		else if (association instanceof CollectionMapping) {
 			final CollectionMapping<?, ?, ?> lazyAssociation = (CollectionMapping<?, ?, ?>) association;
-			lazyAssociation.setCollection(managedInstance.getInstance(),
-				lazyAssociation.getDeclaringAttribute().newInstance(session, managedInstance));
+			final ManagedCollection<?> collection = lazyAssociation.getDeclaringAttribute().newInstance(session, managedInstance);
+			lazyAssociation.setCollection(managedInstance.getInstance(), collection);
 		}
 	}
 
@@ -221,7 +219,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 	}
 
 	private Object getColumnValue(ResultSet rs, int depth, final PhysicalColumn column) throws SQLException {
-		return rs.getObject(this.columnAliases.get(depth).get(column));
+		return rs.getObject(this.columnAliases[depth].get(column));
 	}
 
 	/**
@@ -358,7 +356,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 		}
 
 		while (this.entityPaths.size() > associationNo.intValue()) {
-			final Deque<Association<?, ?>> path = this.entityPaths.get(associationNo.intValue());
+			final Path path = this.entityPaths.get(associationNo.intValue());
 			final Association<?, ?> association = path.getLast();
 
 			if (association.getOwner() != currentType) {
@@ -367,13 +365,13 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 
 			associationNo.increment();
 
-			if (this.inversePaths.contains(path)) { // do inverse set
+			if (path.isInverse()) { // do inverse set
 				if (!managedInstance.isLoaded()) {
 					association.setValue(managedInstance.getInstance(), parent);
 				}
 				continue;
 			}
-			else if (this.lazyPaths.contains(path)) { // do lazy set
+			else if (path.isLazy()) { // do lazy set
 				if (!managedInstance.isLoaded()) {
 					this.createLazyInstance(session, rs, cache, depth, managedInstance, path);
 				}

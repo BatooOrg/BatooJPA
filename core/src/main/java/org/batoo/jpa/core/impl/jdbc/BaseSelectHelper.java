@@ -19,11 +19,8 @@
 package org.batoo.jpa.core.impl.jdbc;
 
 import java.util.Collection;
-import java.util.Deque;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.lang.StringUtils;
@@ -33,6 +30,7 @@ import org.batoo.jpa.core.impl.mapping.OwnedAssociation;
 import org.batoo.jpa.core.impl.mapping.OwnerAssociation;
 import org.batoo.jpa.core.impl.mapping.PersistableAssociation;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.util.Path;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -40,7 +38,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /**
  * Helper class for entity selects.
@@ -64,10 +61,8 @@ public abstract class BaseSelectHelper<X> {
 	private final Mapping<X, ?> alwaysLazyMapping;
 	protected final QueryRunner runner;
 
-	protected final Map<Integer, Map<PhysicalColumn, String>> columnAliases = Maps.newHashMap();
-	protected final List<Deque<Association<?, ?>>> entityPaths = Lists.newArrayList();
-	protected final Set<Deque<Association<?, ?>>> lazyPaths = Sets.newIdentityHashSet();
-	protected final Set<Deque<Association<?, ?>>> inversePaths = Sets.newIdentityHashSet();
+	protected Map<PhysicalColumn, String>[] columnAliases;
+	protected final List<Path> entityPaths = Lists.newArrayList();
 	protected final List<PhysicalColumn> predicates = Lists.newArrayList();
 
 	private String selectSql;
@@ -93,6 +88,8 @@ public abstract class BaseSelectHelper<X> {
 	/**
 	 * Adds fields to the list of fields
 	 * 
+	 * @param columnAliases
+	 *            the list that holds the column aliases
 	 * @param fieldsBuffer
 	 *            the fields buffer
 	 * @param table
@@ -105,7 +102,8 @@ public abstract class BaseSelectHelper<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private void addFields(List<String> fieldsBuffer, EntityTable table, final int tableNo, final int secondaryTableNo) {
+	private void addFields(final List<Map<PhysicalColumn, String>> columnAliases, List<String> fieldsBuffer, EntityTable table,
+		final int tableNo, final int secondaryTableNo) {
 		// Filter out the secondary table columns
 		final Collection<PhysicalColumn> filteredColumns;
 
@@ -133,9 +131,12 @@ public abstract class BaseSelectHelper<X> {
 				final String fieldAlias = tableAlias + "_F" + this.fieldNo++;
 
 				// save the mapping
-				Map<PhysicalColumn, String> aliasMap = BaseSelectHelper.this.columnAliases.get(tableNo);
-				if (aliasMap == null) {
-					BaseSelectHelper.this.columnAliases.put(tableNo, aliasMap = Maps.newHashMap());
+				Map<PhysicalColumn, String> aliasMap;
+				if (columnAliases.size() == tableNo) {
+					columnAliases.add(aliasMap = Maps.newHashMap());
+				}
+				else {
+					aliasMap = columnAliases.get(tableNo);
 				}
 				aliasMap.put(input, fieldAlias);
 
@@ -174,7 +175,10 @@ public abstract class BaseSelectHelper<X> {
 			ownerAssociation = ((OwnedAssociation<?, ?>) association).getOpposite();
 		}
 
-		final Collection<PhysicalColumn> foreignKeys = ownerAssociation.getPhysicalColumns();
+		final List<PhysicalColumn> foreignKeys = Lists.newArrayList();
+		for (final PhysicalColumn column : ownerAssociation.getPhysicalColumns()) {
+			foreignKeys.add(column);
+		}
 
 		final int left = (association instanceof OwnedAssociation ? tableNo : parentTableNo);
 		final int right = (association instanceof OwnedAssociation ? parentTableNo : tableNo);
@@ -315,6 +319,7 @@ public abstract class BaseSelectHelper<X> {
 		return this.selectSql;
 	}
 
+	@SuppressWarnings("unchecked")
 	private synchronized void getSelectSQL0() {
 		if (this.selectSql == null) {
 			final List<String> fieldsBuffer = Lists.newArrayList();
@@ -325,10 +330,12 @@ public abstract class BaseSelectHelper<X> {
 
 			this.preparePredicates();
 
-			this.processType(fieldsBuffer, joinsBuffer, null, this.type, Lists.<Association<?, ?>> newLinkedList(), tableNo, tableNo);
+			final List<Map<PhysicalColumn, String>> columnAliases = Lists.newArrayList();
+			this.processType(columnAliases, fieldsBuffer, joinsBuffer, null, this.type, new Path(), tableNo, tableNo);
 
 			// compose and return the final query
 			this.selectSql = this.compose(fieldsBuffer, joinsBuffer, this.type.getPrimaryTable());
+			this.columnAliases = columnAliases.toArray(new Map[columnAliases.size()]);
 		}
 	}
 
@@ -350,12 +357,12 @@ public abstract class BaseSelectHelper<X> {
 	 */
 	protected abstract void preparePredicates();
 
-	private void processType(final List<String> fieldsBuffer, final List<String> joinsBuffer, EntityTypeImpl<?> parentType,
-		EntityTypeImpl<?> type, Deque<Association<?, ?>> path, int parentTableNo, int tableNo) {
+	private void processType(List<Map<PhysicalColumn, String>> columnAliases, final List<String> fieldsBuffer,
+		final List<String> joinsBuffer, EntityTypeImpl<?> parentType, EntityTypeImpl<?> type, Path path, int parentTableNo, int tableNo) {
 
 		// handle the primary table
 		final EntityTable primaryTable = type.getPrimaryTable();
-		this.addFields(fieldsBuffer, primaryTable, tableNo, -1);
+		this.addFields(columnAliases, fieldsBuffer, primaryTable, tableNo, -1);
 
 		if (parentType != null) { // we are not the root entity
 			final Association<?, ?> association = path.getLast();
@@ -380,27 +387,28 @@ public abstract class BaseSelectHelper<X> {
 				continue;
 			}
 
-			this.addFields(fieldsBuffer, table, tableNo, secondaryTableNo);
+			this.addFields(columnAliases, fieldsBuffer, table, tableNo, secondaryTableNo);
 			this.addSecondaryJoin(joinsBuffer, parentTableNo, tableNo, secondaryTableNo++, table);
 		}
 
 		// process the associations
 		for (final Association<?, ?> child : type.getAssociations()) {
 			// handle the path
-			final LinkedList<Association<?, ?>> childpath = Lists.newLinkedList(path);
+			final Path childpath = new Path(path);
 			childpath.addLast(child);
 
 			this.entityPaths.add(childpath);
 
 			if ((path.size() > 0) && path.getLast().equals(child.getOpposite())) {
-				this.inversePaths.add(childpath);
+				childpath.setInverse();
 			}
 			else if ((path.size() >= MAX_PATH) || !this.cascades(child)
 				|| ((parentType == null) && (this.alwaysLazyMapping != null) && (child.getOpposite() == this.alwaysLazyMapping))) {
-				this.lazyPaths.add(childpath);
+				childpath.setLazy();
 			}
 			else {
-				this.processType(fieldsBuffer, joinsBuffer, child.getOwner(), child.getType(), childpath, parentTableNo, ++tableNo);
+				this.processType(columnAliases, fieldsBuffer, joinsBuffer, child.getOwner(), child.getType(), childpath, parentTableNo,
+					++tableNo);
 			}
 		}
 	}

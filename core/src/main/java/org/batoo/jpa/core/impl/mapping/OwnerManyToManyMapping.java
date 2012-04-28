@@ -54,6 +54,8 @@ public class OwnerManyToManyMapping<X, C, E> extends OwnerAssociationMapping<X, 
 
 	private final AssociationSelectHelper<X, C, E> selectHelper;
 
+	private PhysicalColumn[] physicalColumnsArray;
+
 	/**
 	 * @param declaringAttribute
 	 *            the attribute which declares the mapping
@@ -120,8 +122,13 @@ public class OwnerManyToManyMapping<X, C, E> extends OwnerAssociationMapping<X, 
 	 * 
 	 */
 	@Override
-	public Collection<PhysicalColumn> getPhysicalColumns() {
-		return this.joinTable.getColumns();
+	public PhysicalColumn[] getPhysicalColumns() {
+		if (this.physicalColumnsArray == null) {
+			this.physicalColumnsArray = new PhysicalColumn[this.joinTable.getColumns().size()];
+			this.physicalColumnsArray = this.joinTable.getColumns().toArray(this.physicalColumnsArray);
+		}
+
+		return this.physicalColumnsArray;
 	}
 
 	/**
@@ -140,15 +147,6 @@ public class OwnerManyToManyMapping<X, C, E> extends OwnerAssociationMapping<X, 
 	 */
 	@Override
 	public boolean hasJoin() {
-		return true;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public boolean isCollection() {
 		return true;
 	}
 
