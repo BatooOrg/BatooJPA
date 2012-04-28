@@ -16,40 +16,58 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.manager;
+package org.batoo.jpa.core.test.inheritence.single;
 
-import org.batoo.jpa.core.BLogger;
-import org.batoo.jpa.core.BatooException;
-import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
-import org.batoo.jpa.core.impl.types.IdentifiableTypeImpl;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 /**
- * A Manager that links persistent classes vertically.
  * 
  * @author hceylan
  * @since $version
  */
-public class VLinkerManager extends DeploymentManager<IdentifiableTypeImpl<?>> {
+@Entity
+@DiscriminatorColumn
+public class Foo {
 
-	private static final BLogger LOG = BLogger.getLogger(VLinkerManager.class);
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer key;
 
-	public static void link(MetamodelImpl metamodel) throws BatooException {
-		new VLinkerManager(metamodel).perform();
-	}
+	private String value;
 
-	private VLinkerManager(MetamodelImpl metamodel) {
-		super(LOG, "VLinker", metamodel, Context.IDENTIFIABLE_TYPES);
+	/**
+	 * Returns the key.
+	 * 
+	 * @return the key
+	 * @since $version
+	 */
+	public Integer getKey() {
+		return this.key;
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Returns the value.
 	 * 
+	 * @return the value
+	 * @since $version
 	 */
-	@Override
-	public Void perform(IdentifiableTypeImpl<?> type) throws BatooException {
-		type.vlink();
+	public String getValue() {
+		return this.value;
+	}
 
-		return null;
+	/**
+	 * Sets the value.
+	 * 
+	 * @param value
+	 *            the value to set
+	 * @since $version
+	 */
+	public void setValue(String value) {
+		this.value = value;
 	}
 
 }

@@ -68,8 +68,8 @@ public class MappedSuperclassTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 	 * 
 	 */
 	@Override
-	public Set<Class<? extends Annotation>> parse() throws BatooException {
-		final Set<Class<? extends Annotation>> parsed = super.parse();
+	public void parse(Set<Class<? extends Annotation>> parsed) throws BatooException {
+		super.parse(parsed);
 
 		final Class<X> type = this.getJavaType();
 		final MappedSuperclass mappedSuperclass = type.getAnnotation(MappedSuperclass.class);
@@ -78,20 +78,5 @@ public class MappedSuperclassTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 		}
 
 		parsed.add(MappedSuperclass.class);
-
-		this.parsed = true;
-
-		return parsed;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public void vlink() throws BatooException {
-		super.vlink();
-
-		this.vlinked = true;
 	}
 }

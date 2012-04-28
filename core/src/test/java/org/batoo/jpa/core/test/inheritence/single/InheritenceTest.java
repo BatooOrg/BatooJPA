@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.inheritence;
+package org.batoo.jpa.core.test.inheritence.single;
 
 import javax.persistence.EntityManager;
 

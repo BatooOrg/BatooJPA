@@ -90,7 +90,6 @@ public abstract class IdQueue extends LinkedBlockingQueue<Integer> {
 	}
 
 	protected void doTopUp(Runnable runnable) {
-
 		while (this.size() <= (this.topupSize)) {
 			LOG.debug("Ids will be fetched for {0} from the database...", this.name);
 
@@ -109,8 +108,9 @@ public abstract class IdQueue extends LinkedBlockingQueue<Integer> {
 			Thread.sleep(1);
 		}
 		catch (final InterruptedException e) {}
-
-		this.idExecuter.execute(this.topUpTask);
+		if (!this.idExecuter.isShutdown()) {
+			this.idExecuter.execute(this.topUpTask);
+		}
 	}
 
 	/**

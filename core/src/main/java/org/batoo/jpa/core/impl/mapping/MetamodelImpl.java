@@ -392,6 +392,18 @@ public class MetamodelImpl implements Metamodel {
 	}
 
 	/**
+	 * Returns the executor service for the id generation operations.
+	 * 
+	 * @return the executor service for the id generation operations
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ExecutorService getIdGeneratorExecutor() {
+		return this.idGeneratorExecuter;
+	}
+
+	/**
 	 * Returns the jdbcAdapter.
 	 * 
 	 * @return the jdbcAdapter

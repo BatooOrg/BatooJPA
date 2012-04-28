@@ -97,8 +97,8 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	 * 
 	 */
 	@Override
-	public Set<Class<? extends Annotation>> parse() throws BatooException {
-		final Set<Class<? extends Annotation>> annotations = super.parse();
+	public void parse(Set<Class<? extends Annotation>> parsed) throws BatooException {
+		super.parse(parsed);
 
 		final Class<X> type = this.getJavaType();
 
@@ -106,11 +106,9 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 		if (embeddable == null) {
 			throw new MappingException("Type is not an embeddable " + type);
 		}
-		annotations.add(Embeddable.class);
+		parsed.add(Embeddable.class);
 
 		this.performClassChecks(type);
-
-		return annotations;
 	}
 
 	/**

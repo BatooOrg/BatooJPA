@@ -25,13 +25,8 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.IdClass;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.SecondaryTable;
-import javax.persistence.SecondaryTables;
 import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
 import javax.persistence.TableGenerator;
-import javax.persistence.UniqueConstraint;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.IdentifiableType;
 import javax.persistence.metamodel.SingularAttribute;
@@ -42,7 +37,6 @@ import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.jdbc.PhysicalTableGenerator;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
-import org.batoo.jpa.core.impl.mapping.TableTemplate;
 
 import com.google.common.collect.Maps;
 
@@ -59,10 +53,6 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	protected Class<?> idJavaType;
 	protected TypeImpl<?> idType;
 
-	protected final Map<String, TableTemplate> tableTemplates = Maps.newHashMap();
-
-	private TableTemplate primaryTableTemplate;
-
 	protected final Map<String, SingularAttributeImpl<X, ?>> declaredIdAttributes = Maps.newHashMap();
 	protected final Map<String, SingularAttributeImpl<? super X, ?>> idAttributes = Maps.newHashMap();
 
@@ -71,9 +61,6 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	private TableGenerator tableGenerator;
 
 	private String tableName;
-
-	protected volatile boolean vlinked;
-	protected volatile boolean parsed;
 
 	/**
 	 * @param metaModel
@@ -174,16 +161,6 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	}
 
 	/**
-	 * Returns the primaryTableTemplate.
-	 * 
-	 * @return the primaryTableTemplate
-	 * @since $version
-	 */
-	public TableTemplate getPrimaryTableTemplate() {
-		return this.primaryTableTemplate;
-	}
-
-	/**
 	 * Returns the sequence generator for the type or null if no sequence generator is specified.
 	 * 
 	 * @return the sequence generator or null
@@ -237,16 +214,6 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	}
 
 	/**
-	 * Returns the table templates.
-	 * 
-	 * @return the table templates
-	 * @since $version
-	 */
-	public Collection<TableTemplate> getTableTemplates() {
-		return this.tableTemplates.values();
-	}
-
-	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -277,20 +244,11 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * @return
 	 * 
 	 */
 	@Override
-	public Set<Class<? extends Annotation>> parse() throws BatooException {
-		// wait till the super type is parsed
-		while ((this.getSupertype() != null) && !this.getSupertype().parsed) {
-			try {
-				Thread.sleep(1);
-			}
-			catch (final InterruptedException e) {}
-		}
-
-		final Set<Class<? extends Annotation>> parsed = super.parse();
+	public void parse(Set<Class<? extends Annotation>> parsed) throws BatooException {
+		super.parse(parsed);
 
 		final IdClass idClass = this.getJavaType().getAnnotation(IdClass.class);
 		if (idClass != null) {
@@ -300,12 +258,6 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 		}
 
 		this.parseGenerators(parsed);
-
-		if (this instanceof EntityTypeImpl) {
-			this.parsePrimaryTable(parsed);
-
-			this.parseSecondaryTables(parsed);
-		}
 
 		for (final Attribute<X, ?> attribute : this.setDeclaredAttributes) {
 			if (attribute instanceof SingularAttribute) {
@@ -319,8 +271,6 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 				}
 			}
 		}
-
-		return parsed;
 	}
 
 	private void parseGenerators(Set<Class<? extends Annotation>> parsed) throws MappingException {
@@ -357,75 +307,6 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 		}
 	}
 
-	protected void parsePrimaryTable(final Set<Class<? extends Annotation>> annotations) throws MappingException {
-		final Table table = this.getJavaType().getAnnotation(Table.class);
-		if (table != null) {
-			this.putTable(true, table.schema(), table.name(), table.uniqueConstraints(), null);
-
-			annotations.add(Table.class);
-		}
-		else if (((EntityTypeImpl<X>) this).getTopType().getPrimaryTableTemplate() == null) {
-			this.putTable(true, "", this.name, null, null);
-		}
-	}
-
-	private void parseSecondaryTables(final Set<Class<? extends Annotation>> annotations) throws MappingException {
-		final SecondaryTables secondaryTables = this.getJavaType().getAnnotation(SecondaryTables.class);
-		if (secondaryTables != null) {
-			for (final SecondaryTable secondaryTable : secondaryTables.value()) {
-				this.putTable(false, secondaryTable.schema(), secondaryTable.name(), secondaryTable.uniqueConstraints(),
-					secondaryTable.pkJoinColumns());
-			}
-
-			annotations.add(SecondaryTables.class);
-		}
-
-		final SecondaryTable secondaryTable = this.getJavaType().getAnnotation(SecondaryTable.class);
-		if (secondaryTable != null) {
-			this.putTable(false, secondaryTable.schema(), secondaryTable.name(), secondaryTable.uniqueConstraints(),
-				secondaryTable.pkJoinColumns());
-
-			annotations.add(SecondaryTable.class);
-		}
-	}
-
-	/**
-	 * Adds the table to the list of the tables this entity has. may not be blank
-	 * 
-	 * @param primary
-	 *            if the table is primary
-	 * @param schema
-	 *            the name of the schema, may be null
-	 * @param name
-	 *            the name of the table
-	 * @param uniqueConstraints
-	 *            the unique constraints
-	 * @param primaryKeyJoinColumns
-	 *            the primary key join columns, only required for secondary tables.
-	 * @throws MappingException
-	 *             thrown in case of a mapping error
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	private void putTable(boolean primary, String schema, String name, UniqueConstraint[] uniqueConstraints,
-		PrimaryKeyJoinColumn[] primaryKeyJoinColumns) throws MappingException {
-		if (StringUtils.isBlank(name)) {
-			throw new MappingException("Table name cannot be null, spesified on " + this.javaType);
-		}
-
-		TableTemplate table;
-		if (primary) {
-			table = new TableTemplate(this, schema, name, uniqueConstraints);
-			this.primaryTableTemplate = table;
-		}
-		else {
-			table = new TableTemplate(this, schema, name, uniqueConstraints, primaryKeyJoinColumns);
-		}
-
-		this.tableTemplates.put(schema + "." + name, table);
-	}
-
 	/**
 	 * Sets the idJavaType.
 	 * 
@@ -448,14 +329,6 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * @author hceylan
 	 */
 	public void vlink() throws BatooException {
-		// Sleep till the parent is done
-		while ((this.getSupertype() != null) && !this.getSupertype().vlinked) {
-			try {
-				Thread.sleep(1);
-			}
-			catch (final InterruptedException e) {}
-		}
-
 		LOG.debug("Vertically linking {0}", this);
 
 		this.attributes.putAll(this.declaredAttributes);

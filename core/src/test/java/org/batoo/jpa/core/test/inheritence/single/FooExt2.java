@@ -16,40 +16,39 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.manager;
+package org.batoo.jpa.core.test.inheritence.single;
 
-import org.batoo.jpa.core.BLogger;
-import org.batoo.jpa.core.BatooException;
-import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
-import org.batoo.jpa.core.impl.types.IdentifiableTypeImpl;
+import javax.persistence.Entity;
 
 /**
- * A Manager that links persistent classes vertically.
  * 
  * @author hceylan
  * @since $version
  */
-public class VLinkerManager extends DeploymentManager<IdentifiableTypeImpl<?>> {
+@Entity
+public class FooExt2 extends Foo {
 
-	private static final BLogger LOG = BLogger.getLogger(VLinkerManager.class);
+	private String valueExt2;
 
-	public static void link(MetamodelImpl metamodel) throws BatooException {
-		new VLinkerManager(metamodel).perform();
-	}
-
-	private VLinkerManager(MetamodelImpl metamodel) {
-		super(LOG, "VLinker", metamodel, Context.IDENTIFIABLE_TYPES);
+	/**
+	 * Returns the valueExt2.
+	 * 
+	 * @return the valueExt2
+	 * @since $version
+	 */
+	public String getValueExt2() {
+		return this.valueExt2;
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Sets the valueExt2.
 	 * 
+	 * @param valueExt2
+	 *            the valueExt2 to set
+	 * @since $version
 	 */
-	@Override
-	public Void perform(IdentifiableTypeImpl<?> type) throws BatooException {
-		type.vlink();
-
-		return null;
+	public void setValueExt2(String valueExt2) {
+		this.valueExt2 = valueExt2;
 	}
 
 }

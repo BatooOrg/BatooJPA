@@ -16,13 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.inheritence;
+package org.batoo.jpa.core.test.inheritence.joined;
 
-import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
 /**
  * 
@@ -30,44 +26,28 @@ import javax.persistence.Id;
  * @since $version
  */
 @Entity
-@DiscriminatorColumn
-public class Foo {
+public class FooExt1 extends Foo {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer key;
-
-	private String value;
+	private String valueExt1;
 
 	/**
-	 * Returns the key.
+	 * Returns the valueExt1.
 	 * 
-	 * @return the key
+	 * @return the valueExt1
 	 * @since $version
 	 */
-	public Integer getKey() {
-		return this.key;
+	public String getValueExt1() {
+		return this.valueExt1;
 	}
 
 	/**
-	 * Returns the value.
+	 * Sets the valueExt1.
 	 * 
-	 * @return the value
+	 * @param valueExt1
+	 *            the valueExt1 to set
 	 * @since $version
 	 */
-	public String getValue() {
-		return this.value;
+	public void setValueExt1(String valueExt1) {
+		this.valueExt1 = valueExt1;
 	}
-
-	/**
-	 * Sets the value.
-	 * 
-	 * @param value
-	 *            the value to set
-	 * @since $version
-	 */
-	public void setValue(String value) {
-		this.value = value;
-	}
-
 }

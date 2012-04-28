@@ -3,13 +3,13 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
 	version="2.0">
 
-	<persistence-unit name="org.batoo.jpa.core.test.inheritence">
+	<persistence-unit name="org.batoo.jpa.core.test.inheritence.joined">
 		<provider>org.batoo.jpa.core.PersistenceProvider</provider>
 		
-		<class>org.batoo.jpa.core.test.inheritence.Foo</class>
-		<class>org.batoo.jpa.core.test.inheritence.FooExt1</class>
-		<class>org.batoo.jpa.core.test.inheritence.FooExt11</class>
-		<class>org.batoo.jpa.core.test.inheritence.FooExt2</class>
+		<class>org.batoo.jpa.core.test.inheritence.joined.Foo</class>
+		<class>org.batoo.jpa.core.test.inheritence.joined.FooExt1</class>
+		<class>org.batoo.jpa.core.test.inheritence.joined.FooExt11</class>
+		<class>org.batoo.jpa.core.test.inheritence.joined.FooExt2</class>
 		
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.Driver40" />

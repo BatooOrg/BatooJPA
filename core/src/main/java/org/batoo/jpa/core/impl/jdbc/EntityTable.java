@@ -94,7 +94,7 @@ public final class EntityTable extends AbstractTable {
 	public PhysicalColumn getPrimaryKey() {
 		if (this.primaryKey == null) {
 			if (this.primaryKeys.size() == 1) {
-				this.primaryKey = this.primaryKeys.iterator().next();
+				this.primaryKey = this.primaryKeys.get(0);
 			}
 		}
 

@@ -18,35 +18,42 @@
  */
 package org.batoo.jpa.core.impl.manager;
 
+import java.util.Set;
+
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.jdbc.DDLMode;
 
 /**
- * A Manager that links persistent classes horizontally
+ * A Manager that performs the DDL operations.
  * 
  * @author hceylan
  * @since $version
  */
-public class HLinkerManager extends DeploymentManager<EntityTypeImpl<?>> {
+public class DdlManager extends DeploymentManager<EntityTypeImpl<?>> {
 
-	private static final BLogger LOG = BLogger.getLogger(HLinkerManager.class);
+	private static final BLogger LOG = BLogger.getLogger(DdlManager.class);
 
-	public static void link(MetamodelImpl metamodel, DataSourceImpl datasource) throws BatooException {
-		new HLinkerManager(metamodel, datasource, true).perform();
-		new HLinkerManager(metamodel, datasource, false).perform();
+	public static void perform(DataSourceImpl datasource, MetamodelImpl metamodel, Set<String> schemas, DDLMode ddlMode)
+		throws BatooException {
+		new DdlManager(datasource, metamodel, schemas, ddlMode, true).perform();
+		new DdlManager(datasource, metamodel, schemas, ddlMode, false).perform();
 	}
 
+	private final DataSourceImpl datasource;
+	private final Set<String> schemas;
+	private final DDLMode ddlMode;
 	private final boolean firstPass;
 
-	private final DataSourceImpl datasource;
-
-	public HLinkerManager(MetamodelImpl metamodel, DataSourceImpl datasource, boolean firstPass) {
-		super(LOG, "HLinker", metamodel, Context.ENTITIES);
+	private DdlManager(DataSourceImpl datasource, MetamodelImpl metamodel, Set<String> schemas, DDLMode ddlMode, boolean firstPass) {
+		super(LOG, "DDL Manager", metamodel, Context.ENTITIES);
 
 		this.datasource = datasource;
+		this.schemas = schemas;
+		this.ddlMode = ddlMode;
 		this.firstPass = firstPass;
 	}
 
@@ -56,7 +63,7 @@ public class HLinkerManager extends DeploymentManager<EntityTypeImpl<?>> {
 	 */
 	@Override
 	public Void perform(EntityTypeImpl<?> type) throws BatooException {
-		type.link(this.datasource, this.firstPass);
+		type.ddl(DdlManager.this.datasource, this.schemas, DdlManager.this.ddlMode, this.firstPass);
 
 		return null;
 	}

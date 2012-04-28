@@ -16,29 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.manager;
+package org.batoo.jpa.core.util;
 
-import org.batoo.jpa.core.BLogger;
-import org.batoo.jpa.core.BatooException;
-import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
-import org.batoo.jpa.core.impl.types.IdentifiableTypeImpl;
+import java.util.concurrent.ThreadFactory;
 
 /**
- * A Manager that links persistent classes vertically.
+ * Thread factory that names the threads in the form of "name [no]".
  * 
  * @author hceylan
  * @since $version
  */
-public class VLinkerManager extends DeploymentManager<IdentifiableTypeImpl<?>> {
+public class IncrementalNamingThreadFactory implements ThreadFactory {
 
-	private static final BLogger LOG = BLogger.getLogger(VLinkerManager.class);
+	private int nextThreadNo = 1;
 
-	public static void link(MetamodelImpl metamodel) throws BatooException {
-		new VLinkerManager(metamodel).perform();
-	}
+	private final String name;
 
-	private VLinkerManager(MetamodelImpl metamodel) {
-		super(LOG, "VLinker", metamodel, Context.IDENTIFIABLE_TYPES);
+	/**
+	 * @param name
+	 *            the common name for the threads
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public IncrementalNamingThreadFactory(String name) {
+		super();
+
+		this.name = name;
 	}
 
 	/**
@@ -46,10 +50,8 @@ public class VLinkerManager extends DeploymentManager<IdentifiableTypeImpl<?>> {
 	 * 
 	 */
 	@Override
-	public Void perform(IdentifiableTypeImpl<?> type) throws BatooException {
-		type.vlink();
-
-		return null;
+	public Thread newThread(Runnable r) {
+		return new Thread(r, this.name + " [" + this.nextThreadNo++ + "]");
 	}
 
 }

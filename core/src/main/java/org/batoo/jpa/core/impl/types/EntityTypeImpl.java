@@ -34,6 +34,12 @@ import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.SecondaryTable;
+import javax.persistence.SecondaryTables;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 import javax.persistence.metamodel.EntityType;
@@ -74,7 +80,6 @@ import org.batoo.jpa.core.jdbc.IdType;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /**
  * Implementation of {@link EntityType}.
@@ -100,8 +105,9 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 	private final Map<String, EntityTable> tables = Maps.newHashMap();
 	private final Map<String, JoinTable> joinTables = Maps.newHashMap();
-	private final Set<PhysicalColumn> columns = Sets.newHashSet();
 	private Object topType;
+
+	private final Map<String, TableTemplate> tableTemplates = Maps.newHashMap();
 
 	private final SelectHelper<X> selectHelper;
 	private final RefreshHelper<X> refreshHelper;
@@ -173,8 +179,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 			physicalColumn = new PhysicalColumn(mapping, table, join, referencedColumn.getPhysicalColumn(), sqlType);
 		}
-
-		this.columns.add(physicalColumn);
 
 		return physicalColumn;
 	}
@@ -634,8 +638,11 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * 
 	 */
 	@Override
-	public Set<Class<? extends Annotation>> parse() throws BatooException {
-		final Set<Class<? extends Annotation>> parsed = super.parse();
+	public void parse(Set<Class<? extends Annotation>> parsed) throws BatooException {
+		this.parsePrimaryTable(parsed);
+		this.parseSecondaryTables(parsed);
+
+		super.parse(parsed);
 
 		final Class<X> type = this.getJavaType();
 
@@ -649,10 +656,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		this.parseInheritence(type, parsed);
 
 		this.performClassChecks(type);
-
-		this.parsed = true;
-
-		return parsed;
 	}
 
 	private void parseAttributeOverrides(Class<X> type, final Set<Class<? extends Annotation>> parsed) {
@@ -724,6 +727,46 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		}
 	}
 
+	private void parsePrimaryTable(final Set<Class<? extends Annotation>> annotations) throws MappingException {
+		final boolean singleTableInheritence = (this.getTopType() != this)
+			&& (this.getTopType().inheritance.getInheritenceType() == InheritanceType.SINGLE_TABLE);
+
+		final Table table = this.getJavaType().getAnnotation(Table.class);
+		if (table != null) {
+			if (singleTableInheritence) {
+				throw new MappingException("On " + this.javaType
+					+ ", Table definition is not allowed, as root type sets the inheritence to SINGLE_TABLE");
+			}
+
+			this.putTable(true, table.schema(), table.name(), table.uniqueConstraints(), null);
+
+			annotations.add(Table.class);
+		}
+		else if (!singleTableInheritence) {
+			this.putTable(true, "", this.name, null, null);
+		}
+	}
+
+	private void parseSecondaryTables(final Set<Class<? extends Annotation>> annotations) throws MappingException {
+		final SecondaryTables secondaryTables = this.getJavaType().getAnnotation(SecondaryTables.class);
+		if (secondaryTables != null) {
+			for (final SecondaryTable secondaryTable : secondaryTables.value()) {
+				this.putTable(false, secondaryTable.schema(), secondaryTable.name(), secondaryTable.uniqueConstraints(),
+					secondaryTable.pkJoinColumns());
+			}
+
+			annotations.add(SecondaryTables.class);
+		}
+
+		final SecondaryTable secondaryTable = this.getJavaType().getAnnotation(SecondaryTable.class);
+		if (secondaryTable != null) {
+			this.putTable(false, secondaryTable.schema(), secondaryTable.name(), secondaryTable.uniqueConstraints(),
+				secondaryTable.pkJoinColumns());
+
+			annotations.add(SecondaryTable.class);
+		}
+	}
+
 	/**
 	 * Performs inserts to each table for the managed instance.
 	 * 
@@ -785,6 +828,42 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
+	 * Adds the table to the list of the tables this entity has. may not be blank
+	 * 
+	 * @param primary
+	 *            if the table is primary
+	 * @param schema
+	 *            the name of the schema, may be null
+	 * @param name
+	 *            the name of the table
+	 * @param uniqueConstraints
+	 *            the unique constraints
+	 * @param primaryKeyJoinColumns
+	 *            the primary key join columns, only required for secondary tables.
+	 * @throws MappingException
+	 *             thrown in case of a mapping error
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void putTable(boolean primary, String schema, String name, UniqueConstraint[] uniqueConstraints,
+		PrimaryKeyJoinColumn[] primaryKeyJoinColumns) throws MappingException {
+		if (StringUtils.isBlank(name)) {
+			throw new MappingException("Table name cannot be null, spesified on " + this.javaType);
+		}
+
+		TableTemplate table;
+		if (primary) {
+			table = new TableTemplate(this, schema, name, uniqueConstraints);
+		}
+		else {
+			table = new TableTemplate(this, schema, name, uniqueConstraints, primaryKeyJoinColumns);
+		}
+
+		this.tableTemplates.put(schema + "." + name, table);
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -800,12 +879,9 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 */
 	@Override
 	public void vlink() throws BatooException {
-		// TODO Check clashes from MappedSuperclasses and super entities, during inheritance implementation.
 		super.vlink();
 
 		this.vlinkTables();
-
-		this.vlinked = true;
 	}
 
 	/**
@@ -818,7 +894,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 */
 	private void vlinkTables() throws MappingException {
 		// first do the self defined tables
-		for (final TableTemplate template : this.getTableTemplates()) {
+		for (final TableTemplate template : this.tableTemplates.values()) {
 			final EntityTable table = new EntityTable(this, template, this.metaModel.getJdbcAdapter());
 			if (template.isPrimary()) {
 				this.primaryTable = table;
@@ -827,38 +903,21 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			this.tables.put(table.getName(), table);
 		}
 
-		final IdentifiableTypeImpl<? super X> supertype = this.getSupertype();
-		if (supertype != null) {
-			if (supertype instanceof MappedSuperclassTypeImpl) { // extending mapped super class
-				for (final TableTemplate template : supertype.getTableTemplates()) {
+		// Then add in the tables defined by the super types
+		final EntityTypeImpl<? super X> superType = this.getTopType();
+		if (superType != this) {
+			switch (superType.getTopType().getInheritance().getInheritenceType()) {
+				case SINGLE_TABLE:
+					this.primaryTable = superType.getPrimaryTable();
+					break;
 
-					// is the table overridden
-					if (this.tables.containsKey(template.getName())) {
-						continue;
-					}
-
-					final EntityTable table = new EntityTable(this, template, this.metaModel.getJdbcAdapter());
-					if (table.isPrimary()) {
-						this.primaryTable = table;
-					}
-
-					this.tables.put(table.getName(), table);
-				}
-			}
-			else if (supertype instanceof EntityTypeImpl) { // extending an inherited entity
-				final EntityTypeImpl<?> superEntity = (EntityTypeImpl<?>) supertype;
-				switch (superEntity.getTopType().getInheritance().getInheritenceType()) {
-					case SINGLE_TABLE:
-						this.primaryTable = superEntity.getPrimaryTable();
-						break;
-
-					default:
-						break;
-				}
+				case TABLE_PER_CLASS:
+					throw new MappingException("TABLE_PER_CLASS inheritence not yet supported");
 			}
 		}
 
 		if (this.inheritance != null) {
+			// create the discriminator column
 			new PhysicalColumn(this.primaryTable, this.inheritance);
 		}
 	}

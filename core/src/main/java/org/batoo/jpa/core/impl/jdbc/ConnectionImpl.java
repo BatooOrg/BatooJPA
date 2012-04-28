@@ -138,7 +138,7 @@ public class ConnectionImpl implements Connection {
 		try {
 			try {
 				if (this.connection != null) {
-					this.pool.returnObject(this);
+					this.connection.close();
 				}
 			}
 			catch (final Exception e) {

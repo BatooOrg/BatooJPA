@@ -602,14 +602,15 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	/**
 	 * Parses the meta data of the type.
 	 * 
-	 * @return the set pf annotations parsed
+	 * @param parsed
+	 *            the set of annotations parsed
 	 * @throws BatooException
 	 *             thrown in case of a mapping error
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Set<Class<? extends Annotation>> parse() throws BatooException {
+	public void parse(Set<Class<? extends Annotation>> parsed) throws BatooException {
 		LOG.info("Parsing type {0}", this.getJavaType());
 
 		final Field[] fields = AccessController.doPrivileged(new PrivilegedAction<Field[]>() {
@@ -642,8 +643,6 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 			this.declaredAttributes.put(field.getName(), attribute);
 			this.setDeclaredAttributes.add(attribute);
 		}
-
-		return Sets.newHashSet();
 	}
 
 	protected void performClassChecks(final Class<X> type) throws MappingException {

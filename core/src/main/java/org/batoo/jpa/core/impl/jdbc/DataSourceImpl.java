@@ -83,7 +83,7 @@ public class DataSourceImpl implements DataSource {
 	}
 
 	private void assertActive() {
-		if (this.keepaliveConnection != null) {
+		if (this.keepaliveConnection == null) {
 			throw new IllegalStateException("Datasource closed!");
 		}
 	}
@@ -107,8 +107,6 @@ public class DataSourceImpl implements DataSource {
 		catch (final Exception e) {
 			LOG.warn(e, "Error while closing connection cache");
 		}
-
-		DbUtils.closeQuietly(this.keepaliveConnection);
 	}
 
 	/**

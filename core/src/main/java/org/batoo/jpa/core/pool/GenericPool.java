@@ -41,6 +41,7 @@ public class GenericPool<T> implements ObjectPool<T> {
 
 	private final PoolableObjectFactory<T> factory;
 	private final Deque<T> pool;
+	private boolean active;
 
 	/**
 	 * @param factory
@@ -53,6 +54,7 @@ public class GenericPool<T> implements ObjectPool<T> {
 
 		this.factory = factory;
 		this.pool = new LinkedBlockingDeque<T>();
+		this.active = true;
 	}
 
 	/**
@@ -83,7 +85,12 @@ public class GenericPool<T> implements ObjectPool<T> {
 	 */
 	@Override
 	public void clear() throws Exception, UnsupportedOperationException {
-		throw new UnsupportedOperationException();
+		while (this.pool.size() > 0) {
+			final T item = this.pool.pollFirst();
+			if (item != null) {
+				this.factory.destroyObject(item);
+			}
+		}
 	}
 
 	/**
@@ -92,7 +99,9 @@ public class GenericPool<T> implements ObjectPool<T> {
 	 */
 	@Override
 	public void close() throws Exception {
-		this.shrinkTo(0);
+		this.active = false;
+
+		this.clear();
 	}
 
 	/**
@@ -128,9 +137,13 @@ public class GenericPool<T> implements ObjectPool<T> {
 	 */
 	@Override
 	public void returnObject(T obj) throws Exception {
-		this.pool.addLast(obj);
-
-		this.shrinkTo(MAX_SIZE);
+		if (this.active) {
+			this.pool.addLast(obj);
+			this.shrinkTo(MAX_SIZE);
+		}
+		else {
+			this.factory.destroyObject(obj);
+		}
 	}
 
 	/**
