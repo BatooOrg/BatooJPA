@@ -16,59 +16,40 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.instance;
-
-import org.batoo.jpa.core.impl.mapping.OwnerAssociationMapping;
+package org.batoo.jpa.core.impl.reflect;
 
 /**
- * Resolver for association mappings.
+ * Interface for Accessors.
  * 
+ * @param <Y>
  * @author hceylan
  * @since $version
  */
-public class AssociateResolver extends AbstractResolver {
+public interface Accessor<Y> {
 
 	/**
-	 * @param mapping
-	 *            the mapping
+	 * Returns the value of the field.
+	 * 
 	 * @param instance
 	 *            the instance
+	 * @return the value
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AssociateResolver(OwnerAssociationMapping<?, ?> mapping, Object instance) {
-		super(mapping, instance);
-	}
+	Y get(Object instance);
 
 	/**
-	 * Returns if the mapping contains the instance.
+	 * Sets the value of the field.
 	 * 
 	 * @param instance
-	 * @return true if the mapping contains the instance
+	 *            the instance
+	 * @param the
+	 *            value
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public boolean contains(Object instance) {
-		return this.getMapping().contains(instance);
-	}
+	void set(Object instance, Y value);
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public OwnerAssociationMapping<?, ?> getMapping() {
-		return (OwnerAssociationMapping<?, ?>) super.getMapping();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public boolean isAssociateResolver() {
-		return true;
-	}
 }

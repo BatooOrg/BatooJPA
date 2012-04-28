@@ -85,7 +85,7 @@ public class FieldAccessor {
 	 * {@inheritDoc}
 	 * 
 	 */
-	@SuppressWarnings({ "unchecked", "restriction" })
+	@SuppressWarnings({ "restriction" })
 	public Object get(Object instance) {
 		if (this.primitiveType == null) {
 			return ReflectHelper.unsafe.getObject(instance, this.fieldOffset);

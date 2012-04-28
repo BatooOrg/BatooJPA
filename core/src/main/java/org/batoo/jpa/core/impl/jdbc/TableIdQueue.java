@@ -22,7 +22,6 @@ import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.dbutils.QueryRunner;
-import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.jdbc.adapter.JDBCAdapter;
 
 /**
@@ -34,8 +33,6 @@ import org.batoo.jpa.core.jdbc.adapter.JDBCAdapter;
 public class TableIdQueue extends IdQueue {
 
 	private static final long serialVersionUID = 1L;
-
-	private static final BLogger LOG = BLogger.getLogger(TableIdQueue.class);
 
 	private final PhysicalTableGenerator generator;
 
