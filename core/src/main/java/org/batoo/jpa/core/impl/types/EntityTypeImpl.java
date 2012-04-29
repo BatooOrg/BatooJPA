@@ -459,7 +459,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @param <Y>
 	 */
 	public ManagedInstance<X> getManagedInstance(SessionImpl session, final X instance) {
-		return new ManagedInstance<X>(this, session, instance, this.getManagedIdForInstance(session, instance));
+		return new ManagedInstance<X>(this, session, this.getManagedIdForInstance(session, instance));
 	}
 
 	/**
@@ -584,7 +584,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	public void link(DataSource dataSource, boolean basic) throws BatooException {
 		LOG.debug("Horizontally linking {0}, {1} pass", this, basic ? "first" : "second");
 
-		for (final Attribute<? super X, ?> attribute : this.setAttributes) {
+		for (final Attribute<? super X, ?> attribute : this.attributes.values()) {
 			final boolean association = attribute.getPersistentAttributeType() != PersistentAttributeType.BASIC;
 
 			if (association ^ basic) {
@@ -599,7 +599,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 						+ " violates id specification. Unless specified by IdClass, there can only be one id attribute");
 				}
 
-				final SingularAttributeImpl<? super X, ?> attribute = this.idAttributes.values().iterator().next();
+				final SingularAttributeImpl<?, ?> attribute = this.idAttributes[0];
 				this.idType = this.metaModel.getType(attribute.getJavaType());
 			}
 		}
@@ -621,16 +621,14 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
-	public ManagedInstance<X> newInstanceWithId(final SessionImpl session, final ManagedId<? super X> managedId, boolean lazy) {
+	public ManagedInstance<X> newInstanceWithId(final SessionImpl session, final ManagedId<X> managedId, boolean lazy) {
 		if (!lazy) {
-			return new ManagedInstance<X>(this, session, (X) managedId.getInstance(), managedId);
+			return new ManagedInstance<X>(this, session, managedId);
 		}
 
-		final X proxy = InstanceInvoker.<X> createInvoker(this.javaType.getClassLoader(), this, session, managedId);
-		managedId.proxify(proxy);
+		InstanceInvoker.<X> createInvoker(this.javaType.getClassLoader(), this, session, managedId);
 
-		return new ManagedInstance<X>(this, session, (X) managedId.getInstance(), managedId);
+		return new ManagedInstance<X>(this, session, managedId);
 	}
 
 	/**
@@ -869,7 +867,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 */
 	@Override
 	public String toString() {
-		return "EntityTypeImpl [name=" + this.name + ", IdAttributes=" + this.idAttributes.values() + ", attributes=" + this.setAttributes
+		return "EntityTypeImpl [name=" + this.name + ", IdAttributes=" + this.idAttributes + ", attributes=" + this.attributes.values()
 			+ "]";
 	}
 

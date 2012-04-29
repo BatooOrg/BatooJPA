@@ -65,8 +65,7 @@ public final class ManagedInstance<X> {
 
 	private final EntityTypeImpl<X> type;
 	private final SessionImpl session;
-	private final X instance;
-	private final ManagedId<? super X> id;
+	private final ManagedId<X> id;
 
 	private Status status;
 	private boolean executed;
@@ -82,12 +81,11 @@ public final class ManagedInstance<X> {
 	 * @author hceylan
 	 * @param session
 	 */
-	public ManagedInstance(EntityTypeImpl<X> type, SessionImpl session, X instance, ManagedId<? super X> id) {
+	public ManagedInstance(EntityTypeImpl<X> type, SessionImpl session, ManagedId<X> id) {
 		super();
 
 		this.type = type;
 		this.session = session;
-		this.instance = instance;
 		this.id = id;
 
 		this.status = Status.MANAGED;
@@ -150,7 +148,7 @@ public final class ManagedInstance<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedId<? super X> getId() {
+	public ManagedId<X> getId() {
 		return this.id;
 	}
 
@@ -161,7 +159,7 @@ public final class ManagedInstance<X> {
 	 * @since $version
 	 */
 	public X getInstance() {
-		return this.instance;
+		return this.id.getInstance();
 	}
 
 	/**

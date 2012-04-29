@@ -22,7 +22,6 @@ import java.lang.annotation.Annotation;
 import java.util.Set;
 
 import javax.persistence.Embeddable;
-import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.EmbeddableType;
 
 import org.batoo.jpa.core.BatooException;
@@ -51,27 +50,6 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 		super(metaModel, clazz);
 
 		metaModel.addEmbeddable(this);
-	}
-
-	/**
-	 * Returns if this type directly or transitively embeds the <code>type</code>.
-	 * 
-	 * @param type
-	 *            the embeddablable type
-	 * @return true if embeds
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public boolean embeds(EmbeddableTypeImpl<?> type) {
-		for (final Attribute<? super X, ?> attribute : this.setAttributes) {
-			final boolean embeds = ((AttributeImpl<?, ?>) attribute).embeds(type);
-			if (embeds) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	/**
@@ -117,6 +95,6 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	 */
 	@Override
 	public String toString() {
-		return "EmbeddableTypeImpl [name=" + this.name + ", attributes=" + this.attributes + "]";
+		return "EmbeddableTypeImpl [name=" + this.name + ", attributes=" + this.getAttributes() + "]";
 	}
 }

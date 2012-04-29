@@ -19,8 +19,6 @@
 package org.batoo.jpa.core.impl.types;
 
 import java.lang.annotation.Annotation;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,6 +37,7 @@ import org.batoo.jpa.core.impl.jdbc.PhysicalTableGenerator;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Implementation of {@link IdentifiableType}.
@@ -50,14 +49,13 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 
 	private static final BLogger LOG = BLogger.getLogger(IdentifiableTypeImpl.class);
 
+	protected final Map<String, SingularAttributeImpl<? super X, ?>> versionAttributes = Maps.newHashMap();
 	protected Class<?> idJavaType;
 	protected TypeImpl<?> idType;
 
-	protected final Map<String, SingularAttributeImpl<X, ?>> declaredIdAttributes = Maps.newHashMap();
-	protected final Map<String, SingularAttributeImpl<? super X, ?>> idAttributes = Maps.newHashMap();
-
-	protected final Map<String, SingularAttributeImpl<? super X, ?>> versionAttributes = Maps.newHashMap();
+	protected SingularAttributeImpl<?, ?>[] idAttributes;
 	private SequenceGenerator sequenceGenerator;
+
 	private TableGenerator tableGenerator;
 
 	private String tableName;
@@ -83,9 +81,9 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	@Override
 	@SuppressWarnings("unchecked")
 	public <Y> SingularAttribute<X, Y> getDeclaredId(Class<Y> type) {
-		for (final SingularAttribute<X, ?> singularAttribute : this.declaredIdAttributes.values()) {
-			if (singularAttribute.getJavaType() == type) {
-				return (SingularAttribute<X, Y>) singularAttribute;
+		for (final SingularAttribute<? super X, ?> attribute : this.getDeclaredSingularAttributes()) {
+			if ((attribute.getJavaType() == type)) {
+				return (SingularAttribute<X, Y>) attribute;
 			}
 		}
 
@@ -109,7 +107,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	@Override
 	@SuppressWarnings("unchecked")
 	public <Y> SingularAttribute<? super X, Y> getId(Class<Y> type) {
-		for (final SingularAttribute<? super X, ?> singularAttribute : this.idAttributes.values()) {
+		for (final SingularAttributeImpl<?, ?> singularAttribute : this.idAttributes) {
 			if (singularAttribute.getJavaType() == type) {
 				return (SingularAttribute<? super X, Y>) singularAttribute;
 			}
@@ -124,8 +122,8 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * @return the idAttributes
 	 * @since $version
 	 */
-	public Collection<SingularAttributeImpl<? super X, ?>> getIdAttributes() {
-		return this.idAttributes.values();
+	public SingularAttributeImpl<?, ?>[] getIdAttributes() {
+		return this.idAttributes;
 	}
 
 	/**
@@ -138,7 +136,14 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 			return this.throwNotFound();
 		}
 
-		return new HashSet<SingularAttribute<? super X, ?>>(this.idAttributes.values());
+		final Set<SingularAttribute<? super X, ?>> attributes = Sets.newHashSet();
+		for (final SingularAttribute<? super X, ?> attribute : this.getSingularAttributes()) {
+			if (attribute.isId()) {
+				attributes.add(attribute);
+			}
+		}
+
+		return attributes;
 	}
 
 	/**
@@ -229,7 +234,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 */
 	@Override
 	public boolean hasSingleIdAttribute() {
-		return this.idAttributes.size() == 1;
+		return this.idAttributes.length == 1;
 	}
 
 	/**
@@ -258,19 +263,6 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 		}
 
 		this.parseGenerators(parsed);
-
-		for (final Attribute<X, ?> attribute : this.setDeclaredAttributes) {
-			if (attribute instanceof SingularAttribute) {
-				final SingularAttributeImpl<X, ?> singularAttribute = (SingularAttributeImpl<X, ?>) attribute;
-
-				this.declaredAttributes.put(singularAttribute.getName(), singularAttribute);
-				this.setDeclaredAttributes.add(singularAttribute);
-
-				if (singularAttribute.isId()) {
-					this.declaredIdAttributes.put(singularAttribute.getName(), singularAttribute);
-				}
-			}
-		}
 	}
 
 	private void parseGenerators(Set<Class<? extends Annotation>> parsed) throws MappingException {
@@ -331,15 +323,11 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	public void vlink() throws BatooException {
 		LOG.debug("Vertically linking {0}", this);
 
-		this.attributes.putAll(this.declaredAttributes);
-		this.setAttributes.addAll(this.setDeclaredAttributes);
-		this.idAttributes.putAll(this.declaredIdAttributes);
-
 		final IdentifiableTypeImpl<? super X> supertype = this.getSupertype();
 		if (supertype instanceof MappedSuperclassTypeImpl) {
 
 			// inherit attributes
-			for (final Attribute<?, ?> superAttribute : supertype.setAttributes) {
+			for (final Attribute<?, ?> superAttribute : supertype.attributes.values()) {
 				if (this.attributes.containsKey(superAttribute.getName())) {
 					continue;
 				}
@@ -347,20 +335,19 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 				final AttributeImpl<X, ?> attribute = ((AttributeImpl<?, ?>) superAttribute).clone((EntityTypeImpl<X>) this);
 
 				this.attributes.put(attribute.getName(), attribute);
-				this.setAttributes.add(attribute);
-
-				// TODO Check id conflict
-				if (attribute instanceof SingularAttributeImpl) {
-					final SingularAttributeImpl<X, ?> singularAttribute = (SingularAttributeImpl<X, ?>) attribute;
-					if (singularAttribute.isId()) {
-						this.idAttributes.put(singularAttribute.getName(), singularAttribute);
-					}
-				}
 			}
 
 			this.idJavaType = supertype.idJavaType;
 			this.idType = supertype.idType;
 		}
 
+		final Set<SingularAttribute<? super X, ?>> idAttributes = Sets.newHashSet();
+		for (final SingularAttribute<? super X, ?> attribute : this.getSingularAttributes()) {
+			if (attribute.isId()) {
+				idAttributes.add(attribute);
+			}
+		}
+		this.idAttributes = new SingularAttributeImpl[idAttributes.size()];
+		idAttributes.toArray(this.idAttributes);
 	}
 }

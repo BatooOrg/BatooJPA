@@ -60,6 +60,11 @@ public class SessionImpl {
 		this.repository = new Repository();
 	}
 
+	public <X> ManagedInstance<X> get(final EntityTypeImpl<X> type, X entity) {
+		final ManagedId<X> id = type.getManagedIdForInstance(this, entity);
+		return this.get(id);
+	}
+
 	/**
 	 * Returns the managed instance in the session.
 	 * 
@@ -70,10 +75,11 @@ public class SessionImpl {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public <X> ManagedInstance<? extends X> get(ManagedId<X> id) {
+	@SuppressWarnings("unchecked")
+	public <X> ManagedInstance<X> get(ManagedId<X> id) {
 		final EntityTypeImpl<X> type = id.getType();
 		final SubRepository<X> subRepository = this.repository.get(type);
-		return subRepository.get(id);
+		return (ManagedInstance<X>) subRepository.get(id);
 	}
 
 	/**
@@ -88,8 +94,8 @@ public class SessionImpl {
 	 */
 	@SuppressWarnings("unchecked")
 	public <X> ManagedInstance<X> get(X entity) {
-		final EntityTypeImpl<? super X> type = this.em.getMetamodel().entity((Class<X>) entity.getClass());
-		return (ManagedInstance<X>) this.get(type.getManagedIdForInstance(this, entity));
+		final EntityTypeImpl<X> type = this.em.getMetamodel().entity((Class<X>) entity.getClass());
+		return this.get(type, entity);
 	}
 
 	/**

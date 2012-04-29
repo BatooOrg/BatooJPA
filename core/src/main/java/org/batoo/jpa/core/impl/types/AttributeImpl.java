@@ -45,7 +45,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.ManagedType;
-import javax.persistence.metamodel.PluralAttribute;
 
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.mapping.AbstractMapping;
@@ -218,28 +217,6 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 	}
 
 	/**
-	 * Returns if this attribute has type of <code>type</code> or transitively embeds the type
-	 * 
-	 * @param type
-	 *            the managed type
-	 * @return true if it embeds
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public final boolean embeds(EmbeddableTypeImpl<?> type) {
-		if (this.getType() == type) {
-			return true;
-		}
-
-		if (this.getType() instanceof EmbeddableTypeImpl) {
-			((EmbeddableTypeImpl<?>) this.getType()).embeds(type);
-		}
-
-		return false;
-	}
-
-	/**
 	 * Returns the attribute value of instance.
 	 * 
 	 * @param instance
@@ -353,16 +330,6 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 	 */
 	public final TemporalType getTemporalType() {
 		return this.temporalType;
-	}
-
-	@SuppressWarnings("unchecked")
-	private TypeImpl<Y> getType() {
-		if (this instanceof PluralAttribute) {
-			return ((PluralAttributeImpl<X, ?, Y>) this).getElementType();
-		}
-		else {
-			return ((SingularAttributeImpl<X, Y>) this).getType();
-		}
 	}
 
 	/**

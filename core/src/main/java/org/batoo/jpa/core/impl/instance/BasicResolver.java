@@ -91,15 +91,6 @@ public class BasicResolver extends AbstractResolver {
 	}
 
 	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public boolean isAssociateResolver() {
-		return false;
-	}
-
-	/**
 	 * Lock the resolver so that id values cannot be set.
 	 * 
 	 * @since $version
