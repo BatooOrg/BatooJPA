@@ -19,9 +19,6 @@
 package org.batoo.jpa.core.impl.instance;
 
 import java.util.Arrays;
-import java.util.Set;
-
-import javax.persistence.metamodel.SingularAttribute;
 
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
@@ -40,17 +37,17 @@ public class ManagedId<X> {
 
 	private final EntityTypeImpl<X> type;
 	private final SessionImpl session;
-	private final X instance;
+	private X instance;
 	private final BasicResolver[] resolvers;
 
-	// TODO Remove this
-	private X proxy;
 	private BasicResolver singleId;
 
 	private int h;
+
 	private boolean initialized;
 	private SingularAttributeImpl<? super X, ?> embeddedAttribute;
 	private Class<?> idJavaType;
+	private Object id;
 
 	/**
 	 * @param type
@@ -115,33 +112,34 @@ public class ManagedId<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
+	@SuppressWarnings("unchecked")
 	public Object getId() {
+		if (this.id != null) {
+			return this.id;
+		}
+
 		this.initialize();
+
+		if (this.singleId != null) {
+			return this.singleId.getValue();
+		}
 
 		if (this.embeddedAttribute != null) {
 			return this.embeddedAttribute.get(this.instance);
 		}
 
-		if (this.idJavaType != null) {
-			Object id = null;
-			try {
-				final Set<SingularAttribute<? super X, ?>> idClassAttributes = this.type.getIdClassAttributes();
+		Object id = null;
+		try {
+			id = this.idJavaType.newInstance();
+		}
+		catch (final Exception e) {}
 
-				id = this.idJavaType.newInstance();
-
-				for (final SingularAttribute<? super X, ?> attribute : idClassAttributes) {
-					final SingularAttributeImpl<? super X, ?> idAttribute = (SingularAttributeImpl<? super X, ?>) attribute;
-					idAttribute.set(id, idAttribute.get(this.instance));
-				}
-
-				return id;
-			}
-			catch (final Exception e) {
-				// noop
-			}
+		for (final SingularAttributeImpl<?, ?> attribute : this.type.getIdAttributes()) {
+			final SingularAttributeImpl<? super X, ?> idAttribute = (SingularAttributeImpl<? super X, ?>) attribute;
+			idAttribute.set(id, idAttribute.get(this.instance));
 		}
 
-		return this.singleId.getValue();
+		return id;
 	}
 
 	/**
@@ -151,18 +149,6 @@ public class ManagedId<X> {
 	 * @since $version
 	 */
 	public X getInstance() {
-		return this.proxy != null ? this.proxy : this.instance;
-	}
-
-	/**
-	 * Returns the unproxied instance.
-	 * 
-	 * @return the unproxied instance
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public Object getInstance0() {
 		return this.instance;
 	}
 
@@ -209,18 +195,19 @@ public class ManagedId<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
+	@SuppressWarnings("unchecked")
 	private void initialize() {
 		if (!this.initialized) {
 			final TypeImpl<?> idType = this.type.getIdType();
-			if ((idType != null) && idType.isEmbeddable()) {
 
-				this.embeddedAttribute = (SingularAttributeImpl<? super X, ?>) this.type.getId(this.type.getIdType().getJavaType());
-			}
-			else if (this.type.getIdJavaType() != null) {
-				this.idJavaType = this.type.getIdJavaType();
-			}
-			else if (this.resolvers.length == 1) {
+			if (this.resolvers.length == 1) {
 				this.singleId = this.resolvers[0];
+			}
+			else if ((idType != null) && idType.isEmbeddable()) {
+				this.embeddedAttribute = (SingularAttributeImpl<? super X, ?>) this.type.getIdAttributes()[0];
+			}
+			else if (idType != null) {
+				this.idJavaType = this.type.getIdJavaType();
 			}
 
 			this.initialized = true;
@@ -236,16 +223,17 @@ public class ManagedId<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
+	@SuppressWarnings("unchecked")
 	public void populate(Object id) {
+		this.id = id;
+
 		this.initialize();
 
 		if (this.embeddedAttribute != null) {
 			this.embeddedAttribute.set(this.instance, id);
 		}
 		else if (this.type.getIdJavaType() != null) {
-			final Set<SingularAttribute<? super X, ?>> idClassAttributes = this.type.getIdClassAttributes();
-
-			for (final SingularAttribute<? super X, ?> attribute : idClassAttributes) {
+			for (final SingularAttributeImpl<?, ?> attribute : this.type.getIdAttributes()) {
 				final SingularAttributeImpl<? super X, ?> idAttribute = (SingularAttributeImpl<? super X, ?>) attribute;
 				idAttribute.set(this.instance, idAttribute.get(id));
 			}
@@ -262,16 +250,14 @@ public class ManagedId<X> {
 	}
 
 	/**
-	 * Proxifies the instance with the proxy.
+	 * Sets the instance.
 	 * 
-	 * @param proxy
-	 *            the proxy to proxify with
-	 * 
+	 * @param instance
+	 *            the instance to set
 	 * @since $version
-	 * @author hceylan
 	 */
-	public void proxify(X proxy) {
-		this.proxy = proxy;
+	public void setInstance(X instance) {
+		this.instance = instance;
 	}
 
 	/**

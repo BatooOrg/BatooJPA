@@ -143,7 +143,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 		}
 
 		// get it from the session
-		final ManagedInstance<? super T> managed = (ManagedInstance<? super T>) session.get(managedId);
+		final ManagedInstance<? super T> managed = session.get(managedId);
 		if (managed != null) { // if found in the session
 			cache.put(managed.getId(), managed);
 			return managed;
@@ -178,12 +178,13 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 	 */
 	private <T> ManagedInstance<? super T> createManagedInstance(SessionImpl session, ResultSet rs,
 		Map<ManagedId<?>, ManagedInstance<?>> cache, int depth, EntityTypeImpl<T> currentType) throws SQLException {
+		final EntityTable primaryTable = currentType.getPrimaryTable();
+
 		if (currentType.getTopType().hasSingleIdAttribute()) {
 
 			Object primaryKeyValue;
 
-			final EntityTable primaryTable = currentType.getPrimaryTable();
-			if (primaryTable.getPrimaryKey() == null) {
+			if (currentType.getIdJavaType() != null) {
 				final EmbeddableTypeImpl<?> embeddable = (EmbeddableTypeImpl<?>) currentType.getIdType();
 				primaryKeyValue = embeddable.newInstance();
 
@@ -208,7 +209,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 				// noop;
 			}
 
-			for (final PhysicalColumn column : currentType.getPrimaryTable().getPrimaryKeys()) {
+			for (final PhysicalColumn column : primaryTable.getPrimaryKeys()) {
 				final Object value = this.getColumnValue(rs, depth, column);
 				column.getMapping().getDeclaringAttribute().set(id, value);
 			}

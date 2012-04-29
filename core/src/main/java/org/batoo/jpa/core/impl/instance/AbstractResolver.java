@@ -102,16 +102,6 @@ public abstract class AbstractResolver {
 	}
 
 	/**
-	 * Returns if this is an associate resolver.
-	 * 
-	 * @return true if this is an associate resolver
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public abstract boolean isAssociateResolver();
-
-	/**
 	 * Sets the value of the instance for the mapping.
 	 * 
 	 * @since $version
