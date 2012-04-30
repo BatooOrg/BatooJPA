@@ -63,11 +63,11 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	 */
 	@Override
 	public int compareTo(TimeElement o) {
-		return this.time > o.time ? -1 : o.time > this.time ? 1 : 0;
+		return this.selfHit > o.selfHit ? -1 : o.selfHit > this.selfHit ? 1 : 0;
 	}
 
 	public int dump(int rowNo, int depth) {
-		if (depth > 0) {
+		if ((depth > 0) && (this.hits > 10)) {
 			rowNo++;
 			final String tabs = StringUtils.repeat(" ", depth);
 			System.out.println(String.format("%010d", rowNo) + //
