@@ -20,12 +20,13 @@ package org.batoo.jpa.core.impl.instance;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-
-import javax.persistence.metamodel.PluralAttribute;
+import java.util.IdentityHashMap;
 
 import org.batoo.jpa.core.impl.SessionImpl;
+import org.batoo.jpa.core.impl.mapping.CollectionMapping;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
-import org.batoo.jpa.core.impl.types.PluralAttributeImpl;
+
+import com.google.common.collect.Maps;
 
 /**
  * The managed instance of {@link #instance}.
@@ -66,6 +67,7 @@ public final class ManagedInstance<X> {
 	private final EntityTypeImpl<X> type;
 	private final SessionImpl session;
 	private final ManagedId<X> id;
+	private final IdentityHashMap<CollectionMapping<?, ?, ?>, Object> enhancedCollections = Maps.newIdentityHashMap();
 
 	private Status status;
 	private boolean executed;
@@ -76,7 +78,8 @@ public final class ManagedInstance<X> {
 	 *            the type of the instance
 	 * @param instance
 	 *            the instance
-	 * 
+	 * @param id
+	 *            the managed id for the instance
 	 * @since $version
 	 * @author hceylan
 	 * @param session
@@ -89,10 +92,19 @@ public final class ManagedInstance<X> {
 		this.id = id;
 
 		this.status = Status.MANAGED;
+	}
 
-		// initialize the collections
-		for (final PluralAttribute<? super X, ?, ?> attribute : type.getPluralAttributes()) {
-			((PluralAttributeImpl<? super X, ?, ?>) attribute).initialize(this, session);
+	/**
+	 * @param association
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void enhanceCollection(CollectionMapping<?, ?, ?> association) {
+		if (!this.enhancedCollections.containsKey(association)) {
+			this.enhancedCollections.put(association, null);
+
+			association.getDeclaringAttribute().newInstance(this, false);
 		}
 	}
 
@@ -269,5 +281,4 @@ public final class ManagedInstance<X> {
 	public String toString() {
 		return "ManagedInstance [type=" + this.type.getName() + ", id=" + this.id + "]";
 	}
-
 }

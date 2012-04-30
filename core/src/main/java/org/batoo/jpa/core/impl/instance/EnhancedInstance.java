@@ -16,13 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.util;
+package org.batoo.jpa.core.impl.instance;
 
 /**
+ * Interface implemented by enhanced managed instances.
  * 
  * @author hceylan
  * @since $version
  */
-public class Mutable {
+public interface EnhancedInstance {
 
+	/**
+	 * Returns if the instance has been initialized.
+	 * 
+	 * @return true if the instance has been initialized
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean __Javassist__$$__isInitialized();
 }

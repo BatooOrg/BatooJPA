@@ -21,9 +21,10 @@ package org.batoo.jpa.core.impl.collections;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.mapping.CollectionMapping;
+
+import com.google.common.collect.Lists;
 
 /**
  * Collection to manage persistent entity collections.
@@ -33,7 +34,6 @@ import org.batoo.jpa.core.impl.mapping.CollectionMapping;
  */
 public abstract class AbstractManagedCollection<E> implements Collection<E>, ManagedCollection<E> {
 
-	protected final SessionImpl session;
 	protected final ManagedInstance<?> managedInstance;
 
 	private boolean changed;
@@ -41,26 +41,26 @@ public abstract class AbstractManagedCollection<E> implements Collection<E>, Man
 	protected Collection<E> snapshot;
 	private final CollectionMapping<?, ? extends Collection<E>, E> mapping;
 
+	private boolean initialized;
+
 	/**
-	 * @param session
-	 *            the session
 	 * @param managedInstance
 	 *            the owner managed instance
 	 * @param mapping
 	 *            the mapping
-	 * @param existing
-	 *            the existing collection may be null
+	 * @param lazy
+	 *            if the collection is lazy
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AbstractManagedCollection(SessionImpl session, ManagedInstance<?> managedInstance,
-		CollectionMapping<?, ? extends Collection<E>, E> mapping, Collection<E> existing) {
+	public AbstractManagedCollection(ManagedInstance<?> managedInstance, CollectionMapping<?, ? extends Collection<E>, E> mapping,
+		boolean lazy) {
 		super();
 
-		this.session = session;
 		this.managedInstance = managedInstance;
 		this.mapping = mapping;
+		this.initialized = !lazy;
 	}
 
 	/**
@@ -176,10 +176,14 @@ public abstract class AbstractManagedCollection<E> implements Collection<E>, Man
 	 * @author hceylan
 	 */
 	protected final void initializeIfNecessary() {
-		if (this.snapshot == null) {
-			this.snapshot = this.session.getEntityManager().findAll(this.managedInstance, this.mapping);
+		if (!this.initialized) {
+			this.initialized = true;
+			this.snapshot = this.managedInstance.getSession().getEntityManager().findAll(this.managedInstance, this.mapping);
 
 			this.getCollection().addAll(this.snapshot);
+		}
+		else if (this.snapshot == null) {
+			this.snapshot = Lists.newArrayList(this.getCollection());
 		}
 	}
 

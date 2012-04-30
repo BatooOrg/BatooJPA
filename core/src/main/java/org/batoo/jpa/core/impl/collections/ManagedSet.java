@@ -21,7 +21,6 @@ package org.batoo.jpa.core.impl.collections;
 import java.util.Collection;
 import java.util.Set;
 
-import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.mapping.CollectionMapping;
 
@@ -37,8 +36,6 @@ public class ManagedSet<E> extends AbstractManagedCollection<E> implements Set<E
 	private final Set<E> set = Sets.newHashSet();
 
 	/**
-	 * @param session
-	 *            the session
 	 * @param managedInstance
 	 *            the owner managed instance
 	 * @param mapping
@@ -49,13 +46,8 @@ public class ManagedSet<E> extends AbstractManagedCollection<E> implements Set<E
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedSet(SessionImpl session, ManagedInstance<?> managedInstance, CollectionMapping<?, Set<E>, E> mapping, Set<E> existing) {
-		super(session, managedInstance, mapping, existing);
-
-		if (existing != null) {
-			this.snapshot = existing;
-			this.set.addAll(existing);
-		}
+	public ManagedSet(ManagedInstance<?> managedInstance, CollectionMapping<?, Set<E>, E> mapping, boolean lazy) {
+		super(managedInstance, mapping, lazy);
 	}
 
 	/**
@@ -73,7 +65,6 @@ public class ManagedSet<E> extends AbstractManagedCollection<E> implements Set<E
 	 */
 	@Override
 	public String toString() {
-		return "ManagedSet [set=" + this.set + ", session=" + this.session + ", managedInstance=" + this.managedInstance + ", snapshot="
-			+ this.snapshot + "]";
+		return "ManagedSet [set=" + this.set + ", managedInstance=" + this.managedInstance + ", snapshot=" + this.snapshot + "]";
 	}
 }

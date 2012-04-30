@@ -107,16 +107,14 @@ public class SelectHelper<X> extends BaseSelectHelper<X> {
 		// Do not inline, generation of the select SQL will initialize the predicates!
 		final String selectSql = this.getSelectSql();
 
-		final Collection<Object> params = Collections2.transform(this.predicates, new Function<PhysicalColumn, Object>() {
-			@Override
-			public Object apply(PhysicalColumn input) {
-				return input.getPhysicalValue(managedId.getSession(), managedId.getInstance());
-			}
-		});
+		final Object[] params = new Object[this.predicates.size()];
+		for (int i = 0; i < params.length; i++) {
+			params[i] = this.predicates.get(i).getPhysicalValue(managedId.getSession(), managedId.getInstance());
+		}
 
-		final SelectHandler<X> rsHandler = new SelectHandler<X>(session, this.type, this.columnAliases, this.entityPaths);
+		final SelectHandler<X> rsHandler = new SelectHandler<X>(session, this.type, this.columnAliases, this.root);
 
-		final Collection<X> result = this.runner.query(session.getConnection(), selectSql, rsHandler, params.toArray());
+		final Collection<X> result = this.runner.query(session.getConnection(), selectSql, rsHandler, params);
 
 		return (result != null) && (result.size() > 0) ? result.iterator().next() : null;
 	}

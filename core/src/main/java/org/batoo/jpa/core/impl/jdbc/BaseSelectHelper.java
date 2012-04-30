@@ -19,11 +19,14 @@
 package org.batoo.jpa.core.impl.jdbc;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.mutable.MutableInt;
+import org.batoo.jpa.core.impl.jdbc.QueryItem.QueryItemType;
 import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.mapping.Mapping;
 import org.batoo.jpa.core.impl.mapping.OwnedAssociation;
@@ -31,7 +34,6 @@ import org.batoo.jpa.core.impl.mapping.OwnerAssociation;
 import org.batoo.jpa.core.impl.mapping.PersistableAssociation;
 import org.batoo.jpa.core.impl.types.AttributeImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
-import org.batoo.jpa.core.util.Path;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -63,10 +65,10 @@ public abstract class BaseSelectHelper<X> {
 	protected final QueryRunner runner;
 
 	protected Map<PhysicalColumn, String>[] columnAliases;
-	protected final List<Path> entityPaths = Lists.newArrayList();
 	protected final List<PhysicalColumn> predicates = Lists.newArrayList();
 
 	private String selectSql;
+	protected QueryItem root;
 
 	/**
 	 * @param type
@@ -367,13 +369,11 @@ public abstract class BaseSelectHelper<X> {
 			final List<String> fieldsBuffer = Lists.newArrayList();
 			final List<String> joinsBuffer = Lists.newArrayList();
 
-			// initialize the table number
-			final int tableNo = 0;
-
 			this.preparePredicates();
 
 			final List<Map<PhysicalColumn, String>> columnAliases = Lists.newArrayList();
-			this.processType(columnAliases, fieldsBuffer, joinsBuffer, null, this.type, new Path(), tableNo, tableNo);
+			this.root = this.processType(columnAliases, fieldsBuffer, joinsBuffer, null, this.type, new LinkedList<Association<?, ?>>(), 0,
+				new MutableInt());
 
 			// compose and return the final query
 			this.selectSql = this.compose(fieldsBuffer, joinsBuffer, this.type.getPrimaryTable());
@@ -399,28 +399,31 @@ public abstract class BaseSelectHelper<X> {
 	 */
 	protected abstract void preparePredicates();
 
-	private void processType(List<Map<PhysicalColumn, String>> columnAliases, final List<String> fieldsBuffer,
-		final List<String> joinsBuffer, EntityTypeImpl<?> parentType, EntityTypeImpl<?> type, Path path, int parentTableNo, int tableNo) {
+	private QueryItem processType(List<Map<PhysicalColumn, String>> columnAliases, final List<String> fieldsBuffer,
+		final List<String> joinsBuffer, Association<?, ?> association, EntityTypeImpl<?> type, LinkedList<Association<?, ?>> path,
+		int parentTableNo, MutableInt tableNo) {
 
 		// handle the primary table
+		final int thisTableNo = tableNo.intValue();
 		final EntityTable primaryTable = type.getPrimaryTable();
-		this.addFields(columnAliases, fieldsBuffer, type, primaryTable, tableNo, -1);
 
-		if (parentType != null) { // we are not the root entity
-			final Association<?, ?> association = path.getLast();
+		this.addFields(columnAliases, fieldsBuffer, type, primaryTable, thisTableNo, -1);
+
+		if (association != null) { // we are not the root entity
 			if ((association instanceof PersistableAssociation) && ((PersistableAssociation<?, ?>) association).hasJoin()) {
-				this.addPrimaryJoin2(joinsBuffer, parentTableNo, tableNo, (PersistableAssociation<?, ?>) association, false);
+				this.addPrimaryJoin2(joinsBuffer, parentTableNo, thisTableNo, (PersistableAssociation<?, ?>) association, false);
 			}
 			else if ((association.getOpposite() != null) && (association.getOpposite() instanceof PersistableAssociation)
 				&& ((PersistableAssociation<?, ?>) association.getOpposite()).hasJoin()) {
-				this.addPrimaryJoin2(joinsBuffer, parentTableNo, tableNo, (PersistableAssociation<?, ?>) association.getOpposite(), true);
+				this.addPrimaryJoin2(joinsBuffer, parentTableNo, thisTableNo, (PersistableAssociation<?, ?>) association.getOpposite(),
+					true);
 			}
 			else {
-				this.addPrimaryJoin(joinsBuffer, parentTableNo, tableNo, association);
+				this.addPrimaryJoin(joinsBuffer, parentTableNo, thisTableNo, association);
 			}
 		}
 
-		parentTableNo = tableNo;
+		parentTableNo = thisTableNo;
 
 		int secondaryTableNo = 0;
 		// handle the secondary tables;
@@ -429,29 +432,38 @@ public abstract class BaseSelectHelper<X> {
 				continue;
 			}
 
-			this.addFields(columnAliases, fieldsBuffer, type, table, tableNo, secondaryTableNo);
-			this.addSecondaryJoin(joinsBuffer, parentTableNo, tableNo, secondaryTableNo++, table);
+			this.addFields(columnAliases, fieldsBuffer, type, table, thisTableNo, secondaryTableNo);
+			this.addSecondaryJoin(joinsBuffer, parentTableNo, thisTableNo, secondaryTableNo++, table);
 		}
+
+		final List<QueryItem> children = Lists.newArrayList();
 
 		// process the associations
-		for (final Association<?, ?> child : type.getAssociations()) {
-			// handle the path
-			final Path childpath = new Path(path);
-			childpath.addLast(child);
-
-			this.entityPaths.add(childpath);
-
-			if ((path.size() > 0) && path.getLast().equals(child.getOpposite())) {
-				childpath.setInverse();
+		for (final Association<?, ?> childAssociation : type.getAssociations()) {
+			if ((path.size() > 0) && path.getLast().equals(childAssociation.getOpposite())) {
+				children.add(new QueryItem(childAssociation, QueryItemType.INVERSE));
 			}
-			else if ((path.size() >= MAX_PATH) || !this.cascades(child)
-				|| ((parentType == null) && (this.alwaysLazyMapping != null) && (child.getOpposite() == this.alwaysLazyMapping))) {
-				childpath.setLazy();
+			else if ((path.size() >= MAX_PATH) || !this.cascades(childAssociation)) {
+				children.add(new QueryItem(childAssociation, QueryItemType.LAZY));
 			}
 			else {
-				this.processType(columnAliases, fieldsBuffer, joinsBuffer, child.getOwner(), child.getType(), childpath, parentTableNo,
-					++tableNo);
+				// increment the table no
+				tableNo.increment();
+
+				// append the association to the path
+				final LinkedList<Association<?, ?>> childPath = Lists.newLinkedList(path);
+				childPath.addLast(childAssociation);
+
+				// process the child type
+				children.add(this.processType(columnAliases, fieldsBuffer, joinsBuffer, childAssociation, childAssociation.getType(),
+					childPath, parentTableNo, tableNo));
 			}
 		}
+
+		if (association != null) {
+			return new QueryItem(association, thisTableNo, children.toArray(new QueryItem[children.size()]));
+		}
+
+		return new QueryItem(this.type, children.toArray(new QueryItem[children.size()]));
 	}
 }

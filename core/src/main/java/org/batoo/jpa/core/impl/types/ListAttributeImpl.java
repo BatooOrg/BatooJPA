@@ -26,7 +26,6 @@ import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.ManagedType;
 
 import org.batoo.jpa.core.MappingException;
-import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.collections.ManagedList;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
@@ -98,24 +97,10 @@ public final class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E
 	 * 
 	 */
 	@Override
-	public void initialize(ManagedInstance<?> managedInstance, SessionImpl session) {
-		final ManagedList<E> managedList = this.newInstance0(session, managedInstance, this.get(managedInstance.getInstance()));
-
-		this.accessor.set(managedInstance.getInstance(), managedList);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public ManagedList<E> newInstance(SessionImpl session, ManagedInstance<?> managedInstance) {
-		return this.newInstance0(session, managedInstance, null);
-	}
-
 	@SuppressWarnings("unchecked")
-	private ManagedList<E> newInstance0(SessionImpl session, ManagedInstance<?> managedInstance, List<E> existing) {
-		return new ManagedList<E>(session, managedInstance, (CollectionMapping<?, List<E>, E>) this.mapping, existing);
+	public void newInstance(ManagedInstance<?> managedInstance, boolean lazy) {
+		final ManagedList<E> managedList = new ManagedList<E>(managedInstance, (CollectionMapping<?, List<E>, E>) this.mapping, lazy);
+		this.accessor.set(managedInstance.getInstance(), managedList);
 	}
 
 	/**

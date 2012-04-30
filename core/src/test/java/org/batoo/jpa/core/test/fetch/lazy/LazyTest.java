@@ -88,7 +88,6 @@ public class LazyTest extends AbstractTest {
 			if (CITY_ISTANBUL.equals(address.getCity())) {
 				Assert.assertEquals(TR.getId(), address.getCountry().getId());
 				Assert.assertEquals(COUNTRY_TURKEY, address.getCountry().getName());
-				break;
 			}
 		}
 

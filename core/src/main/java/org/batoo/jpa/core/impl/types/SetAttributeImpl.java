@@ -26,7 +26,6 @@ import javax.persistence.metamodel.ManagedType;
 import javax.persistence.metamodel.SetAttribute;
 
 import org.batoo.jpa.core.MappingException;
-import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.collections.ManagedSet;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
@@ -100,24 +99,10 @@ public final class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>,
 	 * 
 	 */
 	@Override
-	public void initialize(ManagedInstance<?> managedInstance, SessionImpl session) {
-		final ManagedSet<E> managedSet = this.newInstance0(session, managedInstance, this.get(managedInstance.getInstance()));
-
-		this.set(managedInstance.getInstance(), managedSet);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public ManagedSet<E> newInstance(SessionImpl session, ManagedInstance<?> managedInstance) {
-		return this.newInstance0(session, managedInstance, null);
-	}
-
 	@SuppressWarnings("unchecked")
-	private ManagedSet<E> newInstance0(SessionImpl session, ManagedInstance<?> managedInstance, Set<E> existing) {
-		return new ManagedSet<E>(session, managedInstance, (CollectionMapping<?, Set<E>, E>) this.mapping, existing);
+	public void newInstance(ManagedInstance<?> managedInstance, boolean lazy) {
+		final ManagedSet<E> managedSet = new ManagedSet<E>(managedInstance, (CollectionMapping<?, Set<E>, E>) this.mapping, lazy);
+		this.accessor.set(managedInstance.getInstance(), managedSet);
 	}
 
 	/**
@@ -127,14 +112,9 @@ public final class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>,
 	@Override
 	@SuppressWarnings("unchecked")
 	public void set(Object instance, Object value) {
-		if (value instanceof Set) {
-			this.accessor.set(instance, (Set<E>) value);
-		}
-		else {
-			final Collection<E> collection = ((ManagedSet<E>) this.accessor.get(instance)).getCollection();
-			if (!collection.contains(value)) {
-				collection.add((E) value);
-			}
+		final Collection<E> collection = ((ManagedSet<E>) this.accessor.get(instance)).getCollection();
+		if (!collection.contains(value)) {
+			collection.add((E) value);
 		}
 	}
 
@@ -143,9 +123,8 @@ public final class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>,
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public void setCollection(Object instance, ManagedCollection<?> collection) {
-		this.accessor.set(instance, (Set<E>) collection);
+		this.accessor.set(instance, collection);
 	}
 
 	/**

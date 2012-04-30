@@ -25,7 +25,6 @@ import javax.persistence.metamodel.CollectionAttribute;
 import javax.persistence.metamodel.ManagedType;
 
 import org.batoo.jpa.core.MappingException;
-import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.collections.ManagedList;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
@@ -97,19 +96,7 @@ public final class CollectionAttributeImpl<X, E> extends PluralAttributeImpl<X, 
 	 * 
 	 */
 	@Override
-	public void initialize(ManagedInstance<?> managedInstance, SessionImpl session) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public ManagedCollection<E> newInstance(SessionImpl session, ManagedInstance<?> managedInstance) {
-		// TODO Auto-generated method stub
-		return null;
+	public void newInstance(ManagedInstance<?> managedInstance, boolean lazy) {
 	}
 
 	/**

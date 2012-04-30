@@ -20,14 +20,15 @@ package org.batoo.jpa.core.impl.operation;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.EntityExistsException;
 
 import org.batoo.jpa.core.impl.EntityManagerImpl;
 import org.batoo.jpa.core.impl.SessionImpl;
-import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.instance.ManagedId;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
 import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.mapping.CollectionMapping;
@@ -69,17 +70,13 @@ public class PersistOperation<X> extends AbstractOperation<X> {
 		if (association.cascadePersist()) {
 			final Object value = association.getValue(this.managedInstance.getInstance());
 
-			if (value != null) {
-				if (association instanceof CollectionMapping) {
-					final ManagedCollection<?> values = (ManagedCollection<?>) value;
-					for (final Object child : values.getCollection()) {
-						cascades.add(new PersistOperation(this.em, child));
-					}
-
+			if (value instanceof Collection) {
+				for (final Object child : (Collection) value) {
+					cascades.add(new PersistOperation(this.em, child));
 				}
-				else {
-					cascades.add(new PersistOperation(this.em, value));
-				}
+			}
+			else if (value != null) {
+				cascades.add(new PersistOperation(this.em, value));
 			}
 		}
 
@@ -119,7 +116,9 @@ public class PersistOperation<X> extends AbstractOperation<X> {
 		}
 
 		if (this.managedInstance == null) {
-			this.managedInstance = this.type.newInstanceWithId(session, managedId, false);
+			managedId.setInstance(this.instance);
+			this.managedInstance = new ManagedInstance<X>(this.type, session, managedId);
+			this.managedInstance.setLoaded(true);
 			this.managedInstance.setStatus(Status.NEW);
 		}
 

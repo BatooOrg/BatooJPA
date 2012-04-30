@@ -18,14 +18,12 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
-import org.batoo.jpa.core.util.Path;
 
 /**
  * A {@link ResultSetHandler} to load a single result from resultset.
@@ -44,14 +42,13 @@ public class SelectHandler<X> extends BaseSelectHandler<X> {
 	 *            the aliases for the columns
 	 * @param tableAliases
 	 *            the aliases for all the tables
-	 * @param entityPaths
-	 *            the entity path
+	 * @param root
+	 *            the root query item
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SelectHandler(SessionImpl session, EntityTypeImpl<X> rootType, Map<PhysicalColumn, String>[] columnAliases,
-		List<Path> entityPaths) {
-		super(session, rootType, columnAliases, entityPaths);
+	public SelectHandler(SessionImpl session, EntityTypeImpl<X> rootType, Map<PhysicalColumn, String>[] columnAliases, QueryItem root) {
+		super(session, rootType, columnAliases, root);
 	}
 
 	/**
@@ -60,7 +57,7 @@ public class SelectHandler<X> extends BaseSelectHandler<X> {
 	 */
 	@Override
 	protected boolean shouldHandle(ManagedInstance<?> managedInstance) {
-		return (managedInstance != null) && (!managedInstance.isLoaded());
+		return !managedInstance.isLoaded();
 	}
 
 }

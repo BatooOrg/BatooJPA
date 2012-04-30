@@ -40,7 +40,6 @@ import javax.persistence.metamodel.PluralAttribute;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.MappingException;
-import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.mapping.ColumnTemplate;
@@ -190,24 +189,11 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	}
 
 	/**
-	 * Initializes the collection.
-	 * 
-	 * @param managedInstance
-	 *            the managed instance
-	 * @param session
-	 *            the session
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public abstract void initialize(ManagedInstance<?> managedInstance, SessionImpl session);
-
-	/**
 	 * {@inheritDoc}
 	 * 
 	 */
 	@Override
-	public final boolean isCollection() {
+	public boolean isCollection() {
 		return true;
 	}
 
@@ -248,18 +234,16 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	/**
 	 * Returns the created managed collection for the attribute
 	 * 
-	 * @param session
-	 *            the session
 	 * @param managedInstance
 	 *            the managed instance
 	 * @param mapping
 	 *            the collection mapping
-	 * @return
+	 * @return lazy if the collection is lazy
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract ManagedCollection<E> newInstance(SessionImpl session, ManagedInstance<?> managedInstance);
+	public abstract void newInstance(ManagedInstance<?> managedInstance, boolean lazy);
 
 	/**
 	 * Applies the overrides to the column templates.

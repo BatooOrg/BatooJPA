@@ -24,6 +24,13 @@
 			<artifactId>hibernate-jpa-2.0-api</artifactId>
 		</dependency>
 
+		<!-- ASM -->
+		<dependency>
+			<groupId>asm</groupId>
+			<artifactId>asm</artifactId>
+			<version>3.3.1</version>
+		</dependency>
+		
 		<!-- JAXB -->
 		<dependency>
 			<groupId>javax.xml.bind</groupId>

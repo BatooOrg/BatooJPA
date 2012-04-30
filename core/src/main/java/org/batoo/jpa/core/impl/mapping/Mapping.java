@@ -106,6 +106,16 @@ public interface Mapping<X, T> {
 	Deque<AttributeImpl<?, ?>> getPath();
 
 	/**
+	 * Returns the path as string.
+	 * 
+	 * @return the path as string
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	String getPathAsString();
+
+	/**
 	 * Returns the peer type.
 	 * 
 	 * @return the owner
@@ -137,4 +147,5 @@ public interface Mapping<X, T> {
 	 * @author hceylan
 	 */
 	void setValue(Object instance, Object value);
+
 }

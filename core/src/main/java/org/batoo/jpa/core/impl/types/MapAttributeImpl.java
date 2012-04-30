@@ -36,11 +36,8 @@ import javax.persistence.metamodel.Type;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.batoo.jpa.core.MappingException;
-import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
-import org.batoo.jpa.core.impl.collections.ManagedMap;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.mapping.CollectionMapping;
 import org.batoo.jpa.core.impl.reflect.ReflectHelper;
 
 import com.google.common.collect.Sets;
@@ -178,21 +175,7 @@ public final class MapAttributeImpl<X, K, V> extends PluralAttributeImpl<X, Map<
 	 * 
 	 */
 	@Override
-	public void initialize(ManagedInstance<?> managedInstance, SessionImpl session) {
-		final ManagedMap<K, V> managedMap = this.newInstance(session, managedInstance);
-		managedMap.getMap().putAll(this.get(managedInstance.getInstance()));
-
-		this.set(managedInstance.getInstance(), managedMap);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public ManagedMap<K, V> newInstance(SessionImpl session, ManagedInstance<?> managedInstance) {
-		return new ManagedMap<K, V>(session, managedInstance, (CollectionMapping<?, Map<K, V>, V>) this.mapping);
+	public void newInstance(ManagedInstance<?> managedInstance, boolean lazy) {
 	}
 
 	/**
@@ -252,8 +235,7 @@ public final class MapAttributeImpl<X, K, V> extends PluralAttributeImpl<X, Map<
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public void setCollection(Object instance, ManagedCollection<?> collection) {
-		this.accessor.set(instance, (Map<K, V>) collection);
+		this.accessor.set(instance, collection);
 	}
 }

@@ -199,7 +199,7 @@ public abstract class SimpleEntityManager implements EntityManager {
 		this.assertOpen();
 
 		final EntityTypeImpl<T> type = this.getMetamodel().entity(entityClass);
-		final ManagedId<T> managedId = type.getManagedId(this.session, primaryKey);
+		final ManagedId<T> managedId = type.newManagedId(this.session, primaryKey, false);
 
 		final FindOperation<T> operation = new FindOperation<T>((EntityManagerImpl) this, managedId);
 

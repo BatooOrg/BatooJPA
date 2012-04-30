@@ -19,8 +19,10 @@
 package org.batoo.jpa.core.impl.instance;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.batoo.jpa.core.impl.SessionImpl;
+import org.batoo.jpa.core.impl.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 import org.batoo.jpa.core.impl.types.SingularAttributeImpl;
 import org.batoo.jpa.core.impl.types.TypeImpl;
@@ -54,19 +56,23 @@ public class ManagedId<X> {
 	 *            the type of the entity
 	 * @param instance
 	 *            the entity insance
-	 * @param resolvers
-	 *            id resolvers of the instance
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedId(EntityTypeImpl<X> type, SessionImpl session, X instance, BasicResolver[] resolvers) {
+	public ManagedId(EntityTypeImpl<X> type, SessionImpl session, X instance) {
 		super();
 
 		this.type = type;
 		this.session = session;
 		this.instance = instance;
-		this.resolvers = resolvers;
+
+		final List<BasicMapping<?, ?>> idMappings = this.type.getTopType().getIdMappings();
+		this.resolvers = new BasicResolver[idMappings.size()];
+		for (int i = 0; i < idMappings.size(); i++) {
+			this.resolvers[i] = idMappings.get(i).createResolver(instance);
+		}
+
 	}
 
 	/**
@@ -198,18 +204,19 @@ public class ManagedId<X> {
 	@SuppressWarnings("unchecked")
 	private void initialize() {
 		if (!this.initialized) {
-			final TypeImpl<?> idType = this.type.getIdType();
 
 			if (this.resolvers.length == 1) {
 				this.singleId = this.resolvers[0];
 			}
-			else if ((idType != null) && idType.isEmbeddable()) {
-				this.embeddedAttribute = (SingularAttributeImpl<? super X, ?>) this.type.getIdAttributes()[0];
+			else {
+				final TypeImpl<?> idType = this.type.getIdType();
+				if ((idType != null) && idType.isEmbeddable()) {
+					this.embeddedAttribute = (SingularAttributeImpl<? super X, ?>) this.type.getIdAttributes()[0];
+				}
+				else if (this.type.getIdJavaType() != null) {
+					this.idJavaType = this.type.getIdJavaType();
+				}
 			}
-			else if (idType != null) {
-				this.idJavaType = this.type.getIdJavaType();
-			}
-
 			this.initialized = true;
 		}
 	}
@@ -240,11 +247,9 @@ public class ManagedId<X> {
 		}
 		else {
 			for (final BasicResolver resolver : this.resolvers) {
-				synchronized (resolver) {
-					resolver.unlock();
-					resolver.setValue(id);
-					resolver.relock();
-				}
+				resolver.unlock();
+				resolver.setValue(id);
+				resolver.relock();
 			}
 		}
 	}

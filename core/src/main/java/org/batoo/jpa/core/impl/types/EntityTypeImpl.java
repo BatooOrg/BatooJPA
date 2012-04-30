@@ -19,9 +19,11 @@
 package org.batoo.jpa.core.impl.types;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -50,8 +52,6 @@ import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.SessionImpl;
-import org.batoo.jpa.core.impl.instance.BasicResolver;
-import org.batoo.jpa.core.impl.instance.InstanceInvoker;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
@@ -95,23 +95,24 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 	private final Map<String, AbstractMapping<?, ?>> mappings = Maps.newHashMap();
 	private final Map<String, Association<?, ?>> associations = Maps.newHashMap();
-	private final List<BasicMapping<?, ?>> idMappings = Lists.newArrayList();
+	private final List<BasicMapping<?, ?>> idMappings = Lists.newArrayList(); // FIXME Performance: Convert to array
 	private final Map<String, BasicMapping<?, ?>> identityMappings = Maps.newHashMap();
 	private final Map<String, Column> attributeOverrides = Maps.newHashMap();
 
 	private EntityInheritence inheritance;
 
 	private EntityTable primaryTable;
-
 	private final Map<String, EntityTable> tables = Maps.newHashMap();
 	private final Map<String, JoinTable> joinTables = Maps.newHashMap();
-	private Object topType;
-
 	private final Map<String, TableTemplate> tableTemplates = Maps.newHashMap();
 
 	private final SelectHelper<X> selectHelper;
 	private final RefreshHelper<X> refreshHelper;
+	// private final Class<X> enhancedJavaType;
+	private final IdentityHashMap<Method, Method> idMethods = Maps.newIdentityHashMap();
+	private final IdentityHashMap<Method, Method> nonIdMethods = Maps.newIdentityHashMap();
 
+	private Object topType;
 	private Object discriminatorValue;
 
 	/**
@@ -126,6 +127,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
+	@SuppressWarnings("unchecked")
 	public EntityTypeImpl(MetamodelImpl metaModel, final Class<X> javaType) throws MappingException {
 		super(metaModel, javaType);
 
@@ -133,6 +135,11 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 		this.selectHelper = new SelectHelper<X>(this);
 		this.refreshHelper = new RefreshHelper<X>(this);
+
+		// final ProxyFactory factory = new ProxyFactory();
+		// factory.setSuperclass(this.javaType);
+		// factory.setInterfaces(new Class[] { EnhancedInstance.class });
+		// this.enhancedJavaType = factory.createClass();
 	}
 
 	/**
@@ -327,7 +334,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * 
 	 * @since $version
 	 * @author hceylan
-	 * @return
 	 */
 	public Collection<Association<?, ?>> getAssociations() {
 		return this.associations.values();
@@ -371,7 +377,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Collection<BasicMapping<?, ?>> getIdMappings() {
+	public List<BasicMapping<?, ?>> getIdMappings() {
 		return this.idMappings;
 	}
 
@@ -383,38 +389,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 */
 	public EntityInheritence getInheritance() {
 		return this.inheritance;
-	}
-
-	/**
-	 * Returns the managed id for the id.
-	 * 
-	 * @param instance
-	 *            the instance to create managed id or null
-	 * @return managed id for the instance
-	 * @throws NullPointerException
-	 *             thrown if the id is null
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public ManagedId<X> getManagedId(SessionImpl session, final Object id) {
-		if (id == null) {
-			throw new NullPointerException();
-		}
-
-		final X instance = this.newInstance();
-
-		final List<BasicMapping<?, ?>> idMappings = this.getTopType().idMappings;
-		final BasicResolver[] resolvers = new BasicResolver[idMappings.size()];
-		for (int i = 0; i < idMappings.size(); i++) {
-			resolvers[i] = idMappings.get(i).createResolver(instance);
-		}
-
-		final ManagedId<X> managedId = new ManagedId<X>(this, session, instance, resolvers);
-
-		managedId.populate(id);
-
-		return managedId;
 	}
 
 	/**
@@ -434,13 +408,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			throw new NullPointerException();
 		}
 
-		final List<BasicMapping<?, ?>> idMappings = this.getTopType().idMappings;
-		final BasicResolver[] resolvers = new BasicResolver[idMappings.size()];
-		for (int i = 0; i < idMappings.size(); i++) {
-			resolvers[i] = idMappings.get(i).createResolver(instance);
-		}
-
-		return new ManagedId<X>(this, session, instance, resolvers);
+		return new ManagedId<X>(this, session, instance);
 	}
 
 	/**
@@ -550,6 +518,37 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
+	 * @param method
+	 * @return
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isIdMethod(Method method) {
+		if (this.idMethods.containsKey(method)) { // if known id method, let go
+			return true;
+		}
+
+		if (this.nonIdMethods.containsKey(method)) {
+			return false;
+		}
+
+		final String methodName = method.getName();
+		if (methodName.startsWith("get") && (methodName.length() > 3)) { // check if id method
+			for (final SingularAttributeImpl<?, ?> attribute : this.idAttributes) {
+				if (attribute.getGetterName().equals(method.getName())) {
+					this.idMethods.put(method, method);
+					return true;
+				}
+			}
+		}
+
+		this.nonIdMethods.put(method, method);
+
+		return false;
+	}
+
+	/**
 	 * Horizontally links the entity.
 	 * 
 	 * @param dataSource
@@ -587,29 +586,38 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
-	 * Returns a new managed instance with its id populated from id.
-	 * <p>
-	 * if lazy is true Lazy properties will be proxied.
+	 * Returns the managed id for the id.
 	 * 
-	 * @param managedId
-	 *            the id for the new managed instance
-	 * @param session
-	 *            the session
-	 * @param enhanced
-	 *            if the instance will be lazy
-	 * @return the new managed instance
+	 * @param instance
+	 *            the instance to create managed id or null
+	 * @param lazy
+	 *            if the instance is lazy
+	 * @return managed id for the instance
+	 * @throws NullPointerException
+	 *             thrown if the id is null
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedInstance<X> newInstanceWithId(final SessionImpl session, final ManagedId<X> managedId, boolean enhanced) {
-		if (!enhanced) {
-			return new ManagedInstance<X>(this, session, managedId);
+	public ManagedId<X> newManagedId(SessionImpl session, final Object id, boolean lazy) {
+		if (id == null) {
+			throw new NullPointerException();
 		}
 
-		InstanceInvoker.<X> createInvoker(this.javaType.getClassLoader(), this, session, managedId);
+		X instance = null;
+		try {
+			instance = this.javaType.newInstance(); // this.enhancedJavaType.newInstance();
+		}
+		catch (final InstantiationException e) {} // not possible
+		catch (final IllegalAccessException e) {} // not possible
 
-		return new ManagedInstance<X>(this, session, managedId);
+		// ((ProxyObject) instance).setHandler(new Enhancer<X>(this, session, id, lazy));
+
+		final ManagedId<X> managedId = new ManagedId<X>(this, session, instance);
+
+		managedId.populate(id);
+
+		return managedId;
 	}
 
 	/**

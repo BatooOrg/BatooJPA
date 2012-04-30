@@ -51,9 +51,6 @@ public class Foo {
 		if (obj == null) {
 			return false;
 		}
-		if (this.getClass() != obj.getClass()) {
-			return false;
-		}
 		final Foo other = (Foo) obj;
 		if (this.intKey == null) {
 			if (other.intKey != null) {

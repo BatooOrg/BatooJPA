@@ -20,12 +20,12 @@ package org.batoo.jpa.core.impl.jdbc;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.SessionImpl;
-import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
@@ -121,10 +121,9 @@ public final class JoinTable extends AbstractTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
 	public void performInsert(Connection connection, ManagedInstance<?> managedInstance) throws SQLException {
-		final ManagedCollection<Object> children = (ManagedCollection<Object>) this.mapping.getValue(managedInstance.getInstance());
-		for (final Object child : children.getCollection()) {
+		final Collection<?> children = (Collection<?>) this.mapping.getValue(managedInstance.getInstance());
+		for (final Object child : children) {
 			this.performInsert(connection, managedInstance, child);
 		}
 	}

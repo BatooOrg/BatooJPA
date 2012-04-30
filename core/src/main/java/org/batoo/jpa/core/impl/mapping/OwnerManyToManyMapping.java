@@ -47,8 +47,8 @@ import org.batoo.jpa.core.jdbc.adapter.JDBCAdapter;
  * @author hceylan
  * @since $version
  */
-public class OwnerManyToManyMapping<X, C, E> extends OwnerAssociationMapping<X, C> implements Association<X, C>,
-	CollectionMapping<X, C, E>, PersistableAssociation<X, C> {
+public class OwnerManyToManyMapping<X, C, E> extends OwnerAssociationMapping<X, C> implements CollectionMapping<X, C, E>,
+	PersistableAssociation<X, C> {
 
 	private JoinTable joinTable;
 

@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.mapping.CollectionMapping;
 
@@ -50,14 +49,8 @@ public class ManagedList<E> extends AbstractManagedCollection<E> implements List
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedList(SessionImpl session, ManagedInstance<?> managedInstance, CollectionMapping<?, List<E>, E> association,
-		List<E> existing) {
-		super(session, managedInstance, association, existing);
-
-		if (existing != null) {
-			this.snapshot = existing;
-			this.list.addAll(existing);
-		}
+	public ManagedList(ManagedInstance<?> managedInstance, CollectionMapping<?, List<E>, E> association, boolean lazy) {
+		super(managedInstance, association, lazy);
 	}
 
 	/**
@@ -185,8 +178,7 @@ public class ManagedList<E> extends AbstractManagedCollection<E> implements List
 	 */
 	@Override
 	public String toString() {
-		return "ManagedList [list=" + this.list + ", session=" + this.session + ", managedInstance=" + this.managedInstance + ", snapshot="
-			+ this.snapshot + "]";
+		return "ManagedList [list=" + this.list + ", managedInstance=" + this.managedInstance + ", snapshot=" + this.snapshot + "]";
 	}
 
 }

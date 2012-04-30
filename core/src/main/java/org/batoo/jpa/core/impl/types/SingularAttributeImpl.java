@@ -80,6 +80,7 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 	private IdType idType;
 	private String generatorName;
 	private String getterName;
+	private TypeImpl<T> type;
 
 	/**
 	 * Cloning constructor
@@ -228,7 +229,11 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 	@Override
 	@SuppressWarnings("unchecked")
 	public TypeImpl<T> getType() {
-		return (TypeImpl<T>) this.getDeclaringType().getMetaModel().getType(this.javaType);
+		if (this.type == null) {
+			this.type = (TypeImpl<T>) this.getDeclaringType().getMetaModel().getType(this.javaType);
+		}
+
+		return this.type;
 	}
 
 	/**
@@ -236,7 +241,7 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 	 * 
 	 */
 	@Override
-	public final boolean isCollection() {
+	public boolean isCollection() {
 		return false;
 	}
 

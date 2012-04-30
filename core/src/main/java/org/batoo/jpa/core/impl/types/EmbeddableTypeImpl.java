@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.impl.types;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.util.Set;
 
 import javax.persistence.Embeddable;
@@ -36,6 +37,8 @@ import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
  */
 public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements EmbeddableType<X> {
 
+	private final Constructor<X> constructor;
+
 	/**
 	 * @param metaModel
 	 *            the meta model
@@ -48,6 +51,8 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	 */
 	public EmbeddableTypeImpl(MetamodelImpl metaModel, Class<X> clazz) throws MappingException {
 		super(metaModel, clazz);
+
+		this.constructor = this.getDefaultConstructor(this.javaType);
 
 		metaModel.addEmbeddable(this);
 	}
@@ -68,6 +73,25 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	@Override
 	public boolean isEmbeddable() {
 		return true;
+	}
+
+	/**
+	 * Creates a new instance.
+	 * 
+	 * @return a new instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public X newInstance() {
+		try {
+			return this.constructor.newInstance();
+		}
+		catch (final Exception e) {
+			// Not possible
+		}
+
+		return null;
 	}
 
 	/**

@@ -61,7 +61,6 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 
 	protected final Map<String, Attribute<? super X, ?>> attributes = Maps.newHashMap();
 
-	final Constructor<X> constructor;
 	private Set<PluralAttribute<? super X, ?, ?>> plurals;
 
 	/**
@@ -76,8 +75,6 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 */
 	public ManagedTypeImpl(MetamodelImpl metaModel, Class<X> javaType) throws MappingException {
 		super(metaModel, javaType);
-
-		this.constructor = this.getDefaultConstructor(javaType);
 	}
 
 	/**
@@ -572,25 +569,6 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 		plurals.addAll((Collection<? extends SingularAttribute<X, ?>>) set);
 
 		return plurals;
-	}
-
-	/**
-	 * Creates a new instance.
-	 * 
-	 * @return a new instance
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public X newInstance() {
-		try {
-			return this.constructor.newInstance();
-		}
-		catch (final Exception e) {
-			// Not possible
-		}
-
-		return null;
 	}
 
 	/**

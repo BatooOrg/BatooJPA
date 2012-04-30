@@ -132,7 +132,7 @@ public class AssociationSelectHelper<X, C, E> extends BaseSelectHelper<E> {
 			}
 		});
 
-		final SelectHandler<E> rsHandler = new SelectHandler<E>(session, this.type, this.columnAliases, this.entityPaths);
+		final SelectHandler<E> rsHandler = new SelectHandler<E>(session, this.type, this.columnAliases, this.root);
 
 		return new QueryRunner().query(session.getConnection(), selectSql, rsHandler, params.toArray());
 	}
