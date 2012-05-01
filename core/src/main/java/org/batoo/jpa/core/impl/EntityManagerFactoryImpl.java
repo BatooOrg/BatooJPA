@@ -327,7 +327,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		for (final EntityType<?> entity : entities) {
 			list.add((EntityTypeImpl<?>) entity);
 		}
-		Collections.sort(list);
 
 		final Collection<String> transformed = Collections2.transform(list, new Function<EntityType<?>, String>() {
 

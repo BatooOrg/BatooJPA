@@ -92,7 +92,7 @@ import com.google.common.collect.Maps;
  * @since $version
  */
 @SuppressWarnings("restriction")
-public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements EntityType<X>, Comparable<EntityType<X>> {
+public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements EntityType<X> {
 
 	private static final BLogger LOG = BLogger.getLogger(EntityTypeImpl.class);
 
@@ -266,15 +266,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		}
 
 		this.mappings.put(name, mapping);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public int compareTo(EntityType<X> o) {
-		return this.getName().compareTo(o.getName());
 	}
 
 	/**
