@@ -428,19 +428,6 @@ public class ReflectHelper {
 	}
 
 	/**
-	 * Makes the member accessible.
-	 * 
-	 * @param member
-	 *            the member to make accessible
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public static void makeAccessible(final Member member) {
-		ReflectHelper.setAccessible(member, true);
-	}
-
-	/**
 	 * Sets the member's accessibility status.
 	 * 
 	 * @param member

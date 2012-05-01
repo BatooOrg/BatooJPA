@@ -42,7 +42,6 @@ import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
 import org.batoo.jpa.core.impl.mapping.TypeFactory;
-import org.batoo.jpa.core.impl.reflect.ReflectHelper;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -378,8 +377,6 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 		if (constructor == null) {
 			throw new MappingException("Class " + javaType + " must have a default constructor");
 		}
-
-		ReflectHelper.makeAccessible(constructor);
 
 		return constructor;
 	}

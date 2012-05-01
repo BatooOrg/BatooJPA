@@ -176,7 +176,6 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 		this.jdbcAdapter = this.declaringType.getMetaModel().getJdbcAdapter();
 		this.attributeType = AtrributeType.BASIC;
 		this.accessor = new FieldAccessor((Field) this.javaMember);
-		ReflectHelper.makeAccessible(this.javaMember);
 
 		ReflectHelper.checkAnnotations(javaMember, this.parse());
 	}

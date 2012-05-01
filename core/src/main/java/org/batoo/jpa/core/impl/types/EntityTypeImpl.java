@@ -334,8 +334,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 						final Method generateMethod = magClass.getMethod("generateConstructor", Class.class, Class[].class, Class[].class,
 							Integer.TYPE);
 
-						ReflectHelper.makeAccessible(c);
-						ReflectHelper.makeAccessible(generateMethod);
+						ReflectHelper.setAccessible(c, true);
+						ReflectHelper.setAccessible(generateMethod, true);
 						try {
 							final Object mag = c.newInstance();
 							this.enhancer = (sun.reflect.ConstructorAccessor) generateMethod.invoke(mag,
