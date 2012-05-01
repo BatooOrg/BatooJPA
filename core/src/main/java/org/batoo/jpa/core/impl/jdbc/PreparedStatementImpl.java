@@ -60,6 +60,7 @@ public class PreparedStatementImpl implements PreparedStatement {
 	private static AtomicLong no = new AtomicLong(0);
 
 	private final ConnectionImpl connection;
+	private final String sql;
 	private final PreparedStatement statement;
 	private final long statementNo;
 
@@ -69,15 +70,11 @@ public class PreparedStatementImpl implements PreparedStatement {
 	private volatile long executes;
 	private volatile long selects;
 
-	private final String sql;
-
 	private Object[] parameters;
-
 	private final GenericKeyedPool<String, PreparedStatementImpl> pool;
-
 	private ParameterMetaData parameterMetaData;
 
-	private final boolean sqlAudit = true; // FIXME implement
+	private final boolean sqlAudit = false; // FIXME implement
 
 	/**
 	 * @param connection
