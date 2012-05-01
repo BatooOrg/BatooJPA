@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.metamodel.ListAttribute;
-import javax.persistence.metamodel.ManagedType;
 
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
@@ -51,7 +50,7 @@ public final class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E
 	 * @since $version
 	 * @author hceylan
 	 */
-	private ListAttributeImpl(EntityTypeImpl<X> declaringType, ListAttributeImpl<?, E> original) {
+	private ListAttributeImpl(ManagedTypeImpl<X> declaringType, ListAttributeImpl<?, E> original) {
 		super(declaringType, original);
 	}
 
@@ -70,7 +69,7 @@ public final class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public ListAttributeImpl(ManagedType<X> owner, Member javaMember, Class<List<E>> javaType) throws MappingException {
+	public ListAttributeImpl(ManagedTypeImpl<X> owner, Member javaMember, Class<List<E>> javaType) throws MappingException {
 		super(owner, javaMember, javaType, (Class<E>) ReflectHelper.getGenericType(javaMember, 0));
 	}
 
@@ -79,7 +78,7 @@ public final class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E
 	 * 
 	 */
 	@Override
-	public <T> ListAttributeImpl<T, E> clone(EntityTypeImpl<T> declaringType) {
+	public <T> ListAttributeImpl<T, E> clone(ManagedTypeImpl<T> declaringType) {
 		return new ListAttributeImpl<T, E>(declaringType, this);
 	}
 

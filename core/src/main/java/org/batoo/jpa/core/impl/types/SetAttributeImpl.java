@@ -22,7 +22,6 @@ import java.lang.reflect.Member;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.metamodel.ManagedType;
 import javax.persistence.metamodel.SetAttribute;
 
 import org.batoo.jpa.core.MappingException;
@@ -41,21 +40,6 @@ import org.batoo.jpa.core.impl.reflect.ReflectHelper;
 public final class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>, E> implements SetAttribute<X, E> {
 
 	/**
-	 * Cloning constructor
-	 * 
-	 * @param declaringType
-	 *            the type redeclaring this attribute
-	 * @param original
-	 *            the original
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public SetAttributeImpl(EntityTypeImpl<X> declaringType, SetAttributeImpl<?, E> original) {
-		super(declaringType, original);
-	}
-
-	/**
 	 * @param declaringType
 	 *            the type declaring this attribute
 	 * @param javaMember
@@ -70,8 +54,23 @@ public final class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>,
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public SetAttributeImpl(ManagedType<X> owner, Member javaMember, Class<Set<E>> javaType) throws MappingException {
+	public SetAttributeImpl(ManagedTypeImpl<X> owner, Member javaMember, Class<Set<E>> javaType) throws MappingException {
 		super(owner, javaMember, javaType, (Class<E>) ReflectHelper.getGenericType(javaMember, 0));
+	}
+
+	/**
+	 * Cloning constructor
+	 * 
+	 * @param declaringType
+	 *            the type redeclaring this attribute
+	 * @param original
+	 *            the original
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public SetAttributeImpl(ManagedTypeImpl<X> declaringType, SetAttributeImpl<?, E> original) {
+		super(declaringType, original);
 	}
 
 	/**
@@ -81,7 +80,7 @@ public final class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>,
 	 * 
 	 */
 	@Override
-	public <T> SetAttributeImpl<T, E> clone(EntityTypeImpl<T> declaringType) {
+	public <T> SetAttributeImpl<T, E> clone(ManagedTypeImpl<T> declaringType) {
 		return new SetAttributeImpl<T, E>(declaringType, this);
 	}
 

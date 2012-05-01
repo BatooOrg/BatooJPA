@@ -85,6 +85,7 @@ import org.batoo.jpa.core.impl.types.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 import org.batoo.jpa.core.impl.types.ExtendingEntityTypeImpl;
 import org.batoo.jpa.core.impl.types.ListAttributeImpl;
+import org.batoo.jpa.core.impl.types.ManagedTypeImpl;
 import org.batoo.jpa.core.impl.types.MapAttributeImpl;
 import org.batoo.jpa.core.impl.types.MappedSuperclassTypeImpl;
 import org.batoo.jpa.core.impl.types.SetAttributeImpl;
@@ -383,7 +384,7 @@ public class TypeFactory {
 	 * @throws BatooException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static <X> Attribute<X, ?> forType(ManagedType<X> owner, Field field, Class<?> clazz) throws BatooException {
+	public static <X> Attribute<X, ?> forType(ManagedTypeImpl<X> owner, Field field, Class<?> clazz) throws BatooException {
 		// If array type, persistent type must be a basic type
 		if (clazz.isArray() && TypeFactory.isBasicType(clazz.getComponentType(), true)) {
 			return new SingularAttributeImpl(owner, field, clazz);

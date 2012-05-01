@@ -30,7 +30,6 @@ import javax.persistence.MapKey;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.MapKeyJoinColumn;
 import javax.persistence.MapKeyJoinColumns;
-import javax.persistence.metamodel.ManagedType;
 import javax.persistence.metamodel.MapAttribute;
 import javax.persistence.metamodel.Type;
 
@@ -71,7 +70,7 @@ public final class MapAttributeImpl<X, K, V> extends PluralAttributeImpl<X, Map<
 	 * @since $version
 	 * @author hceylan
 	 */
-	private MapAttributeImpl(EntityTypeImpl<X> declaringType, MapAttributeImpl<?, K, V> original) {
+	private MapAttributeImpl(ManagedTypeImpl<X> declaringType, MapAttributeImpl<?, K, V> original) {
 		super(declaringType, original);
 
 		this.keyJavaType = original.keyJavaType;
@@ -96,7 +95,7 @@ public final class MapAttributeImpl<X, K, V> extends PluralAttributeImpl<X, Map<
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public MapAttributeImpl(ManagedType<X> owner, Member javaMember, Class<Map<K, V>> javaType) throws MappingException {
+	public MapAttributeImpl(ManagedTypeImpl<X> owner, Member javaMember, Class<Map<K, V>> javaType) throws MappingException {
 		super(owner, javaMember, javaType, (Class<V>) ReflectHelper.getGenericType(javaMember, 1));
 
 		this.keyJavaType = (Class<K>) ReflectHelper.getGenericType(javaMember, 0);
@@ -109,7 +108,7 @@ public final class MapAttributeImpl<X, K, V> extends PluralAttributeImpl<X, Map<
 	 * 
 	 */
 	@Override
-	public <T> MapAttributeImpl<T, K, V> clone(EntityTypeImpl<T> declaringType) {
+	public <T> MapAttributeImpl<T, K, V> clone(ManagedTypeImpl<T> declaringType) {
 		return new MapAttributeImpl<T, K, V>(declaringType, this);
 	}
 

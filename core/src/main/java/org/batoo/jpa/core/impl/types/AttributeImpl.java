@@ -44,7 +44,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.metamodel.Attribute;
-import javax.persistence.metamodel.ManagedType;
 
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.mapping.AbstractMapping;
@@ -128,7 +127,7 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AttributeImpl(EntityTypeImpl<X> declaringType, AttributeImpl<?, Y> original) {
+	public AttributeImpl(ManagedTypeImpl<X> declaringType, AttributeImpl<?, Y> original) {
 		super();
 
 		this.attributeOverrides.putAll(original.attributeOverrides);
@@ -166,10 +165,10 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AttributeImpl(ManagedType<X> declaringType, Member javaMember, Class<Y> javaType) throws MappingException {
+	public AttributeImpl(ManagedTypeImpl<X> declaringType, Member javaMember, Class<Y> javaType) throws MappingException {
 		super();
 
-		this.declaringType = (ManagedTypeImpl<X>) declaringType;
+		this.declaringType = declaringType;
 		this.javaMember = javaMember;
 		this.javaType = javaType;
 
@@ -190,7 +189,7 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract <T> AttributeImpl<T, Y> clone(EntityTypeImpl<T> declaringType);
+	public abstract <T> AttributeImpl<T, Y> clone(ManagedTypeImpl<T> declaringType);
 
 	/**
 	 * {@inheritDoc}

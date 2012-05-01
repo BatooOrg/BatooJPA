@@ -40,7 +40,6 @@ import javax.persistence.PersistenceException;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.TableGenerator;
 import javax.persistence.Version;
-import javax.persistence.metamodel.ManagedType;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.NotImplementedException;
@@ -83,27 +82,6 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 	private TypeImpl<T> type;
 
 	/**
-	 * Cloning constructor
-	 * 
-	 * @param declaringType
-	 *            the type redeclaring this attribute
-	 * @param original
-	 *            the original
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	private SingularAttributeImpl(EntityTypeImpl<X> declaringType, SingularAttributeImpl<?, T> original) {
-		super(declaringType, original);
-
-		this.optional = original.optional;
-		this.version = original.version;
-		this.idType = original.idType;
-		this.generatorName = original.generatorName;
-		this.getterName = original.getterName;
-	}
-
-	/**
 	 * @param declaringType
 	 *            the type declaring this attribute
 	 * @param member
@@ -116,8 +94,29 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SingularAttributeImpl(ManagedType<X> declaringType, Member member, Class<T> javaMember) throws MappingException {
+	public SingularAttributeImpl(ManagedTypeImpl<X> declaringType, Member member, Class<T> javaMember) throws MappingException {
 		super(declaringType, member, javaMember);
+	}
+
+	/**
+	 * Cloning constructor
+	 * 
+	 * @param declaringType
+	 *            the type redeclaring this attribute
+	 * @param original
+	 *            the original
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private SingularAttributeImpl(ManagedTypeImpl<X> declaringType, SingularAttributeImpl<?, T> original) {
+		super(declaringType, original);
+
+		this.optional = original.optional;
+		this.version = original.version;
+		this.idType = original.idType;
+		this.generatorName = original.generatorName;
+		this.getterName = original.getterName;
 	}
 
 	/**
@@ -125,7 +124,7 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 	 * 
 	 */
 	@Override
-	public <Y> SingularAttributeImpl<Y, T> clone(EntityTypeImpl<Y> declaringType) {
+	public <Y> SingularAttributeImpl<Y, T> clone(ManagedTypeImpl<Y> declaringType) {
 		return new SingularAttributeImpl<Y, T>(declaringType, this);
 	}
 

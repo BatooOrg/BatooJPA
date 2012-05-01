@@ -18,6 +18,10 @@
  */
 package org.batoo.jpa.core.impl.types;
 
+import javax.persistence.metamodel.Attribute;
+
+import org.batoo.jpa.core.BLogger;
+import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
 
@@ -28,6 +32,8 @@ import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
  * @since $version
  */
 public class ExtendingEntityTypeImpl<X> extends EntityTypeImpl<X> {
+
+	private static final BLogger LOG = BLogger.getLogger(ExtendingEntityTypeImpl.class);
 
 	/**
 	 * @param metaModel
@@ -48,4 +54,31 @@ public class ExtendingEntityTypeImpl<X> extends EntityTypeImpl<X> {
 		super(metaModel, supertype, javaType);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void vlink() throws BatooException {
+		LOG.debug("Vertically linking {0}", this);
+
+		if (this.getSupertype() != null) {
+
+			// inherit attributes
+			for (final Attribute<?, ?> superAttribute : this.getSupertype().attributes.values()) {
+				if (this.attributes.containsKey(superAttribute.getName())) {
+					continue;
+				}
+
+				final AttributeImpl<X, ?> attribute = ((AttributeImpl<?, ?>) superAttribute).clone(this);
+
+				this.attributes.put(attribute.getName(), attribute);
+			}
+
+			this.idJavaType = this.getSupertype().idJavaType;
+			this.idType = this.getSupertype().idType;
+		}
+
+		super.vlink();
+	}
 }

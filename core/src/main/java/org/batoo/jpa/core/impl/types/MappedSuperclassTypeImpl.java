@@ -22,8 +22,10 @@ import java.lang.annotation.Annotation;
 import java.util.Set;
 
 import javax.persistence.MappedSuperclass;
+import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.MappedSuperclassType;
 
+import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
@@ -35,6 +37,8 @@ import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
  * @since $version
  */
 public class MappedSuperclassTypeImpl<X> extends IdentifiableTypeImpl<X> implements MappedSuperclassType<X> {
+
+	private static final BLogger LOG = BLogger.getLogger(MappedSuperclassTypeImpl.class);
 
 	/**
 	 * @param metaModel
@@ -81,5 +85,33 @@ public class MappedSuperclassTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 		}
 
 		parsed.add(MappedSuperclass.class);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void vlink() throws BatooException {
+		LOG.debug("Vertically linking {0}", this);
+
+		if (this.getSupertype() != null) {
+
+			// inherit attributes
+			for (final Attribute<?, ?> superAttribute : this.getSupertype().attributes.values()) {
+				if (this.attributes.containsKey(superAttribute.getName())) {
+					continue;
+				}
+
+				final AttributeImpl<X, ?> attribute = ((AttributeImpl<?, ?>) superAttribute).clone(this);
+
+				this.attributes.put(attribute.getName(), attribute);
+			}
+
+			this.idJavaType = this.getSupertype().idJavaType;
+			this.idType = this.getSupertype().idType;
+		}
+
+		super.vlink();
 	}
 }

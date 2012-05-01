@@ -34,7 +34,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.UniqueConstraint;
-import javax.persistence.metamodel.ManagedType;
 import javax.persistence.metamodel.PluralAttribute;
 
 import org.apache.commons.lang.NotImplementedException;
@@ -73,28 +72,6 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	private final TypeImpl<E> elementType;
 
 	/**
-	 * Cloning constructor
-	 * 
-	 * @param declaringType
-	 *            the type redeclaring this attribute
-	 * @param original
-	 *            the original
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public PluralAttributeImpl(EntityTypeImpl<X> declaringType, PluralAttributeImpl<?, C, E> original) {
-		super(declaringType, original);
-
-		this.collectionTableName = original.collectionTableName;
-		this.collectionTableSchema = original.collectionTableSchema;
-		this.elementJavaType = original.elementJavaType;
-		this.elementType = original.elementType;
-
-		this.collectionTableUniqueConstraints.addAll(original.collectionTableUniqueConstraints);
-	}
-
-	/**
 	 * @param declaringType
 	 *            the type declaring this attribute
 	 * @param javaMember
@@ -109,11 +86,34 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public PluralAttributeImpl(ManagedType<X> owner, Member member, Class<C> javaMember, Class<E> elementJavaType) throws MappingException {
+	public PluralAttributeImpl(ManagedTypeImpl<X> owner, Member member, Class<C> javaMember, Class<E> elementJavaType)
+		throws MappingException {
 		super(owner, member, javaMember);
 
 		this.elementJavaType = elementJavaType;
 		this.elementType = (TypeImpl<E>) this.getDeclaringType().getMetaModel().getType(this.elementJavaType);
+	}
+
+	/**
+	 * Cloning constructor
+	 * 
+	 * @param declaringType
+	 *            the type redeclaring this attribute
+	 * @param original
+	 *            the original
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public PluralAttributeImpl(ManagedTypeImpl<X> declaringType, PluralAttributeImpl<?, C, E> original) {
+		super(declaringType, original);
+
+		this.collectionTableName = original.collectionTableName;
+		this.collectionTableSchema = original.collectionTableSchema;
+		this.elementJavaType = original.elementJavaType;
+		this.elementType = original.elementType;
+
+		this.collectionTableUniqueConstraints.addAll(original.collectionTableUniqueConstraints);
 	}
 
 	/**

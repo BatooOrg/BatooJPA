@@ -25,7 +25,6 @@ import java.util.Set;
 import javax.persistence.IdClass;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.TableGenerator;
-import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.IdentifiableType;
 import javax.persistence.metamodel.SingularAttribute;
 
@@ -188,7 +187,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * 
 	 */
 	@Override
-	public synchronized IdentifiableTypeImpl<? super X> getSupertype() {
+	public IdentifiableTypeImpl<? super X> getSupertype() {
 		return this.supertype;
 	}
 
@@ -317,26 +316,6 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * @author hceylan
 	 */
 	public void vlink() throws BatooException {
-		LOG.debug("Vertically linking {0}", this);
-
-		final IdentifiableTypeImpl<? super X> supertype = this.getSupertype();
-		if (supertype instanceof MappedSuperclassTypeImpl) {
-
-			// inherit attributes
-			for (final Attribute<?, ?> superAttribute : supertype.attributes.values()) {
-				if (this.attributes.containsKey(superAttribute.getName())) {
-					continue;
-				}
-
-				final AttributeImpl<X, ?> attribute = ((AttributeImpl<?, ?>) superAttribute).clone((EntityTypeImpl<X>) this);
-
-				this.attributes.put(attribute.getName(), attribute);
-			}
-
-			this.idJavaType = supertype.idJavaType;
-			this.idType = supertype.idType;
-		}
-
 		final Set<SingularAttribute<? super X, ?>> idAttributes = Sets.newHashSet();
 		for (final SingularAttribute<? super X, ?> attribute : this.getSingularAttributes()) {
 			if (attribute.isId()) {
