@@ -33,7 +33,7 @@ import org.junit.Test;
 public class JoinedInheritenceTest extends AbstractTest {
 
 	/**
-	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with identity value
+	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with extending type
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -41,7 +41,8 @@ public class JoinedInheritenceTest extends AbstractTest {
 	@Test
 	public void testSimpleInheritence() {
 		final FooExt1 foo = new FooExt1();
-		foo.setValue("Bar");
+		foo.setValue("Value");
+		foo.setValueExt1("ValueExt1");
 
 		this.persist(foo);
 
@@ -51,10 +52,12 @@ public class JoinedInheritenceTest extends AbstractTest {
 
 		final FooExt1 foo2 = this.find(FooExt1.class, foo.getKey());
 		Assert.assertEquals(foo.getKey(), foo2.getKey());
+		Assert.assertEquals(foo.getValue(), foo2.getValue());
+		Assert.assertEquals(foo.getValueExt1(), foo2.getValueExt1());
 	}
 
 	/**
-	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with identity value
+	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with further extending type
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -62,7 +65,9 @@ public class JoinedInheritenceTest extends AbstractTest {
 	@Test
 	public void testSimpleInheritence2() {
 		final FooExt11 foo = new FooExt11();
-		foo.setValue("Bar");
+		foo.setValue("Value");
+		foo.setValueExt1("ValueExt1");
+		foo.setValueExt11("ValueExt11");
 
 		this.persist(foo);
 
@@ -72,5 +77,33 @@ public class JoinedInheritenceTest extends AbstractTest {
 
 		final FooExt11 foo2 = this.find(FooExt11.class, foo.getKey());
 		Assert.assertEquals(foo.getKey(), foo2.getKey());
+		Assert.assertEquals(foo.getValue(), foo2.getValue());
+		Assert.assertEquals(foo.getValueExt1(), foo2.getValueExt1());
+		Assert.assertEquals(foo.getValueExt11(), foo2.getValueExt11());
 	}
+
+	/**
+	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with root type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testSimpleInheritence3() {
+		final FooExt11 foo = new FooExt11();
+		foo.setValue("Bar");
+
+		this.persist(foo);
+
+		this.commit();
+
+		this.close();
+
+		final Foo foo2 = this.find(Foo.class, foo.getKey());
+		Assert.assertTrue(foo2.getClass() != foo.getClass());
+		Assert.assertTrue(foo.getClass().isAssignableFrom(foo2.getClass()));
+
+		Assert.assertEquals(foo.getKey(), foo2.getKey());
+	}
+
 }
