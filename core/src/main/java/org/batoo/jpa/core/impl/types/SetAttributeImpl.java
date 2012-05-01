@@ -19,7 +19,7 @@
 package org.batoo.jpa.core.impl.types;
 
 import java.lang.reflect.Member;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.metamodel.ManagedType;
@@ -112,9 +112,9 @@ public final class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>,
 	@Override
 	@SuppressWarnings("unchecked")
 	public void set(Object instance, Object value) {
-		final Collection<E> collection = ((ManagedSet<E>) this.accessor.get(instance)).getCollection();
-		if (!collection.contains(value)) {
-			collection.add((E) value);
+		final HashSet<E> list = ((ManagedSet<E>) this.accessor.get(instance)).getCollection();
+		if (!list.contains(value)) {
+			list.add((E) value);
 		}
 	}
 

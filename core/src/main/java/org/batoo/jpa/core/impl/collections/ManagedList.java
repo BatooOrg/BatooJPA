@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.collections;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
@@ -34,7 +35,7 @@ import com.google.common.collect.Lists;
  */
 public class ManagedList<E> extends AbstractManagedCollection<E> implements List<E> {
 
-	private final List<E> list = Lists.newArrayList();
+	private final ArrayList<E> list = Lists.newArrayList();
 
 	/**
 	 * @param session
@@ -91,7 +92,7 @@ public class ManagedList<E> extends AbstractManagedCollection<E> implements List
 	 * 
 	 */
 	@Override
-	public Collection<E> getCollection() {
+	public ArrayList<E> getCollection() {
 		return this.list;
 	}
 

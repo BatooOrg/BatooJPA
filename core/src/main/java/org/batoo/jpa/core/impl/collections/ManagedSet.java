@@ -18,7 +18,7 @@
  */
 package org.batoo.jpa.core.impl.collections;
 
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
@@ -33,7 +33,7 @@ import com.google.common.collect.Sets;
  */
 public class ManagedSet<E> extends AbstractManagedCollection<E> implements Set<E> {
 
-	private final Set<E> set = Sets.newHashSet();
+	private final HashSet<E> set = Sets.newHashSet();
 
 	/**
 	 * @param managedInstance
@@ -55,7 +55,7 @@ public class ManagedSet<E> extends AbstractManagedCollection<E> implements Set<E
 	 * 
 	 */
 	@Override
-	public Collection<E> getCollection() {
+	public HashSet<E> getCollection() {
 		return this.set;
 	}
 

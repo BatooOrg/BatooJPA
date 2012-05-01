@@ -19,7 +19,7 @@
 package org.batoo.jpa.core.impl.types;
 
 import java.lang.reflect.Member;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.metamodel.ListAttribute;
@@ -110,9 +110,9 @@ public final class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E
 	@Override
 	@SuppressWarnings("unchecked")
 	public void set(Object instance, Object value) {
-		final Collection<E> collection = ((ManagedList<E>) this.accessor.get(instance)).getCollection();
-		if (!collection.contains(value)) {
-			collection.add((E) value);
+		final ArrayList<E> list = ((ManagedList<E>) this.accessor.get(instance)).getCollection();
+		if (!list.contains(value)) {
+			list.add((E) value);
 		}
 	}
 
