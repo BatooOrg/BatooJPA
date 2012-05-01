@@ -28,6 +28,7 @@ import java.sql.Types;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Deque;
 import java.util.List;
@@ -95,6 +96,7 @@ import org.reflections.util.FilterBuilder;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -111,7 +113,20 @@ public class TypeFactory {
 
 	public static void collect(MetamodelImpl metaModel, Reflections r, final Class<? extends Annotation> annotation)
 		throws MappingException {
-		final Set<Class<?>> types = r.getTypesAnnotatedWith(annotation);
+		final List<Class<?>> types = Lists.newArrayList(r.getTypesAnnotatedWith(annotation));
+
+		// sort the classes based on hierarchy
+		Collections.sort(types, new Comparator<Class<?>>() {
+
+			@Override
+			public int compare(Class<?> o1, Class<?> o2) {
+				if (o1.isAssignableFrom(o2)) {
+					return -1;
+				}
+
+				return 0;
+			}
+		});
 
 		for (final Class<?> type : types) {
 			TypeFactory.forType(metaModel, annotation, type);
