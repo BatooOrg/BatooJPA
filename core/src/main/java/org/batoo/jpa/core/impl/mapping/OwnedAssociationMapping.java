@@ -19,7 +19,7 @@
 package org.batoo.jpa.core.impl.mapping;
 
 import java.util.Deque;
-import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
@@ -39,7 +39,6 @@ import com.google.common.collect.Sets;
  */
 public abstract class OwnedAssociationMapping<X, T> extends AbstractMapping<X, T> implements OwnedAssociation<X, T> {
 
-	private final HashSet<CascadeType> cascadeTypes;
 	private final boolean orpanRemoval;
 
 	private final boolean eager;
@@ -71,18 +70,18 @@ public abstract class OwnedAssociationMapping<X, T> extends AbstractMapping<X, T
 		Deque<AttributeImpl<?, ?>> path, boolean orpanRemoval, boolean eager) throws MappingException {
 		super(associationType, declaringAttribute, path);
 
-		this.cascadeTypes = Sets.newHashSet(declaringAttribute.getCascadeType());
 		this.orpanRemoval = orpanRemoval;
 		this.eager = eager;
 
 		this.getOwner().addMapping(this, false);
 
-		final boolean cascadeAll = this.cascadeTypes.contains(CascadeType.ALL);
-		this.cascadeDetach = cascadeAll || this.cascadeTypes.contains(CascadeType.DETACH);
-		this.cascadeMerge = cascadeAll || this.cascadeTypes.contains(CascadeType.MERGE);
-		this.cascadePersist = cascadeAll || this.cascadeTypes.contains(CascadeType.PERSIST);
-		this.cascadeRefresh = cascadeAll || this.cascadeTypes.contains(CascadeType.REFRESH);
-		this.cascadeRemove = cascadeAll || this.cascadeTypes.contains(CascadeType.REMOVE);
+		final Set<CascadeType> cascadeTypes = Sets.newHashSet(declaringAttribute.getCascadeType());
+		final boolean cascadeAll = cascadeTypes.contains(CascadeType.ALL);
+		this.cascadeDetach = cascadeAll || cascadeTypes.contains(CascadeType.DETACH);
+		this.cascadeMerge = cascadeAll || cascadeTypes.contains(CascadeType.MERGE);
+		this.cascadePersist = cascadeAll || cascadeTypes.contains(CascadeType.PERSIST);
+		this.cascadeRefresh = cascadeAll || cascadeTypes.contains(CascadeType.REFRESH);
+		this.cascadeRemove = cascadeAll || cascadeTypes.contains(CascadeType.REMOVE);
 	}
 
 	/**

@@ -20,7 +20,7 @@ package org.batoo.jpa.core.impl.mapping;
 
 import java.util.Collection;
 import java.util.Deque;
-import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
@@ -38,10 +38,14 @@ import com.google.common.collect.Sets;
  */
 public abstract class OwnerAssociationMapping<X, T> extends AbstractPhysicalMapping<X, T> implements OwnerAssociation<X, T> {
 
-	private final HashSet<CascadeType> cascadeTypes;
 	private final boolean eager;
 
 	private OwnedAssociation<T, X> opposite;
+	private final boolean cascadeDetach;
+	private final boolean cascadeMerge;
+	private final boolean cascadePersist;
+	private final boolean cascadeRefresh;
+	private final boolean cascadeRemove;
 
 	/**
 	 * @param associationType
@@ -64,20 +68,14 @@ public abstract class OwnerAssociationMapping<X, T> extends AbstractPhysicalMapp
 		super(associationType, declaringAttribute, path, columnTemplates);
 
 		this.eager = eager;
-		this.cascadeTypes = Sets.newHashSet(declaringAttribute.getCascadeType());
-	}
 
-	private boolean cascadeAll() {
-		return this.cascadeTypes.contains(CascadeType.ALL);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public final boolean cascadeDetach() {
-		return this.cascadeAll() || this.cascadeTypes.contains(CascadeType.DETACH);
+		final Set<CascadeType> cascadeTypes = Sets.newHashSet(declaringAttribute.getCascadeType());
+		final boolean cascadeAll = cascadeTypes.contains(CascadeType.ALL);
+		this.cascadeDetach = cascadeAll || cascadeTypes.contains(CascadeType.DETACH);
+		this.cascadeMerge = cascadeAll || cascadeTypes.contains(CascadeType.MERGE);
+		this.cascadePersist = cascadeAll || cascadeTypes.contains(CascadeType.PERSIST);
+		this.cascadeRefresh = cascadeAll || cascadeTypes.contains(CascadeType.REFRESH);
+		this.cascadeRemove = cascadeAll || cascadeTypes.contains(CascadeType.REMOVE);
 	}
 
 	/**
@@ -85,8 +83,8 @@ public abstract class OwnerAssociationMapping<X, T> extends AbstractPhysicalMapp
 	 * 
 	 */
 	@Override
-	public final boolean cascadeMerge() {
-		return this.cascadeAll() || this.cascadeTypes.contains(CascadeType.MERGE);
+	public boolean cascadeDetach() {
+		return this.cascadeDetach;
 	}
 
 	/**
@@ -94,8 +92,8 @@ public abstract class OwnerAssociationMapping<X, T> extends AbstractPhysicalMapp
 	 * 
 	 */
 	@Override
-	public final boolean cascadePersist() {
-		return this.cascadeAll() || this.cascadeTypes.contains(CascadeType.PERSIST);
+	public boolean cascadeMerge() {
+		return this.cascadeMerge;
 	}
 
 	/**
@@ -103,8 +101,8 @@ public abstract class OwnerAssociationMapping<X, T> extends AbstractPhysicalMapp
 	 * 
 	 */
 	@Override
-	public final boolean cascadeRefresh() {
-		return this.cascadeAll() || this.cascadeTypes.contains(CascadeType.REFRESH);
+	public boolean cascadePersist() {
+		return this.cascadePersist;
 	}
 
 	/**
@@ -112,8 +110,17 @@ public abstract class OwnerAssociationMapping<X, T> extends AbstractPhysicalMapp
 	 * 
 	 */
 	@Override
-	public final boolean cascadeRemove() {
-		return this.cascadeAll() || this.cascadeTypes.contains(CascadeType.REMOVE);
+	public boolean cascadeRefresh() {
+		return this.cascadeRefresh;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean cascadeRemove() {
+		return this.cascadeRemove;
 	}
 
 	/**
@@ -144,6 +151,16 @@ public abstract class OwnerAssociationMapping<X, T> extends AbstractPhysicalMapp
 	@Override
 	public OwnedAssociation<T, X> getOpposite() {
 		return this.opposite;
+	}
+
+	/**
+	 * Returns the cascadeRemove.
+	 * 
+	 * @return the cascadeRemove
+	 * @since $version
+	 */
+	public boolean isCascadeRemove() {
+		return this.cascadeRemove;
 	}
 
 	/**
