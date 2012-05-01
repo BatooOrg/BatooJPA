@@ -19,12 +19,19 @@
 package org.batoo.jpa.core.impl.types;
 
 import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.IdClass;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.SecondaryTable;
+import javax.persistence.SecondaryTables;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 import javax.persistence.TableGenerator;
+import javax.persistence.UniqueConstraint;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.IdentifiableType;
 import javax.persistence.metamodel.SingularAttribute;
@@ -35,9 +42,9 @@ import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.jdbc.PhysicalTableGenerator;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
+import org.batoo.jpa.core.impl.mapping.TableTemplate;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /**
  * Implementation of {@link IdentifiableType}.
@@ -49,16 +56,24 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 
 	private static final BLogger LOG = BLogger.getLogger(IdentifiableTypeImpl.class);
 
-	protected final Map<String, SingularAttributeImpl<? super X, ?>> versionAttributes = Maps.newHashMap();
 	protected Class<?> idJavaType;
 	protected TypeImpl<?> idType;
 
-	protected SingularAttributeImpl<?, ?>[] idAttributes;
-	private SequenceGenerator sequenceGenerator;
+	protected final Map<String, TableTemplate> tableTemplates = Maps.newHashMap();
 
+	private TableTemplate primaryTableTemplate;
+
+	protected final Map<String, SingularAttributeImpl<X, ?>> declaredIdAttributes = Maps.newHashMap();
+	protected final Map<String, SingularAttributeImpl<? super X, ?>> idAttributes = Maps.newHashMap();
+
+	protected final Map<String, SingularAttributeImpl<? super X, ?>> versionAttributes = Maps.newHashMap();
+	private SequenceGenerator sequenceGenerator;
 	private TableGenerator tableGenerator;
 
 	private String tableName;
+
+	protected volatile boolean vlinked;
+	protected volatile boolean parsed;
 
 	/**
 	 * @param metaModel
@@ -81,9 +96,9 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	@Override
 	@SuppressWarnings("unchecked")
 	public <Y> SingularAttribute<X, Y> getDeclaredId(Class<Y> type) {
-		for (final SingularAttribute<? super X, ?> attribute : this.getDeclaredSingularAttributes()) {
-			if ((attribute.getJavaType() == type)) {
-				return (SingularAttribute<X, Y>) attribute;
+		for (final SingularAttribute<X, ?> singularAttribute : this.declaredIdAttributes.values()) {
+			if (singularAttribute.getJavaType() == type) {
+				return (SingularAttribute<X, Y>) singularAttribute;
 			}
 		}
 
@@ -107,7 +122,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	@Override
 	@SuppressWarnings("unchecked")
 	public <Y> SingularAttribute<? super X, Y> getId(Class<Y> type) {
-		for (final SingularAttributeImpl<?, ?> singularAttribute : this.idAttributes) {
+		for (final SingularAttribute<? super X, ?> singularAttribute : this.idAttributes.values()) {
 			if (singularAttribute.getJavaType() == type) {
 				return (SingularAttribute<? super X, Y>) singularAttribute;
 			}
@@ -122,8 +137,8 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * @return the idAttributes
 	 * @since $version
 	 */
-	public SingularAttributeImpl<?, ?>[] getIdAttributes() {
-		return this.idAttributes;
+	public Collection<SingularAttributeImpl<? super X, ?>> getIdAttributes() {
+		return this.idAttributes.values();
 	}
 
 	/**
@@ -136,14 +151,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 			return this.throwNotFound();
 		}
 
-		final Set<SingularAttribute<? super X, ?>> attributes = Sets.newHashSet();
-		for (final SingularAttribute<? super X, ?> attribute : this.getSingularAttributes()) {
-			if (attribute.isId()) {
-				attributes.add(attribute);
-			}
-		}
-
-		return attributes;
+		return new HashSet<SingularAttribute<? super X, ?>>(this.idAttributes.values());
 	}
 
 	/**
@@ -163,6 +171,16 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	@Override
 	public TypeImpl<?> getIdType() {
 		return this.idType;
+	}
+
+	/**
+	 * Returns the primaryTableTemplate.
+	 * 
+	 * @return the primaryTableTemplate
+	 * @since $version
+	 */
+	public TableTemplate getPrimaryTableTemplate() {
+		return this.primaryTableTemplate;
 	}
 
 	/**
@@ -219,6 +237,16 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	}
 
 	/**
+	 * Returns the table templates.
+	 * 
+	 * @return the table templates
+	 * @since $version
+	 */
+	public Collection<TableTemplate> getTableTemplates() {
+		return this.tableTemplates.values();
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -234,7 +262,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 */
 	@Override
 	public boolean hasSingleIdAttribute() {
-		return this.idAttributes.length == 1;
+		return this.idAttributes.size() == 1;
 	}
 
 	/**
@@ -249,11 +277,20 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	/**
 	 * {@inheritDoc}
 	 * 
+	 * @return
 	 * 
 	 */
 	@Override
-	public void parse(Set<Class<? extends Annotation>> parsed) throws BatooException {
-		super.parse(parsed);
+	public Set<Class<? extends Annotation>> parse() throws BatooException {
+		// wait till the super type is parsed
+		while ((this.getSupertype() != null) && !this.getSupertype().parsed) {
+			try {
+				Thread.sleep(1);
+			}
+			catch (final InterruptedException e) {}
+		}
+
+		final Set<Class<? extends Annotation>> parsed = super.parse();
 
 		final IdClass idClass = this.getJavaType().getAnnotation(IdClass.class);
 		if (idClass != null) {
@@ -263,6 +300,27 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 		}
 
 		this.parseGenerators(parsed);
+
+		if (this instanceof EntityTypeImpl) {
+			this.parsePrimaryTable(parsed);
+
+			this.parseSecondaryTables(parsed);
+		}
+
+		for (final Attribute<X, ?> attribute : this.setDeclaredAttributes) {
+			if (attribute instanceof SingularAttribute) {
+				final SingularAttributeImpl<X, ?> singularAttribute = (SingularAttributeImpl<X, ?>) attribute;
+
+				this.declaredAttributes.put(singularAttribute.getName(), singularAttribute);
+				this.setDeclaredAttributes.add(singularAttribute);
+
+				if (singularAttribute.isId()) {
+					this.declaredIdAttributes.put(singularAttribute.getName(), singularAttribute);
+				}
+			}
+		}
+
+		return parsed;
 	}
 
 	private void parseGenerators(Set<Class<? extends Annotation>> parsed) throws MappingException {
@@ -299,6 +357,75 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 		}
 	}
 
+	protected void parsePrimaryTable(final Set<Class<? extends Annotation>> annotations) throws MappingException {
+		final Table table = this.getJavaType().getAnnotation(Table.class);
+		if (table != null) {
+			this.putTable(true, table.schema(), table.name(), table.uniqueConstraints(), null);
+
+			annotations.add(Table.class);
+		}
+		else if (((EntityTypeImpl<X>) this).getTopType().getPrimaryTableTemplate() == null) {
+			this.putTable(true, "", this.name, null, null);
+		}
+	}
+
+	private void parseSecondaryTables(final Set<Class<? extends Annotation>> annotations) throws MappingException {
+		final SecondaryTables secondaryTables = this.getJavaType().getAnnotation(SecondaryTables.class);
+		if (secondaryTables != null) {
+			for (final SecondaryTable secondaryTable : secondaryTables.value()) {
+				this.putTable(false, secondaryTable.schema(), secondaryTable.name(), secondaryTable.uniqueConstraints(),
+					secondaryTable.pkJoinColumns());
+			}
+
+			annotations.add(SecondaryTables.class);
+		}
+
+		final SecondaryTable secondaryTable = this.getJavaType().getAnnotation(SecondaryTable.class);
+		if (secondaryTable != null) {
+			this.putTable(false, secondaryTable.schema(), secondaryTable.name(), secondaryTable.uniqueConstraints(),
+				secondaryTable.pkJoinColumns());
+
+			annotations.add(SecondaryTable.class);
+		}
+	}
+
+	/**
+	 * Adds the table to the list of the tables this entity has. may not be blank
+	 * 
+	 * @param primary
+	 *            if the table is primary
+	 * @param schema
+	 *            the name of the schema, may be null
+	 * @param name
+	 *            the name of the table
+	 * @param uniqueConstraints
+	 *            the unique constraints
+	 * @param primaryKeyJoinColumns
+	 *            the primary key join columns, only required for secondary tables.
+	 * @throws MappingException
+	 *             thrown in case of a mapping error
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void putTable(boolean primary, String schema, String name, UniqueConstraint[] uniqueConstraints,
+		PrimaryKeyJoinColumn[] primaryKeyJoinColumns) throws MappingException {
+		if (StringUtils.isBlank(name)) {
+			throw new MappingException("Table name cannot be null, spesified on " + this.javaType);
+		}
+
+		TableTemplate table;
+		if (primary) {
+			table = new TableTemplate(this, schema, name, uniqueConstraints);
+			this.primaryTableTemplate = table;
+		}
+		else {
+			table = new TableTemplate(this, schema, name, uniqueConstraints, primaryKeyJoinColumns);
+		}
+
+		this.tableTemplates.put(schema + "." + name, table);
+	}
+
 	/**
 	 * Sets the idJavaType.
 	 * 
@@ -321,13 +448,25 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * @author hceylan
 	 */
 	public void vlink() throws BatooException {
+		// Sleep till the parent is done
+		while ((this.getSupertype() != null) && !this.getSupertype().vlinked) {
+			try {
+				Thread.sleep(1);
+			}
+			catch (final InterruptedException e) {}
+		}
+
 		LOG.debug("Vertically linking {0}", this);
+
+		this.attributes.putAll(this.declaredAttributes);
+		this.setAttributes.addAll(this.setDeclaredAttributes);
+		this.idAttributes.putAll(this.declaredIdAttributes);
 
 		final IdentifiableTypeImpl<? super X> supertype = this.getSupertype();
 		if (supertype instanceof MappedSuperclassTypeImpl) {
 
 			// inherit attributes
-			for (final Attribute<?, ?> superAttribute : supertype.attributes.values()) {
+			for (final Attribute<?, ?> superAttribute : supertype.setAttributes) {
 				if (this.attributes.containsKey(superAttribute.getName())) {
 					continue;
 				}
@@ -335,19 +474,20 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 				final AttributeImpl<X, ?> attribute = ((AttributeImpl<?, ?>) superAttribute).clone((EntityTypeImpl<X>) this);
 
 				this.attributes.put(attribute.getName(), attribute);
+				this.setAttributes.add(attribute);
+
+				// TODO Check id conflict
+				if (attribute instanceof SingularAttributeImpl) {
+					final SingularAttributeImpl<X, ?> singularAttribute = (SingularAttributeImpl<X, ?>) attribute;
+					if (singularAttribute.isId()) {
+						this.idAttributes.put(singularAttribute.getName(), singularAttribute);
+					}
+				}
 			}
 
 			this.idJavaType = supertype.idJavaType;
 			this.idType = supertype.idType;
 		}
 
-		final Set<SingularAttribute<? super X, ?>> idAttributes = Sets.newHashSet();
-		for (final SingularAttribute<? super X, ?> attribute : this.getSingularAttributes()) {
-			if (attribute.isId()) {
-				idAttributes.add(attribute);
-			}
-		}
-		this.idAttributes = new SingularAttributeImpl[idAttributes.size()];
-		idAttributes.toArray(this.idAttributes);
 	}
 }

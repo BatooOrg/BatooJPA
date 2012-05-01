@@ -45,7 +45,6 @@ import org.batoo.jpa.core.impl.mapping.TypeFactory;
 import org.batoo.jpa.core.impl.reflect.ReflectHelper;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -60,6 +59,10 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	private static final BLogger LOG = BLogger.getLogger(ManagedTypeImpl.class);
 
 	protected final Map<String, Attribute<? super X, ?>> attributes = Maps.newHashMap();
+	protected final Set<Attribute<? super X, ?>> setAttributes = Sets.newHashSet();
+
+	protected final Map<String, Attribute<X, ?>> declaredAttributes = Maps.newHashMap();
+	protected final Set<Attribute<X, ?>> setDeclaredAttributes = Sets.newHashSet();
 
 	final Constructor<X> constructor;
 	private Set<PluralAttribute<? super X, ?, ?>> plurals;
@@ -101,7 +104,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 */
 	@Override
 	public Set<Attribute<? super X, ?>> getAttributes() {
-		return Sets.newHashSet(this.attributes.values());
+		return this.setAttributes;
 	}
 
 	/**
@@ -141,12 +144,11 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public Attribute<X, ?> getDeclaredAttribute(String name) {
-		final Attribute<? super X, ?> attribute = this.attributes.get(name);
+		final Attribute<X, ?> attribute = this.declaredAttributes.get(name);
 
-		if ((attribute != null) && (attribute.getDeclaringType() == this)) {
-			return (Attribute<X, ?>) attribute;
+		if (attribute != null) {
+			return attribute;
 		}
 
 		return this.throwNotFound();
@@ -157,16 +159,8 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public Set<Attribute<X, ?>> getDeclaredAttributes() {
-		final Set<Attribute<X, ?>> attributes = Sets.newHashSet();
-		for (final Attribute<? super X, ?> attribute : this.attributes.values()) {
-			if (attribute.getDeclaringType() == this) {
-				attributes.add((Attribute<X, ?>) attribute);
-			}
-		}
-
-		return attributes;
+		return this.setDeclaredAttributes;
 	}
 
 	/**
@@ -272,14 +266,20 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	@Override
 	@SuppressWarnings("unchecked")
 	public Set<PluralAttribute<X, ?, ?>> getDeclaredPluralAttributes() {
-		final Set<PluralAttribute<X, ?, ?>> attributes = Sets.newHashSet();
-		for (final Attribute<? super X, ?> attribute : this.attributes.values()) {
-			if ((attribute instanceof PluralAttribute) && (attribute.getDeclaringType() == this)) {
-				attributes.add((PluralAttribute<X, ?, ?>) attribute);
-			}
-		}
+		final Predicate<? super Attribute<X, ?>> predicate = new Predicate<Attribute<X, ?>>() {
 
-		return attributes;
+			@Override
+			public boolean apply(Attribute<X, ?> input) {
+				return input instanceof PluralAttribute;
+			}
+		};
+
+		final Set<Attribute<X, ?>> set = Sets.filter(this.setDeclaredAttributes, predicate);
+
+		final Set<PluralAttribute<X, ?, ?>> plurals = Sets.newHashSet();
+		plurals.addAll((Collection<? extends PluralAttribute<X, ?, ?>>) set);
+
+		return plurals;
 	}
 
 	/**
@@ -352,14 +352,20 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	@Override
 	@SuppressWarnings("unchecked")
 	public Set<SingularAttribute<X, ?>> getDeclaredSingularAttributes() {
-		final Set<SingularAttribute<X, ?>> attributes = Sets.newHashSet();
-		for (final Attribute<? super X, ?> attribute : this.getDeclaredAttributes()) {
-			if ((attribute instanceof SingularAttributeImpl) && (attribute.getDeclaringType() == this)) {
-				attributes.add((SingularAttribute<X, ?>) attribute);
-			}
-		}
+		final Predicate<? super Attribute<X, ?>> predicate = new Predicate<Attribute<X, ?>>() {
 
-		return attributes;
+			@Override
+			public boolean apply(Attribute<X, ?> input) {
+				return input instanceof SingularAttribute;
+			}
+		};
+
+		final Set<Attribute<X, ?>> set = Sets.filter(this.setDeclaredAttributes, predicate);
+
+		final Set<SingularAttribute<X, ?>> singulars = Sets.newHashSet();
+		singulars.addAll((Collection<? extends SingularAttribute<X, ?>>) set);
+
+		return singulars;
 	}
 
 	protected Constructor<X> getDefaultConstructor(final Class<X> javaType) throws MappingException {
@@ -480,7 +486,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 			}
 		};
 
-		final Collection<Attribute<? super X, ?>> set = Collections2.filter(this.attributes.values(), predicate);
+		final Set<Attribute<? super X, ?>> set = Sets.filter(this.setAttributes, predicate);
 
 		this.plurals = Sets.newHashSet();
 		this.plurals.addAll((Collection<? extends PluralAttribute<X, ?, ?>>) set);
@@ -566,7 +572,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 			}
 		};
 
-		final Collection<Attribute<? super X, ?>> set = Collections2.filter(this.attributes.values(), predicate);
+		final Set<Attribute<? super X, ?>> set = Sets.filter(this.setAttributes, predicate);
 
 		final Set<SingularAttribute<? super X, ?>> plurals = Sets.newHashSet();
 		plurals.addAll((Collection<? extends SingularAttribute<X, ?>>) set);
@@ -596,15 +602,14 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	/**
 	 * Parses the meta data of the type.
 	 * 
-	 * @param parsed
-	 *            the set of annotations parsed
+	 * @return the set pf annotations parsed
 	 * @throws BatooException
 	 *             thrown in case of a mapping error
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void parse(Set<Class<? extends Annotation>> parsed) throws BatooException {
+	public Set<Class<? extends Annotation>> parse() throws BatooException {
 		LOG.info("Parsing type {0}", this.getJavaType());
 
 		final Field[] fields = AccessController.doPrivileged(new PrivilegedAction<Field[]>() {
@@ -634,8 +639,11 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 
 			LOG.debug("Found {0}.{1} {2}", this.getJavaType().getSimpleName(), field.getName(), attribute);
 
-			this.attributes.put(field.getName(), attribute);
+			this.declaredAttributes.put(field.getName(), attribute);
+			this.setDeclaredAttributes.add(attribute);
 		}
+
+		return Sets.newHashSet();
 	}
 
 	protected void performClassChecks(final Class<X> type) throws MappingException {

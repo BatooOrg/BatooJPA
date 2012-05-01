@@ -35,7 +35,7 @@ import com.google.common.collect.Maps;
  */
 public class SubRepository<X> {
 
-	private final Map<ManagedId<X>, ManagedInstance<? extends X>> repository = Maps.newHashMap();
+	private final Map<ManagedId<? extends X>, ManagedInstance<? extends X>> repository = Maps.newHashMap();
 
 	/**
 	 * 
@@ -56,7 +56,7 @@ public class SubRepository<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public synchronized ManagedInstance<? extends X> get(ManagedId<X> id) {
+	public synchronized ManagedInstance<? extends X> get(ManagedId<? extends X> id) {
 		return this.repository.get(id);
 	}
 
@@ -73,7 +73,7 @@ public class SubRepository<X> {
 	 */
 	@SuppressWarnings("unchecked")
 	public synchronized void put(ManagedInstance<? extends X> instance) {
-		final ManagedId<X> id = (ManagedId<X>) instance.getId();
+		final ManagedId<? extends X> id = (ManagedId<? extends X>) instance.getId();
 		final ManagedInstance<? extends X> old = this.repository.put(id, instance);
 
 		if ((old != null) && instance.equals(old)) {

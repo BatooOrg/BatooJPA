@@ -57,18 +57,13 @@ public final class InstanceInvoker<X> implements Invoker {
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public static <X> X createInvoker(ClassLoader classLoader, EntityTypeImpl<X> type, SessionImpl session, ManagedId<X> managedId) {
-		final InstanceInvoker<X> invoker = new InstanceInvoker<X>(type, session, managedId);
-
-		final X proxy = (X) new JavassistProxyFactory().createInvokerProxy(classLoader, invoker, new Class[] { type.getJavaType(),
-			EnhancedInstance.class });
-		managedId.setInstance(proxy);
-
-		return proxy;
+	public static <X> X createInvoker(ClassLoader classLoader, EntityTypeImpl<X> type, SessionImpl session, ManagedId<? super X> managedId) {
+		return (X) new JavassistProxyFactory().createInvokerProxy(classLoader, new InstanceInvoker<X>(type, session, managedId.getId(),
+			(X) managedId.getInstance()), new Class[] { type.getJavaType(), EnhancedInstance.class });
 	}
 
 	private final EntityTypeImpl<X> type;
-	private final ManagedId<X> id;
+	private final Object id;
 	private final X instance;
 	private final SessionImpl session;
 
@@ -76,12 +71,12 @@ public final class InstanceInvoker<X> implements Invoker {
 
 	private boolean initialized;
 
-	private InstanceInvoker(EntityTypeImpl<X> type, SessionImpl session, ManagedId<X> id) {
+	private InstanceInvoker(EntityTypeImpl<X> type, SessionImpl session, Object id, X instance) {
 		super();
 
 		this.type = type;
 		this.id = id;
-		this.instance = id.getInstance();
+		this.instance = instance;
 		this.session = session;
 	}
 
@@ -114,7 +109,7 @@ public final class InstanceInvoker<X> implements Invoker {
 			}
 
 			if (methodName.startsWith("get") && (methodName.length() > 3)) { // check if id method
-				for (final SingularAttributeImpl<?, ?> attribute : this.type.getIdAttributes()) {
+				for (final SingularAttributeImpl<? super X, ?> attribute : this.type.getIdAttributes()) {
 					if (attribute.getGetterName().equals(method.getName())) {
 						this.idMethods.add(methodName);
 						return method.invoke(this.instance, arguments);
@@ -123,7 +118,7 @@ public final class InstanceInvoker<X> implements Invoker {
 			}
 		}
 
-		this.session.getEntityManager().find(this.type.getJavaType(), this.id.getId());
+		this.session.getEntityManager().find(this.type.getJavaType(), this.id);
 		this.initialized = true;
 
 		return method.invoke(this.instance, arguments);

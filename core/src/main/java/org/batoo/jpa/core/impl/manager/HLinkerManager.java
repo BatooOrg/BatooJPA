@@ -18,11 +18,23 @@
  */
 package org.batoo.jpa.core.impl.manager;
 
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.persistence.metamodel.EntityType;
+
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+
+import com.google.common.collect.Lists;
 
 /**
  * A Manager that links persistent classes horizontally
@@ -30,35 +42,99 @@ import org.batoo.jpa.core.impl.types.EntityTypeImpl;
  * @author hceylan
  * @since $version
  */
-public class HLinkerManager extends DeploymentManager<EntityTypeImpl<?>> {
+public class HLinkerManager extends DeploymentManager {
+
+	private class LinkerThreadFactory implements ThreadFactory {
+
+		@Override
+		public Thread newThread(Runnable r) {
+			return new Thread(r, "Batoo Linker [" + HLinkerManager.this.nextThreadNo.incrementAndGet() + "]");
+		}
+	}
+
+	private class LinkTask implements Runnable {
+
+		private final EntityTypeImpl<?> entity;
+		private final boolean basic;
+
+		private LinkTask(EntityTypeImpl<?> entity, boolean basic) {
+			this.entity = entity;
+			this.basic = basic;
+		}
+
+		@Override
+		public void run() {
+			try {
+				this.entity.link(HLinkerManager.this.datasource, this.basic);
+			}
+			catch (final Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
 
 	private static final BLogger LOG = BLogger.getLogger(HLinkerManager.class);
 
 	public static void link(MetamodelImpl metamodel, DataSourceImpl datasource) throws BatooException {
-		new HLinkerManager(metamodel, datasource, true).perform();
-		new HLinkerManager(metamodel, datasource, false).perform();
+		new HLinkerManager(metamodel, datasource, true).link();
+		new HLinkerManager(metamodel, datasource, false).link();
 	}
 
-	private final boolean firstPass;
-
+	private final AtomicInteger nextThreadNo = new AtomicInteger(0);
+	private final ThreadPoolExecutor executer;
+	private final MetamodelImpl metamodel;
 	private final DataSourceImpl datasource;
+	private final boolean basic;
 
-	public HLinkerManager(MetamodelImpl metamodel, DataSourceImpl datasource, boolean firstPass) {
-		super(LOG, "HLinker", metamodel, Context.ENTITIES);
+	private HLinkerManager(MetamodelImpl metamodel, DataSourceImpl datasource, boolean basic) {
+		super();
 
+		this.metamodel = metamodel;
 		this.datasource = datasource;
-		this.firstPass = firstPass;
+		this.basic = basic;
+
+		final int nThreads = Runtime.getRuntime().availableProcessors() * 2;
+		this.executer = (ThreadPoolExecutor) Executors.newFixedThreadPool(nThreads, new LinkerThreadFactory());
+
+		LOG.debug("Number of linker threads is {0}", nThreads);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Void perform(EntityTypeImpl<?> type) throws BatooException {
-		type.link(this.datasource, this.firstPass);
+	private void link() throws BatooException {
+		final long start = System.currentTimeMillis();
 
-		return null;
+		final Set<EntityType<?>> entities = this.metamodel.getEntities();
+		final List<Future<?>> futures = this.linkTypes(entities);
+
+		try {
+			this.link(futures);
+		}
+		finally {
+			this.executer.shutdownNow();
+		}
+
+		LOG.debug("Horizontal linking took {0} msecs", System.currentTimeMillis() - start);
+	}
+
+	private void link(final List<Future<?>> futures) throws BatooException {
+		for (final Future<?> future : futures) {
+			try {
+				future.get();
+			}
+			catch (final Throwable t) {
+				this.handleException(t);
+			}
+		}
+	}
+
+	private List<Future<?>> linkTypes(Set<EntityType<?>> entities) {
+		final List<Future<?>> futures = Lists.newArrayList();
+
+		for (final EntityType<?> entity : entities) {
+			final Future<?> future = this.executer.submit(new LinkTask((EntityTypeImpl<?>) entity, this.basic));
+			futures.add(future);
+		}
+
+		return futures;
 	}
 
 }

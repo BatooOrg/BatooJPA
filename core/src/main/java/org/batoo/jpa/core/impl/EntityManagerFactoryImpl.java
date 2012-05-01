@@ -41,7 +41,7 @@ import javax.persistence.metamodel.SingularAttribute;
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.JPASettings;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
-import org.batoo.jpa.core.impl.manager.DdlManager;
+import org.batoo.jpa.core.impl.manager.DDLManager;
 import org.batoo.jpa.core.impl.manager.HLinkerManager;
 import org.batoo.jpa.core.impl.manager.ParserManager;
 import org.batoo.jpa.core.impl.manager.VLinkerManager;
@@ -56,7 +56,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /**
  * @author hceylan
@@ -123,19 +122,13 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		VLinkerManager.link(this.metamodel); // vlink
 		HLinkerManager.link(this.metamodel, this.datasource); // hlink
 		this.metamodel.linkAssociations();
-
 		// ddl
 		if (ddlMode == DDLMode.NONE) {
 			LOG.info("Configured DDL mode is {0}. Skiping DDL operations...", ddlMode);
 		}
 		else {
 			LOG.info("Configured DDL mode is {0}", ddlMode);
-
-			final Set<String> schemas = Sets.newHashSet();
-			this.metamodel.performSequencesDdl(schemas, this.datasource, ddlMode);
-			this.metamodel.performGeneratorTablesDdl(schemas, this.datasource, ddlMode);
-
-			DdlManager.perform(this.datasource, this.metamodel, schemas, ddlMode);
+			DDLManager.perform(this.datasource, this.metamodel, ddlMode);
 		}
 
 		this.open = true;
@@ -172,7 +165,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		this.assertOpen();
 
 		this.datasource.close();
-		this.metamodel.getIdGeneratorExecutor().shutdown();
 
 		this.open = false;
 	}

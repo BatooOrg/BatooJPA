@@ -41,4 +41,13 @@ public class OwnedAssociateResolver extends AbstractResolver {
 		super(mapping, instance);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isAssociateResolver() {
+		return true;
+	}
+
 }

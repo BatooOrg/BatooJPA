@@ -22,6 +22,7 @@ import java.lang.annotation.Annotation;
 import java.util.Set;
 
 import javax.persistence.Embeddable;
+import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.EmbeddableType;
 
 import org.batoo.jpa.core.BatooException;
@@ -53,6 +54,27 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	}
 
 	/**
+	 * Returns if this type directly or transitively embeds the <code>type</code>.
+	 * 
+	 * @param type
+	 *            the embeddablable type
+	 * @return true if embeds
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean embeds(EmbeddableTypeImpl<?> type) {
+		for (final Attribute<? super X, ?> attribute : this.setAttributes) {
+			final boolean embeds = ((AttributeImpl<?, ?>) attribute).embeds(type);
+			if (embeds) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -75,8 +97,8 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	 * 
 	 */
 	@Override
-	public void parse(Set<Class<? extends Annotation>> parsed) throws BatooException {
-		super.parse(parsed);
+	public Set<Class<? extends Annotation>> parse() throws BatooException {
+		final Set<Class<? extends Annotation>> annotations = super.parse();
 
 		final Class<X> type = this.getJavaType();
 
@@ -84,9 +106,11 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 		if (embeddable == null) {
 			throw new MappingException("Type is not an embeddable " + type);
 		}
-		parsed.add(Embeddable.class);
+		annotations.add(Embeddable.class);
 
 		this.performClassChecks(type);
+
+		return annotations;
 	}
 
 	/**
@@ -95,6 +119,6 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	 */
 	@Override
 	public String toString() {
-		return "EmbeddableTypeImpl [name=" + this.name + ", attributes=" + this.getAttributes() + "]";
+		return "EmbeddableTypeImpl [name=" + this.name + ", attributes=" + this.attributes + "]";
 	}
 }

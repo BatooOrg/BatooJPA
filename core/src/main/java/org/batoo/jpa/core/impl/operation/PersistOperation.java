@@ -27,7 +27,6 @@ import javax.persistence.EntityExistsException;
 import org.batoo.jpa.core.impl.EntityManagerImpl;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
-import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
 import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.mapping.CollectionMapping;
@@ -113,13 +112,10 @@ public class PersistOperation<X> extends AbstractOperation<X> {
 	 */
 	@Override
 	protected boolean prepare(SessionImpl session) {
-		final ManagedId<X> managedId = this.type.getManagedIdForInstance(session, this.instance);
-		if (managedId.getId() != null) {
-			this.managedInstance = this.em.getSession().get(managedId);
-		}
+		this.managedInstance = this.em.getSession().get(this.instance);
 
 		if (this.managedInstance == null) {
-			this.managedInstance = this.type.newInstanceWithId(session, managedId, false);
+			this.managedInstance = this.type.getManagedInstance(session, this.instance);
 			this.managedInstance.setStatus(Status.NEW);
 		}
 
@@ -148,15 +144,6 @@ public class PersistOperation<X> extends AbstractOperation<X> {
 			default: // DETACHED, for detached entities exception thrown
 				throw new EntityExistsException("Entity has been previously detached");
 		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String toString() {
-		return "PersistOperation [managedInstance=" + this.managedInstance + "]";
 	}
 
 }
