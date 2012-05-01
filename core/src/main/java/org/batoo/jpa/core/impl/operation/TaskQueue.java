@@ -19,15 +19,12 @@
 package org.batoo.jpa.core.impl.operation;
 
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Deque;
 import java.util.Iterator;
-import java.util.concurrent.ExecutorService;
+import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.EntityManager;
 
-import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.impl.EntityManagerImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
@@ -44,14 +41,14 @@ import com.google.common.collect.Lists;
  */
 public class TaskQueue {
 
-	private static final BLogger LOG = BLogger.getLogger(TaskQueue.class);
+	// private static final BLogger LOG = BLogger.getLogger(TaskQueue.class);
 
 	private static AtomicInteger nextNo = new AtomicInteger();
 
-	private final Integer no = nextNo.incrementAndGet();
-	private final Deque<AbstractOperation<?>> queue = Lists.newLinkedList();
+	// private final Integer no = nextNo.incrementAndGet();
+	private final LinkedList<AbstractOperation<?>> queue = Lists.newLinkedList();
 
-	private final ExecutorService executor;
+	// private final ExecutorService executor;
 
 	/**
 	 * 
@@ -61,7 +58,7 @@ public class TaskQueue {
 	public TaskQueue(EntityManagerImpl entityManager) {
 		super();
 
-		this.executor = entityManager.getEntityManagerFactory().getExecutor();
+		// this.executor = entityManager.getEntityManagerFactory().getExecutor();
 	}
 
 	/**
@@ -89,13 +86,13 @@ public class TaskQueue {
 	 */
 	public void flush(final Connection connection) throws BatooException {
 		// get the operations
-		final ArrayList<AbstractOperation<?>> operations = new ArrayList<AbstractOperation<?>>(this.queue);
+		// final ArrayList<AbstractOperation<?>> operations = new ArrayList<AbstractOperation<?>>(this.queue);
 
 		// sort the operations based on their dependencies
 		// Collections.sort(operations);
 
 		// final List<Future<?>> futures = Lists.newArrayList();
-		for (final AbstractOperation<?> operation : operations) {
+		for (final AbstractOperation<?> operation : this.queue) {
 			// futures.add(this.executor.submit(new Runnable() {
 			//
 			// @Override

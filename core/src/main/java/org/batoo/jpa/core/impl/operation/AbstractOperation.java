@@ -22,11 +22,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.batoo.jpa.core.BJPASettings;
-import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.impl.EntityManagerImpl;
-import org.batoo.jpa.core.impl.OperationTookLongTimeWarning;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.mapping.Association;
@@ -42,13 +39,13 @@ import com.google.common.collect.Lists;
  */
 public abstract class AbstractOperation<X> {
 
-	private enum Status {
-		PENDING,
-		COMPLETED,
-		ERRORED
-	}
+	// private enum Status {
+	// PENDING,
+	// COMPLETED,
+	// ERRORED
+	// }
 
-	private static final BLogger LOG = BLogger.getLogger(AbstractOperation.class);
+	// private static final BLogger LOG = BLogger.getLogger(AbstractOperation.class);
 
 	private static volatile long nextOperationNo = 0;
 
@@ -60,8 +57,8 @@ public abstract class AbstractOperation<X> {
 
 	private long operationNo;
 
-	private final List<AbstractOperation<?>> dependencies = Lists.newArrayList();
-	private Status status;
+	// private final List<AbstractOperation<?>> dependencies = Lists.newArrayList();
+	// private Status status;
 
 	private int h;
 
@@ -95,7 +92,7 @@ public abstract class AbstractOperation<X> {
 
 		this.em = entityManager;
 		this.instance = instance;
-		this.status = Status.PENDING;
+		// this.status = Status.PENDING;
 		this.type = this.em.getMetamodel().entity((Class<X>) instance.getClass());
 
 		this.operationNo = nextOperationNo++;
@@ -229,14 +226,14 @@ public abstract class AbstractOperation<X> {
 	public final void run(Connection connection) {
 		// wait till dependencies satisfied
 		try {
-			final AbstractOperation<?> failed = this.waitForDependencies();
-			if (failed != null) {
-				LOG.debug("{0}: dependency {1} failed, bailing out.", this, failed);
-
-				this.status = Status.ERRORED;
-
-				return;
-			}
+			// final AbstractOperation<?> failed = this.waitForDependencies();
+			// if (failed != null) {
+			// LOG.debug("{0}: dependency {1} failed, bailing out.", this, failed);
+			//
+			// this.status = Status.ERRORED;
+			//
+			// return;
+			// }
 
 			try {
 				this.perform(connection);
@@ -246,7 +243,7 @@ public abstract class AbstractOperation<X> {
 			}
 		}
 		catch (final BatooException e) {
-			this.status = Status.ERRORED;
+			// this.status = Status.ERRORED;
 
 			throw new RuntimeException(e);
 		}
@@ -262,48 +259,48 @@ public abstract class AbstractOperation<X> {
 		this.requiresFlush = true;
 	}
 
-	private void waitForDependecy(AbstractOperation<?> dependecy) throws InterruptedException {
-		final long start = System.currentTimeMillis();
-
-		LOG.debug("{0}: waitForDependecy(AbstractOperation), {1}...", this, dependecy);
-
-		try {
-			while (dependecy.status == Status.PENDING) {
-				Thread.sleep(1);
-			}
-		}
-		finally {
-			final long time = System.currentTimeMillis() - start;
-
-			if (time > BJPASettings.WARN_TIME) {
-				LOG.warn(new OperationTookLongTimeWarning(), "{0}: {1} msecs, waitForDependecy(AbstractOperation), {2}...", this, time,
-					dependecy);
-			}
-			else {
-				LOG.debug("{0}: {1} msecs, waitForDependecy(AbstractOperation), {2}...", this, time, dependecy);
-			}
-		}
-	}
-
-	private AbstractOperation<?> waitForDependencies() throws BatooException {
-		for (final AbstractOperation<?> dependecy : this.dependencies) {
-			if (dependecy.status == Status.PENDING) {
-				try {
-					this.waitForDependecy(dependecy);
-				}
-				catch (final InterruptedException e) {
-					throw new BatooException(e);
-				}
-			}
-
-			if (dependecy.status == Status.ERRORED) {
-				LOG.debug("{0}: Dependency {1} has status error, skipping execution", this, dependecy);
-
-				return dependecy;
-			}
-		}
-
-		return null;
-	}
+	// private void waitForDependecy(AbstractOperation<?> dependecy) throws InterruptedException {
+	// final long start = System.currentTimeMillis();
+	//
+	// LOG.debug("{0}: waitForDependecy(AbstractOperation), {1}...", this, dependecy);
+	//
+	// try {
+	// while (dependecy.status == Status.PENDING) {
+	// Thread.sleep(1);
+	// }
+	// }
+	// finally {
+	// final long time = System.currentTimeMillis() - start;
+	//
+	// if (time > BJPASettings.WARN_TIME) {
+	// LOG.warn(new OperationTookLongTimeWarning(), "{0}: {1} msecs, waitForDependecy(AbstractOperation), {2}...", this, time,
+	// dependecy);
+	// }
+	// else {
+	// LOG.debug("{0}: {1} msecs, waitForDependecy(AbstractOperation), {2}...", this, time, dependecy);
+	// }
+	// }
+	// }
+	//
+	// private AbstractOperation<?> waitForDependencies() throws BatooException {
+	// for (final AbstractOperation<?> dependecy : this.dependencies) {
+	// if (dependecy.status == Status.PENDING) {
+	// try {
+	// this.waitForDependecy(dependecy);
+	// }
+	// catch (final InterruptedException e) {
+	// throw new BatooException(e);
+	// }
+	// }
+	//
+	// if (dependecy.status == Status.ERRORED) {
+	// LOG.debug("{0}: Dependency {1} has status error, skipping execution", this, dependecy);
+	//
+	// return dependecy;
+	// }
+	// }
+	//
+	// return null;
+	// }
 
 }

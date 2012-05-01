@@ -62,8 +62,8 @@ public class PersistOperation<X> extends AbstractOperation<X> {
 	 * {@inheritDoc}
 	 * 
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected List<AbstractOperation<?>> cascade(Association<?, ?> association) {
 		final List<AbstractOperation<?>> cascades = Lists.newArrayList();
 
