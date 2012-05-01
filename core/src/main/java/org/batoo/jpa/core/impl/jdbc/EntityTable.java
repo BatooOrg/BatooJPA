@@ -49,7 +49,7 @@ public final class EntityTable extends AbstractTable {
 	private PhysicalColumn primaryKey;
 
 	/**
-	 * @param owner
+	 * @param type
 	 *            the owner entity
 	 * @param template
 	 *            the template for the table
@@ -58,8 +58,8 @@ public final class EntityTable extends AbstractTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EntityTable(EntityTypeImpl<?> owner, TableTemplate template, JDBCAdapter jdbcAdapter) throws MappingException {
-		super(owner, template.getSchema(), template.getName() != null ? template.getName() : owner.getName(),
+	public EntityTable(EntityTypeImpl<?> type, TableTemplate template, JDBCAdapter jdbcAdapter) throws MappingException {
+		super(type, template.getSchema(), template.getName() != null ? template.getName() : type.getName(),
 			template.getUniqueConstraints(), jdbcAdapter);
 
 		this.primary = template.isPrimary();

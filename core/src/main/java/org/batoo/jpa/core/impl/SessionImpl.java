@@ -145,6 +145,6 @@ public class SessionImpl {
 	 * @return
 	 */
 	public <X> void put(ManagedInstance<X> managedInstance) {
-		this.repository.get(managedInstance.getType().getTopType()).put(managedInstance);
+		this.repository.get(managedInstance.getType().getIdentityRoot()).put(managedInstance);
 	}
 }

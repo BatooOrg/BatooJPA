@@ -79,18 +79,15 @@ import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.types.AttributeImpl;
-import org.batoo.jpa.core.impl.types.ChildEntityTypeImpl;
 import org.batoo.jpa.core.impl.types.CollectionAttributeImpl;
 import org.batoo.jpa.core.impl.types.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
-import org.batoo.jpa.core.impl.types.ExtendingEntityTypeImpl;
 import org.batoo.jpa.core.impl.types.ListAttributeImpl;
 import org.batoo.jpa.core.impl.types.ManagedTypeImpl;
 import org.batoo.jpa.core.impl.types.MapAttributeImpl;
 import org.batoo.jpa.core.impl.types.MappedSuperclassTypeImpl;
 import org.batoo.jpa.core.impl.types.SetAttributeImpl;
 import org.batoo.jpa.core.impl.types.SingularAttributeImpl;
-import org.batoo.jpa.core.impl.types.TopEntityTypeImpl;
 import org.batoo.jpa.core.jdbc.IdType;
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
@@ -433,7 +430,7 @@ public class TypeFactory {
 			// is the type extending a mapped super class
 			try {
 				final MappedSuperclassTypeImpl<?> superclass = metaModel.mappedSuperclass(type);
-				new ExtendingEntityTypeImpl(metaModel, superclass, type);
+				new EntityTypeImpl(metaModel, superclass, type);
 				return;
 			}
 			catch (final Exception e) {}
@@ -441,13 +438,13 @@ public class TypeFactory {
 			// is the class extending another entity
 			try {
 				final EntityTypeImpl<?> superclass = metaModel.entity(type);
-				new ChildEntityTypeImpl(metaModel, superclass, type);
+				new EntityTypeImpl(metaModel, superclass, type);
 				return;
 			}
 			catch (final Exception e) {}
 
 			// top type class
-			new TopEntityTypeImpl(metaModel, type);
+			new EntityTypeImpl(metaModel, null, type);
 		}
 
 		if (annotation == MappedSuperclass.class) {

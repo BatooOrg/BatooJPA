@@ -57,7 +57,7 @@ public class Repository {
 	 */
 	@SuppressWarnings("unchecked")
 	public <X> SubRepository<X> get(EntityTypeImpl<X> type) {
-		final EntityTypeImpl<? super X> supr = type.getTopType();
+		final EntityTypeImpl<? super X> supr = type.getIdentityRoot();
 
 		SubRepository<X> subRepository = (SubRepository<X>) this.subRepositories.get(supr);
 

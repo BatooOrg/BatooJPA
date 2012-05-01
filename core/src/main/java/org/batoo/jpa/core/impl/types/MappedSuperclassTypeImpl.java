@@ -92,7 +92,7 @@ public class MappedSuperclassTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 	 * 
 	 */
 	@Override
-	public void vlink() throws BatooException {
+	public void vlink() throws MappingException {
 		LOG.debug("Vertically linking {0}", this);
 
 		if (this.getSupertype() != null) {
@@ -112,6 +112,6 @@ public class MappedSuperclassTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 			this.idType = this.getSupertype().idType;
 		}
 
-		super.vlink();
+		this.prepareIdAttributes();
 	}
 }

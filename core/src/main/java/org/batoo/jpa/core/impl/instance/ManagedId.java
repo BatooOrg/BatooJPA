@@ -67,7 +67,7 @@ public class ManagedId<X> {
 		this.session = session;
 		this.instance = instance;
 
-		final List<BasicMapping<?, ?>> idMappings = this.type.getTopType().getIdMappings();
+		final List<BasicMapping<?, ?>> idMappings = this.type.getIdentityRoot().getIdMappings();
 		this.resolvers = new BasicResolver[idMappings.size()];
 		for (int i = 0; i < idMappings.size(); i++) {
 			this.resolvers[i] = idMappings.get(i).createResolver(instance);
@@ -91,7 +91,7 @@ public class ManagedId<X> {
 			return false;
 		}
 
-		if (!this.type.getTopType().equals(other.type.getTopType())) {
+		if (!this.type.getIdentityRoot().equals(other.type.getIdentityRoot())) {
 			return false;
 		}
 
@@ -278,7 +278,7 @@ public class ManagedId<X> {
 
 		final String idsStr = "[" + Joiner.on(", ").join(ids) + "]";
 
-		return "ManagedId [type=" + this.type.getTopType().getName() + ", ids=" + idsStr + "]";
+		return "ManagedId [type=" + this.type.getIdentityRoot().getName() + ", ids=" + idsStr + "]";
 	}
 
 }

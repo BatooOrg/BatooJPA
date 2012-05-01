@@ -25,7 +25,7 @@ import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 
 /**
- * A Manager that links persistent classes horizontally
+ * A Manager that links persistent classes horizontally.
  * 
  * @author hceylan
  * @since $version

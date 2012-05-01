@@ -25,6 +25,7 @@ import java.util.Set;
 import javax.persistence.IdClass;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.TableGenerator;
+import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.IdentifiableType;
 import javax.persistence.metamodel.SingularAttribute;
 
@@ -295,6 +296,26 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	}
 
 	/**
+	 * Prepares the id attributes out of all the attributes
+	 * 
+	 * @throws MappingException
+	 *             thrown in case of a mapping error
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected void prepareIdAttributes() throws MappingException {
+		final Set<SingularAttribute<? super X, ?>> idAttributes = Sets.newHashSet();
+		for (final SingularAttribute<? super X, ?> attribute : this.getSingularAttributes()) {
+			if (attribute.isId()) {
+				idAttributes.add(attribute);
+			}
+		}
+		this.idAttributes = new SingularAttributeImpl[idAttributes.size()];
+		idAttributes.toArray(this.idAttributes);
+	}
+
+	/**
 	 * Sets the idJavaType.
 	 * 
 	 * @param type
@@ -308,21 +329,33 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 
 	/**
 	 * Vertically links the type.
+	 * <p>
+	 * The implementation deals with parent attributes and tables.
 	 * 
-	 * @throws BatooException
+	 * @throws MappingException
 	 *             thrown in case of a mapping error
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void vlink() throws BatooException {
-		final Set<SingularAttribute<? super X, ?>> idAttributes = Sets.newHashSet();
-		for (final SingularAttribute<? super X, ?> attribute : this.getSingularAttributes()) {
-			if (attribute.isId()) {
-				idAttributes.add(attribute);
+	public void vlink() throws MappingException {
+		LOG.debug("Vertically linking {0}", this);
+
+		if (this.getSupertype() != null) {
+
+			// inherit attributes
+			for (final Attribute<?, ?> superAttribute : this.getSupertype().attributes.values()) {
+				if (this.attributes.containsKey(superAttribute.getName())) {
+					continue;
+				}
+
+				final AttributeImpl<X, ?> attribute = ((AttributeImpl<?, ?>) superAttribute).clone(this);
+
+				this.attributes.put(attribute.getName(), attribute);
 			}
+
+			this.idJavaType = this.getSupertype().idJavaType;
+			this.idType = this.getSupertype().idType;
 		}
-		this.idAttributes = new SingularAttributeImpl[idAttributes.size()];
-		idAttributes.toArray(this.idAttributes);
 	}
 }

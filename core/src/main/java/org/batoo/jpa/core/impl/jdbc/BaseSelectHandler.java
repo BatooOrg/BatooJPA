@@ -215,7 +215,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 		final EntityTable primaryTable = type.getPrimaryTable();
 
 		Object primaryKeyValue = null;
-		if (type.getTopType().hasSingleIdAttribute()) {
+		if (type.getRoot().hasSingleIdAttribute()) {
 
 			if (type.getIdJavaType() != null) {
 				final EmbeddableTypeImpl<?> embeddable = (EmbeddableTypeImpl<?>) type.getIdType();
@@ -266,7 +266,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 		final EntityTypeImpl<?> type = lazyAssociation.getType();
 
 		Object primaryKeyValue = null;
-		if (type.getTopType().hasSingleIdAttribute()) {
+		if (type.getRoot().hasSingleIdAttribute()) {
 
 			if (type.getIdJavaType() != null) {
 				final EmbeddableTypeImpl<?> embeddable = (EmbeddableTypeImpl<?>) type.getIdType();
