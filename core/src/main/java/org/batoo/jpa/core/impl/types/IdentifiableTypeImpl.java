@@ -49,13 +49,14 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 
 	private static final BLogger LOG = BLogger.getLogger(IdentifiableTypeImpl.class);
 
+	private final IdentifiableTypeImpl<? super X> supertype;
 	protected final Map<String, SingularAttributeImpl<? super X, ?>> versionAttributes = Maps.newHashMap();
+
 	protected Class<?> idJavaType;
 	protected TypeImpl<?> idType;
 
 	protected SingularAttributeImpl<?, ?>[] idAttributes;
 	private SequenceGenerator sequenceGenerator;
-
 	private TableGenerator tableGenerator;
 
 	private String tableName;
@@ -63,6 +64,8 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	/**
 	 * @param metaModel
 	 *            the meta model
+	 * @param supertype
+	 *            type that this type extends, may be null
 	 * @param javaType
 	 *            the java type this type corresponds to
 	 * @throws MappingException
@@ -70,8 +73,11 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * @since $version
 	 * @author hceylan
 	 */
-	public IdentifiableTypeImpl(MetamodelImpl metamodelImpl, Class<X> javaType) throws MappingException {
-		super(metamodelImpl, javaType);
+	public IdentifiableTypeImpl(MetamodelImpl metamodel, IdentifiableTypeImpl<? super X> supertype, Class<X> javaType)
+		throws MappingException {
+		super(metamodel, javaType);
+
+		this.supertype = supertype;
 	}
 
 	/**
@@ -183,17 +189,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 */
 	@Override
 	public synchronized IdentifiableTypeImpl<? super X> getSupertype() {
-		IdentifiableTypeImpl<? super X> type = null;
-
-		// seed
-		Class<? super X> clazz = this.getJavaType().getSuperclass();
-		do {
-			// get the type for the class
-			type = this.metaModel.identifiableType0(clazz);
-		}
-		while (((clazz = clazz.getSuperclass()) != null) && (type == null));
-
-		return type;
+		return this.supertype;
 	}
 
 	/**

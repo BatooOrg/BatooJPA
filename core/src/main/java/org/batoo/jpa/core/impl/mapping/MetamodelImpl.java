@@ -617,7 +617,7 @@ public class MetamodelImpl implements Metamodel {
 	}
 
 	/**
-	 * Return the meta model mapped super class type representing the class.
+	 * Return the meta model mapped super class type representing the class or its super classes.
 	 * 
 	 * @param cls
 	 *            the type of the represented class
@@ -629,10 +629,15 @@ public class MetamodelImpl implements Metamodel {
 	 */
 	@SuppressWarnings("unchecked")
 	public <X> MappedSuperclassTypeImpl<X> mappedSuperclass(Class<X> cls) {
-		final MappedSuperclassType<?> mappedSuperclass = this.mappedSuperclasses.get(cls);
+		Class<? super X> currentClass = cls;
+		while (currentClass != Object.class) {
+			final MappedSuperclassType<?> mappedSuperclass = this.mappedSuperclasses.get(currentClass);
 
-		if (mappedSuperclass != null) {
-			return (MappedSuperclassTypeImpl<X>) mappedSuperclass;
+			if (mappedSuperclass != null) {
+				return (MappedSuperclassTypeImpl<X>) mappedSuperclass;
+			}
+
+			currentClass = currentClass.getSuperclass();
 		}
 
 		return this.throwNotFound(cls);

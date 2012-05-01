@@ -41,6 +41,8 @@ public class MappedSuperclassTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 	 *            the meta model
 	 * @param javaType
 	 *            the java type this type corresponds to
+	 * @param supertype
+	 *            the parent mapped super class or null
 	 * @throws MappingException
 	 *             thrown in case of a mapping error
 	 * 
@@ -48,8 +50,9 @@ public class MappedSuperclassTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 	 * @author hceylan
 	 * @param metaModel
 	 */
-	public MappedSuperclassTypeImpl(MetamodelImpl metaModel, Class<X> javaType) throws MappingException {
-		super(metaModel, javaType);
+	public MappedSuperclassTypeImpl(MetamodelImpl metaModel, MappedSuperclassTypeImpl<? super X> supertype, Class<X> javaType)
+		throws MappingException {
+		super(metaModel, supertype, javaType);
 
 		metaModel.addMappedSuperclass(this);
 	}

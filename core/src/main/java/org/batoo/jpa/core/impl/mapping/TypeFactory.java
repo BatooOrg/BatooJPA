@@ -79,14 +79,17 @@ import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.types.AttributeImpl;
+import org.batoo.jpa.core.impl.types.ChildEntityTypeImpl;
 import org.batoo.jpa.core.impl.types.CollectionAttributeImpl;
 import org.batoo.jpa.core.impl.types.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.impl.types.ExtendingEntityTypeImpl;
 import org.batoo.jpa.core.impl.types.ListAttributeImpl;
 import org.batoo.jpa.core.impl.types.MapAttributeImpl;
 import org.batoo.jpa.core.impl.types.MappedSuperclassTypeImpl;
 import org.batoo.jpa.core.impl.types.SetAttributeImpl;
 import org.batoo.jpa.core.impl.types.SingularAttributeImpl;
+import org.batoo.jpa.core.impl.types.TopEntityTypeImpl;
 import org.batoo.jpa.core.jdbc.IdType;
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
@@ -115,18 +118,7 @@ public class TypeFactory {
 		throws MappingException {
 		final List<Class<?>> types = Lists.newArrayList(r.getTypesAnnotatedWith(annotation));
 
-		// sort the classes based on hierarchy
-		Collections.sort(types, new Comparator<Class<?>>() {
-
-			@Override
-			public int compare(Class<?> o1, Class<?> o2) {
-				if (o1.isAssignableFrom(o2)) {
-					return -1;
-				}
-
-				return 0;
-			}
-		});
+		TypeFactory.sortClasses(types);
 
 		for (final Class<?> type : types) {
 			TypeFactory.forType(metaModel, annotation, type);
@@ -437,13 +429,38 @@ public class TypeFactory {
 		if (annotation == Entity.class) {
 			LOG.debug("Found Entity: {0}", type.getCanonicalName());
 
-			new EntityTypeImpl(metaModel, type);
+			// is the type extending a mapped super class
+			try {
+				final MappedSuperclassTypeImpl<?> superclass = metaModel.mappedSuperclass(type);
+				new ExtendingEntityTypeImpl(metaModel, superclass, type);
+				return;
+			}
+			catch (final Exception e) {}
+
+			// is the class extending another entity
+			try {
+				final EntityTypeImpl<?> superclass = metaModel.entity(type);
+				new ChildEntityTypeImpl(metaModel, superclass, type);
+				return;
+			}
+			catch (final Exception e) {}
+
+			// top type class
+			new TopEntityTypeImpl(metaModel, type);
 		}
 
 		if (annotation == MappedSuperclass.class) {
 			LOG.debug("Found MappedSuperType: {0}", type.getCanonicalName());
 
-			new MappedSuperclassTypeImpl(metaModel, type);
+			// is the type extending a mapped super class
+			try {
+				final MappedSuperclassTypeImpl<?> superclass = metaModel.mappedSuperclass(type);
+				new MappedSuperclassTypeImpl(metaModel, superclass, type);
+				return;
+			}
+			catch (final Exception e) {}
+
+			new MappedSuperclassTypeImpl(metaModel, null, type);
 		}
 
 		if (annotation == Embeddable.class) {
@@ -678,17 +695,21 @@ public class TypeFactory {
 	 * @author hceylan
 	 */
 	public static void scanForArtifacts(MetamodelImpl metaModel, List<String> managedClassNames) throws MappingException {
+		final List<Class<?>> embeddables = Lists.newArrayList();
+		final List<Class<?>> mappedSuperclasses = Lists.newArrayList();
+		final List<Class<?>> entities = Lists.newArrayList();
+
 		for (final String className : managedClassNames) {
 			try {
 				final Class<?> clazz = Class.forName(className);
 				if (clazz.getAnnotation(Embeddable.class) != null) {
-					TypeFactory.forType(metaModel, Embeddable.class, clazz);
+					embeddables.add(clazz);
 				}
 				else if (clazz.getAnnotation(MappedSuperclass.class) != null) {
-					TypeFactory.forType(metaModel, MappedSuperclass.class, clazz);
+					mappedSuperclasses.add(clazz);
 				}
 				else if (clazz.getAnnotation(Entity.class) != null) {
-					TypeFactory.forType(metaModel, Entity.class, clazz);
+					entities.add(clazz);
 				}
 				else {
 					throw new MappingException(
@@ -699,6 +720,23 @@ public class TypeFactory {
 				throw new MappingException("Managed persistent class " + className + " cannot be loaded");
 			}
 		}
+
+		TypeFactory.sortClasses(embeddables);
+		TypeFactory.sortClasses(mappedSuperclasses);
+		TypeFactory.sortClasses(entities);
+
+		for (final Class<?> clazz : embeddables) {
+			TypeFactory.forType(metaModel, Embeddable.class, clazz);
+		}
+
+		for (final Class<?> clazz : mappedSuperclasses) {
+			TypeFactory.forType(metaModel, MappedSuperclass.class, clazz);
+		}
+
+		for (final Class<?> clazz : entities) {
+			TypeFactory.forType(metaModel, Entity.class, clazz);
+		}
+
 	}
 
 	/**
@@ -747,6 +785,21 @@ public class TypeFactory {
 		TypeFactory.collect(metaModel, r, Embeddable.class);
 		TypeFactory.collect(metaModel, r, MappedSuperclass.class);
 		TypeFactory.collect(metaModel, r, Entity.class);
+	}
+
+	private static void sortClasses(final List<Class<?>> types) {
+		// sort the classes based on hierarchy
+		Collections.sort(types, new Comparator<Class<?>>() {
+
+			@Override
+			public int compare(Class<?> o1, Class<?> o2) {
+				if (o1.isAssignableFrom(o2)) {
+					return -1;
+				}
+
+				return 0;
+			}
+		});
 	}
 
 	private TypeFactory() {

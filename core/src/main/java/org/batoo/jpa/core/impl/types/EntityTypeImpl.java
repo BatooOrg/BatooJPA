@@ -92,7 +92,7 @@ import com.google.common.collect.Maps;
  * @since $version
  */
 @SuppressWarnings("restriction")
-public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements EntityType<X> {
+public abstract class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements EntityType<X> {
 
 	private static final BLogger LOG = BLogger.getLogger(EntityTypeImpl.class);
 
@@ -125,6 +125,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	/**
 	 * @param metaModel
 	 *            the meta model of the persistence
+	 * @param supertype
+	 *            the mapped super class that this type is extending
 	 * @param javaType
 	 *            the javatype of the entity
 	 * @param name
@@ -134,8 +136,9 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EntityTypeImpl(MetamodelImpl metaModel, final Class<X> javaType) throws MappingException {
-		super(metaModel, javaType);
+	public EntityTypeImpl(MetamodelImpl metaModel, IdentifiableTypeImpl<? super X> supertype, final Class<X> javaType)
+		throws MappingException {
+		super(metaModel, supertype, javaType);
 
 		metaModel.addEntity(this);
 

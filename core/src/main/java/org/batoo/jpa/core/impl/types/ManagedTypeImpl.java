@@ -582,6 +582,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	public void parse(Set<Class<? extends Annotation>> parsed) throws BatooException {
 		LOG.info("Parsing type {0}", this.getJavaType());
 
+		// FIXME remove privileged action
 		final Field[] fields = AccessController.doPrivileged(new PrivilegedAction<Field[]>() {
 
 			@Override
