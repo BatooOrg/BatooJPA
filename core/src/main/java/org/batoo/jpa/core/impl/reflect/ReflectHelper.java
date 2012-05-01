@@ -428,28 +428,44 @@ public class ReflectHelper {
 	}
 
 	/**
-	 * Makes the member accessible
+	 * Makes the member accessible.
 	 * 
 	 * @param member
+	 *            the member to make accessible
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	public static void makeAccessible(final Member member) {
+		ReflectHelper.setAccessible(member, true);
+	}
+
+	/**
+	 * Sets the member's accessibility status.
+	 * 
+	 * @param member
+	 *            the member of which to set accessibility status
+	 * @param accessible
+	 *            true to set accessible, false to make it not accessible
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public static void setAccessible(final Member member, final boolean accessible) {
 		AccessController.doPrivileged(new PrivilegedAction<Void>() {
 
 			@Override
 			public Void run() {
 				if (member instanceof Field) {
-					((Field) member).setAccessible(true);
+					((Field) member).setAccessible(accessible);
 				}
 
 				else if (member instanceof Method) {
-					((Method) member).setAccessible(true);
+					((Method) member).setAccessible(accessible);
 				}
 
 				else {
-					((Constructor<?>) member).setAccessible(true);
+					((Constructor<?>) member).setAccessible(accessible);
 				}
 
 				return null;

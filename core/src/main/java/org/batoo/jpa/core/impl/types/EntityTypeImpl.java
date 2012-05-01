@@ -24,7 +24,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -92,6 +91,7 @@ import com.google.common.collect.Maps;
  * @author hceylan
  * @since $version
  */
+@SuppressWarnings("restriction")
 public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements EntityType<X>, Comparable<EntityType<X>> {
 
 	private static final BLogger LOG = BLogger.getLogger(EntityTypeImpl.class);
@@ -99,7 +99,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private static final Object NO_TOP_TYPE = new Object();
 
 	private final Map<String, AbstractMapping<?, ?>> mappings = Maps.newHashMap();
-	private final Map<String, Association<?, ?>> associations = Maps.newHashMap();
+	private final List<Association<?, ?>> associations = Lists.newArrayList();
 	private final List<BasicMapping<?, ?>> idMappings = Lists.newArrayList(); // FIXME Performance: Convert to array
 	private final Map<String, BasicMapping<?, ?>> identityMappings = Maps.newHashMap();
 	private final Map<String, Column> attributeOverrides = Maps.newHashMap();
@@ -120,7 +120,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private Object topType;
 	private Object discriminatorValue;
 
-	private Constructor<X> enhancedConstructor;
+	private sun.reflect.ConstructorAccessor enhancer;
 
 	/**
 	 * @param metaModel
@@ -249,7 +249,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			final Association<?, ?> association = (Association<?, ?>) mapping;
 
 			this.metaModel.addAssociation(association);
-			this.associations.put(name, association);
+			this.associations.add(association);
 
 			if ((mapping instanceof OwnerAssociationMapping) && !(mapping instanceof OwnerOneToManyMapping)) {
 				final OwnerAssociationMapping<?, ?> associationMapping = (OwnerAssociationMapping<?, ?>) association;
@@ -329,14 +329,32 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	private void enhanceIfNeccessary() {
-		if (this.enhancedConstructor == null) {
+		if (this.enhancer == null) {
 			synchronized (this) {
-				if (this.enhancedConstructor == null) {
+				if (this.enhancer == null) {
 					Class<X> enhancedClass;
 					try {
 						enhancedClass = Enhancer.enhance(this);
-						this.enhancedConstructor = enhancedClass.getConstructor(Class.class, SessionImpl.class, Object.class, Boolean.TYPE);
-						ReflectHelper.makeAccessible(this.enhancedConstructor);
+						final Constructor<X> enhancedConstructor = enhancedClass.getConstructor(Class.class, SessionImpl.class,
+							Object.class, Boolean.TYPE);
+
+						final Class<?> magClass = Class.forName("sun.reflect.MethodAccessorGenerator");
+						final Constructor<?> c = magClass.getDeclaredConstructors()[0];
+						final Method generateMethod = magClass.getMethod("generateConstructor", Class.class, Class[].class, Class[].class,
+							Integer.TYPE);
+
+						ReflectHelper.makeAccessible(c);
+						ReflectHelper.makeAccessible(generateMethod);
+						try {
+							final Object mag = c.newInstance();
+							this.enhancer = (sun.reflect.ConstructorAccessor) generateMethod.invoke(mag,
+								enhancedConstructor.getDeclaringClass(), enhancedConstructor.getParameterTypes(),
+								enhancedConstructor.getExceptionTypes(), enhancedConstructor.getModifiers());
+						}
+						finally {
+							ReflectHelper.setAccessible(c, false);
+							ReflectHelper.setAccessible(generateMethod, false);
+						}
 					}
 					catch (final Exception e) {
 						throw new RuntimeException("Cannot enhance class: " + this.javaType, e);
@@ -354,8 +372,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Collection<Association<?, ?>> getAssociations() {
-		return this.associations.values();
+	public List<Association<?, ?>> getAssociations() {
+		return this.associations;
 	}
 
 	/**
@@ -645,6 +663,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
+	@SuppressWarnings("unchecked")
 	public ManagedId<X> newManagedId(SessionImpl session, final Object id, boolean lazy) {
 		if (id == null) {
 			throw new NullPointerException();
@@ -654,14 +673,11 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 		X instance = null;
 		try {
-			instance = this.enhancedConstructor.newInstance(this.javaType, session, id, !lazy);
+			instance = (X) this.enhancer.newInstance(new Object[] { this.javaType, session, id, !lazy });
 		}
 		catch (final InvocationTargetException e) {} // not possible
-		catch (final InstantiationException e) {} // not possible
-		catch (final IllegalAccessException e) {} // not possible
 		catch (final IllegalArgumentException e) {} // not possible
-
-		// ((ProxyObject) instance).setHandler(new Enhancer<X>(this, session, id, lazy));
+		catch (final InstantiationException e) {} // not possible
 
 		final ManagedId<X> managedId = new ManagedId<X>(this, session, instance);
 

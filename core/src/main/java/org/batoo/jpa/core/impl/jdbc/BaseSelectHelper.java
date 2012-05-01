@@ -366,12 +366,12 @@ public abstract class BaseSelectHelper<X> {
 	@SuppressWarnings("unchecked")
 	private synchronized void getSelectSQL0() {
 		if (this.selectSql == null) {
-			final List<String> fieldsBuffer = Lists.newArrayList();
 			final List<String> joinsBuffer = Lists.newArrayList();
-
+			final List<String> fieldsBuffer = Lists.newArrayList();
+			final List<Map<PhysicalColumn, String>> columnAliases = Lists.newArrayList();
+			
 			this.preparePredicates();
 
-			final List<Map<PhysicalColumn, String>> columnAliases = Lists.newArrayList();
 			this.root = this.processType(columnAliases, fieldsBuffer, joinsBuffer, null, this.type, new LinkedList<Association<?, ?>>(), 0,
 				new MutableInt());
 
