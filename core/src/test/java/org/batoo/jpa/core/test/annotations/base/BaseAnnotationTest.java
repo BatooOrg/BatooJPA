@@ -21,7 +21,6 @@ package org.batoo.jpa.core.test.annotations.base;
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.AbstractTest;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -38,7 +37,6 @@ public class BaseAnnotationTest extends AbstractTest {
 	 * @author hceylan
 	 */
 	@Test
-	@Ignore
 	public void testMapping() {
 		Assert.assertEquals(2, this.em().getMetamodel().getEntities().size());
 	}
