@@ -489,9 +489,7 @@ public class TypeFactory {
 				return Types.CLOB;
 			}
 
-			if ((Byte.class == javaType.getComponentType()) || (byte.class == javaType.getComponentType())) {
-				return Types.BLOB;
-			}
+			return Types.BLOB;
 		}
 
 		if (Boolean.class.isAssignableFrom(javaType) || boolean.class.isAssignableFrom(javaType)) {

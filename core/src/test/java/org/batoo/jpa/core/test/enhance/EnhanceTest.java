@@ -16,36 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.instance;
+package org.batoo.jpa.core.test.enhance;
 
-import java.io.Serializable;
+import java.lang.reflect.Constructor;
+
+import javax.persistence.metamodel.EntityType;
+
+import org.batoo.jpa.core.impl.SessionImpl;
+import org.batoo.jpa.core.impl.instance.Enhancer;
+import org.batoo.jpa.core.test.AbstractTest;
+import org.junit.Test;
 
 /**
- * Interface implemented by enhanced managed instances.
  * 
  * @author hceylan
  * @since $version
  */
-public interface EnhancedInstance extends Serializable {
+public class EnhanceTest extends AbstractTest {
 
-	/**
-	 * Returns if the instance has been initialized.
-	 * 
-	 * @return true if the instance has been initialized
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	boolean __enhanced__$$__isInitialized();
+	@Test
+	public void testEnhance() throws Exception {
+		final EntityType<Person> type = this.em().getMetamodel().entity(Person.class);
 
-	/**
-	 * Returns the id of the instance.
-	 * 
-	 * @return the id of the instance
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	Object get__enhanced__$$__id();
+		final Class<? extends Person> enhanced = Enhancer.enhance(type);
 
+		final Constructor<? extends Person> constructor = enhanced.getConstructor(Class.class, SessionImpl.class, Object.class,
+			boolean.class);
+		final Person newInstance = constructor.newInstance(null, null, null, true);
+
+		System.out.println(newInstance);
+	}
 }

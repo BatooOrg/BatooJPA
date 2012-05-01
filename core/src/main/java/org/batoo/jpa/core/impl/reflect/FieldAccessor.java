@@ -29,21 +29,21 @@ import java.lang.reflect.Field;
 public class FieldAccessor {
 
 	private enum PrimitiveType {
-		BOOLEAN(boolean.class),
+		BOOLEAN(Boolean.TYPE),
 
-		INTEGER(int.class),
+		INTEGER(Integer.TYPE),
 
-		FLOAT(float.class),
+		FLOAT(Float.TYPE),
 
-		DOUBLE(double.class),
+		DOUBLE(Double.TYPE),
 
-		BYTE(byte.class),
+		BYTE(Byte.TYPE),
 
-		SHORT(short.class),
+		SHORT(Short.TYPE),
 
-		LONG(long.class),
+		LONG(Long.TYPE),
 
-		CHAR(char.class);
+		CHAR(Character.TYPE);
 
 		private final Class<?> clazz;
 

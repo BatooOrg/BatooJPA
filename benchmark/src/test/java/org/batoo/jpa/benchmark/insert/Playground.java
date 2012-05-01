@@ -266,12 +266,12 @@ public class Playground {
 		final ClassLoader old = Thread.currentThread().getContextClassLoader();
 		try {
 			Thread.currentThread().setContextClassLoader(new BenchmarkClassLoader(old, type, PU_NAME));
-			long start = System.currentTimeMillis();
+			System.currentTimeMillis();
 
 			final EntityManagerFactory emf = Persistence.createEntityManagerFactory(PU_NAME);
-			LOG.info("{0} - deploy {1}", type, System.currentTimeMillis() - start);
+			// LOG.info("{0} - deploy {1}", type, System.currentTimeMillis() - start);
 
-			start = System.currentTimeMillis();
+			System.currentTimeMillis();
 
 			this.test(type, emf);
 

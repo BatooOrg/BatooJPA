@@ -177,8 +177,9 @@ public abstract class AbstractManagedCollection<E> implements Collection<E>, Man
 	 */
 	protected final void initializeIfNecessary() {
 		if (!this.initialized) {
-			this.initialized = true;
 			this.snapshot = this.managedInstance.getSession().getEntityManager().findAll(this.managedInstance, this.mapping);
+
+			this.initialized = true;
 
 			this.getCollection().addAll(this.snapshot);
 		}

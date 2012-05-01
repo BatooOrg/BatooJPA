@@ -19,6 +19,8 @@
 package org.batoo.jpa.core.impl.types;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -52,6 +54,7 @@ import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.SessionImpl;
+import org.batoo.jpa.core.impl.instance.Enhancer;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
@@ -69,12 +72,14 @@ import org.batoo.jpa.core.impl.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.mapping.ColumnTemplate;
 import org.batoo.jpa.core.impl.mapping.EntityInheritence;
 import org.batoo.jpa.core.impl.mapping.JoinColumnTemplate;
+import org.batoo.jpa.core.impl.mapping.Mapping.AssociationType;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
 import org.batoo.jpa.core.impl.mapping.OwnerAssociationMapping;
 import org.batoo.jpa.core.impl.mapping.OwnerManyToManyMapping;
 import org.batoo.jpa.core.impl.mapping.OwnerOneToManyMapping;
 import org.batoo.jpa.core.impl.mapping.TableTemplate;
 import org.batoo.jpa.core.impl.mapping.TypeFactory;
+import org.batoo.jpa.core.impl.reflect.ReflectHelper;
 import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.IdType;
 
@@ -104,16 +109,18 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private EntityTable primaryTable;
 	private final Map<String, EntityTable> tables = Maps.newHashMap();
 	private final Map<String, JoinTable> joinTables = Maps.newHashMap();
+	private PhysicalColumn[] basicColumns;
 	private final Map<String, TableTemplate> tableTemplates = Maps.newHashMap();
 
 	private final SelectHelper<X> selectHelper;
 	private final RefreshHelper<X> refreshHelper;
-	// private final Class<X> enhancedJavaType;
 	private final IdentityHashMap<Method, Method> idMethods = Maps.newIdentityHashMap();
 	private final IdentityHashMap<Method, Method> nonIdMethods = Maps.newIdentityHashMap();
 
 	private Object topType;
 	private Object discriminatorValue;
+
+	private Constructor<X> enhancedConstructor;
 
 	/**
 	 * @param metaModel
@@ -127,7 +134,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
 	public EntityTypeImpl(MetamodelImpl metaModel, final Class<X> javaType) throws MappingException {
 		super(metaModel, javaType);
 
@@ -135,11 +141,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 		this.selectHelper = new SelectHelper<X>(this);
 		this.refreshHelper = new RefreshHelper<X>(this);
-
-		// final ProxyFactory factory = new ProxyFactory();
-		// factory.setSuperclass(this.javaType);
-		// factory.setInterfaces(new Class[] { EnhancedInstance.class });
-		// this.enhancedJavaType = factory.createClass();
 	}
 
 	/**
@@ -327,6 +328,24 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		}
 	}
 
+	private void enhanceIfNeccessary() {
+		if (this.enhancedConstructor == null) {
+			synchronized (this) {
+				if (this.enhancedConstructor == null) {
+					Class<X> enhancedClass;
+					try {
+						enhancedClass = Enhancer.enhance(this);
+						this.enhancedConstructor = enhancedClass.getConstructor(Class.class, SessionImpl.class, Object.class, Boolean.TYPE);
+						ReflectHelper.makeAccessible(this.enhancedConstructor);
+					}
+					catch (final Exception e) {
+						throw new RuntimeException("Cannot enhance class: " + this.javaType, e);
+					}
+				}
+			}
+		}
+	}
+
 	/**
 	 * Returns the collection of associations.
 	 * 
@@ -337,6 +356,33 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 */
 	public Collection<Association<?, ?>> getAssociations() {
 		return this.associations.values();
+	}
+
+	/**
+	 * Returns list of physical columns for basic attribıtes.
+	 * 
+	 * @return list of physical columns for basic attribıtes
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public PhysicalColumn[] getBasicColumns() {
+		if (this.basicColumns != null) {
+			return this.basicColumns;
+		}
+
+		final List<PhysicalColumn> basicColumns = Lists.newArrayList();
+		for (final EntityTable table : this.tables.values()) {
+			for (final PhysicalColumn column : table.getColumns()) {
+				if ((column.getMapping().getAssociationType() == AssociationType.BASIC) && !column.isId()) {
+					basicColumns.add(column);
+				}
+			}
+		}
+
+		this.basicColumns = basicColumns.toArray(new PhysicalColumn[basicColumns.size()]);
+
+		return this.basicColumns;
 	}
 
 	/**
@@ -604,12 +650,16 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			throw new NullPointerException();
 		}
 
+		this.enhanceIfNeccessary();
+
 		X instance = null;
 		try {
-			instance = this.javaType.newInstance(); // this.enhancedJavaType.newInstance();
+			instance = this.enhancedConstructor.newInstance(this.javaType, session, id, !lazy);
 		}
+		catch (final InvocationTargetException e) {} // not possible
 		catch (final InstantiationException e) {} // not possible
 		catch (final IllegalAccessException e) {} // not possible
+		catch (final IllegalArgumentException e) {} // not possible
 
 		// ((ProxyObject) instance).setHandler(new Enhancer<X>(this, session, id, lazy));
 

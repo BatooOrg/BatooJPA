@@ -33,10 +33,11 @@ import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
 import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.mapping.CollectionMapping;
-import org.batoo.jpa.core.impl.mapping.Mapping.AssociationType;
 import org.batoo.jpa.core.impl.mapping.OwnerAssociationMapping;
+import org.batoo.jpa.core.impl.types.AttributeImpl;
 import org.batoo.jpa.core.impl.types.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.impl.types.PluralAttributeImpl;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
@@ -81,48 +82,54 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 		this.root = root;
 	}
 
-	private Object getColumnValue(ResultSet rs, int depth, final PhysicalColumn column) throws SQLException {
-		return rs.getObject(this.columnAliases[depth].get(column));
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void getLazyInstance(SessionImpl session, ResultSet rs, Map<ManagedId<?>, ManagedInstance<?>> cache, int tableNo,
+	private void createLazyAssociation(SessionImpl session, ResultSet rs, Map<ManagedId<?>, ManagedInstance<?>> cache, int tableNo,
 		final ManagedInstance<?> managedInstance, Association<?, ?> association) throws SQLException {
 
 		// is the association a collection
-		if (association instanceof CollectionMapping) {
-			((CollectionMapping<?, ?, ?>) association).getDeclaringAttribute().newInstance(managedInstance, true);
+		final AttributeImpl<?, ?> attribute = association.getDeclaringAttribute();
+		if (attribute.isCollection()) {
+			((PluralAttributeImpl<?, ?, ?>) attribute).newInstance(managedInstance, true);
 		}
 		else if (association instanceof OwnerAssociationMapping) {
-			final OwnerAssociationMapping<?, ?> lazyAssociation = (OwnerAssociationMapping<?, ?>) association;
-			final EntityTypeImpl<?> type = lazyAssociation.getType();
-
-			// get the primary key and create the instance
-			final Object primaryKey = this.getPrimaryKey(rs, tableNo, lazyAssociation);
-
-			// if the primary key is null then no lazy instance created
-			if (primaryKey != null) {
-				final ManagedId<?> managedId = type.newManagedId(session, primaryKey, true);
-
-				// look for it in the cache
-				ManagedInstance<?> instance = cache.get(managedId);
-				if (instance == null) { // if found reuse the cached instance
-					// get it from the session
-					instance = session.get(managedId);
-					if (instance != null) { // if found in the session, put it to cache and reuse
-						cache.put(instance.getId(), instance);
-					}
-					else {
-						// create a lazy instance
-						instance = new ManagedInstance(type, session, managedId);
-						session.put(instance);
-						cache.put(instance.getId(), instance);
-					}
-				}
-
-				lazyAssociation.setValue(managedInstance.getInstance(), instance.getInstance());
-			}
+			this.createLazyInstance(session, rs, cache, tableNo, managedInstance, association);
 		}
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void createLazyInstance(SessionImpl session, ResultSet rs, Map<ManagedId<?>, ManagedInstance<?>> cache, int tableNo,
+		final ManagedInstance<?> managedInstance, Association<?, ?> association) throws SQLException {
+		final OwnerAssociationMapping<?, ?> lazyAssociation = (OwnerAssociationMapping<?, ?>) association;
+		final EntityTypeImpl<?> type = lazyAssociation.getType();
+
+		// get the primary key and create the instance
+		final Object primaryKey = this.getPrimaryKey(rs, tableNo, lazyAssociation);
+
+		// if the primary key is null then no lazy instance created
+		if (primaryKey != null) {
+			final ManagedId<?> managedId = type.newManagedId(session, primaryKey, true);
+
+			// look for it in the cache
+			ManagedInstance<?> instance = cache.get(managedId);
+			if (instance == null) { // if found reuse the cached instance
+				// get it from the session
+				instance = session.get(managedId);
+				if (instance != null) { // if found in the session, put it to cache and reuse
+					cache.put(instance.getId(), instance);
+				}
+				else {
+					// create a lazy instance
+					instance = new ManagedInstance(type, session, managedId);
+					session.put(instance);
+					cache.put(instance.getId(), instance);
+				}
+			}
+
+			lazyAssociation.setValue(managedInstance.getInstance(), instance.getInstance());
+		}
+	}
+
+	private Object getColumnValue(ResultSet rs, int depth, final PhysicalColumn column) throws SQLException {
+		return rs.getObject(this.columnAliases[depth].get(column));
 	}
 
 	/**
@@ -170,7 +177,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 
 			final Object entity = instance.getInstance();
 			if (entity instanceof EnhancedInstance) {
-				if (!((EnhancedInstance) entity).__Javassist__$$__isInitialized()) {
+				if (!((EnhancedInstance) entity).__enhanced__$$__isInitialized()) {
 					this.loadInstance(type, rs, tableNo, instance);
 				}
 			}
@@ -349,17 +356,9 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 	}
 
 	private void loadInstance(EntityTypeImpl<?> type, ResultSet rs, int tableNo, ManagedInstance<?> instance) throws SQLException {
-		for (final EntityTable table : type.getTables().values()) {
-			for (final PhysicalColumn column : table.getColumns()) {
-				if (column.getMapping().getAssociationType() == AssociationType.BASIC) {
-					if (column.isId()) { // primary key values already handled
-						continue;
-					}
-
-					final Object columnValue = this.getColumnValue(rs, tableNo, column);
-					column.getMapping().setValue(instance.getInstance(), columnValue);
-				}
-			}
+		for (final PhysicalColumn column : type.getBasicColumns()) {
+			final Object columnValue = this.getColumnValue(rs, tableNo, column);
+			column.getMapping().setValue(instance.getInstance(), columnValue);
 		}
 	}
 
@@ -402,7 +401,8 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 							association.setValue(managedInstance.getInstance(), parent);
 							break;
 						case LAZY:
-							this.getLazyInstance(session, rs, cache, queryItem.getTableNo(), managedInstance, childItem.getAssociation());
+							this.createLazyAssociation(session, rs, cache, queryItem.getTableNo(), managedInstance,
+								childItem.getAssociation());
 							break;
 						case EAGER:
 							final ManagedInstance<?> child = this.processRow(session, rs, cache, childItem, managedInstance.getInstance());

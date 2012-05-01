@@ -67,7 +67,7 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	}
 
 	public int dump(int rowNo, int depth) {
-		if ((depth > 0) && (this.hits > 10)) {
+		if ((depth > 0) && (this.timeWithoutDerby > 10000)) {
 			rowNo++;
 			final String tabs = StringUtils.repeat(" ", depth);
 			System.out.println(String.format("%010d", rowNo) + //
