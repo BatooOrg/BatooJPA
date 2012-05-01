@@ -441,9 +441,15 @@ public abstract class BaseSelectHelper<X> {
 		// process the associations
 		for (final Association<?, ?> childAssociation : type.getAssociations()) {
 			if ((path.size() > 0) && path.getLast().equals(childAssociation.getOpposite())) {
+				// that is a known join so reuse the inverse
 				children.add(new QueryItem(childAssociation, QueryItemType.INVERSE));
 			}
 			else if ((path.size() >= MAX_PATH) || !this.cascades(childAssociation)) {
+				// we are over the max path limit or the child association is not cascaded
+				children.add(new QueryItem(childAssociation, QueryItemType.LAZY));
+			}
+			else if ((this.alwaysLazyMapping != null) && (childAssociation.getOpposite() == this.alwaysLazyMapping)) {
+				// this association is marked as always lazy. This is particularyly useful in lazy association fetching
 				children.add(new QueryItem(childAssociation, QueryItemType.LAZY));
 			}
 			else {
