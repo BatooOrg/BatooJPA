@@ -353,9 +353,9 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 	}
 
 	/**
-	 * Returns list of physical columns for basic attribıtes.
+	 * Returns list of physical columns for basic attributes.
 	 * 
-	 * @return list of physical columns for basic attribıtes
+	 * @return list of physical columns for basic attributes
 	 * 
 	 * @since $version
 	 * @author hceylan
