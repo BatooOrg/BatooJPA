@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -62,7 +63,6 @@ import org.batoo.jpa.core.impl.mapping.BasicColumnTemplate;
 import org.batoo.jpa.core.impl.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.mapping.ColumnTemplate;
 import org.batoo.jpa.core.impl.mapping.JoinColumnTemplate;
-import org.batoo.jpa.core.impl.mapping.Mapping.AssociationType;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
 import org.batoo.jpa.core.impl.mapping.OwnerAssociationMapping;
 import org.batoo.jpa.core.impl.mapping.OwnerManyToManyMapping;
@@ -206,7 +206,7 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 	 * @author hceylan
 	 */
 	public void addMapping(AbstractMapping<?, ?> mapping, boolean id) throws MappingException {
-		final String name = mapping.getDeclaringAttribute().getName();
+		mapping.getDeclaringAttribute().getName();
 
 		if (mapping instanceof BasicMapping) {
 			final BasicMapping<?, ?> basicMapping = (BasicMapping<?, ?>) mapping;
@@ -250,7 +250,7 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 			}
 		}
 
-		this.mappings.put(name, mapping);
+		this.mappings.put(mapping.getPathAsString(), mapping);
 	}
 
 	/**
@@ -365,16 +365,33 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 			return this.basicColumns;
 		}
 
-		final List<PhysicalColumn> basicColumns = Lists.newArrayList();
-		for (final EntityTable table : this.tables.values()) {
-			for (final PhysicalColumn column : table.getColumns()) {
-				if ((column.getMapping().getAssociationType() == AssociationType.BASIC) && !column.isId()) {
-					basicColumns.add(column);
+		final ConcurrentMap<String, PhysicalColumn> basicColumns = Maps.newConcurrentMap();
+
+		// add all the tables in the hierarchy
+		AbstractEntityTypeImpl<? super X> currentType = this;
+		while (currentType != null) {
+			for (final AbstractMapping<?, ?> mapping : currentType.mappings.values()) {
+				if (mapping instanceof BasicMapping) {
+					final BasicMapping<?, ?> basicMapping = (BasicMapping<?, ?>) mapping;
+
+					// skip id attributes
+					if (!basicMapping.getDeclaringAttribute().isId()) {
+						// basic mappings always have single column
+						final PhysicalColumn column = basicMapping.getPhysicalColumns()[0];
+						basicColumns.putIfAbsent(mapping.getPathAsString(), column);
+					}
 				}
+			}
+
+			if (currentType.getSupertype() instanceof AbstractEntityTypeImpl) {
+				currentType = (AbstractEntityTypeImpl<? super X>) currentType.getSupertype();
+			}
+			else {
+				break;
 			}
 		}
 
-		this.basicColumns = basicColumns.toArray(new PhysicalColumn[basicColumns.size()]);
+		this.basicColumns = basicColumns.values().toArray(new PhysicalColumn[basicColumns.size()]);
 
 		return this.basicColumns;
 	}
