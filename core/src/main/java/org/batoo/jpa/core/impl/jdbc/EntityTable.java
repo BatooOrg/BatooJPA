@@ -74,11 +74,6 @@ public final class EntityTable extends AbstractTable {
 		super.addColumn(column);
 
 		if (column.getIdType() == IdType.IDENTITY) {
-			if (this.identityColumn != null) {
-				throw new MappingException("Multiple identity columns: " + this.identityColumn.getName() + ", " + column.getName() + " on "
-					+ this.type.getJavaType().getCanonicalName());
-			}
-
 			this.identityColumn = column;
 		}
 	}

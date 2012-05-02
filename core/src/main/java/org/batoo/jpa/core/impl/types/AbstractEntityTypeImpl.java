@@ -89,7 +89,7 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 	private final Map<String, AbstractMapping<?, ?>> mappings = Maps.newHashMap();
 	private final List<Association<?, ?>> associations = Lists.newArrayList();
 	private final List<BasicMapping<?, ?>> idMappings = Lists.newArrayList(); // FIXME Performance: Convert to array
-	private final Map<String, BasicMapping<?, ?>> identityMappings = Maps.newHashMap();
+	private BasicMapping<?, ?> identityMapping;
 	private final Map<String, Column> attributeOverrides = Maps.newHashMap();
 
 	protected EntityTable primaryTable;
@@ -218,7 +218,10 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 
 			// Separate out the identity id attributes
 			if ((singularAttribute.getIdType() == IdType.IDENTITY)) {
-				this.identityMappings.put(name, basicMapping);
+				if (this.identityMapping != null) {
+					throw new MappingException("Multiple identity properties on " + this.javaType);
+				}
+				this.identityMapping = basicMapping;
 			}
 
 			for (final ColumnTemplate<?, ?> template : basicMapping.getColumnTemplates()) {
@@ -485,7 +488,7 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 	 * @author hceylan
 	 */
 	public boolean hasIdentityAttribute() {
-		return this.identityMappings.size() > 0;
+		return this.identityMapping != null;
 	}
 
 	/**
