@@ -27,6 +27,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.TableGenerator;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.IdentifiableType;
+import javax.persistence.metamodel.MappedSuperclassType;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.StringUtils;
@@ -58,8 +59,6 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	protected SingularAttributeImpl<?, ?>[] idAttributes;
 	private SequenceGenerator sequenceGenerator;
 	private TableGenerator tableGenerator;
-
-	private String tableName;
 
 	/**
 	 * @param metaModel
@@ -203,18 +202,6 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	}
 
 	/**
-	 * Returns the table name of the identifiable.
-	 * 
-	 * @return the table name of the identifiable
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String getTableName() {
-		return this.tableName;
-	}
-
-	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -341,7 +328,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	public void vlink() throws MappingException {
 		LOG.debug("Vertically linking {0}", this);
 
-		if (this.getSupertype() != null) {
+		if (this.getSupertype() instanceof MappedSuperclassType) {
 
 			// inherit attributes
 			for (final Attribute<?, ?> superAttribute : this.getSupertype().attributes.values()) {
