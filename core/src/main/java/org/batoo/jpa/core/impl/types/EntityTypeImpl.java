@@ -30,6 +30,7 @@ import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.jdbc.AbstractTable.TableType;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.RefreshHelper;
 import org.batoo.jpa.core.impl.jdbc.SelectHelper;
@@ -92,7 +93,7 @@ public class EntityTypeImpl<X> extends BaseEntityTypeImpl<X> {
 	 * @author hceylan
 	 */
 	public EntityTypeImpl<? super X> getIdentityRoot() {
-		if ((this.parent == null) || (this.parent.inheritance.getInheritenceType() == InheritanceType.TABLE_PER_CLASS)) {
+		if ((this.parent == null) || (this.root.inheritance.getInheritenceType() == InheritanceType.TABLE_PER_CLASS)) {
 			return this;
 		}
 
@@ -191,7 +192,7 @@ public class EntityTypeImpl<X> extends BaseEntityTypeImpl<X> {
 
 		// then to the remaining tables
 		for (final EntityTable table : this.tables.values()) {
-			if (table.isPrimary()) {
+			if (table.getTableType() == TableType.PRIMARY) {
 				continue;
 			}
 

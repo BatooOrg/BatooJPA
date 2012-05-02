@@ -49,6 +49,7 @@ import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.Enhancer;
+import org.batoo.jpa.core.impl.jdbc.AbstractTable.TableType;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
@@ -281,7 +282,7 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 		try {
 			for (final EntityTable table : this.tables.values()) {
 				if (firstPass) {
-					if (!table.isPrimary()) {
+					if (table.getTableType() != TableType.PRIMARY) {
 						final List<PhysicalColumn> keyColumns = Lists.newArrayList();
 						for (final PhysicalColumn column : this.primaryTable.getPrimaryKeys()) {
 							keyColumns.add(new PhysicalColumn(table, column));

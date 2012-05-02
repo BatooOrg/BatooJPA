@@ -26,6 +26,7 @@ import java.util.Map;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
+import org.batoo.jpa.core.impl.jdbc.AbstractTable.TableType;
 import org.batoo.jpa.core.impl.jdbc.QueryItem.QueryItemType;
 import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.mapping.Mapping;
@@ -112,7 +113,7 @@ public abstract class BaseSelectHelper<X> {
 		Collection<PhysicalColumn> filteredColumns;
 
 		// first filter out the secondary table id fields.
-		if (table.isPrimary()) {
+		if (table.getTableType() == TableType.PRIMARY) {
 			filteredColumns = table.getColumns();
 		}
 		else {
@@ -369,7 +370,7 @@ public abstract class BaseSelectHelper<X> {
 			final List<String> joinsBuffer = Lists.newArrayList();
 			final List<String> fieldsBuffer = Lists.newArrayList();
 			final List<Map<PhysicalColumn, String>> columnAliases = Lists.newArrayList();
-			
+
 			this.preparePredicates();
 
 			this.root = this.processType(columnAliases, fieldsBuffer, joinsBuffer, null, this.type, new LinkedList<Association<?, ?>>(), 0,
@@ -425,10 +426,10 @@ public abstract class BaseSelectHelper<X> {
 
 		parentTableNo = thisTableNo;
 
+		// handle the secondary and default tables;
 		int secondaryTableNo = 0;
-		// handle the secondary tables;
 		for (final EntityTable table : type.getTables().values()) {
-			if (table.isPrimary()) { // increment the tableNo index
+			if (table.getTableType() == TableType.PRIMARY) { // increment the tableNo index
 				continue;
 			}
 

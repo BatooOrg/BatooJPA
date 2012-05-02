@@ -39,7 +39,6 @@ import com.google.common.collect.Lists;
 public final class TableTemplate {
 
 	private final IdentifiableTypeImpl<?> owner;
-
 	private final String schema;
 	private final String name;
 	private final boolean primary;

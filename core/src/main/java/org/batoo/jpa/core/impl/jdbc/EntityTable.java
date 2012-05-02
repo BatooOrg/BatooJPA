@@ -42,11 +42,9 @@ import com.google.common.collect.Lists;
  */
 public final class EntityTable extends AbstractTable {
 
-	private final boolean primary;
-
 	private PhysicalColumn identityColumn;
-
 	private PhysicalColumn primaryKey;
+	private final TableType tableType;
 
 	/**
 	 * @param type
@@ -62,7 +60,15 @@ public final class EntityTable extends AbstractTable {
 		super(type, template.getSchema(), template.getName() != null ? template.getName() : type.getName(),
 			template.getUniqueConstraints(), jdbcAdapter);
 
-		this.primary = template.isPrimary();
+		if (type != type.getRoot()) {
+			this.tableType = TableType.DEFAULT;
+		}
+		else if (template.isPrimary()) {
+			this.tableType = TableType.PRIMARY;
+		}
+		else {
+			this.tableType = TableType.SECONDARY;
+		}
 	}
 
 	/**
@@ -96,15 +102,9 @@ public final class EntityTable extends AbstractTable {
 		return this.primaryKey;
 	}
 
-	/**
-	 * Returns the primary.
-	 * 
-	 * @return the primary
-	 * @since $version
-	 */
 	@Override
-	public boolean isPrimary() {
-		return this.primary;
+	public TableType getTableType() {
+		return this.tableType;
 	}
 
 	/**
@@ -169,7 +169,7 @@ public final class EntityTable extends AbstractTable {
 			}
 		}));
 
-		return "EntityTable [owner=" + this.type.getName() + ", name=" + this.getQualifiedName() + ", primary=" + this.primary
+		return "EntityTable [owner=" + this.type.getName() + ", name=" + this.getQualifiedName() + ", type=" + this.tableType
 			+ ", columns=[" + columns + "]]";
 	}
 

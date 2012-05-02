@@ -25,6 +25,7 @@ import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
+import org.batoo.jpa.core.impl.jdbc.AbstractTable.TableType;
 import org.batoo.jpa.core.impl.mapping.AbstractPhysicalMapping;
 import org.batoo.jpa.core.impl.mapping.BasicColumnTemplate;
 import org.batoo.jpa.core.impl.mapping.EntityInheritence;
@@ -46,7 +47,7 @@ public class PhysicalColumn implements Column {
 	private final AbstractPhysicalMapping<?, ?> mapping;
 	private final PhysicalColumn referencedColumn;
 
-	private final Table table;
+	private final AbstractTable table;
 
 	private final String name;
 	private final String physicalName;
@@ -61,6 +62,7 @@ public class PhysicalColumn implements Column {
 	private final boolean unique;
 
 	private int h;
+	private boolean referencing;
 
 	/**
 	 * @param mapping
@@ -154,6 +156,10 @@ public class PhysicalColumn implements Column {
 		this.scale = scale;
 		this.nullable = nullable;
 		this.unique = unique;
+
+		this.referencing = table.getTableType() == TableType.PRIMARY;
+		this.referencing |= !this.isId() && (table.getTableType() != TableType.PRIMARY);
+		this.referencing &= this.referencedColumn != null;
 
 		table.addColumn(this);
 	}
@@ -309,19 +315,17 @@ public class PhysicalColumn implements Column {
 			return type.getDiscriminatorValue();
 		}
 
-		Object value = this.mapping.getValue(instance);
+		final Object value = this.mapping.getValue(instance);
 
-		if ((!this.isId() && !this.getTable().isPrimary()) || this.getTable().isPrimary()) {
-			if ((value != null) && (this.referencedColumn != null)) {
+		if (this.referencing && (value != null)) {
 
-				final ManagedInstance<? super Object> reference = session.get(value);
-				if ((reference == null) || (reference.getStatus() != Status.MANAGED)) {
-					throw new PersistenceException(instance + " has a reference with " + this.mapping.getPathAsString() + " to " + value
-						+ " that is not managed (" + (reference != null ? reference.getStatus() : Status.NEW) + ")");
-				}
-
-				value = this.referencedColumn.getMapping().getValue(value);
+			final ManagedInstance<? super Object> reference = session.get(value);
+			if ((reference == null) || (reference.getStatus() != Status.MANAGED)) {
+				throw new PersistenceException(instance + " has a reference with " + this.mapping.getPathAsString() + " to " + value
+					+ " that is not managed (" + (reference != null ? reference.getStatus() : Status.NEW) + ")");
 			}
+
+			return this.referencedColumn.getMapping().getValue(value);
 		}
 
 		return value;

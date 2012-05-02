@@ -105,8 +105,8 @@ public final class JoinTable extends AbstractTable {
 	 * 
 	 */
 	@Override
-	public boolean isPrimary() {
-		return false;
+	public TableType getTableType() {
+		return TableType.JOIN;
 	}
 
 	/**

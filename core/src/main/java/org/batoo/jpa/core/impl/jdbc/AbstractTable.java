@@ -53,6 +53,29 @@ import com.google.common.collect.Maps;
  */
 public abstract class AbstractTable implements Table {
 
+	public enum TableType {
+
+		/**
+		 * Table is a primary table. it either belongs to the root type or the entity is not part of inheritence.
+		 */
+		PRIMARY,
+
+		/**
+		 * Table is the default table of an entity that is a decendent in an inheritence.
+		 */
+		DEFAULT,
+
+		/**
+		 * Table is a secondary table
+		 */
+		SECONDARY,
+
+		/**
+		 * Table is a join table
+		 */
+		JOIN
+	}
+
 	protected final EntityTypeImpl<?> type;
 	protected final JDBCAdapter jdbcAdapter;
 
@@ -441,6 +464,14 @@ public abstract class AbstractTable implements Table {
 	}
 
 	/**
+	 * Returns the tableType.
+	 * 
+	 * @return the tableType
+	 * @since $version
+	 */
+	public abstract TableType getTableType();
+
+	/**
 	 * Returns the uniqueConstraints.
 	 * 
 	 * @return the uniqueConstraints
@@ -545,5 +576,4 @@ public abstract class AbstractTable implements Table {
 		Collections.sort(this.primaryKeys, c);
 		Collections.sort(this.columns, c);
 	}
-
 }

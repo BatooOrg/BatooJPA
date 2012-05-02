@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.impl.types;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Modifier;
 import java.util.Set;
 
 import javax.persistence.DiscriminatorColumn;
@@ -65,7 +66,8 @@ abstract class BaseEntityTypeImpl<X> extends AbstractEntityTypeImpl<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public BaseEntityTypeImpl(MetamodelImpl metaModel, IdentifiableTypeImpl<? super X> supertype, Class<X> javaType) throws MappingException {
+	public BaseEntityTypeImpl(MetamodelImpl metaModel, IdentifiableTypeImpl<? super X> supertype, Class<X> javaType)
+		throws MappingException {
 		super(metaModel, supertype, javaType);
 	}
 
@@ -94,11 +96,16 @@ abstract class BaseEntityTypeImpl<X> extends AbstractEntityTypeImpl<X> {
 
 	private void parseDiscrimination(Set<Class<? extends Annotation>> parsed) throws MappingException {
 		final Class<X> type = this.getJavaType();
+		final boolean abztract = Modifier.isAbstract(type.getModifiers());
 
 		final DiscriminatorValue discriminatorValue = type.getAnnotation(DiscriminatorValue.class);
 		if (discriminatorValue != null) {
 			if (this.getRoot().inheritance == null) {
 				throw new MappingException("DiscriminatorValue is not allowed for " + this.javaType + " as it is not part of inheritence");
+			}
+
+			if (abztract) {
+				throw new MappingException("DiscriminatorValue is not allowed for " + this.javaType + " as it is abstract");
 			}
 
 			final String value = discriminatorValue.value();
@@ -129,6 +136,9 @@ abstract class BaseEntityTypeImpl<X> extends AbstractEntityTypeImpl<X> {
 
 			parsed.add(DiscriminatorValue.class);
 		}
+		else if (!abztract) {
+			this.discriminatorValue = this.javaType.getSimpleName();
+		}
 	}
 
 	private void parseInheritence(Set<Class<? extends Annotation>> parsed) throws BatooException {
@@ -150,17 +160,6 @@ abstract class BaseEntityTypeImpl<X> extends AbstractEntityTypeImpl<X> {
 	}
 
 	/**
-	 * Sets the discriminatorValue.
-	 * 
-	 * @param discriminatorValue
-	 *            the discriminatorValue to set
-	 * @since $version
-	 */
-	public void setDiscriminatorValue(Object discriminatorValue) {
-		this.discriminatorValue = discriminatorValue;
-	}
-
-	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -171,6 +170,9 @@ abstract class BaseEntityTypeImpl<X> extends AbstractEntityTypeImpl<X> {
 		final Set<SingularAttribute<? super X, ?>> idAttributes = Sets.newHashSet();
 		for (final SingularAttribute<? super X, ?> attribute : this.getSingularAttributes()) {
 			if (attribute.isId()) {
+				if (this.getRoot() != this) {
+					throw new MappingException("Id attribute is not allowed for type " + this.javaType + " as it is part of inheritence");
+				}
 				idAttributes.add(attribute);
 			}
 		}

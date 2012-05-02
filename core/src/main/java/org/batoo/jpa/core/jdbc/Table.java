@@ -74,14 +74,4 @@ public interface Table {
 	 */
 	String getSchema();
 
-	/**
-	 * Returns if the table is primary table.
-	 * 
-	 * @return true the table is primary table
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	boolean isPrimary();
-
 }
