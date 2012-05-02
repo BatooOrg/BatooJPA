@@ -664,7 +664,7 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 	private void putTable(boolean primary, String schema, String name, UniqueConstraint[] uniqueConstraints,
 		PrimaryKeyJoinColumn[] primaryKeyJoinColumns) throws MappingException {
 		if (StringUtils.isBlank(name)) {
-			throw new MappingException("Table name cannot be null, spesified on " + this.javaType);
+			name = this.name;
 		}
 
 		TableTemplate table;
