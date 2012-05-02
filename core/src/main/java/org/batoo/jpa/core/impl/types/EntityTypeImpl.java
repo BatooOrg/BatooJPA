@@ -46,11 +46,12 @@ import com.google.common.collect.Lists;
  */
 public class EntityTypeImpl<X> extends BaseEntityTypeImpl<X> {
 
-	private final SelectHelper<X> selectHelper;
-	private final RefreshHelper<X> refreshHelper;
 	protected EntityTypeImpl<? super X> root;
 	protected final EntityTypeImpl<? super X> parent;
 	private final List<EntityTypeImpl<? extends X>> children = Lists.newArrayList();
+
+	private final SelectHelper<X> selectHelper;
+	private final RefreshHelper<X> refreshHelper;
 
 	/**
 	 * @param metaModel
@@ -78,6 +79,7 @@ public class EntityTypeImpl<X> extends BaseEntityTypeImpl<X> {
 		else {
 			this.parent = null;
 			this.root = this;
+
 		}
 
 		this.selectHelper = new SelectHelper<X>(this);
