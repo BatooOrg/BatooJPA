@@ -21,7 +21,6 @@ package org.batoo.jpa.core.impl.jdbc;
 import java.sql.SQLException;
 import java.util.Collection;
 
-import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.mapping.Association;
@@ -92,6 +91,16 @@ public class AssociationSelectHelper<X, C, E> extends BaseSelectHelper<E> {
 	 * 
 	 */
 	@Override
+	protected String preparePredicate(PhysicalColumn column) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	protected void preparePredicates() {
 		OwnerAssociation<?, ?> ownerAssociation;
 		if (this.mapping instanceof OwnerAssociation) {
@@ -122,7 +131,6 @@ public class AssociationSelectHelper<X, C, E> extends BaseSelectHelper<E> {
 	 * @author hceylan
 	 */
 	public Collection<E> select(SessionImpl session, final ManagedId<?> managedId) throws SQLException {
-		// Do not inline, generation of the select SQL will initialize the predicates!
 		final String selectSql = this.getSelectSql();
 
 		final Collection<Object> params = Collections2.transform(this.predicates, new Function<PhysicalColumn, Object>() {
@@ -134,7 +142,7 @@ public class AssociationSelectHelper<X, C, E> extends BaseSelectHelper<E> {
 
 		final SelectHandler<E> rsHandler = new SelectHandler<E>(session, this.type, this.columnAliases, this.root);
 
-		return new QueryRunner().query(session.getConnection(), selectSql, rsHandler, params.toArray());
+		return this.runner.query(session.getConnection(), selectSql, rsHandler, params.toArray());
 	}
 
 	/**

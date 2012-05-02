@@ -67,6 +67,7 @@ public abstract class BaseSelectHelper<X> {
 
 	protected Map<PhysicalColumn, String>[] columnAliases;
 	protected final List<PhysicalColumn> predicates = Lists.newArrayList();
+	protected final List<PhysicalColumn> parameters = Lists.newArrayList();
 
 	private String selectSql;
 	protected QueryItem root;
@@ -137,10 +138,10 @@ public abstract class BaseSelectHelper<X> {
 				}
 
 				final AttributeImpl<?, ?> root = input.getMapping().getPath().getFirst();
-				final Class<?> parent = root.getDeclaringType().getJavaType();
+				final Class<?> related = root.getDeclaringType().getJavaType();
 				final Class<?> javaType = type.getJavaType();
 
-				return parent.isAssignableFrom(javaType);
+				return javaType.isAssignableFrom(related) || related.isAssignableFrom(javaType);
 			}
 		});
 
@@ -383,14 +384,37 @@ public abstract class BaseSelectHelper<X> {
 	}
 
 	/**
-	 * Subclasses must implement to return the where part of the select statement.
+	 * Returns the where part of the select statement.
 	 * 
 	 * @return the where part of the select statement.
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected abstract String getWhere();
+	protected String getWhere() {
+		// Generate the where statement
+		// T1_F1 = ? [AND T1_F2 = ? [...]]
+		return Joiner.on(" AND ").join(//
+			Collections2.transform(this.predicates, new Function<PhysicalColumn, String>() {
+
+				@Override
+				public String apply(PhysicalColumn input) {
+					return BaseSelectHelper.this.preparePredicate(input);
+				}
+			}));
+	}
+
+	/**
+	 * Subclasses must implement to generate predicate.
+	 * 
+	 * @param column
+	 *            the column to generate predicate for
+	 * @return the predicate
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected abstract String preparePredicate(PhysicalColumn column);
 
 	/**
 	 * Subclasses must implement to initialize the predicates.
@@ -473,4 +497,5 @@ public abstract class BaseSelectHelper<X> {
 
 		return new QueryItem(this.type, children.toArray(new QueryItem[children.size()]));
 	}
+
 }

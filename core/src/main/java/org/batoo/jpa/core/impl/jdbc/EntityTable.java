@@ -120,7 +120,6 @@ public final class EntityTable extends AbstractTable {
 	 * @author hceylan
 	 */
 	public void performInsert(Connection connection, final ManagedInstance<?> managedInstance) throws SQLException {
-
 		final QueryRunner runner = new QueryRunner();
 
 		final SessionImpl session = managedInstance.getSession();

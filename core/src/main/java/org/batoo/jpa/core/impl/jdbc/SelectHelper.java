@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.jdbc;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Set;
 
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedId;
@@ -64,17 +65,25 @@ public class SelectHelper<X> extends BaseSelectHelper<X> {
 	 * 
 	 */
 	@Override
-	protected String getWhere() {
-		// Generate the where statement
-		// T1_F1 = ? [AND T1_F2 = ? [...]]
-		return Joiner.on(" AND ").join(//
-			Collections2.transform(this.predicates, new Function<PhysicalColumn, String>() {
+	protected String preparePredicate(PhysicalColumn column) {
+		if (!column.isDiscriminator()) {
+			return "T0." + column.getPhysicalName() + " = ?";
+		}
 
-				@Override
-				public String apply(PhysicalColumn input) {
-					return "T0." + input.getPhysicalName() + " = ?";
+		final Set<Object> values = this.type.getDiscriminatorValues();
+		final String valuesAsString = Joiner.on(", ").join(Collections2.transform(values, new Function<Object, String>() {
+
+			@Override
+			public String apply(Object input) {
+				if (input instanceof Integer) {
+					return ((Integer) input).toString();
 				}
-			}));
+
+				return "'" + input + "'";
+			}
+		}));
+
+		return "T0." + column.getPhysicalName() + " IN (" + valuesAsString + ")";
 	}
 
 	/**
@@ -86,6 +95,10 @@ public class SelectHelper<X> extends BaseSelectHelper<X> {
 		for (final PhysicalColumn column : this.type.getPrimaryTable().getColumns()) {
 			if (column.isId() || column.isDiscriminator()) {
 				this.predicates.add(column);
+			}
+
+			if (column.isId()) {
+				this.parameters.add(column);
 			}
 		}
 	}
@@ -107,9 +120,9 @@ public class SelectHelper<X> extends BaseSelectHelper<X> {
 		// Do not inline, generation of the select SQL will initialize the predicates!
 		final String selectSql = this.getSelectSql();
 
-		final Object[] params = new Object[this.predicates.size()];
+		final Object[] params = new Object[this.parameters.size()];
 		for (int i = 0; i < params.length; i++) {
-			params[i] = this.predicates.get(i).getPhysicalValue(managedId.getSession(), managedId.getInstance());
+			params[i] = this.parameters.get(i).getPhysicalValue(managedId.getSession(), managedId.getInstance());
 		}
 
 		final SelectHandler<X> rsHandler = new SelectHandler<X>(session, this.type, this.columnAliases, this.root);

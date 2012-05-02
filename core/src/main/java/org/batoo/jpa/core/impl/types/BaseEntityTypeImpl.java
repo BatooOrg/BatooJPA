@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.types;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.DiscriminatorColumn;
@@ -37,6 +38,7 @@ import org.batoo.jpa.core.impl.mapping.EntityInheritence;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
 import org.batoo.jpa.core.impl.mapping.TableTemplate;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 /**
@@ -51,6 +53,9 @@ abstract class BaseEntityTypeImpl<X> extends AbstractEntityTypeImpl<X> {
 
 	protected EntityInheritence inheritance;
 	private Object discriminatorValue;
+	private final Map<Object, EntityTypeImpl<? extends X>> discrimination = Maps.newHashMap();
+
+	private PhysicalColumn discriminatorColumn;
 
 	/**
 	 * @param metaModel
@@ -72,6 +77,22 @@ abstract class BaseEntityTypeImpl<X> extends AbstractEntityTypeImpl<X> {
 	}
 
 	/**
+	 * Returns the discriminator column.
+	 * 
+	 * @return the discriminator column or null
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public PhysicalColumn getDiscriminatorColumn() {
+		if (this.getRoot() == this) {
+			return this.discriminatorColumn;
+		}
+
+		return this.getRoot().getDiscriminatorColumn();
+	}
+
+	/**
 	 * Returns the discriminatorValue.
 	 * 
 	 * @return the discriminatorValue
@@ -79,6 +100,59 @@ abstract class BaseEntityTypeImpl<X> extends AbstractEntityTypeImpl<X> {
 	 */
 	public Object getDiscriminatorValue() {
 		return this.discriminatorValue;
+	}
+
+	/**
+	 * Returns the set of discriminator values for the type.
+	 * 
+	 * @return the set of discriminator values for the type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Set<Object> getDiscriminatorValues() {
+		return this.discrimination.keySet();
+	}
+
+	/**
+	 * Returns the Child type for the discrimination value.
+	 * 
+	 * @param discriminatorValue
+	 *            the value for the discriminator
+	 * @return the Entity type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public EntityTypeImpl<?> getTypeForDiscriminator(Object discriminatorValue) {
+		return this.discrimination.get(discriminatorValue);
+	}
+
+	/**
+	 * Adds the discrimination mapping.
+	 * 
+	 * @param discriminatorValue
+	 *            the discriminator value
+	 * @param child
+	 *            the child that maps to discriminator value
+	 * @throws MappingException
+	 *             thrown in case of a clash
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	void mapDiscrimination(Object discriminatorValue, EntityTypeImpl<? extends X> child) throws MappingException {
+		final EntityTypeImpl<? extends X> other = this.discrimination.get(discriminatorValue);
+		if (other != null) {
+			throw new MappingException("Duplicate mapping for discriminator value " + discriminatorValue + " for " + this.javaType + ": "
+				+ other.javaType + ", " + child.javaType);
+		}
+
+		this.discrimination.put(discriminatorValue, child);
+
+		if (this.getSupertype() instanceof EntityTypeImpl) {
+			((EntityTypeImpl<? super X>) this.getSupertype()).mapDiscrimination(discriminatorValue, child);
+		}
 	}
 
 	/**
@@ -138,6 +212,10 @@ abstract class BaseEntityTypeImpl<X> extends AbstractEntityTypeImpl<X> {
 		}
 		else if (!abztract) {
 			this.discriminatorValue = this.javaType.getSimpleName();
+		}
+
+		if ((this.discriminatorValue != null)) {
+			this.mapDiscrimination(this.discriminatorValue, (EntityTypeImpl<? extends X>) this);
 		}
 	}
 
@@ -216,7 +294,7 @@ abstract class BaseEntityTypeImpl<X> extends AbstractEntityTypeImpl<X> {
 
 		if (this.inheritance != null) {
 			// create the discriminator column
-			new PhysicalColumn(this.primaryTable, this.inheritance);
+			this.discriminatorColumn = new PhysicalColumn(this.primaryTable, this.inheritance);
 		}
 	}
 }

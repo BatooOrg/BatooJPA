@@ -27,11 +27,10 @@ import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 
 import com.google.common.base.Function;
-import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
 
 /**
- * Select helper to select against the primary key
+ * Select helper to select against the primary key.
  * 
  * @param <X>
  * @author hceylan
@@ -64,17 +63,9 @@ public class RefreshHelper<X> extends BaseSelectHelper<X> {
 	 * 
 	 */
 	@Override
-	protected String getWhere() {
-		// Generate the where statement
-		// T1_F1 = ? [AND T1_F2 = ? [...]]
-		return Joiner.on(" AND ").join(//
-			Collections2.transform(this.predicates, new Function<PhysicalColumn, String>() {
-
-				@Override
-				public String apply(PhysicalColumn input) {
-					return "T0." + input.getPhysicalName() + " = ?";
-				}
-			}));
+	protected String preparePredicate(PhysicalColumn column) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -104,7 +95,6 @@ public class RefreshHelper<X> extends BaseSelectHelper<X> {
 	 * @return
 	 */
 	public void refresh(SessionImpl session, final ManagedInstance<X> managedInstance) throws SQLException {
-		// Do not inline, generation of the select SQL will initialize the predicates!
 		final String selectSql = this.getSelectSql();
 
 		final Collection<Object> params = Collections2.transform(this.predicates, new Function<PhysicalColumn, Object>() {

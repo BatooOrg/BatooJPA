@@ -51,7 +51,9 @@ import com.google.common.collect.Maps;
 public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collection<X>> {
 
 	private static final BLogger LOG = BLogger.getLogger(SelectHandler.class);
+
 	private static volatile int nextOperationNo = 0;
+
 	protected final SessionImpl session;
 	protected final EntityTypeImpl<X> rootType;
 	protected final Map<PhysicalColumn, String>[] columnAliases;
@@ -73,6 +75,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 	 * 
 	 * @since $version
 	 * @author hceylan
+	 * @param discriminatorColumn
 	 */
 	public BaseSelectHandler(SessionImpl session, EntityTypeImpl<X> rootType, Map<PhysicalColumn, String>[] columnAliases, QueryItem root) {
 
@@ -158,10 +161,12 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 	 * 
 	 * @since $version
 	 * @author hceylan
+	 * @param discriminatorValue
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private ManagedInstance<?> getManagedInstance(SessionImpl session, Map<ManagedId<?>, ManagedInstance<?>> cache, EntityTypeImpl<?> type,
 		final Object primaryKey, ResultSet rs, int tableNo) throws SQLException {
+
 		final ManagedId<?> managedId = type.newManagedId(session, primaryKey, false);
 
 		// look for it in the cache
@@ -188,6 +193,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 		// new managed instance
 		instance = new ManagedInstance(type, session, managedId);
 
+		// put it into cache and session
 		session.put(instance);
 		cache.put(managedId, instance);
 
@@ -382,12 +388,22 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 	private ManagedInstance<?> processRow(SessionImpl session, ResultSet rs, Map<ManagedId<?>, ManagedInstance<?>> cache,
 		QueryItem queryItem, Object parent) throws SQLException {
 
-		final EntityTypeImpl<?> currentType = queryItem.getType();
+		EntityTypeImpl<?> currentType = queryItem.getType();
 
 		ManagedInstance<?> managedInstance = null;
 
+		// get the primary key
 		final Object primaryKey = this.getPrimaryKey(rs, queryItem.getTableNo(), currentType);
 		if (primaryKey != null) {
+
+			// get the discrimination value
+			final PhysicalColumn discriminatorColumn = currentType.getDiscriminatorColumn();
+			if (discriminatorColumn != null) {
+				final Object discriminatorValue = this.getColumnValue(rs, queryItem.getTableNo(), currentType.getDiscriminatorColumn());
+
+				currentType = currentType.getTypeForDiscriminator(discriminatorValue);
+			}
+
 			managedInstance = this.getManagedInstance(session, cache, currentType, primaryKey, rs, queryItem.getTableNo());
 
 			if (managedInstance != null) {
