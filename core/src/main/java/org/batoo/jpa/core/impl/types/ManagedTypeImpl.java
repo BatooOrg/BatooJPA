@@ -450,16 +450,6 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * 
 	 */
 	@Override
-	public javax.persistence.metamodel.Type.PersistenceType getPersistenceType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	@SuppressWarnings("unchecked")
 	public Set<PluralAttribute<? super X, ?, ?>> getPluralAttributes() {
 		if (this.plurals != null) {
