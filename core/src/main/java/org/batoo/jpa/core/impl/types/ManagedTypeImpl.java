@@ -630,7 +630,9 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	}
 
 	/**
-	 * @return
+	 * Throws an illegal argument exception when an attribute is not found.
+	 * 
+	 * @return never returns
 	 * 
 	 * @since $version
 	 * @author hceylan
