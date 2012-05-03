@@ -18,7 +18,6 @@
  */
 package org.batoo.jpa.core.impl.mapping;
 
-import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -382,28 +381,31 @@ public class TypeFactory {
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static <X> Attribute<X, ?> forType(ManagedTypeImpl<X> owner, Field field, Class<?> clazz) throws BatooException {
-		// If array type, persistent type must be a basic type
-		if (clazz.isArray() && TypeFactory.isBasicType(clazz.getComponentType(), true)) {
-			return new SingularAttributeImpl(owner, field, clazz);
+		// for collections either OneToMany or ManyToMany must exist
+		if ((ReflectHelper.getAnnotation(field, OneToMany.class) != null) || (ReflectHelper.getAnnotation(field, ManyToMany.class) != null)) {
+			if (Map.class.isAssignableFrom(clazz)) {
+				return new MapAttributeImpl(owner, field, clazz);
+			}
+
+			if (List.class.isAssignableFrom(clazz)) {
+				return new ListAttributeImpl(owner, field, clazz);
+			}
+
+			if (Set.class.isAssignableFrom(clazz)) {
+				return new SetAttributeImpl(owner, field, clazz);
+			}
+
+			if (Collection.class.isAssignableFrom(clazz)) {
+				return new CollectionAttributeImpl(owner, field, clazz);
+			}
 		}
 
-		if (Map.class.isAssignableFrom(clazz)) {
-			return new MapAttributeImpl(owner, field, clazz);
+		// If array type, then always lob type
+		if (clazz.isArray()) {
+			return new SingularAttributeImpl(owner, field, clazz, true);
 		}
 
-		if (List.class.isAssignableFrom(clazz)) {
-			return new ListAttributeImpl(owner, field, clazz);
-		}
-
-		if (Set.class.isAssignableFrom(clazz)) {
-			return new SetAttributeImpl(owner, field, clazz);
-		}
-
-		if (Collection.class.isAssignableFrom(clazz)) {
-			return new CollectionAttributeImpl(owner, field, clazz);
-		}
-
-		return new SingularAttributeImpl(owner, field, clazz);
+		return new SingularAttributeImpl(owner, field, clazz, ReflectHelper.getAnnotation(field, OneToMany.class) != null);
 	}
 
 	/**
@@ -506,8 +508,9 @@ public class TypeFactory {
 	 */
 	public static int getSqlType(Class<?> javaType, TemporalType temporal, EnumType enumType, boolean isLob) {
 		if (isLob) {
-			if (Character.class.isAssignableFrom(javaType) || char.class.isAssignableFrom(javaType.getComponentType())
-				|| String.class.isAssignableFrom(javaType)) {
+			if (Character.class.isAssignableFrom(javaType) //
+				|| String.class.isAssignableFrom(javaType) //
+				|| (javaType.isArray() && char.class.isAssignableFrom(javaType.getComponentType()))) {
 				return Types.CLOB;
 			}
 
@@ -622,18 +625,11 @@ public class TypeFactory {
 
 	private static boolean isBasicType(Class<?> cls, boolean array) {
 		// basic array types
-		if (Byte.class.isAssignableFrom(cls) //
+		return Byte.class.isAssignableFrom(cls) //
 			|| byte.class.isAssignableFrom(cls) //
 			|| Character.class.isAssignableFrom(cls) //
-			|| char.class.isAssignableFrom(cls)) {
-			return true;
-		}
-
-		if (array) {
-			return false;
-		}
-
-		return Short.class.isAssignableFrom(cls) //
+			|| char.class.isAssignableFrom(cls) //
+			|| Short.class.isAssignableFrom(cls) //
 			|| Integer.class.isAssignableFrom(cls) //
 			|| Long.class.isAssignableFrom(cls) //
 			|| Float.class.isAssignableFrom(cls) //
@@ -653,8 +649,7 @@ public class TypeFactory {
 			|| Date.class.isAssignableFrom(cls) //
 			|| java.sql.Date.class.isAssignableFrom(cls) //
 			|| java.sql.Time.class.isAssignableFrom(cls) //
-			|| java.sql.Timestamp.class.isAssignableFrom(cls) //
-			|| Serializable.class.isAssignableFrom(cls);
+			|| java.sql.Timestamp.class.isAssignableFrom(cls);
 	}
 
 	/**

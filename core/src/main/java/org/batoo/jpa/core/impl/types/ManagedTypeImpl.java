@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.Transient;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.CollectionAttribute;
 import javax.persistence.metamodel.ListAttribute;
@@ -42,6 +43,7 @@ import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
 import org.batoo.jpa.core.impl.mapping.TypeFactory;
+import org.batoo.jpa.core.impl.reflect.ReflectHelper;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -578,20 +580,22 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 			// skip if field is transient
 			final int mod = field.getModifiers();
 			if (Modifier.isTransient(mod)) {
-				LOG.trace("Skipping transient property {0}.{1}", this.getJavaType().getSimpleName(), field.getName());
+				LOG.debug("Skipping transient property {0}.{1}", this.getJavaType().getSimpleName(), field.getName());
 
 				continue;
 			}
 
 			if (Modifier.isStatic(mod)) {
-				LOG.trace("Skipping static property {0}.{1}", this.getJavaType().getSimpleName(), field.getName());
+				LOG.debug("Skipping static property {0}.{1}", this.getJavaType().getSimpleName(), field.getName());
 
 				continue;
 			}
 
-			final Attribute<X, ?> attribute = TypeFactory.<X> forType(this, field, field.getType());
+			if (ReflectHelper.getAnnotation(field, Transient.class) != null) {
+				LOG.debug("Skipping @Transient property {0}.{1}", this.getJavaType().getSimpleName(), field.getName());
+			}
 
-			LOG.debug("Found {0}.{1} {2}", this.getJavaType().getSimpleName(), field.getName(), attribute);
+			final Attribute<X, ?> attribute = TypeFactory.<X> forType(this, field, field.getType());
 
 			this.attributes.put(field.getName(), attribute);
 		}

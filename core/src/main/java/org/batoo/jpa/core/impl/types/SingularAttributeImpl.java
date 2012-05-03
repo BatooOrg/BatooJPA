@@ -18,7 +18,9 @@
  */
 package org.batoo.jpa.core.impl.types;
 
+import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.util.Collection;
 import java.util.Deque;
@@ -94,8 +96,12 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SingularAttributeImpl(ManagedTypeImpl<X> declaringType, Member member, Class<T> javaMember) throws MappingException {
+	public SingularAttributeImpl(ManagedTypeImpl<X> declaringType, Member member, Class<T> javaMember, boolean lob) throws MappingException {
 		super(declaringType, member, javaMember);
+
+		if (lob) {
+			this.attributeType = AtrributeType.LOB;
+		}
 	}
 
 	/**
@@ -117,6 +123,39 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 		this.idType = original.idType;
 		this.generatorName = original.generatorName;
 		this.getterName = original.getterName;
+	}
+
+	/**
+	 * Performs the checks for the lob type.
+	 * 
+	 * @throws MappingException
+	 *             thrown if the check fails
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void checkLobType() throws MappingException {
+		if (this.isLob()) {
+			final Field field = (Field) this.javaMember;
+			final Class<?> fieldType = field.getType();
+
+			// if it is an array type, check the component typ
+			if (fieldType.isArray() && !Serializable.class.isAssignableFrom(fieldType.getComponentType())) {
+				throw new MappingException(ReflectHelper.createMemberName(this.javaMember) + " component type must be serializable");
+			}
+
+			if (!Serializable.class.isAssignableFrom(fieldType)) {
+				throw new MappingException(ReflectHelper.createMemberName(this.javaMember) + " type must be serializable");
+			}
+		}
+		else {
+			try {
+				this.getDeclaringType().getMetaModel().basic(this.javaType);
+			}
+			catch (final PersistenceException e) {
+				throw new MappingException(ReflectHelper.createMemberName(this.javaMember) + " type must be serializable");
+			}
+		}
 	}
 
 	/**
@@ -374,6 +413,8 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 	 */
 	@Override
 	protected Set<Class<? extends Annotation>> parse() throws MappingException {
+		this.checkLobType();
+
 		final Set<Class<? extends Annotation>> parsed = super.parse();
 
 		final Member member = this.getJavaMember();

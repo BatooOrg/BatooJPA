@@ -57,9 +57,6 @@ public class Foo {
 	private float floatValue;
 	private double doubleValue;
 
-	private char[] charArrayValue;
-	private byte[] byteArrayValue;
-
 	private Boolean booleanObjectValue;
 	private Byte byteObjectValue;
 	private Short shortObjectValue;
@@ -68,9 +65,6 @@ public class Foo {
 
 	private Float floatObjectValue;
 	private Double doubleObjectValue;
-
-	private Character[] charObjectArrayValue;
-	private Byte[] byteObjectArrayValue;
 
 	private Enum<E> enumValue;
 
@@ -117,26 +111,6 @@ public class Foo {
 	}
 
 	/**
-	 * Returns the byteArrayValue.
-	 * 
-	 * @return the byteArrayValue
-	 * @since $version
-	 */
-	public byte[] getByteArrayValue() {
-		return this.byteArrayValue;
-	}
-
-	/**
-	 * Returns the byteObjectArrayValue.
-	 * 
-	 * @return the byteObjectArrayValue
-	 * @since $version
-	 */
-	public Byte[] getByteObjectArrayValue() {
-		return this.byteObjectArrayValue;
-	}
-
-	/**
 	 * Returns the byteObjectValue.
 	 * 
 	 * @return the byteObjectValue
@@ -164,26 +138,6 @@ public class Foo {
 	 */
 	public Calendar getCalendarValue() {
 		return this.calendarValue;
-	}
-
-	/**
-	 * Returns the charArrayValue.
-	 * 
-	 * @return the charArrayValue
-	 * @since $version
-	 */
-	public char[] getCharArrayValue() {
-		return this.charArrayValue;
-	}
-
-	/**
-	 * Returns the charObjectArrayValue.
-	 * 
-	 * @return the charObjectArrayValue
-	 * @since $version
-	 */
-	public Character[] getCharObjectArrayValue() {
-		return this.charObjectArrayValue;
 	}
 
 	/**
@@ -411,28 +365,6 @@ public class Foo {
 	}
 
 	/**
-	 * Sets the byteArrayValue.
-	 * 
-	 * @param byteArrayValue
-	 *            the byteArrayValue to set
-	 * @since $version
-	 */
-	public void setByteArrayValue(byte[] byteArrayValue) {
-		this.byteArrayValue = byteArrayValue;
-	}
-
-	/**
-	 * Sets the byteObjectArrayValue.
-	 * 
-	 * @param byteObjectArrayValue
-	 *            the byteObjectArrayValue to set
-	 * @since $version
-	 */
-	public void setByteObjectArrayValue(Byte[] byteObjectArrayValue) {
-		this.byteObjectArrayValue = byteObjectArrayValue;
-	}
-
-	/**
 	 * Sets the byteObjectValue.
 	 * 
 	 * @param byteObjectValue
@@ -463,28 +395,6 @@ public class Foo {
 	 */
 	public void setCalendarValue(Calendar calendarValue) {
 		this.calendarValue = calendarValue;
-	}
-
-	/**
-	 * Sets the charArrayValue.
-	 * 
-	 * @param charArrayValue
-	 *            the charArrayValue to set
-	 * @since $version
-	 */
-	public void setCharArrayValue(char[] charArrayValue) {
-		this.charArrayValue = charArrayValue;
-	}
-
-	/**
-	 * Sets the charObjectArrayValue.
-	 * 
-	 * @param charObjectArrayValue
-	 *            the charObjectArrayValue to set
-	 * @since $version
-	 */
-	public void setCharObjectArrayValue(Character[] charObjectArrayValue) {
-		this.charObjectArrayValue = charObjectArrayValue;
 	}
 
 	/**
