@@ -73,7 +73,7 @@ public final class JoinTable extends AbstractTable {
 	}
 
 	private void createColumns(EntityTypeImpl<?> type, List<PhysicalColumn> columns) throws MappingException {
-		for (final PhysicalColumn column : type.getPrimaryTable().getPrimaryKeys()) {
+		for (final PhysicalColumn column : type.getRoot().getPrimaryTable().getPrimaryKeys()) {
 			columns.add(new PhysicalColumn(this, type.getName(), column));
 		}
 

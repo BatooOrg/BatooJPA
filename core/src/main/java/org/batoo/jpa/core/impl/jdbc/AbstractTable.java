@@ -130,7 +130,7 @@ public abstract class AbstractTable implements Table {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void addColumn(PhysicalColumn column) throws MappingException {
+	public synchronized void addColumn(PhysicalColumn column) throws MappingException {
 		for (final PhysicalColumn other : this.columns) {
 			if (other.getName().equals(column.getName())) {
 				throw new MappingException("Duplicate column on entity " + this.type.getJavaType().getCanonicalName() + ", "
@@ -177,7 +177,12 @@ public abstract class AbstractTable implements Table {
 	}
 
 	/**
-	 * Performs the DDL operation on the table.
+	 * 
+	 * <ul>
+	 * Performs the DDL operation on the table:
+	 * <li>On the first pass the table DDL is executed
+	 * <li>On the second pass the foreign keys are created
+	 * </ul>
 	 * 
 	 * @param jdbcAdapter
 	 *            the JDBC adapter to use

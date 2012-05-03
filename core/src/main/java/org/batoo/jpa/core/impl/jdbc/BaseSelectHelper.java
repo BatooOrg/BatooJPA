@@ -208,7 +208,7 @@ public abstract class BaseSelectHelper<X> {
 		final int left = (association instanceof OwnedAssociation ? tableNo : parentTableNo);
 		final int right = (association instanceof OwnedAssociation ? parentTableNo : tableNo);
 
-		this.composeJoin(joinsBuffer, tableNo, association.getType().getPrimaryTable(), foreignKeys, left, right);
+		this.composeJoin(joinsBuffer, tableNo, association.getType().getRoot().getPrimaryTable(), foreignKeys, left, right);
 	}
 
 	/**
@@ -236,7 +236,8 @@ public abstract class BaseSelectHelper<X> {
 
 		// add join to joint table
 		this.composeJoin(joinsBuffer, -tableNo, joinTable, firstKeys, -tableNo, parentTableNo);
-		final EntityTable entityTable = inverse ? association.getOwner().getPrimaryTable() : association.getType().getPrimaryTable();
+		final EntityTable entityTable = inverse ? association.getOwner().getRoot().getPrimaryTable()
+			: association.getType().getRoot().getPrimaryTable();
 
 		// add join to entity table
 		this.composeJoin(joinsBuffer, tableNo, entityTable, secondKeys, -tableNo, tableNo);

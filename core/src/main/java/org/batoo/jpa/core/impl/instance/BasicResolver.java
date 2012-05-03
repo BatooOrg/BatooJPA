@@ -30,7 +30,6 @@ public class BasicResolver extends AbstractResolver {
 
 	private final boolean id;
 	private int h;
-	private boolean locked;
 
 	/**
 	 * @param mapping
@@ -43,9 +42,7 @@ public class BasicResolver extends AbstractResolver {
 	 */
 	public BasicResolver(BasicMapping<?, ?> mapping, Object instance) {
 		super(mapping, instance);
-
 		this.id = this.getMapping().getDeclaringAttribute().isId();
-		this.locked = this.id;
 	}
 
 	/**
@@ -91,35 +88,13 @@ public class BasicResolver extends AbstractResolver {
 	}
 
 	/**
-	 * Lock the resolver so that id values cannot be set.
+	 * Sets the value of the instance for the mapping.
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void relock() {
-		this.locked = this.id;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public void setValue(Object value) {
-		if (this.id && this.locked) {
-			throw new IllegalStateException("Id attributes cannot set value");
-		}
-
-		super.setValue(value);
+		this.mapping.setValue(this.instance, value);
 	}
 
-	/**
-	 * Unlocks the resolver so that id value can be set.
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void unlock() {
-		this.locked = false;
-	}
 }

@@ -18,13 +18,16 @@
  */
 package org.batoo.jpa.core.test.inheritence.joined;
 
-import javax.persistence.DiscriminatorColumn;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
+import javax.persistence.OneToMany;
+
+import com.google.common.collect.Sets;
 
 /**
  * 
@@ -32,39 +35,23 @@ import javax.persistence.InheritanceType;
  * @since $version
  */
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn
-public class Foo {
+public class Bar2 {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue
 	private Integer key;
 
-	private String value;
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private final Set<FooExt1> foos = Sets.newHashSet();
 
 	/**
-	 * {@inheritDoc}
+	 * Returns the foos.
 	 * 
+	 * @return the foos
+	 * @since $version
 	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		final Foo other = (Foo) obj;
-		if (this.key == null) {
-			return false;
-		}
-		if (other.key == null) {
-			return false;
-		}
-		if (!this.key.equals(other.key)) {
-			return false;
-		}
-		return true;
+	public Set<FooExt1> getFoos() {
+		return this.foos;
 	}
 
 	/**
@@ -75,39 +62,6 @@ public class Foo {
 	 */
 	public Integer getKey() {
 		return this.key;
-	}
-
-	/**
-	 * Returns the value.
-	 * 
-	 * @return the value
-	 * @since $version
-	 */
-	public String getValue() {
-		return this.value;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = (prime * result) + ((this.key == null) ? 0 : this.key.hashCode());
-		return result;
-	}
-
-	/**
-	 * Sets the value.
-	 * 
-	 * @param value
-	 *            the value to set
-	 * @since $version
-	 */
-	public void setValue(String value) {
-		this.value = value;
 	}
 
 }

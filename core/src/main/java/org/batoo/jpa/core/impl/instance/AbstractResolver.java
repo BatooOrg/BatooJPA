@@ -63,7 +63,14 @@ public abstract class AbstractResolver {
 			return false;
 		}
 
-		return ObjectUtils.equals(this.getValue(), other.getValue());
+		final Object thisValue = this.getValue();
+		final Object otherValue = other.getValue();
+
+		if ((thisValue == null) || (otherValue == null)) {
+			return false;
+		}
+
+		return ObjectUtils.equals(thisValue, otherValue);
 	}
 
 	/**
@@ -99,16 +106,6 @@ public abstract class AbstractResolver {
 		final Object value = this.mapping.getValue(this.instance);
 		result = (prime * result) + ((value == null) ? 0 : value.hashCode());
 		return result;
-	}
-
-	/**
-	 * Sets the value of the instance for the mapping.
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void setValue(Object value) {
-		this.mapping.setValue(this.instance, value);
 	}
 
 	/**

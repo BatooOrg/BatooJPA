@@ -247,9 +247,7 @@ public class ManagedId<X> {
 		}
 		else {
 			for (final BasicResolver resolver : this.resolvers) {
-				resolver.unlock();
 				resolver.setValue(id);
-				resolver.relock();
 			}
 		}
 	}

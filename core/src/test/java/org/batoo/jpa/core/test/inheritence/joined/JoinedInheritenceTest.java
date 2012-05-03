@@ -18,12 +18,16 @@
  */
 package org.batoo.jpa.core.test.inheritence.joined;
 
+import java.util.Set;
+
 import javax.persistence.EntityManager;
 
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.AbstractTest;
 import org.junit.Test;
+
+import com.google.common.collect.Sets;
 
 /**
  * @author hceylan
@@ -40,71 +44,61 @@ public class JoinedInheritenceTest extends AbstractTest {
 	 */
 	@Test
 	public void testSimpleInheritence0() {
-		final Foo foo = new Foo();
-		foo.setValue("Value");
+		final Foo foo1 = new Foo();
+		foo1.setValue("Value");
 
-		this.persist(foo);
+		final Foo foo2 = new Foo();
+		foo2.setValue("Value");
+
+		final Bar bar = new Bar();
+		bar.getFoos().add(foo1);
+		bar.getFoos().add(foo2);
+
+		this.persist(bar);
 
 		this.commit();
 
 		this.close();
 
-		final Foo foo2 = this.find(Foo.class, foo.getKey());
+		final Bar bar2 = this.em().find(Bar.class, bar.getKey());
+		final Set<Foo> foos = Sets.newHashSet(foo1, foo2);
+		final Set<Foo> foos2 = Sets.newHashSet(bar2.getFoos());
 
-		Assert.assertEquals(foo.getKey(), foo2.getKey());
-		Assert.assertEquals(foo.getValue(), foo2.getValue());
+		Assert.assertEquals(bar2.getFoos().size(), 2);
+		Assert.assertEquals(foos, foos2);
 	}
 
 	/**
-	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with extending type
+	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with root type with mixed classes
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	@Test
 	public void testSimpleInheritence1() {
-		final FooExt1 foo = new FooExt1();
-		foo.setValue("Value");
-		foo.setValueExt1("ValueExt1");
+		final Foo foo1 = new Foo();
+		foo1.setValue("Value");
 
-		this.persist(foo);
+		final FooExt1 foo2 = new FooExt1();
+		foo2.setValue("Value");
+		foo2.setValueExt1("ValueExt1");
 
-		this.commit();
+		final Bar bar = new Bar();
+		bar.getFoos().add(foo1);
+		bar.getFoos().add(foo2);
 
-		this.close();
-
-		final FooExt1 foo2 = this.find(FooExt1.class, foo.getKey());
-
-		Assert.assertEquals(foo.getKey(), foo2.getKey());
-		Assert.assertEquals(foo.getValue(), foo2.getValue());
-		Assert.assertEquals(foo.getValueExt1(), foo2.getValueExt1());
-	}
-
-	/**
-	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with further extending type
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@Test
-	public void testSimpleInheritence11() {
-		final FooExt11 foo = new FooExt11();
-		foo.setValue("Value");
-		foo.setValueExt1("ValueExt1");
-		foo.setValueExt11("ValueExt11");
-
-		this.persist(foo);
+		this.persist(bar);
 
 		this.commit();
 
 		this.close();
 
-		final FooExt11 foo2 = this.find(FooExt11.class, foo.getKey());
+		final Bar bar2 = this.em().find(Bar.class, bar.getKey());
+		final Set<Foo> foos = Sets.newHashSet(foo1, foo2);
+		final Set<Foo> foos2 = Sets.newHashSet(bar2.getFoos());
 
-		Assert.assertEquals(foo.getKey(), foo2.getKey());
-		Assert.assertEquals(foo.getValue(), foo2.getValue());
-		Assert.assertEquals(foo.getValueExt1(), foo2.getValueExt1());
-		Assert.assertEquals(foo.getValueExt11(), foo2.getValueExt11());
+		Assert.assertEquals(bar2.getFoos().size(), 2);
+		Assert.assertEquals(foos, foos2);
 	}
 
 	/**
@@ -114,22 +108,31 @@ public class JoinedInheritenceTest extends AbstractTest {
 	 * @author hceylan
 	 */
 	@Test
-	public void testSimpleInheritence3() {
-		final FooExt11 foo = new FooExt11();
-		foo.setValue("Value");
-		foo.setValueExt1("ValueExt1");
+	public void testSimpleInheritence2() {
+		final FooExt1 foo1 = new FooExt1();
+		foo1.setValue("Value");
+		foo1.setValueExt1("ValueExt1");
 
-		this.persist(foo);
+		final FooExt11 foo2 = new FooExt11();
+		foo2.setValue("Value");
+		foo2.setValueExt1("ValueExt1");
+
+		final Bar2 bar = new Bar2();
+		bar.getFoos().add(foo1);
+		bar.getFoos().add(foo2);
+
+		this.persist(bar);
 
 		this.commit();
 
 		this.close();
 
-		final FooExt11 foo2 = (FooExt11) this.find(Foo.class, foo.getKey());
+		final Bar2 bar2 = this.em().find(Bar2.class, bar.getKey());
+		final Set<FooExt1> foos = Sets.newHashSet(foo1, foo2);
+		final Set<FooExt1> foos2 = Sets.newHashSet(bar2.getFoos());
 
-		Assert.assertEquals(foo.getKey(), foo2.getKey());
-		Assert.assertEquals(foo.getValue(), foo2.getValue());
-		Assert.assertEquals(foo.getValueExt1(), foo2.getValueExt1());
-		Assert.assertEquals(foo.getValueExt11(), foo2.getValueExt11());
+		Assert.assertEquals(bar2.getFoos().size(), 2);
+		Assert.assertEquals(foos, foos2);
 	}
+
 }

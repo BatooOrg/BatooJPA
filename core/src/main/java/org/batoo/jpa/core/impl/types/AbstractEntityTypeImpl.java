@@ -543,7 +543,6 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 		parsed.add(Entity.class);
 
 		this.parseAttributeOverrides(type, parsed);
-
 	}
 
 	private void parseAttributeOverrides(Class<X> type, final Set<Class<? extends Annotation>> parsed) {

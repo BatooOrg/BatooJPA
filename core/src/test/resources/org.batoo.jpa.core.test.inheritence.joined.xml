@@ -10,6 +10,10 @@
 		<class>org.batoo.jpa.core.test.inheritence.joined.FooExt1</class>
 		<class>org.batoo.jpa.core.test.inheritence.joined.FooExt11</class>
 		<class>org.batoo.jpa.core.test.inheritence.joined.FooExt2</class>
+
+		<class>org.batoo.jpa.core.test.inheritence.joined.Bar</class>
+		<class>org.batoo.jpa.core.test.inheritence.joined.Bar2</class>
+		<class>org.batoo.jpa.core.test.inheritence.joined.Bar3</class>
 		
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.Driver40" />

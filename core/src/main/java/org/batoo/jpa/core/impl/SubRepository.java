@@ -81,4 +81,13 @@ public class SubRepository<X> {
 				+ " already exists in session");
 		}
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "SubRepository [repository=" + this.repository + "]";
+	}
 }
