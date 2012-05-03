@@ -218,7 +218,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 	 * @author hceylan
 	 */
 	private <T> Object getPrimaryKey(ResultSet rs, int tableNo, EntityTypeImpl<T> type) throws SQLException {
-		final EntityTable primaryTable = type.getPrimaryTable();
+		final EntityTable primaryTable = type.getRoot().getPrimaryTable();
 
 		Object primaryKeyValue = null;
 		if (type.getRoot().hasSingleIdAttribute()) {

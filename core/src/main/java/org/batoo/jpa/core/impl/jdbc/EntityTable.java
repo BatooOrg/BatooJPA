@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.jdbc;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.MappingException;
@@ -45,6 +46,7 @@ public final class EntityTable extends AbstractTable {
 	private PhysicalColumn identityColumn;
 	private PhysicalColumn primaryKey;
 	private final TableType tableType;
+	private final QueryRunner runner;
 
 	/**
 	 * @param type
@@ -69,6 +71,8 @@ public final class EntityTable extends AbstractTable {
 		else {
 			this.tableType = TableType.SECONDARY;
 		}
+
+		this.runner = new QueryRunner();
 	}
 
 	/**
@@ -108,6 +112,29 @@ public final class EntityTable extends AbstractTable {
 	}
 
 	/**
+	 * <ul>
+	 * Links the table with the primary table of the type:
+	 * <li>For secondary tables, the primary table is the primary table of the type.
+	 * <li>For primary tables, the root type's primary table is the primary table.
+	 * </ul>
+	 * 
+	 * @param primaryTable
+	 *            the primary table for the table
+	 * @throws MappingException
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void link(EntityTypeImpl<?> type) throws MappingException {
+		final List<PhysicalColumn> keyColumns = Lists.newArrayList();
+		for (final PhysicalColumn column : type.getPrimaryTable().getPrimaryKeys()) {
+			keyColumns.add(new PhysicalColumn(this, column));
+		}
+
+		this.addForeignKey(new ForeignKey(this.getName(), type.getPrimaryTable().getName(), keyColumns));
+	}
+
+	/**
 	 * Performs inserts to the table for the managed instance or joins.
 	 * 
 	 * @param connection
@@ -120,8 +147,6 @@ public final class EntityTable extends AbstractTable {
 	 * @author hceylan
 	 */
 	public void performInsert(Connection connection, final ManagedInstance<?> managedInstance) throws SQLException {
-		final QueryRunner runner = new QueryRunner();
-
 		final SessionImpl session = managedInstance.getSession();
 		final Object instance = managedInstance.getInstance();
 
@@ -135,11 +160,11 @@ public final class EntityTable extends AbstractTable {
 			params[i] = insertColumns[i].getPhysicalValue(session, instance);
 		}
 
-		runner.update(connection, insertSql, params);
+		this.runner.update(connection, insertSql, params);
 
 		if (this.identityColumn != null) {
 			final String selectLastIdSql = this.jdbcAdapter.getSelectLastIdentitySql();
-			final Number id = runner.query(connection, selectLastIdSql, new SingleValueHandler<Number>());
+			final Number id = this.runner.query(connection, selectLastIdSql, new SingleValueHandler<Number>());
 
 			this.identityColumn.getMapping().setValue(managedInstance.getInstance(), id);
 		}

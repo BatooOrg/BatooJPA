@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.types;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.InheritanceType;
@@ -49,6 +50,9 @@ public class EntityTypeImpl<X> extends BaseEntityTypeImpl<X> {
 	protected EntityTypeImpl<? super X> root;
 	protected final EntityTypeImpl<? super X> parent;
 	private final List<EntityTypeImpl<? extends X>> children = Lists.newArrayList();
+
+	private LinkedList<EntityTable> insertChain;
+	private LinkedList<EntityTable> selectChain;
 
 	private final SelectHelper<X> selectHelper;
 	private final RefreshHelper<X> refreshHelper;
@@ -84,6 +88,31 @@ public class EntityTypeImpl<X> extends BaseEntityTypeImpl<X> {
 
 		this.selectHelper = new SelectHelper<X>(this);
 		this.refreshHelper = new RefreshHelper<X>(this);
+	}
+
+	private void addChildTables(LinkedList<EntityTable> tables) {
+		tables.addAll(this.tables.values());
+
+		// visit each child on each branch to add their tables polymorphically
+		for (final EntityTypeImpl<? extends X> child : this.children) {
+			child.addChildTables(tables);
+		}
+	}
+
+	/**
+	 * Returns all the tables in the inheritence chain, from top to all child roots.
+	 * 
+	 * @return
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public List<EntityTable> getAllTables() {
+		if (this.selectChain != null) {
+			return this.selectChain;
+		}
+
+		return this.prepareSelectChain();
 	}
 
 	/**
@@ -188,16 +217,13 @@ public class EntityTypeImpl<X> extends BaseEntityTypeImpl<X> {
 	 * @author hceylan
 	 */
 	public void performInsert(Connection connection, ManagedInstance<X> managedInstance) throws SQLException {
-		// first insert to the primary table
-		this.primaryTable.performInsert(connection, managedInstance);
+		if (this.insertChain == null) {
+			this.prepareInsertChain();
+		}
+
 		managedInstance.setExecuted();
 
-		// then to the remaining tables
-		for (final EntityTable table : this.tables.values()) {
-			if (table.getTableType() == TableType.PRIMARY) {
-				continue;
-			}
-
+		for (final EntityTable table : this.insertChain) {
 			table.performInsert(connection, managedInstance);
 		}
 	}
@@ -233,5 +259,54 @@ public class EntityTypeImpl<X> extends BaseEntityTypeImpl<X> {
 	 */
 	public X performSelect(SessionImpl session, ManagedId<X> managedId) throws SQLException {
 		return this.selectHelper.select(session, managedId);
+	}
+
+	private synchronized LinkedList<EntityTable> prepareInsertChain() {
+		if (this.insertChain != null) {
+			return this.insertChain;
+		}
+
+		// use local variable to make it available only when it is finished
+		LinkedList<EntityTable> insertChain = Lists.newLinkedList();
+
+		// if super type is an entity then inherit its insert chain
+		if (this.getSupertype() instanceof EntityTypeImpl) {
+			final LinkedList<EntityTable> parentInsertChain = ((EntityTypeImpl<? super X>) this.getSupertype()).prepareInsertChain();
+			insertChain = Lists.newLinkedList(parentInsertChain);
+		}
+		else {
+			insertChain = Lists.newLinkedList();
+		}
+
+		// append own tables
+		insertChain.add(this.primaryTable);
+		for (final EntityTable table : this.tables.values()) {
+			if (table.getTableType() == TableType.SECONDARY) {
+				insertChain.add(table);
+			}
+		}
+
+		// make it available
+		this.insertChain = insertChain;
+
+		return this.insertChain;
+	}
+
+	private synchronized List<EntityTable> prepareSelectChain() {
+		if (this.selectChain != null) {
+			return this.selectChain;
+		}
+
+		// use local variable to make it available only when it is finished
+		final LinkedList<EntityTable> selectChain = Lists.newLinkedList(this.prepareInsertChain()); // inherit the tables from insert chain
+
+		// visit each child on each branch to add their tables polymorphically
+		for (final EntityTypeImpl<? extends X> child : this.children) {
+			child.addChildTables(selectChain);
+		}
+
+		this.selectChain = selectChain;
+
+		return selectChain;
 	}
 }

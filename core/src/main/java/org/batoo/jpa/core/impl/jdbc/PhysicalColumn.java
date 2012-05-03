@@ -165,7 +165,7 @@ public class PhysicalColumn implements Column {
 	}
 
 	/**
-	 * Constructor used for secondary table primary key columns
+	 * Constructor used for secondary table primary key columns.
 	 * 
 	 * @param table
 	 *            the physical table the column belongs to
@@ -182,7 +182,7 @@ public class PhysicalColumn implements Column {
 	}
 
 	/**
-	 * Constructor used for discriminator columns
+	 * Constructor used for discriminator columns.
 	 * 
 	 * @param table
 	 *            the physical table the column belongs to
@@ -199,7 +199,7 @@ public class PhysicalColumn implements Column {
 	}
 
 	/**
-	 * Constructor used for secondary table primary key columns
+	 * Constructor used for secondary table primary key columns.
 	 * 
 	 * @param table
 	 *            the physical table the column belongs to

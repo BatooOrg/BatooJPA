@@ -378,7 +378,7 @@ public abstract class BaseSelectHelper<X> {
 				new MutableInt());
 
 			// compose and return the final query
-			this.selectSql = this.compose(fieldsBuffer, joinsBuffer, this.type.getPrimaryTable());
+			this.selectSql = this.compose(fieldsBuffer, joinsBuffer, this.type.getRoot().getPrimaryTable());
 			this.columnAliases = columnAliases.toArray(new Map[columnAliases.size()]);
 		}
 	}
@@ -430,7 +430,7 @@ public abstract class BaseSelectHelper<X> {
 
 		// handle the primary table
 		final int thisTableNo = tableNo.intValue();
-		final EntityTable primaryTable = type.getPrimaryTable();
+		final EntityTable primaryTable = type.getRoot().getPrimaryTable();
 
 		this.addFields(columnAliases, fieldsBuffer, type, primaryTable, thisTableNo, -1);
 
@@ -452,7 +452,7 @@ public abstract class BaseSelectHelper<X> {
 
 		// handle the secondary and default tables;
 		int secondaryTableNo = 0;
-		for (final EntityTable table : type.getTables().values()) {
+		for (final EntityTable table : type.getAllTables()) {
 			if (table.getTableType() == TableType.PRIMARY) { // increment the tableNo index
 				continue;
 			}

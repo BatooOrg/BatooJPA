@@ -20,23 +20,29 @@ package org.batoo.jpa.core.impl.types;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.MappingException;
+import org.batoo.jpa.core.impl.jdbc.AbstractTable.TableType;
+import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
+import org.batoo.jpa.core.impl.jdbc.JoinTable;
 import org.batoo.jpa.core.impl.jdbc.PhysicalColumn;
 import org.batoo.jpa.core.impl.mapping.EntityInheritence;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
 import org.batoo.jpa.core.impl.mapping.TableTemplate;
+import org.batoo.jpa.core.jdbc.DDLMode;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -238,6 +244,55 @@ abstract class BaseEntityTypeImpl<X> extends AbstractEntityTypeImpl<X> {
 	}
 
 	/**
+	 * Performs the ddl operations for the entity.
+	 * <p>
+	 * On the first pass the table is created.
+	 * <p>
+	 * On the second pass the foreign keys are created.
+	 * 
+	 * @param datasource
+	 *            the datasource
+	 * @param schemas
+	 *            set of schemas
+	 * @param ddlMode
+	 *            the ddl mode
+	 * 
+	 * @throws BatooException
+	 *             thrown if DDL operations cannot be executed
+	 * @param firstPass
+	 *            if first pass
+	 * @throws SQLException
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void performTables(DataSourceImpl datasource, Set<String> schemas, DDLMode ddlMode, boolean firstPass) throws BatooException {
+		LOG.info("Performing DDL operations for {0}, mode {2}", this, ddlMode);
+
+		try {
+			for (final EntityTable table : this.tables.values()) {
+				if (firstPass) {
+					if ((table.getTableType() == TableType.DEFAULT)) {
+						table.link(this.getRoot());
+					}
+					else if (table.getTableType() != TableType.PRIMARY) {
+						table.link((EntityTypeImpl<X>) this);
+					}
+				}
+
+				table.ddl(this.metaModel.getJdbcAdapter(), datasource, ddlMode, schemas, firstPass);
+			}
+
+			for (final JoinTable joinTable : this.joinTables.values()) {
+				joinTable.ddl(this.metaModel.getJdbcAdapter(), datasource, ddlMode, schemas, firstPass);
+			}
+		}
+		catch (final SQLException e) {
+			throw new MappingException("DDL operation failed on " + this.getName(), e);
+		}
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -279,22 +334,16 @@ abstract class BaseEntityTypeImpl<X> extends AbstractEntityTypeImpl<X> {
 			this.tables.put(table.getName(), table);
 		}
 
-		// Then add in the tables defined by the super types
+		// Then add in the primary tables defined by the super types
 		final EntityTypeImpl<? super X> superType = this.getRoot();
-		if (superType != this) {
-			switch (superType.inheritance.getInheritenceType()) {
-				case SINGLE_TABLE:
-					this.primaryTable = superType.getPrimaryTable();
-					break;
-
-				case TABLE_PER_CLASS:
-					throw new MappingException("TABLE_PER_CLASS inheritence not yet supported");
-			}
+		if ((superType != this) && (superType.inheritance.getInheritenceType() == InheritanceType.SINGLE_TABLE)) {
+			this.primaryTable = superType.getPrimaryTable();
 		}
 
+		// create the discriminator column if the type is the root f an inheritence
 		if (this.inheritance != null) {
-			// create the discriminator column
 			this.discriminatorColumn = new PhysicalColumn(this.primaryTable, this.inheritance);
 		}
 	}
+
 }

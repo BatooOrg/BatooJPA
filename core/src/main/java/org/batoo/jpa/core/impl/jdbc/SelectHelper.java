@@ -92,7 +92,7 @@ public class SelectHelper<X> extends BaseSelectHelper<X> {
 	 */
 	@Override
 	protected void preparePredicates() {
-		for (final PhysicalColumn column : this.type.getPrimaryTable().getColumns()) {
+		for (final PhysicalColumn column : this.type.getRoot().getPrimaryTable().getColumns()) {
 			if (column.isId() || column.isDiscriminator()) {
 				this.predicates.add(column);
 			}

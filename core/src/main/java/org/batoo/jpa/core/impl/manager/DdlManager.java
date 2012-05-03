@@ -63,7 +63,7 @@ public class DdlManager extends DeploymentManager<EntityTypeImpl<?>> {
 	 */
 	@Override
 	public Void perform(EntityTypeImpl<?> type) throws BatooException {
-		type.ddl(DdlManager.this.datasource, this.schemas, DdlManager.this.ddlMode, this.firstPass);
+		type.performTables(DdlManager.this.datasource, this.schemas, DdlManager.this.ddlMode, this.firstPass);
 
 		return null;
 	}

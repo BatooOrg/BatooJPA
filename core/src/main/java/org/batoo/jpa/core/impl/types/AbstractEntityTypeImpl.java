@@ -21,7 +21,6 @@ package org.batoo.jpa.core.impl.types;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.sql.SQLException;
 import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -50,8 +49,6 @@ import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.Enhancer;
-import org.batoo.jpa.core.impl.jdbc.AbstractTable.TableType;
-import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
@@ -70,7 +67,6 @@ import org.batoo.jpa.core.impl.mapping.OwnerOneToManyMapping;
 import org.batoo.jpa.core.impl.mapping.TableTemplate;
 import org.batoo.jpa.core.impl.mapping.TypeFactory;
 import org.batoo.jpa.core.impl.reflect.ReflectHelper;
-import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.IdType;
 
 import com.google.common.collect.Lists;
@@ -95,7 +91,7 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 
 	protected EntityTable primaryTable;
 	protected final Map<String, EntityTable> tables = Maps.newHashMap();
-	private final Map<String, JoinTable> joinTables = Maps.newHashMap();
+	protected final Map<String, JoinTable> joinTables = Maps.newHashMap();
 	private PhysicalColumn[] basicColumns;
 	protected final Map<String, TableTemplate> tableTemplates = Maps.newHashMap();
 
@@ -251,57 +247,6 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 		}
 
 		this.mappings.put(mapping.getPathAsString(), mapping);
-	}
-
-	/**
-	 * Performs the ddl operations for the entity.
-	 * <p>
-	 * On the first pass the table is created.
-	 * <p>
-	 * On the second pass the foreign keys are created.
-	 * 
-	 * @param datasource
-	 *            the datasource
-	 * @param schemas
-	 *            set of schemas
-	 * @param ddlMode
-	 *            the ddl mode
-	 * 
-	 * @throws BatooException
-	 *             thrown if DDL operations cannot be executed
-	 * @param firstPass
-	 *            if first pass
-	 * @throws SQLException
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void ddl(DataSourceImpl datasource, Set<String> schemas, DDLMode ddlMode, boolean firstPass) throws BatooException {
-		LOG.info("Performing DDL operations for {0}, mode {2}", this, ddlMode);
-
-		try {
-			for (final EntityTable table : this.tables.values()) {
-				if (firstPass) {
-					if (table.getTableType() != TableType.PRIMARY) {
-						final List<PhysicalColumn> keyColumns = Lists.newArrayList();
-						for (final PhysicalColumn column : this.primaryTable.getPrimaryKeys()) {
-							keyColumns.add(new PhysicalColumn(table, column));
-						}
-
-						table.addForeignKey(new ForeignKey(table.getName(), this.primaryTable.getName(), keyColumns));
-					}
-				}
-
-				table.ddl(this.metaModel.getJdbcAdapter(), datasource, ddlMode, schemas, firstPass);
-			}
-
-			for (final JoinTable joinTable : this.joinTables.values()) {
-				joinTable.ddl(this.metaModel.getJdbcAdapter(), datasource, ddlMode, schemas, firstPass);
-			}
-		}
-		catch (final SQLException e) {
-			throw new MappingException("DDL operation failed on " + this.getName(), e);
-		}
 	}
 
 	protected void enhanceIfNeccessary() {
