@@ -26,6 +26,7 @@ import java.util.Deque;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -36,7 +37,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.metamodel.PluralAttribute;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
@@ -210,11 +210,13 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 
 		switch (this.attributeType) {
 			case BASIC:
-				// eager = this.fetchType == FetchType.EAGER;
-				// OwnerOneToManyMapping.sanitize(this, this.columns);
-				// this.mapping = new OwnerOneToManyMapping<X, C, E>(this, path, this.overrideColumns(attributeOverrides), eager);
+				eager = this.fetchType == FetchType.EAGER;
+				this.mapping = new OwnerOneToManyMapping<X, C, E>(this, path, this.overrideColumns(attributeOverrides), eager);
+				break;
 			case EMBEDDED:
-				throw new NotImplementedException();
+				eager = this.fetchType == FetchType.EAGER;
+				this.mapping = new OwnerOneToManyMapping<X, C, E>(this, path, this.overrideColumns(attributeOverrides), eager);
+				break;
 			case ASSOCIATION:
 				eager = this.fetchType == FetchType.EAGER;
 				if (!this.many) {
@@ -291,6 +293,8 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 		if (elementCollection != null) {
 			this.attributeType = AtrributeType.BASIC;
 
+			this.orphanRemoval = true;
+			this.cascadeType = new CascadeType[] { CascadeType.ALL };
 			this.fetchType = elementCollection.fetch();
 
 			parsed.add(ElementCollection.class);

@@ -48,7 +48,7 @@ public class AssociationSelectHelper<X, C, E> extends BaseSelectHelper<E> {
 
 	/**
 	 * @param mapping
-	 *            the type to select against
+	 *            the mapping to select against
 	 * 
 	 * @since $version
 	 * @author hceylan
