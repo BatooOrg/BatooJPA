@@ -46,7 +46,10 @@ public class Person {
 	private final List<Address> addresses = Lists.newArrayList();
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "person")
-	private final List<Phone> phones = Lists.newArrayList();
+	private final List<HomePhone> phones = Lists.newArrayList();
+
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	private final List<WorkPhone> workPhones = Lists.newArrayList();
 
 	private String name;
 
@@ -106,8 +109,18 @@ public class Person {
 	 * @return the phones
 	 * @since $version
 	 */
-	public List<Phone> getPhones() {
+	public List<HomePhone> getPhones() {
 		return this.phones;
+	}
+
+	/**
+	 * Returns the workPhones.
+	 * 
+	 * @return the workPhones
+	 * @since $version
+	 */
+	public List<WorkPhone> getWorkPhones() {
+		return this.workPhones;
 	}
 
 	/**

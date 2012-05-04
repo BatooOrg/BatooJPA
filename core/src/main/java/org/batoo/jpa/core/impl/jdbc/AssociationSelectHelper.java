@@ -28,6 +28,7 @@ import org.batoo.jpa.core.impl.mapping.CollectionMapping;
 import org.batoo.jpa.core.impl.mapping.Mapping;
 import org.batoo.jpa.core.impl.mapping.OwnedAssociation;
 import org.batoo.jpa.core.impl.mapping.OwnerAssociation;
+import org.batoo.jpa.core.impl.mapping.OwnerOneToManyMapping;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 
 import com.google.common.base.Function;
@@ -73,7 +74,22 @@ public class AssociationSelectHelper<X, C, E> extends BaseSelectHelper<E> {
 	 * 
 	 */
 	@Override
+	protected OwnerOneToManyMapping<?, ?, ?> getRootAssociation() {
+		if (this.mapping instanceof OwnerOneToManyMapping) {
+			return (OwnerOneToManyMapping<?, ?, ?>) this.mapping;
+		}
+
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	protected String getWhere() {
+		final String alias = this.mapping instanceof OwnerOneToManyMapping ? "AJ." : "T0.";
+
 		// Generate the where statement
 		// T1_F1 = ? [AND T1_F2 = ? [...]]
 		return Joiner.on(" AND ").join(//
@@ -81,7 +97,7 @@ public class AssociationSelectHelper<X, C, E> extends BaseSelectHelper<E> {
 
 				@Override
 				public String apply(PhysicalColumn input) {
-					return "T0." + input.getPhysicalName() + " = ?";
+					return alias + input.getPhysicalName() + " = ?";
 				}
 			}));
 	}
@@ -92,8 +108,7 @@ public class AssociationSelectHelper<X, C, E> extends BaseSelectHelper<E> {
 	 */
 	@Override
 	protected String preparePredicate(PhysicalColumn column) {
-		// TODO Auto-generated method stub
-		return null;
+		return "T0." + column.getPhysicalName() + " = ?";
 	}
 
 	/**
@@ -112,6 +127,8 @@ public class AssociationSelectHelper<X, C, E> extends BaseSelectHelper<E> {
 
 		for (final PhysicalColumn column : ownerAssociation.getPhysicalColumns()) {
 			this.predicates.add(column);
+
+			this.parameters.add(column);
 		}
 	}
 
@@ -133,16 +150,14 @@ public class AssociationSelectHelper<X, C, E> extends BaseSelectHelper<E> {
 	public Collection<E> select(SessionImpl session, final ManagedId<?> managedId) throws SQLException {
 		final String selectSql = this.getSelectSql();
 
-		final Collection<Object> params = Collections2.transform(this.predicates, new Function<PhysicalColumn, Object>() {
-			@Override
-			public Object apply(PhysicalColumn input) {
-				return input.getReferencedColumn().getPhysicalValue(managedId.getSession(), managedId.getInstance());
-			}
-		});
+		final Object[] params = new Object[this.parameters.size()];
+		for (int i = 0; i < params.length; i++) {
+			params[i] = this.parameters.get(i).getReferencedColumn().getPhysicalValue(managedId.getSession(), managedId.getInstance());
+		}
 
 		final SelectHandler<E> rsHandler = new SelectHandler<E>(session, this.type, this.columnAliases, this.root);
 
-		return this.runner.query(session.getConnection(), selectSql, rsHandler, params.toArray());
+		return this.runner.query(session.getConnection(), selectSql, rsHandler, params);
 	}
 
 	/**

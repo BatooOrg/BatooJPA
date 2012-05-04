@@ -199,7 +199,7 @@ public class PhysicalColumn implements Column {
 	}
 
 	/**
-	 * Constructor used for secondary table primary key columns.
+	 * Constructor used for owned one to many associations.
 	 * 
 	 * @param table
 	 *            the physical table the column belongs to

@@ -27,8 +27,7 @@ import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.mapping.Association;
-import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.impl.mapping.OwnerAssociationMapping;
 import org.batoo.jpa.core.jdbc.adapter.JDBCAdapter;
 
 import com.google.common.base.Function;
@@ -43,7 +42,7 @@ import com.google.common.collect.Lists;
  */
 public final class JoinTable extends AbstractTable {
 
-	private final Association<?, ?> mapping;
+	private final OwnerAssociationMapping<?, ?> mapping;
 	protected final List<PhysicalColumn> sourceKeys = Lists.newArrayList();
 	protected final List<PhysicalColumn> destinationKeys = Lists.newArrayList();
 
@@ -57,27 +56,39 @@ public final class JoinTable extends AbstractTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public JoinTable(Association<?, ?> mapping, JDBCAdapter jdbcAdapter) throws MappingException {
+	public JoinTable(OwnerAssociationMapping<?, ?> mapping, JDBCAdapter jdbcAdapter) throws MappingException {
 		super(mapping.getOwner(), mapping.getOwner().getPrimaryTable().getSchema(), mapping.getOwner().getName() + "_"
 			+ mapping.getType().getName(), null, jdbcAdapter);
 
 		this.mapping = mapping;
 
 		// add source columns
-		this.createColumns(this.type, this.sourceKeys);
+		this.createSourceColumns();
 
 		// add destination columns
-		this.createColumns(this.mapping.getType(), this.destinationKeys);
+		this.createDestinationColumns();
 
 		this.type.addJoinTable(this);
 	}
 
-	private void createColumns(EntityTypeImpl<?> type, List<PhysicalColumn> columns) throws MappingException {
-		for (final PhysicalColumn column : type.getRoot().getPrimaryTable().getPrimaryKeys()) {
-			columns.add(new PhysicalColumn(this, type.getName(), column));
+	private void createDestinationColumns() throws MappingException {
+		for (final PhysicalColumn column : this.mapping.getType().getRoot().getPrimaryTable().getPrimaryKeys()) {
+			final PhysicalColumn physicalColumn = new PhysicalColumn(this, this.mapping.getType().getName(), column);
+			this.destinationKeys.add(physicalColumn);
 		}
 
-		this.addForeignKey(new ForeignKey(this.getQualifiedName(), type.getPrimaryTable().getQualifiedName(), columns));
+		this.addForeignKey(new ForeignKey(this.getQualifiedName(), this.mapping.getType().getPrimaryTable().getQualifiedName(),
+			this.destinationKeys));
+	}
+
+	private void createSourceColumns() throws MappingException {
+		for (final PhysicalColumn column : this.type.getRoot().getPrimaryTable().getPrimaryKeys()) {
+			final PhysicalColumn physicalColumn = new PhysicalColumn(this, this.type.getName(), column);
+			this.sourceKeys.add(physicalColumn);
+			this.mapping.addColumn(physicalColumn);
+		}
+
+		this.addForeignKey(new ForeignKey(this.getQualifiedName(), this.type.getPrimaryTable().getQualifiedName(), this.sourceKeys));
 	}
 
 	/**

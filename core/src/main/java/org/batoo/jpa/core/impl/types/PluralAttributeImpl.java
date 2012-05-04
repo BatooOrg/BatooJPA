@@ -206,17 +206,22 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 		path = Lists.newLinkedList(path);
 		path.addLast(this);
 
+		final boolean eager;
+
 		switch (this.attributeType) {
+			case BASIC:
+				// eager = this.fetchType == FetchType.EAGER;
+				// OwnerOneToManyMapping.sanitize(this, this.columns);
+				// this.mapping = new OwnerOneToManyMapping<X, C, E>(this, path, this.overrideColumns(attributeOverrides), eager);
 			case EMBEDDED:
 				throw new NotImplementedException();
 			case ASSOCIATION:
-				final boolean eager = this.fetchType == FetchType.EAGER;
+				eager = this.fetchType == FetchType.EAGER;
 				if (!this.many) {
 					if (StringUtils.isNotBlank(this.mappedBy)) {
 						this.mapping = new OwnedOneToManyMapping<X, C, E>(this, path, this.orphanRemoval, eager);
 					}
 					else {
-						OwnerOneToManyMapping.sanitize(this, this.columns);
 						this.mapping = new OwnerOneToManyMapping<X, C, E>(this, path, this.overrideColumns(attributeOverrides), eager);
 					}
 				}

@@ -176,6 +176,7 @@ public class TypeFactory {
 		items.add(MapKeyColumn.class);
 		items.add(MapKeyJoinColumns.class);
 		items.add(MapKeyJoinColumn.class);
+		items.add(ElementCollection.class);
 
 		// @OneToOne
 		conflicts.put(OneToOne.class, items = Sets.newHashSet());
@@ -382,7 +383,10 @@ public class TypeFactory {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static <X> Attribute<X, ?> forType(ManagedTypeImpl<X> owner, Field field, Class<?> clazz) throws BatooException {
 		// for collections either OneToMany or ManyToMany must exist
-		if ((ReflectHelper.getAnnotation(field, OneToMany.class) != null) || (ReflectHelper.getAnnotation(field, ManyToMany.class) != null)) {
+		if ((ReflectHelper.getAnnotation(field, OneToMany.class) != null) //
+			|| (ReflectHelper.getAnnotation(field, ManyToMany.class) != null) //
+			|| (ReflectHelper.getAnnotation(field, ElementCollection.class) != null)) {
+
 			if (Map.class.isAssignableFrom(clazz)) {
 				return new MapAttributeImpl(owner, field, clazz);
 			}
@@ -623,37 +627,8 @@ public class TypeFactory {
 		}
 	}
 
-	private static boolean isBasicType(Class<?> cls, boolean array) {
-		// basic array types
-		return Byte.class.isAssignableFrom(cls) //
-			|| byte.class.isAssignableFrom(cls) //
-			|| Character.class.isAssignableFrom(cls) //
-			|| char.class.isAssignableFrom(cls) //
-			|| Short.class.isAssignableFrom(cls) //
-			|| Integer.class.isAssignableFrom(cls) //
-			|| Long.class.isAssignableFrom(cls) //
-			|| Float.class.isAssignableFrom(cls) //
-			|| Double.class.isAssignableFrom(cls) //
-			|| Boolean.class.isAssignableFrom(cls) //
-			|| short.class.isAssignableFrom(cls) //
-			|| int.class.isAssignableFrom(cls) //
-			|| long.class.isAssignableFrom(cls) //
-			|| float.class.isAssignableFrom(cls) //
-			|| double.class.isAssignableFrom(cls) //
-			|| boolean.class.isAssignableFrom(cls) //
-			|| Enum.class.isAssignableFrom(cls) //
-			|| String.class.isAssignableFrom(cls) //
-			|| BigInteger.class.isAssignableFrom(cls) //
-			|| BigDecimal.class.isAssignableFrom(cls) //
-			|| Calendar.class.isAssignableFrom(cls) //
-			|| Date.class.isAssignableFrom(cls) //
-			|| java.sql.Date.class.isAssignableFrom(cls) //
-			|| java.sql.Time.class.isAssignableFrom(cls) //
-			|| java.sql.Timestamp.class.isAssignableFrom(cls);
-	}
-
 	/**
-	 * Returns path as string seperated with dots
+	 * Returns path as string separated with dots.
 	 * 
 	 * @param path
 	 *            the path

@@ -24,6 +24,7 @@ import java.util.Collection;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.mapping.Association;
+import org.batoo.jpa.core.impl.mapping.OwnerOneToManyMapping;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 
 import com.google.common.base.Function;
@@ -56,6 +57,15 @@ public class RefreshHelper<X> extends BaseSelectHelper<X> {
 	@Override
 	protected boolean cascades(Association<?, ?> association) {
 		return association.cascadeRefresh();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	protected OwnerOneToManyMapping<?, ?, ?> getRootAssociation() {
+		return null;
 	}
 
 	/**

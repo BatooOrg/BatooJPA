@@ -18,26 +18,22 @@
  */
 package org.batoo.jpa.core.test.fetch.lazy;
 
-import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
 
 /**
  * 
  * @author hceylan
  * @since $version
  */
-@Entity
+@MappedSuperclass
 public class Phone {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Integer id;
-
-	@ManyToOne
-	private Person person;
 
 	private String phoneNo;
 
@@ -50,19 +46,13 @@ public class Phone {
 	}
 
 	/**
-	 * @param person
-	 * @param phoneNo
-	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Phone(Person person, String phoneNo) {
+	public Phone(String phone) {
 		super();
 
-		this.person = person;
-		this.phoneNo = phoneNo;
-
-		this.person.getPhones().add(this);
+		this.phoneNo = phone;
 	}
 
 	/**
@@ -76,16 +66,6 @@ public class Phone {
 	}
 
 	/**
-	 * Returns the person.
-	 * 
-	 * @return the person
-	 * @since $version
-	 */
-	public Person getPerson() {
-		return this.person;
-	}
-
-	/**
 	 * Returns the phoneNo.
 	 * 
 	 * @return the phoneNo
@@ -93,17 +73,6 @@ public class Phone {
 	 */
 	public String getPhoneNo() {
 		return this.phoneNo;
-	}
-
-	/**
-	 * Sets the person.
-	 * 
-	 * @param person
-	 *            the person to set
-	 * @since $version
-	 */
-	public void setPerson(Person person) {
-		this.person = person;
 	}
 
 	/**

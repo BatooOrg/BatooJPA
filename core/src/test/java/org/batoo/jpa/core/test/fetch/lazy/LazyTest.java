@@ -53,8 +53,11 @@ public class LazyTest extends AbstractTest {
 		new Address(person, CITY_NEW_YORK, USA);
 		new Address(person, CITY_LONDON, UK);
 
-		new Phone(person, "111 1111111");
-		new Phone(person, "222 2222222");
+		new HomePhone(person, "111 1111111");
+		new HomePhone(person, "222 2222222");
+
+		new WorkPhone(person, "333 3333333");
+		new WorkPhone(person, "444 4444444");
 
 		return person;
 	}
@@ -141,6 +144,33 @@ public class LazyTest extends AbstractTest {
 	}
 
 	/**
+	 * Tests to {@link EntityManager#find(Class, Object)} person with lazy OneToMany association.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testFindOneToMany() {
+		final Person person = this.person();
+		this.persist(person);
+
+		this.commit();
+		this.close();
+
+		final Person person2 = this.find(Person.class, person.getId());
+		Assert.assertEquals(person.getName(), person2.getName());
+		Assert.assertEquals(person.getWorkPhones().size(), person2.getWorkPhones().size());
+
+		for (final Phone phone : person2.getWorkPhones()) {
+			if ("333 3333333".equals(phone.getPhoneNo())) {
+				return;
+			}
+		}
+
+		Assert.fail("Phone 333 3333333 not found");
+	}
+
+	/**
 	 * Tests to {@link EntityManager#persist(Object)} address which does not cascade to Person. PersistenceException expected.
 	 * 
 	 * @since $version
@@ -168,7 +198,7 @@ public class LazyTest extends AbstractTest {
 	 */
 	@Test
 	public void testPersistPerson() {
-		Assert.assertEquals(4, this.em().getMetamodel().getEntities().size());
+		Assert.assertEquals(5, this.em().getMetamodel().getEntities().size());
 
 		this.persist(this.person());
 

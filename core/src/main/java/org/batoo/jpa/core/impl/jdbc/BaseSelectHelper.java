@@ -32,6 +32,7 @@ import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.mapping.Mapping;
 import org.batoo.jpa.core.impl.mapping.OwnedAssociation;
 import org.batoo.jpa.core.impl.mapping.OwnerAssociation;
+import org.batoo.jpa.core.impl.mapping.OwnerOneToManyMapping;
 import org.batoo.jpa.core.impl.mapping.PersistableAssociation;
 import org.batoo.jpa.core.impl.types.AttributeImpl;
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
@@ -244,6 +245,25 @@ public abstract class BaseSelectHelper<X> {
 	}
 
 	/**
+	 * Adds a join buffer for the root join table of the {@link AssociationSelectHelper}
+	 * 
+	 * @param joinsBuffer
+	 *            the joins buffer
+	 * @param association
+	 *            the root association
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void addPrimaryJoin3(List<String> joinsBuffer, OwnerOneToManyMapping<?, ?, ?> association) {
+		final JoinTable joinTable = association.getJoinTable();
+
+		final String bindings = this.prepareJoinBindings(joinTable.getDestinationKeys(), "AJ", "T0");
+
+		joinsBuffer.add("\tLEFT OUTER JOIN " + joinTable.getQualifiedName() + " AS AJ ON " + bindings);
+	}
+
+	/**
 	 * Adds a join for secondary table
 	 * 
 	 * @param joinsBuffer
@@ -310,18 +330,12 @@ public abstract class BaseSelectHelper<X> {
 		final String leftAlias = left < 0 ? "TJ" + Math.abs(left) : "T" + left;
 		final String rightAlias = right < 0 ? "TJ" + Math.abs(right) : "T" + right;
 
-		final Collection<String> restrictions = Collections2.transform(foreignKeys, new Function<PhysicalColumn, String>() {
-
-			@Override
-			public String apply(PhysicalColumn input) {
-				return leftAlias + "." + input.getPhysicalName() + " = " + rightAlias + "." + input.getReferencedColumn().getPhysicalName();
-			}
-		});
+		final String bindings = this.prepareJoinBindings(foreignKeys, leftAlias, rightAlias);
 
 		final String alias = tableNo < 0 ? "TJ" + Math.abs(tableNo) : "T" + tableNo;
 
 		// LEFT OUTER JOIN TABLE as Ty ON TX_F1 = TY_F1 [AND TX_F2 = TY_F2 [...]]
-		joinsBuffer.add("\tLEFT OUTER JOIN " + table.getQualifiedName() + " AS " + alias + " ON " + Joiner.on(" AND ").join(restrictions));
+		joinsBuffer.add("\tLEFT OUTER JOIN " + table.getQualifiedName() + " AS " + alias + " ON " + bindings);
 	}
 
 	/**
@@ -344,6 +358,16 @@ public abstract class BaseSelectHelper<X> {
 		}));
 		return "[" + predicates + "]";
 	}
+
+	/**
+	 * Returns the root association. Useful for {@link AssociationSelectHelper} types to provide the entry point.
+	 * 
+	 * @return the root association or null
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected abstract OwnerOneToManyMapping<?, ?, ?> getRootAssociation();
 
 	/**
 	 * Generates and returns the select SQL.
@@ -375,8 +399,8 @@ public abstract class BaseSelectHelper<X> {
 
 			this.preparePredicates();
 
-			this.root = this.processType(columnAliases, fieldsBuffer, joinsBuffer, null, this.type, new LinkedList<Association<?, ?>>(), 0,
-				new MutableInt());
+			this.root = this.processType(columnAliases, fieldsBuffer, joinsBuffer, null, this.getRootAssociation(), this.type,
+				new LinkedList<Association<?, ?>>(), 0, new MutableInt());
 
 			// compose and return the final query
 			this.selectSql = this.compose(fieldsBuffer, joinsBuffer, this.type.getRoot().getPrimaryTable());
@@ -405,6 +429,19 @@ public abstract class BaseSelectHelper<X> {
 			}));
 	}
 
+	private String prepareJoinBindings(final Collection<PhysicalColumn> foreignKeys, final String leftAlias, final String rightAlias) {
+		final Collection<String> restrictions = Collections2.transform(foreignKeys, new Function<PhysicalColumn, String>() {
+
+			@Override
+			public String apply(PhysicalColumn input) {
+				return leftAlias + "." + input.getPhysicalName() + " = " + rightAlias + "." + input.getReferencedColumn().getPhysicalName();
+			}
+		});
+
+		final String bindings = Joiner.on(" AND ").join(restrictions);
+		return bindings;
+	}
+
 	/**
 	 * Subclasses must implement to generate predicate.
 	 * 
@@ -426,14 +463,18 @@ public abstract class BaseSelectHelper<X> {
 	protected abstract void preparePredicates();
 
 	private QueryItem processType(List<Map<PhysicalColumn, String>> columnAliases, final List<String> fieldsBuffer,
-		final List<String> joinsBuffer, Association<?, ?> association, EntityTypeImpl<?> type, LinkedList<Association<?, ?>> path,
-		int parentTableNo, MutableInt tableNo) {
+		final List<String> joinsBuffer, Association<?, ?> association, OwnerOneToManyMapping<?, ?, ?> rootAssociation,
+		EntityTypeImpl<?> type, LinkedList<Association<?, ?>> path, int parentTableNo, MutableInt tableNo) {
 
 		// handle the primary table
 		final int thisTableNo = tableNo.intValue();
 		final EntityTable primaryTable = type.getRoot().getPrimaryTable();
 
 		this.addFields(columnAliases, fieldsBuffer, type, primaryTable, thisTableNo, -1);
+
+		if (rootAssociation != null) {
+			this.addPrimaryJoin3(joinsBuffer, rootAssociation);
+		}
 
 		if (association != null) { // we are not the root entity
 			if ((association instanceof PersistableAssociation) && ((PersistableAssociation<?, ?>) association).hasJoin()) {
@@ -487,7 +528,7 @@ public abstract class BaseSelectHelper<X> {
 				childPath.addLast(childAssociation);
 
 				// process the child type
-				children.add(this.processType(columnAliases, fieldsBuffer, joinsBuffer, childAssociation, childAssociation.getType(),
+				children.add(this.processType(columnAliases, fieldsBuffer, joinsBuffer, childAssociation, null, childAssociation.getType(),
 					childPath, parentTableNo, tableNo));
 			}
 		}

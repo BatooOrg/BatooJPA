@@ -49,27 +49,6 @@ import org.batoo.jpa.core.jdbc.adapter.JDBCAdapter;
 public class OwnerOneToManyMapping<X, C, E> extends OwnerAssociationMapping<X, C> implements CollectionMapping<X, C, E>,
 	PersistableAssociation<X, C> {
 
-	/**
-	 * Sanitizes the column templates
-	 * 
-	 * @param declaringAttribute
-	 *            the declaring attribute
-	 * @param columns
-	 *            the column templates
-	 * @since $version
-	 * @author hceylan
-	 */
-	public static <X, C, E> void sanitize(PluralAttributeImpl<X, C, E> declaringAttribute, Collection<ColumnTemplate<X, C>> columns) {
-		if (columns.isEmpty()) {
-			final EntityTypeImpl<E> type = (EntityTypeImpl<E>) declaringAttribute.getElementType();
-
-			final Collection<BasicMapping<?, ?>> mappings = type.getIdMappings();
-			for (final BasicMapping<?, ?> mapping : mappings) {
-				columns.add(new JoinColumnTemplate<X, C>(declaringAttribute, mapping));
-			}
-		}
-	}
-
 	private JoinTable joinTable;
 	private final AssociationSelectHelper<X, C, E> selectHelper;
 
@@ -100,8 +79,7 @@ public class OwnerOneToManyMapping<X, C, E> extends OwnerAssociationMapping<X, C
 	 */
 	@Override
 	public boolean contains(Object instance) {
-		// TODO Auto-generated method stub
-		return false;
+		return ((Collection<?>) this.getValue(instance)).contains(instance);
 	}
 
 	/**
