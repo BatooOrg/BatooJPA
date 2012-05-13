@@ -20,9 +20,10 @@ package org.batoo.jpa.core.impl.instance;
 
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Set;
+import java.util.HashSet;
 
 import org.batoo.jpa.core.impl.mapping.Association;
+import org.batoo.jpa.core.impl.metamodel.AttributeImpl;
 import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
 import org.batoo.jpa.core.impl.metamodel.PluralAttributeImpl;
 
@@ -41,7 +42,7 @@ public class Prioritizer implements Comparator<ManagedInstance<?>> {
 	 */
 	public static final Prioritizer INSTANCE = new Prioritizer();
 
-	private final HashMap<EntityTypeImpl<?>, HashMap<EntityTypeImpl<?>, Set<Association<?, ?>>>> associationMap = Maps.newHashMap();
+	private final HashMap<EntityTypeImpl<?>, HashMap<EntityTypeImpl<?>, AttributeImpl<?, ?>[]>> associationMap = Maps.newHashMap();
 
 	/**
 	 * No instantiation.
@@ -60,11 +61,11 @@ public class Prioritizer implements Comparator<ManagedInstance<?>> {
 	@Override
 	public int compare(ManagedInstance<?> o1, ManagedInstance<?> o2) {
 		if (this.references(o1, o2)) {
-			return -1;
+			return 1;
 		}
 
 		if (this.references(o2, o1)) {
-			return 1;
+			return -1;
 		}
 
 		return 0;
@@ -82,15 +83,15 @@ public class Prioritizer implements Comparator<ManagedInstance<?>> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private Set<Association<?, ?>> getAssociationsFor(EntityTypeImpl<?> source, EntityTypeImpl<?> associate) {
-		final HashMap<EntityTypeImpl<?>, Set<Association<?, ?>>> sourceMap = this.associationMap.get(source);
+	private AttributeImpl<?, ?>[] getAssociationsFor(EntityTypeImpl<?> source, EntityTypeImpl<?> associate) {
+		final HashMap<EntityTypeImpl<?>, AttributeImpl<?, ?>[]> sourceMap = this.associationMap.get(source);
 
 		// if source cannot be located then prepare
 		if (sourceMap == null) {
 			return this.prepareAssociations(source, associate);
 		}
 
-		final Set<Association<?, ?>> associations = sourceMap.get(associate);
+		final AttributeImpl<?, ?>[] associations = sourceMap.get(associate);
 
 		// if associate cannot be found the prepare
 		if (associations != null) {
@@ -112,38 +113,42 @@ public class Prioritizer implements Comparator<ManagedInstance<?>> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private synchronized Set<Association<?, ?>> prepareAssociations(EntityTypeImpl<?> source, EntityTypeImpl<?> associate) {
-		HashMap<EntityTypeImpl<?>, Set<Association<?, ?>>> sourceMap = this.associationMap.get(source);
+	private synchronized AttributeImpl<?, ?>[] prepareAssociations(EntityTypeImpl<?> source, EntityTypeImpl<?> associate) {
+		HashMap<EntityTypeImpl<?>, AttributeImpl<?, ?>[]> sourceMap = this.associationMap.get(source);
 		if (sourceMap == null) {
 			sourceMap = Maps.newHashMap();
 		}
 
-		Set<Association<?, ?>> associations = sourceMap.get(associate);
+		AttributeImpl<?, ?>[] associations = sourceMap.get(associate);
 		if (associations != null) {
 			return associations; // other thread got it before us
 		}
 
 		// prepare the related associations
-		associations = Sets.newHashSet();
+		final HashSet<AttributeImpl<?, ?>> attributes = Sets.newHashSet();
 
 		final Association<?, ?>[] allAssociations = source.getAssociations();
 		for (final Association<?, ?> association : allAssociations) {
 
 			// determine the java type
+			final AttributeImpl<?, ?> attribute = association.getDeclaringAttribute();
+
 			Class<?> javaType;
-			if (association instanceof PluralAttributeImpl) {
-				final PluralAttributeImpl<?, ?, ?> pluralAttribute = (PluralAttributeImpl<?, ?, ?>) association;
+			if (attribute instanceof PluralAttributeImpl) {
+				final PluralAttributeImpl<?, ?, ?> pluralAttribute = (PluralAttributeImpl<?, ?, ?>) attribute;
 				javaType = pluralAttribute.getBindableJavaType();
 			}
 			else {
-				javaType = association.getJavaType();
+				javaType = attribute.getJavaType();
 			}
 
 			if (association.isOwner() && javaType.isAssignableFrom(associate.getBindableJavaType())) {
-				associations.add(association);
+				attributes.add(attribute);
 			}
 		}
 
+		associations = new AttributeImpl[attributes.size()];
+		attributes.toArray(associations);
 		sourceMap.put(associate, associations);
 
 		if (this.associationMap.get(source) == null) {
@@ -157,13 +162,17 @@ public class Prioritizer implements Comparator<ManagedInstance<?>> {
 		final EntityTypeImpl<?> type = o1.getType();
 		final EntityTypeImpl<?> associate = o2.getType();
 
-		final Set<Association<?, ?>> associations = this.getAssociationsFor(type, associate);
+		final AttributeImpl<?, ?>[] attributes = this.getAssociationsFor(type, associate);
+
+		if (attributes.length == 0) {
+			return false;
+		}
 
 		final Object instance = o1.getInstance();
-		final Object reference = o1.getInstance();
+		final Object reference = o2.getInstance();
 
-		for (final Association<?, ?> association : associations) {
-			if (association.getDeclaringAttribute().references(instance, reference)) {
+		for (final AttributeImpl<?, ?> attribute : attributes) {
+			if (attribute.references(instance, reference)) {
 				return true;
 			}
 		}

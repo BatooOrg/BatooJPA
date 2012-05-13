@@ -541,7 +541,6 @@ public abstract class SimpleEntityManager implements EntityManager {
 			else {
 				this.session.putNewIdentifiable(instance);
 			}
-
 		}
 
 		return requiresFlush;

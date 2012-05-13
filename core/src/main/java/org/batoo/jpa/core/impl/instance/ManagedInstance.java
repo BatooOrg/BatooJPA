@@ -31,6 +31,7 @@ import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.mapping.CollectionMapping;
 import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
 import org.batoo.jpa.core.impl.metamodel.SingularAttributeImpl;
+import org.batoo.jpa.core.impl.metamodel.TypeImpl;
 
 import com.google.common.collect.Maps;
 
@@ -78,14 +79,18 @@ public class ManagedInstance<X> {
 	private final X instance;
 	private Status status;
 	private final SingularAttributeImpl<?, ?>[] idAttributes;
+	private SingularAttributeImpl<?, ?> singleId;
 	private EntityTransactionImpl transaction;
 	private final boolean external = true;
+	private boolean initialized;
 
 	private Object id;
 	private boolean loaded;
 	private final IdentityHashMap<CollectionMapping<?, ?, ?>, Object> enhancedCollections = Maps.newIdentityHashMap();
 
 	private int h;
+	private SingularAttributeImpl<?, ?> embeddedAttribute;
+	private Class<?> idJavaType;
 
 	/**
 	 * @param type
@@ -305,7 +310,32 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public Object getId() {
-		return null;
+		if (this.id != null) {
+			return this.id;
+		}
+
+		this.initialize();
+
+		if (this.singleId != null) {
+			return this.singleId.get(this.instance);
+		}
+
+		if (this.embeddedAttribute != null) {
+			return this.embeddedAttribute.get(this.instance);
+		}
+
+		Object id = null;
+		try {
+			id = this.idJavaType.newInstance();
+		}
+		catch (final Exception e) {}
+
+		for (final SingularAttributeImpl<?, ?> attribute : this.type.getIdAttributes()) {
+			final SingularAttributeImpl<?, ?> idAttribute = attribute;
+			idAttribute.set(id, idAttribute.get(this.instance));
+		}
+
+		return id;
 	}
 
 	/**
@@ -387,6 +417,31 @@ public class ManagedInstance<X> {
 	}
 
 	/**
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	private void initialize() {
+		if (!this.initialized) {
+
+			if (this.idAttributes.length == 1) {
+				this.singleId = this.idAttributes[0];
+			}
+			else {
+				final TypeImpl<?> idType = this.type.getIdType();
+				if ((idType != null) && idType.isEmbeddable()) {
+					this.embeddedAttribute = this.type.getIdAttributes()[0];
+				}
+				else if (this.type.getIdJavaType() != null) {
+					this.idJavaType = this.type.getIdJavaType();
+				}
+			}
+
+			this.initialized = true;
+		}
+	}
+
+	/**
 	 * Returns the external.
 	 * 
 	 * @return the external
@@ -404,17 +459,6 @@ public class ManagedInstance<X> {
 	 */
 	public boolean isLoaded() {
 		return this.loaded;
-	}
-
-	/**
-	 * Sets the id.
-	 * 
-	 * @param id
-	 *            the id to set
-	 * @since $version
-	 */
-	public void setId(Object id) {
-		this.id = id;
 	}
 
 	/**
