@@ -82,7 +82,6 @@ public class ManagedInstance<X> {
 	private final SingularAttributeImpl<?, ?>[] idAttributes;
 	private SingularAttributeImpl<?, ?> singleId;
 	private EntityTransactionImpl transaction;
-	private final boolean external = true;
 	private boolean initialized;
 
 	private Object id;
@@ -131,9 +130,8 @@ public class ManagedInstance<X> {
 		this(type, session, instance);
 
 		this.id = id;
-		for (final SingularAttributeImpl<?, ?> attribute : this.idAttributes) {
-			attribute.set(instance, id);
-		}
+
+		this.populateId();
 	}
 
 	/**
@@ -440,7 +438,6 @@ public class ManagedInstance<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
 	private void initialize() {
 		if (!this.initialized) {
 
@@ -462,16 +459,6 @@ public class ManagedInstance<X> {
 	}
 
 	/**
-	 * Returns the external.
-	 * 
-	 * @return the external
-	 * @since $version
-	 */
-	public boolean isExternal() {
-		return this.external;
-	}
-
-	/**
 	 * Returns the loaded.
 	 * 
 	 * @return the loaded
@@ -479,6 +466,35 @@ public class ManagedInstance<X> {
 	 */
 	public boolean isLoaded() {
 		return this.loaded;
+	}
+
+	/**
+	 * Populates the instance's id with the id.
+	 * 
+	 * @param id
+	 *            the id for the instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	public void populateId() {
+		this.initialize();
+
+		if (this.embeddedAttribute != null) {
+			this.embeddedAttribute.set(this.instance, this.id);
+		}
+		else if (this.type.getIdJavaType() != null) {
+			for (final SingularAttributeImpl<?, ?> attribute : this.type.getIdAttributes()) {
+				final SingularAttributeImpl<? super X, ?> idAttribute = (SingularAttributeImpl<? super X, ?>) attribute;
+				idAttribute.set(this.instance, idAttribute.get(this.id));
+			}
+		}
+		else {
+			for (final SingularAttributeImpl<?, ?> resolver : this.idAttributes) {
+				resolver.set(this.instance, this.id);
+			}
+		}
 	}
 
 	/**
@@ -532,7 +548,6 @@ public class ManagedInstance<X> {
 			+ ", type=" + this.type.getName() //
 			+ ", status=" + this.status //
 			+ ", id=" + this.id //
-			+ ", external=" + this.external //
 			+ ", instance=" //
 			+ this.instance + "]";
 	}

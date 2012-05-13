@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.Prioritizer;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
@@ -257,7 +258,7 @@ public class SessionImpl {
 
 		final ManagedInstance<?> removed = subRepository.remove(instance);
 
-		if (removed.isExternal()) {
+		if (!(removed.getInstance() instanceof EnhancedInstance)) {
 			this.externalEntities.remove(instance);
 		}
 

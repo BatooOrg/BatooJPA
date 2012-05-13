@@ -95,7 +95,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 			((PluralAttributeImpl<?, ?, ?>) attribute).newInstance(managedInstance, true);
 		}
 		else if (association instanceof OwnerAssociationMapping) {
-			if (!managedInstance.isExternal()) {
+			if (managedInstance.getInstance() instanceof EnhancedInstance) {
 				this.createLazyInstance(session, rs, cache, tableNo, managedInstance, association);
 			}
 		}

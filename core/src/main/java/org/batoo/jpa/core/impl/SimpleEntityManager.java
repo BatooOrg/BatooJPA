@@ -213,7 +213,9 @@ public abstract class SimpleEntityManager implements EntityManager {
 			return type.performSelect(this.session, instance);
 		}
 		catch (final SQLException e) {
-			throw new PersistenceException("Entity cannot be loaded");
+			LOG.error(e, "Entity cannot be loaded {0}: {1}", entityClass, primaryKey);
+
+			throw new PersistenceException("Entity cannot be loaded", e);
 		}
 	}
 
@@ -267,7 +269,9 @@ public abstract class SimpleEntityManager implements EntityManager {
 			return association.performSelect(this.session, (ManagedInstance<X>) managedInstance);
 		}
 		catch (final SQLException e) {
-			throw new PersistenceException("Unable to initialize the collection");
+			LOG.error(e, "Unable to initialize the collection {0}: {1}", managedInstance, association);
+
+			throw new PersistenceException("Unable to initialize the collection", e);
 		}
 	}
 
@@ -283,6 +287,8 @@ public abstract class SimpleEntityManager implements EntityManager {
 			this.session.flush(this.connection, this.transaction);
 		}
 		catch (final SQLException e) {
+			LOG.error(e, "Flush failed");
+
 			throw new PersistenceException("Flush failed", e);
 		}
 	}
