@@ -59,6 +59,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 	protected final QueryItem root;
 
 	private boolean dbAudit;
+	private ResultsetLogger resultsetLogger;
 
 	/**
 	 * @param session
@@ -334,13 +335,27 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 
 	@SuppressWarnings("unchecked")
 	private Collection<X> handle0(ResultSet rs) throws SQLException {
+		if (ResultsetLogger.isLogging()) {
+			this.resultsetLogger = new ResultsetLogger(rs);
+		}
+
 		final HashMap<ManagedInstance<?>, ManagedInstance<?>> cache = Maps.newHashMap();
 		final HashMap<ManagedInstance<? super X>, ManagedInstance<X>> instances = Maps.newHashMap();
 
 		while (rs.next()) {
+			// store the data
+			if (this.resultsetLogger != null) {
+				this.resultsetLogger.storeData(rs);
+			}
+
 			final ManagedInstance<X> managedInstance = (ManagedInstance<X>) this.processRow(this.session, rs, cache, this.root, null);
 			managedInstance.setStatus(Status.MANAGED);
 			instances.put(managedInstance, managedInstance);
+		}
+
+		// report the result resultset
+		if (this.resultsetLogger != null) {
+			this.resultsetLogger.dumpResultSet();
 		}
 
 		for (final ManagedInstance<?> instance : cache.values()) {
@@ -357,6 +372,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 				return input.getInstance();
 			}
 		});
+
 	}
 
 	private void loadInstance(EntityTypeImpl<?> type, ResultSet rs, int tableNo, ManagedInstance<?> instance) throws SQLException {

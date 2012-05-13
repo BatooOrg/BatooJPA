@@ -74,8 +74,6 @@ import org.slf4j.MarkerFactory;
  */
 public class BLogger {
 
-	private static Logger DEFAULT_LOG = LoggerFactory.getLogger("com.ericsson.service.server.ServicePortalServer");
-
 	private static final String FATAL_PREFIX = "FATAL----> ";
 
 	private static final Object[] NULL_ARRAY = new Object[] {};
@@ -111,15 +109,6 @@ public class BLogger {
 		catch (final Throwable e) {
 			return block;
 		}
-	}
-
-	/**
-	 * Returns an instance of Logger with the default name
-	 * 
-	 * @return the logger - {@link BLogger}
-	 */
-	public static final BLogger getLogger() {
-		return new BLogger(BLogger.DEFAULT_LOG);
 	}
 
 	/**
@@ -424,6 +413,71 @@ public class BLogger {
 				this.logger.info(this.format(message, params));
 			}
 		}
+	}
+
+	/**
+	 * Returns if the logger instance enabled for the DEBUG level.
+	 * 
+	 * @return true if this Logger is enabled for the DEBUG level,
+	 *         false otherwise.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isDebugEnabled() {
+		return this.logger.isDebugEnabled();
+	}
+
+	/**
+	 * Returns if the logger instance enabled for the ERROR level.
+	 * 
+	 * @return true if this Logger is enabled for the ERROR level,
+	 *         false otherwise.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isErrorEnabled() {
+		return this.logger.isErrorEnabled();
+	}
+
+	/**
+	 * Returns if the logger instance enabled for the INFO level.
+	 * 
+	 * @return true if this Logger is enabled for the INFO level,
+	 *         false otherwise.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isInfoEnabled() {
+		return this.logger.isInfoEnabled();
+	}
+
+	/**
+	 * Returns if the logger instance enabled for the TRACE level.
+	 * 
+	 * @return true if this Logger is enabled for the TRACE level,
+	 *         false otherwise.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isTraceEnabled() {
+		return this.logger.isTraceEnabled();
+	}
+
+	/**
+	 * Returns if the logger instance enabled for the WARN level.
+	 * 
+	 * @return true if this Logger is enabled for the WARN level,
+	 *         false otherwise.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isWarnEnabled() {
+		return this.logger.isWarnEnabled();
 	}
 
 	/**
