@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.metamodel;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -63,7 +64,9 @@ import org.batoo.jpa.core.impl.mapping.JoinColumnTemplate;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
 import org.batoo.jpa.core.impl.mapping.OwnerAssociationMapping;
 import org.batoo.jpa.core.impl.mapping.OwnerManyToManyMapping;
+import org.batoo.jpa.core.impl.mapping.OwnerManyToOneMapping;
 import org.batoo.jpa.core.impl.mapping.OwnerOneToManyMapping;
+import org.batoo.jpa.core.impl.mapping.OwnerOneToOneMapping;
 import org.batoo.jpa.core.impl.mapping.PersistableAssociation;
 import org.batoo.jpa.core.impl.mapping.TableTemplate;
 import org.batoo.jpa.core.impl.mapping.TypeFactory;
@@ -72,6 +75,7 @@ import org.batoo.jpa.core.jdbc.IdType;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Abstract implementation of {@link EntityType}.
@@ -101,6 +105,7 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 
 	protected sun.reflect.ConstructorAccessor enhancer;
 
+	private final IdentityHashMap<EntityTypeImpl<?>, AttributeImpl<?, ?>[]> associationMap = Maps.newIdentityHashMap();
 	private Association<?, ?>[] associations;
 	private Association<?, ?>[] associationsPersistable;
 	private Association<?, ?>[] associationsDetachable;
@@ -346,6 +351,26 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 		}
 
 		return this.associationsDetachable;
+	}
+
+	/**
+	 * Returns the associations for the associate type
+	 * 
+	 * @param associate
+	 *            the associate type
+	 * @return the array of associations for the associate
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public AttributeImpl<?, ?>[] getAssociationsFor(EntityTypeImpl<?> associate) {
+		final AttributeImpl<?, ?>[] associations = this.associationMap.get(associate);
+
+		if (associations != null) {
+			return associations;
+		}
+
+		return this.prepareAssociationsFor(associate);
 	}
 
 	/**
@@ -719,6 +744,58 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 	}
 
 	/**
+	 * Prepares and returns the associations for the associate type
+	 * 
+	 * @param associate
+	 *            the associate type
+	 * @return the array of associations for the associate
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private synchronized AttributeImpl<?, ?>[] prepareAssociationsFor(EntityTypeImpl<?> associate) {
+		AttributeImpl<?, ?>[] associations = this.associationMap.get(associate);
+
+		if (associations != null) { // other thread got it done!
+			return associations;
+		}
+
+		// prepare the related associations
+		final HashSet<AttributeImpl<?, ?>> attributes = Sets.newHashSet();
+
+		final Association<?, ?>[] allAssociations = this.getAssociations();
+		for (final Association<?, ?> association : allAssociations) {
+
+			// determine the java type
+			final AttributeImpl<?, ?> attribute = association.getDeclaringAttribute();
+
+			// only owner associations impose priority
+			if (!association.isOwner()) {
+				continue;
+			}
+
+			// only relations kept in the row impose priority
+			if (!(association instanceof OwnerManyToOneMapping) //
+				&& !(association instanceof OwnerOneToOneMapping)) {
+				continue;
+			}
+
+			final Class<?> javaType = attribute.getJavaType();
+
+			if (javaType.isAssignableFrom(associate.getBindableJavaType())) {
+				attributes.add(attribute);
+			}
+		}
+
+		associations = new AttributeImpl[attributes.size()];
+		attributes.toArray(associations);
+
+		this.associationMap.put(associate, associations);
+
+		return associations;
+	}
+
+	/**
 	 * Adds the table to the list of the tables this entity has. may not be blank
 	 * 
 	 * @param primary
@@ -763,5 +840,4 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 		return "EntityTypeImpl [name=" + this.name + ", IdAttributes=" + this.idAttributes + ", attributes=" + this.attributes.values()
 			+ "]";
 	}
-
 }

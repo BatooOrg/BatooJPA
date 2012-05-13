@@ -49,6 +49,7 @@ public class PriorityList {
 				this.moveColLeft(col, this.noInstances - 1);
 			}
 		}
+
 		this.noInstances--; // one less instance
 	}
 

@@ -19,18 +19,9 @@
 package org.batoo.jpa.core.impl.instance;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 
-import org.batoo.jpa.core.BLogger;
-import org.batoo.jpa.core.impl.mapping.Association;
-import org.batoo.jpa.core.impl.mapping.OwnerManyToOneMapping;
-import org.batoo.jpa.core.impl.mapping.OwnerOneToOneMapping;
 import org.batoo.jpa.core.impl.metamodel.AttributeImpl;
 import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
-
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /**
  * 
@@ -39,14 +30,10 @@ import com.google.common.collect.Sets;
  */
 public class Prioritizer {
 
-	private static final BLogger LOG = BLogger.getLogger(Prioritizer.class);
-
 	/**
 	 * Singleton global instance
 	 */
 	public static final Prioritizer INSTANCE = new Prioritizer();
-
-	private final HashMap<EntityTypeImpl<?>, HashMap<EntityTypeImpl<?>, AttributeImpl<?, ?>[]>> associationMap = Maps.newHashMap();
 
 	/**
 	 * No instantiation.
@@ -58,102 +45,11 @@ public class Prioritizer {
 		super();
 	}
 
-	/**
-	 * Returns the associations for the types.
-	 * 
-	 * @param source
-	 *            the source type
-	 * @param associate
-	 *            the associate type
-	 * @return the associations for the types
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	private AttributeImpl<?, ?>[] getAssociationsFor(EntityTypeImpl<?> source, EntityTypeImpl<?> associate) {
-		final HashMap<EntityTypeImpl<?>, AttributeImpl<?, ?>[]> sourceMap = this.associationMap.get(source);
-
-		// if source cannot be located then prepare
-		if (sourceMap == null) {
-			return this.prepareAssociations(source, associate);
-		}
-
-		final AttributeImpl<?, ?>[] associations = sourceMap.get(associate);
-
-		// if associate cannot be found the prepare
-		if (associations != null) {
-			return associations;
-		}
-
-		return this.prepareAssociations(source, associate);
-	}
-
-	/**
-	 * Prepares and returns the associations for the types.
-	 * 
-	 * @param type
-	 *            the source type
-	 * @param associate
-	 *            the associate type
-	 * @return the associations for the types
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	private synchronized AttributeImpl<?, ?>[] prepareAssociations(EntityTypeImpl<?> source, EntityTypeImpl<?> associate) {
-		HashMap<EntityTypeImpl<?>, AttributeImpl<?, ?>[]> sourceMap = this.associationMap.get(source);
-		if (sourceMap == null) {
-			sourceMap = Maps.newHashMap();
-		}
-
-		AttributeImpl<?, ?>[] associations = sourceMap.get(associate);
-		if (associations != null) {
-			return associations; // other thread got it before us
-		}
-
-		// prepare the related associations
-		final HashSet<AttributeImpl<?, ?>> attributes = Sets.newHashSet();
-
-		final Association<?, ?>[] allAssociations = source.getAssociations();
-		for (final Association<?, ?> association : allAssociations) {
-
-			// determine the java type
-			final AttributeImpl<?, ?> attribute = association.getDeclaringAttribute();
-
-			// only owner associations impose priority
-			if (!association.isOwner()) {
-				continue;
-			}
-
-			// only relations kept in the row impose priority
-			if (!(association instanceof OwnerManyToOneMapping) //
-				&& !(association instanceof OwnerOneToOneMapping)) {
-				continue;
-			}
-
-			final Class<?> javaType = attribute.getJavaType();
-
-			if (javaType.isAssignableFrom(associate.getBindableJavaType())) {
-				attributes.add(attribute);
-			}
-		}
-
-		associations = new AttributeImpl[attributes.size()];
-		attributes.toArray(associations);
-		sourceMap.put(associate, associations);
-
-		if (this.associationMap.get(source) == null) {
-			this.associationMap.put(source, sourceMap);
-		}
-
-		return associations;
-	}
-
 	private boolean references(ManagedInstance<?> i1, ManagedInstance<?> i2) {
 		final EntityTypeImpl<?> type = i1.getType();
 		final EntityTypeImpl<?> associate = i2.getType();
 
-		final AttributeImpl<?, ?>[] attributes = this.getAssociationsFor(type, associate);
+		final AttributeImpl<?, ?>[] attributes = type.getAssociationsFor(associate);
 
 		if (attributes.length == 0) {
 			return false;

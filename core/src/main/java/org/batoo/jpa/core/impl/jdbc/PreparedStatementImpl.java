@@ -74,7 +74,7 @@ public class PreparedStatementImpl implements PreparedStatement {
 	private final GenericKeyedPool<String, PreparedStatementImpl> pool;
 	private ParameterMetaData parameterMetaData;
 
-	private final boolean sqlAudit = true; // FIXME implement
+	private final boolean sqlAudit = false; // FIXME implement
 
 	/**
 	 * @param connection
