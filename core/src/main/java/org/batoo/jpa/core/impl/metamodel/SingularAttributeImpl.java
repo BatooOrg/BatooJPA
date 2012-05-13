@@ -178,10 +178,6 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 	 * @author hceylan
 	 */
 	public boolean fillValue(Object instance) {
-		if (!this.isId()) {
-			throw new IllegalStateException("Not an id attribute");
-		}
-
 		final T value = this.get(instance);
 
 		// if the attribute already has value, bail out

@@ -19,15 +19,16 @@
 package org.batoo.jpa.core.impl.instance;
 
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.IdentityHashMap;
+import java.util.List;
 
 import org.batoo.jpa.core.impl.EntityTransactionImpl;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.SimpleEntityManager;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.mapping.Association;
+import org.batoo.jpa.core.impl.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.mapping.CollectionMapping;
 import org.batoo.jpa.core.impl.mapping.PersistableAssociation;
 import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
@@ -79,8 +80,8 @@ public class ManagedInstance<X> {
 	private final SessionImpl session;
 	private final X instance;
 	private Status status;
-	private final SingularAttributeImpl<?, ?>[] idAttributes;
-	private SingularAttributeImpl<?, ?> singleId;
+	private final List<BasicMapping<?, ?>> idMappings;
+	private BasicMapping<?, ?> singleId;
 	private EntityTransactionImpl transaction;
 	private boolean initialized;
 
@@ -110,7 +111,7 @@ public class ManagedInstance<X> {
 		this.session = session;
 		this.instance = instance;
 
-		this.idAttributes = type.getIdAttributes();
+		this.idMappings = type.getRoot().getIdMappings();
 	}
 
 	/**
@@ -210,7 +211,6 @@ public class ManagedInstance<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
 	public void enhanceCollection(CollectionMapping<?, ?, ?> association) {
 		if (!this.enhancedCollections.containsKey(association)) {
 			this.enhancedCollections.put(association, null);
@@ -232,12 +232,21 @@ public class ManagedInstance<X> {
 		@SuppressWarnings("unchecked")
 		final ManagedInstance<? super X> other = (ManagedInstance<? super X>) obj;
 
-		if ((this.instance != null) && (this.instance == other.instance)) {
+		if (this.instance == other.instance) {
 			return true;
 		}
 
-		if (!Arrays.equals(this.idAttributes, other.idAttributes)) {
+		if (!this.type.getIdentityRoot().equals(other.type.getIdentityRoot())) {
 			return false;
+		}
+
+		for (final BasicMapping<?, ?> mapping : this.idMappings) {
+			final Object id1 = mapping.getValue(this.instance);
+			final Object id2 = mapping.getValue(other.instance);
+
+			if (!id1.equals(id2)) {
+				return false;
+			}
 		}
 
 		return true;
@@ -254,8 +263,8 @@ public class ManagedInstance<X> {
 	 */
 	public boolean fillIdValues() {
 		boolean allFilled = true;
-		for (final SingularAttributeImpl<?, ?> attribute : this.idAttributes) {
-			allFilled &= attribute.fillValue(this.instance);
+		for (final BasicMapping<?, ?> mapping : this.idMappings) {
+			allFilled &= mapping.getDeclaringAttribute().fillValue(this.instance);
 		}
 
 		return allFilled;
@@ -335,7 +344,7 @@ public class ManagedInstance<X> {
 		this.initialize();
 
 		if (this.singleId != null) {
-			return this.singleId.get(this.instance);
+			return this.singleId.getValue(this.instance);
 		}
 
 		if (this.embeddedAttribute != null) {
@@ -351,6 +360,10 @@ public class ManagedInstance<X> {
 		for (final SingularAttributeImpl<?, ?> attribute : this.type.getIdAttributes()) {
 			final SingularAttributeImpl<?, ?> idAttribute = attribute;
 			idAttribute.set(id, idAttribute.get(this.instance));
+		}
+
+		if (id != null) {
+			this.id = id;
 		}
 
 		return id;
@@ -408,8 +421,8 @@ public class ManagedInstance<X> {
 
 		final int prime = 31;
 		int result = 1;
-		for (final SingularAttributeImpl<?, ?> attribute : this.idAttributes) {
-			final Object idValue = attribute.get(this.instance);
+		for (final BasicMapping<?, ?> mapping : this.idMappings) {
+			final Object idValue = mapping.getValue(this.instance);
 			result = (prime * result) + idValue.hashCode();
 		}
 
@@ -425,8 +438,8 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public boolean hasId() {
-		for (final SingularAttributeImpl<?, ?> attribute : this.idAttributes) {
-			if (attribute.get(this.instance) == null) {
+		for (final BasicMapping<?, ?> mapping : this.idMappings) {
+			if (mapping.getValue(this.instance) == null) {
 				return false;
 			}
 		}
@@ -441,8 +454,8 @@ public class ManagedInstance<X> {
 	private void initialize() {
 		if (!this.initialized) {
 
-			if (this.idAttributes.length == 1) {
-				this.singleId = this.idAttributes[0];
+			if (this.idMappings.size() == 1) {
+				this.singleId = this.idMappings.get(0);
 			}
 			else {
 				final TypeImpl<?> idType = this.type.getIdType();
@@ -491,8 +504,8 @@ public class ManagedInstance<X> {
 			}
 		}
 		else {
-			for (final SingularAttributeImpl<?, ?> resolver : this.idAttributes) {
-				resolver.set(this.instance, this.id);
+			for (final BasicMapping<?, ?> mapping : this.idMappings) {
+				mapping.setValue(this.instance, this.id);
 			}
 		}
 	}
@@ -547,7 +560,7 @@ public class ManagedInstance<X> {
 		return "ManagedInstance [session=" + this.session.getSessionId() //
 			+ ", type=" + this.type.getName() //
 			+ ", status=" + this.status //
-			+ ", id=" + this.id //
+			+ ", id=" + this.getId() //
 			+ ", instance=" //
 			+ this.instance + "]";
 	}

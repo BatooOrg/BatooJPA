@@ -118,21 +118,21 @@ public class SelectHelper<X> extends BaseSelectHelper<X> {
 	 * 
 	 * @param session
 	 *            the session
-	 * @param managedId
-	 *            the id of the managed instance
+	 * @param managedInstance
+	 *            the the managed instance with the id
 	 * @throws SQLException
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 * @return
 	 */
-	public X select(SessionImpl session, final ManagedInstance<X> managedId) throws SQLException {
+	public X select(SessionImpl session, final ManagedInstance<X> managedInstance) throws SQLException {
 		// Do not inline, generation of the select SQL will initialize the predicates!
 		final String selectSql = this.getSelectSql();
 
 		final Object[] params = new Object[this.parameters.size()];
 		for (int i = 0; i < params.length; i++) {
-			params[i] = this.parameters.get(i).getPhysicalValue(managedId.getSession(), managedId.getInstance());
+			params[i] = this.parameters.get(i).getPhysicalValue(managedInstance.getSession(), managedInstance.getInstance());
 		}
 
 		final SelectHandler<X> rsHandler = new SelectHandler<X>(session, this.type, this.columnAliases, this.root);

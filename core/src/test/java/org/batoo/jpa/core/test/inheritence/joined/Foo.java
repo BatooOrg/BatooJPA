@@ -37,7 +37,7 @@ import javax.persistence.InheritanceType;
 public class Foo {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Integer key;
 
 	private String value;

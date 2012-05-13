@@ -209,9 +209,13 @@ public class EntityTypeImpl<X> extends BaseEntityTypeImpl<X> {
 	 * @author hceylan
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public EntityTypeImpl<? super X> getRoot() {
-		return (EntityTypeImpl<? super X>) (this.root != null ? this.root : this);
+		if (this.root != null) {
+			return this.root;
+		}
+		else {
+			return this;
+		}
 	}
 
 	/**
