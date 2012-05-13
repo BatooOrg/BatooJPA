@@ -240,16 +240,23 @@ public class ManagedInstance<X> {
 			return false;
 		}
 
-		for (final BasicMapping<?, ?> mapping : this.idMappings) {
-			final Object id1 = mapping.getValue(this.instance);
-			final Object id2 = mapping.getValue(other.instance);
-
-			if (!id1.equals(id2)) {
-				return false;
-			}
+		final Object id = this.getId();
+		if (id == null) {
+			return false;
 		}
 
-		return true;
+		return id.equals(other.getId());
+
+		// for (final BasicMapping<?, ?> mapping : this.idMappings) {
+		// final Object id1 = mapping.getValue(this.instance);
+		// final Object id2 = mapping.getValue(other.instance);
+		//
+		// if (!id1.equals(id2)) {
+		// return false;
+		// }
+		// }
+		//
+		// return true;
 	}
 
 	/**

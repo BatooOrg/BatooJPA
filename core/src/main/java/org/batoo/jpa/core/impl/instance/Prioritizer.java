@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.impl.instance;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.batoo.jpa.core.impl.metamodel.AttributeImpl;
 import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
@@ -78,26 +79,65 @@ public class Prioritizer {
 	 * @author hceylan
 	 */
 	public ManagedInstance<?>[] sort(ArrayList<ManagedInstance<?>> instances) {
+		final ManagedInstance<?>[] sorted = new ManagedInstance[instances.size()];
+
+		// separate out the independent instances
+		int instanceNo = 0;
+		for (final Iterator<ManagedInstance<?>> i = instances.iterator(); i.hasNext();) {
+			final ManagedInstance<?> i1 = i.next();
+
+			boolean hasDependency = false;
+			for (final ManagedInstance<?> i2 : instances) {
+				if (i1 == i2) {
+					continue;
+				}
+
+				if (this.references(i1, i2)) {
+					hasDependency = true;
+					break;
+				}
+			}
+
+			// if has no reference then it is independent, remove it from
+			if (!hasDependency) {
+				sorted[instanceNo++] = i1;
+				i.remove();
+			}
+		}
+
+		// if all independent then return the result
+		if (instances.size() == 0) {
+			return sorted;
+		}
+
+		// sort the remaining ones based on topology
 		final PriorityList priorityList = new PriorityList(instances.size());
 
 		for (int i = 0; i < instances.size(); i++) {
-			final ManagedInstance<?> i1 = instances.get(i);
+			priorityList.addInstance(instances.get(i));
+		}
 
-			priorityList.addInstance(i1);
+		for (int i = 0; i < instances.size(); i++) {
+			final ManagedInstance<?> i1 = instances.get(i);
 
 			for (int j = i + 1; j < instances.size(); j++) {
 				final ManagedInstance<?> i2 = instances.get(j);
 
 				if (this.references(i1, i2)) {
-					priorityList.addDependency(i, j);
+					priorityList.addDependency(i1, i2);
 				}
 
 				if (this.references(i2, i1)) {
-					priorityList.addDependency(j, i);
+					priorityList.addDependency(i2, i1);
 				}
 			}
 		}
 
-		return priorityList.sort();
+		final ManagedInstance<?>[] rest = priorityList.sort();
+		for (final ManagedInstance<?> instance : rest) {
+			sorted[instanceNo++] = instance;
+		}
+
+		return sorted;
 	}
 }

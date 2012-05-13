@@ -1,67 +1,47 @@
 package org.batoo.jpa.core.impl.instance;
 
+import java.util.IdentityHashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
+
 import javax.persistence.PersistenceException;
+
+import org.batoo.jpa.core.util.IdentityHashSet;
 
 public class PriorityList {
 
-	private final ManagedInstance<?>[] instances;
-	private final int matrix[][]; // adjacency matrix
-
+	private final IdentityHashMap<ManagedInstance<?>, IdentityHashSet<ManagedInstance<?>>> dependencies;
 	private final ManagedInstance<?>[] sortedinstances;
-
-	private int noInstances;
+	private int itemNo;
 
 	public PriorityList(int size) {
-		this.instances = new ManagedInstance[size];
-		this.matrix = new int[size][size];
+		super();
 
-		this.noInstances = 0;
-
-		for (int i = 0; i < size; i++) {
-			for (int k = 0; k < size; k++) {
-				this.matrix[i][k] = 0;
-			}
-		}
-
-		this.sortedinstances = new ManagedInstance[size]; // sorted vert labels
+		this.dependencies = new IdentityHashMap<ManagedInstance<?>, IdentityHashSet<ManagedInstance<?>>>(size);
+		this.sortedinstances = new ManagedInstance[size];
+		this.itemNo = size - 1;
 	}
 
-	public void addDependency(int dependent, int dependency) {
-		this.matrix[dependency][dependent] = 1;
+	public void addDependency(ManagedInstance<?> dependent, ManagedInstance<?> dependency) {
+		this.dependencies.get(dependency).add(dependent);
 	}
 
 	public void addInstance(ManagedInstance<?> instance) {
-		this.instances[this.noInstances++] = instance;
+		this.dependencies.put(instance, new IdentityHashSet<ManagedInstance<?>>());
 	}
 
-	public void deleteInstance(int removeInstance) {
-		// if not last instance, delete from the instance list
-		if (removeInstance != (this.noInstances - 1)) {
-			for (int j = removeInstance; j < (this.noInstances - 1); j++) {
-				this.instances[j] = this.instances[j + 1];
-			}
-
-			for (int row = removeInstance; row < (this.noInstances - 1); row++) {
-				this.moveRowUp(row, this.noInstances);
-			}
-
-			for (int col = removeInstance; col < (this.noInstances - 1); col++) {
-				this.moveColLeft(col, this.noInstances - 1);
-			}
-		}
-
-		this.noInstances--; // one less instance
-	}
-
-	private void moveColLeft(int col, int length) {
-		for (int row = 0; row < length; row++) {
-			this.matrix[row][col] = this.matrix[row][col + 1];
-		}
-	}
-
-	private void moveRowUp(int row, int length) {
-		for (int col = 0; col < length; col++) {
-			this.matrix[row][col] = this.matrix[row + 1][col];
+	/**
+	 * Deletes the instance from the dependencies
+	 * 
+	 * @param instance
+	 *            the instance to delete
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void deleteInstance(ManagedInstance<?> instance) {
+		for (final IdentityHashSet<ManagedInstance<?>> dependencies : this.dependencies.values()) {
+			dependencies.remove(instance);
 		}
 	}
 
@@ -73,26 +53,20 @@ public class PriorityList {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private int noSuccessors() {
-		// dependency from row to column in adjMat
-		boolean isDependency;
+	private ManagedInstance<?> noSuccessors() {
+		for (final Iterator<Entry<ManagedInstance<?>, IdentityHashSet<ManagedInstance<?>>>> i = this.dependencies.entrySet().iterator(); i.hasNext();) {
+			final Entry<ManagedInstance<?>, IdentityHashSet<ManagedInstance<?>>> entry = i.next();
 
-		for (int row = 0; row < this.noInstances; row++) {
-			isDependency = false; // check dependencies
+			if (entry.getValue().size() == 0) {
+				final ManagedInstance<?> instance = entry.getKey();
 
-			for (int col = 0; col < this.noInstances; col++) {
-				if (this.matrix[row][col] > 0) // if dependency to another,
-				{
-					isDependency = true;
-					break; // this instance has a successor try another
-				}
-			}
-			if (!isDependency) {
-				return row;
+				i.remove();
+
+				return instance;
 			}
 		}
 
-		throw new PersistenceException("Dependencies not yet supported");
+		throw new PersistenceException("Circular dependencies not yet supported");
 	}
 
 	/**
@@ -103,14 +77,14 @@ public class PriorityList {
 	 */
 	public ManagedInstance<?>[] sort() {
 		// while there is remaining instances continue the operation
-		while (this.noInstances > 0) {
+		while (this.dependencies.size() > 0) {
 			// get an instance with no successors, or -1
-			final int currentInstance = this.noSuccessors();
+			final ManagedInstance<?> instance = this.noSuccessors();
 
-			// move instance into sorted array (start at end)
-			this.sortedinstances[this.noInstances - 1] = this.instances[currentInstance];
+			// move instance into sorted array
+			this.sortedinstances[this.itemNo--] = instance;
 
-			this.deleteInstance(currentInstance); // delete instance
+			this.deleteInstance(instance); // delete instance
 		}
 
 		return this.sortedinstances;
