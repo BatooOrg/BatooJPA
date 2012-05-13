@@ -20,7 +20,6 @@ package org.batoo.jpa.core.impl;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 
@@ -102,10 +101,14 @@ public class SessionImpl {
 		instances.addAll(this.identifiableEntities);
 		instances.addAll(this.changedEntities);
 
-		Collections.sort(instances, Prioritizer.INSTANCE);
+		final ManagedInstance<?>[] sortedInstances = Prioritizer.INSTANCE.sort(instances);
 
-		for (final ManagedInstance<?> instance : instances) {
+		for (final ManagedInstance<?> instance : sortedInstances) {
 			instance.flush(connection, transaction);
+		}
+
+		for (final ManagedInstance<?> instance : sortedInstances) {
+			instance.flushAssociations(connection);
 		}
 
 		this.externalEntities.addAll(this.identifiableEntities);

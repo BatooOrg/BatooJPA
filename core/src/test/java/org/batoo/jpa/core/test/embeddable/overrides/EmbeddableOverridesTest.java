@@ -20,7 +20,6 @@ package org.batoo.jpa.core.test.embeddable.overrides;
 
 import java.sql.SQLException;
 
-import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 
 import junit.framework.Assert;

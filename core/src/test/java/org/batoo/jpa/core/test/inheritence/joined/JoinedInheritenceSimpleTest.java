@@ -18,8 +18,6 @@
  */
 package org.batoo.jpa.core.test.inheritence.joined;
 
-import javax.persistence.EntityManager;
-
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.AbstractTest;

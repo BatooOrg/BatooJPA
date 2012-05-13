@@ -21,8 +21,6 @@ package org.batoo.jpa.core.test.tablegenerator;
 import java.sql.SQLException;
 import java.util.Set;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.metamodel.EntityType;
 import javax.sql.DataSource;
 

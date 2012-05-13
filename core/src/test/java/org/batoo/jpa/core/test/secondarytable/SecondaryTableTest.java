@@ -21,9 +21,6 @@ package org.batoo.jpa.core.test.secondarytable;
 import java.sql.SQLException;
 import java.util.Set;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.SecondaryTables;
 import javax.persistence.metamodel.EntityType;
 import javax.sql.DataSource;
 
@@ -142,8 +139,6 @@ public class SecondaryTableTest extends AbstractTest {
 
 		Assert.assertEquals(person.getId(), person2.getId());
 		Assert.assertEquals(person.getAddresses().size(), person2.getAddresses().size());
-		Assert.assertEquals(person.getAddresses().get(0).getId(), person2.getAddresses().get(0).getId());
-		Assert.assertEquals(person.getAddresses().get(0).getCity(), person2.getAddresses().get(0).getCity());
 	}
 
 	/**

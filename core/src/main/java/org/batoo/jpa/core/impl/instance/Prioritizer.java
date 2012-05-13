@@ -18,14 +18,16 @@
  */
 package org.batoo.jpa.core.impl.instance;
 
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.impl.mapping.Association;
+import org.batoo.jpa.core.impl.mapping.OwnerManyToOneMapping;
+import org.batoo.jpa.core.impl.mapping.OwnerOneToOneMapping;
 import org.batoo.jpa.core.impl.metamodel.AttributeImpl;
 import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
-import org.batoo.jpa.core.impl.metamodel.PluralAttributeImpl;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -35,7 +37,9 @@ import com.google.common.collect.Sets;
  * @author hceylan
  * @since $version
  */
-public class Prioritizer implements Comparator<ManagedInstance<?>> {
+public class Prioritizer {
+
+	private static final BLogger LOG = BLogger.getLogger(Prioritizer.class);
 
 	/**
 	 * Singleton global instance
@@ -52,23 +56,6 @@ public class Prioritizer implements Comparator<ManagedInstance<?>> {
 	 */
 	private Prioritizer() {
 		super();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public int compare(ManagedInstance<?> o1, ManagedInstance<?> o2) {
-		if (this.references(o1, o2)) {
-			return 1;
-		}
-
-		if (this.references(o2, o1)) {
-			return -1;
-		}
-
-		return 0;
 	}
 
 	/**
@@ -133,16 +120,20 @@ public class Prioritizer implements Comparator<ManagedInstance<?>> {
 			// determine the java type
 			final AttributeImpl<?, ?> attribute = association.getDeclaringAttribute();
 
-			Class<?> javaType;
-			if (attribute instanceof PluralAttributeImpl) {
-				final PluralAttributeImpl<?, ?, ?> pluralAttribute = (PluralAttributeImpl<?, ?, ?>) attribute;
-				javaType = pluralAttribute.getBindableJavaType();
-			}
-			else {
-				javaType = attribute.getJavaType();
+			// only owner associations impose priority
+			if (!association.isOwner()) {
+				continue;
 			}
 
-			if (association.isOwner() && javaType.isAssignableFrom(associate.getBindableJavaType())) {
+			// only relations kept in the row impose priority
+			if (!(association instanceof OwnerManyToOneMapping) //
+				&& !(association instanceof OwnerOneToOneMapping)) {
+				continue;
+			}
+
+			final Class<?> javaType = attribute.getJavaType();
+
+			if (javaType.isAssignableFrom(associate.getBindableJavaType())) {
 				attributes.add(attribute);
 			}
 		}
@@ -158,9 +149,9 @@ public class Prioritizer implements Comparator<ManagedInstance<?>> {
 		return associations;
 	}
 
-	private boolean references(ManagedInstance<?> o1, ManagedInstance<?> o2) {
-		final EntityTypeImpl<?> type = o1.getType();
-		final EntityTypeImpl<?> associate = o2.getType();
+	private boolean references(ManagedInstance<?> i1, ManagedInstance<?> i2) {
+		final EntityTypeImpl<?> type = i1.getType();
+		final EntityTypeImpl<?> associate = i2.getType();
 
 		final AttributeImpl<?, ?>[] attributes = this.getAssociationsFor(type, associate);
 
@@ -168,8 +159,8 @@ public class Prioritizer implements Comparator<ManagedInstance<?>> {
 			return false;
 		}
 
-		final Object instance = o1.getInstance();
-		final Object reference = o2.getInstance();
+		final Object instance = i1.getInstance();
+		final Object reference = i2.getInstance();
 
 		for (final AttributeImpl<?, ?> attribute : attributes) {
 			if (attribute.references(instance, reference)) {
@@ -178,5 +169,39 @@ public class Prioritizer implements Comparator<ManagedInstance<?>> {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Sorts the managed instances based on their dependencies.
+	 * 
+	 * @param instances
+	 *            the list of instances
+	 * @return the sorted array of instances
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ManagedInstance<?>[] sort(ArrayList<ManagedInstance<?>> instances) {
+		final PriorityList priorityList = new PriorityList(instances.size());
+
+		for (int i = 0; i < instances.size(); i++) {
+			final ManagedInstance<?> i1 = instances.get(i);
+
+			priorityList.addInstance(i1);
+
+			for (int j = i + 1; j < instances.size(); j++) {
+				final ManagedInstance<?> i2 = instances.get(j);
+
+				if (this.references(i1, i2)) {
+					priorityList.addDependency(i, j);
+				}
+
+				if (this.references(i2, i1)) {
+					priorityList.addDependency(j, i);
+				}
+			}
+		}
+
+		return priorityList.sort();
 	}
 }

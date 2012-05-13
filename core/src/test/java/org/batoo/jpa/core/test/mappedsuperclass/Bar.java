@@ -110,4 +110,13 @@ public class Bar {
 		this.fooValue = fooValue;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "Bar [key=" + this.key + "]";
+	}
+
 }

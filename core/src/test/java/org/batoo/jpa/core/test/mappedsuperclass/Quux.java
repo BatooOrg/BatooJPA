@@ -101,4 +101,13 @@ public class Quux {
 		this.quuxValue = quuxValue;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "Quux [key=" + this.key + ", foo=" + this.foo + "]";
+	}
+
 }

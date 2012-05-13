@@ -20,8 +20,6 @@ package org.batoo.jpa.core.test.refresh.simple;
 
 import java.util.Iterator;
 
-import javax.persistence.EntityManager;
-
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.AbstractTest;

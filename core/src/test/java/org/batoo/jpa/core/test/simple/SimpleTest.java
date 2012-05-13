@@ -21,9 +21,6 @@ package org.batoo.jpa.core.test.simple;
 import java.sql.SQLException;
 import java.util.Set;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
 import javax.persistence.TransactionRequiredException;
 import javax.persistence.metamodel.EntityType;
 import javax.sql.DataSource;

@@ -18,7 +18,6 @@
  */
 package org.batoo.jpa.core.test.fetch.lazy;
 
-import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 
 import junit.framework.Assert;

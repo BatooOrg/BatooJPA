@@ -29,6 +29,7 @@ import org.batoo.jpa.core.impl.SimpleEntityManager;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.mapping.CollectionMapping;
+import org.batoo.jpa.core.impl.mapping.PersistableAssociation;
 import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
 import org.batoo.jpa.core.impl.metamodel.SingularAttributeImpl;
 import org.batoo.jpa.core.impl.metamodel.TypeImpl;
@@ -266,10 +267,10 @@ public class ManagedInstance<X> {
 	 * 
 	 * Flushes the state of the instance to the database.
 	 * 
-	 * @param transaction
-	 *            the transaction to perform flush against
 	 * @param connection
 	 *            the connection to use to flush
+	 * @param transaction
+	 *            the transaction to perform flush against
 	 * @throws SQLException
 	 *             thrown in case of an SQL error
 	 * 
@@ -299,6 +300,25 @@ public class ManagedInstance<X> {
 		}
 
 		this.transaction = transaction;
+	}
+
+	/**
+	 * 
+	 * Flushes the associations of the instance to the database.
+	 * 
+	 * @param connection
+	 *            the connection to use to flush
+	 * @throws SQLException
+	 *             thrown in case of an SQL error
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void flushAssociations(ConnectionImpl connection) throws SQLException {
+		for (final PersistableAssociation association : this.type.getAssociationsOwnedPersistable()) {
+			association.performInsert(connection, this);
+		}
 	}
 
 	/**

@@ -18,8 +18,6 @@
  */
 package org.batoo.jpa.core.test.manualid;
 
-import javax.persistence.EntityManager;
-
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.AbstractTest;

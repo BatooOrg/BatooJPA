@@ -18,8 +18,6 @@
  */
 package org.batoo.jpa.core.test.manytomany;
 
-import javax.persistence.ManyToMany;
-
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.AbstractTest;

@@ -64,6 +64,7 @@ import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
 import org.batoo.jpa.core.impl.mapping.OwnerAssociationMapping;
 import org.batoo.jpa.core.impl.mapping.OwnerManyToManyMapping;
 import org.batoo.jpa.core.impl.mapping.OwnerOneToManyMapping;
+import org.batoo.jpa.core.impl.mapping.PersistableAssociation;
 import org.batoo.jpa.core.impl.mapping.TableTemplate;
 import org.batoo.jpa.core.impl.mapping.TypeFactory;
 import org.batoo.jpa.core.impl.reflect.ReflectHelper;
@@ -103,6 +104,7 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 	private Association<?, ?>[] associations;
 	private Association<?, ?>[] associationsPersistable;
 	private Association<?, ?>[] associationsDetachable;
+	private PersistableAssociation<?, ?>[] associationsOwnedPersistable;
 
 	/**
 	 * @param metaModel
@@ -258,7 +260,6 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 			synchronized (this) {
 				if (this.enhancer == null) {
 					try {
-						@SuppressWarnings("unchecked")
 						final Class<X> enhancedClass = Enhancer.enhance(this);
 						final Constructor<X> enhancedConstructor = enhancedClass.getConstructor(Class.class, SessionImpl.class,
 							Object.class, Boolean.TYPE);
@@ -345,6 +346,38 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 		}
 
 		return this.associationsDetachable;
+	}
+
+	/**
+	 * Returns the array of associations that are owner and persistable.
+	 * 
+	 * @return the array of associations that are owner and persistable.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public PersistableAssociation<?, ?>[] getAssociationsOwnedPersistable() {
+		if (this.associationsOwnedPersistable != null) {
+			return this.associationsOwnedPersistable;
+		}
+
+		synchronized (this) {
+			if (this.associationsOwnedPersistable != null) {
+				return this.associationsOwnedPersistable;
+			}
+
+			final List<Association<?, ?>> associationsOwnedPersistable = Lists.newArrayList();
+			for (final Association<?, ?> association : this.getAssociations()) {
+				if (association instanceof PersistableAssociation) {
+					associationsOwnedPersistable.add(association);
+				}
+			}
+
+			this.associationsOwnedPersistable = new PersistableAssociation[associationsOwnedPersistable.size()];
+			this.associationsOwnedPersistable = associationsOwnedPersistable.toArray(this.associationsOwnedPersistable);
+		}
+
+		return this.associationsOwnedPersistable;
 	}
 
 	/**

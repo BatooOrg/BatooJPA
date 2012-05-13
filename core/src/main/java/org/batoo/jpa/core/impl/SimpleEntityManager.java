@@ -205,7 +205,7 @@ public abstract class SimpleEntityManager implements EntityManager {
 		final EntityTypeImpl<T> type = this.metamodel.entity(entityClass);
 		final ManagedInstance<T> instance = type.getManagedInstanceById(this.getSession(), primaryKey);
 		final ManagedInstance<T> existing = this.getSession().get(instance);
-		if (existing != null) {
+		if ((existing != null) && existing.isLoaded()) {
 			return existing.getInstance();
 		}
 
