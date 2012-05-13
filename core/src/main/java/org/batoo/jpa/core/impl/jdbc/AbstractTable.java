@@ -56,12 +56,12 @@ public abstract class AbstractTable implements Table {
 	public enum TableType {
 
 		/**
-		 * Table is a primary table. it either belongs to the root type or the entity is not part of inheritence.
+		 * Table is a primary table. it either belongs to the root type or the entity is not part of inheritance.
 		 */
 		PRIMARY,
 
 		/**
-		 * Table is the default table of an entity that is a decendent in an inheritence.
+		 * Table is the default table of an entity that is a descendant in an inheritance.
 		 */
 		DEFAULT,
 

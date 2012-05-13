@@ -158,7 +158,7 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	 * 
 	 */
 	public boolean excludeUnlistedClasses() {
-		return this.persistenceUnit.isExcludeUnlistedClasses();
+		return this.persistenceUnit.getExcludeUnlistedClasses();
 	}
 
 	/**
