@@ -24,12 +24,10 @@ import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.metamodel.Attribute;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.batoo.jpa.core.MappingException;
-import org.batoo.jpa.core.impl.instance.AbstractResolver;
-import org.batoo.jpa.core.impl.types.AttributeImpl;
-import org.batoo.jpa.core.impl.types.EmbeddableTypeImpl;
-import org.batoo.jpa.core.impl.types.SingularAttributeImpl;
+import org.batoo.jpa.core.impl.metamodel.AttributeImpl;
+import org.batoo.jpa.core.impl.metamodel.EmbeddableTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.SingularAttributeImpl;
 
 /**
  * Implementation of {@link AssociationType#ONE} with embeddable attributes.
@@ -59,15 +57,6 @@ public class EmbeddedMapping<X, T> extends AbstractMapping<X, T> {
 		super(AssociationType.ONE, declaringAttribute, path);
 
 		this.linkAttributes(attributeOverrides, id);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public AbstractResolver createResolver(Object instance) {
-		throw new NotImplementedException();
 	}
 
 	/**

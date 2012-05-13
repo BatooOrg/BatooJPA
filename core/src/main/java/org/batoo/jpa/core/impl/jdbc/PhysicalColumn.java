@@ -31,7 +31,7 @@ import org.batoo.jpa.core.impl.mapping.BasicColumnTemplate;
 import org.batoo.jpa.core.impl.mapping.EntityInheritence;
 import org.batoo.jpa.core.impl.mapping.JoinColumnTemplate;
 import org.batoo.jpa.core.impl.mapping.TypeFactory;
-import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
 import org.batoo.jpa.core.jdbc.Column;
 import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.core.jdbc.Table;
@@ -60,9 +60,9 @@ public class PhysicalColumn implements Column {
 	private final int scale;
 	private final boolean nullable;
 	private final boolean unique;
+	private final boolean referencing;
 
 	private int h;
-	private boolean referencing;
 
 	/**
 	 * @param mapping
@@ -157,9 +157,11 @@ public class PhysicalColumn implements Column {
 		this.nullable = nullable;
 		this.unique = unique;
 
-		this.referencing = table.getTableType() == TableType.PRIMARY;
-		this.referencing |= !this.isId() && (table.getTableType() != TableType.PRIMARY);
-		this.referencing &= this.referencedColumn != null;
+		boolean referencing = table.getTableType() == TableType.PRIMARY;
+		referencing |= !this.isId() && (table.getTableType() != TableType.PRIMARY);
+		referencing &= this.referencedColumn != null;
+
+		this.referencing = referencing;
 
 		table.addColumn(this);
 	}
@@ -318,8 +320,7 @@ public class PhysicalColumn implements Column {
 		final Object value = this.mapping.getValue(instance);
 
 		if (this.referencing && (value != null)) {
-
-			final ManagedInstance<? super Object> reference = session.get(value);
+			final ManagedInstance<?> reference = session.get(value);
 			if ((reference == null) || (reference.getStatus() != Status.MANAGED)) {
 				throw new PersistenceException(instance + " has a reference with " + this.mapping.getPathAsString() + " to " + value
 					+ " that is not managed (" + (reference != null ? reference.getStatus() : Status.NEW) + ")");

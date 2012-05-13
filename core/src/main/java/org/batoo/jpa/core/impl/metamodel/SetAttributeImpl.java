@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.types;
+package org.batoo.jpa.core.impl.metamodel;
 
 import java.lang.reflect.Member;
 import java.util.HashSet;
@@ -102,6 +102,17 @@ public final class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>,
 	public void newInstance(ManagedInstance<?> managedInstance, boolean lazy) {
 		final ManagedSet<E> managedSet = new ManagedSet<E>(managedInstance, (CollectionMapping<?, Set<E>, E>) this.mapping, lazy);
 		this.accessor.set(managedInstance.getInstance(), managedSet);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean references(Object instance, Object reference) {
+		final Set<E> set = this.get(instance);
+
+		return (set != null) && set.contains(reference);
 	}
 
 	/**

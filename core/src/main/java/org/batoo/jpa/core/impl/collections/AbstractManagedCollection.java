@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.collections;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.batoo.jpa.core.impl.EntityManagerImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.mapping.CollectionMapping;
 
@@ -177,7 +178,9 @@ public abstract class AbstractManagedCollection<E> implements Collection<E>, Man
 	 */
 	protected final void initializeIfNecessary() {
 		if (!this.initialized) {
-			this.snapshot = this.managedInstance.getSession().getEntityManager().findAll(this.managedInstance, this.mapping);
+			final EntityManagerImpl entityManager = this.managedInstance.getSession().getEntityManager();
+
+			this.snapshot = entityManager.findAll(this.managedInstance, this.mapping);
 
 			this.initialized = true;
 

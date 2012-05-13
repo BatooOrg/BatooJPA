@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.types;
+package org.batoo.jpa.core.impl.metamodel;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -28,6 +28,9 @@ import javax.persistence.metamodel.EmbeddableType;
 import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
+import org.batoo.jpa.core.impl.reflect.ReflectHelper;
+
+import sun.reflect.ConstructorAccessor;
 
 /**
  * Implementation of {@link EmbeddableType}.
@@ -35,9 +38,11 @@ import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
  * @author hceylan
  * @since $version
  */
+@SuppressWarnings("restriction")
 public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements EmbeddableType<X> {
 
-	private final Constructor<X> constructor;
+	protected final ConstructorAccessor constructor0;
+	protected final Constructor<X> constructor1;
 
 	/**
 	 * @param metaModel
@@ -52,7 +57,20 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	public EmbeddableTypeImpl(MetamodelImpl metaModel, Class<X> clazz) throws MappingException {
 		super(metaModel, clazz);
 
-		this.constructor = this.getDefaultConstructor(this.javaType);
+		this.constructor0 = ReflectHelper.createConstructor(this.javaType);
+		if (this.constructor0 == null) {
+			Constructor<X> constructor = null;
+
+			try {
+				constructor = this.javaType.getConstructor();
+			}
+			catch (final Exception e) {} // not possible
+
+			this.constructor1 = constructor;
+		}
+		else {
+			this.constructor1 = null;
+		}
 
 		metaModel.addEmbeddable(this);
 	}
@@ -83,9 +101,14 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	 * @since $version
 	 * @author hceylan
 	 */
+	@SuppressWarnings("unchecked")
 	public X newInstance() {
 		try {
-			return this.constructor.newInstance();
+			if (this.constructor0 != null) {
+				return (X) this.constructor0.newInstance(new Object[] {});
+			}
+
+			return this.constructor1.newInstance();
 		}
 		catch (final Exception e) {
 			// Not possible

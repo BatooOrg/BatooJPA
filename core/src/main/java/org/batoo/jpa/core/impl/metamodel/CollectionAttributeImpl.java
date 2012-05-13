@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.types;
+package org.batoo.jpa.core.impl.metamodel;
 
 import java.lang.reflect.Member;
 import java.util.Collection;
@@ -97,6 +97,17 @@ public final class CollectionAttributeImpl<X, E> extends PluralAttributeImpl<X, 
 	 */
 	@Override
 	public void newInstance(ManagedInstance<?> managedInstance, boolean lazy) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean references(Object instance, Object reference) {
+		final Collection<E> collection = this.get(instance);
+
+		return (collection != null) && collection.contains(reference);
 	}
 
 	/**

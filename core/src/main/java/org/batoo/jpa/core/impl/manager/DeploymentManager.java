@@ -30,8 +30,8 @@ import javax.persistence.metamodel.ManagedType;
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
-import org.batoo.jpa.core.impl.types.ManagedTypeImpl;
-import org.batoo.jpa.core.impl.types.TypeImpl;
+import org.batoo.jpa.core.impl.metamodel.ManagedTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.TypeImpl;
 import org.batoo.jpa.core.util.IncrementalNamingThreadFactory;
 
 import com.google.common.collect.Lists;

@@ -21,23 +21,22 @@ package org.batoo.jpa.core.impl.jdbc;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Map;
+import java.util.HashMap;
 
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.impl.OperationTookLongTimeWarning;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
-import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
 import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.mapping.CollectionMapping;
 import org.batoo.jpa.core.impl.mapping.OwnerAssociationMapping;
-import org.batoo.jpa.core.impl.types.AttributeImpl;
-import org.batoo.jpa.core.impl.types.EmbeddableTypeImpl;
-import org.batoo.jpa.core.impl.types.EntityTypeImpl;
-import org.batoo.jpa.core.impl.types.PluralAttributeImpl;
+import org.batoo.jpa.core.impl.metamodel.AttributeImpl;
+import org.batoo.jpa.core.impl.metamodel.EmbeddableTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.PluralAttributeImpl;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
@@ -56,7 +55,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 
 	protected final SessionImpl session;
 	protected final EntityTypeImpl<X> rootType;
-	protected final Map<PhysicalColumn, String>[] columnAliases;
+	protected final HashMap<PhysicalColumn, String>[] columnAliases;
 	protected final QueryItem root;
 
 	private boolean dbAudit;
@@ -77,7 +76,8 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 	 * @author hceylan
 	 * @param discriminatorColumn
 	 */
-	public BaseSelectHandler(SessionImpl session, EntityTypeImpl<X> rootType, Map<PhysicalColumn, String>[] columnAliases, QueryItem root) {
+	public BaseSelectHandler(SessionImpl session, EntityTypeImpl<X> rootType, HashMap<PhysicalColumn, String>[] columnAliases,
+		QueryItem root) {
 
 		this.session = session;
 		this.rootType = rootType;
@@ -85,8 +85,8 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 		this.root = root;
 	}
 
-	private void createLazyAssociation(SessionImpl session, ResultSet rs, Map<ManagedId<?>, ManagedInstance<?>> cache, int tableNo,
-		final ManagedInstance<?> managedInstance, Association<?, ?> association) throws SQLException {
+	private void createLazyAssociation(SessionImpl session, ResultSet rs, HashMap<ManagedInstance<?>, ManagedInstance<?>> cache,
+		int tableNo, final ManagedInstance<?> managedInstance, Association<?, ?> association) throws SQLException {
 
 		// is the association a collection
 		final AttributeImpl<?, ?> attribute = association.getDeclaringAttribute();
@@ -98,9 +98,9 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 		}
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void createLazyInstance(SessionImpl session, ResultSet rs, Map<ManagedId<?>, ManagedInstance<?>> cache, int tableNo,
-		final ManagedInstance<?> managedInstance, Association<?, ?> association) throws SQLException {
+	private void createLazyInstance(SessionImpl session, ResultSet rs, HashMap<ManagedInstance<?>, ManagedInstance<?>> cache, int tableNo,
+		final ManagedInstance<?> parentInstance, Association<?, ?> association) throws SQLException {
+
 		final OwnerAssociationMapping<?, ?> lazyAssociation = (OwnerAssociationMapping<?, ?>) association;
 		final EntityTypeImpl<?> type = lazyAssociation.getType();
 
@@ -109,25 +109,27 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 
 		// if the primary key is null then no lazy instance created
 		if (primaryKey != null) {
-			final ManagedId<?> managedId = type.newManagedId(session, primaryKey, true);
+			final ManagedInstance<?> managedInstance = type.getManagedInstanceById(session, primaryKey, true);
 
 			// look for it in the cache
-			ManagedInstance<?> instance = cache.get(managedId);
+			ManagedInstance<?> instance = cache.get(managedInstance);
 			if (instance == null) { // if found reuse the cached instance
 				// get it from the session
-				instance = session.get(managedId);
+				instance = session.get(managedInstance);
 				if (instance != null) { // if found in the session, put it to cache and reuse
-					cache.put(instance.getId(), instance);
+					cache.put(instance, instance);
 				}
 				else {
-					// create a lazy instance
-					instance = new ManagedInstance(type, session, managedId);
-					session.put(instance);
-					cache.put(instance.getId(), instance);
+					session.put(managedInstance);
+					cache.put(managedInstance, managedInstance);
+
+					lazyAssociation.setValue(parentInstance.getInstance(), managedInstance.getInstance());
+
+					return;
 				}
 			}
 
-			lazyAssociation.setValue(managedInstance.getInstance(), instance.getInstance());
+			lazyAssociation.setValue(parentInstance.getInstance(), managedInstance.getInstance());
 		}
 	}
 
@@ -163,22 +165,21 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 	 * @author hceylan
 	 * @param discriminatorValue
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private ManagedInstance<?> getManagedInstance(SessionImpl session, Map<ManagedId<?>, ManagedInstance<?>> cache, EntityTypeImpl<?> type,
-		final Object primaryKey, ResultSet rs, int tableNo) throws SQLException {
+	private ManagedInstance<?> getManagedInstance(SessionImpl session, HashMap<ManagedInstance<?>, ManagedInstance<?>> cache,
+		EntityTypeImpl<?> type, final Object primaryKey, ResultSet rs, int tableNo) throws SQLException {
 
-		final ManagedId<?> managedId = type.newManagedId(session, primaryKey, false);
+		final ManagedInstance<?> managedInstance = type.getManagedInstanceById(session, primaryKey, false);
 
 		// look for it in the cache
-		ManagedInstance<?> instance = cache.get(managedId);
+		ManagedInstance<?> instance = cache.get(managedInstance);
 		if (instance != null) { // if found return and reuse the cached instance
 			return instance;
 		}
 
 		// get it from the session
-		instance = session.get(managedId);
+		instance = session.get(managedInstance);
 		if (instance != null) { // if found in the session
-			cache.put(instance.getId(), instance);
+			cache.put(instance, instance);
 
 			final Object entity = instance.getInstance();
 			if (entity instanceof EnhancedInstance) {
@@ -190,16 +191,13 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 			return instance;
 		}
 
-		// new managed instance
-		instance = new ManagedInstance(type, session, managedId);
-
 		// put it into cache and session
-		session.put(instance);
-		cache.put(managedId, instance);
+		session.put(managedInstance);
+		cache.put(managedInstance, managedInstance);
 
-		this.loadInstance(type, rs, tableNo, instance);
+		this.loadInstance(type, rs, tableNo, managedInstance);
 
-		return instance;
+		return managedInstance;
 	}
 
 	/**
@@ -336,13 +334,13 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 
 	@SuppressWarnings("unchecked")
 	private Collection<X> handle0(ResultSet rs) throws SQLException {
-		final Map<ManagedId<?>, ManagedInstance<?>> cache = Maps.newHashMap();
-		final Map<ManagedId<? super X>, ManagedInstance<X>> instances = Maps.newHashMap();
+		final HashMap<ManagedInstance<?>, ManagedInstance<?>> cache = Maps.newHashMap();
+		final HashMap<ManagedInstance<? super X>, ManagedInstance<X>> instances = Maps.newHashMap();
 
 		while (rs.next()) {
 			final ManagedInstance<X> managedInstance = (ManagedInstance<X>) this.processRow(this.session, rs, cache, this.root, null);
 			managedInstance.setStatus(Status.MANAGED);
-			instances.put(managedInstance.getId(), managedInstance);
+			instances.put(managedInstance, managedInstance);
 		}
 
 		for (final ManagedInstance<?> instance : cache.values()) {
@@ -385,7 +383,7 @@ public abstract class BaseSelectHandler<X> implements ResultSetHandler<Collectio
 	 * @since $version
 	 * @author hceylan
 	 */
-	private ManagedInstance<?> processRow(SessionImpl session, ResultSet rs, Map<ManagedId<?>, ManagedInstance<?>> cache,
+	private ManagedInstance<?> processRow(SessionImpl session, ResultSet rs, HashMap<ManagedInstance<?>, ManagedInstance<?>> cache,
 		QueryItem queryItem, Object parent) throws SQLException {
 
 		EntityTypeImpl<?> currentType = queryItem.getType();

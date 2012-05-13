@@ -42,7 +42,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 
+import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.MappingException;
+import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.mapping.TypeFactory;
 import org.batoo.jpa.core.util.Pair;
 import org.reflections.util.ClasspathHelper;
@@ -63,6 +65,8 @@ import com.google.common.collect.Sets;
 public class ReflectHelper {
 
 	private static final ClassLoader CLASS_LOADER = ReflectHelper.class.getClassLoader();
+
+	private static final BLogger LOG = BLogger.getLogger(ReflectHelper.class);
 
 	static final Unsafe unsafe;
 	static {
@@ -227,6 +231,45 @@ public class ReflectHelper {
 		}
 
 		throw new IllegalArgumentException(numberType + " not supported");
+	}
+
+	/**
+	 * Returns a fast constructor accessor.
+	 * 
+	 * @param <X>
+	 *            The type of the class
+	 * @param clazz
+	 *            the base class
+	 * @return the constructor accessor created
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public static <X> sun.reflect.ConstructorAccessor createConstructor(Class<X> clazz) {
+		try {
+			final Constructor<X> enhancedConstructor = clazz.getConstructor(Class.class, SessionImpl.class, Object.class, Boolean.TYPE);
+
+			final Class<?> magClass = Class.forName("sun.reflect.MethodAccessorGenerator");
+			final Constructor<?> c = magClass.getDeclaredConstructors()[0];
+			final Method generateMethod = magClass.getMethod("generateConstructor", Class.class, Class[].class, Class[].class, Integer.TYPE);
+
+			ReflectHelper.setAccessible(c, true);
+			ReflectHelper.setAccessible(generateMethod, true);
+			try {
+				final Object mag = c.newInstance();
+				return (sun.reflect.ConstructorAccessor) generateMethod.invoke(mag, enhancedConstructor.getDeclaringClass(),
+					enhancedConstructor.getParameterTypes(), enhancedConstructor.getExceptionTypes(), enhancedConstructor.getModifiers());
+			}
+			finally {
+				ReflectHelper.setAccessible(c, false);
+				ReflectHelper.setAccessible(generateMethod, false);
+			}
+		}
+		catch (final Exception e) {
+			LOG.warn("Cannot create primitive constructor", e);
+
+			return null;
+		}
 	}
 
 	static Map<Class<?>, ObjectConstructor<?>> createConstructors() {

@@ -25,9 +25,9 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToOne;
 
 import org.batoo.jpa.core.MappingException;
-import org.batoo.jpa.core.impl.types.AttributeImpl;
-import org.batoo.jpa.core.impl.types.EntityTypeImpl;
-import org.batoo.jpa.core.impl.types.SingularAttributeImpl;
+import org.batoo.jpa.core.impl.metamodel.AttributeImpl;
+import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.SingularAttributeImpl;
 
 /**
  * Implementation of {@link AssociationType#MANY} relational attributes.

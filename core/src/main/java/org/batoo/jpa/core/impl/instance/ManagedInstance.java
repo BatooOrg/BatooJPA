@@ -18,23 +18,32 @@
  */
 package org.batoo.jpa.core.impl.instance;
 
-import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.IdentityHashMap;
 
+import org.batoo.jpa.core.impl.EntityTransactionImpl;
 import org.batoo.jpa.core.impl.SessionImpl;
+import org.batoo.jpa.core.impl.SimpleEntityManager;
+import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
+import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.mapping.CollectionMapping;
-import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.SingularAttributeImpl;
 
 import com.google.common.collect.Maps;
 
 /**
- * The managed instance of {@link #instance}.
+ * The managed instance to track entity instances.
+ * 
+ * @param <X>
+ *            the type of the managed instance
  * 
  * @author hceylan
  * @since $version
  */
-public final class ManagedInstance<X> {
+public class ManagedInstance<X> {
 
 	/**
 	 * The states for a managed instance
@@ -66,40 +75,138 @@ public final class ManagedInstance<X> {
 
 	private final EntityTypeImpl<X> type;
 	private final SessionImpl session;
-	private final ManagedId<X> id;
+	private final X instance;
+	private Status status;
+	private final SingularAttributeImpl<?, ?>[] idAttributes;
+	private EntityTransactionImpl transaction;
+	private final boolean external = true;
+
+	private Object id;
+	private boolean loaded;
 	private final IdentityHashMap<CollectionMapping<?, ?, ?>, Object> enhancedCollections = Maps.newIdentityHashMap();
 
-	private Status status;
-	private boolean executed;
-	private boolean loaded;
+	private int h;
 
 	/**
 	 * @param type
-	 *            the type of the instance
+	 *            the entity type of the instance
+	 * @param session
+	 *            the session
 	 * @param instance
 	 *            the instance
-	 * @param id
-	 *            the managed id for the instance
-	 * @since $version
-	 * @author hceylan
-	 * @param session
-	 */
-	public ManagedInstance(EntityTypeImpl<X> type, SessionImpl session, ManagedId<X> id) {
-		super();
-
-		this.type = type;
-		this.session = session;
-		this.id = id;
-
-		this.status = Status.MANAGED;
-	}
-
-	/**
-	 * @param association
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
+	public ManagedInstance(EntityTypeImpl<X> type, SessionImpl session, X instance) {
+		super();
+
+		this.type = type;
+		this.session = session;
+		this.instance = instance;
+
+		this.idAttributes = type.getIdAttributes();
+	}
+
+	/**
+	 * @param type
+	 *            the entity type of the instance
+	 * @param session
+	 *            the session
+	 * @param instance
+	 *            the instance
+	 * @param id
+	 *            the id of the instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ManagedInstance(EntityTypeImpl<X> type, SessionImpl session, X instance, Object id) {
+		this(type, session, instance);
+
+		this.id = id;
+		for (final SingularAttributeImpl<?, ?> attribute : this.idAttributes) {
+			attribute.set(instance, id);
+		}
+	}
+
+	/**
+	 * Cascades the detach operation.
+	 * 
+	 * @param entityManager
+	 *            the entity manager
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void cascadeDetach(SimpleEntityManager entityManager) {
+		final Association<?, ?>[] associations = this.type.getAssociationsDetachable();
+
+		for (final Association<?, ?> association : associations) {
+
+			// if the association a collection attribute then we will cascade to each element
+			if (association instanceof CollectionMapping) {
+				final CollectionMapping<?, ?, ?> collectionMapping = (CollectionMapping<?, ?, ?>) association;
+				final Collection<?> collection = (Collection<?>) collectionMapping.getValue(this.instance);
+
+				// cascade to each element in the collection
+				for (final Object element : collection) {
+					entityManager.detach(element);
+				}
+			}
+			else {
+				final Object associate = association.getValue(this.instance);
+				entityManager.detach(associate);
+			}
+		}
+	}
+
+	/**
+	 * Cascades the persist operation.
+	 * 
+	 * @param entityManager
+	 *            the entity manager
+	 * @return true if an implicit flush is required, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean cascadePersist(SimpleEntityManager entityManager) {
+		boolean requiresFlush = false;
+
+		final Association<?, ?>[] associations = this.type.getAssociationsPersistable();
+
+		for (final Association<?, ?> association : associations) {
+
+			// if the association a collection attribute then we will cascade to each element
+			if (association instanceof CollectionMapping) {
+				final CollectionMapping<?, ?, ?> collectionMapping = (CollectionMapping<?, ?, ?>) association;
+				final Collection<?> collection = (Collection<?>) collectionMapping.getValue(this.instance);
+
+				// cascade to each element in the collection
+				for (final Object element : collection) {
+					requiresFlush |= entityManager.persistImpl(element);
+				}
+			}
+			else {
+				final Object associate = association.getValue(this.instance);
+				requiresFlush |= entityManager.persistImpl(associate);
+			}
+		}
+
+		return requiresFlush;
+	}
+
+	/**
+	 * Enhances the collection.
+	 * 
+	 * @param association
+	 *            the association to enhance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
 	public void enhanceCollection(CollectionMapping<?, ?, ?> association) {
 		if (!this.enhancedCollections.containsKey(association)) {
 			this.enhancedCollections.put(association, null);
@@ -117,51 +224,88 @@ public final class ManagedInstance<X> {
 		if (this == obj) {
 			return true;
 		}
-		if (this.getClass() != obj.getClass()) {
+
+		@SuppressWarnings("unchecked")
+		final ManagedInstance<? super X> other = (ManagedInstance<? super X>) obj;
+
+		if ((this.instance != null) && (this.instance == other.instance)) {
+			return true;
+		}
+
+		if (!Arrays.equals(this.idAttributes, other.idAttributes)) {
 			return false;
 		}
-		final ManagedInstance<?> other = (ManagedInstance<?>) obj;
-		if (!this.id.equals(other.id)) {
-			return false;
-		}
-		if (!this.type.equals(other.type)) {
-			return false;
-		}
+
 		return true;
 	}
 
 	/**
-	 * Returns if any DML executed for the instance.
-	 * 
-	 * @return if any DML executed for the instance
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public boolean executed() {
-		return this.executed;
-	}
-
-	/**
 	 * Fills the sequence / table generated values.
+	 * The operation returns false if at least one entity needs to obtain identity from the database.
+	 * 
+	 * @return false if all ok, true if if at least one entity needs to obtain identity from the database
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void fillIdValues() {
-		this.id.fillIdValues();
+	public boolean fillIdValues() {
+		boolean allFilled = true;
+		for (final SingularAttributeImpl<?, ?> attribute : this.idAttributes) {
+			allFilled &= attribute.fillValue(this.instance);
+		}
+
+		return allFilled;
 	}
 
 	/**
-	 * Returns the id.
 	 * 
-	 * @return the id
+	 * Flushes the state of the instance to the database.
+	 * 
+	 * @param transaction
+	 *            the transaction to perform flush against
+	 * @param connection
+	 *            the connection to use to flush
+	 * @throws SQLException
+	 *             thrown in case of an SQL error
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedId<X> getId() {
-		return this.id;
+	public void flush(ConnectionImpl connection, EntityTransactionImpl transaction) throws SQLException {
+		if (this.status == null) {
+			this.type.performInsert(connection, transaction, this);
+
+			this.status = Status.MANAGED;
+			this.session.putNew(this);
+		}
+		else {
+			switch (this.status) {
+				case NEW:
+					this.type.performInsert(connection, transaction, this);
+					this.status = Status.MANAGED;
+					break;
+				case MANAGED:
+					this.type.performUpdate(connection, transaction, this);
+					break;
+				case REMOVED:
+					this.type.performRemove(connection, transaction, this);
+					break;
+			}
+		}
+
+		this.transaction = transaction;
+	}
+
+	/**
+	 * Returns the id of the instance.
+	 * 
+	 * @return the id of the instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Object getId() {
+		return null;
 	}
 
 	/**
@@ -171,7 +315,7 @@ public final class ManagedInstance<X> {
 	 * @since $version
 	 */
 	public X getInstance() {
-		return this.id.getInstance();
+		return this.instance;
 	}
 
 	/**
@@ -185,7 +329,7 @@ public final class ManagedInstance<X> {
 	}
 
 	/**
-	 * Returns the status of the managed instance.
+	 * Returns the status.
 	 * 
 	 * @return the status
 	 * @since $version
@@ -210,11 +354,46 @@ public final class ManagedInstance<X> {
 	 */
 	@Override
 	public int hashCode() {
+		if (this.h != 0) {
+			return this.h;
+		}
+
 		final int prime = 31;
 		int result = 1;
-		result = (prime * result) + this.id.hashCode();
-		result = (prime * result) + this.type.hashCode();
-		return result;
+		for (final SingularAttributeImpl<?, ?> attribute : this.idAttributes) {
+			final Object idValue = attribute.get(this.instance);
+			result = (prime * result) + idValue.hashCode();
+		}
+
+		return this.h = result;
+	}
+
+	/**
+	 * Returns if the instance has an id.
+	 * 
+	 * @return true if the instance has an id
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean hasId() {
+		for (final SingularAttributeImpl<?, ?> attribute : this.idAttributes) {
+			if (attribute.get(this.instance) == null) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Returns the external.
+	 * 
+	 * @return the external
+	 * @since $version
+	 */
+	public boolean isExternal() {
+		return this.external;
 	}
 
 	/**
@@ -228,26 +407,14 @@ public final class ManagedInstance<X> {
 	}
 
 	/**
-	 * Performs insert for the managed instance
+	 * Sets the id.
 	 * 
-	 * @param connection
-	 * @throws SQLException
-	 * 
+	 * @param id
+	 *            the id to set
 	 * @since $version
-	 * @author hceylan
 	 */
-	public void performInsert(Connection connection) throws SQLException {
-		this.type.performInsert(connection, this);
-	}
-
-	/**
-	 * Sets the instance as executed DML.
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void setExecuted() {
-		this.executed = true;
+	public void setId(Object id) {
+		this.id = id;
 	}
 
 	/**
@@ -262,15 +429,33 @@ public final class ManagedInstance<X> {
 	}
 
 	/**
-	 * Sets the instance's managed status.
+	 * Sets the status.
 	 * 
-	 * @param managed
-	 *            the new managed status
-	 * 
+	 * @param status
+	 *            the status to set
 	 * @since $version
 	 */
 	public void setStatus(Status status) {
 		this.status = status;
+	}
+
+	/**
+	 * Sets the transaction for the instance.
+	 * <p>
+	 * Having a transaction as a mark on an instance is useful in case of detaching, if the transaction is still active the transaction will
+	 * be set to roll back only.
+	 * 
+	 * @param transaction
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setTransaction(EntityTransactionImpl transaction) {
+		if ((this.transaction != null) && (this.transaction.isActive())) {
+			this.transaction.setRollbackOnly();
+		}
+
+		this.transaction = transaction;
 	}
 
 	/**
@@ -279,6 +464,12 @@ public final class ManagedInstance<X> {
 	 */
 	@Override
 	public String toString() {
-		return "ManagedInstance [type=" + this.type.getName() + ", id=" + this.id + "]";
+		return "ManagedInstance [session=" + this.session.getSessionId() //
+			+ ", type=" + this.type.getName() //
+			+ ", status=" + this.status //
+			+ ", id=" + this.id //
+			+ ", external=" + this.external //
+			+ ", instance=" //
+			+ this.instance + "]";
 	}
 }

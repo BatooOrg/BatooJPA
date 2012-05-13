@@ -16,51 +16,50 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.instance;
+package org.batoo.jpa.core.impl.metamodel;
 
-import org.batoo.jpa.core.impl.mapping.OwnerAssociationMapping;
+import java.util.Map;
+import java.util.Set;
+
+import javax.persistence.metamodel.Attribute;
+import javax.persistence.metamodel.BasicType;
+
+import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
+
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
- * Resolver for association mappings.
  * 
- * @author hceylan
  * @since $version
+ * @author hceylan
  */
-public class AssociateResolver extends AbstractResolver {
+public class BasicTypeImpl<X> extends TypeImpl<X> implements BasicType<X> {
+
+	protected final Map<String, Attribute<X, ?>> declaredAttributes = Maps.newHashMap();
+	protected final Set<Attribute<X, ?>> setDeclaredAttributes = Sets.newHashSet();
 
 	/**
-	 * @param mapping
-	 *            the mapping
-	 * @param instance
-	 *            the instance
+	 * @param metaModel
+	 *            the meta model
+	 * @param javaType
+	 *            the java type this type corresponds to
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AssociateResolver(OwnerAssociationMapping<?, ?> mapping, Object instance) {
-		super(mapping, instance);
-	}
+	public BasicTypeImpl(MetamodelImpl metaModel, Class<X> javaType) {
+		super(metaModel, javaType);
 
-	/**
-	 * Returns if the mapping contains the instance.
-	 * 
-	 * @param instance
-	 * @return true if the mapping contains the instance
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public boolean contains(Object instance) {
-		return this.getMapping().contains(instance);
+		metaModel.addBasic(this);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 * 
 	 */
-	@Override
-	public OwnerAssociationMapping<?, ?> getMapping() {
-		return (OwnerAssociationMapping<?, ?>) super.getMapping();
+	public PersistenceType getPersistenceType() {
+		return PersistenceType.BASIC;
 	}
 
 }

@@ -23,10 +23,10 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.batoo.jpa.core.impl.SessionImpl;
-import org.batoo.jpa.core.impl.instance.ManagedId;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.mapping.OwnerOneToManyMapping;
-import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -126,7 +126,7 @@ public class SelectHelper<X> extends BaseSelectHelper<X> {
 	 * @author hceylan
 	 * @return
 	 */
-	public X select(SessionImpl session, final ManagedId<X> managedId) throws SQLException {
+	public X select(SessionImpl session, final ManagedInstance<X> managedId) throws SQLException {
 		// Do not inline, generation of the select SQL will initialize the predicates!
 		final String selectSql = this.getSelectSql();
 

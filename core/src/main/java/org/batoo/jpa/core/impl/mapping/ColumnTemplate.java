@@ -19,7 +19,7 @@
 package org.batoo.jpa.core.impl.mapping;
 
 import org.batoo.jpa.core.impl.jdbc.PhysicalColumn;
-import org.batoo.jpa.core.impl.types.AttributeImpl;
+import org.batoo.jpa.core.impl.metamodel.AttributeImpl;
 
 /**
  * Base class for column templates.

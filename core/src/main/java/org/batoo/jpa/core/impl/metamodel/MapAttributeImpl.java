@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.types;
+package org.batoo.jpa.core.impl.metamodel;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
@@ -218,6 +218,17 @@ public final class MapAttributeImpl<X, K, V> extends PluralAttributeImpl<X, Map<
 		}
 
 		return parsed;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean references(Object instance, Object reference) {
+		final Map<K, V> map = this.get(instance);
+
+		return (map != null) && map.values().contains(reference);
 	}
 
 	/**

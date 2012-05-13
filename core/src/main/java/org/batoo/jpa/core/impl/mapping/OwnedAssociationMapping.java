@@ -22,12 +22,10 @@ import java.util.Deque;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
-import javax.persistence.FetchType;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.MappingException;
-import org.batoo.jpa.core.impl.instance.OwnedAssociateResolver;
-import org.batoo.jpa.core.impl.types.AttributeImpl;
+import org.batoo.jpa.core.impl.metamodel.AttributeImpl;
 import org.batoo.jpa.core.jdbc.adapter.JDBCAdapter;
 
 import com.google.common.collect.Sets;
@@ -127,15 +125,6 @@ public abstract class OwnedAssociationMapping<X, T> extends AbstractMapping<X, T
 	@Override
 	public final boolean cascadeRemove() {
 		return this.cascadeRemove;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public final OwnedAssociateResolver createResolver(Object instance) {
-		return new OwnedAssociateResolver(this, instance);
 	}
 
 	/**

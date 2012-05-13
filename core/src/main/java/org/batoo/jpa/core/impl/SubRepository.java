@@ -22,7 +22,6 @@ import java.util.HashMap;
 
 import javax.persistence.PersistenceException;
 
-import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 
 import com.google.common.collect.Maps;
@@ -30,12 +29,15 @@ import com.google.common.collect.Maps;
 /**
  * Sub section of the repository for a specific entity type.
  * 
+ * @param <X>
+ *            the type of the repository
+ * 
  * @author hceylan
  * @since $version
  */
 public class SubRepository<X> {
 
-	private final HashMap<ManagedId<X>, ManagedInstance<? extends X>> repository = Maps.newHashMap();
+	private final HashMap<ManagedInstance<? extends X>, ManagedInstance<? extends X>> repository = Maps.newHashMap();
 
 	/**
 	 * 
@@ -56,8 +58,14 @@ public class SubRepository<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public synchronized ManagedInstance<? extends X> get(ManagedId<X> id) {
-		return this.repository.get(id);
+	public ManagedInstance<? extends X> get(Object id) {
+		try {
+			return this.repository.get(id);
+		}
+		catch (final NullPointerException e) {
+			// at least one of the attributes is null, therefore cannot be located in the session
+			return null;
+		}
 	}
 
 	/**
@@ -69,15 +77,27 @@ public class SubRepository<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
-	public synchronized void put(ManagedInstance<? extends X> instance) {
-		final ManagedId<X> id = (ManagedId<X>) instance.getId();
-		final ManagedInstance<? extends X> old = this.repository.put(id, instance);
-
-		if ((old != null) && instance.equals(old)) {
+	public void put(ManagedInstance<? extends X> instance) {
+		if (this.repository.containsKey(instance)) {
 			throw new PersistenceException("Type " + instance.getType().getName() + " with id " + instance.getId()
 				+ " already exists in session");
 		}
+
+		this.repository.put(instance, instance);
+	}
+
+	/**
+	 * Removes the managed instance.
+	 * 
+	 * @param instance
+	 *            the managed instance
+	 * @return returns the actual removed instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ManagedInstance<? extends X> remove(ManagedInstance<? extends X> instance) {
+		return this.repository.remove(instance);
 	}
 
 	/**

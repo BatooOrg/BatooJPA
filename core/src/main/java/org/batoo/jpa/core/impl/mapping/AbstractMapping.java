@@ -22,10 +22,9 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import org.batoo.jpa.core.impl.instance.AbstractResolver;
-import org.batoo.jpa.core.impl.types.AttributeImpl;
-import org.batoo.jpa.core.impl.types.EmbeddableTypeImpl;
-import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.AttributeImpl;
+import org.batoo.jpa.core.impl.metamodel.EmbeddableTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
 
 /**
  * Abstract base class for Mappings.
@@ -70,20 +69,6 @@ public abstract class AbstractMapping<X, T> implements Mapping<X, T> {
 		this.path = new LinkedList<AttributeImpl<?, ?>>(path);
 		this.owner = (EntityTypeImpl<?>) this.getPath().getFirst().getDeclaringType();
 	}
-
-	/**
-	 * Returns a resolver for the mapping.
-	 * <p>
-	 * Subclasses should return an appropriate resolver their type.
-	 * 
-	 * @param instance
-	 *            the instance
-	 * @return a resolver for the mapping
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public abstract AbstractResolver createResolver(Object instance);
 
 	/**
 	 * {@inheritDoc}
@@ -165,6 +150,7 @@ public abstract class AbstractMapping<X, T> implements Mapping<X, T> {
 	 * @since $version
 	 * @author hceylan
 	 */
+	@Override
 	public String getPathAsString() {
 		if (this.strPath == null) {
 			this.strPath = TypeFactory.pathAsString(this.path);

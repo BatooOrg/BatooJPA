@@ -23,7 +23,7 @@ import java.sql.SQLException;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
-import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
 
 /**
  * An association that can persist the relation with a join table

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.types;
+package org.batoo.jpa.core.impl.metamodel;
 
 import java.lang.reflect.Member;
 import java.util.ArrayList;
@@ -100,6 +100,17 @@ public final class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E
 	public void newInstance(ManagedInstance<?> managedInstance, boolean lazy) {
 		final ManagedList<E> managedList = new ManagedList<E>(managedInstance, (CollectionMapping<?, List<E>, E>) this.mapping, lazy);
 		this.accessor.set(managedInstance.getInstance(), managedList);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean references(Object instance, Object reference) {
+		final List<E> list = this.get(instance);
+
+		return (list != null) && list.contains(reference);
 	}
 
 	/**

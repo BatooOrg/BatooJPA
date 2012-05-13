@@ -18,34 +18,28 @@
  */
 package org.batoo.jpa.core.impl;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map;
 
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceException;
 import javax.persistence.TransactionRequiredException;
-import javax.sql.DataSource;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.BatooException;
-import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
+import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
+import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.mapping.CollectionMapping;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
-import org.batoo.jpa.core.impl.operation.DetachOperation;
-import org.batoo.jpa.core.impl.operation.FindAllOperation;
-import org.batoo.jpa.core.impl.operation.FindOperation;
-import org.batoo.jpa.core.impl.operation.OperationManager;
-import org.batoo.jpa.core.impl.operation.PersistOperation;
-import org.batoo.jpa.core.impl.operation.RefreshOperation;
-import org.batoo.jpa.core.impl.operation.TaskQueue;
-import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
 
 /**
  * The base class for {@link EntityManager}.
@@ -68,17 +62,16 @@ public abstract class SimpleEntityManager implements EntityManager {
 
 	// Reference properties
 	protected final EntityManagerFactoryImpl emf;
+	private final MetamodelImpl metamodel;
 	@SuppressWarnings("rawtypes")
 	protected final Map properties;
-	protected final DataSource datasource;
+	protected final DataSourceImpl datasource;
 
 	// Lifecycle properties
 	protected boolean open;
-	private Connection connection;
+	private ConnectionImpl connection;
 	private EntityTransactionImpl transaction;
 	private final SessionImpl session;
-
-	private final TaskQueue taskQueue;
 
 	/**
 	 * @param emf
@@ -88,16 +81,16 @@ public abstract class SimpleEntityManager implements EntityManager {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SimpleEntityManager(EntityManagerFactoryImpl emf, @SuppressWarnings("rawtypes") Map properties, DataSource datasource) {
+	public SimpleEntityManager(EntityManagerFactoryImpl emf, @SuppressWarnings("rawtypes") Map properties, DataSourceImpl datasource) {
 		super();
 
 		this.emf = emf;
+		this.metamodel = emf.getMetamodel();
 		this.properties = properties;
 		this.datasource = datasource;
 
 		this.open = true;
 		this.session = new SessionImpl((EntityManagerImpl) this);
-		this.taskQueue = new TaskQueue((EntityManagerImpl) this);
 	}
 
 	private void assertOpen() {
@@ -176,7 +169,10 @@ public abstract class SimpleEntityManager implements EntityManager {
 	public boolean contains(Object entity) {
 		this.assertOpen();
 
-		return this.getSession().get(entity) != null;
+		final EntityTypeImpl<?> type = this.metamodel.entity(entity.getClass());
+		final ManagedInstance<?> instance = type.getManagedInstance(this.getSession(), entity);
+
+		return this.session.get(instance) != null;
 	}
 
 	/**
@@ -187,7 +183,12 @@ public abstract class SimpleEntityManager implements EntityManager {
 	public void detach(Object entity) {
 		this.assertOpen();
 
-		OperationManager.replay((EntityManagerImpl) this, new DetachOperation<Object>((EntityManagerImpl) this, entity));
+		final EntityTypeImpl<?> type = this.metamodel.entity(entity.getClass());
+		final ManagedInstance<?> instance = type.getManagedInstance(this.getSession(), entity);
+
+		this.getSession().remove(this.transaction, instance);
+
+		instance.cascadeDetach(this);
 	}
 
 	/**
@@ -196,27 +197,24 @@ public abstract class SimpleEntityManager implements EntityManager {
 	 */
 	@Override
 	public <T> T find(Class<T> entityClass, Object primaryKey) {
-		this.assertOpen();
+		if (primaryKey == null) {
+			throw new NullPointerException();
+		}
 
-		final EntityTypeImpl<T> type = this.getMetamodel().entity(entityClass);
-		final ManagedId<T> managedId = type.newManagedId(this.session, primaryKey, false);
-
-		final FindOperation<T> operation = new FindOperation<T>((EntityManagerImpl) this, managedId);
+		// try to locate in the session
+		final EntityTypeImpl<T> type = this.metamodel.entity(entityClass);
+		final ManagedInstance<T> instance = type.getManagedInstanceById(this.getSession(), primaryKey);
+		final ManagedInstance<T> existing = this.getSession().get(instance);
+		if (existing != null) {
+			return existing.getInstance();
+		}
 
 		try {
-			OperationManager.replay((EntityManagerImpl) this, operation);
+			return type.performSelect(this.session, instance);
 		}
-		catch (final RuntimeException e) {
-			LOG.error(e, "Find operation encountered an error");
-
-			if ((this.transaction != null) && this.transaction.isActive()) {
-				this.transaction.setRollbackOnly();
-			}
-
-			throw e;
+		catch (final SQLException e) {
+			throw new PersistenceException("Entity cannot be loaded");
 		}
-
-		return operation.getInstance();
 	}
 
 	/**
@@ -265,23 +263,12 @@ public abstract class SimpleEntityManager implements EntityManager {
 	public <X, C, E> Collection<E> findAll(ManagedInstance<?> managedInstance, CollectionMapping<X, C, E> association) {
 		this.assertOpen();
 
-		final FindAllOperation<X, C, E> operation = new FindAllOperation<X, C, E>((EntityManagerImpl) this,
-			(ManagedId<X>) managedInstance.getId(), association);
-
 		try {
-			OperationManager.replay((EntityManagerImpl) this, operation);
+			return association.performSelect(this.session, (ManagedInstance<X>) managedInstance);
 		}
-		catch (final RuntimeException e) {
-			LOG.error(e, "Find operation encountered an error");
-
-			if ((this.transaction != null) && this.transaction.isActive()) {
-				this.transaction.setRollbackOnly();
-			}
-
-			throw e;
+		catch (final SQLException e) {
+			throw new PersistenceException("Unable to initialize the collection");
 		}
-
-		return operation.getCollection();
 	}
 
 	/**
@@ -293,12 +280,10 @@ public abstract class SimpleEntityManager implements EntityManager {
 		this.assertOpen();
 
 		try {
-			this.taskQueue.flush(this.connection);
+			this.session.flush(this.connection, this.transaction);
 		}
-		catch (final BatooException e) {
-			this.getTransaction().setRollbackOnly();
-
-			this.handleBatooException(e);
+		catch (final SQLException e) {
+			throw new PersistenceException("Flush failed", e);
 		}
 	}
 
@@ -310,7 +295,7 @@ public abstract class SimpleEntityManager implements EntityManager {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public synchronized Connection getConnection() {
+	public synchronized ConnectionImpl getConnection() {
 		if (this.connection == null) {
 			try {
 				this.connection = this.datasource.getConnection();
@@ -392,16 +377,6 @@ public abstract class SimpleEntityManager implements EntityManager {
 	 */
 	public SessionImpl getSession() {
 		return this.session;
-	}
-
-	/**
-	 * Returns the taskQueue.
-	 * 
-	 * @return the taskQueue
-	 * @since $version
-	 */
-	public TaskQueue getTaskQueue() {
-		return this.taskQueue;
 	}
 
 	/**
@@ -510,7 +485,66 @@ public abstract class SimpleEntityManager implements EntityManager {
 	public void persist(Object entity) {
 		this.assertTransaction();
 
-		OperationManager.replay((EntityManagerImpl) this, new PersistOperation<Object>((EntityManagerImpl) this, entity));
+		final boolean flush = this.persistImpl(entity);
+		if (flush) {
+			this.flush();
+		}
+	}
+
+	/**
+	 * Cascaded implementation of {@link #persist(Object)}.
+	 * <p>
+	 * Also manages a direct or indirect requirement to an implicit flush.
+	 * 
+	 * @param entity
+	 *            the entity to cascade
+	 * @return true if an implicit flush is required, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean persistImpl(Object entity) {
+		boolean requiresFlush = false;
+
+		final EntityTypeImpl<?> type = this.metamodel.entity(entity.getClass());
+		final ManagedInstance<?> instance = type.getManagedInstance(this.getSession(), entity);
+
+		ManagedInstance<?> existing = null;
+
+		if (instance.hasId()) {
+			existing = this.getSession().get(instance);
+		}
+
+		if (existing != null) {
+			switch (existing.getStatus()) {
+				case DETACHED:
+					throw new EntityExistsException("Entity has been previously detached");
+				case MANAGED:
+					requiresFlush |= existing.cascadePersist(this);
+					break;
+				case REMOVED:
+					existing.setStatus(Status.MANAGED);
+					break;
+				case NEW:
+					break;
+			}
+		}
+		else {
+			requiresFlush = !instance.fillIdValues();
+			requiresFlush |= instance.cascadePersist(this);
+
+			if (!requiresFlush) {
+				instance.setStatus(Status.NEW);
+
+				this.session.putNew(instance);
+			}
+			else {
+				this.session.putNewIdentifiable(instance);
+			}
+
+		}
+
+		return requiresFlush;
 	}
 
 	/**
@@ -528,14 +562,6 @@ public abstract class SimpleEntityManager implements EntityManager {
 	 */
 	@Override
 	public void refresh(Object entity, LockModeType lockMode) {
-		if (lockMode != LockModeType.NONE) {
-			this.assertTransaction();
-		}
-		else {
-			this.assertOpen();
-		}
-
-		OperationManager.replay((EntityManagerImpl) this, new RefreshOperation<Object>((EntityManagerImpl) this, entity));
 	}
 
 	/**

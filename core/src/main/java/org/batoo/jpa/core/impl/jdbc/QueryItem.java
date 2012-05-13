@@ -21,7 +21,7 @@ package org.batoo.jpa.core.impl.jdbc;
 import java.util.Arrays;
 
 import org.batoo.jpa.core.impl.mapping.Association;
-import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
 
 /**
  * An item representing a leaf on the query.

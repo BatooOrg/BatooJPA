@@ -21,7 +21,7 @@ package org.batoo.jpa.core.impl.mapping;
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
 
-import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
 
 /**
  * Interfae for Associations

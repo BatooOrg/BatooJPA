@@ -22,14 +22,14 @@ import java.sql.SQLException;
 import java.util.Collection;
 
 import org.batoo.jpa.core.impl.SessionImpl;
-import org.batoo.jpa.core.impl.instance.ManagedId;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.mapping.Association;
 import org.batoo.jpa.core.impl.mapping.CollectionMapping;
 import org.batoo.jpa.core.impl.mapping.Mapping;
 import org.batoo.jpa.core.impl.mapping.OwnedAssociation;
 import org.batoo.jpa.core.impl.mapping.OwnerAssociation;
 import org.batoo.jpa.core.impl.mapping.OwnerOneToManyMapping;
-import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -137,8 +137,8 @@ public class AssociationSelectHelper<X, C, E> extends BaseSelectHelper<E> {
 	 * 
 	 * @param session
 	 *            the session
-	 * @param managedId
-	 *            the managed id of the owner side of the association
+	 * @param managedInstance
+	 *            the managed instance of the owner side of the association
 	 * @param association
 	 *            the association to select against
 	 * @return the collection of entities
@@ -147,12 +147,13 @@ public class AssociationSelectHelper<X, C, E> extends BaseSelectHelper<E> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Collection<E> select(SessionImpl session, final ManagedId<?> managedId) throws SQLException {
+	public Collection<E> select(SessionImpl session, final ManagedInstance<?> managedInstance) throws SQLException {
 		final String selectSql = this.getSelectSql();
 
 		final Object[] params = new Object[this.parameters.size()];
 		for (int i = 0; i < params.length; i++) {
-			params[i] = this.parameters.get(i).getReferencedColumn().getPhysicalValue(managedId.getSession(), managedId.getInstance());
+			params[i] = this.parameters.get(i).getReferencedColumn().getPhysicalValue(managedInstance.getSession(),
+				managedInstance.getInstance());
 		}
 
 		final SelectHandler<E> rsHandler = new SelectHandler<E>(session, this.type, this.columnAliases, this.root);

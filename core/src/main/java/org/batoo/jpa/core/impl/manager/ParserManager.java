@@ -24,8 +24,8 @@ import java.util.Set;
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
+import org.batoo.jpa.core.impl.metamodel.ManagedTypeImpl;
 import org.batoo.jpa.core.impl.reflect.ReflectHelper;
-import org.batoo.jpa.core.impl.types.ManagedTypeImpl;
 
 import com.google.common.collect.Sets;
 

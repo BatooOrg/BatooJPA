@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.impl.jdbc;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +35,8 @@ import org.batoo.jpa.core.impl.mapping.OwnedAssociation;
 import org.batoo.jpa.core.impl.mapping.OwnerAssociation;
 import org.batoo.jpa.core.impl.mapping.OwnerOneToManyMapping;
 import org.batoo.jpa.core.impl.mapping.PersistableAssociation;
-import org.batoo.jpa.core.impl.types.AttributeImpl;
-import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.AttributeImpl;
+import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -66,7 +67,7 @@ public abstract class BaseSelectHelper<X> {
 	private final Mapping<X, ?> alwaysLazyMapping;
 	protected final QueryRunner runner;
 
-	protected Map<PhysicalColumn, String>[] columnAliases;
+	protected HashMap<PhysicalColumn, String>[] columnAliases;
 	protected final List<PhysicalColumn> predicates = Lists.newArrayList();
 	protected final List<PhysicalColumn> parameters = Lists.newArrayList();
 
@@ -404,7 +405,7 @@ public abstract class BaseSelectHelper<X> {
 
 			// compose and return the final query
 			this.selectSql = this.compose(fieldsBuffer, joinsBuffer, this.type.getRoot().getPrimaryTable());
-			this.columnAliases = columnAliases.toArray(new Map[columnAliases.size()]);
+			this.columnAliases = columnAliases.toArray(new HashMap[columnAliases.size()]);
 		}
 	}
 

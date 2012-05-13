@@ -20,16 +20,14 @@ package org.batoo.jpa.core.impl.criteria;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map.Entry;
 
 import javax.persistence.criteria.Root;
 
 import org.batoo.jpa.core.impl.EntityManagerImpl;
-import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.PhysicalColumn;
-import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
 
 import com.google.common.collect.HashBiMap;
 
@@ -84,6 +82,7 @@ public class RootImpl<X> extends FromImpl<X, X> implements Root<X> {
 	 */
 	@Override
 	public String generateSelect() {
+		return null;
 	}
 
 	/**
@@ -101,23 +100,6 @@ public class RootImpl<X> extends FromImpl<X, X> implements Root<X> {
 	 */
 	@Override
 	public ManagedInstance<X> handleRow(EntityManagerImpl entityManager, ResultSet rs) throws SQLException {
-		final SessionImpl session = entityManager.getSession();
-
-		// create the id of for the instance
-		Object id = null;
-		if (this.entity.hasSingleIdAttribute()) {
-			final String field = this.idFields.keySet().iterator().next();
-			id = rs.getObject(field);
-		}
-
-		final ManagedInstance<X> instance = this.entity.getManagedInstanceById(session, id);
-		for (final Entry<String, PhysicalColumn> entry : this.fields.entrySet()) {
-			final String field = entry.getKey();
-			final PhysicalColumn column = entry.getValue();
-			final Object value = rs.getObject(field);
-			column.setValue(instance.getInstance(), value);
-		}
-
-		return instance;
+		return null;
 	}
 }

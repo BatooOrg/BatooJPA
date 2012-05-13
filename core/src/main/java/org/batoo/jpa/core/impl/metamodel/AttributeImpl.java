@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.types;
+package org.batoo.jpa.core.impl.metamodel;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -30,17 +30,12 @@ import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.metamodel.Attribute;
@@ -440,6 +435,20 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y>, Comparable
 			parsed.add(JoinColumn.class);
 		}
 	}
+
+	/**
+	 * Returns if instance references the reference.
+	 * 
+	 * @param instance
+	 *            the instance
+	 * @param reference
+	 *            the reference
+	 * @return true if instance references the reference
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract boolean references(Object instance, Object reference);
 
 	/**
 	 * Sets the attribute value of instance.

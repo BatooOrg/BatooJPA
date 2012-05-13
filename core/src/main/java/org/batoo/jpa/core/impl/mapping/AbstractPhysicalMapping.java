@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.jdbc.PhysicalColumn;
-import org.batoo.jpa.core.impl.types.AttributeImpl;
+import org.batoo.jpa.core.impl.metamodel.AttributeImpl;
 
 import com.google.common.collect.Lists;
 

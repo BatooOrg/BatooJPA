@@ -23,11 +23,9 @@ import java.util.Deque;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
-import javax.persistence.FetchType;
 
 import org.batoo.jpa.core.MappingException;
-import org.batoo.jpa.core.impl.instance.AssociateResolver;
-import org.batoo.jpa.core.impl.types.AttributeImpl;
+import org.batoo.jpa.core.impl.metamodel.AttributeImpl;
 
 import com.google.common.collect.Sets;
 
@@ -134,15 +132,6 @@ public abstract class OwnerAssociationMapping<X, T> extends AbstractPhysicalMapp
 	 * @author hceylan
 	 */
 	public abstract boolean contains(Object instance);
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public AssociateResolver createResolver(Object instance) {
-		return new AssociateResolver(this, instance);
-	}
 
 	/**
 	 * {@inheritDoc}

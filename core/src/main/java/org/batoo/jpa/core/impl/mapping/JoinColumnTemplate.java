@@ -20,9 +20,9 @@ package org.batoo.jpa.core.impl.mapping;
 
 import javax.persistence.JoinColumn;
 
-import org.batoo.jpa.core.impl.types.AttributeImpl;
-import org.batoo.jpa.core.impl.types.PluralAttributeImpl;
-import org.batoo.jpa.core.impl.types.SingularAttributeImpl;
+import org.batoo.jpa.core.impl.metamodel.AttributeImpl;
+import org.batoo.jpa.core.impl.metamodel.PluralAttributeImpl;
+import org.batoo.jpa.core.impl.metamodel.SingularAttributeImpl;
 
 /**
  * Column template for Join Columns

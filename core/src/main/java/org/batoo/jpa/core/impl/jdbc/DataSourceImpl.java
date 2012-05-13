@@ -114,7 +114,7 @@ public class DataSourceImpl implements DataSource {
 	 * 
 	 */
 	@Override
-	public Connection getConnection() throws SQLException {
+	public ConnectionImpl getConnection() throws SQLException {
 		try {
 			if (this.pool == null) {
 				return this.getConnection0();

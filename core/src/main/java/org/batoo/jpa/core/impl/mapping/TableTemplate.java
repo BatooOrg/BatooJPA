@@ -26,7 +26,7 @@ import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.jdbc.PhysicalColumn;
-import org.batoo.jpa.core.impl.types.IdentifiableTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.IdentifiableTypeImpl;
 
 import com.google.common.collect.Lists;
 

@@ -23,8 +23,8 @@ import java.util.Collection;
 
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
-import org.batoo.jpa.core.impl.instance.ManagedId;
-import org.batoo.jpa.core.impl.types.PluralAttributeImpl;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.metamodel.PluralAttributeImpl;
 
 /**
  * Indicator interface for collection type mappings
@@ -50,15 +50,15 @@ public interface CollectionMapping<X, C, E> extends Mapping<X, C> {
 	 * 
 	 * @param session
 	 *            the session
-	 * @param managedId
-	 *            the managed id of the owner entity
+	 * @param managedInstance
+	 *            the owner managed instance
 	 * @return collection of children
 	 * @throws SQLException
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	Collection<E> performSelect(SessionImpl session, ManagedId<X> managedId) throws SQLException;
+	Collection<E> performSelect(SessionImpl session, ManagedInstance<X> managedInstance) throws SQLException;
 
 	/**
 	 * Resets the association. Useful for refresh operation.

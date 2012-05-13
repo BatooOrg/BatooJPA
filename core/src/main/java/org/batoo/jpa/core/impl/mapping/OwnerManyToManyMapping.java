@@ -23,20 +23,16 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Deque;
 
-import javax.persistence.FetchType;
-import javax.persistence.OneToOne;
-
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
-import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.AssociationSelectHelper;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
 import org.batoo.jpa.core.impl.jdbc.PhysicalColumn;
-import org.batoo.jpa.core.impl.types.AttributeImpl;
-import org.batoo.jpa.core.impl.types.EntityTypeImpl;
-import org.batoo.jpa.core.impl.types.PluralAttributeImpl;
+import org.batoo.jpa.core.impl.metamodel.AttributeImpl;
+import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.PluralAttributeImpl;
 import org.batoo.jpa.core.jdbc.adapter.JDBCAdapter;
 
 /**
@@ -177,8 +173,8 @@ public class OwnerManyToManyMapping<X, C, E> extends OwnerAssociationMapping<X, 
 	 * 
 	 */
 	@Override
-	public Collection<E> performSelect(SessionImpl session, ManagedId<X> managedId) throws SQLException {
-		return this.selectHelper.select(session, managedId);
+	public Collection<E> performSelect(SessionImpl session, ManagedInstance<X> managedInstance) throws SQLException {
+		return this.selectHelper.select(session, managedInstance);
 	}
 
 	/**

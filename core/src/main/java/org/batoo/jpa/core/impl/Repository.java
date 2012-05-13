@@ -20,7 +20,7 @@ package org.batoo.jpa.core.impl;
 
 import java.util.IdentityHashMap;
 
-import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
 
 import com.google.common.collect.Maps;
 

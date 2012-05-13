@@ -27,6 +27,8 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.sql.DataSource;
 
+import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
+
 /**
  * 
  * @author hceylan
@@ -42,7 +44,7 @@ public class EntityManagerImpl extends SimpleEntityManager {
 	 * @param datasource
 	 * @param properties
 	 */
-	public EntityManagerImpl(EntityManagerFactoryImpl emf, @SuppressWarnings("rawtypes") Map properties, DataSource datasource) {
+	public EntityManagerImpl(EntityManagerFactoryImpl emf, @SuppressWarnings("rawtypes") Map properties, DataSourceImpl datasource) {
 		super(emf, properties, datasource);
 	}
 

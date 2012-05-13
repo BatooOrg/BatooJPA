@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.types;
+package org.batoo.jpa.core.impl.metamodel;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
@@ -82,6 +82,7 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 	private String generatorName;
 	private String getterName;
 	private TypeImpl<T> type;
+	private final MetamodelImpl metamodel;
 
 	/**
 	 * @param declaringType
@@ -98,6 +99,8 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 	 */
 	public SingularAttributeImpl(ManagedTypeImpl<X> declaringType, Member member, Class<T> javaMember, boolean lob) throws MappingException {
 		super(declaringType, member, javaMember);
+
+		this.metamodel = declaringType.getMetaModel();
 
 		if (lob) {
 			this.attributeType = AtrributeType.LOB;
@@ -123,6 +126,7 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 		this.idType = original.idType;
 		this.generatorName = original.generatorName;
 		this.getterName = original.getterName;
+		this.metamodel = this.getDeclaringType().getMetaModel();
 	}
 
 	/**
@@ -173,19 +177,39 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void fillValue(Object instance) {
+	public boolean fillValue(Object instance) {
 		if (!this.isId()) {
 			throw new IllegalStateException("Not an id attribute");
 		}
 
+		final T value = this.get(instance);
+
+		// if the attribute already has value, bail out
+		if (value != null) {
+			return true;
+		}
+
+		// fill the id
 		switch (this.idType) {
+			case IDENTITY:
+				// indicate a requirement for an implicit flush
+				return false;
+			case MANUAL:
+				// only check if the id is not null
+				if (value == null) {
+					throw new NullPointerException();
+				}
 			case SEQUENCE:
-				this.set(instance, this.declaringType.getMetaModel().getNextSequence(this.generatorName));
+				// fill with the sequence
+				this.set(instance, this.metamodel.getNextSequence(this.generatorName));
 				break;
 			case TABLE:
-				this.set(instance, this.declaringType.getMetaModel().getNextTableValue(this.generatorName));
+				// fill with the next table generator id
+				this.set(instance, this.metamodel.getNextTableValue(this.generatorName));
 				break;
 		}
+
+		return true;
 	}
 
 	/**
@@ -606,6 +630,15 @@ public final class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> imple
 		}
 
 		this.validateTableGenerator(parsed, member, metaModel, identifiableType, tableGenerator, generatedValue);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean references(Object instance, Object reference) {
+		return this.get(instance) == reference;
 	}
 
 	/**

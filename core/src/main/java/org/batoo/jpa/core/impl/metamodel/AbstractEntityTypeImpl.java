@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.types;
+package org.batoo.jpa.core.impl.metamodel;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -84,7 +84,7 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 	private static final BLogger LOG = BLogger.getLogger(AbstractEntityTypeImpl.class);
 
 	private final Map<String, AbstractMapping<?, ?>> mappings = Maps.newHashMap();
-	private final List<Association<?, ?>> associations = Lists.newArrayList();
+	private final List<Association<?, ?>> associationList = Lists.newArrayList();
 	private final List<BasicMapping<?, ?>> idMappings = Lists.newArrayList(); // FIXME Performance: Convert to array
 	private BasicMapping<?, ?> identityMapping;
 	private final Map<String, Column> attributeOverrides = Maps.newHashMap();
@@ -99,6 +99,10 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 	private final IdentityHashMap<Method, Method> nonIdMethods = Maps.newIdentityHashMap();
 
 	protected sun.reflect.ConstructorAccessor enhancer;
+
+	private Association<?, ?>[] associations;
+	private Association<?, ?>[] associationsPersistable;
+	private Association<?, ?>[] associationsDetachable;
 
 	/**
 	 * @param metaModel
@@ -230,7 +234,7 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 			final Association<?, ?> association = (Association<?, ?>) mapping;
 
 			this.metaModel.addAssociation(association);
-			this.associations.add(association);
+			this.associationList.add(association);
 
 			if ((mapping instanceof OwnerAssociationMapping) && !(mapping instanceof OwnerOneToManyMapping)) {
 				final OwnerAssociationMapping<?, ?> associationMapping = (OwnerAssociationMapping<?, ?>) association;
@@ -253,9 +257,9 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 		if (this.enhancer == null) {
 			synchronized (this) {
 				if (this.enhancer == null) {
-					Class<X> enhancedClass;
 					try {
-						enhancedClass = Enhancer.enhance(this);
+						@SuppressWarnings("unchecked")
+						final Class<X> enhancedClass = Enhancer.enhance(this);
 						final Constructor<X> enhancedConstructor = enhancedClass.getConstructor(Class.class, SessionImpl.class,
 							Object.class, Boolean.TYPE);
 
@@ -266,6 +270,7 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 
 						ReflectHelper.setAccessible(c, true);
 						ReflectHelper.setAccessible(generateMethod, true);
+
 						try {
 							final Object mag = c.newInstance();
 							this.enhancer = (sun.reflect.ConstructorAccessor) generateMethod.invoke(mag,
@@ -293,8 +298,85 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 	 * @since $version
 	 * @author hceylan
 	 */
-	public List<Association<?, ?>> getAssociations() {
+	public Association<?, ?>[] getAssociations() {
+		if (this.associations != null) {
+			return this.associations;
+		}
+
+		synchronized (this) {
+			if (this.associations != null) {
+				return this.associations;
+			}
+
+			this.associations = new Association[this.associationList.size()];
+			this.associationList.toArray(this.associations);
+		}
+
 		return this.associations;
+	}
+
+	/**
+	 * Returns the array of associations where persists are cascaded.
+	 * 
+	 * @return the array of associations where persists are cascaded
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Association<?, ?>[] getAssociationsDetachable() {
+		if (this.associationsDetachable != null) {
+			return this.associationsDetachable;
+		}
+
+		synchronized (this) {
+			if (this.associationsDetachable != null) {
+				return this.associationsDetachable;
+			}
+
+			final List<Association<?, ?>> associationsDetachable = Lists.newArrayList();
+			for (final Association<?, ?> association : this.getAssociations()) {
+				if (association.cascadeDetach()) {
+					associationsDetachable.add(association);
+				}
+			}
+
+			this.associationsDetachable = new Association[associationsDetachable.size()];
+			this.associationsDetachable = associationsDetachable.toArray(this.associationsDetachable);
+		}
+
+		return this.associationsDetachable;
+	}
+
+	/**
+	 * Returns the array of associations where persists are cascaded.
+	 * 
+	 * @return the array of associations where persists are cascaded
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Association<?, ?>[] getAssociationsPersistable() {
+		if (this.associationsPersistable != null) {
+			return this.associationsPersistable;
+		}
+
+		synchronized (this) {
+			if (this.associationsPersistable != null) {
+				return this.associationsPersistable;
+			}
+
+			final List<Association<?, ?>> associationsPersistable = Lists.newArrayList();
+			for (final Association<?, ?> association : this.getAssociations()) {
+				if (association.cascadePersist()) {
+					associationsPersistable.add(association);
+				}
+			}
+
+			this.associationsPersistable = new Association[associationsPersistable.size()];
+			this.associationsPersistable = associationsPersistable.toArray(this.associationsPersistable);
+		}
+
+		return this.associationsPersistable;
 	}
 
 	/**

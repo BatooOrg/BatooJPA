@@ -16,22 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.types;
+package org.batoo.jpa.core.impl.metamodel;
 
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.InheritanceType;
-import javax.persistence.metamodel.EntityType;
 
 import org.batoo.jpa.core.MappingException;
+import org.batoo.jpa.core.impl.EntityTransactionImpl;
 import org.batoo.jpa.core.impl.SessionImpl;
-import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable.TableType;
+import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.RefreshHelper;
 import org.batoo.jpa.core.impl.jdbc.SelectHelper;
@@ -132,10 +131,12 @@ public class EntityTypeImpl<X> extends BaseEntityTypeImpl<X> {
 	}
 
 	/**
-	 * Returns the managed id for the instance.
+	 * Returns the managed instance for the instance.
 	 * 
 	 * @param instance
-	 *            the instance to create managed id or null
+	 *            the instance to create managed instance for
+	 * @param session
+	 *            the session
 	 * @return managed id for the instance
 	 * @throws NullPointerException
 	 *             thrown if the instance is null
@@ -143,12 +144,58 @@ public class EntityTypeImpl<X> extends BaseEntityTypeImpl<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedId<X> getManagedIdForInstance(SessionImpl session, final X instance) {
+	@SuppressWarnings("unchecked")
+	public ManagedInstance<X> getManagedInstance(SessionImpl session, Object instance) {
 		if (instance == null) {
 			throw new NullPointerException();
 		}
 
-		return new ManagedId<X>(this, session, instance);
+		return new ManagedInstance<X>(this, session, (X) instance);
+	}
+
+	/**
+	 * Creates a new managed instance with the id.
+	 * 
+	 * @param session
+	 *            the session
+	 * @param id
+	 *            the primary key
+	 * @return the managed instance created
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ManagedInstance<X> getManagedInstanceById(SessionImpl session, Object id) {
+		return this.getManagedInstanceById(session, id, false);
+	}
+
+	/**
+	 * Creates a new managed instance with the id.
+	 * 
+	 * @param session
+	 *            the session
+	 * @param id
+	 *            the primary key
+	 * @param lazy
+	 *            if the instance is lazy
+	 * @return the managed instance created
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	public ManagedInstance<X> getManagedInstanceById(SessionImpl session, Object id, boolean lazy) {
+		this.enhanceIfNeccessary();
+
+		X instance = null;
+		try {
+			instance = (X) this.enhancer.newInstance(new Object[] { this.javaType, session, id, !lazy });
+		}
+		catch (final InvocationTargetException e) {} // not possible
+		catch (final IllegalArgumentException e) {} // not possible
+		catch (final InstantiationException e) {} // not possible
+
+		return new ManagedInstance<X>(this, session, instance, id);
 	}
 
 	/**
@@ -168,43 +215,6 @@ public class EntityTypeImpl<X> extends BaseEntityTypeImpl<X> {
 	}
 
 	/**
-	 * Returns the managed id for the id.
-	 * 
-	 * @param instance
-	 *            the instance to create managed id or null
-	 * @param lazy
-	 *            if the instance is lazy
-	 * @return managed id for the instance
-	 * @throws NullPointerException
-	 *             thrown if the id is null
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@SuppressWarnings({ "unchecked", "restriction" })
-	public ManagedId<X> newManagedId(SessionImpl session, final Object id, boolean lazy) {
-		if (id == null) {
-			throw new NullPointerException();
-		}
-
-		this.enhanceIfNeccessary();
-
-		X instance = null;
-		try {
-			instance = (X) this.enhancer.newInstance(new Object[] { this.javaType, session, id, !lazy });
-		}
-		catch (final InvocationTargetException e) {} // not possible
-		catch (final IllegalArgumentException e) {} // not possible
-		catch (final InstantiationException e) {} // not possible
-
-		final ManagedId<X> managedId = new ManagedId<X>(this, session, instance);
-
-		managedId.populate(id);
-
-		return managedId;
-	}
-
-	/**
 	 * Performs inserts to each table for the managed instance.
 	 * 
 	 * @param connection
@@ -216,16 +226,17 @@ public class EntityTypeImpl<X> extends BaseEntityTypeImpl<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performInsert(Connection connection, ManagedInstance<X> managedInstance) throws SQLException {
+	public void performInsert(ConnectionImpl connection, EntityTransactionImpl transaction, ManagedInstance<X> instance)
+		throws SQLException {
 		if (this.insertChain == null) {
 			this.prepareInsertChain();
 		}
 
-		managedInstance.setExecuted();
-
 		for (final EntityTable table : this.insertChain) {
-			table.performInsert(connection, managedInstance);
+			table.performInsert(connection, instance);
 		}
+
+		instance.setTransaction(transaction);
 	}
 
 	/**
@@ -244,6 +255,11 @@ public class EntityTypeImpl<X> extends BaseEntityTypeImpl<X> {
 		this.refreshHelper.refresh(session, managedInstance);
 	}
 
+	public void performRemove(ConnectionImpl connection, EntityTransactionImpl transaction, ManagedInstance<X> instance)
+		throws SQLException {
+
+	}
+
 	/**
 	 * Performs select from each table for the managed instance.
 	 * 
@@ -257,8 +273,13 @@ public class EntityTypeImpl<X> extends BaseEntityTypeImpl<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public X performSelect(SessionImpl session, ManagedId<X> managedId) throws SQLException {
+	public X performSelect(SessionImpl session, ManagedInstance<X> managedId) throws SQLException {
 		return this.selectHelper.select(session, managedId);
+	}
+
+	public void performUpdate(ConnectionImpl connection, EntityTransactionImpl transaction, ManagedInstance<X> instance)
+		throws SQLException {
+
 	}
 
 	private synchronized LinkedList<EntityTable> prepareInsertChain() {

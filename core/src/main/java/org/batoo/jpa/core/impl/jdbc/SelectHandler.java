@@ -18,12 +18,11 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
-import java.util.Map;
+import java.util.HashMap;
 
-import org.apache.commons.dbutils.ResultSetHandler;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
 
 /**
  * A {@link ResultSetHandler} to load a single result from resultset.
@@ -47,7 +46,7 @@ public class SelectHandler<X> extends BaseSelectHandler<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SelectHandler(SessionImpl session, EntityTypeImpl<X> rootType, Map<PhysicalColumn, String>[] columnAliases, QueryItem root) {
+	public SelectHandler(SessionImpl session, EntityTypeImpl<X> rootType, HashMap<PhysicalColumn, String>[] columnAliases, QueryItem root) {
 		super(session, rootType, columnAliases, root);
 	}
 

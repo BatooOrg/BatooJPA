@@ -18,13 +18,12 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
-import java.util.Map;
+import java.util.HashMap;
 
-import org.apache.commons.dbutils.ResultSetHandler;
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
-import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
 
 /**
  * A {@link ResultSetHandler} to refresh a single result from resultset.
@@ -49,7 +48,7 @@ public class RefreshHandler<X> extends BaseSelectHandler<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public RefreshHandler(SessionImpl session, EntityTypeImpl<X> rootType, Map<PhysicalColumn, String>[] columnAliases,
+	public RefreshHandler(SessionImpl session, EntityTypeImpl<X> rootType, HashMap<PhysicalColumn, String>[] columnAliases,
 		QueryItem entityPaths) {
 		super(session, rootType, columnAliases, entityPaths);
 	}

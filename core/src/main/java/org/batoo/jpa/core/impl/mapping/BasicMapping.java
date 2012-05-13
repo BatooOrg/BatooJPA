@@ -21,13 +21,10 @@ package org.batoo.jpa.core.impl.mapping;
 import java.util.Collection;
 import java.util.Deque;
 
-import javax.persistence.metamodel.BasicType;
-
 import org.batoo.jpa.core.MappingException;
-import org.batoo.jpa.core.impl.instance.BasicResolver;
-import org.batoo.jpa.core.impl.types.AttributeImpl;
-import org.batoo.jpa.core.impl.types.BasicTypeImpl;
-import org.batoo.jpa.core.impl.types.SingularAttributeImpl;
+import org.batoo.jpa.core.impl.metamodel.AttributeImpl;
+import org.batoo.jpa.core.impl.metamodel.BasicTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.SingularAttributeImpl;
 import org.batoo.jpa.core.jdbc.IdType;
 
 /**
@@ -73,15 +70,6 @@ public final class BasicMapping<X, T> extends AbstractPhysicalMapping<X, T> {
 	public BasicMapping(SingularAttributeImpl<X, T> declaringAttribute, Deque<AttributeImpl<?, ?>> path,
 		Collection<ColumnTemplate<X, T>> columnTemplates, boolean id) throws MappingException {
 		super(AssociationType.BASIC, declaringAttribute, path, columnTemplates, id);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public BasicResolver createResolver(Object instance) {
-		return new BasicResolver(this, instance);
 	}
 
 	/**

@@ -18,11 +18,20 @@
  */
 package org.batoo.jpa.core.impl;
 
-import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
 
-import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.types.EntityTypeImpl;
+import org.batoo.jpa.core.impl.instance.Prioritizer;
+import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
+import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
+import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * 
@@ -33,12 +42,19 @@ public class SessionImpl {
 
 	private static volatile int nextSessionId = 0;
 
-	private Repository repository;
 	private final EntityManagerImpl em;
-
 	private final int sessionId;
+	private final MetamodelImpl metamodel;
+
+	private Repository repository;
+
+	private final HashSet<ManagedInstance<?>> externalEntities = Sets.newHashSet();
+	private final LinkedList<ManagedInstance<?>> identifiableEntities = Lists.newLinkedList();
+	private final LinkedList<ManagedInstance<?>> changedEntities = Lists.newLinkedList();
 
 	/**
+	 * @param entityManager
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
@@ -46,8 +62,10 @@ public class SessionImpl {
 		super();
 
 		this.em = entityManager;
-		this.clear();
+		this.metamodel = entityManager.getMetamodel();
 		this.sessionId = ++nextSessionId;
+
+		this.clear();
 	}
 
 	/**
@@ -57,17 +75,48 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public void clear() {
+		// XXX detach all the entities if there is an existing repository
 		this.repository = new Repository();
+		this.externalEntities.clear();
 	}
 
-	public <X> ManagedInstance<X> get(final EntityTypeImpl<X> type, X entity) {
-		final ManagedId<X> id = type.getManagedIdForInstance(this, entity);
-		return this.get(id);
+	/**
+	 * Flushes the session persisting changes to the database.
+	 * 
+	 * @param connection
+	 *            the connection to use
+	 * @param transaction
+	 *            the transaction for which the flush will take place
+	 * @throws SQLException
+	 *             thrown in case of an SQL error
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void flush(ConnectionImpl connection, EntityTransactionImpl transaction) throws SQLException {
+
+		final int totalSize = this.externalEntities.size() + this.externalEntities.size() + this.changedEntities.size();
+		final ArrayList<ManagedInstance<?>> instances = Lists.newArrayListWithCapacity(totalSize);
+
+		instances.addAll(this.externalEntities);
+		instances.addAll(this.identifiableEntities);
+		instances.addAll(this.changedEntities);
+
+		Collections.sort(instances, Prioritizer.INSTANCE);
+
+		for (final ManagedInstance<?> instance : instances) {
+			instance.flush(connection, transaction);
+		}
+
+		this.externalEntities.addAll(this.identifiableEntities);
+		this.identifiableEntities.clear();
 	}
 
 	/**
 	 * Returns the managed instance in the session.
 	 * 
+	 * @param <X>
+	 *            the type of the instance
 	 * @param instance
 	 *            the instance.
 	 * @return managed instance or a new unmanaged instance
@@ -76,42 +125,41 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public <X> ManagedInstance<X> get(ManagedId<X> id) {
-		final EntityTypeImpl<X> type = id.getType();
-		final SubRepository<X> subRepository = this.repository.get(type);
-		return (ManagedInstance<X>) subRepository.get(id);
+	public <X> ManagedInstance<X> get(ManagedInstance<X> instance) {
+		final EntityTypeImpl<? super X> type = instance.getType();
+		final SubRepository<? super X> subRepository = this.repository.get(type);
+
+		return (ManagedInstance<X>) subRepository.get(instance);
 	}
 
 	/**
-	 * Returns the managed instance in the session.
-	 * 
-	 * @param instance
-	 *            the instance.
-	 * @return managed instance or a new unmanaged instance
+	 * @param value
+	 * @return
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
-	public <X> ManagedInstance<X> get(X entity) {
-		final EntityTypeImpl<X> type = this.em.getMetamodel().entity((Class<X>) entity.getClass());
-		return this.get(type, entity);
+	public ManagedInstance<?> get(Object entity) {
+		final EntityTypeImpl<?> type = this.metamodel.entity(entity.getClass());
+		final ManagedInstance<?> instance = type.getManagedInstance(this, entity);
+
+		return this.get(instance);
 	}
 
 	/**
-	 * Returns the active connection.
+	 * Returns the connection
 	 * 
-	 * @return the connection
+	 * @return the connetion
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Connection getConnection() {
+	public ConnectionImpl getConnection() {
 		return this.em.getConnection();
 	}
 
 	/**
-	 * Returns the entity manager this session belongs to.
+	 * Returns the entity manager.
 	 * 
 	 * @return the entity manager
 	 * 
@@ -123,28 +171,94 @@ public class SessionImpl {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Returns the sessionId.
 	 * 
+	 * @return the sessionId
+	 * @since $version
 	 */
-	@Override
-	public int hashCode() {
+	public int getSessionId() {
 		return this.sessionId;
 	}
 
 	/**
-	 * Puts the instance into session, marking the instance as managed.
+	 * Puts the instance into the session.
 	 * 
-	 * @param type
-	 *            the type of the entity
-	 * @param managedInstance
-	 *            the managed instance
-	 * @return the original managed instance
+	 * @param <X>
+	 *            the type of the instance
+	 * @param instance
+	 *            the instance to put into the session
 	 * 
 	 * @since $version
 	 * @author hceylan
-	 * @return
 	 */
-	public <X> void put(ManagedInstance<X> managedInstance) {
-		this.repository.get(managedInstance.getType().getIdentityRoot()).put(managedInstance);
+	public <X> void put(ManagedInstance<X> instance) {
+		final EntityTypeImpl<? super X> type = instance.getType();
+		final SubRepository<? super X> subRepository = this.repository.get(type);
+
+		subRepository.put(instance);
 	}
+
+	/**
+	 * Puts the new instance into the session.
+	 * <p>
+	 * Additionally stores object in a safe repository that it knows the changes are not traced by enhancement.
+	 * 
+	 * @param <X>
+	 *            the type of the instance
+	 * @param instance
+	 *            the instance to put into the session
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public <X> void putNew(ManagedInstance<X> instance) {
+		this.externalEntities.add(instance);
+
+		this.put(instance);
+	}
+
+	/**
+	 * Puts the new instance into the session. The difference from {@link #putNew(ManagedInstance)} is that the instance needs an insert
+	 * execution to obtain its id.
+	 * <p>
+	 * Under normal circumstances, an implicit flush should be followed by this call.
+	 * <p>
+	 * Post to the flush operation, the instance will be moved into a safe repository that it knows the changes are not traced by
+	 * enhancement.
+	 * 
+	 * @param instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void putNewIdentifiable(ManagedInstance<?> instance) {
+		this.identifiableEntities.add(instance);
+	}
+
+	/**
+	 * Removes the instance from the session.
+	 * 
+	 * @param <X>
+	 *            the type of the instance
+	 * @param instance
+	 *            the instance to remove
+	 * @param transaction
+	 *            the transaction to check against the validity of the transaction
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public <X> void remove(EntityTransactionImpl transaction, ManagedInstance<X> instance) {
+		final EntityTypeImpl<? super X> type = instance.getType();
+		final SubRepository<? super X> subRepository = this.repository.get(type);
+
+		final ManagedInstance<?> removed = subRepository.remove(instance);
+
+		if (removed.isExternal()) {
+			this.externalEntities.remove(instance);
+		}
+
+		removed.setTransaction(transaction);
+	}
+
 }
