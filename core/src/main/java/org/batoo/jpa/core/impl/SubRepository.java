@@ -18,7 +18,7 @@
  */
 package org.batoo.jpa.core.impl;
 
-import java.util.Map;
+import java.util.HashMap;
 
 import javax.persistence.PersistenceException;
 
@@ -35,7 +35,7 @@ import com.google.common.collect.Maps;
  */
 public class SubRepository<X> {
 
-	private final Map<ManagedId<X>, ManagedInstance<? extends X>> repository = Maps.newHashMap();
+	private final HashMap<ManagedId<X>, ManagedInstance<? extends X>> repository = Maps.newHashMap();
 
 	/**
 	 * 
@@ -65,11 +65,9 @@ public class SubRepository<X> {
 	 * 
 	 * @param instance
 	 *            the managed instance
-	 * @return the managed instance
 	 * 
 	 * @since $version
 	 * @author hceylan
-	 * @return
 	 */
 	@SuppressWarnings("unchecked")
 	public synchronized void put(ManagedInstance<? extends X> instance) {

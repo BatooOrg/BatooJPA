@@ -18,7 +18,7 @@
  */
 package org.batoo.jpa.core.impl;
 
-import java.util.Map;
+import java.util.IdentityHashMap;
 
 import org.batoo.jpa.core.impl.types.EntityTypeImpl;
 
@@ -32,7 +32,7 @@ import com.google.common.collect.Maps;
  */
 public class Repository {
 
-	private final Map<EntityTypeImpl<?>, SubRepository<?>> subRepositories;
+	private final IdentityHashMap<EntityTypeImpl<?>, SubRepository<?>> subRepositories;
 
 	/**
 	 * 
