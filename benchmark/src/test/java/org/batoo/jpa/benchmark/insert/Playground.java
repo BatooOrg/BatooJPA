@@ -36,7 +36,6 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
 import org.batoo.jpa.benchmark.insert.BenchmarkClassLoader.Type;
-import org.batoo.jpa.core.BLogger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -51,8 +50,6 @@ import com.google.common.collect.Maps;
  * @since $version
  */
 public class Playground {
-
-	private static final BLogger LOG = BLogger.getLogger(Playground.class);
 
 	private static final String PU_NAME = "insert";
 
@@ -76,19 +73,19 @@ public class Playground {
 
 		final ExecutorService pool = Executors.newFixedThreadPool(1);
 
-		while (this.running) {
-			pool.submit(new Runnable() {
+		pool.submit(new Runnable() {
 
-				@Override
-				public void run() {
+			@Override
+			public void run() {
+				while (Playground.this.running) {
 					Playground.this._measureSingleTime(id, mxBean);
+					try {
+						Thread.sleep(1);
+					}
+					catch (final InterruptedException e) {}
 				}
-			});
-			try {
-				Thread.sleep(1);
 			}
-			catch (final InterruptedException e) {}
-		}
+		});
 
 		pool.shutdownNow();
 	}
@@ -282,9 +279,9 @@ public class Playground {
 	}
 
 	private void singleTest(final EntityManagerFactory emf) {
-		final Person person = this.doPersist(emf);
+		this.doPersist(emf);
 
-		this.doFind(emf, person);
+		// this.doFind(emf, person);
 	}
 
 	private void test(Type type, final EntityManagerFactory emf) {
@@ -295,7 +292,7 @@ public class Playground {
 			catch (final InterruptedException e) {}
 		}
 
-		for (int i = 0; i < 25000; i++) {
+		for (int i = 0; i < 100; i++) {
 			this.singleTest(emf);
 		}
 	}

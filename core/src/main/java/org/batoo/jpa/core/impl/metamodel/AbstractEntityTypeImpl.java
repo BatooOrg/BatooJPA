@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.metamodel;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.LinkedList;
@@ -105,11 +106,13 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 
 	protected sun.reflect.ConstructorAccessor enhancer;
 
-	private final IdentityHashMap<EntityTypeImpl<?>, AttributeImpl<?, ?>[]> associationMap = Maps.newIdentityHashMap();
+	private int dependencyCount;
+	private final HashMap<EntityTypeImpl<?>, AttributeImpl<?, ?>[]> dependencyMap = Maps.newHashMap();
+
 	private Association<?, ?>[] associations;
 	private Association<?, ?>[] associationsPersistable;
 	private Association<?, ?>[] associationsDetachable;
-	private PersistableAssociation<?, ?>[] associationsOwnedPersistable;
+	private PersistableAssociation<?, ?>[] ownerCollections;
 
 	/**
 	 * @param metaModel
@@ -354,58 +357,6 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 	}
 
 	/**
-	 * Returns the associations for the associate type
-	 * 
-	 * @param associate
-	 *            the associate type
-	 * @return the array of associations for the associate
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public AttributeImpl<?, ?>[] getAssociationsFor(EntityTypeImpl<?> associate) {
-		final AttributeImpl<?, ?>[] associations = this.associationMap.get(associate);
-
-		if (associations != null) {
-			return associations;
-		}
-
-		return this.prepareAssociationsFor(associate);
-	}
-
-	/**
-	 * Returns the array of associations that are owner and persistable.
-	 * 
-	 * @return the array of associations that are owner and persistable.
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public PersistableAssociation<?, ?>[] getAssociationsOwnedPersistable() {
-		if (this.associationsOwnedPersistable != null) {
-			return this.associationsOwnedPersistable;
-		}
-
-		synchronized (this) {
-			if (this.associationsOwnedPersistable != null) {
-				return this.associationsOwnedPersistable;
-			}
-
-			final List<Association<?, ?>> associationsOwnedPersistable = Lists.newArrayList();
-			for (final Association<?, ?> association : this.getAssociations()) {
-				if (association instanceof PersistableAssociation) {
-					associationsOwnedPersistable.add(association);
-				}
-			}
-
-			this.associationsOwnedPersistable = new PersistableAssociation[associationsOwnedPersistable.size()];
-			this.associationsOwnedPersistable = associationsOwnedPersistable.toArray(this.associationsOwnedPersistable);
-		}
-
-		return this.associationsOwnedPersistable;
-	}
-
-	/**
 	 * Returns the array of associations where persists are cascaded.
 	 * 
 	 * @return the array of associations where persists are cascaded
@@ -500,6 +451,83 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 	}
 
 	/**
+	 * Returns the dependencies for the associate type
+	 * 
+	 * @param associate
+	 *            the associate type
+	 * @return the array of associations for the associate
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public AttributeImpl<?, ?>[] getDependenciesFor(EntityTypeImpl<?> associate) {
+		final AttributeImpl<?, ?>[] dependencies = this.dependencyMap.get(associate);
+
+		if (dependencies != null) {
+			return dependencies;
+		}
+
+		return this.getDependenciesFor0(associate);
+	}
+
+	private AttributeImpl<?, ?>[] getDependenciesFor0(EntityTypeImpl<?> associate) {
+		AttributeImpl<?, ?>[] dependencies;
+		synchronized (this) {
+			dependencies = this.dependencyMap.get(associate);
+
+			if (dependencies != null) { // other thread got it done!
+				return dependencies;
+			}
+
+			// prepare the related associations
+			final HashSet<AttributeImpl<?, ?>> attributes = Sets.newHashSet();
+
+			final Association<?, ?>[] associations = this.getAssociations();
+			for (final Association<?, ?> association : associations) {
+
+				// determine the java type
+				final AttributeImpl<?, ?> attribute = association.getDeclaringAttribute();
+
+				// only owner associations impose priority
+				if (!association.isOwner()) {
+					continue;
+				}
+
+				// only relations kept in the row impose priority
+				if (!(association instanceof OwnerManyToOneMapping) //
+					&& !(association instanceof OwnerOneToOneMapping)) {
+					continue;
+				}
+
+				final Class<?> javaType = attribute.getJavaType();
+
+				if (javaType.isAssignableFrom(associate.getBindableJavaType())) {
+					attributes.add(attribute);
+				}
+			}
+
+			dependencies = new AttributeImpl[attributes.size()];
+			attributes.toArray(dependencies);
+
+			this.dependencyCount += dependencies.length;
+
+			this.dependencyMap.put(associate, dependencies);
+
+			return dependencies;
+		}
+	}
+
+	/**
+	 * Returns the dependencyCount.
+	 * 
+	 * @return the dependencyCount
+	 * @since $version
+	 */
+	public int getDependencyCount() {
+		return this.dependencyCount;
+	}
+
+	/**
 	 * Returns the id mappings of the entity.
 	 * 
 	 * @return the id mappings of the entity
@@ -523,6 +551,38 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 	 */
 	public AbstractMapping<?, ?> getMapping(String name) {
 		return this.mappings.get(name);
+	}
+
+	/**
+	 * Returns the array of associations that are owner and persistable.
+	 * 
+	 * @return the array of associations that are owner and persistable.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public PersistableAssociation<?, ?>[] getOwnerCollections() {
+		if (this.ownerCollections != null) {
+			return this.ownerCollections;
+		}
+
+		synchronized (this) {
+			if (this.ownerCollections != null) {
+				return this.ownerCollections;
+			}
+
+			final List<Association<?, ?>> associationsOwnedPersistable = Lists.newArrayList();
+			for (final Association<?, ?> association : this.getAssociations()) {
+				if (association instanceof PersistableAssociation) {
+					associationsOwnedPersistable.add(association);
+				}
+			}
+
+			this.ownerCollections = new PersistableAssociation[associationsOwnedPersistable.size()];
+			this.ownerCollections = associationsOwnedPersistable.toArray(this.ownerCollections);
+		}
+
+		return this.ownerCollections;
 	}
 
 	/**
@@ -649,14 +709,23 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 			}
 		}
 
-		if (!first && (this.getRoot() == null)) {
-			if (this.idJavaType == null) {
-				if (!this.hasSingleIdAttribute()) {
-					throw new MappingException("IdClass need to specified for type " + this.javaType + " as it has composite primary key");
+		if (!first) {
+			// pre-prepare the dependencies
+			for (final EntityType<?> type : this.metaModel.getEntities()) {
+				this.getDependenciesFor((EntityTypeImpl<?>) type);
+			}
+
+			if (this.getRoot() == null) {
+				if (this.idJavaType == null) {
+					if (!this.hasSingleIdAttribute()) {
+						throw new MappingException("IdClass need to specified for type " + this.javaType
+							+ " as it has composite primary key");
+					}
+
+					final SingularAttributeImpl<?, ?> attribute = this.idAttributes[0];
+					this.idType = this.metaModel.getType(attribute.getJavaType());
 				}
 
-				final SingularAttributeImpl<?, ?> attribute = this.idAttributes[0];
-				this.idType = this.metaModel.getType(attribute.getJavaType());
 			}
 		}
 	}
@@ -741,58 +810,6 @@ abstract class AbstractEntityTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 
 			annotations.add(SecondaryTable.class);
 		}
-	}
-
-	/**
-	 * Prepares and returns the associations for the associate type
-	 * 
-	 * @param associate
-	 *            the associate type
-	 * @return the array of associations for the associate
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	private synchronized AttributeImpl<?, ?>[] prepareAssociationsFor(EntityTypeImpl<?> associate) {
-		AttributeImpl<?, ?>[] associations = this.associationMap.get(associate);
-
-		if (associations != null) { // other thread got it done!
-			return associations;
-		}
-
-		// prepare the related associations
-		final HashSet<AttributeImpl<?, ?>> attributes = Sets.newHashSet();
-
-		final Association<?, ?>[] allAssociations = this.getAssociations();
-		for (final Association<?, ?> association : allAssociations) {
-
-			// determine the java type
-			final AttributeImpl<?, ?> attribute = association.getDeclaringAttribute();
-
-			// only owner associations impose priority
-			if (!association.isOwner()) {
-				continue;
-			}
-
-			// only relations kept in the row impose priority
-			if (!(association instanceof OwnerManyToOneMapping) //
-				&& !(association instanceof OwnerOneToOneMapping)) {
-				continue;
-			}
-
-			final Class<?> javaType = attribute.getJavaType();
-
-			if (javaType.isAssignableFrom(associate.getBindableJavaType())) {
-				attributes.add(attribute);
-			}
-		}
-
-		associations = new AttributeImpl[attributes.size()];
-		attributes.toArray(associations);
-
-		this.associationMap.put(associate, associations);
-
-		return associations;
 	}
 
 	/**

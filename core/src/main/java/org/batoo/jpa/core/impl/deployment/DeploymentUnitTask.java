@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.manager;
+package org.batoo.jpa.core.impl.deployment;
 
 import java.util.concurrent.Callable;
 

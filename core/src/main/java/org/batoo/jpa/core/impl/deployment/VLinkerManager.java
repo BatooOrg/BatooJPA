@@ -16,35 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.manager;
-
-import java.lang.annotation.Annotation;
-import java.util.Set;
+package org.batoo.jpa.core.impl.deployment;
 
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.BatooException;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
-import org.batoo.jpa.core.impl.metamodel.ManagedTypeImpl;
-import org.batoo.jpa.core.impl.reflect.ReflectHelper;
-
-import com.google.common.collect.Sets;
+import org.batoo.jpa.core.impl.metamodel.IdentifiableTypeImpl;
 
 /**
- * A Manager that parses the metadata of the persistent classes
+ * A Manager that links persistent classes vertically.
  * 
  * @author hceylan
  * @since $version
  */
-public class ParserManager extends DeploymentManager<ManagedTypeImpl<?>> {
+public class VLinkerManager extends DeploymentManager<IdentifiableTypeImpl<?>> {
 
-	private static final BLogger LOG = BLogger.getLogger(ParserManager.class);
+	private static final BLogger LOG = BLogger.getLogger(VLinkerManager.class);
 
-	public static void parse(MetamodelImpl metamodel) throws BatooException {
-		new ParserManager(metamodel).perform();
+	public static void link(MetamodelImpl metamodel) throws BatooException {
+		new VLinkerManager(metamodel).perform();
 	}
 
-	private ParserManager(MetamodelImpl metamodel) {
-		super(LOG, "Parser", metamodel, Context.MANAGED_TYPES);
+	private VLinkerManager(MetamodelImpl metamodel) {
+		super(LOG, "VLinker", metamodel, Context.IDENTIFIABLE_TYPES);
 	}
 
 	/**
@@ -52,12 +46,8 @@ public class ParserManager extends DeploymentManager<ManagedTypeImpl<?>> {
 	 * 
 	 */
 	@Override
-	public Void perform(ManagedTypeImpl<?> type) throws BatooException {
-		final Set<Class<? extends Annotation>> parsed = Sets.newHashSet();
-
-		type.parse(parsed);
-
-		ReflectHelper.checkAnnotations(type.getJavaType(), parsed);
+	public Void perform(IdentifiableTypeImpl<?> type) throws BatooException {
+		type.vlink();
 
 		return null;
 	}

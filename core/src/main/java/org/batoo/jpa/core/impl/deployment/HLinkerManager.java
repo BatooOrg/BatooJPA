@@ -16,29 +16,38 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.manager;
+package org.batoo.jpa.core.impl.deployment;
 
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.BatooException;
+import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
-import org.batoo.jpa.core.impl.metamodel.IdentifiableTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
 
 /**
- * A Manager that links persistent classes vertically.
+ * A Manager that links persistent classes horizontally.
  * 
  * @author hceylan
  * @since $version
  */
-public class VLinkerManager extends DeploymentManager<IdentifiableTypeImpl<?>> {
+public class HLinkerManager extends DeploymentManager<EntityTypeImpl<?>> {
 
-	private static final BLogger LOG = BLogger.getLogger(VLinkerManager.class);
+	private static final BLogger LOG = BLogger.getLogger(HLinkerManager.class);
 
-	public static void link(MetamodelImpl metamodel) throws BatooException {
-		new VLinkerManager(metamodel).perform();
+	public static void link(MetamodelImpl metamodel, DataSourceImpl datasource) throws BatooException {
+		new HLinkerManager(metamodel, datasource, true).perform();
+		new HLinkerManager(metamodel, datasource, false).perform();
 	}
 
-	private VLinkerManager(MetamodelImpl metamodel) {
-		super(LOG, "VLinker", metamodel, Context.IDENTIFIABLE_TYPES);
+	private final boolean firstPass;
+
+	private final DataSourceImpl datasource;
+
+	public HLinkerManager(MetamodelImpl metamodel, DataSourceImpl datasource, boolean firstPass) {
+		super(LOG, "HLinker", metamodel, Context.ENTITIES);
+
+		this.datasource = datasource;
+		this.firstPass = firstPass;
 	}
 
 	/**
@@ -46,8 +55,8 @@ public class VLinkerManager extends DeploymentManager<IdentifiableTypeImpl<?>> {
 	 * 
 	 */
 	@Override
-	public Void perform(IdentifiableTypeImpl<?> type) throws BatooException {
-		type.vlink();
+	public Void perform(EntityTypeImpl<?> type) throws BatooException {
+		type.link(this.datasource, this.firstPass);
 
 		return null;
 	}

@@ -102,7 +102,7 @@ public class SessionImpl {
 		instances.addAll(this.identifiableEntities);
 		instances.addAll(this.changedEntities);
 
-		final ManagedInstance<?>[] sortedInstances = Prioritizer.INSTANCE.sort(instances);
+		final ManagedInstance<?>[] sortedInstances = Prioritizer.sort(instances);
 
 		for (final ManagedInstance<?> instance : sortedInstances) {
 			instance.flush(connection, transaction);

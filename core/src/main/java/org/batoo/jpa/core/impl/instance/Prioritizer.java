@@ -21,8 +21,12 @@ package org.batoo.jpa.core.impl.instance;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.persistence.PersistenceException;
+
 import org.batoo.jpa.core.impl.metamodel.AttributeImpl;
 import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
+
+import com.google.common.collect.Lists;
 
 /**
  * 
@@ -30,43 +34,6 @@ import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
  * @since $version
  */
 public class Prioritizer {
-
-	/**
-	 * Singleton global instance
-	 */
-	public static final Prioritizer INSTANCE = new Prioritizer();
-
-	/**
-	 * No instantiation.
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	private Prioritizer() {
-		super();
-	}
-
-	private boolean references(ManagedInstance<?> i1, ManagedInstance<?> i2) {
-		final EntityTypeImpl<?> type = i1.getType();
-		final EntityTypeImpl<?> associate = i2.getType();
-
-		final AttributeImpl<?, ?>[] attributes = type.getAssociationsFor(associate);
-
-		if (attributes.length == 0) {
-			return false;
-		}
-
-		final Object instance = i1.getInstance();
-		final Object reference = i2.getInstance();
-
-		for (final AttributeImpl<?, ?> attribute : attributes) {
-			if (attribute.references(instance, reference)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
 
 	/**
 	 * Sorts the managed instances based on their dependencies.
@@ -78,66 +45,87 @@ public class Prioritizer {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedInstance<?>[] sort(ArrayList<ManagedInstance<?>> instances) {
-		final ManagedInstance<?>[] sorted = new ManagedInstance[instances.size()];
+	public static ManagedInstance<?>[] sort(ArrayList<ManagedInstance<?>> instances0) {
+		final ManagedInstance<?>[] sorted = new ManagedInstance[instances0.size()];
 
-		// separate out the independent instances
-		int instanceNo = 0;
-		for (final Iterator<ManagedInstance<?>> i = instances.iterator(); i.hasNext();) {
-			final ManagedInstance<?> i1 = i.next();
-
-			boolean hasDependency = false;
-			for (final ManagedInstance<?> i2 : instances) {
-				if (i1 == i2) {
-					continue;
-				}
-
-				if (this.references(i1, i2)) {
-					hasDependency = true;
-					break;
-				}
-			}
-
-			// if has no reference then it is independent, remove it from
-			if (!hasDependency) {
-				sorted[instanceNo++] = i1;
-				i.remove();
-			}
-		}
-
-		// if all independent then return the result
-		if (instances.size() == 0) {
-			return sorted;
-		}
-
-		// sort the remaining ones based on topology
-		final PriorityList priorityList = new PriorityList(instances.size());
-
-		for (int i = 0; i < instances.size(); i++) {
-			priorityList.addInstance(instances.get(i));
-		}
-
-		for (int i = 0; i < instances.size(); i++) {
-			final ManagedInstance<?> i1 = instances.get(i);
-
-			for (int j = i + 1; j < instances.size(); j++) {
-				final ManagedInstance<?> i2 = instances.get(j);
-
-				if (this.references(i1, i2)) {
-					priorityList.addDependency(i1, i2);
-				}
-
-				if (this.references(i2, i1)) {
-					priorityList.addDependency(i2, i1);
-				}
-			}
-		}
-
-		final ManagedInstance<?>[] rest = priorityList.sort();
-		for (final ManagedInstance<?> instance : rest) {
-			sorted[instanceNo++] = instance;
+		for (int ii = 0; ii < 10000; ii++) {
+			final ArrayList<ManagedInstance<?>> instances = Lists.newArrayList(instances0);
+			Prioritizer.sort0(instances, sorted);
 		}
 
 		return sorted;
+	}
+
+	private static void sort0(final ArrayList<ManagedInstance<?>> instances, final ManagedInstance<?>[] sorted) {
+		int instanceNo = 0;
+
+		// final separate out the final ones we know final that have final no dependencies
+		for (final Iterator<ManagedInstance<?>> i = instances.iterator(); i.hasNext();) {
+			final ManagedInstance<?> instance = i.next();
+
+			if (instance.getType().getDependencyCount() == 0) {
+				i.remove();
+
+				sorted[instanceNo++] = instance;
+			}
+		}
+
+		while ((instances.size() > 0)) {
+
+			boolean found = false;
+
+			for (final Iterator<ManagedInstance<?>> i = instances.iterator(); i.hasNext();) {
+				boolean dependent = false;
+
+				final ManagedInstance<?> mi1 = i.next();
+				final EntityTypeImpl<?> e1 = mi1.getType();
+
+				if (e1.getDependencyCount() > 0) {
+					final Object i1 = mi1.getInstance();
+
+					innerLoop:
+					for (int j = 0; j < instances.size(); j++) {
+						final ManagedInstance<?> mi2 = instances.get(j);
+						if (mi1 == mi2) {
+							continue;
+						}
+
+						final EntityTypeImpl<?> e2 = mi2.getType();
+						final AttributeImpl<?, ?>[] attributes = e1.getDependenciesFor(e2);
+						final Object i2 = mi2.getInstance();
+
+						for (final AttributeImpl<?, ?> attribute : attributes) {
+							if (attribute.references(i1, i2)) {
+								dependent = true;
+								break innerLoop;
+							}
+						}
+
+					}
+				}
+
+				if (!dependent) {
+					sorted[instanceNo++] = mi1;
+
+					i.remove();
+
+					found = true;
+				}
+			}
+
+			if (!found) {
+				throw new PersistenceException("Circular dependencies not yet supported");
+			}
+		}
+	}
+
+	/**
+	 * No instantiation.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private Prioritizer() {
+		super();
 	}
 }

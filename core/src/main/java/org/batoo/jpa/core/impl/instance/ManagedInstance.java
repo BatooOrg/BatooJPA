@@ -20,7 +20,7 @@ package org.batoo.jpa.core.impl.instance;
 
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.IdentityHashMap;
+import java.util.HashMap;
 import java.util.List;
 
 import org.batoo.jpa.core.impl.EntityTransactionImpl;
@@ -87,7 +87,7 @@ public class ManagedInstance<X> {
 
 	private Object id;
 	private boolean loaded;
-	private final IdentityHashMap<CollectionMapping<?, ?, ?>, Object> enhancedCollections = Maps.newIdentityHashMap();
+	private final HashMap<CollectionMapping<?, ?, ?>, Object> enhancedCollections = Maps.newHashMap();
 
 	private int h;
 	private SingularAttributeImpl<?, ?> embeddedAttribute;
@@ -330,7 +330,7 @@ public class ManagedInstance<X> {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void flushAssociations(ConnectionImpl connection) throws SQLException {
-		for (final PersistableAssociation association : this.type.getAssociationsOwnedPersistable()) {
+		for (final PersistableAssociation association : this.type.getOwnerCollections()) {
 			association.performInsert(connection, this);
 		}
 	}

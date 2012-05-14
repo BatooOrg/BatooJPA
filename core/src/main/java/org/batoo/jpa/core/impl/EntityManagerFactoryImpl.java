@@ -40,11 +40,11 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.JPASettings;
+import org.batoo.jpa.core.impl.deployment.DdlManager;
+import org.batoo.jpa.core.impl.deployment.HLinkerManager;
+import org.batoo.jpa.core.impl.deployment.ParserManager;
+import org.batoo.jpa.core.impl.deployment.VLinkerManager;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
-import org.batoo.jpa.core.impl.manager.DdlManager;
-import org.batoo.jpa.core.impl.manager.HLinkerManager;
-import org.batoo.jpa.core.impl.manager.ParserManager;
-import org.batoo.jpa.core.impl.manager.VLinkerManager;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
 import org.batoo.jpa.core.impl.metamodel.AttributeImpl;
 import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;

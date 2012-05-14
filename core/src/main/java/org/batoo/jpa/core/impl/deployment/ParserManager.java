@@ -16,38 +16,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.manager;
+package org.batoo.jpa.core.impl.deployment;
+
+import java.lang.annotation.Annotation;
+import java.util.Set;
 
 import org.batoo.jpa.core.BLogger;
 import org.batoo.jpa.core.BatooException;
-import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.mapping.MetamodelImpl;
-import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
+import org.batoo.jpa.core.impl.metamodel.ManagedTypeImpl;
+import org.batoo.jpa.core.impl.reflect.ReflectHelper;
+
+import com.google.common.collect.Sets;
 
 /**
- * A Manager that links persistent classes horizontally.
+ * A Manager that parses the metadata of the persistent classes
  * 
  * @author hceylan
  * @since $version
  */
-public class HLinkerManager extends DeploymentManager<EntityTypeImpl<?>> {
+public class ParserManager extends DeploymentManager<ManagedTypeImpl<?>> {
 
-	private static final BLogger LOG = BLogger.getLogger(HLinkerManager.class);
+	private static final BLogger LOG = BLogger.getLogger(ParserManager.class);
 
-	public static void link(MetamodelImpl metamodel, DataSourceImpl datasource) throws BatooException {
-		new HLinkerManager(metamodel, datasource, true).perform();
-		new HLinkerManager(metamodel, datasource, false).perform();
+	public static void parse(MetamodelImpl metamodel) throws BatooException {
+		new ParserManager(metamodel).perform();
 	}
 
-	private final boolean firstPass;
-
-	private final DataSourceImpl datasource;
-
-	public HLinkerManager(MetamodelImpl metamodel, DataSourceImpl datasource, boolean firstPass) {
-		super(LOG, "HLinker", metamodel, Context.ENTITIES);
-
-		this.datasource = datasource;
-		this.firstPass = firstPass;
+	private ParserManager(MetamodelImpl metamodel) {
+		super(LOG, "Parser", metamodel, Context.MANAGED_TYPES);
 	}
 
 	/**
@@ -55,8 +52,12 @@ public class HLinkerManager extends DeploymentManager<EntityTypeImpl<?>> {
 	 * 
 	 */
 	@Override
-	public Void perform(EntityTypeImpl<?> type) throws BatooException {
-		type.link(this.datasource, this.firstPass);
+	public Void perform(ManagedTypeImpl<?> type) throws BatooException {
+		final Set<Class<? extends Annotation>> parsed = Sets.newHashSet();
+
+		type.parse(parsed);
+
+		ReflectHelper.checkAnnotations(type.getJavaType(), parsed);
 
 		return null;
 	}
