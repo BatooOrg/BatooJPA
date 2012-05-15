@@ -28,7 +28,6 @@ import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.batoo.jpa.core.BLogger;

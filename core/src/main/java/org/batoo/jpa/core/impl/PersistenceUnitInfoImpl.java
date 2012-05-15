@@ -46,13 +46,13 @@ import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.BJPASettings;
 import org.batoo.jpa.core.BatooException;
+import org.batoo.jpa.xml.Persistence;
+import org.batoo.jpa.xml.Persistence.PersistenceUnit;
+import org.batoo.jpa.xml.Persistence.PersistenceUnit.Properties.Property;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.sun.java.xml.ns.persistence.Persistence;
-import com.sun.java.xml.ns.persistence.Persistence.PersistenceUnit;
-import com.sun.java.xml.ns.persistence.Persistence.PersistenceUnit.Properties.Property;
 
 /**
  * @author hceylan
@@ -106,6 +106,7 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public void addTransformer(ClassTransformer transformer) {
 		throw new NotImplementedException();
 	}
@@ -157,6 +158,7 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public boolean excludeUnlistedClasses() {
 		return this.persistenceUnit.getExcludeUnlistedClasses();
 	}
@@ -165,6 +167,7 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public ClassLoader getClassLoader() {
 		if (this.classLoader != null) {
 			return this.classLoader;
@@ -190,11 +193,13 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public List<URL> getJarFileUrls() {
 		final List<String> jarFiles = this.persistenceUnit.getJarFile();
 
 		return Lists.transform(jarFiles, new Function<String, URL>() {
 
+			@Override
 			public URL apply(String input) {
 				try {
 					return new URL(input);
@@ -210,6 +215,7 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public DataSource getJtaDataSource() {
 		return this.getDatasource(this.persistenceUnit.getJtaDataSource());
 	}
@@ -218,6 +224,7 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public List<String> getManagedClassNames() {
 		return this.persistenceUnit.getClazz();
 	}
@@ -226,6 +233,7 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public List<String> getMappingFileNames() {
 		return Collections.unmodifiableList(this.persistenceUnit.getMappingFile());
 	}
@@ -234,6 +242,7 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public ClassLoader getNewTempClassLoader() {
 		return this.createClassLoader();
 	}
@@ -242,6 +251,7 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public DataSource getNonJtaDataSource() {
 		return this.getDatasource(this.persistenceUnit.getNonJtaDataSource());
 	}
@@ -250,6 +260,7 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public String getPersistenceProviderClassName() {
 		return this.persistenceUnit.getProvider();
 	}
@@ -258,6 +269,7 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public String getPersistenceUnitName() {
 		return this.emName;
 	}
@@ -266,6 +278,7 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public URL getPersistenceUnitRootUrl() {
 		return null;
 	}
@@ -274,6 +287,7 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public String getPersistenceXMLSchemaVersion() {
 		return PersistenceUnitInfoImpl.SCHEMA_VERSION;
 	}
@@ -282,6 +296,7 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public Properties getProperties() {
 		final Properties properties = new Properties();
 
@@ -310,6 +325,7 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public SharedCacheMode getSharedCacheMode() {
 		if (this.persistenceUnit.getSharedCacheMode() == null) {
 			return null;
@@ -322,6 +338,7 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public PersistenceUnitTransactionType getTransactionType() {
 		if (this.persistenceUnit.getTransactionType() == null) {
 			return null;
@@ -334,6 +351,7 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public ValidationMode getValidationMode() {
 		if (this.persistenceUnit.getValidationMode() == null) {
 			return null;

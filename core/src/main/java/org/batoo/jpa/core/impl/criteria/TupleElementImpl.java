@@ -18,7 +18,6 @@
  */
 package org.batoo.jpa.core.impl.criteria;
 
-import javax.persistence.Tuple;
 import javax.persistence.TupleElement;
 
 /**

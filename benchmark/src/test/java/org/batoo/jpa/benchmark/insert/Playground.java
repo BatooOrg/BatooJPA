@@ -279,9 +279,9 @@ public class Playground {
 	}
 
 	private void singleTest(final EntityManagerFactory emf) {
-		this.doPersist(emf);
+		final Person person = this.doPersist(emf);
 
-		// this.doFind(emf, person);
+		this.doFind(emf, person);
 	}
 
 	private void test(Type type, final EntityManagerFactory emf) {
@@ -292,7 +292,7 @@ public class Playground {
 			catch (final InterruptedException e) {}
 		}
 
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 25000; i++) {
 			this.singleTest(emf);
 		}
 	}

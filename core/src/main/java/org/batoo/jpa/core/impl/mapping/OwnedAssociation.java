@@ -18,9 +18,6 @@
  */
 package org.batoo.jpa.core.impl.mapping;
 
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-
 import org.batoo.jpa.core.MappingException;
 import org.batoo.jpa.core.jdbc.adapter.JDBCAdapter;
 

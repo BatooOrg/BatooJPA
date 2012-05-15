@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.sql.DataSource;
 

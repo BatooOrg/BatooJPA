@@ -20,8 +20,6 @@ package org.batoo.jpa.core.impl.mapping;
 
 import java.util.Deque;
 
-import javax.persistence.metamodel.Attribute.PersistentAttributeType;
-
 import org.batoo.jpa.core.impl.metamodel.AttributeImpl;
 import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
 import org.batoo.jpa.core.impl.metamodel.TypeImpl;

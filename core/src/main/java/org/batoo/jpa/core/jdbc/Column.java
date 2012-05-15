@@ -18,7 +18,6 @@
  */
 package org.batoo.jpa.core.jdbc;
 
-import java.sql.Types;
 
 /**
  * 

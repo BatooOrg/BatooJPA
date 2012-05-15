@@ -70,7 +70,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 import javax.persistence.metamodel.Attribute;
-import javax.persistence.metamodel.ManagedType;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.BLogger;

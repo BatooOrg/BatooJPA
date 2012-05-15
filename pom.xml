@@ -280,6 +280,7 @@
 	</build>
 
 	<modules>
+		<module>persistence-api</module>
 		<module>core</module>
 		<module>spec</module>
 		<module>benchmark</module>
