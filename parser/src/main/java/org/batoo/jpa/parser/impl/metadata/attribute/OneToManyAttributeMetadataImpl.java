@@ -25,7 +25,7 @@ import javax.persistence.OneToMany;
 
 import org.batoo.jpa.parser.impl.metadata.JoinTableMetadaImpl;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
-import org.batoo.jpa.parser.metadata.OneToManyAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.OneToManyAttributeMetadata;
 
 /**
  * Implementation of {@link OneToManyAttributeMetadata}.

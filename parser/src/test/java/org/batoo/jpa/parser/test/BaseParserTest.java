@@ -22,21 +22,22 @@ import java.util.List;
 
 import javax.persistence.PersistenceContext;
 
+import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.test.BaseTest;
 import org.batoo.jpa.parser.impl.PersistenceParser;
 import org.batoo.jpa.parser.impl.metadata.Metadata;
-import org.batoo.jpa.parser.metadata.AttributeMetadata;
-import org.batoo.jpa.parser.metadata.AttributesMetadata;
-import org.batoo.jpa.parser.metadata.BasicAttributeMetadata;
-import org.batoo.jpa.parser.metadata.EmbeddedIdAttributeMetadata;
-import org.batoo.jpa.parser.metadata.EntityMetadata;
-import org.batoo.jpa.parser.metadata.IdAttributeMetadata;
-import org.batoo.jpa.parser.metadata.ManyToManyAttributeMetadata;
-import org.batoo.jpa.parser.metadata.ManyToOneAttributeMetadata;
-import org.batoo.jpa.parser.metadata.OneToManyAttributeMetadata;
-import org.batoo.jpa.parser.metadata.OneToOneAttributeMetadata;
-import org.batoo.jpa.parser.metadata.TransientAttributeMetadata;
-import org.batoo.jpa.parser.metadata.VersionAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
+import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.EmbeddedIdAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.IdAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.ManyToManyAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.ManyToOneAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.OneToManyAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.OneToOneAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.TransientAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.VersionAttributeMetadata;
+import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -51,7 +52,7 @@ import org.junit.runner.Description;
  */
 public class BaseParserTest extends BaseTest {
 
-	private String persistenceUnitName;
+	private static final String DEFAULT = "default";
 
 	/**
 	 * Rule to get Persistence XML File name.
@@ -68,12 +69,14 @@ public class BaseParserTest extends BaseTest {
 		 */
 		@Override
 		protected void starting(Description description) {
+			BaseParserTest.this.persistenceUnitName = BaseParserTest.DEFAULT;
+
 			final PersistenceContext persistenceContext = description.getAnnotation(PersistenceContext.class);
 			if (persistenceContext != null) {
-				BaseParserTest.this.persistenceUnitName = persistenceContext.unitName();
-			}
-			else {
-				BaseParserTest.this.persistenceUnitName = "default";
+				// if unit name is not the default set the unit name
+				if (StringUtils.isNotBlank(persistenceContext.unitName())) {
+					BaseParserTest.this.persistenceUnitName = persistenceContext.unitName();
+				}
 			}
 		}
 	};
@@ -82,8 +85,8 @@ public class BaseParserTest extends BaseTest {
 	private final String ATTRIBUTE = "attribute";
 
 	private PersistenceParser persistenceParser;
-
 	private ClassLoader oldContextClassLoader;
+	private String persistenceUnitName;
 
 	/**
 	 * Returns the attribute name <code>attribute</code> of the entity named <code>Entity</code>.

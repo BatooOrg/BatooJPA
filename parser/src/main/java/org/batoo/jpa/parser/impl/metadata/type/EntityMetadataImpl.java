@@ -28,8 +28,9 @@ import javax.persistence.MappedSuperclass;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.log.ToStringBuilder;
 import org.batoo.jpa.parser.MappingException;
-import org.batoo.jpa.parser.metadata.AttributesMetadata;
-import org.batoo.jpa.parser.metadata.EntityMetadata;
+import org.batoo.jpa.parser.impl.metadata.attribute.AttributesMetadataImpl;
+import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
+import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 
 /**
  * 

@@ -26,8 +26,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.batoo.jpa.parser.impl.metadata.ColumnMetadataImpl;
-import org.batoo.jpa.parser.metadata.BasicSingularAttributeMetadata;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
+import org.batoo.jpa.parser.metadata.attribute.BasicSingularAttributeMetadata;
 
 /**
  * 

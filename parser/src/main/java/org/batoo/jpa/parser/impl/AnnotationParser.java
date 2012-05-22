@@ -23,7 +23,7 @@ import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.annotated.MetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.type.EntityMetadataImpl;
-import org.batoo.jpa.parser.metadata.EntityMetadata;
+import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 
 /**
  * PersistenceParser that joins the {@link OrmParser} metadata with annotation metadata.

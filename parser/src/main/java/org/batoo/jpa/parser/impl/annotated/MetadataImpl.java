@@ -26,7 +26,7 @@ import javax.persistence.AccessType;
 import org.batoo.jpa.common.log.ToStringBuilder;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.metadata.Metadata;
-import org.batoo.jpa.parser.metadata.EntityMetadata;
+import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

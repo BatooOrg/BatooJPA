@@ -18,6 +18,11 @@
  */
 package org.batoo.jpa.common.log;
 
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.commons.lang.SystemUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
@@ -48,6 +53,7 @@ public class ToStringBuilder extends ReflectionToStringBuilder {
 		LONG
 	}
 
+	@SuppressWarnings("rawtypes")
 	private static final class LongToStringStyle extends ToStringStyle {
 
 		private static final long serialVersionUID = 1L;
@@ -69,10 +75,104 @@ public class ToStringBuilder extends ReflectionToStringBuilder {
 		 * 
 		 */
 		@Override
+		protected void appendDetail(StringBuffer buffer, String fieldName, Collection coll) {
+			final String indent = this.indent();
+
+			buffer.append("{");
+
+			try {
+				for (final Iterator i = coll.iterator(); i.hasNext();) {
+					buffer.append(SystemUtils.LINE_SEPARATOR);
+					buffer.append(indent);
+					buffer.append("  ");
+
+					buffer.append(i.next());
+
+					if (i.hasNext()) {
+						buffer.append(",");
+					}
+				}
+			}
+			finally {
+				ToStringBuilder.indent.set(ToStringBuilder.indent.get().substring(2));
+			}
+
+			buffer.append("}");
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 */
+		@Override
+		protected void appendDetail(StringBuffer buffer, String fieldName, Map map) {
+			final String indent = this.indent();
+
+			buffer.append("{");
+
+			try {
+				for (final Iterator i = map.entrySet().iterator(); i.hasNext();) {
+					buffer.append(SystemUtils.LINE_SEPARATOR);
+					buffer.append(indent);
+					buffer.append("  ");
+
+					final Entry entry = (Entry) i.next();
+					buffer.append(entry.getKey());
+					buffer.append("=");
+					buffer.append(entry.getValue());
+
+					if (i.hasNext()) {
+						buffer.append(",");
+					}
+				}
+			}
+			finally {
+				ToStringBuilder.indent.set(ToStringBuilder.indent.get().substring(2));
+			}
+
+			buffer.append("}");
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 */
+		@Override
+		public void appendEnd(StringBuffer buffer, Object object) {
+			final String indent = ToStringBuilder.indent.get();
+			ToStringBuilder.indent.set(indent.length() == 0 ? null : indent.substring(2));
+
+			super.appendEnd(buffer, object);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 */
+		@Override
 		protected void appendFieldStart(StringBuffer buffer, String fieldName) {
 			buffer.append(ToStringBuilder.indent.get());
 
 			super.appendFieldStart(buffer, fieldName);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 */
+		@Override
+		public void appendStart(StringBuffer buffer, Object object) {
+			this.indent();
+
+			super.appendStart(buffer, object);
+		}
+
+		private String indent() {
+			final String indent = ToStringBuilder.indent.get();
+
+			ToStringBuilder.indent.set(indent != null ? indent + "  " : "");
+
+			return indent;
 		}
 	}
 
@@ -157,22 +257,5 @@ public class ToStringBuilder extends ReflectionToStringBuilder {
 		super.setExcludeFieldNames(fieldNames);
 
 		return this;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String toString() {
-		final String depth = ToStringBuilder.indent.get() != null ? ToStringBuilder.indent.get() : "";
-
-		ToStringBuilder.indent.set(depth + "  ");
-		try {
-			return super.toString();
-		}
-		finally {
-			ToStringBuilder.indent.set(depth);
-		}
 	}
 }

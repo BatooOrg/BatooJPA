@@ -25,7 +25,7 @@ import javax.persistence.AccessType;
 
 import org.batoo.jpa.common.log.ToStringBuilder;
 import org.batoo.jpa.parser.impl.annotated.JavaLocator;
-import org.batoo.jpa.parser.metadata.AttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
 
 /**
  * The implementation of {@link AttributeMetadata}.

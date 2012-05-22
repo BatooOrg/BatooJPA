@@ -22,7 +22,7 @@ import java.util.List;
 
 import javax.persistence.AccessType;
 
-import org.batoo.jpa.parser.metadata.EntityMetadata;
+import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 
 /**
  * The root of the meta model.

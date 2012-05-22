@@ -29,9 +29,9 @@ import javax.persistence.Lob;
 import javax.persistence.Temporal;
 
 import org.batoo.jpa.common.reflect.ReflectHelper;
+import org.batoo.jpa.parser.impl.metadata.attribute.AttributesMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.attribute.BasicAttributeMetadataImpl;
-import org.batoo.jpa.parser.impl.metadata.type.AttributesMetadataImpl;
-import org.batoo.jpa.parser.metadata.BasicAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
 
 /**
  * PersistenceParser for basic attributes that parses and merges the optional ORM File provided metadata.

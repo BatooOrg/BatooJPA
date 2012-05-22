@@ -31,6 +31,18 @@ import org.batoo.jpa.parser.impl.orm.CascadesElementFactory.CascadeMergeElementF
 import org.batoo.jpa.parser.impl.orm.CascadesElementFactory.CascadePersistElementFactory;
 import org.batoo.jpa.parser.impl.orm.CascadesElementFactory.CascadeRefreshElementFactory;
 import org.batoo.jpa.parser.impl.orm.CascadesElementFactory.CascadeRemoveElementFactory;
+import org.batoo.jpa.parser.impl.orm.attribute.AttributesElementFactory;
+import org.batoo.jpa.parser.impl.orm.attribute.BasicAttributeElementFactory;
+import org.batoo.jpa.parser.impl.orm.attribute.EmbeddedAttributeElementFactory;
+import org.batoo.jpa.parser.impl.orm.attribute.EmbeddedIdAttributeElementFactory;
+import org.batoo.jpa.parser.impl.orm.attribute.IdAttributeElementFactory;
+import org.batoo.jpa.parser.impl.orm.attribute.ManyToManyAttributeElementFactory;
+import org.batoo.jpa.parser.impl.orm.attribute.ManyToOneAttributeElementFactory;
+import org.batoo.jpa.parser.impl.orm.attribute.OneToManyAttributeElementFactory;
+import org.batoo.jpa.parser.impl.orm.attribute.OneToOneAttributeElementFactory;
+import org.batoo.jpa.parser.impl.orm.attribute.TransientElementFactory;
+import org.batoo.jpa.parser.impl.orm.attribute.VersionAttributeElementFactory;
+import org.batoo.jpa.parser.impl.orm.type.EntityElementFactory;
 import org.batoo.jpa.parser.metadata.LocatableMatadata;
 import org.xml.sax.Locator;
 
@@ -184,7 +196,7 @@ public abstract class ElementFactory extends ElementFactoryConstants implements 
 		this.generate();
 
 		if (this.parent != null) {
-			ElementFactory.LOG.debug("Parsed child {0}", this);
+			ElementFactory.LOG.trace("Parsed child {0}", this);
 
 			this.parent.handleChild(this);
 		}

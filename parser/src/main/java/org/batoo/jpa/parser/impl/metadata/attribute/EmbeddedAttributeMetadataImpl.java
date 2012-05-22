@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.batoo.jpa.parser.metadata.AssociationOverrideMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
-import org.batoo.jpa.parser.metadata.EmbeddedAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.EmbeddedAttributeMetadata;
 
 /**
  * The implementation of the {@link EmbeddedAttributeMetadata}.

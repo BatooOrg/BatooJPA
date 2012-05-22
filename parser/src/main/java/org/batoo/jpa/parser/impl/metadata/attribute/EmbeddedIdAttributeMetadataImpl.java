@@ -22,7 +22,7 @@ import java.lang.reflect.Member;
 import java.util.List;
 
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
-import org.batoo.jpa.parser.metadata.EmbeddedIdAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.EmbeddedIdAttributeMetadata;
 
 /**
  * 

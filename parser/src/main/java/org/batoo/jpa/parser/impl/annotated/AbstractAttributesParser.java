@@ -27,8 +27,8 @@ import java.util.Map.Entry;
 
 import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.parser.MappingException;
-import org.batoo.jpa.parser.impl.metadata.type.AttributesMetadataImpl;
-import org.batoo.jpa.parser.metadata.AttributeMetadata;
+import org.batoo.jpa.parser.impl.metadata.attribute.AttributesMetadataImpl;
+import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
 
 import com.google.common.collect.Lists;
 

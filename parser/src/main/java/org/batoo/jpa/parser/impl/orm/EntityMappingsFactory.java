@@ -24,7 +24,8 @@ import java.util.Map;
 import javax.persistence.AccessType;
 
 import org.batoo.jpa.parser.impl.metadata.Metadata;
-import org.batoo.jpa.parser.metadata.EntityMetadata;
+import org.batoo.jpa.parser.impl.orm.type.EntityElementFactory;
+import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 
 import com.google.common.collect.Lists;
 

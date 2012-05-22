@@ -29,9 +29,9 @@ import javax.persistence.ManyToMany;
 
 import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.parser.impl.AnnotationParser;
+import org.batoo.jpa.parser.impl.metadata.attribute.AttributesMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.attribute.ManyToManyAttributeMetadataImpl;
-import org.batoo.jpa.parser.impl.metadata.type.AttributesMetadataImpl;
-import org.batoo.jpa.parser.metadata.ManyToManyAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.ManyToManyAttributeMetadata;
 
 import com.google.common.collect.Sets;
 

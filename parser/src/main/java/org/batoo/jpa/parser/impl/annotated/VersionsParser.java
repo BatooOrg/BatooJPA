@@ -30,9 +30,9 @@ import javax.persistence.Version;
 
 import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.parser.impl.AnnotationParser;
+import org.batoo.jpa.parser.impl.metadata.attribute.AttributesMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.attribute.VersionAttributeMetadataImpl;
-import org.batoo.jpa.parser.impl.metadata.type.AttributesMetadataImpl;
-import org.batoo.jpa.parser.metadata.VersionAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.VersionAttributeMetadata;
 
 import com.google.common.collect.Sets;
 

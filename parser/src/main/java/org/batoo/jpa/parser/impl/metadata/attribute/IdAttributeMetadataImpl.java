@@ -30,10 +30,10 @@ import org.batoo.jpa.parser.impl.metadata.GeneratedValueMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.SequenceGeneratorMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.TableGeneratorMetadataImpl;
 import org.batoo.jpa.parser.metadata.GeneratedValueMetadata;
-import org.batoo.jpa.parser.metadata.IdAttributeMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
-import org.batoo.jpa.parser.metadata.VersionAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.IdAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.VersionAttributeMetadata;
 
 /**
  * The implementation of the {@link IdAttributeMetadata}.

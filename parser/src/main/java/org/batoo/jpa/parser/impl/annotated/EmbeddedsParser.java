@@ -29,9 +29,9 @@ import javax.persistence.Embedded;
 
 import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.parser.impl.AnnotationParser;
+import org.batoo.jpa.parser.impl.metadata.attribute.AttributesMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.attribute.EmbeddedAttributeMetadataImpl;
-import org.batoo.jpa.parser.impl.metadata.type.AttributesMetadataImpl;
-import org.batoo.jpa.parser.metadata.EmbeddedAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.EmbeddedAttributeMetadata;
 
 import com.google.common.collect.Sets;
 

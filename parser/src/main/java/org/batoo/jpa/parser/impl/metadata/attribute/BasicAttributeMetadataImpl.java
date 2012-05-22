@@ -28,7 +28,7 @@ import javax.persistence.FetchType;
 import javax.persistence.Lob;
 import javax.persistence.Temporal;
 
-import org.batoo.jpa.parser.metadata.BasicAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
 
 /**
  * The implementation of the {@link BasicAttributeMetadata}.

@@ -23,7 +23,7 @@ import java.lang.reflect.Member;
 import javax.persistence.Column;
 import javax.persistence.Temporal;
 
-import org.batoo.jpa.parser.metadata.VersionAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.VersionAttributeMetadata;
 
 /**
  * The implementation of the {@link VersionAttributeMetadata}.

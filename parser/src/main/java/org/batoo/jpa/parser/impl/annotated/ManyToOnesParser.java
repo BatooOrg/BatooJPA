@@ -29,9 +29,9 @@ import javax.persistence.ManyToOne;
 
 import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.parser.impl.AnnotationParser;
+import org.batoo.jpa.parser.impl.metadata.attribute.AttributesMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.attribute.ManyToOneAttributeMetadataImpl;
-import org.batoo.jpa.parser.impl.metadata.type.AttributesMetadataImpl;
-import org.batoo.jpa.parser.metadata.ManyToOneAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.ManyToOneAttributeMetadata;
 
 import com.google.common.collect.Sets;
 

@@ -25,7 +25,7 @@ import javax.persistence.ManyToOne;
 
 import org.batoo.jpa.parser.impl.metadata.JoinTableMetadaImpl;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
-import org.batoo.jpa.parser.metadata.ManyToOneAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.ManyToOneAttributeMetadata;
 
 /**
  * Implementation of {@link ManyToOneAttributeMetadata}.

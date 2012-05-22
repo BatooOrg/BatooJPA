@@ -28,9 +28,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 
 import org.batoo.jpa.parser.impl.metadata.JoinTableMetadaImpl;
-import org.batoo.jpa.parser.metadata.AssociationAttributeMetadata;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
 import org.batoo.jpa.parser.metadata.JoinTableMetadata;
+import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;

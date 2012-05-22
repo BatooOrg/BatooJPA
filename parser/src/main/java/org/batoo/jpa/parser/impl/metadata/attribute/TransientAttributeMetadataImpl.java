@@ -20,7 +20,7 @@ package org.batoo.jpa.parser.impl.metadata.attribute;
 
 import java.lang.reflect.Member;
 
-import org.batoo.jpa.parser.metadata.TransientAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.TransientAttributeMetadata;
 
 /**
  * The implementation of the {@link TransientAttributeMetadata}.
