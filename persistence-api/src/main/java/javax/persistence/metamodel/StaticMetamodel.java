@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
  * is a metamodel class that represents the entity, mapped
  * superclass, or embeddable class designated by the value
  * element.
- *
+ * 
  * @since Java Persistence 2.0
  */
 @Target(ElementType.TYPE)

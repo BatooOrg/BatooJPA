@@ -17,17 +17,18 @@
 
 package javax.persistence;
 
-import java.lang.annotation.Target;
-import java.lang.annotation.Retention;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
 /**
  * Specifies multiple secondary tables for an entity.
- *
+ * 
  * <pre>
  *    Example 1: Multiple secondary tables assuming primary key columns are named the same in all tables.
- *
+ * 
  *    &#064;Entity
  *    &#064;Table(name="EMPLOYEE")
  *    &#064;SecondaryTables({
@@ -35,10 +36,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *        &#064;SecondaryTable(name="EMP_HIST")
  *    })
  *    public class Employee { ... }
- *
- *
+ * 
+ * 
  *    Example 2: Multiple secondary tables with differently named primary key columns.
- *
+ * 
  *    &#064;Entity
  *    &#064;Table(name="EMPLOYEE")
  *    &#064;SecondaryTables({
@@ -49,12 +50,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *    })
  *    public class Employee { ... }
  * </pre>
- *
+ * 
  * @since Java Persistence 1.0
  */
 @Target(TYPE)
 @Retention(RUNTIME)
-
 public @interface SecondaryTables {
 	/**
 	 * (Required) The secondary tables for an entity.

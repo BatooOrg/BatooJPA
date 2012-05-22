@@ -22,23 +22,24 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+
 import javax.persistence.Tuple;
 
 /**
  * Used to construct criteria queries, compound selections,
  * expressions, predicates, orderings.
- *
- * <p> Note that <code>Predicate</code> is used instead of <code>Expression&#060;Boolean&#062;</code>
- * in this API in order to work around the fact that Java
- * generics are not compatible with varags.
- *
+ * 
+ * <p>
+ * Note that <code>Predicate</code> is used instead of <code>Expression&#060;Boolean&#062;</code> in this API in order to work around the
+ * fact that Java generics are not compatible with varags.
+ * 
  * @since Java Persistence 2.0
  */
 public interface CriteriaBuilder {
 
 	/**
 	 * Create a <code>CriteriaQuery</code> object.
-	 *
+	 * 
 	 * @return criteria query object
 	 */
 	CriteriaQuery<Object> createQuery();
@@ -46,9 +47,10 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a <code>CriteriaQuery</code> object with the specified result
 	 * type.
-	 *
-	 * @param resultClass type of the query result
-	 *
+	 * 
+	 * @param resultClass
+	 *            type of the query result
+	 * 
 	 * @return criteria query object
 	 */
 	<T> CriteriaQuery<T> createQuery(Class<T> resultClass);
@@ -56,11 +58,10 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a <code>CriteriaQuery</code> object that returns a tuple of
 	 * objects as its result.
-	 *
+	 * 
 	 * @return criteria query object
 	 */
 	CriteriaQuery<Tuple> createTupleQuery();
-
 
 	// selection construction methods:
 
@@ -70,79 +71,88 @@ public interface CriteriaBuilder {
 	 * applied to the results of the query execution. If the
 	 * constructor is for an entity class, the resulting entities
 	 * will be in the new state after the query is executed.
-	 *
-	 * @param resultClass class whose instance is to be constructed
-	 * @param selections arguments to the constructor
-	 *
+	 * 
+	 * @param resultClass
+	 *            class whose instance is to be constructed
+	 * @param selections
+	 *            arguments to the constructor
+	 * 
 	 * @return compound selection item
-	 *
-	 * @throws IllegalArgumentException if an argument is a
-	 * tuple- or array-valued selection item
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if an argument is a
+	 *             tuple- or array-valued selection item
 	 */
 	<Y> CompoundSelection<Y> construct(Class<Y> resultClass, Selection<?>... selections);
 
 	/**
 	 * Create a tuple-valued selection item.
-	 *
-	 * @param selections selection items
-	 *
+	 * 
+	 * @param selections
+	 *            selection items
+	 * 
 	 * @return tuple-valued compound selection
-	 *
-	 * @throws IllegalArgumentException if an argument is a
-	 * tuple- or array-valued selection item
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if an argument is a
+	 *             tuple- or array-valued selection item
 	 */
 	CompoundSelection<Tuple> tuple(Selection<?>... selections);
 
 	/**
 	 * Create an array-valued selection item.
-	 *
-	 * @param selections selection items
-	 *
+	 * 
+	 * @param selections
+	 *            selection items
+	 * 
 	 * @return array-valued compound selection
-	 *
-	 * @throws IllegalArgumentException if an argument is a
-	 * tuple- or array-valued selection item
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if an argument is a
+	 *             tuple- or array-valued selection item
 	 */
 	CompoundSelection<Object[]> array(Selection<?>... selections);
 
-
-	//ordering:
+	// ordering:
 
 	/**
 	 * Create an ordering by the ascending value of the expression.
-	 *
-	 * @param x expression used to define the ordering
-	 *
+	 * 
+	 * @param x
+	 *            expression used to define the ordering
+	 * 
 	 * @return ascending ordering corresponding to the expression
 	 */
 	Order asc(Expression<?> x);
 
 	/**
 	 * Create an ordering by the descending value of the expression.
-	 *
-	 * @param x expression used to define the ordering
-	 *
+	 * 
+	 * @param x
+	 *            expression used to define the ordering
+	 * 
 	 * @return descending ordering corresponding to the expression
 	 */
 	Order desc(Expression<?> x);
 
-
-	//aggregate functions:
+	// aggregate functions:
 
 	/**
 	 * Create an aggregate expression applying the avg operation.
-	 *
-	 * @param x expression representing input value to avg operation
-	 *
+	 * 
+	 * @param x
+	 *            expression representing input value to avg operation
+	 * 
 	 * @return avg expression
 	 */
 	<N extends Number> Expression<Double> avg(Expression<N> x);
 
 	/**
 	 * Create an aggregate expression applying the sum operation.
-	 *
-	 * @param x expression representing input value to sum operation
-	 *
+	 * 
+	 * @param x
+	 *            expression representing input value to sum operation
+	 * 
 	 * @return sum expression
 	 */
 	<N extends Number> Expression<N> sum(Expression<N> x);
@@ -150,9 +160,10 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an aggregate expression applying the sum operation to an
 	 * Integer-valued expression, returning a Long result.
-	 *
-	 * @param x expression representing input value to sum operation
-	 *
+	 * 
+	 * @param x
+	 *            expression representing input value to sum operation
+	 * 
 	 * @return sum expression
 	 */
 	Expression<Long> sumAsLong(Expression<Integer> x);
@@ -160,9 +171,10 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an aggregate expression applying the sum operation to a
 	 * Float-valued expression, returning a Double result.
-	 *
-	 * @param x expression representing input value to sum operation
-	 *
+	 * 
+	 * @param x
+	 *            expression representing input value to sum operation
+	 * 
 	 * @return sum expression
 	 */
 	Expression<Double> sumAsDouble(Expression<Float> x);
@@ -170,9 +182,10 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an aggregate expression applying the numerical max
 	 * operation.
-	 *
-	 * @param x expression representing input value to max operation
-	 *
+	 * 
+	 * @param x
+	 *            expression representing input value to max operation
+	 * 
 	 * @return max expression
 	 */
 	<N extends Number> Expression<N> max(Expression<N> x);
@@ -180,9 +193,10 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an aggregate expression applying the numerical min
 	 * operation.
-	 *
-	 * @param x expression representing input value to min operation
-	 *
+	 * 
+	 * @param x
+	 *            expression representing input value to min operation
+	 * 
 	 * @return min expression
 	 */
 	<N extends Number> Expression<N> min(Expression<N> x);
@@ -190,10 +204,11 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an aggregate expression for finding the greatest of
 	 * the values (strings, dates, etc).
-	 *
-	 * @param x expression representing input value to greatest
-	 * operation
-	 *
+	 * 
+	 * @param x
+	 *            expression representing input value to greatest
+	 *            operation
+	 * 
 	 * @return greatest expression
 	 */
 	<X extends Comparable<? super X>> Expression<X> greatest(Expression<X> x);
@@ -201,20 +216,22 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an aggregate expression for finding the least of
 	 * the values (strings, dates, etc).
-	 *
-	 * @param x expression representing input value to least
-	 * operation
-	 *
+	 * 
+	 * @param x
+	 *            expression representing input value to least
+	 *            operation
+	 * 
 	 * @return least expression
 	 */
 	<X extends Comparable<? super X>> Expression<X> least(Expression<X> x);
 
 	/**
 	 * Create an aggregate expression applying the count operation.
-	 *
-	 * @param x expression representing input value to count
-	 * operation
-	 *
+	 * 
+	 * @param x
+	 *            expression representing input value to count
+	 *            operation
+	 * 
 	 * @return count expression
 	 */
 	Expression<Long> count(Expression<?> x);
@@ -222,31 +239,33 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an aggregate expression applying the count distinct
 	 * operation.
-	 *
-	 * @param x expression representing input value to
-	 * count distinct operation
-	 *
+	 * 
+	 * @param x
+	 *            expression representing input value to
+	 *            count distinct operation
+	 * 
 	 * @return count distinct expression
 	 */
 	Expression<Long> countDistinct(Expression<?> x);
 
-
-	//subqueries:
+	// subqueries:
 
 	/**
 	 * Create a predicate testing the existence of a subquery result.
-	 *
-	 * @param subquery subquery whose result is to be tested
-	 *
+	 * 
+	 * @param subquery
+	 *            subquery whose result is to be tested
+	 * 
 	 * @return exists predicate
 	 */
 	Predicate exists(Subquery<?> subquery);
 
 	/**
 	 * Create an all expression over the subquery results.
-	 *
-	 * @param subquery subquery
-	 *
+	 * 
+	 * @param subquery
+	 *            subquery
+	 * 
 	 * @return all expression
 	 */
 	<Y> Expression<Y> all(Subquery<Y> subquery);
@@ -254,9 +273,10 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a some expression over the subquery results.
 	 * This expression is equivalent to an <code>any</code> expression.
-	 *
-	 * @param subquery subquery
-	 *
+	 * 
+	 * @param subquery
+	 *            subquery
+	 * 
 	 * @return some expression
 	 */
 	<Y> Expression<Y> some(Subquery<Y> subquery);
@@ -264,22 +284,24 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an any expression over the subquery results.
 	 * This expression is equivalent to a <code>some</code> expression.
-	 *
-	 * @param subquery subquery
-	 *
+	 * 
+	 * @param subquery
+	 *            subquery
+	 * 
 	 * @return any expression
 	 */
 	<Y> Expression<Y> any(Subquery<Y> subquery);
 
-
-	//boolean functions:
+	// boolean functions:
 
 	/**
 	 * Create a conjunction of the given boolean expressions.
-	 *
-	 * @param x boolean expression
-	 * @param y boolean expression
-	 *
+	 * 
+	 * @param x
+	 *            boolean expression
+	 * @param y
+	 *            boolean expression
+	 * 
 	 * @return and predicate
 	 */
 	Predicate and(Expression<Boolean> x, Expression<Boolean> y);
@@ -287,19 +309,22 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a conjunction of the given restriction predicates.
 	 * A conjunction of zero predicates is true.
-	 *
-	 * @param restrictions zero or more restriction predicates
-	 *
+	 * 
+	 * @param restrictions
+	 *            zero or more restriction predicates
+	 * 
 	 * @return and predicate
 	 */
 	Predicate and(Predicate... restrictions);
 
 	/**
 	 * Create a disjunction of the given boolean expressions.
-	 *
-	 * @param x boolean expression
-	 * @param y boolean expression
-	 *
+	 * 
+	 * @param x
+	 *            boolean expression
+	 * @param y
+	 *            boolean expression
+	 * 
 	 * @return or predicate
 	 */
 	Predicate or(Expression<Boolean> x, Expression<Boolean> y);
@@ -307,18 +332,20 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a disjunction of the given restriction predicates.
 	 * A disjunction of zero predicates is false.
-	 *
-	 * @param restrictions zero or more restriction predicates
-	 *
+	 * 
+	 * @param restrictions
+	 *            zero or more restriction predicates
+	 * 
 	 * @return or predicate
 	 */
 	Predicate or(Predicate... restrictions);
 
 	/**
 	 * Create a negation of the given restriction.
-	 *
-	 * @param restriction restriction expression
-	 *
+	 * 
+	 * @param restriction
+	 *            restriction expression
+	 * 
 	 * @return not predicate
 	 */
 	Predicate not(Expression<Boolean> restriction);
@@ -326,7 +353,7 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a conjunction (with zero conjuncts).
 	 * A conjunction with zero conjuncts is true.
-	 *
+	 * 
 	 * @return and predicate
 	 */
 	Predicate conjunction();
@@ -334,106 +361,117 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a disjunction (with zero disjuncts).
 	 * A disjunction with zero disjuncts is false.
-	 *
+	 * 
 	 * @return or predicate
 	 */
 	Predicate disjunction();
 
-
-	//turn Expression<Boolean> into a Predicate
-	//useful for use with varargs methods
+	// turn Expression<Boolean> into a Predicate
+	// useful for use with varargs methods
 
 	/**
 	 * Create a predicate testing for a true value.
-	 *
-	 * @param x expression to be tested
-	 *
+	 * 
+	 * @param x
+	 *            expression to be tested
+	 * 
 	 * @return predicate
 	 */
 	Predicate isTrue(Expression<Boolean> x);
 
 	/**
 	 * Create a predicate testing for a false value.
-	 *
-	 * @param x expression to be tested
-	 *
+	 * 
+	 * @param x
+	 *            expression to be tested
+	 * 
 	 * @return predicate
 	 */
 	Predicate isFalse(Expression<Boolean> x);
 
-
-	//null tests:
+	// null tests:
 
 	/**
 	 * Create a predicate to test whether the expression is null.
-	 *
-	 * @param x expression
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * 
 	 * @return is-null predicate
 	 */
 	Predicate isNull(Expression<?> x);
 
 	/**
 	 * Create a predicate to test whether the expression is not null.
-	 *
-	 * @param x expression
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * 
 	 * @return is-not-null predicate
 	 */
 	Predicate isNotNull(Expression<?> x);
 
-	//equality:
+	// equality:
 
 	/**
 	 * Create a predicate for testing the arguments for equality.
-	 *
-	 * @param x expression
-	 * @param y expression
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            expression
+	 * 
 	 * @return equality predicate
 	 */
 	Predicate equal(Expression<?> x, Expression<?> y);
 
 	/**
 	 * Create a predicate for testing the arguments for equality.
-	 *
-	 * @param x expression
-	 * @param y object
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            object
+	 * 
 	 * @return equality predicate
 	 */
 	Predicate equal(Expression<?> x, Object y);
 
 	/**
 	 * Create a predicate for testing the arguments for inequality.
-	 *
-	 * @param x expression
-	 * @param y expression
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            expression
+	 * 
 	 * @return inequality predicate
 	 */
 	Predicate notEqual(Expression<?> x, Expression<?> y);
 
 	/**
 	 * Create a predicate for testing the arguments for inequality.
-	 *
-	 * @param x expression
-	 * @param y object
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            object
+	 * 
 	 * @return inequality predicate
 	 */
 	Predicate notEqual(Expression<?> x, Object y);
 
-
-	//comparisons for generic (non-numeric) operands:
+	// comparisons for generic (non-numeric) operands:
 
 	/**
 	 * Create a predicate for testing whether the first argument is
 	 * greater than the second.
-	 *
-	 * @param x expression
-	 * @param y expression
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            expression
+	 * 
 	 * @return greater-than predicate
 	 */
 	<Y extends Comparable<? super Y>> Predicate greaterThan(Expression<? extends Y> x, Expression<? extends Y> y);
@@ -441,10 +479,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the first argument is
 	 * greater than the second.
-	 *
-	 * @param x expression
-	 * @param y value
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            value
+	 * 
 	 * @return greater-than predicate
 	 */
 	<Y extends Comparable<? super Y>> Predicate greaterThan(Expression<? extends Y> x, Y y);
@@ -452,10 +492,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the first argument is
 	 * greater than or equal to the second.
-	 *
-	 * @param x expression
-	 * @param y expression
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            expression
+	 * 
 	 * @return greater-than-or-equal predicate
 	 */
 	<Y extends Comparable<? super Y>> Predicate greaterThanOrEqualTo(Expression<? extends Y> x, Expression<? extends Y> y);
@@ -463,10 +505,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the first argument is
 	 * greater than or equal to the second.
-	 *
-	 * @param x expression
-	 * @param y value
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            value
+	 * 
 	 * @return greater-than-or-equal predicate
 	 */
 	<Y extends Comparable<? super Y>> Predicate greaterThanOrEqualTo(Expression<? extends Y> x, Y y);
@@ -474,10 +518,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the first argument is
 	 * less than the second.
-	 *
-	 * @param x expression
-	 * @param y expression
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            expression
+	 * 
 	 * @return less-than predicate
 	 */
 	<Y extends Comparable<? super Y>> Predicate lessThan(Expression<? extends Y> x, Expression<? extends Y> y);
@@ -485,10 +531,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the first argument is
 	 * less than the second.
-	 *
-	 * @param x expression
-	 * @param y value
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            value
+	 * 
 	 * @return less-than predicate
 	 */
 	<Y extends Comparable<? super Y>> Predicate lessThan(Expression<? extends Y> x, Y y);
@@ -496,10 +544,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the first argument is
 	 * less than or equal to the second.
-	 *
-	 * @param x expression
-	 * @param y expression
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            expression
+	 * 
 	 * @return less-than-or-equal predicate
 	 */
 	<Y extends Comparable<? super Y>> Predicate lessThanOrEqualTo(Expression<? extends Y> x, Expression<? extends Y> y);
@@ -507,10 +557,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the first argument is
 	 * less than or equal to the second.
-	 *
-	 * @param x expression
-	 * @param y value
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            value
+	 * 
 	 * @return less-than-or-equal predicate
 	 */
 	<Y extends Comparable<? super Y>> Predicate lessThanOrEqualTo(Expression<? extends Y> x, Y y);
@@ -518,11 +570,14 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the first argument is
 	 * between the second and third arguments in value.
-	 *
-	 * @param v expression
-	 * @param x expression
-	 * @param y expression
-	 *
+	 * 
+	 * @param v
+	 *            expression
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            expression
+	 * 
 	 * @return between predicate
 	 */
 	<Y extends Comparable<? super Y>> Predicate between(Expression<? extends Y> v, Expression<? extends Y> x, Expression<? extends Y> y);
@@ -530,25 +585,29 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the first argument is
 	 * between the second and third arguments in value.
-	 *
-	 * @param v expression
-	 * @param x value
-	 * @param y value
-	 *
+	 * 
+	 * @param v
+	 *            expression
+	 * @param x
+	 *            value
+	 * @param y
+	 *            value
+	 * 
 	 * @return between predicate
 	 */
 	<Y extends Comparable<? super Y>> Predicate between(Expression<? extends Y> v, Y x, Y y);
 
-
-	//comparisons for numeric operands:
+	// comparisons for numeric operands:
 
 	/**
 	 * Create a predicate for testing whether the first argument is
 	 * greater than the second.
-	 *
-	 * @param x expression
-	 * @param y expression
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            expression
+	 * 
 	 * @return greater-than predicate
 	 */
 	Predicate gt(Expression<? extends Number> x, Expression<? extends Number> y);
@@ -556,10 +615,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the first argument is
 	 * greater than the second.
-	 *
-	 * @param x expression
-	 * @param y value
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            value
+	 * 
 	 * @return greater-than predicate
 	 */
 	Predicate gt(Expression<? extends Number> x, Number y);
@@ -567,10 +628,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the first argument is
 	 * greater than or equal to the second.
-	 *
-	 * @param x expression
-	 * @param y expression
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            expression
+	 * 
 	 * @return greater-than-or-equal predicate
 	 */
 	Predicate ge(Expression<? extends Number> x, Expression<? extends Number> y);
@@ -578,10 +641,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the first argument is
 	 * greater than or equal to the second.
-	 *
-	 * @param x expression
-	 * @param y value
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            value
+	 * 
 	 * @return greater-than-or-equal predicate
 	 */
 	Predicate ge(Expression<? extends Number> x, Number y);
@@ -589,10 +654,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the first argument is
 	 * less than the second.
-	 *
-	 * @param x expression
-	 * @param y expression
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            expression
+	 * 
 	 * @return less-than predicate
 	 */
 	Predicate lt(Expression<? extends Number> x, Expression<? extends Number> y);
@@ -600,10 +667,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the first argument is
 	 * less than the second.
-	 *
-	 * @param x expression
-	 * @param y value
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            value
+	 * 
 	 * @return less-than predicate
 	 */
 	Predicate lt(Expression<? extends Number> x, Number y);
@@ -611,10 +680,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the first argument is
 	 * less than or equal to the second.
-	 *
-	 * @param x expression
-	 * @param y expression
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            expression
+	 * 
 	 * @return less-than-or-equal predicate
 	 */
 	Predicate le(Expression<? extends Number> x, Expression<? extends Number> y);
@@ -622,23 +693,25 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the first argument is
 	 * less than or equal to the second.
-	 *
-	 * @param x expression
-	 * @param y value
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            value
+	 * 
 	 * @return less-than-or-equal predicate
 	 */
 	Predicate le(Expression<? extends Number> x, Number y);
 
-
-	//numerical operations:
+	// numerical operations:
 
 	/**
 	 * Create an expression that returns the arithmetic negation
 	 * of its argument.
-	 *
-	 * @param x expression
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * 
 	 * @return arithmetic negation
 	 */
 	<N extends Number> Expression<N> neg(Expression<N> x);
@@ -646,9 +719,10 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an expression that returns the absolute value
 	 * of its argument.
-	 *
-	 * @param x expression
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * 
 	 * @return absolute value
 	 */
 	<N extends Number> Expression<N> abs(Expression<N> x);
@@ -656,10 +730,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an expression that returns the sum
 	 * of its arguments.
-	 *
-	 * @param x expression
-	 * @param y expression
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            expression
+	 * 
 	 * @return sum
 	 */
 	<N extends Number> Expression<N> sum(Expression<? extends N> x, Expression<? extends N> y);
@@ -667,10 +743,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an expression that returns the sum
 	 * of its arguments.
-	 *
-	 * @param x expression
-	 * @param y value
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            value
+	 * 
 	 * @return sum
 	 */
 	<N extends Number> Expression<N> sum(Expression<? extends N> x, N y);
@@ -678,10 +756,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an expression that returns the sum
 	 * of its arguments.
-	 *
-	 * @param x value
-	 * @param y expression
-	 *
+	 * 
+	 * @param x
+	 *            value
+	 * @param y
+	 *            expression
+	 * 
 	 * @return sum
 	 */
 	<N extends Number> Expression<N> sum(N x, Expression<? extends N> y);
@@ -689,10 +769,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an expression that returns the product
 	 * of its arguments.
-	 *
-	 * @param x expression
-	 * @param y expression
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            expression
+	 * 
 	 * @return product
 	 */
 	<N extends Number> Expression<N> prod(Expression<? extends N> x, Expression<? extends N> y);
@@ -700,10 +782,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an expression that returns the product
 	 * of its arguments.
-	 *
-	 * @param x expression
-	 * @param y value
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            value
+	 * 
 	 * @return product
 	 */
 	<N extends Number> Expression<N> prod(Expression<? extends N> x, N y);
@@ -711,10 +795,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an expression that returns the product
 	 * of its arguments.
-	 *
-	 * @param x value
-	 * @param y expression
-	 *
+	 * 
+	 * @param x
+	 *            value
+	 * @param y
+	 *            expression
+	 * 
 	 * @return product
 	 */
 	<N extends Number> Expression<N> prod(N x, Expression<? extends N> y);
@@ -722,10 +808,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an expression that returns the difference
 	 * between its arguments.
-	 *
-	 * @param x expression
-	 * @param y expression
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            expression
+	 * 
 	 * @return difference
 	 */
 	<N extends Number> Expression<N> diff(Expression<? extends N> x, Expression<? extends N> y);
@@ -733,10 +821,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an expression that returns the difference
 	 * between its arguments.
-	 *
-	 * @param x expression
-	 * @param y value
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            value
+	 * 
 	 * @return difference
 	 */
 	<N extends Number> Expression<N> diff(Expression<? extends N> x, N y);
@@ -744,10 +834,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an expression that returns the difference
 	 * between its arguments.
-	 *
-	 * @param x value
-	 * @param y expression
-	 *
+	 * 
+	 * @param x
+	 *            value
+	 * @param y
+	 *            expression
+	 * 
 	 * @return difference
 	 */
 	<N extends Number> Expression<N> diff(N x, Expression<? extends N> y);
@@ -755,10 +847,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an expression that returns the quotient
 	 * of its arguments.
-	 *
-	 * @param x expression
-	 * @param y expression
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            expression
+	 * 
 	 * @return quotient
 	 */
 	Expression<Number> quot(Expression<? extends Number> x, Expression<? extends Number> y);
@@ -766,10 +860,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an expression that returns the quotient
 	 * of its arguments.
-	 *
-	 * @param x expression
-	 * @param y value
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            value
+	 * 
 	 * @return quotient
 	 */
 	Expression<Number> quot(Expression<? extends Number> x, Number y);
@@ -777,10 +873,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an expression that returns the quotient
 	 * of its arguments.
-	 *
-	 * @param x value
-	 * @param y expression
-	 *
+	 * 
+	 * @param x
+	 *            value
+	 * @param y
+	 *            expression
+	 * 
 	 * @return quotient
 	 */
 	Expression<Number> quot(Number x, Expression<? extends Number> y);
@@ -788,10 +886,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an expression that returns the modulus
 	 * of its arguments.
-	 *
-	 * @param x expression
-	 * @param y expression
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            expression
+	 * 
 	 * @return modulus
 	 */
 	Expression<Integer> mod(Expression<Integer> x, Expression<Integer> y);
@@ -799,10 +899,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an expression that returns the modulus
 	 * of its arguments.
-	 *
-	 * @param x expression
-	 * @param y value
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            value
+	 * 
 	 * @return modulus
 	 */
 	Expression<Integer> mod(Expression<Integer> x, Integer y);
@@ -810,10 +912,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an expression that returns the modulus
 	 * of its arguments.
-	 *
-	 * @param x value
-	 * @param y expression
-	 *
+	 * 
+	 * @param x
+	 *            value
+	 * @param y
+	 *            expression
+	 * 
 	 * @return modulus
 	 */
 	Expression<Integer> mod(Integer x, Expression<Integer> y);
@@ -821,132 +925,144 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an expression that returns the square root
 	 * of its argument.
-	 *
-	 * @param x expression
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * 
 	 * @return square root
 	 */
 	Expression<Double> sqrt(Expression<? extends Number> x);
 
-
-	//typecasts:
+	// typecasts:
 
 	/**
-	 * Typecast.  Returns same expression object.
-	 *
-	 * @param number numeric expression
-	 *
+	 * Typecast. Returns same expression object.
+	 * 
+	 * @param number
+	 *            numeric expression
+	 * 
 	 * @return Expression&#060;Long&#062;
 	 */
 	Expression<Long> toLong(Expression<? extends Number> number);
 
 	/**
-	 * Typecast.  Returns same expression object.
-	 *
-	 * @param number numeric expression
-	 *
+	 * Typecast. Returns same expression object.
+	 * 
+	 * @param number
+	 *            numeric expression
+	 * 
 	 * @return Expression&#060;Integer&#062;
 	 */
 	Expression<Integer> toInteger(Expression<? extends Number> number);
 
 	/**
 	 * Typecast. Returns same expression object.
-	 *
-	 * @param number numeric expression
-	 *
+	 * 
+	 * @param number
+	 *            numeric expression
+	 * 
 	 * @return Expression&#060;Float&#062;
 	 */
 	Expression<Float> toFloat(Expression<? extends Number> number);
 
 	/**
-	 * Typecast.  Returns same expression object.
-	 *
-	 * @param number numeric expression
-	 *
+	 * Typecast. Returns same expression object.
+	 * 
+	 * @param number
+	 *            numeric expression
+	 * 
 	 * @return Expression&#060;Double&#062;
 	 */
 	Expression<Double> toDouble(Expression<? extends Number> number);
 
 	/**
-	 * Typecast.  Returns same expression object.
-	 *
-	 * @param number numeric expression
-	 *
+	 * Typecast. Returns same expression object.
+	 * 
+	 * @param number
+	 *            numeric expression
+	 * 
 	 * @return Expression&#060;BigDecimal&#062;
 	 */
 	Expression<BigDecimal> toBigDecimal(Expression<? extends Number> number);
 
 	/**
-	 * Typecast.  Returns same expression object.
-	 *
-	 * @param number numeric expression
-	 *
+	 * Typecast. Returns same expression object.
+	 * 
+	 * @param number
+	 *            numeric expression
+	 * 
 	 * @return Expression&#060;BigInteger&#062;
 	 */
 	Expression<BigInteger> toBigInteger(Expression<? extends Number> number);
 
 	/**
-	 * Typecast.  Returns same expression object.
-	 *
-	 * @param character expression
-	 *
+	 * Typecast. Returns same expression object.
+	 * 
+	 * @param character
+	 *            expression
+	 * 
 	 * @return Expression&#060;String&#062;
 	 */
 	Expression<String> toString(Expression<Character> character);
 
-
-	//literals:
+	// literals:
 
 	/**
 	 * Create an expression for a literal.
-	 *
-	 * @param value value represented by the expression
-	 *
+	 * 
+	 * @param value
+	 *            value represented by the expression
+	 * 
 	 * @return expression literal
-	 *
-	 * @throws IllegalArgumentException if value is null
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if value is null
 	 */
 	<T> Expression<T> literal(T value);
 
 	/**
 	 * Create an expression for a null literal with the given type.
-	 *
-	 * @param resultClass type of the null literal
-	 *
+	 * 
+	 * @param resultClass
+	 *            type of the null literal
+	 * 
 	 * @return null expression literal
 	 */
 	<T> Expression<T> nullLiteral(Class<T> resultClass);
 
-	//parameters:
+	// parameters:
 
 	/**
 	 * Create a parameter expression.
-	 *
-	 * @param paramClass parameter class
-	 *
+	 * 
+	 * @param paramClass
+	 *            parameter class
+	 * 
 	 * @return parameter expression
 	 */
 	<T> ParameterExpression<T> parameter(Class<T> paramClass);
 
 	/**
 	 * Create a parameter expression with the given name.
-	 *
-	 * @param paramClass parameter class
-	 * @param name name that can be used to refer to
-	 * the parameter
-	 *
+	 * 
+	 * @param paramClass
+	 *            parameter class
+	 * @param name
+	 *            name that can be used to refer to
+	 *            the parameter
+	 * 
 	 * @return parameter expression
 	 */
 	<T> ParameterExpression<T> parameter(Class<T> paramClass, String name);
 
-
-	//collection operations:
+	// collection operations:
 
 	/**
 	 * Create a predicate that tests whether a collection is empty.
-	 *
-	 * @param collection expression
-	 *
+	 * 
+	 * @param collection
+	 *            expression
+	 * 
 	 * @return is-empty predicate
 	 */
 	<C extends Collection<?>> Predicate isEmpty(Expression<C> collection);
@@ -954,27 +1070,30 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate that tests whether a collection is
 	 * not empty.
-	 *
-	 * @param collection expression
-	 *
+	 * 
+	 * @param collection
+	 *            expression
+	 * 
 	 * @return is-not-empty predicate
 	 */
 	<C extends Collection<?>> Predicate isNotEmpty(Expression<C> collection);
 
 	/**
 	 * Create an expression that tests the size of a collection.
-	 *
-	 * @param collection expression
-	 *
+	 * 
+	 * @param collection
+	 *            expression
+	 * 
 	 * @return size expression
 	 */
 	<C extends java.util.Collection<?>> Expression<Integer> size(Expression<C> collection);
 
 	/**
 	 * Create an expression that tests the size of a collection.
-	 *
-	 * @param collection collection
-	 *
+	 * 
+	 * @param collection
+	 *            collection
+	 * 
 	 * @return size expression
 	 */
 	<C extends Collection<?>> Expression<Integer> size(C collection);
@@ -983,10 +1102,12 @@ public interface CriteriaBuilder {
 	 * Create a predicate that tests whether an element is
 	 * a member of a collection.
 	 * If the collection is empty, the predicate will be false.
-	 *
-	 * @param elem element expression
-	 * @param collection expression
-	 *
+	 * 
+	 * @param elem
+	 *            element expression
+	 * @param collection
+	 *            expression
+	 * 
 	 * @return is-member predicate
 	 */
 	<E, C extends Collection<E>> Predicate isMember(Expression<E> elem, Expression<C> collection);
@@ -995,10 +1116,12 @@ public interface CriteriaBuilder {
 	 * Create a predicate that tests whether an element is
 	 * a member of a collection.
 	 * If the collection is empty, the predicate will be false.
-	 *
-	 * @param elem element
-	 * @param collection expression
-	 *
+	 * 
+	 * @param elem
+	 *            element
+	 * @param collection
+	 *            expression
+	 * 
 	 * @return is-member predicate
 	 */
 	<E, C extends Collection<E>> Predicate isMember(E elem, Expression<C> collection);
@@ -1007,10 +1130,12 @@ public interface CriteriaBuilder {
 	 * Create a predicate that tests whether an element is
 	 * not a member of a collection.
 	 * If the collection is empty, the predicate will be true.
-	 *
-	 * @param elem element expression
-	 * @param collection expression
-	 *
+	 * 
+	 * @param elem
+	 *            element expression
+	 * @param collection
+	 *            expression
+	 * 
 	 * @return is-not-member predicate
 	 */
 	<E, C extends Collection<E>> Predicate isNotMember(Expression<E> elem, Expression<C> collection);
@@ -1019,46 +1144,50 @@ public interface CriteriaBuilder {
 	 * Create a predicate that tests whether an element is
 	 * not a member of a collection.
 	 * If the collection is empty, the predicate will be true.
-	 *
-	 * @param elem element
-	 * @param collection expression
-	 *
+	 * 
+	 * @param elem
+	 *            element
+	 * @param collection
+	 *            expression
+	 * 
 	 * @return is-not-member predicate
 	 */
 	<E, C extends Collection<E>> Predicate isNotMember(E elem, Expression<C> collection);
 
-
-	//get the values and keys collections of the Map, which may then
-	//be passed to size(), isMember(), isEmpty(), etc
+	// get the values and keys collections of the Map, which may then
+	// be passed to size(), isMember(), isEmpty(), etc
 
 	/**
 	 * Create an expression that returns the values of a map.
-	 *
-	 * @param map map
-	 *
+	 * 
+	 * @param map
+	 *            map
+	 * 
 	 * @return collection expression
 	 */
 	<V, M extends Map<?, V>> Expression<Collection<V>> values(M map);
 
 	/**
 	 * Create an expression that returns the keys of a map.
-	 *
-	 * @param map map
-	 *
+	 * 
+	 * @param map
+	 *            map
+	 * 
 	 * @return set expression
 	 */
 	<K, M extends Map<K, ?>> Expression<Set<K>> keys(M map);
 
-
-	//string functions:
+	// string functions:
 
 	/**
 	 * Create a predicate for testing whether the expression
 	 * satisfies the given pattern.
-	 *
-	 * @param x string expression
-	 * @param pattern string expression
-	 *
+	 * 
+	 * @param x
+	 *            string expression
+	 * @param pattern
+	 *            string expression
+	 * 
 	 * @return like predicate
 	 */
 	Predicate like(Expression<String> x, Expression<String> pattern);
@@ -1066,10 +1195,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the expression
 	 * satisfies the given pattern.
-	 *
-	 * @param x string expression
-	 * @param pattern string
-	 *
+	 * 
+	 * @param x
+	 *            string expression
+	 * @param pattern
+	 *            string
+	 * 
 	 * @return like predicate
 	 */
 	Predicate like(Expression<String> x, String pattern);
@@ -1077,11 +1208,14 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the expression
 	 * satisfies the given pattern.
-	 *
-	 * @param x string expression
-	 * @param pattern string expression
-	 * @param escapeChar escape character expression
-	 *
+	 * 
+	 * @param x
+	 *            string expression
+	 * @param pattern
+	 *            string expression
+	 * @param escapeChar
+	 *            escape character expression
+	 * 
 	 * @return like predicate
 	 */
 	Predicate like(Expression<String> x, Expression<String> pattern, Expression<Character> escapeChar);
@@ -1089,11 +1223,14 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the expression
 	 * satisfies the given pattern.
-	 *
-	 * @param x string expression
-	 * @param pattern string expression
-	 * @param escapeChar escape character
-	 *
+	 * 
+	 * @param x
+	 *            string expression
+	 * @param pattern
+	 *            string expression
+	 * @param escapeChar
+	 *            escape character
+	 * 
 	 * @return like predicate
 	 */
 	Predicate like(Expression<String> x, Expression<String> pattern, char escapeChar);
@@ -1101,11 +1238,14 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the expression
 	 * satisfies the given pattern.
-	 *
-	 * @param x string expression
-	 * @param pattern string
-	 * @param escapeChar escape character expression
-	 *
+	 * 
+	 * @param x
+	 *            string expression
+	 * @param pattern
+	 *            string
+	 * @param escapeChar
+	 *            escape character expression
+	 * 
 	 * @return like predicate
 	 */
 	Predicate like(Expression<String> x, String pattern, Expression<Character> escapeChar);
@@ -1113,11 +1253,14 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the expression
 	 * satisfies the given pattern.
-	 *
-	 * @param x string expression
-	 * @param pattern string
-	 * @param escapeChar escape character
-	 *
+	 * 
+	 * @param x
+	 *            string expression
+	 * @param pattern
+	 *            string
+	 * @param escapeChar
+	 *            escape character
+	 * 
 	 * @return like predicate
 	 */
 	Predicate like(Expression<String> x, String pattern, char escapeChar);
@@ -1125,10 +1268,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the expression
 	 * does not satisfy the given pattern.
-	 *
-	 * @param x string expression
-	 * @param pattern string expression
-	 *
+	 * 
+	 * @param x
+	 *            string expression
+	 * @param pattern
+	 *            string expression
+	 * 
 	 * @return not-like predicate
 	 */
 	Predicate notLike(Expression<String> x, Expression<String> pattern);
@@ -1136,10 +1281,12 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the expression
 	 * does not satisfy the given pattern.
-	 *
-	 * @param x string expression
-	 * @param pattern string
-	 *
+	 * 
+	 * @param x
+	 *            string expression
+	 * @param pattern
+	 *            string
+	 * 
 	 * @return not-like predicate
 	 */
 	Predicate notLike(Expression<String> x, String pattern);
@@ -1147,11 +1294,14 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the expression
 	 * does not satisfy the given pattern.
-	 *
-	 * @param x string expression
-	 * @param pattern string expression
-	 * @param escapeChar escape character expression
-	 *
+	 * 
+	 * @param x
+	 *            string expression
+	 * @param pattern
+	 *            string expression
+	 * @param escapeChar
+	 *            escape character expression
+	 * 
 	 * @return not-like predicate
 	 */
 	Predicate notLike(Expression<String> x, Expression<String> pattern, Expression<Character> escapeChar);
@@ -1159,11 +1309,14 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the expression
 	 * does not satisfy the given pattern.
-	 *
-	 * @param x string expression
-	 * @param pattern string expression
-	 * @param escapeChar escape character
-	 *
+	 * 
+	 * @param x
+	 *            string expression
+	 * @param pattern
+	 *            string expression
+	 * @param escapeChar
+	 *            escape character
+	 * 
 	 * @return not-like predicate
 	 */
 	Predicate notLike(Expression<String> x, Expression<String> pattern, char escapeChar);
@@ -1171,11 +1324,14 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the expression
 	 * does not satisfy the given pattern.
-	 *
-	 * @param x string expression
-	 * @param pattern string
-	 * @param escapeChar escape character expression
-	 *
+	 * 
+	 * @param x
+	 *            string expression
+	 * @param pattern
+	 *            string
+	 * @param escapeChar
+	 *            escape character expression
+	 * 
 	 * @return not-like predicate
 	 */
 	Predicate notLike(Expression<String> x, String pattern, Expression<Character> escapeChar);
@@ -1183,41 +1339,50 @@ public interface CriteriaBuilder {
 	/**
 	 * Create a predicate for testing whether the expression
 	 * does not satisfy the given pattern.
-	 *
-	 * @param x string expression
-	 * @param pattern string
-	 * @param escapeChar escape character
-	 *
+	 * 
+	 * @param x
+	 *            string expression
+	 * @param pattern
+	 *            string
+	 * @param escapeChar
+	 *            escape character
+	 * 
 	 * @return not-like predicate
 	 */
 	Predicate notLike(Expression<String> x, String pattern, char escapeChar);
 
 	/**
 	 * Create an expression for string concatenation.
-	 *
-	 * @param x string expression
-	 * @param y string expression
-	 *
+	 * 
+	 * @param x
+	 *            string expression
+	 * @param y
+	 *            string expression
+	 * 
 	 * @return expression corresponding to concatenation
 	 */
 	Expression<String> concat(Expression<String> x, Expression<String> y);
 
 	/**
 	 * Create an expression for string concatenation.
-	 *
-	 * @param x string expression
-	 * @param y string
-	 *
+	 * 
+	 * @param x
+	 *            string expression
+	 * @param y
+	 *            string
+	 * 
 	 * @return expression corresponding to concatenation
 	 */
 	Expression<String> concat(Expression<String> x, String y);
 
 	/**
 	 * Create an expression for string concatenation.
-	 *
-	 * @param x string
-	 * @param y string expression
-	 *
+	 * 
+	 * @param x
+	 *            string
+	 * @param y
+	 *            string expression
+	 * 
 	 * @return expression corresponding to concatenation
 	 */
 	Expression<String> concat(String x, Expression<String> y);
@@ -1227,10 +1392,12 @@ public interface CriteriaBuilder {
 	 * Extracts a substring starting at the specified position
 	 * through to end of the string.
 	 * First position is 1.
-	 *
-	 * @param x string expression
-	 * @param from start position expression
-	 *
+	 * 
+	 * @param x
+	 *            string expression
+	 * @param from
+	 *            start position expression
+	 * 
 	 * @return expression corresponding to substring extraction
 	 */
 	Expression<String> substring(Expression<String> x, Expression<Integer> from);
@@ -1240,10 +1407,12 @@ public interface CriteriaBuilder {
 	 * Extracts a substring starting at the specified position
 	 * through to end of the string.
 	 * First position is 1.
-	 *
-	 * @param x string expression
-	 * @param from start position
-	 *
+	 * 
+	 * @param x
+	 *            string expression
+	 * @param from
+	 *            start position
+	 * 
 	 * @return expression corresponding to substring extraction
 	 */
 	Expression<String> substring(Expression<String> x, int from);
@@ -1253,11 +1422,14 @@ public interface CriteriaBuilder {
 	 * Extracts a substring of given length starting at the
 	 * specified position.
 	 * First position is 1.
-	 *
-	 * @param x string expression
-	 * @param from start position expression
-	 * @param len length expression
-	 *
+	 * 
+	 * @param x
+	 *            string expression
+	 * @param from
+	 *            start position expression
+	 * @param len
+	 *            length expression
+	 * 
 	 * @return expression corresponding to substring extraction
 	 */
 	Expression<String> substring(Expression<String> x, Expression<Integer> from, Expression<Integer> len);
@@ -1267,11 +1439,14 @@ public interface CriteriaBuilder {
 	 * Extracts a substring of given length starting at the
 	 * specified position.
 	 * First position is 1.
-	 *
-	 * @param x string expression
-	 * @param from start position
-	 * @param len length
-	 *
+	 * 
+	 * @param x
+	 *            string expression
+	 * @param from
+	 *            start position
+	 * @param len
+	 *            length
+	 * 
 	 * @return expression corresponding to substring extraction
 	 */
 	Expression<String> substring(Expression<String> x, int from, int len);
@@ -1300,19 +1475,22 @@ public interface CriteriaBuilder {
 	/**
 	 * Create expression to trim blanks from both ends of
 	 * a string.
-	 *
-	 * @param x expression for string to trim
-	 *
+	 * 
+	 * @param x
+	 *            expression for string to trim
+	 * 
 	 * @return trim expression
 	 */
 	Expression<String> trim(Expression<String> x);
 
 	/**
 	 * Create expression to trim blanks from a string.
-	 *
-	 * @param ts trim specification
-	 * @param x expression for string to trim
-	 *
+	 * 
+	 * @param ts
+	 *            trim specification
+	 * @param x
+	 *            expression for string to trim
+	 * 
 	 * @return trim expression
 	 */
 	Expression<String> trim(Trimspec ts, Expression<String> x);
@@ -1320,21 +1498,26 @@ public interface CriteriaBuilder {
 	/**
 	 * Create expression to trim character from both ends of
 	 * a string.
-	 *
-	 * @param t expression for character to be trimmed
-	 * @param x expression for string to trim
-	 *
+	 * 
+	 * @param t
+	 *            expression for character to be trimmed
+	 * @param x
+	 *            expression for string to trim
+	 * 
 	 * @return trim expression
 	 */
 	Expression<String> trim(Expression<Character> t, Expression<String> x);
 
 	/**
 	 * Create expression to trim character from a string.
-	 *
-	 * @param ts trim specification
-	 * @param t expression for character to be trimmed
-	 * @param x expression for string to trim
-	 *
+	 * 
+	 * @param ts
+	 *            trim specification
+	 * @param t
+	 *            expression for character to be trimmed
+	 * @param x
+	 *            expression for string to trim
+	 * 
 	 * @return trim expression
 	 */
 	Expression<String> trim(Trimspec ts, Expression<Character> t, Expression<String> x);
@@ -1342,63 +1525,72 @@ public interface CriteriaBuilder {
 	/**
 	 * Create expression to trim character from both ends of
 	 * a string.
-	 *
-	 * @param t character to be trimmed
-	 * @param x expression for string to trim
-	 *
+	 * 
+	 * @param t
+	 *            character to be trimmed
+	 * @param x
+	 *            expression for string to trim
+	 * 
 	 * @return trim expression
 	 */
 	Expression<String> trim(char t, Expression<String> x);
 
 	/**
 	 * Create expression to trim character from a string.
-	 *
-	 * @param ts trim specification
-	 * @param t character to be trimmed
-	 * @param x expression for string to trim
-	 *
+	 * 
+	 * @param ts
+	 *            trim specification
+	 * @param t
+	 *            character to be trimmed
+	 * @param x
+	 *            expression for string to trim
+	 * 
 	 * @return trim expression
 	 */
 	Expression<String> trim(Trimspec ts, char t, Expression<String> x);
 
 	/**
 	 * Create expression for converting a string to lowercase.
-	 *
-	 * @param x string expression
-	 *
+	 * 
+	 * @param x
+	 *            string expression
+	 * 
 	 * @return expression to convert to lowercase
 	 */
 	Expression<String> lower(Expression<String> x);
 
 	/**
 	 * Create expression for converting a string to uppercase.
-	 *
-	 * @param x string expression
-	 *
+	 * 
+	 * @param x
+	 *            string expression
+	 * 
 	 * @return expression to convert to uppercase
 	 */
 	Expression<String> upper(Expression<String> x);
 
 	/**
 	 * Create expression to return length of a string.
-	 *
-	 * @param x string expression
-	 *
+	 * 
+	 * @param x
+	 *            string expression
+	 * 
 	 * @return length expression
 	 */
 	Expression<Integer> length(Expression<String> x);
-
 
 	/**
 	 * Create expression to locate the position of one string
 	 * within another, returning position of first character
 	 * if found.
-	 * The first position in a string is denoted by 1.  If the
+	 * The first position in a string is denoted by 1. If the
 	 * string to be located is not found, 0 is returned.
-	 *
-	 * @param x expression for string to be searched
-	 * @param pattern expression for string to be located
-	 *
+	 * 
+	 * @param x
+	 *            expression for string to be searched
+	 * @param pattern
+	 *            expression for string to be located
+	 * 
 	 * @return expression corresponding to position
 	 */
 	Expression<Integer> locate(Expression<String> x, Expression<String> pattern);
@@ -1407,12 +1599,14 @@ public interface CriteriaBuilder {
 	 * Create expression to locate the position of one string
 	 * within another, returning position of first character
 	 * if found.
-	 * The first position in a string is denoted by 1.  If the
+	 * The first position in a string is denoted by 1. If the
 	 * string to be located is not found, 0 is returned.
-	 *
-	 * @param x expression for string to be searched
-	 * @param pattern string to be located
-	 *
+	 * 
+	 * @param x
+	 *            expression for string to be searched
+	 * @param pattern
+	 *            string to be located
+	 * 
 	 * @return expression corresponding to position
 	 */
 	Expression<Integer> locate(Expression<String> x, String pattern);
@@ -1421,13 +1615,16 @@ public interface CriteriaBuilder {
 	 * Create expression to locate the position of one string
 	 * within another, returning position of first character
 	 * if found.
-	 * The first position in a string is denoted by 1.  If the
+	 * The first position in a string is denoted by 1. If the
 	 * string to be located is not found, 0 is returned.
-	 *
-	 * @param x expression for string to be searched
-	 * @param pattern expression for string to be located
-	 * @param from expression for position at which to start search
-	 *
+	 * 
+	 * @param x
+	 *            expression for string to be searched
+	 * @param pattern
+	 *            expression for string to be located
+	 * @param from
+	 *            expression for position at which to start search
+	 * 
 	 * @return expression corresponding to position
 	 */
 	Expression<Integer> locate(Expression<String> x, Expression<String> pattern, Expression<Integer> from);
@@ -1436,43 +1633,44 @@ public interface CriteriaBuilder {
 	 * Create expression to locate the position of one string
 	 * within another, returning position of first character
 	 * if found.
-	 * The first position in a string is denoted by 1.  If the
+	 * The first position in a string is denoted by 1. If the
 	 * string to be located is not found, 0 is returned.
-	 *
-	 * @param x expression for string to be searched
-	 * @param pattern string to be located
-	 * @param from position at which to start search
-	 *
+	 * 
+	 * @param x
+	 *            expression for string to be searched
+	 * @param pattern
+	 *            string to be located
+	 * @param from
+	 *            position at which to start search
+	 * 
 	 * @return expression corresponding to position
 	 */
 	Expression<Integer> locate(Expression<String> x, String pattern, int from);
-
 
 	// Date/time/timestamp functions:
 
 	/**
 	 * Create expression to return current date.
-	 *
+	 * 
 	 * @return expression for current date
 	 */
 	Expression<java.sql.Date> currentDate();
 
 	/**
 	 * Create expression to return current timestamp.
-	 *
+	 * 
 	 * @return expression for current timestamp
 	 */
 	Expression<java.sql.Timestamp> currentTimestamp();
 
 	/**
 	 * Create expression to return current time.
-	 *
+	 * 
 	 * @return expression for current time
 	 */
 	Expression<java.sql.Time> currentTime();
 
-
-	//in builders:
+	// in builders:
 
 	/**
 	 * Interface used to build in predicates.
@@ -1482,25 +1680,27 @@ public interface CriteriaBuilder {
 		/**
 		 * Return the expression to be tested against the
 		 * list of values.
-		 *
+		 * 
 		 * @return expression
 		 */
 		Expression<T> getExpression();
 
 		/**
 		 * Add to list of values to be tested against.
-		 *
-		 * @param value value
-		 *
+		 * 
+		 * @param value
+		 *            value
+		 * 
 		 * @return in predicate
 		 */
 		In<T> value(T value);
 
 		/**
 		 * Add to list of values to be tested against.
-		 *
-		 * @param value expression
-		 *
+		 * 
+		 * @param value
+		 *            expression
+		 * 
 		 * @return in predicate
 		 */
 		In<T> value(Expression<? extends T> value);
@@ -1509,13 +1709,13 @@ public interface CriteriaBuilder {
 	/**
 	 * Create predicate to test whether given expression
 	 * is contained in a list of values.
-	 *
-	 * @param expression to be tested against list of values
-	 *
+	 * 
+	 * @param expression
+	 *            to be tested against list of values
+	 * 
 	 * @return in predicate
 	 */
 	<T> In<T> in(Expression<? extends T> expression);
-
 
 	// coalesce, nullif:
 
@@ -1523,10 +1723,12 @@ public interface CriteriaBuilder {
 	 * Create an expression that returns null if all its arguments
 	 * evaluate to null, and the value of the first non-null argument
 	 * otherwise.
-	 *
-	 * @param x expression
-	 * @param y expression
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            expression
+	 * 
 	 * @return coalesce expression
 	 */
 	<Y> Expression<Y> coalesce(Expression<? extends Y> x, Expression<? extends Y> y);
@@ -1535,10 +1737,12 @@ public interface CriteriaBuilder {
 	 * Create an expression that returns null if all its arguments
 	 * evaluate to null, and the value of the first non-null argument
 	 * otherwise.
-	 *
-	 * @param x expression
-	 * @param y value
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            value
+	 * 
 	 * @return coalesce expression
 	 */
 	<Y> Expression<Y> coalesce(Expression<? extends Y> x, Y y);
@@ -1547,10 +1751,12 @@ public interface CriteriaBuilder {
 	 * Create an expression that tests whether its argument are
 	 * equal, returning null if they are and the value of the
 	 * first expression if they are not.
-	 *
-	 * @param x expression
-	 * @param y expression
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            expression
+	 * 
 	 * @return nullif expression
 	 */
 	<Y> Expression<Y> nullif(Expression<Y> x, Expression<?> y);
@@ -1559,20 +1765,21 @@ public interface CriteriaBuilder {
 	 * Create an expression that tests whether its argument are
 	 * equal, returning null if they are and the value of the
 	 * first expression if they are not.
-	 *
-	 * @param x expression
-	 * @param y value
-	 *
+	 * 
+	 * @param x
+	 *            expression
+	 * @param y
+	 *            value
+	 * 
 	 * @return nullif expression
 	 */
 	<Y> Expression<Y> nullif(Expression<Y> x, Y y);
-
 
 	// coalesce builder:
 
 	/**
 	 * Interface used to build coalesce expressions.
-	 *
+	 * 
 	 * A coalesce expression is equivalent to a case expression
 	 * that returns null if all its arguments evaluate to null,
 	 * and the value of its first non-null argument otherwise.
@@ -1581,18 +1788,20 @@ public interface CriteriaBuilder {
 
 		/**
 		 * Add an argument to the coalesce expression.
-		 *
-		 * @param value value
-		 *
+		 * 
+		 * @param value
+		 *            value
+		 * 
 		 * @return coalesce expression
 		 */
 		Coalesce<T> value(T value);
 
 		/**
 		 * Add an argument to the coalesce expression.
-		 *
-		 * @param value expression
-		 *
+		 * 
+		 * @param value
+		 *            expression
+		 * 
 		 * @return coalesce expression
 		 */
 		Coalesce<T> value(Expression<? extends T> value);
@@ -1600,13 +1809,12 @@ public interface CriteriaBuilder {
 
 	/**
 	 * Create a coalesce expression.
-	 *
+	 * 
 	 * @return coalesce expression
 	 */
 	<T> Coalesce<T> coalesce();
 
-
-	//case builders:
+	// case builders:
 
 	/**
 	 * Interface used to build simple case expressions.
@@ -1618,45 +1826,51 @@ public interface CriteriaBuilder {
 		/**
 		 * Return the expression to be tested against the
 		 * conditions.
-		 *
+		 * 
 		 * @return expression
 		 */
 		Expression<C> getExpression();
 
 		/**
 		 * Add a when/then clause to the case expression.
-		 *
-		 * @param condition "when" condition
-		 * @param result "then" result value
-		 *
+		 * 
+		 * @param condition
+		 *            "when" condition
+		 * @param result
+		 *            "then" result value
+		 * 
 		 * @return simple case expression
 		 */
 		SimpleCase<C, R> when(C condition, R result);
 
 		/**
 		 * Add a when/then clause to the case expression.
-		 *
-		 * @param condition "when" condition
-		 * @param result "then" result expression
-		 *
+		 * 
+		 * @param condition
+		 *            "when" condition
+		 * @param result
+		 *            "then" result expression
+		 * 
 		 * @return simple case expression
 		 */
 		SimpleCase<C, R> when(C condition, Expression<? extends R> result);
 
 		/**
 		 * Add an "else" clause to the case expression.
-		 *
-		 * @param result "else" result
-		 *
+		 * 
+		 * @param result
+		 *            "else" result
+		 * 
 		 * @return expression
 		 */
 		Expression<R> otherwise(R result);
 
 		/**
 		 * Add an "else" clause to the case expression.
-		 *
-		 * @param result "else" result expression
-		 *
+		 * 
+		 * @param result
+		 *            "else" result expression
+		 * 
 		 * @return expression
 		 */
 		Expression<R> otherwise(Expression<? extends R> result);
@@ -1664,13 +1878,13 @@ public interface CriteriaBuilder {
 
 	/**
 	 * Create a simple case expression.
-	 *
-	 * @param expression to be tested against the case conditions
-	 *
+	 * 
+	 * @param expression
+	 *            to be tested against the case conditions
+	 * 
 	 * @return simple case expression
 	 */
 	<C, R> SimpleCase<C, R> selectCase(Expression<? extends C> expression);
-
 
 	/**
 	 * Interface used to build general case expressions.
@@ -1681,38 +1895,44 @@ public interface CriteriaBuilder {
 
 		/**
 		 * Add a when/then clause to the case expression.
-		 *
-		 * @param condition "when" condition
-		 * @param result "then" result value
-		 *
+		 * 
+		 * @param condition
+		 *            "when" condition
+		 * @param result
+		 *            "then" result value
+		 * 
 		 * @return general case expression
 		 */
 		Case<R> when(Expression<Boolean> condition, R result);
 
 		/**
 		 * Add a when/then clause to the case expression.
-		 *
-		 * @param condition "when" condition
-		 * @param result "then" result expression
-		 *
+		 * 
+		 * @param condition
+		 *            "when" condition
+		 * @param result
+		 *            "then" result expression
+		 * 
 		 * @return general case expression
 		 */
 		Case<R> when(Expression<Boolean> condition, Expression<? extends R> result);
 
 		/**
 		 * Add an "else" clause to the case expression.
-		 *
-		 * @param result "else" result
-		 *
+		 * 
+		 * @param result
+		 *            "else" result
+		 * 
 		 * @return expression
 		 */
 		Expression<R> otherwise(R result);
 
 		/**
 		 * Add an "else" clause to the case expression.
-		 *
-		 * @param result "else" result expression
-		 *
+		 * 
+		 * @param result
+		 *            "else" result expression
+		 * 
 		 * @return expression
 		 */
 		Expression<R> otherwise(Expression<? extends R> result);
@@ -1720,7 +1940,7 @@ public interface CriteriaBuilder {
 
 	/**
 	 * Create a general case expression.
-	 *
+	 * 
 	 * @return general case expression
 	 */
 	<R> Case<R> selectCase();
@@ -1728,11 +1948,14 @@ public interface CriteriaBuilder {
 	/**
 	 * Create an expression for the execution of a database
 	 * function.
-	 *
-	 * @param name function name
-	 * @param type expected result type
-	 * @param args function arguments
-	 *
+	 * 
+	 * @param name
+	 *            function name
+	 * @param type
+	 *            expected result type
+	 * @param args
+	 *            function arguments
+	 * 
 	 * @return expression
 	 */
 	<T> Expression<T> function(String name, Class<T> type, Expression<?>... args);

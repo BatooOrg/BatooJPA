@@ -17,14 +17,15 @@
 
 package javax.persistence;
 
-import java.lang.annotation.Target;
-import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
  * Specifies that a unique constraint is to be included in
  * the generated DDL for a primary or secondary table.
- *
+ * 
  * <pre>
  *    Example:
  *    &#064;Entity
@@ -35,16 +36,16 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *    )
  *    public class Employee { ... }
  * </pre>
- *
+ * 
  * @since Java Persistence 1.0
  */
-@Target({ })
+@Target({})
 @Retention(RUNTIME)
 public @interface UniqueConstraint {
 	/**
-	 * (Optional) Constraint name.  A provider-chosen name will be chosen
+	 * (Optional) Constraint name. A provider-chosen name will be chosen
 	 * if a name is not specified.
-	 *
+	 * 
 	 * @since Java Persistence 2.0
 	 */
 	String name() default "";

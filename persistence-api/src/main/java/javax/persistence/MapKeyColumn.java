@@ -17,21 +17,22 @@
 
 package javax.persistence;
 
-import java.lang.annotation.Target;
-import java.lang.annotation.Retention;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
  * Specifies the mapping for the key column of a map whose
  * map key is a basic type. If the <code>name</code> element is not specified, it
  * defaults to the concatenation of the following: the name of the
  * referencing relationship field or property; "_"; "KEY".
- *
+ * 
  * <pre>
  *    Example:
- *
+ * 
  *    &#064;Entity
  *    public class Item {
  *       &#064;Id int id;
@@ -44,9 +45,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *       ...
  *    }
  * </pre>
+ * 
  * @since Java Persistence 2.0
  */
-@Target( { METHOD, FIELD })
+@Target({ METHOD, FIELD })
 @Retention(RUNTIME)
 public @interface MapKeyColumn {
 
@@ -59,8 +61,8 @@ public @interface MapKeyColumn {
 	 * If the map key is for a OneToMany entity relationship using a foreign key
 	 * mapping strategy, the map key column is in the table of the entity that
 	 * is the value of the map.
-         * <p> Defaults to the concatenation of the following: the name of
-         * the referencing relationship field or property; "_"; "<code>KEY</code>".
+	 * <p>
+	 * Defaults to the concatenation of the following: the name of the referencing relationship field or property; "_"; "<code>KEY</code>".
 	 */
 	String name() default "";
 
@@ -93,23 +95,21 @@ public @interface MapKeyColumn {
 	/**
 	 * (Optional) The SQL fragment that is used when generating the DDL for the
 	 * column.
-	 * <p> Defaults to the generated SQL to create a
-	 * column of the inferred type.
-         *
+	 * <p>
+	 * Defaults to the generated SQL to create a column of the inferred type.
+	 * 
 	 */
 	String columnDefinition() default "";
 
-	/** (Optional) The name of the table that contains the column.
-         *
-         * <p> Defaults: If the map key is for an element collection,
-         * the name of the collection table for the map value. If the
-         * map key is for a OneToMany or ManyToMany entity
-         * relationship using a join table, the name of the join table
-         * for the map. If the map key is for a OneToMany entity
-         * relationship using a foreign key mapping strategy, the name
-         * of the primary table of the entity that is the value of the
-         * map.
-         */
+	/**
+	 * (Optional) The name of the table that contains the column.
+	 * 
+	 * <p>
+	 * Defaults: If the map key is for an element collection, the name of the collection table for the map value. If the map key is for a
+	 * OneToMany or ManyToMany entity relationship using a join table, the name of the join table for the map. If the map key is for a
+	 * OneToMany entity relationship using a foreign key mapping strategy, the name of the primary table of the entity that is the value of
+	 * the map.
+	 */
 	String table() default "";
 
 	/**
@@ -121,8 +121,9 @@ public @interface MapKeyColumn {
 	/**
 	 * (Optional) The precision for a decimal (exact numeric) column. (Applies
 	 * only if a decimal column is used.)
-         *
-         *<p> Default: 0. (The value must be set by the developer.)
+	 * 
+	 * <p>
+	 * Default: 0. (The value must be set by the developer.)
 	 */
 	int precision() default 0; // decimal precision
 

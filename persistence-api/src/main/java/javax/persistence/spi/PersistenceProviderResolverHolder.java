@@ -31,13 +31,14 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.persistence.PersistenceException;
 
 /**
  * Holds the global PersistenceProviderResolver instance.
  * If no PersistenceProviderResolver is set by the environment,
  * the default PersistenceProviderResolver is used.
- *
+ * 
  * Implementations must be thread-safe.
  */
 public class PersistenceProviderResolverHolder {
@@ -47,7 +48,7 @@ public class PersistenceProviderResolverHolder {
 
 	/**
 	 * Returns the current persistence provider resolver
-	 *
+	 * 
 	 * @return persistence provider resolver in use
 	 */
 	public static PersistenceProviderResolver getPersistenceProviderResolver() {
@@ -56,8 +57,9 @@ public class PersistenceProviderResolverHolder {
 
 	/**
 	 * Defines the persistence provider resolver used.
-	 *
-	 * @param resolver PersistenceProviderResolver to be used.
+	 * 
+	 * @param resolver
+	 *            PersistenceProviderResolver to be used.
 	 */
 	public static void setPersistenceProviderResolver(PersistenceProviderResolver resolver) {
 		RESOLVER = resolver;
@@ -67,14 +69,13 @@ public class PersistenceProviderResolverHolder {
 	 * Cache PersistenceProviderResolver per classloader and use the current classloader as a
 	 * key.
 	 * Use CachingPersistenceProviderResolver for each PersistenceProviderResolver instance.
-	 *
+	 * 
 	 * @author Emmanuel Bernard
 	 */
 	private static class PersistenceProviderResolverPerClassLoader implements PersistenceProviderResolver {
 
-		//FIXME use a ConcurrentHashMap with weak entry
-		private final WeakHashMap<ClassLoader, PersistenceProviderResolver> resolvers =
-				new WeakHashMap<ClassLoader, PersistenceProviderResolver>();
+		// FIXME use a ConcurrentHashMap with weak entry
+		private final WeakHashMap<ClassLoader, PersistenceProviderResolver> resolvers = new WeakHashMap<ClassLoader, PersistenceProviderResolver>();
 		private volatile short barrier = 1;
 
 		/**
@@ -82,11 +83,11 @@ public class PersistenceProviderResolverHolder {
 		 */
 		public List<PersistenceProvider> getPersistenceProviders() {
 			ClassLoader cl = getContextualClassLoader();
-			if ( barrier == 1 ) {} //read barrier syncs state with other threads
-			PersistenceProviderResolver currentResolver = resolvers.get( cl );
-			if ( currentResolver == null ) {
-				currentResolver = new CachingPersistenceProviderResolver( cl );
-				resolvers.put( cl, currentResolver );
+			if (barrier == 1) {} // read barrier syncs state with other threads
+			PersistenceProviderResolver currentResolver = resolvers.get(cl);
+			if (currentResolver == null) {
+				currentResolver = new CachingPersistenceProviderResolver(cl);
+				resolvers.put(cl, currentResolver);
 				barrier = 1;
 			}
 			return currentResolver.getPersistenceProviders();
@@ -98,16 +99,16 @@ public class PersistenceProviderResolverHolder {
 		public void clearCachedProviders() {
 			// todo : should we clear all providers from all resolvers here?
 			ClassLoader cl = getContextualClassLoader();
-			if ( barrier == 1 ) {} //read barrier syncs state with other threads
-			PersistenceProviderResolver currentResolver = resolvers.get( cl );
-			if ( currentResolver != null ) {
+			if (barrier == 1) {} // read barrier syncs state with other threads
+			PersistenceProviderResolver currentResolver = resolvers.get(cl);
+			if (currentResolver != null) {
 				currentResolver.clearCachedProviders();
 			}
 		}
 
 		private static ClassLoader getContextualClassLoader() {
 			ClassLoader cl = Thread.currentThread().getContextClassLoader();
-			if ( cl == null ) {
+			if (cl == null) {
 				cl = PersistenceProviderResolverPerClassLoader.class.getClassLoader();
 			}
 			return cl;
@@ -115,57 +116,56 @@ public class PersistenceProviderResolverHolder {
 
 		/**
 		 * Resolve the list of Persistence providers for a given classloader and cache the results.
-		 *
+		 * 
 		 * Avoids to keep any reference from this class to the classloader being
 		 * passed to the constructor.
-		 *
+		 * 
 		 * @author Emmanuel Bernard
 		 */
 		private static class CachingPersistenceProviderResolver implements PersistenceProviderResolver {
-			//this assumes that the class loader keeps the list of classes loaded
-			private final List<WeakReference<Class<? extends PersistenceProvider>>> resolverClasses
-					= new ArrayList<WeakReference<Class<? extends PersistenceProvider>>>();
+			// this assumes that the class loader keeps the list of classes loaded
+			private final List<WeakReference<Class<? extends PersistenceProvider>>> resolverClasses = new ArrayList<WeakReference<Class<? extends PersistenceProvider>>>();
 
 			public CachingPersistenceProviderResolver(ClassLoader cl) {
-				loadResolverClasses( cl );
+				loadResolverClasses(cl);
 			}
 
 			private void loadResolverClasses(ClassLoader cl) {
-				synchronized ( resolverClasses ) {
+				synchronized (resolverClasses) {
 					try {
-						Enumeration<URL> resources = cl.getResources( "META-INF/services/" + PersistenceProvider.class.getName() );
+						Enumeration<URL> resources = cl.getResources("META-INF/services/" + PersistenceProvider.class.getName());
 						Set<String> names = new HashSet<String>();
-						while ( resources.hasMoreElements() ) {
+						while (resources.hasMoreElements()) {
 							URL url = resources.nextElement();
 							InputStream is = url.openStream();
 							try {
-								names.addAll( providerNamesFromReader( new BufferedReader( new InputStreamReader( is ) ) ) );
+								names.addAll(providerNamesFromReader(new BufferedReader(new InputStreamReader(is))));
 							}
 							finally {
 								is.close();
 							}
 						}
-						for ( String s : names ) {
-							@SuppressWarnings( "unchecked" )
-							Class<? extends PersistenceProvider> providerClass = (Class<? extends PersistenceProvider>) cl.loadClass( s );
-							WeakReference<Class<? extends PersistenceProvider>> reference
-									= new WeakReference<Class<? extends PersistenceProvider>>(providerClass);
-							//keep Hibernate atop
-							if ( s.endsWith( "HibernatePersistence" ) && resolverClasses.size() > 0 ) {
-								WeakReference<Class<? extends PersistenceProvider>> movedReference = resolverClasses.get( 0 );
-								resolverClasses.add( 0, reference );
-								resolverClasses.add( movedReference );
+						for (String s : names) {
+							@SuppressWarnings("unchecked")
+							Class<? extends PersistenceProvider> providerClass = (Class<? extends PersistenceProvider>) cl.loadClass(s);
+							WeakReference<Class<? extends PersistenceProvider>> reference = new WeakReference<Class<? extends PersistenceProvider>>(
+								providerClass);
+							// keep Hibernate atop
+							if (s.endsWith("HibernatePersistence") && resolverClasses.size() > 0) {
+								WeakReference<Class<? extends PersistenceProvider>> movedReference = resolverClasses.get(0);
+								resolverClasses.add(0, reference);
+								resolverClasses.add(movedReference);
 							}
 							else {
-								resolverClasses.add( reference );
+								resolverClasses.add(reference);
 							}
 						}
 					}
-					catch ( IOException e ) {
-						throw new PersistenceException( e );
+					catch (IOException e) {
+						throw new PersistenceException(e);
 					}
-					catch ( ClassNotFoundException e ) {
-						throw new PersistenceException( e );
+					catch (ClassNotFoundException e) {
+						throw new PersistenceException(e);
 					}
 				}
 			}
@@ -174,22 +174,23 @@ public class PersistenceProviderResolverHolder {
 			 * {@inheritDoc}
 			 */
 			public List<PersistenceProvider> getPersistenceProviders() {
-				//TODO find a way to cache property instances
-				//problem #1: avoid hard ref with classloader (List<WR<PP>>?
-				//problem #2: avoid half GC lists
-				// todo (steve) : why arent we just caching the PersistenceProvider *instances* as the CachingPersistenceProviderResolver state???
-				synchronized ( resolverClasses ) {
-					List<PersistenceProvider> providers = new ArrayList<PersistenceProvider>( resolverClasses.size() );
+				// TODO find a way to cache property instances
+				// problem #1: avoid hard ref with classloader (List<WR<PP>>?
+				// problem #2: avoid half GC lists
+				// todo (steve) : why arent we just caching the PersistenceProvider *instances* as the CachingPersistenceProviderResolver
+				// state???
+				synchronized (resolverClasses) {
+					List<PersistenceProvider> providers = new ArrayList<PersistenceProvider>(resolverClasses.size());
 					try {
-						for ( WeakReference<Class<? extends PersistenceProvider>> providerClass : resolverClasses ) {
-							providers.add( providerClass.get().newInstance() );
+						for (WeakReference<Class<? extends PersistenceProvider>> providerClass : resolverClasses) {
+							providers.add(providerClass.get().newInstance());
 						}
 					}
-					catch ( InstantiationException e ) {
-						throw new PersistenceException( e );
+					catch (InstantiationException e) {
+						throw new PersistenceException(e);
 					}
-					catch ( IllegalAccessException e ) {
-						throw new PersistenceException( e );
+					catch (IllegalAccessException e) {
+						throw new PersistenceException(e);
 					}
 					return providers;
 				}
@@ -199,23 +200,22 @@ public class PersistenceProviderResolverHolder {
 			 * {@inheritDoc}
 			 */
 			public synchronized void clearCachedProviders() {
-				synchronized ( resolverClasses ) {
+				synchronized (resolverClasses) {
 					resolverClasses.clear();
-					loadResolverClasses( PersistenceProviderResolverPerClassLoader.getContextualClassLoader() );
+					loadResolverClasses(PersistenceProviderResolverPerClassLoader.getContextualClassLoader());
 				}
 			}
 
-
-			private static final Pattern nonCommentPattern = Pattern.compile( "^([^#]+)" );
+			private static final Pattern nonCommentPattern = Pattern.compile("^([^#]+)");
 
 			private static Set<String> providerNamesFromReader(BufferedReader reader) throws IOException {
 				Set<String> names = new HashSet<String>();
 				String line;
-				while ( ( line = reader.readLine() ) != null ) {
+				while ((line = reader.readLine()) != null) {
 					line = line.trim();
-					Matcher m = nonCommentPattern.matcher( line );
-					if ( m.find() ) {
-						names.add( m.group().trim() );
+					Matcher m = nonCommentPattern.matcher(line);
+					if (m.find()) {
+						names.add(m.group().trim());
 					}
 				}
 				return names;

@@ -16,20 +16,20 @@
 // $Id: ExcludeSuperclassListeners.java 20957 2011-06-13 09:58:51Z stliu $
 
 package javax.persistence;
-import java.lang.annotation.Target;
-import java.lang.annotation.Retention;
+
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
  * Specifies that the invocation of superclass listeners is
  * to be excluded for the entity class (or mapped superclass)
  * and its subclasses.
- *
+ * 
  * @since Java Persistence 1.0
  */
-@Target({TYPE})
+@Target({ TYPE })
 @Retention(RUNTIME)
-
-public @interface ExcludeSuperclassListeners {
-}
+public @interface ExcludeSuperclassListeners {}

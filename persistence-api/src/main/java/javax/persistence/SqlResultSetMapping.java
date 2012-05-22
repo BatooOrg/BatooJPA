@@ -17,17 +17,18 @@
 
 package javax.persistence;
 
-import java.lang.annotation.Target;
-import java.lang.annotation.Retention;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
 /**
  * Specifies the mapping of the result of a native SQL query.
- *
+ * 
  * <pre>
  *    Example:
- *
+ * 
  *    Query q = em.createNativeQuery(
  *        "SELECT o.id AS order_id, " +
  *            "o.quantity AS order_quantity, " +
@@ -36,7 +37,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *        "FROM Order o, Item i " +
  *        "WHERE (order_quantity > 25) AND (order_item = i.id)",
  *    "OrderResults");
- *
+ * 
  *    &#064;SqlResultSetMapping(name="OrderResults",
  *        entities={
  *            &#064;EntityResult(entityClass=com.acme.Order.class, fields={
@@ -47,7 +48,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *            &#064;ColumnResult(name="item_name")}
  *    )
  * </pre>
- *
+ * 
  * @since Java Persistence 1.0
  */
 @Target({ TYPE })
@@ -62,10 +63,10 @@ public @interface SqlResultSetMapping {
 	/**
 	 * Specifies the result set mapping to entities.
 	 */
-	EntityResult[] entities() default { };
+	EntityResult[] entities() default {};
 
 	/**
 	 * Specifies the result set mapping to scalar values.
 	 */
-	ColumnResult[] columns() default { };
+	ColumnResult[] columns() default {};
 }

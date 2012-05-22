@@ -17,20 +17,21 @@
 
 package javax.persistence;
 
-import java.lang.annotation.Target;
-import java.lang.annotation.Retention;
-import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
  * Groups {@link PrimaryKeyJoinColumn} annotations.
  * It is used to map composite foreign keys.
- *
+ * 
  * <pre>
  *    Example: ValuedCustomer subclass
- *
+ * 
  *    &#064;Entity
  *    &#064;Table(name="VCUST")
  *    &#064;DiscriminatorValue("VCUST")
@@ -42,7 +43,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *    })
  *    public class ValuedCustomer extends Customer { ... }
  * </pre>
- *
+ * 
  * @since Java Persistence 1.0
  */
 @Target({ TYPE, METHOD, FIELD })

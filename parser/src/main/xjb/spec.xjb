@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jxb:bindings xmlns:jxb="http://java.sun.com/xml/ns/jaxb" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd"
+	jxb:version="2.0">
+
+	<jxb:globalBindings>
+		<xjc:simple />
+	</jxb:globalBindings>
+
+	<!-- Persistence.xml -->
+	<jxb:bindings schemaLocation="../xsd/persistence_2_0.xsd" node="/xsd:schema">
+		<jxb:schemaBindings>
+			<jxb:package name="org.batoo.jpa.parser.persistence" />
+		</jxb:schemaBindings>
+
+		<jxb:bindings node="//xsd:element[@name='persistence']">
+			<jxb:class name="Persistence" />
+		</jxb:bindings>
+	</jxb:bindings>
+
+</jxb:bindings>

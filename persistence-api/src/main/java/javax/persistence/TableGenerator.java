@@ -17,12 +17,13 @@
 
 package javax.persistence;
 
-import java.lang.annotation.Target;
-import java.lang.annotation.Retention;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
  * Defines a primary key generator that may be
@@ -31,10 +32,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * may be specified on the entity class or on the primary key
  * field or property. The scope of the generator name is global
  * to the persistence unit (across all generator types).
- *
+ * 
  * <pre>
  *    Example 1:
- *
+ * 
  *    &#064;Entity public class Employee {
  *        ...
  *        &#064;TableGenerator(
@@ -49,9 +50,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *        int id;
  *        ...
  *    }
- *
+ * 
  *    Example 2:
- *
+ * 
  *    &#064;Entity public class Address {
  *        ...
  *        &#064;TableGenerator(
@@ -66,7 +67,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *        ...
  *    }
  * </pre>
- *
+ * 
  * @see GeneratedValue
  * @since Java Persistence 1.0
  */
@@ -119,8 +120,7 @@ public @interface TableGenerator {
 	 * that distinguishes this set of generated values from others
 	 * that may be stored in the table.
 	 * <p/>
-	 * Defaults to a provider-chosen value to store in the
-	 * primary key column of the generator table
+	 * Defaults to a provider-chosen value to store in the primary key column of the generator table
 	 */
 	String pkColumnValue() default "";
 
@@ -143,5 +143,5 @@ public @interface TableGenerator {
 	 * <p/>
 	 * Defaults to no additional constraints.
 	 */
-	UniqueConstraint[] uniqueConstraints() default { };
+	UniqueConstraint[] uniqueConstraints() default {};
 }

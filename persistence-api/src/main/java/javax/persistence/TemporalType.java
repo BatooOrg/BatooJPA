@@ -18,9 +18,8 @@
 package javax.persistence;
 
 /**
- * Type used to indicate a specific mapping of <code>java.util.Date</code>
- * or <code>java.util.Calendar</code>.
- *
+ * Type used to indicate a specific mapping of <code>java.util.Date</code> or <code>java.util.Calendar</code>.
+ * 
  * @since Java Persistence 1.0
  */
 public enum TemporalType {

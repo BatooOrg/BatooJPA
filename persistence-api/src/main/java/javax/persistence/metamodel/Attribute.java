@@ -19,12 +19,16 @@ package javax.persistence.metamodel;
 
 /**
  * Represents an attribute of a Java type.
- *
- * @param <X> The represented type that contains the attribute
- * @param <Y> The type of the represented attribute
+ * 
+ * @param <X>
+ *            The represented type that contains the attribute
+ * @param <Y>
+ *            The type of the represented attribute
+ * 
  * @since Java Persistence 2.0
  */
 public interface Attribute<X, Y> {
+
 	public static enum PersistentAttributeType {
 		/**
 		 * Many-to-one association
@@ -63,45 +67,45 @@ public interface Attribute<X, Y> {
 	}
 
 	/**
+	 * Return the managed type representing the type in which
+	 * the attribute was declared.
+	 * 
+	 * @return declaring type
+	 */
+	ManagedType<X> getDeclaringType();
+
+	/**
+	 * Return the <code>java.lang.reflect.Member</code> for the represented
+	 * attribute.
+	 * 
+	 * @return corresponding <code>java.lang.reflect.Member</code>
+	 */
+	java.lang.reflect.Member getJavaMember();
+
+	/**
+	 * Return the Java type of the represented attribute.
+	 * 
+	 * @return Java type
+	 */
+	Class<Y> getJavaType();
+
+	/**
 	 * Return the name of the attribute.
-	 *
+	 * 
 	 * @return name
 	 */
 	String getName();
 
 	/**
 	 * Return the persistent attribute type for the attribute.
-	 *
+	 * 
 	 * @return persistent attribute type
 	 */
 	PersistentAttributeType getPersistentAttributeType();
 
 	/**
-	 * Return the managed type representing the type in which
-	 * the attribute was declared.
-	 *
-	 * @return declaring type
-	 */
-	ManagedType<X> getDeclaringType();
-
-	/**
-	 * Return the Java type of the represented attribute.
-	 *
-	 * @return Java type
-	 */
-	Class<Y> getJavaType();
-
-	/**
-	 * Return the <code>java.lang.reflect.Member</code> for the represented
-	 * attribute.
-	 *
-	 * @return corresponding <code>java.lang.reflect.Member</code>
-	 */
-	java.lang.reflect.Member getJavaMember();
-
-	/**
 	 * Is the attribute an association.
-	 *
+	 * 
 	 * @return boolean indicating whether the attribute
 	 *         corresponds to an association
 	 */
@@ -110,7 +114,7 @@ public interface Attribute<X, Y> {
 	/**
 	 * Is the attribute collection-valued (represents a Collection,
 	 * Set, List, or Map).
-	 *
+	 * 
 	 * @return boolean indicating whether the attribute is
 	 *         collection-valued
 	 */

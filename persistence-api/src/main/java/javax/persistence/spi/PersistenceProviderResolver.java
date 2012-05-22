@@ -22,13 +22,14 @@ import java.util.List;
 /**
  * Determine the list of persistence providers available in the
  * runtime environment.
- *
- * <p> Implementations must be thread-safe.
- *
- * <p> Note that the <code>getPersistenceProviders</code> method can potentially
- * be called many times: it is recommended that the implementation
+ * 
+ * <p>
+ * Implementations must be thread-safe.
+ * 
+ * <p>
+ * Note that the <code>getPersistenceProviders</code> method can potentially be called many times: it is recommended that the implementation
  * of this method make use of caching.
- *
+ * 
  * @see PersistenceProvider
  * @since Java Persistence 2.0
  */
@@ -36,7 +37,7 @@ public interface PersistenceProviderResolver {
 	/**
 	 * Returns a list of the <code>PersistenceProvider</code> implementations
 	 * available in the runtime environment.
-	 *
+	 * 
 	 * @return list of the persistence providers available
 	 *         in the environment
 	 */

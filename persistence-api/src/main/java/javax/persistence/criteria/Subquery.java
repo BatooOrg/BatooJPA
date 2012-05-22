@@ -23,10 +23,11 @@ import java.util.Set;
 /**
  * The <code>Subquery</code> interface defines functionality that is
  * specific to subqueries.
- *
+ * 
  * A subquery has an expression as its selection item.
- *
- * @param <T> the type of the selection item.
+ * 
+ * @param <T>
+ *            the type of the selection item.
  * @since Java Persistence 2.0
  */
 public interface Subquery<T> extends AbstractQuery<T>, Expression<T> {
@@ -34,10 +35,11 @@ public interface Subquery<T> extends AbstractQuery<T>, Expression<T> {
 	 * Specify the item that is to be returned as the subquery
 	 * result.
 	 * Replaces the previously specified selection, if any.
-	 *
-	 * @param expression expression specifying the item that
-	 * is to be returned as the subquery result
-	 *
+	 * 
+	 * @param expression
+	 *            expression specifying the item that
+	 *            is to be returned as the subquery result
+	 * 
 	 * @return the modified subquery
 	 */
 	Subquery<T> select(Expression<T> expression);
@@ -48,9 +50,10 @@ public interface Subquery<T> extends AbstractQuery<T>, Expression<T> {
 	 * Replaces the previously added restriction(s), if any.
 	 * This method only overrides the return type of the
 	 * corresponding <code>AbstractQuery</code> method.
-	 *
-	 * @param restriction a simple or compound boolean expression
-	 *
+	 * 
+	 * @param restriction
+	 *            a simple or compound boolean expression
+	 * 
 	 * @return the modified subquery
 	 */
 	Subquery<T> where(Expression<Boolean> restriction);
@@ -63,9 +66,10 @@ public interface Subquery<T> extends AbstractQuery<T>, Expression<T> {
 	 * restrictions are simply removed.
 	 * This method only overrides the return type of the
 	 * corresponding <code>AbstractQuery</code> method.
-	 *
-	 * @param restrictions zero or more restriction predicates
-	 *
+	 * 
+	 * @param restrictions
+	 *            zero or more restriction predicates
+	 * 
 	 * @return the modified subquery
 	 */
 	Subquery<T> where(Predicate... restrictions);
@@ -78,9 +82,10 @@ public interface Subquery<T> extends AbstractQuery<T>, Expression<T> {
 	 * added grouping expressions are simply removed.
 	 * This method only overrides the return type of the
 	 * corresponding <code>AbstractQuery</code> method.
-	 *
-	 * @param grouping zero or more grouping expressions
-	 *
+	 * 
+	 * @param grouping
+	 *            zero or more grouping expressions
+	 * 
 	 * @return the modified subquery
 	 */
 	Subquery<T> groupBy(Expression<?>... grouping);
@@ -93,9 +98,10 @@ public interface Subquery<T> extends AbstractQuery<T>, Expression<T> {
 	 * added grouping expressions are simply removed.
 	 * This method only overrides the return type of the
 	 * corresponding <code>AbstractQuery</code> method.
-	 *
-	 * @param grouping list of zero or more grouping expressions
-	 *
+	 * 
+	 * @param grouping
+	 *            list of zero or more grouping expressions
+	 * 
 	 * @return the modified subquery
 	 */
 	Subquery<T> groupBy(List<Expression<?>> grouping);
@@ -105,9 +111,10 @@ public interface Subquery<T> extends AbstractQuery<T>, Expression<T> {
 	 * Replaces the previous having restriction(s), if any.
 	 * This method only overrides the return type of the
 	 * corresponding <code>AbstractQuery</code> method.
-	 *
-	 * @param restriction a simple or compound boolean expression
-	 *
+	 * 
+	 * @param restriction
+	 *            a simple or compound boolean expression
+	 * 
 	 * @return the modified subquery
 	 */
 	Subquery<T> having(Expression<Boolean> restriction);
@@ -121,9 +128,10 @@ public interface Subquery<T> extends AbstractQuery<T>, Expression<T> {
 	 * restrictions are simply removed.
 	 * This method only overrides the return type of the
 	 * corresponding <code>AbstractQuery</code> method.
-	 *
-	 * @param restrictions zero or more restriction predicates
-	 *
+	 * 
+	 * @param restrictions
+	 *            zero or more restriction predicates
+	 * 
 	 * @return the modified subquery
 	 */
 	Subquery<T> having(Predicate... restrictions);
@@ -136,11 +144,12 @@ public interface Subquery<T> extends AbstractQuery<T>, Expression<T> {
 	 * be retained.
 	 * This method only overrides the return type of the
 	 * corresponding <code>AbstractQuery</code> method.
-	 *
-	 * @param distinct boolean value specifying whether duplicate
-	 * results must be eliminated from the subquery result or
-	 * whether they must be retained
-	 *
+	 * 
+	 * @param distinct
+	 *            boolean value specifying whether duplicate
+	 *            results must be eliminated from the subquery result or
+	 *            whether they must be retained
+	 * 
 	 * @return the modified subquery.
 	 */
 	Subquery<T> distinct(boolean distinct);
@@ -148,9 +157,10 @@ public interface Subquery<T> extends AbstractQuery<T>, Expression<T> {
 	/**
 	 * Create a subquery root correlated to a root of the
 	 * enclosing query.
-	 *
-	 * @param parentRoot a root of the containing query
-	 *
+	 * 
+	 * @param parentRoot
+	 *            a root of the containing query
+	 * 
 	 * @return subquery root
 	 */
 	<Y> Root<Y> correlate(Root<Y> parentRoot);
@@ -158,9 +168,10 @@ public interface Subquery<T> extends AbstractQuery<T>, Expression<T> {
 	/**
 	 * Create a subquery join object correlated to a join object
 	 * of the enclosing query.
-	 *
-	 * @param parentJoin join object of the containing query
-	 *
+	 * 
+	 * @param parentJoin
+	 *            join object of the containing query
+	 * 
 	 * @return subquery join
 	 */
 	<X, Y> Join<X, Y> correlate(Join<X, Y> parentJoin);
@@ -168,9 +179,10 @@ public interface Subquery<T> extends AbstractQuery<T>, Expression<T> {
 	/**
 	 * Create a subquery collection join object correlated to a
 	 * collection join object of the enclosing query.
-	 *
-	 * @param parentCollection join object of the containing query
-	 *
+	 * 
+	 * @param parentCollection
+	 *            join object of the containing query
+	 * 
 	 * @return subquery join
 	 */
 	<X, Y> CollectionJoin<X, Y> correlate(CollectionJoin<X, Y> parentCollection);
@@ -178,9 +190,10 @@ public interface Subquery<T> extends AbstractQuery<T>, Expression<T> {
 	/**
 	 * Create a subquery set join object correlated to a set join
 	 * object of the enclosing query.
-	 *
-	 * @param parentSet join object of the containing query
-	 *
+	 * 
+	 * @param parentSet
+	 *            join object of the containing query
+	 * 
 	 * @return subquery join
 	 */
 	<X, Y> SetJoin<X, Y> correlate(SetJoin<X, Y> parentSet);
@@ -188,9 +201,10 @@ public interface Subquery<T> extends AbstractQuery<T>, Expression<T> {
 	/**
 	 * Create a subquery list join object correlated to a list join
 	 * object of the enclosing query.
-	 *
-	 * @param parentList join object of the containing query
-	 *
+	 * 
+	 * @param parentList
+	 *            join object of the containing query
+	 * 
 	 * @return subquery join
 	 */
 	<X, Y> ListJoin<X, Y> correlate(ListJoin<X, Y> parentList);
@@ -198,23 +212,24 @@ public interface Subquery<T> extends AbstractQuery<T>, Expression<T> {
 	/**
 	 * Create a subquery map join object correlated to a map join
 	 * object of the enclosing query.
-	 *
-	 * @param parentMap join object of the containing query
-	 *
+	 * 
+	 * @param parentMap
+	 *            join object of the containing query
+	 * 
 	 * @return subquery join
 	 */
 	<X, K, V> MapJoin<X, K, V> correlate(MapJoin<X, K, V> parentMap);
 
 	/**
 	 * Return the query of which this is a subquery.
-	 *
+	 * 
 	 * @return the enclosing query or subquery
 	 */
 	AbstractQuery<?> getParent();
 
 	/**
 	 * Return the selection expression.
-	 *
+	 * 
 	 * @return the item to be returned in the subquery result
 	 */
 	Expression<T> getSelection();
@@ -224,7 +239,7 @@ public interface Subquery<T> extends AbstractQuery<T>, Expression<T> {
 	 * Returns empty set if the subquery has no correlated
 	 * joins.
 	 * Modifications to the set do not affect the query.
-	 *
+	 * 
 	 * @return the correlated joins of the subquery
 	 */
 	Set<Join<?, ?>> getCorrelatedJoins();
