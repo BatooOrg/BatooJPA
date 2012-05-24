@@ -3,18 +3,18 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
 	version="2.0">
 
-	<persistence-unit name="org.batoo.jpa.core.test.simple">
-		<provider>org.batoo.jpa.core.PersistenceProvider</provider>
+	<persistence-unit name="default">
+		<provider>org.batoo.jpa.core.BatooPersistenceProvider</provider>
 		
-		<class>org.batoo.jpa.core.test.simple.Foo</class>
+		<class>org.batoo.jpa.core.test.annotations.base.Address</class>
+		<class>org.batoo.jpa.core.test.annotations.base.Employee</class>
+		<class>org.batoo.jpa.core.test.annotations.base.Person</class>
 		
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.Driver40" />
-			<property name="javax.persistence.jdbc.url" value="jdbc:derby:memory:simple;create=true" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:derby:memory:testDB;create=true" />
 			<property name="javax.persistence.jdbc.user" value="sa" />
 			<property name="javax.persistence.jdbc.password" value="" />
-
-			<property name="org.batoo.jpa.ddl" value="DROP" />
 		</properties>
 
 	</persistence-unit>

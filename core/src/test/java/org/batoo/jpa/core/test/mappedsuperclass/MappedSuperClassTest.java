@@ -29,7 +29,7 @@ import junit.framework.Assert;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.jdbc.SingleValueHandler;
-import org.batoo.jpa.core.test.AbstractTest;
+import org.batoo.jpa.core.test.BaseCoreTest;
 import org.batoo.jpa.core.test.NullResultSetHandler;
 import org.junit.Test;
 
@@ -38,7 +38,7 @@ import org.junit.Test;
  * 
  * @since $version
  */
-public class MappedSuperClassTest extends AbstractTest {
+public class MappedSuperClassTest extends BaseCoreTest {
 
 	/**
 	 * @return new Foo

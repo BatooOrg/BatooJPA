@@ -20,7 +20,7 @@ package org.batoo.jpa.core.test.manytomanytomany;
 
 import junit.framework.Assert;
 
-import org.batoo.jpa.core.test.AbstractTest;
+import org.batoo.jpa.core.test.BaseCoreTest;
 import org.junit.Test;
 
 /**
@@ -28,7 +28,7 @@ import org.junit.Test;
  * 
  * @since $version
  */
-public class ManyToManyToManyTest extends AbstractTest {
+public class ManyToManyToManyTest extends BaseCoreTest {
 
 	/**
 	 * Tests to persist {@link ManyToMany} relations.

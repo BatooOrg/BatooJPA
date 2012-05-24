@@ -4,6 +4,7 @@
 	<access>PROPERTY</access>
 
 	<entity name="Entity" class="org.batoo.jpa.parser.test.Entity">
+	<secondary-table name=""></secondary-table>
 		<attributes>
 		</attributes>
 	</entity>

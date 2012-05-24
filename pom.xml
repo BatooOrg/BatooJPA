@@ -105,7 +105,13 @@
 			<!-- Internal -->
 			<dependency>
 				<groupId>org.batoo.jpa</groupId>
-				<artifactId>spec</artifactId>
+				<artifactId>parser</artifactId>
+				<version>${project.version}</version>
+				<type>bundle</type>
+			</dependency>
+			<dependency>
+				<groupId>org.batoo.jpa</groupId>
+				<artifactId>common</artifactId>
 				<version>${project.version}</version>
 				<type>bundle</type>
 			</dependency>

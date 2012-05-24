@@ -20,7 +20,7 @@ package org.batoo.jpa.core.test.onetoonetoone;
 
 import junit.framework.Assert;
 
-import org.batoo.jpa.core.test.AbstractTest;
+import org.batoo.jpa.core.test.BaseCoreTest;
 import org.junit.Test;
 
 /**
@@ -28,7 +28,7 @@ import org.junit.Test;
  * 
  * @since $version
  */
-public class OneToOneToOneTest extends AbstractTest {
+public class OneToOneToOneTest extends BaseCoreTest {
 
 	/**
 	 * Tests to {@link EntityManager#find(Class, Object)} person.

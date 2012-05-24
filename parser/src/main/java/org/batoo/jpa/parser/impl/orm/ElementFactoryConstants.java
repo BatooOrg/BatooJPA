@@ -74,6 +74,8 @@ public class ElementFactoryConstants {
 	protected static final String ELEMENT_TRANSIENT = "transient";
 	protected static final String ELEMENT_UNIQUE_CONSTRAINT = "unique-constraint";
 	protected static final String ELEMENT_VERSION = "version";
+	protected static final String ELEMENT_TABLE = "secondary-table";
+	protected static final String ELEMENT_SECONDARY_TABLE = "secondary-table";
 
 	/**
 	 * Column Attribute names.

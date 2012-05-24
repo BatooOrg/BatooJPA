@@ -18,16 +18,27 @@
  */
 package org.batoo.jpa.parser.impl.orm.type;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.AccessType;
 
+import org.batoo.jpa.parser.impl.orm.AssociationOverrideElementFactory;
+import org.batoo.jpa.parser.impl.orm.AttributeOverrideElementFactory;
 import org.batoo.jpa.parser.impl.orm.ElementFactory;
 import org.batoo.jpa.parser.impl.orm.ElementFactoryConstants;
 import org.batoo.jpa.parser.impl.orm.EntityMappingsFactory;
 import org.batoo.jpa.parser.impl.orm.ParentElementFactory;
+import org.batoo.jpa.parser.impl.orm.TableElementFactory;
 import org.batoo.jpa.parser.impl.orm.attribute.AttributesElementFactory;
+import org.batoo.jpa.parser.metadata.AssociationOverrideMetadata;
+import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
+import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
+import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
+import org.batoo.jpa.parser.metadata.TableMetadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
+
+import com.google.common.collect.Lists;
 
 /**
  * Element factory for <code>entity-mappings</code> elements.
@@ -42,8 +53,12 @@ public class EntityElementFactory extends ParentElementFactory implements Entity
 	private boolean metadataComplete;
 	private Boolean cachable;
 	private AccessType accessType;
-
+	private SequenceGeneratorMetadata sequenceGenerator;
+	private TableGeneratorMetadata tableGenerator;
 	private AttributesElementFactory attrs;
+	private TableMetadata table;
+	private final List<AttributeOverrideMetadata> attributeOverrides = Lists.newArrayList();
+	private final List<AssociationOverrideMetadata> associationOverrides = Lists.newArrayList();
 
 	/**
 	 * Constructor for ORM File parsing
@@ -59,7 +74,13 @@ public class EntityElementFactory extends ParentElementFactory implements Entity
 	public EntityElementFactory(ParentElementFactory parent, Map<String, String> attributes) {
 		super(parent, attributes, //
 			ElementFactoryConstants.ELEMENT_ACCESS, //
-			ElementFactoryConstants.ELEMENT_ATTRIBUTES);
+			ElementFactoryConstants.ELEMENT_ATTRIBUTE_OVERRIDE, //
+			ElementFactoryConstants.ELEMENT_ASSOCIATION_OVERRIDE, //
+			ElementFactoryConstants.ELEMENT_ATTRIBUTES, //
+			ElementFactoryConstants.ELEMENT_TABLE_GENERATOR, //
+			ElementFactoryConstants.ELEMENT_TABLE_GENERATOR, //
+			ElementFactoryConstants.ELEMENT_TABLE, //
+			ElementFactoryConstants.ELEMENT_SECONDARY_TABLE);
 	}
 
 	/**
@@ -84,6 +105,24 @@ public class EntityElementFactory extends ParentElementFactory implements Entity
 	@Override
 	public AccessType getAccessType() {
 		return this.accessType != null ? this.accessType : ((EntityMappingsFactory) this.getParent()).getAccessType();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<AssociationOverrideMetadata> getAssociationOverrides() {
+		return this.associationOverrides;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<AttributeOverrideMetadata> getAttributeOverrides() {
+		return this.attributeOverrides;
 	}
 
 	/**
@@ -127,9 +166,56 @@ public class EntityElementFactory extends ParentElementFactory implements Entity
 	 * 
 	 */
 	@Override
+	public SequenceGeneratorMetadata getSequenceGenerator() {
+		return this.sequenceGenerator;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public TableMetadata getTable() {
+		return this.table;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public TableGeneratorMetadata getTableGenerator() {
+		return this.tableGenerator;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	protected void handleChild(ElementFactory child) {
 		if (child instanceof AttributesElementFactory) {
 			this.attrs = (AttributesElementFactory) child;
+		}
+
+		if (child instanceof SequenceGeneratorMetadata) {
+			this.sequenceGenerator = (SequenceGeneratorMetadata) child;
+		}
+
+		if (child instanceof TableGeneratorMetadata) {
+			this.tableGenerator = (TableGeneratorMetadata) child;
+		}
+
+		if (child instanceof TableElementFactory) {
+			this.table = (TableMetadata) child;
+		}
+
+		if (child instanceof AttributeOverrideElementFactory) {
+			this.attributeOverrides.add((AttributeOverrideMetadata) child);
+		}
+
+		if (child instanceof AssociationOverrideElementFactory) {
+			this.associationOverrides.add((AssociationOverrideMetadata) child);
 		}
 	}
 

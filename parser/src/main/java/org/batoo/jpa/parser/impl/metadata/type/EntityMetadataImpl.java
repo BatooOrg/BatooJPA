@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.parser.impl.metadata.type;
 
+import java.util.List;
+
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Cacheable;
@@ -29,6 +31,11 @@ import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.log.ToStringBuilder;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.metadata.attribute.AttributesMetadataImpl;
+import org.batoo.jpa.parser.metadata.AssociationOverrideMetadata;
+import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
+import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
+import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
+import org.batoo.jpa.parser.metadata.TableMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 
@@ -99,6 +106,26 @@ public class EntityMetadataImpl implements EntityMetadata {
 		// if entity specifies an access type then value is return, otherwise the default access type provided is returned
 		final Access access = this.clazz.getAnnotation(Access.class);
 		return access != null ? access.value() : this.defaultAccessType;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<AssociationOverrideMetadata> getAssociationOverrides() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<AttributeOverrideMetadata> getAttributeOverrides() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -181,8 +208,38 @@ public class EntityMetadataImpl implements EntityMetadata {
 	 * 
 	 */
 	@Override
+	public SequenceGeneratorMetadata getSequenceGenerator() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public TableMetadata getTable() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public TableGeneratorMetadata getTableGenerator() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public boolean isMetadataComplete() {
-		// if ORM Metada specifies then it is returned, otherwise false is returned as default
+		// if ORM Metadata specifies then it is returned, otherwise false is returned as default
 		return this.ormMetadata != null ? this.ormMetadata.isMetadataComplete() : false;
 	}
 

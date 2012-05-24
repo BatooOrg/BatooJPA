@@ -18,9 +18,7 @@
  */
 package org.batoo.jpa.core.test;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.Enumeration;
+import java.io.InputStream;
 
 /**
  * A test class loader to map test persistence.xml's
@@ -42,7 +40,10 @@ public class TestClassLoader extends ClassLoader {
 	}
 
 	/**
+	 * Sets the parent class loader.
+	 * 
 	 * @param parent
+	 *            the parent class loader
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -56,23 +57,25 @@ public class TestClassLoader extends ClassLoader {
 	 * 
 	 */
 	@Override
-	public Enumeration<URL> getResources(String name) throws IOException {
-		if ("META-INF/persistence.xml".equals(name)) {
-			return super.getResources(this.root + ".xml");
+	public InputStream getResourceAsStream(String name) {
+		if (name.startsWith("META-INF")) {
+			name = this.root + name.substring(8);
+			return super.getResourceAsStream(name);
 		}
 
-		return super.getResources(name);
+		return super.getResourceAsStream(name);
 	}
 
 	/**
-	 * Sets the test name
+	 * Sets the root of the test.
 	 * 
 	 * @param root
+	 *            the root of the test
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	public void setRoot(String root) {
-		this.root = root;
+		this.root = root.replace('.', '/');
 	}
 }

@@ -22,7 +22,7 @@ import javax.persistence.PersistenceException;
 
 import junit.framework.Assert;
 
-import org.batoo.jpa.core.test.AbstractTest;
+import org.batoo.jpa.core.test.BaseCoreTest;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -32,7 +32,7 @@ import org.junit.Test;
  * 
  * @since $version
  */
-public class EagerTest extends AbstractTest {
+public class EagerTest extends BaseCoreTest {
 
 	private static Country TR;
 

@@ -27,16 +27,16 @@ import javax.persistence.TemporalType;
 
 import org.batoo.jpa.parser.impl.metadata.ColumnMetadataImpl;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
-import org.batoo.jpa.parser.metadata.attribute.BasicSingularAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.PhysicalAttributeMetadata;
 
 /**
  * 
- * The implementation of the {@link BasicSingularAttributeMetadata}.
+ * The implementation of the {@link PhysicalAttributeMetadata}.
  * 
  * @author hceylan
  * @since $version
  */
-public class BasicSingularAttributeMetadataImpl extends AttributeMetadataImpl implements BasicSingularAttributeMetadata {
+public class BasicSingularAttributeMetadataImpl extends AttributeMetadataImpl implements PhysicalAttributeMetadata {
 
 	private final ColumnMetadata column;
 	private final TemporalType temporalType;
@@ -51,7 +51,7 @@ public class BasicSingularAttributeMetadataImpl extends AttributeMetadataImpl im
 	 * @since $version
 	 * @author hceylan
 	 */
-	public BasicSingularAttributeMetadataImpl(Member member, BasicSingularAttributeMetadata metadata) {
+	public BasicSingularAttributeMetadataImpl(Member member, PhysicalAttributeMetadata metadata) {
 		super(member, metadata);
 
 		this.column = metadata.getColumn();

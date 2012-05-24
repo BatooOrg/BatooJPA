@@ -33,7 +33,6 @@ import org.batoo.jpa.parser.metadata.GeneratedValueMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.attribute.IdAttributeMetadata;
-import org.batoo.jpa.parser.metadata.attribute.VersionAttributeMetadata;
 
 /**
  * The implementation of the {@link IdAttributeMetadata}.
@@ -43,9 +42,26 @@ import org.batoo.jpa.parser.metadata.attribute.VersionAttributeMetadata;
  */
 public class IdAttributeMetadataImpl extends BasicSingularAttributeMetadataImpl implements IdAttributeMetadata {
 
-	private GeneratedValueMetadata generatedValue;
-	private SequenceGeneratorMetadata sequenceGenerator;
-	private TableGeneratorMetadata tableGenerator;
+	private final GeneratedValueMetadata generatedValue;
+	private final SequenceGeneratorMetadata sequenceGenerator;
+	private final TableGeneratorMetadata tableGenerator;
+
+	/**
+	 * @param member
+	 *            the java member of basic attribute
+	 * @param metadata
+	 *            the metadata definition of the basic attribute
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public IdAttributeMetadataImpl(Member member, IdAttributeMetadata metadata) {
+		super(member, metadata);
+
+		this.generatedValue = metadata.getGeneratedValue();
+		this.sequenceGenerator = metadata.getSequenceGenerator();
+		this.tableGenerator = metadata.getTableGenerator();
+	}
 
 	/**
 	 * @param member
@@ -74,19 +90,6 @@ public class IdAttributeMetadataImpl extends BasicSingularAttributeMetadataImpl 
 		this.tableGenerator = this.tableGenerator != null ? new TableGeneratorMetadataImpl(this.getLocator(), tableGenerator) : null;
 		this.sequenceGenerator = this.sequenceGenerator != null ? new SequenceGeneratorMetadataImpl(this.getLocator(), sequenceGenerator)
 			: null;
-	}
-
-	/**
-	 * @param member
-	 *            the java member of basic attribute
-	 * @param metadata
-	 *            the metadata definition of the basic attribute
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public IdAttributeMetadataImpl(Member member, VersionAttributeMetadata metadata) {
-		super(member, metadata);
 	}
 
 	/**

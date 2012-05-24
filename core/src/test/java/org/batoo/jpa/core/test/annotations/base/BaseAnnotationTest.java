@@ -20,7 +20,7 @@ package org.batoo.jpa.core.test.annotations.base;
 
 import junit.framework.Assert;
 
-import org.batoo.jpa.core.test.AbstractTest;
+import org.batoo.jpa.core.test.BaseCoreTest;
 import org.junit.Test;
 
 /**
@@ -28,7 +28,7 @@ import org.junit.Test;
  * 
  * @since $version
  */
-public class BaseAnnotationTest extends AbstractTest {
+public class BaseAnnotationTest extends BaseCoreTest {
 
 	/**
 	 * Test if {@link Person} deployed correctly

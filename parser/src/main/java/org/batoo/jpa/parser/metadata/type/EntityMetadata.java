@@ -18,9 +18,16 @@
  */
 package org.batoo.jpa.parser.metadata.type;
 
+import java.util.List;
+
 import javax.persistence.AccessType;
 
+import org.batoo.jpa.parser.metadata.AssociationOverrideMetadata;
+import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.BindableMetadata;
+import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
+import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
+import org.batoo.jpa.parser.metadata.TableMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
 
 /**
@@ -40,6 +47,26 @@ public interface EntityMetadata extends BindableMetadata {
 	 * @author hceylan
 	 */
 	AccessType getAccessType();
+
+	/**
+	 * Returns the associationOverrides of the entity.
+	 * 
+	 * @return the associationOverrides of the entity
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public List<AssociationOverrideMetadata> getAssociationOverrides();
+
+	/**
+	 * Returns the attributeOverrides of the entity.
+	 * 
+	 * @return the attributeOverrides of the entity
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public List<AttributeOverrideMetadata> getAttributeOverrides();
 
 	/**
 	 * Returns the attributes of the entity.
@@ -70,6 +97,36 @@ public interface EntityMetadata extends BindableMetadata {
 	 * @author hceylan
 	 */
 	String getClassName();
+
+	/**
+	 * Returns the sequenceGenerator of the entity.
+	 * 
+	 * @return the sequenceGenerator of the entity
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public SequenceGeneratorMetadata getSequenceGenerator();
+
+	/**
+	 * Returns the table of the entity.
+	 * 
+	 * @return the table of the entity
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public TableMetadata getTable();
+
+	/**
+	 * Returns the tableGenerator of the entity.
+	 * 
+	 * @return the tableGenerator of the entity
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public TableGeneratorMetadata getTableGenerator();
 
 	/**
 	 * Returns if the entity's metadata is complete.

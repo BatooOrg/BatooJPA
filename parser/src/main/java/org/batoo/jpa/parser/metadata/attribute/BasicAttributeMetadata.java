@@ -27,7 +27,7 @@ import javax.persistence.EnumType;
  * @author hceylan
  * @since $version
  */
-public interface BasicAttributeMetadata extends BasicSingularAttributeMetadata {
+public interface BasicAttributeMetadata extends PhysicalAttributeMetadata {
 
 	/**
 	 * Returns the enumType of the basic attribute.

@@ -29,7 +29,7 @@ import org.batoo.jpa.parser.impl.orm.ElementFactoryConstants;
 import org.batoo.jpa.parser.impl.orm.ParentElementFactory;
 import org.batoo.jpa.parser.impl.orm.TemporalElementFactory;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
-import org.batoo.jpa.parser.metadata.attribute.BasicSingularAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.PhysicalAttributeMetadata;
 
 /**
  * Common implementation of singular attribute element factories.
@@ -37,7 +37,7 @@ import org.batoo.jpa.parser.metadata.attribute.BasicSingularAttributeMetadata;
  * @author hceylan
  * @since $version
  */
-public abstract class SingularAttributeElementFactory extends AttributeElementFactory implements BasicSingularAttributeMetadata {
+public abstract class SingularAttributeElementFactory extends AttributeElementFactory implements PhysicalAttributeMetadata {
 
 	private ColumnElementFactory column;
 	private TemporalType temporalType;

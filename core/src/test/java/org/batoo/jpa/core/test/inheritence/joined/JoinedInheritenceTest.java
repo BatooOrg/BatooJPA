@@ -22,7 +22,7 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.batoo.jpa.core.test.AbstractTest;
+import org.batoo.jpa.core.test.BaseCoreTest;
 import org.junit.Test;
 
 import com.google.common.collect.Sets;
@@ -32,7 +32,7 @@ import com.google.common.collect.Sets;
  * 
  * @since $version
  */
-public class JoinedInheritenceTest extends AbstractTest {
+public class JoinedInheritenceTest extends BaseCoreTest {
 
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with root type

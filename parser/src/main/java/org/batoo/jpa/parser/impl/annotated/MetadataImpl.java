@@ -55,6 +55,20 @@ public class MetadataImpl implements Metadata {
 	}
 
 	/**
+	 * Returns if the type is already contained in the metamodel.
+	 * 
+	 * @param className
+	 *            the name of the class
+	 * @return true if the type is already contained in the metamodel, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean contains(String className) {
+		return this.entities.containsKey(className);
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */

@@ -18,19 +18,24 @@
  */
 package org.batoo.jpa.common.reflect;
 
+import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
+import org.reflections.util.ClasspathHelper;
 
 import sun.misc.Unsafe;
 
@@ -144,6 +149,33 @@ public class ReflectHelper {
 		}
 
 		throw new IllegalArgumentException("Member is neither field nor method: " + member);
+	}
+
+	/**
+	 * Returns the class path URLSs.
+	 * 
+	 * @return the class path URLSs
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public static Set<URL> getClasspathUrls() {
+		final Set<URL> urls = ClasspathHelper.forClassLoader(ClasspathHelper.defaultClassLoaders);
+		for (final Iterator<URL> i = urls.iterator(); i.hasNext();) {
+			final URL item = i.next();
+			try {
+				final File file = new File(item.toURI());
+				if (file.isDirectory() || file.getAbsolutePath().endsWith(".jar")) {
+					continue;
+				}
+			}
+			catch (final URISyntaxException e) {}
+
+			ReflectHelper.LOG.warn("Skipping classpath url {0}", item);
+			i.remove();
+		}
+
+		return urls;
 	}
 
 	/**
@@ -263,4 +295,5 @@ public class ReflectHelper {
 				Joiner.on(", ").join(filtered));
 		}
 	}
+
 }

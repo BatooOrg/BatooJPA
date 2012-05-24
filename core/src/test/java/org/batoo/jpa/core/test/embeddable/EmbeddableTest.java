@@ -26,7 +26,7 @@ import junit.framework.Assert;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.jdbc.SingleValueHandler;
-import org.batoo.jpa.core.test.AbstractTest;
+import org.batoo.jpa.core.test.BaseCoreTest;
 import org.junit.Test;
 
 /**
@@ -34,7 +34,7 @@ import org.junit.Test;
  * 
  * @since $version
  */
-public class EmbeddableTest extends AbstractTest {
+public class EmbeddableTest extends BaseCoreTest {
 
 	private Foo foo() {
 		final Foo foo = new Foo();

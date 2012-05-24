@@ -22,7 +22,7 @@ import javax.persistence.PersistenceException;
 
 import junit.framework.Assert;
 
-import org.batoo.jpa.core.test.AbstractTest;
+import org.batoo.jpa.core.test.BaseCoreTest;
 import org.junit.Test;
 
 /**
@@ -30,7 +30,7 @@ import org.junit.Test;
  * 
  * @since $version
  */
-public class ManyToOneToManyTest extends AbstractTest {
+public class ManyToOneToManyTest extends BaseCoreTest {
 
 	private Person person() {
 		final Person person = new Person("Ceylan");

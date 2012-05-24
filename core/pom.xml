@@ -15,7 +15,13 @@
 		<!-- Internal Dependencies -->
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
-			<artifactId>spec</artifactId>
+			<artifactId>parser</artifactId>
+			<type>bundle</type>
+		</dependency>
+
+		<dependency>
+			<groupId>org.batoo.jpa</groupId>
+			<artifactId>common</artifactId>
 			<type>bundle</type>
 		</dependency>
 
@@ -56,12 +62,16 @@
 			<artifactId>reflections</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>commons-dbutils</groupId>
-			<artifactId>commons-dbutils</artifactId>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>commons-collections</groupId>
 			<artifactId>commons-collections</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-dbutils</groupId>
+			<artifactId>commons-dbutils</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>

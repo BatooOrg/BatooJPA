@@ -28,7 +28,7 @@ import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
  * @author hceylan
  * @since $version
  */
-public interface IdAttributeMetadata extends BasicSingularAttributeMetadata {
+public interface IdAttributeMetadata extends PhysicalAttributeMetadata {
 
 	/**
 	 * Returns the value generation definition of the id attribute.

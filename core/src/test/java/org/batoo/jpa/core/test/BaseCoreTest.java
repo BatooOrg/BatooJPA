@@ -23,13 +23,18 @@ import java.util.HashMap;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
+import javax.persistence.PersistenceContext;
 
 import junit.framework.Assert;
 
-import org.batoo.jpa.core.JPASettings;
-import org.batoo.jpa.core.PersistenceProvider;
+import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.core.BJPASettings;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 
 import com.google.common.collect.Maps;
 
@@ -38,8 +43,38 @@ import com.google.common.collect.Maps;
  * 
  * @since $version
  */
-public abstract class AbstractTest {
+public abstract class BaseCoreTest {
 
+	private static final String DEFAULT = "default";
+
+	/**
+	 * Rule to get Persistence XML File name.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Rule
+	public final TestWatcher watchman = new TestWatcher() {
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 */
+		@Override
+		protected void starting(Description description) {
+			BaseCoreTest.this.persistenceUnitName = BaseCoreTest.DEFAULT;
+
+			final PersistenceContext persistenceContext = description.getAnnotation(PersistenceContext.class);
+			if (persistenceContext != null) {
+				// if unit name is not the default set the unit name
+				if (StringUtils.isNotBlank(persistenceContext.unitName())) {
+					BaseCoreTest.this.persistenceUnitName = persistenceContext.unitName();
+				}
+			}
+		}
+	};
+
+	private String persistenceUnitName;
 	private EntityManagerFactory emf;
 	private ClassLoader oldContextClassLoader;
 	private EntityManager em;
@@ -211,8 +246,8 @@ public abstract class AbstractTest {
 	protected HashMap<Object, Object> getProperties() {
 		final HashMap<Object, Object> properties = Maps.newHashMap();
 
-		properties.put(JPASettings.ROOT_PACKAGE, this.getRootPackage());
-		properties.put(JPASettings.CLASS_LOADER_CLASS, TestClassLoader.class.getCanonicalName());
+		properties.put(BJPASettings.ROOT_PACKAGE, this.getRootPackage());
+		properties.put(BJPASettings.CLASS_LOADER_CLASS, TestClassLoader.class.getCanonicalName());
 
 		return properties;
 	}
@@ -287,7 +322,6 @@ public abstract class AbstractTest {
 	}
 
 	private void setupEmf() {
-		final PersistenceProvider persistence = new PersistenceProvider();
 
 		final Thread currentThread = Thread.currentThread();
 		this.oldContextClassLoader = currentThread.getContextClassLoader();
@@ -296,7 +330,7 @@ public abstract class AbstractTest {
 		currentThread.setContextClassLoader(cl);
 		cl.setRoot(this.getRootPackage());
 
-		this.emf = persistence.createEntityManagerFactory(this.getPersistenceUnitName(), this.getProperties());
+		this.emf = Persistence.createEntityManagerFactory(this.persistenceUnitName);
 
 		Assert.assertNotNull("EntityManagerFactory is null", this.emf);
 	}

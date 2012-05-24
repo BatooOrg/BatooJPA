@@ -18,10 +18,13 @@
  */
 package org.batoo.jpa.parser.impl;
 
+import javax.persistence.Table;
+
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.annotated.MetadataImpl;
+import org.batoo.jpa.parser.impl.metadata.TableMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.type.EntityMetadataImpl;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 
@@ -67,6 +70,8 @@ public class AnnotationParser {
 			catch (final ClassNotFoundException e) {
 				throw new MappingException("Class " + entity.getClassName() + " cannot be found.", entity.getLocation());
 			}
+
+			new TableMetadataImpl(clazz, clazz.getAnnotation(Table.class), entity.getTable());
 
 			this.metadata.add(new EntityMetadataImpl(clazz, this.metadata.getAccessType(), entity));
 		}

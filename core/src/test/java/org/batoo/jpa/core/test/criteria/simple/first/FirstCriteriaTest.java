@@ -19,7 +19,7 @@
 package org.batoo.jpa.core.test.criteria.simple.first;
 
 import org.batoo.jpa.core.BLogger;
-import org.batoo.jpa.core.test.AbstractTest;
+import org.batoo.jpa.core.test.BaseCoreTest;
 import org.junit.Test;
 
 /**
@@ -27,7 +27,7 @@ import org.junit.Test;
  * 
  * @since $version
  */
-public class FirstCriteriaTest extends AbstractTest {
+public class FirstCriteriaTest extends BaseCoreTest {
 
 	private static final BLogger LOG = BLogger.getLogger(FirstCriteriaTest.class);
 

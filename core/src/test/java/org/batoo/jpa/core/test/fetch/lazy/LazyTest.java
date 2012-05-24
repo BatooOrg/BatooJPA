@@ -22,7 +22,7 @@ import javax.persistence.PersistenceException;
 
 import junit.framework.Assert;
 
-import org.batoo.jpa.core.test.AbstractTest;
+import org.batoo.jpa.core.test.BaseCoreTest;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,7 +31,7 @@ import org.junit.Test;
  * 
  * @since $version
  */
-public class LazyTest extends AbstractTest {
+public class LazyTest extends BaseCoreTest {
 
 	private static final String COUNTRY_UK = "UK";
 	private static final String COUNTRY_USA = "USA";

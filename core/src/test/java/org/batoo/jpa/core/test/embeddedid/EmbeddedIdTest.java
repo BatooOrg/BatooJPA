@@ -20,7 +20,7 @@ package org.batoo.jpa.core.test.embeddedid;
 
 import junit.framework.Assert;
 
-import org.batoo.jpa.core.test.AbstractTest;
+import org.batoo.jpa.core.test.BaseCoreTest;
 import org.junit.Test;
 
 /**
@@ -28,7 +28,7 @@ import org.junit.Test;
  * 
  * @since $version
  */
-public class EmbeddedIdTest extends AbstractTest {
+public class EmbeddedIdTest extends BaseCoreTest {
 
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with identity value

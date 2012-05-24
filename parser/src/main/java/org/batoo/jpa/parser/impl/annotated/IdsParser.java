@@ -37,7 +37,6 @@ import org.batoo.jpa.parser.impl.AnnotationParser;
 import org.batoo.jpa.parser.impl.metadata.attribute.AttributesMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.attribute.IdAttributeMetadataImpl;
 import org.batoo.jpa.parser.metadata.attribute.IdAttributeMetadata;
-import org.batoo.jpa.parser.metadata.attribute.VersionAttributeMetadata;
 
 import com.google.common.collect.Sets;
 
@@ -71,7 +70,7 @@ public class IdsParser extends AbstractAttributesParser<IdAttributeMetadata> {
 	@Override
 	protected void parseAttribute(String name, Member member, IdAttributeMetadata ormMetadata) {
 		if (ormMetadata != null) {
-			this.getAttributes().add(new IdAttributeMetadataImpl(member, (VersionAttributeMetadata) ormMetadata));
+			this.getAttributes().add(new IdAttributeMetadataImpl(member, (IdAttributeMetadata) ormMetadata));
 
 			ReflectHelper.warnAnnotations(AnnotationParser.LOG, member, Collections.<Class<? extends Annotation>> emptySet());
 		}

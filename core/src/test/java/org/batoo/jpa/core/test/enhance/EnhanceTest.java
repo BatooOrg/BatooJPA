@@ -24,7 +24,7 @@ import javax.persistence.metamodel.EntityType;
 
 import org.batoo.jpa.core.impl.SessionImpl;
 import org.batoo.jpa.core.impl.instance.Enhancer;
-import org.batoo.jpa.core.test.AbstractTest;
+import org.batoo.jpa.core.test.BaseCoreTest;
 import org.junit.Test;
 
 /**
@@ -32,7 +32,7 @@ import org.junit.Test;
  * @author hceylan
  * @since $version
  */
-public class EnhanceTest extends AbstractTest {
+public class EnhanceTest extends BaseCoreTest {
 
 	@Test
 	public void testEnhance() throws Exception {

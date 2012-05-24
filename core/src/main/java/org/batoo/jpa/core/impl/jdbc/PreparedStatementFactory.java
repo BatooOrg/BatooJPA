@@ -16,48 +16,54 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.parser.metadata.attribute;
+package org.batoo.jpa.core.impl.jdbc;
 
-import javax.persistence.FetchType;
-import javax.persistence.TemporalType;
+import java.sql.SQLException;
 
-import org.batoo.jpa.parser.metadata.ColumnMetadata;
+import org.apache.commons.pool.BaseKeyedPoolableObjectFactory;
+
+import com.google.common.annotations.Beta;
 
 /**
- * The definition of the singular attributes.
+ * A Factory to implement preparation of {@link PreparedStatementImpl}s
  * 
  * @author hceylan
  * @since $version
  */
-public interface BasicSingularAttributeMetadata extends AttributeMetadata {
+@Beta
+public class PreparedStatementFactory extends BaseKeyedPoolableObjectFactory<String, PreparedStatementImpl> {
+
+	private final ConnectionImpl connection;
 
 	/**
-	 * Returns the column definition of the singular attribute.
-	 * 
-	 * @return the column definition of the singular attribute
+	 * @param connection
+	 *            the connection
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	ColumnMetadata getColumn();
+	public PreparedStatementFactory(ConnectionImpl connection) {
+		super();
+
+		this.connection = connection;
+	}
 
 	/**
-	 * Returns the fetch type of the attribute.
+	 * {@inheritDoc}
 	 * 
-	 * @return the fetch type of the attribute
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	FetchType getFetchType();
+	@Override
+	public void destroyObject(String key, PreparedStatementImpl obj) throws SQLException {
+		obj.close0();
+	}
 
 	/**
-	 * Returns the temporal type of the singular attribute.
+	 * {@inheritDoc}
 	 * 
-	 * @return the temporal type of the singular attribute
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	TemporalType getTemporalType();
+	@Override
+	public PreparedStatementImpl makeObject(String key) throws SQLException {
+		return this.connection.prepareStatement0(key);
+	}
+
 }

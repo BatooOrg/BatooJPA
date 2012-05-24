@@ -25,6 +25,6 @@ package org.batoo.jpa.parser.metadata.attribute;
  * @author hceylan
  * @since $version
  */
-public interface VersionAttributeMetadata extends BasicSingularAttributeMetadata {
+public interface VersionAttributeMetadata extends PhysicalAttributeMetadata {
 
 }

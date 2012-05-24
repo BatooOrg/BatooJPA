@@ -24,3 +24,6 @@ embeddeds
 init
 immutability
 inline
+utils
+lob
+datasource

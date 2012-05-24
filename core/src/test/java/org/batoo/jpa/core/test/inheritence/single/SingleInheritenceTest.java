@@ -20,7 +20,7 @@ package org.batoo.jpa.core.test.inheritence.single;
 
 import junit.framework.Assert;
 
-import org.batoo.jpa.core.test.AbstractTest;
+import org.batoo.jpa.core.test.BaseCoreTest;
 import org.junit.Test;
 
 /**
@@ -28,7 +28,7 @@ import org.junit.Test;
  * 
  * @since $version
  */
-public class SingleInheritenceTest extends AbstractTest {
+public class SingleInheritenceTest extends BaseCoreTest {
 
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with root type

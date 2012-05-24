@@ -83,7 +83,7 @@ public class BasicAttributeMetadataImpl extends BasicSingularAttributeMetadataIm
 		super(member, name, column, basic != null ? basic.fetch() : FetchType.EAGER, temporal);
 
 		this.lob = lob != null;
-		this.enumType = enumerated != null ? enumerated.value() : EnumType.ORDINAL;
+		this.enumType = enumerated != null ? enumerated.value() : null;
 		this.optional = basic != null ? basic.optional() : true;
 	}
 

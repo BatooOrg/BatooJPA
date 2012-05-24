@@ -22,7 +22,7 @@ import java.util.Iterator;
 
 import junit.framework.Assert;
 
-import org.batoo.jpa.core.test.AbstractTest;
+import org.batoo.jpa.core.test.BaseCoreTest;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -33,7 +33,7 @@ import org.junit.Test;
  * @since $version
  */
 @Ignore
-public class RefreshTest extends AbstractTest {
+public class RefreshTest extends BaseCoreTest {
 
 	private static final String COUNTRY_UK = "UK";
 	private static final String COUNTRY_USA = "USA";

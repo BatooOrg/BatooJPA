@@ -19,7 +19,9 @@
 package org.batoo.jpa.parser.impl;
 
 import java.io.InputStream;
+import java.util.List;
 
+import javax.persistence.AccessType;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -27,9 +29,12 @@ import javax.xml.bind.Unmarshaller;
 import org.batoo.jpa.common.BatooException;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.annotated.MetadataImpl;
+import org.batoo.jpa.parser.impl.metadata.type.EntityMetadataImpl;
 import org.batoo.jpa.parser.persistence.Persistence;
 import org.batoo.jpa.parser.persistence.Persistence.PersistenceUnit;
+import org.batoo.jpa.parser.persistence.Persistence.PersistenceUnit.Properties.Property;
 
 /**
  * 
@@ -62,14 +67,13 @@ public class PersistenceParser {
 		this.puName = persistenceUnitName;
 		this.metadata = new MetadataImpl();
 
-		// parse the Persistence XML
 		this.init();
 
-		// parse ORM XML Files phase
 		this.parseOrmXmls();
-
-		// parse annotated model
 		this.parse();
+		this.parseExplicitClasses();
+
+		PersistenceParser.LOG.debug("Final metamodel {0}", this.metadata);
 	}
 
 	/**
@@ -85,7 +89,27 @@ public class PersistenceParser {
 	}
 
 	/**
-	 * Initializes the persistence unit.
+	 * Returns the property value of the key.
+	 * 
+	 * @param key
+	 *            the key of the property
+	 * @return the property value of the key or null
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getProperty(String key) {
+		for (final Property property : this.persistenceUnit.getProperties().getProperties()) {
+			if (property.getName().equals(key)) {
+				return property.getValue();
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Initializes the persistence unit by parsing the Persistence XML File.
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -135,8 +159,26 @@ public class PersistenceParser {
 	 */
 	private void parse() {
 		new AnnotationParser(this.metadata).parse();
+	}
 
-		PersistenceParser.LOG.debug("Final metamodel {0}", this.metadata);
+	/**
+	 * Parses the explicit
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void parseExplicitClasses() {
+		final List<String> classes = this.persistenceUnit.getClazzs();
+		for (final String className : classes) {
+			if (!this.metadata.contains(className)) {
+				try {
+					this.metadata.add(new EntityMetadataImpl(Class.forName(className), AccessType.FIELD, null));
+				}
+				catch (final ClassNotFoundException e) {
+					throw new MappingException("Class " + className + " not found.", "persistence.xml");
+				}
+			}
+		}
 	}
 
 	private void parseOrmXml(final String mappingFile) {
