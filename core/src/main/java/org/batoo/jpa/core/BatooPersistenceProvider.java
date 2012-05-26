@@ -18,7 +18,6 @@
  */
 package org.batoo.jpa.core;
 
-import java.sql.SQLException;
 import java.util.Map;
 
 import javax.persistence.EntityManagerFactory;
@@ -26,12 +25,7 @@ import javax.persistence.spi.PersistenceProvider;
 import javax.persistence.spi.PersistenceUnitInfo;
 import javax.persistence.spi.ProviderUtil;
 
-import org.batoo.jpa.common.BatooException;
-import org.batoo.jpa.core.impl.EntityManagerFactoryImpl;
-import org.batoo.jpa.core.impl.jdbc.AbstractJdbcAdaptor;
-import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
-import org.batoo.jpa.core.impl.model.MetamodelImpl;
-import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
+import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.parser.PersistenceParser;
 
 /**
@@ -42,9 +36,6 @@ import org.batoo.jpa.parser.PersistenceParser;
  */
 public class BatooPersistenceProvider implements PersistenceProvider {
 
-	private DataSourceImpl datasource;
-	private JdbcAdaptor jdbcAdaptor;
-
 	/**
 	 * {@inheritDoc}
 	 * 
@@ -52,19 +43,6 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 	@Override
 	public EntityManagerFactoryImpl createContainerEntityManagerFactory(PersistenceUnitInfo info, @SuppressWarnings("rawtypes") Map map) {
 		return null;
-	}
-
-	private void createDatasource(PersistenceParser parser) throws SQLException {
-		final boolean scanExternal = Boolean.valueOf(parser.getProperty(BJPASettings.SCAN_EXTERNAL_JDBC_DRIVERS));
-		final String jdbcDriver = parser.getProperty(JPASettings.JDBC_DRIVER);
-
-		this.jdbcAdaptor = AbstractJdbcAdaptor.getAdapter(scanExternal, jdbcDriver);
-
-		final String jdbcUrl = parser.getProperty(JPASettings.JDBC_URL);
-		final String jdbcUser = parser.getProperty(JPASettings.JDBC_USER);
-		final String jdbcPassword = parser.getProperty(JPASettings.JDBC_PASSWORD);
-
-		this.datasource = new DataSourceImpl(jdbcUrl, jdbcUser, jdbcPassword);
 	}
 
 	/**
@@ -76,19 +54,8 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 		// create the persistence parser
 		final PersistenceParser parser = new PersistenceParser(emName);
 
-		// create the datasource
-		try {
-			this.createDatasource(parser);
-		}
-		catch (final SQLException e) {
-			throw new BatooException("Cannot create the datasource", e);
-		}
-
-		// create the metamodel
-		final MetamodelImpl metamodel = new MetamodelImpl(this.jdbcAdaptor, parser.getMetadata());
-
 		// finally, create the entity manager factory
-		return new EntityManagerFactoryImpl(emName, metamodel, this.datasource);
+		return new EntityManagerFactoryImpl(emName, parser);
 	}
 
 	/**

@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.parser;
 
+import org.batoo.jpa.parser.impl.AbstractLocator;
+
 import com.google.common.base.Joiner;
 
 /**
@@ -32,18 +34,31 @@ public class MappingException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Constructs a new {@link MappingException} with duplicate definitions.
-	 * 
 	 * @param message
 	 *            the message to prepend to the constructed message
-	 * @param loctions
+	 * @param locations
 	 *            the locators
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public MappingException(String message, Object... loctions) {
-		super(message + " Defined at:" + (loctions.length > 1 ? "\n\t" : " ") + Joiner.on("\n\t").join(loctions));
+	public MappingException(String message, AbstractLocator... locations) {
+		super(message + " Defined at:" + (locations.length > 1 ? "\n\t" : " ") + Joiner.on("\n\t").join(locations));
+	}
+
+	/**
+	 * @param message
+	 *            the message to prepend to the constructed message
+	 * @param cause
+	 *            the cause of the exception
+	 * @param locations
+	 *            the locators
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public MappingException(String message, Throwable cause, AbstractLocator... locations) {
+		super(message + " Defined at:" + (locations.length > 1 ? "\n\t" : " ") + Joiner.on("\n\t").join(locations), cause);
 	}
 
 }

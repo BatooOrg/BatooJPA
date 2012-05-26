@@ -21,8 +21,8 @@ package org.batoo.jpa.core.test.enhance;
 import java.sql.SQLException;
 
 import org.batoo.jpa.core.MappingException;
-import org.batoo.jpa.core.impl.SessionImpl;
-import org.batoo.jpa.core.impl.instance.EnhancedInstance;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.manager.instance.EnhancedInstance;
 
 /**
  * A Sample class for the enhanced type

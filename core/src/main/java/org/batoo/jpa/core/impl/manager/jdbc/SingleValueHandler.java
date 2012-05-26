@@ -16,34 +16,44 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.enhance;
+package org.batoo.jpa.core.impl.manager.jdbc;
 
-import java.lang.reflect.Constructor;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-import javax.persistence.metamodel.EntityType;
-
-import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.manager.instance.Enhancer;
-import org.batoo.jpa.core.test.BaseCoreTest;
-import org.junit.Test;
+import org.apache.commons.dbutils.ResultSetHandler;
 
 /**
+ * A Handler to return single values from the result sets.
+ * 
+ * @param <T>
+ *            the target type the input ResultSet will be converted to.
  * 
  * @author hceylan
  * @since $version
  */
-public class EnhanceTest extends BaseCoreTest {
+public class SingleValueHandler<T> implements ResultSetHandler<T> {
 
-	@Test
-	public void testEnhance() throws Exception {
-		final EntityType<Person> type = this.em().getMetamodel().entity(Person.class);
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public SingleValueHandler() {
+		super();
+	}
 
-		final Class<? extends Person> enhanced = Enhancer.enhance(type);
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public T handle(ResultSet rs) throws SQLException {
+		if (rs.next()) {
+			return (T) rs.getObject(1);
+		}
 
-		final Constructor<? extends Person> constructor = enhanced.getConstructor(Class.class, SessionImpl.class, Object.class,
-			boolean.class);
-		final Person newInstance = constructor.newInstance(null, null, null, true);
-
-		System.out.println(newInstance);
+		return null;
 	}
 }

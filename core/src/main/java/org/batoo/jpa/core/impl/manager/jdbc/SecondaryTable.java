@@ -16,34 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.enhance;
+package org.batoo.jpa.core.impl.manager.jdbc;
 
-import java.lang.reflect.Constructor;
-
-import javax.persistence.metamodel.EntityType;
-
-import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.manager.instance.Enhancer;
-import org.batoo.jpa.core.test.BaseCoreTest;
-import org.junit.Test;
+import org.batoo.jpa.core.impl.manager.model.EntityTypeImpl;
+import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 
 /**
+ * Table representing an secondary table for entity persistent storage.
  * 
  * @author hceylan
  * @since $version
  */
-public class EnhanceTest extends BaseCoreTest {
+public class SecondaryTable extends AbstractTable {
 
-	@Test
-	public void testEnhance() throws Exception {
-		final EntityType<Person> type = this.em().getMetamodel().entity(Person.class);
+	private final EntityTypeImpl<?> entity;
 
-		final Class<? extends Person> enhanced = Enhancer.enhance(type);
+	/**
+	 * @param entity
+	 *            the entity
+	 * @param metadata
+	 *            the table metadata
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public SecondaryTable(EntityTypeImpl<?> entity, SecondaryTableMetadata metadata) {
+		super(metadata.getName(), metadata);
 
-		final Constructor<? extends Person> constructor = enhanced.getConstructor(Class.class, SessionImpl.class, Object.class,
-			boolean.class);
-		final Person newInstance = constructor.newInstance(null, null, null, true);
-
-		System.out.println(newInstance);
+		this.entity = entity;
 	}
 }

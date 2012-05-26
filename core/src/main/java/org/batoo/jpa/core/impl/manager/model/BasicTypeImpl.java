@@ -16,34 +16,42 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.enhance;
+package org.batoo.jpa.core.impl.manager.model;
 
-import java.lang.reflect.Constructor;
+import javax.persistence.metamodel.BasicType;
 
-import javax.persistence.metamodel.EntityType;
-
-import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.manager.instance.Enhancer;
-import org.batoo.jpa.core.test.BaseCoreTest;
-import org.junit.Test;
 
 /**
+ * Implementation of {@link BasicType}.
+ * 
+ * @param <X>
+ *            The type of the represented basic type
  * 
  * @author hceylan
  * @since $version
  */
-public class EnhanceTest extends BaseCoreTest {
+public final class BasicTypeImpl<X> extends TypeImpl<X> implements BasicType<X> {
 
-	@Test
-	public void testEnhance() throws Exception {
-		final EntityType<Person> type = this.em().getMetamodel().entity(Person.class);
-
-		final Class<? extends Person> enhanced = Enhancer.enhance(type);
-
-		final Constructor<? extends Person> constructor = enhanced.getConstructor(Class.class, SessionImpl.class, Object.class,
-			boolean.class);
-		final Person newInstance = constructor.newInstance(null, null, null, true);
-
-		System.out.println(newInstance);
+	/**
+	 * @param metamodel
+	 *            the metamodel
+	 * @param javaType
+	 *            the java type of the type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public BasicTypeImpl(MetamodelImpl metamodel, Class<X> javaType) {
+		super(metamodel, javaType);
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public PersistenceType getPersistenceType() {
+		return PersistenceType.BASIC;
+	}
+
 }

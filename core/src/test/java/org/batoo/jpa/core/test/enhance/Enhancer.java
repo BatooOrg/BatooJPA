@@ -4,9 +4,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 
-import org.batoo.jpa.core.impl.EntityManagerImpl;
-import org.batoo.jpa.core.impl.SessionImpl;
-import org.batoo.jpa.core.impl.metamodel.EntityTypeImpl;
+import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.manager.metamodel.EntityTypeImpl;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;

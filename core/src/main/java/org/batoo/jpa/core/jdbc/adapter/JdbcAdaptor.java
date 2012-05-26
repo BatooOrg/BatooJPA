@@ -29,14 +29,16 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.sql.DataSource;
 
+import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
-import org.batoo.jpa.core.impl.jdbc.AbstractJdbcAdaptor;
-import org.batoo.jpa.core.impl.jdbc.AbstractTable;
-import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
-import org.batoo.jpa.core.impl.model.SequenceGenerator;
-import org.batoo.jpa.core.impl.model.TableGenerator;
+import org.batoo.jpa.core.impl.manager.jdbc.AbstractColumn;
+import org.batoo.jpa.core.impl.manager.jdbc.AbstractJdbcAdaptor;
+import org.batoo.jpa.core.impl.manager.jdbc.AbstractTable;
+import org.batoo.jpa.core.impl.manager.jdbc.DataSourceImpl;
+import org.batoo.jpa.core.impl.manager.jdbc.PkPhysicalColumn;
+import org.batoo.jpa.core.impl.manager.model.SequenceGenerator;
+import org.batoo.jpa.core.impl.manager.model.TableGenerator;
 import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.parser.MappingException;
@@ -59,7 +61,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public JdbcAdaptor() throws MappingException {
+	public JdbcAdaptor() {
 		super();
 
 		this.loadReservedWords();
@@ -77,6 +79,32 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 */
 	@Override
 	public abstract String createColumnDDL(AbstractColumn columnDefinition);
+
+	/**
+	 * Returns the SQL to create the table.
+	 * 
+	 * @param table
+	 *            the table
+	 * @return the SQL to create the table
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private String createCreateTableStatement(AbstractTable table) {
+		final List<String> ddlColumns = Lists.newArrayList();
+
+		final List<String> pkColumns = Lists.newArrayList();
+
+		for (final AbstractColumn column : table.getColumns()) {
+			ddlColumns.add(this.createColumnDDL(column));
+
+			if (column instanceof PkPhysicalColumn) {
+				pkColumns.add(column.getName());
+			}
+		}
+
+		return this.createCreateTableStatement(table, ddlColumns, pkColumns);
+	}
 
 	/**
 	 * Creates the create table statement
@@ -101,35 +129,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 			+ columns // columns part
 			+ "\nPRIMARY KEY(" + keys + "))"; // primary key part
 	}
-
-	/**
-	 * Creates a foreign key on the table
-	 * 
-	 * @param dataSource
-	 *            the datasource
-	 * @param foreignKey
-	 *            the foreign key
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 * @throws SQLException
-	 */
-	// public abstract void createForeignKey(DataSource dataSource, ForeignKey foreignKey) throws SQLException;
-
-	/**
-	 * Creates a foreign key on the table
-	 * 
-	 * @param dataSource
-	 *            the datasource
-	 * @param foreignKey
-	 *            the foreign key
-	 * @throws SQLException
-	 *             thrown in case of underlying SQLException
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public abstract void createForeignKey(DataSource dataSource, ForeignKey foreignKey) throws SQLException;
 
 	/**
 	 * Creates the schema if necessary. The adapter should check if schema exists and create the schema if it does not exist.
@@ -160,6 +159,25 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @author hceylan
 	 */
 	public abstract void createSequenceIfNecessary(DataSource datasource, SequenceGenerator sequence) throws SQLException;
+
+	/**
+	 * @param table
+	 *            the
+	 * @param datasource
+	 *            the datasource
+	 * @param schemas
+	 *            the list of schemas
+	 * @throws SQLException
+	 *             thrown if DDL table creation fails
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void createTable(AbstractTable table, DataSourceImpl datasource, Set<String> schemas) throws SQLException {
+		final String ddlSql = this.createCreateTableStatement(table);
+
+		new QueryRunner(datasource).update(ddlSql);
+	}
 
 	/**
 	 * Creates the table generator if not exists.

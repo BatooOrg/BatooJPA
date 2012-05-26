@@ -19,6 +19,7 @@
 package org.batoo.jpa.parser;
 
 import java.io.InputStream;
+import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -32,6 +33,8 @@ import org.batoo.jpa.parser.impl.metadata.MetadataImpl;
 import org.batoo.jpa.parser.persistence.Persistence;
 import org.batoo.jpa.parser.persistence.Persistence.PersistenceUnit;
 import org.batoo.jpa.parser.persistence.Persistence.PersistenceUnit.Properties.Property;
+
+import com.google.common.collect.Maps;
 
 /**
  * The main entry point to parse the persistence units.
@@ -56,6 +59,7 @@ public class PersistenceParser {
 	private final String puName;
 	private final MetadataImpl metadata;
 	private PersistenceUnit persistenceUnit;
+	private final Map<String, Object> properties = Maps.newHashMap();
 
 	/**
 	 * @param persistenceUnitName
@@ -71,11 +75,36 @@ public class PersistenceParser {
 
 		// initialize the persistence unit
 		this.init();
+		this.readProperties();
 
 		this.metadata = new MetadataImpl(this.persistenceUnit.getClazzs());
 
 		this.parseOrmXmls();
 		this.metadata.parse();
+	}
+
+	/**
+	 * Returns the metadata of the PersistenceParser.
+	 * 
+	 * @return the metadata of the PersistenceParser
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public MetadataImpl getMetadata() {
+		return this.metadata;
+	}
+
+	/**
+	 * Returns the properties of the persistence unit.
+	 * 
+	 * @return the properties of the persistence unit
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Map<String, Object> getProperties() {
+		return this.properties;
 	}
 
 	/**
@@ -88,14 +117,8 @@ public class PersistenceParser {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String getProperty(String key) {
-		for (final Property property : this.persistenceUnit.getProperties().getProperties()) {
-			if (property.getName().equals(key)) {
-				return property.getValue();
-			}
-		}
-
-		return null;
+	public Object getProperty(String key) {
+		return this.properties.get(key);
 	}
 
 	/**
@@ -181,14 +204,14 @@ public class PersistenceParser {
 	}
 
 	/**
-	 * Returns the metadata of the PersistenceParser.
-	 *
-	 * @return the metadata of the PersistenceParser
-	 *
+	 * Reads the properties from the persistence unit.
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public MetadataImpl getMetadata() {
-		return metadata;
+	private void readProperties() {
+		for (final Property property : this.persistenceUnit.getProperties().getProperties()) {
+			this.properties.put(property.getName(), property.getValue());
+		}
 	}
 }

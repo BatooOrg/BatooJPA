@@ -26,19 +26,14 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
-import org.apache.derby.impl.sql.compile.ResultColumnList.ColumnMapping;
-import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
-import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
-import org.batoo.jpa.core.impl.jdbc.PkPhysicalColumn;
-import org.batoo.jpa.core.impl.jdbc.SingleValueHandler;
-import org.batoo.jpa.core.impl.model.SequenceGenerator;
-import org.batoo.jpa.core.impl.model.TableGenerator;
+import org.batoo.jpa.core.impl.manager.jdbc.AbstractColumn;
+import org.batoo.jpa.core.impl.manager.jdbc.DataSourceImpl;
+import org.batoo.jpa.core.impl.manager.jdbc.PkPhysicalColumn;
+import org.batoo.jpa.core.impl.manager.jdbc.SingleValueHandler;
+import org.batoo.jpa.core.impl.manager.model.SequenceGenerator;
+import org.batoo.jpa.core.impl.manager.model.TableGenerator;
 import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.parser.MappingException;
-
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 
 /**
  * JDBC Adapter for Derby.
@@ -72,40 +67,6 @@ public class DerbyAdaptor extends JdbcAdaptor {
 			+ (!column.isNullable() ? " NOT NULL" : "") // not null part
 			+ (column.isUnique() ? " UNIQUE" : "") // not null part
 			+ (identity ? " GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1)" : ""); // auto increment part
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public void createForeignKey(DataSource dataSource, ForeignKey foreignKey) throws SQLException {
-		final String tableName = foreignKey.getTable().getName();
-		final String referenceTableName = foreignKey.getReferencedTable().getName();
-
-		final String keyColumns = Joiner.on(", ").join(
-			Lists.transform(foreignKey.getColumnMappings(), new Function<ColumnMapping, String>() {
-
-				@Override
-				public String apply(ColumnMapping input) {
-					return input.getDestination().getPhysicalName();
-				}
-			}));
-
-		final String foreignKeyColumns = Joiner.on(", ").join(
-			Lists.transform(foreignKey.getColumnMappings(), new Function<ColumnMapping, String>() {
-
-				@Override
-				public String apply(ColumnMapping input) {
-					return input.getSource().getPhysicalName();
-				}
-			}));
-
-		final String sql = "ALTER TABLE " + tableName //
-			+ "\n\tADD FOREIGN KEY (" + keyColumns + ")" //
-			+ "\n\tREFERENCES " + referenceTableName + "(" + foreignKeyColumns + ")";
-
-		new QueryRunner(dataSource).update(sql);
 	}
 
 	/**

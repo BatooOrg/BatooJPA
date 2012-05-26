@@ -31,3 +31,5 @@ cachability
 cacheable
 cacheability
 clazz
+embeddable
+bails

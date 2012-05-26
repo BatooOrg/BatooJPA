@@ -16,34 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.enhance;
+package org.batoo.jpa.core.impl.manager.model;
 
-import java.lang.reflect.Constructor;
+import javax.persistence.metamodel.EmbeddableType;
 
-import javax.persistence.metamodel.EntityType;
-
-import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.manager.instance.Enhancer;
-import org.batoo.jpa.core.test.BaseCoreTest;
-import org.junit.Test;
+import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 
 /**
+ * 
  * 
  * @author hceylan
  * @since $version
  */
-public class EnhanceTest extends BaseCoreTest {
+public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements EmbeddableType<X> {
 
-	@Test
-	public void testEnhance() throws Exception {
-		final EntityType<Person> type = this.em().getMetamodel().entity(Person.class);
-
-		final Class<? extends Person> enhanced = Enhancer.enhance(type);
-
-		final Constructor<? extends Person> constructor = enhanced.getConstructor(Class.class, SessionImpl.class, Object.class,
-			boolean.class);
-		final Person newInstance = constructor.newInstance(null, null, null, true);
-
-		System.out.println(newInstance);
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public EmbeddableTypeImpl(MetamodelImpl metamodel, EmbeddableTypeImpl<? super X> parent, Class<X> javaType, EntityMetadata metadata) {
+		super(metamodel, parent, javaType, metadata);
 	}
+
 }

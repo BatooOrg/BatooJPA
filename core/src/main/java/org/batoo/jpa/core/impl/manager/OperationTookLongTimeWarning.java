@@ -16,34 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.enhance;
-
-import java.lang.reflect.Constructor;
-
-import javax.persistence.metamodel.EntityType;
-
-import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.manager.instance.Enhancer;
-import org.batoo.jpa.core.test.BaseCoreTest;
-import org.junit.Test;
+package org.batoo.jpa.core.impl.manager;
 
 /**
+ * A dummy class to print stack trace.
  * 
  * @author hceylan
  * @since $version
  */
-public class EnhanceTest extends BaseCoreTest {
+public class OperationTookLongTimeWarning extends Throwable {
 
-	@Test
-	public void testEnhance() throws Exception {
-		final EntityType<Person> type = this.em().getMetamodel().entity(Person.class);
+	private static final long serialVersionUID = 1L;
 
-		final Class<? extends Person> enhanced = Enhancer.enhance(type);
-
-		final Constructor<? extends Person> constructor = enhanced.getConstructor(Class.class, SessionImpl.class, Object.class,
-			boolean.class);
-		final Person newInstance = constructor.newInstance(null, null, null, true);
-
-		System.out.println(newInstance);
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public OperationTookLongTimeWarning() {
+		super("Operation took long time");
 	}
+
 }

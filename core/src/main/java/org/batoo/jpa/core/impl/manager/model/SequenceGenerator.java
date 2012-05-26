@@ -16,34 +16,42 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.enhance;
+package org.batoo.jpa.core.impl.manager.model;
 
-import java.lang.reflect.Constructor;
-
-import javax.persistence.metamodel.EntityType;
-
-import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.manager.instance.Enhancer;
-import org.batoo.jpa.core.test.BaseCoreTest;
-import org.junit.Test;
+import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
 
 /**
+ * Sequence based generator.
  * 
  * @author hceylan
  * @since $version
  */
-public class EnhanceTest extends BaseCoreTest {
+public class SequenceGenerator extends AbstractGenerator {
 
-	@Test
-	public void testEnhance() throws Exception {
-		final EntityType<Person> type = this.em().getMetamodel().entity(Person.class);
+	private final String sequenceName;
 
-		final Class<? extends Person> enhanced = Enhancer.enhance(type);
+	/**
+	 * @param metadata
+	 *            the metadata
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public SequenceGenerator(SequenceGeneratorMetadata metadata) {
+		super(metadata);
 
-		final Constructor<? extends Person> constructor = enhanced.getConstructor(Class.class, SessionImpl.class, Object.class,
-			boolean.class);
-		final Person newInstance = constructor.newInstance(null, null, null, true);
+		this.sequenceName = metadata.getSequenceName();
+	}
 
-		System.out.println(newInstance);
+	/**
+	 * Returns the sequenceName of the sequence generator.
+	 * 
+	 * @return the sequenceName of the sequence generator
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getSequenceName() {
+		return this.sequenceName;
 	}
 }
