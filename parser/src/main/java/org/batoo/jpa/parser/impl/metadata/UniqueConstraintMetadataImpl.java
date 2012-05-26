@@ -20,34 +20,36 @@ package org.batoo.jpa.parser.impl.metadata;
 
 import javax.persistence.UniqueConstraint;
 
-import org.batoo.jpa.parser.impl.annotated.JavaLocator;
+import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.UniqueConstraintMetadata;
 
 /**
- * Annotated definition of {@link UniqueConstraintMetadata}.
+ * Implementation of {@link UniqueConstraintMetadata}.
  * 
  * @author hceylan
  * @since $version
  */
 public class UniqueConstraintMetadataImpl implements UniqueConstraintMetadata {
 
-	private final JavaLocator locator;
-	private final UniqueConstraint uniqueConstraint;
+	private final AbstractLocator locator;
+	private final String[] columnNames;
+	private final String name;
 
 	/**
 	 * @param locator
 	 *            the java locator
-	 * @param uniqueConstraint
-	 *            the obtained {@link UniqueConstraint} annotation
+	 * @param annotation
+	 *            the annotation
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public UniqueConstraintMetadataImpl(JavaLocator locator, UniqueConstraint uniqueConstraint) {
+	public UniqueConstraintMetadataImpl(AbstractLocator locator, UniqueConstraint annotation) {
 		super();
 
 		this.locator = locator;
-		this.uniqueConstraint = uniqueConstraint;
+		this.name = annotation.name();
+		this.columnNames = annotation.columnNames();
 	}
 
 	/**
@@ -56,7 +58,7 @@ public class UniqueConstraintMetadataImpl implements UniqueConstraintMetadata {
 	 */
 	@Override
 	public String[] getColumnNames() {
-		return this.uniqueConstraint.columnNames();
+		return this.columnNames;
 	}
 
 	/**
@@ -64,8 +66,8 @@ public class UniqueConstraintMetadataImpl implements UniqueConstraintMetadata {
 	 * 
 	 */
 	@Override
-	public String getLocation() {
-		return this.locator.getLocation();
+	public AbstractLocator getLocator() {
+		return this.locator;
 	}
 
 	/**
@@ -74,6 +76,7 @@ public class UniqueConstraintMetadataImpl implements UniqueConstraintMetadata {
 	 */
 	@Override
 	public String getName() {
-		return this.uniqueConstraint.name();
+		return this.name;
 	}
+
 }

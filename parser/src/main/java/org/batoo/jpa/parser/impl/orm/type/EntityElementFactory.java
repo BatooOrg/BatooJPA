@@ -23,16 +23,18 @@ import java.util.Map;
 
 import javax.persistence.AccessType;
 
-import org.batoo.jpa.parser.impl.orm.AssociationOverrideElementFactory;
-import org.batoo.jpa.parser.impl.orm.AttributeOverrideElementFactory;
-import org.batoo.jpa.parser.impl.orm.ElementFactory;
-import org.batoo.jpa.parser.impl.orm.ElementFactoryConstants;
-import org.batoo.jpa.parser.impl.orm.EntityMappingsFactory;
-import org.batoo.jpa.parser.impl.orm.ParentElementFactory;
-import org.batoo.jpa.parser.impl.orm.TableElementFactory;
-import org.batoo.jpa.parser.impl.orm.attribute.AttributesElementFactory;
+import org.batoo.jpa.parser.impl.orm.AssociationOverrideElement;
+import org.batoo.jpa.parser.impl.orm.AttributeOverrideElement;
+import org.batoo.jpa.parser.impl.orm.Element;
+import org.batoo.jpa.parser.impl.orm.ElementConstants;
+import org.batoo.jpa.parser.impl.orm.EntityMappings;
+import org.batoo.jpa.parser.impl.orm.ParentElement;
+import org.batoo.jpa.parser.impl.orm.SecondaryTableElement;
+import org.batoo.jpa.parser.impl.orm.TableElement;
+import org.batoo.jpa.parser.impl.orm.attribute.AttributesElement;
 import org.batoo.jpa.parser.metadata.AssociationOverrideMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
+import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableMetadata;
@@ -41,12 +43,12 @@ import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 import com.google.common.collect.Lists;
 
 /**
- * Element factory for <code>entity-mappings</code> elements.
+ * Element for <code>entity-mappings</code> elements.
  * 
  * @author hceylan
  * @since $version
  */
-public class EntityElementFactory extends ParentElementFactory implements EntityMetadata {
+public class EntityElementFactory extends ParentElement implements EntityMetadata {
 
 	private String name;
 	private String className;
@@ -55,8 +57,9 @@ public class EntityElementFactory extends ParentElementFactory implements Entity
 	private AccessType accessType;
 	private SequenceGeneratorMetadata sequenceGenerator;
 	private TableGeneratorMetadata tableGenerator;
-	private AttributesElementFactory attrs;
+	private AttributesElement attrs;
 	private TableMetadata table;
+	private final List<SecondaryTableMetadata> secondaryTables = Lists.newArrayList();
 	private final List<AttributeOverrideMetadata> attributeOverrides = Lists.newArrayList();
 	private final List<AssociationOverrideMetadata> associationOverrides = Lists.newArrayList();
 
@@ -71,16 +74,16 @@ public class EntityElementFactory extends ParentElementFactory implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EntityElementFactory(ParentElementFactory parent, Map<String, String> attributes) {
+	public EntityElementFactory(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, //
-			ElementFactoryConstants.ELEMENT_ACCESS, //
-			ElementFactoryConstants.ELEMENT_ATTRIBUTE_OVERRIDE, //
-			ElementFactoryConstants.ELEMENT_ASSOCIATION_OVERRIDE, //
-			ElementFactoryConstants.ELEMENT_ATTRIBUTES, //
-			ElementFactoryConstants.ELEMENT_TABLE_GENERATOR, //
-			ElementFactoryConstants.ELEMENT_TABLE_GENERATOR, //
-			ElementFactoryConstants.ELEMENT_TABLE, //
-			ElementFactoryConstants.ELEMENT_SECONDARY_TABLE);
+			ElementConstants.ELEMENT_ACCESS, //
+			ElementConstants.ELEMENT_ATTRIBUTE_OVERRIDE, //
+			ElementConstants.ELEMENT_ASSOCIATION_OVERRIDE, //
+			ElementConstants.ELEMENT_ATTRIBUTES, //
+			ElementConstants.ELEMENT_TABLE_GENERATOR, //
+			ElementConstants.ELEMENT_TABLE_GENERATOR, //
+			ElementConstants.ELEMENT_TABLE, //
+			ElementConstants.ELEMENT_SECONDARY_TABLE);
 	}
 
 	/**
@@ -89,13 +92,13 @@ public class EntityElementFactory extends ParentElementFactory implements Entity
 	 */
 	@Override
 	protected void generate() {
-		this.name = this.getAttribute(ElementFactoryConstants.ATTR_NAME, ElementFactoryConstants.EMPTY);
-		this.className = this.getAttribute(ElementFactoryConstants.ATTR_CLASS, ElementFactoryConstants.EMPTY);
-		this.metadataComplete = this.getAttribute(ElementFactoryConstants.ATTR_METADATA_COMPLETE, false);
-		this.cachable = this.getAttribute(ElementFactoryConstants.ATTR_CACHABLE) != null
-			? Boolean.valueOf(this.getAttribute(ElementFactoryConstants.ATTR_CACHABLE)) : null;
-		this.accessType = this.getAttribute(ElementFactoryConstants.ATTR_ACCESS) != null
-			? AccessType.valueOf(this.getAttribute(ElementFactoryConstants.ATTR_ACCESS)) : null;
+		this.name = this.getAttribute(ElementConstants.ATTR_NAME, ElementConstants.EMPTY);
+		this.className = this.getAttribute(ElementConstants.ATTR_CLASS, ElementConstants.EMPTY);
+		this.metadataComplete = this.getAttribute(ElementConstants.ATTR_METADATA_COMPLETE, false);
+		this.cachable = this.getAttribute(ElementConstants.ATTR_CACHABLE) != null
+			? Boolean.valueOf(this.getAttribute(ElementConstants.ATTR_CACHABLE)) : null;
+		this.accessType = this.getAttribute(ElementConstants.ATTR_ACCESS) != null
+			? AccessType.valueOf(this.getAttribute(ElementConstants.ATTR_ACCESS)) : null;
 	}
 
 	/**
@@ -104,7 +107,7 @@ public class EntityElementFactory extends ParentElementFactory implements Entity
 	 */
 	@Override
 	public AccessType getAccessType() {
-		return this.accessType != null ? this.accessType : ((EntityMappingsFactory) this.getParent()).getAccessType();
+		return this.accessType != null ? this.accessType : ((EntityMappings) this.getParent()).getAccessType();
 	}
 
 	/**
@@ -130,7 +133,7 @@ public class EntityElementFactory extends ParentElementFactory implements Entity
 	 * 
 	 */
 	@Override
-	public AttributesElementFactory getAttributes() {
+	public AttributesElement getAttributes() {
 		return this.attrs;
 	}
 
@@ -139,7 +142,7 @@ public class EntityElementFactory extends ParentElementFactory implements Entity
 	 * 
 	 */
 	@Override
-	public Boolean getCachable() {
+	public Boolean getCacheable() {
 		return this.cachable;
 	}
 
@@ -159,6 +162,15 @@ public class EntityElementFactory extends ParentElementFactory implements Entity
 	@Override
 	public String getName() {
 		return this.name;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<SecondaryTableMetadata> getSecondaryTables() {
+		return this.secondaryTables;
 	}
 
 	/**
@@ -193,9 +205,9 @@ public class EntityElementFactory extends ParentElementFactory implements Entity
 	 * 
 	 */
 	@Override
-	protected void handleChild(ElementFactory child) {
-		if (child instanceof AttributesElementFactory) {
-			this.attrs = (AttributesElementFactory) child;
+	protected void handleChild(Element child) {
+		if (child instanceof AttributesElement) {
+			this.attrs = (AttributesElement) child;
 		}
 
 		if (child instanceof SequenceGeneratorMetadata) {
@@ -206,15 +218,19 @@ public class EntityElementFactory extends ParentElementFactory implements Entity
 			this.tableGenerator = (TableGeneratorMetadata) child;
 		}
 
-		if (child instanceof TableElementFactory) {
+		if (child instanceof TableElement) {
 			this.table = (TableMetadata) child;
 		}
 
-		if (child instanceof AttributeOverrideElementFactory) {
+		if (child instanceof SecondaryTableElement) {
+			this.secondaryTables.add((SecondaryTableMetadata) child);
+		}
+
+		if (child instanceof AttributeOverrideElement) {
 			this.attributeOverrides.add((AttributeOverrideMetadata) child);
 		}
 
-		if (child instanceof AssociationOverrideElementFactory) {
+		if (child instanceof AssociationOverrideElement) {
 			this.associationOverrides.add((AssociationOverrideMetadata) child);
 		}
 	}

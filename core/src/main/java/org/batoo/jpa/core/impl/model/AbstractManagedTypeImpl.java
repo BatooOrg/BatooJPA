@@ -30,12 +30,16 @@ import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.batoo.jpa.core.impl.MetamodelImpl;
+import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttributeImpl;
+import org.batoo.jpa.core.impl.model.attribute.IdAttributeImpl;
+import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
 import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.IdAttributeMetadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Implementation of {@link ManagedType}.
@@ -48,8 +52,7 @@ import com.google.common.collect.Maps;
  */
 public abstract class AbstractManagedTypeImpl<X> extends TypeImpl<X> implements ManagedType<X> {
 
-	private final MetamodelImpl metamodel;
-	private final Map<String, BasicAttributeImpl<X, ?>> basicAttributes = Maps.newHashMap();
+	private final Map<String, AttributeImpl<X, ?>> attributes = Maps.newHashMap();
 
 	/**
 	 * @param metamodel
@@ -63,9 +66,8 @@ public abstract class AbstractManagedTypeImpl<X> extends TypeImpl<X> implements 
 	 * @author hceylan
 	 */
 	public AbstractManagedTypeImpl(MetamodelImpl metamodel, Class<X> clazz, EntityMetadata metadata) {
-		super(clazz);
+		super(metamodel, clazz);
 
-		this.metamodel = metamodel;
 		this.addAttributes(metadata);
 	}
 
@@ -80,8 +82,14 @@ public abstract class AbstractManagedTypeImpl<X> extends TypeImpl<X> implements 
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void addAttributes(EntityMetadata entity) {
+		// id attributes
+		for (final IdAttributeMetadata id : entity.getAttributes().getIds()) {
+			this.attributes.put(id.getName(), new IdAttributeImpl((ManagedTypeImpl) this, id));
+		}
+
+		// basic attributes
 		for (final BasicAttributeMetadata basic : entity.getAttributes().getBasics()) {
-			this.basicAttributes.put(basic.getName(), new BasicAttributeImpl((ManagedTypeImpl) this, basic));
+			this.attributes.put(basic.getName(), new BasicAttributeImpl((ManagedTypeImpl) this, basic));
 		}
 	}
 
@@ -260,9 +268,16 @@ public abstract class AbstractManagedTypeImpl<X> extends TypeImpl<X> implements 
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public Set<SingularAttribute<X, ?>> getDeclaredSingularAttributes() {
-		// TODO Auto-generated method stub
-		return null;
+		final Set<SingularAttribute<X, ?>> attributes = Sets.newHashSet();
+		for (final Attribute<? super X, ?> attribute : this.attributes.values()) {
+			if ((attribute instanceof SingularAttributeImpl) && (attribute.getDeclaringType() == this)) {
+				attributes.add((SingularAttribute<X, ?>) attribute);
+			}
+		}
+
+		return attributes;
 	}
 
 	/**
@@ -303,18 +318,6 @@ public abstract class AbstractManagedTypeImpl<X> extends TypeImpl<X> implements 
 	public <K, V> MapAttribute<? super X, K, V> getMap(String name, Class<K> keyType, Class<V> valueType) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	/**
-	 * Returns the metamodel of the AbstractManagedTypeImpl.
-	 * 
-	 * @return the metamodel of the AbstractManagedTypeImpl
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public MetamodelImpl getMetamodel() {
-		return this.metamodel;
 	}
 
 	/**

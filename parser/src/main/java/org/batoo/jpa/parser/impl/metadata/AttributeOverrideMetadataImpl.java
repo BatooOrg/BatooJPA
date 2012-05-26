@@ -20,38 +20,37 @@ package org.batoo.jpa.parser.impl.metadata;
 
 import javax.persistence.AttributeOverride;
 
-import org.batoo.jpa.parser.impl.annotated.JavaLocator;
+import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 
 /**
- * Annotated definition of {@link AttributeOverrideMetadata}.
+ * Implementation of {@link AttributeOverrideMetadata}.
  * 
  * @author hceylan
  * @since $version
  */
 public class AttributeOverrideMetadataImpl implements AttributeOverrideMetadata {
 
-	private final JavaLocator locator;
-	private final AttributeOverride attributeOverride;
-
-	private final ColumnMetadataImpl column;
+	private final AbstractLocator locator;
+	private final String name;
+	private final ColumnMetadata column;
 
 	/**
 	 * @param locator
-	 *            the java locator
-	 * @param attributeOverride
-	 *            the obtained {@link AttributeOverride} annotation
+	 *            the locator
+	 * @param annotation
+	 *            the annotation
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AttributeOverrideMetadataImpl(JavaLocator locator, AttributeOverride attributeOverride) {
+	public AttributeOverrideMetadataImpl(AbstractLocator locator, AttributeOverride annotation) {
 		super();
 
 		this.locator = locator;
-		this.attributeOverride = attributeOverride;
-
-		this.column = new ColumnMetadataImpl(locator, attributeOverride.column());
+		this.name = annotation.name();
+		this.column = new ColumnMetadataImpl(locator, annotation.column());
 	}
 
 	/**
@@ -68,8 +67,8 @@ public class AttributeOverrideMetadataImpl implements AttributeOverrideMetadata 
 	 * 
 	 */
 	@Override
-	public String getLocation() {
-		return this.locator.getLocation();
+	public AbstractLocator getLocator() {
+		return this.locator;
 	}
 
 	/**
@@ -78,7 +77,6 @@ public class AttributeOverrideMetadataImpl implements AttributeOverrideMetadata 
 	 */
 	@Override
 	public String getName() {
-		return this.attributeOverride.name();
+		return this.name;
 	}
-
 }

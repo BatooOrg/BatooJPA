@@ -27,3 +27,7 @@ inline
 utils
 lob
 datasource
+cachability
+cacheable
+cacheability
+clazz

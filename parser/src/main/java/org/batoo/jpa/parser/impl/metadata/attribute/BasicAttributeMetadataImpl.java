@@ -18,16 +18,17 @@
  */
 package org.batoo.jpa.parser.impl.metadata.attribute;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
+import java.util.Set;
 
 import javax.persistence.Basic;
-import javax.persistence.Column;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Lob;
-import javax.persistence.Temporal;
 
+import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
 
 /**
@@ -36,11 +37,12 @@ import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
  * @author hceylan
  * @since $version
  */
-public class BasicAttributeMetadataImpl extends BasicSingularAttributeMetadataImpl implements BasicAttributeMetadata {
+public class BasicAttributeMetadataImpl extends PhysicalAttributeMetadataImpl implements BasicAttributeMetadata {
 
 	private final boolean lob;
 	private final EnumType enumType;
 	private final boolean optional;
+	private final FetchType fetchType;
 
 	/**
 	 * @param member
@@ -57,34 +59,36 @@ public class BasicAttributeMetadataImpl extends BasicSingularAttributeMetadataIm
 		this.lob = metadata.isLob();
 		this.enumType = metadata.getEnumType();
 		this.optional = metadata.isOptional();
+		this.fetchType = metadata.getFetchType();
 	}
 
 	/**
 	 * @param member
-	 *            the java member of basic attribute
+	 *            the java member of attribute
 	 * @param name
-	 *            the name of the basic attribute
-	 * @param basic
-	 *            the basic definition of the basic attribute
-	 * @param enumerated
-	 *            the enumerated definition of the basic attribute
-	 * @param lob
-	 *            the lob definition of the basic attribute
-	 * @param column
-	 *            the column definition of the basic attribute
-	 * @param temporal
-	 *            the temporal definition of the basic attribute
+	 *            the name of the attribute
+	 * @param parsed
+	 *            set of annotations parsed
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public BasicAttributeMetadataImpl(Member member, String name, Basic basic, Enumerated enumerated, Lob lob, Column column,
-		Temporal temporal) {
-		super(member, name, column, basic != null ? basic.fetch() : FetchType.EAGER, temporal);
+	public BasicAttributeMetadataImpl(Member member, String name, Set<Class<? extends Annotation>> parsed) {
+		super(member, name, parsed);
 
+		final Basic basic = ReflectHelper.getAnnotation(member, Basic.class);
+		final Lob lob = ReflectHelper.getAnnotation(member, Lob.class);
+		final Enumerated enumerated = ReflectHelper.getAnnotation(member, Enumerated.class);
+
+		parsed.add(Lob.class);
+		parsed.add(Basic.class);
+		parsed.add(Enumerated.class);
+		parsed.add(Basic.class);
+
+		this.optional = basic != null ? basic.optional() : true;
+		this.fetchType = basic != null ? basic.fetch() : FetchType.EAGER;
 		this.lob = lob != null;
 		this.enumType = enumerated != null ? enumerated.value() : null;
-		this.optional = basic != null ? basic.optional() : true;
 	}
 
 	/**
@@ -94,6 +98,15 @@ public class BasicAttributeMetadataImpl extends BasicSingularAttributeMetadataIm
 	@Override
 	public EnumType getEnumType() {
 		return this.enumType;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public FetchType getFetchType() {
+		return this.fetchType;
 	}
 
 	/**

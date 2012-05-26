@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.parser.metadata;
 
+import org.batoo.jpa.parser.impl.AbstractLocator;
+
 /**
  * The interface to obtain the location metadata.
  * 
@@ -27,13 +29,12 @@ package org.batoo.jpa.parser.metadata;
 public interface LocatableMatadata {
 
 	/**
-	 * Returns the location of the metadata as string.
+	 * Returns the locator.
 	 * 
-	 * @return the location of the metadata as string
+	 * @return the locator
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	String getLocation();
-
+	AbstractLocator getLocator();
 }

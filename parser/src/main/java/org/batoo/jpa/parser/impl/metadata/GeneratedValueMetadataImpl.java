@@ -21,7 +21,7 @@ package org.batoo.jpa.parser.impl.metadata;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 
-import org.batoo.jpa.parser.impl.annotated.JavaLocator;
+import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.GeneratedValueMetadata;
 
 /**
@@ -32,7 +32,7 @@ import org.batoo.jpa.parser.metadata.GeneratedValueMetadata;
  */
 public class GeneratedValueMetadataImpl implements GeneratedValueMetadata {
 
-	private final JavaLocator locator;
+	private final AbstractLocator locator;
 	private final GeneratedValue generatedValue;
 
 	/**
@@ -44,7 +44,7 @@ public class GeneratedValueMetadataImpl implements GeneratedValueMetadata {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public GeneratedValueMetadataImpl(JavaLocator locator, GeneratedValue generatedValue) {
+	public GeneratedValueMetadataImpl(AbstractLocator locator, GeneratedValue generatedValue) {
 		super();
 
 		this.locator = locator;
@@ -65,8 +65,8 @@ public class GeneratedValueMetadataImpl implements GeneratedValueMetadata {
 	 * 
 	 */
 	@Override
-	public String getLocation() {
-		return this.locator.getLocation();
+	public AbstractLocator getLocator() {
+		return this.locator;
 	}
 
 	/**

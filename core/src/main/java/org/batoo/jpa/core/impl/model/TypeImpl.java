@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.model;
 
 import javax.persistence.metamodel.Type;
 
+
 /**
  * Implementation of {@link Type}.
  * 
@@ -31,18 +32,22 @@ import javax.persistence.metamodel.Type;
  */
 public abstract class TypeImpl<X> implements Type<X> {
 
+	private final MetamodelImpl metamodel;
 	private final Class<X> javaType;
 
 	/**
+	 * @param metamodel
+	 *            the metamodel
 	 * @param javaType
 	 *            the java type of the type
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public TypeImpl(Class<X> javaType) {
+	public TypeImpl(MetamodelImpl metamodel, Class<X> javaType) {
 		super();
 
+		this.metamodel = metamodel;
 		this.javaType = javaType;
 	}
 
@@ -51,7 +56,19 @@ public abstract class TypeImpl<X> implements Type<X> {
 	 * 
 	 */
 	@Override
-	public Class<X> getJavaType() {
+	public final Class<X> getJavaType() {
 		return this.javaType;
+	}
+
+	/**
+	 * Returns the metamodel.
+	 * 
+	 * @return the metamodel
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public final MetamodelImpl getMetamodel() {
+		return this.metamodel;
 	}
 }

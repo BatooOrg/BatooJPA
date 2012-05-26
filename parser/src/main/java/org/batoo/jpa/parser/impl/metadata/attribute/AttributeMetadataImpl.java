@@ -24,7 +24,7 @@ import java.lang.reflect.Member;
 import javax.persistence.AccessType;
 
 import org.batoo.jpa.common.log.ToStringBuilder;
-import org.batoo.jpa.parser.impl.annotated.JavaLocator;
+import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
 
 /**
@@ -38,7 +38,7 @@ public class AttributeMetadataImpl implements AttributeMetadata {
 	private final Member member;
 	private final String name;
 	private final AccessType access;
-	private final JavaLocator locator;
+	private final AbstractLocator locator;
 
 	/**
 	 * @param member
@@ -50,7 +50,7 @@ public class AttributeMetadataImpl implements AttributeMetadata {
 	 * @author hceylan
 	 */
 	public AttributeMetadataImpl(Member member, AttributeMetadata metadata) {
-		this(member, metadata.getName(), metadata.getAccess(), metadata.getLocation());
+		this(member, metadata.getName(), metadata.getAccess(), metadata.getLocator());
 	}
 
 	/**
@@ -66,13 +66,13 @@ public class AttributeMetadataImpl implements AttributeMetadata {
 		this(member, name, member instanceof Field ? AccessType.FIELD : AccessType.PROPERTY, null);
 	}
 
-	private AttributeMetadataImpl(Member member, String name, AccessType access, String ormLocation) {
+	private AttributeMetadataImpl(Member member, String name, AccessType access, AbstractLocator locator) {
 		super();
 
 		this.name = name;
 		this.member = member;
 		this.access = access;
-		this.locator = new JavaLocator(member, ormLocation);
+		this.locator = locator;
 	}
 
 	/**
@@ -85,15 +85,6 @@ public class AttributeMetadataImpl implements AttributeMetadata {
 	}
 
 	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String getLocation() {
-		return this.locator.getLocation();
-	}
-
-	/**
 	 * Returns the locator of the attribute.
 	 * 
 	 * @return the locator of the attribute
@@ -101,7 +92,8 @@ public class AttributeMetadataImpl implements AttributeMetadata {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public JavaLocator getLocator() {
+	@Override
+	public AbstractLocator getLocator() {
 		return this.locator;
 	}
 

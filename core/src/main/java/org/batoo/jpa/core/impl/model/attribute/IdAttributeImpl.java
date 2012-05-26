@@ -20,7 +20,12 @@ package org.batoo.jpa.core.impl.model.attribute;
 
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.batoo.jpa.core.impl.jdbc.PhysicalColumn;
+import org.batoo.jpa.core.impl.jdbc.PkPhysicalColumn;
+import org.batoo.jpa.core.impl.jdbc.TypeFactory;
 import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
+import org.batoo.jpa.core.jdbc.IdType;
+import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.metadata.GeneratedValueMetadata;
 import org.batoo.jpa.parser.metadata.attribute.IdAttributeMetadata;
 
@@ -35,9 +40,11 @@ import org.batoo.jpa.parser.metadata.attribute.IdAttributeMetadata;
  * @author hceylan
  * @since $version
  */
-public class IdAttributeImpl<X, T> extends BaseBasicAttributeImpl<X, T> {
+public class IdAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 
-	private final GeneratedValueMetadata generatedValue;
+	private final String generator;
+	private final IdType idType;
+	private PkPhysicalColumn column;
 
 	/**
 	 * @param declaringType
@@ -51,19 +58,63 @@ public class IdAttributeImpl<X, T> extends BaseBasicAttributeImpl<X, T> {
 	public IdAttributeImpl(ManagedTypeImpl<X> declaringType, IdAttributeMetadata metadata) {
 		super(declaringType, metadata);
 
-		this.generatedValue = metadata.getGeneratedValue();
+		final JdbcAdaptor jdbcAdaptor = declaringType.getMetamodel().getJdbcAdaptor();
+
+		final GeneratedValueMetadata generatedValue = metadata.getGeneratedValue();
+		if (generatedValue != null) {
+			this.generator = generatedValue.getGenerator();
+			this.idType = jdbcAdaptor.supports(generatedValue.getStrategy());
+		}
+		else {
+			this.generator = null;
+			this.idType = IdType.MANUAL;
+		}
+
+		if (metadata.getSequenceGenerator() != null) {
+			declaringType.getMetamodel().addSequenceGenerator(metadata.getSequenceGenerator());
+		}
+		if (metadata.getSequenceGenerator() != null) {
+			declaringType.getMetamodel().addSequenceGenerator(metadata.getSequenceGenerator());
+		}
+
+		this.initColumn(metadata);
 	}
 
 	/**
-	 * Returns the generatedValue.
+	 * {@inheritDoc}
 	 * 
-	 * @return the generatedValue
+	 */
+	@Override
+	public PhysicalColumn getColumn() {
+		return this.column;
+	}
+
+	/**
+	 * Returns the idType.
+	 * 
+	 * @return the idType
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public GeneratedValueMetadata getGeneratedValue() {
-		return this.generatedValue;
+	public IdType getIdType() {
+		return this.idType;
+	}
+
+	/**
+	 * Initializes the column for the attribute.
+	 * 
+	 * @param metadata
+	 *            the metadata
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void initColumn(IdAttributeMetadata metadata) {
+		final int sqlType = TypeFactory.getSqlType(this.getJavaType(), this.getTemporalType(), null, false);
+
+		this.column = new PkPhysicalColumn(this, sqlType, (metadata != null) && (metadata.getColumn() != null) ? metadata.getColumn()
+			: null);
 	}
 
 	/**

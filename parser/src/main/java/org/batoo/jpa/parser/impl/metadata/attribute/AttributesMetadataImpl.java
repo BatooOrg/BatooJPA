@@ -19,15 +19,29 @@
 package org.batoo.jpa.parser.impl.metadata.attribute;
 
 import java.beans.PropertyDescriptor;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.Embedded;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Transient;
+import javax.persistence.Version;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.batoo.jpa.common.log.BLogger;
@@ -35,16 +49,6 @@ import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.common.log.ToStringBuilder;
 import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.parser.MappingException;
-import org.batoo.jpa.parser.impl.annotated.BasicsParser;
-import org.batoo.jpa.parser.impl.annotated.EmbeddedIdsParser;
-import org.batoo.jpa.parser.impl.annotated.EmbeddedsParser;
-import org.batoo.jpa.parser.impl.annotated.IdsParser;
-import org.batoo.jpa.parser.impl.annotated.ManyToManiesParser;
-import org.batoo.jpa.parser.impl.annotated.ManyToOnesParser;
-import org.batoo.jpa.parser.impl.annotated.OneToManiesParser;
-import org.batoo.jpa.parser.impl.annotated.OneToOnesParser;
-import org.batoo.jpa.parser.impl.annotated.TransientsParser;
-import org.batoo.jpa.parser.impl.annotated.VersionsParser;
 import org.batoo.jpa.parser.impl.metadata.type.EntityMetadataImpl;
 import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
@@ -59,7 +63,9 @@ import org.batoo.jpa.parser.metadata.attribute.OneToOneAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.TransientAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.VersionAttributeMetadata;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Implementation of {@link AttributesMetadata}.
@@ -69,10 +75,124 @@ import com.google.common.collect.Maps;
  */
 public class AttributesMetadataImpl implements AttributesMetadata {
 
+	/**
+	 * Common parser for attributes that parses and merges the optional ORM File provided metadata.
+	 * 
+	 * @param <A>
+	 *            the type of the attribute
+	 * 
+	 * @author hceylan
+	 * @since $version
+	 */
+	private abstract class AttributesParser<A extends AttributeMetadata> extends ArrayList<A> {
+
+		private final Map<String, Member> memberMap;
+		private final List<A> metadatas;
+		private final Class<? extends Annotation> indicativeAnnotation;
+
+		/**
+		 * @param memberMap
+		 *            the map of members
+		 * @param metadatas
+		 *            the optional ORM Metadata
+		 * @param indicativeAnnotation
+		 *            the annotation that indicates the type
+		 * 
+		 * @since $version
+		 * @author hceylan
+		 */
+		@SuppressWarnings("unchecked")
+		public AttributesParser(Map<String, Member> memberMap, List<A> metadatas, Class<? extends Annotation> indicativeAnnotation) {
+			super();
+
+			this.memberMap = memberMap;
+			this.metadatas = (List<A>) (metadatas != null ? metadatas : Lists.newArrayList());
+			this.indicativeAnnotation = indicativeAnnotation;
+
+			this.probe();
+
+			this.metadatas.removeAll(this);
+			if (this.metadatas.size() > 0) {
+				throw new MappingException("The following attributes defined in orm.xml could be located\n" + metadatas);
+			}
+		}
+
+		/**
+		 * Parses the <code>member</code>.
+		 * 
+		 * @param name
+		 *            the name of the attribute
+		 * @param member
+		 *            the member
+		 * @param parseDefault
+		 *            true if by default the member should be parsed
+		 * @param metadata
+		 *            the optional ORM Metadata
+		 * @param parsed
+		 *            the set of annotations parsed
+		 * @return the attribute created
+		 * 
+		 * @since $version
+		 * @author hceylan
+		 */
+		protected abstract A parseAttribute(String name, Member member, A metadata, Set<Class<? extends Annotation>> parsed);
+
+		@SuppressWarnings("unchecked")
+		private void probe() {
+			final Set<Class<? extends Annotation>> parsed = Sets.<Class<? extends Annotation>> newHashSet();
+
+			// if the ORM Attributes is null or empty then nothing interesting here
+			if (this.metadatas != null) {
+
+				// process the list of attributes defined by ORM Mapping
+				for (final AttributeMetadata attribute : this.metadatas) {
+					final Member member = this.memberMap.remove(attribute.getName());
+
+					if (member == null) {
+						throw new MappingException("The attribute " + attribute.getName() + " cannot be found.", attribute.getLocator());
+					}
+
+					// parse the attribute
+					this.add(this.parseAttribute(attribute.getName(), member, (A) attribute, parsed));
+
+					// log ignored annotations
+					ReflectHelper.warnAnnotations(AttributesMetadataImpl.LOG, member, parsed);
+				}
+			}
+
+			// probe the rest of the properties only if metadata is not complete
+			if (!AttributesMetadataImpl.this.isMetadataComplete()) {
+
+				// enumerate all the members
+				final Iterator<Entry<String, Member>> i = this.memberMap.entrySet().iterator();
+				while (i.hasNext()) {
+					final Entry<String, Member> entry = i.next();
+
+					final String name = entry.getKey();
+					final Member member = entry.getValue();
+
+					// if the member has an indicative annotation then probed
+					if ((this.indicativeAnnotation == null) || (ReflectHelper.getAnnotation(member, this.indicativeAnnotation) != null)) {
+
+						// remove the member as it is probed
+						i.remove();
+
+						// parse the attribute
+						this.add(this.parseAttribute(name, member, null, parsed));
+
+						// log ignored annotations
+						ReflectHelper.warnAnnotations(AttributesMetadataImpl.LOG, member, parsed);
+					}
+				}
+			}
+
+		}
+	}
+
 	private static final BLogger LOG = BLoggerFactory.getLogger(AttributesMetadataImpl.class);
 
 	private final EntityMetadataImpl parent;
-	private final AttributesMetadata ormMetadata;
+	private final AttributesMetadata metadata;
 
 	private final List<TransientAttributeMetadata> transients;
 	private final List<IdAttributeMetadata> ids;
@@ -91,42 +211,44 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 
 	/**
 	 * 
+	 * @param clazz
+	 *            the entity's represented class
 	 * @param parent
 	 *            the parent managed type
-	 * @param ormMetadata
-	 *            the optional ORM Metadata
+	 * @param metadata
+	 *            the metadata
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AttributesMetadataImpl(EntityMetadataImpl parent, AttributesMetadata ormMetadata) {
+	public AttributesMetadataImpl(EntityMetadataImpl parent, Class<?> clazz, AttributesMetadata metadata) {
 		super();
 
 		this.parent = parent;
-		this.ormMetadata = ormMetadata;
+		this.metadata = metadata;
 
 		this.consolidateAttributes();
-		this.probeAttributes();
+		this.probeAttributes(clazz);
 
 		// transients
-		this.transients = new TransientsParser(this, this.memberMap, ormMetadata != null ? ormMetadata.getTransients() : null).getAttributes();
+		this.transients = this.handleTransients();
+		this.versions = this.handleVersions();
 
 		// id and version stuff
-		this.ids = new IdsParser(this, this.memberMap, ormMetadata != null ? ormMetadata.getIds() : null).getAttributes();
-		this.embeddedIds = new EmbeddedIdsParser(this, this.memberMap, ormMetadata != null ? ormMetadata.getEmbeddedIds() : null).getAttributes();
-		this.versions = new VersionsParser(this, this.memberMap, ormMetadata != null ? ormMetadata.getVersions() : null).getAttributes();
+		this.ids = this.handleIds();
+		this.embeddedIds = this.handleEmbeddedIds();
 
 		// embeddeds
-		this.embeddeds = new EmbeddedsParser(this, this.memberMap, ormMetadata != null ? ormMetadata.getEmbeddeds() : null).getAttributes();
+		this.embeddeds = this.handleEmbeddeds();
 
 		// associations
-		this.oneToOnes = new OneToOnesParser(this, this.memberMap, ormMetadata != null ? ormMetadata.getOneToOnes() : null).getAttributes();
-		this.oneToManies = new OneToManiesParser(this, this.memberMap, ormMetadata != null ? ormMetadata.getOneToManies() : null).getAttributes();
-		this.manyToOnes = new ManyToOnesParser(this, this.memberMap, ormMetadata != null ? ormMetadata.getManyToOnes() : null).getAttributes();
-		this.manyToManies = new ManyToManiesParser(this, this.memberMap, ormMetadata != null ? ormMetadata.getManyToManies() : null).getAttributes();
+		this.oneToOnes = this.handleOneToOnes();
+		this.manyToOnes = this.handleManyToOnes();
+		this.oneToManies = this.handleOneToManies();
+		this.manyToManies = this.handleManyToManies();
 
 		// basics is the last
-		this.basics = new BasicsParser(this, this.memberMap, ormMetadata != null ? ormMetadata.getBasics() : null).getAttributes();
+		this.basics = this.handleBasics();
 	}
 
 	/**
@@ -155,17 +277,17 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 
 		AttributesMetadataImpl.LOG.debug("Consolidating ORM Attributes of entity {0}", this.parent.getClassName());
 
-		if (this.ormMetadata != null) {
-			this.consolidateAttributes(this.ormMetadata.getBasics());
-			this.consolidateAttributes(this.ormMetadata.getEmbeddedIds());
-			this.consolidateAttributes(this.ormMetadata.getEmbeddeds());
-			this.consolidateAttributes(this.ormMetadata.getIds());
-			this.consolidateAttributes(this.ormMetadata.getManyToManies());
-			this.consolidateAttributes(this.ormMetadata.getManyToOnes());
-			this.consolidateAttributes(this.ormMetadata.getOneToManies());
-			this.consolidateAttributes(this.ormMetadata.getOneToOnes());
-			this.consolidateAttributes(this.ormMetadata.getTransients());
-			this.consolidateAttributes(this.ormMetadata.getVersions());
+		if (this.metadata != null) {
+			this.consolidateAttributes(this.metadata.getBasics());
+			this.consolidateAttributes(this.metadata.getEmbeddedIds());
+			this.consolidateAttributes(this.metadata.getEmbeddeds());
+			this.consolidateAttributes(this.metadata.getIds());
+			this.consolidateAttributes(this.metadata.getManyToManies());
+			this.consolidateAttributes(this.metadata.getManyToOnes());
+			this.consolidateAttributes(this.metadata.getOneToManies());
+			this.consolidateAttributes(this.metadata.getOneToOnes());
+			this.consolidateAttributes(this.metadata.getTransients());
+			this.consolidateAttributes(this.metadata.getVersions());
 		}
 
 		AttributesMetadataImpl.LOG.debug("{0} ORM Attribute(s) obtained for entity {1}", this.ormAttributeMap.size(),
@@ -186,7 +308,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 			final AttributeMetadata existing = this.ormAttributeMap.get(attribute.getName());
 
 			if (existing != null) {
-				throw new MappingException("Duplicate attribute names.", existing.getLocation(), attribute.getLocation());
+				throw new MappingException("Duplicate attribute names.", existing.getLocator(), attribute.getLocator());
 			}
 
 			this.ormAttributeMap.put(attribute.getName(), attribute);
@@ -200,20 +322,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	@Override
 	public List<BasicAttributeMetadata> getBasics() {
 		return this.basics;
-	}
-
-	/**
-	 * Returns the java class of the managed type.
-	 * 
-	 * @return the java class of the managed type
-	 * 
-	 * @see EntityMetadataImpl#getClazz()
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public Class<?> getClazz() {
-		return this.parent.getClazz();
 	}
 
 	/**
@@ -295,6 +403,274 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	@Override
 	public List<VersionAttributeMetadata> getVersions() {
 		return this.versions;
+	}
+
+	/**
+	 * Handles the basic attributes.
+	 * 
+	 * @return the list of basic attributes
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private List<BasicAttributeMetadata> handleBasics() {
+		final List<BasicAttributeMetadata> list = this.metadata != null ? this.metadata.getBasics() : null;
+
+		return new AttributesParser<BasicAttributeMetadata>(this.memberMap, list, null) {
+
+			@Override
+			protected BasicAttributeMetadata parseAttribute(String name, Member member, BasicAttributeMetadata metadata,
+				Set<Class<? extends Annotation>> parsed) {
+				if (metadata != null) {
+					return new BasicAttributeMetadataImpl(member, metadata);
+				}
+				else {
+					return new BasicAttributeMetadataImpl(member, name, parsed);
+				}
+			}
+		};
+	}
+
+	/**
+	 * Handles the embedded id attributes.
+	 * 
+	 * @return list of embedded ids.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private List<EmbeddedIdAttributeMetadata> handleEmbeddedIds() {
+		final List<EmbeddedIdAttributeMetadata> list = this.metadata != null ? this.metadata.getEmbeddedIds() : null;
+
+		return new AttributesParser<EmbeddedIdAttributeMetadata>(this.memberMap, list, EmbeddedId.class) {
+
+			@Override
+			protected EmbeddedIdAttributeMetadata parseAttribute(String name, Member member, EmbeddedIdAttributeMetadata metadata,
+				Set<Class<? extends Annotation>> parsed) {
+				if (metadata != null) {
+					return new EmbeddedIdAttributeMetadataImpl(member, metadata);
+				}
+				else {
+					return new EmbeddedIdAttributeMetadataImpl(member, name, parsed);
+				}
+			}
+		};
+	}
+
+	/**
+	 * Handles the embedded attributes.
+	 * 
+	 * @return list of embedded attributes.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private List<EmbeddedAttributeMetadata> handleEmbeddeds() {
+		final List<EmbeddedAttributeMetadata> list = this.metadata != null ? this.metadata.getEmbeddeds() : null;
+
+		return new AttributesParser<EmbeddedAttributeMetadata>(this.memberMap, list, Embedded.class) {
+
+			@Override
+			protected EmbeddedAttributeMetadata parseAttribute(String name, Member member, EmbeddedAttributeMetadata metadata,
+				Set<Class<? extends Annotation>> parsed) {
+				if (metadata != null) {
+					return new EmbeddedAttributeMetadataImpl(member, metadata);
+				}
+				else {
+					return new EmbeddedAttributeMetadataImpl(member, name, parsed);
+				}
+			}
+		};
+	}
+
+	/**
+	 * Handles the id attributes.
+	 * 
+	 * @return list of id attributes
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private List<IdAttributeMetadata> handleIds() {
+		final List<IdAttributeMetadata> list = this.metadata != null ? this.metadata.getIds() : null;
+
+		return new AttributesParser<IdAttributeMetadata>(this.memberMap, list, Id.class) {
+
+			@Override
+			protected IdAttributeMetadata parseAttribute(String name, Member member, IdAttributeMetadata metadata,
+				Set<Class<? extends Annotation>> parsed) {
+				if (metadata != null) {
+					return new IdAttributeMetadataImpl(member, metadata);
+				}
+				else {
+					return new IdAttributeMetadataImpl(member, name, parsed);
+				}
+			}
+		};
+	}
+
+	/**
+	 * Handles the many-to-many attributes.
+	 * 
+	 * @return list of many-to-many attributes.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private List<ManyToManyAttributeMetadata> handleManyToManies() {
+		final List<ManyToManyAttributeMetadata> list = this.metadata != null ? this.metadata.getManyToManies() : null;
+
+		return new AttributesParser<ManyToManyAttributeMetadata>(this.memberMap, list, ManyToMany.class) {
+
+			@Override
+			protected ManyToManyAttributeMetadata parseAttribute(String name, Member member, ManyToManyAttributeMetadata metadata,
+				Set<Class<? extends Annotation>> parsed) {
+				if (metadata != null) {
+					return new ManyToManyAttributeMetadataImpl(member, metadata);
+				}
+				else {
+					final ManyToMany manyToMany = ReflectHelper.getAnnotation(member, ManyToMany.class);
+
+					return new ManyToManyAttributeMetadataImpl(member, name, manyToMany, parsed);
+				}
+			}
+		};
+	}
+
+	/**
+	 * Handles the many-to-one attributes.
+	 * 
+	 * @return list of many-to-one attributes.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private List<ManyToOneAttributeMetadata> handleManyToOnes() {
+		final List<ManyToOneAttributeMetadata> list = this.metadata != null ? this.metadata.getManyToOnes() : null;
+
+		return new AttributesParser<ManyToOneAttributeMetadata>(this.memberMap, list, ManyToOne.class) {
+
+			@Override
+			protected ManyToOneAttributeMetadata parseAttribute(String name, Member member, ManyToOneAttributeMetadata metadata,
+				Set<Class<? extends Annotation>> parsed) {
+				if (metadata != null) {
+					return new ManyToOneAttributeMetadataImpl(member, metadata);
+				}
+				else {
+					final ManyToOne manyToOne = ReflectHelper.getAnnotation(member, ManyToOne.class);
+
+					return new ManyToOneAttributeMetadataImpl(member, name, manyToOne, parsed);
+				}
+			}
+		};
+	}
+
+	/**
+	 * Handles the one-to-many attributes.
+	 * 
+	 * @return list of one-to-many attributes.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private List<OneToManyAttributeMetadata> handleOneToManies() {
+		final List<OneToManyAttributeMetadata> list = this.metadata != null ? this.metadata.getOneToManies() : null;
+
+		return new AttributesParser<OneToManyAttributeMetadata>(this.memberMap, list, OneToMany.class) {
+
+			@Override
+			protected OneToManyAttributeMetadata parseAttribute(String name, Member member, OneToManyAttributeMetadata metadata,
+				Set<Class<? extends Annotation>> parsed) {
+				if (metadata != null) {
+					return new OneToManyAttributeMetadataImpl(member, metadata);
+				}
+				else {
+					final OneToMany oneToMany = ReflectHelper.getAnnotation(member, OneToMany.class);
+
+					return new OneToManyAttributeMetadataImpl(member, name, oneToMany, parsed);
+				}
+			}
+		};
+	}
+
+	/**
+	 * Handles the one-to-one attributes.
+	 * 
+	 * @return list of one-to-one attributes.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private List<OneToOneAttributeMetadata> handleOneToOnes() {
+		final List<OneToOneAttributeMetadata> list = this.metadata != null ? this.metadata.getOneToOnes() : null;
+
+		return new AttributesParser<OneToOneAttributeMetadata>(this.memberMap, list, OneToOne.class) {
+
+			@Override
+			protected OneToOneAttributeMetadata parseAttribute(String name, Member member, OneToOneAttributeMetadata metadata,
+				Set<Class<? extends Annotation>> parsed) {
+				if (metadata != null) {
+					return new OneToOneAttributeMetadataImpl(member, metadata);
+				}
+				else {
+					final OneToOne oneToOne = ReflectHelper.getAnnotation(member, OneToOne.class);
+
+					return new OneToOneAttributeMetadataImpl(member, name, oneToOne, parsed);
+				}
+			}
+		};
+	}
+
+	/**
+	 * Handles the id attributes.
+	 * 
+	 * @return the list of transient attributes
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private List<TransientAttributeMetadata> handleTransients() {
+		final List<TransientAttributeMetadata> list = this.metadata != null ? this.metadata.getTransients() : null;
+
+		return new AttributesParser<TransientAttributeMetadata>(this.memberMap, list, Transient.class) {
+
+			@Override
+			protected TransientAttributeMetadata parseAttribute(String name, Member member, TransientAttributeMetadata metadata,
+				Set<Class<? extends Annotation>> parsed) {
+				if (metadata != null) {
+					return new TransientAttributeMetadataImpl(member, metadata);
+				}
+				else {
+					return new TransientAttributeMetadataImpl(member, name);
+				}
+			}
+		};
+	}
+
+	/**
+	 * Handles the version attributes
+	 * 
+	 * @return the list of version attributes
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private List<VersionAttributeMetadata> handleVersions() {
+		final List<VersionAttributeMetadata> list = this.metadata != null ? this.metadata.getVersions() : null;
+
+		return new AttributesParser<VersionAttributeMetadata>(this.memberMap, list, Version.class) {
+
+			@Override
+			protected VersionAttributeMetadata parseAttribute(String name, Member member, VersionAttributeMetadata metadata,
+				Set<Class<? extends Annotation>> parsed) {
+				if (metadata != null) {
+					return new VersionAttributeMetadataImpl(member, metadata);
+				}
+				else {
+					return new VersionAttributeMetadataImpl(member, name, parsed);
+				}
+			}
+		};
 	}
 
 	/**
@@ -395,8 +771,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private void probeAttributes() {
-		final Class<?> clazz = this.parent.getClazz();
+	private void probeAttributes(Class<?> clazz) {
 		final AccessType accessType = this.parent.getAccessType();
 
 		// based on the access type preference give priority to fields or properties

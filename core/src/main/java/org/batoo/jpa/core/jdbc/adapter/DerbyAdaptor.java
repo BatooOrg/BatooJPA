@@ -21,14 +21,19 @@ package org.batoo.jpa.core.jdbc.adapter;
 import java.sql.SQLException;
 import java.util.List;
 
-import javax.persistence.Column;
+import javax.persistence.GenerationType;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.apache.derby.impl.sql.compile.ResultColumnList.ColumnMapping;
+import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
+import org.batoo.jpa.core.impl.jdbc.PkPhysicalColumn;
 import org.batoo.jpa.core.impl.jdbc.SingleValueHandler;
+import org.batoo.jpa.core.impl.model.SequenceGenerator;
+import org.batoo.jpa.core.impl.model.TableGenerator;
+import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.parser.MappingException;
 
 import com.google.common.base.Function;
@@ -46,7 +51,6 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	private static final String[] DRIVER_CLASSES = new String[] { "org.apache.derby.jdbc.Driver40", "org.apache.derby.jdbc.EmbeddedDriver" };
 
 	/**
-	 * @throws MappingException
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -60,13 +64,13 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
-	public String createColumnDDL(Column columnDefinition) {
-		final boolean identity = (columnDefinition.getIdType() == IdType.IDENTITY);
+	public String createColumnDDL(AbstractColumn column) {
+		final boolean identity = (column instanceof PkPhysicalColumn) && (((PkPhysicalColumn) column).getIdType() == IdType.IDENTITY);
 
-		return columnDefinition.getPhysicalName() + " " // name part
-			+ this.getColumnType(columnDefinition, columnDefinition.getSqlType()) // data type part
-			+ (!columnDefinition.isNullable() ? " NOT NULL" : "") // not null part
-			+ (columnDefinition.isUnique() ? " UNIQUE" : "") // not null part
+		return column.getName() + " " // name part
+			+ this.getColumnType(column, column.getSqlType()) // data type part
+			+ (!column.isNullable() ? " NOT NULL" : "") // not null part
+			+ (column.isUnique() ? " UNIQUE" : "") // not null part
 			+ (identity ? " GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1)" : ""); // auto increment part
 	}
 
@@ -144,7 +148,7 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
-	public void createTableGeneratorIfNecessary(DataSource datasource, PhysicalTableGenerator table) throws SQLException {
+	public void createTableGeneratorIfNecessary(DataSource datasource, TableGenerator table) throws SQLException {
 		final String schema = this.schemaOf(datasource, table.getSchema());
 
 		if (new QueryRunner(datasource).query("SELECT TABLENAME FROM SYS.SYSSCHEMAS S\n" + //
@@ -259,11 +263,20 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
-	public IdType supports(IdType idType) {
-		if (idType == null) {
+	public IdType supports(GenerationType type) {
+		if (type == null) {
 			return IdType.SEQUENCE;
 		}
 
-		return idType;
+		switch (type) {
+			case IDENTITY:
+				return IdType.IDENTITY;
+			case SEQUENCE:
+				return IdType.SEQUENCE;
+			case TABLE:
+				return IdType.TABLE;
+			default:
+				return IdType.SEQUENCE;
+		}
 	}
 }

@@ -25,6 +25,7 @@ import javax.persistence.AccessType;
 import org.batoo.jpa.parser.metadata.AssociationOverrideMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.BindableMetadata;
+import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableMetadata;
@@ -86,7 +87,7 @@ public interface EntityMetadata extends BindableMetadata {
 	 * @since $version
 	 * @author hceylan
 	 */
-	Boolean getCachable();
+	Boolean getCacheable();
 
 	/**
 	 * Returns the name of the class of the entity.
@@ -97,6 +98,16 @@ public interface EntityMetadata extends BindableMetadata {
 	 * @author hceylan
 	 */
 	String getClassName();
+
+	/**
+	 * Returns the list secondary tables of the entity.
+	 * 
+	 * @return the list secondary tables of the entity
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	List<SecondaryTableMetadata> getSecondaryTables();
 
 	/**
 	 * Returns the sequenceGenerator of the entity.

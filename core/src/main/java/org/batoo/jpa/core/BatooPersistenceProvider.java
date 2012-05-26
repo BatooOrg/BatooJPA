@@ -28,11 +28,11 @@ import javax.persistence.spi.ProviderUtil;
 
 import org.batoo.jpa.common.BatooException;
 import org.batoo.jpa.core.impl.EntityManagerFactoryImpl;
-import org.batoo.jpa.core.impl.MetamodelImpl;
 import org.batoo.jpa.core.impl.jdbc.AbstractJdbcAdaptor;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
+import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
-import org.batoo.jpa.parser.impl.PersistenceParser;
+import org.batoo.jpa.parser.PersistenceParser;
 
 /**
  * Implementation of {@link PersistenceProvider}.
@@ -43,7 +43,7 @@ import org.batoo.jpa.parser.impl.PersistenceParser;
 public class BatooPersistenceProvider implements PersistenceProvider {
 
 	private DataSourceImpl datasource;
-	private JdbcAdaptor jdbcAdapter;
+	private JdbcAdaptor jdbcAdaptor;
 
 	/**
 	 * {@inheritDoc}
@@ -58,7 +58,7 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 		final boolean scanExternal = Boolean.valueOf(parser.getProperty(BJPASettings.SCAN_EXTERNAL_JDBC_DRIVERS));
 		final String jdbcDriver = parser.getProperty(JPASettings.JDBC_DRIVER);
 
-		this.jdbcAdapter = AbstractJdbcAdaptor.getAdapter(scanExternal, jdbcDriver);
+		this.jdbcAdaptor = AbstractJdbcAdaptor.getAdapter(scanExternal, jdbcDriver);
 
 		final String jdbcUrl = parser.getProperty(JPASettings.JDBC_URL);
 		final String jdbcUser = parser.getProperty(JPASettings.JDBC_USER);
@@ -85,7 +85,7 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 		}
 
 		// create the metamodel
-		final MetamodelImpl metamodel = new MetamodelImpl(parser.getMetadata());
+		final MetamodelImpl metamodel = new MetamodelImpl(this.jdbcAdaptor, parser.getMetadata());
 
 		// finally, create the entity manager factory
 		return new EntityManagerFactoryImpl(emName, metamodel, this.datasource);

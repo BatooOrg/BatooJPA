@@ -20,7 +20,6 @@ package org.batoo.jpa.core.impl.model;
 
 import javax.persistence.metamodel.ManagedType;
 
-import org.batoo.jpa.core.impl.MetamodelImpl;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 
 /**

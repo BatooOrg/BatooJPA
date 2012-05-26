@@ -25,7 +25,6 @@ import javax.persistence.metamodel.IdentifiableType;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.Type;
 
-import org.batoo.jpa.core.impl.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.IdAttributeImpl;
 import org.batoo.jpa.parser.metadata.attribute.IdAttributeMetadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;

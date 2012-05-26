@@ -33,6 +33,7 @@ import javax.persistence.metamodel.Metamodel;
 import javax.sql.DataSource;
 
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
+import org.batoo.jpa.core.impl.model.MetamodelImpl;
 
 /**
  * Implementation of {@link EntityManager}.

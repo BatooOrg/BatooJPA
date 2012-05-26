@@ -20,34 +20,44 @@ package org.batoo.jpa.parser.impl.metadata;
 
 import javax.persistence.SequenceGenerator;
 
-import org.batoo.jpa.parser.impl.annotated.JavaLocator;
+import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
 
 /**
- * Annotated definition of sequence generators.
+ * Implementation of {@link SequenceGeneratorMetadata}.
  * 
  * @author hceylan
  * @since $version
  */
 public class SequenceGeneratorMetadataImpl implements SequenceGeneratorMetadata {
 
-	private final JavaLocator locator;
-	private final SequenceGenerator sequenceGenerator;
+	private final AbstractLocator locator;
+	private final String catalog;
+	private final String schema;
+	private final String name;
+	private final String sequenceName;
+	private final int initialValue;
+	private final int allocationSize;
 
 	/**
 	 * @param locator
 	 *            the java locator
-	 * @param sequenceGenerator
-	 *            the obtained {@link SequenceGenerator} annotation
+	 * @param annotation
+	 *            the annotation
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SequenceGeneratorMetadataImpl(JavaLocator locator, SequenceGenerator sequenceGenerator) {
+	public SequenceGeneratorMetadataImpl(AbstractLocator locator, SequenceGenerator annotation) {
 		super();
 
 		this.locator = locator;
-		this.sequenceGenerator = sequenceGenerator;
+		this.catalog = annotation.catalog();
+		this.schema = annotation.schema();
+		this.name = annotation.name();
+		this.sequenceName = annotation.sequenceName();
+		this.initialValue = annotation.initialValue();
+		this.allocationSize = annotation.allocationSize();
 	}
 
 	/**
@@ -56,7 +66,7 @@ public class SequenceGeneratorMetadataImpl implements SequenceGeneratorMetadata 
 	 */
 	@Override
 	public int getAllocationSize() {
-		return this.sequenceGenerator.allocationSize();
+		return this.allocationSize;
 	}
 
 	/**
@@ -65,7 +75,7 @@ public class SequenceGeneratorMetadataImpl implements SequenceGeneratorMetadata 
 	 */
 	@Override
 	public String getCatalog() {
-		return this.sequenceGenerator.catalog();
+		return this.catalog;
 	}
 
 	/**
@@ -74,7 +84,7 @@ public class SequenceGeneratorMetadataImpl implements SequenceGeneratorMetadata 
 	 */
 	@Override
 	public int getInitialValue() {
-		return this.sequenceGenerator.initialValue();
+		return this.initialValue;
 	}
 
 	/**
@@ -82,8 +92,8 @@ public class SequenceGeneratorMetadataImpl implements SequenceGeneratorMetadata 
 	 * 
 	 */
 	@Override
-	public String getLocation() {
-		return this.locator.getLocation();
+	public AbstractLocator getLocator() {
+		return this.locator;
 	}
 
 	/**
@@ -92,7 +102,7 @@ public class SequenceGeneratorMetadataImpl implements SequenceGeneratorMetadata 
 	 */
 	@Override
 	public String getName() {
-		return this.sequenceGenerator.name();
+		return this.name;
 	}
 
 	/**
@@ -101,7 +111,7 @@ public class SequenceGeneratorMetadataImpl implements SequenceGeneratorMetadata 
 	 */
 	@Override
 	public String getSchema() {
-		return this.sequenceGenerator.schema();
+		return this.schema;
 	}
 
 	/**
@@ -110,7 +120,6 @@ public class SequenceGeneratorMetadataImpl implements SequenceGeneratorMetadata 
 	 */
 	@Override
 	public String getSequenceName() {
-		return this.sequenceGenerator.sequenceName();
+		return this.sequenceName;
 	}
-
 }

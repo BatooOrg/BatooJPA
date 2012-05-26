@@ -19,10 +19,9 @@
 package org.batoo.jpa.core.impl.model.attribute;
 
 import javax.persistence.metamodel.SingularAttribute;
-import javax.persistence.metamodel.Type;
 
 import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
-import org.batoo.jpa.parser.metadata.attribute.SingularAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
 
 /**
  * Implementation of {@link SingularAttribute}.
@@ -46,7 +45,7 @@ public abstract class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> im
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SingularAttributeImpl(ManagedTypeImpl<X> declaringType, SingularAttributeMetadata metadata) {
+	public SingularAttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata) {
 		super(declaringType, metadata);
 	}
 
@@ -66,16 +65,6 @@ public abstract class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> im
 	@Override
 	public final BindableType getBindableType() {
 		return BindableType.SINGULAR_ATTRIBUTE;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Type<T> getType() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/**

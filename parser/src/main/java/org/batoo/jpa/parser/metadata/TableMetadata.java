@@ -21,7 +21,7 @@ package org.batoo.jpa.parser.metadata;
 import java.util.List;
 
 /**
- * The common definitio of tables.
+ * Element for <code>table</code> elements.
  * 
  * @author hceylan
  * @since $version
@@ -57,5 +57,4 @@ public interface TableMetadata extends BindableMetadata {
 	 * @author hceylan
 	 */
 	List<UniqueConstraintMetadata> getUniqueConstraints();
-
 }

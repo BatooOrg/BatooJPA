@@ -21,11 +21,10 @@ package org.batoo.jpa.core.impl.model.attribute;
 import java.lang.reflect.Member;
 
 import javax.persistence.metamodel.Attribute;
-import javax.persistence.metamodel.ManagedType;
 
 import org.batoo.jpa.common.reflect.ReflectHelper;
-import org.batoo.jpa.core.impl.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
+import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.parser.impl.metadata.attribute.AttributeMetadataImpl;
 import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
 
@@ -73,7 +72,7 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y> {
 	 * 
 	 */
 	@Override
-	public ManagedType<X> getDeclaringType() {
+	public ManagedTypeImpl<X> getDeclaringType() {
 		return this.declaringType;
 	}
 

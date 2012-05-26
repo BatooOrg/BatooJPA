@@ -18,14 +18,16 @@
  */
 package org.batoo.jpa.parser.impl.metadata.attribute;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
+import java.util.Set;
 
-import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.TableGenerator;
-import javax.persistence.Temporal;
 
+import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.parser.impl.metadata.GeneratedValueMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.SequenceGeneratorMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.TableGeneratorMetadataImpl;
@@ -40,7 +42,7 @@ import org.batoo.jpa.parser.metadata.attribute.IdAttributeMetadata;
  * @author hceylan
  * @since $version
  */
-public class IdAttributeMetadataImpl extends BasicSingularAttributeMetadataImpl implements IdAttributeMetadata {
+public class IdAttributeMetadataImpl extends PhysicalAttributeMetadataImpl implements IdAttributeMetadata {
 
 	private final GeneratedValueMetadata generatedValue;
 	private final SequenceGeneratorMetadata sequenceGenerator;
@@ -68,23 +70,23 @@ public class IdAttributeMetadataImpl extends BasicSingularAttributeMetadataImpl 
 	 *            the java member of basic attribute
 	 * @param name
 	 *            the name of the basic attribute
-	 * @param column
-	 *            the column definition of the basic attribute
-	 * @param temporal
-	 *            the temporal definition of the basic attribute
-	 * @param generatedValue
-	 *            the generated definition of the id attribute
-	 * @param tableGenerator
-	 *            the table generator of the id attribute
-	 * @param sequenceGenerator
-	 *            the sequence generator of the id attribute
+	 * @param parsed
+	 *            set of annotations parsed
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public IdAttributeMetadataImpl(Member member, String name, Column column, Temporal temporal, GeneratedValue generatedValue,
-		TableGenerator tableGenerator, SequenceGenerator sequenceGenerator) {
-		super(member, name, column, null, temporal);
+	public IdAttributeMetadataImpl(Member member, String name, Set<Class<? extends Annotation>> parsed) {
+		super(member, name, parsed);
+
+		final TableGenerator tableGenerator = ReflectHelper.getAnnotation(member, TableGenerator.class);
+		final SequenceGenerator sequenceGenerator = ReflectHelper.getAnnotation(member, SequenceGenerator.class);
+		final GeneratedValue generatedValue = ReflectHelper.getAnnotation(member, GeneratedValue.class);
+
+		parsed.add(Id.class);
+		parsed.add(TableGenerator.class);
+		parsed.add(SequenceGenerator.class);
+		parsed.add(GeneratedValue.class);
 
 		this.generatedValue = generatedValue != null ? new GeneratedValueMetadataImpl(this.getLocator(), generatedValue) : null;
 		this.tableGenerator = this.tableGenerator != null ? new TableGeneratorMetadataImpl(this.getLocator(), tableGenerator) : null;

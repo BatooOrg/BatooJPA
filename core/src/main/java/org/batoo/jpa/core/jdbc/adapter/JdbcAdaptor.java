@@ -25,15 +25,20 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.persistence.Column;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.AbstractJdbcAdaptor;
+import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
+import org.batoo.jpa.core.impl.model.SequenceGenerator;
+import org.batoo.jpa.core.impl.model.TableGenerator;
 import org.batoo.jpa.core.jdbc.DDLMode;
+import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.parser.MappingException;
 
 import com.google.common.base.Function;
@@ -51,7 +56,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	private List<String> words;
 
 	/**
-	 * @throws MappingException
 	 * @since $version
 	 * @author hceylan
 	 */
@@ -72,7 +76,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @author hceylan
 	 */
 	@Override
-	public abstract String createColumnDDL(Column columnDefinition);
+	public abstract String createColumnDDL(AbstractColumn columnDefinition);
 
 	/**
 	 * Creates the create table statement
@@ -89,7 +93,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @author hceylan
 	 */
 	@Override
-	public String createCreateTableStatement(Table table, List<String> ddlColumns, List<String> pkColumns) {
+	public String createCreateTableStatement(AbstractTable table, List<String> ddlColumns, List<String> pkColumns) {
 		final String columns = Joiner.on(",\n\t").join(ddlColumns) + ",";
 		final String keys = Joiner.on(", ").join(pkColumns);
 
@@ -119,10 +123,11 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 *            the datasource
 	 * @param foreignKey
 	 *            the foreign key
+	 * @throws SQLException
+	 *             thrown in case of underlying SQLException
 	 * 
 	 * @since $version
 	 * @author hceylan
-	 * @throws SQLException
 	 */
 	public abstract void createForeignKey(DataSource dataSource, ForeignKey foreignKey) throws SQLException;
 
@@ -149,6 +154,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @param sequence
 	 *            the sequence to create
 	 * @throws SQLException
+	 *             thrown in case of an SQL error
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -163,11 +169,12 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @param table
 	 *            the table generator
 	 * @throws SQLException
+	 *             thrown in case of an SQL error
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract void createTableGeneratorIfNecessary(DataSource datasource, PhysicalTableGenerator table) throws SQLException;
+	public abstract void createTableGeneratorIfNecessary(DataSource datasource, TableGenerator table) throws SQLException;
 
 	/**
 	 * Recreates the schema.
@@ -183,8 +190,9 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 *            the DDL mode
 	 * @param schema
 	 *            the name of the current schema, may be null to indicate the default schema
-	 * @return the name of the shema
+	 * @return the name of the schema
 	 * @throws SQLException
+	 *             thrown in case of an SQL error
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -216,6 +224,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @param schema
 	 *            the name of the schema
 	 * @throws SQLException
+	 *             thrown in case of an SQL error
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -256,7 +265,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected String getColumnType(Column cd, int sqlType) {
+	protected String getColumnType(AbstractColumn cd, int sqlType) {
 		switch (cd.getSqlType()) {
 			case Types.BLOB:
 				return "BLOB(" + cd.getLength() + ")";
@@ -321,6 +330,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 *            the name of the sequence
 	 * @return the next sequence number
 	 * @throws SQLException
+	 *             thrown in case of an SQL error
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -358,9 +368,9 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	}
 
 	/**
-	 * Returns the sql to select the last identity generated.
+	 * Returns the SQL to select the last identity generated.
 	 * 
-	 * @return the sql to select the last identity generated
+	 * @return the SQL to select the last identity generated
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -416,12 +426,12 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * If the idType is some other value than null then the adapter should either return the same {@link IdType} if supported or null value
 	 * in case the adapter does not support the specified {@link IdType}.
 	 * 
-	 * @param idType
+	 * @param type
 	 *            the id type
 	 * @return the {@link IdType} selected, the {@link Id} passed or null
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract IdType supports(IdType idType);
+	public abstract IdType supports(GenerationType type);
 }

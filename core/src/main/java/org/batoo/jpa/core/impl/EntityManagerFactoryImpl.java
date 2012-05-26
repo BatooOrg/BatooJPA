@@ -28,6 +28,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.metamodel.Metamodel;
 
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
+import org.batoo.jpa.core.impl.model.MetamodelImpl;
 
 /**
  * Implementation of {@link EntityManagerFactory}.

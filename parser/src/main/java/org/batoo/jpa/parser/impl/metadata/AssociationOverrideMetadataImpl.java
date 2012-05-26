@@ -23,7 +23,7 @@ import java.util.List;
 import javax.persistence.AssociationOverride;
 import javax.persistence.JoinColumn;
 
-import org.batoo.jpa.parser.impl.annotated.JavaLocator;
+import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.AssociationOverrideMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
@@ -32,43 +32,42 @@ import org.batoo.jpa.parser.metadata.JoinTableMetadata;
 import com.google.common.collect.Lists;
 
 /**
- * Annotated definition of {@link AttributeOverrideMetadata}.
+ * Implementation of {@link AttributeOverrideMetadata}.
  * 
  * @author hceylan
  * @since $version
  */
 public class AssociationOverrideMetadataImpl implements AssociationOverrideMetadata {
 
-	private final JavaLocator locator;
-	private final AssociationOverride associationOverride;
+	private final AbstractLocator locator;
+	private final String name;
 	private final List<JoinColumnMetadata> joinColumns = Lists.newArrayList();
 	private final JoinTableMetadata joinTable;
 
 	/**
 	 * @param locator
-	 *            the java locator
-	 * @param associationOverride
-	 *            the obtained {@link AssociationOverride} annotation
+	 *            the locator
+	 * @param annotation
+	 *            the annotation
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AssociationOverrideMetadataImpl(JavaLocator locator, AssociationOverride associationOverride) {
+	public AssociationOverrideMetadataImpl(AbstractLocator locator, AssociationOverride annotation) {
 		super();
 
 		this.locator = locator;
-		this.associationOverride = associationOverride;
+		this.name = annotation.name();
 
-		// based on join columns?
-		if (associationOverride.joinColumns().length > 0) {
-			for (final JoinColumn joinColumn : associationOverride.joinColumns()) {
-				this.joinColumns.add(new JoinColumnMetadataImpl(locator, joinColumn));
+		if (annotation.joinColumns().length > 0) {
+			for (final JoinColumn joinColumn : annotation.joinColumns()) {
+				this.joinColumns.add(new JoinColumnMetadataImpl(this.locator, joinColumn));
 			}
 
 			this.joinTable = null;
 		}
 		else {
-			this.joinTable = new JoinTableMetadaImpl(locator, associationOverride.joinTable());
+			this.joinTable = new JoinTableMetadaImpl(locator, annotation.joinTable());
 		}
 	}
 
@@ -95,8 +94,8 @@ public class AssociationOverrideMetadataImpl implements AssociationOverrideMetad
 	 * 
 	 */
 	@Override
-	public String getLocation() {
-		return this.locator.getLocation();
+	public AbstractLocator getLocator() {
+		return this.locator;
 	}
 
 	/**
@@ -105,7 +104,7 @@ public class AssociationOverrideMetadataImpl implements AssociationOverrideMetad
 	 */
 	@Override
 	public String getName() {
-		return this.associationOverride.name();
+		return this.name;
 	}
 
 }

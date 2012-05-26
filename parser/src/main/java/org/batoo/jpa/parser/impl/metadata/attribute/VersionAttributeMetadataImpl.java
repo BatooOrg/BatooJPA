@@ -18,10 +18,9 @@
  */
 package org.batoo.jpa.parser.impl.metadata.attribute;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
-
-import javax.persistence.Column;
-import javax.persistence.Temporal;
+import java.util.Set;
 
 import org.batoo.jpa.parser.metadata.attribute.VersionAttributeMetadata;
 
@@ -31,23 +30,21 @@ import org.batoo.jpa.parser.metadata.attribute.VersionAttributeMetadata;
  * @author hceylan
  * @since $version
  */
-public class VersionAttributeMetadataImpl extends BasicSingularAttributeMetadataImpl implements VersionAttributeMetadata {
+public class VersionAttributeMetadataImpl extends PhysicalAttributeMetadataImpl implements VersionAttributeMetadata {
 
 	/**
 	 * @param member
-	 *            the java member of version attribute
+	 *            the java member of attribute
 	 * @param name
-	 *            the name of the version attribute
-	 * @param column
-	 *            the column definition of the version attribute
-	 * @param temporal
-	 *            the temporal definition of the version attribute
+	 *            the name of the attribute
+	 * @param parsed
+	 *            set of annotations parsed
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public VersionAttributeMetadataImpl(Member member, String name, Column column, Temporal temporal) {
-		super(member, name, column, null, temporal);
+	public VersionAttributeMetadataImpl(Member member, String name, Set<Class<? extends Annotation>> parsed) {
+		super(member, name, parsed);
 	}
 
 	/**

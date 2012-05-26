@@ -18,13 +18,12 @@
  */
 package org.batoo.jpa.parser.impl.metadata.attribute;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.ManyToMany;
 
-import org.batoo.jpa.parser.impl.metadata.JoinTableMetadaImpl;
-import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.ManyToManyAttributeMetadata;
 
 /**
@@ -54,22 +53,21 @@ public class ManyToManyAttributeMetadataImpl extends AssociationAttributeMetadat
 
 	/**
 	 * @param member
-	 *            the java member of one-to-one attribute
+	 *            the java member of attribute
 	 * @param name
-	 *            the name of the one-to-one attribute
+	 *            the name of the attribute
 	 * @param manyToMany
-	 *            the obtained {@link ManyToMany} annotation
-	 * @param joinColumns
-	 *            the join columns definition
-	 * @param joinTable
-	 *            the join table definition
+	 *            the annotation
+	 * @param parsed
+	 *            set of annotations parsed
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManyToManyAttributeMetadataImpl(Member member, String name, ManyToMany manyToMany, List<JoinColumnMetadata> joinColumns,
-		JoinTableMetadaImpl joinTable) {
+	public ManyToManyAttributeMetadataImpl(Member member, String name, ManyToMany manyToMany, Set<Class<? extends Annotation>> parsed) {
+		super(member, name, parsed, manyToMany.targetEntity().getName(), manyToMany.fetch(), manyToMany.cascade());
 
-		super(member, name, manyToMany.targetEntity().getName(), manyToMany.fetch(), manyToMany.cascade(), joinColumns, joinTable);
+		parsed.add(ManyToMany.class);
 
 		this.mappedBy = manyToMany.mappedBy();
 	}

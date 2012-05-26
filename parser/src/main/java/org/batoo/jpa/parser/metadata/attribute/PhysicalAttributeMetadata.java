@@ -18,7 +18,6 @@
  */
 package org.batoo.jpa.parser.metadata.attribute;
 
-import javax.persistence.FetchType;
 import javax.persistence.TemporalType;
 
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
@@ -29,7 +28,7 @@ import org.batoo.jpa.parser.metadata.ColumnMetadata;
  * @author hceylan
  * @since $version
  */
-public interface PhysicalAttributeMetadata extends SingularAttributeMetadata {
+public interface PhysicalAttributeMetadata extends AttributeMetadata {
 
 	/**
 	 * Returns the column definition of the singular attribute.
@@ -40,16 +39,6 @@ public interface PhysicalAttributeMetadata extends SingularAttributeMetadata {
 	 * @author hceylan
 	 */
 	ColumnMetadata getColumn();
-
-	/**
-	 * Returns the fetch type of the attribute.
-	 * 
-	 * @return the fetch type of the attribute
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	FetchType getFetchType();
 
 	/**
 	 * Returns the temporal type of the singular attribute.

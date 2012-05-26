@@ -18,10 +18,22 @@
  */
 package org.batoo.jpa.core.impl.model;
 
-import javax.persistence.metamodel.EntityType;
+import java.util.Map;
 
-import org.batoo.jpa.core.impl.MetamodelImpl;
+import javax.persistence.metamodel.EntityType;
+import javax.persistence.metamodel.SingularAttribute;
+
+import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.core.impl.jdbc.AbstractTable;
+import org.batoo.jpa.core.impl.jdbc.EntityTable;
+import org.batoo.jpa.core.impl.jdbc.PhysicalColumn;
+import org.batoo.jpa.core.impl.jdbc.SecondaryTable;
+import org.batoo.jpa.core.impl.model.attribute.PhysicalAttributeImpl;
+import org.batoo.jpa.parser.MappingException;
+import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
+
+import com.google.common.collect.Maps;
 
 /**
  * Implementation of {@link EntityType}.
@@ -35,6 +47,8 @@ import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements EntityType<X> {
 
 	private final String name;
+	private EntityTable primaryTable;
+	private final Map<String, AbstractTable> tables = Maps.newHashMap();
 
 	/**
 	 * @param metamodel
@@ -51,6 +65,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		super(metamodel, javaType, metadata);
 
 		this.name = metadata.getName();
+
+		this.initTables(metadata);
 	}
 
 	/**
@@ -80,4 +96,41 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		return this.name;
 	}
 
+	/**
+	 * Initializes the tables.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 * @param metadata
+	 */
+	private void initTables(EntityMetadata metadata) {
+		this.primaryTable = new EntityTable(this, metadata.getTable());
+
+		this.tables.put(this.primaryTable.getName(), this.primaryTable);
+
+		for (final SecondaryTableMetadata secondaryTableMetadata : metadata.getSecondaryTables()) {
+			this.tables.put(secondaryTableMetadata.getName(), new SecondaryTable(this, secondaryTableMetadata));
+		}
+
+		for (final SingularAttribute<X, ?> attribute : this.getDeclaredSingularAttributes()) {
+			if (attribute instanceof PhysicalAttributeImpl) {
+				final PhysicalColumn column = ((PhysicalAttributeImpl<X, ?>) attribute).getColumn();
+				final String tableName = column.getTableName();
+
+				// if table name is blank, it means the column should belong to the primary table
+				if (StringUtils.isBlank(tableName)) {
+					column.setTable(this.primaryTable);
+				}
+				// otherwise locate the table
+				else {
+					final AbstractTable table = this.tables.get(tableName);
+					if (table == null) {
+						throw new MappingException("Table " + tableName + " could not be found", column.getLocator());
+					}
+
+					column.setTable(table);
+				}
+			}
+		}
+	}
 }

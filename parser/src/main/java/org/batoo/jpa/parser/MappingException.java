@@ -36,14 +36,14 @@ public class MappingException extends RuntimeException {
 	 * 
 	 * @param message
 	 *            the message to prepend to the constructed message
-	 * @param locations
-	 *            the locations
+	 * @param loctions
+	 *            the locators
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public MappingException(String message, String... locations) {
-		super(message + " Defined at:" + (locations.length > 1 ? "\n\t" : " ") + Joiner.on("\n\t").join(locations));
+	public MappingException(String message, Object... loctions) {
+		super(message + " Defined at:" + (loctions.length > 1 ? "\n\t" : " ") + Joiner.on("\n\t").join(loctions));
 	}
 
 }

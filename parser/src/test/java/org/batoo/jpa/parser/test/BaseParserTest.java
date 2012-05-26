@@ -24,8 +24,8 @@ import javax.persistence.PersistenceContext;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.test.BaseTest;
-import org.batoo.jpa.parser.impl.PersistenceParser;
-import org.batoo.jpa.parser.impl.metadata.Metadata;
+import org.batoo.jpa.parser.PersistenceParser;
+import org.batoo.jpa.parser.metadata.Metadata;
 import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
 import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;

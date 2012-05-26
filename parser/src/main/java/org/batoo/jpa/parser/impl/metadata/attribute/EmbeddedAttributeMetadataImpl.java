@@ -18,12 +18,24 @@
  */
 package org.batoo.jpa.parser.impl.metadata.attribute;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 import java.util.List;
+import java.util.Set;
 
+import javax.persistence.AssociationOverride;
+import javax.persistence.AssociationOverrides;
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
+
+import org.batoo.jpa.common.reflect.ReflectHelper;
+import org.batoo.jpa.parser.impl.metadata.AssociationOverrideMetadataImpl;
+import org.batoo.jpa.parser.impl.metadata.AttributeOverrideMetadataImpl;
 import org.batoo.jpa.parser.metadata.AssociationOverrideMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.attribute.EmbeddedAttributeMetadata;
+
+import com.google.common.collect.Lists;
 
 /**
  * The implementation of the {@link EmbeddedAttributeMetadata}.
@@ -33,8 +45,8 @@ import org.batoo.jpa.parser.metadata.attribute.EmbeddedAttributeMetadata;
  */
 public class EmbeddedAttributeMetadataImpl extends AttributeMetadataImpl implements EmbeddedAttributeMetadata {
 
-	private final List<AttributeOverrideMetadata> attributeOverrides;
-	private final List<AssociationOverrideMetadata> associationOverrides;
+	private final List<AttributeOverrideMetadata> attributeOverrides = Lists.newArrayList();
+	private final List<AssociationOverrideMetadata> associationOverrides = Lists.newArrayList();
 
 	/**
 	 * @param member
@@ -48,8 +60,8 @@ public class EmbeddedAttributeMetadataImpl extends AttributeMetadataImpl impleme
 	public EmbeddedAttributeMetadataImpl(Member member, EmbeddedAttributeMetadata metadata) {
 		super(member, metadata);
 
-		this.attributeOverrides = metadata.getAttributeOverrides();
-		this.associationOverrides = metadata.getAssociationOverrides();
+		this.attributeOverrides.addAll(metadata.getAttributeOverrides());
+		this.associationOverrides.addAll(metadata.getAssociationOverrides());
 	}
 
 	/**
@@ -57,20 +69,48 @@ public class EmbeddedAttributeMetadataImpl extends AttributeMetadataImpl impleme
 	 *            the java member of attribute
 	 * @param name
 	 *            the name of the attribute
-	 * @param attributeOverrides
-	 *            the attribute overrides
-	 * @param associationOverrides
-	 *            the association overrides
+	 * @param parsed
+	 *            set of annotations parsed
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EmbeddedAttributeMetadataImpl(Member member, String name, List<AttributeOverrideMetadata> attributeOverrides,
-		List<AssociationOverrideMetadata> associationOverrides) {
+	public EmbeddedAttributeMetadataImpl(Member member, String name, Set<Class<? extends Annotation>> parsed) {
 		super(member, name);
 
-		this.attributeOverrides = attributeOverrides;
-		this.associationOverrides = associationOverrides;
+		// if there is AttributesOverrides annotation use it
+		final AttributeOverrides attributeOverrides = ReflectHelper.getAnnotation(member, AttributeOverrides.class);
+		final AttributeOverride attributeOverride = ReflectHelper.getAnnotation(member, AttributeOverride.class);
+
+		if ((attributeOverrides != null) && (attributeOverrides.value() != null) && (attributeOverrides.value().length > 0)) {
+			parsed.add(AttributeOverrides.class);
+
+			for (final AttributeOverride a : attributeOverrides.value()) {
+				this.attributeOverrides.add(new AttributeOverrideMetadataImpl(this.getLocator(), a));
+			}
+		}
+		else if (attributeOverride != null) {
+			parsed.add(AttributeOverride.class);
+
+			this.attributeOverrides.add(new AttributeOverrideMetadataImpl(this.getLocator(), attributeOverride));
+		}
+
+		// if there is AssociationsOverrides annotation use it
+		final AssociationOverrides associationOverrides = ReflectHelper.getAnnotation(member, AssociationOverrides.class);
+		final AssociationOverride associationOverride = ReflectHelper.getAnnotation(member, AssociationOverride.class);
+
+		if ((associationOverrides != null) && (associationOverrides.value() != null) && (associationOverrides.value().length > 0)) {
+			parsed.add(AssociationOverrides.class);
+
+			for (final AssociationOverride a : associationOverrides.value()) {
+				this.associationOverrides.add(new AssociationOverrideMetadataImpl(this.getLocator(), a));
+			}
+		}
+		else if (associationOverride != null) {
+			parsed.add(AssociationOverride.class);
+
+			this.associationOverrides.add(new AssociationOverrideMetadataImpl(this.getLocator(), associationOverride));
+		}
 	}
 
 	/**

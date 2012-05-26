@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.persistence.Column;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.QueryRunner;
@@ -133,14 +132,14 @@ public abstract class AbstractJdbcAdaptor {
 	/**
 	 * Creates the PhysicalColumn Definition DDL For the column.
 	 * 
-	 * @param columnDefinition
+	 * @param column
 	 *            the column definition to create the DDL from
 	 * @return the PhysicalColumn Definition DDL For the column
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract String createColumnDDL(Column columnDefinition);
+	public abstract String createColumnDDL(AbstractColumn column);
 
 	/**
 	 * Returns the SQL to create the table.
@@ -153,15 +152,15 @@ public abstract class AbstractJdbcAdaptor {
 	 * @author hceylan
 	 * @param tableDefinition
 	 */
-	private String createCreateTableStatement(Table table) {
+	private String createCreateTableStatement(AbstractTable table) {
 		final List<String> ddlColumns = Lists.newArrayList();
 		final List<String> pkColumns = Lists.newArrayList();
 
-		for (final Column column : table.getColumns()) {
+		for (final AbstractColumn column : table.getColumns()) {
 			ddlColumns.add(this.createColumnDDL(column));
 
-			if (column.getIdType() != null) {
-				pkColumns.add(column.getPhysicalName());
+			if (column instanceof PkPhysicalColumn) {
+				pkColumns.add(column.getName());
 			}
 		}
 
@@ -175,12 +174,14 @@ public abstract class AbstractJdbcAdaptor {
 	 *            the table
 	 * @param ddlColumns
 	 *            the column DDL fragments
+	 * @param pkColumns
+	 *            the list of primary key columns
 	 * @return the SQL to create the table
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected abstract String createCreateTableStatement(Table table, List<String> ddlColumns, List<String> pkColumns);
+	protected abstract String createCreateTableStatement(AbstractTable table, List<String> ddlColumns, List<String> pkColumns);
 
 	/**
 	 * Recreates the schema.
@@ -233,9 +234,6 @@ public abstract class AbstractJdbcAdaptor {
 	 */
 	public final void performTableDdl(Set<String> schemas, DataSourceImpl datasource, DDLMode ddlMode, AbstractTable table)
 		throws SQLException {
-
-		// Sort columns to look nice
-		table.sortColumns();
 
 		this.dropAndCreateSchemaIfNecessary(datasource, schemas, ddlMode, table.getSchema());
 

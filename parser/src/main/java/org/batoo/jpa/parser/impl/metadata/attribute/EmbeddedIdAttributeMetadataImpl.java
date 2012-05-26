@@ -18,11 +18,20 @@
  */
 package org.batoo.jpa.parser.impl.metadata.attribute;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 import java.util.List;
+import java.util.Set;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
+
+import org.batoo.jpa.common.reflect.ReflectHelper;
+import org.batoo.jpa.parser.impl.metadata.AttributeOverrideMetadataImpl;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.attribute.EmbeddedIdAttributeMetadata;
+
+import com.google.common.collect.Lists;
 
 /**
  * 
@@ -32,7 +41,7 @@ import org.batoo.jpa.parser.metadata.attribute.EmbeddedIdAttributeMetadata;
  */
 public class EmbeddedIdAttributeMetadataImpl extends AttributeMetadataImpl implements EmbeddedIdAttributeMetadata {
 
-	private final List<AttributeOverrideMetadata> attributeOverrides;
+	private final List<AttributeOverrideMetadata> attributeOverrides = Lists.newArrayList();
 
 	/**
 	 * @param member
@@ -46,7 +55,7 @@ public class EmbeddedIdAttributeMetadataImpl extends AttributeMetadataImpl imple
 	public EmbeddedIdAttributeMetadataImpl(Member member, EmbeddedIdAttributeMetadata metadata) {
 		super(member, metadata);
 
-		this.attributeOverrides = metadata.getAttributeOverrides();
+		this.attributeOverrides.addAll(metadata.getAttributeOverrides());
 	}
 
 	/**
@@ -54,16 +63,31 @@ public class EmbeddedIdAttributeMetadataImpl extends AttributeMetadataImpl imple
 	 *            the java member of attribute
 	 * @param name
 	 *            the name of the attribute
-	 * @param attributeOverrides
-	 *            the attribute overrides
+	 * @param parsed
+	 *            set of annotations parsed
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EmbeddedIdAttributeMetadataImpl(Member member, String name, List<AttributeOverrideMetadata> attributeOverrides) {
+	public EmbeddedIdAttributeMetadataImpl(Member member, String name, Set<Class<? extends Annotation>> parsed) {
 		super(member, name);
 
-		this.attributeOverrides = attributeOverrides;
+		// if there is AttributesOverrides annotation use it
+		final AttributeOverrides attributeOverrides = ReflectHelper.getAnnotation(member, AttributeOverrides.class);
+		final AttributeOverride attributeOverride = ReflectHelper.getAnnotation(member, AttributeOverride.class);
+
+		if ((attributeOverrides != null) && (attributeOverrides.value() != null) && (attributeOverrides.value().length > 0)) {
+			parsed.add(AttributeOverrides.class);
+
+			for (final AttributeOverride a : attributeOverrides.value()) {
+				this.attributeOverrides.add(new AttributeOverrideMetadataImpl(this.getLocator(), a));
+			}
+		}
+		else if (attributeOverride != null) {
+			parsed.add(AttributeOverride.class);
+
+			this.attributeOverrides.add(new AttributeOverrideMetadataImpl(this.getLocator(), attributeOverride));
+		}
 	}
 
 	/**

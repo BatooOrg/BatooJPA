@@ -19,7 +19,7 @@
 package org.batoo.jpa.parser.metadata.attribute;
 
 import javax.persistence.EnumType;
-
+import javax.persistence.FetchType;
 
 /**
  * 
@@ -38,6 +38,16 @@ public interface BasicAttributeMetadata extends PhysicalAttributeMetadata {
 	 * @author hceylan
 	 */
 	EnumType getEnumType();
+
+	/**
+	 * Returns the fetch type of the attribute.
+	 * 
+	 * @return the fetch type of the attribute
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	FetchType getFetchType();
 
 	/**
 	 * Returns if the basic attribute is lob.

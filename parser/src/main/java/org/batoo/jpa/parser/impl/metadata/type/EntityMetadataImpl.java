@@ -18,94 +18,141 @@
  */
 package org.batoo.jpa.parser.impl.metadata.type;
 
+import java.lang.annotation.Annotation;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.AssociationOverride;
+import javax.persistence.AssociationOverrides;
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.Cacheable;
-import javax.persistence.Embeddable;
 import javax.persistence.Entity;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.SecondaryTable;
+import javax.persistence.SecondaryTables;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.TableGenerator;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.common.log.ToStringBuilder;
-import org.batoo.jpa.parser.MappingException;
+import org.batoo.jpa.parser.impl.metadata.AssociationOverrideMetadataImpl;
+import org.batoo.jpa.parser.impl.metadata.AttributeOverrideMetadataImpl;
+import org.batoo.jpa.parser.impl.metadata.JavaLocator;
+import org.batoo.jpa.parser.impl.metadata.SecondaryTableMetadataImpl;
+import org.batoo.jpa.parser.impl.metadata.SequenceGeneratorMetadataImpl;
+import org.batoo.jpa.parser.impl.metadata.TableGeneratorMetadataImpl;
+import org.batoo.jpa.parser.impl.metadata.TableMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.attribute.AttributesMetadataImpl;
 import org.batoo.jpa.parser.metadata.AssociationOverrideMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
+import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
 /**
- * 
- * Implementation of {@link EntityMetadata}.
+ * Implementation {@link EntityMetadata}.
  * 
  * @author hceylan
  * @since $version
  */
 public class EntityMetadataImpl implements EntityMetadata {
 
+	private final JavaLocator locator;
 	private final Class<?> clazz;
-	private final AccessType defaultAccessType;
-	private final EntityMetadata ormMetadata;
+	private final String name;
+	private final Boolean cachable;
+	private final AccessType accessType;
+	private final TableMetadata table;
+	private final SequenceGeneratorMetadata sequenceGenerator;
+	private final TableGeneratorMetadata tableGenerator;
+	private final List<SecondaryTableMetadata> secondaryTables = Lists.newArrayList();
+	private final List<AssociationOverrideMetadata> associationOverrides = Lists.newArrayList();
+	private final List<AttributeOverrideMetadata> attributeOverrides = Lists.newArrayList();
 	private final AttributesMetadataImpl attributes;
 
 	/**
 	 * @param clazz
-	 *            the class of the entity
-	 * @param defaultAccessType
-	 *            the default access supplied by the Persistence XML File
-	 * @param ormMetadata
-	 *            the optional entity metadata
+	 *            the represented class
+	 * @param metadata
+	 *            the metadata
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EntityMetadataImpl(Class<?> clazz, AccessType defaultAccessType, EntityMetadata ormMetadata) {
+	public EntityMetadataImpl(Class<?> clazz, EntityMetadata metadata) {
 		super();
 
 		this.clazz = clazz;
-		this.defaultAccessType = defaultAccessType;
-		this.ormMetadata = ormMetadata;
+		this.locator = new JavaLocator(clazz);
+		this.accessType = this.getAccessType(metadata);
 
-		// check consistency with ORM metadata
-		if (ormMetadata != null) {
+		// handle attributes
+		this.attributes = new AttributesMetadataImpl(this, clazz, metadata != null ? metadata.getAttributes() : null);
 
-			// class shouldn't have @MappedSuperclass
-			final MappedSuperclass mappedSuperclass = clazz.getAnnotation(MappedSuperclass.class);
-			if (mappedSuperclass != null) {
-				throw new MappingException("Class " + clazz + " mapped as entity in the ORM File but annotaed as @MappedSuperclass");
-			}
+		final Set<Class<? extends Annotation>> parsed = Sets.newHashSet();
 
-			// class shouldn't have @Embeddable
-			final Embeddable embeddable = clazz.getAnnotation(Embeddable.class);
-			if (embeddable != null) {
-				throw new MappingException("Class " + clazz + " mapped as entity in the ORM File but annotaed as @Embeddable");
-			}
-		}
+		// handle name
+		this.name = this.handleName(metadata, parsed);
 
-		// visit the attributes
-		this.attributes = new AttributesMetadataImpl(this, ormMetadata != null ? ormMetadata.getAttributes() : null);
+		// handle cacheable
+		this.cachable = this.handleCacheable(metadata, parsed);
+
+		// handle tables
+		this.table = this.handleTable(metadata, parsed);
+		this.handleSecondaryTables(metadata, parsed);
+
+		// handle overrides
+		this.handleAttributeOverrides(metadata, parsed);
+		this.handleAssociationOverrides(metadata, parsed);
+
+		// handle generators
+		this.sequenceGenerator = this.handleSequenceGenerator(metadata, parsed);
+		this.tableGenerator = this.handleTableGenerator(metadata, parsed);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 * 
-	 * 
 	 */
 	@Override
 	public AccessType getAccessType() {
-		// if ORM Metadata specifies then return the access type of the ORM Metadata.
-		if ((this.ormMetadata != null) && (this.ormMetadata.getAccessType() != null)) {
-			return this.ormMetadata.getAccessType();
+		return this.accessType;
+	}
+
+	/**
+	 * Returns the access type.
+	 * <p>
+	 * if metadata exists and it specifies the access type then it is returned.
+	 * <p>
+	 * then is class has {@link Access} annotation then it is returned.
+	 * <p>
+	 * finally default {@link AccessType#FIELD} is returned.
+	 * 
+	 * @param metadata
+	 * @return
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private AccessType getAccessType(EntityMetadata metadata) {
+		if ((metadata != null) && (metadata.getAccessType() != null)) {
+			return metadata.getAccessType();
 		}
 
-		// if entity specifies an access type then value is return, otherwise the default access type provided is returned
 		final Access access = this.clazz.getAnnotation(Access.class);
-		return access != null ? access.value() : this.defaultAccessType;
+		if ((access != null) && (access.value() != null)) {
+			return access.value();
+		}
+
+		return AccessType.FIELD;
 	}
 
 	/**
@@ -114,8 +161,7 @@ public class EntityMetadataImpl implements EntityMetadata {
 	 */
 	@Override
 	public List<AssociationOverrideMetadata> getAssociationOverrides() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.associationOverrides;
 	}
 
 	/**
@@ -124,8 +170,7 @@ public class EntityMetadataImpl implements EntityMetadata {
 	 */
 	@Override
 	public List<AttributeOverrideMetadata> getAttributeOverrides() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.attributeOverrides;
 	}
 
 	/**
@@ -142,15 +187,8 @@ public class EntityMetadataImpl implements EntityMetadata {
 	 * 
 	 */
 	@Override
-	public Boolean getCachable() {
-		// if ORM Metadata specifies then return the value of the ORM Metadata.
-		if ((this.ormMetadata != null) && (this.ormMetadata.getCachable() != null)) {
-			return this.ormMetadata.getCachable();
-		}
-
-		// if entity specifies a value then it is return, otherwise the null value returned indicating no preference
-		final Cacheable cacheable = this.clazz.getAnnotation(Cacheable.class);
-		return cacheable != null ? cacheable.value() : null;
+	public Boolean getCacheable() {
+		return this.cachable;
 	}
 
 	/**
@@ -163,24 +201,12 @@ public class EntityMetadataImpl implements EntityMetadata {
 	}
 
 	/**
-	 * Returns the java class of the entity.
-	 * 
-	 * @return the java class of the entity
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public Class<?> getClazz() {
-		return this.clazz;
-	}
-
-	/**
 	 * {@inheritDoc}
 	 * 
 	 */
 	@Override
-	public String getLocation() {
-		return this.clazz.getName();
+	public JavaLocator getLocator() {
+		return this.locator;
 	}
 
 	/**
@@ -189,18 +215,16 @@ public class EntityMetadataImpl implements EntityMetadata {
 	 */
 	@Override
 	public String getName() {
-		// if ORM Metadata specifies then return the name of the ORM Metadata.
-		if ((this.ormMetadata != null) && StringUtils.isNotBlank(this.ormMetadata.getName())) {
-			return this.ormMetadata.getName();
-		}
+		return this.name;
+	}
 
-		// if entity specifies a name then it is return, otherwise the simple name of the class is returned
-		final Entity entity = this.clazz.getAnnotation(Entity.class);
-		if (entity == null) {
-			return this.clazz.getSimpleName();
-		}
-
-		return StringUtils.isNotBlank(entity.name()) ? entity.name() : this.clazz.getSimpleName();
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<SecondaryTableMetadata> getSecondaryTables() {
+		return this.secondaryTables;
 	}
 
 	/**
@@ -209,8 +233,7 @@ public class EntityMetadataImpl implements EntityMetadata {
 	 */
 	@Override
 	public SequenceGeneratorMetadata getSequenceGenerator() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.sequenceGenerator;
 	}
 
 	/**
@@ -219,8 +242,7 @@ public class EntityMetadataImpl implements EntityMetadata {
 	 */
 	@Override
 	public TableMetadata getTable() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.table;
 	}
 
 	/**
@@ -229,7 +251,294 @@ public class EntityMetadataImpl implements EntityMetadata {
 	 */
 	@Override
 	public TableGeneratorMetadata getTableGenerator() {
-		// TODO Auto-generated method stub
+		return this.tableGenerator;
+	}
+
+	/**
+	 * Handles the association override definitions of the entity.
+	 * <p>
+	 * If metadata provides at least one association override definition then the its definitions are added to {@link #attributeOverrides}.
+	 * <p>
+	 * Else if either {@link AssociationOverrides} or {@link AssociationOverride} annotations present, then definition based on the
+	 * annotation is added to {@link #associationOverrides}.
+	 * 
+	 * @param metadata
+	 *            the metadata
+	 * @param parsed
+	 *            the set of annotations parsed
+	 * 
+	 * @since $version
+	 * @author
+	 * @param parsed
+	 */
+	private void handleAssociationOverrides(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
+		if ((metadata != null) && (metadata.getAssociationOverrides().size() > 0)) {
+			this.associationOverrides.addAll(metadata.getAssociationOverrides());
+		}
+		else {
+			final AssociationOverrides overrides = this.clazz.getAnnotation(AssociationOverrides.class);
+			if ((overrides != null) && (overrides.value().length > 0)) {
+				parsed.add(AttributeOverrides.class);
+
+				for (final AssociationOverride override : overrides.value()) {
+					this.associationOverrides.add(new AssociationOverrideMetadataImpl(this.locator, override));
+				}
+			}
+			else {
+				final AssociationOverride override = this.clazz.getAnnotation(AssociationOverride.class);
+				parsed.add(AssociationOverride.class);
+
+				if (override != null) {
+					this.associationOverrides.add(new AssociationOverrideMetadataImpl(this.locator, override));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Handles the attribute override definitions of the entity.
+	 * <p>
+	 * If metadata provides at least one attribute override definition then the its definitions are added to {@link #attributeOverrides}.
+	 * <p>
+	 * Else if either {@link AttributeOverrides} or {@link AttributeOverride} annotations present, then definition based on the annotation
+	 * is added to {@link #attributeOverrides}.
+	 * 
+	 * @param metadata
+	 *            the metadata
+	 * @param parsed
+	 *            the set of annotations parsed
+	 * 
+	 * @since $version
+	 * @author
+	 * @param parsed
+	 */
+	private void handleAttributeOverrides(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
+		if ((metadata != null) && (metadata.getAttributeOverrides().size() > 0)) {
+			this.attributeOverrides.addAll(metadata.getAttributeOverrides());
+		}
+		else {
+			final AttributeOverrides overrides = this.clazz.getAnnotation(AttributeOverrides.class);
+			if ((overrides != null) && (overrides.value().length > 0)) {
+				parsed.add(AttributeOverrides.class);
+
+				for (final AttributeOverride override : overrides.value()) {
+					this.attributeOverrides.add(new AttributeOverrideMetadataImpl(this.locator, override));
+				}
+			}
+			else {
+				final AttributeOverride override = this.clazz.getAnnotation(AttributeOverride.class);
+				parsed.add(AttributeOverride.class);
+
+				if (override != null) {
+					this.attributeOverrides.add(new AttributeOverrideMetadataImpl(this.locator, override));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Handles the cacheability of the entity.
+	 * <p>
+	 * If metadata specifies the cacheability definition, the definition is returned.
+	 * <p>
+	 * Then if the {@link Cacheable} annotation present, then returned true.
+	 * <p>
+	 * Finally entity class's simple name is returned
+	 * 
+	 * @param metadata
+	 *            the metadata
+	 * @param parsed
+	 *            the set of annotation parsed
+	 * @return the name
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private Boolean handleCacheable(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
+		if ((metadata != null) && (metadata.getCacheable() != null)) {
+			return metadata.getCacheable();
+		}
+
+		final Cacheable cacheable = this.clazz.getAnnotation(Cacheable.class);
+		if (cacheable != null) {
+			parsed.add(Cacheable.class);
+
+			return cacheable.value();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Handles the name of the entity.
+	 * <p>
+	 * If metadata provides a name definition, the definition is returned.
+	 * <p>
+	 * Then if the {@link Entity} annotation present, then name on the annotation is returned.
+	 * <p>
+	 * Finally entity class's simple name is returned
+	 * 
+	 * @param metadata
+	 *            the metadata
+	 * @param parsed
+	 *            the set of annotation parsed
+	 * @return the name
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private String handleName(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
+		if ((metadata != null) && StringUtils.isNotBlank(metadata.getName())) {
+			return metadata.getName();
+		}
+
+		final Entity entity = this.clazz.getAnnotation(Entity.class);
+		if ((entity != null) && StringUtils.isNotBlank(entity.name())) {
+			parsed.add(Entity.class);
+
+			return entity.name();
+		}
+
+		return this.clazz.getSimpleName();
+	}
+
+	/**
+	 * Handles the secondary table definitions of the entity.
+	 * <p>
+	 * If metadata provides at least one secondary table definition then the its definitions are added to {@link #secondaryTables}.
+	 * <p>
+	 * Else if either {@link SecondaryTables} or {@link SecondaryTable} annotations present, then definition based on the annotation is
+	 * added to {@link #secondaryTables}.
+	 * 
+	 * @param metadata
+	 *            the metadata
+	 * @param parsed
+	 *            the set of annotations parsed
+	 * 
+	 * @since $version
+	 * @author
+	 */
+	private void handleSecondaryTables(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
+		if ((metadata != null) && (metadata.getSecondaryTables().size() > 0)) {
+			this.secondaryTables.addAll(metadata.getSecondaryTables());
+		}
+		else {
+			final SecondaryTables secondaryTables = this.clazz.getAnnotation(SecondaryTables.class);
+			if ((secondaryTables != null) && (secondaryTables.value().length > 0)) {
+				parsed.add(SecondaryTables.class);
+
+				for (final SecondaryTable secondaryTable : secondaryTables.value()) {
+					this.secondaryTables.add(new SecondaryTableMetadataImpl(this.locator, secondaryTable));
+				}
+			}
+			else {
+				final SecondaryTable secondaryTable = this.clazz.getAnnotation(SecondaryTable.class);
+				if (secondaryTable != null) {
+					parsed.add(SecondaryTable.class);
+
+					this.secondaryTables.add(new SecondaryTableMetadataImpl(this.locator, secondaryTable));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Handles the sequence generator definition of the entity.
+	 * <p>
+	 * If metadata provides a sequence generator then the definition is returned.
+	 * <p>
+	 * Then if the {@link SequenceGenerator} annotation present, then definition based on the annotation is returned.
+	 * <p>
+	 * Finally null value is returned
+	 * 
+	 * @param metadata
+	 *            the metadata
+	 * @param parsed
+	 *            the set of annotation parsed
+	 * @return the sequence generator metadata or null
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private SequenceGeneratorMetadata handleSequenceGenerator(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
+		if ((metadata != null) && (metadata.getSequenceGenerator() != null)) {
+			return metadata.getSequenceGenerator();
+		}
+
+		final SequenceGenerator annotation = this.clazz.getAnnotation(SequenceGenerator.class);
+		if (annotation != null) {
+			parsed.add(SequenceGenerator.class);
+
+			return new SequenceGeneratorMetadataImpl(this.locator, annotation);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Handles the table definition of the entity.
+	 * <p>
+	 * <p>
+	 * If metadata provides a table definition then the definition is returned.
+	 * <p>
+	 * Then if the {@link Table} annotation present, then definition based on the annotation is returned.
+	 * <p>
+	 * Finally null value is returned
+	 * 
+	 * @param metadata
+	 *            the metadata
+	 * @param parsed
+	 *            the set of annotation parsed
+	 * @return the table metadata or null
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private TableMetadata handleTable(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
+		if ((metadata != null) && (metadata.getTable() != null)) {
+			return metadata.getTable();
+		}
+
+		final Table annotation = this.clazz.getAnnotation(Table.class);
+		if (annotation != null) {
+			parsed.add(Table.class);
+
+			return new TableMetadataImpl(this.locator, annotation);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Handles the table generator definition of the entity.
+	 * <p>
+	 * If metadata provides a table generator then the definition is returned.
+	 * <p>
+	 * Then if the {@link TableGenerator} annotation present, then definition based on the annotation is returned.
+	 * <p>
+	 * Finally null value is returned
+	 * 
+	 * @param metadata
+	 *            the metadata
+	 * @param parsed
+	 *            the set of annotation parsed
+	 * @return the table generator metadata or null
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private TableGeneratorMetadata handleTableGenerator(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
+		if ((metadata != null) && (metadata.getTableGenerator() != null)) {
+			return metadata.getTableGenerator();
+		}
+
+		final TableGenerator annotation = this.clazz.getAnnotation(TableGenerator.class);
+		if (annotation != null) {
+			parsed.add(TableGenerator.class);
+
+			return new TableGeneratorMetadataImpl(this.locator, annotation);
+		}
+
 		return null;
 	}
 
@@ -239,18 +548,7 @@ public class EntityMetadataImpl implements EntityMetadata {
 	 */
 	@Override
 	public boolean isMetadataComplete() {
-		// if ORM Metadata specifies then it is returned, otherwise false is returned as default
-		return this.ormMetadata != null ? this.ormMetadata.isMetadataComplete() : false;
+		return false; // N/A
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String toString() {
-		return new ToStringBuilder(this)//
-		.excludeFieldNames("ormMetadata", "defaultAccessType") //
-		.toString();
-	}
 }

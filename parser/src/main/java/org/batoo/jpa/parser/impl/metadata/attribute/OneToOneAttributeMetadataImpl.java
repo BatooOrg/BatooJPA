@@ -18,13 +18,17 @@
  */
 package org.batoo.jpa.parser.impl.metadata.attribute;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.PrimaryKeyJoinColumns;
 
-import org.batoo.jpa.parser.impl.metadata.JoinTableMetadaImpl;
-import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
+import org.batoo.jpa.common.reflect.ReflectHelper;
+import org.batoo.jpa.parser.impl.metadata.PrimaryKeyJoinColumnMetadataImpl;
 import org.batoo.jpa.parser.metadata.PrimaryKeyJoinColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.OneToOneAttributeMetadata;
 
@@ -41,7 +45,7 @@ public class OneToOneAttributeMetadataImpl extends AssociationAttributeMetadataI
 	private final String mappedBy;
 	private final boolean removesOprhans;
 	private final boolean optional;
-	private final List<PrimaryKeyJoinColumnMetadata> pkJoinColumns;
+	private final List<PrimaryKeyJoinColumnMetadata> pkJoinColumns = Lists.newArrayList();
 
 	/**
 	 * @param member
@@ -58,34 +62,48 @@ public class OneToOneAttributeMetadataImpl extends AssociationAttributeMetadataI
 		this.mappedBy = metadata.getMappedBy();
 		this.optional = metadata.isOptional();
 		this.removesOprhans = metadata.removesOprhans();
-		this.pkJoinColumns = Lists.newArrayList(metadata.getPrimaryKeyJoinColumns());
+		this.pkJoinColumns.addAll(Lists.newArrayList(metadata.getPrimaryKeyJoinColumns()));
 	}
 
 	/**
 	 * @param member
-	 *            the java member of one-to-one attribute
+	 *            the java member of attribute
 	 * @param name
-	 *            the name of the one-to-one attribute
+	 *            the name of the attribute
 	 * @param oneToOne
-	 *            the obtained {@link OneToOne} annotation
-	 * @param pkJoinColumns
-	 *            the primary key join columns definition
-	 * @param joinColumns
-	 *            the join columns definition
-	 * @param joinTable
-	 *            the join table definition
+	 *            the annotation
+	 * @param parsed
+	 *            set of annotations parsed
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public OneToOneAttributeMetadataImpl(Member member, String name, OneToOne oneToOne, List<PrimaryKeyJoinColumnMetadata> pkJoinColumns,
-		List<JoinColumnMetadata> joinColumns, JoinTableMetadaImpl joinTable) {
-
-		super(member, name, oneToOne.targetEntity().getName(), oneToOne.fetch(), oneToOne.cascade(), joinColumns, joinTable);
+	public OneToOneAttributeMetadataImpl(Member member, String name, OneToOne oneToOne, Set<Class<? extends Annotation>> parsed) {
+		super(member, name, parsed, oneToOne.targetEntity().getName(), oneToOne.fetch(), oneToOne.cascade());
 
 		this.mappedBy = oneToOne.mappedBy();
 		this.optional = oneToOne.optional();
 		this.removesOprhans = oneToOne.orphanRemoval();
-		this.pkJoinColumns = pkJoinColumns;
+
+		parsed.add(OneToOne.class);
+
+		final PrimaryKeyJoinColumns pkJoinColumns = ReflectHelper.getAnnotation(member, PrimaryKeyJoinColumns.class);
+		final PrimaryKeyJoinColumn pkJoinColumn = ReflectHelper.getAnnotation(member, PrimaryKeyJoinColumn.class);
+
+		if (pkJoinColumns != null) {
+			parsed.add(PrimaryKeyJoinColumns.class);
+
+			for (final PrimaryKeyJoinColumn joinColumn : pkJoinColumns.value()) {
+				this.pkJoinColumns.add(new PrimaryKeyJoinColumnMetadataImpl(this.getLocator(), joinColumn));
+			}
+		}
+		else {
+			if (pkJoinColumn != null) {
+				parsed.add(PrimaryKeyJoinColumn.class);
+
+				this.pkJoinColumns.add(new PrimaryKeyJoinColumnMetadataImpl(this.getLocator(), pkJoinColumn));
+			}
+		}
 	}
 
 	/**

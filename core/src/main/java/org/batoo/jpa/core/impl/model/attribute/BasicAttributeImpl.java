@@ -20,6 +20,8 @@ package org.batoo.jpa.core.impl.model.attribute;
 
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.batoo.jpa.core.impl.jdbc.PhysicalColumn;
+import org.batoo.jpa.core.impl.jdbc.TypeFactory;
 import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
 import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
 
@@ -34,9 +36,10 @@ import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
  * @author hceylan
  * @since $version
  */
-public class BasicAttributeImpl<X, T> extends BaseBasicAttributeImpl<X, T> {
+public class BasicAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 
 	private final boolean optional;
+	private PhysicalColumn column;
 
 	/**
 	 * 
@@ -47,6 +50,32 @@ public class BasicAttributeImpl<X, T> extends BaseBasicAttributeImpl<X, T> {
 		super(type, metadata);
 
 		this.optional = metadata.isOptional();
+
+		this.initColumn(metadata);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public PhysicalColumn getColumn() {
+		return this.column;
+	}
+
+	/**
+	 * Initializes the column for the attribute.
+	 * 
+	 * @param metadata
+	 *            the metadata
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void initColumn(BasicAttributeMetadata metadata) {
+		final int sqlType = TypeFactory.getSqlType(this.getJavaType(), this.getTemporalType(), null, false);
+
+		this.column = new PhysicalColumn(this, sqlType, (metadata != null) && (metadata.getColumn() != null) ? metadata.getColumn() : null);
 	}
 
 	/**

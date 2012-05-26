@@ -18,13 +18,12 @@
  */
 package org.batoo.jpa.parser.impl.metadata.attribute;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.OneToMany;
 
-import org.batoo.jpa.parser.impl.metadata.JoinTableMetadaImpl;
-import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.OneToManyAttributeMetadata;
 
 /**
@@ -61,17 +60,16 @@ public class OneToManyAttributeMetadataImpl extends AssociationAttributeMetadata
 	 *            the name of the one-to-one attribute
 	 * @param oneToMany
 	 *            the obtained {@link OneToMany} annotation
-	 * @param joinColumns
-	 *            the join columns definition
-	 * @param joinTable
-	 *            the join table definition
+	 * @param parsed
+	 *            set of annotations parsed
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public OneToManyAttributeMetadataImpl(Member member, String name, OneToMany oneToMany, List<JoinColumnMetadata> joinColumns,
-		JoinTableMetadaImpl joinTable) {
+	public OneToManyAttributeMetadataImpl(Member member, String name, OneToMany oneToMany, Set<Class<? extends Annotation>> parsed) {
+		super(member, name, parsed, oneToMany.targetEntity().getName(), oneToMany.fetch(), oneToMany.cascade());
 
-		super(member, name, oneToMany.targetEntity().getName(), oneToMany.fetch(), oneToMany.cascade(), joinColumns, joinTable);
+		parsed.add(OneToMany.class);
 
 		this.mappedBy = oneToMany.mappedBy();
 		this.removesOprhans = oneToMany.orphanRemoval();

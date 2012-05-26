@@ -24,7 +24,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.UniqueConstraint;
 
-import org.batoo.jpa.parser.impl.annotated.JavaLocator;
+import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
 import org.batoo.jpa.parser.metadata.JoinTableMetadata;
 import org.batoo.jpa.parser.metadata.UniqueConstraintMetadata;
@@ -39,40 +39,42 @@ import com.google.common.collect.Lists;
  */
 public class JoinTableMetadaImpl implements JoinTableMetadata {
 
-	private final JavaLocator locator;
-	private final JoinTable joinTable;
-
-	private final List<JoinColumnMetadata> inverseJoinColumns = Lists.newArrayList();
+	private final AbstractLocator locator;
+	private final String catalog;
+	private final String schema;
+	private final String name;
 	private final List<JoinColumnMetadata> joinColumns = Lists.newArrayList();
+	private final List<JoinColumnMetadata> inverseJoinColumns = Lists.newArrayList();
 	private final List<UniqueConstraintMetadata> uniqueConstraints = Lists.newArrayList();
 
 	/**
 	 * @param locator
-	 *            the java locator
-	 * @param joinTable
-	 *            the obtained {@link JoinTable} annotation
+	 *            the locator
+	 * @param annotation
+	 *            the annotation
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public JoinTableMetadaImpl(JavaLocator locator, JoinTable joinTable) {
+	public JoinTableMetadaImpl(AbstractLocator locator, JoinTable annotation) {
 		super();
 
 		this.locator = locator;
-		this.joinTable = joinTable;
 
-		// add the join column definitions
-		for (final JoinColumn joinColumn : joinTable.joinColumns()) {
+		this.catalog = annotation.catalog();
+		this.schema = annotation.schema();
+		this.name = annotation.name();
+
+		for (final JoinColumn joinColumn : annotation.joinColumns()) {
 			this.joinColumns.add(new JoinColumnMetadataImpl(locator, joinColumn));
 		}
 
-		// add the inverse join column definitions
-		for (final JoinColumn joinColumn : joinTable.inverseJoinColumns()) {
+		for (final JoinColumn joinColumn : annotation.inverseJoinColumns()) {
 			this.inverseJoinColumns.add(new JoinColumnMetadataImpl(locator, joinColumn));
 		}
 
-		for (final UniqueConstraint uniqueConstraint : joinTable.uniqueConstraints()) {
-			this.uniqueConstraints.add(new UniqueConstraintMetadataImpl(locator, uniqueConstraint));
+		for (final UniqueConstraint constraint : annotation.uniqueConstraints()) {
+			this.uniqueConstraints.add(new UniqueConstraintMetadataImpl(locator, constraint));
 		}
 	}
 
@@ -82,7 +84,7 @@ public class JoinTableMetadaImpl implements JoinTableMetadata {
 	 */
 	@Override
 	public String getCatalog() {
-		return this.joinTable.catalog();
+		return this.catalog;
 	}
 
 	/**
@@ -108,8 +110,8 @@ public class JoinTableMetadaImpl implements JoinTableMetadata {
 	 * 
 	 */
 	@Override
-	public String getLocation() {
-		return this.locator.getLocation();
+	public AbstractLocator getLocator() {
+		return this.locator;
 	}
 
 	/**
@@ -118,7 +120,7 @@ public class JoinTableMetadaImpl implements JoinTableMetadata {
 	 */
 	@Override
 	public String getName() {
-		return this.joinTable.name();
+		return this.name;
 	}
 
 	/**
@@ -127,7 +129,7 @@ public class JoinTableMetadaImpl implements JoinTableMetadata {
 	 */
 	@Override
 	public String getSchema() {
-		return this.joinTable.schema();
+		return this.schema;
 	}
 
 	/**

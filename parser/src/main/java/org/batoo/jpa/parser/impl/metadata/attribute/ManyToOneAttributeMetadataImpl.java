@@ -18,13 +18,12 @@
  */
 package org.batoo.jpa.parser.impl.metadata.attribute;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.ManyToOne;
 
-import org.batoo.jpa.parser.impl.metadata.JoinTableMetadaImpl;
-import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.ManyToOneAttributeMetadata;
 
 /**
@@ -54,22 +53,19 @@ public class ManyToOneAttributeMetadataImpl extends AssociationAttributeMetadata
 
 	/**
 	 * @param member
-	 *            the java member of one-to-one attribute
+	 *            the java member of attribute
 	 * @param name
-	 *            the name of the one-to-one attribute
+	 *            the name of the attribute
 	 * @param manyToOne
-	 *            the obtained {@link ManyToOne} annotation
-	 * @param joinColumns
-	 *            the join columns definition
-	 * @param joinTable
-	 *            the join table definition
+	 *            the annotation
+	 * @param parsed
+	 *            set of annotations parsed
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManyToOneAttributeMetadataImpl(Member member, String name, ManyToOne manyToOne, List<JoinColumnMetadata> joinColumns,
-		JoinTableMetadaImpl joinTable) {
-
-		super(member, name, manyToOne.targetEntity().getName(), manyToOne.fetch(), manyToOne.cascade(), joinColumns, joinTable);
+	public ManyToOneAttributeMetadataImpl(Member member, String name, ManyToOne manyToOne, Set<Class<? extends Annotation>> parsed) {
+		super(member, name, parsed, manyToOne.targetEntity().getName(), manyToOne.fetch(), manyToOne.cascade());
 
 		this.optional = manyToOne.optional();
 	}

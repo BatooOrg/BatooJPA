@@ -20,33 +20,75 @@ package org.batoo.jpa.parser.impl.metadata;
 
 import javax.persistence.JoinColumn;
 
-import org.batoo.jpa.parser.impl.annotated.JavaLocator;
+import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
 
 /**
- * The implementation of {@link JoinColumnMetadata}.
+ * Implementation of {@link JoinColumnMetadata}.
  * 
  * @author hceylan
  * @since $version
  */
-public class JoinColumnMetadataImpl extends BaseColumnMetadataImpl implements JoinColumnMetadata {
+public class JoinColumnMetadataImpl implements JoinColumnMetadata {
 
-	private final JoinColumn joinColumn;
+	private final AbstractLocator locator;
+	private final String columnDefinition;
+	private final boolean insertable;
+	private final String name;
+	private final boolean nullable;
+	private final String referencedColumnName;
+	private final String table;
+	private final boolean unique;
+	private final boolean updatable;
 
 	/**
 	 * @param locator
-	 *            the java locator
-	 * @param column
-	 *            the obtained {@link JoinColumn} annotation
+	 *            the locator
+	 * @param annotation
+	 *            the annotation
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public JoinColumnMetadataImpl(JavaLocator locator, JoinColumn column) {
-		super(locator, column.table(), column.name(), column.columnDefinition(), column.insertable(), column.nullable(),
-			column.updatable(), column.unique());
+	public JoinColumnMetadataImpl(AbstractLocator locator, JoinColumn annotation) {
+		super();
 
-		this.joinColumn = column;
+		this.locator = locator;
+		this.columnDefinition = annotation.columnDefinition();
+		this.insertable = annotation.insertable();
+		this.name = annotation.name();
+		this.nullable = annotation.nullable();
+		this.referencedColumnName = annotation.referencedColumnName();
+		this.table = annotation.table();
+		this.unique = annotation.unique();
+		this.updatable = annotation.updatable();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getColumnDefinition() {
+		return this.columnDefinition;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public AbstractLocator getLocator() {
+		return this.locator;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getName() {
+		return this.name;
 	}
 
 	/**
@@ -55,7 +97,52 @@ public class JoinColumnMetadataImpl extends BaseColumnMetadataImpl implements Jo
 	 */
 	@Override
 	public String getReferencedColumnName() {
-		return this.joinColumn.referencedColumnName();
+		return this.referencedColumnName;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getTable() {
+		return this.table;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isInsertable() {
+		return this.insertable;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isNullable() {
+		return this.nullable;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isUnique() {
+		return this.unique;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isUpdatable() {
+		return this.updatable;
 	}
 
 }

@@ -23,41 +23,55 @@ import java.util.List;
 import javax.persistence.TableGenerator;
 import javax.persistence.UniqueConstraint;
 
-import org.batoo.jpa.parser.impl.annotated.JavaLocator;
+import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.UniqueConstraintMetadata;
 
 import com.google.common.collect.Lists;
 
 /**
- * Annotated definition of table generators.
+ * Implementation of {@link TableGeneratorMetadata}.
  * 
  * @author hceylan
  * @since $version
  */
 public class TableGeneratorMetadataImpl implements TableGeneratorMetadata {
 
-	private final JavaLocator locator;
-	private final TableGenerator tableGenerator;
+	private final AbstractLocator locator;
+	private final String catalog;
+	private final String schema;
+	private final String name;
+	private final String pkColumnName;
+	private final String pkColumnValue;
+	private final String valueColumnName;
+	private final int initialValue;
+	private final int allocationSize;
+	private final String table;
 	private final List<UniqueConstraintMetadata> uniqueConstraints = Lists.newArrayList();
 
 	/**
 	 * @param locator
 	 *            the java locator
-	 * @param tableGenerator
-	 *            the obtained {@link TableGenerator} annotation
+	 * @param annotation
+	 *            the annotation
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public TableGeneratorMetadataImpl(JavaLocator locator, TableGenerator tableGenerator) {
-		super();
-
+	public TableGeneratorMetadataImpl(AbstractLocator locator, TableGenerator annotation) {
 		this.locator = locator;
-		this.tableGenerator = tableGenerator;
+		this.catalog = annotation.catalog();
+		this.schema = annotation.schema();
+		this.table = annotation.table();
+		this.name = annotation.name();
+		this.pkColumnName = annotation.pkColumnName();
+		this.pkColumnValue = annotation.pkColumnValue();
+		this.valueColumnName = annotation.valueColumnName();
+		this.initialValue = annotation.initialValue();
+		this.allocationSize = annotation.allocationSize();
 
-		for (final UniqueConstraint uniqueConstraint : tableGenerator.uniqueConstraints()) {
-			this.uniqueConstraints.add(new UniqueConstraintMetadataImpl(locator, uniqueConstraint));
+		for (final UniqueConstraint constraint : annotation.uniqueConstraints()) {
+			this.uniqueConstraints.add(new UniqueConstraintMetadataImpl(locator, constraint));
 		}
 	}
 
@@ -67,7 +81,7 @@ public class TableGeneratorMetadataImpl implements TableGeneratorMetadata {
 	 */
 	@Override
 	public int getAllocationSize() {
-		return this.tableGenerator.allocationSize();
+		return this.allocationSize;
 	}
 
 	/**
@@ -76,7 +90,7 @@ public class TableGeneratorMetadataImpl implements TableGeneratorMetadata {
 	 */
 	@Override
 	public String getCatalog() {
-		return this.tableGenerator.catalog();
+		return this.catalog;
 	}
 
 	/**
@@ -85,7 +99,7 @@ public class TableGeneratorMetadataImpl implements TableGeneratorMetadata {
 	 */
 	@Override
 	public int getInitialValue() {
-		return this.tableGenerator.initialValue();
+		return this.initialValue;
 	}
 
 	/**
@@ -93,8 +107,8 @@ public class TableGeneratorMetadataImpl implements TableGeneratorMetadata {
 	 * 
 	 */
 	@Override
-	public String getLocation() {
-		return this.locator.getLocation();
+	public AbstractLocator getLocator() {
+		return this.locator;
 	}
 
 	/**
@@ -103,7 +117,7 @@ public class TableGeneratorMetadataImpl implements TableGeneratorMetadata {
 	 */
 	@Override
 	public String getName() {
-		return this.tableGenerator.name();
+		return this.name;
 	}
 
 	/**
@@ -112,7 +126,7 @@ public class TableGeneratorMetadataImpl implements TableGeneratorMetadata {
 	 */
 	@Override
 	public String getPkColumnName() {
-		return this.tableGenerator.pkColumnName();
+		return this.pkColumnName;
 	}
 
 	/**
@@ -121,7 +135,7 @@ public class TableGeneratorMetadataImpl implements TableGeneratorMetadata {
 	 */
 	@Override
 	public String getPkColumnValue() {
-		return this.tableGenerator.pkColumnValue();
+		return this.pkColumnValue;
 	}
 
 	/**
@@ -130,7 +144,7 @@ public class TableGeneratorMetadataImpl implements TableGeneratorMetadata {
 	 */
 	@Override
 	public String getSchema() {
-		return this.tableGenerator.schema();
+		return this.schema;
 	}
 
 	/**
@@ -139,7 +153,7 @@ public class TableGeneratorMetadataImpl implements TableGeneratorMetadata {
 	 */
 	@Override
 	public String getTable() {
-		return this.tableGenerator.table();
+		return this.table;
 	}
 
 	/**
@@ -157,7 +171,6 @@ public class TableGeneratorMetadataImpl implements TableGeneratorMetadata {
 	 */
 	@Override
 	public String getValueColumnName() {
-		return this.tableGenerator.valueColumnName();
+		return this.valueColumnName;
 	}
-
 }

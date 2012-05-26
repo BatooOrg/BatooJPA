@@ -23,59 +23,45 @@ import java.util.List;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import org.batoo.jpa.parser.impl.annotated.JavaLocator;
+import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.TableMetadata;
 import org.batoo.jpa.parser.metadata.UniqueConstraintMetadata;
 
 import com.google.common.collect.Lists;
 
 /**
- * PersistenceParser for @Table annotation that parses and merges the optional ORM File provided metadata.
+ * Implementation of {@link TableMetadata}.
  * 
  * @author hceylan
  * @since $version
  */
 public class TableMetadataImpl implements TableMetadata {
 
-	private final String name;
 	private final JavaLocator locator;
-	private final String schema;
 	private final String catalog;
+	private final String schema;
+	private final String name;
 	private final List<UniqueConstraintMetadata> uniqueConstraints = Lists.newArrayList();
 
 	/**
-	 * @param clazz
-	 *            the class
-	 * @param table
-	 *            the table annotation
-	 * @param metadata
-	 *            the optional metadata
+	 * @param locator
+	 *            the java locator
+	 * @param annotation
+	 *            the annotation
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public TableMetadataImpl(Class<?> clazz, Table table, TableMetadata metadata) {
+	public TableMetadataImpl(JavaLocator locator, Table annotation) {
 		super();
 
-		// if metadata exists use the metadata
-		if (metadata != null) {
-			this.catalog = metadata.getCatalog();
-			this.schema = metadata.getSchema();
-			this.name = metadata.getName();
-			this.locator = new JavaLocator(clazz, metadata.getLocation());
-			this.uniqueConstraints.addAll(metadata.getUniqueConstraints());
-		}
-		// use the table annotation obtained from the class
-		else {
-			this.locator = new JavaLocator(clazz, null);
+		this.locator = locator;
+		this.catalog = annotation.catalog();
+		this.schema = annotation.schema();
+		this.name = annotation.name();
 
-			this.catalog = table.catalog();
-			this.schema = table.catalog();
-			this.name = table.name();
-
-			for (final UniqueConstraint constraint : table.uniqueConstraints()) {
-				this.uniqueConstraints.add(new UniqueConstraintMetadataImpl(this.locator, constraint));
-			}
+		for (final UniqueConstraint constraint : annotation.uniqueConstraints()) {
+			this.uniqueConstraints.add(new UniqueConstraintMetadataImpl(locator, constraint));
 		}
 	}
 
@@ -93,8 +79,8 @@ public class TableMetadataImpl implements TableMetadata {
 	 * 
 	 */
 	@Override
-	public String getLocation() {
-		return this.locator.getLocation();
+	public AbstractLocator getLocator() {
+		return this.locator;
 	}
 
 	/**
@@ -123,5 +109,4 @@ public class TableMetadataImpl implements TableMetadata {
 	public List<UniqueConstraintMetadata> getUniqueConstraints() {
 		return this.uniqueConstraints;
 	}
-
 }

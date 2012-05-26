@@ -20,33 +20,61 @@ package org.batoo.jpa.parser.impl.metadata;
 
 import javax.persistence.Column;
 
-import org.batoo.jpa.parser.impl.annotated.JavaLocator;
+import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 
 /**
- * The annotated definition of columns.
+ * Implementation of {@link ColumnMetadata}.
  * 
  * @author hceylan
  * @since $version
  */
-public class ColumnMetadataImpl extends BaseColumnMetadataImpl implements ColumnMetadata {
+public class ColumnMetadataImpl implements ColumnMetadata {
 
-	private final Column column;
+	private final AbstractLocator locator;
+	private final String columnDefinition;
+	private final boolean insertable;
+	private final int length;
+	private final String name;
+	private final boolean nullable;
+	private final int precision;
+	private final int scale;
+	private final String table;
+	private final boolean unique;
+	private final boolean updatable;
 
 	/**
 	 * @param locator
 	 *            the java locator
-	 * @param column
-	 *            the column annotation obtained
+	 * @param annotation
+	 *            the annotation
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ColumnMetadataImpl(JavaLocator locator, Column column) {
-		super(locator, column.table(), column.name(), column.columnDefinition(), column.insertable(), column.nullable(),
-			column.updatable(), column.unique());
+	public ColumnMetadataImpl(AbstractLocator locator, Column annotation) {
+		super();
 
-		this.column = column;
+		this.locator = locator;
+		this.columnDefinition = annotation.columnDefinition();
+		this.insertable = annotation.insertable();
+		this.length = annotation.length();
+		this.name = annotation.name();
+		this.nullable = annotation.nullable();
+		this.precision = annotation.precision();
+		this.scale = annotation.scale();
+		this.table = annotation.table();
+		this.unique = annotation.unique();
+		this.updatable = annotation.updatable();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getColumnDefinition() {
+		return this.columnDefinition;
 	}
 
 	/**
@@ -55,7 +83,25 @@ public class ColumnMetadataImpl extends BaseColumnMetadataImpl implements Column
 	 */
 	@Override
 	public int getLength() {
-		return this.column.length();
+		return this.length;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public AbstractLocator getLocator() {
+		return this.locator;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getName() {
+		return this.name;
 	}
 
 	/**
@@ -64,7 +110,7 @@ public class ColumnMetadataImpl extends BaseColumnMetadataImpl implements Column
 	 */
 	@Override
 	public int getPrecision() {
-		return this.column.precision();
+		return this.precision;
 	}
 
 	/**
@@ -73,7 +119,52 @@ public class ColumnMetadataImpl extends BaseColumnMetadataImpl implements Column
 	 */
 	@Override
 	public int getScale() {
-		return this.column.scale();
+		return this.scale;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getTable() {
+		return this.table;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isInsertable() {
+		return this.insertable;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isNullable() {
+		return this.nullable;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isUnique() {
+		return this.unique;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isUpdatable() {
+		return this.updatable;
 	}
 
 }
