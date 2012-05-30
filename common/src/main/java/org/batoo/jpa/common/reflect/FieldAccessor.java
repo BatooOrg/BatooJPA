@@ -21,12 +21,12 @@ package org.batoo.jpa.common.reflect;
 import java.lang.reflect.Field;
 
 /**
- * Accessor implemention for the {@link Field}s.
+ * Accessor implementation of {@link AbstractAccessor} for the members of {@link Field}s.
  * 
  * @author hceylan
  * @since $version
  */
-public class FieldAccessor {
+public class FieldAccessor extends AbstractAccessor {
 
 	private enum PrimitiveType {
 		BOOLEAN(Boolean.TYPE),
@@ -61,10 +61,11 @@ public class FieldAccessor {
 	private Class<?> numberType;
 
 	/**
+	 * @param field
+	 *            the field to access
 	 * 
 	 * @since $version
 	 * @author hceylan
-	 * @param field
 	 */
 	@SuppressWarnings("restriction")
 	public FieldAccessor(Field field) {
@@ -83,6 +84,7 @@ public class FieldAccessor {
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	@SuppressWarnings({ "restriction" })
 	public Object get(Object instance) {
 		if (this.primitiveType == null) {
@@ -132,6 +134,7 @@ public class FieldAccessor {
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	@SuppressWarnings("restriction")
 	public void set(Object instance, Object value) {
 		if (instance == null) {

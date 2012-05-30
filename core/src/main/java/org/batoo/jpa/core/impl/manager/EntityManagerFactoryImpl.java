@@ -32,10 +32,10 @@ import javax.persistence.metamodel.Metamodel;
 import org.batoo.jpa.common.BatooException;
 import org.batoo.jpa.core.BJPASettings;
 import org.batoo.jpa.core.JPASettings;
-import org.batoo.jpa.core.impl.manager.deployment.DdlManager;
-import org.batoo.jpa.core.impl.manager.jdbc.AbstractJdbcAdaptor;
-import org.batoo.jpa.core.impl.manager.jdbc.DataSourceImpl;
-import org.batoo.jpa.core.impl.manager.model.MetamodelImpl;
+import org.batoo.jpa.core.impl.deployment.DdlManager;
+import org.batoo.jpa.core.impl.jdbc.AbstractJdbcAdaptor;
+import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
+import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
 import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.PersistenceParser;
@@ -87,6 +87,8 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 */
 	@Override
 	public void close() {
+		this.datasource.close();
+
 		this.open = false;
 	}
 

@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.common.reflect;
 
+import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -33,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.beanutils.PropertyUtils;
+import org.batoo.jpa.common.BatooException;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.reflections.util.ClasspathHelper;
@@ -125,6 +128,33 @@ public class ReflectHelper {
 	}
 
 	/**
+	 * Returns the accessor for the member
+	 * 
+	 * @param javaMember
+	 *            the java member
+	 * @return the accessor
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public static AbstractAccessor getAccessor(Member javaMember) {
+		if (javaMember instanceof Field) {
+			return new FieldAccessor((Field) javaMember);
+		}
+		else {
+			final Class<?> clazz = javaMember.getDeclaringClass();
+			final PropertyDescriptor[] descriptors = PropertyUtils.getPropertyDescriptors(clazz);
+			for (final PropertyDescriptor descriptor : descriptors) {
+				if (descriptor.getReadMethod() == javaMember) {
+					return new MethodAccessor(descriptor.getReadMethod(), descriptor.getWriteMethod());
+				}
+			}
+
+			throw new BatooException("Method " + javaMember.getName() + " could not be found");
+		}
+	}
+
+	/**
 	 * Returns the annotation instance if the <code>member</code> has the <code>annotation</code>.
 	 * 
 	 * @param member
@@ -191,10 +221,14 @@ public class ReflectHelper {
 	 *            the index number of the generic parameter
 	 * @return the class of generic type
 	 * 
+	 * @param <X>
+	 *            the type of the class
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public static Class<?> getGenericType(Member member, int index) {
+	@SuppressWarnings("unchecked")
+	public static <X> Class<X> getGenericType(Member member, int index) {
 		Type type;
 
 		if (member instanceof Field) {
@@ -216,7 +250,7 @@ public class ReflectHelper {
 
 		final Type[] types = parameterizedType != null ? parameterizedType.getActualTypeArguments() : null;
 
-		return (Class<?>) ((types != null) && (index < types.length) ? types[index] : null);
+		return (Class<X>) ((types != null) && (index < types.length) ? types[index] : null);
 	}
 
 	/**

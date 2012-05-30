@@ -25,7 +25,7 @@ import javax.sql.DataSource;
 import junit.framework.Assert;
 
 import org.apache.commons.dbutils.QueryRunner;
-import org.batoo.jpa.core.impl.manager.jdbc.SingleValueHandler;
+import org.batoo.jpa.core.impl.jdbc.SingleValueHandler;
 import org.batoo.jpa.core.test.BaseCoreTest;
 import org.junit.Test;
 

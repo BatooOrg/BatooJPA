@@ -31,7 +31,7 @@ import javax.sql.DataSource;
 import junit.framework.Assert;
 
 import org.apache.commons.dbutils.QueryRunner;
-import org.batoo.jpa.core.impl.manager.jdbc.SingleValueHandler;
+import org.batoo.jpa.core.impl.jdbc.SingleValueHandler;
 import org.batoo.jpa.core.test.BaseCoreTest;
 import org.batoo.jpa.core.test.NullResultSetHandler;
 import org.junit.Test;
@@ -62,6 +62,9 @@ public class SimpleTest extends BaseCoreTest {
 
 	/**
 	 * Tests {@link EntityManagerFactory#createEntityManager()}
+	 * 
+	 * @throws SQLException
+	 *             thrown if fails
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -97,6 +100,9 @@ public class SimpleTest extends BaseCoreTest {
 
 	/**
 	 * Tests {@link EntityManager#detach(Object)} then {@link EntityTransaction#commit()}.
+	 * 
+	 * @throws SQLException
+	 *             thrown if fails
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -137,6 +143,9 @@ public class SimpleTest extends BaseCoreTest {
 	/**
 	 * Tests {@link EntityManager#flush()} then {@link EntityManager#detach(Object)}
 	 * 
+	 * @throws SQLException
+	 *             thrown if fails
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
@@ -160,6 +169,8 @@ public class SimpleTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#persist(Object)}.
 	 * 
+	 * @throws SQLException
+	 *             thrown if fails
 	 * @since $version
 	 * @author hceylan
 	 */

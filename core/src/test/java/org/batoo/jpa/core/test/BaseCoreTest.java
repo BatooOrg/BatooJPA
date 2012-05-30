@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.core.test;
 
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.HashMap;
 
 import javax.persistence.EntityManager;
@@ -322,7 +324,6 @@ public abstract class BaseCoreTest {
 	}
 
 	private void setupEmf() {
-
 		final Thread currentThread = Thread.currentThread();
 		this.oldContextClassLoader = currentThread.getContextClassLoader();
 
@@ -355,10 +356,23 @@ public abstract class BaseCoreTest {
 			this.emf = null;
 		}
 
+		try {
+			DriverManager.getConnection("jdbc:derby:memory:simple;drop=true");
+		}
+		catch (final SQLException e) {}
+
 		Thread.currentThread().setContextClassLoader(this.oldContextClassLoader);
 		this.oldContextClassLoader = null;
 	}
 
+	/**
+	 * Returns the active transaction from the entity manager.
+	 * 
+	 * @return the active transaction
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
 	protected EntityTransaction tx() {
 		if (this.tx != null) {
 			return this.tx;

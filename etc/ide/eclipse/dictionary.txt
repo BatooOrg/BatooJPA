@@ -33,3 +33,6 @@ cacheability
 clazz
 embeddable
 bails
+accessor
+accessors
+embeddables

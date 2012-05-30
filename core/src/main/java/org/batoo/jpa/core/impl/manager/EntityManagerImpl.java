@@ -18,22 +18,30 @@
  */
 package org.batoo.jpa.core.impl.manager;
 
+import java.sql.SQLException;
 import java.util.Map;
 
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import javax.persistence.TransactionRequiredException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.metamodel.Metamodel;
 import javax.sql.DataSource;
 
-import org.batoo.jpa.core.impl.manager.jdbc.DataSourceImpl;
-import org.batoo.jpa.core.impl.manager.model.MetamodelImpl;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
+import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
+import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
+import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 
 /**
  * Implementation of {@link EntityManager}.
@@ -46,6 +54,10 @@ public class EntityManagerImpl implements EntityManager {
 	private final EntityManagerFactoryImpl emf;
 	private final MetamodelImpl metamodel;
 	private final DataSourceImpl datasource;
+	private boolean open;
+	private EntityTransaction transaction;
+	private ConnectionImpl connection;
+	private final SessionImpl session;
 
 	/**
 	 * @param entityManagerFactory
@@ -64,6 +76,21 @@ public class EntityManagerImpl implements EntityManager {
 		this.emf = entityManagerFactory;
 		this.metamodel = metamodel;
 		this.datasource = datasource;
+		this.session = new SessionImpl(this);
+
+		this.open = true;
+	}
+
+	private void assertOpen() {
+		if (!this.open) {
+			throw new IllegalStateException("EntityManager has been previously closed");
+		}
+	}
+
+	private void assertTransaction() {
+		if ((this.transaction == null) || !this.transaction.isActive()) {
+			throw new TransactionRequiredException("No active transaction");
+		}
 	}
 
 	/**
@@ -76,12 +103,22 @@ public class EntityManagerImpl implements EntityManager {
 	}
 
 	/**
+	 * Clears the transaction.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void clearTransaction() {
+		this.transaction = null;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
 	@Override
 	public void close() {
-		// TODO Auto-generated method stub
+		this.open = false;
 	}
 
 	/**
@@ -235,6 +272,28 @@ public class EntityManagerImpl implements EntityManager {
 	}
 
 	/**
+	 * Returns the active connection.
+	 * 
+	 * @return the connection
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private ConnectionImpl getConnection() {
+		// if the connection exists then simply return it
+		if (this.connection != null) {
+			return this.connection;
+		}
+		try {
+			// create a new connection and return it
+			return this.connection = this.datasource.getConnection();
+		}
+		catch (final SQLException e) {
+			throw new PersistenceException("Unable to obtain connection from the datasource", e);
+		}
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -319,8 +378,15 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public EntityTransaction getTransaction() {
-		// TODO Auto-generated method stub
-		return null;
+		// if the transaction exists simply return it
+		if (this.transaction != null) {
+			return this.transaction;
+		}
+
+		this.assertOpen();
+
+		// create the new transaction and return it
+		return this.transaction = new EntityTransactionImpl(this, this.getConnection());
 	}
 
 	/**
@@ -331,6 +397,21 @@ public class EntityManagerImpl implements EntityManager {
 	public boolean isOpen() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	/**
+	 * Check if the transaction is valid and belongs to this entity manager.
+	 * 
+	 * @param transaction
+	 *            the transaction to test the validity
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void isValid(EntityTransactionImpl transaction) {
+		if (this.transaction != transaction) {
+			throw new PersistenceException("Transaction is stale");
+		}
 	}
 
 	/**
@@ -377,7 +458,63 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public void persist(Object entity) {
-		// TODO Auto-generated method stub
+		this.assertTransaction();
+
+		final boolean flush = this.persistImpl(entity);
+		if (flush) {
+			this.flush();
+		}
+	}
+
+	/**
+	 * Cascaded implementation of {@link #persist(Object)}.
+	 * <p>
+	 * Also manages a direct or indirect requirement to an implicit flush.
+	 * 
+	 * @param entity
+	 *            the entity to cascade
+	 * @return true if an implicit flush is required, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean persistImpl(Object entity) {
+		boolean requiresFlush = false;
+
+		final EntityTypeImpl<?> type = this.metamodel.entity(entity.getClass());
+		final ManagedInstance<?> instance = type.getManagedInstance(this.session, entity);
+
+		final ManagedInstance<?> existing = this.session.get(instance);
+		if (existing != null) {
+			switch (existing.getStatus()) {
+				case DETACHED:
+					throw new EntityExistsException("Entity has been previously detached");
+				case MANAGED:
+					requiresFlush |= existing.cascadePersist(this);
+					break;
+				case REMOVED:
+					existing.setStatus(Status.MANAGED);
+					break;
+				case NEW:
+					break;
+			}
+		}
+		else {
+			requiresFlush = !instance.fillIdValues();
+			requiresFlush |= instance.cascadePersist(this);
+
+			if (!requiresFlush) {
+				instance.setStatus(Status.NEW);
+
+				this.session.putNew(instance);
+			}
+			else {
+				this.session.putNewIdentifiable(instance);
+			}
+
+		}
+
+		return requiresFlush;
 	}
 
 	/**
