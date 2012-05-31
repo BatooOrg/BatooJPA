@@ -62,6 +62,7 @@ public class ConnectionImpl implements Connection {
 
 	final long connNo;
 	private final long opened;
+	private boolean closed;
 
 	private volatile long callNo = 0;
 	private volatile long statements = 0;
@@ -117,6 +118,8 @@ public class ConnectionImpl implements Connection {
 		if (this.pool != null) {
 			try {
 				this.pool.returnObject(this);
+
+				this.closed = true;
 			}
 			catch (final Exception e) {
 				if (e instanceof SQLException) {
@@ -297,8 +300,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public String getCatalog() throws SQLException {
-		this.throwNotImplemented();
-		return null;
+		return this.connection.getCatalog();
 	}
 
 	/**
@@ -307,8 +309,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public Properties getClientInfo() throws SQLException {
-		this.throwNotImplemented();
-		return null;
+		return this.connection.getClientInfo();
 	}
 
 	/**
@@ -317,8 +318,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public String getClientInfo(String name) throws SQLException {
-		this.throwNotImplemented();
-		return null;
+		return this.connection.getClientInfo(name);
 	}
 
 	/**
@@ -327,8 +327,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public int getHoldability() throws SQLException {
-		this.throwNotImplemented();
-		return 0;
+		return this.connection.getHoldability();
 	}
 
 	/**
@@ -337,8 +336,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public DatabaseMetaData getMetaData() throws SQLException {
-		this.throwNotImplemented();
-		return null;
+		return this.connection.getMetaData();
 	}
 
 	/**
@@ -347,8 +345,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public int getNetworkTimeout() throws SQLException {
-		this.throwNotImplemented();
-		return 0;
+		return this.connection.getNetworkTimeout();
 	}
 
 	/**
@@ -357,8 +354,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public String getSchema() throws SQLException {
-		this.throwNotImplemented();
-		return null;
+		return this.connection.getSchema();
 	}
 
 	/**
@@ -367,8 +363,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public int getTransactionIsolation() throws SQLException {
-		this.throwNotImplemented();
-		return 0;
+		return this.connection.getTransactionIsolation();
 	}
 
 	/**
@@ -377,8 +372,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public Map<String, Class<?>> getTypeMap() throws SQLException {
-		this.throwNotImplemented();
-		return null;
+		return this.connection.getTypeMap();
 	}
 
 	/**
@@ -387,8 +381,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public SQLWarning getWarnings() throws SQLException {
-		this.throwNotImplemented();
-		return null;
+		return this.connection.getWarnings();
 	}
 
 	private void handlePoolException(Exception e) throws SQLException {
@@ -405,8 +398,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public boolean isClosed() throws SQLException {
-		this.throwNotImplemented();
-		return false;
+		return this.closed;
 	}
 
 	/**
@@ -415,8 +407,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public boolean isReadOnly() throws SQLException {
-		this.throwNotImplemented();
-		return false;
+		return this.isReadOnly();
 	}
 
 	/**
@@ -425,8 +416,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public boolean isValid(int timeout) throws SQLException {
-		this.throwNotImplemented();
-		return false;
+		return this.isValid(timeout);
 	}
 
 	/**
@@ -435,8 +425,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public boolean isWrapperFor(Class<?> iface) throws SQLException {
-		this.throwNotImplemented();
-		return false;
+		return this.isWrapperFor(iface);
 	}
 
 	/**
@@ -445,8 +434,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public String nativeSQL(String sql) throws SQLException {
-		this.throwNotImplemented();
-		return null;
+		return this.nativeSQL(sql);
 	}
 
 	/**
@@ -666,8 +654,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public void setCatalog(String catalog) throws SQLException {
-		this.throwNotImplemented();
-
+		this.connection.setCatalog(catalog);
 	}
 
 	/**
@@ -676,8 +663,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public void setClientInfo(Properties properties) throws SQLClientInfoException {
-		this.throwNotImplemented();
-
+		this.setClientInfo(properties);
 	}
 
 	/**
@@ -686,8 +672,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public void setClientInfo(String name, String value) throws SQLClientInfoException {
-		this.throwNotImplemented();
-
+		this.setClientInfo(name, value);
 	}
 
 	/**
@@ -699,6 +684,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	public void setConnection(Connection connection) {
 		this.connection = connection;
+		this.closed = false;
 	}
 
 	/**
@@ -707,8 +693,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public void setHoldability(int holdability) throws SQLException {
-		this.throwNotImplemented();
-
+		this.setHoldability(holdability);
 	}
 
 	/**
@@ -717,7 +702,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
-		this.throwNotImplemented();
+		this.connection.setNetworkTimeout(executor, milliseconds);
 	}
 
 	/**
@@ -726,8 +711,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public void setReadOnly(boolean readOnly) throws SQLException {
-		this.throwNotImplemented();
-
+		this.connection.setReadOnly(readOnly);
 	}
 
 	/**
@@ -736,8 +720,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public Savepoint setSavepoint() throws SQLException {
-		this.throwNotImplemented();
-		return null;
+		return this.connection.setSavepoint();
 	}
 
 	/**
@@ -746,8 +729,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public Savepoint setSavepoint(String name) throws SQLException {
-		this.throwNotImplemented();
-		return null;
+		return this.setSavepoint(name);
 	}
 
 	/**
@@ -756,7 +738,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public void setSchema(String schema) throws SQLException {
-		this.throwNotImplemented();
+		this.connection.setSchema(schema);
 	}
 
 	/**
@@ -765,8 +747,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public void setTransactionIsolation(int level) throws SQLException {
-		this.throwNotImplemented();
-
+		this.setTransactionIsolation(level);
 	}
 
 	/**
@@ -775,8 +756,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
-		this.throwNotImplemented();
-
+		this.setTypeMap(map);
 	}
 
 	private void throwNotImplemented() {

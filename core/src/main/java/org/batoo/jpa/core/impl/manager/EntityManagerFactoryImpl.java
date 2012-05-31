@@ -20,7 +20,6 @@ package org.batoo.jpa.core.impl.manager;
 
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.Set;
 
 import javax.persistence.Cache;
 import javax.persistence.EntityManager;
@@ -39,8 +38,6 @@ import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
 import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.PersistenceParser;
-
-import com.google.common.collect.Sets;
 
 /**
  * Implementation of {@link EntityManagerFactory}.
@@ -75,8 +72,12 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		this.metamodel = new MetamodelImpl(this.jdbcAdaptor, parser.getMetadata());
 		this.properties = parser.getProperties();
 
-		final Set<String> schemas = Sets.newHashSet();
-		DdlManager.perform(this.datasource, this.metamodel, schemas, DDLMode.DROP);
+		this.metamodel.performSequencesDdl(this.datasource, DDLMode.DROP);
+		this.metamodel.performTableGeneratorsDdl(this.datasource, DDLMode.DROP);
+
+		DdlManager.perform(this.datasource, this.metamodel, DDLMode.DROP);
+
+		this.metamodel.preFillGenerators(this.datasource);
 
 		this.open = true;
 	}

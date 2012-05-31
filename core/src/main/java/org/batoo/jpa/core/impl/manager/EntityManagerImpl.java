@@ -31,11 +31,13 @@ import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.persistence.TransactionRequiredException;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.metamodel.Metamodel;
 import javax.sql.DataSource;
 
+import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
+import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
@@ -55,9 +57,10 @@ public class EntityManagerImpl implements EntityManager {
 	private final MetamodelImpl metamodel;
 	private final DataSourceImpl datasource;
 	private boolean open;
-	private EntityTransaction transaction;
+	private EntityTransactionImpl transaction;
 	private ConnectionImpl connection;
 	private final SessionImpl session;
+	private final CriteriaBuilderImpl criteriaBuilder;
 
 	/**
 	 * @param entityManagerFactory
@@ -77,6 +80,7 @@ public class EntityManagerImpl implements EntityManager {
 		this.metamodel = metamodel;
 		this.datasource = datasource;
 		this.session = new SessionImpl(this);
+		this.criteriaBuilder = new CriteriaBuilderImpl(this.metamodel);
 
 		this.open = true;
 	}
@@ -127,8 +131,10 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public boolean contains(Object entity) {
-		// TODO Auto-generated method stub
-		return false;
+		final EntityTypeImpl<?> type = this.metamodel.entity(entity.getClass());
+		final ManagedInstance<?> managedInstance = type.getManagedInstance(this.session, entity);
+
+		return this.session.get(managedInstance) != null;
 	}
 
 	/**
@@ -186,9 +192,8 @@ public class EntityManagerImpl implements EntityManager {
 	 * 
 	 */
 	@Override
-	public <T> TypedQuery<T> createQuery(CriteriaQuery<T> criteriaQuery) {
-		// TODO Auto-generated method stub
-		return null;
+	public <T> TypedQueryImpl<T> createQuery(CriteriaQuery<T> criteriaQuery) {
+		return new TypedQueryImpl<T>((CriteriaQueryImpl<T>) criteriaQuery, this);
 	}
 
 	/**
@@ -227,8 +232,19 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public <T> T find(Class<T> entityClass, Object primaryKey) {
-		// TODO Auto-generated method stub
-		return null;
+		if (primaryKey == null) {
+			throw new NullPointerException();
+		}
+
+		// try to locate in the session
+		final EntityTypeImpl<T> type = this.metamodel.entity(entityClass);
+		final ManagedInstance<T> instance = type.getManagedInstanceById(this.session, primaryKey);
+		final ManagedInstance<T> existing = this.session.get(instance);
+		if (existing != null) {
+			return existing.getInstance();
+		}
+
+		return type.performSelect(this, instance);
 	}
 
 	/**
@@ -267,8 +283,12 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public void flush() {
-		// TODO Auto-generated method stub
-
+		try {
+			this.session.flush(this.getConnection(), this.transaction);
+		}
+		catch (final SQLException e) {
+			throw new PersistenceException("Flush failed", e);
+		}
 	}
 
 	/**
@@ -279,7 +299,7 @@ public class EntityManagerImpl implements EntityManager {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private ConnectionImpl getConnection() {
+	public ConnectionImpl getConnection() {
 		// if the connection exists then simply return it
 		if (this.connection != null) {
 			return this.connection;
@@ -298,9 +318,8 @@ public class EntityManagerImpl implements EntityManager {
 	 * 
 	 */
 	@Override
-	public CriteriaBuilder getCriteriaBuilder() {
-		// TODO Auto-generated method stub
-		return null;
+	public CriteriaBuilderImpl getCriteriaBuilder() {
+		return this.criteriaBuilder;
 	}
 
 	/**
@@ -373,6 +392,18 @@ public class EntityManagerImpl implements EntityManager {
 	}
 
 	/**
+	 * Returns the session.
+	 * 
+	 * @return the session
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public SessionImpl getSession() {
+		return this.session;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -395,8 +426,7 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public boolean isOpen() {
-		// TODO Auto-generated method stub
-		return false;
+		return this.open;
 	}
 
 	/**

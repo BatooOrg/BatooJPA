@@ -118,8 +118,8 @@ public abstract class AbstractManagedTypeImpl<X> extends TypeImpl<X> implements 
 	 */
 	@Override
 	public Set<Attribute<? super X, ?>> getAttributes() {
-		// TODO Auto-generated method stub
-		return null;
+		// XXX inheritence
+		return Sets.newHashSet();
 	}
 
 	/**

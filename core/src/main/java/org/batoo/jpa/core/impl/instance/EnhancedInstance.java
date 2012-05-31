@@ -16,44 +16,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.metamodel;
+package org.batoo.jpa.core.impl.instance;
 
-import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
+import java.io.Serializable;
 
 /**
- * Sequence based generator.
+ * Interface implemented by enhanced managed instances.
  * 
  * @author hceylan
  * @since $version
  */
-public class SequenceGenerator extends AbstractGenerator {
-
-	private static final String DEFAULT_SEQUENCE_NAME = "BATOO_ID";
-
-	private final String sequenceName;
+public interface EnhancedInstance extends Serializable {
 
 	/**
-	 * @param metadata
-	 *            the metadata
+	 * Returns if the instance has been initialized.
+	 * 
+	 * @return true if the instance has been initialized
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SequenceGenerator(SequenceGeneratorMetadata metadata) {
-		super(metadata);
-
-		this.sequenceName = metadata != null ? metadata.getName() : SequenceGenerator.DEFAULT_SEQUENCE_NAME;
-	}
+	boolean __enhanced__$$__isInitialized();
 
 	/**
-	 * Returns the sequenceName of the sequence generator.
+	 * Returns the id of the instance.
 	 * 
-	 * @return the sequenceName of the sequence generator
+	 * @return the id of the instance
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String getSequenceName() {
-		return this.sequenceName;
-	}
+	Object get__enhanced__$$__id();
 }

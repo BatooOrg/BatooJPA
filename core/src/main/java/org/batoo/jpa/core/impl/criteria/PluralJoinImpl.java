@@ -16,44 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.metamodel;
+package org.batoo.jpa.core.impl.criteria;
 
-import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
+import javax.persistence.criteria.PluralJoin;
 
 /**
- * Sequence based generator.
+ * The definition of the functionality
+ * that is common to joins to all collection types. It is
+ * not intended to be used directly in query construction.
  * 
+ * @param <Z>
+ *            the source type
+ * @param <C>
+ *            the collection type
+ * @param <E>
+ *            the element type of the collection
  * @author hceylan
  * @since $version
  */
-public class SequenceGenerator extends AbstractGenerator {
+public abstract class PluralJoinImpl<Z, C, E> extends JoinImpl<Z, E> implements PluralJoin<Z, C, E> {
 
-	private static final String DEFAULT_SEQUENCE_NAME = "BATOO_ID";
-
-	private final String sequenceName;
-
-	/**
-	 * @param metadata
-	 *            the metadata
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public SequenceGenerator(SequenceGeneratorMetadata metadata) {
-		super(metadata);
-
-		this.sequenceName = metadata != null ? metadata.getName() : SequenceGenerator.DEFAULT_SEQUENCE_NAME;
-	}
-
-	/**
-	 * Returns the sequenceName of the sequence generator.
-	 * 
-	 * @return the sequenceName of the sequence generator
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String getSequenceName() {
-		return this.sequenceName;
-	}
 }

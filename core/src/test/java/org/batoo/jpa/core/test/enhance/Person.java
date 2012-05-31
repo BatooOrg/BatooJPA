@@ -23,7 +23,7 @@ import java.sql.SQLException;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.batoo.jpa.core.MappingException;
+import org.batoo.jpa.parser.MappingException;
 
 /**
  * 

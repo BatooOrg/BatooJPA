@@ -18,6 +18,9 @@
  */
 package org.batoo.jpa.core.impl.model;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
@@ -28,12 +31,21 @@ import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.common.reflect.ReflectHelper;
+import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
+import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.criteria.PredicateImpl;
+import org.batoo.jpa.core.impl.criteria.RootImpl;
+import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.instance.Enhancer;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.PhysicalColumn;
 import org.batoo.jpa.core.impl.jdbc.SecondaryTable;
+import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.EntityTransactionImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
@@ -63,6 +75,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private AssociatedAttribute<? super X, ?>[] associatedAttributes;
 	private AssociatedAttribute<? super X, ?>[] persistableAssociations;
 	private EntityTable[] tables;
+	private sun.reflect.ConstructorAccessor enhancer;
+	private CriteriaQueryImpl<X> selectCriteria;
 
 	/**
 	 * @param metamodel
@@ -83,6 +97,42 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		this.name = metadata.getName();
 
 		this.initTables(metadata);
+	}
+
+	private void enhanceIfNeccessary() {
+		if (this.enhancer == null) {
+			synchronized (this) {
+				if (this.enhancer == null) {
+					try {
+						final Class<X> enhancedClass = Enhancer.enhance(this);
+						final Constructor<X> enhancedConstructor = enhancedClass.getConstructor(Class.class, SessionImpl.class,
+							Object.class, Boolean.TYPE);
+
+						final Class<?> magClass = Class.forName("sun.reflect.MethodAccessorGenerator");
+						final Constructor<?> c = magClass.getDeclaredConstructors()[0];
+						final Method generateMethod = magClass.getMethod("generateConstructor", Class.class, Class[].class, Class[].class,
+							Integer.TYPE);
+
+						ReflectHelper.setAccessible(c, true);
+						ReflectHelper.setAccessible(generateMethod, true);
+
+						try {
+							final Object mag = c.newInstance();
+							this.enhancer = (sun.reflect.ConstructorAccessor) generateMethod.invoke(mag,
+								enhancedConstructor.getDeclaringClass(), enhancedConstructor.getParameterTypes(),
+								enhancedConstructor.getExceptionTypes(), enhancedConstructor.getModifiers());
+						}
+						finally {
+							ReflectHelper.setAccessible(c, false);
+							ReflectHelper.setAccessible(generateMethod, false);
+						}
+					}
+					catch (final Exception e) {
+						throw new RuntimeException("Cannot enhance class: " + this.getJavaType(), e);
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -199,12 +249,69 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
+	 * Creates a new managed instance with the id.
+	 * 
+	 * @param session
+	 *            the session
+	 * @param id
+	 *            the primary key
+	 * @return the managed instance created
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ManagedInstance<X> getManagedInstanceById(SessionImpl session, Object id) {
+		return this.getManagedInstanceById(session, id, false);
+	}
+
+	/**
+	 * Creates a new managed instance with the id.
+	 * 
+	 * @param session
+	 *            the session
+	 * @param id
+	 *            the primary key
+	 * @param lazy
+	 *            if the instance is lazy
+	 * @return the managed instance created
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	public ManagedInstance<X> getManagedInstanceById(SessionImpl session, Object id, boolean lazy) {
+		this.enhanceIfNeccessary();
+
+		X instance = null;
+		try {
+			instance = (X) this.enhancer.newInstance(new Object[] { this.getJavaType(), session, id, !lazy });
+		}
+		catch (final InvocationTargetException e) {} // not possible
+		catch (final IllegalArgumentException e) {} // not possible
+		catch (final InstantiationException e) {} // not possible
+
+		return new ManagedInstance<X>(this, session, instance, id);
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
 	@Override
 	public String getName() {
 		return this.name;
+	}
+
+	/**
+	 * Returns the primary table of the type
+	 * 
+	 * @return the primary table
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public EntityTable getPrimaryTable() {
+		return this.primaryTable;
 	}
 
 	/**
@@ -284,6 +391,21 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
+	 * Returns if the method is an id method.
+	 * 
+	 * @param method
+	 *            the method
+	 * @return if the method is an id method
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isIdMethod(Method method) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/**
 	 * Performs inserts to each table for the managed instance.
 	 * 
 	 * @param connection
@@ -325,6 +447,29 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
+	 * Performs select to find the instance.
+	 * 
+	 * @param entityManager
+	 *            the entity manager to use
+	 * @param instance
+	 *            the managed instance to perform insert for
+	 * @return the instance found or null
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public X performSelect(EntityManagerImpl entityManager, ManagedInstance<X> instance) {
+		if (this.selectCriteria == null) {
+			this.prepareSelectCriteria(entityManager);
+		}
+
+		final TypedQueryImpl<X> q = entityManager.createQuery(this.selectCriteria);
+		q.setParameter(1, instance);
+
+		return q.getSingleResult();
+	}
+
+	/**
 	 * @param connection
 	 *            the connection to use
 	 * @param transaction
@@ -339,5 +484,25 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 */
 	public void performUpdate(ConnectionImpl connection, EntityTransactionImpl transaction, ManagedInstance<X> instance)
 		throws SQLException {
+	}
+
+	private synchronized CriteriaQueryImpl<X> prepareSelectCriteria(EntityManagerImpl entityManager) {
+		// other thread prepared before this one
+		if (this.selectCriteria != null) {
+			return this.selectCriteria;
+		}
+
+		final CriteriaBuilderImpl cb = entityManager.getCriteriaBuilder();
+		CriteriaQueryImpl<X> q = cb.createQuery(this.getJavaType());
+		final RootImpl<X> r = q.from(this.getJavaType());
+		q = q.select(r);
+		q = q.distinct(true);
+
+		final ParameterExpressionImpl<X> pe = cb.parameter(this.getJavaType());
+		final PredicateImpl w = cb.equal(r, pe);
+		q = q.where(w);
+		this.selectCriteria = q;
+
+		return q;
 	}
 }

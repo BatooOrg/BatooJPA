@@ -25,6 +25,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.persistence.Embeddable;
@@ -38,7 +41,6 @@ import javax.persistence.metamodel.ManagedType;
 import javax.persistence.metamodel.MappedSuperclassType;
 import javax.persistence.metamodel.Metamodel;
 
-import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.BatooException;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
@@ -68,6 +70,24 @@ import com.google.common.collect.Sets;
  */
 public class MetamodelImpl implements Metamodel {
 
+	private static class GeneratorThreadFactory implements ThreadFactory {
+
+		private static volatile int nextThreadNo = 1;
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 */
+		@Override
+		public Thread newThread(Runnable r) {
+			final Thread thread = new Thread(r, "Id Generator - " + GeneratorThreadFactory.nextThreadNo++);
+
+			thread.setPriority(Thread.MAX_PRIORITY);
+
+			return thread;
+		}
+	}
+
 	private static final BLogger LOG = BLoggerFactory.getLogger(MetamodelImpl.class);
 
 	// TODO Consider making this configurable
@@ -85,6 +105,8 @@ public class MetamodelImpl implements Metamodel {
 
 	private final Map<String, SequenceQueue> sequenceQueues = Maps.newHashMap();
 	private final Map<String, TableIdQueue> tableIdQueues = Maps.newHashMap();
+
+	private ThreadPoolExecutor idGeneratorExecuter;
 
 	/**
 	 * @param jdbcAdaptor
@@ -163,7 +185,8 @@ public class MetamodelImpl implements Metamodel {
 	 * @author hceylan
 	 */
 	public synchronized void addSequenceGenerator(SequenceGeneratorMetadata metadata) {
-		this.sequenceGenerators.put(metadata.getName(), new SequenceGenerator(metadata));
+		final SequenceGenerator sequenceGenerator = new SequenceGenerator(metadata);
+		this.sequenceGenerators.put(sequenceGenerator.getName(), sequenceGenerator);
 	}
 
 	/**
@@ -175,8 +198,9 @@ public class MetamodelImpl implements Metamodel {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public synchronized void addSequenceGenerator(TableGeneratorMetadata metadata) {
-		this.tableGenerators.put(metadata.getName(), new TableGenerator(metadata));
+	public synchronized void addTableGenerator(TableGeneratorMetadata metadata) {
+		final TableGenerator tableGenerator = new TableGenerator(metadata);
+		this.tableGenerators.put(metadata.getName(), tableGenerator);
 	}
 
 	/**
@@ -302,10 +326,6 @@ public class MetamodelImpl implements Metamodel {
 	 */
 	public Integer getNextSequence(String generator) {
 		try {
-			if (StringUtils.isBlank(generator)) {
-				generator = AbstractGenerator.DEFAULT_NAME;
-			}
-
 			return this.sequenceQueues.get(generator).poll(MetamodelImpl.POLL_TIMEOUT, TimeUnit.SECONDS);
 		}
 		catch (final InterruptedException e) {
@@ -326,10 +346,6 @@ public class MetamodelImpl implements Metamodel {
 	 */
 	public Object getNextTableValue(String generator) {
 		try {
-			if (StringUtils.isBlank(generator)) {
-				generator = AbstractGenerator.DEFAULT_NAME;
-			}
-
 			return this.tableIdQueues.get(generator).poll(MetamodelImpl.POLL_TIMEOUT, TimeUnit.SECONDS);
 		}
 		catch (final InterruptedException e) {
@@ -387,9 +403,49 @@ public class MetamodelImpl implements Metamodel {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performForeignKeys(DataSourceImpl datasource, Set<String> schemas, DDLMode ddlMode, EntityTypeImpl<?> type) {
+	public void performForeignKeysDdl(DataSourceImpl datasource, DDLMode ddlMode, EntityTypeImpl<?> type) {
 		// TODO Auto-generated method stub
 
+	}
+
+	/**
+	 * @param datasource
+	 *            the datasource
+	 * @param drop
+	 *            the DDL Mode
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void performSequencesDdl(DataSourceImpl datasource, DDLMode drop) {
+		for (final SequenceGenerator sequenceGenerator : this.sequenceGenerators.values()) {
+			try {
+				this.jdbcAdaptor.createSequenceIfNecessary(datasource, sequenceGenerator);
+			}
+			catch (final SQLException e) {
+				throw new MappingException("DDL operation failed on table generator" + sequenceGenerator.getName(), e);
+			}
+		}
+	}
+
+	/**
+	 * @param datasource
+	 *            the datasource
+	 * @param ddlMode
+	 *            the DDL Mode
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void performTableGeneratorsDdl(DataSourceImpl datasource, DDLMode ddlMode) {
+		for (final TableGenerator tableGenerator : this.tableGenerators.values()) {
+			try {
+				this.jdbcAdaptor.createTableGeneratorIfNecessary(datasource, tableGenerator);
+			}
+			catch (final SQLException e) {
+				throw new MappingException("DDL operation failed on table generator" + tableGenerator.getName(), e);
+			}
+		}
 	}
 
 	/**
@@ -397,8 +453,6 @@ public class MetamodelImpl implements Metamodel {
 	 * 
 	 * @param datasource
 	 *            the datasource
-	 * @param schemas
-	 *            the schema registry
 	 * @param ddlMode
 	 *            the DDL Mode
 	 * @param type
@@ -409,17 +463,43 @@ public class MetamodelImpl implements Metamodel {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performTables(DataSourceImpl datasource, Set<String> schemas, DDLMode ddlMode, EntityTypeImpl<?> type) {
+	public void performTablesDddl(DataSourceImpl datasource, DDLMode ddlMode, EntityTypeImpl<?> type) {
 		MetamodelImpl.LOG.info("Performing DDL operations for {0}, mode {2}", this, ddlMode);
 
 		for (final EntityTable table : type.getDeclaredTables()) {
 			try {
-				this.jdbcAdaptor.createTable(table, datasource, schemas);
+				this.jdbcAdaptor.createTable(table, datasource);
 			}
 			catch (final SQLException e) {
-				throw new MappingException("DDL operation failed on " + table.getName(), e);
+				throw new MappingException("DDL operation failed on table " + table.getName(), e);
 			}
+		}
+	}
 
+	/**
+	 * Prefills the id generators.
+	 * 
+	 * @param datasource
+	 *            the datasource to use
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void preFillGenerators(DataSourceImpl datasource) {
+		final int nThreads = Runtime.getRuntime().availableProcessors();
+
+		this.idGeneratorExecuter = new ThreadPoolExecutor(1, nThreads, //
+			30, TimeUnit.SECONDS, //
+			new LinkedBlockingQueue<Runnable>(), //
+			new GeneratorThreadFactory());
+
+		for (final SequenceGenerator generator : this.sequenceGenerators.values()) {
+			this.sequenceQueues.put(generator.getName(), new SequenceQueue(this.jdbcAdaptor, datasource, this.idGeneratorExecuter,
+				generator.getSequenceName(), generator.getAllocationSize()));
+		}
+
+		for (final TableGenerator generator : this.tableGenerators.values()) {
+			this.tableIdQueues.put(generator.getName(), new TableIdQueue(this.jdbcAdaptor, datasource, this.idGeneratorExecuter, generator));
 		}
 	}
 }

@@ -53,6 +53,18 @@ public class PhysicalColumn extends AbstractColumn {
 	}
 
 	/**
+	 * Returns the table of the column
+	 * 
+	 * @return the table
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public AbstractTable getTable() {
+		return this.table;
+	}
+
+	/**
 	 * Returns the value for the column
 	 * 
 	 * @param instance

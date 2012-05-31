@@ -16,44 +16,54 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.metamodel;
+package org.batoo.jpa.core.impl.criteria;
 
-import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
+import javax.persistence.criteria.From;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
+import javax.persistence.metamodel.Attribute;
 
 /**
- * Sequence based generator.
+ * A join to an entity, embeddable, or basic type.
+ * 
+ * @param <Z>
+ *            the source type of the join
+ * @param <X>
+ *            the target type of the join
  * 
  * @author hceylan
  * @since $version
  */
-public class SequenceGenerator extends AbstractGenerator {
-
-	private static final String DEFAULT_SEQUENCE_NAME = "BATOO_ID";
-
-	private final String sequenceName;
+public abstract class JoinImpl<Z, X> extends FromImpl<Z, X> implements Join<Z, X> {
 
 	/**
-	 * @param metadata
-	 *            the metadata
+	 * {@inheritDoc}
 	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	public SequenceGenerator(SequenceGeneratorMetadata metadata) {
-		super(metadata);
-
-		this.sequenceName = metadata != null ? metadata.getName() : SequenceGenerator.DEFAULT_SEQUENCE_NAME;
+	@Override
+	public Attribute<? super Z, ?> getAttribute() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
-	 * Returns the sequenceName of the sequence generator.
+	 * {@inheritDoc}
 	 * 
-	 * @return the sequenceName of the sequence generator
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	public String getSequenceName() {
-		return this.sequenceName;
+	@Override
+	public JoinType getJoinType() {
+		// TODO Auto-generated method stub
+		return null;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public From<?, Z> getParent() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

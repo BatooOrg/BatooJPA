@@ -53,12 +53,12 @@ public class AbstractGenerator {
 	public AbstractGenerator(GeneratorMetadata metadata) {
 		super();
 
-		this.locator = metadata.getLocator();
-		this.catalog = metadata.getCatalog();
-		this.name = metadata.getName();
-		this.schema = metadata.getSchema();
-		this.initialValue = metadata.getInitialValue();
-		this.allocationSize = metadata.getAllocationSize();
+		this.locator = metadata != null ? metadata.getLocator() : null;
+		this.catalog = metadata != null ? metadata.getCatalog() : null;
+		this.name = metadata != null ? metadata.getName() : AbstractGenerator.DEFAULT_NAME;
+		this.schema = metadata != null ? metadata.getSchema() : null;
+		this.initialValue = metadata != null ? metadata.getInitialValue() : 0;
+		this.allocationSize = metadata != null ? metadata.getAllocationSize() : 50;
 	}
 
 	/**

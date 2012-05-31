@@ -19,16 +19,17 @@
 package org.batoo.jpa.core.jdbc.adapter;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.sql.DataSource;
 
+import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -39,7 +40,6 @@ import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.PkPhysicalColumn;
 import org.batoo.jpa.core.impl.metamodel.SequenceGenerator;
 import org.batoo.jpa.core.impl.metamodel.TableGenerator;
-import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.parser.MappingException;
 
@@ -165,15 +165,13 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 *            the
 	 * @param datasource
 	 *            the datasource
-	 * @param schemas
-	 *            the list of schemas
 	 * @throws SQLException
 	 *             thrown if DDL table creation fails
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void createTable(AbstractTable table, DataSourceImpl datasource, Set<String> schemas) throws SQLException {
+	public void createTable(AbstractTable table, DataSourceImpl datasource) throws SQLException {
 		final String ddlSql = this.createCreateTableStatement(table);
 
 		new QueryRunner(datasource).update(ddlSql);
@@ -193,46 +191,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @author hceylan
 	 */
 	public abstract void createTableGeneratorIfNecessary(DataSource datasource, TableGenerator table) throws SQLException;
-
-	/**
-	 * Recreates the schema.
-	 * <p>
-	 * if DDL mode is DDLMode#DROP then first the schema is dropped. To keep track of whether a schema is previously dropped, schemas
-	 * consulted.
-	 * 
-	 * @param datasource
-	 *            the datasource to use
-	 * @param schemas
-	 *            the set of schemas already dropped / created
-	 * @param ddlMode
-	 *            the DDL mode
-	 * @param schema
-	 *            the name of the current schema, may be null to indicate the default schema
-	 * @return the name of the schema
-	 * @throws SQLException
-	 *             thrown in case of an SQL error
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@Override
-	public String dropAndCreateSchemaIfNecessary(DataSource datasource, Set<String> schemas, DDLMode ddlMode, String schema)
-		throws SQLException {
-		schema = this.schemaOf(datasource, schema);
-
-		synchronized (schemas) {
-			if (!schemas.contains(schema)) {
-				if (ddlMode == DDLMode.DROP) {
-					this.dropSchema(datasource, schema);
-				}
-
-				this.createSchemaIfNecessary(datasource, schema);
-				schemas.add(schema);
-			}
-		}
-
-		return schema;
-	}
 
 	/**
 	 * Drops the schema if exists
@@ -333,11 +291,21 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @param dataSource
 	 *            the datasource to use
 	 * @return the name of the default schema or null if database does not support schemas
+	 * @throws SQLException
+	 *             thrown in case of an SQL error
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract String getDefaultSchema(DataSource dataSource);
+	public final String getDefaultSchema(DataSource dataSource) throws SQLException {
+		final Connection connection = dataSource.getConnection();
+		try {
+			return connection.getSchema();
+		}
+		finally {
+			DbUtils.closeQuietly(connection);
+		}
+	}
 
 	/**
 	 * Returns next sequence number from the database.
@@ -424,11 +392,13 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @param schema
 	 *            the schema name
 	 * @return the proper schema name
+	 * @throws SQLException
+	 *             thrown in case of an SQL error
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected String schemaOf(DataSource datasource, String schema) {
+	protected String schemaOf(DataSource datasource, String schema) throws SQLException {
 		if (StringUtils.isBlank(schema)) {
 			schema = this.getDefaultSchema(datasource);
 		}

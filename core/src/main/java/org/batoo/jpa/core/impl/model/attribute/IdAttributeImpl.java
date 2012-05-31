@@ -20,9 +20,12 @@ package org.batoo.jpa.core.impl.model.attribute;
 
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.jdbc.PhysicalColumn;
 import org.batoo.jpa.core.impl.jdbc.PkPhysicalColumn;
 import org.batoo.jpa.core.impl.jdbc.TypeFactory;
+import org.batoo.jpa.core.impl.metamodel.AbstractGenerator;
+import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
 import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
@@ -59,22 +62,40 @@ public class IdAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 		super(declaringType, metadata);
 
 		final JdbcAdaptor jdbcAdaptor = declaringType.getMetamodel().getJdbcAdaptor();
+		final MetamodelImpl metamodel = declaringType.getMetamodel();
 
 		final GeneratedValueMetadata generatedValue = metadata.getGeneratedValue();
 		if (generatedValue != null) {
-			this.generator = generatedValue.getGenerator();
 			this.idType = jdbcAdaptor.supports(generatedValue.getStrategy());
+
+			// if generator is not specified then assign the default name
+			if (StringUtils.isNotBlank(generatedValue.getGenerator())) {
+				this.generator = generatedValue.getGenerator();
+			}
+			else {
+				this.generator = AbstractGenerator.DEFAULT_NAME;
+
+				if (this.idType == IdType.SEQUENCE) {
+					metamodel.addSequenceGenerator(null);
+				}
+				else {
+					metamodel.addTableGenerator(null);
+				}
+			}
+
+			// add sequence generator if defined
+			if (metadata.getSequenceGenerator() != null) {
+				metamodel.addSequenceGenerator(metadata.getSequenceGenerator());
+			}
+
+			// add table generator if defined
+			if (metadata.getTableGenerator() != null) {
+				metamodel.addTableGenerator(metadata.getTableGenerator());
+			}
 		}
 		else {
 			this.generator = null;
 			this.idType = IdType.MANUAL;
-		}
-
-		if (metadata.getSequenceGenerator() != null) {
-			declaringType.getMetamodel().addSequenceGenerator(metadata.getSequenceGenerator());
-		}
-		if (metadata.getSequenceGenerator() != null) {
-			declaringType.getMetamodel().addSequenceGenerator(metadata.getSequenceGenerator());
 		}
 
 		this.initColumn(metadata);

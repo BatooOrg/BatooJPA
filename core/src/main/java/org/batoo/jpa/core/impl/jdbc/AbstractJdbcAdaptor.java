@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
@@ -184,30 +182,6 @@ public abstract class AbstractJdbcAdaptor {
 	protected abstract String createCreateTableStatement(AbstractTable table, List<String> ddlColumns, List<String> pkColumns);
 
 	/**
-	 * Recreates the schema.
-	 * <p>
-	 * if DDL mode is DDLMode#DROP then first the schema is dropped. To keep track of whether a schema is previously dropped, schemas
-	 * consulted.
-	 * 
-	 * @param datasource
-	 *            the datasource to use
-	 * @param schemas
-	 *            the set of schemas already dropped / created
-	 * @param ddlMode
-	 *            the DDL mode
-	 * @param schema
-	 *            the name of the current schema, may be null to indicate the default schema
-	 * @return the name of the schema
-	 * @throws SQLException
-	 *             throw in case of of underlying SQLException
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public abstract String dropAndCreateSchemaIfNecessary(DataSource datasource, Set<String> schemas, DDLMode ddlMode, String schema)
-		throws SQLException;
-
-	/**
 	 * @return the JDBC Driver this adapter works with
 	 * 
 	 * @since $version
@@ -234,9 +208,6 @@ public abstract class AbstractJdbcAdaptor {
 	 */
 	public final void performTableDdl(Set<String> schemas, DataSourceImpl datasource, DDLMode ddlMode, AbstractTable table)
 		throws SQLException {
-
-		this.dropAndCreateSchemaIfNecessary(datasource, schemas, ddlMode, table.getSchema());
-
 		new QueryRunner(datasource).update(this.createCreateTableStatement(table));
 	}
 }

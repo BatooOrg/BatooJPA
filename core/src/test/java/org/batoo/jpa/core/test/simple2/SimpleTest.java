@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.simple;
+package org.batoo.jpa.core.test.simple2;
 
 import java.sql.SQLException;
 import java.util.Set;
@@ -43,14 +43,6 @@ import org.junit.Test;
  */
 public class SimpleTest extends BaseCoreTest {
 
-	private Foo newFoo() {
-		final Foo foo = new Foo();
-
-		foo.setValue("test");
-
-		return foo;
-	}
-
 	/**
 	 * Tests {@link EntityManager#contains(Object)}.
 	 * 
@@ -59,8 +51,8 @@ public class SimpleTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testContains() {
-		final Foo foo = this.newFoo();
-		final Foo foo2 = this.newFoo();
+		final Foo foo = new Foo();
+		final Foo foo2 = new Foo();
 
 		this.persist(foo);
 
@@ -95,7 +87,8 @@ public class SimpleTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testDetach() {
-		final Foo foo = this.newFoo();
+		// FIXME it still contains but the status is detached
+		final Foo foo = new Foo();
 		this.persist(foo);
 
 		Assert.assertTrue(this.em().contains(foo));
@@ -116,7 +109,7 @@ public class SimpleTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testDetachThenCommit() throws SQLException {
-		final Foo foo = this.newFoo();
+		final Foo foo = new Foo();
 		this.persist(foo);
 
 		this.detach(foo);
@@ -136,15 +129,15 @@ public class SimpleTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testFind() {
-		final Foo foo = this.newFoo();
+		final Foo foo = new Foo();
 		this.persist(foo);
 
 		this.commit();
 
 		this.close();
 
-		final Foo foo2 = this.find(Foo.class, foo.getId());
-		Assert.assertEquals(foo.getId(), foo2.getId());
+		final Foo foo2 = this.find(Foo.class, foo.getKey());
+		Assert.assertEquals(foo.getKey(), foo2.getKey());
 	}
 
 	/**
@@ -158,7 +151,7 @@ public class SimpleTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testFlushThenDetach() throws SQLException {
-		final Foo foo = this.newFoo();
+		final Foo foo = new Foo();
 		this.persist(foo);
 
 		this.flush();
@@ -183,7 +176,7 @@ public class SimpleTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testPersist() throws SQLException {
-		final Foo foo = this.newFoo();
+		final Foo foo = new Foo();
 		this.persist(foo);
 
 		this.commit();

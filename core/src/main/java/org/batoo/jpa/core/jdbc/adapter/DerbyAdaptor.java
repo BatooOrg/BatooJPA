@@ -33,7 +33,6 @@ import org.batoo.jpa.core.impl.jdbc.SingleValueHandler;
 import org.batoo.jpa.core.impl.metamodel.SequenceGenerator;
 import org.batoo.jpa.core.impl.metamodel.TableGenerator;
 import org.batoo.jpa.core.jdbc.IdType;
-import org.batoo.jpa.parser.MappingException;
 
 /**
  * JDBC Adapter for Derby.
@@ -50,7 +49,7 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public DerbyAdaptor() throws MappingException {
+	public DerbyAdaptor() {
 		super();
 	}
 
@@ -174,15 +173,6 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	@Override
 	protected String getDatabaseName() {
 		return "Derby";
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String getDefaultSchema(DataSource dataSource) {
-		return "SA";
 	}
 
 	/**

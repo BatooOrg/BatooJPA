@@ -21,6 +21,7 @@ package org.batoo.jpa.common.reflect;
 import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -28,6 +29,8 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -285,6 +288,39 @@ public class ReflectHelper {
 	 */
 	public static boolean isCollection(Class<?> type) {
 		return (List.class == type) || (Collection.class == type) || (Set.class == type) || (Map.class == type);
+	}
+
+	/**
+	 * Sets the member's accessibility status.
+	 * 
+	 * @param member
+	 *            the member of which to set accessibility status
+	 * @param accessible
+	 *            true to set accessible, false to make it not accessible
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public static void setAccessible(final Member member, final boolean accessible) {
+		AccessController.doPrivileged(new PrivilegedAction<Void>() {
+
+			@Override
+			public Void run() {
+				if (member instanceof Field) {
+					((Field) member).setAccessible(accessible);
+				}
+
+				else if (member instanceof Method) {
+					((Method) member).setAccessible(accessible);
+				}
+
+				else {
+					((Constructor<?>) member).setAccessible(accessible);
+				}
+
+				return null;
+			}
+		});
 	}
 
 	/**

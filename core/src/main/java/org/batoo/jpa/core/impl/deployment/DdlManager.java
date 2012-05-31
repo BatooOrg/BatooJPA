@@ -18,8 +18,6 @@
  */
 package org.batoo.jpa.core.impl.deployment;
 
-import java.util.Set;
-
 import org.batoo.jpa.common.BatooException;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
@@ -45,8 +43,6 @@ public class DdlManager extends DeploymentManager<EntityTypeImpl<?>> {
 	 *            the datasource
 	 * @param metamodel
 	 *            the metamodel
-	 * @param schemas
-	 *            the schema registry
 	 * @param ddlMode
 	 *            the DDL Mode
 	 * @throws BatooException
@@ -55,22 +51,19 @@ public class DdlManager extends DeploymentManager<EntityTypeImpl<?>> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public static void perform(DataSourceImpl datasource, MetamodelImpl metamodel, Set<String> schemas, DDLMode ddlMode)
-		throws BatooException {
-		new DdlManager(datasource, metamodel, schemas, ddlMode, true).perform();
-		new DdlManager(datasource, metamodel, schemas, ddlMode, false).perform();
+	public static void perform(DataSourceImpl datasource, MetamodelImpl metamodel, DDLMode ddlMode) throws BatooException {
+		new DdlManager(datasource, metamodel, ddlMode, true).perform();
+		new DdlManager(datasource, metamodel, ddlMode, false).perform();
 	}
 
 	private final DataSourceImpl datasource;
-	private final Set<String> schemas;
 	private final DDLMode ddlMode;
 	private final boolean firstPass;
 
-	private DdlManager(DataSourceImpl datasource, MetamodelImpl metamodel, Set<String> schemas, DDLMode ddlMode, boolean firstPass) {
+	private DdlManager(DataSourceImpl datasource, MetamodelImpl metamodel, DDLMode ddlMode, boolean firstPass) {
 		super(DdlManager.LOG, "DDL Manager", metamodel, Context.ENTITIES);
 
 		this.datasource = datasource;
-		this.schemas = schemas;
 		this.ddlMode = ddlMode;
 		this.firstPass = firstPass;
 	}
@@ -82,13 +75,12 @@ public class DdlManager extends DeploymentManager<EntityTypeImpl<?>> {
 	@Override
 	public Void perform(EntityTypeImpl<?> type) throws BatooException {
 		if (this.firstPass) {
-			this.getMetamodel().performTables(this.datasource, this.schemas, this.ddlMode, type);
+			this.getMetamodel().performTablesDddl(this.datasource, this.ddlMode, type);
 		}
 		else {
-			this.getMetamodel().performForeignKeys(this.datasource, this.schemas, this.ddlMode, type);
+			this.getMetamodel().performForeignKeysDdl(this.datasource, this.ddlMode, type);
 		}
 
 		return null;
 	}
-
 }

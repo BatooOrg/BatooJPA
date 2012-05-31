@@ -16,44 +16,41 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.metamodel;
+package org.batoo.jpa.core.impl.criteria;
 
-import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
+import javax.persistence.Tuple;
+import javax.persistence.TupleElement;
 
 /**
- * Sequence based generator.
+ * The definition of an element that is returned in a query result tuple.
+ * 
+ * @param <X>
+ *            the type of the element
+ * @see Tuple
  * 
  * @author hceylan
  * @since $version
  */
-public class SequenceGenerator extends AbstractGenerator {
-
-	private static final String DEFAULT_SEQUENCE_NAME = "BATOO_ID";
-
-	private final String sequenceName;
+public class TupleElementImpl<X> implements TupleElement<X> {
 
 	/**
-	 * @param metadata
-	 *            the metadata
+	 * {@inheritDoc}
 	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	public SequenceGenerator(SequenceGeneratorMetadata metadata) {
-		super(metadata);
-
-		this.sequenceName = metadata != null ? metadata.getName() : SequenceGenerator.DEFAULT_SEQUENCE_NAME;
+	@Override
+	public String getAlias() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
-	 * Returns the sequenceName of the sequence generator.
+	 * {@inheritDoc}
 	 * 
-	 * @return the sequenceName of the sequence generator
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	public String getSequenceName() {
-		return this.sequenceName;
+	@Override
+	public Class<? extends X> getJavaType() {
+		// TODO Auto-generated method stub
+		return null;
 	}
+
 }

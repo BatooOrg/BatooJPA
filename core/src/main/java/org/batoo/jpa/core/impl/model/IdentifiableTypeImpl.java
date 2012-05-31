@@ -188,8 +188,7 @@ public class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> implements Ident
 	 */
 	@Override
 	public boolean hasSingleIdAttribute() {
-		// TODO Auto-generated method stub
-		return false;
+		return this.idAttributes.length == 1;
 	}
 
 	/**

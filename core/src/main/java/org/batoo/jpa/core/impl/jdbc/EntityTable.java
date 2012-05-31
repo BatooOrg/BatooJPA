@@ -77,6 +77,8 @@ public class EntityTable extends AbstractTable {
 	 */
 	@Override
 	public void addColumn(PhysicalColumn column) {
+		super.addColumn(column);
+
 		if ((column instanceof PkPhysicalColumn) && (((PkPhysicalColumn) column).getIdType() == IdType.IDENTITY)) {
 			this.identityColumn = (PkPhysicalColumn) column;
 		}

@@ -16,44 +16,46 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.metamodel;
+package org.batoo.jpa.core.impl.criteria;
 
-import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Order;
 
 /**
- * Sequence based generator.
  * 
  * @author hceylan
  * @since $version
  */
-public class SequenceGenerator extends AbstractGenerator {
-
-	private static final String DEFAULT_SEQUENCE_NAME = "BATOO_ID";
-
-	private final String sequenceName;
+public class OrderImpl implements Order {
 
 	/**
-	 * @param metadata
-	 *            the metadata
-	 * 
-	 * @since $version
-	 * @author hceylan
+	 * {@inheritDoc}
+	 *
 	 */
-	public SequenceGenerator(SequenceGeneratorMetadata metadata) {
-		super(metadata);
-
-		this.sequenceName = metadata != null ? metadata.getName() : SequenceGenerator.DEFAULT_SEQUENCE_NAME;
+	@Override
+	public Order reverse() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
-	 * Returns the sequenceName of the sequence generator.
-	 * 
-	 * @return the sequenceName of the sequence generator
-	 * 
-	 * @since $version
-	 * @author hceylan
+	 * {@inheritDoc}
+	 *
 	 */
-	public String getSequenceName() {
-		return this.sequenceName;
+	@Override
+	public boolean isAscending() {
+		// TODO Auto-generated method stub
+		return false;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 */
+	@Override
+	public Expression<?> getExpression() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

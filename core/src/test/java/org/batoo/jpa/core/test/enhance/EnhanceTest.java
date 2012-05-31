@@ -22,8 +22,8 @@ import java.lang.reflect.Constructor;
 
 import javax.persistence.metamodel.EntityType;
 
+import org.batoo.jpa.core.impl.instance.Enhancer;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.manager.instance.Enhancer;
 import org.batoo.jpa.core.test.BaseCoreTest;
 import org.junit.Test;
 
@@ -34,6 +34,15 @@ import org.junit.Test;
  */
 public class EnhanceTest extends BaseCoreTest {
 
+	/**
+	 * Tests the enhancement
+	 * 
+	 * @throws Exception
+	 *             thrown in case of failure
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
 	@Test
 	public void testEnhance() throws Exception {
 		final EntityType<Person> type = this.em().getMetamodel().entity(Person.class);
