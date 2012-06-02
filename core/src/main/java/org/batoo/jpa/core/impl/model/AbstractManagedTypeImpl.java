@@ -34,10 +34,13 @@ import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.IdAttributeImpl;
+import org.batoo.jpa.core.impl.model.attribute.ManyToOneAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
 import org.batoo.jpa.parser.impl.AbstractLocator;
+import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
 import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.IdAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.ManyToOneAttributeMetadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 
 import com.google.common.collect.Maps;
@@ -54,9 +57,10 @@ import com.google.common.collect.Sets;
  */
 public abstract class AbstractManagedTypeImpl<X> extends TypeImpl<X> implements ManagedType<X> {
 
-	private final Map<String, AttributeImpl<X, ?>> attributes = Maps.newHashMap();
 	private final AbstractLocator locator;
 	private final ManagedTypeImpl<? super X> parent;
+	private final Map<String, AttributeImpl<X, ?>> declaredAttributes = Maps.newHashMap();
+	private final Map<String, AttributeImpl<? super X, ?>> attributes = Maps.newHashMap();
 
 	/**
 	 * @param metamodel
@@ -91,15 +95,31 @@ public abstract class AbstractManagedTypeImpl<X> extends TypeImpl<X> implements 
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void addAttributes(EntityMetadata entity) {
+		final AttributesMetadata metadata = entity.getAttributes();
+
 		// id attributes
-		for (final IdAttributeMetadata id : entity.getAttributes().getIds()) {
-			this.attributes.put(id.getName(), new IdAttributeImpl((ManagedTypeImpl) this, id));
+		for (final IdAttributeMetadata id : metadata.getIds()) {
+			this.declaredAttributes.put(id.getName(), new IdAttributeImpl((ManagedTypeImpl) this, id));
 		}
 
 		// basic attributes
-		for (final BasicAttributeMetadata basic : entity.getAttributes().getBasics()) {
-			this.attributes.put(basic.getName(), new BasicAttributeImpl((ManagedTypeImpl) this, basic));
+		for (final BasicAttributeMetadata basic : metadata.getBasics()) {
+			this.declaredAttributes.put(basic.getName(), new BasicAttributeImpl((ManagedTypeImpl) this, basic));
 		}
+
+		// many to one attributes
+		for (final ManyToOneAttributeMetadata manyToOne : metadata.getManyToOnes()) {
+			this.declaredAttributes.put(manyToOne.getName(), new ManyToOneAttributeImpl((ManagedTypeImpl) this, manyToOne));
+		}
+
+		if (this.parent != null) {
+			// force parent to initialize
+			for (final Attribute<?, ?> attribute : this.parent.getAttributes()) {
+				this.attributes.put(attribute.getName(), (AttributeImpl<? super X, ?>) attribute);
+			}
+		}
+
+		this.attributes.putAll(this.declaredAttributes);
 	}
 
 	/**
@@ -108,8 +128,7 @@ public abstract class AbstractManagedTypeImpl<X> extends TypeImpl<X> implements 
 	 */
 	@Override
 	public Attribute<? super X, ?> getAttribute(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.declaredAttributes.get(name);
 	}
 
 	/**
@@ -118,8 +137,11 @@ public abstract class AbstractManagedTypeImpl<X> extends TypeImpl<X> implements 
 	 */
 	@Override
 	public Set<Attribute<? super X, ?>> getAttributes() {
-		// XXX inheritence
-		return Sets.newHashSet();
+		final Set<Attribute<? super X, ?>> attributes = Sets.newHashSet();
+
+		attributes.addAll(this.attributes.values());
+
+		return attributes;
 	}
 
 	/**
@@ -280,7 +302,7 @@ public abstract class AbstractManagedTypeImpl<X> extends TypeImpl<X> implements 
 	@SuppressWarnings("unchecked")
 	public Set<SingularAttribute<X, ?>> getDeclaredSingularAttributes() {
 		final Set<SingularAttribute<X, ?>> attributes = Sets.newHashSet();
-		for (final Attribute<? super X, ?> attribute : this.attributes.values()) {
+		for (final Attribute<? super X, ?> attribute : this.declaredAttributes.values()) {
 			if ((attribute instanceof SingularAttributeImpl) && (attribute.getDeclaringType() == this)) {
 				attributes.add((SingularAttribute<X, ?>) attribute);
 			}

@@ -21,10 +21,10 @@ package org.batoo.jpa.core.impl.jdbc;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.impl.AbstractLocator;
-import org.batoo.jpa.parser.metadata.ColumnMetadata;
+import org.batoo.jpa.parser.metadata.BaseColumnMetadata;
 
 /**
- * Abstract base implementation for Primary Key Column, Basic Column and Join Columns.
+ * Abstract base implementation for Primary Key BasicColumn, Basic BasicColumn and Join Columns.
  * 
  * @author hceylan
  * @since $version
@@ -51,13 +51,20 @@ public class AbstractColumn {
 	 *            the default name for the column
 	 * @param sqlType
 	 *            the SQL type
+	 * @param length
+	 *            the length of the column
+	 * @param precision
+	 *            the precision of the column
+	 * @param scale
+	 *            the scale of the column
 	 * @param metadata
 	 *            the metadata
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AbstractColumn(JdbcAdaptor jdbcAdaptor, String defaultName, int sqlType, ColumnMetadata metadata) {
+	public AbstractColumn(JdbcAdaptor jdbcAdaptor, String defaultName, int sqlType, int length, int precision, int scale,
+		BaseColumnMetadata metadata) {
 		super();
 
 		this.sqlType = sqlType;
@@ -68,9 +75,9 @@ public class AbstractColumn {
 			this.tableName = metadata.getTable();
 			this.name = jdbcAdaptor.escape(StringUtils.isNotBlank(metadata.getName()) ? metadata.getName() : defaultName);
 			this.columnDefinition = metadata.getColumnDefinition();
-			this.length = metadata.getLength();
-			this.precision = metadata.getPrecision();
-			this.scale = metadata.getScale();
+			this.length = length;
+			this.precision = precision;
+			this.scale = scale;
 			this.insertable = metadata.isInsertable();
 			this.nullable = metadata.isNullable();
 			this.unique = metadata.isUnique();
@@ -82,9 +89,9 @@ public class AbstractColumn {
 			this.tableName = null;
 			this.name = jdbcAdaptor.escape(defaultName);
 			this.columnDefinition = null;
-			this.length = 255;
-			this.precision = 0;
-			this.scale = 0;
+			this.length = length;
+			this.precision = precision;
+			this.scale = scale;
 			this.insertable = true;
 			this.nullable = true;
 			this.unique = false;

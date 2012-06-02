@@ -85,5 +85,4 @@ public interface BaseColumnMetadata extends BindableMetadata {
 	 * @author hceylan
 	 */
 	boolean isUpdatable();
-
 }

@@ -18,12 +18,23 @@
  */
 package org.batoo.jpa.core.impl.model.attribute;
 
+import java.util.List;
+
 import javax.persistence.CascadeType;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.jdbc.ForeignKey;
+import org.batoo.jpa.core.impl.jdbc.JoinColumn;
+import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
+import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
+import org.batoo.jpa.parser.MappingException;
+import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
+
+import com.google.common.collect.Lists;
 
 /**
  * Implementation of {@link SingularAttribute} representing types of ManyToOne and OneToOne
@@ -46,6 +57,10 @@ public abstract class AssociatedSingularAttribute<X, T> extends SingularAttribut
 	private final boolean cascadesRefresh;
 	private final boolean cascadesRemove;
 
+	private EntityTypeImpl<T> type;
+	private AssociatedAttribute<T, X> inverse;
+	private final List<JoinColumn> joinColumns = Lists.newArrayList();
+
 	/**
 	 * @param declaringType
 	 *            the declaring type
@@ -67,6 +82,8 @@ public abstract class AssociatedSingularAttribute<X, T> extends SingularAttribut
 		this.cascadesPersist = metadata.getCascades().contains(CascadeType.ALL) || metadata.getCascades().contains(CascadeType.PERSIST);
 		this.cascadesRefresh = metadata.getCascades().contains(CascadeType.ALL) || metadata.getCascades().contains(CascadeType.REFRESH);
 		this.cascadesRemove = metadata.getCascades().contains(CascadeType.ALL) || metadata.getCascades().contains(CascadeType.REMOVE);
+
+		this.initColumn(metadata);
 	}
 
 	/**
@@ -119,8 +136,46 @@ public abstract class AssociatedSingularAttribute<X, T> extends SingularAttribut
 	 * 
 	 */
 	@Override
+	public EntityTypeImpl<T> getType() {
+		return this.type;
+	}
+
+	/**
+	 * Initializes the column for the attribute.
+	 * 
+	 * @param metadata
+	 *            the metadata
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void initColumn(AssociationAttributeMetadata metadata) {
+		final JdbcAdaptor jdbcAdaptor = this.getDeclaringType().getMetamodel().getJdbcAdaptor();
+
+		// if metadata defines the join columns then use the information provided
+		if ((metadata != null) && (metadata.getJoinColumns().size() > 0)) {
+			for (final JoinColumnMetadata column : metadata.getJoinColumns()) {
+				this.joinColumns.add(new JoinColumn(jdbcAdaptor, this, column));
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public boolean isAssociation() {
 		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isId() {
+		return false;
 	}
 
 	/**
@@ -146,7 +201,45 @@ public abstract class AssociatedSingularAttribute<X, T> extends SingularAttribut
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
+	public void link() throws MappingException {
+		final MetamodelImpl metamodel = this.getDeclaringType().getMetamodel();
+
+		this.type = metamodel.entity(this.getJavaType());
+
+		if (this.inverseName != null) {
+			this.inverse = (AssociatedAttribute<T, X>) this.type.getAttribute(this.inverseName);
+
+			if (this.inverse == null) {
+				throw new MappingException("Cannot find the mappedBy attribute " + this.inverseName + " specified on "
+					+ this.getJavaMember());
+			}
+
+			this.inverse.setInverse(this);
+		}
+
+		final EntityTypeImpl<X> entity = (EntityTypeImpl<X>) this.getDeclaringType();
+
+		final ForeignKey foreignKey = new ForeignKey(table, referencedTable, columnMappings);
+
+		entity.getPrimaryTable().addForeignKey(foreignKey);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public boolean references(ManagedInstance<?> source, ManagedInstance<?> associate) {
 		return this.get(source) == associate;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void setInverse(AssociatedAttribute<T, X> inverse) {
+		this.inverse = inverse;
 	}
 }

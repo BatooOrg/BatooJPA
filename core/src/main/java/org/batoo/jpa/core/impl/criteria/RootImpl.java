@@ -28,8 +28,8 @@ import javax.persistence.criteria.Root;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
-import org.batoo.jpa.core.impl.jdbc.PhysicalColumn;
-import org.batoo.jpa.core.impl.jdbc.PkPhysicalColumn;
+import org.batoo.jpa.core.impl.jdbc.BasicColumn;
+import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.EntityTypeImpl;
@@ -49,8 +49,8 @@ import com.google.common.collect.Lists;
 public class RootImpl<X> extends FromImpl<X, X> implements Root<X> {
 
 	private final EntityTypeImpl<X> entity;
-	private final HashBiMap<String, PhysicalColumn> idFields = HashBiMap.create();
-	private final HashBiMap<String, PhysicalColumn> fields = HashBiMap.create();
+	private final HashBiMap<String, BasicColumn> idFields = HashBiMap.create();
+	private final HashBiMap<String, BasicColumn> fields = HashBiMap.create();
 	private final HashBiMap<String, EntityTable> tableAliases = HashBiMap.create();
 
 	/**
@@ -93,17 +93,17 @@ public class RootImpl<X> extends FromImpl<X, X> implements Root<X> {
 
 		for (final EntityTable table : this.entity.getTables()) {
 
-			final Collection<PhysicalColumn> columns = table.getColumns();
-			for (final PhysicalColumn column : columns) {
+			final Collection<BasicColumn> basicColumns = table.getColumns();
+			for (final BasicColumn basicColumn : basicColumns) {
 
-				this.tableAliases.inverse().get(column.getTable());
+				this.tableAliases.inverse().get(basicColumn.getTable());
 
-				final String field = Joiner.on(".").skipNulls().join(this.getAlias(), column.getName());
-				if (column instanceof PkPhysicalColumn) {
-					this.idFields.put(field, column);
+				final String field = Joiner.on(".").skipNulls().join(this.getAlias(), basicColumn.getName());
+				if (basicColumn instanceof PkColumn) {
+					this.idFields.put(field, basicColumn);
 				}
 				else {
-					this.fields.put(field, column);
+					this.fields.put(field, basicColumn);
 				}
 
 				fields.add(field);
@@ -138,11 +138,11 @@ public class RootImpl<X> extends FromImpl<X, X> implements Root<X> {
 		}
 
 		final ManagedInstance<X> instance = this.entity.getManagedInstanceById(session, id);
-		for (final Entry<String, PhysicalColumn> entry : this.fields.entrySet()) {
+		for (final Entry<String, BasicColumn> entry : this.fields.entrySet()) {
 			final String field = entry.getKey();
-			final PhysicalColumn column = entry.getValue();
+			final BasicColumn basicColumn = entry.getValue();
 			final Object value = rs.getObject(field);
-			column.setValue(instance.getInstance(), value);
+			basicColumn.setValue(instance.getInstance(), value);
 		}
 
 		return instance;

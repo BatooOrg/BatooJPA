@@ -3,8 +3,11 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
 	version="2.0">
 
-	<persistence-unit name="org.batoo.jpa.core.test.manytoonetomany">
+	<persistence-unit name="default">
 		<provider>org.batoo.jpa.core.PersistenceProvider</provider>
+		
+		<class>org.batoo.jpa.core.test.manytoonetomany.Address</class>
+		<class>org.batoo.jpa.core.test.manytoonetomany.Person</class>
 		
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.Driver40" />

@@ -49,9 +49,9 @@ public class EntityTable extends AbstractTable {
 	private final QueryRunner runner;
 
 	private final HashMap<EntityTypeImpl<?>, String> insertSqls = Maps.newHashMap();
-	private final HashMap<EntityTypeImpl<?>, PhysicalColumn[]> insertColumns = Maps.newHashMap();
+	private final HashMap<EntityTypeImpl<?>, BasicColumn[]> insertColumns = Maps.newHashMap();
 	private final JdbcAdaptor jdbcAdaptor;
-	private PkPhysicalColumn identityColumn;
+	private PkColumn identityColumn;
 
 	/**
 	 * @param entity
@@ -76,11 +76,11 @@ public class EntityTable extends AbstractTable {
 	 * 
 	 */
 	@Override
-	public void addColumn(PhysicalColumn column) {
-		super.addColumn(column);
+	public void addColumn(BasicColumn basicColumn) {
+		super.addColumn(basicColumn);
 
-		if ((column instanceof PkPhysicalColumn) && (((PkPhysicalColumn) column).getIdType() == IdType.IDENTITY)) {
-			this.identityColumn = (PkPhysicalColumn) column;
+		if ((basicColumn instanceof PkColumn) && (((PkColumn) basicColumn).getIdType() == IdType.IDENTITY)) {
+			this.identityColumn = (PkColumn) basicColumn;
 		}
 	}
 
@@ -99,14 +99,14 @@ public class EntityTable extends AbstractTable {
 			return;
 		}
 
-		final List<PhysicalColumn> insertColumns = Lists.newArrayList();
+		final List<BasicColumn> insertColumns = Lists.newArrayList();
 		// Filter out the identity physicalColumns
-		final Collection<PhysicalColumn> filteredColumns = type == null ? this.getColumns() : Collections2.filter(this.getColumns(),
-			new Predicate<PhysicalColumn>() {
+		final Collection<BasicColumn> filteredColumns = type == null ? this.getColumns() : Collections2.filter(this.getColumns(),
+			new Predicate<BasicColumn>() {
 
 				@Override
-				public boolean apply(PhysicalColumn input) {
-					if ((input instanceof PkPhysicalColumn) && (((PkPhysicalColumn) input).getIdType() == IdType.IDENTITY)) {
+				public boolean apply(BasicColumn input) {
+					if ((input instanceof PkColumn) && (((PkColumn) input).getIdType() == IdType.IDENTITY)) {
 						return false;
 					}
 
@@ -126,10 +126,10 @@ public class EntityTable extends AbstractTable {
 			});
 
 		// prepare the names tuple in the form of "COLNAME [, COLNAME]*"
-		final Collection<String> columnNames = Collections2.transform(filteredColumns, new Function<PhysicalColumn, String>() {
+		final Collection<String> columnNames = Collections2.transform(filteredColumns, new Function<BasicColumn, String>() {
 
 			@Override
-			public String apply(PhysicalColumn input) {
+			public String apply(BasicColumn input) {
 				insertColumns.add(input);
 
 				return input.getName();
@@ -137,10 +137,10 @@ public class EntityTable extends AbstractTable {
 		});
 
 		// prepare the parameters in the form of "? [, ?]*"
-		final Collection<String> parameters = Collections2.transform(filteredColumns, new Function<PhysicalColumn, String>() {
+		final Collection<String> parameters = Collections2.transform(filteredColumns, new Function<BasicColumn, String>() {
 
 			@Override
-			public String apply(PhysicalColumn input) {
+			public String apply(BasicColumn input) {
 				return "?";
 			}
 		});
@@ -156,7 +156,7 @@ public class EntityTable extends AbstractTable {
 			+ "\nVALUES (" + parametersStr + ")";
 
 		this.insertSqls.put(type, sql);
-		this.insertColumns.put(type, insertColumns.toArray(new PhysicalColumn[insertColumns.size()]));
+		this.insertColumns.put(type, insertColumns.toArray(new BasicColumn[insertColumns.size()]));
 	}
 
 	/**
@@ -213,7 +213,7 @@ public class EntityTable extends AbstractTable {
 
 		// Do not inline, generation of the insert SQL will initialize the insertColumns!
 		final String insertSql = this.getInsertSql(entityType);
-		final PhysicalColumn[] insertColumns = this.insertColumns.get(entityType);
+		final BasicColumn[] insertColumns = this.insertColumns.get(entityType);
 
 		// prepare the parameters
 		final Object[] params = new Object[insertColumns.length];
@@ -239,12 +239,12 @@ public class EntityTable extends AbstractTable {
 	 */
 	@Override
 	public String toString() {
-		final String columns = Joiner.on(", ").join(Collections2.transform(this.getColumns(), new Function<PhysicalColumn, String>() {
+		final String columns = Joiner.on(", ").join(Collections2.transform(this.getColumns(), new Function<BasicColumn, String>() {
 
 			@Override
-			public String apply(PhysicalColumn input) {
+			public String apply(BasicColumn input) {
 				final StringBuffer out = new StringBuffer();
-				out.append(input instanceof PkPhysicalColumn ? "ID [" : "COL [");
+				out.append(input instanceof PkColumn ? "ID [" : "COL [");
 
 				out.append("name=");
 				out.append(input.getName());

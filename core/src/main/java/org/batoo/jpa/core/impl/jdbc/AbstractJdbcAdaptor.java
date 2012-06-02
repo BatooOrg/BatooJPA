@@ -128,11 +128,11 @@ public abstract class AbstractJdbcAdaptor {
 	}
 
 	/**
-	 * Creates the PhysicalColumn Definition DDL For the column.
+	 * Creates the BasicColumn Definition DDL For the column.
 	 * 
 	 * @param column
 	 *            the column definition to create the DDL from
-	 * @return the PhysicalColumn Definition DDL For the column
+	 * @return the BasicColumn Definition DDL For the column
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -157,7 +157,7 @@ public abstract class AbstractJdbcAdaptor {
 		for (final AbstractColumn column : table.getColumns()) {
 			ddlColumns.add(this.createColumnDDL(column));
 
-			if (column instanceof PkPhysicalColumn) {
+			if (column instanceof PkColumn) {
 				pkColumns.add(column.getName());
 			}
 		}

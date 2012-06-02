@@ -37,7 +37,7 @@ import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.AbstractJdbcAdaptor;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
-import org.batoo.jpa.core.impl.jdbc.PkPhysicalColumn;
+import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.metamodel.SequenceGenerator;
 import org.batoo.jpa.core.impl.metamodel.TableGenerator;
 import org.batoo.jpa.core.jdbc.IdType;
@@ -68,11 +68,11 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	}
 
 	/**
-	 * Creates the PhysicalColumn Definition DDL For the column.
+	 * Creates the BasicColumn Definition DDL For the column.
 	 * 
 	 * @param columnDefinition
 	 *            the column definition to create the DDL from
-	 * @return the PhysicalColumn Definition DDL For the column
+	 * @return the BasicColumn Definition DDL For the column
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -98,7 +98,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 		for (final AbstractColumn column : table.getColumns()) {
 			ddlColumns.add(this.createColumnDDL(column));
 
-			if (column instanceof PkPhysicalColumn) {
+			if (column instanceof PkColumn) {
 				pkColumns.add(column.getName());
 			}
 		}

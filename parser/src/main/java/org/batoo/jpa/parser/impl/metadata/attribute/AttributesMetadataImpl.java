@@ -258,23 +258,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * @author hceylan
 	 */
 	private void consolidateAttributes() {
-		/*
-		 * NOTE: 21.05.2012 01:19
-		 * .
-		 * Just watched "the Lake House"...
-		 * .
-		 * ...for the second time, the first one being in a movie theater and now on TV when I took a break from the project and wanted to
-		 * watch a movie.
-		 * .
-		 * For those haven't seen it yet, it's a love story spanning over two years. Love is all about passion.
-		 * .
-		 * I have started this project two months ago, and the prototype proved that it could be what I envision it to be.
-		 * .
-		 * From now on, I'll put notes like this into the sources.
-		 * .
-		 * Hope two years from now, some who are as passionate about 'developing software' as I am, will be reading them.
-		 */
-
 		AttributesMetadataImpl.LOG.debug("Consolidating ORM Attributes of entity {0}", this.parent.getClassName());
 
 		if (this.metadata != null) {

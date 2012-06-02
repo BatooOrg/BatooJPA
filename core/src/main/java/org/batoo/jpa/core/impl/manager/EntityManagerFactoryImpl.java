@@ -32,6 +32,7 @@ import org.batoo.jpa.common.BatooException;
 import org.batoo.jpa.core.BJPASettings;
 import org.batoo.jpa.core.JPASettings;
 import org.batoo.jpa.core.impl.deployment.DdlManager;
+import org.batoo.jpa.core.impl.deployment.LinkManager;
 import org.batoo.jpa.core.impl.jdbc.AbstractJdbcAdaptor;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
@@ -75,6 +76,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		this.metamodel.performSequencesDdl(this.datasource, DDLMode.DROP);
 		this.metamodel.performTableGeneratorsDdl(this.datasource, DDLMode.DROP);
 
+		LinkManager.perform(this.metamodel);
 		DdlManager.perform(this.datasource, this.metamodel, DDLMode.DROP);
 
 		this.metamodel.preFillGenerators(this.datasource);

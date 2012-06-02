@@ -67,6 +67,8 @@ public class ManyToOneAttributeMetadataImpl extends AssociationAttributeMetadata
 	public ManyToOneAttributeMetadataImpl(Member member, String name, ManyToOne manyToOne, Set<Class<? extends Annotation>> parsed) {
 		super(member, name, parsed, manyToOne.targetEntity().getName(), manyToOne.fetch(), manyToOne.cascade());
 
+		parsed.add(ManyToOne.class);
+
 		this.optional = manyToOne.optional();
 	}
 

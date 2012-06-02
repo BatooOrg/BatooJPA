@@ -18,10 +18,16 @@
  */
 package org.batoo.jpa.core.test.manytoonetomany;
 
+import java.sql.SQLException;
+
+import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
+import javax.sql.DataSource;
 
 import junit.framework.Assert;
 
+import org.apache.commons.dbutils.QueryRunner;
+import org.batoo.jpa.core.impl.jdbc.SingleValueHandler;
 import org.batoo.jpa.core.test.BaseCoreTest;
 import org.junit.Test;
 
@@ -80,35 +86,48 @@ public class ManyToOneToManyTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} address which does not cascade to Person. PersistenceException expected.
 	 * 
+	 * @throws SQLException
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	@Test
-	public void testPersistAddress() {
+	@Test(expected = PersistenceException.class)
+	public void testPersistAddress() throws SQLException {
 		this.persist(this.person().getAddresses().get(0));
 
-		try {
-			this.commit();
+		this.commit();
 
-			Assert.fail("No PersistenceException thrown");
-		}
-		catch (final PersistenceException e) {
-			// expected
-		}
+		Integer count;
+
+		count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM PERSON", new SingleValueHandler<Integer>());
+		Assert.assertEquals(new Integer(1), count);
+
+		count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM ADDRESS", new SingleValueHandler<Integer>());
+		Assert.assertEquals(new Integer(1), count);
 	}
 
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} Person which cascades to Address.
 	 * 
+	 * @throws SQLException
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	@Test
-	public void testPersistPerson() {
+	public void testPersistPerson() throws SQLException {
 		Assert.assertEquals(2, this.em().getMetamodel().getEntities().size());
 
 		this.persist(this.person());
 
 		this.commit();
+
+		Integer count;
+
+		count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM PERSON", new SingleValueHandler<Integer>());
+		Assert.assertEquals(new Integer(1), count);
+
+		count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM ADDRESS", new SingleValueHandler<Integer>());
+		Assert.assertEquals(new Integer(1), count);
 	}
 }

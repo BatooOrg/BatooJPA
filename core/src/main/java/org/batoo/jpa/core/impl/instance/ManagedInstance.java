@@ -31,7 +31,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedAttribute;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedPluralAttribute;
-import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
+import org.batoo.jpa.core.impl.model.attribute.ManyToOneAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.IdAttributeImpl;
 
 import com.google.common.collect.Maps;
@@ -185,7 +185,7 @@ public class ManagedInstance<X> {
 				}
 			}
 			else {
-				final AssociatedSingularAttribute<? super X, ?> attribute = (AssociatedSingularAttribute<? super X, ?>) association;
+				final ManyToOneAttributeImpl<? super X, ?> attribute = (ManyToOneAttributeImpl<? super X, ?>) association;
 				final Object associate = attribute.get(this.instance);
 				requiresFlush |= entityManager.persistImpl(associate);
 			}

@@ -23,12 +23,12 @@ import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 
 /**
- * Column to persist basic attributes of the entity.
+ * BasicColumn to persist basic attributes of the entity.
  * 
  * @author hceylan
  * @since $version
  */
-public class PhysicalColumn extends AbstractColumn {
+public class BasicColumn extends AbstractColumn {
 
 	private final AttributeImpl<?, ?> attribute;
 	private AbstractTable table;
@@ -46,8 +46,14 @@ public class PhysicalColumn extends AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PhysicalColumn(JdbcAdaptor jdbcAdaptor, AttributeImpl<?, ?> attribute, int sqlType, ColumnMetadata metadata) {
-		super(jdbcAdaptor, attribute.getName(), sqlType, metadata);
+	public BasicColumn(JdbcAdaptor jdbcAdaptor, AttributeImpl<?, ?> attribute, int sqlType, ColumnMetadata metadata) {
+		super(jdbcAdaptor, //
+			attribute.getName(), //
+			sqlType, //
+			metadata != null ? metadata.getLength() : 255, //
+			metadata != null ? metadata.getPrecision() : 0, //
+			metadata != null ? metadata.getScale() : 0, //
+			metadata);
 
 		this.attribute = attribute;
 	}

@@ -45,7 +45,7 @@ public class AbstractTable {
 	private final String catalog;
 	private final String schema;
 	private final String name;
-	private final Map<String, PhysicalColumn> columns = Maps.newHashMap();
+	private final Map<String, BasicColumn> basicColumns = Maps.newHashMap();
 	private final Map<String, String[]> uniqueConstraints = Maps.newHashMap();
 	private final List<ForeignKey> foreignKeys = Lists.newArrayList();
 
@@ -77,17 +77,17 @@ public class AbstractTable {
 	/**
 	 * Adds the column to the table
 	 * 
-	 * @param column
+	 * @param basicColumn
 	 *            the column to add
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void addColumn(PhysicalColumn column) {
-		final PhysicalColumn existing = this.columns.put(column.getName(), column);
+	public void addColumn(BasicColumn basicColumn) {
+		final BasicColumn existing = this.basicColumns.put(basicColumn.getName(), basicColumn);
 
 		if (existing != null) {
-			throw new MappingException("Duplicate column names " + column.getName() + " on table " + this.name, column.getLocator(),
+			throw new MappingException("Duplicate column names " + basicColumn.getName() + " on table " + this.name, basicColumn.getLocator(),
 				existing.getLocator());
 		}
 	}
@@ -118,15 +118,15 @@ public class AbstractTable {
 	}
 
 	/**
-	 * Returns the collection of columns of the table.
+	 * Returns the collection of basicColumns of the table.
 	 * 
-	 * @return the collection of columns of the table
+	 * @return the collection of basicColumns of the table
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Collection<PhysicalColumn> getColumns() {
-		return this.columns.values();
+	public Collection<BasicColumn> getColumns() {
+		return this.basicColumns.values();
 	}
 
 	/**

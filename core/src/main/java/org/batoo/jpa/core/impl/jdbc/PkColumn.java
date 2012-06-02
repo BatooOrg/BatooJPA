@@ -24,12 +24,12 @@ import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 
 /**
- * Column to persist id attributes of the entity.
+ * BasicColumn to persist id attributes of the entity.
  * 
  * @author hceylan
  * @since $version
  */
-public class PkPhysicalColumn extends PhysicalColumn {
+public class PkColumn extends BasicColumn {
 
 	private final IdType idType;
 
@@ -46,7 +46,7 @@ public class PkPhysicalColumn extends PhysicalColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PkPhysicalColumn(JdbcAdaptor jdbcAdaptor, IdAttributeImpl<?, ?> attribute, int sqlType, ColumnMetadata metadata) {
+	public PkColumn(JdbcAdaptor jdbcAdaptor, IdAttributeImpl<?, ?> attribute, int sqlType, ColumnMetadata metadata) {
 		super(jdbcAdaptor, attribute, sqlType, metadata);
 
 		this.idType = attribute.getIdType();

@@ -28,7 +28,7 @@ import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
-import org.batoo.jpa.core.impl.jdbc.PkPhysicalColumn;
+import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.jdbc.SingleValueHandler;
 import org.batoo.jpa.core.impl.metamodel.SequenceGenerator;
 import org.batoo.jpa.core.impl.metamodel.TableGenerator;
@@ -59,7 +59,7 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	 */
 	@Override
 	public String createColumnDDL(AbstractColumn column) {
-		final boolean identity = (column instanceof PkPhysicalColumn) && (((PkPhysicalColumn) column).getIdType() == IdType.IDENTITY);
+		final boolean identity = (column instanceof PkColumn) && (((PkColumn) column).getIdType() == IdType.IDENTITY);
 
 		return column.getName() + " " // name part
 			+ this.getColumnType(column, column.getSqlType()) // data type part

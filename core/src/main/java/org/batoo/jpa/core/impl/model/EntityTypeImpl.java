@@ -43,7 +43,7 @@ import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
-import org.batoo.jpa.core.impl.jdbc.PhysicalColumn;
+import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.jdbc.SecondaryTable;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.EntityTransactionImpl;
@@ -75,6 +75,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private AssociatedAttribute<? super X, ?>[] associatedAttributes;
 	private AssociatedAttribute<? super X, ?>[] persistableAssociations;
 	private EntityTable[] tables;
+	@SuppressWarnings("restriction")
 	private sun.reflect.ConstructorAccessor enhancer;
 	private CriteriaQueryImpl<X> selectCriteria;
 
@@ -99,6 +100,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		this.initTables(metadata);
 	}
 
+	@SuppressWarnings("restriction")
 	private void enhanceIfNeccessary() {
 		if (this.enhancer == null) {
 			synchronized (this) {
@@ -370,21 +372,21 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 		for (final SingularAttribute<X, ?> attribute : this.getDeclaredSingularAttributes()) {
 			if (attribute instanceof PhysicalAttributeImpl) {
-				final PhysicalColumn column = ((PhysicalAttributeImpl<X, ?>) attribute).getColumn();
-				final String tableName = column.getTableName();
+				final BasicColumn basicColumn = ((PhysicalAttributeImpl<X, ?>) attribute).getColumn();
+				final String tableName = basicColumn.getTableName();
 
 				// if table name is blank, it means the column should belong to the primary table
 				if (StringUtils.isBlank(tableName)) {
-					column.setTable(this.primaryTable);
+					basicColumn.setTable(this.primaryTable);
 				}
 				// otherwise locate the table
 				else {
 					final AbstractTable table = this.declaredTables.get(tableName);
 					if (table == null) {
-						throw new MappingException("Table " + tableName + " could not be found", column.getLocator());
+						throw new MappingException("Table " + tableName + " could not be found", basicColumn.getLocator());
 					}
 
-					column.setTable(table);
+					basicColumn.setTable(table);
 				}
 			}
 		}
