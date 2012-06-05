@@ -20,13 +20,13 @@ package org.batoo.jpa.core.impl.manager;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.Prioritizer;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
+import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 
 import com.google.common.collect.Lists;
@@ -42,6 +42,7 @@ public class SessionImpl {
 	private static volatile int nextSessionId = 0;
 
 	private final EntityManagerImpl em;
+	private final MetamodelImpl metamodel;
 	private final int sessionId;
 	private Repository repository;
 
@@ -52,14 +53,17 @@ public class SessionImpl {
 	/**
 	 * @param entityManager
 	 *            the owner entity manager
+	 * @param metamodel
+	 *            the metamodel
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SessionImpl(EntityManagerImpl entityManager) {
+	public SessionImpl(EntityManagerImpl entityManager, MetamodelImpl metamodel) {
 		super();
 
 		this.em = entityManager;
+		this.metamodel = metamodel;
 		this.sessionId = ++SessionImpl.nextSessionId;
 
 		this.clear();
@@ -91,7 +95,6 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public void flush(ConnectionImpl connection, EntityTransactionImpl transaction) throws SQLException {
-
 		final int totalSize = this.externalEntities.size() + this.externalEntities.size() + this.changedEntities.size();
 		final ArrayList<ManagedInstance<?>> instances = Lists.newArrayListWithCapacity(totalSize);
 
@@ -99,9 +102,9 @@ public class SessionImpl {
 		instances.addAll(this.identifiableEntities);
 		instances.addAll(this.changedEntities);
 
-		Collections.sort(instances, Prioritizer.INSTANCE);
+		final ManagedInstance<?>[] sortedInstances = Prioritizer.sort(instances);
 
-		for (final ManagedInstance<?> instance : instances) {
+		for (final ManagedInstance<?> instance : sortedInstances) {
 			instance.flush(connection, transaction);
 		}
 
@@ -112,11 +115,11 @@ public class SessionImpl {
 	/**
 	 * Returns the managed instance in the session.
 	 * 
-	 * @param <X>
-	 *            the type of the instance
 	 * @param instance
 	 *            the instance.
-	 * @return managed instance or a new unmanaged instance
+	 * @param <X>
+	 *            the type of the instance
+	 * @return managed instance or null
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -127,6 +130,26 @@ public class SessionImpl {
 		final SubRepository<? super X> subRepository = this.repository.get(type);
 
 		return (ManagedInstance<X>) subRepository.get(instance);
+	}
+
+	/**
+	 * Returns the managed instance instance in the session
+	 * 
+	 * @param entity
+	 *            the entity
+	 * @param <X>
+	 *            the type of the instance
+	 * @return the managed instance or null
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	public <X> ManagedInstance<X> get(X entity) {
+		final EntityTypeImpl<?> type = this.metamodel.entity(entity.getClass());
+		final ManagedInstance<X> managedInstance = (ManagedInstance<X>) type.getManagedInstance(this, entity);
+
+		return this.get(managedInstance);
 	}
 
 	/**

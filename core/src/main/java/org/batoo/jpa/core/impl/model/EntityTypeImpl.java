@@ -23,10 +23,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.metamodel.Attribute;
+import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.SingularAttribute;
 
@@ -38,12 +41,14 @@ import org.batoo.jpa.core.impl.criteria.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.PredicateImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.instance.Enhancer;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
+import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
-import org.batoo.jpa.core.impl.jdbc.BasicColumn;
+import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.SecondaryTable;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.EntityTransactionImpl;
@@ -57,6 +62,7 @@ import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Implementation of {@link EntityType}.
@@ -78,6 +84,9 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	@SuppressWarnings("restriction")
 	private sun.reflect.ConstructorAccessor enhancer;
 	private CriteriaQueryImpl<X> selectCriteria;
+
+	private int dependencyCount;
+	private final HashMap<EntityTypeImpl<?>, AssociatedAttribute<?, ?>[]> dependencyMap = Maps.newHashMap();
 
 	/**
 	 * @param metamodel
@@ -228,6 +237,30 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
+	 * Returns the dependencies for the associate type
+	 * 
+	 * @param associate
+	 *            the associate type
+	 * @return the array of associations for the associate
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public AssociatedAttribute<?, ?>[] getDependenciesFor(EntityTypeImpl<?> associate) {
+		return this.dependencyMap.get(associate);
+	}
+
+	/**
+	 * Returns the dependencyCount.
+	 * 
+	 * @return the dependencyCount
+	 * @since $version
+	 */
+	public int getDependencyCount() {
+		return this.dependencyCount;
+	}
+
+	/**
 	 * Returns the managed instance for the instance.
 	 * 
 	 * @param instance
@@ -280,7 +313,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "restriction" })
 	public ManagedInstance<X> getManagedInstanceById(SessionImpl session, Object id, boolean lazy) {
 		this.enhanceIfNeccessary();
 
@@ -292,7 +325,11 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		catch (final IllegalArgumentException e) {} // not possible
 		catch (final InstantiationException e) {} // not possible
 
-		return new ManagedInstance<X>(this, session, instance, id);
+		final ManagedInstance<X> managedInstance = new ManagedInstance<X>(this, session, instance, id);
+
+		((EnhancedInstance) instance).__enhanced__$$__setManagedInstance(managedInstance);
+
+		return managedInstance;
 	}
 
 	/**
@@ -370,6 +407,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			this.declaredTables.put(secondaryTableMetadata.getName(), new SecondaryTable(this, secondaryTableMetadata));
 		}
 
+		// link the singular attributes
 		for (final SingularAttribute<X, ?> attribute : this.getDeclaredSingularAttributes()) {
 			if (attribute instanceof PhysicalAttributeImpl) {
 				final BasicColumn basicColumn = ((PhysicalAttributeImpl<X, ?>) attribute).getColumn();
@@ -405,6 +443,39 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	public boolean isIdMethod(Method method) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	/**
+	 * Links the associations of the entity.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void linkAssociations() {
+		for (final AssociatedAttribute<? super X, ?> attribute : this.getAssociations()) {
+			// link the attribute
+			attribute.link();
+
+			// if linked by join columns then link the foreign key
+			final ForeignKey foreignKey = attribute.getForeignKey();
+			if (foreignKey != null) {
+				final String tableName = foreignKey.getTableName();
+
+				// if table name is blank, it means the column should belong to the primary table
+				if (StringUtils.isBlank(tableName)) {
+					foreignKey.setTable(this.primaryTable);
+				}
+				// otherwise locate the table
+				else {
+					final AbstractTable table = this.declaredTables.get(tableName);
+					if (table == null) {
+						throw new MappingException("Table " + tableName + " could not be found");
+					}
+
+					foreignKey.setTable(table);
+				}
+			}
+		}
 	}
 
 	/**
@@ -488,6 +559,48 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		throws SQLException {
 	}
 
+	/**
+	 * Prepares the dependencies for the associate.
+	 * 
+	 * @param associate
+	 *            the associate
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void prepareDependenciesFor(EntityTypeImpl<?> associate) {
+		// prepare the related associations
+		final Set<AssociatedAttribute<?, ?>> attributes = Sets.newHashSet();
+
+		for (final AssociatedAttribute<?, ?> association : this.getAssociations()) {
+
+			// only owner associations impose priority
+			if (!association.isOwner()) {
+				continue;
+			}
+
+			// only relations kept in the row impose priority
+			if ((association.getPersistentAttributeType() != PersistentAttributeType.ONE_TO_ONE) && //
+				(association.getPersistentAttributeType() != PersistentAttributeType.MANY_TO_ONE)) {
+				continue;
+			}
+
+			final Class<?> javaType = association.getJavaType();
+
+			if (javaType.isAssignableFrom(associate.getBindableJavaType())) {
+				attributes.add(association);
+			}
+		}
+
+		final AssociatedAttribute<?, ?>[] dependencies = new AssociatedAttribute[attributes.size()];
+		attributes.toArray(dependencies);
+
+		this.dependencyCount += dependencies.length;
+
+		this.dependencyMap.put(associate, dependencies);
+
+	}
+
 	private synchronized CriteriaQueryImpl<X> prepareSelectCriteria(EntityManagerImpl entityManager) {
 		// other thread prepared before this one
 		if (this.selectCriteria != null) {
@@ -506,5 +619,14 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		this.selectCriteria = q;
 
 		return q;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "EntityTypeImpl [name=" + this.name + "]";
 	}
 }

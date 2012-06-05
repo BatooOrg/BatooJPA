@@ -18,9 +18,14 @@
  */
 package org.batoo.jpa.parser;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.batoo.jpa.parser.impl.AbstractLocator;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
 
 /**
  * 
@@ -33,17 +38,31 @@ public class MappingException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
+	private static String getLocation(AbstractLocator[] locators) {
+		if (locators == null) {
+			return "";
+		}
+
+		final Collection<AbstractLocator> filteredLocators = Collections2.filter(Arrays.asList(locators),
+			Predicates.not(Predicates.isNull()));
+		if (filteredLocators.size() == 0) {
+			return "";
+		}
+
+		return " Defined at:" + (filteredLocators.size() > 1 ? "\n\t" : " ") + Joiner.on("\n\t").skipNulls().join(filteredLocators);
+	}
+
 	/**
 	 * @param message
 	 *            the message to prepend to the constructed message
-	 * @param locations
+	 * @param locators
 	 *            the locators
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public MappingException(String message, AbstractLocator... locations) {
-		super(message + " Defined at:" + (locations.length > 1 ? "\n\t" : " ") + Joiner.on("\n\t").join(locations));
+	public MappingException(String message, AbstractLocator... locators) {
+		super(message + MappingException.getLocation(locators));
 	}
 
 	/**
@@ -51,14 +70,14 @@ public class MappingException extends RuntimeException {
 	 *            the message to prepend to the constructed message
 	 * @param cause
 	 *            the cause of the exception
-	 * @param locations
+	 * @param locators
 	 *            the locators
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public MappingException(String message, Throwable cause, AbstractLocator... locations) {
-		super(message + " Defined at:" + (locations.length > 1 ? "\n\t" : " ") + Joiner.on("\n\t").join(locations), cause);
+	public MappingException(String message, Throwable cause, AbstractLocator... locators) {
+		super(message + MappingException.getLocation(locators), cause);
 	}
 
 }

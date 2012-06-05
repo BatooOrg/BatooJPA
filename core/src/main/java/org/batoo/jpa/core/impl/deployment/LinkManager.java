@@ -18,12 +18,13 @@
  */
 package org.batoo.jpa.core.impl.deployment;
 
+import javax.persistence.metamodel.EntityType;
+
 import org.batoo.jpa.common.BatooException;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.EntityTypeImpl;
-import org.batoo.jpa.core.impl.model.attribute.AssociatedAttribute;
 
 /**
  * A Manager that performs the association linking operations.
@@ -32,6 +33,24 @@ import org.batoo.jpa.core.impl.model.attribute.AssociatedAttribute;
  * @since $version
  */
 public class LinkManager extends DeploymentManager<EntityTypeImpl<?>> {
+
+	/**
+	 * The linking phase
+	 * 
+	 * @author hceylan
+	 * @since $version
+	 */
+	public static enum Phase {
+		/**
+		 * The association linking phase
+		 */
+		LINK_ASSOCIATIONS,
+
+		/**
+		 * The dependency linking phase
+		 */
+		LINK_DEPENDENCIES
+	}
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(LinkManager.class);
 
@@ -47,11 +66,16 @@ public class LinkManager extends DeploymentManager<EntityTypeImpl<?>> {
 	 * @author hceylan
 	 */
 	public static void perform(MetamodelImpl metamodel) throws BatooException {
-		new LinkManager(metamodel).perform();
+		new LinkManager(metamodel, Phase.LINK_ASSOCIATIONS).perform();
+		new LinkManager(metamodel, Phase.LINK_DEPENDENCIES).perform();
 	}
 
-	private LinkManager(MetamodelImpl metamodel) {
+	private final Phase phase;
+
+	private LinkManager(MetamodelImpl metamodel, Phase phase) {
 		super(LinkManager.LOG, "Link Manager", metamodel, Context.ENTITIES);
+
+		this.phase = phase;
 	}
 
 	/**
@@ -59,10 +83,16 @@ public class LinkManager extends DeploymentManager<EntityTypeImpl<?>> {
 	 * 
 	 */
 	@Override
-	public Void perform(EntityTypeImpl<?> type) throws BatooException {
-		final AssociatedAttribute<?, ?>[] associations = type.getAssociations();
-		for (final AssociatedAttribute<?, ?> attribute : associations) {
-			attribute.link();
+	public Void perform(EntityTypeImpl<?> entity) throws BatooException {
+		switch (this.phase) {
+			case LINK_ASSOCIATIONS:
+				entity.linkAssociations();
+				break;
+			case LINK_DEPENDENCIES:
+				for (final EntityType<?> type : this.getMetamodel().getEntities()) {
+					entity.prepareDependenciesFor((EntityTypeImpl<?>) type);
+				}
+				break;
 		}
 
 		return null;

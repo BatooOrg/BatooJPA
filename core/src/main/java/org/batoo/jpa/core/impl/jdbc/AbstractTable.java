@@ -45,7 +45,7 @@ public class AbstractTable {
 	private final String catalog;
 	private final String schema;
 	private final String name;
-	private final Map<String, BasicColumn> basicColumns = Maps.newHashMap();
+	private final Map<String, AbstractColumn> columns = Maps.newHashMap();
 	private final Map<String, String[]> uniqueConstraints = Maps.newHashMap();
 	private final List<ForeignKey> foreignKeys = Lists.newArrayList();
 
@@ -61,11 +61,10 @@ public class AbstractTable {
 	public AbstractTable(String defaultName, TableMetadata metadata) {
 		super();
 
-		final String name = (metadata != null) && StringUtils.isNotBlank(metadata.getName()) ? metadata.getName() : defaultName;
 		this.locator = metadata != null ? metadata.getLocator() : null;
 		this.catalog = (metadata != null) && StringUtils.isNotBlank(metadata.getCatalog()) ? metadata.getCatalog() : null;
 		this.schema = (metadata != null) && StringUtils.isNotBlank(metadata.getSchema()) ? metadata.getSchema() : null;
-		this.name = name;
+		this.name = (metadata != null) && StringUtils.isNotBlank(metadata.getName()) ? metadata.getName() : defaultName;
 
 		if (metadata != null) {
 			for (final UniqueConstraintMetadata constraint : metadata.getUniqueConstraints()) {
@@ -77,17 +76,17 @@ public class AbstractTable {
 	/**
 	 * Adds the column to the table
 	 * 
-	 * @param basicColumn
+	 * @param column
 	 *            the column to add
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void addColumn(BasicColumn basicColumn) {
-		final BasicColumn existing = this.basicColumns.put(basicColumn.getName(), basicColumn);
+	public void addColumn(AbstractColumn column) {
+		final AbstractColumn existing = this.columns.put(column.getMappingName(), column);
 
 		if (existing != null) {
-			throw new MappingException("Duplicate column names " + basicColumn.getName() + " on table " + this.name, basicColumn.getLocator(),
+			throw new MappingException("Duplicate column names " + column.getMappingName() + " on table " + this.name, column.getLocator(),
 				existing.getLocator());
 		}
 	}
@@ -125,8 +124,20 @@ public class AbstractTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Collection<BasicColumn> getColumns() {
-		return this.basicColumns.values();
+	public Collection<AbstractColumn> getColumns() {
+		return this.columns.values();
+	}
+
+	/**
+	 * Returns the foreign keys of the table.
+	 * 
+	 * @return the foreign keys of the table
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public List<ForeignKey> getForeignKeys() {
+		return this.foreignKeys;
 	}
 
 	/**

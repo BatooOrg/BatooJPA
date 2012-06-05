@@ -62,7 +62,7 @@ public class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> implements Ident
 	public IdentifiableTypeImpl(MetamodelImpl metamodel, IdentifiableTypeImpl<? super X> parent, Class<X> javaType, EntityMetadata metadata) {
 		super(metamodel, parent, javaType, metadata);
 
-		this.addAttributes(metadata);
+		this.addIdAttributes(metadata);
 	}
 
 	/**
@@ -75,9 +75,12 @@ public class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> implements Ident
 	 * @author hceylan
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void addAttributes(EntityMetadata metadata) {
+	private void addIdAttributes(EntityMetadata metadata) {
 		for (final IdAttributeMetadata id : metadata.getAttributes().getIds()) {
-			this.declaredIdAttributes.put(id.getName(), new IdAttributeImpl(this, id));
+			final IdAttributeImpl attribute = new IdAttributeImpl(this, id);
+
+			this.declaredIdAttributes.put(id.getName(), attribute);
+			this.addDeclaredAttribute(attribute);
 		}
 	}
 

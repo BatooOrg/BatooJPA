@@ -18,86 +18,27 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
-import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.parser.impl.AbstractLocator;
-import org.batoo.jpa.parser.metadata.BaseColumnMetadata;
 
 /**
- * Abstract base implementation for Primary Key BasicColumn, Basic BasicColumn and Join Columns.
+ * Abstract base implementation for columns
  * 
  * @author hceylan
  * @since $version
  */
-public class AbstractColumn {
-
-	private final int sqlType;
-	private final String name;
-	private final String columnDefinition;
-	private final int length;
-	private final AbstractLocator locator;
-	private final int precision;
-	private final int scale;
-	private final String tableName;
-	private final boolean nullable;
-	private final boolean insertable;
-	private final boolean unique;
-	private final boolean updatable;
+public abstract class AbstractColumn {
 
 	/**
-	 * @param jdbcAdaptor
-	 *            the JDBC adaptor
-	 * @param defaultName
-	 *            the default name for the column
-	 * @param sqlType
-	 *            the SQL type
-	 * @param length
-	 *            the length of the column
-	 * @param precision
-	 *            the precision of the column
-	 * @param scale
-	 *            the scale of the column
-	 * @param metadata
-	 *            the metadata
+	 * Returns the attribute of the column.
+	 * 
+	 * @return the attribute of the column
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AbstractColumn(JdbcAdaptor jdbcAdaptor, String defaultName, int sqlType, int length, int precision, int scale,
-		BaseColumnMetadata metadata) {
-		super();
-
-		this.sqlType = sqlType;
-
-		// if metadata exists, then create the column based on the metadata
-		if (metadata != null) {
-			this.locator = metadata.getLocator();
-			this.tableName = metadata.getTable();
-			this.name = jdbcAdaptor.escape(StringUtils.isNotBlank(metadata.getName()) ? metadata.getName() : defaultName);
-			this.columnDefinition = metadata.getColumnDefinition();
-			this.length = length;
-			this.precision = precision;
-			this.scale = scale;
-			this.insertable = metadata.isInsertable();
-			this.nullable = metadata.isNullable();
-			this.unique = metadata.isUnique();
-			this.updatable = metadata.isUpdatable();
-		}
-		// otherwise use the defaults
-		else {
-			this.locator = null;
-			this.tableName = null;
-			this.name = jdbcAdaptor.escape(defaultName);
-			this.columnDefinition = null;
-			this.length = length;
-			this.precision = precision;
-			this.scale = scale;
-			this.insertable = true;
-			this.nullable = true;
-			this.unique = false;
-			this.updatable = true;
-		}
-	}
+	public abstract AttributeImpl<?, ?> getAttribute();
 
 	/**
 	 * Returns the static definition of the column.
@@ -107,9 +48,7 @@ public class AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String getColumnDefinition() {
-		return this.columnDefinition;
-	}
+	public abstract String getColumnDefinition();
 
 	/**
 	 * Returns the length of the column.
@@ -119,21 +58,27 @@ public class AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public int getLength() {
-		return this.length;
-	}
+	public abstract int getLength();
 
 	/**
-	 * Returns the locator for the column.
+	 * Returns the locator of the column.
 	 * 
-	 * @return the locator for the column
+	 * @return the locator of the column
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AbstractLocator getLocator() {
-		return this.locator;
-	}
+	public abstract AbstractLocator getLocator();
+
+	/**
+	 * Returns the mapping name of the column.
+	 * 
+	 * @return the mapping name of the column
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract String getMappingName();
 
 	/**
 	 * Returns the name of the column.
@@ -143,9 +88,7 @@ public class AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String getName() {
-		return this.name;
-	}
+	public abstract String getName();
 
 	/**
 	 * Returns the precision of the column.
@@ -155,9 +98,7 @@ public class AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public int getPrecision() {
-		return this.precision;
-	}
+	public abstract int getPrecision();
 
 	/**
 	 * Returns the scale of the column.
@@ -167,9 +108,7 @@ public class AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public int getScale() {
-		return this.scale;
-	}
+	public abstract int getScale();
 
 	/**
 	 * Returns the SQL Type of the column.
@@ -179,9 +118,17 @@ public class AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public int getSqlType() {
-		return this.sqlType;
-	}
+	public abstract int getSqlType();
+
+	/**
+	 * Returns the table of the column
+	 * 
+	 * @return the table
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract AbstractTable getTable();
 
 	/**
 	 * Returns the table name of the column.
@@ -191,9 +138,21 @@ public class AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String getTableName() {
-		return this.tableName;
-	}
+	public abstract String getTableName();
+
+	/**
+	 * Returns the value for the column
+	 * 
+	 * @param sesssion
+	 *            the session
+	 * @param instance
+	 *            the instance
+	 * @return the value
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract Object getValue(SessionImpl sesssion, Object instance);
 
 	/**
 	 * Returns the insertable of the column.
@@ -203,9 +162,7 @@ public class AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public boolean isInsertable() {
-		return this.insertable;
-	}
+	public abstract boolean isInsertable();
 
 	/**
 	 * Returns the nullable of the column.
@@ -215,9 +172,7 @@ public class AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public boolean isNullable() {
-		return this.nullable;
-	}
+	public abstract boolean isNullable();
 
 	/**
 	 * Returns the unique of the column.
@@ -227,9 +182,7 @@ public class AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public boolean isUnique() {
-		return this.unique;
-	}
+	public abstract boolean isUnique();
 
 	/**
 	 * Returns the updatable of the column.
@@ -239,7 +192,29 @@ public class AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public boolean isUpdatable() {
-		return this.updatable;
-	}
+	public abstract boolean isUpdatable();
+
+	/**
+	 * Sets the table of the column.
+	 * 
+	 * @param table
+	 *            the owning table
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract void setTable(AbstractTable table);
+
+	/**
+	 * Sets the value for the instance
+	 * 
+	 * @param instance
+	 *            the instance of which to set value
+	 * @param value
+	 *            the value to set
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract void setValue(Object instance, Object value);
 }

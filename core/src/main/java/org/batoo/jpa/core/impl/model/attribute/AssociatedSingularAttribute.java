@@ -23,7 +23,6 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinColumn;
 import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
@@ -46,10 +45,12 @@ import com.google.common.collect.Lists;
  * @author hceylan
  * @since $version
  */
-public abstract class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, T> implements SingularAttribute<X, T>,
+public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, T> implements SingularAttribute<X, T>,
 	AssociatedAttribute<X, T> {
 
+	private final PersistentAttributeType attributeType;
 	private final String inverseName;
+	private final boolean optional;
 
 	private final boolean cascadesDetach;
 	private final boolean cascadesMerge;
@@ -59,23 +60,30 @@ public abstract class AssociatedSingularAttribute<X, T> extends SingularAttribut
 
 	private EntityTypeImpl<T> type;
 	private AssociatedAttribute<T, X> inverse;
-	private final List<JoinColumn> joinColumns = Lists.newArrayList();
+	private ForeignKey foreignKey;
 
 	/**
 	 * @param declaringType
 	 *            the declaring type
 	 * @param metadata
 	 *            the metadata
+	 * @param attributeType
+	 *            the type of the attribute
 	 * @param mappedBy
 	 *            the mapped by attribute
+	 * @param optional
+	 *            if the attribute is optional
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AssociatedSingularAttribute(ManagedTypeImpl<X> declaringType, AssociationAttributeMetadata metadata, String mappedBy) {
+	public AssociatedSingularAttribute(ManagedTypeImpl<X> declaringType, PersistentAttributeType attributeType,
+		AssociationAttributeMetadata metadata, String mappedBy, boolean optional) {
 		super(declaringType, metadata);
 
+		this.attributeType = attributeType;
 		this.inverseName = mappedBy;
+		this.optional = optional;
 
 		this.cascadesDetach = metadata.getCascades().contains(CascadeType.ALL) || metadata.getCascades().contains(CascadeType.DETACH);
 		this.cascadesMerge = metadata.getCascades().contains(CascadeType.ALL) || metadata.getCascades().contains(CascadeType.MERGE);
@@ -83,7 +91,7 @@ public abstract class AssociatedSingularAttribute<X, T> extends SingularAttribut
 		this.cascadesRefresh = metadata.getCascades().contains(CascadeType.ALL) || metadata.getCascades().contains(CascadeType.REFRESH);
 		this.cascadesRemove = metadata.getCascades().contains(CascadeType.ALL) || metadata.getCascades().contains(CascadeType.REMOVE);
 
-		this.initColumn(metadata);
+		this.initColumns(metadata);
 	}
 
 	/**
@@ -132,6 +140,28 @@ public abstract class AssociatedSingularAttribute<X, T> extends SingularAttribut
 	}
 
 	/**
+	 * Returns the foreign key of the attribute.
+	 * 
+	 * @return the foreign key of the attribute
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Override
+	public ForeignKey getForeignKey() {
+		return this.foreignKey;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public PersistentAttributeType getPersistentAttributeType() {
+		return this.attributeType;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -141,7 +171,7 @@ public abstract class AssociatedSingularAttribute<X, T> extends SingularAttribut
 	}
 
 	/**
-	 * Initializes the column for the attribute.
+	 * Initializes the columns for the attribute.
 	 * 
 	 * @param metadata
 	 *            the metadata
@@ -149,15 +179,18 @@ public abstract class AssociatedSingularAttribute<X, T> extends SingularAttribut
 	 * @since $version
 	 * @author hceylan
 	 */
-	private void initColumn(AssociationAttributeMetadata metadata) {
-		final JdbcAdaptor jdbcAdaptor = this.getDeclaringType().getMetamodel().getJdbcAdaptor();
+	private void initColumns(AssociationAttributeMetadata metadata) {
+		final List<JoinColumn> joinColumns = Lists.newArrayList();
 
+		final JdbcAdaptor jdbcAdaptor = this.getDeclaringType().getMetamodel().getJdbcAdaptor();
 		// if metadata defines the join columns then use the information provided
 		if ((metadata != null) && (metadata.getJoinColumns().size() > 0)) {
 			for (final JoinColumnMetadata column : metadata.getJoinColumns()) {
-				this.joinColumns.add(new JoinColumn(jdbcAdaptor, this, column));
+				joinColumns.add(new JoinColumn(jdbcAdaptor, this, column));
 			}
 		}
+
+		this.foreignKey = new ForeignKey(this, joinColumns);
 	}
 
 	/**
@@ -176,6 +209,15 @@ public abstract class AssociatedSingularAttribute<X, T> extends SingularAttribut
 	@Override
 	public boolean isId() {
 		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isOptional() {
+		return this.optional;
 	}
 
 	/**
@@ -218,11 +260,9 @@ public abstract class AssociatedSingularAttribute<X, T> extends SingularAttribut
 			this.inverse.setInverse(this);
 		}
 
-		final EntityTypeImpl<X> entity = (EntityTypeImpl<X>) this.getDeclaringType();
-
-		final ForeignKey foreignKey = new ForeignKey(table, referencedTable, columnMappings);
-
-		entity.getPrimaryTable().addForeignKey(foreignKey);
+		// initialize the foreign key
+		final JdbcAdaptor jdbcAdaptor = this.getDeclaringType().getMetamodel().getJdbcAdaptor();
+		this.foreignKey.link(jdbcAdaptor, this.type.getPrimaryTable());
 	}
 
 	/**
@@ -230,8 +270,8 @@ public abstract class AssociatedSingularAttribute<X, T> extends SingularAttribut
 	 * 
 	 */
 	@Override
-	public boolean references(ManagedInstance<?> source, ManagedInstance<?> associate) {
-		return this.get(source) == associate;
+	public boolean references(Object instance, Object reference) {
+		return this.get(instance) == reference;
 	}
 
 	/**

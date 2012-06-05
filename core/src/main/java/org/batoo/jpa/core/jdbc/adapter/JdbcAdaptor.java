@@ -37,6 +37,7 @@ import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.AbstractJdbcAdaptor;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
+import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.metamodel.SequenceGenerator;
 import org.batoo.jpa.core.impl.metamodel.TableGenerator;
@@ -129,6 +130,21 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 			+ columns // columns part
 			+ "\nPRIMARY KEY(" + keys + "))"; // primary key part
 	}
+
+	/**
+	 * Creates a foreign key on the table
+	 * 
+	 * @param datasource
+	 *            the datasource
+	 * @param foreignKey
+	 *            the foreign key
+	 * @throws SQLException
+	 *             thrown in case of an SQL error
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract void createForeignKey(DataSource datasource, ForeignKey foreignKey) throws SQLException;
 
 	/**
 	 * Creates the schema if necessary. The adapter should check if schema exists and create the schema if it does not exist.

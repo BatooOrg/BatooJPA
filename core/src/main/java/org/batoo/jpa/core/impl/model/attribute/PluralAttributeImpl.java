@@ -20,9 +20,11 @@ package org.batoo.jpa.core.impl.model.attribute;
 
 import javax.persistence.metamodel.PluralAttribute;
 
+import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
-import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
+import org.batoo.jpa.parser.MappingException;
+import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
 
 /**
  * Implementation of {@link PluralAttribute}.
@@ -39,7 +41,7 @@ import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
  */
 public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> implements PluralAttribute<X, C, E> {
 
-	private final Class<E> elementType;
+	private final Class<E> bindableJavaType;
 
 	/**
 	 * @param declaringType
@@ -50,10 +52,21 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PluralAttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata) {
+	@SuppressWarnings("unchecked")
+	public PluralAttributeImpl(ManagedTypeImpl<X> declaringType, AssociationAttributeMetadata metadata) {
 		super(declaringType, metadata);
 
-		this.elementType = ReflectHelper.getGenericType(this.getJavaMember(), 0);
+		if (StringUtils.isNotBlank(metadata.getTargetEntity())) {
+			try {
+				this.bindableJavaType = (Class<E>) Class.forName(metadata.getTargetEntity());
+			}
+			catch (final ClassNotFoundException e) {
+				throw new MappingException("Target enttity class not found", metadata.getLocator());
+			}
+		}
+		else {
+			this.bindableJavaType = ReflectHelper.getGenericType(this.getJavaMember(), 0);
+		}
 	}
 
 	/**
@@ -62,7 +75,7 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 */
 	@Override
 	public final Class<E> getBindableJavaType() {
-		return this.elementType;
+		return this.bindableJavaType;
 	}
 
 	/**

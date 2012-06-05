@@ -34,6 +34,24 @@ import org.batoo.jpa.core.jdbc.DDLMode;
  */
 public class DdlManager extends DeploymentManager<EntityTypeImpl<?>> {
 
+	/**
+	 * The phase of the DDL Operation
+	 * 
+	 * @author hceylan
+	 * @since $version
+	 */
+	public enum DdlPhase {
+		/**
+		 * The tables phase
+		 */
+		TABLES,
+
+		/**
+		 * The foreign keys phase
+		 */
+		FOREIGN_KEYS
+	}
+
 	private static final BLogger LOG = BLoggerFactory.getLogger(DdlManager.class);
 
 	/**
@@ -52,20 +70,20 @@ public class DdlManager extends DeploymentManager<EntityTypeImpl<?>> {
 	 * @author hceylan
 	 */
 	public static void perform(DataSourceImpl datasource, MetamodelImpl metamodel, DDLMode ddlMode) throws BatooException {
-		new DdlManager(datasource, metamodel, ddlMode, true).perform();
-		new DdlManager(datasource, metamodel, ddlMode, false).perform();
+		new DdlManager(datasource, metamodel, ddlMode, DdlPhase.TABLES).perform();
+		new DdlManager(datasource, metamodel, ddlMode, DdlPhase.FOREIGN_KEYS).perform();
 	}
 
 	private final DataSourceImpl datasource;
 	private final DDLMode ddlMode;
-	private final boolean firstPass;
+	private final DdlPhase ddlPhase;
 
-	private DdlManager(DataSourceImpl datasource, MetamodelImpl metamodel, DDLMode ddlMode, boolean firstPass) {
+	private DdlManager(DataSourceImpl datasource, MetamodelImpl metamodel, DDLMode ddlMode, DdlPhase ddlPhase) {
 		super(DdlManager.LOG, "DDL Manager", metamodel, Context.ENTITIES);
 
 		this.datasource = datasource;
 		this.ddlMode = ddlMode;
-		this.firstPass = firstPass;
+		this.ddlPhase = ddlPhase;
 	}
 
 	/**
@@ -74,11 +92,13 @@ public class DdlManager extends DeploymentManager<EntityTypeImpl<?>> {
 	 */
 	@Override
 	public Void perform(EntityTypeImpl<?> type) throws BatooException {
-		if (this.firstPass) {
-			this.getMetamodel().performTablesDddl(this.datasource, this.ddlMode, type);
-		}
-		else {
-			this.getMetamodel().performForeignKeysDdl(this.datasource, this.ddlMode, type);
+		switch (this.ddlPhase) {
+			case TABLES:
+				this.getMetamodel().performTablesDddl(this.datasource, this.ddlMode, type);
+				break;
+			case FOREIGN_KEYS:
+				this.getMetamodel().performForeignKeysDdl(this.datasource, this.ddlMode, type);
+				break;
 		}
 
 		return null;

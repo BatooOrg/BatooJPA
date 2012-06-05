@@ -79,7 +79,7 @@ public class EntityManagerImpl implements EntityManager {
 		this.emf = entityManagerFactory;
 		this.metamodel = metamodel;
 		this.datasource = datasource;
-		this.session = new SessionImpl(this);
+		this.session = new SessionImpl(this, metamodel);
 		this.criteriaBuilder = new CriteriaBuilderImpl(this.metamodel);
 
 		this.open = true;
@@ -131,10 +131,7 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public boolean contains(Object entity) {
-		final EntityTypeImpl<?> type = this.metamodel.entity(entity.getClass());
-		final ManagedInstance<?> managedInstance = type.getManagedInstance(this.session, entity);
-
-		return this.session.get(managedInstance) != null;
+		return this.session.get(entity) != null;
 	}
 
 	/**
@@ -253,7 +250,6 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public <T> T find(Class<T> entityClass, Object primaryKey, LockModeType lockMode) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

@@ -18,30 +18,95 @@
  */
 package org.batoo.jpa.core.impl.instance;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import javax.persistence.PersistenceException;
 
 import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedAttribute;
-import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
-
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /**
  * 
  * @author hceylan
  * @since $version
  */
-public class Prioritizer implements Comparator<ManagedInstance<?>> {
+public class Prioritizer {
 
 	/**
-	 * Singleton global instance
+	 * Sorts the managed instances based on their dependencies.
+	 * 
+	 * @param instances
+	 *            the list of instances
+	 * @return the sorted array of instances
+	 * 
+	 * @since $version
+	 * @author hceylan
 	 */
-	public static final Prioritizer INSTANCE = new Prioritizer();
+	public static ManagedInstance<?>[] sort(ArrayList<ManagedInstance<?>> instances) {
+		final ManagedInstance<?>[] sorted = new ManagedInstance[instances.size()];
 
-	private final HashMap<EntityTypeImpl<?>, HashMap<EntityTypeImpl<?>, Set<AssociatedAttribute<?, ?>>>> associationMap = Maps.newHashMap();
+		int instanceNo = 0;
+
+		// separate out the ones we know that have no dependencies
+		for (final Iterator<ManagedInstance<?>> i = instances.iterator(); i.hasNext();) {
+			final ManagedInstance<?> instance = i.next();
+
+			if (instance.getType().getDependencyCount() == 0) {
+				i.remove();
+
+				sorted[instanceNo++] = instance;
+			}
+		}
+
+		while ((instances.size() > 0)) {
+
+			boolean found = false;
+
+			for (final Iterator<ManagedInstance<?>> i = instances.iterator(); i.hasNext();) {
+				boolean dependent = false;
+
+				final ManagedInstance<?> mi1 = i.next();
+				final EntityTypeImpl<?> e1 = mi1.getType();
+
+				final Object i1 = mi1.getInstance();
+
+				innerLoop:
+				for (int j = 0; j < instances.size(); j++) {
+					final ManagedInstance<?> mi2 = instances.get(j);
+					if (mi1 == mi2) {
+						continue;
+					}
+
+					final EntityTypeImpl<?> e2 = mi2.getType();
+					final AssociatedAttribute<?, ?>[] attributes = e1.getDependenciesFor(e2);
+					final Object i2 = mi2.getInstance();
+
+					for (final AssociatedAttribute<?, ?> attribute : attributes) {
+						if (attribute.references(i1, i2)) {
+							dependent = true;
+							break innerLoop;
+						}
+					}
+
+				}
+
+				if (!dependent) {
+					sorted[instanceNo++] = mi1;
+
+					i.remove();
+
+					found = true;
+				}
+			}
+
+			if (!found) {
+				throw new PersistenceException("Circular dependencies not yet supported");
+			}
+		}
+
+		return sorted;
+	}
 
 	/**
 	 * No instantiation.
@@ -51,120 +116,5 @@ public class Prioritizer implements Comparator<ManagedInstance<?>> {
 	 */
 	private Prioritizer() {
 		super();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public int compare(ManagedInstance<?> o1, ManagedInstance<?> o2) {
-		if (this.references(o1, o2)) {
-			return -1;
-		}
-
-		if (this.references(o2, o1)) {
-			return 1;
-		}
-
-		return 0;
-	}
-
-	/**
-	 * Returns the associations for the types.
-	 * 
-	 * @param source
-	 *            the source type
-	 * @param associate
-	 *            the associate type
-	 * @return the associations for the types
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	private Set<AssociatedAttribute<?, ?>> getAssociationsFor(EntityTypeImpl<?> source, EntityTypeImpl<?> associate) {
-		final HashMap<EntityTypeImpl<?>, Set<AssociatedAttribute<?, ?>>> sourceMap = this.associationMap.get(source);
-
-		// if source cannot be located then prepare
-		if (sourceMap == null) {
-			return this.prepareAssociations(source, associate);
-		}
-
-		final Set<AssociatedAttribute<?, ?>> associations = sourceMap.get(associate);
-
-		// if associate cannot be found the prepare
-		if (associations != null) {
-			return associations;
-		}
-
-		return this.prepareAssociations(source, associate);
-	}
-
-	/**
-	 * Prepares and returns the associations for the types.
-	 * 
-	 * @param type
-	 *            the source type
-	 * @param associate
-	 *            the associate type
-	 * @return the associations for the types
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	private Set<AssociatedAttribute<?, ?>> prepareAssociations(EntityTypeImpl<?> source, EntityTypeImpl<?> associate) {
-		HashMap<EntityTypeImpl<?>, Set<AssociatedAttribute<?, ?>>> sourceMap = this.associationMap.get(source);
-		if (sourceMap == null) {
-			sourceMap = Maps.newHashMap();
-		}
-
-		Set<AssociatedAttribute<?, ?>> associations = sourceMap.get(associate);
-		if (associations != null) {
-			return associations; // other thread got it before us
-		}
-
-		// prepare the related associations
-		associations = Sets.newHashSet();
-
-		final AssociatedAttribute<?, ?>[] allAssociations = source.getAssociations();
-		for (final AssociatedAttribute<?, ?> association : allAssociations) {
-
-			// determine the java type
-			Class<?> javaType;
-			if (association instanceof PluralAttributeImpl) {
-				final PluralAttributeImpl<?, ?, ?> pluralAttribute = (PluralAttributeImpl<?, ?, ?>) association;
-				javaType = pluralAttribute.getBindableJavaType();
-			}
-			else {
-				javaType = association.getJavaType();
-			}
-
-			if (association.isOwner() && javaType.isAssignableFrom(associate.getBindableJavaType())) {
-				associations.add(association);
-			}
-		}
-
-		sourceMap.put(associate, associations);
-
-		if (this.associationMap.get(source) == null) {
-			this.associationMap.put(source, sourceMap);
-		}
-
-		return associations;
-	}
-
-	private boolean references(ManagedInstance<?> o1, ManagedInstance<?> o2) {
-		final EntityTypeImpl<?> type = o1.getType();
-		final EntityTypeImpl<?> associate = o2.getType();
-
-		final Set<AssociatedAttribute<?, ?>> associations = this.getAssociationsFor(type, associate);
-
-		for (final AssociatedAttribute<?, ?> association : associations) {
-			if (association.references(o1, o2)) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 }

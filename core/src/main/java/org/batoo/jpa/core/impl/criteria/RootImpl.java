@@ -27,8 +27,8 @@ import java.util.Map.Entry;
 import javax.persistence.criteria.Root;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
-import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -49,8 +49,8 @@ import com.google.common.collect.Lists;
 public class RootImpl<X> extends FromImpl<X, X> implements Root<X> {
 
 	private final EntityTypeImpl<X> entity;
-	private final HashBiMap<String, BasicColumn> idFields = HashBiMap.create();
-	private final HashBiMap<String, BasicColumn> fields = HashBiMap.create();
+	private final HashBiMap<String, PkColumn> idFields = HashBiMap.create();
+	private final HashBiMap<String, AbstractColumn> fields = HashBiMap.create();
 	private final HashBiMap<String, EntityTable> tableAliases = HashBiMap.create();
 
 	/**
@@ -93,17 +93,17 @@ public class RootImpl<X> extends FromImpl<X, X> implements Root<X> {
 
 		for (final EntityTable table : this.entity.getTables()) {
 
-			final Collection<BasicColumn> basicColumns = table.getColumns();
-			for (final BasicColumn basicColumn : basicColumns) {
+			final Collection<AbstractColumn> columns = table.getColumns();
+			for (final AbstractColumn column : columns) {
 
-				this.tableAliases.inverse().get(basicColumn.getTable());
+				this.tableAliases.inverse().get(column.getTable());
 
-				final String field = Joiner.on(".").skipNulls().join(this.getAlias(), basicColumn.getName());
-				if (basicColumn instanceof PkColumn) {
-					this.idFields.put(field, basicColumn);
+				final String field = Joiner.on(".").skipNulls().join(this.getAlias(), column.getName());
+				if (column instanceof PkColumn) {
+					this.idFields.put(field, (PkColumn) column);
 				}
 				else {
-					this.fields.put(field, basicColumn);
+					this.fields.put(field, column);
 				}
 
 				fields.add(field);
@@ -138,9 +138,9 @@ public class RootImpl<X> extends FromImpl<X, X> implements Root<X> {
 		}
 
 		final ManagedInstance<X> instance = this.entity.getManagedInstanceById(session, id);
-		for (final Entry<String, BasicColumn> entry : this.fields.entrySet()) {
+		for (final Entry<String, AbstractColumn> entry : this.fields.entrySet()) {
 			final String field = entry.getKey();
-			final BasicColumn basicColumn = entry.getValue();
+			final AbstractColumn basicColumn = entry.getValue();
 			final Object value = rs.getObject(field);
 			basicColumn.setValue(instance.getInstance(), value);
 		}

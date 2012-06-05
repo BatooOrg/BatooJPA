@@ -46,6 +46,7 @@ import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
+import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.model.BasicTypeImpl;
 import org.batoo.jpa.core.impl.model.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.EntityTypeImpl;
@@ -395,31 +396,54 @@ public class MetamodelImpl implements Metamodel {
 	}
 
 	/**
+	 * Performs the foreign key DDL operations.
+	 * 
 	 * @param datasource
-	 * @param schemas
+	 *            the datasource
 	 * @param ddlMode
-	 * @param type
+	 *            the DDL Mode
+	 * @param entity
+	 *            the entity to perform DDL against
+	 * @throws BatooException
+	 *             thrown in case of an underlying exception
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performForeignKeysDdl(DataSourceImpl datasource, DDLMode ddlMode, EntityTypeImpl<?> type) {
-		// TODO Auto-generated method stub
+	public void performForeignKeysDdl(DataSourceImpl datasource, DDLMode ddlMode, EntityTypeImpl<?> entity) {
+		MetamodelImpl.LOG.info("Performing foreign key DDL operations for entiy {0}, mode {1}", entity.getName(), ddlMode);
 
+		for (final EntityTable table : entity.getDeclaredTables()) {
+			try {
+				MetamodelImpl.LOG.info("Performing foreign key DDL operations for table {0}, mode {1}", table.getName(), ddlMode);
+
+				for (final ForeignKey foreignKey : table.getForeignKeys()) {
+					this.jdbcAdaptor.createForeignKey(datasource, foreignKey);
+				}
+			}
+			catch (final SQLException e) {
+				throw new MappingException("DDL operation failed on table " + table.getName(), e);
+			}
+		}
 	}
 
 	/**
+	 * Performs the sequence generators DDL operations.
+	 * 
 	 * @param datasource
 	 *            the datasource
-	 * @param drop
+	 * @param ddlMode
 	 *            the DDL Mode
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performSequencesDdl(DataSourceImpl datasource, DDLMode drop) {
+	public void performSequencesDdl(DataSourceImpl datasource, DDLMode ddlMode) {
 		for (final SequenceGenerator sequenceGenerator : this.sequenceGenerators.values()) {
 			try {
+				MetamodelImpl.LOG.info("Performing DDL operations for sequence generators for {0}, mode {1}", sequenceGenerator.getName(),
+					ddlMode);
+
 				this.jdbcAdaptor.createSequenceIfNecessary(datasource, sequenceGenerator);
 			}
 			catch (final SQLException e) {
@@ -429,6 +453,8 @@ public class MetamodelImpl implements Metamodel {
 	}
 
 	/**
+	 * Performs the table generator DDL operations.
+	 * 
 	 * @param datasource
 	 *            the datasource
 	 * @param ddlMode
@@ -440,6 +466,9 @@ public class MetamodelImpl implements Metamodel {
 	public void performTableGeneratorsDdl(DataSourceImpl datasource, DDLMode ddlMode) {
 		for (final TableGenerator tableGenerator : this.tableGenerators.values()) {
 			try {
+				MetamodelImpl.LOG.info("Performing DDL operations for sequence generators for mode table {1}, mode {0}",
+					tableGenerator.getName(), ddlMode);
+
 				this.jdbcAdaptor.createTableGeneratorIfNecessary(datasource, tableGenerator);
 			}
 			catch (final SQLException e) {
@@ -449,25 +478,27 @@ public class MetamodelImpl implements Metamodel {
 	}
 
 	/**
-	 * Performs the DDL operations.
+	 * Performs the table DDL operations.
 	 * 
 	 * @param datasource
 	 *            the datasource
 	 * @param ddlMode
 	 *            the DDL Mode
-	 * @param type
-	 *            the type to perform DDL against
+	 * @param entity
+	 *            the entity to perform DDL against
 	 * @throws BatooException
 	 *             thrown in case of an underlying exception
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performTablesDddl(DataSourceImpl datasource, DDLMode ddlMode, EntityTypeImpl<?> type) {
-		MetamodelImpl.LOG.info("Performing DDL operations for {0}, mode {2}", this, ddlMode);
+	public void performTablesDddl(DataSourceImpl datasource, DDLMode ddlMode, EntityTypeImpl<?> entity) {
+		MetamodelImpl.LOG.info("Performing DDL operations for entity {0}, mode {1}", entity.getName(), ddlMode);
 
-		for (final EntityTable table : type.getDeclaredTables()) {
+		for (final EntityTable table : entity.getDeclaredTables()) {
 			try {
+				MetamodelImpl.LOG.info("Performing DDL operations for {0}, mode {1}", table.getName(), ddlMode);
+
 				this.jdbcAdaptor.createTable(table, datasource);
 			}
 			catch (final SQLException e) {

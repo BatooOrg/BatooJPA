@@ -92,9 +92,9 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 		FetchType fetchType, CascadeType[] cascades) {
 		super(member, name);
 
-		this.targetEntity = targetEntity;
+		this.targetEntity = "void".equals(targetEntity) ? null : targetEntity;
 		this.fetchType = fetchType;
-		this.cascades = this.cascades != null ? Sets.newHashSet(cascades) : Sets.<CascadeType> newHashSet();
+		this.cascades = cascades != null ? Sets.newHashSet(cascades) : Sets.<CascadeType> newHashSet();
 
 		final JoinColumns joinColumns = ReflectHelper.getAnnotation(member, JoinColumns.class);
 		final JoinColumn joinColumn = ReflectHelper.getAnnotation(member, JoinColumn.class);

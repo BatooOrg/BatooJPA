@@ -20,7 +20,7 @@ package org.batoo.jpa.core.impl.model.attribute;
 
 import javax.persistence.metamodel.Attribute;
 
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.parser.MappingException;
 
 /**
@@ -77,6 +77,16 @@ public interface AssociatedAttribute<X, T> extends Attribute<X, T> {
 	boolean cascadesRemove();
 
 	/**
+	 * Returns the foreign key of the attribute.
+	 * 
+	 * @return the foreign key of the attribute
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	ForeignKey getForeignKey();
+
+	/**
 	 * Returns if the association is the owner side.
 	 * 
 	 * @return true if the association is the owner side
@@ -98,25 +108,25 @@ public interface AssociatedAttribute<X, T> extends Attribute<X, T> {
 	void link() throws MappingException;
 
 	/**
-	 * @param source
+	 * @param instance
 	 *            the source instance
-	 * @param associate
+	 * @param reference
 	 *            the associate instance
 	 * @return true if source contains reference to the associate, false otherwise
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	boolean references(ManagedInstance<?> source, ManagedInstance<?> associate);
+	boolean references(Object instance, Object reference);
 
 	/**
 	 * Sets the inverse attribute.
 	 * 
-	 * @param association
+	 * @param inverse
 	 *            the inverse association
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	void setInverse(AssociatedAttribute<T, X> association);
+	void setInverse(AssociatedAttribute<T, X> inverse);
 }

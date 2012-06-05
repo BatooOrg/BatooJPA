@@ -18,7 +18,6 @@
  */
 package org.batoo.jpa.core.test.manytoonetomany;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -37,7 +36,7 @@ public class Address {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Integer id;
 
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne
 	private Person person;
 
 	private String city;

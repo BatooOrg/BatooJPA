@@ -28,11 +28,17 @@ import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
+import org.batoo.jpa.core.impl.jdbc.ForeignKey;
+import org.batoo.jpa.core.impl.jdbc.JoinColumn;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.jdbc.SingleValueHandler;
 import org.batoo.jpa.core.impl.metamodel.SequenceGenerator;
 import org.batoo.jpa.core.impl.metamodel.TableGenerator;
 import org.batoo.jpa.core.jdbc.IdType;
+
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 
 /**
  * JDBC Adapter for Derby.
@@ -66,6 +72,39 @@ public class DerbyAdaptor extends JdbcAdaptor {
 			+ (!column.isNullable() ? " NOT NULL" : "") // not null part
 			+ (column.isUnique() ? " UNIQUE" : "") // not null part
 			+ (identity ? " GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1)" : ""); // auto increment part
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void createForeignKey(DataSource datasource, ForeignKey foreignKey) throws SQLException {
+		final String tableName = foreignKey.getTable().getName();
+		final String referenceTableName = foreignKey.getReferencedTable().getName();
+
+		final String foreignKeyColumns = Joiner.on(", ").join(
+			Lists.transform(foreignKey.getJoinColumns(), new Function<JoinColumn, String>() {
+
+				@Override
+				public String apply(JoinColumn input) {
+					return input.getReferencedColumn().getName();
+				}
+			}));
+
+		final String keyColumns = Joiner.on(", ").join(Lists.transform(foreignKey.getJoinColumns(), new Function<JoinColumn, String>() {
+
+			@Override
+			public String apply(JoinColumn input) {
+				return input.getName();
+			}
+		}));
+
+		final String sql = "ALTER TABLE " + tableName //
+			+ "\n\tADD FOREIGN KEY (" + keyColumns + ")" //
+			+ "\n\tREFERENCES " + referenceTableName + "(" + foreignKeyColumns + ")";
+
+		new QueryRunner(datasource).update(sql);
 	}
 
 	/**

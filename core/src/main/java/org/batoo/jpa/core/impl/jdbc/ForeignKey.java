@@ -19,8 +19,10 @@
 package org.batoo.jpa.core.impl.jdbc;
 
 import java.util.List;
+import java.util.Map;
 
-import org.apache.derby.impl.sql.compile.ResultColumnList.ColumnMapping;
+import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
+import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 
 /**
  * Foreign key definition.
@@ -30,70 +32,123 @@ import org.apache.derby.impl.sql.compile.ResultColumnList.ColumnMapping;
  */
 public class ForeignKey {
 
-	private final EntityTable table;
-	private final EntityTable referencedTable;
-	private final List<ColumnMapping> columnMappings;
+	private final AttributeImpl<?, ?> attribute;
+	private final List<JoinColumn> joinColumns;
+
+	private String tableName;
+	private AbstractTable table;
+	private EntityTable referencedTable;
 
 	/**
-	 * @param table
-	 *            the table that owns the foreign key, join or entity table
-	 * @param referencedTable
-	 *            the referenced entity table
-	 * @param columnMappings
-	 *            the column mappings
+	 * @param attribute
+	 *            the attribute
+	 * @param joinColumns
+	 *            the list of join columns
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ForeignKey(EntityTable table, EntityTable referencedTable, List<ColumnMapping> columnMappings) {
+	public ForeignKey(AttributeImpl<?, ?> attribute, List<JoinColumn> joinColumns) {
 		super();
 
-		this.table = table;
-		this.referencedTable = referencedTable;
-		this.columnMappings = columnMappings;
-
-		this.table.addForeignKey(this);
+		this.attribute = attribute;
+		this.joinColumns = joinColumns;
 	}
 
 	/**
-	 * Returns the columnMappings.
+	 * Returns the list of join columns of the foreign key.
 	 * 
-	 * @return the columnMappings
+	 * @return the list of join columns of the foreign key.
+	 * 
 	 * @since $version
+	 * @author hceylan
 	 */
-	public List<ColumnMapping> getColumnMappings() {
-		return this.columnMappings;
+	public List<JoinColumn> getJoinColumns() {
+		return this.joinColumns;
 	}
 
 	/**
-	 * Returns the referencedTable.
+	 * Returns the referenced table of the foreign key.
 	 * 
-	 * @return the referencedTable
+	 * @return the referenced table of the foreign key
+	 * 
 	 * @since $version
+	 * @author hceylan
 	 */
 	public EntityTable getReferencedTable() {
 		return this.referencedTable;
 	}
 
 	/**
-	 * Returns the table.
+	 * Returns the table of the ForeignKey.
 	 * 
-	 * @return the table
+	 * @return the table of the ForeignKey
+	 * 
 	 * @since $version
+	 * @author hceylan
 	 */
-	public EntityTable getTable() {
+	public AbstractTable getTable() {
 		return this.table;
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Returns the name of the table name of the foreign key.
 	 * 
+	 * @return the name of the table name of the foreign key
+	 * 
+	 * @since $version
+	 * @author hceylan
 	 */
-	@Override
-	public String toString() {
-		return "ForeignKey [table=" + this.table.getEntity().getName() + ":" + this.table.getQName() //
-			+ ", referencedTable=" + this.referencedTable.getEntity().getName() + ":" + this.referencedTable.getQName() + //
-			", columnMappings=" + this.columnMappings + "]";
+	public String getTableName() {
+		return this.tableName;
 	}
 
+	/**
+	 * Links the foreign key
+	 * 
+	 * @param jdbcAdaptor
+	 *            the JDBC Adaptor
+	 * @param referencedTable
+	 *            the referenced table
+	 * 
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void link(JdbcAdaptor jdbcAdaptor, EntityTable referencedTable) {
+		this.referencedTable = referencedTable;
+
+		final Map<String, PkColumn> pkColumns = referencedTable.getPkColumns();
+
+		// single primary key
+		if (pkColumns.size() == 1) {
+			final PkColumn pkColumn = pkColumns.values().iterator().next();
+
+			// no definition for the join column
+			if (this.joinColumns.size() == 0) {
+				// create the join column
+				this.joinColumns.add(new JoinColumn(jdbcAdaptor, this.attribute, pkColumn));
+				this.tableName = "";
+			}
+		}
+	}
+
+	/**
+	 * Sets the table of the foreign key.
+	 * 
+	 * @param table
+	 *            the table
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setTable(AbstractTable table) {
+		this.table = table;
+
+		for (final JoinColumn joinColumn : this.joinColumns) {
+			joinColumn.setTable(table);
+		}
+
+		this.table.addForeignKey(this);
+	}
 }

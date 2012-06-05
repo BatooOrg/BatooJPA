@@ -20,11 +20,12 @@ package org.batoo.jpa.core.impl.jdbc;
 
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
@@ -47,9 +48,10 @@ public class EntityTable extends AbstractTable {
 
 	private final EntityTypeImpl<?> entity;
 	private final QueryRunner runner;
+	private final Map<String, PkColumn> pkColumns = Maps.newHashMap();
 
-	private final HashMap<EntityTypeImpl<?>, String> insertSqls = Maps.newHashMap();
-	private final HashMap<EntityTypeImpl<?>, BasicColumn[]> insertColumns = Maps.newHashMap();
+	private final Map<EntityTypeImpl<?>, String> insertSqls = Maps.newHashMap();
+	private final Map<EntityTypeImpl<?>, AbstractColumn[]> insertColumns = Maps.newHashMap();
 	private final JdbcAdaptor jdbcAdaptor;
 	private PkColumn identityColumn;
 
@@ -76,11 +78,17 @@ public class EntityTable extends AbstractTable {
 	 * 
 	 */
 	@Override
-	public void addColumn(BasicColumn basicColumn) {
-		super.addColumn(basicColumn);
+	public void addColumn(AbstractColumn column) {
+		super.addColumn(column);
 
-		if ((basicColumn instanceof PkColumn) && (((PkColumn) basicColumn).getIdType() == IdType.IDENTITY)) {
-			this.identityColumn = (PkColumn) basicColumn;
+		if (column instanceof PkColumn) {
+			final PkColumn pkColumn = (PkColumn) column;
+
+			this.pkColumns.put(pkColumn.getMappingName(), pkColumn);
+
+			if (pkColumn.getIdType() == IdType.IDENTITY) {
+				this.identityColumn = (PkColumn) column;
+			}
 		}
 	}
 
@@ -99,13 +107,13 @@ public class EntityTable extends AbstractTable {
 			return;
 		}
 
-		final List<BasicColumn> insertColumns = Lists.newArrayList();
+		final List<AbstractColumn> insertColumns = Lists.newArrayList();
 		// Filter out the identity physicalColumns
-		final Collection<BasicColumn> filteredColumns = type == null ? this.getColumns() : Collections2.filter(this.getColumns(),
-			new Predicate<BasicColumn>() {
+		final Collection<AbstractColumn> filteredColumns = type == null ? this.getColumns() : Collections2.filter(this.getColumns(),
+			new Predicate<AbstractColumn>() {
 
 				@Override
-				public boolean apply(BasicColumn input) {
+				public boolean apply(AbstractColumn input) {
 					if ((input instanceof PkColumn) && (((PkColumn) input).getIdType() == IdType.IDENTITY)) {
 						return false;
 					}
@@ -126,10 +134,10 @@ public class EntityTable extends AbstractTable {
 			});
 
 		// prepare the names tuple in the form of "COLNAME [, COLNAME]*"
-		final Collection<String> columnNames = Collections2.transform(filteredColumns, new Function<BasicColumn, String>() {
+		final Collection<String> columnNames = Collections2.transform(filteredColumns, new Function<AbstractColumn, String>() {
 
 			@Override
-			public String apply(BasicColumn input) {
+			public String apply(AbstractColumn input) {
 				insertColumns.add(input);
 
 				return input.getName();
@@ -137,10 +145,10 @@ public class EntityTable extends AbstractTable {
 		});
 
 		// prepare the parameters in the form of "? [, ?]*"
-		final Collection<String> parameters = Collections2.transform(filteredColumns, new Function<BasicColumn, String>() {
+		final Collection<String> parameters = Collections2.transform(filteredColumns, new Function<AbstractColumn, String>() {
 
 			@Override
-			public String apply(BasicColumn input) {
+			public String apply(AbstractColumn input) {
 				return "?";
 			}
 		});
@@ -156,7 +164,7 @@ public class EntityTable extends AbstractTable {
 			+ "\nVALUES (" + parametersStr + ")";
 
 		this.insertSqls.put(type, sql);
-		this.insertColumns.put(type, insertColumns.toArray(new BasicColumn[insertColumns.size()]));
+		this.insertColumns.put(type, insertColumns.toArray(new AbstractColumn[insertColumns.size()]));
 	}
 
 	/**
@@ -193,6 +201,18 @@ public class EntityTable extends AbstractTable {
 	}
 
 	/**
+	 * Returns the pkColumns of the EntityTable.
+	 * 
+	 * @return the pkColumns of the EntityTable
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Map<String, PkColumn> getPkColumns() {
+		return this.pkColumns;
+	}
+
+	/**
 	 * Performs inserts to the table for the managed instance or joins.
 	 * 
 	 * @param connection
@@ -206,19 +226,19 @@ public class EntityTable extends AbstractTable {
 	 * @author hceylan
 	 */
 	public void performInsert(ConnectionImpl connection, final ManagedInstance<?> managedInstance) throws SQLException {
-		managedInstance.getSession();
+		final SessionImpl session = managedInstance.getSession();
 
 		final EntityTypeImpl<?> entityType = managedInstance.getType();
 		final Object instance = managedInstance.getInstance();
 
 		// Do not inline, generation of the insert SQL will initialize the insertColumns!
 		final String insertSql = this.getInsertSql(entityType);
-		final BasicColumn[] insertColumns = this.insertColumns.get(entityType);
+		final AbstractColumn[] insertColumns = this.insertColumns.get(entityType);
 
 		// prepare the parameters
 		final Object[] params = new Object[insertColumns.length];
 		for (int i = 0; i < insertColumns.length; i++) {
-			params[i] = insertColumns[i].getValue(instance);
+			params[i] = insertColumns[i].getValue(session, instance);
 		}
 
 		// execute the insert
@@ -239,10 +259,10 @@ public class EntityTable extends AbstractTable {
 	 */
 	@Override
 	public String toString() {
-		final String columns = Joiner.on(", ").join(Collections2.transform(this.getColumns(), new Function<BasicColumn, String>() {
+		final String columns = Joiner.on(", ").join(Collections2.transform(this.getColumns(), new Function<AbstractColumn, String>() {
 
 			@Override
-			public String apply(BasicColumn input) {
+			public String apply(AbstractColumn input) {
 				final StringBuffer out = new StringBuffer();
 				out.append(input instanceof PkColumn ? "ID [" : "COL [");
 

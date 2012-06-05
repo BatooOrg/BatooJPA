@@ -18,8 +18,10 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
+import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 
 /**
@@ -31,7 +33,20 @@ import org.batoo.jpa.parser.metadata.ColumnMetadata;
 public class BasicColumn extends AbstractColumn {
 
 	private final AttributeImpl<?, ?> attribute;
-	private AbstractTable table;
+	private EntityTable table;
+	private final int sqlType;
+	private final String name;
+	private final String columnDefinition;
+	private final int length;
+	private final AbstractLocator locator;
+	private final int precision;
+	private final int scale;
+	private final String tableName;
+	private final boolean nullable;
+	private final boolean insertable;
+	private final boolean unique;
+	private final boolean updatable;
+	private final String mappingName;
 
 	/**
 	 * @param jdbcAdaptor
@@ -47,51 +62,169 @@ public class BasicColumn extends AbstractColumn {
 	 * @author hceylan
 	 */
 	public BasicColumn(JdbcAdaptor jdbcAdaptor, AttributeImpl<?, ?> attribute, int sqlType, ColumnMetadata metadata) {
-		super(jdbcAdaptor, //
-			attribute.getName(), //
-			sqlType, //
-			metadata != null ? metadata.getLength() : 255, //
-			metadata != null ? metadata.getPrecision() : 0, //
-			metadata != null ? metadata.getScale() : 0, //
-			metadata);
+		super();
 
 		this.attribute = attribute;
+
+		this.locator = metadata != null ? metadata.getLocator() : null;
+		this.sqlType = sqlType;
+
+		this.mappingName = metadata != null ? metadata.getName() : attribute.getName();
+		this.name = jdbcAdaptor.escape(this.mappingName);
+
+		this.tableName = metadata != null ? metadata.getTable() : "";
+		this.columnDefinition = metadata != null ? metadata.getColumnDefinition() : "";
+		this.length = metadata != null ? metadata.getLength() : 255;
+		this.precision = metadata != null ? metadata.getPrecision() : 0;
+		this.scale = metadata != null ? metadata.getScale() : 0;
+		this.insertable = metadata != null ? metadata.isInsertable() : true;
+		this.nullable = metadata != null ? metadata.isNullable() : true;
+		this.unique = metadata != null ? metadata.isUnique() : false;
+		this.updatable = metadata != null ? metadata.isUpdatable() : true;
 	}
 
 	/**
-	 * Returns the table of the column
+	 * {@inheritDoc}
 	 * 
-	 * @return the table
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	public AbstractTable getTable() {
+	@Override
+	public AttributeImpl<?, ?> getAttribute() {
+		return this.attribute;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getColumnDefinition() {
+		return this.columnDefinition;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int getLength() {
+		return this.length;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public AbstractLocator getLocator() {
+		return this.locator;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getMappingName() {
+		return this.mappingName;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getName() {
+		return this.name;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int getPrecision() {
+		return this.precision;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int getScale() {
+		return this.scale;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int getSqlType() {
+		return this.sqlType;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public EntityTable getTable() {
 		return this.table;
 	}
 
 	/**
-	 * Returns the value for the column
+	 * {@inheritDoc}
 	 * 
-	 * @param instance
-	 *            the instance
-	 * @return the value
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	public Object getValue(Object instance) {
-		return this.attribute.get(instance);
+	@Override
+	public String getTableName() {
+		return this.tableName;
+	}
 
-		// XXX implement with embeddables
-		// for (final AttributeImpl<?, ?> attribute : this.path) {
-		//
-		// if (value == null) {
-		// break;
-		// }
-		// }
-		//
-		// return (Y) value;
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Object getValue(SessionImpl session, Object instance) {
+		return this.attribute.get(instance);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isInsertable() {
+		return this.insertable;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isNullable() {
+		return this.nullable;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isUnique() {
+		return this.unique;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isUpdatable() {
+		return this.updatable;
 	}
 
 	/**
@@ -103,8 +236,9 @@ public class BasicColumn extends AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
+	@Override
 	public void setTable(AbstractTable table) {
-		this.table = table;
+		this.table = (EntityTable) table;
 
 		this.table.addColumn(this);
 	}
@@ -120,18 +254,8 @@ public class BasicColumn extends AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
+	@Override
 	public void setValue(Object instance, Object value) {
 		this.attribute.set(instance, value);
-		// XXX implement with embeddables
-		// for (int i = 0; i < this.path.length; i++) {
-		// final AttributeImpl<?, ?> attribute = this.path[i];
-		//
-		// if (i == (this.path.length - 1)) {
-		// attribute.set(instance, value);
-		// }
-		// else {
-		// instance = attribute.get(instance);
-		// }
-		// }
 	}
 }

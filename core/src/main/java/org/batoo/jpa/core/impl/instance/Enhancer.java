@@ -41,11 +41,14 @@ public final class Enhancer implements Opcodes {
 	private static final String FIELD_ENHANCED_SESSION = "__enhanced_$$__session";
 	private static final String FIELD_ENHANCED_TYPE = "__enhanced_$$__type";
 	private static final String FIELD_ENHANCED_ID = "__enhanced__$$__id";
+	private static final String FIELD_ENHANCED_MANAGED_INSTANCE = "__enhanced__$$__managedInstance";
 
 	private static final String METHOD_ENHANCED_IS_INITIALIZED = "__enhanced__$$__isInitialized";
 	private static final String METHOD_ENHANCED_CHECK = "__enhanced_$$__check";
-	private static final String METHOD_ENHANCED_GET_ID = "get__enhanced__$$__id";
+	private static final String METHOD_ENHANCED_GET_ID = "__enhanced__$$__getId";
 	private static final String METHOD_GET_ENTITY_MANAGER = "getEntityManager";
+	private static final String METHOD_ENHANCED_GET_MANAGED_INSTANCE = "__enhanced__$$__getManagedInstance";
+	private static final String METHOD_ENHANCED_SET_MANAGED_INSTANCE = "__enhanced__$$__setManagedInstance";
 	private static final String METHOD_FIND = "find";
 
 	private static byte[] create(EntityType<?> type, Class<?> clazz) throws Exception {
@@ -77,6 +80,8 @@ public final class Enhancer implements Opcodes {
 		Enhancer.createMethodIsInitialized(enhancedClassName, descEnhancer, cw);
 		Enhancer.createMethodCheck(enhancedClassName, descEnhancer, cw);
 		Enhancer.createMethodGetId(enhancedClassName, descEnhancer, cw);
+		Enhancer.createMethodGetManagedInstance(enhancedClassName, descEnhancer, cw);
+		Enhancer.createMethodSetManagedInstance(enhancedClassName, descEnhancer, cw);
 
 		final Map<String, Method> methods = Maps.newHashMap();
 
@@ -221,11 +226,33 @@ public final class Enhancer implements Opcodes {
 		MethodVisitor mv;
 		mv = cw.visitMethod(Opcodes.ACC_PUBLIC, Enhancer.METHOD_ENHANCED_GET_ID, Enhancer.makeDescription(Object.class), null, null);
 		mv.visitCode();
+
 		final Label l0 = new Label();
 		mv.visitLabel(l0);
 		mv.visitVarInsn(Opcodes.ALOAD, 0);
-		mv.visitFieldInsn(Opcodes.GETFIELD, enhancedClassName, Enhancer.FIELD_ENHANCED_ID, Type.getDescriptor(Object.class));
+		mv.visitFieldInsn(Opcodes.GETFIELD, enhancedClassName, Enhancer.FIELD_ENHANCED_MANAGED_INSTANCE, Type.getDescriptor(Object.class));
 		mv.visitInsn(Opcodes.ARETURN);
+
+		final Label l1 = new Label();
+		mv.visitLabel(l1);
+		mv.visitLocalVariable(Enhancer.THIS, descEnhancer, null, l0, l1, 0);
+		mv.visitMaxs(0, 0);
+		mv.visitEnd();
+	}
+
+	private static void createMethodGetManagedInstance(final String enhancedClassName, final String descEnhancer, final ClassWriter cw) {
+		MethodVisitor mv;
+		mv = cw.visitMethod(Opcodes.ACC_PUBLIC, Enhancer.METHOD_ENHANCED_GET_MANAGED_INSTANCE, Enhancer.makeDescription(Object.class),
+			null, null);
+		mv.visitCode();
+
+		final Label l0 = new Label();
+		mv.visitLabel(l0);
+		mv.visitVarInsn(Opcodes.ALOAD, 0);
+		mv.visitFieldInsn(Opcodes.GETFIELD, enhancedClassName, Enhancer.FIELD_ENHANCED_MANAGED_INSTANCE,
+			Type.getDescriptor(ManagedInstance.class));
+		mv.visitInsn(Opcodes.ARETURN);
+
 		final Label l1 = new Label();
 		mv.visitLabel(l1);
 		mv.visitLocalVariable(Enhancer.THIS, descEnhancer, null, l0, l1, 0);
@@ -247,6 +274,31 @@ public final class Enhancer implements Opcodes {
 		final Label l1 = new Label();
 		mv.visitLabel(l1);
 		mv.visitLocalVariable(Enhancer.THIS, descEnhancer, null, l0, l1, 0);
+		mv.visitMaxs(0, 0);
+		mv.visitEnd();
+	}
+
+	private static void createMethodSetManagedInstance(final String enhancedClassName, final String descEnhancer, final ClassWriter cw) {
+		MethodVisitor mv;
+		mv = cw.visitMethod(Opcodes.ACC_PUBLIC, Enhancer.METHOD_ENHANCED_SET_MANAGED_INSTANCE,
+			Enhancer.makeDescription(Object.class, ManagedInstance.class), null, null);
+		mv.visitCode();
+
+		final Label l0 = new Label();
+		mv.visitLabel(l0);
+		mv.visitVarInsn(Opcodes.ALOAD, 0);
+		mv.visitVarInsn(Opcodes.ALOAD, 1);
+		mv.visitFieldInsn(Opcodes.PUTFIELD, enhancedClassName, Enhancer.FIELD_ENHANCED_MANAGED_INSTANCE,
+			Type.getDescriptor(ManagedInstance.class));
+
+		final Label l1 = new Label();
+		mv.visitLabel(l1);
+		mv.visitInsn(Opcodes.RETURN);
+
+		final Label l2 = new Label();
+		mv.visitLabel(l2);
+		mv.visitLocalVariable(Enhancer.THIS, descEnhancer, null, l0, l1, 0);
+		mv.visitLocalVariable("table", Type.getDescriptor(ManagedInstance.class), null, l0, l2, 1);
 		mv.visitMaxs(0, 0);
 		mv.visitEnd();
 	}
@@ -413,6 +465,7 @@ public final class Enhancer implements Opcodes {
 	 *            the type for the class
 	 * @return the enhanced class
 	 * @throws Exception
+	 *             thrown if the enhancement fails
 	 * 
 	 * @since $version
 	 * @author hceylan

@@ -75,6 +75,7 @@ public class AssociationElement extends AttributeElement implements AssociationA
 			ElementConstants.ELEMENT_JOIN_COLUMN, //
 			ElementConstants.ELEMENT_JOIN_TABLE, //
 			ElementConstants.ELEMENT_PRIMARY_KEY_JOIN_COLUMN);
+
 		this.fetchType = defaultFetchType;
 	}
 

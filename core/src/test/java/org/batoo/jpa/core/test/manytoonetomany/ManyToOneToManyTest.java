@@ -86,30 +86,22 @@ public class ManyToOneToManyTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} address which does not cascade to Person. PersistenceException expected.
 	 * 
-	 * @throws SQLException
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	@Test(expected = PersistenceException.class)
-	public void testPersistAddress() throws SQLException {
+	public void testPersistAddress() {
 		this.persist(this.person().getAddresses().get(0));
 
 		this.commit();
-
-		Integer count;
-
-		count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM PERSON", new SingleValueHandler<Integer>());
-		Assert.assertEquals(new Integer(1), count);
-
-		count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM ADDRESS", new SingleValueHandler<Integer>());
-		Assert.assertEquals(new Integer(1), count);
 	}
 
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} Person which cascades to Address.
 	 * 
 	 * @throws SQLException
+	 *             ins case of an underlying SQL Exception
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -128,6 +120,6 @@ public class ManyToOneToManyTest extends BaseCoreTest {
 		Assert.assertEquals(new Integer(1), count);
 
 		count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM ADDRESS", new SingleValueHandler<Integer>());
-		Assert.assertEquals(new Integer(1), count);
+		Assert.assertEquals(new Integer(3), count);
 	}
 }

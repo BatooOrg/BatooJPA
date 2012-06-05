@@ -18,39 +18,47 @@
  */
 package org.batoo.jpa.core.impl.model.attribute;
 
-import javax.persistence.metamodel.SingularAttribute;
+import java.util.List;
 
+import javax.persistence.metamodel.ListAttribute;
+
+import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
-import org.batoo.jpa.parser.metadata.attribute.ManyToOneAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
 
 /**
- * Implementation of {@link SingularAttribute} for many-to-one attributes.
+ * Implementation of {@link ListAttribute}.
  * 
  * @param <X>
- *            The type containing the represented attribute
- * @param <T>
- *            The type of the represented attribute
+ *            The type the represented collection belongs to
+ * @param <C>
+ *            The type of the represented collection
+ * @param <E>
+ *            The element type of the represented collection
  * 
  * @author hceylan
  * @since $version
  */
-public class ManyToOneAttributeImpl<X, T> extends AssociatedSingularAttribute<X, T> {
-
-	private final boolean optional;
+public class ListAttributeImpl<X, C, E> extends AssociatedPluralAttribute<X, List<E>, E> implements ListAttribute<X, E> {
 
 	/**
 	 * @param declaringType
 	 *            the declaring type
 	 * @param metadata
 	 *            the metadata
+	 * @param attributeType
+	 *            attribute type
+	 * @param mappedBy
+	 *            the mapped by attribute
+	 * @param removesOrphans
+	 *            if attribute removes orphans
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManyToOneAttributeImpl(ManagedTypeImpl<X> declaringType, ManyToOneAttributeMetadata metadata) {
-		super(declaringType, metadata, null);
-
-		this.optional = metadata.isOptional();
+	public ListAttributeImpl(ManagedTypeImpl<X> declaringType, AssociationAttributeMetadata metadata,
+		PersistentAttributeType attributeType, String mappedBy, boolean removesOrphans) {
+		super(declaringType, attributeType, metadata, mappedBy, removesOrphans);
 	}
 
 	/**
@@ -58,8 +66,8 @@ public class ManyToOneAttributeImpl<X, T> extends AssociatedSingularAttribute<X,
 	 * 
 	 */
 	@Override
-	public PersistentAttributeType getPersistentAttributeType() {
-		return PersistentAttributeType.MANY_TO_ONE;
+	public CollectionType getCollectionType() {
+		return CollectionType.LIST;
 	}
 
 	/**
@@ -67,7 +75,8 @@ public class ManyToOneAttributeImpl<X, T> extends AssociatedSingularAttribute<X,
 	 * 
 	 */
 	@Override
-	public boolean isOptional() {
-		return this.optional;
+	public ForeignKey getForeignKey() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

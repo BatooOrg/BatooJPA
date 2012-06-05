@@ -29,6 +29,26 @@ import java.io.Serializable;
 public interface EnhancedInstance extends Serializable {
 
 	/**
+	 * Returns the id of the instance.
+	 * 
+	 * @return the id of the instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	ManagedInstance<?> __enhanced__$$__getId();
+
+	/**
+	 * Returns the managed instance of the instance.
+	 * 
+	 * @return the managed instance of the instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	ManagedInstance<?> __enhanced__$$__getManagedInstance();
+
+	/**
 	 * Returns if the instance has been initialized.
 	 * 
 	 * @return true if the instance has been initialized
@@ -39,12 +59,11 @@ public interface EnhancedInstance extends Serializable {
 	boolean __enhanced__$$__isInitialized();
 
 	/**
-	 * Returns the id of the instance.
-	 * 
-	 * @return the id of the instance
+	 * Sets the managed instance of the instance.
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	Object get__enhanced__$$__id();
+	void __enhanced__$$__setManagedInstance(ManagedInstance instance);
+
 }

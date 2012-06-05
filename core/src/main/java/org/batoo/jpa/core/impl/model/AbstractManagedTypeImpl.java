@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.metamodel.Attribute;
+import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 import javax.persistence.metamodel.CollectionAttribute;
 import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.ManagedType;
@@ -31,16 +32,16 @@ import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
+import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttributeImpl;
-import org.batoo.jpa.core.impl.model.attribute.IdAttributeImpl;
-import org.batoo.jpa.core.impl.model.attribute.ManyToOneAttributeImpl;
+import org.batoo.jpa.core.impl.model.attribute.ListAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
 import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
-import org.batoo.jpa.parser.metadata.attribute.IdAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.ManyToOneAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.OneToManyAttributeMetadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 
 import com.google.common.collect.Maps;
@@ -87,30 +88,15 @@ public abstract class AbstractManagedTypeImpl<X> extends TypeImpl<X> implements 
 	/**
 	 * Creates and adds the attributes of the managed type from the metadata.
 	 * 
-	 * @param entity
-	 *            the
+	 * @param entityMetadata
+	 *            the metadata
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void addAttributes(EntityMetadata entity) {
-		final AttributesMetadata metadata = entity.getAttributes();
-
-		// id attributes
-		for (final IdAttributeMetadata id : metadata.getIds()) {
-			this.declaredAttributes.put(id.getName(), new IdAttributeImpl((ManagedTypeImpl) this, id));
-		}
-
-		// basic attributes
-		for (final BasicAttributeMetadata basic : metadata.getBasics()) {
-			this.declaredAttributes.put(basic.getName(), new BasicAttributeImpl((ManagedTypeImpl) this, basic));
-		}
-
-		// many to one attributes
-		for (final ManyToOneAttributeMetadata manyToOne : metadata.getManyToOnes()) {
-			this.declaredAttributes.put(manyToOne.getName(), new ManyToOneAttributeImpl((ManagedTypeImpl) this, manyToOne));
-		}
+	private void addAttributes(EntityMetadata entityMetadata) {
+		final AttributesMetadata attributesMetadata = entityMetadata.getAttributes();
 
 		if (this.parent != null) {
 			// force parent to initialize
@@ -119,7 +105,36 @@ public abstract class AbstractManagedTypeImpl<X> extends TypeImpl<X> implements 
 			}
 		}
 
-		this.attributes.putAll(this.declaredAttributes);
+		// basic attributes
+		for (final BasicAttributeMetadata metadata : attributesMetadata.getBasics()) {
+			this.addDeclaredAttribute(new BasicAttributeImpl((ManagedTypeImpl) this, metadata));
+		}
+
+		// many to one attributes
+		for (final ManyToOneAttributeMetadata metadata : attributesMetadata.getManyToOnes()) {
+			this.addDeclaredAttribute(new AssociatedSingularAttribute((ManagedTypeImpl) this, PersistentAttributeType.MANY_TO_ONE,
+				metadata, null, metadata.isOptional()));
+		}
+
+		// one to many attributes
+		for (final OneToManyAttributeMetadata metadata : attributesMetadata.getOneToManies()) {
+			this.addDeclaredAttribute(new ListAttributeImpl((ManagedTypeImpl) this, metadata, PersistentAttributeType.ONE_TO_MANY,
+				metadata.getMappedBy(), metadata.removesOprhans()));
+		}
+	}
+
+	/**
+	 * Adds the declared attributes into attributes.
+	 * 
+	 * @param attribute
+	 *            the declared attribute
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected void addDeclaredAttribute(AttributeImpl<X, ?> attribute) {
+		this.declaredAttributes.put(attribute.getName(), attribute);
+		this.attributes.put(attribute.getName(), attribute);
 	}
 
 	/**
