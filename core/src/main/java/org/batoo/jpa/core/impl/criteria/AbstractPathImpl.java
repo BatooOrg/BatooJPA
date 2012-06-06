@@ -18,18 +18,11 @@
  */
 package org.batoo.jpa.core.impl.criteria;
 
-import java.util.Collection;
-import java.util.Map;
-
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
-import javax.persistence.metamodel.MapAttribute;
-import javax.persistence.metamodel.PluralAttribute;
-import javax.persistence.metamodel.SingularAttribute;
 
 /**
- * Represents a simple or compound attribute path from a
- * bound type or collection, and is a "primitive" expression.
+ * Abstract implementation of {@link Path}.
  * 
  * @param <X>
  *            the type referenced by the path
@@ -37,16 +30,21 @@ import javax.persistence.metamodel.SingularAttribute;
  * @author hceylan
  * @since $version
  */
-public abstract class PathImpl<X> extends ExpressionImpl<X> implements Path<X> {
+public abstract class AbstractPathImpl<X> extends ExpressionImpl<X> implements Path<X> {
+
+	private final AbstractPathImpl<?> parent;
 
 	/**
-	 * {@inheritDoc}
+	 * @param parent
+	 *            the parent path, may be null
 	 * 
+	 * @since $version
+	 * @author hceylan
 	 */
-	@Override
-	public <K, V, M extends Map<K, V>> Expression<M> get(MapAttribute<X, K, V> map) {
-		// TODO Auto-generated method stub
-		return null;
+	public AbstractPathImpl(AbstractPathImpl<?> parent) {
+		super();
+
+		this.parent = parent;
 	}
 
 	/**
@@ -54,39 +52,20 @@ public abstract class PathImpl<X> extends ExpressionImpl<X> implements Path<X> {
 	 * 
 	 */
 	@Override
-	public <E, C extends Collection<E>> Expression<C> get(PluralAttribute<X, C, E> collection) {
-		// TODO Auto-generated method stub
-		return null;
+	public AbstractPathImpl<?> getParentPath() {
+		return this.parent;
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Returns the root of this path.
 	 * 
-	 */
-	@Override
-	public <Y> Path<Y> get(SingularAttribute<? super X, Y> attribute) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
+	 * @return the root of this path
 	 * 
+	 * @since $version
+	 * @author hceylan
 	 */
-	@Override
-	public <Y> Path<Y> get(String attributeName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Path<?> getParentPath() {
-		// TODO Auto-generated method stub
-		return null;
+	public AbstractFromImpl<?, ?> getRoot() {
+		return this.parent.getRoot();
 	}
 
 	/**

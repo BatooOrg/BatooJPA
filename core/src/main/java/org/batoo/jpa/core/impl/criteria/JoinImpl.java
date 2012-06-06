@@ -23,6 +23,8 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.metamodel.Attribute;
 
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
+
 /**
  * A join to an entity, embeddable, or basic type.
  * 
@@ -34,7 +36,16 @@ import javax.persistence.metamodel.Attribute;
  * @author hceylan
  * @since $version
  */
-public abstract class JoinImpl<Z, X> extends FromImpl<Z, X> implements Join<Z, X> {
+public abstract class JoinImpl<Z, X> extends AbstractFromImpl<Z, X> implements Join<Z, X> {
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public JoinImpl(EntityTypeImpl<X> entity) {
+		super(entity);
+	}
 
 	/**
 	 * {@inheritDoc}

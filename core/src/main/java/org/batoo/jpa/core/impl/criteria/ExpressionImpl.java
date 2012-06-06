@@ -102,5 +102,4 @@ public abstract class ExpressionImpl<T> extends SelectionImpl<T> implements Expr
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }

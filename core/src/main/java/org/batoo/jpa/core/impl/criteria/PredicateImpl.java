@@ -18,14 +18,14 @@
  */
 package org.batoo.jpa.core.impl.criteria;
 
-import java.sql.ResultSet;
 import java.util.List;
 
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 
 /**
  * 
@@ -34,23 +34,27 @@ import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
  */
 public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate {
 
-	private final Expression<?> x;
-	private final Expression<?> y;
+	private final BooleanOperator operator;
+	private final boolean negated;
+	private final List<Expression<Boolean>> expressions;
+
+	private PredicateImpl(boolean negated, BooleanOperator operator, List<Expression<Boolean>> expressions) {
+		super();
+
+		this.negated = negated;
+		this.operator = operator;
+		this.expressions = expressions;
+	}
 
 	/**
-	 * @param x
-	 *            the first expression
-	 * @param y
-	 *            the second expression
+	 * @param expressions
+	 *            the expressions
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PredicateImpl(Expression<?> x, Expression<?> y) {
-		super();
-
-		this.x = x;
-		this.y = y;
+	public PredicateImpl(Expression<Boolean>... expressions) {
+		this(false, BooleanOperator.AND, Lists.newArrayList(expressions));
 	}
 
 	/**
@@ -58,9 +62,16 @@ public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate 
 	 * 
 	 */
 	@Override
-	public String generateSelect() {
-		// TODO Auto-generated method stub
-		return null;
+	public String generate(final CriteriaQueryImpl<?> query) {
+		final List<String> converted = Lists.transform(this.expressions, new Function<Expression<Boolean>, String>() {
+
+			@Override
+			public String apply(Expression<Boolean> input) {
+				return ((ExpressionImpl<Boolean>) input).generate(query);
+			}
+		});
+
+		return Joiner.on(this.operator.name()).join(converted);
 	}
 
 	/**
@@ -69,8 +80,7 @@ public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate 
 	 */
 	@Override
 	public List<Expression<Boolean>> getExpressions() {
-		// TODO Auto-generated method stub
-		return null;
+		return Lists.newArrayList(this.expressions);
 	}
 
 	/**
@@ -79,18 +89,7 @@ public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate 
 	 */
 	@Override
 	public BooleanOperator getOperator() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public ManagedInstance<Boolean> handleRow(EntityManagerImpl entityManager, ResultSet rs) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.operator;
 	}
 
 	/**
@@ -99,8 +98,7 @@ public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate 
 	 */
 	@Override
 	public boolean isNegated() {
-		// TODO Auto-generated method stub
-		return false;
+		return this.negated;
 	}
 
 	/**
@@ -109,8 +107,6 @@ public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate 
 	 */
 	@Override
 	public Predicate not() {
-		// TODO Auto-generated method stub
-		return null;
+		return new PredicateImpl(true, this.operator, this.expressions);
 	}
-
 }

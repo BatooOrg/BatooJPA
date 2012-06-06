@@ -61,9 +61,12 @@ public interface EnhancedInstance extends Serializable {
 	/**
 	 * Sets the managed instance of the instance.
 	 * 
+	 * @param instance
+	 *            the instance to set
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	void __enhanced__$$__setManagedInstance(ManagedInstance instance);
+	void __enhanced__$$__setManagedInstance(ManagedInstance<?> instance);
 
 }

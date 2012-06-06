@@ -38,25 +38,43 @@ import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
  */
 public abstract class SelectionImpl<X> extends TupleElementImpl<X> implements Selection<X> {
 
+	private String alias;
+
 	/**
 	 * {@inheritDoc}
 	 * 
 	 */
 	@Override
-	public Selection<X> alias(String name) {
-		// TODO Auto-generated method stub
-		return null;
+	public Selection<X> alias(String alias) {
+		if (alias == null) {
+			throw new IllegalStateException("Alias has already been set");
+		}
+
+		this.alias = alias;
+
+		return this;
 	}
 
 	/**
-	 * Returns the generated select SQL fragment.
+	 * Returns the generated SQL fragment.
 	 * 
-	 * @return the generated select SQL fragment
+	 * @param query
+	 *            the query
+	 * @return the generated SQL fragment
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract String generateSelect();
+	public abstract String generate(CriteriaQueryImpl<?> query);
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getAlias() {
+		return this.alias;
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -64,25 +82,28 @@ public abstract class SelectionImpl<X> extends TupleElementImpl<X> implements Se
 	 */
 	@Override
 	public List<Selection<?>> getCompoundSelectionItems() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	/**
-	 * Handles a single row from the resultset.
+	 * Handles the row.
+	 * <p>
+	 * The default implementation does nothing.
 	 * 
-	 * @param entityManager
+	 * @param em
 	 *            the entity manager
 	 * @param rs
-	 *            the resultset to handle row
-	 * @return the managed instance created
+	 *            the resultset
+	 * @return the managed instance
 	 * @throws SQLException
-	 *             thrown in case of an SQL error
+	 *             thrown in case of an underlying SQL Exception
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract ManagedInstance<X> handleRow(EntityManagerImpl entityManager, ResultSet rs) throws SQLException;
+	public ManagedInstance<X> handleRow(EntityManagerImpl em, ResultSet rs) throws SQLException {
+		return null;
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -90,8 +111,6 @@ public abstract class SelectionImpl<X> extends TupleElementImpl<X> implements Se
 	 */
 	@Override
 	public boolean isCompoundSelection() {
-		// TODO Auto-generated method stub
 		return false;
 	}
-
 }

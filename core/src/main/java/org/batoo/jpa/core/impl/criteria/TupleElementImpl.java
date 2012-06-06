@@ -31,17 +31,7 @@ import javax.persistence.TupleElement;
  * @author hceylan
  * @since $version
  */
-public class TupleElementImpl<X> implements TupleElement<X> {
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String getAlias() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+public abstract class TupleElementImpl<X> implements TupleElement<X> {
 
 	/**
 	 * {@inheritDoc}
@@ -52,5 +42,4 @@ public class TupleElementImpl<X> implements TupleElement<X> {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }

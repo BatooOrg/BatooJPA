@@ -18,8 +18,8 @@
  */
 package org.batoo.jpa.core.impl.criteria;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.criteria.AbstractQuery;
 import javax.persistence.criteria.Expression;
@@ -54,21 +54,9 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	private final MetamodelImpl metamodel;
 	private final Class<T> resultType;
 
-	private final HashSet<RootImpl<?>> roots = Sets.newHashSet();
-
-	/**
-	 * @param original
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public AbstractQueryImpl(AbstractQueryImpl<T> original) {
-		super();
-
-		this.metamodel = original.getMetamodel();
-		this.resultType = original.resultType;
-		this.roots.addAll(original.roots);
-	}
+	private final Set<RootImpl<?>> roots = Sets.newHashSet();
+	protected PredicateImpl restriction;
+	private int nextAlias;
 
 	/**
 	 * @param metamodel
@@ -93,6 +81,7 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	@Override
 	public <X> RootImpl<X> from(Class<X> entityClass) {
 		final EntityTypeImpl<X> entity = this.getMetamodel().entity(entityClass);
+
 		return this.from(entity);
 	}
 
@@ -103,9 +92,22 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	@Override
 	public <X> RootImpl<X> from(EntityType<X> entity) {
 		final RootImpl<X> r = new RootImpl<X>((EntityTypeImpl<X>) entity);
+
 		this.roots.add(r);
 
 		return r;
+	}
+
+	/**
+	 * Returns the generated alias.
+	 * 
+	 * @return the generated alias
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String generateAlias() {
+		return "E" + this.nextAlias++;
 	}
 
 	/**
@@ -143,9 +145,8 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	 * 
 	 */
 	@Override
-	public Predicate getRestriction() {
-		// TODO Auto-generated method stub
-		return null;
+	public PredicateImpl getRestriction() {
+		return this.restriction;
 	}
 
 	/**
@@ -154,8 +155,7 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	 */
 	@Override
 	public Class<T> getResultType() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.resultType;
 	}
 
 	/**
@@ -163,7 +163,7 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	 * 
 	 */
 	@Override
-	public HashSet<Root<?>> getRoots() {
+	public Set<Root<?>> getRoots() {
 		return Sets.<Root<?>> newHashSet(this.roots);
 	}
 
@@ -176,5 +176,4 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }

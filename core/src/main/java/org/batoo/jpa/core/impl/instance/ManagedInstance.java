@@ -19,7 +19,6 @@
 package org.batoo.jpa.core.impl.instance;
 
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -211,11 +210,11 @@ public class ManagedInstance<X> {
 			return true;
 		}
 
-		if (!Arrays.equals(this.idAttributes, other.idAttributes)) {
+		if (this.getType() != other.getType()) {
 			return false;
 		}
 
-		return true;
+		return this.getId().equals(other.getId());
 	}
 
 	/**
@@ -284,7 +283,11 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public Object getId() {
-		return null;
+		if (this.id != null) {
+			return this.id;
+		}
+
+		return this.id = this.idAttributes[0].get(this.instance);
 	}
 
 	/**
@@ -338,13 +341,25 @@ public class ManagedInstance<X> {
 		}
 
 		final int prime = 31;
-		int result = 1;
-		for (final IdAttributeImpl<? super X, ?> attribute : this.idAttributes) {
-			final Object idValue = attribute.get(this.instance);
-			result = (prime * result) + idValue.hashCode();
+		final int result = 1;
+
+		final Object id = this.getId();
+		if (id == null) {
+			return result;
 		}
 
-		return this.h = result;
+		return this.h = (prime * result) + id.hashCode();
+	}
+
+	/**
+	 * Initializes the id attributes
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void initialize() {
+		// TODO Auto-generated method stub
+
 	}
 
 	/**

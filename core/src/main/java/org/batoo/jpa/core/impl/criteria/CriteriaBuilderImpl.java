@@ -38,6 +38,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Selection;
 import javax.persistence.criteria.Subquery;
 
+import org.batoo.jpa.core.impl.criteria.CompundExpressionImpl.Comparison;
 import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
 
 /**
@@ -379,8 +380,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public PredicateImpl equal(Expression<?> x, Expression<?> y) {
-		return new PredicateImpl(x, y);
+		return new PredicateImpl(new CompundExpressionImpl(Comparison.EQUAL, (ExpressionImpl<?>) x, (ExpressionImpl<?>) y));
 	}
 
 	/**
@@ -1059,8 +1061,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <T> ParameterExpressionImpl<T> parameter(Class<T> paramClass) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ParameterExpressionImpl<T>(paramClass, null);
 	}
 
 	/**
@@ -1069,8 +1070,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <T> ParameterExpression<T> parameter(Class<T> paramClass, String name) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ParameterExpressionImpl<T>(paramClass, "name");
 	}
 
 	/**

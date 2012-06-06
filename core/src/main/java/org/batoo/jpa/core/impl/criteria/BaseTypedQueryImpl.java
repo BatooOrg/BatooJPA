@@ -21,8 +21,9 @@ package org.batoo.jpa.core.impl.criteria;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
@@ -38,6 +39,7 @@ import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * The base implementation of {@link TypedQueryImpl}.
@@ -54,20 +56,23 @@ public abstract class BaseTypedQueryImpl<X> implements TypedQuery<X>, ResultSetH
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(BaseTypedQueryImpl.class);
 
-	private final CriteriaQueryImpl<X> cq;
+	protected final CriteriaQueryImpl<X> cq;
 	private final EntityManagerImpl em;
 	private final MetamodelImpl metamodel;
 	private final Class<X> resultType;
 	private final SelectionImpl<X> selection;
 
-	private final ArrayList<ManagedInstance<X>> results = Lists.newArrayList();
+	protected final Map<ParameterExpressionImpl<?>, Object> parameters = Maps.newHashMap();
+	private final List<ManagedInstance<X>> results = Lists.newArrayList();
 
 	private String[] labels;
-	private ArrayList<Object[]> data;
+	private List<Object[]> data;
 
 	/**
 	 * @param criteriaQuery
+	 *            the criteria query
 	 * @param entityManager
+	 *            the entity manager
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -152,8 +157,13 @@ public abstract class BaseTypedQueryImpl<X> implements TypedQuery<X>, ResultSetH
 	public List<X> getResultList() {
 		final String sql = this.cq.getSql();
 
+		final Object[] parameters = new Object[this.parameters.size()];
+		for (final Entry<ParameterExpressionImpl<?>, Object> e : this.parameters.entrySet()) {
+			parameters[e.getKey().getPosition() - 1] = e.getValue();
+		}
+
 		try {
-			final List<ManagedInstance<X>> result = new QueryRunner().query(this.em.getConnection(), sql, this);
+			final List<ManagedInstance<X>> result = new QueryRunner().query(this.em.getConnection(), sql, this, parameters);
 
 			return Lists.transform(result, new Function<ManagedInstance<X>, X>() {
 

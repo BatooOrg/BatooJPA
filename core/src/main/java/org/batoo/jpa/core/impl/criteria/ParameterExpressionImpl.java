@@ -18,13 +18,7 @@
  */
 package org.batoo.jpa.core.impl.criteria;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import javax.persistence.criteria.ParameterExpression;
-
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 
 /**
  * Type of criteria query parameter expressions.
@@ -37,17 +31,23 @@ import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 public class ParameterExpressionImpl<T> extends ExpressionImpl<T> implements ParameterExpression<T> {
 
 	private final Class<T> paramClass;
+	private final String name;
+	private Integer position;
 
 	/**
 	 * @param paramClass
+	 *            the class of the parameter
+	 * @param name
+	 *            the name of the parameter
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ParameterExpressionImpl(Class<T> paramClass) {
+	public ParameterExpressionImpl(Class<T> paramClass, String name) {
 		super();
 
 		this.paramClass = paramClass;
+		this.name = name;
 	}
 
 	/**
@@ -55,9 +55,12 @@ public class ParameterExpressionImpl<T> extends ExpressionImpl<T> implements Par
 	 * 
 	 */
 	@Override
-	public String generateSelect() {
-		// TODO Auto-generated method stub
-		return null;
+	public String generate(CriteriaQueryImpl<?> query) {
+		if (this.position == null) {
+			query.addParameter(this);
+		}
+
+		return "?";
 	}
 
 	/**
@@ -66,8 +69,7 @@ public class ParameterExpressionImpl<T> extends ExpressionImpl<T> implements Par
 	 */
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.name;
 	}
 
 	/**
@@ -76,8 +78,7 @@ public class ParameterExpressionImpl<T> extends ExpressionImpl<T> implements Par
 	 */
 	@Override
 	public Class<T> getParameterType() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.paramClass;
 	}
 
 	/**
@@ -86,18 +87,19 @@ public class ParameterExpressionImpl<T> extends ExpressionImpl<T> implements Par
 	 */
 	@Override
 	public Integer getPosition() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.position;
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Sets the position of the parameter
 	 * 
+	 * @param position
+	 *            the position
+	 * 
+	 * @since $version
+	 * @author hceylan
 	 */
-	@Override
-	public ManagedInstance<T> handleRow(EntityManagerImpl entityManager, ResultSet rs) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+	public void setPosition(int position) {
+		this.position = position;
 	}
-
 }

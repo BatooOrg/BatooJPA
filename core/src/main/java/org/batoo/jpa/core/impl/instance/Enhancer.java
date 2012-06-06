@@ -73,6 +73,8 @@ public final class Enhancer implements Opcodes {
 			Type.getDescriptor(Class.class), null, null).visitEnd();
 		cw.visitField(Opcodes.ACC_PRIVATE + Opcodes.ACC_FINAL + Opcodes.ACC_TRANSIENT, Enhancer.FIELD_ENHANCED_SESSION,
 			Type.getDescriptor(SessionImpl.class), null, null).visitEnd();
+		cw.visitField(Opcodes.ACC_PRIVATE + Opcodes.ACC_TRANSIENT, Enhancer.FIELD_ENHANCED_MANAGED_INSTANCE,
+			Type.getDescriptor(ManagedInstance.class), null, null).visitEnd();
 
 		// Constructors
 		Enhancer.createNoArgConstructor(enhancingClassName, enhancedClassName, descEnhancer, cw);
@@ -90,7 +92,7 @@ public final class Enhancer implements Opcodes {
 			for (final Method method : currentClass.getDeclaredMethods()) {
 				int modifiers = method.getModifiers();
 
-				// Filter out uninterested details
+				// Filter out the details that we are not interested
 				modifiers &= Modifier.ABSTRACT;
 				modifiers &= Modifier.FINAL;
 				modifiers &= Modifier.NATIVE;
@@ -279,9 +281,8 @@ public final class Enhancer implements Opcodes {
 	}
 
 	private static void createMethodSetManagedInstance(final String enhancedClassName, final String descEnhancer, final ClassWriter cw) {
-		MethodVisitor mv;
-		mv = cw.visitMethod(Opcodes.ACC_PUBLIC, Enhancer.METHOD_ENHANCED_SET_MANAGED_INSTANCE,
-			Enhancer.makeDescription(Object.class, ManagedInstance.class), null, null);
+		final MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, Enhancer.METHOD_ENHANCED_SET_MANAGED_INSTANCE,
+			Enhancer.makeDescription(Void.TYPE, ManagedInstance.class), null, null);
 		mv.visitCode();
 
 		final Label l0 = new Label();
@@ -298,7 +299,7 @@ public final class Enhancer implements Opcodes {
 		final Label l2 = new Label();
 		mv.visitLabel(l2);
 		mv.visitLocalVariable(Enhancer.THIS, descEnhancer, null, l0, l1, 0);
-		mv.visitLocalVariable("table", Type.getDescriptor(ManagedInstance.class), null, l0, l2, 1);
+		mv.visitLocalVariable("instance", Type.getDescriptor(ManagedInstance.class), null, l0, l2, 1);
 		mv.visitMaxs(0, 0);
 		mv.visitEnd();
 	}
@@ -347,10 +348,7 @@ public final class Enhancer implements Opcodes {
 	private static void createOverrriddenMethod(final String enhancingClassName, final String enhancedClassName, final String descEnhancer,
 		final ClassWriter cw, Method method) {
 		final String methodDescription = Enhancer.makeDescription(method.getReturnType(), method.getParameterTypes());
-		Enhancer.LOG.trace("");
-		Enhancer.LOG.trace("Enhancing method: {0}", method);
-		Enhancer.LOG.trace("");
-		Enhancer.LOG.trace("");
+		Enhancer.LOG.debug("Enhancing method: {0}", method);
 
 		for (int i = 0; i < method.getExceptionTypes().length; i++) {}
 		/**

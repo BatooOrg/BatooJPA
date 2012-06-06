@@ -39,3 +39,4 @@ embeddables
 prefills
 enhancer
 resultset
+subqueries

@@ -20,8 +20,6 @@ package org.batoo.jpa.core.impl.criteria;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map.Entry;
 
 import javax.persistence.criteria.Root;
@@ -29,14 +27,9 @@ import javax.persistence.criteria.Root;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
-import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.EntityTypeImpl;
-
-import com.google.common.base.Joiner;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.Lists;
 
 /**
  * A root type in the from clause. Query roots always reference entities.
@@ -46,71 +39,33 @@ import com.google.common.collect.Lists;
  * @author hceylan
  * @since $version
  */
-public class RootImpl<X> extends FromImpl<X, X> implements Root<X> {
-
-	private final EntityTypeImpl<X> entity;
-	private final HashBiMap<String, PkColumn> idFields = HashBiMap.create();
-	private final HashBiMap<String, AbstractColumn> fields = HashBiMap.create();
-	private final HashBiMap<String, EntityTable> tableAliases = HashBiMap.create();
+public class RootImpl<X> extends AbstractFromImpl<X, X> implements Root<X> {
 
 	/**
 	 * @param entity
-	 *            the entity type
+	 *            the entity
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	public RootImpl(EntityTypeImpl<X> entity) {
-		super();
-
-		this.entity = entity;
+		super(entity);
 	}
 
 	/**
 	 * Returns the generated from SQL fragment.
 	 * 
 	 * @param query
-	 *            the query the root belongs to
+	 *            the query
 	 * @return the generated from SQL fragment
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String generateFrom(BaseQueryImpl<?> query) {
-		final EntityTable defaultTable = this.entity.getPrimaryTable();
+	public String generateFrom(CriteriaQueryImpl<?> query) {
+		final EntityTable primaryTable = this.entity.getPrimaryTable();
 
-		this.tableAliases.put("T0", defaultTable);
-		return defaultTable.getQName();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generateSelect() {
-		final ArrayList<String> fields = Lists.newArrayList();
-
-		for (final EntityTable table : this.entity.getTables()) {
-
-			final Collection<AbstractColumn> columns = table.getColumns();
-			for (final AbstractColumn column : columns) {
-
-				this.tableAliases.inverse().get(column.getTable());
-
-				final String field = Joiner.on(".").skipNulls().join(this.getAlias(), column.getName());
-				if (column instanceof PkColumn) {
-					this.idFields.put(field, (PkColumn) column);
-				}
-				else {
-					this.fields.put(field, column);
-				}
-
-				fields.add(field);
-			}
-		}
-
-		return "SELECT " + Joiner.on(", ").join(fields);
+		return primaryTable.getName() + " AS " + this.getTableAlias(query, primaryTable);
 	}
 
 	/**

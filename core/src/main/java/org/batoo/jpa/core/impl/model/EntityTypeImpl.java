@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.criteria.Path;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 import javax.persistence.metamodel.EntityType;
@@ -55,6 +56,7 @@ import org.batoo.jpa.core.impl.manager.EntityTransactionImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedAttribute;
+import org.batoo.jpa.core.impl.model.attribute.IdAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.PhysicalAttributeImpl;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
@@ -537,7 +539,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		}
 
 		final TypedQueryImpl<X> q = entityManager.createQuery(this.selectCriteria);
-		q.setParameter(1, instance);
+		q.setParameter(1, instance.getId());
 
 		return q.getSingleResult();
 	}
@@ -598,7 +600,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		this.dependencyCount += dependencies.length;
 
 		this.dependencyMap.put(associate, dependencies);
-
 	}
 
 	private synchronized CriteriaQueryImpl<X> prepareSelectCriteria(EntityManagerImpl entityManager) {
@@ -609,16 +610,19 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 		final CriteriaBuilderImpl cb = entityManager.getCriteriaBuilder();
 		CriteriaQueryImpl<X> q = cb.createQuery(this.getJavaType());
-		final RootImpl<X> r = q.from(this.getJavaType());
+		final RootImpl<X> r = q.from(this);
 		q = q.select(r);
-		q = q.distinct(true);
 
-		final ParameterExpressionImpl<X> pe = cb.parameter(this.getJavaType());
-		final PredicateImpl w = cb.equal(r, pe);
-		q = q.where(w);
-		this.selectCriteria = q;
+		final List<PredicateImpl> predicates = Lists.newArrayList();
+		for (final IdAttributeImpl<? super X, ?> idAttribute : this.getIdAttributes()) {
+			final ParameterExpressionImpl<?> pe = cb.parameter(idAttribute.getJavaType());
+			final Path<?> path = r.get(idAttribute);
+			final PredicateImpl predicate = cb.equal(path, pe);
 
-		return q;
+			predicates.add(predicate);
+		}
+
+		return this.selectCriteria = q.where(predicates.toArray(new PredicateImpl[predicates.size()]));
 	}
 
 	/**

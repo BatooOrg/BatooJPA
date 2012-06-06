@@ -279,9 +279,11 @@ public class TypedQueryImpl<X> extends BaseTypedQueryImpl<X> {
 	 * 
 	 */
 	@Override
-	public TypedQuery<X> setParameter(int position, Object value) {
-		// TODO Auto-generated method stub
-		return null;
+	public TypedQueryImpl<X> setParameter(int position, Object value) {
+		final ParameterExpressionImpl<?> parameter = this.cq.getParameter(position);
+		this.parameters.put(parameter, value);
+
+		return this;
 	}
 
 	/**
