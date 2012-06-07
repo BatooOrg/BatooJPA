@@ -170,5 +170,4 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	public String getTargetEntity() {
 		return this.targetEntity;
 	}
-
 }

@@ -28,6 +28,7 @@ import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
+import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinColumn;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
@@ -80,31 +81,35 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	 */
 	@Override
 	public void createForeignKey(DataSource datasource, ForeignKey foreignKey) throws SQLException {
-		final String tableName = foreignKey.getTable().getName();
-		final String referenceTableName = foreignKey.getReferencedTable().getName();
+		final EntityTable referencedTable = foreignKey.getReferencedTable();
+		synchronized (referencedTable) {
 
-		final String foreignKeyColumns = Joiner.on(", ").join(
-			Lists.transform(foreignKey.getJoinColumns(), new Function<JoinColumn, String>() {
+			final String referenceTableName = referencedTable.getName();
+			final String tableName = foreignKey.getTable().getName();
+
+			final String foreignKeyColumns = Joiner.on(", ").join(
+				Lists.transform(foreignKey.getJoinColumns(), new Function<JoinColumn, String>() {
+
+					@Override
+					public String apply(JoinColumn input) {
+						return input.getReferencedColumn().getName();
+					}
+				}));
+
+			final String keyColumns = Joiner.on(", ").join(Lists.transform(foreignKey.getJoinColumns(), new Function<JoinColumn, String>() {
 
 				@Override
 				public String apply(JoinColumn input) {
-					return input.getReferencedColumn().getName();
+					return input.getName();
 				}
 			}));
 
-		final String keyColumns = Joiner.on(", ").join(Lists.transform(foreignKey.getJoinColumns(), new Function<JoinColumn, String>() {
+			final String sql = "ALTER TABLE " + tableName //
+				+ "\n\tADD FOREIGN KEY (" + keyColumns + ")" //
+				+ "\n\tREFERENCES " + referenceTableName + "(" + foreignKeyColumns + ")";
 
-			@Override
-			public String apply(JoinColumn input) {
-				return input.getName();
-			}
-		}));
-
-		final String sql = "ALTER TABLE " + tableName //
-			+ "\n\tADD FOREIGN KEY (" + keyColumns + ")" //
-			+ "\n\tREFERENCES " + referenceTableName + "(" + foreignKeyColumns + ")";
-
-		new QueryRunner(datasource).update(sql);
+			new QueryRunner(datasource).update(sql);
+		}
 	}
 
 	/**

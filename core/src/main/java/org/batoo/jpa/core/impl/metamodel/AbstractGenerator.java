@@ -57,7 +57,7 @@ public class AbstractGenerator {
 		this.catalog = metadata != null ? metadata.getCatalog() : null;
 		this.name = metadata != null ? metadata.getName() : AbstractGenerator.DEFAULT_NAME;
 		this.schema = metadata != null ? metadata.getSchema() : null;
-		this.initialValue = metadata != null ? metadata.getInitialValue() : 0;
+		this.initialValue = metadata != null ? metadata.getInitialValue() : 1;
 		this.allocationSize = metadata != null ? metadata.getAllocationSize() : 50;
 	}
 

@@ -142,8 +142,8 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * 
 	 */
 	@Override
-	public Attribute<? super X, ?> getAttribute(String name) {
-		return this.declaredAttributes.get(name);
+	public AttributeImpl<? super X, ?> getAttribute(String name) {
+		return this.attributes.get(name);
 	}
 
 	/**

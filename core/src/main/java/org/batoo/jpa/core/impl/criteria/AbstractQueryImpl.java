@@ -54,6 +54,7 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	private final MetamodelImpl metamodel;
 	private final Class<T> resultType;
 
+	protected SelectionImpl<T> selection;
 	private final Set<RootImpl<?>> roots = Sets.newHashSet();
 	protected PredicateImpl restriction;
 	private int nextAlias;
@@ -72,6 +73,16 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 
 		this.metamodel = metamodel;
 		this.resultType = resultType;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public AbstractQuery<T> distinct(boolean distinct) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -165,6 +176,65 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	@Override
 	public Set<Root<?>> getRoots() {
 		return Sets.<Root<?>> newHashSet(this.roots);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public SelectionImpl<T> getSelection() {
+		return this.selection;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public AbstractQuery<T> groupBy(Expression<?>... grouping) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public AbstractQuery<T> groupBy(List<Expression<?>> grouping) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public AbstractQuery<T> having(Expression<Boolean> restriction) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public AbstractQuery<T> having(Predicate... restrictions) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isDistinct() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	/**

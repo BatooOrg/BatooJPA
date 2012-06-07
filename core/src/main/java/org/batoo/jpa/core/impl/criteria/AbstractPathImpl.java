@@ -77,5 +77,4 @@ public abstract class AbstractPathImpl<X> extends ExpressionImpl<X> implements P
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }

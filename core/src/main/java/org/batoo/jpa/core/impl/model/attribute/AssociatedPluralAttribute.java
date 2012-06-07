@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.model.attribute;
 import java.util.Collection;
 
 import javax.persistence.CascadeType;
+import javax.persistence.FetchType;
 
 import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.EntityTypeImpl;
@@ -54,6 +55,7 @@ public abstract class AssociatedPluralAttribute<X, C, E> extends PluralAttribute
 	private final boolean cascadesRefresh;
 	private final boolean cascadesRemove;
 	private final boolean removesOrphans;
+	private final boolean eager;
 
 	private EntityTypeImpl<E> type;
 
@@ -79,6 +81,8 @@ public abstract class AssociatedPluralAttribute<X, C, E> extends PluralAttribute
 		this.attributeType = attributeType;
 		this.inverseName = mappedBy;
 		this.removesOrphans = removesOrphans;
+
+		this.eager = metadata.getFetchType() == FetchType.EAGER;
 
 		this.cascadesDetach = metadata.getCascades().contains(CascadeType.ALL) || metadata.getCascades().contains(CascadeType.DETACH);
 		this.cascadesMerge = metadata.getCascades().contains(CascadeType.ALL) || metadata.getCascades().contains(CascadeType.MERGE);
@@ -146,6 +150,15 @@ public abstract class AssociatedPluralAttribute<X, C, E> extends PluralAttribute
 	 * 
 	 */
 	@Override
+	public AssociatedAttribute<C, X> getInverse() {
+		return this.inverse;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public PersistentAttributeType getPersistentAttributeType() {
 		return this.attributeType;
 	}
@@ -164,6 +177,15 @@ public abstract class AssociatedPluralAttribute<X, C, E> extends PluralAttribute
 	 * 
 	 */
 	@Override
+	public boolean isEager() {
+		return this.eager;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public final boolean isOwner() {
 		return this.inverseName == null;
 	}
@@ -173,9 +195,21 @@ public abstract class AssociatedPluralAttribute<X, C, E> extends PluralAttribute
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public void link() throws MappingException {
 		final MetamodelImpl metamodel = this.getDeclaringType().getMetamodel();
 		this.type = metamodel.entity(this.getBindableJavaType());
+
+		if (this.inverseName != null) {
+			this.inverse = (AssociatedAttribute<C, X>) this.type.getAttribute(this.inverseName);
+
+			if (this.inverse == null) {
+				throw new MappingException("Cannot find the mappedBy attribute " + this.inverseName + " specified on "
+					+ this.getJavaMember());
+			}
+
+			this.inverse.setInverse(this);
+		}
 	}
 
 	/**

@@ -21,8 +21,13 @@ package org.batoo.jpa.core.impl.jdbc;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.criteria.JoinType;
+
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 
 /**
  * Foreign key definition.
@@ -53,6 +58,39 @@ public class ForeignKey {
 
 		this.attribute = attribute;
 		this.joinColumns = joinColumns;
+	}
+
+	/**
+	 * @param joinType
+	 *            the type of the join
+	 * @param parentAlias
+	 *            the alias of the parent table
+	 * @param alias
+	 *            the alias of the table
+	 * @return the join SQL fragment
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String createJoin(JoinType joinType, String parentAlias, String alias) {
+		final List<String> parts = Lists.newArrayList();
+
+		for (final JoinColumn joinColumn : this.joinColumns) {
+			final String part = parentAlias + "." + joinColumn.getReferencedColumn().getName() + " = " + alias + "." + joinColumn.getName();
+			parts.add(part);
+		}
+
+		final String join = Joiner.on(" AND ").join(parts);
+
+		// append the join part
+		switch (joinType) {
+			case INNER:
+				return "INNER JOIN " + this.table.getName() + " AS " + alias + " ON " + join;
+			case LEFT:
+				return "LEFT JOIN " + this.table.getName() + " AS " + alias + " ON " + join;
+			default:
+				return "RIGHT JOIN " + this.table.getName() + " AS " + alias + " ON " + join;
+		}
 	}
 
 	/**

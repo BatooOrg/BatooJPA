@@ -41,4 +41,17 @@ public class SecondaryTable extends EntityTable {
 	public SecondaryTable(EntityTypeImpl<?> entity, SecondaryTableMetadata metadata) {
 		super(entity, metadata);
 	}
+
+	/**
+	 * @param primaryTableAlias
+	 * @param alias
+	 * @return
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String joinPrimary(String primaryTableAlias, String alias) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

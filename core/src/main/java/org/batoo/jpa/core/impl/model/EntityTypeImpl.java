@@ -19,7 +19,6 @@
 package org.batoo.jpa.core.impl.model;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -28,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.criteria.FetchParent;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Path;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
@@ -80,15 +81,19 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private final String name;
 	private EntityTable primaryTable;
 	private final Map<String, EntityTable> declaredTables = Maps.newHashMap();
-	private AssociatedAttribute<? super X, ?>[] associatedAttributes;
-	private AssociatedAttribute<? super X, ?>[] persistableAssociations;
-	private EntityTable[] tables;
+
 	@SuppressWarnings("restriction")
 	private sun.reflect.ConstructorAccessor enhancer;
+
+	private EntityTable[] tables;
 	private CriteriaQueryImpl<X> selectCriteria;
 
 	private int dependencyCount;
 	private final HashMap<EntityTypeImpl<?>, AssociatedAttribute<?, ?>[]> dependencyMap = Maps.newHashMap();
+
+	private AssociatedAttribute<? super X, ?>[] associatedAttributes;
+	private AssociatedAttribute<? super X, ?>[] persistableAssociations;
+	private AssociatedAttribute<? super X, ?>[] eagerAssociations;
 
 	/**
 	 * @param metamodel
@@ -176,6 +181,36 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		}
 
 		return this.associatedAttributes;
+	}
+
+	/**
+	 * Returns the associatedAttributes that are persistable by the type.
+	 * 
+	 * @return the associatedAttributes that are persistable by the type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	public AssociatedAttribute<? super X, ?>[] getAssociationsEager() {
+		if (this.eagerAssociations != null) {
+			return this.eagerAssociations;
+		}
+
+		synchronized (this) {
+			final List<AssociatedAttribute<? super X, ?>> eagerAssociations = Lists.newArrayList();
+
+			for (final AssociatedAttribute<? super X, ?> association : this.getAssociations()) {
+				if (association.isEager()) {
+					eagerAssociations.add(association);
+				}
+			}
+
+			this.eagerAssociations = new AssociatedAttribute[eagerAssociations.size()];
+			eagerAssociations.toArray(this.eagerAssociations);
+		}
+
+		return this.eagerAssociations;
 	}
 
 	/**
@@ -323,9 +358,9 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		try {
 			instance = (X) this.enhancer.newInstance(new Object[] { this.getJavaType(), session, id, !lazy });
 		}
-		catch (final InvocationTargetException e) {} // not possible
-		catch (final IllegalArgumentException e) {} // not possible
-		catch (final InstantiationException e) {} // not possible
+		catch (final Exception e) {
+			e.printStackTrace();
+		} // not possible
 
 		final ManagedInstance<X> managedInstance = new ManagedInstance<X>(this, session, instance, id);
 
@@ -602,6 +637,18 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		this.dependencyMap.put(associate, dependencies);
 	}
 
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 * @param entityTypeImpl
+	 */
+	private void prepareEagerAssociations(FetchParent<?, ?> r, EntityTypeImpl<?> entityType) {
+		for (final AssociatedAttribute<?, ?> attribute : entityType.getAssociationsEager()) {
+			r.fetch(attribute.getName(), JoinType.LEFT);
+		}
+	}
+
 	private synchronized CriteriaQueryImpl<X> prepareSelectCriteria(EntityManagerImpl entityManager) {
 		// other thread prepared before this one
 		if (this.selectCriteria != null) {
@@ -612,6 +659,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		CriteriaQueryImpl<X> q = cb.createQuery(this.getJavaType());
 		final RootImpl<X> r = q.from(this);
 		q = q.select(r);
+
+		this.prepareEagerAssociations(r, this);
 
 		final List<PredicateImpl> predicates = Lists.newArrayList();
 		for (final IdAttributeImpl<? super X, ?> idAttribute : this.getIdAttributes()) {

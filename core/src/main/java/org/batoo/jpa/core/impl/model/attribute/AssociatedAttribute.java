@@ -77,6 +77,18 @@ public interface AssociatedAttribute<X, T> extends Attribute<X, T> {
 	boolean cascadesRemove();
 
 	/**
+	 * Returns the attribute value of instance.
+	 * 
+	 * @param instance
+	 *            the instance of which the value to be returned
+	 * @return the attribute value of instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public T get(Object instance);
+
+	/**
 	 * Returns the foreign key of the attribute.
 	 * 
 	 * @return the foreign key of the attribute
@@ -85,6 +97,27 @@ public interface AssociatedAttribute<X, T> extends Attribute<X, T> {
 	 * @author hceylan
 	 */
 	ForeignKey getForeignKey();
+
+	/**
+	 * Returns the inverse attribute.
+	 * 
+	 * @return the inverse attribute or null
+	 * 
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	AssociatedAttribute<T, X> getInverse();
+
+	/**
+	 * Returns if the association should be eagerly fetched.
+	 * 
+	 * @return true if the association should be eagerly fetched
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	boolean isEager();
 
 	/**
 	 * Returns if the association is the owner side.
@@ -118,6 +151,19 @@ public interface AssociatedAttribute<X, T> extends Attribute<X, T> {
 	 * @author hceylan
 	 */
 	boolean references(Object instance, Object reference);
+
+	/**
+	 * Sets the attribute value of instance.
+	 * 
+	 * @param instance
+	 *            the instance of which the value to be returned
+	 * @param value
+	 *            the value to set
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	void set(Object instance, Object value);
 
 	/**
 	 * Sets the inverse attribute.

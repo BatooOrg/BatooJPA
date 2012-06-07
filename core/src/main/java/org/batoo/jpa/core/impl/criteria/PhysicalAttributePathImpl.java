@@ -31,7 +31,10 @@ import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.model.attribute.PhysicalAttributeImpl;
 
 /**
+ * Physical Attribute implementation of {@link Path}.
  * 
+ * @param <X>
+ *            the type referenced by the path
  * 
  * @author hceylan
  * @since $version
@@ -39,7 +42,6 @@ import org.batoo.jpa.core.impl.model.attribute.PhysicalAttributeImpl;
 public class PhysicalAttributePathImpl<X> extends AbstractPathImpl<X> {
 
 	private final PhysicalAttributeImpl<?, X> attribute;
-	private String alias;
 
 	/**
 	 * @param parent
@@ -64,12 +66,17 @@ public class PhysicalAttributePathImpl<X> extends AbstractPathImpl<X> {
 	 * {@inheritDoc}
 	 * 
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public String generate(CriteriaQueryImpl<?> query) {
 		final BasicColumn column = this.getModel().getColumn();
 
-		final AbstractFromImpl<?, ?> root = this.getRoot();
-		final String tableAlias = root.getTableAlias(query, column.getTable());
+		AbstractPathImpl<?> root = this;
+		while (root.getParentPath() != null) {
+			root = root.getParentPath();
+		}
+
+		final String tableAlias = ((AbstractFromImpl<X, X>) root).getTableAlias(query, column.getTable());
 
 		return tableAlias + "." + column.getName();
 	}

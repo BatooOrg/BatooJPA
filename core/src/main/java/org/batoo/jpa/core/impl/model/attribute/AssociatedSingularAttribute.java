@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.model.attribute;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.FetchType;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
@@ -50,8 +51,9 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 
 	private final PersistentAttributeType attributeType;
 	private final String inverseName;
-	private final boolean optional;
 
+	private final boolean eager;
+	private final boolean optional;
 	private final boolean cascadesDetach;
 	private final boolean cascadesMerge;
 	private final boolean cascadesPersist;
@@ -84,6 +86,8 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 		this.attributeType = attributeType;
 		this.inverseName = mappedBy;
 		this.optional = optional;
+
+		this.eager = metadata.getFetchType() == FetchType.EAGER;
 
 		this.cascadesDetach = metadata.getCascades().contains(CascadeType.ALL) || metadata.getCascades().contains(CascadeType.DETACH);
 		this.cascadesMerge = metadata.getCascades().contains(CascadeType.ALL) || metadata.getCascades().contains(CascadeType.MERGE);
@@ -157,6 +161,15 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 	 * 
 	 */
 	@Override
+	public AssociatedAttribute<T, X> getInverse() {
+		return this.inverse;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public PersistentAttributeType getPersistentAttributeType() {
 		return this.attributeType;
 	}
@@ -200,6 +213,15 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 	@Override
 	public boolean isAssociation() {
 		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isEager() {
+		return this.eager;
 	}
 
 	/**

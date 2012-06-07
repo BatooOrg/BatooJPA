@@ -18,14 +18,13 @@
  */
 package org.batoo.jpa.core.impl.criteria;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.criteria.Selection;
 
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
+import org.apache.commons.lang.mutable.MutableInt;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
  * The definition of an item that is to be
@@ -90,18 +89,18 @@ public abstract class SelectionImpl<X> extends TupleElementImpl<X> implements Se
 	 * <p>
 	 * The default implementation does nothing.
 	 * 
-	 * @param em
-	 *            the entity manager
-	 * @param rs
-	 *            the resultset
+	 * @param session
+	 *            the session
+	 * @param query
+	 *            the query
+	 * @param data
+	 *            the resultset data
 	 * @return the managed instance
-	 * @throws SQLException
-	 *             thrown in case of an underlying SQL Exception
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedInstance<X> handleRow(EntityManagerImpl em, ResultSet rs) throws SQLException {
+	public List<X> handle(SessionImpl session, BaseTypedQueryImpl<?> query, List<Map<String, Object>> data, MutableInt rowNo) {
 		return null;
 	}
 

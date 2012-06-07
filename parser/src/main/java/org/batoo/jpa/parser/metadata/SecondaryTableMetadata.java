@@ -37,5 +37,4 @@ public interface SecondaryTableMetadata extends TableMetadata {
 	 * @author hceylan
 	 */
 	List<PrimaryKeyJoinColumnMetadata> getPrimaryKeyJoinColumnMetadata();
-
 }

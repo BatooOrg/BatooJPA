@@ -44,6 +44,9 @@ public class ManyToOneToManyTest extends BaseCoreTest {
 		new Address(person, "London");
 		new Address(person, "New York");
 
+		new Phone(person, "(111) 111-1111");
+		new Phone(person, "(222) 222-2222");
+
 		return person;
 	}
 

@@ -30,6 +30,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Selection;
 
+import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
 
 import com.google.common.base.Joiner;
@@ -51,7 +52,6 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	private final Map<String, ParameterExpressionImpl<?>> parameterMap = Maps.newHashMap();
 	private final List<ParameterExpressionImpl<?>> parameters = Lists.newArrayList();
 	protected boolean distinct;
-	protected SelectionImpl<T> selection;
 
 	private String sql;
 
@@ -90,7 +90,8 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 */
 	@Override
 	public CriteriaQuery<T> distinct(boolean distinct) {
-		// TODO Auto-generated method stub
+		this.distinct = distinct;
+
 		return null;
 	}
 
@@ -145,15 +146,6 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	}
 
 	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public SelectionImpl<T> getSelection() {
-		return this.selection;
-	}
-
-	/**
 	 * Returns the generated SQL.
 	 * 
 	 * @return the generated SQL
@@ -173,8 +165,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 */
 	@Override
 	public CriteriaQuery<T> groupBy(Expression<?>... grouping) {
-		// TODO Auto-generated method stub
-		return null;
+		return (CriteriaQuery<T>) super.groupBy(grouping);
 	}
 
 	/**
@@ -183,8 +174,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 */
 	@Override
 	public CriteriaQuery<T> groupBy(List<Expression<?>> grouping) {
-		// TODO Auto-generated method stub
-		return null;
+		return (CriteriaQuery<T>) super.groupBy(grouping);
 	}
 
 	/**
@@ -193,8 +183,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 */
 	@Override
 	public CriteriaQuery<T> having(Expression<Boolean> restriction) {
-		// TODO Auto-generated method stub
-		return null;
+		return (CriteriaQuery<T>) super.having(restriction);
 	}
 
 	/**
@@ -203,8 +192,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 */
 	@Override
 	public CriteriaQuery<T> having(Predicate... restrictions) {
-		// TODO Auto-generated method stub
-		return null;
+		return (CriteriaQuery<T>) super.having(restrictions);
 	}
 
 	/**
@@ -213,8 +201,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 */
 	@Override
 	public boolean isDistinct() {
-		// TODO Auto-generated method stub
-		return false;
+		return this.distinct;
 	}
 
 	/**
@@ -271,18 +258,28 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 			return this.sql;
 		}
 
+		final PredicateImpl restriction = this.getRestriction();
+
 		// generate from chunk
 		final List<String> froms = Lists.newArrayList();
-		for (final Root<?> root : this.getRoots()) {
-			froms.add(((RootImpl<?>) root).generateFrom(this));
+		final List<String> joins = Lists.newArrayList();
+		for (final Root<?> r : this.getRoots()) {
+			final RootImpl<?> root = (RootImpl<?>) r;
+			froms.add(root.generateFrom(this));
+			joins.add(root.generateJoins(this));
 		}
 
 		// generate the select chunk
-		final String select = "SELECT " + this.selection.generate(this);
-		final String where = this.restriction != null ? "WHERE " + this.restriction.generate(this) : null;
+		final String select = "SELECT\n\t" + this.selection.generate(this);
+		final String where = restriction != null ? "WHERE " + restriction.generate(this) : null;
 
 		final String from = "FROM " + Joiner.on(",").join(froms);
-		return Joiner.on("\n").skipNulls().join(select, from, where);
+		final String join = Joiner.on(",").join(joins);
+
+		return Joiner.on("\n").skipNulls().join(select, //
+			from, //
+			StringUtils.isBlank(join) ? null : join, //
+			StringUtils.isBlank(where) ? null : where);
 	}
 
 	/**
@@ -319,5 +316,4 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 
 		return this;
 	}
-
 }

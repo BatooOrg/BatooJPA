@@ -8,6 +8,7 @@
 		
 		<class>org.batoo.jpa.core.test.manytoonetomany.Address</class>
 		<class>org.batoo.jpa.core.test.manytoonetomany.Person</class>
+		<class>org.batoo.jpa.core.test.manytoonetomany.Phone</class>
 		
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.Driver40" />
