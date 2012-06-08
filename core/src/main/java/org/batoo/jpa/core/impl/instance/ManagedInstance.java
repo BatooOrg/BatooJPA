@@ -20,10 +20,8 @@ package org.batoo.jpa.core.impl.instance;
 
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.HashMap;
 
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
-import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.EntityTransactionImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -32,8 +30,6 @@ import org.batoo.jpa.core.impl.model.attribute.AssociatedAttribute;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedPluralAttribute;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
 import org.batoo.jpa.core.impl.model.attribute.IdAttributeImpl;
-
-import com.google.common.collect.Maps;
 
 /**
  * The managed instance to track entity instances.
@@ -83,7 +79,6 @@ public class ManagedInstance<X> {
 	private final boolean external = true;
 
 	private Object id;
-	private final HashMap<ForeignKey, ManagedInstance<?>> foreignKeys = Maps.newHashMap();
 
 	private int h;
 
@@ -131,17 +126,6 @@ public class ManagedInstance<X> {
 	}
 
 	/**
-	 * @param foreignKey
-	 * @param source
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void addForeignKey(ForeignKey foreignKey, ManagedInstance<?> source) {
-		this.foreignKeys.put(foreignKey, source);
-	}
-
-	/**
 	 * 
 	 * 
 	 * @since $version
@@ -158,7 +142,7 @@ public class ManagedInstance<X> {
 	 * 
 	 * @param entityManager
 	 *            the entity manager
-	 * @return true if an implicit flush is required, false othwerwise
+	 * @return true if an implicit flush is required, false otherwise
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -166,13 +150,12 @@ public class ManagedInstance<X> {
 	public boolean cascadePersist(EntityManagerImpl entityManager) {
 		boolean requiresFlush = false;
 
-		final AssociatedAttribute<? super X, ?>[] associations = this.type.getAssociationsPersistable();
+		final AssociatedAttribute<? super X, ?, ?>[] associations = this.type.getAssociationsPersistable();
 
-		for (final AssociatedAttribute<? super X, ?> association : associations) {
+		for (final AssociatedAttribute<? super X, ?, ?> association : associations) {
 
 			// if the association a collection attribute then we will cascade to each element
 			if (association instanceof AssociatedPluralAttribute) {
-				@SuppressWarnings("unchecked")
 				final AssociatedPluralAttribute<? super X, ?, ?> pluralAttribute = (AssociatedPluralAttribute<? super X, ?, ?>) association;
 
 				// extract the collection
@@ -191,6 +174,18 @@ public class ManagedInstance<X> {
 		}
 
 		return requiresFlush;
+	}
+
+	/**
+	 * Checks that no association of the instance is transient
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void checkTransients() {
+		for (final AssociatedAttribute<? super X, ?, ?> association : this.type.getAssociations()) {
+			association.checkTransient(this);
+		}
 	}
 
 	/**
@@ -272,6 +267,23 @@ public class ManagedInstance<X> {
 		}
 
 		this.transaction = transaction;
+	}
+
+	/**
+	 * Flushes the associations.
+	 * 
+	 * @param connection
+	 *            the connection
+	 * @throws SQLException
+	 *             thrown if there is an underlying SQL Exception
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void flushAssociations(ConnectionImpl connection) throws SQLException {
+		for (final AssociatedPluralAttribute<? super X, ?, ?> association : this.type.getAssociationsJoined()) {
+			association.flush(this.session, connection, this);
+		}
 	}
 
 	/**

@@ -123,12 +123,21 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 */
 	@Override
 	public String createCreateTableStatement(AbstractTable table, List<String> ddlColumns, List<String> pkColumns) {
-		final String columns = Joiner.on(",\n\t").join(ddlColumns) + ",";
+		final String columns = Joiner.on(",\n\t").join(ddlColumns);
 		final String keys = Joiner.on(", ").join(pkColumns);
 
-		return "CREATE TABLE " + table.getQName() + " (\n\t" // table part
-			+ columns // columns part
-			+ "\nPRIMARY KEY(" + keys + "))"; // primary key part
+		final StringBuilder statement = new StringBuilder();
+		statement.append("CREATE TABLE ").append(table.getQName()).append(" (\n\t"); // table part
+		statement.append(columns); // columns part
+
+		if (StringUtils.isNotBlank(keys)) {
+			statement.append(",");
+			statement.append("\nPRIMARY KEY(").append(keys).append(")");
+		}
+
+		statement.append(")");
+
+		return statement.toString();
 	}
 
 	/**

@@ -130,6 +130,10 @@ public class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> implements Ident
 
 		// populate the id attributes with the inheritance
 		synchronized (this) {
+			if (this.idAttributes != null) {
+				return this.idAttributes;
+			}
+
 			final Map<String, IdAttributeImpl<? super X, ?>> idAttributes = Maps.newHashMap();
 			for (final IdAttributeImpl<X, ?> attribute : this.declaredIdAttributes.values()) {
 				idAttributes.put(attribute.getName(), attribute);
@@ -138,8 +142,10 @@ public class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> implements Ident
 			// XXX implement inheritance
 			// addAll getParent().getIdAttributes();
 
-			this.idAttributes = new IdAttributeImpl[idAttributes.size()];
-			idAttributes.values().toArray(this.idAttributes);
+			final IdAttributeImpl<X, ?>[] idAttributes0 = new IdAttributeImpl[idAttributes.size()];
+			idAttributes.values().toArray(idAttributes0);
+
+			this.idAttributes = idAttributes0;
 		}
 
 		return this.idAttributes;

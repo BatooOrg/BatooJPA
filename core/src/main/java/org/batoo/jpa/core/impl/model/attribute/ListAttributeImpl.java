@@ -18,11 +18,14 @@
  */
 package org.batoo.jpa.core.impl.model.attribute;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.persistence.metamodel.ListAttribute;
 
-import org.batoo.jpa.core.impl.jdbc.ForeignKey;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
 
@@ -66,8 +69,16 @@ public class ListAttributeImpl<X, C, E> extends AssociatedPluralAttribute<X, Lis
 	 * 
 	 */
 	@Override
-	public CollectionType getCollectionType() {
-		return CollectionType.LIST;
+	public void checkTransient(ManagedInstance<? extends X> managedInstance) {
+		final List<E> entities = this.get(managedInstance.getInstance());
+
+		final SessionImpl session = managedInstance.getSession();
+
+		if (entities != null) {
+			for (final E entity : entities) {
+				session.checkTransient(entity);
+			}
+		}
 	}
 
 	/**
@@ -75,8 +86,22 @@ public class ListAttributeImpl<X, C, E> extends AssociatedPluralAttribute<X, Lis
 	 * 
 	 */
 	@Override
-	public ForeignKey getForeignKey() {
-		// TODO Auto-generated method stub
-		return null;
+	public void flush(SessionImpl session, ConnectionImpl connection, ManagedInstance<? extends X> managedInstance) throws SQLException {
+		final List<E> entities = this.get(managedInstance.getInstance());
+
+		if (entities != null) {
+			for (final E entity : entities) {
+				this.getJoinTable().performInsert(session, connection, managedInstance.getInstance(), entity);
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public CollectionType getCollectionType() {
+		return CollectionType.LIST;
 	}
 }

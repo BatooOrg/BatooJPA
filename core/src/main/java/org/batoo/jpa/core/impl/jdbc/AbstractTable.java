@@ -23,12 +23,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
+import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.TableMetadata;
 import org.batoo.jpa.parser.metadata.UniqueConstraintMetadata;
 
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -44,10 +49,15 @@ public class AbstractTable {
 
 	private final String catalog;
 	private final String schema;
-	private final String name;
+	private String name;
 	private final Map<String, AbstractColumn> columns = Maps.newHashMap();
 	private final Map<String, String[]> uniqueConstraints = Maps.newHashMap();
 	private final List<ForeignKey> foreignKeys = Lists.newArrayList();
+
+	private final Map<EntityTypeImpl<?>, String> insertSqlMap = Maps.newHashMap();
+	private final Map<EntityTypeImpl<?>, AbstractColumn[]> insertColumnsMap = Maps.newHashMap();
+	private String insertSql;
+	private AbstractColumn[] insertColumns;
 
 	/**
 	 * @param defaultName
@@ -59,18 +69,31 @@ public class AbstractTable {
 	 * @author hceylan
 	 */
 	public AbstractTable(String defaultName, TableMetadata metadata) {
+		this(metadata);
+
+		this.name = (metadata != null) && StringUtils.isNotBlank(metadata.getName()) ? metadata.getName() : defaultName;
+	}
+
+	/**
+	 * @param metadata
+	 *            the metadata
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public AbstractTable(TableMetadata metadata) {
 		super();
 
 		this.locator = metadata != null ? metadata.getLocator() : null;
 		this.catalog = (metadata != null) && StringUtils.isNotBlank(metadata.getCatalog()) ? metadata.getCatalog() : null;
 		this.schema = (metadata != null) && StringUtils.isNotBlank(metadata.getSchema()) ? metadata.getSchema() : null;
-		this.name = (metadata != null) && StringUtils.isNotBlank(metadata.getName()) ? metadata.getName() : defaultName;
 
 		if (metadata != null) {
 			for (final UniqueConstraintMetadata constraint : metadata.getUniqueConstraints()) {
 				this.uniqueConstraints.put(constraint.getName(), constraint.getColumnNames());
 			}
 		}
+
 	}
 
 	/**
@@ -102,6 +125,87 @@ public class AbstractTable {
 	 */
 	public void addForeignKey(ForeignKey foreignKey) {
 		this.foreignKeys.add(foreignKey);
+	}
+
+	/**
+	 * Generates the insert statement for the type.
+	 * 
+	 * @param type
+	 *            the type to generate the insert statement for
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private synchronized void generateInsertSql(final EntityTypeImpl<?> type) {
+		String sql = type != null ? this.insertSqlMap.get(type) : this.insertSql;
+		if (sql != null) { // other thread finished the job for us
+			return;
+		}
+
+		final List<AbstractColumn> insertColumns = Lists.newArrayList();
+		// Filter out the identity physicalColumns
+		final Collection<AbstractColumn> filteredColumns = type == null ? this.getColumns() : Collections2.filter(this.getColumns(),
+			new Predicate<AbstractColumn>() {
+
+				@Override
+				public boolean apply(AbstractColumn input) {
+					if ((input instanceof PkColumn) && (((PkColumn) input).getIdType() == IdType.IDENTITY)) {
+						return false;
+					}
+
+					// XXX implement with inheritance
+					// if (input.isDiscriminator()) {
+					// return true;
+					// }
+
+					return true;
+					// XXX: inheritance
+					// final AttributeImpl<?, ?> root = input.getMapping().getPath().getFirst();
+					// final Class<?> parent = root.getDeclaringType().getJavaType();
+					// final Class<?> javaType = type.getJavaType();
+					//
+					// return parent.isAssignableFrom(javaType);
+				}
+			});
+
+		// prepare the names tuple in the form of "COLNAME [, COLNAME]*"
+		final Collection<String> columnNames = Collections2.transform(filteredColumns, new Function<AbstractColumn, String>() {
+
+			@Override
+			public String apply(AbstractColumn input) {
+				insertColumns.add(input);
+
+				return input.getName();
+			}
+		});
+
+		// prepare the parameters in the form of "? [, ?]*"
+		final Collection<String> parameters = Collections2.transform(filteredColumns, new Function<AbstractColumn, String>() {
+
+			@Override
+			public String apply(AbstractColumn input) {
+				return "?";
+			}
+		});
+
+		final String columnNamesStr = Joiner.on(", ").join(columnNames);
+		final String parametersStr = Joiner.on(", ").join(parameters);
+
+		// INSERT INTO SCHEMA.TABLE
+		// (COL [, COL]*)
+		// VALUES (PARAM [, PARAM]*)
+		sql = "INSERT INTO " + this.getQName() //
+			+ "\n(" + columnNamesStr + ")"//
+			+ "\nVALUES (" + parametersStr + ")";
+
+		if (type != null) {
+			this.insertSqlMap.put(type, sql);
+			this.insertColumnsMap.put(type, insertColumns.toArray(new AbstractColumn[insertColumns.size()]));
+		}
+		else {
+			this.insertSql = sql;
+			this.insertColumns = insertColumns.toArray(new AbstractColumn[insertColumns.size()]);
+		}
 	}
 
 	/**
@@ -138,6 +242,53 @@ public class AbstractTable {
 	 */
 	public List<ForeignKey> getForeignKeys() {
 		return this.foreignKeys;
+	}
+
+	/**
+	 * Returns the columns for the insert.
+	 * 
+	 * @param entity
+	 *            the entity to returns columns for or null for generic columns
+	 * @return the insert columns
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected AbstractColumn[] getInsertColumns(final EntityTypeImpl<?> entity) {
+		if (entity == null) {
+			return this.insertColumns;
+		}
+
+		return this.insertColumnsMap.get(entity);
+	}
+
+	/**
+	 * Returns the insert statement for the table specifically.
+	 * 
+	 * @param entity
+	 *            the entity to return insert statement for or null for generic SQL
+	 * @return the insert statement
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected String getInsertSql(EntityTypeImpl<?> entity) {
+		if (entity == null) {
+			if (this.insertSql == null) {
+				this.generateInsertSql(null);
+			}
+
+			return this.insertSql;
+		}
+
+		String sql = this.insertSqlMap.get(entity);
+		if (sql == null) {
+			this.generateInsertSql(entity);
+
+			sql = this.insertSqlMap.get(entity);
+		}
+
+		return sql;
 	}
 
 	/**
@@ -198,5 +349,18 @@ public class AbstractTable {
 	 */
 	public Map<String, String[]> getUniqueConstraints() {
 		return this.uniqueConstraints;
+	}
+
+	/**
+	 * Updates the name of the table.
+	 * 
+	 * @param name
+	 *            the name of the table
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected void setName(String name) {
+		this.name = name;
 	}
 }

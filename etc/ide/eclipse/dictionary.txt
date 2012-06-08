@@ -40,3 +40,4 @@ prefills
 enhancer
 resultset
 subqueries
+persistable

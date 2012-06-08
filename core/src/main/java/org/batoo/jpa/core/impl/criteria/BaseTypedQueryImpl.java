@@ -163,10 +163,13 @@ public abstract class BaseTypedQueryImpl<X> implements TypedQuery<X>, ResultSetH
 			parameters[e.getKey().getPosition() - 1] = e.getValue();
 		}
 
+		final String sql = this.cq.getSql();
 		try {
-			return new QueryRunner().query(this.em.getConnection(), this.cq.getSql(), this, parameters);
+			return new QueryRunner().query(this.em.getConnection(), sql, this, parameters);
 		}
 		catch (final SQLException e) {
+			BaseTypedQueryImpl.LOG.error(e, "Query failed" + BaseTypedQueryImpl.LOG.lazyBoxed(sql, parameters));
+
 			throw new PersistenceException("Query failed", e);
 		}
 	}

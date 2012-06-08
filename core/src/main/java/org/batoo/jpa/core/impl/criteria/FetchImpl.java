@@ -29,6 +29,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
+import org.batoo.jpa.core.impl.jdbc.JoinTable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedAttribute;
@@ -49,7 +50,7 @@ import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
 public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X> {
 
 	@SuppressWarnings("unchecked")
-	private static <X, Z> EntityTypeImpl<X> getEntity(AssociatedAttribute<? super Z, X> attribute) {
+	private static <X, Z> EntityTypeImpl<X> getEntity(AssociatedAttribute<? super Z, X, ?> attribute) {
 		if (attribute instanceof SingularAttribute) {
 			return (EntityTypeImpl<X>) ((SingularAttributeImpl<? super Z, X>) attribute).getType();
 		}
@@ -58,7 +59,7 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	}
 
 	private final FetchParentImpl<?, Z> parent;
-	private final AssociatedAttribute<? super Z, ?> attribute;
+	private final AssociatedAttribute<? super Z, X, ?> attribute;
 	private final JoinType joinType;
 	private ManagedInstance<?> parentInstance;
 
@@ -73,7 +74,7 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	 * @since $version
 	 * @author hceylan
 	 */
-	public FetchImpl(FetchParentImpl<?, Z> parent, AssociatedAttribute<? super Z, X> attribute, JoinType joinType) {
+	public FetchImpl(FetchParentImpl<?, Z> parent, AssociatedAttribute<? super Z, X, ?> attribute, JoinType joinType) {
 		super(FetchImpl.getEntity(attribute));
 
 		this.parent = parent;
@@ -90,9 +91,19 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 		final String parentAlias = this.getParent().getPrimaryTableAlias(query);
 		final String alias = this.getPrimaryTableAlias(query);
 
+		String join;
+
 		final ForeignKey foreignKey = this.attribute.getInverse() != null ? this.attribute.getInverse().getForeignKey()
 			: this.attribute.getForeignKey();
-		final String join = "\t" + foreignKey.createJoin(this.joinType, parentAlias, alias);
+		if (foreignKey != null) {
+			join = foreignKey.createSourceJoin(this.joinType, parentAlias, alias);
+		}
+		else {
+			final JoinTable joinTable = this.attribute.getJoinTable() != null ? this.attribute.getJoinTable()
+				: this.attribute.getInverse().getJoinTable();
+			join = joinTable.createJoin(this.joinType, parentAlias, alias);
+		}
+
 		final String joins = super.generateJoins(query);
 
 		return join + (StringUtils.isBlank(joins) ? "" : "\n\t") + joins;
@@ -103,7 +114,7 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	 * 
 	 */
 	@Override
-	public AssociatedAttribute<? super Z, ?> getAttribute() {
+	public AssociatedAttribute<? super Z, ?, ?> getAttribute() {
 		return this.attribute;
 	}
 

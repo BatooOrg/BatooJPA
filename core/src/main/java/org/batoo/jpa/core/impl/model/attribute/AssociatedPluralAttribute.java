@@ -18,11 +18,18 @@
  */
 package org.batoo.jpa.core.impl.model.attribute;
 
+import java.sql.SQLException;
 import java.util.Collection;
 
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
 
+import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
+import org.batoo.jpa.core.impl.jdbc.ForeignKey;
+import org.batoo.jpa.core.impl.jdbc.JoinTable;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
@@ -42,11 +49,11 @@ import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
  * @author hceylan
  * @since $version
  */
-public abstract class AssociatedPluralAttribute<X, C, E> extends PluralAttributeImpl<X, C, E> implements AssociatedAttribute<X, C> {
+public abstract class AssociatedPluralAttribute<X, C, E> extends PluralAttributeImpl<X, C, E> implements AssociatedAttribute<X, E, C> {
 
 	private final PersistentAttributeType attributeType;
 	private final String inverseName;
-	private AssociatedAttribute<C, X> inverse;
+	private AssociatedAttribute<E, X, ?> inverse;
 
 	// Cascades
 	private final boolean cascadesDetach;
@@ -58,6 +65,7 @@ public abstract class AssociatedPluralAttribute<X, C, E> extends PluralAttribute
 	private final boolean eager;
 
 	private EntityTypeImpl<E> type;
+	private JoinTable joinTable;
 
 	/**
 	 * @param declaringType
@@ -89,6 +97,12 @@ public abstract class AssociatedPluralAttribute<X, C, E> extends PluralAttribute
 		this.cascadesPersist = metadata.getCascades().contains(CascadeType.ALL) || metadata.getCascades().contains(CascadeType.PERSIST);
 		this.cascadesRefresh = metadata.getCascades().contains(CascadeType.ALL) || metadata.getCascades().contains(CascadeType.REFRESH);
 		this.cascadesRemove = metadata.getCascades().contains(CascadeType.ALL) || metadata.getCascades().contains(CascadeType.REMOVE);
+
+		if (StringUtils.isBlank(this.inverseName)) {
+			if ((this.getPersistentAttributeType() == PersistentAttributeType.MANY_TO_MANY) || (metadata.getJoinTable() != null)) {
+				this.joinTable = new JoinTable(metadata.getJoinTable());
+			}
+		}
 	}
 
 	/**
@@ -137,6 +151,24 @@ public abstract class AssociatedPluralAttribute<X, C, E> extends PluralAttribute
 	}
 
 	/**
+	 * Flushes the associates.
+	 * 
+	 * @param session
+	 *            the session
+	 * @param connection
+	 *            the connection to use
+	 * @param managedInstance
+	 *            the managed instance
+	 * @throws SQLException
+	 *             thrown if there is an underlying SQL Exception
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract void flush(SessionImpl session, ConnectionImpl connection, ManagedInstance<? extends X> managedInstance)
+		throws SQLException;
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -150,8 +182,26 @@ public abstract class AssociatedPluralAttribute<X, C, E> extends PluralAttribute
 	 * 
 	 */
 	@Override
-	public AssociatedAttribute<C, X> getInverse() {
+	public ForeignKey getForeignKey() {
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public AssociatedAttribute<E, X, ?> getInverse() {
 		return this.inverse;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public JoinTable getJoinTable() {
+		return this.joinTable;
 	}
 
 	/**
@@ -200,8 +250,8 @@ public abstract class AssociatedPluralAttribute<X, C, E> extends PluralAttribute
 		final MetamodelImpl metamodel = this.getDeclaringType().getMetamodel();
 		this.type = metamodel.entity(this.getBindableJavaType());
 
-		if (this.inverseName != null) {
-			this.inverse = (AssociatedAttribute<C, X>) this.type.getAttribute(this.inverseName);
+		if (StringUtils.isNotBlank(this.inverseName)) {
+			this.inverse = (AssociatedAttribute<E, X, ?>) this.type.getAttribute(this.inverseName);
 
 			if (this.inverse == null) {
 				throw new MappingException("Cannot find the mappedBy attribute " + this.inverseName + " specified on "
@@ -209,6 +259,14 @@ public abstract class AssociatedPluralAttribute<X, C, E> extends PluralAttribute
 			}
 
 			this.inverse.setInverse(this);
+		}
+		else {
+			if (this.joinTable != null) {
+				this.joinTable.link((EntityTypeImpl<X>) this.getDeclaringType(), this.type);
+			}
+			else {
+				this.inverse = this.type.addVirtualAttribute(this);
+			}
 		}
 	}
 
@@ -232,7 +290,7 @@ public abstract class AssociatedPluralAttribute<X, C, E> extends PluralAttribute
 	 * 
 	 */
 	@Override
-	public final void setInverse(AssociatedAttribute<C, X> inverse) {
+	public void setInverse(AssociatedAttribute<E, X, ?> inverse) {
 		this.inverse = inverse;
 	}
 }

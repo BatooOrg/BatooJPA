@@ -111,8 +111,6 @@ public class ManyToOneToManyTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testPersistPerson() throws SQLException {
-		Assert.assertEquals(2, this.em().getMetamodel().getEntities().size());
-
 		this.persist(this.person());
 
 		this.commit();

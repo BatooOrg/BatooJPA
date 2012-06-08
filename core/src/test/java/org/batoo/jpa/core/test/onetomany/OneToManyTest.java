@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.core.test.onetomany;
 
+import javax.persistence.EntityManager;
+
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;

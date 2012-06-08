@@ -357,7 +357,7 @@ public abstract class BaseCoreTest {
 		}
 
 		try {
-			DriverManager.getConnection("jdbc:derby:memory:simple;drop=true");
+			DriverManager.getConnection("jdbc:derby:memory:test;drop=true");
 		}
 		catch (final SQLException e) {}
 

@@ -35,6 +35,8 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.metamodel.Metamodel;
 import javax.sql.DataSource;
 
+import org.batoo.jpa.common.log.BLogger;
+import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
@@ -53,6 +55,8 @@ import org.batoo.jpa.core.impl.model.EntityTypeImpl;
  */
 public class EntityManagerImpl implements EntityManager {
 
+	private static final BLogger LOG = BLoggerFactory.getLogger(EntityManagerImpl.class);
+
 	private final EntityManagerFactoryImpl emf;
 	private final MetamodelImpl metamodel;
 	private final DataSourceImpl datasource;
@@ -61,6 +65,7 @@ public class EntityManagerImpl implements EntityManager {
 	private ConnectionImpl connection;
 	private final SessionImpl session;
 	private final CriteriaBuilderImpl criteriaBuilder;
+	private final Map<String, Object> properties;
 
 	/**
 	 * @param entityManagerFactory
@@ -69,18 +74,22 @@ public class EntityManagerImpl implements EntityManager {
 	 *            the metamodel
 	 * @param datasource
 	 *            the datasource
+	 * @param properties
+	 *            properties for the entity manager
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EntityManagerImpl(EntityManagerFactoryImpl entityManagerFactory, MetamodelImpl metamodel, DataSourceImpl datasource) {
+	public EntityManagerImpl(EntityManagerFactoryImpl entityManagerFactory, MetamodelImpl metamodel, DataSourceImpl datasource,
+		Map<String, Object> properties) {
 		super();
 
 		this.emf = entityManagerFactory;
 		this.metamodel = metamodel;
 		this.datasource = datasource;
 		this.session = new SessionImpl(this, metamodel);
-		this.criteriaBuilder = new CriteriaBuilderImpl(this.metamodel);
+		this.criteriaBuilder = this.emf.getCriteriaBuilder();
+		this.properties = properties;
 
 		this.open = true;
 	}
@@ -103,7 +112,14 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public void clear() {
-		// TODO Auto-generated method stub
+		this.assertOpen();
+
+		if ((this.transaction != null) && this.transaction.isActive()) {
+			this.transaction.rollback();
+			EntityManagerImpl.LOG.warn("Session cleared with active and transaction. Updated persistent types will become stale...");
+		}
+
+		this.session.clear();
 	}
 
 	/**
@@ -122,6 +138,23 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public void close() {
+		this.assertOpen();
+
+		if ((this.transaction != null) && this.transaction.isActive()) {
+			this.transaction.rollback();
+
+			EntityManagerImpl.LOG.warn("Entity manager closed with an active transaction. Updated persistent types will become stale...");
+		}
+
+		this.session.clear();
+		try {
+			if (this.connection != null) {
+				this.connection.close();
+			}
+			this.connection = null;
+		}
+		catch (final SQLException e) {}
+
 		this.open = false;
 	}
 
@@ -279,10 +312,14 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public void flush() {
+		this.assertOpen();
+
 		try {
 			this.session.flush(this.getConnection(), this.transaction);
 		}
 		catch (final SQLException e) {
+			EntityManagerImpl.LOG.error(e, "Flush failed");
+
 			throw new PersistenceException("Flush failed", e);
 		}
 	}
@@ -324,8 +361,9 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public Object getDelegate() {
-		// TODO Auto-generated method stub
-		return null;
+		this.assertOpen();
+
+		return this;
 	}
 
 	/**
@@ -334,8 +372,7 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public EntityManagerFactory getEntityManagerFactory() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.emf;
 	}
 
 	/**
@@ -373,8 +410,7 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public Map<String, Object> getProperties() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.properties;
 	}
 
 	/**
@@ -465,7 +501,6 @@ public class EntityManagerImpl implements EntityManager {
 	@Override
 	public void lock(Object entity, LockModeType lockMode, Map<String, Object> properties) {
 		// TODO Auto-generated method stub
-
 	}
 
 	/**
@@ -559,7 +594,6 @@ public class EntityManagerImpl implements EntityManager {
 	@Override
 	public void refresh(Object entity, LockModeType lockMode) {
 		// TODO Auto-generated method stub
-
 	}
 
 	/**

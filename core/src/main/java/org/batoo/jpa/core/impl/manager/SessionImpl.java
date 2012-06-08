@@ -23,7 +23,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+import javax.persistence.PersistenceException;
+
+import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
 import org.batoo.jpa.core.impl.instance.Prioritizer;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
@@ -70,6 +74,30 @@ public class SessionImpl {
 	}
 
 	/**
+	 * Checks if the instance is managed in this session
+	 * 
+	 * @param instance
+	 *            the instance to check
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void checkTransient(Object instance) {
+		if (instance instanceof EnhancedInstance) {
+			final ManagedInstance<?> associate = ((EnhancedInstance) instance).__enhanced__$$__getManagedInstance();
+			if ((associate.getStatus() != Status.MANAGED) && (associate.getSession() == this)) {
+				throw new PersistenceException("Instance " + instance + " is not managed");
+			}
+		}
+		else {
+			final ManagedInstance<?> associate = this.get(instance);
+			if ((associate == null) || (associate.getStatus() != Status.MANAGED)) {
+				throw new PersistenceException("Instance " + instance + " is not managed");
+			}
+		}
+	}
+
+	/**
 	 * Clears the session.
 	 * 
 	 * @since $version
@@ -106,6 +134,11 @@ public class SessionImpl {
 
 		for (final ManagedInstance<?> instance : sortedInstances) {
 			instance.flush(connection, transaction);
+		}
+
+		for (final ManagedInstance<?> instance : sortedInstances) {
+			instance.checkTransients();
+			instance.flushAssociations(connection);
 		}
 
 		this.externalEntities.addAll(this.identifiableEntities);

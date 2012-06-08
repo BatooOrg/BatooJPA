@@ -50,13 +50,13 @@ import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
-import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.SecondaryTable;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.EntityTransactionImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedAttribute;
+import org.batoo.jpa.core.impl.model.attribute.AssociatedPluralAttribute;
 import org.batoo.jpa.core.impl.model.attribute.IdAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.PhysicalAttributeImpl;
 import org.batoo.jpa.parser.MappingException;
@@ -89,11 +89,12 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private CriteriaQueryImpl<X> selectCriteria;
 
 	private int dependencyCount;
-	private final HashMap<EntityTypeImpl<?>, AssociatedAttribute<?, ?>[]> dependencyMap = Maps.newHashMap();
+	private final HashMap<EntityTypeImpl<?>, AssociatedAttribute<?, ?, ?>[]> dependencyMap = Maps.newHashMap();
 
-	private AssociatedAttribute<? super X, ?>[] associatedAttributes;
-	private AssociatedAttribute<? super X, ?>[] persistableAssociations;
-	private AssociatedAttribute<? super X, ?>[] eagerAssociations;
+	private AssociatedAttribute<? super X, ?, ?>[] associatedAttributes;
+	private AssociatedAttribute<? super X, ?, ?>[] persistableAssociations;
+	private AssociatedAttribute<? super X, ?, ?>[] eagerAssociations;
+	private AssociatedPluralAttribute<? super X, ?, ?>[] joinedAssociations;
 
 	/**
 	 * @param metamodel
@@ -162,82 +163,136 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public AssociatedAttribute<? super X, ?>[] getAssociations() {
+	public AssociatedAttribute<? super X, ?, ?>[] getAssociations() {
 		if (this.associatedAttributes != null) {
 			return this.associatedAttributes;
 		}
 
 		synchronized (this) {
-			final List<AssociatedAttribute<? super X, ?>> associations = Lists.newArrayList();
+			if (this.associatedAttributes != null) {
+				return this.associatedAttributes;
+			}
+
+			final List<AssociatedAttribute<? super X, ?, ?>> associations = Lists.newArrayList();
 
 			for (final Attribute<? super X, ?> attribute : this.getAttributes()) {
 				if (attribute instanceof AssociatedAttribute) {
-					associations.add((AssociatedAttribute<? super X, ?>) attribute);
+					associations.add((AssociatedAttribute<? super X, ?, ?>) attribute);
 				}
 			}
 
-			this.associatedAttributes = new AssociatedAttribute[associations.size()];
-			associations.toArray(this.associatedAttributes);
+			final AssociatedAttribute<? super X, ?, ?>[] associatedAttributes0 = new AssociatedAttribute[associations.size()];
+			associations.toArray(associatedAttributes0);
+
+			this.associatedAttributes = associatedAttributes0;
 		}
 
 		return this.associatedAttributes;
 	}
 
 	/**
-	 * Returns the associatedAttributes that are persistable by the type.
+	 * Returns the associated attributes that are eager.
 	 * 
-	 * @return the associatedAttributes that are persistable by the type
+	 * @return the associated attributes that are eager
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public AssociatedAttribute<? super X, ?>[] getAssociationsEager() {
+	public AssociatedAttribute<? super X, ?, ?>[] getAssociationsEager() {
 		if (this.eagerAssociations != null) {
 			return this.eagerAssociations;
 		}
 
 		synchronized (this) {
-			final List<AssociatedAttribute<? super X, ?>> eagerAssociations = Lists.newArrayList();
+			if (this.eagerAssociations != null) {
+				return this.eagerAssociations;
+			}
 
-			for (final AssociatedAttribute<? super X, ?> association : this.getAssociations()) {
+			final List<AssociatedAttribute<? super X, ?, ?>> eagerAssociations = Lists.newArrayList();
+
+			for (final AssociatedAttribute<? super X, ?, ?> association : this.getAssociations()) {
 				if (association.isEager()) {
 					eagerAssociations.add(association);
 				}
 			}
 
-			this.eagerAssociations = new AssociatedAttribute[eagerAssociations.size()];
-			eagerAssociations.toArray(this.eagerAssociations);
+			final AssociatedAttribute<? super X, ?, ?>[] eagerAssociations0 = new AssociatedAttribute[eagerAssociations.size()];
+			eagerAssociations.toArray(eagerAssociations0);
+
+			this.eagerAssociations = eagerAssociations0;
 		}
 
 		return this.eagerAssociations;
 	}
 
 	/**
-	 * Returns the associatedAttributes that are persistable by the type.
+	 * Returns the associated attributes that are joined.
 	 * 
-	 * @return the associatedAttributes that are persistable by the type
+	 * @return the associated attributes that are joined
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public AssociatedAttribute<? super X, ?>[] getAssociationsPersistable() {
+	public AssociatedPluralAttribute<? super X, ?, ?>[] getAssociationsJoined() {
+		if (this.joinedAssociations != null) {
+			return this.joinedAssociations;
+		}
+
+		synchronized (this) {
+			if (this.joinedAssociations != null) {
+				return this.joinedAssociations;
+			}
+
+			final List<AssociatedPluralAttribute<? super X, ?, ?>> joinedAssociations = Lists.newArrayList();
+
+			for (final AssociatedAttribute<? super X, ?, ?> association : this.getAssociations()) {
+				if (association.getJoinTable() != null) {
+					joinedAssociations.add((AssociatedPluralAttribute<? super X, ?, ?>) association);
+				}
+			}
+
+			final AssociatedPluralAttribute<? super X, ?, ?>[] joinedAssociations0 = new AssociatedPluralAttribute[joinedAssociations.size()];
+			joinedAssociations.toArray(joinedAssociations0);
+
+			this.joinedAssociations = joinedAssociations0;
+		}
+
+		return this.joinedAssociations;
+	}
+
+	/**
+	 * Returns the associated attributes that are persistable by the type.
+	 * 
+	 * @return the associated attributes that are persistable by the type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	public AssociatedAttribute<? super X, ?, ?>[] getAssociationsPersistable() {
 		if (this.persistableAssociations != null) {
 			return this.persistableAssociations;
 		}
 
 		synchronized (this) {
-			final List<AssociatedAttribute<? super X, ?>> persistableAssociations = Lists.newArrayList();
+			if (this.persistableAssociations != null) {
+				return this.persistableAssociations;
+			}
 
-			for (final AssociatedAttribute<? super X, ?> association : this.getAssociations()) {
+			final List<AssociatedAttribute<? super X, ?, ?>> persistableAssociations = Lists.newArrayList();
+
+			for (final AssociatedAttribute<? super X, ?, ?> association : this.getAssociations()) {
 				if (association.cascadesPersist()) {
 					persistableAssociations.add(association);
 				}
 			}
 
-			this.persistableAssociations = new AssociatedAttribute[persistableAssociations.size()];
-			persistableAssociations.toArray(this.persistableAssociations);
+			final AssociatedAttribute<? super X, ?, ?>[] persistableAssociations0 = new AssociatedAttribute[persistableAssociations.size()];
+			persistableAssociations.toArray(persistableAssociations0);
+
+			this.persistableAssociations = persistableAssociations0;
 		}
 
 		return this.persistableAssociations;
@@ -283,7 +338,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AssociatedAttribute<?, ?>[] getDependenciesFor(EntityTypeImpl<?> associate) {
+	public AssociatedAttribute<?, ?, ?>[] getDependenciesFor(EntityTypeImpl<?> associate) {
 		return this.dependencyMap.get(associate);
 	}
 
@@ -391,6 +446,26 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
+	 * Returns the table with the name.
+	 * <p>
+	 * If the <code>tableName</code> is blank then the primary table is returned
+	 * 
+	 * @param tableName
+	 *            the name of the table, may be blank
+	 * @return the table or null if not found
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public AbstractTable getTable(String tableName) {
+		if (StringUtils.isBlank(tableName)) {
+			return this.primaryTable;
+		}
+
+		return this.declaredTables.get(tableName);
+	}
+
+	/**
 	 * Returns the tables of the type, starting from the top of the hierarchy.
 	 * 
 	 * @return the tables of the type
@@ -405,6 +480,10 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		}
 
 		synchronized (this) {
+			if (this.tables != null) {
+				return this.tables;
+			}
+
 			int size = this.getDeclaredTables().size();
 			if (this.getParent() instanceof EntityTypeImpl) {
 				size += ((EntityTypeImpl<? super X>) this.getParent()).getTables().length;
@@ -480,39 +559,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	public boolean isIdMethod(Method method) {
 		// TODO Auto-generated method stub
 		return false;
-	}
-
-	/**
-	 * Links the associations of the entity.
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void linkAssociations() {
-		for (final AssociatedAttribute<? super X, ?> attribute : this.getAssociations()) {
-			// link the attribute
-			attribute.link();
-
-			// if linked by join columns then link the foreign key
-			final ForeignKey foreignKey = attribute.getForeignKey();
-			if (foreignKey != null) {
-				final String tableName = foreignKey.getTableName();
-
-				// if table name is blank, it means the column should belong to the primary table
-				if (StringUtils.isBlank(tableName)) {
-					foreignKey.setTable(this.primaryTable);
-				}
-				// otherwise locate the table
-				else {
-					final AbstractTable table = this.declaredTables.get(tableName);
-					if (table == null) {
-						throw new MappingException("Table " + tableName + " could not be found");
-					}
-
-					foreignKey.setTable(table);
-				}
-			}
-		}
 	}
 
 	/**
@@ -607,9 +653,9 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 */
 	public void prepareDependenciesFor(EntityTypeImpl<?> associate) {
 		// prepare the related associations
-		final Set<AssociatedAttribute<?, ?>> attributes = Sets.newHashSet();
+		final Set<AssociatedAttribute<?, ?, ?>> attributes = Sets.newHashSet();
 
-		for (final AssociatedAttribute<?, ?> association : this.getAssociations()) {
+		for (final AssociatedAttribute<?, ?, ?> association : this.getAssociations()) {
 
 			// only owner associations impose priority
 			if (!association.isOwner()) {
@@ -629,7 +675,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			}
 		}
 
-		final AssociatedAttribute<?, ?>[] dependencies = new AssociatedAttribute[attributes.size()];
+		final AssociatedAttribute<?, ?, ?>[] dependencies = new AssociatedAttribute[attributes.size()];
 		attributes.toArray(dependencies);
 
 		this.dependencyCount += dependencies.length;
@@ -644,7 +690,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @param entityTypeImpl
 	 */
 	private void prepareEagerAssociations(FetchParent<?, ?> r, EntityTypeImpl<?> entityType) {
-		for (final AssociatedAttribute<?, ?> attribute : entityType.getAssociationsEager()) {
+		for (final AssociatedAttribute<?, ?, ?> attribute : entityType.getAssociationsEager()) {
 			r.fetch(attribute.getName(), JoinType.LEFT);
 		}
 	}

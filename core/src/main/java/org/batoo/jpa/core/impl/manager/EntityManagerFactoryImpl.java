@@ -19,18 +19,19 @@
 package org.batoo.jpa.core.impl.manager;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Map;
 
 import javax.persistence.Cache;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnitUtil;
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.metamodel.Metamodel;
 
 import org.batoo.jpa.common.BatooException;
 import org.batoo.jpa.core.BJPASettings;
 import org.batoo.jpa.core.JPASettings;
+import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.deployment.DdlManager;
 import org.batoo.jpa.core.impl.deployment.LinkManager;
 import org.batoo.jpa.core.impl.jdbc.AbstractJdbcAdaptor;
@@ -54,6 +55,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	private final JdbcAdaptor jdbcAdaptor;
 	private final Map<String, Object> properties;
 	private boolean open;
+	private final CriteriaBuilderImpl criteriaBuilder;
 
 	/**
 	 * @param name
@@ -80,8 +82,15 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		DdlManager.perform(this.datasource, this.metamodel, DDLMode.DROP);
 
 		this.metamodel.preFillGenerators(this.datasource);
+		this.criteriaBuilder = new CriteriaBuilderImpl(this.metamodel);
 
 		this.open = true;
+	}
+
+	private void assertOpen() {
+		if (!this.open) {
+			throw new IllegalStateException("EntityManagerFactory has been previously closed");
+		}
 	}
 
 	/**
@@ -90,6 +99,9 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 */
 	@Override
 	public void close() {
+		this.assertOpen();
+
+		this.metamodel.stopIdGenerators();
 		this.datasource.close();
 
 		this.open = false;
@@ -114,7 +126,9 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 */
 	@Override
 	public EntityManager createEntityManager() {
-		return new EntityManagerImpl(this, this.metamodel, this.datasource);
+		this.assertOpen();
+
+		return new EntityManagerImpl(this, this.metamodel, this.datasource, Collections.<String, Object>emptyMap());
 	}
 
 	/**
@@ -123,8 +137,9 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 */
 	@Override
 	public EntityManager createEntityManager(Map map) {
-		// TODO Auto-generated method stub
-		return null;
+		this.assertOpen();
+
+		return new EntityManagerImpl(this, this.metamodel, this.datasource, map);
 	}
 
 	/**
@@ -159,9 +174,10 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * 
 	 */
 	@Override
-	public CriteriaBuilder getCriteriaBuilder() {
-		// TODO Auto-generated method stub
-		return null;
+	public CriteriaBuilderImpl getCriteriaBuilder() {
+		this.assertOpen();
+
+		return this.criteriaBuilder;
 	}
 
 	/**

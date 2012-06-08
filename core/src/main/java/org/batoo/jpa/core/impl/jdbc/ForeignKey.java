@@ -19,12 +19,15 @@
 package org.batoo.jpa.core.impl.jdbc;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.criteria.JoinType;
 
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
+import org.batoo.jpa.core.impl.model.attribute.IdAttributeImpl;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
+import org.batoo.jpa.parser.MappingException;
+import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -37,30 +40,29 @@ import com.google.common.collect.Lists;
  */
 public class ForeignKey {
 
-	private final AttributeImpl<?, ?> attribute;
-	private final List<JoinColumn> joinColumns;
+	private final List<JoinColumn> joinColumns = Lists.newArrayList();
 
 	private String tableName;
 	private AbstractTable table;
-	private EntityTable referencedTable;
 
 	/**
-	 * @param attribute
-	 *            the attribute
-	 * @param joinColumns
-	 *            the list of join columns
+	 * @param metadata
+	 *            the metadata for join column
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ForeignKey(AttributeImpl<?, ?> attribute, List<JoinColumn> joinColumns) {
+	public ForeignKey(List<JoinColumnMetadata> metadata) {
 		super();
 
-		this.attribute = attribute;
-		this.joinColumns = joinColumns;
+		for (final JoinColumnMetadata columnMetadata : metadata) {
+			this.joinColumns.add(new JoinColumn(columnMetadata));
+		}
 	}
 
 	/**
+	 * Creates the join for destination foreign keys.
+	 * 
 	 * @param joinType
 	 *            the type of the join
 	 * @param parentAlias
@@ -72,11 +74,18 @@ public class ForeignKey {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String createJoin(JoinType joinType, String parentAlias, String alias) {
+	public String createDestinationJoin(JoinType joinType, String parentAlias, String alias) {
+		return this.createJoin(joinType, parentAlias, alias, this.joinColumns.get(0).getReferencedTable().getName(), false);
+	}
+
+	private String createJoin(JoinType joinType, String parentAlias, String alias, final String tableName, final boolean source) {
 		final List<String> parts = Lists.newArrayList();
 
 		for (final JoinColumn joinColumn : this.joinColumns) {
-			final String part = parentAlias + "." + joinColumn.getReferencedColumn().getName() + " = " + alias + "." + joinColumn.getName();
+			final String leftColumnName = source ? joinColumn.getReferencedColumnName() : joinColumn.getName();
+			final String rightColumnName = source ? joinColumn.getName() : joinColumn.getReferencedColumnName();
+
+			final String part = parentAlias + "." + leftColumnName + " = " + alias + "." + rightColumnName;
 			parts.add(part);
 		}
 
@@ -85,12 +94,30 @@ public class ForeignKey {
 		// append the join part
 		switch (joinType) {
 			case INNER:
-				return "INNER JOIN " + this.table.getName() + " AS " + alias + " ON " + join;
+				return "\tINNER JOIN " + tableName + " AS " + alias + " ON " + join;
 			case LEFT:
-				return "LEFT JOIN " + this.table.getName() + " AS " + alias + " ON " + join;
+				return "\tLEFT JOIN " + tableName + " AS " + alias + " ON " + join;
 			default:
-				return "RIGHT JOIN " + this.table.getName() + " AS " + alias + " ON " + join;
+				return "\tRIGHT JOIN " + tableName + " AS " + alias + " ON " + join;
 		}
+	}
+
+	/**
+	 * Creates the join for source foreign keys.
+	 * 
+	 * @param joinType
+	 *            the type of the join
+	 * @param parentAlias
+	 *            the alias of the parent table
+	 * @param alias
+	 *            the alias of the table
+	 * @return the join SQL fragment
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String createSourceJoin(JoinType joinType, String parentAlias, String alias) {
+		return this.createJoin(joinType, parentAlias, alias, this.joinColumns.get(0).getTable().getName(), true);
 	}
 
 	/**
@@ -113,8 +140,8 @@ public class ForeignKey {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EntityTable getReferencedTable() {
-		return this.referencedTable;
+	public AbstractTable getReferencedTable() {
+		return this.joinColumns.get(0).getReferencedTable();
 	}
 
 	/**
@@ -130,44 +157,71 @@ public class ForeignKey {
 	}
 
 	/**
-	 * Returns the name of the table name of the foreign key.
-	 * 
-	 * @return the name of the table name of the foreign key
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String getTableName() {
-		return this.tableName;
-	}
-
-	/**
 	 * Links the foreign key
 	 * 
 	 * @param jdbcAdaptor
 	 *            the JDBC Adaptor
-	 * @param referencedTable
-	 *            the referenced table
+	 * @param attribute
+	 *            the owner attribute
+	 * @param targetEntity
+	 *            the target entity
 	 * 
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void link(JdbcAdaptor jdbcAdaptor, EntityTable referencedTable) {
-		this.referencedTable = referencedTable;
-
-		final Map<String, PkColumn> pkColumns = referencedTable.getPkColumns();
+	public void link(JdbcAdaptor jdbcAdaptor, AttributeImpl<?, ?> attribute, EntityTypeImpl<?> targetEntity) {
+		final IdAttributeImpl<?, ?>[] idAttributes = targetEntity.getIdAttributes();
 
 		// single primary key
-		if (pkColumns.size() == 1) {
-			final PkColumn pkColumn = pkColumns.values().iterator().next();
+		if (idAttributes.length == 1) {
+			final IdAttributeImpl<?, ?> idAttribute = idAttributes[0];
 
 			// no definition for the join column
 			if (this.joinColumns.size() == 0) {
 				// create the join column
-				this.joinColumns.add(new JoinColumn(jdbcAdaptor, this.attribute, pkColumn));
-				this.tableName = "";
+				this.joinColumns.add(new JoinColumn(jdbcAdaptor, attribute, idAttribute));
 			}
+			// existing definition for the join column
+			else {
+				final JoinColumn joinColumn = this.joinColumns.get(0);
+				joinColumn.setColumnProperties(jdbcAdaptor, attribute, idAttribute);
+			}
+		}
+		// composite primary key
+		else {
+			for (final IdAttributeImpl<?, ?> idAttribute : idAttributes) {
+				// no definition for the join columns
+				if (this.joinColumns.size() == 0) {
+					this.joinColumns.add(new JoinColumn(jdbcAdaptor, attribute, idAttribute));
+				}
+				// existing definition for the join column
+				else {
+					// locate the corresponding join column
+					JoinColumn joinColumn = null;
+					for (final JoinColumn column : this.joinColumns) {
+						if (idAttribute.getColumn().getName().equals(column.getReferencedColumnName())) {
+							joinColumn = column;
+							break;
+						}
+					}
+
+					if (joinColumn == null) {
+						throw new MappingException("Join column cannot be located in a composite key target entity");
+					}
+
+					joinColumn.setColumnProperties(jdbcAdaptor, attribute, idAttribute);
+				}
+			}
+		}
+
+		if (attribute != null) {
+			final AbstractTable table = ((EntityTypeImpl<?>) attribute.getDeclaringType()).getTable(this.tableName);
+			if (table == null) {
+				throw new MappingException("Table " + this.tableName + " could not be found");
+			}
+
+			this.setTable(table);
 		}
 	}
 

@@ -20,7 +20,9 @@ package org.batoo.jpa.core.impl.model.attribute;
 
 import javax.persistence.metamodel.Attribute;
 
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
+import org.batoo.jpa.core.impl.jdbc.JoinTable;
 import org.batoo.jpa.parser.MappingException;
 
 /**
@@ -30,11 +32,13 @@ import org.batoo.jpa.parser.MappingException;
  *            The represented type that contains the association
  * @param <T>
  *            The type of the represented association
+ * @param <Y>
+ *            the attribute type
  * 
  * @author hceylan
  * @since $version
  */
-public interface AssociatedAttribute<X, T> extends Attribute<X, T> {
+public interface AssociatedAttribute<X, T, Y> extends Attribute<X, Y> {
 
 	/**
 	 * Returns if the type cascades detach operations.
@@ -77,16 +81,15 @@ public interface AssociatedAttribute<X, T> extends Attribute<X, T> {
 	boolean cascadesRemove();
 
 	/**
-	 * Returns the attribute value of instance.
+	 * Checks that the association references not a transient instance
 	 * 
-	 * @param instance
-	 *            the instance of which the value to be returned
-	 * @return the attribute value of instance
+	 * @param managedInstance
+	 *            the managed instance
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public T get(Object instance);
+	void checkTransient(ManagedInstance<? extends X> managedInstance);
 
 	/**
 	 * Returns the foreign key of the attribute.
@@ -107,7 +110,17 @@ public interface AssociatedAttribute<X, T> extends Attribute<X, T> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	AssociatedAttribute<T, X> getInverse();
+	AssociatedAttribute<T, X, ?> getInverse();
+
+	/**
+	 * Returns the join table of the attribute.
+	 * 
+	 * @return the join table of the attribute
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	JoinTable getJoinTable();
 
 	/**
 	 * Returns if the association should be eagerly fetched.
@@ -174,5 +187,5 @@ public interface AssociatedAttribute<X, T> extends Attribute<X, T> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	void setInverse(AssociatedAttribute<T, X> inverse);
+	void setInverse(AssociatedAttribute<T, X, ?> inverse);
 }

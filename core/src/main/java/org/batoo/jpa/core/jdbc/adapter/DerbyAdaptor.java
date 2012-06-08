@@ -27,8 +27,8 @@ import javax.sql.DataSource;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
+import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
-import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinColumn;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
@@ -81,7 +81,7 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	 */
 	@Override
 	public void createForeignKey(DataSource datasource, ForeignKey foreignKey) throws SQLException {
-		final EntityTable referencedTable = foreignKey.getReferencedTable();
+		final AbstractTable referencedTable = foreignKey.getReferencedTable();
 		synchronized (referencedTable) {
 
 			final String referenceTableName = referencedTable.getName();
@@ -92,7 +92,7 @@ public class DerbyAdaptor extends JdbcAdaptor {
 
 					@Override
 					public String apply(JoinColumn input) {
-						return input.getReferencedColumn().getName();
+						return input.getReferencedColumnName();
 					}
 				}));
 

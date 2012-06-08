@@ -25,6 +25,7 @@ import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.attribute.AssociatedAttribute;
 
 /**
  * A Manager that performs the association linking operations.
@@ -86,7 +87,9 @@ public class LinkManager extends DeploymentManager<EntityTypeImpl<?>> {
 	public Void perform(EntityTypeImpl<?> entity) throws BatooException {
 		switch (this.phase) {
 			case LINK_ASSOCIATIONS:
-				entity.linkAssociations();
+				for (final AssociatedAttribute<?, ?, ?> attribute : entity.getAssociations()) {
+					attribute.link();
+				}
 				break;
 			case LINK_DEPENDENCIES:
 				for (final EntityType<?> type : this.getMetamodel().getEntities()) {

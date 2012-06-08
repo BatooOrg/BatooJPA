@@ -104,7 +104,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 			throw new IllegalArgumentException("Cannot dereference");
 		}
 
-		final FetchImpl<X, Y> fetch = new FetchImpl<X, Y>(this, (AssociatedAttribute<? super X, Y>) attribute, jt);
+		final FetchImpl<X, Y> fetch = new FetchImpl<X, Y>(this, (AssociatedAttribute<? super X, Y, ?>) attribute, jt);
 		this.fetches.add(fetch);
 
 		return fetch;
@@ -313,7 +313,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	 * Returns the alias of the primary table.
 	 * 
 	 * @param query
-	 *            the ruery
+	 *            the query
 	 * @return the alias of the primary table
 	 * 
 	 * @since $version
@@ -419,11 +419,18 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 				final FetchImpl<X, ?> fetch = this.fetches.get(i);
 				final MutableInt subRowNo = new MutableInt(rowNo);
 				final List<?> value = fetch.handle(session, query, data, subRowNo, leap, instance);
-				final AssociatedAttribute<? super X, ?> attribute = fetch.getAttribute();
+				final AssociatedAttribute<? super X, ?, ?> attribute = fetch.getAttribute();
 
 				if (value != null) {
 					leap = subRowNo.intValue() - rowNo.intValue();
-					attribute.set(instance.getInstance(), value);
+					if (attribute.isCollection()) {
+						attribute.set(instance.getInstance(), value);
+					}
+					else {
+						if (value.size() > 0) {
+							attribute.set(instance.getInstance(), value.get(0));
+						}
+					}
 				}
 			}
 

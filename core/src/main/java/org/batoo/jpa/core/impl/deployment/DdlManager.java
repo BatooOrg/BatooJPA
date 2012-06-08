@@ -94,7 +94,7 @@ public class DdlManager extends DeploymentManager<EntityTypeImpl<?>> {
 	public Void perform(EntityTypeImpl<?> type) throws BatooException {
 		switch (this.ddlPhase) {
 			case TABLES:
-				this.getMetamodel().performTablesDddl(this.datasource, this.ddlMode, type);
+				this.getMetamodel().performTablesDdl(this.datasource, this.ddlMode, type);
 				break;
 			case FOREIGN_KEYS:
 				this.getMetamodel().performForeignKeysDdl(this.datasource, this.ddlMode, type);

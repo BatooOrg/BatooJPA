@@ -88,15 +88,6 @@ public class BasicColumn extends AbstractColumn {
 	 * 
 	 */
 	@Override
-	public AttributeImpl<?, ?> getAttribute() {
-		return this.attribute;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public String getColumnDefinition() {
 		return this.columnDefinition;
 	}

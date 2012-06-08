@@ -19,7 +19,6 @@
 package org.batoo.jpa.core.impl.jdbc;
 
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 
 /**
@@ -29,16 +28,6 @@ import org.batoo.jpa.parser.impl.AbstractLocator;
  * @since $version
  */
 public abstract class AbstractColumn {
-
-	/**
-	 * Returns the attribute of the column.
-	 * 
-	 * @return the attribute of the column
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public abstract AttributeImpl<?, ?> getAttribute();
 
 	/**
 	 * Returns the static definition of the column.

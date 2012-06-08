@@ -21,7 +21,6 @@ package org.batoo.jpa.core.impl.model.attribute;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.jdbc.TypeFactory;
 import org.batoo.jpa.core.impl.metamodel.AbstractGenerator;
@@ -153,7 +152,7 @@ public class IdAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 	 * 
 	 */
 	@Override
-	public BasicColumn getColumn() {
+	public PkColumn getColumn() {
 		return this.column;
 	}
 
@@ -183,8 +182,8 @@ public class IdAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 
 		final JdbcAdaptor jdbcAdaptor = this.getDeclaringType().getMetamodel().getJdbcAdaptor();
 
-		this.column = new PkColumn(jdbcAdaptor, this, sqlType, (metadata != null) && (metadata.getColumn() != null)
-			? metadata.getColumn() : null);
+		this.column = new PkColumn(jdbcAdaptor, this, sqlType, (metadata != null) && (metadata.getColumn() != null) ? metadata.getColumn()
+			: null);
 	}
 
 	/**

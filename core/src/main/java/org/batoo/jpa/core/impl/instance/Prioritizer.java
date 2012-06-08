@@ -79,10 +79,10 @@ public class Prioritizer {
 					}
 
 					final EntityTypeImpl<?> e2 = mi2.getType();
-					final AssociatedAttribute<?, ?>[] attributes = e1.getDependenciesFor(e2);
+					final AssociatedAttribute<?, ?, ?>[] attributes = e1.getDependenciesFor(e2);
 					final Object i2 = mi2.getInstance();
 
-					for (final AssociatedAttribute<?, ?> attribute : attributes) {
+					for (final AssociatedAttribute<?, ?, ?> attribute : attributes) {
 						if (attribute.references(i1, i2)) {
 							dependent = true;
 							break innerLoop;
