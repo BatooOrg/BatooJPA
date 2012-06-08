@@ -1,20 +1,3 @@
-/*
- * Copyright (c) 2008, 2009 Sun Microsystems. All rights reserved.
- *
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
- * which accompanies this distribution.
- * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at
- * http://www.eclipse.org/org/documents/edl-v10.php.
- *
- * Contributors:
- *     Linda DeMichiel - Java Persistence 2.0 - Version 2.0 (October 1, 2009)
- *     Specification available from http://jcp.org/en/jsr/detail?id=317
- */
-
-// $Id: ManyToOne.java 20957 2011-06-13 09:58:51Z stliu $
-
 package javax.persistence;
 
 import static java.lang.annotation.ElementType.FIELD;
@@ -26,13 +9,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Defines a single-valued association to another entity class that
- * has many-to-one multiplicity. It is not normally necessary to
- * specify the target entity explicitly since it can usually be
- * inferred from the type of the object being referenced. If the
- * relationship is bidirectional, the non-owning <code>OneToMany</code> entity side must used the <code>mappedBy</code> element to specify
- * the relationship field or
- * property of the entity that is the owner of the relationship.
+ * Defines a single-valued association to another entity class that has many-to-one multiplicity. It is not normally necessary to specify
+ * the target entity explicitly since it can usually be inferred from the type of the object being referenced. If the relationship is
+ * bidirectional, the non-owning <code>OneToMany</code> entity side must used the <code>mappedBy</code> element to specify the relationship
+ * field or property of the entity that is the owner of the relationship.
  * 
  * <p>
  * The <code>ManyToOne</code> annotation may be used within an embeddable class to specify a relationship from the embeddable class to an
@@ -82,18 +62,7 @@ import java.lang.annotation.Target;
 public @interface ManyToOne {
 
 	/**
-	 * (Optional) The entity class that is the target of
-	 * the association.
-	 * 
-	 * <p>
-	 * Defaults to the type of the field or property that stores the association.
-	 */
-	@SuppressWarnings("rawtypes")
-	Class targetEntity() default void.class;
-
-	/**
-	 * (Optional) The operations that must be cascaded to
-	 * the target of the association.
+	 * (Optional) The operations that must be cascaded to the target of the association.
 	 * 
 	 * <p>
 	 * By default no operations are cascaded.
@@ -101,17 +70,22 @@ public @interface ManyToOne {
 	CascadeType[] cascade() default {};
 
 	/**
-	 * (Optional) Whether the association should be lazily
-	 * loaded or must be eagerly fetched. The EAGER
-	 * strategy is a requirement on the persistence provider runtime that
-	 * the associated entity must be eagerly fetched. The LAZY
-	 * strategy is a hint to the persistence provider runtime.
+	 * (Optional) Whether the association should be lazily loaded or must be eagerly fetched. The EAGER strategy is a requirement on the
+	 * persistence provider runtime that the associated entity must be eagerly fetched. The LAZY strategy is a hint to the persistence
+	 * provider runtime.
 	 */
 	FetchType fetch() default EAGER;
 
 	/**
-	 * (Optional) Whether the association is optional. If set
-	 * to false then a non-null relationship must always exist.
+	 * (Optional) Whether the association is optional. If set to false then a non-null relationship must always exist.
 	 */
 	boolean optional() default true;
+
+	/**
+	 * (Optional) The entity class that is the target of the association.
+	 * 
+	 * <p>
+	 * Defaults to the type of the field or property that stores the association.
+	 */
+	Class<?> targetEntity() default void.class;
 }

@@ -281,7 +281,7 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void flushAssociations(ConnectionImpl connection) throws SQLException {
-		for (final AssociatedPluralAttribute<? super X, ?, ?> association : this.type.getAssociationsJoined()) {
+		for (final AssociatedAttribute<? super X, ?, ?> association : this.type.getAssociationsJoined()) {
 			association.flush(this.session, connection, this);
 		}
 	}

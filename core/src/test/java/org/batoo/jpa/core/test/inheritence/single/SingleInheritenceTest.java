@@ -18,9 +18,12 @@
  */
 package org.batoo.jpa.core.test.inheritence.single;
 
+import javax.persistence.EntityManager;
+
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -28,6 +31,7 @@ import org.junit.Test;
  * 
  * @since $version
  */
+@Ignore
 public class SingleInheritenceTest extends BaseCoreTest {
 
 	/**

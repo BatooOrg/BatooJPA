@@ -57,17 +57,32 @@ public class JoinTable extends AbstractTable {
 	}
 
 	/**
+	 * Creates a join between the source and destination entities
+	 * 
 	 * @param joinType
+	 *            the type of the join
 	 * @param parentAlias
+	 *            the alias of the parent table
 	 * @param alias
-	 * @return
+	 *            the alias of the table
+	 * @param forward
+	 *            if the join if forward or backwards
+	 * @return the join SQL fragment
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String createJoin(JoinType joinType, String parentAlias, String alias) {
-		final String sourceJoin = this.sourceKey.createSourceJoin(joinType, parentAlias, alias + "_J");
-		final String destinationJoin = this.destinationKey.createDestinationJoin(joinType, alias + "_J", alias);
+	public String createJoin(JoinType joinType, String parentAlias, String alias, boolean forward) {
+		String sourceJoin, destinationJoin;
+
+		if (forward) {
+			sourceJoin = this.sourceKey.createSourceJoin(joinType, parentAlias, alias + "_J");
+			destinationJoin = this.destinationKey.createDestinationJoin(joinType, alias + "_J", alias);
+		}
+		else {
+			sourceJoin = this.destinationKey.createSourceJoin(joinType, parentAlias, alias + "_J");
+			destinationJoin = this.sourceKey.createDestinationJoin(joinType, alias + "_J", alias);
+		}
 
 		return sourceJoin + "\n" + destinationJoin;
 	}

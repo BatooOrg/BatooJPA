@@ -29,7 +29,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
-import org.batoo.jpa.core.impl.jdbc.JoinTable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedAttribute;
@@ -99,14 +98,17 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 			join = foreignKey.createSourceJoin(this.joinType, parentAlias, alias);
 		}
 		else {
-			final JoinTable joinTable = this.attribute.getJoinTable() != null ? this.attribute.getJoinTable()
-				: this.attribute.getInverse().getJoinTable();
-			join = joinTable.createJoin(this.joinType, parentAlias, alias);
+			if (this.attribute.getJoinTable() != null) {
+				join = this.attribute.getJoinTable().createJoin(this.joinType, parentAlias, alias, true);
+			}
+			else {
+				join = this.attribute.getInverse().getJoinTable().createJoin(this.joinType, parentAlias, alias, false);
+			}
 		}
 
 		final String joins = super.generateJoins(query);
 
-		return join + (StringUtils.isBlank(joins) ? "" : "\n\t") + joins;
+		return join + (StringUtils.isBlank(joins) ? "" : "\n") + joins;
 	}
 
 	/**

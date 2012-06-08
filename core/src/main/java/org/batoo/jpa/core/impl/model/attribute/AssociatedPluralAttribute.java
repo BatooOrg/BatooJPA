@@ -18,18 +18,14 @@
  */
 package org.batoo.jpa.core.impl.model.attribute;
 
-import java.sql.SQLException;
 import java.util.Collection;
 
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
-import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
@@ -53,7 +49,7 @@ public abstract class AssociatedPluralAttribute<X, C, E> extends PluralAttribute
 
 	private final PersistentAttributeType attributeType;
 	private final String inverseName;
-	private AssociatedAttribute<E, X, ?> inverse;
+	private final JoinTable joinTable;
 
 	// Cascades
 	private final boolean cascadesDetach;
@@ -65,7 +61,7 @@ public abstract class AssociatedPluralAttribute<X, C, E> extends PluralAttribute
 	private final boolean eager;
 
 	private EntityTypeImpl<E> type;
-	private JoinTable joinTable;
+	private AssociatedAttribute<E, X, ?> inverse;
 
 	/**
 	 * @param declaringType
@@ -99,9 +95,15 @@ public abstract class AssociatedPluralAttribute<X, C, E> extends PluralAttribute
 		this.cascadesRemove = metadata.getCascades().contains(CascadeType.ALL) || metadata.getCascades().contains(CascadeType.REMOVE);
 
 		if (StringUtils.isBlank(this.inverseName)) {
-			if ((this.getPersistentAttributeType() == PersistentAttributeType.MANY_TO_MANY) || (metadata.getJoinTable() != null)) {
+			if ((this.getPersistentAttributeType() == PersistentAttributeType.MANY_TO_MANY) || (metadata.getJoinColumns().size() == 0)) {
 				this.joinTable = new JoinTable(metadata.getJoinTable());
 			}
+			else {
+				this.joinTable = null;
+			}
+		}
+		else {
+			this.joinTable = null;
 		}
 	}
 
@@ -151,22 +153,13 @@ public abstract class AssociatedPluralAttribute<X, C, E> extends PluralAttribute
 	}
 
 	/**
-	 * Flushes the associates.
+	 * {@inheritDoc}
 	 * 
-	 * @param session
-	 *            the session
-	 * @param connection
-	 *            the connection to use
-	 * @param managedInstance
-	 *            the managed instance
-	 * @throws SQLException
-	 *             thrown if there is an underlying SQL Exception
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	public abstract void flush(SessionImpl session, ConnectionImpl connection, ManagedInstance<? extends X> managedInstance)
-		throws SQLException;
+	@Override
+	public String describe() {
+		return super.toString();
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -264,9 +257,6 @@ public abstract class AssociatedPluralAttribute<X, C, E> extends PluralAttribute
 			if (this.joinTable != null) {
 				this.joinTable.link((EntityTypeImpl<X>) this.getDeclaringType(), this.type);
 			}
-			else {
-				this.inverse = this.type.addVirtualAttribute(this);
-			}
 		}
 	}
 
@@ -292,5 +282,29 @@ public abstract class AssociatedPluralAttribute<X, C, E> extends PluralAttribute
 	@Override
 	public void setInverse(AssociatedAttribute<E, X, ?> inverse) {
 		this.inverse = inverse;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder("association").append(super.toString());
+
+		if (this.isAssociation()) {
+			if (this.getPersistentAttributeType() == PersistentAttributeType.ONE_TO_MANY) {
+				builder.append(" <1..*>");
+			}
+			else {
+				builder.append(" <*..*>");
+			}
+		}
+
+		if (this.inverse != null) {
+			builder.append(this.inverse.describe());
+		}
+
+		return builder.toString();
 	}
 }

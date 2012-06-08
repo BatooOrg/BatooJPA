@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -30,6 +31,7 @@ import org.junit.Test;
  * 
  * @since $version
  */
+@Ignore
 public class DuplicateColumnTest extends BaseCoreTest {
 
 	/**

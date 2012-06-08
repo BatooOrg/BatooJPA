@@ -20,6 +20,8 @@ package org.batoo.jpa.core.impl.criteria;
 
 import javax.persistence.criteria.ParameterExpression;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * Type of criteria query parameter expressions.
  * 
@@ -101,5 +103,24 @@ public class ParameterExpressionImpl<T> extends ExpressionImpl<T> implements Par
 	 */
 	public void setPosition(int position) {
 		this.position = position;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder(":");
+
+		if (StringUtils.isNotBlank(this.name)) {
+			builder.append(this.name).append(":");
+		}
+
+		if (this.position != null) {
+			builder.append(this.position).append(":");
+		}
+
+		return builder.append("?").toString();
 	}
 }

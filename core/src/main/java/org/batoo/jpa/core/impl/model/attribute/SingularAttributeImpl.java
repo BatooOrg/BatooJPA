@@ -75,4 +75,30 @@ public abstract class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> im
 	public final boolean isCollection() {
 		return false;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder();
+
+		if (this.isId()) {
+			builder.append("id");
+		}
+		else if (this.isVersion()) {
+			builder.append("version");
+		}
+		else if (this.getPersistentAttributeType() == PersistentAttributeType.EMBEDDED) {
+			builder.append("embedded");
+		}
+
+		final String declaringType = this.getDeclaringType().getJavaType().getSimpleName();
+
+		final String type = this.getBindableJavaType().getSimpleName();
+		builder.append(" ").append(declaringType).append(".").append(this.getName()).append("(").append(type).append(")");
+
+		return builder.toString();
+	}
 }

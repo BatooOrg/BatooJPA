@@ -23,7 +23,7 @@ package org.batoo.jpa.core.impl.criteria;
  * @author hceylan
  * @since $version
  */
-public class CompundExpressionImpl extends ExpressionImpl<Boolean> {
+public class CompoundExpressionImpl extends ExpressionImpl<Boolean> {
 
 	/**
 	 * The comparison types
@@ -72,7 +72,7 @@ public class CompundExpressionImpl extends ExpressionImpl<Boolean> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public CompundExpressionImpl(Comparison comparison, ExpressionImpl<?> x, ExpressionImpl<?> y) {
+	public CompoundExpressionImpl(Comparison comparison, ExpressionImpl<?> x, ExpressionImpl<?> y) {
 		super();
 
 		this.comparison = comparison;
@@ -88,5 +88,14 @@ public class CompundExpressionImpl extends ExpressionImpl<Boolean> {
 	@Override
 	public String generate(CriteriaQueryImpl<?> query) {
 		return this.x.generate(query) + this.comparison.getFragment() + this.y.generate(query);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return this.x + this.comparison.getFragment() + this.y;
 	}
 }

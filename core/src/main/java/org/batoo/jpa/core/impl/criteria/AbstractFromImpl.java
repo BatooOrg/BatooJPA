@@ -498,6 +498,19 @@ public abstract class AbstractFromImpl<Z, X> extends AbstractPathImpl<X> impleme
 	 * 
 	 */
 	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder(this.entity.getName());
+
+		builder.append(" ").append(this.fetchContext);
+
+		return builder.toString();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public Expression<Class<? extends X>> type() {
 		// TODO Auto-generated method stub
 		return null;

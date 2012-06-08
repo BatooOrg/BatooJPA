@@ -1,20 +1,3 @@
-/*
- * Copyright (c) 2008, 2009 Sun Microsystems. All rights reserved.
- *
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
- * which accompanies this distribution.
- * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at
- * http://www.eclipse.org/org/documents/edl-v10.php.
- *
- * Contributors:
- *     Linda DeMichiel - Java Persistence 2.0 - Version 2.0 (October 1, 2009)
- *     Specification available from http://jcp.org/en/jsr/detail?id=317
- */
-
-// $Id: AttributeOverride.java 20957 2011-06-13 09:58:51Z stliu $
-
 package javax.persistence;
 
 import static java.lang.annotation.ElementType.FIELD;
@@ -26,18 +9,21 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Used to override the mapping of a <code>Basic</code> (whether
- * explicit or default) property or field or <code>Id</code> property or
+ * Used to override the mapping of a <code>Basic</code> (whether explicit or default) property or field or <code>Id</code> property or
  * field.
  * 
  * <p>
  * May be applied to an entity that extends a mapped superclass or to an embedded field or property to override a basic mapping or id
  * mapping defined by the mapped superclass or embeddable class (or embeddable class of one of its attributes).
  * 
- * <p>
- * May be applied to an element collection containing instances of an embeddable class or to a map collection whose key and/or value is an
- * embeddable class. When <code>AttributeOverride</code> is applied to a map, "<code>key.</code>" or "<code>value.</code>" must be used to
- * prefix the name of the attribute that is being overridden in order to specify it as part of the map key or map value.
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+e of the attribute that is being overridden in order to specify it as part of the map key or map value.
  * 
  * <p>
  * To override mappings at multiple levels of embedding, a dot (".") notation form must be used in the <code>name</code> element to indicate
@@ -135,16 +121,14 @@ import java.lang.annotation.Target;
 public @interface AttributeOverride {
 
 	/**
-	 * (Required) The name of the property whose mapping is being
-	 * overridden if property-based access is being used, or the
-	 * name of the field if field-based access is used.
-	 */
-	String name();
-
-	/**
-	 * (Required) The column that is being mapped to the persistent
-	 * attribute. The mapping type will remain the same as is
-	 * defined in the embeddable class or mapped superclass.
+	 * (Required) The column that is being mapped to the persistent attribute. The mapping type will remain the same as is defined in the
+	 * embeddable class or mapped superclass.
 	 */
 	Column column();
+
+	/**
+	 * (Required) The name of the property whose mapping is being overridden if property-based access is being used, or the name of the
+	 * field if field-based access is used.
+	 */
+	String name();
 }

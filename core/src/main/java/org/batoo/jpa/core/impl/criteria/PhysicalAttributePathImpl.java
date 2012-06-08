@@ -125,4 +125,24 @@ public class PhysicalAttributePathImpl<X> extends AbstractPathImpl<X> {
 	public PhysicalAttributeImpl<?, X> getModel() {
 		return this.attribute;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder();
+
+		if (this.getParentPath() != null) {
+			builder.append(this.getParentPath());
+		}
+		else {
+			builder.append(this.attribute.getDeclaringType().getJavaType().getSimpleName());
+		}
+
+		builder.append(".").append(this.attribute.getName());
+
+		return builder.toString();
+	}
 }

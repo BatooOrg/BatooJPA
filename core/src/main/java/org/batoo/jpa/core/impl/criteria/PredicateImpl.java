@@ -109,4 +109,21 @@ public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate 
 	public Predicate not() {
 		return new PredicateImpl(true, this.operator, this.expressions);
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder();
+
+		if (this.negated) {
+			builder.append("not");
+		}
+
+		builder.append(Joiner.on("\t\n " + this.operator.name()).join(this.expressions));
+
+		return builder.toString();
+	}
 }

@@ -34,6 +34,7 @@ import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.jdbc.SingleValueHandler;
 import org.batoo.jpa.core.test.BaseCoreTest;
 import org.batoo.jpa.core.test.NullResultSetHandler;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -94,6 +95,7 @@ public class SimpleTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
+	@Ignore
 	public void testDetach() {
 		final Foo foo = this.newFoo();
 		this.persist(foo);
@@ -115,6 +117,7 @@ public class SimpleTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
+	@Ignore
 	public void testDetachThenCommit() throws SQLException {
 		final Foo foo = this.newFoo();
 		this.persist(foo);
@@ -157,6 +160,7 @@ public class SimpleTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
+	@Ignore
 	public void testFlushThenDetach() throws SQLException {
 		final Foo foo = this.newFoo();
 		this.persist(foo);

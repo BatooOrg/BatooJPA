@@ -70,6 +70,46 @@ public class ManyToOneToManyTest extends BaseCoreTest {
 	}
 
 	/**
+	 * Tests to {@link EntityManager#find(Class, Object)} person.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testFind2() {
+		final Person person = this.person();
+		this.persist(person);
+
+		this.commit();
+		this.close();
+
+		final Phone phone = this.find(Phone.class, person.getPhones().get(0).getId());
+		final Person person2 = phone.getPerson();
+		Assert.assertEquals(person.getName(), person2.getName());
+		Assert.assertEquals(person.getAddresses().size(), person2.getAddresses().size());
+	}
+
+	/**
+	 * Tests to {@link EntityManager#find(Class, Object)} person.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testFind3() {
+		final Person person = this.person();
+		this.persist(person);
+
+		this.commit();
+		this.close();
+
+		final Address address = this.find(Address.class, person.getAddresses().get(0).getId());
+		final Person person2 = address.getPerson();
+		Assert.assertEquals(person.getName(), person2.getName());
+		Assert.assertEquals(person.getAddresses().size(), person2.getAddresses().size());
+	}
+
+	/**
 	 * Tests to {@link EntityManager#find(Class, Object)} person that is in the session.
 	 * 
 	 * @since $version

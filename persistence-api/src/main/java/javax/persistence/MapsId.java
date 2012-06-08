@@ -1,20 +1,3 @@
-/*
- * Copyright (c) 2008, 2009 Sun Microsystems. All rights reserved.
- *
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
- * which accompanies this distribution.
- * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at
- * http://www.eclipse.org/org/documents/edl-v10.php.
- *
- * Contributors:
- *     Linda DeMichiel - Java Persistence 2.0 - Version 2.0 (October 1, 2009)
- *     Specification available from http://jcp.org/en/jsr/detail?id=317
- */
-
-// $Id: $
-
 package javax.persistence;
 
 import static java.lang.annotation.ElementType.FIELD;
@@ -25,14 +8,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Designates a <code>ManyToOne</code> or <code>OneToOne</code> relationship attribute that provides the
- * mapping for an {@link EmbeddedId} primary key, an attribute within
- * an <code>EmbeddedId</code> primary key, or a simple primary key of
- * the parent entity. The <code>value</code> element specifies the
- * attribute within a composite key to which the relationship
- * attribute corresponds. If the entity's primary key is of the same
- * Java type as the primary key of the entity referenced by the
- * relationship, the value attribute is not specified.
+ * Designates a <code>ManyToOne</code> or <code>OneToOne</code> relationship attribute that provides the mapping for an {@link EmbeddedId}
+ * primary key, an attribute within an <code>EmbeddedId</code> primary key, or a simple primary key of the parent entity. The
+ * <code>value</code> element specifies the attribute within a composite key to which the relationship attribute corresponds. If the
+ * entity's primary key is of the same Java type as the primary key of the entity referenced by the relationship, the value attribute is not
+ * specified.
  * 
  * <pre>
  *    Example:
@@ -70,10 +50,8 @@ import java.lang.annotation.Target;
 public @interface MapsId {
 
 	/**
-	 * (Optional) The name of the attribute within the composite key
-	 * to which the relationship attribute corresponds. If not
-	 * supplied, the relationship maps the entitys primary
-	 * key.
+	 * (Optional) The name of the attribute within the composite key to which the relationship attribute corresponds. If not supplied, the
+	 * relationship maps the entitys primary key.
 	 */
 	String value() default "";
 }

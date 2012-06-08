@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.FetchParent;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Path;
@@ -57,6 +58,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedAttribute;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedPluralAttribute;
+import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
 import org.batoo.jpa.core.impl.model.attribute.IdAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.PhysicalAttributeImpl;
 import org.batoo.jpa.parser.MappingException;
@@ -94,7 +96,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private AssociatedAttribute<? super X, ?, ?>[] associatedAttributes;
 	private AssociatedAttribute<? super X, ?, ?>[] persistableAssociations;
 	private AssociatedAttribute<? super X, ?, ?>[] eagerAssociations;
-	private AssociatedPluralAttribute<? super X, ?, ?>[] joinedAssociations;
+	private AssociatedAttribute<? super X, ?, ?>[] joinedAssociations;
 
 	/**
 	 * @param metamodel
@@ -235,7 +237,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public AssociatedPluralAttribute<? super X, ?, ?>[] getAssociationsJoined() {
+	public AssociatedAttribute<? super X, ?, ?>[] getAssociationsJoined() {
 		if (this.joinedAssociations != null) {
 			return this.joinedAssociations;
 		}
@@ -245,15 +247,15 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.joinedAssociations;
 			}
 
-			final List<AssociatedPluralAttribute<? super X, ?, ?>> joinedAssociations = Lists.newArrayList();
+			final List<AssociatedAttribute<? super X, ?, ?>> joinedAssociations = Lists.newArrayList();
 
 			for (final AssociatedAttribute<? super X, ?, ?> association : this.getAssociations()) {
 				if (association.getJoinTable() != null) {
-					joinedAssociations.add((AssociatedPluralAttribute<? super X, ?, ?>) association);
+					joinedAssociations.add(association);
 				}
 			}
 
-			final AssociatedPluralAttribute<? super X, ?, ?>[] joinedAssociations0 = new AssociatedPluralAttribute[joinedAssociations.size()];
+			final AssociatedAttribute<? super X, ?, ?>[] joinedAssociations0 = new AssociatedAttribute[joinedAssociations.size()];
 			joinedAssociations.toArray(joinedAssociations0);
 
 			this.joinedAssociations = joinedAssociations0;
@@ -689,9 +691,30 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 * @param entityTypeImpl
 	 */
-	private void prepareEagerAssociations(FetchParent<?, ?> r, EntityTypeImpl<?> entityType) {
-		for (final AssociatedAttribute<?, ?, ?> attribute : entityType.getAssociationsEager()) {
-			r.fetch(attribute.getName(), JoinType.LEFT);
+	private void prepareEagerAssociations(FetchParent<?, ?> r, int depth, AssociatedAttribute<?, ?, ?> parent) {
+		for (final AssociatedAttribute<?, ?, ?> attribute : this.getAssociationsEager()) {
+
+			// if we are coming from the inverse side and inverse side is not many-to-one then skip
+			if ((parent != null) && //
+				(attribute.getInverse() == parent) && //
+				(parent.getPersistentAttributeType() != PersistentAttributeType.MANY_TO_ONE)) {
+				continue;
+			}
+
+			final Fetch<Object, Object> r2 = r.fetch(attribute.getName(), JoinType.LEFT);
+
+			EntityTypeImpl<?> type;
+
+			if (attribute instanceof AssociatedSingularAttribute) {
+				final AssociatedSingularAttribute<?, ?> singularAttribute = (AssociatedSingularAttribute<?, ?>) attribute;
+				type = singularAttribute.getType();
+			}
+			else {
+				final AssociatedPluralAttribute<?, ?, ?> pluralAttribute = (AssociatedPluralAttribute<?, ?, ?>) attribute;
+				type = pluralAttribute.getElementType();
+			}
+
+			type.prepareEagerAssociations(r2, depth + 1, attribute);
 		}
 	}
 
@@ -706,7 +729,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		final RootImpl<X> r = q.from(this);
 		q = q.select(r);
 
-		this.prepareEagerAssociations(r, this);
+		this.prepareEagerAssociations(r, 1, null);
 
 		final List<PredicateImpl> predicates = Lists.newArrayList();
 		for (final IdAttributeImpl<? super X, ?> idAttribute : this.getIdAttributes()) {

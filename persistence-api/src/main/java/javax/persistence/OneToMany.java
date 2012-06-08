@@ -1,20 +1,3 @@
-/*
- * Copyright (c) 2008, 2009 Sun Microsystems. All rights reserved.
- *
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
- * which accompanies this distribution.
- * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at
- * http://www.eclipse.org/org/documents/edl-v10.php.
- *
- * Contributors:
- *     Linda DeMichiel - Java Persistence 2.0 - Version 2.0 (October 1, 2009)
- *     Specification available from http://jcp.org/en/jsr/detail?id=317
- */
-
-// $Id: OneToMany.java 20957 2011-06-13 09:58:51Z stliu $
-
 package javax.persistence;
 
 import static java.lang.annotation.ElementType.FIELD;
@@ -89,50 +72,41 @@ import java.lang.annotation.Target;
 public @interface OneToMany {
 
 	/**
-	 * (Optional) The entity class that is the target
-	 * of the association. Optional only if the collection
-	 * property is defined using Java generics.
-	 * Must be specified otherwise.
-	 * 
-	 * <p>
-	 * Defaults to the parameterized type of the collection when defined using generics.
-	 */
-	@SuppressWarnings("rawtypes")
-	Class targetEntity() default void.class;
-
-	/**
-	 * (Optional) The operations that must be cascaded to
-	 * the target of the association.
+	 * (Optional) The operations that must be cascaded to the target of the association.
 	 * <p>
 	 * Defaults to no operations being cascaded.
 	 * 
 	 * <p>
-	 * When the target collection is a {@link java.util.Map
-	 * java.util.Map}, the <code>cascade</code> element applies to the map value.
+	 * When the target collection is a {@link java.util.Map java.util.Map}, the <code>cascade</code> element applies to the map value.
 	 */
 	CascadeType[] cascade() default {};
 
 	/**
-	 * (Optional) Whether the association should be lazily loaded or
-	 * must be eagerly fetched. The EAGER strategy is a requirement on
-	 * the persistence provider runtime that the associated entities
-	 * must be eagerly fetched. The LAZY strategy is a hint to the
-	 * persistence provider runtime.
+	 * (Optional) Whether the association should be lazily loaded or must be eagerly fetched. The EAGER strategy is a requirement on the
+	 * persistence provider runtime that the associated entities must be eagerly fetched. The LAZY strategy is a hint to the persistence
+	 * provider runtime.
 	 */
 	FetchType fetch() default LAZY;
 
 	/**
-	 * The field that owns the relationship. Required unless
-	 * the relationship is unidirectional.
+	 * The field that owns the relationship. Required unless the relationship is unidirectional.
 	 */
 	String mappedBy() default "";
 
 	/**
-	 * (Optional) Whether to apply the remove operation to entities that have
-	 * been removed from the relationship and to cascade the remove operation to
-	 * those entities.
+	 * (Optional) Whether to apply the remove operation to entities that have been removed from the relationship and to cascade the remove
+	 * operation to those entities.
 	 * 
 	 * @since Java Persistence 2.0
 	 */
 	boolean orphanRemoval() default false;
+
+	/**
+	 * (Optional) The entity class that is the target of the association. Optional only if the collection property is defined using Java
+	 * generics. Must be specified otherwise.
+	 * 
+	 * <p>
+	 * Defaults to the parameterized type of the collection when defined using generics.
+	 */
+	Class<?> targetEntity() default void.class;
 }

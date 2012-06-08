@@ -1,20 +1,3 @@
-/*
- * Copyright (c) 2008, 2009 Sun Microsystems. All rights reserved.
- *
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
- * which accompanies this distribution.
- * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at
- * http://www.eclipse.org/org/documents/edl-v10.php.
- *
- * Contributors:
- *     Linda DeMichiel - Java Persistence 2.0 - Version 2.0 (October 1, 2009)
- *     Specification available from http://jcp.org/en/jsr/detail?id=317
- */
-
-// $Id: AssociationOverride.java 20957 2011-06-13 09:58:51Z stliu $
-
 package javax.persistence;
 
 import static java.lang.annotation.ElementType.FIELD;
@@ -120,31 +103,24 @@ import java.lang.annotation.Target;
 public @interface AssociationOverride {
 
 	/**
-	 * (Required) The name of the relationship property whose mapping is
-	 * being overridden if property-based access is being used,
-	 * or the name of the relationship field if field-based access is used.
-	 */
-	String name();
-
-	/**
-	 * The join column(s) being mapped to the persistent attribute(s).
-	 * The <code>joinColumns</code> elements must be specified if a
-	 * foreign key mapping is used in the overriding of the mapping of
-	 * the relationship. The <code>joinColumns</code> element must
-	 * not be specified if a join table is used in the overriding of
-	 * the mapping of the relationship.
+	 * The join column(s) being mapped to the persistent attribute(s). The <code>joinColumns</code> elements must be specified if a foreign
+	 * key mapping is used in the overriding of the mapping of the relationship. The <code>joinColumns</code> element must not be specified
+	 * if a join table is used in the overriding of the mapping of the relationship.
 	 */
 	JoinColumn[] joinColumns() default {};
 
 	/**
-	 * The join table that maps the relationship.
-	 * The <code>joinTable</code> element must be specified if a join table
-	 * is used in the overriding of the mapping of the
-	 * relationship. The <code>joinTable</code> element must not be specified
-	 * if a foreign key mapping is used in the overriding of
-	 * the relationship.
+	 * The join table that maps the relationship. The <code>joinTable</code> element must be specified if a join table is used in the
+	 * overriding of the mapping of the relationship. The <code>joinTable</code> element must not be specified if a foreign key mapping is
+	 * used in the overriding of the relationship.
 	 * 
 	 * @since Java Persistence 2.0
 	 */
 	JoinTable joinTable() default @JoinTable;
+
+	/**
+	 * (Required) The name of the relationship property whose mapping is being overridden if property-based access is being used, or the
+	 * name of the relationship field if field-based access is used.
+	 */
+	String name();
 }

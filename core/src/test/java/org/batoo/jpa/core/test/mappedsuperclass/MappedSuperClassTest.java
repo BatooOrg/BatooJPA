@@ -21,6 +21,9 @@ package org.batoo.jpa.core.test.mappedsuperclass;
 import java.sql.SQLException;
 import java.util.Set;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.TransactionRequiredException;
 import javax.persistence.metamodel.EntityType;
 import javax.sql.DataSource;
@@ -31,6 +34,7 @@ import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.jdbc.SingleValueHandler;
 import org.batoo.jpa.core.test.BaseCoreTest;
 import org.batoo.jpa.core.test.NullResultSetHandler;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -38,6 +42,7 @@ import org.junit.Test;
  * 
  * @since $version
  */
+@Ignore
 public class MappedSuperClassTest extends BaseCoreTest {
 
 	/**

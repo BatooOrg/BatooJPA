@@ -95,4 +95,24 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	public final boolean isCollection() {
 		return true;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder();
+
+		if (this.getPersistentAttributeType() == PersistentAttributeType.ELEMENT_COLLECTION) {
+			builder.append("collection");
+		}
+
+		final String declaringType = this.getDeclaringType().getJavaType().getSimpleName();
+
+		final String type = this.getBindableJavaType().getSimpleName();
+		builder.append(" ").append(declaringType).append(".").append(this.getName()).append("(").append(type).append(")");
+
+		return builder.toString();
+	}
 }

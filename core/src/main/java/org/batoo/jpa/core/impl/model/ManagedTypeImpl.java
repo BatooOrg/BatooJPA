@@ -32,7 +32,6 @@ import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
-import org.batoo.jpa.core.impl.model.attribute.AssociatedPluralAttribute;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttributeImpl;
@@ -136,26 +135,6 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	protected void addDeclaredAttribute(AttributeImpl<X, ?> attribute) {
 		this.declaredAttributes.put(attribute.getName(), attribute);
 		this.attributes.put(attribute.getName(), attribute);
-	}
-
-	/**
-	 * Adds a virtual attribute to link joined one-to-many attribute
-	 * 
-	 * @param attribute
-	 *            the inverse attribute
-	 * @param <T>
-	 *            the target entity type
-	 * @return the attribute created
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public <T> AssociatedSingularAttribute<X, T> addVirtualAttribute(AssociatedPluralAttribute<T, ?, X> attribute) {
-		final AssociatedSingularAttribute<X, T> virtual = new AssociatedSingularAttribute<X, T>(this, PersistentAttributeType.MANY_TO_ONE,
-			null, null, true);
-		virtual.link();
-
-		return virtual;
 	}
 
 	/**

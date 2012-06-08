@@ -463,4 +463,13 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	protected boolean shouldContinue(SessionImpl session, Map<String, Object> row) {
 		return true;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return super.toString();
+	}
 }

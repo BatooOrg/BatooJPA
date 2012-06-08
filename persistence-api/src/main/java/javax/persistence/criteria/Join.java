@@ -1,20 +1,3 @@
-/*
- * Copyright (c) 2008, 2009 Sun Microsystems. All rights reserved.
- *
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
- * which accompanies this distribution.
- * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at
- * http://www.eclipse.org/org/documents/edl-v10.php.
- *
- * Contributors:
- *     Linda DeMichiel - Java Persistence 2.0 - Version 2.0 (October 1, 2009)
- *     Specification available from http://jcp.org/en/jsr/detail?id=317
- */
-
-// $Id: Join.java 20957 2011-06-13 09:58:51Z stliu $
-
 package javax.persistence.criteria;
 
 import javax.persistence.metamodel.Attribute;
@@ -26,7 +9,6 @@ import javax.persistence.metamodel.Attribute;
  *            the source type of the join
  * @param <X>
  *            the target type of the join
- * @since Java Persistence 2.0
  */
 public interface Join<Z, X> extends From<Z, X> {
 	/**
@@ -37,6 +19,20 @@ public interface Join<Z, X> extends From<Z, X> {
 	Attribute<? super Z, ?> getAttribute();
 
 	/**
+	 * Return the join type.
+	 * 
+	 * @return join type
+	 */
+	JoinType getJoinType();
+
+	/**
+	 * Return the predicate that corresponds to the ON restriction(s) on the join, or null if no ON condition has been specified.
+	 * 
+	 * @return the ON restriction predicate
+	 */
+	Predicate getOn();
+
+	/**
 	 * Return the parent of the join.
 	 * 
 	 * @return join parent
@@ -44,9 +40,22 @@ public interface Join<Z, X> extends From<Z, X> {
 	From<?, Z> getParent();
 
 	/**
-	 * Return the join type.
+	 * Modify the join to restrict the result according to the specified ON condition. Replaces the previous ON condition, if any. Return
+	 * the join object
 	 * 
-	 * @return join type
+	 * @param restriction
+	 *            a simple or compound boolean expression
+	 * @return the modified join object
 	 */
-	JoinType getJoinType();
+	Join<Z, X> on(Expression<Boolean> restriction);
+
+	/**
+	 * Modify the join to restrict the result according to the specified ON condition. Replaces the previous ON condition, if any. Return
+	 * the join object
+	 * 
+	 * @param restrictions
+	 *            zero or more restriction predicates
+	 * @return the modified join object
+	 */
+	Join<Z, X> on(Predicate... restrictions);
 }

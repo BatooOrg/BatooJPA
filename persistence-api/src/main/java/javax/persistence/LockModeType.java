@@ -1,37 +1,18 @@
-/*
- * Copyright (c) 2008, 2009 Sun Microsystems. All rights reserved.
- *
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
- * which accompanies this distribution.
- * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at
- * http://www.eclipse.org/org/documents/edl-v10.php.
- *
- * Contributors:
- *     Linda DeMichiel - Java Persistence 2.0 - Version 2.0 (October 1, 2009)
- *     Specification available from http://jcp.org/en/jsr/detail?id=317
- */
-
-// $Id: LockModeType.java 20957 2011-06-13 09:58:51Z stliu $
-
 package javax.persistence;
 
 /**
  * Lock modes can be specified by means of passing a <code>LockModeType</code> argument to one of the
- * {@link javax.persistence.EntityManager} methods that take locks
- * (<code>lock</code>, <code>find</code>, or <code>refresh</code>) or
- * to the {@link Query#setLockMode Query.setLockMode()} or {@link TypedQuery#setLockMode TypedQuery.setLockMode()} method.
+ * {@link javax.persistence.EntityManager} methods that take locks (<code>lock</code>, <code>find</code>, or <code>refresh</code>) or to the
+ * {@link Query#setLockMode Query.setLockMode()} or {@link TypedQuery#setLockMode TypedQuery.setLockMode()} method.
  * 
  * <p>
  * Lock modes can be used to specify either optimistic or pessimistic locks.
  * 
  * <p>
  * Optimistic locks are specified using {@link LockModeType#OPTIMISTIC LockModeType.OPTIMISTIC} and
- * {@link LockModeType#OPTIMISTIC_FORCE_INCREMENT
- * LockModeType.OPTIMISTIC_FORCE_INCREMENT}. The lock mode type values {@link LockModeType#READ LockModeType.READ} and
- * {@link LockModeType#WRITE LockModeType.WRITE} are synonyms of <code>OPTIMISTIC</code> and <code>OPTIMISTIC_FORCE_INCREMENT</code>
- * respectively. The latter are to be preferred for new applications.
+ * {@link LockModeType#OPTIMISTIC_FORCE_INCREMENT LockModeType.OPTIMISTIC_FORCE_INCREMENT}. The lock mode type values
+ * {@link LockModeType#READ LockModeType.READ} and {@link LockModeType#WRITE LockModeType.WRITE} are synonyms of <code>OPTIMISTIC</code> and
+ * <code>OPTIMISTIC_FORCE_INCREMENT</code> respectively. The latter are to be preferred for new applications.
  * 
  * <p>
  * The semantics of requesting locks of type <code>LockModeType.OPTIMISTIC</code> and
@@ -62,10 +43,9 @@ package javax.persistence;
  * support a such lock call, it must throw the {@link PersistenceException}.
  * 
  * <p>
- * The lock modes {@link LockModeType#PESSIMISTIC_READ
- * LockModeType.PESSIMISTIC_READ}, {@link LockModeType#PESSIMISTIC_WRITE LockModeType.PESSIMISTIC_WRITE}, and
- * {@link LockModeType#PESSIMISTIC_FORCE_INCREMENT
- * LockModeType.PESSIMISTIC_FORCE_INCREMENT} are used to immediately obtain long-term database locks.
+ * The lock modes {@link LockModeType#PESSIMISTIC_READ LockModeType.PESSIMISTIC_READ}, {@link LockModeType#PESSIMISTIC_WRITE
+ * LockModeType.PESSIMISTIC_WRITE}, and {@link LockModeType#PESSIMISTIC_FORCE_INCREMENT LockModeType.PESSIMISTIC_FORCE_INCREMENT} are used
+ * to immediately obtain long-term database locks.
  * 
  * <p>
  * The semantics of requesting locks of type <code>LockModeType.PESSIMISTIC_READ</code>, <code>LockModeType.PESSIMISTIC_WRITE</code>, and
@@ -106,8 +86,7 @@ package javax.persistence;
  */
 public enum LockModeType {
 	/**
-	 * Synonymous with <code>OPTIMISTIC</code>. <code>OPTIMISTIC</code> is to be preferred for new
-	 * applications.
+	 * Synonymous with <code>OPTIMISTIC</code>. <code>OPTIMISTIC</code> is to be preferred for new applications.
 	 * 
 	 */
 	READ,

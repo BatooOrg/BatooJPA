@@ -22,6 +22,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 
 /**
@@ -37,6 +38,7 @@ public class Phone {
 	private Integer id;
 
 	@ManyToOne
+	@JoinTable
 	private Person person;
 
 	private String phone;

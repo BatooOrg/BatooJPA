@@ -16,28 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.annotations.base;
-
-import junit.framework.Assert;
-
-import org.batoo.jpa.core.test.BaseCoreTest;
-import org.junit.Test;
+package javax.persistence;
 
 /**
- * @author hceylan
+ * Types for the synchronization.
  * 
- * @since $version
+ * @since 2.1
  */
-public class BaseAnnotationTest extends BaseCoreTest {
+public enum SynchronizationType {
 
 	/**
-	 * Test if {@link Person} deployed correctly
-	 * 
-	 * @since $version
-	 * @author hceylan
+	 * Synchronized.
 	 */
-	@Test
-	public void testMapping() {
-		Assert.assertEquals(2, this.em().getMetamodel().getEntities().size());
-	}
+	SYNCHRONIZED,
+
+	/**
+	 * Unsynchronized.
+	 */
+	UNSYNCHRONIZED
 }

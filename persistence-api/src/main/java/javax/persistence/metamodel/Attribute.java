@@ -1,20 +1,3 @@
-/*
- * Copyright (c) 2008, 2009 Sun Microsystems. All rights reserved.
- *
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
- * which accompanies this distribution.
- * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at
- * http://www.eclipse.org/org/documents/edl-v10.php.
- *
- * Contributors:
- *     Linda DeMichiel - Java Persistence 2.0 - Version 2.0 (October 1, 2009)
- *     Specification available from http://jcp.org/en/jsr/detail?id=317
- */
-
-// $Id: Attribute.java 20957 2011-06-13 09:58:51Z stliu $
-
 package javax.persistence.metamodel;
 
 /**
@@ -24,11 +7,13 @@ package javax.persistence.metamodel;
  *            The represented type that contains the attribute
  * @param <Y>
  *            The type of the represented attribute
- * 
- * @since Java Persistence 2.0
  */
 public interface Attribute<X, Y> {
 
+	/**
+	 * Persistent attribute types.
+	 * 
+	 */
 	public static enum PersistentAttributeType {
 		/**
 		 * Many-to-one association
@@ -67,18 +52,16 @@ public interface Attribute<X, Y> {
 	}
 
 	/**
-	 * Return the managed type representing the type in which
-	 * the attribute was declared.
+	 * Return the managed type representing the type in which the attribute was declared.
 	 * 
 	 * @return declaring type
 	 */
 	ManagedType<X> getDeclaringType();
 
 	/**
-	 * Return the <code>java.lang.reflect.Member</code> for the represented
-	 * attribute.
+	 * Return the java.lang.reflect.Member for the represented attribute.
 	 * 
-	 * @return corresponding <code>java.lang.reflect.Member</code>
+	 * @return corresponding java.lang.reflect.Member
 	 */
 	java.lang.reflect.Member getJavaMember();
 
@@ -106,17 +89,14 @@ public interface Attribute<X, Y> {
 	/**
 	 * Is the attribute an association.
 	 * 
-	 * @return boolean indicating whether the attribute
-	 *         corresponds to an association
+	 * @return boolean indicating whether the attribute corresponds to an association
 	 */
 	boolean isAssociation();
 
 	/**
-	 * Is the attribute collection-valued (represents a Collection,
-	 * Set, List, or Map).
+	 * Is the attribute collection-valued (represents a Collection, Set, List, or Map).
 	 * 
-	 * @return boolean indicating whether the attribute is
-	 *         collection-valued
+	 * @return boolean indicating whether the attribute is collection-valued
 	 */
 	boolean isCollection();
 }

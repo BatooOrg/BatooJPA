@@ -20,9 +20,12 @@ package org.batoo.jpa.core.test.inheritence.joined;
 
 import java.util.Set;
 
+import javax.persistence.EntityManager;
+
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Sets;
@@ -32,6 +35,7 @@ import com.google.common.collect.Sets;
  * 
  * @since $version
  */
+@Ignore
 public class JoinedInheritenceTest extends BaseCoreTest {
 
 	/**

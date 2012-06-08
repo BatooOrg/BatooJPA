@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.core.test.elementcollection;
 
+import javax.persistence.EntityManager;
+
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
@@ -29,6 +31,7 @@ import org.junit.Test;
  * 
  * @since $version
  */
+@Ignore
 public class ElementCollectionTest extends BaseCoreTest {
 
 	/**
@@ -38,7 +41,6 @@ public class ElementCollectionTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
-	@Ignore
 	public void testElementCollection() {
 		final Foo foo = new Foo();
 		foo.setValue("Bar");

@@ -18,11 +18,15 @@
  */
 package org.batoo.jpa.core.impl.model.attribute;
 
+import java.sql.SQLException;
+
 import javax.persistence.metamodel.Attribute;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.parser.MappingException;
 
 /**
@@ -90,6 +94,33 @@ public interface AssociatedAttribute<X, T, Y> extends Attribute<X, Y> {
 	 * @author hceylan
 	 */
 	void checkTransient(ManagedInstance<? extends X> managedInstance);
+
+	/**
+	 * Describes the attribute.
+	 * 
+	 * @return the description
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract String describe();
+
+	/**
+	 * Flushes the associates.
+	 * 
+	 * @param session
+	 *            the session
+	 * @param connection
+	 *            the connection to use
+	 * @param managedInstance
+	 *            the managed instance
+	 * @throws SQLException
+	 *             thrown if there is an underlying SQL Exception
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	void flush(SessionImpl session, ConnectionImpl connection, ManagedInstance<? extends X> managedInstance) throws SQLException;
 
 	/**
 	 * Returns the foreign key of the attribute.

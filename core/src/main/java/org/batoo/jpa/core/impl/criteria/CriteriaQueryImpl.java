@@ -18,12 +18,14 @@
  */
 package org.batoo.jpa.core.impl.criteria;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Predicate;
@@ -33,7 +35,9 @@ import javax.persistence.criteria.Selection;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
 
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -292,6 +296,50 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 		this.selection = (SelectionImpl<T>) selection;
 
 		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder();
+
+		// append distinct if necessary
+		if (this.distinct) {
+			builder.append("distinct ");
+		}
+
+		final Collection<String> roots = Collections2.transform(this.getRoots(), new Function<Root<?>, String>() {
+
+			@Override
+			public String apply(Root<?> input) {
+				final StringBuilder builder = new StringBuilder(input.getModel().getName());
+
+				if (StringUtils.isNotBlank(input.getAlias())) {
+					builder.append(" as ").append(input.getAlias());
+				}
+
+				return builder.toString();
+			}
+		});
+		builder.append("").append(Joiner.on(", ").join(roots));
+
+		final Set<Fetch<?, ?>> fetches = Sets.newHashSet();
+		for (final Root<?> root : this.getRoots()) {
+			fetches.addAll(root.getFetches());
+
+		}
+		for (final Fetch<?, ?> fetch : fetches) {
+			builder.append("\n\t").append(fetch);
+		}
+
+		if (this.getRestriction() != null) {
+			builder.append("\nwhere ").append(this.getRestriction());
+		}
+
+		return builder.toString();
 	}
 
 	/**
