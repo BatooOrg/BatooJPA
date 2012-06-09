@@ -44,6 +44,16 @@ public abstract class ExpressionImpl<T> extends SelectionImpl<T> implements Expr
 	}
 
 	/**
+	 * Returns the description of the expression.
+	 * 
+	 * @return the description of the expression
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract String describe();
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */

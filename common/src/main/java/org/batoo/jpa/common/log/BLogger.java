@@ -250,7 +250,7 @@ public interface BLogger {
 	 * @since $version
 	 * @author hceylan
 	 */
-	Object lazyBoxed(final String block);
+	Object lazyBoxed(final Object block);
 
 	/**
 	 * Returns an object that lazily boxes the block.
@@ -264,7 +264,7 @@ public interface BLogger {
 	 * @since $version
 	 * @author hceylan
 	 */
-	Object lazyBoxed(final String block, final Object[] parameters);
+	Object lazyBoxed(final Object block, final Object[] parameters);
 
 	/**
 	 * Convenience method to log a message

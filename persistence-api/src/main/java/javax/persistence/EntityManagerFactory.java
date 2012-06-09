@@ -58,7 +58,7 @@ public interface EntityManagerFactory {
 	 * @throws IllegalStateException
 	 *             if the entity manager factory has been closed
 	 */
-	public EntityManager createEntityManager(Map<?, ?> map);
+	public EntityManager createEntityManager(Map<String, Object> map);
 
 	/**
 	 * Create a new JTA application-managed EntityManager with the specified synchronization type and Map of properties. This method returns
@@ -72,7 +72,7 @@ public interface EntityManagerFactory {
 	 * @throws IllegalStateException
 	 *             if the entity manager factory has been configured for resource-local entity managers or has been closed
 	 */
-	public EntityManager createEntityManager(SynchronizationType synchronizationType, Map<?, ?> map);
+	public EntityManager createEntityManager(SynchronizationType synchronizationType, Map<String, Object> map);
 
 	/**
 	 * Access the cache that is associated with the entity manager factory (the "second level cache").

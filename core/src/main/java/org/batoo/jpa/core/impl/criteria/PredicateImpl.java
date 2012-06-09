@@ -36,14 +36,50 @@ public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate 
 
 	private final BooleanOperator operator;
 	private final boolean negated;
-	private final List<Expression<Boolean>> expressions;
+	private final List<ExpressionImpl<Boolean>> expressions = Lists.newArrayList();
 
-	private PredicateImpl(boolean negated, BooleanOperator operator, List<Expression<Boolean>> expressions) {
+	/**
+	 * @param negated
+	 *            if negated
+	 * @param operator
+	 *            the operator
+	 * @param expressions
+	 *            the expressions
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public PredicateImpl(boolean negated, BooleanOperator operator, Expression<Boolean>... expressions) {
 		super();
 
 		this.negated = negated;
 		this.operator = operator;
-		this.expressions = expressions;
+
+		for (final Expression<Boolean> predicate : expressions) {
+			this.expressions.add((ExpressionImpl<Boolean>) predicate);
+		}
+	}
+
+	/**
+	 * @param negated
+	 *            if negated
+	 * @param operator
+	 *            the operator
+	 * @param predicates
+	 *            the predicates
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public PredicateImpl(boolean negated, BooleanOperator operator, Predicate... predicates) {
+		super();
+
+		this.negated = negated;
+		this.operator = operator;
+
+		for (final Expression<Boolean> predicate : predicates) {
+			this.expressions.add((ExpressionImpl<Boolean>) predicate);
+		}
 	}
 
 	/**
@@ -53,8 +89,41 @@ public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PredicateImpl(Expression<Boolean>... expressions) {
-		this(false, BooleanOperator.AND, Lists.newArrayList(expressions));
+	public PredicateImpl(ExpressionImpl<Boolean>... expressions) {
+		this(false, BooleanOperator.AND, expressions);
+	}
+
+	/**
+	 * Returns the description of the prediction.
+	 * 
+	 * @return the description of the prediction
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Override
+	public String describe() {
+		final StringBuilder builder = new StringBuilder();
+
+		if (this.negated) {
+			builder.append("not (\n");
+		}
+
+		final List<String> expressions = Lists.transform(this.expressions, new Function<ExpressionImpl<Boolean>, String>() {
+
+			@Override
+			public String apply(ExpressionImpl<Boolean> input) {
+				return input.describe();
+			}
+		});
+
+		builder.append(Joiner.on("\t\n " + this.operator.name()).join(expressions));
+
+		if (this.negated) {
+			builder.append("\n)");
+		}
+
+		return builder.toString();
 	}
 
 	/**
@@ -80,7 +149,10 @@ public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate 
 	 */
 	@Override
 	public List<Expression<Boolean>> getExpressions() {
-		return Lists.newArrayList(this.expressions);
+		final List<Expression<Boolean>> expressions = Lists.newArrayList();
+		expressions.addAll(this.expressions);
+
+		return expressions;
 	}
 
 	/**
@@ -106,8 +178,9 @@ public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate 
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public Predicate not() {
-		return new PredicateImpl(true, this.operator, this.expressions);
+		return new PredicateImpl(true, this.operator, this.expressions.toArray(new Expression[this.expressions.size()]));
 	}
 
 	/**
@@ -116,14 +189,6 @@ public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate 
 	 */
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder();
-
-		if (this.negated) {
-			builder.append("not");
-		}
-
-		builder.append(Joiner.on("\t\n " + this.operator.name()).join(this.expressions));
-
-		return builder.toString();
+		return this.describe();
 	}
 }

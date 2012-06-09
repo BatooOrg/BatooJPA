@@ -29,9 +29,12 @@ import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import javax.persistence.StoredProcedureQuery;
 import javax.persistence.TransactionRequiredException;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.metamodel.Metamodel;
 import javax.sql.DataSource;
 
@@ -192,6 +195,16 @@ public class EntityManagerImpl implements EntityManager {
 	 * 
 	 */
 	@Override
+	public StoredProcedureQuery createNamedStoredProcedureQuery(String name) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public Query createNativeQuery(String sqlString) {
 		// TODO Auto-generated method stub
 		return null;
@@ -202,7 +215,7 @@ public class EntityManagerImpl implements EntityManager {
 	 * 
 	 */
 	@Override
-	public Query createNativeQuery(String sqlString, Class resultClass) {
+	public Query createNativeQuery(String sqlString, Class<?> resultClass) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -222,8 +235,28 @@ public class EntityManagerImpl implements EntityManager {
 	 * 
 	 */
 	@Override
+	public Query createQuery(CriteriaDelete<?> deleteQuery) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public <T> TypedQueryImpl<T> createQuery(CriteriaQuery<T> criteriaQuery) {
 		return new TypedQueryImpl<T>((CriteriaQueryImpl<T>) criteriaQuery, this);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Query createQuery(CriteriaUpdate<?> updateQuery) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -242,6 +275,36 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public <T> TypedQuery<T> createQuery(String qlString, Class<T> resultClass) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public StoredProcedureQuery createStoredProcedureQuery(String procedureName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public StoredProcedureQuery createStoredProcedureQuery(String procedureName, Class<?>... resultClasses) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public StoredProcedureQuery createStoredProcedureQuery(String procedureName, String... resultSetMappings) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -450,6 +513,16 @@ public class EntityManagerImpl implements EntityManager {
 
 		// create the new transaction and return it
 		return this.transaction = new EntityTransactionImpl(this, this.getConnection());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isJoinedToTransaction() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	/**

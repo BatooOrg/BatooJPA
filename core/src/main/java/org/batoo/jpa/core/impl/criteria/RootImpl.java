@@ -31,7 +31,7 @@ import org.batoo.jpa.core.impl.model.EntityTypeImpl;
  * @author hceylan
  * @since $version
  */
-public class RootImpl<X> extends AbstractFromImpl<X, X> implements Root<X> {
+public class RootImpl<X> extends FromImpl<X, X> implements Root<X> {
 
 	/**
 	 * @param entity
@@ -45,6 +45,15 @@ public class RootImpl<X> extends AbstractFromImpl<X, X> implements Root<X> {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generate(CriteriaQueryImpl<?> query) {
+		return this.getFetchRoot().generate(query);
+	}
+
+	/**
 	 * Returns the generated from SQL fragment.
 	 * 
 	 * @param query
@@ -55,17 +64,8 @@ public class RootImpl<X> extends AbstractFromImpl<X, X> implements Root<X> {
 	 * @author hceylan
 	 */
 	public String generateFrom(CriteriaQueryImpl<?> query) {
-		final EntityTable primaryTable = this.entity.getPrimaryTable();
+		final EntityTable primaryTable = this.getModel().getPrimaryTable();
 
-		return primaryTable.getName() + " AS " + this.getTableAlias(query, primaryTable);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public EntityTypeImpl<X> getModel() {
-		return this.entity;
+		return primaryTable.getName() + " AS " + this.getFetchRoot().getTableAlias(query, primaryTable);
 	}
 }

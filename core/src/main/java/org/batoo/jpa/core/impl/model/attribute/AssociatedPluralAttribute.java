@@ -166,6 +166,15 @@ public abstract class AssociatedPluralAttribute<X, C, E> extends PluralAttribute
 	 * 
 	 */
 	@Override
+	public EntityTypeImpl<E> getAssociationType() {
+		return this.getElementType();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public final EntityTypeImpl<E> getElementType() {
 		return this.type;
 	}

@@ -27,6 +27,8 @@ import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
 import org.batoo.jpa.parser.MappingException;
 
 /**
@@ -121,6 +123,27 @@ public interface AssociatedAttribute<X, T, Y> extends Attribute<X, Y> {
 	 * @author hceylan
 	 */
 	void flush(SessionImpl session, ConnectionImpl connection, ManagedInstance<? extends X> managedInstance) throws SQLException;
+
+	/**
+	 * Returns the bindable entity type.
+	 * 
+	 * @return the bindable entity type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	EntityTypeImpl<T> getAssociationType();
+
+	/**
+	 * Return the managed type representing the type in which the attribute was declared.
+	 * 
+	 * @return declaring type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Override
+	ManagedTypeImpl<X> getDeclaringType();
 
 	/**
 	 * Returns the foreign key of the attribute.

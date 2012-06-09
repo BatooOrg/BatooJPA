@@ -379,6 +379,18 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	}
 
 	/**
+	 * Returns the name of the type.
+	 * 
+	 * @return the name of the type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getName() {
+		return this.getJavaType().getSimpleName();
+	}
+
+	/**
 	 * Returns the parent of the managed type.
 	 * 
 	 * @return the parent of the managed type
@@ -459,5 +471,4 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }

@@ -86,6 +86,15 @@ public class CompoundExpressionImpl extends ExpressionImpl<Boolean> {
 	 * 
 	 */
 	@Override
+	public String describe() {
+		return this.x + this.comparison.getFragment() + this.y;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public String generate(CriteriaQueryImpl<?> query) {
 		return this.x.generate(query) + this.comparison.getFragment() + this.y.generate(query);
 	}
@@ -96,6 +105,6 @@ public class CompoundExpressionImpl extends ExpressionImpl<Boolean> {
 	 */
 	@Override
 	public String toString() {
-		return this.x + this.comparison.getFragment() + this.y;
+		return this.describe();
 	}
 }

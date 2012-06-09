@@ -27,8 +27,7 @@ import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
- * The definition of an item that is to be
- * returned in a query result.
+ * The definition of an item that is to be returned in a query result.
  * 
  * @param <X>
  *            the type of the selection item
@@ -71,7 +70,7 @@ public abstract class SelectionImpl<X> extends TupleElementImpl<X> implements Se
 	 * 
 	 */
 	@Override
-	public String getAlias() {
+	public final String getAlias() {
 		return this.alias;
 	}
 
@@ -86,8 +85,6 @@ public abstract class SelectionImpl<X> extends TupleElementImpl<X> implements Se
 
 	/**
 	 * Handles the row.
-	 * <p>
-	 * The default implementation does nothing.
 	 * 
 	 * @param session
 	 *            the session
@@ -100,9 +97,7 @@ public abstract class SelectionImpl<X> extends TupleElementImpl<X> implements Se
 	 * @since $version
 	 * @author hceylan
 	 */
-	public List<X> handle(SessionImpl session, BaseTypedQueryImpl<?> query, List<Map<String, Object>> data, MutableInt rowNo) {
-		return null;
-	}
+	public abstract List<X> handle(SessionImpl session, BaseTypedQueryImpl<?> query, List<Map<String, Object>> data, MutableInt rowNo);
 
 	/**
 	 * {@inheritDoc}

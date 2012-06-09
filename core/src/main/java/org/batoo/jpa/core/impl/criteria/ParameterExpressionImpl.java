@@ -57,6 +57,25 @@ public class ParameterExpressionImpl<T> extends ExpressionImpl<T> implements Par
 	 * 
 	 */
 	@Override
+	public String describe() {
+		final StringBuilder builder = new StringBuilder();
+
+		if (StringUtils.isNotBlank(this.name)) {
+			return builder.append(":").append(this.name).toString();
+		}
+
+		if (this.position != null) {
+			return builder.append("?").append(this.position).toString();
+		}
+
+		return builder.append("?").toString();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public String generate(CriteriaQueryImpl<?> query) {
 		if (this.position == null) {
 			query.addParameter(this);
@@ -111,16 +130,6 @@ public class ParameterExpressionImpl<T> extends ExpressionImpl<T> implements Par
 	 */
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder(":");
-
-		if (StringUtils.isNotBlank(this.name)) {
-			builder.append(this.name).append(":");
-		}
-
-		if (this.position != null) {
-			builder.append(this.position).append(":");
-		}
-
-		return builder.append("?").toString();
+		return this.describe();
 	}
 }

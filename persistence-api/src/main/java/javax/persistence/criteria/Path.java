@@ -63,18 +63,18 @@ public interface Path<X> extends Expression<X> {
 	 * 
 	 * <pre>
 	 *     For example:
-	 *     CriteriaQuery<Person> q = cb.createQuery(Person.class);
-	 *     Root<Person> p = q.from(Person.class);
+	 *     
+	 *     CriteriaQuery&lt;Person&gt; q = cb.createQuery(Person.class);
+	 *     Root&lt;Person&gt; p = q.from(Person.class);
 	 *     q.select(p)
 	 * 	    .where(cb.isMember("joe",
-	 * 	                       p.<Set<String>>get("nicknames")));
-	 * </pre>
-	 * 
-	 * <pre>
+	 * 	                       p.&lt;Set&lt;String&gt;&gt;get("nicknames")));
+	 *     
 	 *     rather than: 
-	 *     CriteriaQuery<Person> q = cb.createQuery(Person.class);
-	 *     Root<Person> p = q.from(Person.class);
-	 *     Path<Set<String>> nicknames = p.get("nicknames");
+	 * 
+	 *     CriteriaQuery&lt;Person&gt; q = cb.createQuery(Person.class);
+	 *     Root&lt;Person&gt; p = q.from(Person.class);
+	 *     Path&lt;Set&lt;String&gt;&gt; nicknames = p.get("nicknames");
 	 *     q.select(p)
 	 * 	    .where(cb.isMember("joe", nicknames));
 	 * </pre>

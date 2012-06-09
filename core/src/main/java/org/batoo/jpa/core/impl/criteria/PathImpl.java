@@ -18,7 +18,6 @@
  */
 package org.batoo.jpa.core.impl.criteria;
 
-import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
 
 /**
@@ -30,9 +29,9 @@ import javax.persistence.criteria.Path;
  * @author hceylan
  * @since $version
  */
-public abstract class AbstractPathImpl<X> extends ExpressionImpl<X> implements Path<X> {
+public abstract class PathImpl<X> extends ExpressionImpl<X> implements Path<X> {
 
-	private final AbstractPathImpl<?> parent;
+	private final PathImpl<?> parent;
 
 	/**
 	 * @param parent
@@ -41,7 +40,7 @@ public abstract class AbstractPathImpl<X> extends ExpressionImpl<X> implements P
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AbstractPathImpl(AbstractPathImpl<?> parent) {
+	public PathImpl(PathImpl<?> parent) {
 		super();
 
 		this.parent = parent;
@@ -52,20 +51,8 @@ public abstract class AbstractPathImpl<X> extends ExpressionImpl<X> implements P
 	 * 
 	 */
 	@Override
-	public AbstractPathImpl<?> getParentPath() {
+	public PathImpl<?> getParentPath() {
 		return this.parent;
-	}
-
-	/**
-	 * Returns the root of this path.
-	 * 
-	 * @return the root of this path
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public AbstractFromImpl<?, ?> getRoot() {
-		return this.parent.getRoot();
 	}
 
 	/**
@@ -73,8 +60,8 @@ public abstract class AbstractPathImpl<X> extends ExpressionImpl<X> implements P
 	 * 
 	 */
 	@Override
-	public Expression<Class<? extends X>> type() {
-		// TODO Auto-generated method stub
-		return null;
+	@SuppressWarnings("unchecked")
+	public PathImpl<Class<? extends X>> type() {
+		return (PathImpl<Class<? extends X>>) this;
 	}
 }

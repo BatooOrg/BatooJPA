@@ -32,6 +32,8 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.ListJoin;
 import javax.persistence.criteria.MapJoin;
 import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Selection;
 import javax.persistence.criteria.SetJoin;
 import javax.persistence.metamodel.CollectionAttribute;
 import javax.persistence.metamodel.ListAttribute;
@@ -40,13 +42,10 @@ import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
-import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.EntityTypeImpl;
-import org.batoo.jpa.core.impl.model.attribute.PhysicalAttributeImpl;
-
-import com.google.common.collect.Maps;
 
 /**
  * Represents a bound type, usually an entity that appears in the from clause, but may also be an embeddable belonging to an entity in the
@@ -63,12 +62,11 @@ import com.google.common.collect.Maps;
  * @author hceylan
  * @since $version
  */
-public abstract class AbstractFromImpl<Z, X> extends AbstractPathImpl<X> implements From<Z, X> {
+public class FromImpl<Z, X> extends SelectionImpl<X> implements From<Z, X> {
 
-	protected final EntityTypeImpl<X> entity;
-
-	private final Map<String, AbstractPathImpl<?>> children = Maps.newHashMap();
-	protected final FetchParentImpl<Z, X> fetchContext;
+	private final EntityTypeImpl<X> entity;
+	private final FetchParentImpl<Z, X> fetchRoot;
+	private final RootPathImpl<X> rootPath;
 
 	/**
 	 * @param entity
@@ -77,11 +75,48 @@ public abstract class AbstractFromImpl<Z, X> extends AbstractPathImpl<X> impleme
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AbstractFromImpl(EntityTypeImpl<X> entity) {
-		super(null);
+	public FromImpl(EntityTypeImpl<X> entity) {
+		super();
+
+		this.fetchRoot = new FetchParentImpl<Z, X>(entity);
+		this.rootPath = new RootPathImpl<X>(entity, this.fetchRoot);
 
 		this.entity = entity;
-		this.fetchContext = new FetchParentImpl<Z, X>(entity);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public final FromImpl<Z, X> alias(String alias) {
+		super.alias(alias);
+
+		this.rootPath.alias(alias);
+
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public <X> Expression<X> as(Class<X> type) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * Returns the description of the root.
+	 * 
+	 * @return the description of the root.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String describe() {
+		return this.fetchRoot.describe(StringUtils.isNotBlank(this.getAlias()) ? this.getAlias() : this.getModel().getName());
 	}
 
 	/**
@@ -90,7 +125,7 @@ public abstract class AbstractFromImpl<Z, X> extends AbstractPathImpl<X> impleme
 	 */
 	@Override
 	public <Y> Fetch<X, Y> fetch(PluralAttribute<? super X, ?, Y> attribute) {
-		return this.fetchContext.fetch(attribute);
+		return this.fetchRoot.fetch(attribute);
 	}
 
 	/**
@@ -99,7 +134,7 @@ public abstract class AbstractFromImpl<Z, X> extends AbstractPathImpl<X> impleme
 	 */
 	@Override
 	public <Y> Fetch<X, Y> fetch(PluralAttribute<? super X, ?, Y> attribute, JoinType jt) {
-		return this.fetchContext.fetch(attribute, jt);
+		return this.fetchRoot.fetch(attribute, jt);
 	}
 
 	/**
@@ -108,7 +143,7 @@ public abstract class AbstractFromImpl<Z, X> extends AbstractPathImpl<X> impleme
 	 */
 	@Override
 	public <Y> Fetch<X, Y> fetch(SingularAttribute<? super X, Y> attribute) {
-		return this.fetchContext.fetch(attribute);
+		return this.fetchRoot.fetch(attribute);
 	}
 
 	/**
@@ -117,7 +152,7 @@ public abstract class AbstractFromImpl<Z, X> extends AbstractPathImpl<X> impleme
 	 */
 	@Override
 	public <Y> Fetch<X, Y> fetch(SingularAttribute<? super X, Y> attribute, JoinType jt) {
-		return this.fetchContext.fetch(attribute, jt);
+		return this.fetchRoot.fetch(attribute, jt);
 	}
 
 	/**
@@ -126,7 +161,7 @@ public abstract class AbstractFromImpl<Z, X> extends AbstractPathImpl<X> impleme
 	 */
 	@Override
 	public <XX, Y> Fetch<XX, Y> fetch(String attributeName) {
-		return this.fetchContext.fetch(attributeName);
+		return this.fetchRoot.fetch(attributeName);
 	}
 
 	/**
@@ -135,7 +170,7 @@ public abstract class AbstractFromImpl<Z, X> extends AbstractPathImpl<X> impleme
 	 */
 	@Override
 	public <T, Y> Fetch<T, Y> fetch(String attributeName, JoinType jt) {
-		return this.fetchContext.fetch(attributeName, jt);
+		return this.fetchRoot.fetch(attributeName, jt);
 	}
 
 	/**
@@ -144,7 +179,8 @@ public abstract class AbstractFromImpl<Z, X> extends AbstractPathImpl<X> impleme
 	 */
 	@Override
 	public String generate(CriteriaQueryImpl<?> query) {
-		return this.fetchContext.generate(query);
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -158,7 +194,7 @@ public abstract class AbstractFromImpl<Z, X> extends AbstractPathImpl<X> impleme
 	 * @author hceylan
 	 */
 	public String generateJoins(CriteriaQueryImpl<?> query) {
-		return this.fetchContext.generateJoins(query);
+		return this.fetchRoot.generateJoins(query);
 	}
 
 	/**
@@ -167,8 +203,7 @@ public abstract class AbstractFromImpl<Z, X> extends AbstractPathImpl<X> impleme
 	 */
 	@Override
 	public <K, V, M extends Map<K, V>> Expression<M> get(MapAttribute<X, K, V> map) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.rootPath.get(map);
 	}
 
 	/**
@@ -177,8 +212,7 @@ public abstract class AbstractFromImpl<Z, X> extends AbstractPathImpl<X> impleme
 	 */
 	@Override
 	public <E, C extends Collection<E>> Expression<C> get(PluralAttribute<X, C, E> collection) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.rootPath.get(collection);
 	}
 
 	/**
@@ -186,25 +220,8 @@ public abstract class AbstractFromImpl<Z, X> extends AbstractPathImpl<X> impleme
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
-	public <Y> AbstractPathImpl<Y> get(SingularAttribute<? super X, Y> attribute) {
-		if (attribute.getDeclaringType() != this.entity) {
-			throw new IllegalArgumentException("Cannot dereference");
-		}
-
-		// try to resolve from path
-		AbstractPathImpl<Y> path = (AbstractPathImpl<Y>) this.children.get(attribute.getName());
-		if (path != null) {
-			return path;
-		}
-
-		// generate and return
-		if (attribute instanceof PhysicalAttributeImpl) {
-			path = new PhysicalAttributePathImpl<Y>(this, (PhysicalAttributeImpl<?, Y>) attribute);
-			this.children.put(attribute.getName(), path);
-		}
-
-		return path;
+	public <Y> PathImpl<Y> get(SingularAttribute<? super X, Y> attribute) {
+		return this.rootPath.get(attribute);
 	}
 
 	/**
@@ -213,7 +230,15 @@ public abstract class AbstractFromImpl<Z, X> extends AbstractPathImpl<X> impleme
 	 */
 	@Override
 	public <Y> Path<Y> get(String attributeName) {
-		// TODO Auto-generated method stub
+		return this.rootPath.get(attributeName);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<Selection<?>> getCompoundSelectionItems() {
 		return null;
 	}
 
@@ -233,7 +258,28 @@ public abstract class AbstractFromImpl<Z, X> extends AbstractPathImpl<X> impleme
 	 */
 	@Override
 	public Set<Fetch<X, ?>> getFetches() {
-		return this.fetchContext.getFetches();
+		return this.fetchRoot.getFetches();
+	}
+
+	/**
+	 * Returns the fetchRoot of the FromImpl.
+	 * 
+	 * @return the fetchRoot of the FromImpl
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public FetchParentImpl<Z, X> getFetchRoot() {
+		return this.fetchRoot;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Class<? extends X> getJavaType() {
+		return this.getModel().getJavaType();
 	}
 
 	/**
@@ -256,22 +302,12 @@ public abstract class AbstractFromImpl<Z, X> extends AbstractPathImpl<X> impleme
 	}
 
 	/**
-	 * Returns the alias for the table.
-	 * <p>
-	 * if table does not have an alias, it is generated.
+	 * {@inheritDoc}
 	 * 
-	 * @param query
-	 *            the query
-	 * @param table
-	 *            the table
-	 * @return
-	 *         the alias for the table
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	public String getTableAlias(CriteriaQueryImpl<?> query, EntityTable table) {
-		return this.fetchContext.getTableAlias(query, table);
+	@Override
+	public Path<?> getParentPath() {
+		return null;
 	}
 
 	/**
@@ -280,7 +316,47 @@ public abstract class AbstractFromImpl<Z, X> extends AbstractPathImpl<X> impleme
 	 */
 	@Override
 	public List<X> handle(SessionImpl session, BaseTypedQueryImpl<?> query, List<Map<String, Object>> data, MutableInt rowNo) {
-		return this.fetchContext.handle(session, query, data, rowNo, 1);
+		return this.fetchRoot.handle(session, query, data, rowNo, 1);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Predicate in(Collection<?> values) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Predicate in(Expression<?>... values) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Predicate in(Expression<Collection<?>> values) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Predicate in(Object... values) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -291,6 +367,26 @@ public abstract class AbstractFromImpl<Z, X> extends AbstractPathImpl<X> impleme
 	public boolean isCorrelated() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Predicate isNotNull() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Predicate isNull() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -499,11 +595,7 @@ public abstract class AbstractFromImpl<Z, X> extends AbstractPathImpl<X> impleme
 	 */
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder(this.entity.getName());
-
-		builder.append(" ").append(this.fetchContext);
-
-		return builder.toString();
+		return this.fetchRoot.describe("");
 	}
 
 	/**
@@ -511,8 +603,8 @@ public abstract class AbstractFromImpl<Z, X> extends AbstractPathImpl<X> impleme
 	 * 
 	 */
 	@Override
-	public Expression<Class<? extends X>> type() {
-		// TODO Auto-generated method stub
-		return null;
+	@SuppressWarnings("unchecked")
+	public ExpressionImpl<Class<? extends X>> type() {
+		return (ExpressionImpl<Class<? extends X>>) this.rootPath;
 	}
 }

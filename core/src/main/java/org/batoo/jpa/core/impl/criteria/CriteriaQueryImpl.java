@@ -25,14 +25,16 @@ import java.util.Set;
 
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Predicate.BooleanOperator;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Selection;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.common.log.BLogger;
+import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
 
 import com.google.common.base.Function;
@@ -53,9 +55,11 @@ import com.google.common.collect.Sets;
  */
 public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements CriteriaQuery<T> {
 
+	private static final BLogger LOG = BLoggerFactory.getLogger(CriteriaQueryImpl.class);
+
 	private final Map<String, ParameterExpressionImpl<?>> parameterMap = Maps.newHashMap();
 	private final List<ParameterExpressionImpl<?>> parameters = Lists.newArrayList();
-	protected boolean distinct;
+	private boolean distinct;
 
 	private String sql;
 
@@ -262,6 +266,8 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 			return this.sql;
 		}
 
+		CriteriaQueryImpl.LOG.debug("Preparing SQL for {0}", CriteriaQueryImpl.LOG.lazyBoxed(this));
+
 		final PredicateImpl restriction = this.getRestriction();
 
 		// generate from chunk
@@ -304,7 +310,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 */
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder("select ");
 
 		// append distinct if necessary
 		if (this.distinct) {
@@ -326,17 +332,12 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 		});
 		builder.append("").append(Joiner.on(", ").join(roots));
 
-		final Set<Fetch<?, ?>> fetches = Sets.newHashSet();
 		for (final Root<?> root : this.getRoots()) {
-			fetches.addAll(root.getFetches());
-
-		}
-		for (final Fetch<?, ?> fetch : fetches) {
-			builder.append("\n\t").append(fetch);
+			builder.append("\n").append(((RootImpl<?>) root).describe());
 		}
 
 		if (this.getRestriction() != null) {
-			builder.append("\nwhere ").append(this.getRestriction());
+			builder.append("\nwhere\n\t").append(this.getRestriction().describe());
 		}
 
 		return builder.toString();
@@ -349,7 +350,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	@Override
 	@SuppressWarnings("unchecked")
 	public CriteriaQueryImpl<T> where(Expression<Boolean> restriction) {
-		this.restriction = new PredicateImpl(restriction);
+		this.restriction = new PredicateImpl((ExpressionImpl<Boolean>) restriction);
 
 		return this;
 	}
@@ -359,8 +360,8 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 * 
 	 */
 	@Override
-	public CriteriaQueryImpl<T> where(Predicate... restrictions) {
-		this.restriction = new PredicateImpl(restrictions);
+	public CriteriaQueryImpl<T> where(Predicate... predicates) {
+		this.restriction = new PredicateImpl(false, BooleanOperator.AND, predicates);
 
 		return this;
 	}

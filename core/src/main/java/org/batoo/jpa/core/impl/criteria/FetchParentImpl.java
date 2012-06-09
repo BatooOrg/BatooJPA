@@ -44,6 +44,7 @@ import org.batoo.jpa.core.impl.model.attribute.AssociatedAttribute;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
+import org.batoo.jpa.core.util.BatooUtils;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -86,6 +87,25 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 		super();
 
 		this.entity = entity;
+	}
+
+	/**
+	 * Returns the description of the fetch.
+	 * 
+	 * @param parent
+	 *            the parent
+	 * @return the description of the fetch *
+	 */
+	public String describe(final String parent) {
+		final List<String> fetches = Lists.transform(this.fetches, new Function<FetchImpl<X, ?>, String>() {
+
+			@Override
+			public String apply(FetchImpl<X, ?> input) {
+				return input.describe(parent);
+			}
+		});
+
+		return BatooUtils.indent(Joiner.on("\n").join(fetches));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -335,8 +355,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	 *            the query
 	 * @param table
 	 *            the table
-	 * @return
-	 *         the alias for the table
+	 * @return the alias for the table
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -402,7 +421,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 			final ManagedInstance<X> managedInstance = session.get(instance);
 			if (managedInstance != null) {
 				instances.add(managedInstance);
-				rowNo.increment();
+				rowNo.add(leap);
 
 				continue;
 			}
@@ -462,14 +481,5 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	 */
 	protected boolean shouldContinue(SessionImpl session, Map<String, Object> row) {
 		return true;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String toString() {
-		return super.toString();
 	}
 }

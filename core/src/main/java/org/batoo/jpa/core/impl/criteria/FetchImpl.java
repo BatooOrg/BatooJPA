@@ -21,14 +21,15 @@ package org.batoo.jpa.core.impl.criteria;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedAttribute;
@@ -82,6 +83,44 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	}
 
 	/**
+	 * Returns the description of the fetch.
+	 * 
+	 * @param parent
+	 *            the parent
+	 * @return the description of the fetch
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Override
+	public String describe(String parent) {
+		final StringBuilder builder = new StringBuilder();
+
+		switch (this.joinType) {
+			case INNER:
+				builder.append("inner");
+				break;
+			case LEFT:
+				builder.append("left");
+				break;
+			case RIGHT:
+				builder.append("right");
+				break;
+		}
+
+		builder.append(" join fetch ");
+
+		builder.append(parent).append(".").append(this.attribute.getName());
+
+		final String children = super.describe(this.attribute.getAssociationType().getName());
+		if (StringUtils.isNotBlank(children)) {
+			builder.append("\n").append(children);
+		}
+
+		return builder.toString();
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -92,18 +131,17 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 
 		String join;
 
-		final ForeignKey foreignKey = this.attribute.getInverse() != null ? this.attribute.getInverse().getForeignKey()
-			: this.attribute.getForeignKey();
-		if (foreignKey != null) {
-			join = foreignKey.createSourceJoin(this.joinType, parentAlias, alias);
+		if (this.attribute.getForeignKey() != null) {
+			join = this.attribute.getForeignKey().createDestinationJoin(this.joinType, parentAlias, alias);
+		}
+		else if ((this.attribute.getInverse() != null) && (this.attribute.getInverse().getForeignKey() != null)) {
+			join = this.attribute.getInverse().getForeignKey().createSourceJoin(this.joinType, parentAlias, alias);
+		}
+		else if (this.attribute.getJoinTable() != null) {
+			join = this.attribute.getJoinTable().createJoin(this.joinType, parentAlias, alias, true);
 		}
 		else {
-			if (this.attribute.getJoinTable() != null) {
-				join = this.attribute.getJoinTable().createJoin(this.joinType, parentAlias, alias, true);
-			}
-			else {
-				join = this.attribute.getInverse().getJoinTable().createJoin(this.joinType, parentAlias, alias, false);
-			}
+			join = this.attribute.getInverse().getJoinTable().createJoin(this.joinType, parentAlias, alias, false);
 		}
 
 		final String joins = super.generateJoins(query);
@@ -127,6 +165,16 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	@Override
 	public JoinType getJoinType() {
 		return this.joinType;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Predicate getOn() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -172,9 +220,38 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	 * 
 	 */
 	@Override
+	public Fetch<Z, X> on(Expression<Boolean> restriction) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Fetch<Z, X> on(Predicate... restrictions) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	protected boolean shouldContinue(SessionImpl session, Map<String, Object> row) {
 		final ManagedInstance<Z> instance = this.getParent().getInstance(session, row);
 
 		return this.parentInstance.equals(instance);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return this.describe("");
 	}
 }

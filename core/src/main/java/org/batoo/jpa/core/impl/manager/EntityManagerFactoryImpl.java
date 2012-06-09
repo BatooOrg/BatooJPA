@@ -26,6 +26,8 @@ import javax.persistence.Cache;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnitUtil;
+import javax.persistence.Query;
+import javax.persistence.SynchronizationType;
 import javax.persistence.metamodel.Metamodel;
 
 import org.batoo.jpa.common.BatooException;
@@ -87,6 +89,16 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		this.open = true;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void addNamedQuery(String name, Query query) {
+		// TODO Auto-generated method stub
+
+	}
+
 	private void assertOpen() {
 		if (!this.open) {
 			throw new IllegalStateException("EntityManagerFactory has been previously closed");
@@ -128,7 +140,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	public EntityManager createEntityManager() {
 		this.assertOpen();
 
-		return new EntityManagerImpl(this, this.metamodel, this.datasource, Collections.<String, Object>emptyMap());
+		return new EntityManagerImpl(this, this.metamodel, this.datasource, Collections.<String, Object> emptyMap());
 	}
 
 	/**
@@ -136,10 +148,20 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * 
 	 */
 	@Override
-	public EntityManager createEntityManager(Map map) {
+	public EntityManager createEntityManager(Map<String, Object> map) {
 		this.assertOpen();
 
 		return new EntityManagerImpl(this, this.metamodel, this.datasource, map);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public EntityManager createEntityManager(SynchronizationType synchronizationType, Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -215,5 +237,15 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	@Override
 	public boolean isOpen() {
 		return this.open;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public <T> T unwrap(Class<T> cls) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

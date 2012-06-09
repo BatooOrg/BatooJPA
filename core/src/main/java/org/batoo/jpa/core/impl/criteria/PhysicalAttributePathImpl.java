@@ -39,7 +39,7 @@ import org.batoo.jpa.core.impl.model.attribute.PhysicalAttributeImpl;
  * @author hceylan
  * @since $version
  */
-public class PhysicalAttributePathImpl<X> extends AbstractPathImpl<X> {
+public class PhysicalAttributePathImpl<X> extends PathImpl<X> {
 
 	private final PhysicalAttributeImpl<?, X> attribute;
 
@@ -52,7 +52,7 @@ public class PhysicalAttributePathImpl<X> extends AbstractPathImpl<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PhysicalAttributePathImpl(AbstractPathImpl<?> parent, PhysicalAttributeImpl<?, X> attribute) {
+	public PhysicalAttributePathImpl(PathImpl<?> parent, PhysicalAttributeImpl<?, X> attribute) {
 		super(parent);
 
 		this.attribute = attribute;
@@ -66,17 +66,32 @@ public class PhysicalAttributePathImpl<X> extends AbstractPathImpl<X> {
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
+	public String describe() {
+		final StringBuilder builder = new StringBuilder();
+
+		builder.append(this.getParentPath().describe());
+
+		builder.append(".").append(this.attribute.getName());
+
+		return builder.toString();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public String generate(CriteriaQueryImpl<?> query) {
 		final BasicColumn column = this.getModel().getColumn();
 
-		AbstractPathImpl<?> root = this;
+		PathImpl<?> root = this;
 		while (root.getParentPath() != null) {
 			root = root.getParentPath();
 		}
 
-		final String tableAlias = ((AbstractFromImpl<X, X>) root).getTableAlias(query, column.getTable());
+		final String tableAlias = ((RootPathImpl<X>) root).getTableAlias(query, column.getTable());
 
 		return tableAlias + "." + column.getName();
 	}
@@ -132,17 +147,6 @@ public class PhysicalAttributePathImpl<X> extends AbstractPathImpl<X> {
 	 */
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder();
-
-		if (this.getParentPath() != null) {
-			builder.append(this.getParentPath());
-		}
-		else {
-			builder.append(this.attribute.getDeclaringType().getJavaType().getSimpleName());
-		}
-
-		builder.append(".").append(this.attribute.getName());
-
-		return builder.toString();
+		return this.describe();
 	}
 }

@@ -192,6 +192,15 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public EntityTypeImpl<T> getAssociationType() {
+		return this.getType();
+	}
+
+	/**
 	 * Returns the foreign key of the attribute.
 	 * 
 	 * @return the foreign key of the attribute

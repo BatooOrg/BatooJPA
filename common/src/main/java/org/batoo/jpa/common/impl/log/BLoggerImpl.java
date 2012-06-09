@@ -464,7 +464,7 @@ public class BLoggerImpl implements BLogger {
 	 * @author hceylan
 	 */
 	@Override
-	public Object lazyBoxed(final String block) {
+	public Object lazyBoxed(final Object block) {
 		return this.lazyBoxed(block, null);
 	}
 
@@ -481,12 +481,12 @@ public class BLoggerImpl implements BLogger {
 	 * @author hceylan
 	 */
 	@Override
-	public Object lazyBoxed(final String block, final Object[] parameters) {
+	public Object lazyBoxed(final Object block, final Object[] parameters) {
 		return new Callable<String>() {
 
 			@Override
 			public String call() throws Exception {
-				return BLoggerImpl.this.boxed(block, parameters);
+				return BLoggerImpl.this.boxed(block != null ? block.toString() : null, parameters);
 			}
 
 			@Override
@@ -495,7 +495,7 @@ public class BLoggerImpl implements BLogger {
 					return this.call();
 				}
 				catch (final Throwable e) {
-					return block;
+					return null;
 				}
 			}
 		};

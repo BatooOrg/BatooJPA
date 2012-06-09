@@ -31,6 +31,13 @@ public interface Type<X> {
 	}
 
 	/**
+	 * Return the represented Java type.
+	 * 
+	 * @return Java type
+	 */
+	Class<X> getJavaType();
+
+	/**
 	 * Return the persistence type.
 	 * 
 	 * @return persistence type
