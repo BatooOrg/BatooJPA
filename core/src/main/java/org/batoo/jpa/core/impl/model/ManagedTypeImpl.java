@@ -42,6 +42,7 @@ import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
 import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.ManyToOneAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.OneToManyAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.OneToOneAttributeMetadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 
 import com.google.common.collect.Maps;
@@ -113,6 +114,12 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 		// many to one attributes
 		for (final ManyToOneAttributeMetadata metadata : attributesMetadata.getManyToOnes()) {
 			this.addDeclaredAttribute(new AssociatedSingularAttribute(this, PersistentAttributeType.MANY_TO_ONE, metadata, null,
+				metadata.isOptional()));
+		}
+
+		// one to one attributes
+		for (final OneToOneAttributeMetadata metadata : attributesMetadata.getOneToOnes()) {
+			this.addDeclaredAttribute(new AssociatedSingularAttribute(this, PersistentAttributeType.ONE_TO_ONE, metadata, null,
 				metadata.isOptional()));
 		}
 

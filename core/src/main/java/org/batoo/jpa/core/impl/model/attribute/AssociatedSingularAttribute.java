@@ -165,8 +165,9 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 	@Override
 	public void checkTransient(ManagedInstance<? extends X> managedInstance) {
 		final T instance = this.get(managedInstance.getInstance());
-
-		managedInstance.getSession().checkTransient(instance);
+		if (instance != null) {
+			managedInstance.getSession().checkTransient(instance);
+		}
 	}
 
 	/**

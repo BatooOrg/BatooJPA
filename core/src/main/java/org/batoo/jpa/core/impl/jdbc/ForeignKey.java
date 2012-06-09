@@ -140,8 +140,8 @@ public class ForeignKey {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AbstractTable getReferencedTable() {
-		return this.joinColumns.get(0).getReferencedTable();
+	public String getReferencedTableName() {
+		return this.joinColumns.get(0).getReferencedTable().getName();
 	}
 
 	/**

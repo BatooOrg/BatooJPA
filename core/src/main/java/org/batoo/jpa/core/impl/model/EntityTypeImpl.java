@@ -80,6 +80,7 @@ import com.google.common.collect.Sets;
  */
 public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements EntityType<X> {
 
+	private static final int MAX_DEPTH = 5;
 	private final String name;
 	private EntityTable primaryTable;
 	private final Map<String, EntityTable> declaredTables = Maps.newHashMap();
@@ -692,29 +693,32 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @param entityTypeImpl
 	 */
 	private void prepareEagerAssociations(FetchParent<?, ?> r, int depth, AssociatedAttribute<?, ?, ?> parent) {
-		for (final AssociatedAttribute<?, ?, ?> attribute : this.getAssociationsEager()) {
+		if (depth < EntityTypeImpl.MAX_DEPTH) {
 
-			// if we are coming from the inverse side and inverse side is not many-to-one then skip
-			if ((parent != null) && //
-				(attribute.getInverse() == parent) && //
-				(parent.getPersistentAttributeType() != PersistentAttributeType.MANY_TO_ONE)) {
-				continue;
+			for (final AssociatedAttribute<?, ?, ?> attribute : this.getAssociationsEager()) {
+
+				// if we are coming from the inverse side and inverse side is not many-to-one then skip
+				if ((parent != null) && //
+					(attribute.getInverse() == parent) && //
+					(parent.getPersistentAttributeType() != PersistentAttributeType.MANY_TO_ONE)) {
+					continue;
+				}
+
+				final Fetch<Object, Object> r2 = r.fetch(attribute.getName(), JoinType.LEFT);
+
+				EntityTypeImpl<?> type;
+
+				if (attribute instanceof AssociatedSingularAttribute) {
+					final AssociatedSingularAttribute<?, ?> singularAttribute = (AssociatedSingularAttribute<?, ?>) attribute;
+					type = singularAttribute.getType();
+				}
+				else {
+					final AssociatedPluralAttribute<?, ?, ?> pluralAttribute = (AssociatedPluralAttribute<?, ?, ?>) attribute;
+					type = pluralAttribute.getElementType();
+				}
+
+				type.prepareEagerAssociations(r2, depth + 1, attribute);
 			}
-
-			final Fetch<Object, Object> r2 = r.fetch(attribute.getName(), JoinType.LEFT);
-
-			EntityTypeImpl<?> type;
-
-			if (attribute instanceof AssociatedSingularAttribute) {
-				final AssociatedSingularAttribute<?, ?> singularAttribute = (AssociatedSingularAttribute<?, ?>) attribute;
-				type = singularAttribute.getType();
-			}
-			else {
-				final AssociatedPluralAttribute<?, ?, ?> pluralAttribute = (AssociatedPluralAttribute<?, ?, ?>) attribute;
-				type = pluralAttribute.getElementType();
-			}
-
-			type.prepareEagerAssociations(r2, depth + 1, attribute);
 		}
 	}
 
@@ -729,7 +733,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		final RootImpl<X> r = q.from(this);
 		q = q.select(r);
 
-		this.prepareEagerAssociations(r, 1, null);
+		this.prepareEagerAssociations(r, 0, null);
 
 		final List<PredicateImpl> predicates = Lists.newArrayList();
 		for (final IdAttributeImpl<? super X, ?> idAttribute : this.getIdAttributes()) {
