@@ -290,5 +290,4 @@ public class SessionImpl {
 
 		removed.setTransaction(transaction);
 	}
-
 }

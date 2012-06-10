@@ -429,7 +429,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 			for (final Entry<String, AbstractColumn> entry : this.fields.entrySet()) {
 				final String field = entry.getKey();
 				final AbstractColumn column = entry.getValue();
-				column.setValue(instance.getInstance(), row.get(field));
+				column.setValue(instance, row.get(field));
 			}
 			instances.add(instance);
 			session.put(instance);
@@ -443,11 +443,11 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 				if (value != null) {
 					leap = subRowNo.intValue() - rowNo.intValue();
 					if (attribute.isCollection()) {
-						attribute.set(instance.getInstance(), value);
+						attribute.set(instance, value);
 					}
 					else {
 						if (value.size() > 0) {
-							attribute.set(instance.getInstance(), value.get(0));
+							attribute.set(instance, value.get(0));
 						}
 					}
 				}

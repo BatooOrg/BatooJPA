@@ -20,11 +20,11 @@ package org.batoo.jpa.core.impl.model.attribute;
 
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
-import javax.persistence.metamodel.ListAttribute;
+import javax.persistence.metamodel.SetAttribute;
 
-import org.batoo.jpa.core.impl.collections.ManagedList;
+import org.batoo.jpa.core.impl.collections.ManagedSet;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -32,7 +32,7 @@ import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
 
 /**
- * Implementation of {@link ListAttribute}.
+ * Implementation of {@link SetAttribute}.
  * 
  * @param <X>
  *            The type the represented collection belongs to
@@ -42,7 +42,7 @@ import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
  * @author hceylan
  * @since $version
  */
-public class ListAttributeImpl<X, E> extends AssociatedPluralAttribute<X, List<E>, E> implements ListAttribute<X, E> {
+public class SetAttributeImpl<X, E> extends AssociatedPluralAttribute<X, Set<E>, E> implements SetAttribute<X, E> {
 
 	/**
 	 * @param declaringType
@@ -59,8 +59,8 @@ public class ListAttributeImpl<X, E> extends AssociatedPluralAttribute<X, List<E
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ListAttributeImpl(ManagedTypeImpl<X> declaringType, AssociationAttributeMetadata metadata,
-		PersistentAttributeType attributeType, String mappedBy, boolean removesOrphans) {
+	public SetAttributeImpl(ManagedTypeImpl<X> declaringType, AssociationAttributeMetadata metadata, PersistentAttributeType attributeType,
+		String mappedBy, boolean removesOrphans) {
 		super(declaringType, attributeType, metadata, mappedBy, removesOrphans);
 	}
 
@@ -70,7 +70,7 @@ public class ListAttributeImpl<X, E> extends AssociatedPluralAttribute<X, List<E
 	 */
 	@Override
 	public void checkTransient(ManagedInstance<? extends X> managedInstance) {
-		final List<E> entities = this.get(managedInstance.getInstance());
+		final Set<E> entities = this.get(managedInstance.getInstance());
 
 		final SessionImpl session = managedInstance.getSession();
 
@@ -87,7 +87,7 @@ public class ListAttributeImpl<X, E> extends AssociatedPluralAttribute<X, List<E
 	 */
 	@Override
 	public void flush(SessionImpl session, ConnectionImpl connection, ManagedInstance<? extends X> managedInstance) throws SQLException {
-		final List<E> entities = this.get(managedInstance.getInstance());
+		final Set<E> entities = this.get(managedInstance.getInstance());
 
 		if (entities != null) {
 			for (final E entity : entities) {
@@ -102,7 +102,7 @@ public class ListAttributeImpl<X, E> extends AssociatedPluralAttribute<X, List<E
 	 */
 	@Override
 	public CollectionType getCollectionType() {
-		return CollectionType.LIST;
+		return CollectionType.SET;
 	}
 
 	/**
@@ -111,7 +111,7 @@ public class ListAttributeImpl<X, E> extends AssociatedPluralAttribute<X, List<E
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public void set(ManagedInstance<? extends X> managedInstance, Object value) {
-		super.set(managedInstance, new ManagedList<X, E>(this, managedInstance, (Collection<? extends E>) value));
+	public final void set(ManagedInstance<? extends X> managedInstance, Object value) {
+		super.set(managedInstance, new ManagedSet<X, E>(this, managedInstance, (Collection<? extends E>) value));
 	}
 }

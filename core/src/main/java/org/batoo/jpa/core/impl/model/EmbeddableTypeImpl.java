@@ -40,4 +40,13 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 		super(metamodel, parent, javaType, metadata);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public PersistenceType getPersistenceType() {
+		return PersistenceType.EMBEDDABLE;
+	}
+
 }

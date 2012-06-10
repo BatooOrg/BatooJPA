@@ -23,23 +23,25 @@ import java.util.Set;
 
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
-import javax.persistence.metamodel.CollectionAttribute;
-import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.ManagedType;
 import javax.persistence.metamodel.MapAttribute;
 import javax.persistence.metamodel.PluralAttribute;
-import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
+import org.batoo.jpa.core.impl.model.attribute.AssociatedPluralAttribute;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttributeImpl;
+import org.batoo.jpa.core.impl.model.attribute.CollectionAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.ListAttributeImpl;
+import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
+import org.batoo.jpa.core.impl.model.attribute.SetAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
 import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.ManyToManyAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.ManyToOneAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.OneToManyAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.OneToOneAttributeMetadata;
@@ -62,7 +64,11 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	private final AbstractLocator locator;
 	private final ManagedTypeImpl<? super X> parent;
 	private final Map<String, AttributeImpl<X, ?>> declaredAttributes = Maps.newHashMap();
+	private final Map<String, SingularAttributeImpl<X, ?>> declaredSingularAttributes = Maps.newHashMap();
+	private final Map<String, PluralAttributeImpl<X, ?, ?>> declaredPluralAttributes = Maps.newHashMap();
 	private final Map<String, AttributeImpl<? super X, ?>> attributes = Maps.newHashMap();
+	private final Map<String, SingularAttributeImpl<? super X, ?>> singularAttributes = Maps.newHashMap();
+	private final Map<String, PluralAttributeImpl<? super X, ?, ?>> pluralAttributes = Maps.newHashMap();
 
 	/**
 	 * @param metamodel
@@ -128,6 +134,12 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 			this.addDeclaredAttribute(new ListAttributeImpl(this, metadata, PersistentAttributeType.ONE_TO_MANY, metadata.getMappedBy(),
 				metadata.removesOprhans()));
 		}
+
+		// one to many attributes
+		for (final ManyToManyAttributeMetadata metadata : attributesMetadata.getManyToManies()) {
+			this.addDeclaredAttribute(AssociatedPluralAttribute.create(this, metadata, PersistentAttributeType.MANY_TO_MANY,
+				metadata.getMappedBy(), false));
+		}
 	}
 
 	/**
@@ -139,9 +151,19 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * @since $version
 	 * @author hceylan
 	 */
+	@SuppressWarnings("unchecked")
 	protected void addDeclaredAttribute(AttributeImpl<X, ?> attribute) {
 		this.declaredAttributes.put(attribute.getName(), attribute);
 		this.attributes.put(attribute.getName(), attribute);
+
+		if (attribute instanceof SingularAttribute) {
+			this.declaredSingularAttributes.put(attribute.getName(), (SingularAttributeImpl<X, ?>) attribute);
+			this.singularAttributes.put(attribute.getName(), (SingularAttributeImpl<X, ?>) attribute);
+		}
+		else {
+			this.declaredPluralAttributes.put(attribute.getName(), (PluralAttributeImpl<X, ?, ?>) attribute);
+			this.pluralAttributes.put(attribute.getName(), (PluralAttributeImpl<? super X, ?, ?>) attribute);
+		}
 	}
 
 	/**
@@ -160,160 +182,13 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	@Override
 	public Set<Attribute<? super X, ?>> getAttributes() {
 		final Set<Attribute<? super X, ?>> attributes = Sets.newHashSet();
-
 		attributes.addAll(this.attributes.values());
 
 		return attributes;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public CollectionAttribute<? super X, ?> getCollection(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public <E> CollectionAttribute<? super X, E> getCollection(String name, Class<E> elementType) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Attribute<X, ?> getDeclaredAttribute(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Set<Attribute<X, ?>> getDeclaredAttributes() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public CollectionAttribute<X, ?> getDeclaredCollection(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public <E> CollectionAttribute<X, E> getDeclaredCollection(String name, Class<E> elementType) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public ListAttribute<X, ?> getDeclaredList(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public <E> ListAttribute<X, E> getDeclaredList(String name, Class<E> elementType) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public MapAttribute<X, ?, ?> getDeclaredMap(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public <K, V> MapAttribute<X, K, V> getDeclaredMap(String name, Class<K> keyType, Class<V> valueType) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Set<PluralAttribute<X, ?, ?>> getDeclaredPluralAttributes() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public SetAttribute<X, ?> getDeclaredSet(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public <E> SetAttribute<X, E> getDeclaredSet(String name, Class<E> elementType) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public SingularAttribute<X, ?> getDeclaredSingularAttribute(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public <Y> SingularAttribute<X, Y> getDeclaredSingularAttribute(String name, Class<Y> type) {
-		// TODO Auto-generated method stub
-		return null;
+	public Map<String, AttributeImpl<? super X, ?>> getAttributes0() {
+		return this.attributes;
 	}
 
 	/**
@@ -322,13 +197,113 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public Set<SingularAttribute<X, ?>> getDeclaredSingularAttributes() {
-		final Set<SingularAttribute<X, ?>> attributes = Sets.newHashSet();
-		for (final Attribute<? super X, ?> attribute : this.declaredAttributes.values()) {
-			if ((attribute instanceof SingularAttributeImpl) && (attribute.getDeclaringType() == this)) {
-				attributes.add((SingularAttribute<X, ?>) attribute);
-			}
-		}
+	public CollectionAttributeImpl<? super X, ?> getCollection(String name) {
+		return (CollectionAttributeImpl<? super X, ?>) this.getAttribute(name);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public <E> CollectionAttributeImpl<? super X, E> getCollection(String name, Class<E> elementType) {
+		return (CollectionAttributeImpl<? super X, E>) this.getAttribute(name);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public AttributeImpl<X, ?> getDeclaredAttribute(String name) {
+		return this.declaredAttributes.get(name);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Set<Attribute<X, ?>> getDeclaredAttributes() {
+		final Set<Attribute<X, ?>> attributes = Sets.newHashSet();
+		attributes.addAll(this.declaredAttributes.values());
+
+		return attributes;
+	}
+
+	public Map<String, AttributeImpl<X, ?>> getDeclaredAttributes0() {
+		return this.declaredAttributes;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public CollectionAttributeImpl<X, ?> getDeclaredCollection(String name) {
+		return (CollectionAttributeImpl<X, ?>) this.getDeclaredAttribute(name);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public <E> CollectionAttributeImpl<X, E> getDeclaredCollection(String name, Class<E> elementType) {
+		return (CollectionAttributeImpl<X, E>) this.getDeclaredAttribute(name);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public ListAttributeImpl<X, ?> getDeclaredList(String name) {
+		return (ListAttributeImpl<X, ?>) this.getDeclaredAttribute(name);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public <E> ListAttributeImpl<X, E> getDeclaredList(String name, Class<E> elementType) {
+		return (ListAttributeImpl<X, E>) this.getDeclaredAttribute(name);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public MapAttribute<X, ?, ?> getDeclaredMap(String name) {
+		return (MapAttribute<X, ?, ?>) this.getDeclaredAttribute(name);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public <K, V> MapAttribute<X, K, V> getDeclaredMap(String name, Class<K> keyType, Class<V> valueType) {
+		return (MapAttribute<X, K, V>) this.getDeclaredAttribute(name);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Set<PluralAttribute<X, ?, ?>> getDeclaredPluralAttributes() {
+		final Set<PluralAttribute<X, ?, ?>> attributes = Sets.newHashSet();
+		attributes.addAll(this.declaredPluralAttributes.values());
 
 		return attributes;
 	}
@@ -338,9 +313,9 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * 
 	 */
 	@Override
-	public ListAttribute<? super X, ?> getList(String name) {
-		// TODO Auto-generated method stub
-		return null;
+	@SuppressWarnings("unchecked")
+	public SetAttributeImpl<X, ?> getDeclaredSet(String name) {
+		return (SetAttributeImpl<X, ?>) this.getDeclaredAttribute(name);
 	}
 
 	/**
@@ -348,9 +323,64 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * 
 	 */
 	@Override
-	public <E> ListAttribute<? super X, E> getList(String name, Class<E> elementType) {
-		// TODO Auto-generated method stub
-		return null;
+	@SuppressWarnings("unchecked")
+	public <E> SetAttributeImpl<X, E> getDeclaredSet(String name, Class<E> elementType) {
+		return (SetAttributeImpl<X, E>) this.getDeclaredAttribute(name);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public SingularAttributeImpl<X, ?> getDeclaredSingularAttribute(String name) {
+		return (SingularAttributeImpl<X, ?>) this.getDeclaredAttribute(name);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public <Y> SingularAttributeImpl<X, Y> getDeclaredSingularAttribute(String name, Class<Y> type) {
+		return (SingularAttributeImpl<X, Y>) this.getDeclaredAttribute(name);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Set<SingularAttribute<X, ?>> getDeclaredSingularAttributes() {
+		final Set<SingularAttribute<X, ?>> attributes = Sets.newHashSet();
+		attributes.addAll(this.declaredSingularAttributes.values());
+
+		return attributes;
+	}
+
+	public Map<String, SingularAttributeImpl<X, ?>> getDeclaredSingularAttributes0() {
+		return this.declaredSingularAttributes;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public ListAttributeImpl<? super X, ?> getList(String name) {
+		return (ListAttributeImpl<? super X, ?>) this.getAttribute(name);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public <E> ListAttributeImpl<? super X, E> getList(String name, Class<E> elementType) {
+		return (ListAttributeImpl<? super X, E>) this.getAttribute(name);
 	}
 
 	/**
@@ -370,9 +400,9 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public MapAttribute<? super X, ?, ?> getMap(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		return (MapAttribute<? super X, ?, ?>) this.getAttribute(name);
 	}
 
 	/**
@@ -380,9 +410,9 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <K, V> MapAttribute<? super X, K, V> getMap(String name, Class<K> keyType, Class<V> valueType) {
-		// TODO Auto-generated method stub
-		return null;
+		return (MapAttribute<? super X, K, V>) this.getMap(name);
 	}
 
 	/**
@@ -414,19 +444,15 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * 
 	 */
 	@Override
-	public javax.persistence.metamodel.Type.PersistenceType getPersistenceType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public Set<PluralAttribute<? super X, ?, ?>> getPluralAttributes() {
-		// TODO Auto-generated method stub
-		return null;
+		final Set<PluralAttribute<? super X, ?, ?>> attributes = Sets.newHashSet();
+		attributes.addAll(this.pluralAttributes.values());
+
+		return attributes;
+	}
+
+	public Map<String, PluralAttributeImpl<? super X, ?, ?>> getPluralAttributes0() {
+		return this.pluralAttributes;
 	}
 
 	/**
@@ -434,9 +460,9 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * 
 	 */
 	@Override
-	public SetAttribute<? super X, ?> getSet(String name) {
-		// TODO Auto-generated method stub
-		return null;
+	@SuppressWarnings("unchecked")
+	public SetAttributeImpl<? super X, ?> getSet(String name) {
+		return (SetAttributeImpl<? super X, ?>) this.getAttribute(name);
 	}
 
 	/**
@@ -444,9 +470,9 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * 
 	 */
 	@Override
-	public <E> SetAttribute<? super X, E> getSet(String name, Class<E> elementType) {
-		// TODO Auto-generated method stub
-		return null;
+	@SuppressWarnings("unchecked")
+	public <E> SetAttributeImpl<? super X, E> getSet(String name, Class<E> elementType) {
+		return (SetAttributeImpl<? super X, E>) this.getAttribute(name);
 	}
 
 	/**
@@ -454,9 +480,8 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * 
 	 */
 	@Override
-	public SingularAttribute<? super X, ?> getSingularAttribute(String name) {
-		// TODO Auto-generated method stub
-		return null;
+	public SingularAttributeImpl<? super X, ?> getSingularAttribute(String name) {
+		return (SingularAttributeImpl<? super X, ?>) this.getAttribute(name);
 	}
 
 	/**
@@ -464,9 +489,9 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * 
 	 */
 	@Override
-	public <Y> SingularAttribute<? super X, Y> getSingularAttribute(String name, Class<Y> type) {
-		// TODO Auto-generated method stub
-		return null;
+	@SuppressWarnings("unchecked")
+	public <Y> SingularAttributeImpl<? super X, Y> getSingularAttribute(String name, Class<Y> type) {
+		return (SingularAttributeImpl<? super X, Y>) this.getAttribute(name);
 	}
 
 	/**
@@ -475,7 +500,13 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 */
 	@Override
 	public Set<SingularAttribute<? super X, ?>> getSingularAttributes() {
-		// TODO Auto-generated method stub
-		return null;
+		final Set<SingularAttribute<? super X, ?>> attributes = Sets.newHashSet();
+		attributes.addAll(this.singularAttributes.values());
+
+		return attributes;
+	}
+
+	public Map<String, SingularAttributeImpl<? super X, ?>> getSingularAttributes0() {
+		return this.singularAttributes;
 	}
 }

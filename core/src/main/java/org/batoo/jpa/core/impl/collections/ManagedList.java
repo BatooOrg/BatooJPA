@@ -16,42 +16,42 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.model;
+package org.batoo.jpa.core.impl.collections;
 
-import javax.persistence.metamodel.BasicType;
+import java.util.ArrayList;
+import java.util.Collection;
 
-import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
 
 /**
- * Implementation of {@link BasicType}.
- * 
  * @param <X>
- *            The type of the represented basic type
- * 
+ *            The type the represented collection belongs to
+ * @param <E>
+ *            The element type of the represented collection
  * @author hceylan
  * @since $version
  */
-public final class BasicTypeImpl<X> extends TypeImpl<X> implements BasicType<X> {
+public class ManagedList<X, E> extends ArrayList<E> {
+
+	private final PluralAttributeImpl<X, ?, E> attribute;
+	private final ManagedInstance<? extends X> managedInstance;
 
 	/**
-	 * @param metamodel
-	 *            the metamodel
-	 * @param javaType
-	 *            the java type of the type
+	 * @param attribute
+	 *            the attribute
+	 * @param managedInstance
+	 *            the managed instance
+	 * @param values
+	 *            the initial values
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public BasicTypeImpl(MetamodelImpl metamodel, Class<X> javaType) {
-		super(metamodel, javaType);
-	}
+	public ManagedList(PluralAttributeImpl<X, ?, E> attribute, ManagedInstance<? extends X> managedInstance, Collection<? extends E> values) {
+		super(values);
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public PersistenceType getPersistenceType() {
-		return PersistenceType.BASIC;
+		this.attribute = attribute;
+		this.managedInstance = managedInstance;
 	}
 }

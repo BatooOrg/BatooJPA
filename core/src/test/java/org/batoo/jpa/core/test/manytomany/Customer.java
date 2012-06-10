@@ -18,7 +18,7 @@
  */
 package org.batoo.jpa.core.test.manytomany;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -27,7 +27,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 
 /**
  * 
@@ -44,7 +44,7 @@ public class Customer {
 	private String name;
 
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private final Set<PhoneNumber> phoneNumbers = Sets.newHashSet();
+	private final List<PhoneNumber> phoneNumbers = Lists.newArrayList();
 
 	/**
 	 * 
@@ -93,7 +93,7 @@ public class Customer {
 	 * @return the phoneNumbers
 	 * @since $version
 	 */
-	public Set<PhoneNumber> getPhoneNumbers() {
+	public List<PhoneNumber> getPhoneNumbers() {
 		return this.phoneNumbers;
 	}
 

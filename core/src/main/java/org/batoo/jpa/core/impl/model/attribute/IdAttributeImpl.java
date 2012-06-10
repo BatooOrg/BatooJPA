@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.model.attribute;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.jdbc.TypeFactory;
 import org.batoo.jpa.core.impl.metamodel.AbstractGenerator;
@@ -105,19 +106,19 @@ public class IdAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 	 * <p>
 	 * The operation returns false if at least one entity needs to obtain identity from the database.
 	 * 
-	 * @param instance
+	 * @param managedInstance
 	 *            the instance to fill ids.
-	 * @return false if all ok, true if if at least one entity needs to obtain identity from the database
+	 * @return false if all OK, true if if at least one entity needs to obtain identity from the database
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public boolean fillValue(X instance) {
+	public boolean fillValue(ManagedInstance<? extends X> managedInstance) {
 		if (!this.isId()) {
 			throw new IllegalStateException("Not an id attribute");
 		}
 
-		final T value = this.get(instance);
+		final T value = this.get(managedInstance);
 
 		// if the attribute already has value, bail out
 		if (value != null) {
@@ -136,11 +137,11 @@ public class IdAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 				}
 			case SEQUENCE:
 				// fill with the sequence
-				this.set(instance, this.getMetamodel().getNextSequence(this.generator));
+				this.set(managedInstance, this.getMetamodel().getNextSequence(this.generator));
 				break;
 			case TABLE:
 				// fill with the next table generator id
-				this.set(instance, this.getMetamodel().getNextTableValue(this.generator));
+				this.set(managedInstance, this.getMetamodel().getNextTableValue(this.generator));
 				break;
 		}
 

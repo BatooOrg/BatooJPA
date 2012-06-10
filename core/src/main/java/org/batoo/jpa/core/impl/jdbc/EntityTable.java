@@ -146,7 +146,7 @@ public class EntityTable extends AbstractTable {
 			final String selectLastIdSql = this.jdbcAdaptor.getSelectLastIdentitySql();
 			final Number id = runner.query(connection, selectLastIdSql, new SingleValueHandler<Number>());
 
-			this.identityColumn.setValue(instance, id);
+			this.identityColumn.setValue(managedInstance, id);
 		}
 	}
 

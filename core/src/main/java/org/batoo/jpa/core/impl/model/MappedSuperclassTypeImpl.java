@@ -41,4 +41,12 @@ public class MappedSuperclassTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 		super(metamodel, parent, javaType, metadata);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public PersistenceType getPersistenceType() {
+		return PersistenceType.MAPPED_SUPERCLASS;
+	}
 }

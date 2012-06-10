@@ -121,7 +121,7 @@ public class ManagedInstance<X> {
 
 		this.id = id;
 		for (final IdAttributeImpl<? super X, ?> attribute : this.idAttributes) {
-			attribute.set(instance, id);
+			attribute.set(this, id);
 		}
 	}
 
@@ -213,8 +213,8 @@ public class ManagedInstance<X> {
 	}
 
 	/**
-	 * Fills the sequence / table generated values.
-	 * The operation returns false if at least one entity needs to obtain identity from the database.
+	 * Fills the sequence / table generated values. The operation returns false if at least one entity needs to obtain identity from the
+	 * database.
 	 * 
 	 * @return false if all OK, true if if at least one entity needs to obtain identity from the database
 	 * 
@@ -224,7 +224,7 @@ public class ManagedInstance<X> {
 	public boolean fillIdValues() {
 		boolean allFilled = true;
 		for (final IdAttributeImpl<? super X, ?> attribute : this.idAttributes) {
-			allFilled &= attribute.fillValue(this.instance);
+			allFilled &= attribute.fillValue(this);
 		}
 
 		return allFilled;

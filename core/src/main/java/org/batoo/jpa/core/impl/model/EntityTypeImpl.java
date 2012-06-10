@@ -61,6 +61,7 @@ import org.batoo.jpa.core.impl.model.attribute.AssociatedPluralAttribute;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
 import org.batoo.jpa.core.impl.model.attribute.IdAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.PhysicalAttributeImpl;
+import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
@@ -437,6 +438,15 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public PersistenceType getPersistenceType() {
+		return PersistenceType.ENTITY;
+	}
+
+	/**
 	 * Returns the primary table of the type
 	 * 
 	 * @return the primary table
@@ -527,7 +537,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		}
 
 		// link the singular attributes
-		for (final SingularAttribute<X, ?> attribute : this.getDeclaredSingularAttributes()) {
+		for (final SingularAttribute<X, ?> attribute : this.getDeclaredSingularAttributes0().values()) {
 			if (attribute instanceof PhysicalAttributeImpl) {
 				final BasicColumn basicColumn = ((PhysicalAttributeImpl<X, ?>) attribute).getColumn();
 				final String tableName = basicColumn.getTableName();
@@ -571,7 +581,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 *            the connection to use
 	 * @param transaction
 	 *            the transaction for which the insert will be performed
-	 * @param instance
+	 * @param managedInstance
 	 *            the managed instance to perform insert for
 	 * @throws SQLException
 	 *             thrown in case of an SQL Error
@@ -579,13 +589,17 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performInsert(ConnectionImpl connection, EntityTransactionImpl transaction, ManagedInstance<X> instance)
+	public void performInsert(ConnectionImpl connection, EntityTransactionImpl transaction, ManagedInstance<X> managedInstance)
 		throws SQLException {
 		for (final EntityTable table : this.getTables()) {
-			table.performInsert(connection, instance);
+			table.performInsert(connection, managedInstance);
 		}
 
-		instance.setTransaction(transaction);
+		for (final PluralAttributeImpl<? super X, ?, ?> attribute : this.getPluralAttributes0().values()) {
+			attribute.set(managedInstance, attribute.get(managedInstance.getInstance()));
+		}
+
+		managedInstance.setTransaction(transaction);
 	}
 
 	/**

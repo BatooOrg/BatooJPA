@@ -41,7 +41,7 @@ import com.google.common.collect.Maps;
  * @author hceylan
  * @since $version
  */
-public class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> implements IdentifiableType<X> {
+public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> implements IdentifiableType<X> {
 
 	private final Map<String, IdAttributeImpl<X, ?>> declaredIdAttributes = Maps.newHashMap();
 	private IdAttributeImpl<? super X, ?>[] idAttributes;;

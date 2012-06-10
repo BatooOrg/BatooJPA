@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
@@ -355,7 +356,8 @@ public class JoinColumn extends AbstractColumn {
 	 * 
 	 */
 	@Override
-	public void setValue(Object instance, Object value) {
-		this.attribute.set(instance, value);
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void setValue(ManagedInstance managedInstance, Object value) {
+		this.attribute.set(managedInstance, value);
 	}
 }

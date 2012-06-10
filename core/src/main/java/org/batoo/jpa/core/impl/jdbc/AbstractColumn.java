@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 
@@ -205,5 +206,6 @@ public abstract class AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract void setValue(Object instance, Object value);
+	@SuppressWarnings("rawtypes")
+	public abstract void setValue(ManagedInstance instance, Object value);
 }

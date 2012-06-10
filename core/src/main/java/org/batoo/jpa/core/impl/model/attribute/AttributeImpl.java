@@ -24,6 +24,7 @@ import javax.persistence.metamodel.Attribute;
 
 import org.batoo.jpa.common.reflect.AbstractAccessor;
 import org.batoo.jpa.common.reflect.ReflectHelper;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
 import org.batoo.jpa.parser.impl.metadata.attribute.AttributeMetadataImpl;
@@ -136,15 +137,15 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y> {
 	/**
 	 * Sets the attribute value of instance.
 	 * 
-	 * @param instance
-	 *            the instance of which the value to be returned
+	 * @param managedInstance
+	 *            the instance of which the value to set
 	 * @param value
 	 *            the value to set
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public final void set(Object instance, Object value) {
-		this.accessor.set(instance, value);
+	public void set(ManagedInstance<? extends X> managedInstance, Object value) {
+		this.accessor.set(managedInstance.getInstance(), value);
 	}
 }

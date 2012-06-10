@@ -222,15 +222,15 @@ public interface AssociatedAttribute<X, T, Y> extends Attribute<X, Y> {
 	/**
 	 * Sets the attribute value of instance.
 	 * 
-	 * @param instance
-	 *            the instance of which the value to be returned
+	 * @param managedInstance
+	 *            the instance of which the value to set
 	 * @param value
 	 *            the value to set
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	void set(Object instance, Object value);
+	void set(ManagedInstance<? extends X> managedInstance, Object value);
 
 	/**
 	 * Sets the inverse attribute.

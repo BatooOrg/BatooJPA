@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
@@ -237,7 +238,7 @@ public class BasicColumn extends AbstractColumn {
 	/**
 	 * Sets the value for the instance
 	 * 
-	 * @param instance
+	 * @param managedInstance
 	 *            the instance of which to set value
 	 * @param value
 	 *            the value to set
@@ -246,7 +247,8 @@ public class BasicColumn extends AbstractColumn {
 	 * @author hceylan
 	 */
 	@Override
-	public void setValue(Object instance, Object value) {
-		this.attribute.set(instance, value);
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void setValue(ManagedInstance managedInstance, Object value) {
+		this.attribute.set(managedInstance, value);
 	}
 }

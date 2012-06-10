@@ -18,7 +18,13 @@
  */
 package org.batoo.jpa.core.impl.model.attribute;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
@@ -30,6 +36,7 @@ import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
 import org.batoo.jpa.parser.MappingException;
+import org.batoo.jpa.parser.impl.metadata.attribute.AttributeMetadataImpl;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
 
 /**
@@ -46,6 +53,55 @@ import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
  * @since $version
  */
 public abstract class AssociatedPluralAttribute<X, C, E> extends PluralAttributeImpl<X, C, E> implements AssociatedAttribute<X, E, C> {
+
+	/**
+	 * Creates an associated plural attribute corresponding to member type
+	 * 
+	 * @param declaringType
+	 *            the declaring type
+	 * @param metadata
+	 *            the metadata
+	 * @param attributeType
+	 *            the attribute type
+	 * @param mappedBy
+	 *            the mapped by attribute
+	 * @param removesOrphans
+	 *            if attribute removes orphans
+	 * @param <X>
+	 *            the type of the managed type
+	 * @return the attribute created
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static <X> AssociatedPluralAttribute<X, ?, ?> create(ManagedTypeImpl<X> declaringType, AssociationAttributeMetadata metadata,
+		PersistentAttributeType attributeType, String mappedBy, boolean removesOrphans) {
+		final Member member = ((AttributeMetadataImpl) metadata).getMember();
+
+		Class<?> type;
+		if (member instanceof Field) {
+			type = ((Field) member).getType();
+		}
+		else {
+			type = ((Method) member).getReturnType();
+		}
+
+		if (List.class == type) {
+			return new ListAttributeImpl(declaringType, metadata, attributeType, mappedBy, removesOrphans);
+		}
+		else if (Set.class == type) {
+			return new SetAttributeImpl(declaringType, metadata, attributeType, mappedBy, removesOrphans);
+		}
+		else if (Collection.class == type) {
+			return new CollectionAttributeImpl(declaringType, metadata, attributeType, mappedBy, removesOrphans);
+		}
+		else if (Map.class == type) {
+			return null;
+		}
+
+		throw new MappingException("Cannot determine collection type for " + type, metadata.getLocator());
+	}
 
 	private final PersistentAttributeType attributeType;
 	private final String inverseName;
