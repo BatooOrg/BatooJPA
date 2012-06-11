@@ -16,16 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.model;
+package org.batoo.jpa.core.impl.model.type;
 
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.IdentifiableType;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.Type;
 
-import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
+import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.IdAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.VersionAttributeImpl;
@@ -113,10 +114,11 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	protected void addAttributes(ManagedTypeMetadata entityMetadata) {
 		if (this.supertype != null) {
-			for (final AttributeImpl<? super X, ?> attribute : this.supertype.getAttributes0().values()) {
-				this.addAttribute(attribute);
+			for (final Attribute<?, ?> attribute : this.supertype.getAttributes()) {
+				this.addAttribute((AttributeImpl<? super X, ?>) attribute);
 			}
 
 			if (this.supertype.versionAttribute != null) {
@@ -180,43 +182,6 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	public <Y> SingularAttribute<? super X, Y> getId(Class<Y> type) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	/**
-	 * Returns an array of id attributes.
-	 * 
-	 * @return an array of id attributes
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@SuppressWarnings("unchecked")
-	public IdAttributeImpl<? super X, ?>[] getIdAttributes() {
-		if (this.idAttributes0 != null) {
-			return this.idAttributes0;
-		}
-
-		// populate the id attributes with the inheritance
-		synchronized (this) {
-			if (this.idAttributes0 != null) {
-				return this.idAttributes0;
-			}
-
-			final Map<String, IdAttributeImpl<? super X, ?>> idAttributes = Maps.newHashMap();
-			for (final IdAttributeImpl<? super X, ?> attribute : this.idAttributes.values()) {
-				idAttributes.put(attribute.getName(), attribute);
-			}
-
-			// XXX implement inheritance
-			// addAll getParent().getIdAttributes();
-
-			final IdAttributeImpl<X, ?>[] idAttributes0 = new IdAttributeImpl[idAttributes.size()];
-			idAttributes.values().toArray(idAttributes0);
-
-			this.idAttributes0 = idAttributes0;
-		}
-
-		return this.idAttributes0;
 	}
 
 	/**

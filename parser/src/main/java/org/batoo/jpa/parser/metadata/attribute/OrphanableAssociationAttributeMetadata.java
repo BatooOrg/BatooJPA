@@ -34,5 +34,5 @@ public interface OrphanableAssociationAttributeMetadata {
 	 * @since $version
 	 * @author hceylan
 	 */
-	boolean removesOprhans();
+	boolean removesOrphans();
 }

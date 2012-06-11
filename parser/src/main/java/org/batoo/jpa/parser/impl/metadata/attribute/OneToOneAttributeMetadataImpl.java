@@ -61,7 +61,7 @@ public class OneToOneAttributeMetadataImpl extends AssociationAttributeMetadataI
 
 		this.mappedBy = metadata.getMappedBy();
 		this.optional = metadata.isOptional();
-		this.removesOprhans = metadata.removesOprhans();
+		this.removesOprhans = metadata.removesOrphans();
 		this.pkJoinColumns.addAll(Lists.newArrayList(metadata.getPrimaryKeyJoinColumns()));
 	}
 
@@ -138,7 +138,7 @@ public class OneToOneAttributeMetadataImpl extends AssociationAttributeMetadataI
 	 * 
 	 */
 	@Override
-	public boolean removesOprhans() {
+	public boolean removesOrphans() {
 		return this.removesOprhans;
 	}
 

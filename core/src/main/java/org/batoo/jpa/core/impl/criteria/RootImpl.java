@@ -21,7 +21,7 @@ package org.batoo.jpa.core.impl.criteria;
 import javax.persistence.criteria.Root;
 
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
-import org.batoo.jpa.core.impl.model.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 /**
  * A root type in the from clause. Query roots always reference entities.

@@ -32,8 +32,8 @@ import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinColumn;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.jdbc.SingleValueHandler;
-import org.batoo.jpa.core.impl.metamodel.SequenceGenerator;
-import org.batoo.jpa.core.impl.metamodel.TableGenerator;
+import org.batoo.jpa.core.impl.model.SequenceGenerator;
+import org.batoo.jpa.core.impl.model.TableGenerator;
 import org.batoo.jpa.core.jdbc.IdType;
 
 import com.google.common.base.Function;

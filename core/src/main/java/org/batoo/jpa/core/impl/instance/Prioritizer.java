@@ -23,8 +23,8 @@ import java.util.Iterator;
 
 import javax.persistence.PersistenceException;
 
-import org.batoo.jpa.core.impl.model.EntityTypeImpl;
-import org.batoo.jpa.core.impl.model.attribute.AssociatedAttribute;
+import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 /**
  * 
@@ -79,10 +79,10 @@ public class Prioritizer {
 					}
 
 					final EntityTypeImpl<?> e2 = mi2.getType();
-					final AssociatedAttribute<?, ?, ?>[] attributes = e1.getDependenciesFor(e2);
+					final AssociationMapping<?, ?, ?>[] attributes = e1.getDependenciesFor(e2);
 					final Object i2 = mi2.getInstance();
 
-					for (final AssociatedAttribute<?, ?, ?> attribute : attributes) {
+					for (final AssociationMapping<?, ?, ?> attribute : attributes) {
 						if (attribute.references(i1, i2)) {
 							dependent = true;
 							break innerLoop;

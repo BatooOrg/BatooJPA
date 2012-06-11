@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.model;
+package org.batoo.jpa.core.impl.model.type;
 
 import java.util.Map;
 import java.util.Set;
@@ -28,8 +28,7 @@ import javax.persistence.metamodel.MapAttribute;
 import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
-import org.batoo.jpa.core.impl.model.attribute.AssociatedPluralAttribute;
+import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttributeImpl;
@@ -139,26 +138,22 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 
 		// many to one attributes
 		for (final ManyToOneAttributeMetadata metadata : attributesMetadata.getManyToOnes()) {
-			this.addAttribute(new AssociatedSingularAttribute(this, PersistentAttributeType.MANY_TO_ONE, metadata, null,
-				metadata.isOptional()));
+			this.addAttribute(new AssociatedSingularAttribute(this, PersistentAttributeType.MANY_TO_ONE, metadata));
 		}
 
 		// one to one attributes
 		for (final OneToOneAttributeMetadata metadata : attributesMetadata.getOneToOnes()) {
-			this.addAttribute(new AssociatedSingularAttribute(this, PersistentAttributeType.ONE_TO_ONE, metadata, null,
-				metadata.isOptional()));
+			this.addAttribute(new AssociatedSingularAttribute(this, PersistentAttributeType.ONE_TO_ONE, metadata));
 		}
 
 		// one to many attributes
 		for (final OneToManyAttributeMetadata metadata : attributesMetadata.getOneToManies()) {
-			this.addAttribute(new ListAttributeImpl(this, metadata, PersistentAttributeType.ONE_TO_MANY, metadata.getMappedBy(),
-				metadata.removesOprhans()));
+			this.addAttribute(PluralAttributeImpl.create(this, metadata, PersistentAttributeType.ONE_TO_MANY));
 		}
 
-		// one to many attributes
+		// many to many attributes
 		for (final ManyToManyAttributeMetadata metadata : attributesMetadata.getManyToManies()) {
-			this.addAttribute(AssociatedPluralAttribute.create(this, metadata, PersistentAttributeType.MANY_TO_MANY,
-				metadata.getMappedBy(), false));
+			this.addAttribute(PluralAttributeImpl.create(this, metadata, PersistentAttributeType.MANY_TO_MANY));
 		}
 	}
 
@@ -181,10 +176,6 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 		attributes.addAll(this.attributes.values());
 
 		return attributes;
-	}
-
-	public Map<String, AttributeImpl<? super X, ?>> getAttributes0() {
-		return this.attributes;
 	}
 
 	/**
@@ -226,10 +217,6 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 		attributes.addAll(this.declaredAttributes.values());
 
 		return attributes;
-	}
-
-	public Map<String, AttributeImpl<X, ?>> getDeclaredAttributes0() {
-		return this.declaredAttributes;
 	}
 
 	/**
@@ -353,10 +340,6 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 		attributes.addAll(this.declaredSingularAttributes.values());
 
 		return attributes;
-	}
-
-	public Map<String, SingularAttributeImpl<X, ?>> getDeclaredSingularAttributes0() {
-		return this.declaredSingularAttributes;
 	}
 
 	/**

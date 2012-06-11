@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.metamodel;
+package org.batoo.jpa.core.impl.model;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;

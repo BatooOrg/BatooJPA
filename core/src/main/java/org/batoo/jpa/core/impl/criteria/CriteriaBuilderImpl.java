@@ -49,7 +49,7 @@ import javax.persistence.criteria.SetJoin;
 import javax.persistence.criteria.Subquery;
 
 import org.batoo.jpa.core.impl.criteria.CompoundExpressionImpl.Comparison;
-import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
+import org.batoo.jpa.core.impl.model.MetamodelImpl;
 
 /**
  * Used to construct criteria queries, compound selections, expressions, predicates, orderings.

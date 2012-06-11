@@ -20,7 +20,7 @@ package org.batoo.jpa.core.impl.jdbc;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
+import org.batoo.jpa.core.impl.model.mapping.PhysicalMapping;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
@@ -33,7 +33,6 @@ import org.batoo.jpa.parser.metadata.ColumnMetadata;
  */
 public class BasicColumn extends AbstractColumn {
 
-	private final AttributeImpl<?, ?> attribute;
 	private EntityTable table;
 	private final int sqlType;
 	private final String name;
@@ -48,12 +47,12 @@ public class BasicColumn extends AbstractColumn {
 	private final boolean unique;
 	private final boolean updatable;
 	private final String mappingName;
+	private final PhysicalMapping<?, ?> mapping;
+	private final JdbcAdaptor jdbcAdaptor;
 
 	/**
-	 * @param jdbcAdaptor
-	 *            the JDBC adaptor
-	 * @param attribute
-	 *            the attribute
+	 * @param mapping
+	 *            the mapping
 	 * @param sqlType
 	 *            the SQL type
 	 * @param metadata
@@ -62,16 +61,16 @@ public class BasicColumn extends AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public BasicColumn(JdbcAdaptor jdbcAdaptor, AttributeImpl<?, ?> attribute, int sqlType, ColumnMetadata metadata) {
+	public BasicColumn(PhysicalMapping<?, ?> mapping, int sqlType, ColumnMetadata metadata) {
 		super();
 
-		this.attribute = attribute;
-
+		this.jdbcAdaptor = mapping.getEntity().getMetamodel().getJdbcAdaptor();
+		this.mapping = mapping;
 		this.locator = metadata != null ? metadata.getLocator() : null;
 		this.sqlType = sqlType;
 
-		this.mappingName = metadata != null ? metadata.getName() : attribute.getName();
-		this.name = jdbcAdaptor.escape(this.mappingName);
+		this.mappingName = metadata != null ? metadata.getName() : this.mapping.getAttribute().getName();
+		this.name = this.jdbcAdaptor.escape(this.mappingName);
 
 		this.tableName = metadata != null ? metadata.getTable() : "";
 		this.columnDefinition = metadata != null ? metadata.getColumnDefinition() : "";
@@ -180,7 +179,7 @@ public class BasicColumn extends AbstractColumn {
 	 */
 	@Override
 	public Object getValue(SessionImpl session, Object instance) {
-		return this.attribute.get(instance);
+		return this.mapping.get(instance);
 	}
 
 	/**
@@ -247,8 +246,7 @@ public class BasicColumn extends AbstractColumn {
 	 * @author hceylan
 	 */
 	@Override
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void setValue(ManagedInstance managedInstance, Object value) {
-		this.attribute.set(managedInstance, value);
+		this.mapping.set(managedInstance, value);
 	}
 }

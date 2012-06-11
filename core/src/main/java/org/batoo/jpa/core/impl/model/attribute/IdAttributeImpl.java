@@ -22,11 +22,9 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.jdbc.PkColumn;
-import org.batoo.jpa.core.impl.jdbc.TypeFactory;
-import org.batoo.jpa.core.impl.metamodel.AbstractGenerator;
-import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
-import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
+import org.batoo.jpa.core.impl.model.AbstractGenerator;
+import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.metadata.GeneratedValueMetadata;
@@ -47,7 +45,6 @@ public class IdAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 
 	private final String generator;
 	private final IdType idType;
-	private PkColumn column;
 
 	/**
 	 * @param declaringType
@@ -97,8 +94,6 @@ public class IdAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 			this.generator = null;
 			this.idType = IdType.MANUAL;
 		}
-
-		this.initColumn(metadata);
 	}
 
 	/**
@@ -149,15 +144,6 @@ public class IdAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 	}
 
 	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public PkColumn getColumn() {
-		return this.column;
-	}
-
-	/**
 	 * Returns the idType.
 	 * 
 	 * @return the idType
@@ -167,24 +153,6 @@ public class IdAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 	 */
 	public IdType getIdType() {
 		return this.idType;
-	}
-
-	/**
-	 * Initializes the column for the attribute.
-	 * 
-	 * @param metadata
-	 *            the metadata
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	private void initColumn(IdAttributeMetadata metadata) {
-		final int sqlType = TypeFactory.getSqlType(this.getJavaType(), this.getTemporalType(), null, false);
-
-		final JdbcAdaptor jdbcAdaptor = this.getDeclaringType().getMetamodel().getJdbcAdaptor();
-
-		this.column = new PkColumn(jdbcAdaptor, this, sqlType, (metadata != null) && (metadata.getColumn() != null) ? metadata.getColumn()
-			: null);
 	}
 
 	/**

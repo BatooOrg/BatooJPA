@@ -45,7 +45,7 @@ import javax.persistence.metamodel.SingularAttribute;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 /**
  * Represents a bound type, usually an entity that appears in the from clause, but may also be an embeddable belonging to an entity in the
@@ -160,7 +160,7 @@ public class FromImpl<Z, X> extends SelectionImpl<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public <XX, Y> Fetch<XX, Y> fetch(String attributeName) {
+	public <Y> Fetch<X, Y> fetch(String attributeName) {
 		return this.fetchRoot.fetch(attributeName);
 	}
 
@@ -169,7 +169,7 @@ public class FromImpl<Z, X> extends SelectionImpl<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public <T, Y> Fetch<T, Y> fetch(String attributeName, JoinType jt) {
+	public <Y> Fetch<X, Y> fetch(String attributeName, JoinType jt) {
 		return this.fetchRoot.fetch(attributeName, jt);
 	}
 

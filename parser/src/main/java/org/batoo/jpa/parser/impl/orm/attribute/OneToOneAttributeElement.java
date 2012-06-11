@@ -123,7 +123,7 @@ public class OneToOneAttributeElement extends AssociationElement implements OneT
 	 * 
 	 */
 	@Override
-	public boolean removesOprhans() {
+	public boolean removesOrphans() {
 		return this.orphanRemoval;
 	}
 }

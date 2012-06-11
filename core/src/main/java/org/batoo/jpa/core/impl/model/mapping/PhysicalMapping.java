@@ -16,41 +16,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.model;
+package org.batoo.jpa.core.impl.model.mapping;
 
-import javax.persistence.metamodel.Type;
-
-import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
-
+import org.batoo.jpa.core.impl.jdbc.BasicColumn;
+import org.batoo.jpa.core.impl.model.attribute.PhysicalAttributeImpl;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.type.TypeImpl;
 
 /**
- * Implementation of {@link Type}.
+ * Mapping for basic types, id, version, basic attributes.
  * 
  * @param <X>
- *            The type of the represented object or attribute
+ *            the type of the entity
+ * @param <Y>
+ *            the type of the value
  * 
  * @author hceylan
  * @since $version
  */
-public abstract class TypeImpl<X> implements Type<X> {
-
-	private final MetamodelImpl metamodel;
-	private final Class<X> javaType;
+public abstract class PhysicalMapping<X, Y> extends AbstractMapping<X, Y> {
 
 	/**
-	 * @param metamodel
-	 *            the metamodel
-	 * @param javaType
-	 *            the java type of the type
+	 * @param entity
+	 *            the entity
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public TypeImpl(MetamodelImpl metamodel, Class<X> javaType) {
-		super();
-
-		this.metamodel = metamodel;
-		this.javaType = javaType;
+	public PhysicalMapping(EntityTypeImpl<X> entity) {
+		super(entity);
 	}
 
 	/**
@@ -58,19 +52,25 @@ public abstract class TypeImpl<X> implements Type<X> {
 	 * 
 	 */
 	@Override
-	public final Class<X> getJavaType() {
-		return this.javaType;
-	}
+	public abstract PhysicalAttributeImpl<? super X, Y> getAttribute();
 
 	/**
-	 * Returns the metamodel.
+	 * Returns the physical column of the attribute.
 	 * 
-	 * @return the metamodel
+	 * @return the physical column of the attribute
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public final MetamodelImpl getMetamodel() {
-		return this.metamodel;
-	}
+	public abstract BasicColumn getColumn();
+
+	/**
+	 * Returns the bindable entity type.
+	 * 
+	 * @return the bindable entity type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract TypeImpl<Y> getType();
 }

@@ -20,7 +20,7 @@ package org.batoo.jpa.core.impl.manager;
 
 import java.util.Map;
 
-import org.batoo.jpa.core.impl.model.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 import com.google.common.collect.Maps;
 

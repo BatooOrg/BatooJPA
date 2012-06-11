@@ -25,11 +25,11 @@ import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.EntityTransactionImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.EntityTypeImpl;
-import org.batoo.jpa.core.impl.model.attribute.AssociatedAttribute;
-import org.batoo.jpa.core.impl.model.attribute.AssociatedPluralAttribute;
-import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
-import org.batoo.jpa.core.impl.model.attribute.IdAttributeImpl;
+import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.IdMapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 /**
  * The managed instance to track entity instances.
@@ -74,7 +74,7 @@ public class ManagedInstance<X> {
 	private final SessionImpl session;
 	private final X instance;
 	private Status status;
-	private final IdAttributeImpl<? super X, ?>[] idAttributes;
+	private final IdMapping<? super X, ?>[] idAttributes;
 	private EntityTransactionImpl transaction;
 	private final boolean external = true;
 
@@ -100,7 +100,7 @@ public class ManagedInstance<X> {
 		this.session = session;
 		this.instance = instance;
 
-		this.idAttributes = type.getIdAttributes();
+		this.idAttributes = type.getIdMappings();
 	}
 
 	/**
@@ -120,7 +120,7 @@ public class ManagedInstance<X> {
 		this(type, session, instance);
 
 		this.id = id;
-		for (final IdAttributeImpl<? super X, ?> attribute : this.idAttributes) {
+		for (final IdMapping<? super X, ?> attribute : this.idAttributes) {
 			attribute.set(this, id);
 		}
 	}
@@ -150,16 +150,16 @@ public class ManagedInstance<X> {
 	public boolean cascadePersist(EntityManagerImpl entityManager) {
 		boolean requiresFlush = false;
 
-		final AssociatedAttribute<? super X, ?, ?>[] associations = this.type.getAssociationsPersistable();
+		final AssociationMapping<? super X, ?, ?>[] associations = this.type.getAssociationsPersistable();
 
-		for (final AssociatedAttribute<? super X, ?, ?> association : associations) {
+		for (final AssociationMapping<? super X, ?, ?> association : associations) {
 
 			// if the association a collection attribute then we will cascade to each element
-			if (association instanceof AssociatedPluralAttribute) {
-				final AssociatedPluralAttribute<? super X, ?, ?> pluralAttribute = (AssociatedPluralAttribute<? super X, ?, ?>) association;
+			if (association instanceof PluralAssociationMapping) {
+				final PluralAssociationMapping<? super X, ?, ?> mapping = (PluralAssociationMapping<? super X, ?, ?>) association;
 
 				// extract the collection
-				final Collection<?> collection = (Collection<?>) pluralAttribute.get(this.instance);
+				final Collection<?> collection = (Collection<?>) mapping.get(this.instance);
 
 				// cascade to each element in the collection
 				for (final Object element : collection) {
@@ -167,8 +167,8 @@ public class ManagedInstance<X> {
 				}
 			}
 			else {
-				final AssociatedSingularAttribute<? super X, ?> attribute = (AssociatedSingularAttribute<? super X, ?>) association;
-				final Object associate = attribute.get(this.instance);
+				final SingularAssociationMapping<? super X, ?> mapping = (SingularAssociationMapping<? super X, ?>) association;
+				final Object associate = mapping.get(this.instance);
 				requiresFlush |= entityManager.persistImpl(associate);
 			}
 		}
@@ -183,7 +183,7 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void checkTransients() {
-		for (final AssociatedAttribute<? super X, ?, ?> association : this.type.getAssociations()) {
+		for (final AssociationMapping<? super X, ?, ?> association : this.type.getAssociations()) {
 			association.checkTransient(this);
 		}
 	}
@@ -223,8 +223,8 @@ public class ManagedInstance<X> {
 	 */
 	public boolean fillIdValues() {
 		boolean allFilled = true;
-		for (final IdAttributeImpl<? super X, ?> attribute : this.idAttributes) {
-			allFilled &= attribute.fillValue(this);
+		for (final IdMapping<? super X, ?> mapping : this.idAttributes) {
+			allFilled &= mapping.getAttribute().fillValue(this);
 		}
 
 		return allFilled;
@@ -281,8 +281,8 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void flushAssociations(ConnectionImpl connection) throws SQLException {
-		for (final AssociatedAttribute<? super X, ?, ?> association : this.type.getAssociationsJoined()) {
-			association.flush(this.session, connection, this);
+		for (final AssociationMapping<? super X, ?, ?> association : this.type.getAssociationsJoined()) {
+			association.flush(connection, this);
 		}
 	}
 

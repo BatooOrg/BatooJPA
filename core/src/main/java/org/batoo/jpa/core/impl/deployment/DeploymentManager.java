@@ -29,9 +29,9 @@ import javax.persistence.metamodel.ManagedType;
 
 import org.batoo.jpa.common.BatooException;
 import org.batoo.jpa.common.log.BLogger;
-import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
-import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
-import org.batoo.jpa.core.impl.model.TypeImpl;
+import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
+import org.batoo.jpa.core.impl.model.type.TypeImpl;
 import org.batoo.jpa.core.util.IncrementalNamingThreadFactory;
 
 import com.google.common.collect.Lists;

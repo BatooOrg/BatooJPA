@@ -69,14 +69,12 @@ public interface FetchParent<Z, X> {
 	 * @param attributeName
 	 *            name of the attribute for the target of the join
 	 * @return the resulting fetch join
-	 * @param <T>
-	 *            the source type of the fetch
 	 * @param <Y>
 	 *            the target type of the fetch
 	 * @throws IllegalArgumentException
 	 *             if attribute of the given name does not exist
 	 */
-	<T, Y> Fetch<T, Y> fetch(String attributeName);
+	<Y> Fetch<X, Y> fetch(String attributeName);
 
 	/**
 	 * Create a fetch join to the specified attribute using the given join type.
@@ -86,14 +84,12 @@ public interface FetchParent<Z, X> {
 	 * @param jt
 	 *            join type
 	 * @return the resulting fetch join
-	 * @param <T>
-	 *            the source type of the fetch
 	 * @param <Y>
 	 *            the target type of the fetch
 	 * @throws IllegalArgumentException
 	 *             if attribute of the given name does not exist
 	 */
-	<T, Y> Fetch<T, Y> fetch(String attributeName, JoinType jt);
+	<Y> Fetch<X, Y> fetch(String attributeName, JoinType jt);
 
 	/**
 	 * Return the fetch joins that have been made from this type. Returns empty set if no fetch joins have been made from this type.

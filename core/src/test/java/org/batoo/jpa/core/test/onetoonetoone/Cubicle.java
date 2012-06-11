@@ -37,16 +37,16 @@ public class Cubicle {
 	private Integer id;
 
 	@OneToOne(mappedBy = "assignedCubicle")
-	private Employee employe;
+	private Employee employee;
 
 	/**
-	 * Returns the employe.
+	 * Returns the employee.
 	 * 
-	 * @return the employe
+	 * @return the employee
 	 * @since $version
 	 */
-	public Employee getEmploye() {
-		return this.employe;
+	public Employee getEmployee() {
+		return this.employee;
 	}
 
 	/**
@@ -60,13 +60,13 @@ public class Cubicle {
 	}
 
 	/**
-	 * Sets the employe.
+	 * Sets the employee.
 	 * 
-	 * @param employe
-	 *            the employe to set
+	 * @param employee
+	 *            the employee to set
 	 * @since $version
 	 */
-	public void setEmploye(Employee employe) {
-		this.employe = employe;
+	public void setEmployee(Employee employee) {
+		this.employee = employee;
 	}
 }

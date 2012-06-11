@@ -18,12 +18,10 @@
  */
 package org.batoo.jpa.core.impl.model.attribute;
 
-import javax.persistence.TemporalType;
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.batoo.jpa.core.impl.jdbc.BasicColumn;
-import org.batoo.jpa.core.impl.model.BasicTypeImpl;
-import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
+import org.batoo.jpa.core.impl.model.type.BasicTypeImpl;
+import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.parser.metadata.attribute.PhysicalAttributeMetadata;
 
 /**
@@ -39,7 +37,6 @@ import org.batoo.jpa.parser.metadata.attribute.PhysicalAttributeMetadata;
  */
 public abstract class PhysicalAttributeImpl<X, T> extends SingularAttributeImpl<X, T> {
 
-	private final TemporalType temporalType;
 	private final BasicTypeImpl<T> type;
 
 	/**
@@ -55,18 +52,16 @@ public abstract class PhysicalAttributeImpl<X, T> extends SingularAttributeImpl<
 		super(declaringType, metadata);
 
 		this.type = this.getDeclaringType().getMetamodel().createBasicType(this.getJavaType());
-		this.temporalType = metadata.getTemporalType();
 	}
 
 	/**
-	 * Returns the physical column of the attribute.
+	 * {@inheritDoc}
 	 * 
-	 * @return the physical column of the attribute
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	public abstract BasicColumn getColumn();
+	@Override
+	public PhysicalAttributeMetadata getMetadata() {
+		return (PhysicalAttributeMetadata) super.getMetadata();
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -75,18 +70,6 @@ public abstract class PhysicalAttributeImpl<X, T> extends SingularAttributeImpl<
 	@Override
 	public PersistentAttributeType getPersistentAttributeType() {
 		return PersistentAttributeType.BASIC;
-	}
-
-	/**
-	 * Returns the temporalType.
-	 * 
-	 * @return the temporalType
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public TemporalType getTemporalType() {
-		return this.temporalType;
 	}
 
 	/**

@@ -20,10 +20,7 @@ package org.batoo.jpa.core.impl.model.attribute;
 
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.batoo.jpa.core.impl.jdbc.BasicColumn;
-import org.batoo.jpa.core.impl.jdbc.TypeFactory;
-import org.batoo.jpa.core.impl.model.IdentifiableTypeImpl;
-import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
+import org.batoo.jpa.core.impl.model.type.IdentifiableTypeImpl;
 import org.batoo.jpa.parser.metadata.attribute.VersionAttributeMetadata;
 
 /**
@@ -39,8 +36,6 @@ import org.batoo.jpa.parser.metadata.attribute.VersionAttributeMetadata;
  */
 public class VersionAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 
-	private BasicColumn versionColumn;
-
 	/**
 	 * @param declaringType
 	 *            the declaring type
@@ -52,35 +47,6 @@ public class VersionAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 	 */
 	public VersionAttributeImpl(IdentifiableTypeImpl<X> declaringType, VersionAttributeMetadata metadata) {
 		super(declaringType, metadata);
-
-		this.initColumn(metadata);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public BasicColumn getColumn() {
-		return this.versionColumn;
-	}
-
-	/**
-	 * Initializes the basicColumn for the attribute.
-	 * 
-	 * @param metadata
-	 *            the metadata
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	private void initColumn(VersionAttributeMetadata metadata) {
-		final int sqlType = TypeFactory.getSqlType(this.getJavaType(), this.getTemporalType(), null, false);
-
-		final JdbcAdaptor jdbcAdaptor = this.getDeclaringType().getMetamodel().getJdbcAdaptor();
-
-		this.versionColumn = new BasicColumn(jdbcAdaptor, this, sqlType, (metadata != null) && (metadata.getColumn() != null)
-			? metadata.getColumn() : null);
 	}
 
 	/**

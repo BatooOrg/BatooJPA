@@ -25,16 +25,13 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
-import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.EntityTypeImpl;
-import org.batoo.jpa.core.impl.model.attribute.AssociatedAttribute;
-import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
-import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
+import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
+import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 
 /**
  * Implementation of {@link Fetch}.
@@ -49,36 +46,27 @@ import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
  */
 public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X> {
 
-	@SuppressWarnings("unchecked")
-	private static <X, Z> EntityTypeImpl<X> getEntity(AssociatedAttribute<? super Z, X, ?> attribute) {
-		if (attribute instanceof SingularAttribute) {
-			return (EntityTypeImpl<X>) ((SingularAttributeImpl<? super Z, X>) attribute).getType();
-		}
-
-		return (EntityTypeImpl<X>) ((PluralAttributeImpl<? super Z, ?, X>) attribute).getElementType();
-	}
-
 	private final FetchParentImpl<?, Z> parent;
-	private final AssociatedAttribute<? super Z, X, ?> attribute;
+	private final AssociationMapping<? super Z, X, ?> mapping;
 	private final JoinType joinType;
 	private ManagedInstance<?> parentInstance;
 
 	/**
 	 * @param parent
 	 *            the parent of the join
-	 * @param attribute
-	 *            the attribute of the join
+	 * @param mapping
+	 *            the mapping of the join
 	 * @param joinType
 	 *            the join type
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public FetchImpl(FetchParentImpl<?, Z> parent, AssociatedAttribute<? super Z, X, ?> attribute, JoinType joinType) {
-		super(FetchImpl.getEntity(attribute));
+	public FetchImpl(FetchParentImpl<?, Z> parent, AssociationMapping<? super Z, X, ?> mapping, JoinType joinType) {
+		super(mapping.getType());
 
 		this.parent = parent;
-		this.attribute = attribute;
+		this.mapping = mapping;
 		this.joinType = joinType;
 	}
 
@@ -110,9 +98,9 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 
 		builder.append(" join fetch ");
 
-		builder.append(parent).append(".").append(this.attribute.getName());
+		builder.append(parent).append(".").append(this.mapping.getAttribute().getName());
 
-		final String children = super.describe(this.attribute.getAssociationType().getName());
+		final String children = super.describe(this.mapping.getType().getName());
 		if (StringUtils.isNotBlank(children)) {
 			builder.append("\n").append(children);
 		}
@@ -131,17 +119,17 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 
 		String join;
 
-		if (this.attribute.getForeignKey() != null) {
-			join = this.attribute.getForeignKey().createDestinationJoin(this.joinType, parentAlias, alias);
+		if (this.mapping.getForeignKey() != null) {
+			join = this.mapping.getForeignKey().createDestinationJoin(this.joinType, parentAlias, alias);
 		}
-		else if ((this.attribute.getInverse() != null) && (this.attribute.getInverse().getForeignKey() != null)) {
-			join = this.attribute.getInverse().getForeignKey().createSourceJoin(this.joinType, parentAlias, alias);
+		else if ((this.mapping.getInverse() != null) && (this.mapping.getInverse().getForeignKey() != null)) {
+			join = this.mapping.getInverse().getForeignKey().createSourceJoin(this.joinType, parentAlias, alias);
 		}
-		else if (this.attribute.getJoinTable() != null) {
-			join = this.attribute.getJoinTable().createJoin(this.joinType, parentAlias, alias, true);
+		else if (this.mapping.getJoinTable() != null) {
+			join = this.mapping.getJoinTable().createJoin(this.joinType, parentAlias, alias, true);
 		}
 		else {
-			join = this.attribute.getInverse().getJoinTable().createJoin(this.joinType, parentAlias, alias, false);
+			join = this.mapping.getInverse().getJoinTable().createJoin(this.joinType, parentAlias, alias, false);
 		}
 
 		final String joins = super.generateJoins(query);
@@ -154,8 +142,8 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	 * 
 	 */
 	@Override
-	public AssociatedAttribute<? super Z, ?, ?> getAttribute() {
-		return this.attribute;
+	public AttributeImpl<? super Z, ?> getAttribute() {
+		return this.mapping.getAttribute();
 	}
 
 	/**

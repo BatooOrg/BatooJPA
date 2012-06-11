@@ -39,11 +39,12 @@ import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.jdbc.SecondaryTable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.EntityTypeImpl;
-import org.batoo.jpa.core.impl.model.attribute.AssociatedAttribute;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
-import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
-import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
+import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
+import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.util.BatooUtils;
 
 import com.google.common.base.Function;
@@ -108,28 +109,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 		return BatooUtils.indent(Joiner.on("\n").join(fetches));
 	}
 
-	@SuppressWarnings("unchecked")
-	private <Y> FetchImpl<X, Y> fetch(AttributeImpl<? super X, Y> attribute, JoinType jt) {
-		Type<?> type;
-
-		if (attribute instanceof SingularAttributeImpl) {
-			type = ((SingularAttributeImpl<? super X, ?>) attribute).getType();
-		}
-		else {
-			final PluralAttributeImpl<? super X, ?, ?> pluralAttribute = (PluralAttributeImpl<? super X, ?, ?>) attribute;
-			type = pluralAttribute.getElementType();
-		}
-
-		if (!(type instanceof EntityType)) {
-			throw new IllegalArgumentException("Cannot dereference");
-		}
-
-		final FetchImpl<X, Y> fetch = new FetchImpl<X, Y>(this, (AssociatedAttribute<? super X, Y, ?>) attribute, jt);
-		this.fetches.add(fetch);
-
-		return fetch;
-	}
-
 	/**
 	 * {@inheritDoc}
 	 * 
@@ -146,7 +125,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public final <Y> Fetch<X, Y> fetch(PluralAttribute<? super X, ?, Y> attribute, JoinType jt) {
-		return this.fetch((AttributeImpl<? super X, Y>) attribute, jt);
+		return this.fetch(attribute.getName(), jt);
 	}
 
 	/**
@@ -165,16 +144,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public final <Y> Fetch<X, Y> fetch(SingularAttribute<? super X, Y> attribute, JoinType jt) {
-		return this.fetch((AttributeImpl<? super X, Y>) attribute, jt);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public final <XX, Y> Fetch<XX, Y> fetch(String attributeName) {
-		return this.fetch(attributeName, JoinType.INNER);
+		return this.fetch(attribute.getName(), jt);
 	}
 
 	/**
@@ -183,13 +153,36 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public final <XX, Y> Fetch<XX, Y> fetch(String attributeName, JoinType jt) {
-		final AttributeImpl<? super X, ?> attribute = this.entity.getAttribute(attributeName);
-		if (attribute != null) {
-			return (Fetch<XX, Y>) this.fetch(attribute, jt);
+	public final <Y> Fetch<X, Y> fetch(String attributeName) {
+		return (Fetch<X, Y>) this.fetch(attributeName, JoinType.INNER);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public <Y> Fetch<X, Y> fetch(String attributeName, JoinType jt) {
+		Type<Y> type;
+
+		final AbstractMapping<X, Y> mapping = (AbstractMapping<X, Y>) this.entity.getMapping(attributeName);
+
+		if (mapping instanceof SingularAssociationMapping) {
+			type = ((SingularAssociationMapping<? super X, Y>) mapping).getType();
+		}
+		else {
+			type = ((PluralAssociationMapping<? super X, Y, ?>) mapping).getType();
 		}
 
-		throw new IllegalArgumentException("Cannot dereference");
+		if (!(type instanceof EntityType)) {
+			throw new IllegalArgumentException("Cannot dereference attribute " + attributeName);
+		}
+
+		final FetchImpl<X, Y> fetch = new FetchImpl<X, Y>(this, (AssociationMapping<? super X, Y, ?>) mapping, jt);
+		this.fetches.add(fetch);
+
+		return fetch;
 	}
 
 	/**
@@ -438,7 +431,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 				final FetchImpl<X, ?> fetch = this.fetches.get(i);
 				final MutableInt subRowNo = new MutableInt(rowNo);
 				final List<?> value = fetch.handle(session, query, data, subRowNo, leap, instance);
-				final AssociatedAttribute<? super X, ?, ?> attribute = fetch.getAttribute();
+				final AttributeImpl<? super X, ?> attribute = fetch.getAttribute();
 
 				if (value != null) {
 					leap = subRowNo.intValue() - rowNo.intValue();

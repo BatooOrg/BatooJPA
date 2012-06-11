@@ -20,9 +20,9 @@ package org.batoo.jpa.core.impl.jdbc;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.EntityTypeImpl;
-import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
-import org.batoo.jpa.core.impl.model.attribute.IdAttributeImpl;
+import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.IdMapping;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
@@ -44,11 +44,11 @@ public class JoinColumn extends AbstractColumn {
 	private final boolean unique;
 	private final boolean updatable;
 
-	private AttributeImpl<?, ?> attribute;
+	private AssociationMapping<?, ?, ?> mapping;
 	private String mappingName;
 	private String name;
 	private String referencedColumnName;
-	private IdAttributeImpl<?, ?> referencedAttribute;
+	private IdMapping<?, ?> referencedMapping;
 
 	private AbstractTable table;
 
@@ -60,20 +60,18 @@ public class JoinColumn extends AbstractColumn {
 	/**
 	 * Constructor with no metadata
 	 * 
-	 * @param jdbcAdaptor
-	 *            the JDBC adaptor
-	 * @param attribute
-	 *            the attribute
-	 * @param idAttribute
-	 *            the referenced primary key column name
+	 * @param mapping
+	 *            the mapping
+	 * @param idMapping
+	 *            the referenced mapping
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public JoinColumn(JdbcAdaptor jdbcAdaptor, AttributeImpl<?, ?> attribute, IdAttributeImpl<?, ?> idAttribute) {
+	public JoinColumn(AssociationMapping<?, ?, ?> mapping, IdMapping<?, ?> idMapping) {
 		super();
 
-		this.attribute = attribute;
+		this.mapping = mapping;
 		this.locator = null;
 
 		this.columnDefinition = "";
@@ -83,7 +81,7 @@ public class JoinColumn extends AbstractColumn {
 		this.unique = false;;
 		this.updatable = true;
 
-		this.setColumnProperties(jdbcAdaptor, attribute, idAttribute);
+		this.setColumnProperties(mapping, idMapping);
 	}
 
 	/**
@@ -196,7 +194,7 @@ public class JoinColumn extends AbstractColumn {
 	 * @author hceylan
 	 */
 	public AbstractTable getReferencedTable() {
-		return this.referencedAttribute.getColumn().getTable();
+		return this.referencedMapping.getColumn().getTable();
 	}
 
 	/**
@@ -241,11 +239,11 @@ public class JoinColumn extends AbstractColumn {
 	 */
 	@Override
 	public Object getValue(SessionImpl session, Object instance) {
-		if (this.attribute != null) {
-			instance = this.attribute.get(instance);
+		if (this.mapping != null) {
+			instance = this.mapping.get(instance);
 		}
 
-		return instance != null ? this.referencedAttribute.get(instance) : null;
+		return instance != null ? this.referencedMapping.get(instance) : null;
 	}
 
 	/**
@@ -300,44 +298,44 @@ public class JoinColumn extends AbstractColumn {
 		return this.updatable;
 	}
 
-	private void setColumnProperties(IdAttributeImpl<?, ?> referencedAttribute) {
-		this.referencedAttribute = referencedAttribute;
-		final PkColumn referencedColumn = referencedAttribute.getColumn();
+	/**
+	 * Sets the column definition.
+	 * 
+	 * @param mapping
+	 *            the owner mapping
+	 * @param referencedMapping
+	 *            the referenced primary key Column
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setColumnProperties(AssociationMapping<?, ?, ?> mapping, IdMapping<?, ?> referencedMapping) {
+		final JdbcAdaptor jdbcAdaptor = referencedMapping.getEntity().getMetamodel().getJdbcAdaptor();
+
+		// if attribute present then the join column belongs to an entity table
+		if (mapping != null) {
+			this.mapping = mapping;
+			this.mappingName = mapping.getAttribute().getName() + "_" + referencedMapping.getColumn().getName();
+			this.name = jdbcAdaptor.escape(this.mappingName);
+		}
+		else {
+			this.mappingName = ((EntityTypeImpl<?>) referencedMapping.getEntity()).getName() + "_"
+				+ referencedMapping.getColumn().getName();
+			this.name = jdbcAdaptor.escape(this.mappingName);
+		}
+
+		this.setColumnProperties(referencedMapping);
+	}
+
+	private void setColumnProperties(IdMapping<?, ?> referencedMapping) {
+		this.referencedMapping = referencedMapping;
+		final PkColumn referencedColumn = referencedMapping.getColumn();
 
 		this.referencedColumnName = referencedColumn.getName();
 		this.sqlType = referencedColumn.getSqlType();
 		this.length = referencedColumn.getLength();
 		this.precision = referencedColumn.getPrecision();
 		this.scale = referencedColumn.getScale();
-	}
-
-	/**
-	 * Sets the column definition.
-	 * 
-	 * @param jdbcAdaptor
-	 *            the JDBC adaptor
-	 * @param attribute
-	 *            the owner attribute
-	 * @param referencedAttribute
-	 *            the referenced primary key Column
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void setColumnProperties(JdbcAdaptor jdbcAdaptor, AttributeImpl<?, ?> attribute, IdAttributeImpl<?, ?> referencedAttribute) {
-		// if attribute present then the join column belongs to an entity table
-		if (attribute != null) {
-			this.attribute = attribute;
-			this.mappingName = attribute.getName() + "_" + referencedAttribute.getColumn().getName();
-			this.name = jdbcAdaptor.escape(this.mappingName);
-		}
-		else {
-			this.mappingName = ((EntityTypeImpl<?>) referencedAttribute.getDeclaringType()).getName() + "_"
-				+ referencedAttribute.getColumn().getName();
-			this.name = jdbcAdaptor.escape(this.mappingName);
-		}
-
-		this.setColumnProperties(referencedAttribute);
 	}
 
 	/**
@@ -356,8 +354,8 @@ public class JoinColumn extends AbstractColumn {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings("rawtypes")
 	public void setValue(ManagedInstance managedInstance, Object value) {
-		this.attribute.set(managedInstance, value);
+		this.mapping.set(managedInstance, value);
 	}
 }

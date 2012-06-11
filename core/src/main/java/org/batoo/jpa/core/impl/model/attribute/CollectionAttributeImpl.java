@@ -18,17 +18,14 @@
  */
 package org.batoo.jpa.core.impl.model.attribute;
 
-import java.sql.SQLException;
 import java.util.Collection;
 
 import javax.persistence.metamodel.CollectionAttribute;
 
 import org.batoo.jpa.core.impl.collections.ManagedList;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
-import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
-import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
+import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
+import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
 
 /**
  * Implementation of {@link CollectionAttribute}.
@@ -41,7 +38,7 @@ import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
  * @author hceylan
  * @since $version
  */
-public class CollectionAttributeImpl<X, E> extends AssociatedPluralAttribute<X, Collection<E>, E> implements CollectionAttribute<X, E> {
+public class CollectionAttributeImpl<X, E> extends PluralAttributeImpl<X, Collection<E>, E> implements CollectionAttribute<X, E> {
 
 	/**
 	 * @param declaringType
@@ -50,49 +47,11 @@ public class CollectionAttributeImpl<X, E> extends AssociatedPluralAttribute<X, 
 	 *            the metadata
 	 * @param attributeType
 	 *            attribute type
-	 * @param mappedBy
-	 *            the mapped by attribute
-	 * @param removesOrphans
-	 *            if attribute removes orphans
-	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public CollectionAttributeImpl(ManagedTypeImpl<X> declaringType, AssociationAttributeMetadata metadata,
-		PersistentAttributeType attributeType, String mappedBy, boolean removesOrphans) {
-		super(declaringType, attributeType, metadata, mappedBy, removesOrphans);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public void checkTransient(ManagedInstance<? extends X> managedInstance) {
-		final Collection<E> entities = this.get(managedInstance.getInstance());
-
-		final SessionImpl session = managedInstance.getSession();
-
-		if (entities != null) {
-			for (final E entity : entities) {
-				session.checkTransient(entity);
-			}
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public void flush(SessionImpl session, ConnectionImpl connection, ManagedInstance<? extends X> managedInstance) throws SQLException {
-		final Collection<E> entities = this.get(managedInstance.getInstance());
-
-		if (entities != null) {
-			for (final E entity : entities) {
-				this.getJoinTable().performInsert(session, connection, managedInstance.getInstance(), entity);
-			}
-		}
+	public CollectionAttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata, PersistentAttributeType attributeType) {
+		super(declaringType, metadata, attributeType);
 	}
 
 	/**
@@ -112,5 +71,14 @@ public class CollectionAttributeImpl<X, E> extends AssociatedPluralAttribute<X, 
 	@SuppressWarnings("unchecked")
 	public void set(ManagedInstance<? extends X> managedInstance, Object value) {
 		super.set(managedInstance, new ManagedList<X, E>(this, managedInstance, (Collection<? extends E>) value));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "CollectionAttribute" + super.toString();
 	}
 }

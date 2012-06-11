@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.metamodel;
+package org.batoo.jpa.core.impl.model;
 
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;

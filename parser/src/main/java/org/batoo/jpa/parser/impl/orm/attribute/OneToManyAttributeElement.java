@@ -102,7 +102,7 @@ public class OneToManyAttributeElement extends AssociationElement implements One
 	 * 
 	 */
 	@Override
-	public boolean removesOprhans() {
+	public boolean removesOrphans() {
 		return this.orphanRemoval;
 	}
 }

@@ -28,8 +28,10 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
-import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.attribute.PhysicalAttributeImpl;
+import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
+import org.batoo.jpa.core.impl.model.mapping.PhysicalMapping;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 import com.google.common.collect.Maps;
 
@@ -122,7 +124,8 @@ public class RootPathImpl<X> extends PathImpl<X> {
 
 		// generate and return
 		if (attribute instanceof PhysicalAttributeImpl) {
-			path = new PhysicalAttributePathImpl<Y>(this, (PhysicalAttributeImpl<?, Y>) attribute);
+			final AbstractMapping<X, ?> mapping = this.entity.getMapping(attribute.getName());
+			path = new PhysicalAttributePathImpl<Y>(this, (PhysicalMapping<?, Y>) mapping);
 			this.children.put(attribute.getName(), path);
 		}
 

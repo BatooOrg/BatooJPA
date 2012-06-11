@@ -25,8 +25,7 @@ import javax.persistence.criteria.JoinType;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.EntityTypeImpl;
-import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
 import org.batoo.jpa.parser.metadata.JoinTableMetadata;
 
@@ -121,14 +120,12 @@ public class JoinTable extends AbstractTable {
 	 * @author hceylan
 	 */
 	public void link(EntityTypeImpl<?> source, EntityTypeImpl<?> destination) {
-		final JdbcAdaptor jdbcAdaptor = source.getMetamodel().getJdbcAdaptor();
-
 		if (this.getName() == null) {
 			this.setName(source.getName() + "_" + destination.getName());
 		}
 
-		this.sourceKey.link(jdbcAdaptor, null, source);
-		this.destinationKey.link(jdbcAdaptor, null, destination);
+		this.sourceKey.link(null, source);
+		this.destinationKey.link(null, destination);
 
 		this.sourceKey.setTable(this);
 		this.destinationKey.setTable(this);

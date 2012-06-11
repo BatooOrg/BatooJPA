@@ -18,13 +18,25 @@
  */
 package org.batoo.jpa.core.impl.model.attribute;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import javax.persistence.metamodel.PluralAttribute;
+import javax.persistence.metamodel.Type;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.reflect.ReflectHelper;
-import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
+import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.parser.MappingException;
+import org.batoo.jpa.parser.impl.metadata.attribute.AttributeMetadataImpl;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
 
 /**
  * Implementation of {@link PluralAttribute}.
@@ -41,24 +53,77 @@ import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
  */
 public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> implements PluralAttribute<X, C, E> {
 
+	/**
+	 * Creates an associated plural attribute corresponding to member type
+	 * 
+	 * @param declaringType
+	 *            the declaring type
+	 * @param metadata
+	 *            the metadata
+	 * @param attributeType
+	 *            the attribute type
+	 * @param <X>
+	 *            the type of the managed type
+	 * @return the attribute created
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static <X> PluralAttributeImpl<X, ?, ?> create(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata,
+		PersistentAttributeType attributeType) {
+		final Member member = ((AttributeMetadataImpl) metadata).getMember();
+
+		Class<?> type;
+		if (member instanceof Field) {
+			type = ((Field) member).getType();
+		}
+		else {
+			type = ((Method) member).getReturnType();
+		}
+
+		if (List.class == type) {
+			return new ListAttributeImpl(declaringType, metadata, attributeType);
+		}
+		else if (Set.class == type) {
+			return new SetAttributeImpl(declaringType, metadata, attributeType);
+		}
+		else if (Collection.class == type) {
+			return new CollectionAttributeImpl(declaringType, metadata, attributeType);
+		}
+		else if (Map.class == type) {
+			return null;
+		}
+
+		throw new MappingException("Cannot determine collection type for " + type, metadata.getLocator());
+	}
+
 	private final Class<E> bindableJavaType;
+	private final javax.persistence.metamodel.Attribute.PersistentAttributeType attributeType;
+	private final boolean association;
+	private Type<E> type;
 
 	/**
 	 * @param declaringType
 	 *            the declaring type
 	 * @param metadata
 	 *            the metadata
+	 * @param attributeType
+	 *            the attribute type
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public PluralAttributeImpl(ManagedTypeImpl<X> declaringType, AssociationAttributeMetadata metadata) {
+	public PluralAttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata, PersistentAttributeType attributeType) {
 		super(declaringType, metadata);
 
-		if (StringUtils.isNotBlank(metadata.getTargetEntity())) {
+		this.attributeType = attributeType;
+
+		if ((metadata instanceof AssociationAttributeMetadata)
+			&& StringUtils.isNotBlank(((AssociationAttributeMetadata) metadata).getTargetEntity())) {
 			try {
-				this.bindableJavaType = (Class<E>) Class.forName(metadata.getTargetEntity());
+				this.bindableJavaType = (Class<E>) Class.forName(((AssociationAttributeMetadata) metadata).getTargetEntity());
 			}
 			catch (final ClassNotFoundException e) {
 				throw new MappingException("Target enttity class not found", metadata.getLocator());
@@ -67,6 +132,8 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 		else {
 			this.bindableJavaType = ReflectHelper.getGenericType(this.getJavaMember(), 0);
 		}
+
+		this.association = attributeType != PersistentAttributeType.ELEMENT_COLLECTION;
 	}
 
 	/**
@@ -85,6 +152,49 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	@Override
 	public final BindableType getBindableType() {
 		return BindableType.PLURAL_ATTRIBUTE;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Type<E> getElementType() {
+		if (this.type != null) {
+			return this.type;
+		}
+
+		final MetamodelImpl metamodel = this.getDeclaringType().getMetamodel();
+
+		switch (this.attributeType) {
+			case ONE_TO_MANY:
+			case MANY_TO_MANY:
+				this.type = metamodel.entity(this.bindableJavaType);
+				break;
+			case ELEMENT_COLLECTION:
+				this.type = metamodel.embeddable(this.bindableJavaType) != null ? metamodel.embeddable(this.bindableJavaType)
+					: metamodel.createBasicType(this.bindableJavaType);
+		}
+
+		return this.type;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public final PersistentAttributeType getPersistentAttributeType() {
+		return this.attributeType;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public final boolean isAssociation() {
+		return this.association;
 	}
 
 	/**

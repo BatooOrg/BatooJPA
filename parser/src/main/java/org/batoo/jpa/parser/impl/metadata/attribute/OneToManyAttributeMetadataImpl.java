@@ -50,7 +50,7 @@ public class OneToManyAttributeMetadataImpl extends AssociationAttributeMetadata
 		super(member, metadata);
 
 		this.mappedBy = metadata.getMappedBy();
-		this.removesOprhans = metadata.removesOprhans();
+		this.removesOprhans = metadata.removesOrphans();
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class OneToManyAttributeMetadataImpl extends AssociationAttributeMetadata
 	 * 
 	 */
 	@Override
-	public boolean removesOprhans() {
+	public boolean removesOrphans() {
 		return this.removesOprhans;
 	}
 

@@ -35,7 +35,7 @@ import javax.persistence.criteria.Selection;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
-import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
+import org.batoo.jpa.core.impl.model.MetamodelImpl;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;

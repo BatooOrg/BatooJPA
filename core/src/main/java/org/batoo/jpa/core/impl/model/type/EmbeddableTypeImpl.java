@@ -16,48 +16,39 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.jdbc;
+package org.batoo.jpa.core.impl.model.type;
 
-import org.batoo.jpa.core.impl.model.mapping.IdMapping;
-import org.batoo.jpa.core.jdbc.IdType;
-import org.batoo.jpa.parser.metadata.ColumnMetadata;
+import javax.persistence.metamodel.EmbeddableType;
+
+import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 
 /**
- * BasicColumn to persist id attributes of the entity.
+ * 
  * 
  * @author hceylan
  * @since $version
  */
-public class PkColumn extends BasicColumn {
-
-	private final IdType idType;
+public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements EmbeddableType<X> {
 
 	/**
-	 * @param mapping
-	 *            the mapping
-	 * @param sqlType
-	 *            the SQL type
-	 * @param metadata
-	 *            the metadata
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PkColumn(IdMapping<?, ?> mapping, int sqlType, ColumnMetadata metadata) {
-		super(mapping, sqlType, metadata);
+	public EmbeddableTypeImpl(MetamodelImpl metamodel, Class<X> javaType, EntityMetadata metadata) {
+		super(metamodel, javaType, metadata);
 
-		this.idType = mapping.getAttribute().getIdType();
+		this.addAttributes(metadata);
 	}
 
 	/**
-	 * Returns the idType of the column.
+	 * {@inheritDoc}
 	 * 
-	 * @return the idType of the column
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	public IdType getIdType() {
-		return this.idType;
+	@Override
+	public PersistenceType getPersistenceType() {
+		return PersistenceType.EMBEDDABLE;
 	}
+
 }

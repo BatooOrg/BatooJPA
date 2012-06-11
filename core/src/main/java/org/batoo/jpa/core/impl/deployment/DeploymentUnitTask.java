@@ -20,10 +20,10 @@ package org.batoo.jpa.core.impl.deployment;
 
 import java.util.concurrent.Callable;
 
-import org.batoo.jpa.core.impl.model.EmbeddableTypeImpl;
-import org.batoo.jpa.core.impl.model.IdentifiableTypeImpl;
-import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
-import org.batoo.jpa.core.impl.model.MappedSuperclassTypeImpl;
+import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
+import org.batoo.jpa.core.impl.model.type.IdentifiableTypeImpl;
+import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
+import org.batoo.jpa.core.impl.model.type.MappedSuperclassTypeImpl;
 
 /**
  * Implementation for deployment unit tasks.

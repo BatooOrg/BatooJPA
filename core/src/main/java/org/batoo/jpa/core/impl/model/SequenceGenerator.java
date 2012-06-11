@@ -18,40 +18,42 @@
  */
 package org.batoo.jpa.core.impl.model;
 
-import javax.persistence.metamodel.BasicType;
-
-import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
+import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
 
 /**
- * Implementation of {@link BasicType}.
- * 
- * @param <X>
- *            The type of the represented basic type
+ * Sequence based generator.
  * 
  * @author hceylan
  * @since $version
  */
-public final class BasicTypeImpl<X> extends TypeImpl<X> implements BasicType<X> {
+public class SequenceGenerator extends AbstractGenerator {
+
+	private static final String DEFAULT_SEQUENCE_NAME = "BATOO_ID";
+
+	private final String sequenceName;
 
 	/**
-	 * @param metamodel
-	 *            the metamodel
-	 * @param javaType
-	 *            the java type of the type
+	 * @param metadata
+	 *            the metadata
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public BasicTypeImpl(MetamodelImpl metamodel, Class<X> javaType) {
-		super(metamodel, javaType);
+	public SequenceGenerator(SequenceGeneratorMetadata metadata) {
+		super(metadata);
+
+		this.sequenceName = metadata != null ? metadata.getName() : SequenceGenerator.DEFAULT_SEQUENCE_NAME;
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Returns the sequenceName of the sequence generator.
 	 * 
+	 * @return the sequenceName of the sequence generator
+	 * 
+	 * @since $version
+	 * @author hceylan
 	 */
-	@Override
-	public PersistenceType getPersistenceType() {
-		return PersistenceType.BASIC;
+	public String getSequenceName() {
+		return this.sequenceName;
 	}
 }

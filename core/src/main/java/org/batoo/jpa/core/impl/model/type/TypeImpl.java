@@ -16,43 +16,41 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.model;
+package org.batoo.jpa.core.impl.model.type;
 
-import javax.persistence.metamodel.MappedSuperclassType;
+import javax.persistence.metamodel.Type;
 
-import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
-import org.batoo.jpa.parser.metadata.type.MappedSuperclassMetadata;
+import org.batoo.jpa.core.impl.model.MetamodelImpl;
+
 
 /**
- * Implementation of {@link MappedSuperclassType}.
+ * Implementation of {@link Type}.
  * 
  * @param <X>
- *            The represented entity type
+ *            The type of the represented object or attribute
  * 
  * @author hceylan
  * @since $version
  */
-public class MappedSuperclassTypeImpl<X> extends IdentifiableTypeImpl<X> implements MappedSuperclassType<X> {
+public abstract class TypeImpl<X> implements Type<X> {
+
+	private final MetamodelImpl metamodel;
+	private final Class<X> javaType;
 
 	/**
 	 * @param metamodel
 	 *            the metamodel
-	 * @param parent
-	 *            the parent type
 	 * @param javaType
-	 *            the java type of the managed type
-	 * @param metadata
-	 *            the metadata
+	 *            the java type of the type
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public MappedSuperclassTypeImpl(MetamodelImpl metamodel, MappedSuperclassTypeImpl<? super X> parent, Class<X> javaType,
-		MappedSuperclassMetadata metadata) {
+	public TypeImpl(MetamodelImpl metamodel, Class<X> javaType) {
+		super();
 
-		super(metamodel, parent, javaType, metadata);
-
-		this.addAttributes(metadata);
+		this.metamodel = metamodel;
+		this.javaType = javaType;
 	}
 
 	/**
@@ -60,7 +58,19 @@ public class MappedSuperclassTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 	 * 
 	 */
 	@Override
-	public PersistenceType getPersistenceType() {
-		return PersistenceType.MAPPED_SUPERCLASS;
+	public final Class<X> getJavaType() {
+		return this.javaType;
+	}
+
+	/**
+	 * Returns the metamodel.
+	 * 
+	 * @return the metamodel
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public final MetamodelImpl getMetamodel() {
+		return this.metamodel;
 	}
 }

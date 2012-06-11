@@ -16,30 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.model;
+package org.batoo.jpa.core.impl.model.type;
 
-import javax.persistence.metamodel.EmbeddableType;
+import javax.persistence.metamodel.BasicType;
 
-import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
-import org.batoo.jpa.parser.metadata.type.EntityMetadata;
+import org.batoo.jpa.core.impl.model.MetamodelImpl;
 
 /**
+ * Implementation of {@link BasicType}.
  * 
+ * @param <X>
+ *            The type of the represented basic type
  * 
  * @author hceylan
  * @since $version
  */
-public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements EmbeddableType<X> {
+public final class BasicTypeImpl<X> extends TypeImpl<X> implements BasicType<X> {
 
 	/**
+	 * @param metamodel
+	 *            the metamodel
+	 * @param javaType
+	 *            the java type of the type
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EmbeddableTypeImpl(MetamodelImpl metamodel, Class<X> javaType, EntityMetadata metadata) {
-		super(metamodel, javaType, metadata);
-
-		this.addAttributes(metadata);
+	public BasicTypeImpl(MetamodelImpl metamodel, Class<X> javaType) {
+		super(metamodel, javaType);
 	}
 
 	/**
@@ -48,7 +52,6 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	 */
 	@Override
 	public PersistenceType getPersistenceType() {
-		return PersistenceType.EMBEDDABLE;
+		return PersistenceType.BASIC;
 	}
-
 }

@@ -16,44 +16,51 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.metamodel;
+package org.batoo.jpa.core.impl.model.type;
 
-import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
+import javax.persistence.metamodel.MappedSuperclassType;
+
+import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.parser.metadata.type.MappedSuperclassMetadata;
 
 /**
- * Sequence based generator.
+ * Implementation of {@link MappedSuperclassType}.
+ * 
+ * @param <X>
+ *            The represented entity type
  * 
  * @author hceylan
  * @since $version
  */
-public class SequenceGenerator extends AbstractGenerator {
-
-	private static final String DEFAULT_SEQUENCE_NAME = "BATOO_ID";
-
-	private final String sequenceName;
+public class MappedSuperclassTypeImpl<X> extends IdentifiableTypeImpl<X> implements MappedSuperclassType<X> {
 
 	/**
+	 * @param metamodel
+	 *            the metamodel
+	 * @param parent
+	 *            the parent type
+	 * @param javaType
+	 *            the java type of the managed type
 	 * @param metadata
 	 *            the metadata
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SequenceGenerator(SequenceGeneratorMetadata metadata) {
-		super(metadata);
+	public MappedSuperclassTypeImpl(MetamodelImpl metamodel, MappedSuperclassTypeImpl<? super X> parent, Class<X> javaType,
+		MappedSuperclassMetadata metadata) {
 
-		this.sequenceName = metadata != null ? metadata.getName() : SequenceGenerator.DEFAULT_SEQUENCE_NAME;
+		super(metamodel, parent, javaType, metadata);
+
+		this.addAttributes(metadata);
 	}
 
 	/**
-	 * Returns the sequenceName of the sequence generator.
+	 * {@inheritDoc}
 	 * 
-	 * @return the sequenceName of the sequence generator
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	public String getSequenceName() {
-		return this.sequenceName;
+	@Override
+	public PersistenceType getPersistenceType() {
+		return PersistenceType.MAPPED_SUPERCLASS;
 	}
 }

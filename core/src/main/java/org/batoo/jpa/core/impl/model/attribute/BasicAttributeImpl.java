@@ -20,10 +20,7 @@ package org.batoo.jpa.core.impl.model.attribute;
 
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.batoo.jpa.core.impl.jdbc.BasicColumn;
-import org.batoo.jpa.core.impl.jdbc.TypeFactory;
-import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
-import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
+import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
 
 /**
@@ -40,7 +37,6 @@ import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
 public class BasicAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 
 	private final boolean optional;
-	private BasicColumn basicColumn;
 
 	/**
 	 * @param declaringType
@@ -55,35 +51,6 @@ public class BasicAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 		super(declaringType, metadata);
 
 		this.optional = metadata.isOptional();
-
-		this.initColumn(metadata);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public BasicColumn getColumn() {
-		return this.basicColumn;
-	}
-
-	/**
-	 * Initializes the basicColumn for the attribute.
-	 * 
-	 * @param metadata
-	 *            the metadata
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	private void initColumn(BasicAttributeMetadata metadata) {
-		final int sqlType = TypeFactory.getSqlType(this.getJavaType(), this.getTemporalType(), null, false);
-
-		final JdbcAdaptor jdbcAdaptor = this.getDeclaringType().getMetamodel().getJdbcAdaptor();
-
-		this.basicColumn = new BasicColumn(jdbcAdaptor, this, sqlType, (metadata != null) && (metadata.getColumn() != null)
-			? metadata.getColumn() : null);
 	}
 
 	/**

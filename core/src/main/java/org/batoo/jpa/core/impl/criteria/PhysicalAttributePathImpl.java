@@ -29,6 +29,7 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.model.attribute.PhysicalAttributeImpl;
+import org.batoo.jpa.core.impl.model.mapping.PhysicalMapping;
 
 /**
  * Physical Attribute implementation of {@link Path}.
@@ -41,21 +42,21 @@ import org.batoo.jpa.core.impl.model.attribute.PhysicalAttributeImpl;
  */
 public class PhysicalAttributePathImpl<X> extends PathImpl<X> {
 
-	private final PhysicalAttributeImpl<?, X> attribute;
+	private final PhysicalMapping<?, X> mapping;
 
 	/**
 	 * @param parent
 	 *            the parent path
-	 * @param attribute
-	 *            the physical attribute
+	 * @param mapping
+	 *            the physical mapping
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PhysicalAttributePathImpl(PathImpl<?> parent, PhysicalAttributeImpl<?, X> attribute) {
+	public PhysicalAttributePathImpl(PathImpl<?> parent, PhysicalMapping<?, X> mapping) {
 		super(parent);
 
-		this.attribute = attribute;
+		this.mapping = mapping;
 	}
 
 	private IllegalArgumentException cannotDereference() {
@@ -72,7 +73,7 @@ public class PhysicalAttributePathImpl<X> extends PathImpl<X> {
 
 		builder.append(this.getParentPath().describe());
 
-		builder.append(".").append(this.attribute.getName());
+		builder.append(".").append(this.mapping.getAttribute().getName());
 
 		return builder.toString();
 	}
@@ -84,7 +85,7 @@ public class PhysicalAttributePathImpl<X> extends PathImpl<X> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public String generate(CriteriaQueryImpl<?> query) {
-		final BasicColumn column = this.getModel().getColumn();
+		final BasicColumn column = this.mapping.getColumn();
 
 		PathImpl<?> root = this;
 		while (root.getParentPath() != null) {
@@ -138,7 +139,7 @@ public class PhysicalAttributePathImpl<X> extends PathImpl<X> {
 	 */
 	@Override
 	public PhysicalAttributeImpl<?, X> getModel() {
-		return this.attribute;
+		return this.mapping.getAttribute();
 	}
 
 	/**

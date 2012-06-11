@@ -18,7 +18,7 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
-import org.batoo.jpa.core.impl.model.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 
 /**

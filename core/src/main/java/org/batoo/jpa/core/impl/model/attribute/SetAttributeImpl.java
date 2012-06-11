@@ -18,7 +18,6 @@
  */
 package org.batoo.jpa.core.impl.model.attribute;
 
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Set;
 
@@ -26,10 +25,8 @@ import javax.persistence.metamodel.SetAttribute;
 
 import org.batoo.jpa.core.impl.collections.ManagedSet;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
-import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
-import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
+import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
+import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
 
 /**
  * Implementation of {@link SetAttribute}.
@@ -42,7 +39,7 @@ import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
  * @author hceylan
  * @since $version
  */
-public class SetAttributeImpl<X, E> extends AssociatedPluralAttribute<X, Set<E>, E> implements SetAttribute<X, E> {
+public class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>, E> implements SetAttribute<X, E> {
 
 	/**
 	 * @param declaringType
@@ -51,49 +48,11 @@ public class SetAttributeImpl<X, E> extends AssociatedPluralAttribute<X, Set<E>,
 	 *            the metadata
 	 * @param attributeType
 	 *            attribute type
-	 * @param mappedBy
-	 *            the mapped by attribute
-	 * @param removesOrphans
-	 *            if attribute removes orphans
-	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SetAttributeImpl(ManagedTypeImpl<X> declaringType, AssociationAttributeMetadata metadata, PersistentAttributeType attributeType,
-		String mappedBy, boolean removesOrphans) {
-		super(declaringType, attributeType, metadata, mappedBy, removesOrphans);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public void checkTransient(ManagedInstance<? extends X> managedInstance) {
-		final Set<E> entities = this.get(managedInstance.getInstance());
-
-		final SessionImpl session = managedInstance.getSession();
-
-		if (entities != null) {
-			for (final E entity : entities) {
-				session.checkTransient(entity);
-			}
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public void flush(SessionImpl session, ConnectionImpl connection, ManagedInstance<? extends X> managedInstance) throws SQLException {
-		final Set<E> entities = this.get(managedInstance.getInstance());
-
-		if (entities != null) {
-			for (final E entity : entities) {
-				this.getJoinTable().performInsert(session, connection, managedInstance.getInstance(), entity);
-			}
-		}
+	public SetAttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata, PersistentAttributeType attributeType) {
+		super(declaringType, metadata, attributeType);
 	}
 
 	/**
@@ -113,5 +72,14 @@ public class SetAttributeImpl<X, E> extends AssociatedPluralAttribute<X, Set<E>,
 	@SuppressWarnings("unchecked")
 	public final void set(ManagedInstance<? extends X> managedInstance, Object value) {
 		super.set(managedInstance, new ManagedSet<X, E>(this, managedInstance, (Collection<? extends E>) value));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "SetAttribute" + super.toString();
 	}
 }

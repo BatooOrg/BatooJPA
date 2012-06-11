@@ -39,8 +39,8 @@ import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
-import org.batoo.jpa.core.impl.metamodel.SequenceGenerator;
-import org.batoo.jpa.core.impl.metamodel.TableGenerator;
+import org.batoo.jpa.core.impl.model.SequenceGenerator;
+import org.batoo.jpa.core.impl.model.TableGenerator;
 import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.parser.MappingException;
 

@@ -22,10 +22,9 @@ import java.util.List;
 
 import javax.persistence.criteria.JoinType;
 
-import org.batoo.jpa.core.impl.model.EntityTypeImpl;
-import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
-import org.batoo.jpa.core.impl.model.attribute.IdAttributeImpl;
-import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
+import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.IdMapping;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
 
@@ -159,9 +158,7 @@ public class ForeignKey {
 	/**
 	 * Links the foreign key
 	 * 
-	 * @param jdbcAdaptor
-	 *            the JDBC Adaptor
-	 * @param attribute
+	 * @param mapping
 	 *            the owner attribute
 	 * @param targetEntity
 	 *            the target entity
@@ -170,37 +167,39 @@ public class ForeignKey {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void link(JdbcAdaptor jdbcAdaptor, AttributeImpl<?, ?> attribute, EntityTypeImpl<?> targetEntity) {
-		final IdAttributeImpl<?, ?>[] idAttributes = targetEntity.getIdAttributes();
+	public void link(AssociationMapping<?, ?, ?> mapping, EntityTypeImpl<?> targetEntity) {
+		targetEntity.getMetamodel().getJdbcAdaptor();
+
+		final IdMapping<?, ?>[] idMappings = targetEntity.getIdMappings();
 
 		// single primary key
-		if (idAttributes.length == 1) {
-			final IdAttributeImpl<?, ?> idAttribute = idAttributes[0];
+		if (idMappings.length == 1) {
+			final IdMapping<?, ?> idMapping = idMappings[0];
 
 			// no definition for the join column
 			if (this.joinColumns.size() == 0) {
 				// create the join column
-				this.joinColumns.add(new JoinColumn(jdbcAdaptor, attribute, idAttribute));
+				this.joinColumns.add(new JoinColumn(mapping, idMapping));
 			}
 			// existing definition for the join column
 			else {
 				final JoinColumn joinColumn = this.joinColumns.get(0);
-				joinColumn.setColumnProperties(jdbcAdaptor, attribute, idAttribute);
+				joinColumn.setColumnProperties(mapping, idMapping);
 			}
 		}
 		// composite primary key
 		else {
-			for (final IdAttributeImpl<?, ?> idAttribute : idAttributes) {
+			for (final IdMapping<?, ?> idMapping : idMappings) {
 				// no definition for the join columns
 				if (this.joinColumns.size() == 0) {
-					this.joinColumns.add(new JoinColumn(jdbcAdaptor, attribute, idAttribute));
+					this.joinColumns.add(new JoinColumn(mapping, idMapping));
 				}
 				// existing definition for the join column
 				else {
 					// locate the corresponding join column
 					JoinColumn joinColumn = null;
 					for (final JoinColumn column : this.joinColumns) {
-						if (idAttribute.getColumn().getName().equals(column.getReferencedColumnName())) {
+						if (idMapping.getColumn().getName().equals(column.getReferencedColumnName())) {
 							joinColumn = column;
 							break;
 						}
@@ -210,13 +209,13 @@ public class ForeignKey {
 						throw new MappingException("Join column cannot be located in a composite key target entity");
 					}
 
-					joinColumn.setColumnProperties(jdbcAdaptor, attribute, idAttribute);
+					joinColumn.setColumnProperties(mapping, idMapping);
 				}
 			}
 		}
 
-		if (attribute != null) {
-			final AbstractTable table = ((EntityTypeImpl<?>) attribute.getDeclaringType()).getTable(this.tableName);
+		if (mapping != null) {
+			final AbstractTable table = ((EntityTypeImpl<?>) mapping.getEntity()).getTable(this.tableName);
 			if (table == null) {
 				throw new MappingException("Table " + this.tableName + " could not be found");
 			}

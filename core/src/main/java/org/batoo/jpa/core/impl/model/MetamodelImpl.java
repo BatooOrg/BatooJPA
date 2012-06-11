@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.metamodel;
+package org.batoo.jpa.core.impl.model;
 
 import java.io.Serializable;
 import java.sql.SQLException;
@@ -47,12 +47,12 @@ import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
-import org.batoo.jpa.core.impl.model.BasicTypeImpl;
-import org.batoo.jpa.core.impl.model.EntityTypeImpl;
-import org.batoo.jpa.core.impl.model.IdentifiableTypeImpl;
-import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
-import org.batoo.jpa.core.impl.model.MappedSuperclassTypeImpl;
-import org.batoo.jpa.core.impl.model.attribute.AssociatedAttribute;
+import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
+import org.batoo.jpa.core.impl.model.type.BasicTypeImpl;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.type.IdentifiableTypeImpl;
+import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
+import org.batoo.jpa.core.impl.model.type.MappedSuperclassTypeImpl;
 import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.MappingException;
@@ -453,7 +453,7 @@ public class MetamodelImpl implements Metamodel {
 			}
 		}
 
-		for (final AssociatedAttribute<?, ?, ?> attribute : entity.getAssociations()) {
+		for (final AssociationMapping<?, ?, ?> attribute : entity.getAssociations()) {
 			final JoinTable table = attribute.getJoinTable();
 			if (table == null) {
 				continue;
@@ -553,7 +553,7 @@ public class MetamodelImpl implements Metamodel {
 		}
 
 		// create the join tables
-		for (final AssociatedAttribute<?, ?, ?> attribute : entity.getAssociations()) {
+		for (final AssociationMapping<?, ?, ?> attribute : entity.getAssociations()) {
 			final JoinTable table = attribute.getJoinTable();
 			if (table != null) {
 				try {
