@@ -181,9 +181,9 @@ public class PersistenceParser {
 			ormParser.consume(is);
 
 			this.metadata.merge(ormParser.getMetadata());
-		}
 
-		PersistenceParser.LOG.trace("Merged metamodel {0}", this.metadata);
+			PersistenceParser.LOG.trace("Merged metamodel {0}", this.metadata);
+		}
 	}
 
 	/**

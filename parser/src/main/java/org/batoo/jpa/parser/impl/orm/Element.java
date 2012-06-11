@@ -43,6 +43,7 @@ import org.batoo.jpa.parser.impl.orm.attribute.OneToOneAttributeElement;
 import org.batoo.jpa.parser.impl.orm.attribute.TransientElement;
 import org.batoo.jpa.parser.impl.orm.attribute.VersionAttributeElement;
 import org.batoo.jpa.parser.impl.orm.type.EntityElementFactory;
+import org.batoo.jpa.parser.impl.orm.type.MappedSuperclassElementFactory;
 import org.batoo.jpa.parser.metadata.LocatableMatadata;
 import org.xml.sax.Locator;
 
@@ -66,6 +67,7 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 		Element.factoryMap.put(ElementConstants.ELEMENT_ENTITY_MAPPINGS, EntityMappings.class);
 
 		// managed types
+		Element.factoryMap.put(ElementConstants.ELEMENT_MAPPED_SUPERCLASS, MappedSuperclassElementFactory.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_ENTITY, EntityElementFactory.class);
 
 		// attributes

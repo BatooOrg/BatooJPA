@@ -16,39 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.parser.metadata;
+package org.batoo.jpa.parser.impl.metadata.type;
 
-import java.util.List;
-
-import javax.persistence.AccessType;
-
-import org.batoo.jpa.parser.metadata.type.ManagedTypeMetadata;
+import org.batoo.jpa.parser.metadata.type.MappedSuperclassMetadata;
 
 /**
- * The root of the meta model.
+ * Implementation {@link MappedSuperclassMetadata}.
  * 
  * @author hceylan
  * @since $version
  */
-public interface Metadata {
+public class MappedSuperclassMetadataImpl extends ManagedTypeMetadatImpl implements MappedSuperclassMetadata {
 
 	/**
-	 * Returns the default access type.
-	 * 
-	 * @return the default access type
+	 * @param clazz
+	 *            the represented class
+	 * @param metadata
+	 *            the metadata
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	AccessType getAccessType();
-
-	/**
-	 * Returns the entity mappings.
-	 * 
-	 * @return the entity mappings
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	List<ManagedTypeMetadata> getEntityMappings();
+	public MappedSuperclassMetadataImpl(Class<?> clazz, MappedSuperclassMetadata metadata) {
+		super(clazz, null);
+	}
 }

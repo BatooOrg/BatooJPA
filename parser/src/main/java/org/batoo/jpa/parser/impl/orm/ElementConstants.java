@@ -55,6 +55,7 @@ public class ElementConstants {
 	protected static final String ELEMENT_COLUMN_NAME = "column-name";
 	protected static final String ELEMENT_EMBEDDED = "embedded";
 	protected static final String ELEMENT_EMBEDDED_ID = "embedded-id";
+	protected static final String ELEMENT_MAPPED_SUPERCLASS = "mapped-superclass";
 	protected static final String ELEMENT_ENTITY = "entity";
 	protected static final String ELEMENT_ENUMERATED = "enumerated";
 	protected static final String ELEMENT_GENERATED_VALUE = "generated-value";

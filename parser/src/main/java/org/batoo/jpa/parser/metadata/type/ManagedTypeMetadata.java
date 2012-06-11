@@ -16,26 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.parser.metadata;
-
-import java.util.List;
+package org.batoo.jpa.parser.metadata.type;
 
 import javax.persistence.AccessType;
 
-import org.batoo.jpa.parser.metadata.type.ManagedTypeMetadata;
+import org.batoo.jpa.parser.metadata.LocatableMatadata;
+import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
 
 /**
- * The root of the meta model.
+ * The definition of the managed types.
  * 
  * @author hceylan
  * @since $version
  */
-public interface Metadata {
+public interface ManagedTypeMetadata extends LocatableMatadata {
 
 	/**
-	 * Returns the default access type.
+	 * Returns the access type of the entity.
 	 * 
-	 * @return the default access type
+	 * @return the access type of the entity
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -43,12 +42,32 @@ public interface Metadata {
 	AccessType getAccessType();
 
 	/**
-	 * Returns the entity mappings.
+	 * Returns the attributes of the entity.
 	 * 
-	 * @return the entity mappings
+	 * @return the attributes of the entity
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	List<ManagedTypeMetadata> getEntityMappings();
+	AttributesMetadata getAttributes();
+
+	/**
+	 * Returns the name of the class of the entity.
+	 * 
+	 * @return the name of the class of the entity
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	String getClassName();
+
+	/**
+	 * Returns if the entity's metadata is complete.
+	 * 
+	 * @return true if the entity's metadata is complete
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	boolean isMetadataComplete();
 }

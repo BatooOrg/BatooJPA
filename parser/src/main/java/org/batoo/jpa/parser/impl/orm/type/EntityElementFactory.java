@@ -43,7 +43,7 @@ import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 import com.google.common.collect.Lists;
 
 /**
- * Element for <code>entity-mappings</code> elements.
+ * Element for <code>entity</code> elements.
  * 
  * @author hceylan
  * @since $version
@@ -81,7 +81,7 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 			ElementConstants.ELEMENT_ASSOCIATION_OVERRIDE, //
 			ElementConstants.ELEMENT_ATTRIBUTES, //
 			ElementConstants.ELEMENT_TABLE_GENERATOR, //
-			ElementConstants.ELEMENT_TABLE_GENERATOR, //
+			ElementConstants.ELEMENT_SEQUENCE_GENERATOR, //
 			ElementConstants.ELEMENT_TABLE, //
 			ElementConstants.ELEMENT_SECONDARY_TABLE);
 	}

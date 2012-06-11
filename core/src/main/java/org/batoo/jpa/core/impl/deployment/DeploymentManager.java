@@ -160,6 +160,10 @@ public abstract class DeploymentManager<X extends ManagedTypeImpl<?>> {
 	 * @author hceylan
 	 */
 	public boolean hasPerformed(TypeImpl<?> type) {
+		if (!this.types.contains(type)) {
+			return true;
+		}
+
 		if (type == null) {
 			return true;
 		}

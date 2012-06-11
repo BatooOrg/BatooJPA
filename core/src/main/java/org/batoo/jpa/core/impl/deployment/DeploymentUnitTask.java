@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.deployment;
 import java.util.concurrent.Callable;
 
 import org.batoo.jpa.core.impl.model.EmbeddableTypeImpl;
+import org.batoo.jpa.core.impl.model.IdentifiableTypeImpl;
 import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
 import org.batoo.jpa.core.impl.model.MappedSuperclassTypeImpl;
 
@@ -60,9 +61,10 @@ public final class DeploymentUnitTask implements Callable<Void>, Comparable<Depl
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public final Void call() throws Exception {
-		final ManagedTypeImpl<?> parent = this.type.getParent();
+		final IdentifiableTypeImpl<?> parent = this.type instanceof IdentifiableTypeImpl
+			? ((IdentifiableTypeImpl) this.type).getSupertype() : null;
 
 		// if the super type hasn't performed yet, then wait for to finish
 		while (!this.manager.hasPerformed(parent)) {

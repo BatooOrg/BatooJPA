@@ -38,7 +38,7 @@ import com.google.common.collect.Lists;
  */
 public class SecondaryTableMetadataImpl implements SecondaryTableMetadata {
 
-	private final JavaLocator locator;
+	private final AbstractLocator locator;
 	private final String catalog;
 	private final String schema;
 	private final String name;
@@ -54,7 +54,7 @@ public class SecondaryTableMetadataImpl implements SecondaryTableMetadata {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SecondaryTableMetadataImpl(JavaLocator locator, SecondaryTable annotation) {
+	public SecondaryTableMetadataImpl(AbstractLocator locator, SecondaryTable annotation) {
 		super();
 
 		this.locator = locator;

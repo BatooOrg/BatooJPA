@@ -45,7 +45,7 @@ import org.batoo.jpa.parser.metadata.attribute.ManyToManyAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.ManyToOneAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.OneToManyAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.OneToOneAttributeMetadata;
-import org.batoo.jpa.parser.metadata.type.EntityMetadata;
+import org.batoo.jpa.parser.metadata.type.ManagedTypeMetadata;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -62,7 +62,6 @@ import com.google.common.collect.Sets;
 public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedType<X> {
 
 	private final AbstractLocator locator;
-	private final ManagedTypeImpl<? super X> parent;
 	private final Map<String, AttributeImpl<X, ?>> declaredAttributes = Maps.newHashMap();
 	private final Map<String, SingularAttributeImpl<X, ?>> declaredSingularAttributes = Maps.newHashMap();
 	private final Map<String, PluralAttributeImpl<X, ?, ?>> declaredPluralAttributes = Maps.newHashMap();
@@ -73,8 +72,6 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	/**
 	 * @param metamodel
 	 *            the meta model
-	 * @param parent
-	 *            the parent type
 	 * @param clazz
 	 *            the class of the represented type
 	 * @param metadata
@@ -83,67 +80,14 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedTypeImpl(MetamodelImpl metamodel, ManagedTypeImpl<? super X> parent, Class<X> clazz, EntityMetadata metadata) {
+	public ManagedTypeImpl(MetamodelImpl metamodel, Class<X> clazz, ManagedTypeMetadata metadata) {
 		super(metamodel, clazz);
 
-		this.parent = parent;
 		this.locator = metadata.getLocator();
-
-		this.addAttributes(metadata);
 	}
 
 	/**
-	 * Creates and adds the attributes of the managed type from the metadata.
-	 * 
-	 * @param entityMetadata
-	 *            the metadata
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void addAttributes(EntityMetadata entityMetadata) {
-		final AttributesMetadata attributesMetadata = entityMetadata.getAttributes();
-
-		if (this.parent != null) {
-			// force parent to initialize
-			for (final Attribute<?, ?> attribute : this.parent.getAttributes()) {
-				this.attributes.put(attribute.getName(), (AttributeImpl<? super X, ?>) attribute);
-			}
-		}
-
-		// basic attributes
-		for (final BasicAttributeMetadata metadata : attributesMetadata.getBasics()) {
-			this.addDeclaredAttribute(new BasicAttributeImpl(this, metadata));
-		}
-
-		// many to one attributes
-		for (final ManyToOneAttributeMetadata metadata : attributesMetadata.getManyToOnes()) {
-			this.addDeclaredAttribute(new AssociatedSingularAttribute(this, PersistentAttributeType.MANY_TO_ONE, metadata, null,
-				metadata.isOptional()));
-		}
-
-		// one to one attributes
-		for (final OneToOneAttributeMetadata metadata : attributesMetadata.getOneToOnes()) {
-			this.addDeclaredAttribute(new AssociatedSingularAttribute(this, PersistentAttributeType.ONE_TO_ONE, metadata, null,
-				metadata.isOptional()));
-		}
-
-		// one to many attributes
-		for (final OneToManyAttributeMetadata metadata : attributesMetadata.getOneToManies()) {
-			this.addDeclaredAttribute(new ListAttributeImpl(this, metadata, PersistentAttributeType.ONE_TO_MANY, metadata.getMappedBy(),
-				metadata.removesOprhans()));
-		}
-
-		// one to many attributes
-		for (final ManyToManyAttributeMetadata metadata : attributesMetadata.getManyToManies()) {
-			this.addDeclaredAttribute(AssociatedPluralAttribute.create(this, metadata, PersistentAttributeType.MANY_TO_MANY,
-				metadata.getMappedBy(), false));
-		}
-	}
-
-	/**
-	 * Adds the declared attributes into attributes.
+	 * Adds the attribute into attributes.
 	 * 
 	 * @param attribute
 	 *            the declared attribute
@@ -152,17 +96,69 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	protected void addDeclaredAttribute(AttributeImpl<X, ?> attribute) {
-		this.declaredAttributes.put(attribute.getName(), attribute);
+	protected void addAttribute(AttributeImpl<? super X, ?> attribute) {
+		if (attribute.getDeclaringType() == this) {
+			this.declaredAttributes.put(attribute.getName(), (AttributeImpl<X, ?>) attribute);
+		}
+
 		this.attributes.put(attribute.getName(), attribute);
 
 		if (attribute instanceof SingularAttribute) {
-			this.declaredSingularAttributes.put(attribute.getName(), (SingularAttributeImpl<X, ?>) attribute);
+			if (attribute.getDeclaringType() == this) {
+				this.declaredSingularAttributes.put(attribute.getName(), (SingularAttributeImpl<X, ?>) attribute);
+			}
+
 			this.singularAttributes.put(attribute.getName(), (SingularAttributeImpl<X, ?>) attribute);
 		}
 		else {
-			this.declaredPluralAttributes.put(attribute.getName(), (PluralAttributeImpl<X, ?, ?>) attribute);
+			if (attribute.getDeclaringType() == this) {
+				this.declaredPluralAttributes.put(attribute.getName(), (PluralAttributeImpl<X, ?, ?>) attribute);
+			}
+
 			this.pluralAttributes.put(attribute.getName(), (PluralAttributeImpl<? super X, ?, ?>) attribute);
+		}
+	}
+
+	/**
+	 * Creates and adds the attributes of the managed type from the metadata.
+	 * 
+	 * @param typeMetadata
+	 *            the metadata
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	protected void addAttributes(ManagedTypeMetadata typeMetadata) {
+		final AttributesMetadata attributesMetadata = typeMetadata.getAttributes();
+
+		// basic attributes
+		for (final BasicAttributeMetadata metadata : attributesMetadata.getBasics()) {
+			this.addAttribute(new BasicAttributeImpl(this, metadata));
+		}
+
+		// many to one attributes
+		for (final ManyToOneAttributeMetadata metadata : attributesMetadata.getManyToOnes()) {
+			this.addAttribute(new AssociatedSingularAttribute(this, PersistentAttributeType.MANY_TO_ONE, metadata, null,
+				metadata.isOptional()));
+		}
+
+		// one to one attributes
+		for (final OneToOneAttributeMetadata metadata : attributesMetadata.getOneToOnes()) {
+			this.addAttribute(new AssociatedSingularAttribute(this, PersistentAttributeType.ONE_TO_ONE, metadata, null,
+				metadata.isOptional()));
+		}
+
+		// one to many attributes
+		for (final OneToManyAttributeMetadata metadata : attributesMetadata.getOneToManies()) {
+			this.addAttribute(new ListAttributeImpl(this, metadata, PersistentAttributeType.ONE_TO_MANY, metadata.getMappedBy(),
+				metadata.removesOprhans()));
+		}
+
+		// one to many attributes
+		for (final ManyToManyAttributeMetadata metadata : attributesMetadata.getManyToManies()) {
+			this.addAttribute(AssociatedPluralAttribute.create(this, metadata, PersistentAttributeType.MANY_TO_MANY,
+				metadata.getMappedBy(), false));
 		}
 	}
 
@@ -425,18 +421,6 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 */
 	public String getName() {
 		return this.getJavaType().getSimpleName();
-	}
-
-	/**
-	 * Returns the parent of the managed type.
-	 * 
-	 * @return the parent of the managed type
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public ManagedTypeImpl<? super X> getParent() {
-		return this.parent;
 	}
 
 	/**

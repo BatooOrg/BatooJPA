@@ -42,6 +42,12 @@ public class LinkManager extends DeploymentManager<EntityTypeImpl<?>> {
 	 * @since $version
 	 */
 	public static enum Phase {
+
+		/**
+		 * The vertical linking phase
+		 */
+		LINK_INHERITENCE,
+
 		/**
 		 * The association linking phase
 		 */
@@ -67,6 +73,7 @@ public class LinkManager extends DeploymentManager<EntityTypeImpl<?>> {
 	 * @author hceylan
 	 */
 	public static void perform(MetamodelImpl metamodel) throws BatooException {
+		new LinkManager(metamodel, Phase.LINK_INHERITENCE).perform();
 		new LinkManager(metamodel, Phase.LINK_ASSOCIATIONS).perform();
 		new LinkManager(metamodel, Phase.LINK_DEPENDENCIES).perform();
 	}
@@ -86,6 +93,9 @@ public class LinkManager extends DeploymentManager<EntityTypeImpl<?>> {
 	@Override
 	public Void perform(EntityTypeImpl<?> entity) throws BatooException {
 		switch (this.phase) {
+			case LINK_INHERITENCE:
+				// entity.link();
+				break;
 			case LINK_ASSOCIATIONS:
 				for (final AssociatedAttribute<?, ?, ?> attribute : entity.getAssociations()) {
 					attribute.link();

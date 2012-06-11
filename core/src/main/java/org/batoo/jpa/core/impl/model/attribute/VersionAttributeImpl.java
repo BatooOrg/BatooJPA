@@ -22,12 +22,12 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.jdbc.TypeFactory;
-import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
+import org.batoo.jpa.core.impl.model.IdentifiableTypeImpl;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
-import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.VersionAttributeMetadata;
 
 /**
- * Implementation of {@link SingularAttribute} for basic attributes.
+ * Implementation of {@link SingularAttribute} for version attributes.
  * 
  * @param <X>
  *            The type containing the represented attribute
@@ -37,10 +37,9 @@ import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
  * @author hceylan
  * @since $version
  */
-public class BasicAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
+public class VersionAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 
-	private final boolean optional;
-	private BasicColumn basicColumn;
+	private BasicColumn versionColumn;
 
 	/**
 	 * @param declaringType
@@ -51,10 +50,8 @@ public class BasicAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public BasicAttributeImpl(ManagedTypeImpl<X> declaringType, BasicAttributeMetadata metadata) {
+	public VersionAttributeImpl(IdentifiableTypeImpl<X> declaringType, VersionAttributeMetadata metadata) {
 		super(declaringType, metadata);
-
-		this.optional = metadata.isOptional();
 
 		this.initColumn(metadata);
 	}
@@ -65,7 +62,7 @@ public class BasicAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 	 */
 	@Override
 	public BasicColumn getColumn() {
-		return this.basicColumn;
+		return this.versionColumn;
 	}
 
 	/**
@@ -77,12 +74,12 @@ public class BasicAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private void initColumn(BasicAttributeMetadata metadata) {
+	private void initColumn(VersionAttributeMetadata metadata) {
 		final int sqlType = TypeFactory.getSqlType(this.getJavaType(), this.getTemporalType(), null, false);
 
 		final JdbcAdaptor jdbcAdaptor = this.getDeclaringType().getMetamodel().getJdbcAdaptor();
 
-		this.basicColumn = new BasicColumn(jdbcAdaptor, this, sqlType, (metadata != null) && (metadata.getColumn() != null)
+		this.versionColumn = new BasicColumn(jdbcAdaptor, this, sqlType, (metadata != null) && (metadata.getColumn() != null)
 			? metadata.getColumn() : null);
 	}
 
@@ -101,7 +98,7 @@ public class BasicAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 	 */
 	@Override
 	public boolean isOptional() {
-		return this.optional;
+		return false;
 	}
 
 	/**
@@ -119,6 +116,6 @@ public class BasicAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 	 */
 	@Override
 	public String toString() {
-		return "BasicAttribute" + super.toString();
+		return "VersionAttribute" + super.toString();
 	}
 }

@@ -21,10 +21,13 @@ package org.batoo.jpa.core.impl.model;
 import javax.persistence.metamodel.MappedSuperclassType;
 
 import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
-import org.batoo.jpa.parser.metadata.type.EntityMetadata;
+import org.batoo.jpa.parser.metadata.type.MappedSuperclassMetadata;
 
 /**
+ * Implementation of {@link MappedSuperclassType}.
  * 
+ * @param <X>
+ *            The represented entity type
  * 
  * @author hceylan
  * @since $version
@@ -32,13 +35,24 @@ import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 public class MappedSuperclassTypeImpl<X> extends IdentifiableTypeImpl<X> implements MappedSuperclassType<X> {
 
 	/**
+	 * @param metamodel
+	 *            the metamodel
+	 * @param parent
+	 *            the parent type
+	 * @param javaType
+	 *            the java type of the managed type
+	 * @param metadata
+	 *            the metadata
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	public MappedSuperclassTypeImpl(MetamodelImpl metamodel, MappedSuperclassTypeImpl<? super X> parent, Class<X> javaType,
-		EntityMetadata metadata) {
+		MappedSuperclassMetadata metadata) {
+
 		super(metamodel, parent, javaType, metadata);
+
+		this.addAttributes(metadata);
 	}
 
 	/**

@@ -36,8 +36,10 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EmbeddableTypeImpl(MetamodelImpl metamodel, EmbeddableTypeImpl<? super X> parent, Class<X> javaType, EntityMetadata metadata) {
-		super(metamodel, parent, javaType, metadata);
+	public EmbeddableTypeImpl(MetamodelImpl metamodel, Class<X> javaType, EntityMetadata metadata) {
+		super(metamodel, javaType, metadata);
+
+		this.addAttributes(metadata);
 	}
 
 	/**

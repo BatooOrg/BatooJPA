@@ -37,7 +37,7 @@ import com.google.common.collect.Lists;
  */
 public class TableMetadataImpl implements TableMetadata {
 
-	private final JavaLocator locator;
+	private final AbstractLocator locator;
 	private final String catalog;
 	private final String schema;
 	private final String name;
@@ -52,7 +52,7 @@ public class TableMetadataImpl implements TableMetadata {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public TableMetadataImpl(JavaLocator locator, Table annotation) {
+	public TableMetadataImpl(AbstractLocator locator, Table annotation) {
 		super();
 
 		this.locator = locator;

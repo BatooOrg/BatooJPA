@@ -41,8 +41,6 @@ public class Bar {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer key;
 
-	private String fooValue;
-
 	private String barValue;
 
 	@OneToMany(cascade = CascadeType.ALL)
@@ -56,16 +54,6 @@ public class Bar {
 	 */
 	public String getBarValue() {
 		return this.barValue;
-	}
-
-	/**
-	 * Returns the fooValue.
-	 * 
-	 * @return the fooValue
-	 * @since $version
-	 */
-	public String getFooValue() {
-		return this.fooValue;
 	}
 
 	/**
@@ -97,17 +85,6 @@ public class Bar {
 	 */
 	public void setBarValue(String barValue) {
 		this.barValue = barValue;
-	}
-
-	/**
-	 * Sets the fooValue.
-	 * 
-	 * @param fooValue
-	 *            the fooValue to set
-	 * @since $version
-	 */
-	public void setFooValue(String fooValue) {
-		this.fooValue = fooValue;
 	}
 
 	/**

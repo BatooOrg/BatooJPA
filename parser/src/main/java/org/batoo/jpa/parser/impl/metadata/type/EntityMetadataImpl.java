@@ -22,8 +22,6 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.AssociationOverride;
 import javax.persistence.AssociationOverrides;
 import javax.persistence.AttributeOverride;
@@ -39,19 +37,16 @@ import javax.persistence.TableGenerator;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.parser.impl.metadata.AssociationOverrideMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.AttributeOverrideMetadataImpl;
-import org.batoo.jpa.parser.impl.metadata.JavaLocator;
 import org.batoo.jpa.parser.impl.metadata.SecondaryTableMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.SequenceGeneratorMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.TableGeneratorMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.TableMetadataImpl;
-import org.batoo.jpa.parser.impl.metadata.attribute.AttributesMetadataImpl;
 import org.batoo.jpa.parser.metadata.AssociationOverrideMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableMetadata;
-import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 
 import com.google.common.collect.Lists;
@@ -63,20 +58,17 @@ import com.google.common.collect.Sets;
  * @author hceylan
  * @since $version
  */
-public class EntityMetadataImpl implements EntityMetadata {
+public class EntityMetadataImpl extends ManagedTypeMetadatImpl implements EntityMetadata {
 
-	private final JavaLocator locator;
-	private final Class<?> clazz;
 	private final String name;
 	private final Boolean cachable;
-	private final AccessType accessType;
+
 	private final TableMetadata table;
 	private final SequenceGeneratorMetadata sequenceGenerator;
 	private final TableGeneratorMetadata tableGenerator;
 	private final List<SecondaryTableMetadata> secondaryTables = Lists.newArrayList();
 	private final List<AssociationOverrideMetadata> associationOverrides = Lists.newArrayList();
 	private final List<AttributeOverrideMetadata> attributeOverrides = Lists.newArrayList();
-	private final AttributesMetadataImpl attributes;
 
 	/**
 	 * @param clazz
@@ -88,14 +80,7 @@ public class EntityMetadataImpl implements EntityMetadata {
 	 * @author hceylan
 	 */
 	public EntityMetadataImpl(Class<?> clazz, EntityMetadata metadata) {
-		super();
-
-		this.clazz = clazz;
-		this.locator = new JavaLocator(clazz);
-		this.accessType = this.getAccessType(metadata);
-
-		// handle attributes
-		this.attributes = new AttributesMetadataImpl(this, clazz, metadata != null ? metadata.getAttributes() : null);
+		super(clazz, metadata);
 
 		final Set<Class<? extends Annotation>> parsed = Sets.newHashSet();
 
@@ -123,43 +108,6 @@ public class EntityMetadataImpl implements EntityMetadata {
 	 * 
 	 */
 	@Override
-	public AccessType getAccessType() {
-		return this.accessType;
-	}
-
-	/**
-	 * Returns the access type.
-	 * <p>
-	 * if metadata exists and it specifies the access type then it is returned.
-	 * <p>
-	 * then is class has {@link Access} annotation then it is returned.
-	 * <p>
-	 * finally default {@link AccessType#FIELD} is returned.
-	 * 
-	 * @param metadata
-	 * @return
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	private AccessType getAccessType(EntityMetadata metadata) {
-		if ((metadata != null) && (metadata.getAccessType() != null)) {
-			return metadata.getAccessType();
-		}
-
-		final Access access = this.clazz.getAnnotation(Access.class);
-		if ((access != null) && (access.value() != null)) {
-			return access.value();
-		}
-
-		return AccessType.FIELD;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public List<AssociationOverrideMetadata> getAssociationOverrides() {
 		return this.associationOverrides;
 	}
@@ -178,35 +126,8 @@ public class EntityMetadataImpl implements EntityMetadata {
 	 * 
 	 */
 	@Override
-	public AttributesMetadata getAttributes() {
-		return this.attributes;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public Boolean getCacheable() {
 		return this.cachable;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String getClassName() {
-		return this.clazz.getName();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public JavaLocator getLocator() {
-		return this.locator;
 	}
 
 	/**
@@ -276,20 +197,20 @@ public class EntityMetadataImpl implements EntityMetadata {
 			this.associationOverrides.addAll(metadata.getAssociationOverrides());
 		}
 		else {
-			final AssociationOverrides overrides = this.clazz.getAnnotation(AssociationOverrides.class);
+			final AssociationOverrides overrides = this.getClazz().getAnnotation(AssociationOverrides.class);
 			if ((overrides != null) && (overrides.value().length > 0)) {
 				parsed.add(AttributeOverrides.class);
 
 				for (final AssociationOverride override : overrides.value()) {
-					this.associationOverrides.add(new AssociationOverrideMetadataImpl(this.locator, override));
+					this.associationOverrides.add(new AssociationOverrideMetadataImpl(this.getLocator(), override));
 				}
 			}
 			else {
-				final AssociationOverride override = this.clazz.getAnnotation(AssociationOverride.class);
+				final AssociationOverride override = this.getClazz().getAnnotation(AssociationOverride.class);
 				parsed.add(AssociationOverride.class);
 
 				if (override != null) {
-					this.associationOverrides.add(new AssociationOverrideMetadataImpl(this.locator, override));
+					this.associationOverrides.add(new AssociationOverrideMetadataImpl(this.getLocator(), override));
 				}
 			}
 		}
@@ -317,20 +238,20 @@ public class EntityMetadataImpl implements EntityMetadata {
 			this.attributeOverrides.addAll(metadata.getAttributeOverrides());
 		}
 		else {
-			final AttributeOverrides overrides = this.clazz.getAnnotation(AttributeOverrides.class);
+			final AttributeOverrides overrides = this.getClazz().getAnnotation(AttributeOverrides.class);
 			if ((overrides != null) && (overrides.value().length > 0)) {
 				parsed.add(AttributeOverrides.class);
 
 				for (final AttributeOverride override : overrides.value()) {
-					this.attributeOverrides.add(new AttributeOverrideMetadataImpl(this.locator, override));
+					this.attributeOverrides.add(new AttributeOverrideMetadataImpl(this.getLocator(), override));
 				}
 			}
 			else {
-				final AttributeOverride override = this.clazz.getAnnotation(AttributeOverride.class);
+				final AttributeOverride override = this.getClazz().getAnnotation(AttributeOverride.class);
 				parsed.add(AttributeOverride.class);
 
 				if (override != null) {
-					this.attributeOverrides.add(new AttributeOverrideMetadataImpl(this.locator, override));
+					this.attributeOverrides.add(new AttributeOverrideMetadataImpl(this.getLocator(), override));
 				}
 			}
 		}
@@ -359,7 +280,7 @@ public class EntityMetadataImpl implements EntityMetadata {
 			return metadata.getCacheable();
 		}
 
-		final Cacheable cacheable = this.clazz.getAnnotation(Cacheable.class);
+		final Cacheable cacheable = this.getClazz().getAnnotation(Cacheable.class);
 		if (cacheable != null) {
 			parsed.add(Cacheable.class);
 
@@ -392,14 +313,14 @@ public class EntityMetadataImpl implements EntityMetadata {
 			return metadata.getName();
 		}
 
-		final Entity entity = this.clazz.getAnnotation(Entity.class);
+		final Entity entity = this.getClazz().getAnnotation(Entity.class);
 		if ((entity != null) && StringUtils.isNotBlank(entity.name())) {
 			parsed.add(Entity.class);
 
 			return entity.name();
 		}
 
-		return this.clazz.getSimpleName();
+		return this.getClazz().getSimpleName();
 	}
 
 	/**
@@ -423,20 +344,20 @@ public class EntityMetadataImpl implements EntityMetadata {
 			this.secondaryTables.addAll(metadata.getSecondaryTables());
 		}
 		else {
-			final SecondaryTables secondaryTables = this.clazz.getAnnotation(SecondaryTables.class);
+			final SecondaryTables secondaryTables = this.getClazz().getAnnotation(SecondaryTables.class);
 			if ((secondaryTables != null) && (secondaryTables.value().length > 0)) {
 				parsed.add(SecondaryTables.class);
 
 				for (final SecondaryTable secondaryTable : secondaryTables.value()) {
-					this.secondaryTables.add(new SecondaryTableMetadataImpl(this.locator, secondaryTable));
+					this.secondaryTables.add(new SecondaryTableMetadataImpl(this.getLocator(), secondaryTable));
 				}
 			}
 			else {
-				final SecondaryTable secondaryTable = this.clazz.getAnnotation(SecondaryTable.class);
+				final SecondaryTable secondaryTable = this.getClazz().getAnnotation(SecondaryTable.class);
 				if (secondaryTable != null) {
 					parsed.add(SecondaryTable.class);
 
-					this.secondaryTables.add(new SecondaryTableMetadataImpl(this.locator, secondaryTable));
+					this.secondaryTables.add(new SecondaryTableMetadataImpl(this.getLocator(), secondaryTable));
 				}
 			}
 		}
@@ -465,11 +386,11 @@ public class EntityMetadataImpl implements EntityMetadata {
 			return metadata.getSequenceGenerator();
 		}
 
-		final SequenceGenerator annotation = this.clazz.getAnnotation(SequenceGenerator.class);
+		final SequenceGenerator annotation = this.getClazz().getAnnotation(SequenceGenerator.class);
 		if (annotation != null) {
 			parsed.add(SequenceGenerator.class);
 
-			return new SequenceGeneratorMetadataImpl(this.locator, annotation);
+			return new SequenceGeneratorMetadataImpl(this.getLocator(), annotation);
 		}
 
 		return null;
@@ -499,11 +420,11 @@ public class EntityMetadataImpl implements EntityMetadata {
 			return metadata.getTable();
 		}
 
-		final Table annotation = this.clazz.getAnnotation(Table.class);
+		final Table annotation = this.getClazz().getAnnotation(Table.class);
 		if (annotation != null) {
 			parsed.add(Table.class);
 
-			return new TableMetadataImpl(this.locator, annotation);
+			return new TableMetadataImpl(this.getLocator(), annotation);
 		}
 
 		return null;
@@ -532,23 +453,13 @@ public class EntityMetadataImpl implements EntityMetadata {
 			return metadata.getTableGenerator();
 		}
 
-		final TableGenerator annotation = this.clazz.getAnnotation(TableGenerator.class);
+		final TableGenerator annotation = this.getClazz().getAnnotation(TableGenerator.class);
 		if (annotation != null) {
 			parsed.add(TableGenerator.class);
 
-			return new TableGeneratorMetadataImpl(this.locator, annotation);
+			return new TableGeneratorMetadataImpl(this.getLocator(), annotation);
 		}
 
 		return null;
 	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public boolean isMetadataComplete() {
-		return false; // N/A
-	}
-
 }

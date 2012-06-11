@@ -20,8 +20,7 @@ package org.batoo.jpa.core.impl.metamodel;
 
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,10 +48,10 @@ import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
 import org.batoo.jpa.core.impl.model.BasicTypeImpl;
-import org.batoo.jpa.core.impl.model.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.IdentifiableTypeImpl;
 import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
+import org.batoo.jpa.core.impl.model.MappedSuperclassTypeImpl;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedAttribute;
 import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
@@ -61,7 +60,10 @@ import org.batoo.jpa.parser.impl.metadata.MetadataImpl;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
+import org.batoo.jpa.parser.metadata.type.ManagedTypeMetadata;
+import org.batoo.jpa.parser.metadata.type.MappedSuperclassMetadata;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -126,34 +128,43 @@ public class MetamodelImpl implements Metamodel {
 
 		this.jdbcAdaptor = jdbcAdaptor;
 
-		final List<EntityMetadata> entities = metadata.getEntities();
+		final List<ManagedTypeMetadata> entities = Lists.newArrayList(metadata.getEntityMappings());
+		final List<ManagedTypeMetadata> sortedEntities = Lists.newArrayList();
 
-		Collections.sort(entities, new Comparator<EntityMetadata>() {
+		try {
+			while (entities.size() > 0) {
+				for (final Iterator<ManagedTypeMetadata> i = entities.iterator(); i.hasNext();) {
+					final ManagedTypeMetadata entity = i.next();
+					final Class<?> c1 = Class.forName(entity.getClassName());
 
-			@Override
-			public int compare(EntityMetadata o1, EntityMetadata o2) {
-				try {
-					final Class<?> c1 = Class.forName(o1.getClassName());
-					final Class<?> c2 = Class.forName(o2.getClassName());
+					boolean independent = true;
+					for (final ManagedTypeMetadata entity2 : entities) {
+						if (entity == entity2) {
+							continue;
+						}
 
-					if (c1.isAssignableFrom(c2)) {
-						return -1;
+						final Class<?> c2 = Class.forName(entity2.getClassName());
+
+						if (c2.isAssignableFrom(c1)) {
+							independent = false;
+							break;
+						}
 					}
-					if (c2.isAssignableFrom(c1)) {
-						return 1;
+
+					if (independent) {
+						i.remove();
+						sortedEntities.add(entity);
 					}
 				}
-				catch (final Exception e) {} // not possible at this stage
-
-				return 0;
 			}
+		}
+		catch (final Exception e) {
+			e.printStackTrace();
+		} // not possible at this stage
 
-		});
-
-		for (final EntityMetadata entity : entities) {
+		for (final ManagedTypeMetadata type : sortedEntities) {
 			try {
-				EntityTypeImpl<?> entityType;
-				final Class<?> clazz = Class.forName(entity.getClassName());
+				final Class<?> clazz = Class.forName(type.getClassName());
 
 				ManagedTypeImpl<?> parent = null;
 
@@ -164,15 +175,29 @@ public class MetamodelImpl implements Metamodel {
 					currentClass = currentClass.getSuperclass();
 				}
 
-				// make sure it extends an identifiable type
-				if ((parent != null) && (parent instanceof EmbeddableTypeImpl)) {
-					throw new MappingException("An Entity can only extend a MappedSuperclass or another Entity.", entity.getLocator(),
-						parent.getLocator());
+				if (type instanceof EntityMetadata) {
+					// make sure it extends an identifiable type
+					if ((parent != null) && !(parent instanceof IdentifiableTypeImpl)) {
+						throw new MappingException("An Entity can only extend a MappedSuperclass or another Entity.", type.getLocator(),
+							parent.getLocator());
+					}
+
+					final EntityTypeImpl entity = new EntityTypeImpl(this, (IdentifiableTypeImpl) parent, clazz, (EntityMetadata) type);
+
+					this.entities.put(entity.getJavaType(), entity);
+				}
+				else if (type instanceof MappedSuperclassMetadata) {
+					// make sure it extends an mapped superclass type
+					if ((parent != null) && !(parent instanceof MappedSuperclassTypeImpl)) {
+						throw new MappingException("An Entity can only extend a MappedSuperclass or another Entity.", type.getLocator(),
+							parent.getLocator());
+					}
+
+					final MappedSuperclassTypeImpl mappedSuperclass = new MappedSuperclassTypeImpl(this, (MappedSuperclassTypeImpl) parent,
+						clazz, (MappedSuperclassMetadata) type);
+					this.mappedSuperclasses.put(mappedSuperclass.getJavaType(), mappedSuperclass);
 				}
 
-				entityType = new EntityTypeImpl(this, (IdentifiableTypeImpl) parent, clazz, entity);
-
-				this.entities.put(entityType.getJavaType(), entityType);
 			}
 			catch (final ClassNotFoundException e) {} // not possible at this time
 		}

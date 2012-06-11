@@ -27,6 +27,7 @@ import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
+import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.impl.metadata.attribute.AttributeMetadataImpl;
 import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
 
@@ -43,6 +44,7 @@ import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
  */
 public abstract class AttributeImpl<X, Y> implements Attribute<X, Y> {
 
+	private final AbstractLocator locator;
 	private final ManagedTypeImpl<X> declaringType;
 	private final String name;
 	private final Member javaMember;
@@ -62,6 +64,8 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y> {
 	@SuppressWarnings("unchecked")
 	public AttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata) {
 		super();
+
+		this.locator = metadata.getLocator();
 
 		this.declaringType = declaringType;
 		this.name = metadata.getName();
@@ -111,6 +115,18 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y> {
 	@Override
 	public Class<Y> getJavaType() {
 		return this.javaType;
+	}
+
+	/**
+	 * Returns the locator of the AttributeImpl.
+	 * 
+	 * @return the locator of the AttributeImpl
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public AbstractLocator getLocator() {
+		return this.locator;
 	}
 
 	/**

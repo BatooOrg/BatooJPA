@@ -118,6 +118,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 		this.name = metadata.getName();
 
+		this.addAttributes(metadata);
+
 		this.initTables(metadata);
 	}
 
@@ -498,8 +500,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			}
 
 			int size = this.getDeclaredTables().size();
-			if (this.getParent() instanceof EntityTypeImpl) {
-				size += ((EntityTypeImpl<? super X>) this.getParent()).getTables().length;
+			if (this.getSupertype() instanceof EntityTypeImpl) {
+				size += ((EntityTypeImpl<? super X>) this.getSupertype()).getTables().length;
 			}
 
 			final EntityTable[] tables = new EntityTable[size];
@@ -510,8 +512,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				i++;
 			}
 
-			if (this.getParent() instanceof EntityTypeImpl) {
-				for (final EntityTable table : ((EntityTypeImpl<? super X>) this.getParent()).getDeclaredTables()) {
+			if (this.getSupertype() instanceof EntityTypeImpl) {
+				for (final EntityTable table : ((EntityTypeImpl<? super X>) this.getSupertype()).getDeclaredTables()) {
 					tables[i] = table;
 				}
 			}

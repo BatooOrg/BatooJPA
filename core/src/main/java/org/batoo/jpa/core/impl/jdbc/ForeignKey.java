@@ -243,4 +243,13 @@ public class ForeignKey {
 
 		this.table.addForeignKey(this);
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "ForeignKey [tableName=" + this.tableName + ", joinColumns=" + this.joinColumns + "]";
+	}
 }

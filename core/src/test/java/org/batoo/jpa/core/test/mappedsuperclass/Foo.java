@@ -55,7 +55,6 @@ public class Foo extends Bar {
 	 * @return the fooValue
 	 * @since $version
 	 */
-	@Override
 	public String getFooValue() {
 		return this.fooValue;
 	}
@@ -67,7 +66,6 @@ public class Foo extends Bar {
 	 *            the fooValue to set
 	 * @since $version
 	 */
-	@Override
 	public void setFooValue(String fooValue) {
 		this.fooValue = fooValue;
 	}

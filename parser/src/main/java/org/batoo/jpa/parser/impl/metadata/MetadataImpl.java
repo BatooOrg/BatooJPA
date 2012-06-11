@@ -23,11 +23,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.persistence.AccessType;
+import javax.persistence.Entity;
+import javax.persistence.MappedSuperclass;
 
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.metadata.type.EntityMetadataImpl;
+import org.batoo.jpa.parser.impl.metadata.type.MappedSuperclassMetadataImpl;
 import org.batoo.jpa.parser.metadata.Metadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
+import org.batoo.jpa.parser.metadata.type.ManagedTypeMetadata;
+import org.batoo.jpa.parser.metadata.type.MappedSuperclassMetadata;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -40,7 +45,7 @@ import com.google.common.collect.Maps;
  */
 public class MetadataImpl implements Metadata {
 
-	private final Map<String, EntityMetadata> entityMap = Maps.newHashMap();
+	private final Map<String, ManagedTypeMetadata> entityMap = Maps.newHashMap();
 
 	/**
 	 * @param classes
@@ -72,7 +77,7 @@ public class MetadataImpl implements Metadata {
 	 * 
 	 */
 	@Override
-	public List<EntityMetadata> getEntities() {
+	public List<ManagedTypeMetadata> getEntityMappings() {
 		return Lists.newArrayList(this.entityMap.values());
 	}
 
@@ -86,12 +91,12 @@ public class MetadataImpl implements Metadata {
 	 * @author hceylan
 	 */
 	public void merge(Metadata metadata) {
-		for (final EntityMetadata entity : metadata.getEntities()) {
-			final EntityMetadata existing = this.entityMap.put(entity.getClassName(), entity);
+		for (final ManagedTypeMetadata managedType : metadata.getEntityMappings()) {
+			final ManagedTypeMetadata existing = this.entityMap.put(managedType.getClassName(), managedType);
 
 			if (existing != null) {
 				if (existing != null) {
-					throw new MappingException("Duplicate definitions for " + entity.getClassName(), entity.getLocator(),
+					throw new MappingException("Duplicate definitions for " + managedType.getClassName(), managedType.getLocator(),
 						existing.getLocator());
 				}
 			}
@@ -105,13 +110,31 @@ public class MetadataImpl implements Metadata {
 	 * @author hceylan
 	 */
 	public void parse() {
-		for (final Entry<String, EntityMetadata> entry : this.entityMap.entrySet()) {
+		for (final Entry<String, ManagedTypeMetadata> entry : this.entityMap.entrySet()) {
 			final String className = entry.getKey();
-			final EntityMetadata metadata = entry.getValue();
+			final ManagedTypeMetadata metadata = entry.getValue();
 
 			try {
 				final Class<?> clazz = Class.forName(className);
-				this.entityMap.put(className, new EntityMetadataImpl(clazz, metadata));
+				if (metadata == null) {
+					if (clazz.getAnnotation(Entity.class) != null) {
+						this.entityMap.put(className, new EntityMetadataImpl(clazz, (EntityMetadata) metadata));
+					}
+					else if (clazz.getAnnotation(MappedSuperclass.class) != null) {
+						this.entityMap.put(className, new MappedSuperclassMetadataImpl(clazz, (MappedSuperclassMetadata) metadata));
+					}
+					else {
+						throw new MappingException("Cannot determine type of class " + className);
+					}
+				}
+				else {
+					if (metadata instanceof EntityMetadata) {
+						this.entityMap.put(className, new EntityMetadataImpl(clazz, (EntityMetadata) metadata));
+					}
+					else if (metadata instanceof MappedSuperclassMetadata) {
+						this.entityMap.put(className, new MappedSuperclassMetadataImpl(clazz, (MappedSuperclassMetadata) metadata));
+					}
+				}
 			}
 			catch (final ClassNotFoundException e) { // class could not be found
 				throw new MappingException("Class " + className + " cound not be found.", metadata.getLocator());
@@ -119,5 +142,4 @@ public class MetadataImpl implements Metadata {
 
 		}
 	}
-
 }

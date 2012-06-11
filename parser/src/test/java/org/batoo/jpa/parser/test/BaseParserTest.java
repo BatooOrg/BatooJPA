@@ -38,6 +38,7 @@ import org.batoo.jpa.parser.metadata.attribute.OneToOneAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.TransientAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.VersionAttributeMetadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
+import org.batoo.jpa.parser.metadata.type.ManagedTypeMetadata;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -229,10 +230,13 @@ public class BaseParserTest extends BaseTest {
 	 * @author hceylan
 	 */
 	protected EntityMetadata e(String name) {
-		final List<EntityMetadata> entities = this.mm().getEntities();
-		for (final EntityMetadata entity : entities) {
-			if (name.equals(entity.getName())) {
-				return entity;
+		final List<ManagedTypeMetadata> entities = this.mm().getEntityMappings();
+		for (final ManagedTypeMetadata type : entities) {
+			if (type instanceof EntityMetadata) {
+				final EntityMetadata entity = (EntityMetadata) type;
+				if (name.equals(entity.getName())) {
+					return entity;
+				}
 			}
 		}
 

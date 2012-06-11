@@ -20,8 +20,6 @@ package org.batoo.jpa.parser.metadata.type;
 
 import java.util.List;
 
-import javax.persistence.AccessType;
-
 import org.batoo.jpa.parser.metadata.AssociationOverrideMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.BindableMetadata;
@@ -29,7 +27,6 @@ import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableMetadata;
-import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
 
 /**
  * The definition of the entities.
@@ -37,17 +34,7 @@ import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
  * @author hceylan
  * @since $version
  */
-public interface EntityMetadata extends BindableMetadata {
-
-	/**
-	 * Returns the access type of the entity.
-	 * 
-	 * @return the access type of the entity
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	AccessType getAccessType();
+public interface EntityMetadata extends ManagedTypeMetadata, BindableMetadata {
 
 	/**
 	 * Returns the associationOverrides of the entity.
@@ -70,16 +57,6 @@ public interface EntityMetadata extends BindableMetadata {
 	public List<AttributeOverrideMetadata> getAttributeOverrides();
 
 	/**
-	 * Returns the attributes of the entity.
-	 * 
-	 * @return the attributes of the entity
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	AttributesMetadata getAttributes();
-
-	/**
 	 * Returns if the entity is cachable.
 	 * 
 	 * @return true if the entity is cachable
@@ -88,16 +65,6 @@ public interface EntityMetadata extends BindableMetadata {
 	 * @author hceylan
 	 */
 	Boolean getCacheable();
-
-	/**
-	 * Returns the name of the class of the entity.
-	 * 
-	 * @return the name of the class of the entity
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	String getClassName();
 
 	/**
 	 * Returns the list secondary tables of the entity.
@@ -138,14 +105,4 @@ public interface EntityMetadata extends BindableMetadata {
 	 * @author hceylan
 	 */
 	public TableGeneratorMetadata getTableGenerator();
-
-	/**
-	 * Returns if the entity's metadata is complete.
-	 * 
-	 * @return true if the entity's metadata is complete
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	boolean isMetadataComplete();
 }

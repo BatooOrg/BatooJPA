@@ -62,6 +62,7 @@ import org.batoo.jpa.parser.metadata.attribute.OneToManyAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.OneToOneAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.TransientAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.VersionAttributeMetadata;
+import org.batoo.jpa.parser.metadata.type.ManagedTypeMetadata;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -191,7 +192,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(AttributesMetadataImpl.class);
 
-	private final EntityMetadataImpl parent;
+	private final ManagedTypeMetadata parent;
 	private final AttributesMetadata metadata;
 
 	private final List<TransientAttributeMetadata> transients;
@@ -221,7 +222,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AttributesMetadataImpl(EntityMetadataImpl parent, Class<?> clazz, AttributesMetadata metadata) {
+	public AttributesMetadataImpl(ManagedTypeMetadata parent, Class<?> clazz, AttributesMetadata metadata) {
 		super();
 
 		this.parent = parent;

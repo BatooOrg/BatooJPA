@@ -26,9 +26,14 @@ import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.Type;
 
 import org.batoo.jpa.core.impl.metamodel.MetamodelImpl;
+import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.IdAttributeImpl;
+import org.batoo.jpa.core.impl.model.attribute.VersionAttributeImpl;
+import org.batoo.jpa.parser.MappingException;
+import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
 import org.batoo.jpa.parser.metadata.attribute.IdAttributeMetadata;
-import org.batoo.jpa.parser.metadata.type.EntityMetadata;
+import org.batoo.jpa.parser.metadata.attribute.VersionAttributeMetadata;
+import org.batoo.jpa.parser.metadata.type.ManagedTypeMetadata;
 
 import com.google.common.collect.Maps;
 
@@ -44,13 +49,18 @@ import com.google.common.collect.Maps;
 public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> implements IdentifiableType<X> {
 
 	private final Map<String, IdAttributeImpl<X, ?>> declaredIdAttributes = Maps.newHashMap();
-	private IdAttributeImpl<? super X, ?>[] idAttributes;;
+	private final Map<String, IdAttributeImpl<? super X, ?>> idAttributes = Maps.newHashMap();
+	private final IdentifiableTypeImpl<? super X> supertype;
+	private VersionAttributeImpl<X, ?> declaredVersionAttribute;
+	private VersionAttributeImpl<? super X, ?> versionAttribute;
+
+	private IdAttributeImpl<? super X, ?>[] idAttributes0;
 
 	/**
 	 * @param metamodel
 	 *            the metamodel
-	 * @param parent
-	 *            the parent type
+	 * @param supertype
+	 *            the super type
 	 * @param javaType
 	 *            the java type of the managed type
 	 * @param metadata
@@ -59,10 +69,62 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * @since $version
 	 * @author hceylan
 	 */
-	public IdentifiableTypeImpl(MetamodelImpl metamodel, IdentifiableTypeImpl<? super X> parent, Class<X> javaType, EntityMetadata metadata) {
-		super(metamodel, parent, javaType, metadata);
+	public IdentifiableTypeImpl(MetamodelImpl metamodel, IdentifiableTypeImpl<? super X> supertype, Class<X> javaType,
+		ManagedTypeMetadata metadata) {
+		super(metamodel, javaType, metadata);
+		this.supertype = supertype;
 
 		this.addIdAttributes(metadata);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings({ "unchecked" })
+	protected void addAttribute(AttributeImpl<? super X, ?> attribute) {
+		if (attribute instanceof IdAttributeImpl) {
+			if (attribute.getDeclaringType() == this) {
+				this.declaredIdAttributes.put(attribute.getName(), (IdAttributeImpl<X, ?>) attribute);
+			}
+
+			this.idAttributes.put(attribute.getName(), (IdAttributeImpl<? super X, ?>) attribute);
+		}
+
+		if ((attribute instanceof VersionAttributeImpl)) {
+			if (this.versionAttribute != null) {
+				throw new MappingException("Multiple version attributes not supported.", this.versionAttribute.getLocator(),
+					attribute.getLocator());
+			}
+
+			if (attribute.getDeclaringType() == this) {
+				this.declaredVersionAttribute = (VersionAttributeImpl<X, ?>) attribute;
+			}
+
+			this.versionAttribute = (VersionAttributeImpl<? super X, ?>) attribute;
+		}
+
+		super.addAttribute(attribute);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	protected void addAttributes(ManagedTypeMetadata entityMetadata) {
+		if (this.supertype != null) {
+			for (final AttributeImpl<? super X, ?> attribute : this.supertype.getAttributes0().values()) {
+				this.addAttribute(attribute);
+			}
+
+			if (this.supertype.versionAttribute != null) {
+				this.addAttribute(this.supertype.versionAttribute);
+			}
+		}
+
+		super.addAttributes(entityMetadata);
 	}
 
 	/**
@@ -75,12 +137,18 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * @author hceylan
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void addIdAttributes(EntityMetadata metadata) {
-		for (final IdAttributeMetadata id : metadata.getAttributes().getIds()) {
-			final IdAttributeImpl attribute = new IdAttributeImpl(this, id);
+	private void addIdAttributes(ManagedTypeMetadata metadata) {
+		final AttributesMetadata attributes = metadata.getAttributes();
 
-			this.declaredIdAttributes.put(id.getName(), attribute);
-			this.addDeclaredAttribute(attribute);
+		// add id attributes
+		for (final IdAttributeMetadata attribute : attributes.getIds()) {
+			this.addAttribute(new IdAttributeImpl(this, attribute));
+		}
+
+		// add version attributes
+		for (final VersionAttributeMetadata attribute : attributes.getVersions()) {
+			this.declaredVersionAttribute = new VersionAttributeImpl(this, attribute);
+			this.addAttribute(this.declaredVersionAttribute);
 		}
 	}
 
@@ -99,9 +167,9 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <Y> SingularAttribute<X, Y> getDeclaredVersion(Class<Y> type) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SingularAttribute<X, Y>) this.versionAttribute;
 	}
 
 	/**
@@ -124,18 +192,18 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 */
 	@SuppressWarnings("unchecked")
 	public IdAttributeImpl<? super X, ?>[] getIdAttributes() {
-		if (this.idAttributes != null) {
-			return this.idAttributes;
+		if (this.idAttributes0 != null) {
+			return this.idAttributes0;
 		}
 
 		// populate the id attributes with the inheritance
 		synchronized (this) {
-			if (this.idAttributes != null) {
-				return this.idAttributes;
+			if (this.idAttributes0 != null) {
+				return this.idAttributes0;
 			}
 
 			final Map<String, IdAttributeImpl<? super X, ?>> idAttributes = Maps.newHashMap();
-			for (final IdAttributeImpl<X, ?> attribute : this.declaredIdAttributes.values()) {
+			for (final IdAttributeImpl<? super X, ?> attribute : this.idAttributes.values()) {
 				idAttributes.put(attribute.getName(), attribute);
 			}
 
@@ -145,10 +213,10 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 			final IdAttributeImpl<X, ?>[] idAttributes0 = new IdAttributeImpl[idAttributes.size()];
 			idAttributes.values().toArray(idAttributes0);
 
-			this.idAttributes = idAttributes0;
+			this.idAttributes0 = idAttributes0;
 		}
 
-		return this.idAttributes;
+		return this.idAttributes0;
 	}
 
 	/**
@@ -176,9 +244,8 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * 
 	 */
 	@Override
-	public IdentifiableType<? super X> getSupertype() {
-		// TODO Auto-generated method stub
-		return null;
+	public IdentifiableTypeImpl<? super X> getSupertype() {
+		return this.supertype;
 	}
 
 	/**
@@ -186,9 +253,17 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * 
 	 */
 	@Override
-	public <Y> SingularAttribute<? super X, Y> getVersion(Class<Y> type) {
-		// TODO Auto-generated method stub
-		return null;
+	@SuppressWarnings("unchecked")
+	public <Y> VersionAttributeImpl<? super X, Y> getVersion(Class<Y> type) {
+		if (this.versionAttribute == null) {
+			return null;
+		}
+
+		if (this.versionAttribute.getJavaType() != type) {
+			throw new IllegalArgumentException("Version does not match specified type : " + type.getName());
+		}
+
+		return (VersionAttributeImpl<? super X, Y>) this.versionAttribute;
 	}
 
 	/**
@@ -197,7 +272,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 */
 	@Override
 	public boolean hasSingleIdAttribute() {
-		return this.idAttributes.length == 1;
+		return this.idAttributes.size() == 1;
 	}
 
 	/**
@@ -206,7 +281,6 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 */
 	@Override
 	public boolean hasVersionAttribute() {
-		// TODO Auto-generated method stub
-		return false;
+		return this.versionAttribute != null;
 	}
 }

@@ -26,6 +26,7 @@ import javax.persistence.AccessType;
 import org.batoo.jpa.parser.impl.orm.type.EntityElementFactory;
 import org.batoo.jpa.parser.metadata.Metadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
+import org.batoo.jpa.parser.metadata.type.ManagedTypeMetadata;
 
 import com.google.common.collect.Lists;
 
@@ -38,7 +39,7 @@ import com.google.common.collect.Lists;
 public class EntityMappings extends ParentElement implements Metadata {
 
 	private AccessType accessType;
-	private final List<EntityMetadata> entities = Lists.newArrayList();
+	private final List<ManagedTypeMetadata> entities = Lists.newArrayList();
 
 	/**
 	 * @param attributes
@@ -67,7 +68,7 @@ public class EntityMappings extends ParentElement implements Metadata {
 	 * 
 	 */
 	@Override
-	public List<EntityMetadata> getEntities() {
+	public List<ManagedTypeMetadata> getEntityMappings() {
 		return this.entities;
 	}
 
