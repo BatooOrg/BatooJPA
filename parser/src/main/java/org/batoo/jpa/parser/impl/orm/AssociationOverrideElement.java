@@ -21,7 +21,7 @@ package org.batoo.jpa.parser.impl.orm;
 import java.util.List;
 import java.util.Map;
 
-import org.batoo.jpa.parser.metadata.AssociationOverrideMetadata;
+import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
 import org.batoo.jpa.parser.metadata.JoinTableMetadata;
 
@@ -33,7 +33,7 @@ import com.google.common.collect.Lists;
  * @author hceylan
  * @since $version
  */
-public class AssociationOverrideElement extends ParentElement implements AssociationOverrideMetadata {
+public class AssociationOverrideElement extends ParentElement implements AssociationMetadata {
 
 	private String name;
 	private JoinTableMetadata joinTable;

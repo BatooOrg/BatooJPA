@@ -31,7 +31,7 @@ import javax.persistence.AttributeOverrides;
 import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.parser.impl.metadata.AssociationOverrideMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.AttributeOverrideMetadataImpl;
-import org.batoo.jpa.parser.metadata.AssociationOverrideMetadata;
+import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.attribute.EmbeddedAttributeMetadata;
 
@@ -46,7 +46,7 @@ import com.google.common.collect.Lists;
 public class EmbeddedAttributeMetadataImpl extends AttributeMetadataImpl implements EmbeddedAttributeMetadata {
 
 	private final List<AttributeOverrideMetadata> attributeOverrides = Lists.newArrayList();
-	private final List<AssociationOverrideMetadata> associationOverrides = Lists.newArrayList();
+	private final List<AssociationMetadata> associationOverrides = Lists.newArrayList();
 
 	/**
 	 * @param member
@@ -118,7 +118,7 @@ public class EmbeddedAttributeMetadataImpl extends AttributeMetadataImpl impleme
 	 * 
 	 */
 	@Override
-	public List<AssociationOverrideMetadata> getAssociationOverrides() {
+	public List<AssociationMetadata> getAssociationOverrides() {
 		return this.associationOverrides;
 	}
 

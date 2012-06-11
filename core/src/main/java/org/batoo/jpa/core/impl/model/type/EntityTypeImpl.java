@@ -56,6 +56,7 @@ import org.batoo.jpa.core.impl.manager.EntityTransactionImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
+import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.IdAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.PhysicalAttributeImpl;
@@ -70,6 +71,7 @@ import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.VersionMapping;
 import org.batoo.jpa.parser.MappingException;
+import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
@@ -173,6 +175,26 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				}
 			}
 		}
+	}
+
+	/**
+	 * @param attribute
+	 *            the attribute
+	 * @param path
+	 *            the path of the attribute
+	 * @return the column metadata or null
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public AssociationMetadata getAssociationOverride(AttributeImpl<? super X, ?> attribute, String path) {
+		for (final AssociationMetadata override : this.metadata.getAssociationOverrides()) {
+			if (override.getName().equals(path)) {
+				return override;
+			}
+		}
+
+		return (AssociationMetadata) attribute.getMetadata();
 	}
 
 	/**

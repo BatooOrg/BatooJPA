@@ -20,8 +20,10 @@ package org.batoo.jpa.core.test.mappedsuperclass;
 
 import java.util.List;
 
+import javax.persistence.AssociationOverride;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.JoinTable;
 import javax.persistence.OneToMany;
 
 import com.google.common.collect.Lists;
@@ -32,6 +34,7 @@ import com.google.common.collect.Lists;
  * @since $version
  */
 @Entity
+@AssociationOverride(joinTable = @JoinTable(name = "Bar_Quux"), name = "quuxes")
 public class Foo extends Bar {
 
 	private String fooValue;

@@ -20,7 +20,7 @@ package org.batoo.jpa.parser.metadata.type;
 
 import java.util.List;
 
-import org.batoo.jpa.parser.metadata.AssociationOverrideMetadata;
+import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.BindableMetadata;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
@@ -44,7 +44,7 @@ public interface EntityMetadata extends ManagedTypeMetadata, BindableMetadata {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public List<AssociationOverrideMetadata> getAssociationOverrides();
+	public List<AssociationMetadata> getAssociationOverrides();
 
 	/**
 	 * Returns the attributeOverrides of the entity.

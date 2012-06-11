@@ -32,6 +32,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.parser.MappingException;
+import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
 
 /**
@@ -67,7 +68,7 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 		super(entity, (AssociationAttributeMetadata) attribute.getMetadata());
 
 		this.attribute = attribute;
-		final AssociationAttributeMetadata metadata = (AssociationAttributeMetadata) attribute.getMetadata();
+		final AssociationMetadata metadata = entity.getAssociationOverride(attribute, attribute.getName());
 
 		if (this.isOwner()) {
 			if ((this.getAttribute().getPersistentAttributeType() == PersistentAttributeType.MANY_TO_MANY)

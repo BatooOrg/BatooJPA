@@ -20,7 +20,7 @@ package org.batoo.jpa.parser.metadata.attribute;
 
 import java.util.List;
 
-import org.batoo.jpa.parser.metadata.AssociationOverrideMetadata;
+import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 
 /**
@@ -39,7 +39,7 @@ public interface EmbeddedAttributeMetadata extends AttributeMetadata {
 	 * @since $version
 	 * @author hceylan
 	 */
-	List<AssociationOverrideMetadata> getAssociationOverrides();
+	List<AssociationMetadata> getAssociationOverrides();
 
 	/**
 	 * Returns the list of attribute overrides for the embedded attribute.

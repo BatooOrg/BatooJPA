@@ -26,7 +26,7 @@ import org.batoo.jpa.parser.impl.orm.AttributeOverrideElement;
 import org.batoo.jpa.parser.impl.orm.Element;
 import org.batoo.jpa.parser.impl.orm.ElementConstants;
 import org.batoo.jpa.parser.impl.orm.ParentElement;
-import org.batoo.jpa.parser.metadata.AssociationOverrideMetadata;
+import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.attribute.EmbeddedAttributeMetadata;
 
@@ -41,7 +41,7 @@ import com.google.common.collect.Lists;
 public class EmbeddedAttributeElement extends AttributeElement implements EmbeddedAttributeMetadata {
 
 	private final List<AttributeOverrideMetadata> attributeOverrides = Lists.newArrayList();
-	private final List<AssociationOverrideMetadata> associationOverrides = Lists.newArrayList();
+	private final List<AssociationMetadata> associationOverrides = Lists.newArrayList();
 
 	/**
 	 * @param parent
@@ -65,7 +65,7 @@ public class EmbeddedAttributeElement extends AttributeElement implements Embedd
 	 * 
 	 */
 	@Override
-	public List<AssociationOverrideMetadata> getAssociationOverrides() {
+	public List<AssociationMetadata> getAssociationOverrides() {
 		return this.associationOverrides;
 	}
 
@@ -89,7 +89,7 @@ public class EmbeddedAttributeElement extends AttributeElement implements Embedd
 		}
 
 		if (child instanceof AssociationOverrideElement) {
-			this.associationOverrides.add((AssociationOverrideMetadata) child);
+			this.associationOverrides.add((AssociationMetadata) child);
 		}
 	}
 }

@@ -28,7 +28,7 @@ import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.parser.MappingException;
-import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
+import org.batoo.jpa.parser.metadata.AssociationMetadata;
 
 /**
  * The mapping for one-to-one and many-to-one associations.
@@ -62,7 +62,7 @@ public class SingularAssociationMapping<X, Z> extends AssociationMapping<X, Z, Z
 		super(entity, attribute.getMetadata());
 
 		this.attribute = attribute;
-		final AssociationAttributeMetadata metadata = attribute.getMetadata();
+		final AssociationMetadata metadata = entity.getAssociationOverride(attribute, attribute.getName());
 
 		if (this.isOwner()) {
 			if (metadata.getJoinTable() != null) {

@@ -71,7 +71,9 @@ public class AbstractTable {
 	public AbstractTable(String defaultName, TableMetadata metadata) {
 		this(metadata);
 
-		this.name = (metadata != null) && StringUtils.isNotBlank(metadata.getName()) ? metadata.getName() : defaultName;
+		if (this.name == null) {
+			this.name = defaultName;
+		}
 	}
 
 	/**
@@ -89,6 +91,10 @@ public class AbstractTable {
 		this.schema = (metadata != null) && StringUtils.isNotBlank(metadata.getSchema()) ? metadata.getSchema() : null;
 
 		if (metadata != null) {
+			if (StringUtils.isNotBlank(metadata.getName())) {
+				this.name = metadata.getName();
+			}
+
 			for (final UniqueConstraintMetadata constraint : metadata.getUniqueConstraints()) {
 				this.uniqueConstraints.put(constraint.getName(), constraint.getColumnNames());
 			}

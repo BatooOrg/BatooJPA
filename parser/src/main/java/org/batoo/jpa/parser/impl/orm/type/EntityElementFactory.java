@@ -32,7 +32,7 @@ import org.batoo.jpa.parser.impl.orm.ParentElement;
 import org.batoo.jpa.parser.impl.orm.SecondaryTableElement;
 import org.batoo.jpa.parser.impl.orm.TableElement;
 import org.batoo.jpa.parser.impl.orm.attribute.AttributesElement;
-import org.batoo.jpa.parser.metadata.AssociationOverrideMetadata;
+import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
@@ -61,7 +61,7 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 	private TableMetadata table;
 	private final List<SecondaryTableMetadata> secondaryTables = Lists.newArrayList();
 	private final List<AttributeOverrideMetadata> attributeOverrides = Lists.newArrayList();
-	private final List<AssociationOverrideMetadata> associationOverrides = Lists.newArrayList();
+	private final List<AssociationMetadata> associationOverrides = Lists.newArrayList();
 
 	/**
 	 * Constructor for ORM File parsing
@@ -115,7 +115,7 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 	 * 
 	 */
 	@Override
-	public List<AssociationOverrideMetadata> getAssociationOverrides() {
+	public List<AssociationMetadata> getAssociationOverrides() {
 		return this.associationOverrides;
 	}
 
@@ -231,7 +231,7 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 		}
 
 		if (child instanceof AssociationOverrideElement) {
-			this.associationOverrides.add((AssociationOverrideMetadata) child);
+			this.associationOverrides.add((AssociationMetadata) child);
 		}
 	}
 

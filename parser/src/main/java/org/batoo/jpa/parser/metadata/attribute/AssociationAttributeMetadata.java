@@ -18,14 +18,12 @@
  */
 package org.batoo.jpa.parser.metadata.attribute;
 
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
 
-import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
-import org.batoo.jpa.parser.metadata.JoinTableMetadata;
+import org.batoo.jpa.parser.metadata.AssociationMetadata;
 
 /**
  * The common definition of association attributes.
@@ -33,7 +31,7 @@ import org.batoo.jpa.parser.metadata.JoinTableMetadata;
  * @author hceylan
  * @since $version
  */
-public interface AssociationAttributeMetadata extends AttributeMetadata {
+public interface AssociationAttributeMetadata extends AttributeMetadata, AssociationMetadata {
 
 	/**
 	 * Returns the cascades of the association attribute.
@@ -54,26 +52,6 @@ public interface AssociationAttributeMetadata extends AttributeMetadata {
 	 * @author hceylan
 	 */
 	FetchType getFetchType();
-
-	/**
-	 * Returns the join column definition of the association attribute.
-	 * 
-	 * @return the join column definition of the association attribute
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	List<JoinColumnMetadata> getJoinColumns();
-
-	/**
-	 * Returns the join table definition of the association attribute.
-	 * 
-	 * @return the join table definition of the association attribute
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	JoinTableMetadata getJoinTable();
 
 	/**
 	 * Returns the name of the target entity of the association attribute.

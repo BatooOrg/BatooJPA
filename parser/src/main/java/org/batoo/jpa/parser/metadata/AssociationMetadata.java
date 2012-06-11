@@ -26,7 +26,7 @@ import java.util.List;
  * @author hceylan
  * @since $version
  */
-public interface AssociationOverrideMetadata extends BindableMetadata {
+public interface AssociationMetadata extends BindableMetadata {
 
 	/**
 	 * Returns the list of join column definition of the override.

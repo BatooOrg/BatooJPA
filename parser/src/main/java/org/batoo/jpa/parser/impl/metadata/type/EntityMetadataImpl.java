@@ -41,7 +41,7 @@ import org.batoo.jpa.parser.impl.metadata.SecondaryTableMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.SequenceGeneratorMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.TableGeneratorMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.TableMetadataImpl;
-import org.batoo.jpa.parser.metadata.AssociationOverrideMetadata;
+import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
@@ -67,7 +67,7 @@ public class EntityMetadataImpl extends ManagedTypeMetadatImpl implements Entity
 	private final SequenceGeneratorMetadata sequenceGenerator;
 	private final TableGeneratorMetadata tableGenerator;
 	private final List<SecondaryTableMetadata> secondaryTables = Lists.newArrayList();
-	private final List<AssociationOverrideMetadata> associationOverrides = Lists.newArrayList();
+	private final List<AssociationMetadata> associationOverrides = Lists.newArrayList();
 	private final List<AttributeOverrideMetadata> attributeOverrides = Lists.newArrayList();
 
 	/**
@@ -108,7 +108,7 @@ public class EntityMetadataImpl extends ManagedTypeMetadatImpl implements Entity
 	 * 
 	 */
 	@Override
-	public List<AssociationOverrideMetadata> getAssociationOverrides() {
+	public List<AssociationMetadata> getAssociationOverrides() {
 		return this.associationOverrides;
 	}
 
