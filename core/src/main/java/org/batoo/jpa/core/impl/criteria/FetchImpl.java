@@ -240,6 +240,6 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	 */
 	@Override
 	public String toString() {
-		return this.describe("");
+		return this.describe(this.getParent().toString());
 	}
 }

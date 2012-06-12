@@ -32,6 +32,7 @@ import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.Type;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
@@ -235,7 +236,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	private String generateImpl(CriteriaQueryImpl<?> query) {
 		final List<String> selects = Lists.newArrayList();
 
-		for (final EntityTable table : this.entity.getTables()) {
+		for (final EntityTable table : this.entity.getAllTables()) {
 			int fieldNo = 0;
 
 			final List<String> fields = Lists.newArrayList();
@@ -520,5 +521,14 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	 */
 	protected boolean shouldContinue(SessionImpl session, Map<String, Object> row) {
 		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return this.entity.getName();
 	}
 }

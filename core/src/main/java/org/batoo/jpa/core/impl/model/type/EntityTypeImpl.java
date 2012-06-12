@@ -102,11 +102,12 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private final String name;
 	private EntityTable primaryTable;
 	private final Map<String, EntityTable> tableMap = Maps.newHashMap();
+	private EntityTable[] tables;
+	private EntityTable[] allTables;
 
 	@SuppressWarnings("restriction")
 	private sun.reflect.ConstructorAccessor enhancer;
 
-	private EntityTable[] tables;
 	private CriteriaQueryImpl<X> selectCriteria;
 
 	private int dependencyCount;
@@ -211,6 +212,62 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 						throw new RuntimeException("Cannot enhance class: " + this.getJavaType(), e);
 					}
 				}
+			}
+		}
+	}
+
+	/**
+	 * Returns all the tables in the inheritance chain.
+	 * 
+	 * @return the array of tables
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public EntityTable[] getAllTables() {
+		if (this.allTables != null) {
+			return this.allTables;
+
+		}
+
+		synchronized (this) {
+			if (this.allTables != null) {
+				return this.allTables;
+			}
+
+			final Map<String, EntityTable> tableMap = Maps.newHashMap();
+			this.getAllTables(tableMap);
+
+			final EntityTable[] tables = new EntityTable[tableMap.size()];
+			tableMap.values().toArray(tables);
+
+			Arrays.sort(tables, new Comparator<EntityTable>() {
+
+				@Override
+				public int compare(EntityTable o1, EntityTable o2) {
+					if ((o1 instanceof SecondaryTable) && !(o2 instanceof SecondaryTable)) {
+						return 1;
+					}
+
+					if ((o2 instanceof SecondaryTable) && !(o1 instanceof SecondaryTable)) {
+						return -1;
+					}
+
+					return o1.getName().compareTo(o2.getName());
+				}
+			});
+
+			return this.allTables = tables;
+		}
+	}
+
+	private void getAllTables(final Map<String, EntityTable> tableMap) {
+		tableMap.putAll(this.tableMap);
+
+		for (final EntityTypeImpl<? extends X> child : this.children.values()) {
+			if (child != this) {
+				child.getAllTables(tableMap);
+				tableMap.putAll(child.tableMap);
 			}
 		}
 	}
@@ -749,33 +806,53 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @param metadata
 	 */
 	private void initTables(EntityMetadata metadata) {
-		if ((this.getRootType().inheritanceType != InheritanceType.SINGLE_TABLE) || (this.getRootType() == this)) {
+		if (this.getRootType().getInheritanceType() != null) {
+			switch (this.getRootType().getInheritanceType()) {
+				case SINGLE_TABLE:
+					// if this is the root, create the primary table
+					if (this.getRootType() == this) {
+						this.primaryTable = new EntityTable(this, metadata.getTable());
 
-			if (this.getRootType() == this) {
-				this.primaryTable = new EntityTable(this, metadata.getTable());
+						this.tableMap.put(this.primaryTable.getName(), this.primaryTable);
+					}
+					// else map the primary key to the root type's primary table and the tables from the parent
+					else {
+						final EntityTypeImpl<? super X> supertype = (EntityTypeImpl<? super X>) this.getSupertype();
 
-			}
-			else if (this.getRootType().getInheritanceType() == InheritanceType.JOINED) {
-				this.tableMap.putAll(this.getRootType().tableMap);
+						this.primaryTable = supertype.primaryTable;
+						this.tableMap.putAll(supertype.tableMap);
+					}
+					break;
+				case JOINED:
+					// if this is the root, create the primary table
+					if (this.getRootType() == this) {
+						this.primaryTable = new EntityTable(this, metadata.getTable());
 
-				this.primaryTable = new SecondaryTable(this.getRootType(), metadata.getTable());
-			}
-			else {
-				this.tableMap.putAll(this.getRootType().tableMap);
+						this.tableMap.put(this.primaryTable.getName(), this.primaryTable);
+					}
+					// else map all the parent tables and create the primary table as secondary table
+					else {
+						final EntityTypeImpl<? super X> supertype = (EntityTypeImpl<? super X>) this.getSupertype();
+						this.tableMap.putAll(supertype.tableMap);
 
-				this.primaryTable = new SecondaryTable(this.getRootType(), metadata.getTable());
-			}
-
-			this.tableMap.put(this.primaryTable.getName(), this.primaryTable);
-
-			for (final SecondaryTableMetadata secondaryTableMetadata : metadata.getSecondaryTables()) {
-				final SecondaryTable secondaryTable = new SecondaryTable(this, secondaryTableMetadata);
-				this.tableMap.put(secondaryTableMetadata.getName(), secondaryTable);
+						this.primaryTable = new SecondaryTable(this, metadata.getTable());
+						this.tableMap.put(this.primaryTable.getName(), this.primaryTable);
+					}
+					break;
+				case TABLE_PER_CLASS:
+					throw new MappingException("TABLE_PER_CLASS inheritence type is not yet supported", this.getRootType().getLocator());
 			}
 		}
+		// create the primary table
 		else {
-			this.primaryTable = this.getRootType().primaryTable;
-			this.tableMap.putAll(this.getRootType().tableMap);
+			this.primaryTable = new EntityTable(this, metadata.getTable());
+
+			this.tableMap.put(this.primaryTable.getName(), this.primaryTable);
+		}
+
+		for (final SecondaryTableMetadata secondaryTableMetadata : metadata.getSecondaryTables()) {
+			final SecondaryTable secondaryTable = new SecondaryTable(this, secondaryTableMetadata);
+			this.tableMap.put(secondaryTableMetadata.getName(), secondaryTable);
 		}
 	}
 
@@ -827,6 +904,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			IdentifiableTypeImpl<? super X> parent = this;
 			do {
 				((EntityTypeImpl<? super X>) parent).children.put(this.discriminatorValue, this);
+
 				parent = parent.getSupertype();
 			}
 			while (parent instanceof EntityTypeImpl);

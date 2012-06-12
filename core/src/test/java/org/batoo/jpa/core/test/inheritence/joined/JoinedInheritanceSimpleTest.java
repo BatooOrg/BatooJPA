@@ -118,6 +118,7 @@ public class JoinedInheritanceSimpleTest extends BaseCoreTest {
 		final FooExt11 foo = new FooExt11();
 		foo.setValue("Value");
 		foo.setValueExt1("ValueExt1");
+		foo.setValueExt11("ValueExt11");
 
 		this.persist(foo);
 

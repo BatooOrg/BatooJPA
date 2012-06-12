@@ -91,6 +91,8 @@ public class SecondaryTable extends EntityTable {
 	 * @author hceylan
 	 */
 	public void link() {
-		this.foreignKey = new ForeignKey(this, this.getEntity(), this.metadata);
+		if (this.foreignKey == null) {
+			this.foreignKey = new ForeignKey(this, this.getEntity(), this.metadata);
+		}
 	}
 }

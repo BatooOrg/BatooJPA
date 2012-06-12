@@ -64,7 +64,7 @@ public class RootImpl<X> extends FromImpl<X, X> implements Root<X> {
 	 * @author hceylan
 	 */
 	public String generateFrom(CriteriaQueryImpl<?> query) {
-		final EntityTable primaryTable = this.getModel().getPrimaryTable();
+		final EntityTable primaryTable = this.getModel().getRootType().getPrimaryTable();
 
 		return primaryTable.getName() + " AS " + this.getFetchRoot().getTableAlias(query, primaryTable);
 	}
