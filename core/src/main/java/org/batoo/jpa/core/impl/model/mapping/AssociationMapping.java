@@ -152,7 +152,7 @@ public abstract class AssociationMapping<X, Z, Y> extends AbstractMapping<X, Y> 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract void checkTransient(ManagedInstance<? extends X> managedInstance);
+	public abstract void checkTransient(ManagedInstance<?> managedInstance);
 
 	/**
 	 * Flushes the associates.
@@ -167,7 +167,7 @@ public abstract class AssociationMapping<X, Z, Y> extends AbstractMapping<X, Y> 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract void flush(ConnectionImpl connection, ManagedInstance<? extends X> managedInstance) throws SQLException;
+	public abstract void flush(ConnectionImpl connection, ManagedInstance<?> managedInstance) throws SQLException;
 
 	/**
 	 * Returns the foreign key of the attribute.

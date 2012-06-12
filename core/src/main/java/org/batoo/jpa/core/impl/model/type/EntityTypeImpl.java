@@ -115,11 +115,13 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private int dependencyCount;
 	private final HashMap<EntityTypeImpl<?>, AssociationMapping<? super X, ?, ?>[]> dependencyMap = Maps.newHashMap();
 
-	private AssociationMapping<? super X, ?, ?>[] associations;
-	private AssociationMapping<? super X, ?, ?>[] associationsPersistable;
-	private AssociationMapping<? super X, ?, ?>[] associationsEager;
-	private AssociationMapping<? super X, ?, ?>[] associationsJoined;
-	private final HashMap<Method, Method> idMethods = Maps.newHashMap();
+	private AssociationMapping<?, ?, ?>[] associations;
+	private AssociationMapping<?, ?, ?>[] associationsPersistable;
+	private AssociationMapping<?, ?, ?>[] associationsEager;
+	private AssociationMapping<?, ?, ?>[] associationsJoined;
+	private PluralAssociationMapping<?, ?, ?>[] associationsPlural;
+
+	private final Map<Method, Method> idMethods = Maps.newHashMap();
 
 	private final Map<String, AbstractMapping<? super X, ?>> mappings = Maps.newHashMap();
 	private IdMapping<? super X, ?>[] idMappings;
@@ -291,7 +293,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public AssociationMapping<? super X, ?, ?>[] getAssociations() {
+	public AssociationMapping<?, ?, ?>[] getAssociations() {
 		if (this.associations != null) {
 			return this.associations;
 		}
@@ -301,21 +303,24 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.associations;
 			}
 
-			final List<AssociationMapping<? super X, ?, ?>> associations = Lists.newArrayList();
+			final List<AssociationMapping<?, ?, ?>> associations = Lists.newArrayList();
 
-			for (final AbstractMapping<? super X, ?> attribute : this.mappings.values()) {
-				if (attribute instanceof AssociationMapping) {
-					associations.add((AssociationMapping<? super X, ?, ?>) attribute);
+			for (final AbstractMapping<? super X, ?> mapping : this.mappings.values()) {
+				if (mapping instanceof AssociationMapping) {
+					associations.add((AssociationMapping<? super X, ?, ?>) mapping);
+				}
+
+				if (mapping instanceof EmbeddedMapping) {
+					final EmbeddedMapping<? super X, ?> embeddedMapping = (EmbeddedMapping<? super X, ?>) mapping;
+					embeddedMapping.addAssociations(associations);
 				}
 			}
 
 			final AssociationMapping<? super X, ?, ?>[] associatedAttributes0 = new AssociationMapping[associations.size()];
 			associations.toArray(associatedAttributes0);
 
-			this.associations = associatedAttributes0;
+			return this.associations = associatedAttributes0;
 		}
-
-		return this.associations;
 	}
 
 	/**
@@ -327,7 +332,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public AssociationMapping<? super X, ?, ?>[] getAssociationsEager() {
+	public AssociationMapping<?, ?, ?>[] getAssociationsEager() {
 		if (this.associationsEager != null) {
 			return this.associationsEager;
 		}
@@ -337,21 +342,19 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.associationsEager;
 			}
 
-			final List<AssociationMapping<? super X, ?, ?>> eagerAssociations = Lists.newArrayList();
+			final List<AssociationMapping<?, ?, ?>> eagerAssociations = Lists.newArrayList();
 
-			for (final AssociationMapping<? super X, ?, ?> association : this.getAssociations()) {
+			for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
 				if (association.isEager()) {
 					eagerAssociations.add(association);
 				}
 			}
 
-			final AssociationMapping<? super X, ?, ?>[] eagerAssociations0 = new AssociationMapping[eagerAssociations.size()];
+			final AssociationMapping<?, ?, ?>[] eagerAssociations0 = new AssociationMapping[eagerAssociations.size()];
 			eagerAssociations.toArray(eagerAssociations0);
 
-			this.associationsEager = eagerAssociations0;
+			return this.associationsEager = eagerAssociations0;
 		}
-
-		return this.associationsEager;
 	}
 
 	/**
@@ -363,7 +366,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public AssociationMapping<? super X, ?, ?>[] getAssociationsJoined() {
+	public AssociationMapping<?, ?, ?>[] getAssociationsJoined() {
 		if (this.associationsJoined != null) {
 			return this.associationsJoined;
 		}
@@ -373,21 +376,19 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.associationsJoined;
 			}
 
-			final List<AssociationMapping<? super X, ?, ?>> joinedAssociations = Lists.newArrayList();
+			final List<AssociationMapping<?, ?, ?>> joinedAssociations = Lists.newArrayList();
 
-			for (final AssociationMapping<? super X, ?, ?> association : this.getAssociations()) {
+			for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
 				if (association.getJoinTable() != null) {
 					joinedAssociations.add(association);
 				}
 			}
 
-			final AssociationMapping<? super X, ?, ?>[] joinedAssociations0 = new AssociationMapping[joinedAssociations.size()];
+			final AssociationMapping<?, ?, ?>[] joinedAssociations0 = new AssociationMapping[joinedAssociations.size()];
 			joinedAssociations.toArray(joinedAssociations0);
 
-			this.associationsJoined = joinedAssociations0;
+			return this.associationsJoined = joinedAssociations0;
 		}
-
-		return this.associationsJoined;
 	}
 
 	/**
@@ -399,7 +400,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public AssociationMapping<? super X, ?, ?>[] getAssociationsPersistable() {
+	public AssociationMapping<?, ?, ?>[] getAssociationsPersistable() {
 		if (this.associationsPersistable != null) {
 			return this.associationsPersistable;
 		}
@@ -409,21 +410,52 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.associationsPersistable;
 			}
 
-			final List<AssociationMapping<? super X, ?, ?>> persistableAssociations = Lists.newArrayList();
+			final List<AssociationMapping<?, ?, ?>> persistableAssociations = Lists.newArrayList();
 
-			for (final AssociationMapping<? super X, ?, ?> association : this.getAssociations()) {
+			for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
 				if (association.cascadesPersist()) {
 					persistableAssociations.add(association);
 				}
 			}
 
-			final AssociationMapping<? super X, ?, ?>[] persistableAssociations0 = new AssociationMapping[persistableAssociations.size()];
+			final AssociationMapping<?, ?, ?>[] persistableAssociations0 = new AssociationMapping[persistableAssociations.size()];
 			persistableAssociations.toArray(persistableAssociations0);
 
-			this.associationsPersistable = persistableAssociations0;
+			return this.associationsPersistable = persistableAssociations0;
+		}
+	}
+
+	/**
+	 * Returns the plural associations.
+	 * 
+	 * @return the plural associations
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	private PluralAssociationMapping<?, ?, ?>[] getAssociationsPlural() {
+		if (this.associationsPlural != null) {
+			return this.associationsPlural;
 		}
 
-		return this.associationsPersistable;
+		synchronized (this) {
+			if (this.associationsPlural != null) {
+				return this.associationsPlural;
+			}
+
+			final List<PluralAssociationMapping<?, ?, ?>> associationsPlural = Lists.newArrayList();
+			for (final AssociationMapping<?, ?, ?> mapping : this.getAssociations()) {
+				if (mapping instanceof PluralAssociationMapping) {
+					associationsPlural.add((PluralAssociationMapping<? super X, ?, ?>) mapping);
+				}
+			}
+
+			final PluralAssociationMapping<?, ?, ?>[] associationsPlural0 = new PluralAssociationMapping[associationsPlural.size()];
+			associationsPlural.toArray(associationsPlural0);
+
+			return this.associationsPlural = associationsPlural0;
+		}
 	}
 
 	/**
@@ -995,8 +1027,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			table.performInsert(connection, managedInstance);
 		}
 
-		for (final PluralAttributeImpl<? super X, ?, ?> attribute : this.getPluralAttributes0().values()) {
-			attribute.set(managedInstance.getInstance(), attribute.get(managedInstance.getInstance()));
+		for (final PluralAssociationMapping<?, ?, ?> association : this.getAssociationsPlural()) {
+			association.set(managedInstance, association.get(managedInstance.getInstance()));
 		}
 
 		managedInstance.setTransaction(transaction);
@@ -1071,9 +1103,9 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	@SuppressWarnings("unchecked")
 	public void prepareDependenciesFor(EntityTypeImpl<?> associate) {
 		// prepare the related associations
-		final Set<AssociationMapping<? super X, ?, ?>> attributes = Sets.newHashSet();
+		final Set<AssociationMapping<?, ?, ?>> attributes = Sets.newHashSet();
 
-		for (final AssociationMapping<? super X, ?, ?> association : this.getAssociations()) {
+		for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
 
 			// only owner associations impose priority
 			if (!association.isOwner()) {
@@ -1110,7 +1142,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private void prepareEagerAssociations(FetchParent<?, ?> r, int depth, AssociationMapping<?, ?, ?> parent) {
 		if (depth < EntityTypeImpl.MAX_DEPTH) {
 
-			for (final AssociationMapping<? super X, ?, ?> association : this.getAssociationsEager()) {
+			for (final AssociationMapping<?, ?, ?> association : this.getAssociationsEager()) {
 
 				// if we are coming from the inverse side and inverse side is not many-to-one then skip
 				if ((parent != null) && //

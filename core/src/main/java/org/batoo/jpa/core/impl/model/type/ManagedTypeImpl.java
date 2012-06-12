@@ -425,10 +425,6 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 		return attributes;
 	}
 
-	public Map<String, PluralAttributeImpl<? super X, ?, ?>> getPluralAttributes0() {
-		return this.pluralAttributes;
-	}
-
 	/**
 	 * {@inheritDoc}
 	 * 
@@ -478,9 +474,5 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 		attributes.addAll(this.singularAttributes.values());
 
 		return attributes;
-	}
-
-	public Map<String, SingularAttributeImpl<? super X, ?>> getSingularAttributes0() {
-		return this.singularAttributes;
 	}
 }

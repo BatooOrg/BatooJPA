@@ -90,7 +90,7 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public void checkTransient(ManagedInstance<? extends X> managedInstance) {
+	public void checkTransient(ManagedInstance<?> managedInstance) {
 		final Object values = this.get(managedInstance.getInstance());
 
 		final SessionImpl session = managedInstance.getSession();
@@ -113,7 +113,7 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public void flush(ConnectionImpl connection, ManagedInstance<? extends X> managedInstance) throws SQLException {
+	public void flush(ConnectionImpl connection, ManagedInstance<?> managedInstance) throws SQLException {
 		final Object values = this.get(managedInstance.getInstance());
 
 		final SessionImpl session = managedInstance.getSession();

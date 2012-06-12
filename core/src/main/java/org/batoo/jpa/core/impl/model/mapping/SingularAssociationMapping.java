@@ -85,7 +85,7 @@ public class SingularAssociationMapping<X, Z> extends AssociationMapping<X, Z, Z
 	 * 
 	 */
 	@Override
-	public void checkTransient(ManagedInstance<? extends X> managedInstance) {
+	public void checkTransient(ManagedInstance<?> managedInstance) {
 		final Z instance = this.get(managedInstance.getInstance());
 		if (instance != null) {
 			managedInstance.getSession().checkTransient(instance);
@@ -97,7 +97,7 @@ public class SingularAssociationMapping<X, Z> extends AssociationMapping<X, Z, Z
 	 * 
 	 */
 	@Override
-	public void flush(ConnectionImpl connection, ManagedInstance<? extends X> managedInstance) throws SQLException {
+	public void flush(ConnectionImpl connection, ManagedInstance<?> managedInstance) throws SQLException {
 		if (this.getJoinTable() != null) {
 			final Z entity = this.get(managedInstance.getInstance());
 

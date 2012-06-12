@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.model.mapping;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.metamodel.Attribute;
@@ -65,6 +66,29 @@ public class EmbeddedMapping<X, Y> extends AbstractMapping<X, Y> {
 		this.attribute = attribute;
 
 		this.link();
+	}
+
+	/**
+	 * Adds the associations that are within the the embeddable.
+	 * 
+	 * @param associations
+	 *            the list to add associations
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	public void addAssociations(List<AssociationMapping<?, ?, ?>> associations) {
+		for (final AbstractMapping<? super X, ?> mapping : this.mappings.values()) {
+			if (mapping instanceof AssociationMapping) {
+				associations.add((AssociationMapping<? super X, ?, ?>) mapping);
+			}
+
+			if (mapping instanceof EmbeddedMapping) {
+				final EmbeddedMapping<?, ?> embeddedMapping = (EmbeddedMapping<?, ?>) mapping;
+				embeddedMapping.addAssociations(associations);
+			}
+		}
 	}
 
 	/**

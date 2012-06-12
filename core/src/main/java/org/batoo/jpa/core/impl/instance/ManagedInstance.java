@@ -150,13 +150,11 @@ public class ManagedInstance<X> {
 	public boolean cascadePersist(EntityManagerImpl entityManager) {
 		boolean requiresFlush = false;
 
-		final AssociationMapping<? super X, ?, ?>[] associations = this.type.getAssociationsPersistable();
-
-		for (final AssociationMapping<? super X, ?, ?> association : associations) {
+		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsPersistable()) {
 
 			// if the association a collection attribute then we will cascade to each element
 			if (association instanceof PluralAssociationMapping) {
-				final PluralAssociationMapping<? super X, ?, ?> mapping = (PluralAssociationMapping<? super X, ?, ?>) association;
+				final PluralAssociationMapping<?, ?, ?> mapping = (PluralAssociationMapping<?, ?, ?>) association;
 
 				// extract the collection
 				final Collection<?> collection = (Collection<?>) mapping.get(this.instance);
@@ -167,7 +165,7 @@ public class ManagedInstance<X> {
 				}
 			}
 			else {
-				final SingularAssociationMapping<? super X, ?> mapping = (SingularAssociationMapping<? super X, ?>) association;
+				final SingularAssociationMapping<?, ?> mapping = (SingularAssociationMapping<?, ?>) association;
 				final Object associate = mapping.get(this.instance);
 				requiresFlush |= entityManager.persistImpl(associate);
 			}
@@ -183,7 +181,7 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void checkTransients() {
-		for (final AssociationMapping<? super X, ?, ?> association : this.type.getAssociations()) {
+		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociations()) {
 			association.checkTransient(this);
 		}
 	}
@@ -281,7 +279,7 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void flushAssociations(ConnectionImpl connection) throws SQLException {
-		for (final AssociationMapping<? super X, ?, ?> association : this.type.getAssociationsJoined()) {
+		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsJoined()) {
 			association.flush(connection, this);
 		}
 	}
