@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.core.test.lob;
 
+import javax.persistence.EntityManager;
+
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
@@ -57,5 +59,4 @@ public class LobTest extends BaseCoreTest {
 		Assert.assertEquals(foo.getKey(), foo2.getKey());
 		Assert.assertEquals(Sets.newHashSet("Value1", "Value2"), foo2.getValues());
 	}
-
 }
