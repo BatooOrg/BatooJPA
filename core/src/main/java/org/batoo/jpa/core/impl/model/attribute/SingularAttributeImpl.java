@@ -93,6 +93,9 @@ public abstract class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> im
 		else if (this.getPersistentAttributeType() == PersistentAttributeType.EMBEDDED) {
 			builder.append("embedded");
 		}
+		else {
+			builder.append("basic");
+		}
 
 		final String declaringType = this.getDeclaringType().getJavaType().getSimpleName();
 

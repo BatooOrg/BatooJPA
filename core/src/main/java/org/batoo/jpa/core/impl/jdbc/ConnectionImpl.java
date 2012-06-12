@@ -551,8 +551,6 @@ public class ConnectionImpl implements Connection {
 
 		final long start = System.currentTimeMillis();
 		try {
-			// LOG.debug("Preparing statement {0}", BLogger.lazyBoxed(sql));
-
 			return new PreparedStatementImpl(this, sql, this.connection.prepareStatement(sql), this.preparedStatementPool);
 		}
 		finally {

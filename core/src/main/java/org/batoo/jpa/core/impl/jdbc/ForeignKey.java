@@ -27,6 +27,7 @@ import org.batoo.jpa.core.impl.model.mapping.IdMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
+import org.batoo.jpa.parser.metadata.PrimaryKeyJoinColumnMetadata;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -41,10 +42,12 @@ public class ForeignKey {
 
 	private final List<JoinColumn> joinColumns = Lists.newArrayList();
 
-	private String tableName;
 	private AbstractTable table;
+	private String tableName;
 
 	/**
+	 * Constructor to create a join foreign key
+	 * 
 	 * @param metadata
 	 *            the metadata for join column
 	 * 
@@ -57,6 +60,45 @@ public class ForeignKey {
 		for (final JoinColumnMetadata columnMetadata : metadata) {
 			this.joinColumns.add(new JoinColumn(columnMetadata));
 		}
+	}
+
+	/**
+	 * @param table
+	 *            the secondary table
+	 * @param entity
+	 *            the entity
+	 * @param metadata
+	 *            the metadata
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ForeignKey(SecondaryTable table, EntityTypeImpl<?> entity, List<PrimaryKeyJoinColumnMetadata> metadata) {
+		super();
+
+		final IdMapping<?, ?>[] idMappings = entity.getIdMappings();
+
+		if ((metadata == null) || (metadata.size() == 0)) {
+			for (final IdMapping<?, ?> idMapping : idMappings) {
+				this.joinColumns.add(new JoinColumn(table, idMapping));
+			}
+		}
+		else {
+			for (final IdMapping<?, ?> idMapping : idMappings) {
+				for (final PrimaryKeyJoinColumnMetadata columnMetadata : metadata) {
+					if (idMapping.getColumn().getMappingName().equals(columnMetadata.getReferencedColumnName())) {
+						this.joinColumns.add(new JoinColumn(columnMetadata, table, idMappings[0]));
+						continue;
+					}
+
+					throw new MappingException("Primary key field cannot be found " + columnMetadata.getReferencedColumnName(),
+						columnMetadata.getLocator());
+				}
+			}
+		}
+
+		this.table = table;
+		this.table.addForeignKey(this);
 	}
 
 	/**
@@ -249,6 +291,6 @@ public class ForeignKey {
 	 */
 	@Override
 	public String toString() {
-		return "ForeignKey [tableName=" + this.tableName + ", joinColumns=" + this.joinColumns + "]";
+		return "ForeignKey [tableName=" + this.table.getName() + ", joinColumns=" + this.joinColumns + "]";
 	}
 }

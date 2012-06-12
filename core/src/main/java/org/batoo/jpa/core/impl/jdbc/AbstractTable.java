@@ -100,7 +100,6 @@ public class AbstractTable {
 				this.uniqueConstraints.put(constraint.getName(), constraint.getColumnNames());
 			}
 		}
-
 	}
 
 	/**
@@ -164,7 +163,15 @@ public class AbstractTable {
 						return true;
 					}
 
-					final AttributeImpl<?, ?> root = input.getMapping().getAttribute();
+					final AttributeImpl<?, ?> root;
+
+					if ((input instanceof JoinColumn) && (input.getMapping() == null)) {
+						root = ((JoinColumn) input).getReferencedMapping().getAttribute();
+					}
+					else {
+						root = input.getMapping().getAttribute();
+					}
+
 					final Class<?> parent = root.getDeclaringType().getJavaType();
 					final Class<?> javaType = type.getJavaType();
 

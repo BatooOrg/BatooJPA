@@ -215,7 +215,25 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 		final StringBuilder builder = new StringBuilder();
 
 		if (this.getPersistentAttributeType() == PersistentAttributeType.ELEMENT_COLLECTION) {
-			builder.append("collection");
+			builder.append("element-collection");
+		}
+		else {
+			builder.append("association ");
+
+			switch (this.getCollectionType()) {
+				case COLLECTION:
+					builder.append("collection");
+					break;
+				case LIST:
+					builder.append("list");
+					break;
+				case MAP:
+					builder.append("map");
+					break;
+				case SET:
+					builder.append("set");
+					break;
+			}
 		}
 
 		final String declaringType = this.getDeclaringType().getJavaType().getSimpleName();

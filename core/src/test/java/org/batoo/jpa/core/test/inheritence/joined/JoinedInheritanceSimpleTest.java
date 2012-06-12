@@ -23,7 +23,6 @@ import javax.persistence.EntityManager;
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -31,7 +30,6 @@ import org.junit.Test;
  * 
  * @since $version
  */
-@Ignore
 public class JoinedInheritanceSimpleTest extends BaseCoreTest {
 
 	/**
@@ -41,7 +39,7 @@ public class JoinedInheritanceSimpleTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
-	public void testSimpleInheritence0() {
+	public void testSimpleInheritance0() {
 		final Foo foo = new Foo();
 		foo.setValue("Value");
 
@@ -64,7 +62,7 @@ public class JoinedInheritanceSimpleTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
-	public void testSimpleInheritence1() {
+	public void testSimpleInheritance1() {
 		final FooExt1 foo = new FooExt1();
 		foo.setValue("Value");
 		foo.setValueExt1("ValueExt1");
@@ -89,7 +87,7 @@ public class JoinedInheritanceSimpleTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
-	public void testSimpleInheritence11() {
+	public void testSimpleInheritance11() {
 		final FooExt11 foo = new FooExt11();
 		foo.setValue("Value");
 		foo.setValueExt1("ValueExt1");
@@ -116,7 +114,7 @@ public class JoinedInheritanceSimpleTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
-	public void testSimpleInheritence3() {
+	public void testSimpleInheritance3() {
 		final FooExt11 foo = new FooExt11();
 		foo.setValue("Value");
 		foo.setValueExt1("ValueExt1");

@@ -26,6 +26,7 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
+import org.batoo.jpa.parser.metadata.PrimaryKeyJoinColumnMetadata;
 
 /**
  * Mapping of two {@link BasicColumn}s.
@@ -36,6 +37,11 @@ import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
 public class JoinColumn extends AbstractColumn {
 
 	private final AbstractLocator locator;
+	private AbstractTable table;
+
+	private String mappingName;
+	private String name;
+	private String referencedColumnName;
 
 	private final String columnDefinition;
 	private final String tableName;
@@ -44,21 +50,16 @@ public class JoinColumn extends AbstractColumn {
 	private final boolean unique;
 	private final boolean updatable;
 
-	private AssociationMapping<?, ?, ?> mapping;
-	private String mappingName;
-	private String name;
-	private String referencedColumnName;
-	private IdMapping<?, ?> referencedMapping;
-
-	private AbstractTable table;
-
 	private int length;
 	private int precision;
 	private int sqlType;
 	private int scale;
 
+	private AssociationMapping<?, ?, ?> mapping;
+	private IdMapping<?, ?> referencedMapping;
+
 	/**
-	 * Constructor with no metadata
+	 * Constructor with no metadata.
 	 * 
 	 * @param mapping
 	 *            the mapping
@@ -78,17 +79,49 @@ public class JoinColumn extends AbstractColumn {
 		this.tableName = "";
 		this.insertable = true;
 		this.nullable = true;
-		this.unique = false;;
+		this.unique = false;
 		this.updatable = true;
 
 		this.setColumnProperties(mapping, idMapping);
 	}
 
 	/**
-	 * Constructor with metadata
+	 * Constructor for inheritance and secondary table joins.
+	 * 
+	 * @param table
+	 *            the table
+	 * @param idMapping
+	 *            the referenced id mapping
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public JoinColumn(EntityTable table, IdMapping<?, ?> idMapping) {
+		super();
+
+		this.locator = null;
+		this.referencedMapping = idMapping;
+		final PkColumn referencedColumn = idMapping.getColumn();
+
+		this.referencedColumnName = referencedColumn.getName();
+		this.columnDefinition = referencedColumn.getColumnDefinition();
+		this.tableName = table.getName();
+		this.mappingName = referencedColumn.getMappingName();
+		this.name = referencedColumn.getName();
+		this.insertable = referencedColumn.isInsertable();
+		this.nullable = referencedColumn.isNullable();
+		this.unique = referencedColumn.isUnique();
+		this.updatable = referencedColumn.isUnique();
+
+		this.setColumnProperties(idMapping);
+		this.setTable(table);
+	}
+
+	/**
+	 * Constructor with metadata.
 	 * 
 	 * @param metadata
-	 *            the referenced column
+	 *            the metadata for the join
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -105,6 +138,38 @@ public class JoinColumn extends AbstractColumn {
 		this.nullable = metadata.isNullable();
 		this.unique = metadata.isUnique();
 		this.updatable = metadata.isUpdatable();
+	}
+
+	/**
+	 * Constructor for secondary table join column with metadata.
+	 * 
+	 * @param metadata
+	 *            the metadata for the join
+	 * @param table
+	 *            the secondary table
+	 * @param idMapping
+	 *            the id mapping
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public JoinColumn(PrimaryKeyJoinColumnMetadata metadata, SecondaryTable table, IdMapping<?, ?> idMapping) {
+		super();
+
+		this.locator = metadata.getLocator();
+		this.tableName = table.getName();
+
+		this.referencedColumnName = metadata.getReferencedColumnName();
+		this.columnDefinition = metadata.getColumnDefinition();
+		this.mappingName = metadata.getName();
+
+		this.insertable = true;
+		this.nullable = false;
+		this.unique = false;
+		this.updatable = false;
+
+		this.setColumnProperties(idMapping);
+		this.setTable(table);
 	}
 
 	/**
@@ -192,6 +257,18 @@ public class JoinColumn extends AbstractColumn {
 	 */
 	public String getReferencedColumnName() {
 		return this.referencedColumnName;
+	}
+
+	/**
+	 * Returns the referencedMapping of the JoinColumn.
+	 * 
+	 * @return the referencedMapping of the JoinColumn
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public IdMapping<?, ?> getReferencedMapping() {
+		return this.referencedMapping;
 	}
 
 	/**
@@ -365,6 +442,8 @@ public class JoinColumn extends AbstractColumn {
 	@Override
 	@SuppressWarnings("rawtypes")
 	public void setValue(ManagedInstance managedInstance, Object value) {
-		this.mapping.set(managedInstance, value);
+		if (this.mapping != null) {
+			this.mapping.set(managedInstance, value);
+		}
 	}
 }

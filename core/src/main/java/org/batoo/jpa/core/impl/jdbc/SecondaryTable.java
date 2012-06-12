@@ -18,8 +18,14 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
+import java.util.List;
+
+import javax.persistence.criteria.JoinType;
+
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.parser.metadata.PrimaryKeyJoinColumnMetadata;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
+import org.batoo.jpa.parser.metadata.TableMetadata;
 
 /**
  * Table representing an secondary table for entity persistent storage.
@@ -29,7 +35,12 @@ import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
  */
 public class SecondaryTable extends EntityTable {
 
+	private List<PrimaryKeyJoinColumnMetadata> metadata;
+	private ForeignKey foreignKey;
+
 	/**
+	 * Default secondary table constructor.
+	 * 
 	 * @param entity
 	 *            the entity
 	 * @param metadata
@@ -40,18 +51,46 @@ public class SecondaryTable extends EntityTable {
 	 */
 	public SecondaryTable(EntityTypeImpl<?> entity, SecondaryTableMetadata metadata) {
 		super(entity, metadata);
+
+		this.metadata = metadata.getPrimaryKeyJoinColumnMetadata();
+	}
+
+	/**
+	 * Constructor primary table as join table in inheritance.
+	 * 
+	 * @param entity
+	 *            the root entity
+	 * @param metadata
+	 *            the metadata
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public SecondaryTable(EntityTypeImpl<?> entity, TableMetadata metadata) {
+		super(entity, metadata);
 	}
 
 	/**
 	 * @param primaryTableAlias
+	 *            the primary table alias
 	 * @param alias
-	 * @return
+	 *            the table alias
+	 * @return the join SQL fragment
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	public String joinPrimary(String primaryTableAlias, String alias) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.foreignKey.createSourceJoin(JoinType.LEFT, primaryTableAlias, alias);
+	}
+
+	/**
+	 * Links the secondary table to the primary table
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void link() {
+		this.foreignKey = new ForeignKey(this, this.getEntity(), this.metadata);
 	}
 }

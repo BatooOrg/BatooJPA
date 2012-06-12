@@ -295,6 +295,9 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 
 		CriteriaQueryImpl.LOG.debug("Preparing SQL for {0}", CriteriaQueryImpl.LOG.lazyBoxed(this));
 
+		// generate the select chunk
+		final String select = "SELECT\n\t" + this.selection.generate(this);
+
 		// generate from chunk
 		final List<String> froms = Lists.newArrayList();
 		final List<String> joins = Lists.newArrayList();
@@ -304,8 +307,6 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 			joins.add(root.generateJoins(this));
 		}
 
-		// generate the select chunk
-		final String select = "SELECT\n\t" + this.selection.generate(this);
 		final String restriction = this.generateRestriction();
 		final String where = restriction != null ? "WHERE " + restriction : null;
 
@@ -336,11 +337,11 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 */
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder("select ");
+		final StringBuilder builder = new StringBuilder("select");
 
 		// append distinct if necessary
 		if (this.distinct) {
-			builder.append("distinct ");
+			builder.append(" distinct");
 		}
 
 		final Collection<String> roots = Collections2.transform(this.getRoots(), new Function<Root<?>, String>() {
@@ -356,10 +357,13 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 				return builder.toString();
 			}
 		});
-		builder.append("").append(Joiner.on(", ").join(roots));
+		builder.append("\n\t").append(Joiner.on(", ").join(roots));
 
 		for (final Root<?> root : this.getRoots()) {
-			builder.append("\n").append(((RootImpl<?>) root).describe());
+			final String join = ((RootImpl<?>) root).describe();
+			if (StringUtils.isNotBlank(join)) {
+				builder.append("\n").append(join);
+			}
 		}
 
 		if (this.getRestriction() != null) {

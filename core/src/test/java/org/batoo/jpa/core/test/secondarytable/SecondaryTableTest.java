@@ -33,7 +33,6 @@ import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.jdbc.SingleValueHandler;
 import org.batoo.jpa.core.test.BaseCoreTest;
 import org.batoo.jpa.core.test.NullResultSetHandler;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -41,7 +40,6 @@ import org.junit.Test;
  * 
  * @since $version
  */
-@Ignore
 public class SecondaryTableTest extends BaseCoreTest {
 
 	private Person person() {
@@ -55,6 +53,9 @@ public class SecondaryTableTest extends BaseCoreTest {
 
 	/**
 	 * Tests {@link EntityManagerFactory#createEntityManager()}
+	 * 
+	 * @throws SQLException
+	 *             thrown if underlying SQL fails
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -149,6 +150,9 @@ public class SecondaryTableTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#persist(Object)}.
 	 * 
+	 * @throws SQLException
+	 *             thrown if underlying SQL fails
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
@@ -171,6 +175,9 @@ public class SecondaryTableTest extends BaseCoreTest {
 
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} with one-many-one.
+	 * 
+	 * @throws SQLException
+	 *             thrown if underlying SQL fails
 	 * 
 	 * @since $version
 	 * @author hceylan

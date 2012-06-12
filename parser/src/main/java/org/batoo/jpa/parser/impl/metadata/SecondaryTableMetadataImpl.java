@@ -118,8 +118,7 @@ public class SecondaryTableMetadataImpl implements SecondaryTableMetadata {
 	 */
 	@Override
 	public List<UniqueConstraintMetadata> getUniqueConstraints() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.uniqueConstraints;
 	}
 
 }

@@ -36,6 +36,7 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 public abstract class AbstractMapping<X, Y> {
 
 	private final EntityTypeImpl<X> entity;
+	private final boolean inherited;
 
 	/**
 	 * @param entity
@@ -48,6 +49,7 @@ public abstract class AbstractMapping<X, Y> {
 		super();
 
 		this.entity = entity;
+		this.inherited = entity.getRootType().getInheritanceType() != null;
 	}
 
 	/**
@@ -99,6 +101,17 @@ public abstract class AbstractMapping<X, Y> {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void set(ManagedInstance managedInstance, Object value) {
-		this.getAttribute().set(managedInstance, value);
+		if (!this.inherited || managedInstance.getType().doesExtend(this.entity)) {
+			this.getAttribute().set(managedInstance, value);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return this.getAttribute().toString();
 	}
 }

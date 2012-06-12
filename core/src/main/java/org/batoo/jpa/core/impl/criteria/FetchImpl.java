@@ -229,7 +229,7 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	 */
 	@Override
 	protected boolean shouldContinue(SessionImpl session, Map<String, Object> row) {
-		final ManagedInstance<Z> instance = this.getParent().getInstance(session, row);
+		final ManagedInstance<? extends Z> instance = this.getParent().getInstance(session, row);
 
 		return this.parentInstance.equals(instance);
 	}

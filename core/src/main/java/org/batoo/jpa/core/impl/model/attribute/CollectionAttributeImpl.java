@@ -72,13 +72,4 @@ public class CollectionAttributeImpl<X, E> extends PluralAttributeImpl<X, Collec
 	public void set(ManagedInstance<? extends X> managedInstance, Object value) {
 		super.set(managedInstance, new ManagedList<X, E>(this, managedInstance, (Collection<? extends E>) value));
 	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String toString() {
-		return "CollectionAttribute" + super.toString();
-	}
 }

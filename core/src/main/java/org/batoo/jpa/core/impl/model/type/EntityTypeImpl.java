@@ -21,6 +21,8 @@ package org.batoo.jpa.core.impl.model.type;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +36,7 @@ import javax.persistence.criteria.Path;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 import javax.persistence.metamodel.EntityType;
+import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.reflect.ReflectHelper;
@@ -113,6 +116,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private AssociationMapping<? super X, ?, ?>[] associationsPersistable;
 	private AssociationMapping<? super X, ?, ?>[] associationsEager;
 	private AssociationMapping<? super X, ?, ?>[] associationsJoined;
+	private final HashMap<Method, Method> idMethods = Maps.newHashMap();
 
 	private final Map<String, AbstractMapping<? super X, ?>> mappings = Maps.newHashMap();
 	private IdMapping<? super X, ?>[] idMappings;
@@ -148,6 +152,30 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		this.initTables(metadata);
 
 		this.linkMappings();
+	}
+
+	/**
+	 * Returns if this entity extends the parent entity.
+	 * 
+	 * @param parent
+	 *            the parent to test
+	 * @return true if this entity extends the parent entity, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean doesExtend(EntityTypeImpl<?> parent) {
+		IdentifiableTypeImpl<? super X> supertype = this;
+
+		do {
+			if (supertype == parent) {
+				return true;
+			}
+			supertype = supertype.getSupertype();
+		}
+		while (supertype != null);
+
+		return false;
 	}
 
 	@SuppressWarnings("restriction")
@@ -693,6 +721,22 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			final EntityTable[] tables = new EntityTable[this.tableMap.size()];
 			this.tableMap.values().toArray(tables);
 
+			Arrays.sort(tables, new Comparator<EntityTable>() {
+
+				@Override
+				public int compare(EntityTable o1, EntityTable o2) {
+					if ((o1 instanceof SecondaryTable) && !(o2 instanceof SecondaryTable)) {
+						return 1;
+					}
+
+					if ((o2 instanceof SecondaryTable) && !(o1 instanceof SecondaryTable)) {
+						return -1;
+					}
+
+					return o1.getName().compareTo(o2.getName());
+				}
+			});
+
 			return this.tables = tables;
 		}
 	}
@@ -706,16 +750,27 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 */
 	private void initTables(EntityMetadata metadata) {
 		if ((this.getRootType().inheritanceType != InheritanceType.SINGLE_TABLE) || (this.getRootType() == this)) {
-			this.primaryTable = new EntityTable(this, metadata.getTable());
+
+			if (this.getRootType() == this) {
+				this.primaryTable = new EntityTable(this, metadata.getTable());
+
+			}
+			else if (this.getRootType().getInheritanceType() == InheritanceType.JOINED) {
+				this.tableMap.putAll(this.getRootType().tableMap);
+
+				this.primaryTable = new SecondaryTable(this.getRootType(), metadata.getTable());
+			}
+			else {
+				this.tableMap.putAll(this.getRootType().tableMap);
+
+				this.primaryTable = new SecondaryTable(this.getRootType(), metadata.getTable());
+			}
 
 			this.tableMap.put(this.primaryTable.getName(), this.primaryTable);
 
-			if (this.getRootType() != this) {
-				this.tableMap.putAll(this.getRootType().tableMap);
-			}
-
 			for (final SecondaryTableMetadata secondaryTableMetadata : metadata.getSecondaryTables()) {
-				this.tableMap.put(secondaryTableMetadata.getName(), new SecondaryTable(this, secondaryTableMetadata));
+				final SecondaryTable secondaryTable = new SecondaryTable(this, secondaryTableMetadata);
+				this.tableMap.put(secondaryTableMetadata.getName(), secondaryTable);
 			}
 		}
 		else {
@@ -735,7 +790,21 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public boolean isIdMethod(Method method) {
-		// TODO Auto-generated method stub
+		if (this.idMethods.containsKey(method)) { // if known id method, let go
+			return true;
+		}
+
+		final String methodName = method.getName();
+		if (methodName.startsWith("get") && (methodName.length() > 3)) { // check if id method
+			for (final SingularAttribute<? super X, ?> attribute : this.getSingularAttributes()) {
+				final String getterName = "get" + StringUtils.capitalize(attribute.getName());
+				if (attribute.isId() && getterName.equals(method.getName())) {
+					this.idMethods.put(method, method);
+					return true;
+				}
+			}
+		}
+
 		return false;
 	}
 
@@ -747,9 +816,12 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void linkMappings() {
-		if ((this.getRootType() != this) && (this.getRootType().getInheritanceType() != null)) {
-			// inherit mappings from the parent
-			this.mappings.putAll(((EntityTypeImpl<? super X>) this.getSupertype()).mappings);
+		if (this.getRootType().getInheritanceType() != null) {
+			if (this.getRootType() != this) {
+				// inherit mappings from the parent
+				this.mappings.putAll(((EntityTypeImpl<? super X>) this.getSupertype()).mappings);
+
+			}
 
 			// register the discriminator value
 			IdentifiableTypeImpl<? super X> parent = this;
@@ -821,6 +893,13 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 					break;
 				default:
 					break;
+			}
+		}
+
+		// link the secondary tables
+		for (final EntityTable table : this.tableMap.values()) {
+			if (table instanceof SecondaryTable) {
+				((SecondaryTable) table).link();
 			}
 		}
 	}

@@ -55,8 +55,9 @@ public class Address {
 
 	/**
 	 * @param person
+	 *            the person
 	 * @param city
-	 * @param country
+	 *            the city
 	 * 
 	 * @since $version
 	 * @author hceylan

@@ -181,13 +181,4 @@ public class IdAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 	public boolean isVersion() {
 		return false;
 	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String toString() {
-		return "IdAttribute" + super.toString();
-	}
 }

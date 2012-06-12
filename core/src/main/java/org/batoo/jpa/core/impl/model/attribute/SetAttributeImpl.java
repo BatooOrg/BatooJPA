@@ -73,13 +73,4 @@ public class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>, E> im
 	public final void set(ManagedInstance<? extends X> managedInstance, Object value) {
 		super.set(managedInstance, new ManagedSet<X, E>(this, managedInstance, (Collection<? extends E>) value));
 	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String toString() {
-		return "SetAttribute" + super.toString();
-	}
 }

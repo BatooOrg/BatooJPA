@@ -50,7 +50,7 @@ public class BaseTest extends Assertable {
 		 */
 		@Override
 		protected void failed(Throwable e, Description description) {
-			// BaseTest.LOG.error(e, "Test failed {0}", description);
+			BaseTest.LOG.error(e, "Test failed {0}", description);
 		}
 
 		/**

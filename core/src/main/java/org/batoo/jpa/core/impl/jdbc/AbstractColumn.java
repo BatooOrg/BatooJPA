@@ -219,4 +219,17 @@ public abstract class AbstractColumn {
 	 */
 	@SuppressWarnings("rawtypes")
 	public abstract void setValue(ManagedInstance instance, Object value);
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		final String tableName = this.getTable() != null ? this.getTable().getName() : "N/A";
+		final String mapping = this.getMapping() != null ? " " + this.getMapping().toString() + " " : "";
+
+		return this.getClass().getSimpleName() + mapping + " [name=" + this.getName() + ", type=" + this.getSqlType() + ", length="
+			+ this.getLength() + ", precision=" + this.getPrecision() + ", scale=" + this.getScale() + ", table=" + tableName + "]";
+	}
 }

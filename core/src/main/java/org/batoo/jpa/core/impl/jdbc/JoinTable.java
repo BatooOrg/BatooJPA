@@ -180,4 +180,14 @@ public class JoinTable extends AbstractTable {
 
 		new QueryRunner().update(connection, insertSql, params);
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return super.toString();
+	}
 }

@@ -233,10 +233,12 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	}
 
 	private String generateImpl(CriteriaQueryImpl<?> query) {
-		final List<String> fields = Lists.newArrayList();
+		final List<String> selects = Lists.newArrayList();
 
 		for (final EntityTable table : this.entity.getTables()) {
 			int fieldNo = 0;
+
+			final List<String> fields = Lists.newArrayList();
 
 			final String tableAlias = this.getTableAlias(query, table);
 
@@ -258,9 +260,11 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 
 				fields.add(field + " AS " + fieldAlias);
 			}
+
+			selects.add(Joiner.on(", ").join(fields));
 		}
 
-		return Joiner.on(", ").join(fields);
+		return Joiner.on(",\n\t\t").join(selects);
 	}
 
 	/**
@@ -401,6 +405,9 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 			}
 
 			return alias;
+		}
+		else if (table.getEntity() != table.getEntity().getRootType()) {
+
 		}
 
 		return this.getPrimaryTableAlias(query);

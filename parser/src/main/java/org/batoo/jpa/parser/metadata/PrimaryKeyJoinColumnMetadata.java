@@ -45,5 +45,4 @@ public interface PrimaryKeyJoinColumnMetadata extends BindableMetadata {
 	 * @author hceylan
 	 */
 	String getReferencedColumnName();
-
 }

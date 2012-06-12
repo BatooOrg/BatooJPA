@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
+import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.PhysicalMapping;
@@ -69,7 +70,8 @@ public class BasicColumn extends AbstractColumn {
 		this.locator = metadata != null ? metadata.getLocator() : null;
 		this.sqlType = sqlType;
 
-		this.mappingName = metadata != null ? metadata.getName() : this.mapping.getAttribute().getName();
+		this.mappingName = (metadata != null) && StringUtils.isNotBlank(metadata.getName()) ? metadata.getName()
+			: this.mapping.getAttribute().getName();
 		this.name = this.jdbcAdaptor.escape(this.mappingName);
 
 		this.tableName = metadata != null ? metadata.getTable() : "";
@@ -118,6 +120,7 @@ public class BasicColumn extends AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
+	@Override
 	public PhysicalMapping<?, ?> getMapping() {
 		return this.mapping;
 	}
@@ -258,6 +261,7 @@ public class BasicColumn extends AbstractColumn {
 	 * @author hceylan
 	 */
 	@Override
+	@SuppressWarnings("rawtypes")
 	public void setValue(ManagedInstance managedInstance, Object value) {
 		this.mapping.set(managedInstance, value);
 	}
