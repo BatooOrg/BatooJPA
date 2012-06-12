@@ -62,6 +62,7 @@ import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttributeImpl;
+import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
 import org.batoo.jpa.core.impl.model.attribute.IdAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.PhysicalAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
@@ -69,6 +70,7 @@ import org.batoo.jpa.core.impl.model.attribute.VersionAttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
+import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
 import org.batoo.jpa.core.impl.model.mapping.IdMapping;
 import org.batoo.jpa.core.impl.model.mapping.PhysicalMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
@@ -106,7 +108,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private EntityTable[] allTables;
 
 	@SuppressWarnings("restriction")
-	private sun.reflect.ConstructorAccessor enhancer;
+	private sun.reflect.ConstructorAccessor constructor;
 
 	private CriteriaQueryImpl<X> selectCriteria;
 
@@ -179,38 +181,26 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		return false;
 	}
 
-	@SuppressWarnings("restriction")
 	private void enhanceIfNeccessary() {
-		if (this.enhancer == null) {
-			synchronized (this) {
-				if (this.enhancer == null) {
-					try {
-						final Class<X> enhancedClass = Enhancer.enhance(this);
-						final Constructor<X> enhancedConstructor = enhancedClass.getConstructor(Class.class, SessionImpl.class,
-							Object.class, Boolean.TYPE);
+		if (this.constructor != null) {
+			return;
+		}
+		synchronized (this) {
+			// other thread got it before us?
+			if (this.constructor != null) {
+				return;
+			}
 
-						final Class<?> magClass = Class.forName("sun.reflect.MethodAccessorGenerator");
-						final Constructor<?> c = magClass.getDeclaredConstructors()[0];
-						final Method generateMethod = magClass.getMethod("generateConstructor", Class.class, Class[].class, Class[].class,
-							Integer.TYPE);
+			if (this.constructor == null) {
+				try {
+					final Class<X> enhancedClass = Enhancer.enhance(this);
+					final Constructor<X> constructor = enhancedClass.getConstructor(Class.class, SessionImpl.class, Object.class,
+						Boolean.TYPE);
 
-						ReflectHelper.setAccessible(c, true);
-						ReflectHelper.setAccessible(generateMethod, true);
-
-						try {
-							final Object mag = c.newInstance();
-							this.enhancer = (sun.reflect.ConstructorAccessor) generateMethod.invoke(mag,
-								enhancedConstructor.getDeclaringClass(), enhancedConstructor.getParameterTypes(),
-								enhancedConstructor.getExceptionTypes(), enhancedConstructor.getModifiers());
-						}
-						finally {
-							ReflectHelper.setAccessible(c, false);
-							ReflectHelper.setAccessible(generateMethod, false);
-						}
-					}
-					catch (final Exception e) {
-						throw new RuntimeException("Cannot enhance class: " + this.getJavaType(), e);
-					}
+					this.constructor = ReflectHelper.createConstructor(constructor);
+				}
+				catch (final Exception e) {
+					throw new RuntimeException("Cannot enhance class: " + this.getJavaType(), e);
 				}
 			}
 		}
@@ -655,7 +645,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 		X instance = null;
 		try {
-			instance = (X) this.enhancer.newInstance(new Object[] { this.getJavaType(), session, id, !lazy });
+			instance = (X) this.constructor.newInstance(new Object[] { this.getJavaType(), session, id, !lazy });
 		}
 		catch (final Exception e) {
 			e.printStackTrace();
@@ -969,6 +959,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				case ONE_TO_MANY:
 					this.mappings.put(attribute.getName(), new PluralAssociationMapping(this, (PluralAttributeImpl) attribute));
 					break;
+				case EMBEDDED:
+					this.mappings.put(attribute.getName(), new EmbeddedMapping(this, (EmbeddedAttribute) attribute));
 				default:
 					break;
 			}
@@ -1004,7 +996,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		}
 
 		for (final PluralAttributeImpl<? super X, ?, ?> attribute : this.getPluralAttributes0().values()) {
-			attribute.set(managedInstance, attribute.get(managedInstance.getInstance()));
+			attribute.set(managedInstance.getInstance(), attribute.get(managedInstance.getInstance()));
 		}
 
 		managedInstance.setTransaction(transaction);

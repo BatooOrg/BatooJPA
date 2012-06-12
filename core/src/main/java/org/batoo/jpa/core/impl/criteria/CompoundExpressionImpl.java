@@ -18,6 +18,12 @@
  */
 package org.batoo.jpa.core.impl.criteria;
 
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.mutable.MutableInt;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
+
 /**
  * 
  * @author hceylan
@@ -97,6 +103,16 @@ public class CompoundExpressionImpl extends ExpressionImpl<Boolean> {
 	@Override
 	public String generate(CriteriaQueryImpl<?> query) {
 		return this.x.generate(query) + this.comparison.getFragment() + this.y.generate(query);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<Boolean> handle(SessionImpl session, BaseTypedQueryImpl<?> query, List<Map<String, Object>> data, MutableInt rowNo) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**

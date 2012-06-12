@@ -21,10 +21,13 @@ package org.batoo.jpa.core.impl.model.type;
 import javax.persistence.metamodel.EmbeddableType;
 
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
-import org.batoo.jpa.parser.metadata.type.EntityMetadata;
+import org.batoo.jpa.parser.metadata.type.EmbeddableMetadata;
 
 /**
+ * Implementation of {@link EmbeddableType}.
  * 
+ * @param <X>
+ *            The represented embeddable type
  * 
  * @author hceylan
  * @since $version
@@ -32,11 +35,17 @@ import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements EmbeddableType<X> {
 
 	/**
+	 * @param metamodel
+	 *            the metamodel
+	 * @param javaType
+	 *            the java type
+	 * @param metadata
+	 *            the metadata
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EmbeddableTypeImpl(MetamodelImpl metamodel, Class<X> javaType, EntityMetadata metadata) {
+	public EmbeddableTypeImpl(MetamodelImpl metamodel, Class<X> javaType, EmbeddableMetadata metadata) {
 		super(metamodel, javaType, metadata);
 
 		this.addAttributes(metadata);
@@ -50,5 +59,4 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	public PersistenceType getPersistenceType() {
 		return PersistenceType.EMBEDDABLE;
 	}
-
 }

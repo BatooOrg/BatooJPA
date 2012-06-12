@@ -43,6 +43,8 @@ public class BasicMapping<X, Y> extends PhysicalMapping<X, Y> {
 	private final BasicColumn column;
 
 	/**
+	 * Constructor for root type mapping.
+	 * 
 	 * @param entity
 	 *            the entity
 	 * @param attribute

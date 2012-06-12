@@ -242,4 +242,16 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	public String toString() {
 		return this.describe(this.getParent().toString());
 	}
+
+	/**
+	 * Returns the mapping of the FetchImpl.
+	 *
+	 * @return the mapping of the FetchImpl
+	 *
+	 * @since $version
+	 * @author hceylan
+	 */
+	public AssociationMapping<? super Z, X, ?> getMapping() {
+		return mapping;
+	}
 }

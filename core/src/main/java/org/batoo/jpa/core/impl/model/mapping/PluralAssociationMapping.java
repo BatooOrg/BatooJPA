@@ -228,6 +228,18 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 	 * 
 	 */
 	@Override
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void set(ManagedInstance managedInstance, Object value) {
+		final C collection = this.attribute.newCollection(managedInstance, this, (Collection<? extends Z>) value);
+
+		super.set(managedInstance, collection);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public void setInverse(AssociationMapping<Z, X, ?> inverse) {
 		this.inverse = inverse;
 	}

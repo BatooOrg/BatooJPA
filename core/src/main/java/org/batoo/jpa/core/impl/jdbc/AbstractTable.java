@@ -166,10 +166,10 @@ public class AbstractTable {
 					final AttributeImpl<?, ?> root;
 
 					if ((input instanceof JoinColumn) && (input.getMapping() == null)) {
-						root = ((JoinColumn) input).getReferencedMapping().getAttribute();
+						root = ((JoinColumn) input).getReferencedMapping().getRootMapping().getAttribute();
 					}
 					else {
-						root = input.getMapping().getAttribute();
+						root = input.getMapping().getRootMapping().getAttribute();
 					}
 
 					final Class<?> parent = root.getDeclaringType().getJavaType();

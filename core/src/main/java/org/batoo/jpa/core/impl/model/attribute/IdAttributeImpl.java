@@ -132,11 +132,11 @@ public class IdAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 				}
 			case SEQUENCE:
 				// fill with the sequence
-				this.set(managedInstance, this.getMetamodel().getNextSequence(this.generator));
+				this.set(managedInstance.getInstance(), this.getMetamodel().getNextSequence(this.generator));
 				break;
 			case TABLE:
 				// fill with the next table generator id
-				this.set(managedInstance, this.getMetamodel().getNextTableValue(this.generator));
+				this.set(managedInstance.getInstance(), this.getMetamodel().getNextTableValue(this.generator));
 				break;
 		}
 

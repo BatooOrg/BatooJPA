@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.impl.criteria;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.criteria.Expression;
@@ -27,7 +28,9 @@ import javax.persistence.metamodel.MapAttribute;
 import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.PhysicalAttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.PhysicalMapping;
 
@@ -140,6 +143,16 @@ public class PhysicalAttributePathImpl<X> extends PathImpl<X> {
 	@Override
 	public PhysicalAttributeImpl<?, X> getModel() {
 		return this.mapping.getAttribute();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<X> handle(SessionImpl session, BaseTypedQueryImpl<?> query, List<Map<String, Object>> data, MutableInt rowNo) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**

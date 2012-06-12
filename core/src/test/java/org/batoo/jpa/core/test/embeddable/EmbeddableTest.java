@@ -28,7 +28,6 @@ import junit.framework.Assert;
 import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.jdbc.SingleValueHandler;
 import org.batoo.jpa.core.test.BaseCoreTest;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -36,7 +35,6 @@ import org.junit.Test;
  * 
  * @since $version
  */
-@Ignore
 public class EmbeddableTest extends BaseCoreTest {
 
 	private Foo foo() {
@@ -75,6 +73,9 @@ public class EmbeddableTest extends BaseCoreTest {
 
 	/**
 	 * Tests to {@link EntityManager#persist(Object)}.
+	 * 
+	 * @throws SQLException
+	 *             thrown if SQL fails
 	 * 
 	 * @since $version
 	 * @author hceylan

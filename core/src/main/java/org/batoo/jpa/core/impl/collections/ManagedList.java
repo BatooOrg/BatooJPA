@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
+import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 
 /**
  * @param <X>
@@ -34,24 +34,25 @@ import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
  */
 public class ManagedList<X, E> extends ArrayList<E> {
 
-	private final PluralAttributeImpl<X, ?, E> attribute;
 	private final ManagedInstance<? extends X> managedInstance;
+	private final PluralAssociationMapping<?, E, ?> mapping;
 
 	/**
-	 * @param attribute
-	 *            the attribute
 	 * @param managedInstance
 	 *            the managed instance
-	 * @param values
+	 * @param mapping
+	 *            the mapping
+	 * @param value
 	 *            the initial values
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedList(PluralAttributeImpl<X, ?, E> attribute, ManagedInstance<? extends X> managedInstance, Collection<? extends E> values) {
-		super(values);
+	public ManagedList(ManagedInstance<? extends X> managedInstance, PluralAssociationMapping<?, E, ?> mapping,
+		Collection<? extends E> value) {
+		super(value);
 
-		this.attribute = attribute;
 		this.managedInstance = managedInstance;
+		this.mapping = mapping;
 	}
 }

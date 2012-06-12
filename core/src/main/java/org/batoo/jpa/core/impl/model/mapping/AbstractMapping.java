@@ -37,6 +37,7 @@ public abstract class AbstractMapping<X, Y> {
 
 	private final EntityTypeImpl<X> entity;
 	private final boolean inherited;
+	private EmbeddedMapping<?, ?> parent;
 
 	/**
 	 * @param entity
@@ -62,7 +63,15 @@ public abstract class AbstractMapping<X, Y> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Y get(Object instance) {
+	public final Y get(Object instance) {
+		if (this.parent != null) {
+			instance = this.parent.get(instance);
+
+			if (instance == null) {
+				return null;
+			}
+		}
+
 		return this.getAttribute().get(instance);
 	}
 
@@ -84,8 +93,25 @@ public abstract class AbstractMapping<X, Y> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EntityTypeImpl<X> getEntity() {
+	public final EntityTypeImpl<X> getEntity() {
 		return this.entity;
+	}
+
+	/**
+	 * Returns the root of the mapping.
+	 * 
+	 * @return the root mapping
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public final AbstractMapping<?, ?> getRootMapping() {
+		AbstractMapping<?, ?> rootMapping = this;
+		while (rootMapping.parent != null) {
+			rootMapping = rootMapping.parent;
+		}
+
+		return rootMapping;
 	}
 
 	/**
@@ -99,11 +125,33 @@ public abstract class AbstractMapping<X, Y> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void set(ManagedInstance managedInstance, Object value) {
-		if (!this.inherited || managedInstance.getType().doesExtend(this.entity)) {
-			this.getAttribute().set(managedInstance, value);
+	public void set(ManagedInstance<?> managedInstance, Object value) {
+		Object instance = managedInstance.getInstance();
+		if (this.parent != null) {
+			instance = this.parent.get(managedInstance.getInstance());
+
+			if (instance == null) {
+				instance = this.parent.getAttribute().newInstance();
+				this.parent.set(managedInstance, instance);
+			}
 		}
+
+		if (!this.inherited || managedInstance.getType().doesExtend(this.entity)) {
+			this.getAttribute().set(instance, value);
+		}
+	}
+
+	/**
+	 * Sets the parent mapping
+	 * 
+	 * @param parent
+	 *            the parent mapping to set
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public final void setParent(EmbeddedMapping<?, ?> parent) {
+		this.parent = parent;
 	}
 
 	/**

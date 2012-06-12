@@ -27,15 +27,15 @@ import org.batoo.jpa.parser.impl.orm.ElementConstants;
 import org.batoo.jpa.parser.impl.orm.EntityMappings;
 import org.batoo.jpa.parser.impl.orm.ParentElement;
 import org.batoo.jpa.parser.impl.orm.attribute.AttributesElement;
-import org.batoo.jpa.parser.metadata.type.MappedSuperclassMetadata;
+import org.batoo.jpa.parser.metadata.type.EmbeddableMetadata;
 
 /**
- * Element for <code>mapped-superclass</code> elements.
+ * Element for <code>embeddable</code> elements.
  * 
  * @author hceylan
  * @since $version
  */
-public class MappedSuperclassElementFactory extends ParentElement implements MappedSuperclassMetadata {
+public class EmbeddableElementFactory extends ParentElement implements EmbeddableMetadata {
 
 	private String className;
 	private boolean metadataComplete;
@@ -53,7 +53,7 @@ public class MappedSuperclassElementFactory extends ParentElement implements Map
 	 * @since $version
 	 * @author hceylan
 	 */
-	public MappedSuperclassElementFactory(ParentElement parent, Map<String, String> attributes) {
+	public EmbeddableElementFactory(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, ElementConstants.ELEMENT_ATTRIBUTES);
 	}
 

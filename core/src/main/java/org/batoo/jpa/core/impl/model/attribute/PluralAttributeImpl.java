@@ -31,7 +31,9 @@ import javax.persistence.metamodel.Type;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.reflect.ReflectHelper;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.metadata.attribute.AttributeMetadataImpl;
@@ -205,6 +207,23 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	public final boolean isCollection() {
 		return true;
 	}
+
+	/**
+	 * Creates a new managed collection to track changes.
+	 * 
+	 * @param managedInstance
+	 *            the managed instance
+	 * @param mapping
+	 *            the mapping
+	 * @param values
+	 *            the values
+	 * @return the managed collection
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract C newCollection(ManagedInstance<? extends X> managedInstance, PluralAssociationMapping<?, E, C> mapping,
+		Collection<? extends E> values);
 
 	/**
 	 * {@inheritDoc}

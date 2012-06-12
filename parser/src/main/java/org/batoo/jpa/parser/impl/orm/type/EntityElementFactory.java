@@ -83,7 +83,6 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 	 */
 	public EntityElementFactory(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, //
-			ElementConstants.ELEMENT_ACCESS, //
 			ElementConstants.ELEMENT_ATTRIBUTE_OVERRIDE, //
 			ElementConstants.ELEMENT_ASSOCIATION_OVERRIDE, //
 			ElementConstants.ELEMENT_ATTRIBUTES, //

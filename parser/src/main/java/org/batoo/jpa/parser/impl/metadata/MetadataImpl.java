@@ -23,13 +23,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.persistence.AccessType;
+import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
 
 import org.batoo.jpa.parser.MappingException;
+import org.batoo.jpa.parser.impl.metadata.type.EmbeddableMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.type.EntityMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.type.MappedSuperclassMetadataImpl;
 import org.batoo.jpa.parser.metadata.Metadata;
+import org.batoo.jpa.parser.metadata.type.EmbeddableMetadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 import org.batoo.jpa.parser.metadata.type.ManagedTypeMetadata;
 import org.batoo.jpa.parser.metadata.type.MappedSuperclassMetadata;
@@ -122,6 +125,9 @@ public class MetadataImpl implements Metadata {
 					}
 					else if (clazz.getAnnotation(MappedSuperclass.class) != null) {
 						this.entityMap.put(className, new MappedSuperclassMetadataImpl(clazz, (MappedSuperclassMetadata) metadata));
+					}
+					else if (clazz.getAnnotation(Embeddable.class) != null) {
+						this.entityMap.put(className, new EmbeddableMetadataImpl(clazz, (EmbeddableMetadata) metadata));
 					}
 					else {
 						throw new MappingException("Cannot determine type of class " + className);

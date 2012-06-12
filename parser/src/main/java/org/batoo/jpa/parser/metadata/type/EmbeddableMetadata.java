@@ -19,9 +19,9 @@
 package org.batoo.jpa.parser.metadata.type;
 
 /**
- * The definition of the mapped super classes.
+ * The definition of the embeddable classes.
  * 
  * @author hceylan
  * @since $version
  */
-public interface MappedSuperclassMetadata extends ManagedTypeMetadata {}
+public interface EmbeddableMetadata extends ManagedTypeMetadata {}

@@ -19,9 +19,13 @@
 package org.batoo.jpa.core.impl.criteria;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
+
+import org.apache.commons.lang.mutable.MutableInt;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -162,6 +166,16 @@ public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate 
 	@Override
 	public BooleanOperator getOperator() {
 		return this.operator;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<Boolean> handle(SessionImpl session, BaseTypedQueryImpl<?> query, List<Map<String, Object>> data, MutableInt rowNo) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**

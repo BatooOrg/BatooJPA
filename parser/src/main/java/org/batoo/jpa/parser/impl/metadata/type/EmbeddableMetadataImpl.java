@@ -16,12 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.parser.metadata.type;
+package org.batoo.jpa.parser.impl.metadata.type;
+
+import org.batoo.jpa.parser.metadata.type.EmbeddableMetadata;
 
 /**
- * The definition of the mapped super classes.
+ * Implementation {@link EmbeddableMetadata}.
  * 
  * @author hceylan
  * @since $version
  */
-public interface MappedSuperclassMetadata extends ManagedTypeMetadata {}
+public class EmbeddableMetadataImpl extends ManagedTypeMetadatImpl implements EmbeddableMetadata {
+
+	/**
+	 * @param clazz
+	 *            the represented class
+	 * @param metadata
+	 *            the metadata
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public EmbeddableMetadataImpl(Class<?> clazz, EmbeddableMetadata metadata) {
+		super(clazz, null);
+	}
+}

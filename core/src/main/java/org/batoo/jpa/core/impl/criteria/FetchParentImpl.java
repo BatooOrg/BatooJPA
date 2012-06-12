@@ -32,7 +32,6 @@ import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.Type;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
@@ -41,7 +40,6 @@ import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.jdbc.SecondaryTable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
@@ -478,16 +476,16 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 				final FetchImpl<X, ?> fetch = this.fetches.get(i);
 				final MutableInt subRowNo = new MutableInt(rowNo);
 				final List<?> value = fetch.handle(session, query, data, subRowNo, leap, instance);
-				final AttributeImpl<? super X, ?> attribute = fetch.getAttribute();
+				final AssociationMapping<? super X, ?, ?> mapping = fetch.getMapping();
 
 				if (value != null) {
 					leap = subRowNo.intValue() - rowNo.intValue();
-					if (attribute.isCollection()) {
-						attribute.set(instance, value);
+					if (mapping.getAttribute().isCollection()) {
+						mapping.set(instance, value);
 					}
 					else {
 						if (value.size() > 0) {
-							attribute.set(instance, value.get(0));
+							mapping.set(instance, value.get(0));
 						}
 					}
 				}

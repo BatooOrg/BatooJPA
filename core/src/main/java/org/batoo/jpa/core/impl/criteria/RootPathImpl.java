@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.impl.criteria;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.criteria.Path;
@@ -27,7 +28,9 @@ import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.PhysicalAttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
 import org.batoo.jpa.core.impl.model.mapping.PhysicalMapping;
@@ -168,5 +171,15 @@ public class RootPathImpl<X> extends PathImpl<X> {
 	 */
 	public String getTableAlias(CriteriaQueryImpl<?> query, EntityTable table) {
 		return this.fetchContext.getTableAlias(query, table);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<X> handle(SessionImpl session, BaseTypedQueryImpl<?> query, List<Map<String, Object>> data, MutableInt rowNo) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

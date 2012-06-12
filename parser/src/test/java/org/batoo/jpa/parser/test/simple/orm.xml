@@ -11,4 +11,5 @@
 		<one-to-many name=""></one-to-many>
 		</attributes>
 	</entity>
+	<embeddable class=""></embeddable>
 </entity-mappings>

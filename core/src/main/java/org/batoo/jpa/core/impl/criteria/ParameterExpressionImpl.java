@@ -18,9 +18,14 @@
  */
 package org.batoo.jpa.core.impl.criteria;
 
+import java.util.List;
+import java.util.Map;
+
 import javax.persistence.criteria.ParameterExpression;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.mutable.MutableInt;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
  * Type of criteria query parameter expressions.
@@ -109,6 +114,16 @@ public class ParameterExpressionImpl<T> extends ExpressionImpl<T> implements Par
 	@Override
 	public Integer getPosition() {
 		return this.position;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<T> handle(SessionImpl session, BaseTypedQueryImpl<?> query, List<Map<String, Object>> data, MutableInt rowNo) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**

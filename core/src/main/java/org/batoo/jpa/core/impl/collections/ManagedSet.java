@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
+import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 
 /**
  * @param <X>
@@ -34,24 +34,24 @@ import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
  */
 public class ManagedSet<X, E> extends HashSet<E> {
 
-	private final PluralAttributeImpl<X, ?, E> attribute;
 	private final ManagedInstance<? extends X> managedInstance;
+	private final PluralAssociationMapping<?, E, ?> mapping;
 
 	/**
-	 * @param attribute
-	 *            the attribute
 	 * @param managedInstance
 	 *            the managed instance
-	 * @param values
+	 * @param mapping
+	 *            the mapping
+	 * @param value
 	 *            the initial values
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedSet(PluralAttributeImpl<X, ?, E> attribute, ManagedInstance<? extends X> managedInstance, Collection<? extends E> values) {
-		super(values);
+	public ManagedSet(ManagedInstance<? extends X> managedInstance, PluralAssociationMapping<?, E, ?> mapping, Collection<? extends E> value) {
+		super(value);
 
-		this.attribute = attribute;
 		this.managedInstance = managedInstance;
+		this.mapping = mapping;
 	}
 }

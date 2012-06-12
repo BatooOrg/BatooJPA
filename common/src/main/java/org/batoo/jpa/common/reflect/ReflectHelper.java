@@ -44,6 +44,7 @@ import org.batoo.jpa.common.log.BLoggerFactory;
 import org.reflections.util.ClasspathHelper;
 
 import sun.misc.Unsafe;
+import sun.reflect.ConstructorAccessor;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
@@ -114,6 +115,40 @@ public class ReflectHelper {
 		}
 
 		throw new IllegalArgumentException(numberType + " not supported");
+	}
+
+	/**
+	 * Creates and returns a fast constructor accessor.
+	 * 
+	 * @param constructor
+	 *            the original constructor
+	 * @return the constructor accessor
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public static ConstructorAccessor createConstructor(Constructor<?> constructor) {
+		try {
+			final Class<?> magClass = Class.forName("sun.reflect.MethodAccessorGenerator");
+			final Constructor<?> c = magClass.getDeclaredConstructors()[0];
+			final Method generateMethod = magClass.getMethod("generateConstructor", Class.class, Class[].class, Class[].class, Integer.TYPE);
+
+			ReflectHelper.setAccessible(c, true);
+			ReflectHelper.setAccessible(generateMethod, true);
+
+			try {
+				final Object mag = c.newInstance();
+				return (sun.reflect.ConstructorAccessor) generateMethod.invoke(mag, constructor.getDeclaringClass(),
+					constructor.getParameterTypes(), constructor.getExceptionTypes(), constructor.getModifiers());
+			}
+			finally {
+				ReflectHelper.setAccessible(c, false);
+				ReflectHelper.setAccessible(generateMethod, false);
+			}
+		}
+		catch (final Exception e) {
+			throw new RuntimeException("Constructor generation failed", e);
+		}
 	}
 
 	/**

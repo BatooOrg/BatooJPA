@@ -20,6 +20,8 @@ package org.batoo.jpa.core.impl.model;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +51,7 @@ import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.type.BasicTypeImpl;
+import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.IdentifiableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
@@ -59,6 +62,7 @@ import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.metadata.MetadataImpl;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
+import org.batoo.jpa.parser.metadata.type.EmbeddableMetadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 import org.batoo.jpa.parser.metadata.type.ManagedTypeMetadata;
 import org.batoo.jpa.parser.metadata.type.MappedSuperclassMetadata;
@@ -131,6 +135,24 @@ public class MetamodelImpl implements Metamodel {
 		final List<ManagedTypeMetadata> entities = Lists.newArrayList(metadata.getEntityMappings());
 		final List<ManagedTypeMetadata> sortedEntities = Lists.newArrayList();
 
+		// sort so that the embeddables are first
+		Collections.sort(entities, new Comparator<ManagedTypeMetadata>() {
+
+			@Override
+			public int compare(ManagedTypeMetadata o1, ManagedTypeMetadata o2) {
+				if (o1 instanceof EmbeddableMetadata) {
+					return -1;
+				}
+
+				if (o2 instanceof EmbeddableMetadata) {
+					return 1;
+				}
+
+				return 0;
+			}
+		});
+
+		// sort by inheritance
 		try {
 			while (entities.size() > 0) {
 				for (final Iterator<ManagedTypeMetadata> i = entities.iterator(); i.hasNext();) {
@@ -178,7 +200,7 @@ public class MetamodelImpl implements Metamodel {
 				if (type instanceof EntityMetadata) {
 					// make sure it extends an identifiable type
 					if ((parent != null) && !(parent instanceof IdentifiableTypeImpl)) {
-						throw new MappingException("An Entity can only extend a MappedSuperclass or another Entity.", type.getLocator(),
+						throw new MappingException("Entities can only extend MappedSuperclasses or other Entities.", type.getLocator(),
 							parent.getLocator());
 					}
 
@@ -187,15 +209,25 @@ public class MetamodelImpl implements Metamodel {
 					this.entities.put(entity.getJavaType(), entity);
 				}
 				else if (type instanceof MappedSuperclassMetadata) {
-					// make sure it extends an mapped superclass type
+					// make sure it extends a mapped superclass type
 					if ((parent != null) && !(parent instanceof MappedSuperclassTypeImpl)) {
-						throw new MappingException("An Entity can only extend a MappedSuperclass or another Entity.", type.getLocator(),
+						throw new MappingException("MappedSuperclasses can only extend other MappedSuperclasses.", type.getLocator(),
 							parent.getLocator());
 					}
 
 					final MappedSuperclassTypeImpl mappedSuperclass = new MappedSuperclassTypeImpl(this, (MappedSuperclassTypeImpl) parent,
 						clazz, (MappedSuperclassMetadata) type);
 					this.mappedSuperclasses.put(mappedSuperclass.getJavaType(), mappedSuperclass);
+				}
+				if (type instanceof EmbeddableMetadata) {
+					// make sure it extends a embeddable type
+					if ((parent != null) && !(parent instanceof EmbeddableTypeImpl)) {
+						throw new MappingException("Embeddables can only extend a other Embeddables.", type.getLocator(),
+							parent.getLocator());
+					}
+
+					final EmbeddableTypeImpl embeddable = new EmbeddableTypeImpl(this, clazz, (EmbeddableMetadata) type);
+					this.embeddables.put(embeddable.getJavaType(), embeddable);
 				}
 
 			}
@@ -260,8 +292,8 @@ public class MetamodelImpl implements Metamodel {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public <X> EmbeddableType<X> embeddable(Class<X> clazz) {
-		return (EmbeddableType<X>) this.embeddables.get(clazz);
+	public <X> EmbeddableTypeImpl<X> embeddable(Class<X> clazz) {
+		return (EmbeddableTypeImpl<X>) this.embeddables.get(clazz);
 	}
 
 	/**
