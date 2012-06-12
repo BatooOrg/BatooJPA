@@ -228,7 +228,7 @@ public class MetamodelImpl implements Metamodel {
 	 */
 	public synchronized void addTableGenerator(TableGeneratorMetadata metadata) {
 		final TableGenerator tableGenerator = new TableGenerator(metadata);
-		this.tableGenerators.put(metadata.getName(), tableGenerator);
+		this.tableGenerators.put(tableGenerator.getName(), tableGenerator);
 	}
 
 	/**
@@ -440,7 +440,11 @@ public class MetamodelImpl implements Metamodel {
 	public void performForeignKeysDdl(DataSourceImpl datasource, DDLMode ddlMode, EntityTypeImpl<?> entity) {
 		MetamodelImpl.LOG.info("Performing foreign key DDL operations for entiy {0}, mode {1}", entity.getName(), ddlMode);
 
-		for (final EntityTable table : entity.getDeclaredTables()) {
+		for (final EntityTable table : entity.getTables()) {
+			// skip parent tables
+			if (table.getEntity() != entity) {
+				continue;
+			}
 			try {
 				MetamodelImpl.LOG.info("Performing foreign key DDL operations for table {0}, mode {1}", table.getName(), ddlMode);
 
@@ -455,7 +459,8 @@ public class MetamodelImpl implements Metamodel {
 
 		for (final AssociationMapping<?, ?, ?> attribute : entity.getAssociations()) {
 			final JoinTable table = attribute.getJoinTable();
-			if (table == null) {
+			// skip not applicable join tables
+			if ((table == null) || (table.getEntity() != entity)) {
 				continue;
 			}
 
@@ -541,7 +546,12 @@ public class MetamodelImpl implements Metamodel {
 		MetamodelImpl.LOG.info("Performing DDL operations for entity {0}, mode {1}", entity.getName(), ddlMode);
 
 		// create the entity tables
-		for (final EntityTable table : entity.getDeclaredTables()) {
+		for (final EntityTable table : entity.getTables()) {
+			// if table belongs to parent then skip
+			if (table.getEntity() != entity) {
+				continue;
+			}
+
 			try {
 				MetamodelImpl.LOG.info("Performing DDL operations for {0}, mode {1}", table.getName(), ddlMode);
 
@@ -555,13 +565,17 @@ public class MetamodelImpl implements Metamodel {
 		// create the join tables
 		for (final AssociationMapping<?, ?, ?> attribute : entity.getAssociations()) {
 			final JoinTable table = attribute.getJoinTable();
-			if (table != null) {
-				try {
-					this.jdbcAdaptor.createTable(attribute.getJoinTable(), datasource);
-				}
-				catch (final SQLException e) {
-					throw new MappingException("DDL operation failed on table " + table.getName(), e);
-				}
+
+			// skip not applicable tables
+			if ((table == null) || (table.getEntity() != entity)) {
+				continue;
+			}
+
+			try {
+				this.jdbcAdaptor.createTable(attribute.getJoinTable(), datasource);
+			}
+			catch (final SQLException e) {
+				throw new MappingException("DDL operation failed on table " + table.getName(), e);
 			}
 		}
 	}

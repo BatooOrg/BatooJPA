@@ -27,7 +27,11 @@ import javax.persistence.AssociationOverrides;
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Cacheable;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.SecondaryTable;
 import javax.persistence.SecondaryTables;
 import javax.persistence.SequenceGenerator;
@@ -37,12 +41,14 @@ import javax.persistence.TableGenerator;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.parser.impl.metadata.AssociationOverrideMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.AttributeOverrideMetadataImpl;
+import org.batoo.jpa.parser.impl.metadata.DiscriminatorColumnMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.SecondaryTableMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.SequenceGeneratorMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.TableGeneratorMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.TableMetadataImpl;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
+import org.batoo.jpa.parser.metadata.DiscriminatorColumnMetadata;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
@@ -69,6 +75,9 @@ public class EntityMetadataImpl extends ManagedTypeMetadatImpl implements Entity
 	private final List<SecondaryTableMetadata> secondaryTables = Lists.newArrayList();
 	private final List<AssociationMetadata> associationOverrides = Lists.newArrayList();
 	private final List<AttributeOverrideMetadata> attributeOverrides = Lists.newArrayList();
+	private InheritanceType inheritanceType;
+	private DiscriminatorColumnMetadata discriminatorColumn;
+	private String discriminatorValue;
 
 	/**
 	 * @param clazz
@@ -97,6 +106,9 @@ public class EntityMetadataImpl extends ManagedTypeMetadatImpl implements Entity
 		// handle overrides
 		this.handleAttributeOverrides(metadata, parsed);
 		this.handleAssociationOverrides(metadata, parsed);
+
+		// handle inheritance
+		this.handleInheritance(metadata, parsed);
 
 		// handle generators
 		this.sequenceGenerator = this.handleSequenceGenerator(metadata, parsed);
@@ -128,6 +140,33 @@ public class EntityMetadataImpl extends ManagedTypeMetadatImpl implements Entity
 	@Override
 	public Boolean getCacheable() {
 		return this.cachable;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public DiscriminatorColumnMetadata getDiscriminatorColumn() {
+		return this.discriminatorColumn;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getDiscriminatorValue() {
+		return this.discriminatorValue;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public InheritanceType getInheritanceType() {
+		return this.inheritanceType;
 	}
 
 	/**
@@ -288,6 +327,52 @@ public class EntityMetadataImpl extends ManagedTypeMetadatImpl implements Entity
 		}
 
 		return null;
+	}
+
+	/**
+	 * Handles the inheritance definition of the entity.
+	 * 
+	 * @param metadata
+	 *            the metadata
+	 * @param parsed
+	 *            the set of annotations parsed
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void handleInheritance(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
+		if (metadata != null) {
+			this.inheritanceType = metadata.getInheritanceType();
+			this.discriminatorColumn = metadata.getDiscriminatorColumn();
+			this.discriminatorValue = metadata.getDiscriminatorValue();
+		}
+
+		if (this.inheritanceType == null) {
+			final Inheritance inheritance = this.getClazz().getAnnotation(Inheritance.class);
+			if (inheritance != null) {
+				this.inheritanceType = inheritance.strategy();
+
+				parsed.add(Inheritance.class);
+			}
+		}
+
+		if (this.discriminatorColumn == null) {
+			final DiscriminatorColumn discriminatorColumn = this.getClazz().getAnnotation(DiscriminatorColumn.class);
+			if (discriminatorColumn != null) {
+				this.discriminatorColumn = new DiscriminatorColumnMetadataImpl(this.getLocator(), discriminatorColumn);
+
+				parsed.add(DiscriminatorColumn.class);
+			}
+		}
+
+		if (this.discriminatorValue == null) {
+			final DiscriminatorValue discriminatorValue = this.getClazz().getAnnotation(DiscriminatorValue.class);
+			if (discriminatorValue != null) {
+				this.discriminatorValue = discriminatorValue.value();
+
+				parsed.add(DiscriminatorValue.class);
+			}
+		}
 	}
 
 	/**

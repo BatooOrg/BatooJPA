@@ -20,9 +20,12 @@ package org.batoo.jpa.parser.metadata.type;
 
 import java.util.List;
 
+import javax.persistence.InheritanceType;
+
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.BindableMetadata;
+import org.batoo.jpa.parser.metadata.DiscriminatorColumnMetadata;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
@@ -44,7 +47,7 @@ public interface EntityMetadata extends ManagedTypeMetadata, BindableMetadata {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public List<AssociationMetadata> getAssociationOverrides();
+	List<AssociationMetadata> getAssociationOverrides();
 
 	/**
 	 * Returns the attributeOverrides of the entity.
@@ -54,7 +57,7 @@ public interface EntityMetadata extends ManagedTypeMetadata, BindableMetadata {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public List<AttributeOverrideMetadata> getAttributeOverrides();
+	List<AttributeOverrideMetadata> getAttributeOverrides();
 
 	/**
 	 * Returns if the entity is cachable.
@@ -65,6 +68,36 @@ public interface EntityMetadata extends ManagedTypeMetadata, BindableMetadata {
 	 * @author hceylan
 	 */
 	Boolean getCacheable();
+
+	/**
+	 * Returns the discriminator column definition of the entity.
+	 * 
+	 * @return the discriminator column definition of the entity
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	DiscriminatorColumnMetadata getDiscriminatorColumn();
+
+	/**
+	 * Returns the discriminator value for the entity.
+	 * 
+	 * @return the discriminator value for the entity
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	String getDiscriminatorValue();
+
+	/**
+	 * Returns the inheritance type of the entity.
+	 * 
+	 * @return the inheritance type of the entity
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	InheritanceType getInheritanceType();
 
 	/**
 	 * Returns the list secondary tables of the entity.
@@ -84,7 +117,7 @@ public interface EntityMetadata extends ManagedTypeMetadata, BindableMetadata {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SequenceGeneratorMetadata getSequenceGenerator();
+	SequenceGeneratorMetadata getSequenceGenerator();
 
 	/**
 	 * Returns the table of the entity.
@@ -94,7 +127,7 @@ public interface EntityMetadata extends ManagedTypeMetadata, BindableMetadata {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public TableMetadata getTable();
+	TableMetadata getTable();
 
 	/**
 	 * Returns the tableGenerator of the entity.
@@ -104,5 +137,5 @@ public interface EntityMetadata extends ManagedTypeMetadata, BindableMetadata {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public TableGeneratorMetadata getTableGenerator();
+	TableGeneratorMetadata getTableGenerator();
 }

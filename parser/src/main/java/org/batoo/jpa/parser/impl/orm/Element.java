@@ -69,6 +69,7 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 		// managed types
 		Element.factoryMap.put(ElementConstants.ELEMENT_MAPPED_SUPERCLASS, MappedSuperclassElementFactory.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_ENTITY, EntityElementFactory.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_INHERITANCE, InheritanceElement.class);
 
 		// attributes
 		Element.factoryMap.put(ElementConstants.ELEMENT_ATTRIBUTES, AttributesElement.class);
@@ -113,8 +114,12 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 		Element.factoryMap.put(ElementConstants.ELEMENT_INVERSE_JOIN_COLUMN, InverseJoinColumnElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_JOIN_COLUMN, JoinColumnElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_PRIMARY_KEY_JOIN_COLUMN, PrimaryKeyJoinColumnElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_DISCRIMINATOR_COLUMN, DiscriminatorColumnElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_DISCRIMINATOR_VALUE, DiscriminatorValueElement.class);
 
 		// tables
+		Element.factoryMap.put(ElementConstants.ELEMENT_TABLE, TableElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_SECONDARY_TABLE, SecondaryTableElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_JOIN_TABLE, JoinTableElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_UNIQUE_CONSTRAINT, UniqueConstraintsElement.class);
 	}

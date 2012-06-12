@@ -16,60 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.inheritence.single;
+package org.batoo.jpa.parser.metadata;
 
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 
 /**
+ * The definition for inheritances.
  * 
  * @author hceylan
  * @since $version
  */
-@Entity
-@Inheritance
-@DiscriminatorColumn
-public class Foo {
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer key;
-
-	private String value;
+public interface InheritanceMetadata {
 
 	/**
-	 * Returns the key.
+	 * Returns the inheritance type.
 	 * 
-	 * @return the key
-	 * @since $version
-	 */
-	public Integer getKey() {
-		return this.key;
-	}
-
-	/**
-	 * Returns the value.
+	 * @return the inheritance type
 	 * 
-	 * @return the value
 	 * @since $version
+	 * @author hceylan
 	 */
-	public String getValue() {
-		return this.value;
-	}
-
-	/**
-	 * Sets the value.
-	 * 
-	 * @param value
-	 *            the value to set
-	 * @since $version
-	 */
-	public void setValue(String value) {
-		this.value = value;
-	}
-
+	InheritanceType getInheritanceType();
 }

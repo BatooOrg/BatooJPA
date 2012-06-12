@@ -22,9 +22,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.AccessType;
+import javax.persistence.InheritanceType;
 
 import org.batoo.jpa.parser.impl.orm.AssociationOverrideElement;
 import org.batoo.jpa.parser.impl.orm.AttributeOverrideElement;
+import org.batoo.jpa.parser.impl.orm.DiscriminatorValueElement;
 import org.batoo.jpa.parser.impl.orm.Element;
 import org.batoo.jpa.parser.impl.orm.ElementConstants;
 import org.batoo.jpa.parser.impl.orm.EntityMappings;
@@ -34,6 +36,8 @@ import org.batoo.jpa.parser.impl.orm.TableElement;
 import org.batoo.jpa.parser.impl.orm.attribute.AttributesElement;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
+import org.batoo.jpa.parser.metadata.DiscriminatorColumnMetadata;
+import org.batoo.jpa.parser.metadata.InheritanceMetadata;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
@@ -62,6 +66,9 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 	private final List<SecondaryTableMetadata> secondaryTables = Lists.newArrayList();
 	private final List<AttributeOverrideMetadata> attributeOverrides = Lists.newArrayList();
 	private final List<AssociationMetadata> associationOverrides = Lists.newArrayList();
+	private InheritanceType inheritanceType;
+	private DiscriminatorColumnMetadata discriminatorColumn;
+	private String discriminatorValue;
 
 	/**
 	 * Constructor for ORM File parsing
@@ -83,7 +90,10 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 			ElementConstants.ELEMENT_TABLE_GENERATOR, //
 			ElementConstants.ELEMENT_SEQUENCE_GENERATOR, //
 			ElementConstants.ELEMENT_TABLE, //
-			ElementConstants.ELEMENT_SECONDARY_TABLE);
+			ElementConstants.ELEMENT_SECONDARY_TABLE, //
+			ElementConstants.ELEMENT_INHERITANCE, //
+			ElementConstants.ELEMENT_DISCRIMINATOR_COLUMN, //
+			ElementConstants.ELEMENT_DISCRIMINATOR_VALUE);
 	}
 
 	/**
@@ -153,6 +163,33 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 	@Override
 	public String getClassName() {
 		return this.className;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public DiscriminatorColumnMetadata getDiscriminatorColumn() {
+		return this.discriminatorColumn;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getDiscriminatorValue() {
+		return this.discriminatorValue;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public InheritanceType getInheritanceType() {
+		return this.inheritanceType;
 	}
 
 	/**
@@ -232,6 +269,18 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 
 		if (child instanceof AssociationOverrideElement) {
 			this.associationOverrides.add((AssociationMetadata) child);
+		}
+
+		if (child instanceof InheritanceMetadata) {
+			this.inheritanceType = ((InheritanceMetadata) child).getInheritanceType();
+		}
+
+		if (child instanceof DiscriminatorColumnMetadata) {
+			this.discriminatorColumn = (DiscriminatorColumnMetadata) child;
+		}
+
+		if (child instanceof DiscriminatorValueElement) {
+			this.discriminatorValue = ((DiscriminatorValueElement) child).getDiscriminatorValue();
 		}
 	}
 

@@ -32,7 +32,7 @@ import org.junit.Test;
  * @since $version
  */
 @Ignore
-public class JoinedInheritenceSimpleTest extends BaseCoreTest {
+public class JoinedInheritanceSimpleTest extends BaseCoreTest {
 
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with root type

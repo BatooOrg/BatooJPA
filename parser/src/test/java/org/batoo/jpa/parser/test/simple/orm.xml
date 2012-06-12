@@ -5,7 +5,7 @@
 
 	<mapped-superclass class="" ></mapped-superclass>
 
-	<entity name="Entity" class="org.batoo.jpa.parser.test.Entity">
+	<entity name="Entity" class="org.batoo.jpa.parser.test.Entity"> <inheritance strategy="SINGLE_TABLE"/><discriminator-column />
 	<secondary-table name=""></secondary-table>
 		<attributes>
 		<one-to-many name=""></one-to-many>

@@ -73,7 +73,7 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 		if (this.isOwner()) {
 			if ((this.getAttribute().getPersistentAttributeType() == PersistentAttributeType.MANY_TO_MANY)
 				|| (metadata.getJoinColumns().size() == 0)) {
-				this.joinTable = new JoinTable(metadata.getJoinTable());
+				this.joinTable = new JoinTable(entity, metadata.getJoinTable());
 			}
 			else {
 				this.joinTable = null;

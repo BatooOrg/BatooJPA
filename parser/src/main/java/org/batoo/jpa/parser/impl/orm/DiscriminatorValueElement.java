@@ -16,60 +16,51 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.inheritence.single;
+package org.batoo.jpa.parser.impl.orm;
 
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
+import java.util.Map;
 
 /**
+ * Element for <code>discriminator-value</code> elements.
  * 
  * @author hceylan
  * @since $version
  */
-@Entity
-@Inheritance
-@DiscriminatorColumn
-public class Foo {
+public class DiscriminatorValueElement extends ChildElement {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer key;
-
-	private String value;
+	private String discriminatorValue;
 
 	/**
-	 * Returns the key.
+	 * @param parent
+	 *            the parent element factory
+	 * @param attributes
+	 *            the attributes
 	 * 
-	 * @return the key
 	 * @since $version
+	 * @author hceylan
 	 */
-	public Integer getKey() {
-		return this.key;
+	public DiscriminatorValueElement(ParentElement parent, Map<String, String> attributes) {
+		super(parent, attributes);
 	}
 
 	/**
-	 * Returns the value.
+	 * {@inheritDoc}
 	 * 
-	 * @return the value
-	 * @since $version
 	 */
-	public String getValue() {
-		return this.value;
+	@Override
+	public void cdata(String cdata) {
+		this.discriminatorValue = cdata;
 	}
 
 	/**
-	 * Sets the value.
+	 * Returns the discriminator value.
 	 * 
-	 * @param value
-	 *            the value to set
+	 * @return the discriminator value
+	 * 
 	 * @since $version
+	 * @author hceylan
 	 */
-	public void setValue(String value) {
-		this.value = value;
+	public String getDiscriminatorValue() {
+		return this.discriminatorValue;
 	}
-
 }

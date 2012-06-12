@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.parser.MappingException;
@@ -159,18 +160,15 @@ public class AbstractTable {
 						return false;
 					}
 
-					// XXX implement with inheritance
-					// if (input.isDiscriminator()) {
-					// return true;
-					// }
+					if (input instanceof DiscriminatorColumn) {
+						return true;
+					}
 
-					return true;
-					// XXX: inheritance
-					// final AttributeImpl<?, ?> root = input.getMapping().getPath().getFirst();
-					// final Class<?> parent = root.getDeclaringType().getJavaType();
-					// final Class<?> javaType = type.getJavaType();
-					//
-					// return parent.isAssignableFrom(javaType);
+					final AttributeImpl<?, ?> root = input.getMapping().getAttribute();
+					final Class<?> parent = root.getDeclaringType().getJavaType();
+					final Class<?> javaType = type.getJavaType();
+
+					return parent.isAssignableFrom(javaType);
 				}
 			});
 

@@ -36,7 +36,7 @@ import com.google.common.collect.Sets;
  * @since $version
  */
 @Ignore
-public class JoinedInheritenceTest extends BaseCoreTest {
+public class JoinedInheritanceTest extends BaseCoreTest {
 
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with root type

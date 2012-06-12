@@ -147,6 +147,15 @@ public class JoinColumn extends AbstractColumn {
 	 * 
 	 */
 	@Override
+	public AssociationMapping<?, ?, ?> getMapping() {
+		return this.mapping;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public String getMappingName() {
 		return this.mappingName;
 	}

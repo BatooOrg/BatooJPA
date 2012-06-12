@@ -16,60 +16,52 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.inheritence.single;
+package org.batoo.jpa.parser.impl.orm;
 
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
+import java.util.Map;
+
+import javax.persistence.InheritanceType;
+
+import org.batoo.jpa.parser.metadata.InheritanceMetadata;
 
 /**
+ * Element for <code>inheritance</code> elements.
  * 
  * @author hceylan
  * @since $version
  */
-@Entity
-@Inheritance
-@DiscriminatorColumn
-public class Foo {
+public class InheritanceElement extends ChildElement implements InheritanceMetadata {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer key;
-
-	private String value;
+	private InheritanceType inheritance;
 
 	/**
-	 * Returns the key.
+	 * @param parent
+	 *            the parent element factory
+	 * @param attributes
+	 *            the attributes
 	 * 
-	 * @return the key
 	 * @since $version
+	 * @author hceylan
 	 */
-	public Integer getKey() {
-		return this.key;
+	public InheritanceElement(ParentElement parent, Map<String, String> attributes) {
+		super(parent, attributes);
 	}
 
 	/**
-	 * Returns the value.
+	 * {@inheritDoc}
 	 * 
-	 * @return the value
-	 * @since $version
 	 */
-	public String getValue() {
-		return this.value;
+	@Override
+	protected void generate() {
+		this.inheritance = InheritanceType.valueOf(this.getAttribute(ElementConstants.ATTR_STRATEGY, InheritanceType.SINGLE_TABLE.name()));
 	}
 
 	/**
-	 * Sets the value.
+	 * {@inheritDoc}
 	 * 
-	 * @param value
-	 *            the value to set
-	 * @since $version
 	 */
-	public void setValue(String value) {
-		this.value = value;
+	@Override
+	public InheritanceType getInheritanceType() {
+		return this.inheritance;
 	}
-
 }

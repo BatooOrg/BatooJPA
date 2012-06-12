@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.model;
 
+import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
 
 /**
@@ -42,7 +43,8 @@ public class SequenceGenerator extends AbstractGenerator {
 	public SequenceGenerator(SequenceGeneratorMetadata metadata) {
 		super(metadata);
 
-		this.sequenceName = metadata != null ? metadata.getName() : SequenceGenerator.DEFAULT_SEQUENCE_NAME;
+		this.sequenceName = (metadata != null) && StringUtils.isNotBlank(metadata.getName()) ? metadata.getName()
+			: SequenceGenerator.DEFAULT_SEQUENCE_NAME;
 	}
 
 	/**

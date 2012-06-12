@@ -75,8 +75,11 @@ public class ElementConstants {
 	protected static final String ELEMENT_TRANSIENT = "transient";
 	protected static final String ELEMENT_UNIQUE_CONSTRAINT = "unique-constraint";
 	protected static final String ELEMENT_VERSION = "version";
-	protected static final String ELEMENT_TABLE = "secondary-table";
+	protected static final String ELEMENT_TABLE = "table";
 	protected static final String ELEMENT_SECONDARY_TABLE = "secondary-table";
+	protected static final String ELEMENT_INHERITANCE = "inheritance";
+	protected static final String ELEMENT_DISCRIMINATOR_COLUMN = "discriminator-column";
+	protected static final String ELEMENT_DISCRIMINATOR_VALUE = "discriminator-value";
 
 	/**
 	 * Column Attribute names.
@@ -91,6 +94,7 @@ public class ElementConstants {
 	protected static final String ATTR_PRECISION = "precision";
 	protected static final String ATTR_SCALE = "scale";
 	protected static final String ATTR_REFERENCED_COLUMN_NAME = "referenced-column-name";
+	protected static final String ATTR_DISCRIMINATOR_TYPE = "discriminator-type";
 
 	/**
 	 * Schema, Catalog, table, etc.

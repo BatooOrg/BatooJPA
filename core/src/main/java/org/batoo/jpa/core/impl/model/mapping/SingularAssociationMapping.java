@@ -66,7 +66,7 @@ public class SingularAssociationMapping<X, Z> extends AssociationMapping<X, Z, Z
 
 		if (this.isOwner()) {
 			if (metadata.getJoinTable() != null) {
-				this.joinTable = new JoinTable(metadata.getJoinTable());
+				this.joinTable = new JoinTable(entity, metadata.getJoinTable());
 				this.foreignKey = null;
 			}
 			else {

@@ -111,6 +111,18 @@ public class BasicColumn extends AbstractColumn {
 	}
 
 	/**
+	 * Returns the mapping of the BasicColumn.
+	 * 
+	 * @return the mapping of the BasicColumn
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public PhysicalMapping<?, ?> getMapping() {
+		return this.mapping;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */

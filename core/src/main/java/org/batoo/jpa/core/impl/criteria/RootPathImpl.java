@@ -112,10 +112,6 @@ public class RootPathImpl<X> extends PathImpl<X> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public <Y> PathImpl<Y> get(SingularAttribute<? super X, Y> attribute) {
-		if (attribute.getDeclaringType() != this.entity) {
-			throw new IllegalArgumentException("Cannot dereference");
-		}
-
 		// try to resolve from path
 		PathImpl<Y> path = (PathImpl<Y>) this.children.get(attribute.getName());
 		if (path != null) {
@@ -124,7 +120,12 @@ public class RootPathImpl<X> extends PathImpl<X> {
 
 		// generate and return
 		if (attribute instanceof PhysicalAttributeImpl) {
-			final AbstractMapping<X, ?> mapping = this.entity.getMapping(attribute.getName());
+			final AbstractMapping<? super X, ?> mapping = this.entity.getMapping(attribute.getName());
+
+			if (mapping == null) {
+				throw new IllegalArgumentException("Cannot dereference");
+			}
+
 			path = new PhysicalAttributePathImpl<Y>(this, (PhysicalMapping<?, Y>) mapping);
 			this.children.put(attribute.getName(), path);
 		}

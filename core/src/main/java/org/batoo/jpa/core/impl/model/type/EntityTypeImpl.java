@@ -21,12 +21,12 @@ package org.batoo.jpa.core.impl.model.type;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.InheritanceType;
 import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.FetchParent;
 import javax.persistence.criteria.JoinType;
@@ -49,6 +49,7 @@ import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
+import org.batoo.jpa.core.impl.jdbc.DiscriminatorColumn;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.SecondaryTable;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
@@ -93,9 +94,11 @@ import com.google.common.collect.Sets;
 public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements EntityType<X> {
 
 	private static final int MAX_DEPTH = 5;
+
+	private final EntityMetadata metadata;
 	private final String name;
 	private EntityTable primaryTable;
-	private final Map<String, EntityTable> declaredTables = Maps.newHashMap();
+	private final Map<String, EntityTable> tableMap = Maps.newHashMap();
 
 	@SuppressWarnings("restriction")
 	private sun.reflect.ConstructorAccessor enhancer;
@@ -111,9 +114,13 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private AssociationMapping<? super X, ?, ?>[] associationsEager;
 	private AssociationMapping<? super X, ?, ?>[] associationsJoined;
 
-	private final Map<String, AbstractMapping<X, ?>> mappings = Maps.newHashMap();
-	private final EntityMetadata metadata;
+	private final Map<String, AbstractMapping<? super X, ?>> mappings = Maps.newHashMap();
 	private IdMapping<? super X, ?>[] idMappings;
+
+	private EntityTypeImpl<? super X> rootType;
+	private final InheritanceType inheritanceType;
+	private final String discriminatorValue;
+	private DiscriminatorColumn discriminatorColumn;
 
 	/**
 	 * @param metamodel
@@ -133,6 +140,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 		this.name = metadata.getName();
 		this.metadata = metadata;
+		this.inheritanceType = metadata.getInheritanceType();
+		this.discriminatorValue = StringUtils.isNotBlank(metadata.getDiscriminatorValue()) ? metadata.getDiscriminatorValue() : this.name;
 
 		this.addAttributes(metadata);
 		this.initTables(metadata);
@@ -218,7 +227,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 			final List<AssociationMapping<? super X, ?, ?>> associations = Lists.newArrayList();
 
-			for (final AbstractMapping<X, ?> attribute : this.mappings.values()) {
+			for (final AbstractMapping<? super X, ?> attribute : this.mappings.values()) {
 				if (attribute instanceof AssociationMapping) {
 					associations.add((AssociationMapping<? super X, ?, ?>) attribute);
 				}
@@ -380,18 +389,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
-	 * Returns the tables of the entity.
-	 * 
-	 * @return the tables of the entity
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public Collection<EntityTable> getDeclaredTables() {
-		return this.declaredTables.values();
-	}
-
-	/**
 	 * Returns the dependencies for the associate type
 	 * 
 	 * @param associate
@@ -416,6 +413,30 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
+	 * Returns the discriminator column of the entity.
+	 * 
+	 * @return the discriminator column of the entity
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public DiscriminatorColumn getDiscriminatorColumn() {
+		return this.discriminatorColumn;
+	}
+
+	/**
+	 * Returns the discriminatorValue of the EntityTypeImpl.
+	 * 
+	 * @return the discriminatorValue of the EntityTypeImpl
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getDiscriminatorValue() {
+		return this.discriminatorValue;
+	}
+
+	/**
 	 * Returns an array of id attributes.
 	 * 
 	 * @return an array of id attributes
@@ -436,7 +457,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			}
 
 			final List<IdMapping<? super X, ?>> idMappings = Lists.newArrayList();
-			for (final AbstractMapping<X, ?> mapping : this.mappings.values()) {
+			for (final AbstractMapping<? super X, ?> mapping : this.mappings.values()) {
 				if (mapping instanceof IdMapping) {
 					idMappings.add((IdMapping<? super X, ?>) mapping);
 				}
@@ -449,6 +470,18 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		}
 
 		return this.idMappings;
+	}
+
+	/**
+	 * Returns the inheritance type of the entity.
+	 * 
+	 * @return the inheritance type of the entity or <code>null</code>
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public InheritanceType getInheritanceType() {
+		return this.inheritanceType;
 	}
 
 	/**
@@ -533,7 +566,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AbstractMapping<X, ?> getMapping(String name) {
+	public AbstractMapping<? super X, ?> getMapping(String name) {
 		return this.mappings.get(name);
 	}
 
@@ -568,6 +601,30 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
+	 * Returns the root type of the hierarchy.
+	 * 
+	 * @return the root type of the hierarchy
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public EntityTypeImpl<? super X> getRootType() {
+		if (this.rootType != null) {
+			return this.rootType;
+		}
+
+		EntityTypeImpl<? super X> supertype = this;
+
+		while (supertype.getSupertype() instanceof EntityTypeImpl) {
+			supertype = (EntityTypeImpl<? super X>) supertype.getSupertype();
+		}
+
+		this.rootType = supertype;
+
+		return this.rootType;
+	}
+
+	/**
 	 * Returns the table with the name.
 	 * <p>
 	 * If the <code>tableName</code> is blank then the primary table is returned
@@ -584,7 +641,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			return this.primaryTable;
 		}
 
-		return this.declaredTables.get(tableName);
+		return this.tableMap.get(tableName);
 	}
 
 	/**
@@ -606,24 +663,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.tables;
 			}
 
-			int size = this.getDeclaredTables().size();
-			if (this.getSupertype() instanceof EntityTypeImpl) {
-				size += ((EntityTypeImpl<? super X>) this.getSupertype()).getTables().length;
-			}
-
-			final EntityTable[] tables = new EntityTable[size];
-
-			int i = 0;
-			for (final EntityTable entityTable : this.getDeclaredTables()) {
-				tables[i] = entityTable;
-				i++;
-			}
-
-			if (this.getSupertype() instanceof EntityTypeImpl) {
-				for (final EntityTable table : ((EntityTypeImpl<? super X>) this.getSupertype()).getDeclaredTables()) {
-					tables[i] = table;
-				}
-			}
+			final EntityTable[] tables = new EntityTable[this.tableMap.size()];
+			this.tableMap.values().toArray(tables);
 
 			return this.tables = tables;
 		}
@@ -637,12 +678,22 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @param metadata
 	 */
 	private void initTables(EntityMetadata metadata) {
-		this.primaryTable = new EntityTable(this, metadata.getTable());
+		if ((this.getRootType().inheritanceType != InheritanceType.SINGLE_TABLE) || (this.getRootType() == this)) {
+			this.primaryTable = new EntityTable(this, metadata.getTable());
 
-		this.declaredTables.put(this.primaryTable.getName(), this.primaryTable);
+			this.tableMap.put(this.primaryTable.getName(), this.primaryTable);
 
-		for (final SecondaryTableMetadata secondaryTableMetadata : metadata.getSecondaryTables()) {
-			this.declaredTables.put(secondaryTableMetadata.getName(), new SecondaryTable(this, secondaryTableMetadata));
+			if (this.getRootType() != this) {
+				this.tableMap.putAll(this.getRootType().tableMap);
+			}
+
+			for (final SecondaryTableMetadata secondaryTableMetadata : metadata.getSecondaryTables()) {
+				this.tableMap.put(secondaryTableMetadata.getName(), new SecondaryTable(this, secondaryTableMetadata));
+			}
+		}
+		else {
+			this.primaryTable = this.getRootType().primaryTable;
+			this.tableMap.putAll(this.getRootType().tableMap);
 		}
 	}
 
@@ -669,7 +720,24 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void linkMappings() {
+		if ((this.getRootType() != this) && (this.getRootType().getInheritanceType() != null)) {
+			this.mappings.putAll(((EntityTypeImpl<? super X>) this.getSupertype()).mappings);
+		}
+
+		if ((this.getRootType() == this) && (this.inheritanceType != null)) {
+			this.discriminatorColumn = new DiscriminatorColumn(this, this.metadata.getDiscriminatorColumn());
+		}
+
 		for (final Attribute<? super X, ?> attribute : this.getAttributes()) {
+
+			// should we process the attribute
+			final boolean process = (attribute.getDeclaringType() == this) //
+				|| (attribute.getDeclaringType() instanceof MappedSuperclassTypeImpl);
+
+			if (!process) {
+				continue;
+			}
+
 			switch (attribute.getPersistentAttributeType()) {
 				case BASIC:
 					final PhysicalAttributeImpl<? super X, ?> physicalAttribute = (PhysicalAttributeImpl<? super X, ?>) attribute;
@@ -693,11 +761,11 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 					// if table name is blank, it means the column should belong to the primary table
 					if (StringUtils.isBlank(tableName)) {
-						basicColumn.setTable(this.primaryTable);
+						basicColumn.setTable(this.getPrimaryTable());
 					}
 					// otherwise locate the table
 					else {
-						final AbstractTable table = this.declaredTables.get(tableName);
+						final AbstractTable table = this.tableMap.get(tableName);
 						if (table == null) {
 							throw new MappingException("Table " + tableName + " could not be found", basicColumn.getLocator());
 						}
@@ -888,7 +956,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		this.prepareEagerAssociations(r, 0, null);
 
 		final List<PredicateImpl> predicates = Lists.newArrayList();
-		for (final IdMapping<? super X, ?> idMapping : this.getIdMappings()) {
+		for (final IdMapping<? super X, ?> idMapping : this.getRootType().getIdMappings()) {
 			final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
 			final Path<?> path = r.get(idMapping.getAttribute());
 			final PredicateImpl predicate = cb.equal(path, pe);

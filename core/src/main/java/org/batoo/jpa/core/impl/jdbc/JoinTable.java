@@ -39,16 +39,21 @@ public class JoinTable extends AbstractTable {
 
 	private final ForeignKey sourceKey;
 	private final ForeignKey destinationKey;
+	private final EntityTypeImpl<?> entity;
 
 	/**
+	 * @param entity
+	 *            the owner entity
 	 * @param metadata
 	 *            the metadata
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public JoinTable(JoinTableMetadata metadata) {
+	public JoinTable(EntityTypeImpl<?> entity, JoinTableMetadata metadata) {
 		super(metadata);
+
+		this.entity = entity;
 
 		this.sourceKey = new ForeignKey(metadata != null ? metadata.getJoinColumns() : Collections.<JoinColumnMetadata> emptyList());
 		this.destinationKey = new ForeignKey(metadata != null ? metadata.getInverseJoinColumns()
@@ -96,6 +101,18 @@ public class JoinTable extends AbstractTable {
 	 */
 	public ForeignKey getDestinationKey() {
 		return this.destinationKey;
+	}
+
+	/**
+	 * Returns the oner entity of the table.
+	 * 
+	 * @return the oner entity of the table
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public EntityTypeImpl<?> getEntity() {
+		return this.entity;
 	}
 
 	/**

@@ -100,7 +100,7 @@ public class ManagedInstance<X> {
 		this.session = session;
 		this.instance = instance;
 
-		this.idAttributes = type.getIdMappings();
+		this.idAttributes = type.getRootType().getIdMappings();
 	}
 
 	/**

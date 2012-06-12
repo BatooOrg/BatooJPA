@@ -23,10 +23,10 @@ import java.util.Map;
 
 import javax.persistence.AccessType;
 
-import org.batoo.jpa.parser.impl.orm.type.EntityElementFactory;
 import org.batoo.jpa.parser.metadata.Metadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 import org.batoo.jpa.parser.metadata.type.ManagedTypeMetadata;
+import org.batoo.jpa.parser.metadata.type.MappedSuperclassMetadata;
 
 import com.google.common.collect.Lists;
 
@@ -51,7 +51,8 @@ public class EntityMappings extends ParentElement implements Metadata {
 	public EntityMappings(Map<String, String> attributes) {
 		super(null, attributes, //
 			ElementConstants.ELEMENT_ACCESS, //
-			ElementConstants.ELEMENT_ENTITY);
+			ElementConstants.ELEMENT_ENTITY, //
+			ElementConstants.ELEMENT_MAPPED_SUPERCLASS);
 	}
 
 	/**
@@ -82,8 +83,12 @@ public class EntityMappings extends ParentElement implements Metadata {
 			this.accessType = ((AccessElement) child).getAccessType();
 		}
 
-		if (child instanceof EntityElementFactory) {
+		if (child instanceof EntityMetadata) {
 			this.entities.add((EntityMetadata) child);
+		}
+
+		if (child instanceof MappedSuperclassMetadata) {
+			this.entities.add((MappedSuperclassMetadata) child);
 		}
 	}
 }

@@ -49,17 +49,17 @@ public class TableGenerator extends AbstractGenerator {
 	public TableGenerator(TableGeneratorMetadata metadata) {
 		super(metadata);
 
-		this.table = StringUtils.isBlank(metadata.getTable()) ? //
-			TableGenerator.DEFAULT_TABLE_NAME : metadata.getTable();
+		this.table = (metadata != null) && StringUtils.isNotBlank(metadata.getTable()) ? metadata.getTable()
+			: TableGenerator.DEFAULT_TABLE_NAME;
 
-		this.pkColumnName = StringUtils.isBlank(metadata.getPkColumnName()) ? //
-			TableGenerator.DEFAULT_PK_COLUMN_NAME : metadata.getPkColumnName();
+		this.pkColumnName = (metadata != null) && StringUtils.isNotBlank(metadata.getPkColumnName()) ? metadata.getPkColumnName()
+			: TableGenerator.DEFAULT_PK_COLUMN_NAME;
 
-		this.pkColumnValue = StringUtils.isBlank(metadata.getPkColumnValue()) ? //
-			TableGenerator.DEFAULT_PK_COLUMN_VALUE : metadata.getPkColumnValue();
+		this.pkColumnValue = (metadata != null) && StringUtils.isNotBlank(metadata.getPkColumnValue()) ? metadata.getPkColumnValue()
+			: TableGenerator.DEFAULT_PK_COLUMN_VALUE;
 
-		this.valueColumnName = StringUtils.isBlank(metadata.getValueColumnName()) ? //
-			TableGenerator.DEFAULT_VALUE_COLUMN_NAME : metadata.getValueColumnName();
+		this.valueColumnName = (metadata != null) && StringUtils.isNotBlank(metadata.getValueColumnName()) ? metadata.getValueColumnName()
+			: TableGenerator.DEFAULT_VALUE_COLUMN_NAME;
 	}
 
 	/**

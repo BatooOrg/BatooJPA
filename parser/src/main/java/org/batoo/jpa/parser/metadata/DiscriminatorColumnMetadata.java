@@ -16,60 +16,45 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.inheritence.single;
+package org.batoo.jpa.parser.metadata;
 
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
+import javax.persistence.DiscriminatorType;
 
 /**
+ * The definition for inheritances.
  * 
  * @author hceylan
  * @since $version
  */
-@Entity
-@Inheritance
-@DiscriminatorColumn
-public class Foo {
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer key;
-
-	private String value;
+public interface DiscriminatorColumnMetadata extends BindableMetadata {
 
 	/**
-	 * Returns the key.
+	 * Returns the column definition of the discriminator column.
 	 * 
-	 * @return the key
+	 * @return the column definition of the discriminator column
+	 * 
 	 * @since $version
+	 * @author hceylan
 	 */
-	public Integer getKey() {
-		return this.key;
-	}
+	String getColumnDefinition();
 
 	/**
-	 * Returns the value.
+	 * Returns the type of the discriminator column.
 	 * 
-	 * @return the value
+	 * @return the type of the discriminator column
+	 * 
 	 * @since $version
+	 * @author hceylan
 	 */
-	public String getValue() {
-		return this.value;
-	}
+	DiscriminatorType getDiscriminatorType();
 
 	/**
-	 * Sets the value.
+	 * Returns the length of the discriminator column.
 	 * 
-	 * @param value
-	 *            the value to set
+	 * @return the length of the discriminator column
+	 * 
 	 * @since $version
+	 * @author hceylan
 	 */
-	public void setValue(String value) {
-		this.value = value;
-	}
-
+	int getLength();
 }

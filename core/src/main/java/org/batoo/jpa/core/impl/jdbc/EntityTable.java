@@ -134,7 +134,13 @@ public class EntityTable extends AbstractTable {
 		// prepare the parameters
 		final Object[] params = new Object[insertColumns.length];
 		for (int i = 0; i < insertColumns.length; i++) {
-			params[i] = insertColumns[i].getValue(session, instance);
+			final AbstractColumn column = insertColumns[i];
+			if (column instanceof DiscriminatorColumn) {
+				params[i] = managedInstance.getType().getDiscriminatorValue();
+			}
+			else {
+				params[i] = column.getValue(session, instance);
+			}
 		}
 
 		// execute the insert
