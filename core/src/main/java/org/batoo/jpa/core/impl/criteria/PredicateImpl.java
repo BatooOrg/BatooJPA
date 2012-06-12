@@ -140,7 +140,7 @@ public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate 
 			}
 		});
 
-		return Joiner.on(this.operator.name()).join(converted);
+		return "(" + Joiner.on(this.operator.name()).join(converted) + ")";
 	}
 
 	/**

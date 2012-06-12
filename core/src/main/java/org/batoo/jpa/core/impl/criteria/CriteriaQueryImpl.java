@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.impl.criteria;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -113,6 +114,32 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 		if (this.sql == null) {
 			this.sql = this.prepareSql();
 		}
+	}
+
+	/**
+	 * Returns the restriction for the query.
+	 * 
+	 * @return the restriction
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private String generateRestriction() {
+		final String[] restrictions = new String[this.getRoots().size() + 1];
+
+		if (this.restriction != null) {
+			restrictions[0] = this.restriction.generate(this);
+		}
+
+		int i = 0;
+		final Iterator<Root<?>> j = this.getRoots().iterator();
+		while (j.hasNext()) {
+			final Root<?> root = j.next();
+			restrictions[++i] = ((RootImpl<?>) root).generateDiscrimination();
+
+		}
+
+		return Joiner.on(" AND ").skipNulls().join(restrictions);
 	}
 
 	/**
@@ -268,8 +295,6 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 
 		CriteriaQueryImpl.LOG.debug("Preparing SQL for {0}", CriteriaQueryImpl.LOG.lazyBoxed(this));
 
-		final PredicateImpl restriction = this.getRestriction();
-
 		// generate from chunk
 		final List<String> froms = Lists.newArrayList();
 		final List<String> joins = Lists.newArrayList();
@@ -281,7 +306,8 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 
 		// generate the select chunk
 		final String select = "SELECT\n\t" + this.selection.generate(this);
-		final String where = restriction != null ? "WHERE " + restriction.generate(this) : null;
+		final String restriction = this.generateRestriction();
+		final String where = restriction != null ? "WHERE " + restriction : null;
 
 		final String from = "FROM " + Joiner.on(",").join(froms);
 		final String join = Joiner.on(",").join(joins);

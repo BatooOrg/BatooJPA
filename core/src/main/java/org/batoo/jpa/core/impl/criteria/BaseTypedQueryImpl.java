@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.criteria;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -60,14 +61,11 @@ public abstract class BaseTypedQueryImpl<X> implements TypedQuery<X>, ResultSetH
 	protected final CriteriaQueryImpl<X> cq;
 	private final EntityManagerImpl em;
 	private final SelectionImpl<X> selection;
-
 	protected final Map<ParameterExpressionImpl<?>, Object> parameters = Maps.newHashMap();
 	private final List<X> results = Lists.newArrayList();
 
 	private final LinkedList<Map<String, Object>> data = Lists.newLinkedList();
-
 	private ResultSetMetaData md;
-
 	private String[] labels;
 
 	/**
@@ -201,13 +199,19 @@ public abstract class BaseTypedQueryImpl<X> implements TypedQuery<X>, ResultSetH
 	public List<X> handle(ResultSet rs) throws SQLException {
 		this.md = rs.getMetaData();
 
-		if (BaseTypedQueryImpl.LOG.isDebugEnabled()) {
-			this.prepareLabels(this.md);
-		}
-
 		// store the data
 		while (rs.next()) {
 			this.storeData(rs);
+		}
+
+		if (this.data.size() == 0) {
+			BaseTypedQueryImpl.LOG.debug("No result returned");
+
+			return Collections.emptyList();
+		}
+
+		if (BaseTypedQueryImpl.LOG.isDebugEnabled()) {
+			this.prepareLabels(this.md);
 		}
 
 		if (BaseTypedQueryImpl.LOG.isDebugEnabled()) {
@@ -252,7 +256,7 @@ public abstract class BaseTypedQueryImpl<X> implements TypedQuery<X>, ResultSetH
 	public void storeData(ResultSet rs) throws SQLException {
 		final Map<String, Object> data = Maps.newHashMap();
 
-		for (int i = 0; i < this.labels.length; i++) {
+		for (int i = 0; i < this.md.getColumnCount(); i++) {
 			final Object value = rs.getObject(i + 1);
 			data.put(this.md.getColumnName(i + 1), value);
 		}

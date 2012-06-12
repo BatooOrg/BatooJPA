@@ -117,10 +117,11 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private final Map<String, AbstractMapping<? super X, ?>> mappings = Maps.newHashMap();
 	private IdMapping<? super X, ?>[] idMappings;
 
-	private EntityTypeImpl<? super X> rootType;
 	private final InheritanceType inheritanceType;
+	private final Map<String, EntityTypeImpl<? extends X>> children = Maps.newHashMap();
 	private final String discriminatorValue;
 	private DiscriminatorColumn discriminatorColumn;
+	private EntityTypeImpl<? super X> rootType;
 
 	/**
 	 * @param metamodel
@@ -389,6 +390,20 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
+	 * Returns the child based on the <code>discriminatorValue</code> value.
+	 * 
+	 * @param discriminatorValue
+	 *            the discriminator value of the child
+	 * @return the child type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public EntityTypeImpl<? extends X> getChildType(Object discriminatorValue) {
+		return this.children.get(discriminatorValue);
+	}
+
+	/**
 	 * Returns the dependencies for the associate type
 	 * 
 	 * @param associate
@@ -422,6 +437,18 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 */
 	public DiscriminatorColumn getDiscriminatorColumn() {
 		return this.discriminatorColumn;
+	}
+
+	/**
+	 * Returns the set of discriminator values in the range of this entity's hierarchy.
+	 * 
+	 * @return the set of discriminator values
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Set<String> getDiscriminators() {
+		return this.children.keySet();
 	}
 
 	/**
@@ -721,9 +748,19 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void linkMappings() {
 		if ((this.getRootType() != this) && (this.getRootType().getInheritanceType() != null)) {
+			// inherit mappings from the parent
 			this.mappings.putAll(((EntityTypeImpl<? super X>) this.getSupertype()).mappings);
+
+			// register the discriminator value
+			IdentifiableTypeImpl<? super X> parent = this;
+			do {
+				((EntityTypeImpl<? super X>) parent).children.put(this.discriminatorValue, this);
+				parent = parent.getSupertype();
+			}
+			while (parent instanceof EntityTypeImpl);
 		}
 
+		// if the root type then create the discriminator column
 		if ((this.getRootType() == this) && (this.inheritanceType != null)) {
 			this.discriminatorColumn = new DiscriminatorColumn(this, this.metadata.getDiscriminatorColumn());
 		}
@@ -955,6 +992,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 		this.prepareEagerAssociations(r, 0, null);
 
+		// add id fields to the restriction
 		final List<PredicateImpl> predicates = Lists.newArrayList();
 		for (final IdMapping<? super X, ?> idMapping : this.getRootType().getIdMappings()) {
 			final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());

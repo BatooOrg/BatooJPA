@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.test.inheritence.single;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 
 import junit.framework.Assert;
 
@@ -39,9 +40,10 @@ public class InheritanceTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
-	public void testSimpleInheritence() {
+	public void testInheritance() {
 		final FooExt1 foo = new FooExt1();
 		foo.setValue("Bar");
+		foo.setValueExt1("Bar1");
 
 		this.persist(foo);
 
@@ -49,8 +51,10 @@ public class InheritanceTest extends BaseCoreTest {
 
 		this.close();
 
-		final FooExt1 foo2 = this.find(FooExt1.class, foo.getKey());
+		final FooExt1 foo2 = (FooExt1) this.find(Foo.class, foo.getKey());
 		Assert.assertEquals(foo.getKey(), foo2.getKey());
+		Assert.assertEquals(foo.getValue(), foo2.getValue());
+		Assert.assertEquals(foo.getValueExt1(), foo.getValueExt1());
 	}
 
 	/**
@@ -60,7 +64,7 @@ public class InheritanceTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
-	public void testSimpleInheritence2() {
+	public void testSimpleInheritance2() {
 		final FooExt11 foo = new FooExt11();
 		foo.setValue("Bar");
 
@@ -72,5 +76,28 @@ public class InheritanceTest extends BaseCoreTest {
 
 		final FooExt11 foo2 = this.find(FooExt11.class, foo.getKey());
 		Assert.assertEquals(foo.getKey(), foo2.getKey());
+		Assert.assertEquals(foo.getValue(), foo2.getValue());
+		Assert.assertEquals(foo.getValueExt1(), foo.getValueExt1());
 	}
+
+	/**
+	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with identity value
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test(expected = NoResultException.class)
+	public void testSimpleInheritance3() {
+		final FooExt1 foo = new FooExt1();
+		foo.setValue("Bar");
+
+		this.persist(foo);
+
+		this.commit();
+
+		this.close();
+
+		this.find(FooExt11.class, foo.getKey());
+	}
+
 }

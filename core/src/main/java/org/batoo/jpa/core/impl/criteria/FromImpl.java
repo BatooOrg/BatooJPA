@@ -311,6 +311,18 @@ public class FromImpl<Z, X> extends SelectionImpl<X> implements From<Z, X> {
 	}
 
 	/**
+	 * Returns the restriction based on discrimination.
+	 * 
+	 * @return the restriction based on discrimination, <code>null</code>
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String generateDiscrimination() {
+		return this.fetchRoot.generateDiscrimination();
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */

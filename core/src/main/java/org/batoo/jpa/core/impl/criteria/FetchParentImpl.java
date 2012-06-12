@@ -35,6 +35,7 @@ import javax.persistence.metamodel.Type;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
+import org.batoo.jpa.core.impl.jdbc.DiscriminatorColumn;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.jdbc.SecondaryTable;
@@ -49,6 +50,7 @@ import org.batoo.jpa.core.util.BatooUtils;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -76,6 +78,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	private final HashBiMap<String, PkColumn> idFields = HashBiMap.create();
 	private final HashBiMap<String, AbstractColumn> fields = HashBiMap.create();
 	private int nextTableAlias = 0;
+	private String discriminatorAlias;
 
 	/**
 	 * @param entity
@@ -123,7 +126,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public final <Y> Fetch<X, Y> fetch(PluralAttribute<? super X, ?, Y> attribute, JoinType jt) {
 		return this.fetch(attribute.getName(), jt);
 	}
@@ -142,7 +144,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public final <Y> Fetch<X, Y> fetch(SingularAttribute<? super X, Y> attribute, JoinType jt) {
 		return this.fetch(attribute.getName(), jt);
 	}
@@ -206,6 +207,31 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 		return Joiner.on(",\n\t").join(selects);
 	}
 
+	/**
+	 * Returns the restriction based on discrimination.
+	 * 
+	 * @return the restriction based on discrimination, <code>null</code>
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String generateDiscrimination() {
+		if (this.entity.getRootType().getInheritanceType() == null) {
+			return null;
+		}
+
+		final Collection<String> discriminators = Collections2.transform(this.entity.getDiscriminators(), new Function<String, String>() {
+
+			@Override
+			public String apply(String input) {
+				return "'" + input + "'";
+			}
+		});
+
+		return this.primaryTableAlias + "." + this.entity.getRootType().getDiscriminatorColumn().getName() + " IN ("
+			+ Joiner.on(",").join(discriminators) + ")";
+	}
+
 	private String generateImpl(CriteriaQueryImpl<?> query) {
 		final List<String> fields = Lists.newArrayList();
 
@@ -222,6 +248,9 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 				final String field = Joiner.on(".").skipNulls().join(tableAlias, column.getName());
 				if (column instanceof PkColumn) {
 					this.idFields.put(fieldAlias, (PkColumn) column);
+				}
+				else if (column instanceof DiscriminatorColumn) {
+					this.discriminatorAlias = fieldAlias;
 				}
 				else {
 					this.fields.put(fieldAlias, column);
@@ -311,12 +340,22 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedInstance<X> getInstance(SessionImpl session, Map<String, Object> row) {
+	public ManagedInstance<? extends X> getInstance(SessionImpl session, Map<String, Object> row) {
 		// get the id of for the instance
 		final Object id = this.getId(row);
 
 		if (id == null) {
 			return null;
+		}
+
+		// if inheritance is in place then locate the correct child type
+		if (this.entity.getRootType().getInheritanceType() != null) {
+			final Object discriminatorValue = row.get(this.discriminatorAlias);
+
+			final EntityTypeImpl<? extends X> effectiveType = this.entity.getChildType(discriminatorValue);
+			if (effectiveType != null) {
+				return effectiveType.getManagedInstanceById(session, id);
+			}
 		}
 
 		return this.entity.getManagedInstanceById(session, id);
@@ -388,7 +427,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	 * @author hceylan
 	 */
 	public List<X> handle(SessionImpl session, BaseTypedQueryImpl<?> query, List<Map<String, Object>> data, MutableInt rowNo, int jumpSize) {
-		final List<ManagedInstance<X>> instances = Lists.newArrayList();
+		final List<ManagedInstance<? extends X>> instances = Lists.newArrayList();
 
 		while ((rowNo.intValue() < data.size())) {
 			int leap = jumpSize;
@@ -396,7 +435,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 			final Map<String, Object> row = data.get(rowNo.intValue());
 
 			// if id is null then break
-			final ManagedInstance<X> instance = this.getInstance(session, row);
+			final ManagedInstance<? extends X> instance = this.getInstance(session, row);
 			if (instance == null) {
 				return null;
 			}
@@ -411,7 +450,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 				break;
 			}
 
-			final ManagedInstance<X> managedInstance = session.get(instance);
+			final ManagedInstance<? extends X> managedInstance = session.get(instance);
 			if (managedInstance != null) {
 				instances.add(managedInstance);
 				rowNo.add(leap);
@@ -449,10 +488,10 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 			rowNo.add(leap);
 		}
 
-		return Lists.transform(instances, new Function<ManagedInstance<X>, X>() {
+		return Lists.transform(instances, new Function<ManagedInstance<? extends X>, X>() {
 
 			@Override
-			public X apply(ManagedInstance<X> input) {
+			public X apply(ManagedInstance<? extends X> input) {
 				return input.getInstance();
 			}
 		});
