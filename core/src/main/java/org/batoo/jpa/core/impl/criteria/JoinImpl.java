@@ -39,6 +39,8 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 public abstract class JoinImpl<Z, X> extends FromImpl<Z, X> implements Join<Z, X> {
 
 	/**
+	 * @param entity
+	 *            the entity
 	 * 
 	 * @since $version
 	 * @author hceylan

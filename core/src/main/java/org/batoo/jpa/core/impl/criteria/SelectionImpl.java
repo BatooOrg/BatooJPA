@@ -92,6 +92,8 @@ public abstract class SelectionImpl<X> extends TupleElementImpl<X> implements Se
 	 *            the query
 	 * @param data
 	 *            the resultset data
+	 * @param rowNo
+	 *            the row no
 	 * @return the managed instance
 	 * 
 	 * @since $version

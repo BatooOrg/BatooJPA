@@ -39,7 +39,9 @@ public class WorkPhone extends Phone {
 
 	/**
 	 * @param person
+	 *            the person
 	 * @param phone
+	 *            the phone
 	 * 
 	 * @since $version
 	 * @author hceylan

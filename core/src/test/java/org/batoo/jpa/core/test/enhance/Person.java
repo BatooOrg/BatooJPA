@@ -456,6 +456,38 @@ public class Person {
 		this.stringPropertyArray = stringPropertyArray;
 	}
 
+	/**
+	 * @param arg0
+	 *            the arg
+	 * @param arg1
+	 *            the arg
+	 * @param arg2
+	 *            the arg
+	 * @param arg3
+	 *            the arg
+	 * @param arg4
+	 *            the arg
+	 * @param arg5
+	 *            the arg
+	 * @param arg6
+	 *            the arg
+	 * @param arg7
+	 *            the arg
+	 * @param arg8
+	 *            the arg
+	 * @param arg9
+	 *            the arg
+	 * @param arg10
+	 *            the arg
+	 * @return the return value
+	 * @throws SQLException
+	 *             some exception
+	 * @throws MappingException
+	 *             some exception
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
 	public Object someBusinessMethod(boolean arg0, char arg1, byte arg2, short arg3, int arg4, long arg5, float arg6, double arg7,
 		String arg8, Integer[] arg9, long[] arg10) throws SQLException, MappingException {
 		return null;

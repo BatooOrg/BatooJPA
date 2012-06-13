@@ -25,18 +25,29 @@ package org.batoo.jpa.core;
  */
 public interface BJPASettings {
 
+	/**
+	 * The warn time for SQL operations taking too long.
+	 */
 	final long WARN_TIME = 2500;
 
-	// Class loader to use during deployment, default null
+	/**
+	 * Class loader to use during deployment, default null
+	 */
 	String CLASS_LOADER_CLASS = "org.batoo.jpa.class_loader_class";
 
-	// The root package for the persistence unit to scan for entities, default null
+	/**
+	 * The root package for the persistence unit to scan for entities, default null
+	 */
 	String ROOT_PACKAGE = "org.batoo.jpa.root_url";
 
-	// If JDBC drivers on the classpath should be scanned, default false
+	/**
+	 * If JDBC drivers on the classpath should be scanned, default false
+	 */
 	String SCAN_EXTERNAL_JDBC_DRIVERS = "org.batoo.jpa.root_url";
 
-	// DDL operations, DROP | CREATE (*) | UPDATE | VERIFY | NONE
+	/**
+	 * DDL operations, DROP | CREATE (*) | UPDATE | VERIFY | NONE
+	 */
 	String DDL = "org.batoo.jpa.ddl";
 
 }

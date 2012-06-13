@@ -45,7 +45,9 @@ public class Country {
 
 	/**
 	 * @param code
+	 *            the code
 	 * @param name
+	 *            the name
 	 * 
 	 * @since $version
 	 * @author hceylan

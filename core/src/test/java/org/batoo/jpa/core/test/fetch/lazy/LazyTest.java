@@ -64,6 +64,11 @@ public class LazyTest extends BaseCoreTest {
 		return person;
 	}
 
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
 	@Before
 	public void prepareCountries() {
 		this.persist(LazyTest.TR);

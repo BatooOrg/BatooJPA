@@ -211,6 +211,8 @@ public abstract class BaseCoreTest extends BaseTest {
 	 *            the class of the entity
 	 * @param pk
 	 *            the primary key of the entity
+	 * @param <T>
+	 *            the type of entity
 	 * @return entity or null
 	 * 
 	 * @since $version

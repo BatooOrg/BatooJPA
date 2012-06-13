@@ -60,6 +60,7 @@ public class Person {
 
 	/**
 	 * @param name
+	 *            the name
 	 * 
 	 * @since $version
 	 * @author hceylan

@@ -16,37 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.model.attribute;
+package org.batoo.jpa.parser.impl.orm;
 
-import javax.persistence.metamodel.SingularAttribute;
-
-import org.batoo.jpa.core.impl.model.type.IdentifiableTypeImpl;
-import org.batoo.jpa.parser.metadata.attribute.VersionAttributeMetadata;
+import java.util.Map;
 
 /**
- * Implementation of {@link SingularAttribute} for version attributes.
- * 
- * @param <X>
- *            The type containing the represented attribute
- * @param <T>
- *            The type of the represented attribute
+ * Element for <code>id-class</code> elements.
  * 
  * @author hceylan
  * @since $version
  */
-public class VersionAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
+public class IdClassElement extends ChildElement {
+
+	private String idClass;
 
 	/**
-	 * @param declaringType
-	 *            the declaring type
-	 * @param metadata
-	 *            the metadata
+	 * @param parent
+	 *            the parent element factory
+	 * @param attributes
+	 *            the attributes
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public VersionAttributeImpl(IdentifiableTypeImpl<X> declaringType, VersionAttributeMetadata metadata) {
-		super(declaringType, metadata);
+	public IdClassElement(ParentElement parent, Map<String, String> attributes) {
+		super(parent, attributes);
 	}
 
 	/**
@@ -54,25 +48,19 @@ public class VersionAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 	 * 
 	 */
 	@Override
-	public boolean isId() {
-		return false;
+	protected void generate() {
+		this.idClass = this.getAttribute(ElementConstants.ATTR_CLASS);
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Returns the idClass of the IdClassElement.
 	 * 
-	 */
-	@Override
-	public boolean isOptional() {
-		return false;
-	}
-
-	/**
-	 * {@inheritDoc}
+	 * @return the idClass of the IdClassElement
 	 * 
+	 * @since $version
+	 * @author hceylan
 	 */
-	@Override
-	public boolean isVersion() {
-		return false;
+	public String getIdClass() {
+		return this.idClass;
 	}
 }

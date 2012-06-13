@@ -31,8 +31,8 @@ import javax.persistence.metamodel.SingularAttribute;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.attribute.PhysicalAttributeImpl;
-import org.batoo.jpa.core.impl.model.mapping.PhysicalMapping;
+import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
+import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 
 /**
  * Physical Attribute implementation of {@link Path}.
@@ -45,7 +45,7 @@ import org.batoo.jpa.core.impl.model.mapping.PhysicalMapping;
  */
 public class PhysicalAttributePathImpl<X> extends PathImpl<X> {
 
-	private final PhysicalMapping<?, X> mapping;
+	private final BasicMapping<?, X> mapping;
 
 	/**
 	 * @param parent
@@ -56,7 +56,7 @@ public class PhysicalAttributePathImpl<X> extends PathImpl<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PhysicalAttributePathImpl(PathImpl<?> parent, PhysicalMapping<?, X> mapping) {
+	public PhysicalAttributePathImpl(PathImpl<?> parent, BasicMapping<?, X> mapping) {
 		super(parent);
 
 		this.mapping = mapping;
@@ -141,7 +141,7 @@ public class PhysicalAttributePathImpl<X> extends PathImpl<X> {
 	 * 
 	 */
 	@Override
-	public PhysicalAttributeImpl<?, X> getModel() {
+	public BasicAttribute<?, X> getModel() {
 		return this.mapping.getAttribute();
 	}
 

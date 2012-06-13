@@ -233,7 +233,8 @@ public class DiscriminatorColumn extends AbstractColumn {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("rawtypes")
 	public void setValue(ManagedInstance instance, Object value) {
-
+		// noop
 	}
 }

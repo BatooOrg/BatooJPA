@@ -23,7 +23,7 @@ import java.util.List;
 import javax.persistence.criteria.JoinType;
 
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
-import org.batoo.jpa.core.impl.model.mapping.IdMapping;
+import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
@@ -76,15 +76,15 @@ public class ForeignKey {
 	public ForeignKey(SecondaryTable table, EntityTypeImpl<?> entity, List<PrimaryKeyJoinColumnMetadata> metadata) {
 		super();
 
-		final IdMapping<?, ?>[] idMappings = entity.getIdMappings();
+		final BasicMapping<?, ?>[] idMappings = entity.getIdMappings();
 
 		if ((metadata == null) || (metadata.size() == 0)) {
-			for (final IdMapping<?, ?> idMapping : idMappings) {
+			for (final BasicMapping<?, ?> idMapping : idMappings) {
 				this.joinColumns.add(new JoinColumn(table, idMapping));
 			}
 		}
 		else {
-			for (final IdMapping<?, ?> idMapping : idMappings) {
+			for (final BasicMapping<?, ?> idMapping : idMappings) {
 				for (final PrimaryKeyJoinColumnMetadata columnMetadata : metadata) {
 					if (idMapping.getColumn().getMappingName().equals(columnMetadata.getReferencedColumnName())) {
 						this.joinColumns.add(new JoinColumn(columnMetadata, table, idMappings[0]));
@@ -212,11 +212,11 @@ public class ForeignKey {
 	public void link(AssociationMapping<?, ?, ?> mapping, EntityTypeImpl<?> targetEntity) {
 		targetEntity.getMetamodel().getJdbcAdaptor();
 
-		final IdMapping<?, ?>[] idMappings = targetEntity.getIdMappings();
+		final BasicMapping<?, ?>[] idMappings = targetEntity.getIdMappings();
 
 		// single primary key
 		if (idMappings.length == 1) {
-			final IdMapping<?, ?> idMapping = idMappings[0];
+			final BasicMapping<?, ?> idMapping = idMappings[0];
 
 			// no definition for the join column
 			if (this.joinColumns.size() == 0) {
@@ -231,7 +231,7 @@ public class ForeignKey {
 		}
 		// composite primary key
 		else {
-			for (final IdMapping<?, ?> idMapping : idMappings) {
+			for (final BasicMapping<?, ?> idMapping : idMappings) {
 				// no definition for the join columns
 				if (this.joinColumns.size() == 0) {
 					this.joinColumns.add(new JoinColumn(mapping, idMapping));

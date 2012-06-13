@@ -83,6 +83,9 @@ public class EmbeddableOverridesTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#persist(Object)}.
 	 * 
+	 * @throws SQLException
+	 *             thrown if SQL fails
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */

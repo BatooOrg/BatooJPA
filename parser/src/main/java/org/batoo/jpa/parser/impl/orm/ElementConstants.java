@@ -60,6 +60,7 @@ public class ElementConstants {
 	protected static final String ELEMENT_ENUMERATED = "enumerated";
 	protected static final String ELEMENT_GENERATED_VALUE = "generated-value";
 	protected static final String ELEMENT_ID = "id";
+	protected static final String ELEMENT_ID_CLASS = "id-class";
 	protected static final String ELEMENT_INVERSE_JOIN_COLUMN = "inverse-join-column";
 	protected static final String ELEMENT_JOIN_COLUMN = "join-column";
 	protected static final String ELEMENT_JOIN_TABLE = "join-table";

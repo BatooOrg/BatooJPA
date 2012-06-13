@@ -28,13 +28,19 @@ public class FooPk {
 
 	private Integer intKey;
 
+	/**
+	 * @since $version
+	 * @author hceylan
+	 */
 	public FooPk() {
 		super();
 	}
 
 	/**
 	 * @param intKey
+	 *            the integer key
 	 * @param strKey
+	 *            the string key
 	 * 
 	 * @since $version
 	 * @author hceylan

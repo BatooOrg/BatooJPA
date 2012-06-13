@@ -90,6 +90,16 @@ public interface EntityMetadata extends ManagedTypeMetadata, BindableMetadata {
 	String getDiscriminatorValue();
 
 	/**
+	 * Returns the id class of the entity.
+	 * 
+	 * @return the id class of the entity
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	String getIdClass();
+
+	/**
 	 * Returns the inheritance type of the entity.
 	 * 
 	 * @return the inheritance type of the entity

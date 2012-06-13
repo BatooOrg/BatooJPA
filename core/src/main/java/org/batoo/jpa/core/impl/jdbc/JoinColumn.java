@@ -21,7 +21,7 @@ package org.batoo.jpa.core.impl.jdbc;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
-import org.batoo.jpa.core.impl.model.mapping.IdMapping;
+import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.impl.AbstractLocator;
@@ -56,7 +56,7 @@ public class JoinColumn extends AbstractColumn {
 	private int scale;
 
 	private AssociationMapping<?, ?, ?> mapping;
-	private IdMapping<?, ?> referencedMapping;
+	private BasicMapping<?, ?> referencedMapping;
 
 	/**
 	 * Constructor with no metadata.
@@ -69,7 +69,7 @@ public class JoinColumn extends AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public JoinColumn(AssociationMapping<?, ?, ?> mapping, IdMapping<?, ?> idMapping) {
+	public JoinColumn(AssociationMapping<?, ?, ?> mapping, BasicMapping<?, ?> idMapping) {
 		super();
 
 		this.mapping = mapping;
@@ -96,12 +96,12 @@ public class JoinColumn extends AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public JoinColumn(EntityTable table, IdMapping<?, ?> idMapping) {
+	public JoinColumn(EntityTable table, BasicMapping<?, ?> idMapping) {
 		super();
 
 		this.locator = null;
 		this.referencedMapping = idMapping;
-		final PkColumn referencedColumn = idMapping.getColumn();
+		final PkColumn referencedColumn = (PkColumn) idMapping.getColumn();
 
 		this.referencedColumnName = referencedColumn.getName();
 		this.columnDefinition = referencedColumn.getColumnDefinition();
@@ -153,7 +153,7 @@ public class JoinColumn extends AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public JoinColumn(PrimaryKeyJoinColumnMetadata metadata, SecondaryTable table, IdMapping<?, ?> idMapping) {
+	public JoinColumn(PrimaryKeyJoinColumnMetadata metadata, SecondaryTable table, BasicMapping<?, ?> idMapping) {
 		super();
 
 		this.locator = metadata.getLocator();
@@ -267,7 +267,7 @@ public class JoinColumn extends AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public IdMapping<?, ?> getReferencedMapping() {
+	public BasicMapping<?, ?> getReferencedMapping() {
 		return this.referencedMapping;
 	}
 
@@ -395,7 +395,7 @@ public class JoinColumn extends AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void setColumnProperties(AssociationMapping<?, ?, ?> mapping, IdMapping<?, ?> referencedMapping) {
+	public void setColumnProperties(AssociationMapping<?, ?, ?> mapping, BasicMapping<?, ?> referencedMapping) {
 		final JdbcAdaptor jdbcAdaptor = referencedMapping.getEntity().getMetamodel().getJdbcAdaptor();
 
 		// if attribute present then the join column belongs to an entity table
@@ -413,9 +413,9 @@ public class JoinColumn extends AbstractColumn {
 		this.setColumnProperties(referencedMapping);
 	}
 
-	private void setColumnProperties(IdMapping<?, ?> referencedMapping) {
+	private void setColumnProperties(BasicMapping<?, ?> referencedMapping) {
 		this.referencedMapping = referencedMapping;
-		final PkColumn referencedColumn = referencedMapping.getColumn();
+		final PkColumn referencedColumn = (PkColumn) referencedMapping.getColumn();
 
 		this.referencedColumnName = referencedColumn.getName();
 		this.sqlType = referencedColumn.getSqlType();

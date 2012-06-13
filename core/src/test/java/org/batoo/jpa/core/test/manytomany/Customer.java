@@ -57,6 +57,7 @@ public class Customer {
 
 	/**
 	 * @param name
+	 *            the name
 	 * 
 	 * @since $version
 	 * @author hceylan

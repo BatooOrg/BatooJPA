@@ -61,21 +61,15 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
-import org.batoo.jpa.core.impl.model.attribute.BasicAttributeImpl;
+import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
-import org.batoo.jpa.core.impl.model.attribute.IdAttributeImpl;
-import org.batoo.jpa.core.impl.model.attribute.PhysicalAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
-import org.batoo.jpa.core.impl.model.attribute.VersionAttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
-import org.batoo.jpa.core.impl.model.mapping.IdMapping;
-import org.batoo.jpa.core.impl.model.mapping.PhysicalMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
-import org.batoo.jpa.core.impl.model.mapping.VersionMapping;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
@@ -124,7 +118,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private final Map<Method, Method> idMethods = Maps.newHashMap();
 
 	private final Map<String, AbstractMapping<? super X, ?>> mappings = Maps.newHashMap();
-	private IdMapping<? super X, ?>[] idMappings;
+	private BasicMapping<? super X, ?>[] idMappings;
 
 	private final InheritanceType inheritanceType;
 	private final Map<String, EntityTypeImpl<? extends X>> children = Maps.newHashMap();
@@ -331,7 +325,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
 	public AssociationMapping<?, ?, ?>[] getAssociationsEager() {
 		if (this.associationsEager != null) {
 			return this.associationsEager;
@@ -365,7 +358,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
 	public AssociationMapping<?, ?, ?>[] getAssociationsJoined() {
 		if (this.associationsJoined != null) {
 			return this.associationsJoined;
@@ -399,7 +391,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
 	public AssociationMapping<?, ?, ?>[] getAssociationsPersistable() {
 		if (this.associationsPersistable != null) {
 			return this.associationsPersistable;
@@ -468,7 +459,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ColumnMetadata getAttributeOverride(PhysicalAttributeImpl<? super X, ?> attribute, String path) {
+	public ColumnMetadata getAttributeOverride(BasicAttribute<? super X, ?> attribute, String path) {
 		for (final AttributeOverrideMetadata override : this.metadata.getAttributeOverrides()) {
 			if (override.getName().equals(path)) {
 				return override.getColumn();
@@ -579,7 +570,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public IdMapping<? super X, ?>[] getIdMappings() {
+	public BasicMapping<? super X, ?>[] getIdMappings() {
 		if (this.idMappings != null) {
 			return this.idMappings;
 		}
@@ -590,14 +581,14 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.idMappings;
 			}
 
-			final List<IdMapping<? super X, ?>> idMappings = Lists.newArrayList();
+			final List<BasicMapping<? super X, ?>> idMappings = Lists.newArrayList();
 			for (final AbstractMapping<? super X, ?> mapping : this.mappings.values()) {
-				if (mapping instanceof IdMapping) {
-					idMappings.add((IdMapping<? super X, ?>) mapping);
+				if ((mapping.getAttribute() instanceof BasicAttribute) && ((BasicAttribute<? super X, ?>) mapping.getAttribute()).isId()) {
+					idMappings.add((BasicMapping<? super X, ?>) mapping);
 				}
 			}
 
-			final IdMapping<? super X, ?>[] idMappings0 = new IdMapping[idMappings.size()];
+			final BasicMapping<? super X, ?>[] idMappings0 = new BasicMapping[idMappings.size()];
 			idMappings.toArray(idMappings0);
 
 			this.idMappings = idMappings0;
@@ -949,23 +940,12 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 			switch (attribute.getPersistentAttributeType()) {
 				case BASIC:
-					final PhysicalAttributeImpl<? super X, ?> physicalAttribute = (PhysicalAttributeImpl<? super X, ?>) attribute;
-					PhysicalMapping mapping;
+					BasicMapping mapping;
 
-					if (physicalAttribute.isVersion()) {
-						mapping = new VersionMapping(this, (VersionAttributeImpl<? super X, ?>) attribute);
-						this.mappings.put(attribute.getName(), mapping);
-					}
-					else if (physicalAttribute.isId()) {
-						mapping = new IdMapping(this, (IdAttributeImpl<? super X, ?>) attribute);
-						this.mappings.put(attribute.getName(), mapping);
-					}
-					else {
-						mapping = new BasicMapping(this, (BasicAttributeImpl<? super X, ?>) attribute);
-						this.mappings.put(attribute.getName(), mapping);
-					}
+					mapping = new BasicMapping(this, (BasicAttribute) attribute);
+					this.mappings.put(attribute.getName(), mapping);
 
-					final BasicColumn basicColumn = ((PhysicalMapping<? super X, ?>) mapping).getColumn();
+					final BasicColumn basicColumn = ((BasicMapping<? super X, ?>) mapping).getColumn();
 					final String tableName = basicColumn.getTableName();
 
 					// if table name is blank, it means the column should belong to the primary table
@@ -1175,7 +1155,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 		// add id fields to the restriction
 		final List<PredicateImpl> predicates = Lists.newArrayList();
-		for (final IdMapping<? super X, ?> idMapping : this.getRootType().getIdMappings()) {
+		for (final BasicMapping<? super X, ?> idMapping : this.getRootType().getIdMappings()) {
 			final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
 			final Path<?> path = r.get(idMapping.getAttribute());
 			final PredicateImpl predicate = cb.equal(path, pe);

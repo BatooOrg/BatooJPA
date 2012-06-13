@@ -29,7 +29,6 @@ import javax.persistence.Embeddable;
 public class FooPk {
 
 	private String strKey;
-
 	private Integer intKey;
 
 	/**

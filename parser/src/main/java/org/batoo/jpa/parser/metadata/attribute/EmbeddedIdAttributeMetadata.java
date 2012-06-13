@@ -39,5 +39,4 @@ public interface EmbeddedIdAttributeMetadata extends AttributeMetadata {
 	 * @author hceylan
 	 */
 	List<AttributeOverrideMetadata> getAttributeOverrides();
-
 }

@@ -8,8 +8,20 @@ import junit.framework.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+/**
+ * 
+ * 
+ * @author hceylan
+ * @since $version
+ */
 public class HashMapBug {
 
+	/**
+	 * Test to demonstrate the hash map bug
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
 	@Test
 	@Ignore
 	public void hashMapBug() {

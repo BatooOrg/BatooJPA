@@ -41,10 +41,10 @@ public class FooExt11 extends FooExt1 {
 	}
 
 	/**
-	 * Sets the valueExt1.
+	 * Sets the valueExt11.
 	 * 
-	 * @param valueExt1
-	 *            the valueExt1 to set
+	 * @param valueExt11
+	 *            the valueExt11 to set
 	 * @since $version
 	 */
 	public void setValueExt11(String valueExt11) {

@@ -38,7 +38,6 @@ public class EntityTransactionImpl implements EntityTransaction {
 	private final ConnectionImpl connection;
 	private boolean active;
 	private boolean rollbackOnly;
-	private boolean open;
 
 	/**
 	 * @param entityManager

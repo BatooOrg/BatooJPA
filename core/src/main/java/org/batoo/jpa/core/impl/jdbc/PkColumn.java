@@ -18,7 +18,7 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
-import org.batoo.jpa.core.impl.model.mapping.IdMapping;
+import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 
@@ -43,7 +43,7 @@ public class PkColumn extends BasicColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PkColumn(IdMapping<?, ?> mapping, int sqlType, ColumnMetadata metadata) {
+	public PkColumn(BasicMapping<?, ?> mapping, int sqlType, ColumnMetadata metadata) {
 		super(mapping, sqlType, metadata);
 
 		this.idType = mapping.getAttribute().getIdType();

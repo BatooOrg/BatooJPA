@@ -24,13 +24,17 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
+import org.batoo.jpa.core.impl.model.type.IdentifiableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.attribute.EmbeddedAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.EmbeddedIdAttributeMetadata;
 
 import sun.reflect.ConstructorAccessor;
+
+import com.google.common.collect.Lists;
 
 /**
  * Implementation of {@link SingularAttribute} for embeddable attributes.
@@ -43,16 +47,46 @@ import sun.reflect.ConstructorAccessor;
  * @author hceylan
  * @since $version
  */
+@SuppressWarnings("restriction")
 public class EmbeddedAttribute<X, T> extends SingularAttributeImpl<X, T> implements SingularAttribute<X, T> {
 	private static final Object[] EMPTY_PARAMS = new Object[] {};
 
+	private final boolean id;
 	private final List<AssociationMetadata> associationOverrides;
 	private final List<AttributeOverrideMetadata> attributeOverrides;
 	private EmbeddableTypeImpl<T> type;
-	@SuppressWarnings("restriction")
 	private final ConstructorAccessor constructor;
 
 	/**
+	 * Constructor for id type embedded attributes.
+	 * 
+	 * @param declaringType
+	 *            the declaring type
+	 * @param metadata
+	 *            the metadata
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public EmbeddedAttribute(IdentifiableTypeImpl<X> declaringType, EmbeddedIdAttributeMetadata metadata) {
+		super(declaringType, metadata);
+
+		this.id = true;
+
+		this.associationOverrides = Lists.newArrayList();
+		this.attributeOverrides = metadata.getAttributeOverrides();
+
+		try {
+			this.constructor = ReflectHelper.createConstructor(this.getBindableJavaType().getConstructor());
+		}
+		catch (final Exception e) {
+			throw new MappingException("Embeddable type does not have a default constructor", this.getLocator());
+		}
+	}
+
+	/**
+	 * Constructor for regular embedded attributes.
+	 * 
 	 * @param declaringType
 	 *            the declaring type
 	 * @param metadata
@@ -63,6 +97,8 @@ public class EmbeddedAttribute<X, T> extends SingularAttributeImpl<X, T> impleme
 	 */
 	public EmbeddedAttribute(ManagedTypeImpl<X> declaringType, EmbeddedAttributeMetadata metadata) {
 		super(declaringType, metadata);
+
+		this.id = false;
 
 		this.associationOverrides = metadata.getAssociationOverrides();
 		this.attributeOverrides = metadata.getAttributeOverrides();
@@ -112,7 +148,7 @@ public class EmbeddedAttribute<X, T> extends SingularAttributeImpl<X, T> impleme
 	 */
 	@Override
 	public boolean isId() {
-		return false;
+		return this.id;
 	}
 
 	/**
@@ -141,7 +177,7 @@ public class EmbeddedAttribute<X, T> extends SingularAttributeImpl<X, T> impleme
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings({ "restriction", "unchecked" })
+	@SuppressWarnings({ "unchecked" })
 	public T newInstance() {
 		try {
 			return (T) this.constructor.newInstance(EmbeddedAttribute.EMPTY_PARAMS);

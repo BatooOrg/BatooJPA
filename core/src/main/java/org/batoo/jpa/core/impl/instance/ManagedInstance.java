@@ -26,7 +26,7 @@ import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.EntityTransactionImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
-import org.batoo.jpa.core.impl.model.mapping.IdMapping;
+import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
@@ -74,7 +74,7 @@ public class ManagedInstance<X> {
 	private final SessionImpl session;
 	private final X instance;
 	private Status status;
-	private final IdMapping<? super X, ?>[] idAttributes;
+	private final BasicMapping<? super X, ?>[] idMappings;
 	private EntityTransactionImpl transaction;
 	private final boolean external = true;
 
@@ -100,7 +100,7 @@ public class ManagedInstance<X> {
 		this.session = session;
 		this.instance = instance;
 
-		this.idAttributes = type.getRootType().getIdMappings();
+		this.idMappings = type.getRootType().getIdMappings();
 	}
 
 	/**
@@ -120,7 +120,7 @@ public class ManagedInstance<X> {
 		this(type, session, instance);
 
 		this.id = id;
-		for (final IdMapping<? super X, ?> attribute : this.idAttributes) {
+		for (final BasicMapping<? super X, ?> attribute : this.idMappings) {
 			attribute.set(this, id);
 		}
 	}
@@ -221,7 +221,7 @@ public class ManagedInstance<X> {
 	 */
 	public boolean fillIdValues() {
 		boolean allFilled = true;
-		for (final IdMapping<? super X, ?> mapping : this.idAttributes) {
+		for (final BasicMapping<? super X, ?> mapping : this.idMappings) {
 			allFilled &= mapping.getAttribute().fillValue(this);
 		}
 
@@ -297,7 +297,7 @@ public class ManagedInstance<X> {
 			return this.id;
 		}
 
-		return this.id = this.idAttributes[0].get(this.instance);
+		return this.id = this.idMappings[0].get(this.instance);
 	}
 
 	/**

@@ -27,7 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
-import org.batoo.jpa.core.impl.model.attribute.BasicAttributeImpl;
+import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
@@ -113,7 +113,7 @@ public class EmbeddedMapping<X, Y> extends AbstractMapping<X, Y> {
 
 			switch (attribute.getPersistentAttributeType()) {
 				case BASIC:
-					mapping = new BasicMapping(this.getEntity(), (BasicAttributeImpl) attribute);
+					mapping = new BasicMapping(this.getEntity(), (BasicAttribute) attribute);
 					this.mappings.put(attribute.getName(), mapping);
 
 					final BasicColumn basicColumn = ((BasicMapping) mapping).getColumn();

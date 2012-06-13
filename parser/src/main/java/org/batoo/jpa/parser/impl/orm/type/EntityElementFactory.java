@@ -30,6 +30,7 @@ import org.batoo.jpa.parser.impl.orm.DiscriminatorValueElement;
 import org.batoo.jpa.parser.impl.orm.Element;
 import org.batoo.jpa.parser.impl.orm.ElementConstants;
 import org.batoo.jpa.parser.impl.orm.EntityMappings;
+import org.batoo.jpa.parser.impl.orm.IdClassElement;
 import org.batoo.jpa.parser.impl.orm.ParentElement;
 import org.batoo.jpa.parser.impl.orm.SecondaryTableElement;
 import org.batoo.jpa.parser.impl.orm.TableElement;
@@ -69,6 +70,7 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 	private InheritanceType inheritanceType;
 	private DiscriminatorColumnMetadata discriminatorColumn;
 	private String discriminatorValue;
+	private String idClass;
 
 	/**
 	 * Constructor for ORM File parsing
@@ -92,7 +94,8 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 			ElementConstants.ELEMENT_SECONDARY_TABLE, //
 			ElementConstants.ELEMENT_INHERITANCE, //
 			ElementConstants.ELEMENT_DISCRIMINATOR_COLUMN, //
-			ElementConstants.ELEMENT_DISCRIMINATOR_VALUE);
+			ElementConstants.ELEMENT_DISCRIMINATOR_VALUE, //
+			ElementConstants.ELEMENT_ID_CLASS);
 	}
 
 	/**
@@ -180,6 +183,15 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 	@Override
 	public String getDiscriminatorValue() {
 		return this.discriminatorValue;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getIdClass() {
+		return this.idClass;
 	}
 
 	/**
@@ -280,6 +292,10 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 
 		if (child instanceof DiscriminatorValueElement) {
 			this.discriminatorValue = ((DiscriminatorValueElement) child).getDiscriminatorValue();
+		}
+
+		if (child instanceof IdClassElement) {
+			this.idClass = ((IdClassElement) child).getIdClass();
 		}
 	}
 

@@ -51,7 +51,6 @@ import org.batoo.jpa.parser.PersistenceParser;
  */
 public class EntityManagerFactoryImpl implements EntityManagerFactory {
 
-	private final String name;
 	private final MetamodelImpl metamodel;
 	private final DataSourceImpl datasource;
 	private final JdbcAdaptor jdbcAdaptor;
@@ -71,7 +70,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	public EntityManagerFactoryImpl(String name, PersistenceParser parser) {
 		super();
 
-		this.name = name;
 		this.jdbcAdaptor = this.createJdbcAdaptor(parser);
 		this.datasource = this.createDatasource(parser);
 		this.metamodel = new MetamodelImpl(this.jdbcAdaptor, parser.getMetadata());

@@ -51,7 +51,9 @@ public class Phone {
 
 	/**
 	 * @param person
+	 *            the person
 	 * @param phoneNo
+	 *            the phone number
 	 * 
 	 * @since $version
 	 * @author hceylan

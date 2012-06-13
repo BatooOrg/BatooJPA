@@ -31,9 +31,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.attribute.PhysicalAttributeImpl;
+import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
-import org.batoo.jpa.core.impl.model.mapping.PhysicalMapping;
+import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 import com.google.common.collect.Maps;
@@ -122,14 +122,14 @@ public class RootPathImpl<X> extends PathImpl<X> {
 		}
 
 		// generate and return
-		if (attribute instanceof PhysicalAttributeImpl) {
+		if (attribute instanceof BasicAttribute) {
 			final AbstractMapping<? super X, ?> mapping = this.entity.getMapping(attribute.getName());
 
 			if (mapping == null) {
 				throw new IllegalArgumentException("Cannot dereference");
 			}
 
-			path = new PhysicalAttributePathImpl<Y>(this, (PhysicalMapping<?, Y>) mapping);
+			path = new PhysicalAttributePathImpl<Y>(this, (BasicMapping<?, Y>) mapping);
 			this.children.put(attribute.getName(), path);
 		}
 

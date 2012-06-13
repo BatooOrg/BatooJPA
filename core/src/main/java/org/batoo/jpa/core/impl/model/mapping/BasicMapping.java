@@ -19,15 +19,15 @@
 package org.batoo.jpa.core.impl.model.mapping;
 
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
+import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.jdbc.TypeFactory;
-import org.batoo.jpa.core.impl.model.attribute.BasicAttributeImpl;
+import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.type.BasicTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
-import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
 
 /**
- * Mapping for id attributes.
+ * Mapping for basic types, id, version, basic attributes.
  * 
  * @param <X>
  *            the type of the entity
@@ -37,33 +37,35 @@ import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
  * @author hceylan
  * @since $version
  */
-public class BasicMapping<X, Y> extends PhysicalMapping<X, Y> {
+public class BasicMapping<X, Y> extends AbstractMapping<X, Y> {
 
-	private final BasicAttributeImpl<? super X, Y> attribute;
-	private final BasicColumn column;
+	private final BasicAttribute<? super X, Y> attribute;
+	private BasicColumn column;
 
 	/**
-	 * Constructor for root type mapping.
-	 * 
 	 * @param entity
 	 *            the entity
 	 * @param attribute
-	 *            the attribute
+	 *            the basic attribute
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public BasicMapping(EntityTypeImpl<X> entity, BasicAttributeImpl<? super X, Y> attribute) {
+	public BasicMapping(EntityTypeImpl<X> entity, BasicAttribute<? super X, Y> attribute) {
 		super(entity);
 
 		this.attribute = attribute;
 
-		final BasicAttributeMetadata metadata = (BasicAttributeMetadata) attribute.getMetadata();
-		final ColumnMetadata columnMetadata = this.getEntity().getAttributeOverride(attribute, this.attribute.getName());
-		final int sqlType = TypeFactory.getSqlType(this.attribute.getJavaType(), metadata.getTemporalType(), metadata.getEnumType(),
-			metadata.isLob());
+		final ColumnMetadata columnMetadata = this.getEntity().getAttributeOverride(attribute, this.getAttribute().getName());
+		final int sqlType = TypeFactory.getSqlType(this.getAttribute().getJavaType(), attribute.getTemporalType(), attribute.getEnumType(),
+			attribute.isLob());
 
-		this.column = new BasicColumn(this, sqlType, columnMetadata);
+		if (attribute.isId()) {
+			this.column = new PkColumn(this, sqlType, columnMetadata);
+		}
+		else {
+			this.column = new BasicColumn(this, sqlType, columnMetadata);
+		}
 	}
 
 	/**
@@ -71,25 +73,31 @@ public class BasicMapping<X, Y> extends PhysicalMapping<X, Y> {
 	 * 
 	 */
 	@Override
-	public BasicAttributeImpl<? super X, Y> getAttribute() {
+	public final BasicAttribute<? super X, Y> getAttribute() {
 		return this.attribute;
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Returns the physical column of the attribute.
 	 * 
+	 * @return the physical column of the attribute
+	 * 
+	 * @since $version
+	 * @author hceylan
 	 */
-	@Override
 	public BasicColumn getColumn() {
 		return this.column;
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Returns the bindable entity type.
 	 * 
+	 * @return the bindable entity type
+	 * 
+	 * @since $version
+	 * @author hceylan
 	 */
-	@Override
-	public BasicTypeImpl<Y> getType() {
-		return this.attribute.getType();
+	public final BasicTypeImpl<Y> getType() {
+		return this.getAttribute().getType();
 	}
 }

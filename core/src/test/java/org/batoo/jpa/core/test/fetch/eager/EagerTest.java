@@ -42,6 +42,10 @@ public class EagerTest extends BaseCoreTest {
 	private static Country USA;
 	private static Country UK;
 
+	/**
+	 * @since $version
+	 * @author hceylan
+	 */
 	@BeforeClass
 	public static void initCountries() {
 		EagerTest.TR = new Country(1, "Turkey");
@@ -62,6 +66,11 @@ public class EagerTest extends BaseCoreTest {
 		return person;
 	}
 
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
 	@Before
 	public void prepareCountries() {
 		this.persist(EagerTest.TR);

@@ -31,7 +31,7 @@ import javax.persistence.metamodel.SingularAttribute;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
-import org.batoo.jpa.core.impl.model.attribute.BasicAttributeImpl;
+import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.attribute.CollectionAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
 import org.batoo.jpa.core.impl.model.attribute.ListAttributeImpl;
@@ -135,7 +135,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 
 		// basic attributes
 		for (final BasicAttributeMetadata metadata : attributesMetadata.getBasics()) {
-			this.addAttribute(new BasicAttributeImpl(this, metadata));
+			this.addAttribute(new BasicAttribute(this, metadata));
 		}
 
 		// many to one attributes

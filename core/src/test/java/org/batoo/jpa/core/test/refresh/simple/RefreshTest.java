@@ -20,6 +20,8 @@ package org.batoo.jpa.core.test.refresh.simple;
 
 import java.util.Iterator;
 
+import javax.persistence.EntityManager;
+
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
@@ -43,16 +45,16 @@ public class RefreshTest extends BaseCoreTest {
 	private static final String CITY_NEW_YORK = "New York";
 	private static final String CITY_ISTANBUL = "Istanbul";
 
-	private static Country TR = new Country(1, COUNTRY_TURKEY);
-	private static Country USA = new Country(2, COUNTRY_USA);
-	private static Country UK = new Country(3, COUNTRY_UK);
+	private static Country TR = new Country(1, RefreshTest.COUNTRY_TURKEY);
+	private static Country USA = new Country(2, RefreshTest.COUNTRY_USA);
+	private static Country UK = new Country(3, RefreshTest.COUNTRY_UK);
 
 	private Person person() {
 		final Person person = new Person("Ceylan");
 
-		new Address(person, CITY_ISTANBUL, TR);
-		new Address(person, CITY_NEW_YORK, USA);
-		new Address(person, CITY_LONDON, UK);
+		new Address(person, RefreshTest.CITY_ISTANBUL, RefreshTest.TR);
+		new Address(person, RefreshTest.CITY_NEW_YORK, RefreshTest.USA);
+		new Address(person, RefreshTest.CITY_LONDON, RefreshTest.UK);
 
 		new Phone(person, "111 1111111");
 		new Phone(person, "222 2222222");
@@ -60,6 +62,11 @@ public class RefreshTest extends BaseCoreTest {
 		return person;
 	}
 
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
 	@Before
 	public void prepareCountries() {
 		this.persist(RefreshTest.TR);
@@ -84,7 +91,7 @@ public class RefreshTest extends BaseCoreTest {
 		person = this.find(Person.class, person.getId());
 
 		for (final Iterator<Address> i = person.getAddresses().iterator(); i.hasNext();) {
-			if (CITY_ISTANBUL.equals(i.next().getCity())) {
+			if (RefreshTest.CITY_ISTANBUL.equals(i.next().getCity())) {
 				i.remove();
 				break;
 			}

@@ -30,6 +30,7 @@ import javax.persistence.Cacheable;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.IdClass;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.SecondaryTable;
@@ -78,6 +79,7 @@ public class EntityMetadataImpl extends ManagedTypeMetadatImpl implements Entity
 	private InheritanceType inheritanceType;
 	private DiscriminatorColumnMetadata discriminatorColumn;
 	private String discriminatorValue;
+	private final String idClass;
 
 	/**
 	 * @param clazz
@@ -95,6 +97,9 @@ public class EntityMetadataImpl extends ManagedTypeMetadatImpl implements Entity
 
 		// handle name
 		this.name = this.handleName(metadata, parsed);
+
+		// handle id class
+		this.idClass = this.handleIdClass(metadata, parsed);
 
 		// handle cacheable
 		this.cachable = this.handleCacheable(metadata, parsed);
@@ -158,6 +163,15 @@ public class EntityMetadataImpl extends ManagedTypeMetadatImpl implements Entity
 	@Override
 	public String getDiscriminatorValue() {
 		return this.discriminatorValue;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getIdClass() {
+		return this.idClass;
 	}
 
 	/**
@@ -324,6 +338,29 @@ public class EntityMetadataImpl extends ManagedTypeMetadatImpl implements Entity
 			parsed.add(Cacheable.class);
 
 			return cacheable.value();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Handles the id class definition of the entity.
+	 * 
+	 * @param metadata
+	 *            the metadata
+	 * @param parsed
+	 *            the set of annotations parsed
+	 * @return the id class attribute
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private String handleIdClass(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
+		final IdClass idClass = this.getClazz().getAnnotation(IdClass.class);
+		if (idClass != null) {
+			parsed.add(IdClass.class);
+
+			return idClass.value().getName();
 		}
 
 		return null;

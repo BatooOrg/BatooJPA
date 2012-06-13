@@ -67,6 +67,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 
 	/**
 	 * @param metamodel
+	 *            the metamodel
 	 * 
 	 * @since $version
 	 * @author hceylan

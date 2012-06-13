@@ -18,20 +18,27 @@
  */
 package org.batoo.jpa.core.impl.model.attribute;
 
+import javax.persistence.EnumType;
+import javax.persistence.TemporalType;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.AbstractGenerator;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.core.impl.model.type.BasicTypeImpl;
+import org.batoo.jpa.core.impl.model.type.IdentifiableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.metadata.GeneratedValueMetadata;
+import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.IdAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.PhysicalAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.VersionAttributeMetadata;
 
 /**
- * Implementation of {@link SingularAttribute} for basic attributes.
+ * Implementation of {@link SingularAttribute} for basic, version and id attributes.
  * 
  * @param <X>
  *            The type containing the represented attribute
@@ -41,12 +48,20 @@ import org.batoo.jpa.parser.metadata.attribute.IdAttributeMetadata;
  * @author hceylan
  * @since $version
  */
-public class IdAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
+public final class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 
-	private final String generator;
+	private final BasicTypeImpl<T> type;
+	private final boolean optional;
+	private final boolean version;
 	private final IdType idType;
+	private final String generator;
+	private final boolean lob;
+	private final TemporalType temporalType;
+	private final EnumType enumType;
 
 	/**
+	 * Constructor for version attributes.
+	 * 
 	 * @param declaringType
 	 *            the declaring type
 	 * @param metadata
@@ -55,8 +70,66 @@ public class IdAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public IdAttributeImpl(ManagedTypeImpl<X> declaringType, IdAttributeMetadata metadata) {
+	public BasicAttribute(IdentifiableTypeImpl<X> declaringType, VersionAttributeMetadata metadata) {
 		super(declaringType, metadata);
+
+		this.version = true;
+		this.optional = false;
+		this.idType = null;
+		this.generator = null;
+		this.lob = false;
+		this.enumType = null;
+
+		this.type = this.getDeclaringType().getMetamodel().createBasicType(this.getJavaType());
+		this.temporalType = metadata.getTemporalType();
+	}
+
+	/**
+	 * Constructor for basic attributes.
+	 * 
+	 * @param declaringType
+	 *            the declaring type
+	 * @param metadata
+	 *            the metadata
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public BasicAttribute(ManagedTypeImpl<X> declaringType, BasicAttributeMetadata metadata) {
+		super(declaringType, metadata);
+
+		this.version = false;
+		this.idType = null;
+		this.generator = null;
+
+		this.lob = metadata.isLob();
+		this.type = this.getDeclaringType().getMetamodel().createBasicType(this.getJavaType());
+		this.optional = metadata.isOptional();
+		this.temporalType = metadata.getTemporalType();
+		this.enumType = metadata.getEnumType();
+	}
+
+	/**
+	 * Constructor for id attributes.
+	 * 
+	 * @param declaringType
+	 *            the declaring type
+	 * @param metadata
+	 *            the metadata
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public BasicAttribute(ManagedTypeImpl<X> declaringType, IdAttributeMetadata metadata) {
+		super(declaringType, metadata);
+
+		this.version = false;
+		this.optional = false;
+		this.lob = false;
+		this.enumType = null;
+
+		this.type = this.getDeclaringType().getMetamodel().createBasicType(this.getJavaType());
+		this.temporalType = metadata.getTemporalType();
 
 		final JdbcAdaptor jdbcAdaptor = declaringType.getMetamodel().getJdbcAdaptor();
 		final MetamodelImpl metamodel = declaringType.getMetamodel();
@@ -109,10 +182,6 @@ public class IdAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 	 * @author hceylan
 	 */
 	public boolean fillValue(ManagedInstance<? extends X> managedInstance) {
-		if (!this.isId()) {
-			throw new IllegalStateException("Not an id attribute");
-		}
-
 		final T value = this.get(managedInstance);
 
 		// if the attribute already has value, bail out
@@ -144,9 +213,21 @@ public class IdAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 	}
 
 	/**
-	 * Returns the idType.
+	 * Returns the enum type of the attribute.
 	 * 
-	 * @return the idType
+	 * @return the enum type of the attribute
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public EnumType getEnumType() {
+		return this.enumType;
+	}
+
+	/**
+	 * Returns the id type of the attribute.
+	 * 
+	 * @return the id type of the attribute
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -160,8 +241,68 @@ public class IdAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 	 * 
 	 */
 	@Override
+	public PhysicalAttributeMetadata getMetadata() {
+		return (PhysicalAttributeMetadata) super.getMetadata();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public PersistentAttributeType getPersistentAttributeType() {
+		return PersistentAttributeType.BASIC;
+	}
+
+	/**
+	 * Returns the temporal type of the attribute.
+	 * 
+	 * @return the temporal type of the attribute
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public TemporalType getTemporalType() {
+		return this.temporalType;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public BasicTypeImpl<T> getType() {
+		return this.type;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isAssociation() {
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public boolean isId() {
-		return true;
+		return this.idType != null;
+	}
+
+	/**
+	 * Returns if the attribute is lob.
+	 * 
+	 * @return true if the attribute is lob, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isLob() {
+		return this.lob;
 	}
 
 	/**
@@ -170,7 +311,7 @@ public class IdAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 	 */
 	@Override
 	public boolean isOptional() {
-		return false;
+		return this.optional;
 	}
 
 	/**
@@ -179,6 +320,6 @@ public class IdAttributeImpl<X, T> extends PhysicalAttributeImpl<X, T> {
 	 */
 	@Override
 	public boolean isVersion() {
-		return false;
+		return this.version;
 	}
 }

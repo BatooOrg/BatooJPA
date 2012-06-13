@@ -74,6 +74,8 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 		// attributes
 		Element.factoryMap.put(ElementConstants.ELEMENT_ATTRIBUTES, AttributesElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_TRANSIENT, TransientElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_ID, IdAttributeElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_ID_CLASS, IdClassElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_EMBEDDED, IdAttributeElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_EMBEDDED_ID, EmbeddedIdAttributeElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_VERSION, VersionAttributeElement.class);

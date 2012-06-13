@@ -21,7 +21,7 @@ package org.batoo.jpa.core.impl.jdbc;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.mapping.PhysicalMapping;
+import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
@@ -48,7 +48,7 @@ public class BasicColumn extends AbstractColumn {
 	private final boolean unique;
 	private final boolean updatable;
 	private final String mappingName;
-	private final PhysicalMapping<?, ?> mapping;
+	private final BasicMapping<?, ?> mapping;
 	private final JdbcAdaptor jdbcAdaptor;
 
 	/**
@@ -62,7 +62,7 @@ public class BasicColumn extends AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public BasicColumn(PhysicalMapping<?, ?> mapping, int sqlType, ColumnMetadata metadata) {
+	public BasicColumn(BasicMapping<?, ?> mapping, int sqlType, ColumnMetadata metadata) {
 		super();
 
 		this.jdbcAdaptor = mapping.getEntity().getMetamodel().getJdbcAdaptor();
@@ -121,7 +121,7 @@ public class BasicColumn extends AbstractColumn {
 	 * @author hceylan
 	 */
 	@Override
-	public PhysicalMapping<?, ?> getMapping() {
+	public BasicMapping<?, ?> getMapping() {
 		return this.mapping;
 	}
 
