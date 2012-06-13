@@ -31,7 +31,7 @@ import javax.persistence.metamodel.Type;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.reflect.ReflectHelper;
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
@@ -211,10 +211,12 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	/**
 	 * Creates a new managed collection to track changes.
 	 * 
-	 * @param managedInstance
-	 *            the managed instance
 	 * @param mapping
 	 *            the mapping
+	 * @param session
+	 *            the session
+	 * @param id
+	 *            the id of the root entity
 	 * @param values
 	 *            the values
 	 * @return the managed collection
@@ -222,7 +224,7 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract C newCollection(ManagedInstance<? extends X> managedInstance, PluralAssociationMapping<?, E, C> mapping,
+	public abstract C newCollection(PluralAssociationMapping<?, E, C> mapping, SessionImpl session, Object id,
 		Collection<? extends E> values);
 
 	/**

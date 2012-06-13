@@ -20,8 +20,12 @@ package org.batoo.jpa.core.impl.model.type;
 
 import javax.persistence.metamodel.EmbeddableType;
 
+import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.type.EmbeddableMetadata;
+
+import sun.reflect.ConstructorAccessor;
 
 /**
  * Implementation of {@link EmbeddableType}.
@@ -32,7 +36,11 @@ import org.batoo.jpa.parser.metadata.type.EmbeddableMetadata;
  * @author hceylan
  * @since $version
  */
+@SuppressWarnings("restriction")
 public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements EmbeddableType<X> {
+	private static final Object[] EMPTY_PARAMS = new Object[] {};
+
+	private ConstructorAccessor constructor;
 
 	/**
 	 * @param metamodel
@@ -49,6 +57,13 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 		super(metamodel, javaType, metadata);
 
 		this.addAttributes(metadata);
+
+		try {
+			this.constructor = ReflectHelper.createConstructor(javaType.getConstructor());
+		}
+		catch (final Exception e) {
+			throw new MappingException("Embeddable type does not have a default constructor", this.getLocator());
+		}
 	}
 
 	/**
@@ -59,4 +74,23 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	public PersistenceType getPersistenceType() {
 		return PersistenceType.EMBEDDABLE;
 	}
+
+	/**
+	 * Returns a new instance of the type
+	 * 
+	 * @return a new instance of the type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	public X newInstance() {
+		try {
+			return (X) this.constructor.newInstance(EmbeddableTypeImpl.EMPTY_PARAMS);
+		}
+		catch (final Exception e) {} // not possible at this stage
+
+		return null;
+	}
+
 }

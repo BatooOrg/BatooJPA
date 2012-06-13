@@ -26,7 +26,7 @@ import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.OptionalAssociationAttributeMetadata;
 
 /**
- * Implementation of {@link SingularAttribute} representing types of ManyToOne and OneToOne
+ * Implementation of {@link SingularMapping} representing types of ManyToOne and OneToOne
  * 
  * @param <X>
  *            The type containing the represented attribute

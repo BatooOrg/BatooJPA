@@ -228,11 +228,11 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 	 * 
 	 */
 	@Override
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void set(ManagedInstance managedInstance, Object value) {
-		final C collection = this.attribute.newCollection(managedInstance, this, (Collection<? extends Z>) value);
+	@SuppressWarnings({ "unchecked" })
+	public void set(SessionImpl session, Object id, Object instance, Object value) {
+		final C collection = this.attribute.newCollection(this, session, id, (Collection<? extends Z>) value);
 
-		super.set(managedInstance, collection);
+		super.set(session, id, instance, collection);
 	}
 
 	/**

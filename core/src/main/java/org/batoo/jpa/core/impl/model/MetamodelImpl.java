@@ -56,6 +56,7 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.IdentifiableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.core.impl.model.type.MappedSuperclassTypeImpl;
+import org.batoo.jpa.core.impl.model.type.TypeImpl;
 import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.MappingException;
@@ -647,5 +648,27 @@ public class MetamodelImpl implements Metamodel {
 	 */
 	public void stopIdGenerators() {
 		this.idGeneratorExecuter.shutdown();
+	}
+
+	/**
+	 * Returns the type corresponding to the <code>clazz</code>.
+	 * 
+	 * @param clazz
+	 *            the class of the type
+	 * @param <X>
+	 *            the expected type of the type
+	 * @return the type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	public <X> TypeImpl<X> type(Class<X> clazz) {
+		final BasicTypeImpl<?> basic = this.basics.get(clazz);
+		if (basic != null) {
+			return (TypeImpl<X>) basic;
+		}
+
+		return this.managedType(clazz);
 	}
 }

@@ -23,7 +23,6 @@ import javax.persistence.TemporalType;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.AbstractGenerator;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.BasicTypeImpl;
@@ -174,19 +173,23 @@ public final class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 	 * <p>
 	 * The operation returns false if at least one entity needs to obtain identity from the database.
 	 * 
-	 * @param managedInstance
+	 * @param instance
 	 *            the instance to fill ids.
 	 * @return false if all OK, true if if at least one entity needs to obtain identity from the database
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public boolean fillValue(ManagedInstance<? extends X> managedInstance) {
-		final T value = this.get(managedInstance);
+	public boolean fillValue(Object instance) {
+		final T value = this.get(instance);
 
 		// if the attribute already has value, bail out
 		if (value != null) {
 			return true;
+		}
+
+		if (this.idType == null) {
+			throw new NullPointerException();
 		}
 
 		// fill the id
@@ -201,11 +204,11 @@ public final class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 				}
 			case SEQUENCE:
 				// fill with the sequence
-				this.set(managedInstance.getInstance(), this.getMetamodel().getNextSequence(this.generator));
+				this.set(instance, this.getMetamodel().getNextSequence(this.generator));
 				break;
 			case TABLE:
 				// fill with the next table generator id
-				this.set(managedInstance.getInstance(), this.getMetamodel().getNextTableValue(this.generator));
+				this.set(instance, this.getMetamodel().getNextTableValue(this.generator));
 				break;
 		}
 

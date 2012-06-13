@@ -31,6 +31,7 @@ import javax.persistence.metamodel.EntityType;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 /**
@@ -57,7 +58,8 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	protected SelectionImpl<T> selection;
 	private final Set<RootImpl<?>> roots = Sets.newHashSet();
 	protected PredicateImpl restriction;
-	private int nextAlias;
+	private int nextEntityAlias;
+	private final List<ParameterExpressionImpl<?>> sqlParameters = Lists.newArrayList();
 
 	/**
 	 * @param metamodel
@@ -110,15 +112,15 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	}
 
 	/**
-	 * Returns the generated alias.
+	 * Returns the generated entity alias.
 	 * 
-	 * @return the generated alias
+	 * @return the generated entity alias
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String generateAlias() {
-		return "E" + this.nextAlias++;
+	public String generateEntityAlias() {
+		return "E" + this.nextEntityAlias++;
 	}
 
 	/**
@@ -188,6 +190,18 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	}
 
 	/**
+	 * Returns the sqlParameters of the AbstractQueryImpl.
+	 * 
+	 * @return the sqlParameters of the AbstractQueryImpl
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public List<ParameterExpressionImpl<?>> getSqlParameters() {
+		return this.sqlParameters;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -235,6 +249,22 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	public boolean isDistinct() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	/**
+	 * Adds the parameter to the SQL parameters queue.
+	 * 
+	 * @param parameter
+	 *            the parameter to add
+	 * @return the positional number of the parameter
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public int setNextSqlParam(ParameterExpressionImpl<?> parameter) {
+		this.sqlParameters.add(parameter);
+
+		return this.sqlParameters.size() - 1;
 	}
 
 	/**

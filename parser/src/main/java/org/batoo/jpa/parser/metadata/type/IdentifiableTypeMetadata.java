@@ -16,32 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.parser.impl.metadata.type;
-
-import javax.persistence.MappedSuperclass;
-
-import org.batoo.jpa.parser.metadata.type.MappedSuperclassMetadata;
+package org.batoo.jpa.parser.metadata.type;
 
 /**
- * Implementation {@link MappedSuperclassMetadata}.
+ * The definition for identifiable types.
  * 
  * @author hceylan
  * @since $version
  */
-public class MappedSuperclassMetadataImpl extends IdentifiableMetadataImpl implements MappedSuperclassMetadata {
+public interface IdentifiableTypeMetadata extends ManagedTypeMetadata {
 
 	/**
-	 * @param clazz
-	 *            the represented class
-	 * @param metadata
-	 *            the metadata
+	 * Returns the id class of the identifiable type.
+	 * 
+	 * @return the id class of the identifiable type
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public MappedSuperclassMetadataImpl(Class<?> clazz, MappedSuperclassMetadata metadata) {
-		super(clazz, null);
-
-		this.getAnnotationsParsed().add(MappedSuperclass.class);
-	}
+	String getIdClass();
 }

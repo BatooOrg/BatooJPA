@@ -21,10 +21,12 @@ package org.batoo.jpa.core.impl.collections;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 
 /**
+ * The list implementation of managed collection.
+ * 
  * @param <X>
  *            The type the represented collection belongs to
  * @param <E>
@@ -34,25 +36,28 @@ import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
  */
 public class ManagedList<X, E> extends ArrayList<E> {
 
-	private final ManagedInstance<? extends X> managedInstance;
 	private final PluralAssociationMapping<?, E, ?> mapping;
+	private final SessionImpl session;
+	private final Object id;
 
 	/**
-	 * @param managedInstance
-	 *            the managed instance
 	 * @param mapping
 	 *            the mapping
+	 * @param session
+	 *            the session
+	 * @param id
+	 *            the id of the root entity
 	 * @param value
 	 *            the initial values
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedList(ManagedInstance<? extends X> managedInstance, PluralAssociationMapping<?, E, ?> mapping,
-		Collection<? extends E> value) {
+	public ManagedList(PluralAssociationMapping<?, E, ?> mapping, SessionImpl session, Object id, Collection<? extends E> value) {
 		super(value);
 
-		this.managedInstance = managedInstance;
 		this.mapping = mapping;
+		this.session = session;
+		this.id = id;
 	}
 }

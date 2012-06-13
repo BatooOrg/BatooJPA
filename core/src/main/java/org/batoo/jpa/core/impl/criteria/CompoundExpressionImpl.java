@@ -102,7 +102,24 @@ public class CompoundExpressionImpl extends ExpressionImpl<Boolean> {
 	 */
 	@Override
 	public String generate(CriteriaQueryImpl<?> query) {
+		if (this.x instanceof ParameterExpressionImpl) {
+			return this.y.generate(query, this.comparison, (ParameterExpressionImpl<?>) this.x);
+		}
+		else if (this.y instanceof ParameterExpressionImpl) {
+			return this.x.generate(query, this.comparison, (ParameterExpressionImpl<?>) this.y);
+		}
+
 		return this.x.generate(query) + this.comparison.getFragment() + this.y.generate(query);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**

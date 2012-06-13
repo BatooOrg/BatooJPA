@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.impl.model.mapping;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
@@ -125,7 +126,7 @@ public abstract class AbstractMapping<X, Y> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void set(ManagedInstance<?> managedInstance, Object value) {
+	public final void set(ManagedInstance<?> managedInstance, Object value) {
 		Object instance = managedInstance.getInstance();
 		if (this.parent != null) {
 			instance = this.parent.get(managedInstance.getInstance());
@@ -137,8 +138,27 @@ public abstract class AbstractMapping<X, Y> {
 		}
 
 		if (!this.inherited || managedInstance.getType().doesExtend(this.entity)) {
-			this.getAttribute().set(instance, value);
+			this.set(managedInstance.getSession(), managedInstance.getId(), instance, value);
 		}
+	}
+
+	/**
+	 * Sets the mapping value of the instance
+	 * 
+	 * @param session
+	 *            the session
+	 * @param id
+	 *            the id of the root instance
+	 * @param instance
+	 *            the instance of which the value to set
+	 * @param value
+	 *            the value to set
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void set(SessionImpl session, Object id, Object instance, Object value) {
+		this.getAttribute().set(instance, value);
 	}
 
 	/**

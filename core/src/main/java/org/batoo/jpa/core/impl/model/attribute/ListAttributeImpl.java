@@ -24,7 +24,7 @@ import java.util.List;
 import javax.persistence.metamodel.ListAttribute;
 
 import org.batoo.jpa.core.impl.collections.ManagedList;
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
@@ -70,8 +70,8 @@ public class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E>, E> 
 	 * 
 	 */
 	@Override
-	public List<E> newCollection(ManagedInstance<? extends X> managedInstance, PluralAssociationMapping<?, E, List<E>> mapping,
+	public List<E> newCollection(PluralAssociationMapping<?, E, List<E>> mapping, SessionImpl session, Object id,
 		Collection<? extends E> values) {
-		return new ManagedList<X, E>(managedInstance, mapping, values);
+		return new ManagedList<X, E>(mapping, session, id, values);
 	}
 }

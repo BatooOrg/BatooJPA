@@ -23,6 +23,8 @@ import java.util.Collection;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 
+import org.batoo.jpa.core.impl.criteria.CompoundExpressionImpl.Comparison;
+
 /**
  * Type for query expressions.
  * 
@@ -52,6 +54,22 @@ public abstract class ExpressionImpl<T> extends SelectionImpl<T> implements Expr
 	 * @author hceylan
 	 */
 	public abstract String describe();
+
+	/**
+	 * Returns the generated SQL fragment with comparison to parameter expression.
+	 * 
+	 * @param query
+	 *            the query
+	 * @param comparison
+	 *            the comparison
+	 * @param parameter
+	 *            the parameter expression
+	 * @return the generated SQL fragment
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter);
 
 	/**
 	 * {@inheritDoc}

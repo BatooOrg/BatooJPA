@@ -29,11 +29,13 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
+import org.batoo.jpa.core.impl.criteria.CompoundExpressionImpl.Comparison;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
+import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 import com.google.common.collect.Maps;
@@ -93,6 +95,16 @@ public class RootPathImpl<X> extends PathImpl<X> {
 	 * 
 	 */
 	@Override
+	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public <K, V, M extends Map<K, V>> ExpressionImpl<M> get(MapAttribute<X, K, V> map) {
 		// TODO Auto-generated method stub
 		return null;
@@ -121,17 +133,21 @@ public class RootPathImpl<X> extends PathImpl<X> {
 			return path;
 		}
 
+		final AbstractMapping<? super X, ?> mapping = this.entity.getMapping(attribute.getName());
+
+		if (mapping == null) {
+			throw new IllegalArgumentException("Cannot dereference");
+		}
+
 		// generate and return
 		if (attribute instanceof BasicAttribute) {
-			final AbstractMapping<? super X, ?> mapping = this.entity.getMapping(attribute.getName());
-
-			if (mapping == null) {
-				throw new IllegalArgumentException("Cannot dereference");
-			}
-
-			path = new PhysicalAttributePathImpl<Y>(this, (BasicMapping<?, Y>) mapping);
-			this.children.put(attribute.getName(), path);
+			path = new PhysicalAttributePathImpl<Y>(this, (BasicMapping<? super X, Y>) mapping);
 		}
+		else {
+			path = new EmbeddedAttributePathImpl<Y>(this, (EmbeddedMapping<? super X, Y>) mapping);
+		}
+
+		this.children.put(attribute.getName(), path);
 
 		return path;
 	}

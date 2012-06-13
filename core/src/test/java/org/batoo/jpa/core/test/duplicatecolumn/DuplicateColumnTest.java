@@ -18,9 +18,8 @@
  */
 package org.batoo.jpa.core.test.duplicatecolumn;
 
-import junit.framework.Assert;
-
 import org.batoo.jpa.core.test.BaseCoreTest;
+import org.batoo.jpa.parser.MappingException;
 import org.junit.Test;
 
 /**
@@ -45,16 +44,8 @@ public class DuplicateColumnTest extends BaseCoreTest {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@Test
+	@Test(expected = MappingException.class)
 	public void testDuplicateColumn() {
-		try {
-			this.em();
-
-			Assert.fail("Exception expected");
-		}
-		catch (final IllegalArgumentException e) {
-			Assert.assertTrue(e.getCause().getCause().getMessage().startsWith(
-				"Duplicate column on entity org.batoo.jpa.core.test.duplicatecolumn.Foo"));
-		}
+		this.em();
 	}
 }

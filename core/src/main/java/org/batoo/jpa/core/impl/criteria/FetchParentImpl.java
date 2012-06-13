@@ -35,15 +35,18 @@ import javax.persistence.metamodel.Type;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
+import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.jdbc.DiscriminatorColumn;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
-import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.jdbc.SecondaryTable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
+import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.util.BatooUtils;
 
@@ -73,8 +76,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	private String alias;
 	private String primaryTableAlias;
 	private final HashBiMap<String, SecondaryTable> tableAliases = HashBiMap.create();
-
-	private final HashBiMap<String, PkColumn> idFields = HashBiMap.create();
 	private final HashBiMap<String, AbstractColumn> fields = HashBiMap.create();
 	private int nextTableAlias = 0;
 	private String discriminatorAlias;
@@ -247,10 +248,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 				final String fieldAlias = tableAlias + "_F" + fieldNo++;
 
 				final String field = Joiner.on(".").skipNulls().join(tableAlias, column.getName());
-				if (column instanceof PkColumn) {
-					this.idFields.put(fieldAlias, (PkColumn) column);
-				}
-				else if (column instanceof DiscriminatorColumn) {
+				if (column instanceof DiscriminatorColumn) {
 					this.discriminatorAlias = fieldAlias;
 				}
 				else {
@@ -304,7 +302,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	 */
 	private String getAlias(CriteriaQueryImpl<?> query) {
 		if (this.alias == null) {
-			this.alias = query.generateAlias();
+			this.alias = query.generateEntityAlias();
 		}
 
 		return this.alias;
@@ -324,8 +322,17 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 
 	private Object getId(Map<String, Object> row) {
 		if (this.entity.hasSingleIdAttribute()) {
-			final String field = this.idFields.keySet().iterator().next();
-			return row.get(field);
+			final SingularMapping<? super X, ?> idMapping = this.entity.getIdMapping();
+			if (idMapping instanceof BasicMapping) {
+				final BasicColumn column = ((BasicMapping<? super X, ?>) idMapping).getColumn();
+				return row.get(this.fields.inverse().get(column));
+			}
+
+			if (idMapping instanceof EmbeddedMapping) {
+				final EmbeddedMapping<? super X, ?> mapping = (EmbeddedMapping<? super X, ?>) idMapping;
+
+				return this.populateEmbeddedId(row, mapping);
+			}
 		}
 
 		return null;
@@ -501,6 +508,35 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 				return input.getInstance();
 			}
 		});
+	}
+
+	/**
+	 * Populates the embedded id fields from the result set
+	 * 
+	 * @param row
+	 *            the row
+	 * @param mapping
+	 *            the embedded mapping
+	 * @return the generated embedded id
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private Object populateEmbeddedId(Map<String, Object> row, EmbeddedMapping<? super X, ?> mapping) {
+		final Object id = mapping.getAttribute().newInstance();
+
+		for (final AbstractMapping<?, ?> child : mapping.getMappings()) {
+			if (child instanceof BasicMapping) {
+				final BasicMapping<?, ?> basicMapping = (BasicMapping<?, ?>) child;
+				final String field = this.fields.inverse().get(basicMapping.getColumn());
+				basicMapping.getAttribute().set(id, row.get(field));
+			}
+			else {
+				child.getAttribute().set(id, this.populateEmbeddedId(row, mapping));
+			}
+		}
+
+		return id;
 	}
 
 	/**

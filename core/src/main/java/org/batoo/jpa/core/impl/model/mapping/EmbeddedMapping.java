@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.model.mapping;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +47,7 @@ import com.google.common.collect.Maps;
  * @author hceylan
  * @since $version
  */
-public class EmbeddedMapping<X, Y> extends AbstractMapping<X, Y> {
+public class EmbeddedMapping<X, Y> extends SingularMapping<X, Y> {
 
 	private final EmbeddedAttribute<? super X, Y> attribute;
 	private final Map<String, AbstractMapping<? super X, ?>> mappings = Maps.newHashMap();
@@ -92,12 +93,77 @@ public class EmbeddedMapping<X, Y> extends AbstractMapping<X, Y> {
 	}
 
 	/**
+	 * Adds the basic attributes that are within the the embeddable.
+	 * 
+	 * @param basicMappings
+	 *            the list to add basic mappings
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void addBasicAttributes(List<BasicMapping<?, ?>> basicMappings) {
+		for (final AbstractMapping<? super X, ?> mapping : this.mappings.values()) {
+			if (mapping instanceof BasicMapping) {
+				basicMappings.add((BasicMapping<?, ?>) mapping);
+			}
+
+			if (mapping instanceof EmbeddedMapping) {
+				final EmbeddedMapping<?, ?> embeddedMapping = (EmbeddedMapping<?, ?>) mapping;
+				embeddedMapping.addBasicAttributes(basicMappings);
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public boolean fillValue(Object instance) {
+		final Y value = this.get(instance);
+
+		if (value == null) {
+			throw new NullPointerException();
+		}
+
+		for (final AbstractMapping<? super X, ?> mapping : this.mappings.values()) {
+			// mapping is another embedded mapping
+			if (mapping instanceof EmbeddedMapping) {
+				((EmbeddedMapping<? super X, Y>) mapping).fillValue(value);
+			}
+			// mapping is basic mapping
+			else if (mapping instanceof BasicMapping) {
+				((BasicMapping<? super X, Y>) mapping).getAttribute().fillValue(instance);
+			}
+			// no other mappings allowed in id classes
+			else {
+				throw new MappingException("Embbeded ids can pnly have basic and embedded attributes.", mapping.getAttribute().getLocator());
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
 	@Override
 	public EmbeddedAttribute<? super X, Y> getAttribute() {
 		return this.attribute;
+	}
+
+	/**
+	 * Returns the mappings of the EmbeddedMapping.
+	 * 
+	 * @return the mappings of the EmbeddedMapping
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Collection<AbstractMapping<? super X, ?>> getMappings() {
+		return this.mappings.values();
 	}
 
 	/**
@@ -113,7 +179,7 @@ public class EmbeddedMapping<X, Y> extends AbstractMapping<X, Y> {
 
 			switch (attribute.getPersistentAttributeType()) {
 				case BASIC:
-					mapping = new BasicMapping(this.getEntity(), (BasicAttribute) attribute);
+					mapping = new BasicMapping(this.getEntity(), (BasicAttribute) attribute, this.getAttribute().isId());
 					this.mappings.put(attribute.getName(), mapping);
 
 					final BasicColumn basicColumn = ((BasicMapping) mapping).getColumn();

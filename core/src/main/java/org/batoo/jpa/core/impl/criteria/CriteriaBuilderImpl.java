@@ -39,7 +39,6 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.ListJoin;
 import javax.persistence.criteria.MapJoin;
 import javax.persistence.criteria.Order;
-import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Predicate.BooleanOperator;
@@ -1090,7 +1089,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <T> ParameterExpressionImpl<T> parameter(Class<T> paramClass) {
-		return new ParameterExpressionImpl<T>(paramClass, null);
+		return this.parameter(paramClass, null);
 	}
 
 	/**
@@ -1098,8 +1097,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public <T> ParameterExpression<T> parameter(Class<T> paramClass, String name) {
-		return new ParameterExpressionImpl<T>(paramClass, "name");
+	public <T> ParameterExpressionImpl<T> parameter(Class<T> paramClass, String name) {
+		return new ParameterExpressionImpl<T>(paramClass, name);
 	}
 
 	/**

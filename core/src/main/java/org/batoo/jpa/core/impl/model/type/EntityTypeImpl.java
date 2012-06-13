@@ -70,6 +70,7 @@ import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
@@ -90,6 +91,7 @@ import com.google.common.collect.Sets;
  * @author hceylan
  * @since $version
  */
+@SuppressWarnings("restriction")
 public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements EntityType<X> {
 
 	private static final int MAX_DEPTH = 5;
@@ -101,7 +103,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private EntityTable[] tables;
 	private EntityTable[] allTables;
 
-	@SuppressWarnings("restriction")
 	private sun.reflect.ConstructorAccessor constructor;
 
 	private CriteriaQueryImpl<X> selectCriteria;
@@ -118,6 +119,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private final Map<Method, Method> idMethods = Maps.newHashMap();
 
 	private final Map<String, AbstractMapping<? super X, ?>> mappings = Maps.newHashMap();
+	private SingularMapping<? super X, ?> idMapping;
 	private BasicMapping<? super X, ?>[] idMappings;
 
 	private final InheritanceType inheritanceType;
@@ -562,6 +564,35 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
+	 * Returns the single id mapping.
+	 * 
+	 * @return the single id mapping
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public SingularMapping<? super X, ?> getIdMapping() {
+		if (this.idMapping != null) {
+			return this.idMapping;
+		}
+
+		synchronized (this) {
+			if (this.idMapping != null) {
+				return this.idMapping;
+			}
+
+			for (final AbstractMapping<? super X, ?> mapping : this.mappings.values()) {
+				if ((mapping.getAttribute() instanceof SingularAttribute)
+					&& ((SingularAttribute<? super X, ?>) mapping.getAttribute()).isId()) {
+					return this.idMapping = (SingularMapping<? super X, ?>) mapping;
+				}
+			}
+
+			throw new NullPointerException(); // impossible
+		}
+	}
+
+	/**
 	 * Returns an array of id attributes.
 	 * 
 	 * @return an array of id attributes
@@ -662,7 +693,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings({ "unchecked", "restriction" })
+	@SuppressWarnings({ "unchecked" })
 	public ManagedInstance<X> getManagedInstanceById(SessionImpl session, Object id, boolean lazy) {
 		this.enhanceIfNeccessary();
 
@@ -1153,17 +1184,28 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 		this.prepareEagerAssociations(r, 0, null);
 
-		// add id fields to the restriction
-		final List<PredicateImpl> predicates = Lists.newArrayList();
-		for (final BasicMapping<? super X, ?> idMapping : this.getRootType().getIdMappings()) {
+		// has single id mapping
+		if (this.getRootType().hasSingleIdAttribute()) {
+			final SingularMapping<? super X, ?> idMapping = this.getRootType().getIdMapping();
 			final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
 			final Path<?> path = r.get(idMapping.getAttribute());
 			final PredicateImpl predicate = cb.equal(path, pe);
 
-			predicates.add(predicate);
+			return this.selectCriteria = q.where(predicate);
 		}
+		// has multiple id mappings
+		else {
+			final List<PredicateImpl> predicates = Lists.newArrayList();
+			for (final BasicMapping<? super X, ?> idMapping : this.getRootType().getIdMappings()) {
+				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
+				final Path<?> path = r.get(idMapping.getAttribute());
+				final PredicateImpl predicate = cb.equal(path, pe);
 
-		return this.selectCriteria = q.where(predicates.toArray(new PredicateImpl[predicates.size()]));
+				predicates.add(predicate);
+			}
+
+			return this.selectCriteria = q.where(predicates.toArray(new PredicateImpl[predicates.size()]));
+		}
 	}
 
 	/**

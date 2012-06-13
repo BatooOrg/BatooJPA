@@ -29,6 +29,8 @@ import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
+import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 /**
@@ -74,7 +76,11 @@ public class ManagedInstance<X> {
 	private final SessionImpl session;
 	private final X instance;
 	private Status status;
+
+	private final SingularMapping<? super X, ?> idMapping;
 	private final BasicMapping<? super X, ?>[] idMappings;
+	private final EmbeddableTypeImpl<?> idType;
+
 	private EntityTransactionImpl transaction;
 	private final boolean external = true;
 
@@ -100,7 +106,16 @@ public class ManagedInstance<X> {
 		this.session = session;
 		this.instance = instance;
 
-		this.idMappings = type.getRootType().getIdMappings();
+		if (type.getRootType().hasSingleIdAttribute()) {
+			this.idMapping = type.getRootType().getIdMapping();
+			this.idMappings = null;
+			this.idType = null;
+		}
+		else {
+			this.idType = (EmbeddableTypeImpl<?>) this.type.getRootType().getIdType();
+			this.idMappings = this.type.getRootType().getIdMappings();
+			this.idMapping = null;
+		}
 	}
 
 	/**
@@ -120,8 +135,13 @@ public class ManagedInstance<X> {
 		this(type, session, instance);
 
 		this.id = id;
-		for (final BasicMapping<? super X, ?> attribute : this.idMappings) {
-			attribute.set(this, id);
+		if (this.idMapping != null) {
+			this.idMapping.set(this, id);
+		}
+		else {
+			for (final BasicMapping<? super X, ?> attribute : this.idMappings) {
+				attribute.set(this, id);
+			}
 		}
 	}
 
@@ -220,12 +240,18 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public boolean fillIdValues() {
-		boolean allFilled = true;
-		for (final BasicMapping<? super X, ?> mapping : this.idMappings) {
-			allFilled &= mapping.getAttribute().fillValue(this);
+		if (this.idMapping != null) {
+			return this.idMapping.fillValue(this.instance);
 		}
+		else {
+			for (final BasicMapping<? super X, ?> mapping : this.idMappings) {
+				if (!mapping.fillValue(this.instance)) {
+					return false;
+				}
+			}
 
-		return allFilled;
+			return true;
+		}
 	}
 
 	/**
@@ -297,7 +323,16 @@ public class ManagedInstance<X> {
 			return this.id;
 		}
 
-		return this.id = this.idMappings[0].get(this.instance);
+		if (this.idMapping != null) {
+			return this.id = this.idMapping.get(this.instance);
+		}
+
+		this.id = this.idType.newInstance();
+		for (final BasicMapping<? super X, ?> mapping : this.idMappings) {
+			mapping.set(null, null, this.id, mapping.get(this.instance));
+		}
+
+		return this.id;
 	}
 
 	/**

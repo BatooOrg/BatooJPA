@@ -24,7 +24,7 @@ import java.util.Set;
 import javax.persistence.metamodel.SetAttribute;
 
 import org.batoo.jpa.core.impl.collections.ManagedSet;
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
@@ -70,8 +70,8 @@ public class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>, E> im
 	 * 
 	 */
 	@Override
-	public Set<E> newCollection(ManagedInstance<? extends X> managedInstance, PluralAssociationMapping<?, E, Set<E>> mapping,
+	public Set<E> newCollection(PluralAssociationMapping<?, E, Set<E>> mapping, SessionImpl session, Object id,
 		Collection<? extends E> values) {
-		return new ManagedSet<X, E>(managedInstance, mapping, values);
+		return new ManagedSet<X, E>(mapping, session, id, values);
 	}
 }

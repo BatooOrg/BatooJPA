@@ -25,6 +25,7 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 
 import org.apache.commons.lang.mutable.MutableInt;
+import org.batoo.jpa.core.impl.criteria.CompoundExpressionImpl.Comparison;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 import com.google.common.base.Function;
@@ -145,6 +146,16 @@ public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate 
 		});
 
 		return "(" + Joiner.on(this.operator.name()).join(converted) + ")";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**

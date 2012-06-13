@@ -25,7 +25,13 @@ import javax.persistence.criteria.ParameterExpression;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
+import org.batoo.jpa.core.impl.criteria.CompoundExpressionImpl.Comparison;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
+import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
+import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
+
+import com.google.common.collect.Maps;
 
 /**
  * Type of criteria query parameter expressions.
@@ -40,6 +46,8 @@ public class ParameterExpressionImpl<T> extends ExpressionImpl<T> implements Par
 	private final Class<T> paramClass;
 	private final String name;
 	private Integer position;
+	private int expandedCount = 0;
+	private final Map<Integer, AbstractMapping<?, ?>> mappingMap = Maps.newHashMap();
 
 	/**
 	 * @param paramClass
@@ -86,7 +94,33 @@ public class ParameterExpressionImpl<T> extends ExpressionImpl<T> implements Par
 			query.addParameter(this);
 		}
 
+		if (this.mappingMap.isEmpty()) {
+			this.expandedCount++;
+		}
+
 		return "?";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * Returns the expanded parameter count of the parameter.
+	 * 
+	 * @return the expanded parameter count of the parameter
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public int getExpandedCount() {
+		return this.expandedCount;
 	}
 
 	/**
@@ -124,6 +158,80 @@ public class ParameterExpressionImpl<T> extends ExpressionImpl<T> implements Par
 	public List<T> handle(SessionImpl session, BaseTypedQueryImpl<?> query, List<Map<String, Object>> data, MutableInt rowNo) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	/**
+	 * Registers the parameter with the query.
+	 * 
+	 * @param query
+	 *            the query
+	 * @param mapping
+	 *            the mapping to bind to
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void registerParameter(CriteriaQueryImpl<?> query, AbstractMapping<?, ?> mapping) {
+		this.mappingMap.put(query.setNextSqlParam(this), mapping);
+	}
+
+	/**
+	 * Sets the parameters by expanding the embedded mapping.
+	 * 
+	 * @param parameters
+	 *            the SQL parameters
+	 * @param paramIndex
+	 *            the index corresponding to the parameter
+	 * @param mapping
+	 *            the embedded mapping
+	 * @param value
+	 *            the value to set to the parameter
+	 * 
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void setParameter(Object[] parameters, MutableInt sqlParamindex, EmbeddedMapping<?, ?> mapping, Object value) {
+		for (final AbstractMapping<?, ?> child : mapping.getMappings()) {
+			if (child instanceof BasicMapping) {
+				parameters[sqlParamindex.intValue()] = child.getAttribute().get(value);
+
+				sqlParamindex.increment();
+			}
+			else if (child instanceof EmbeddedMapping) {
+				this.setParameter(parameters, sqlParamindex, (EmbeddedMapping<?, ?>) child, mapping.getAttribute().get(value));
+			}
+		}
+	}
+
+	/**
+	 * Sets the parameters expanding if necessary.
+	 * 
+	 * @param parameters
+	 *            the SQL parameters
+	 * @param paramIndex
+	 *            the index corresponding to the parameter
+	 * @param sqlParamindex
+	 *            the index corresponding to expanded SQL parameter
+	 * @param value
+	 *            the value to set to the parameter
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setParameter(Object[] parameters, MutableInt paramIndex, MutableInt sqlParamindex, Object value) {
+		final AbstractMapping<?, ?> mapping = this.mappingMap.get(paramIndex.intValue());
+
+		if (mapping instanceof BasicMapping) {
+			parameters[sqlParamindex.intValue()] = value;
+
+			sqlParamindex.increment();
+		}
+		else if (mapping instanceof EmbeddedMapping) {
+			this.setParameter(parameters, sqlParamindex, (EmbeddedMapping<?, ?>) mapping, value);
+		}
+
+		paramIndex.increment();
 	}
 
 	/**

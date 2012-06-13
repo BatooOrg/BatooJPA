@@ -32,8 +32,13 @@ import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.criteria.CompoundExpressionImpl.Comparison;
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
+import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
+import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
+import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 
 /**
  * Physical Attribute implementation of {@link Path}.
@@ -44,20 +49,20 @@ import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
  * @author hceylan
  * @since $version
  */
-public class PhysicalAttributePathImpl<X> extends PathImpl<X> {
+public class EmbeddedAttributePathImpl<X> extends PathImpl<X> {
 
-	private final BasicMapping<?, X> mapping;
+	private final EmbeddedMapping<?, X> mapping;
 
 	/**
 	 * @param parent
 	 *            the parent path
 	 * @param mapping
-	 *            the physical mapping
+	 *            the embedded mapping
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PhysicalAttributePathImpl(PathImpl<?> parent, BasicMapping<?, X> mapping) {
+	public EmbeddedAttributePathImpl(PathImpl<?> parent, EmbeddedMapping<?, X> mapping) {
 		super(parent);
 
 		this.mapping = mapping;
@@ -86,19 +91,25 @@ public class PhysicalAttributePathImpl<X> extends PathImpl<X> {
 	 * {@inheritDoc}
 	 * 
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public String generate(CriteriaQueryImpl<?> query) {
-		final BasicColumn column = this.mapping.getColumn();
+		final List<String> fragments = Lists.newArrayList();
 
-		PathImpl<?> root = this;
-		while (root.getParentPath() != null) {
-			root = root.getParentPath();
+		for (final AbstractMapping<?, ?> mapping : this.mapping.getMappings()) {
+			if (mapping instanceof BasicMapping) {
+				final BasicColumn column = ((BasicMapping) mapping).getColumn();
+				PathImpl<?> root = this;
+				while (root.getParentPath() != null) {
+					root = root.getParentPath();
+				}
+
+				final String tableAlias = ((RootPathImpl<X>) root).getTableAlias(query, column.getTable());
+				fragments.add(tableAlias + "." + column.getName());
+			}
 		}
 
-		final String tableAlias = ((RootPathImpl<X>) root).getTableAlias(query, column.getTable());
-
-		return tableAlias + "." + column.getName();
+		return Joiner.on(", ").join(fragments);
 	}
 
 	/**
@@ -107,13 +118,38 @@ public class PhysicalAttributePathImpl<X> extends PathImpl<X> {
 	 */
 	@Override
 	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
-		// expand the mapping
-		final String sql = this.generate(query) + comparison.getFragment() + parameter.generate(query);
+		final List<String> fragments = Lists.newArrayList();
+
+		// expand the mappings
+		this.generate(query, comparison, parameter, this.mapping, fragments);
 
 		// seal the parameter count
 		parameter.registerParameter(query, this.mapping);
 
-		return sql;
+		// return the joined restriction
+		return Joiner.on(" AND ").join(fragments);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter,
+		EmbeddedMapping<?, ?> mapping, final List<String> fragments) {
+		for (final AbstractMapping<?, ?> child : mapping.getMappings()) {
+			// handle basic mapping
+			if (child instanceof BasicMapping) {
+				final BasicColumn column = ((BasicMapping) child).getColumn();
+				PathImpl<?> root = this;
+				while (root.getParentPath() != null) {
+					root = root.getParentPath();
+				}
+
+				final String tableAlias = ((RootPathImpl<X>) root).getTableAlias(query, column.getTable());
+				fragments.add(tableAlias + "." + column.getName() + comparison.getFragment() + parameter.generate(query));
+			}
+			// further expand the embedded mappings
+			else if (child instanceof EmbeddedMapping) {
+				this.generate(query, comparison, parameter, (EmbeddedMapping<?, ?>) child, fragments);
+			}
+		}
 	}
 
 	/**
@@ -157,7 +193,7 @@ public class PhysicalAttributePathImpl<X> extends PathImpl<X> {
 	 * 
 	 */
 	@Override
-	public BasicAttribute<?, X> getModel() {
+	public EmbeddedAttribute<?, X> getModel() {
 		return this.mapping.getAttribute();
 	}
 

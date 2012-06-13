@@ -18,6 +18,9 @@
  */
 package org.batoo.jpa.parser.impl.metadata.type;
 
+import java.lang.annotation.Annotation;
+import java.util.Set;
+
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 
@@ -25,8 +28,9 @@ import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.impl.metadata.JavaLocator;
 import org.batoo.jpa.parser.impl.metadata.attribute.AttributesMetadataImpl;
 import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
-import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 import org.batoo.jpa.parser.metadata.type.ManagedTypeMetadata;
+
+import com.google.common.collect.Sets;
 
 /**
  * Implementation of {@link ManagedTypeMetadatImpl}.
@@ -34,12 +38,13 @@ import org.batoo.jpa.parser.metadata.type.ManagedTypeMetadata;
  * @author hceylan
  * @since $version
  */
-public class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
+public abstract class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
 
 	private final JavaLocator locator;
 	private final Class<?> clazz;
 	private final AccessType accessType;
 	private final AttributesMetadataImpl attributes;
+	private final Set<Class<? extends Annotation>> parsed = Sets.newHashSet();
 
 	/**
 	 * @param clazz
@@ -50,7 +55,7 @@ public class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedTypeMetadatImpl(Class<?> clazz, EntityMetadata metadata) {
+	public ManagedTypeMetadatImpl(Class<?> clazz, ManagedTypeMetadata metadata) {
 		super();
 
 		this.clazz = clazz;
@@ -80,12 +85,13 @@ public class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
 	 * finally default {@link AccessType#FIELD} is returned.
 	 * 
 	 * @param metadata
-	 * @return
+	 *            the metadata
+	 * @return the access type
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	private AccessType getAccessType(EntityMetadata metadata) {
+	private AccessType getAccessType(ManagedTypeMetadata metadata) {
 		if ((metadata != null) && (metadata.getAccessType() != null)) {
 			return metadata.getAccessType();
 		}
@@ -96,6 +102,18 @@ public class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
 		}
 
 		return AccessType.FIELD;
+	}
+
+	/**
+	 * Returns the set of annotations parsed.
+	 * 
+	 * @return the set of annotations parsed
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected Set<Class<? extends Annotation>> getAnnotationsParsed() {
+		return this.parsed;
 	}
 
 	/**

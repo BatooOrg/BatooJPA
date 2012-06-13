@@ -86,6 +86,10 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y> {
 	 */
 	@SuppressWarnings("unchecked")
 	public Y get(Object instance) {
+		if (instance == null) {
+			return null;
+		}
+
 		return (Y) this.accessor.get(instance);
 	}
 

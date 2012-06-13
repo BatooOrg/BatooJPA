@@ -25,6 +25,7 @@ import javax.persistence.AccessType;
 import org.batoo.jpa.parser.impl.orm.Element;
 import org.batoo.jpa.parser.impl.orm.ElementConstants;
 import org.batoo.jpa.parser.impl.orm.EntityMappings;
+import org.batoo.jpa.parser.impl.orm.IdClassElement;
 import org.batoo.jpa.parser.impl.orm.ParentElement;
 import org.batoo.jpa.parser.impl.orm.attribute.AttributesElement;
 import org.batoo.jpa.parser.metadata.type.MappedSuperclassMetadata;
@@ -41,6 +42,7 @@ public class MappedSuperclassElementFactory extends ParentElement implements Map
 	private boolean metadataComplete;
 	private AccessType accessType;
 	private AttributesElement attrs;
+	private String idClass;
 
 	/**
 	 * Constructor for ORM File parsing
@@ -54,7 +56,9 @@ public class MappedSuperclassElementFactory extends ParentElement implements Map
 	 * @author hceylan
 	 */
 	public MappedSuperclassElementFactory(ParentElement parent, Map<String, String> attributes) {
-		super(parent, attributes, ElementConstants.ELEMENT_ATTRIBUTES);
+		super(parent, attributes, //
+			ElementConstants.ELEMENT_ATTRIBUTES, //
+			ElementConstants.ELEMENT_ID_CLASS);
 	}
 
 	/**
@@ -101,9 +105,22 @@ public class MappedSuperclassElementFactory extends ParentElement implements Map
 	 * 
 	 */
 	@Override
+	public String getIdClass() {
+		return this.idClass;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	protected void handleChild(Element child) {
 		if (child instanceof AttributesElement) {
 			this.attrs = (AttributesElement) child;
+		}
+
+		if (child instanceof IdClassElement) {
+			this.idClass = ((IdClassElement) child).getIdClass();
 		}
 	}
 

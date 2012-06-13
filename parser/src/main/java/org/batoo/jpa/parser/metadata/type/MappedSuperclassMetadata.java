@@ -24,4 +24,4 @@ package org.batoo.jpa.parser.metadata.type;
  * @author hceylan
  * @since $version
  */
-public interface MappedSuperclassMetadata extends ManagedTypeMetadata {}
+public interface MappedSuperclassMetadata extends IdentifiableTypeMetadata {}

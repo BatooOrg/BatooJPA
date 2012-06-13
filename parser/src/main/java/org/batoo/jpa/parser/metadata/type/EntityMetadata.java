@@ -37,7 +37,7 @@ import org.batoo.jpa.parser.metadata.TableMetadata;
  * @author hceylan
  * @since $version
  */
-public interface EntityMetadata extends ManagedTypeMetadata, BindableMetadata {
+public interface EntityMetadata extends IdentifiableTypeMetadata, BindableMetadata {
 
 	/**
 	 * Returns the associationOverrides of the entity.
@@ -88,16 +88,6 @@ public interface EntityMetadata extends ManagedTypeMetadata, BindableMetadata {
 	 * @author hceylan
 	 */
 	String getDiscriminatorValue();
-
-	/**
-	 * Returns the id class of the entity.
-	 * 
-	 * @return the id class of the entity
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	String getIdClass();
 
 	/**
 	 * Returns the inheritance type of the entity.

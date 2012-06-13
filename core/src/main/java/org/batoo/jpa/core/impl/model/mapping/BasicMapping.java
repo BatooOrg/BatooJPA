@@ -37,12 +37,14 @@ import org.batoo.jpa.parser.metadata.ColumnMetadata;
  * @author hceylan
  * @since $version
  */
-public class BasicMapping<X, Y> extends AbstractMapping<X, Y> {
+public class BasicMapping<X, Y> extends SingularMapping<X, Y> {
 
 	private final BasicAttribute<? super X, Y> attribute;
 	private BasicColumn column;
 
 	/**
+	 * The default constructor.
+	 * 
 	 * @param entity
 	 *            the entity
 	 * @param attribute
@@ -52,6 +54,23 @@ public class BasicMapping<X, Y> extends AbstractMapping<X, Y> {
 	 * @author hceylan
 	 */
 	public BasicMapping(EntityTypeImpl<X> entity, BasicAttribute<? super X, Y> attribute) {
+		this(entity, attribute, false);
+	}
+
+	/**
+	 * Constructor for embedded attribute sub mappings.
+	 * 
+	 * @param entity
+	 *            the entity
+	 * @param attribute
+	 *            the basic attribute
+	 * @param id
+	 *            if the attribute should be treated as id
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public BasicMapping(EntityTypeImpl<X> entity, BasicAttribute<? super X, Y> attribute, boolean id) {
 		super(entity);
 
 		this.attribute = attribute;
@@ -60,12 +79,21 @@ public class BasicMapping<X, Y> extends AbstractMapping<X, Y> {
 		final int sqlType = TypeFactory.getSqlType(this.getAttribute().getJavaType(), attribute.getTemporalType(), attribute.getEnumType(),
 			attribute.isLob());
 
-		if (attribute.isId()) {
+		if (id || attribute.isId()) {
 			this.column = new PkColumn(this, sqlType, columnMetadata);
 		}
 		else {
 			this.column = new BasicColumn(this, sqlType, columnMetadata);
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean fillValue(Object instance) {
+		return this.getAttribute().fillValue(instance);
 	}
 
 	/**

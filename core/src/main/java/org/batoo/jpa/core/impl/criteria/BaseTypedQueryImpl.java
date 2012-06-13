@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
@@ -156,12 +155,24 @@ public abstract class BaseTypedQueryImpl<X> implements TypedQuery<X>, ResultSetH
 	 */
 	@Override
 	public List<X> getResultList() {
-		final Object[] parameters = new Object[this.parameters.size()];
-		for (final Entry<ParameterExpressionImpl<?>, Object> e : this.parameters.entrySet()) {
-			parameters[e.getKey().getPosition() - 1] = e.getValue();
-		}
+		int paramCount = 0;
 
 		final String sql = this.cq.getSql();
+
+		final List<ParameterExpressionImpl<?>> sqlParameters = this.cq.getSqlParameters();
+
+		for (final ParameterExpressionImpl<?> parameter : sqlParameters) {
+			paramCount += parameter.getExpandedCount();
+		}
+
+		final MutableInt sqlIndex = new MutableInt(0);
+		final MutableInt paramIndex = new MutableInt(0);
+		final Object[] parameters = new Object[paramCount];
+
+		for (final ParameterExpressionImpl<?> parameter : sqlParameters) {
+			parameter.setParameter(parameters, sqlIndex, paramIndex, this.parameters.get(parameter));
+		}
+
 		try {
 			return new QueryRunner().query(this.em.getConnection(), sql, this, parameters);
 		}

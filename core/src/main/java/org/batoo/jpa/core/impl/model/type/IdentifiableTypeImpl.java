@@ -26,18 +26,22 @@ import javax.persistence.metamodel.IdentifiableType;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.Type;
 
+import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
+import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
 import org.batoo.jpa.parser.metadata.attribute.EmbeddedIdAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.IdAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.VersionAttributeMetadata;
+import org.batoo.jpa.parser.metadata.type.IdentifiableTypeMetadata;
 import org.batoo.jpa.parser.metadata.type.ManagedTypeMetadata;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Implementation of {@link IdentifiableType}.
@@ -50,9 +54,14 @@ import com.google.common.collect.Maps;
  */
 public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> implements IdentifiableType<X> {
 
-	private final Map<String, BasicAttribute<X, ?>> declaredIdAttributes = Maps.newHashMap();
-	private final Map<String, BasicAttribute<? super X, ?>> idAttributes = Maps.newHashMap();
 	private final IdentifiableTypeImpl<? super X> supertype;
+	private final EmbeddableTypeImpl<?> idType;
+
+	private final Map<String, SingularAttributeImpl<X, ?>> declaredIdAttributes = Maps.newHashMap();
+	private final Map<String, SingularAttributeImpl<? super X, ?>> idAttributes = Maps.newHashMap();
+	private EmbeddedAttribute<X, ?> declaredEmbeddedId;
+	private EmbeddedAttribute<? super X, ?> embeddedId;
+
 	private BasicAttribute<X, ?> declaredVersionAttribute;
 	private BasicAttribute<? super X, ?> versionAttribute;
 
@@ -70,9 +79,11 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * @author hceylan
 	 */
 	public IdentifiableTypeImpl(MetamodelImpl metamodel, IdentifiableTypeImpl<? super X> supertype, Class<X> javaType,
-		ManagedTypeMetadata metadata) {
+		IdentifiableTypeMetadata metadata) {
 		super(metamodel, javaType, metadata);
+
 		this.supertype = supertype;
+		this.idType = this.getIdClass(metadata);
 
 		this.addIdAttributes(metadata);
 	}
@@ -92,6 +103,16 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 					this.declaredIdAttributes.put(attribute.getName(), (BasicAttribute<X, ?>) basicAttribute);
 				}
 
+				if (this.embeddedId != null) {
+					throw new MappingException("Embbeded id attributes cannot be combined with other id attributes.", //
+						attribute.getLocator(), this.embeddedId.getLocator());
+				}
+
+				if ((this.idType != null) && (this.idAttributes.size() > 0)) {
+					throw new MappingException("Multiple id attributes are only allowed with id class declaration.", //
+						attribute.getLocator(), this.idAttributes.values().iterator().next().getLocator());
+				}
+
 				this.idAttributes.put(attribute.getName(), basicAttribute);
 			}
 
@@ -109,6 +130,27 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 			}
 
 		}
+		else if (attribute instanceof EmbeddedAttribute) {
+			final EmbeddedAttribute<? super X, ?> embeddedAttribute = (EmbeddedAttribute<? super X, ?>) attribute;
+			if (embeddedAttribute.isId()) {
+				if (this.idType != null) {
+					throw new MappingException("When IdClass defined, it is illegal to use embedded id attributes.", this.getLocator());
+				}
+
+				if (this.idAttributes.size() > 0) {
+					throw new MappingException("Embbeded id attributes cannot be combined with other id attributes.", //
+						attribute.getLocator(), this.idAttributes.values().iterator().next().getLocator());
+				}
+
+				if (embeddedAttribute.getDeclaringType() == this) {
+					this.declaredEmbeddedId = (EmbeddedAttribute<X, ?>) embeddedAttribute;
+				}
+
+				this.idAttributes.put(attribute.getName(), (SingularAttributeImpl<? super X, ?>) attribute);
+				this.embeddedId = embeddedAttribute;
+			}
+		}
+
 		super.addAttribute(attribute);
 	}
 
@@ -145,14 +187,14 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	private void addIdAttributes(ManagedTypeMetadata metadata) {
 		final AttributesMetadata attributes = metadata.getAttributes();
 
-		// add id attributes
-		for (final IdAttributeMetadata attribute : attributes.getIds()) {
-			this.addAttribute(new BasicAttribute(this, attribute));
-		}
-
 		// embedded-id attributes
 		for (final EmbeddedIdAttributeMetadata attribute : attributes.getEmbeddedIds()) {
 			this.addAttribute(new EmbeddedAttribute(this, attribute));
+		}
+
+		// add id attributes
+		for (final IdAttributeMetadata attribute : attributes.getIds()) {
+			this.addAttribute(new BasicAttribute(this, attribute));
 		}
 
 		// add version attributes
@@ -167,8 +209,20 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <Y> SingularAttribute<X, Y> getDeclaredId(Class<Y> type) {
-		// TODO Auto-generated method stub
+		if ((this.declaredEmbeddedId != null) && (type == this.declaredEmbeddedId.getJavaType())) {
+			return (SingularAttribute<X, Y>) this.declaredEmbeddedId;
+		}
+
+		if (this.idType != null) {
+			throw new IllegalArgumentException("Type defines multiple id attributes");
+		}
+
+		if (this.declaredIdAttributes.size() > 1) {
+			return (SingularAttribute<X, Y>) this.declaredIdAttributes.values().iterator().next();
+		}
+
 		return null;
 	}
 
@@ -187,8 +241,38 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <Y> SingularAttribute<? super X, Y> getId(Class<Y> type) {
-		// TODO Auto-generated method stub
+		if ((this.embeddedId != null) && (type == this.embeddedId.getJavaType())) {
+			return (SingularAttribute<? super X, Y>) this.embeddedId;
+		}
+
+		if (this.idType != null) {
+			throw new IllegalArgumentException("Type defines multiple id attributes");
+		}
+
+		if (this.idAttributes.size() > 1) {
+			return (SingularAttribute<? super X, Y>) this.idAttributes.values().iterator().next();
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param metadata
+	 * @return
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private EmbeddableTypeImpl<?> getIdClass(IdentifiableTypeMetadata metadata) {
+		if (StringUtils.isNotBlank(metadata.getIdClass())) {
+			try {
+				return this.getMetamodel().embeddable(Class.forName(metadata.getIdClass()));
+			}
+			catch (final ClassNotFoundException e) {}
+		}
+
 		return null;
 	}
 
@@ -198,8 +282,14 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 */
 	@Override
 	public Set<SingularAttribute<? super X, ?>> getIdClassAttributes() {
-		// TODO Auto-generated method stub
-		return null;
+		if (this.idType != null) {
+			final Set<SingularAttribute<? super X, ?>> idAttributes = Sets.newHashSet();
+			idAttributes.addAll(this.idAttributes.values());
+
+			return idAttributes;
+		}
+
+		throw new IllegalArgumentException("Type does not have an id class definition");
 	}
 
 	/**
@@ -208,8 +298,15 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 */
 	@Override
 	public Type<?> getIdType() {
-		// TODO Auto-generated method stub
-		return null;
+		if (this.idType != null) {
+			return this.idType;
+		}
+
+		if (this.embeddedId != null) {
+			return this.embeddedId.getType();
+		}
+
+		return this.idAttributes.values().iterator().next().getType();
 	}
 
 	/**
