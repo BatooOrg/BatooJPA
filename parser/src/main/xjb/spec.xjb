@@ -17,5 +17,4 @@
 			<jxb:class name="Persistence" />
 		</jxb:bindings>
 	</jxb:bindings>
-
 </jxb:bindings>

@@ -39,7 +39,7 @@ public class CascadesElement extends ParentElement {
 	 * @author hceylan
 	 * @since $version
 	 */
-	public static class CascadeAllElementFactory extends CascadeElementFactory {
+	public static class CascadeAllElement extends CascadeElement {
 
 		/**
 		 * @param parent
@@ -50,7 +50,7 @@ public class CascadesElement extends ParentElement {
 		 * @since $version
 		 * @author hceylan
 		 */
-		public CascadeAllElementFactory(ParentElement parent, Map<String, String> attributes) {
+		public CascadeAllElement(ParentElement parent, Map<String, String> attributes) {
 			super(parent, attributes);
 		}
 
@@ -71,7 +71,7 @@ public class CascadesElement extends ParentElement {
 	 * @author hceylan
 	 * @since $version
 	 */
-	public static class CascadeDetachElementFactory extends CascadeElementFactory {
+	public static class CascadeDetachElement extends CascadeElement {
 
 		/**
 		 * @param parent
@@ -82,7 +82,7 @@ public class CascadesElement extends ParentElement {
 		 * @since $version
 		 * @author hceylan
 		 */
-		public CascadeDetachElementFactory(ParentElement parent, Map<String, String> attributes) {
+		public CascadeDetachElement(ParentElement parent, Map<String, String> attributes) {
 			super(parent, attributes);
 		}
 
@@ -97,7 +97,7 @@ public class CascadesElement extends ParentElement {
 
 	}
 
-	private abstract static class CascadeElementFactory extends ChildElement {
+	private abstract static class CascadeElement extends ChildElement {
 
 		/**
 		 * @param parent
@@ -108,7 +108,7 @@ public class CascadesElement extends ParentElement {
 		 * @since $version
 		 * @author hceylan
 		 */
-		public CascadeElementFactory(ParentElement parent, Map<String, String> attributes) {
+		public CascadeElement(ParentElement parent, Map<String, String> attributes) {
 			super(parent, attributes);
 		}
 
@@ -129,7 +129,7 @@ public class CascadesElement extends ParentElement {
 	 * @author hceylan
 	 * @since $version
 	 */
-	public static class CascadeMergeElementFactory extends CascadeElementFactory {
+	public static class CascadeMergeElement extends CascadeElement {
 
 		/**
 		 * @param parent
@@ -140,7 +140,7 @@ public class CascadesElement extends ParentElement {
 		 * @since $version
 		 * @author hceylan
 		 */
-		public CascadeMergeElementFactory(ParentElement parent, Map<String, String> attributes) {
+		public CascadeMergeElement(ParentElement parent, Map<String, String> attributes) {
 			super(parent, attributes);
 		}
 
@@ -161,7 +161,7 @@ public class CascadesElement extends ParentElement {
 	 * @author hceylan
 	 * @since $version
 	 */
-	public static class CascadePersistElementFactory extends CascadeElementFactory {
+	public static class CascadePersistElement extends CascadeElement {
 
 		/**
 		 * @param parent
@@ -172,7 +172,7 @@ public class CascadesElement extends ParentElement {
 		 * @since $version
 		 * @author hceylan
 		 */
-		public CascadePersistElementFactory(ParentElement parent, Map<String, String> attributes) {
+		public CascadePersistElement(ParentElement parent, Map<String, String> attributes) {
 			super(parent, attributes);
 		}
 
@@ -193,7 +193,7 @@ public class CascadesElement extends ParentElement {
 	 * @author hceylan
 	 * @since $version
 	 */
-	public static class CascadeRefreshElementFactory extends CascadeElementFactory {
+	public static class CascadeRefreshElement extends CascadeElement {
 
 		/**
 		 * @param parent
@@ -204,7 +204,7 @@ public class CascadesElement extends ParentElement {
 		 * @since $version
 		 * @author hceylan
 		 */
-		public CascadeRefreshElementFactory(ParentElement parent, Map<String, String> attributes) {
+		public CascadeRefreshElement(ParentElement parent, Map<String, String> attributes) {
 			super(parent, attributes);
 		}
 
@@ -225,7 +225,7 @@ public class CascadesElement extends ParentElement {
 	 * @author hceylan
 	 * @since $version
 	 */
-	public static class CascadeRemoveElementFactory extends CascadeElementFactory {
+	public static class CascadeRemoveElement extends CascadeElement {
 
 		/**
 		 * @param parent
@@ -236,7 +236,7 @@ public class CascadesElement extends ParentElement {
 		 * @since $version
 		 * @author hceylan
 		 */
-		public CascadeRemoveElementFactory(ParentElement parent, Map<String, String> attributes) {
+		public CascadeRemoveElement(ParentElement parent, Map<String, String> attributes) {
 			super(parent, attributes);
 		}
 
@@ -285,6 +285,6 @@ public class CascadesElement extends ParentElement {
 	 */
 	@Override
 	protected void handleChild(Element child) {
-		this.getCascades().add(((CascadeElementFactory) child).getCascadeType());
+		this.getCascades().add(((CascadeElement) child).getCascadeType());
 	}
 }

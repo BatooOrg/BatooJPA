@@ -25,7 +25,6 @@ import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -33,7 +32,6 @@ import org.junit.Test;
  * 
  * @since $version
  */
-@Ignore
 public class LazyTest extends BaseCoreTest {
 
 	private static final String COUNTRY_UK = "UK";
@@ -183,18 +181,11 @@ public class LazyTest extends BaseCoreTest {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@Test
+	@Test(expected = PersistenceException.class)
 	public void testPersistAddress() {
 		this.persist(this.person().getAddresses().get(0));
 
-		try {
-			this.commit();
-
-			Assert.fail("No PersistenceException thrown");
-		}
-		catch (final PersistenceException e) {
-			// expected
-		}
+		this.commit();
 	}
 
 	/**

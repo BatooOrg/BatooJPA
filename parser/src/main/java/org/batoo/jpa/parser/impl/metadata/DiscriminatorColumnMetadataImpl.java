@@ -22,11 +22,10 @@ import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 
 import org.batoo.jpa.parser.impl.AbstractLocator;
-import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.DiscriminatorColumnMetadata;
 
 /**
- * Implementation of {@link ColumnMetadata}.
+ * Implementation of {@link DiscriminatorColumnMetadata}.
  * 
  * @author hceylan
  * @since $version

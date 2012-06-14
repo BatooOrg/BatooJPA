@@ -25,12 +25,19 @@ import java.util.Set;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.parser.MappingException;
-import org.batoo.jpa.parser.impl.orm.CascadesElement.CascadeAllElementFactory;
-import org.batoo.jpa.parser.impl.orm.CascadesElement.CascadeDetachElementFactory;
-import org.batoo.jpa.parser.impl.orm.CascadesElement.CascadeMergeElementFactory;
-import org.batoo.jpa.parser.impl.orm.CascadesElement.CascadePersistElementFactory;
-import org.batoo.jpa.parser.impl.orm.CascadesElement.CascadeRefreshElementFactory;
-import org.batoo.jpa.parser.impl.orm.CascadesElement.CascadeRemoveElementFactory;
+import org.batoo.jpa.parser.impl.orm.CascadesElement.CascadeAllElement;
+import org.batoo.jpa.parser.impl.orm.CascadesElement.CascadeDetachElement;
+import org.batoo.jpa.parser.impl.orm.CascadesElement.CascadeMergeElement;
+import org.batoo.jpa.parser.impl.orm.CascadesElement.CascadePersistElement;
+import org.batoo.jpa.parser.impl.orm.CascadesElement.CascadeRefreshElement;
+import org.batoo.jpa.parser.impl.orm.CascadesElement.CascadeRemoveElement;
+import org.batoo.jpa.parser.impl.orm.EntityListenerElement.PostLoadElement;
+import org.batoo.jpa.parser.impl.orm.EntityListenerElement.PostPersistElement;
+import org.batoo.jpa.parser.impl.orm.EntityListenerElement.PostRemoveElement;
+import org.batoo.jpa.parser.impl.orm.EntityListenerElement.PostUpdateElement;
+import org.batoo.jpa.parser.impl.orm.EntityListenerElement.PrePersistElement;
+import org.batoo.jpa.parser.impl.orm.EntityListenerElement.PreRemoveElement;
+import org.batoo.jpa.parser.impl.orm.EntityListenerElement.PreUpdateElement;
 import org.batoo.jpa.parser.impl.orm.attribute.AttributesElement;
 import org.batoo.jpa.parser.impl.orm.attribute.BasicAttributeElement;
 import org.batoo.jpa.parser.impl.orm.attribute.EmbeddedAttributeElement;
@@ -42,6 +49,7 @@ import org.batoo.jpa.parser.impl.orm.attribute.OneToManyAttributeElement;
 import org.batoo.jpa.parser.impl.orm.attribute.OneToOneAttributeElement;
 import org.batoo.jpa.parser.impl.orm.attribute.TransientElement;
 import org.batoo.jpa.parser.impl.orm.attribute.VersionAttributeElement;
+import org.batoo.jpa.parser.impl.orm.type.EmbeddableElementFactory;
 import org.batoo.jpa.parser.impl.orm.type.EntityElementFactory;
 import org.batoo.jpa.parser.impl.orm.type.MappedSuperclassElementFactory;
 import org.batoo.jpa.parser.metadata.LocatableMatadata;
@@ -65,9 +73,26 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	static {
 		// metamodel
 		Element.factoryMap.put(ElementConstants.ELEMENT_ENTITY_MAPPINGS, EntityMappings.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_CATALOG, InheritanceElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_SCHEMA, InheritanceElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_ACCESS, AccessElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_PERSISTENT_UNIT_METADATA, PersistenceUnitMetadataElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_XML_MAPPING_METADATA_COMPLETE, XmlMappingMetadataCompleteElement.class);
+
+		// listeners
+		Element.factoryMap.put(ElementConstants.ELEMENT_ENTITY_LISTENERS, EntityListenersElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_ENTITY_LISTENER, EntityListenerElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_POST_LOAD, PostLoadElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_POST_PERSIST, PostPersistElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_POST_REMOVE, PostRemoveElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_POST_UPDATE, PostUpdateElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_PRE_PERSIST, PrePersistElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_PRE_REMOVE, PreRemoveElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_PRE_UPDATE, PreUpdateElement.class);
 
 		// managed types
 		Element.factoryMap.put(ElementConstants.ELEMENT_MAPPED_SUPERCLASS, MappedSuperclassElementFactory.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_EMBEDDABLE, EmbeddableElementFactory.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_ENTITY, EntityElementFactory.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_INHERITANCE, InheritanceElement.class);
 
@@ -92,7 +117,6 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 		Element.factoryMap.put(ElementConstants.ELEMENT_TABLE_GENERATOR, TableGeneratorElement.class);
 
 		// enum types
-		Element.factoryMap.put(ElementConstants.ELEMENT_ACCESS, AccessElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_TEMPORAL, TemporalElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_ENUMERATED, EnumeratedElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_LOB, LobElement.class);
@@ -103,12 +127,12 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 
 		// cascades
 		Element.factoryMap.put(ElementConstants.ELEMENT_CASCADE, CascadesElement.class);
-		Element.factoryMap.put(ElementConstants.ELEMENT_CASCADE_ALL, CascadeAllElementFactory.class);
-		Element.factoryMap.put(ElementConstants.ELEMENT_CASCADE_DETACH, CascadeDetachElementFactory.class);
-		Element.factoryMap.put(ElementConstants.ELEMENT_CASCADE_MERGE, CascadeMergeElementFactory.class);
-		Element.factoryMap.put(ElementConstants.ELEMENT_CASCADE_PERSIST, CascadePersistElementFactory.class);
-		Element.factoryMap.put(ElementConstants.ELEMENT_CASCADE_REFRESH, CascadeRefreshElementFactory.class);
-		Element.factoryMap.put(ElementConstants.ELEMENT_CASCADE_REMOVE, CascadeRemoveElementFactory.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_CASCADE_ALL, CascadeAllElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_CASCADE_DETACH, CascadeDetachElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_CASCADE_MERGE, CascadeMergeElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_CASCADE_PERSIST, CascadePersistElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_CASCADE_REFRESH, CascadeRefreshElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_CASCADE_REMOVE, CascadeRemoveElement.class);
 
 		// columns
 		Element.factoryMap.put(ElementConstants.ELEMENT_COLUMN, ColumnElement.class);

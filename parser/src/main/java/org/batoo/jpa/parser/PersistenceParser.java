@@ -84,9 +84,9 @@ public class PersistenceParser {
 	}
 
 	/**
-	 * Returns the metadata of the PersistenceParser.
+	 * Returns the metadata of the parser.
 	 * 
-	 * @return the metadata of the PersistenceParser
+	 * @return the metadata of the parser
 	 * 
 	 * @since $version
 	 * @author hceylan

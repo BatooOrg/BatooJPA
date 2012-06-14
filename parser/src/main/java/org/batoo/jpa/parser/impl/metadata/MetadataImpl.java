@@ -31,7 +31,10 @@ import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.metadata.type.EmbeddableMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.type.EntityMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.type.MappedSuperclassMetadataImpl;
+import org.batoo.jpa.parser.metadata.EntityListenerMetadata;
 import org.batoo.jpa.parser.metadata.Metadata;
+import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
+import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.type.EmbeddableMetadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 import org.batoo.jpa.parser.metadata.type.ManagedTypeMetadata;
@@ -48,7 +51,17 @@ import com.google.common.collect.Maps;
  */
 public class MetadataImpl implements Metadata {
 
+	private AccessType accessType;
+	private boolean xmlMappingMetadataComplete;
+	private String schema;
+	private String catalog;
+
+	private final List<SequenceGeneratorMetadata> sequenceGenerators = Lists.newArrayList();
+	private final List<TableGeneratorMetadata> tableGenerators = Lists.newArrayList();
+
+	private final List<EntityListenerMetadata> entityListeners = Lists.newArrayList();
 	private final Map<String, ManagedTypeMetadata> entityMap = Maps.newHashMap();
+	private boolean cascadePersist;
 
 	/**
 	 * @param classes
@@ -70,9 +83,35 @@ public class MetadataImpl implements Metadata {
 	 * 
 	 */
 	@Override
+	public boolean cascadePersists() {
+		return this.cascadePersist;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public AccessType getAccessType() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.accessType;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getCatalog() {
+		return this.catalog;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<EntityListenerMetadata> getEntityListeners() {
+		return this.entityListeners;
 	}
 
 	/**
@@ -85,6 +124,42 @@ public class MetadataImpl implements Metadata {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getSchema() {
+		return this.schema;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<SequenceGeneratorMetadata> getSequenceGenerators() {
+		return this.sequenceGenerators;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<TableGeneratorMetadata> getTableGenerators() {
+		return this.tableGenerators;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isXmlMappingMetadataComplete() {
+		return this.xmlMappingMetadataComplete;
+	}
+
+	/**
 	 * Merges the ORM XML based metadata.
 	 * 
 	 * @param metadata
@@ -94,6 +169,18 @@ public class MetadataImpl implements Metadata {
 	 * @author hceylan
 	 */
 	public void merge(Metadata metadata) {
+		this.accessType = metadata.getAccessType();
+		this.catalog = metadata.getCatalog();
+		this.schema = metadata.getSchema();
+
+		this.xmlMappingMetadataComplete = metadata.isXmlMappingMetadataComplete();
+		this.cascadePersist = metadata.cascadePersists();
+
+		this.sequenceGenerators.addAll(metadata.getSequenceGenerators());
+		this.tableGenerators.addAll(metadata.getTableGenerators());
+
+		this.entityListeners.addAll(metadata.getEntityListeners());
+
 		for (final ManagedTypeMetadata managedType : metadata.getEntityMappings()) {
 			final ManagedTypeMetadata existing = this.entityMap.put(managedType.getClassName(), managedType);
 
@@ -145,7 +232,6 @@ public class MetadataImpl implements Metadata {
 			catch (final ClassNotFoundException e) { // class could not be found
 				throw new MappingException("Class " + className + " cound not be found.", metadata.getLocator());
 			}
-
 		}
 	}
 }

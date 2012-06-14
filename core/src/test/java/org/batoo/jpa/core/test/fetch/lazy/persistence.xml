@@ -6,6 +6,13 @@
 	<persistence-unit name="default">
 		<provider>org.batoo.jpa.core.PersistenceProvider</provider>
 		
+		<class>org.batoo.jpa.core.test.fetch.lazy.Address</class>
+		<class>org.batoo.jpa.core.test.fetch.lazy.Country</class>
+		<class>org.batoo.jpa.core.test.fetch.lazy.HomePhone</class>
+		<class>org.batoo.jpa.core.test.fetch.lazy.Person</class>
+		<class>org.batoo.jpa.core.test.fetch.lazy.Phone</class>
+		<class>org.batoo.jpa.core.test.fetch.lazy.WorkPhone</class>
+		
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.Driver40" />
 			<property name="javax.persistence.jdbc.url" value="jdbc:derby:memory:test;create=true" />

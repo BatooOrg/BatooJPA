@@ -170,6 +170,9 @@ public class BasicMapping<X, Y> extends SingularMapping<X, Y> {
 			if (entity.getSupertype() instanceof EntityTypeImpl) {
 				entity = (EntityTypeImpl<? super X>) entity.getSupertype();
 			}
+			else {
+				break;
+			}
 		}
 
 		// fall back to attribute's column metadata

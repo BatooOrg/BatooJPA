@@ -67,3 +67,4 @@ discriminator
 cascadable
 discriminators
 metatada
+xml

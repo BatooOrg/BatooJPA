@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd" version="2.0">
-	<access>FIELD</access>
+	
+	<persistence-unit-metadata>
+		<xml-mapping-metadata-complete/>
+		<persistence-unit-defaults>
+			<entity-listeners>
+				<entity-listener class=""><post-load method-name=""></post-load></entity-listener>
+			</entity-listeners>
+		</persistence-unit-defaults>
+	</persistence-unit-metadata>
 
+	<access>FIELD</access>
 	<entity class="org.batoo.jpa.parser.test.Entity">
 		<attributes>
 			<version name="version">
@@ -11,4 +20,5 @@
 			</version>
 		</attributes>
 	</entity>
+	<embeddable class=""></embeddable>
 </entity-mappings>

@@ -39,11 +39,15 @@ public class ElementConstants {
 	 * Elements
 	 */
 	public static final String ELEMENT_ENTITY_MAPPINGS = "entity-mappings";
+	protected static final String ELEMENT_PERSISTENT_UNIT_METADATA = "persistence-unit-metadata";
 	protected static final String ELEMENT_ACCESS = "access";
 	protected static final String ELEMENT_ASSOCIATION_OVERRIDE = "association-override";
 	protected static final String ELEMENT_ATTRIBUTE_OVERRIDE = "attribute-override";
 	protected static final String ELEMENT_ATTRIBUTES = "attributes";
 	protected static final String ELEMENT_BASIC = "basic";
+	protected static final String ELEMENT_CATALOG = "catalog";
+	protected static final String ELEMENT_XML_MAPPING_METADATA_COMPLETE = "xml-mapping-metadata-complete";
+	protected static final String ELEMENT_SCHEMA = "schema";
 	protected static final String ELEMENT_CASCADE = "cascade";
 	protected static final String ELEMENT_CASCADE_ALL = "cascade-all";
 	protected static final String ELEMENT_CASCADE_DETACH = "cascade-detach";
@@ -56,6 +60,7 @@ public class ElementConstants {
 	protected static final String ELEMENT_EMBEDDED = "embedded";
 	protected static final String ELEMENT_EMBEDDED_ID = "embedded-id";
 	protected static final String ELEMENT_MAPPED_SUPERCLASS = "mapped-superclass";
+	protected static final String ELEMENT_EMBEDDABLE = "embeddable";
 	protected static final String ELEMENT_ENTITY = "entity";
 	protected static final String ELEMENT_ENUMERATED = "enumerated";
 	protected static final String ELEMENT_GENERATED_VALUE = "generated-value";
@@ -81,6 +86,15 @@ public class ElementConstants {
 	protected static final String ELEMENT_INHERITANCE = "inheritance";
 	protected static final String ELEMENT_DISCRIMINATOR_COLUMN = "discriminator-column";
 	protected static final String ELEMENT_DISCRIMINATOR_VALUE = "discriminator-value";
+	protected static final String ELEMENT_ENTITY_LISTENERS = "entity-listeners";
+	protected static final String ELEMENT_ENTITY_LISTENER = "entity-listener";
+	protected static final String ELEMENT_POST_LOAD = "post-load";
+	protected static final String ELEMENT_POST_PERSIST = "post-persist";
+	protected static final String ELEMENT_POST_REMOVE = "post-remove";
+	protected static final String ELEMENT_POST_UPDATE = "post-update";
+	protected static final String ELEMENT_PRE_PERSIST = "pre-persist";
+	protected static final String ELEMENT_PRE_REMOVE = "pre-remove";
+	protected static final String ELEMENT_PRE_UPDATE = "pre-update";
 
 	/**
 	 * Column Attribute names.

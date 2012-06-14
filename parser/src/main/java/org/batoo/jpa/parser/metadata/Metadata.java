@@ -33,6 +33,16 @@ import org.batoo.jpa.parser.metadata.type.ManagedTypeMetadata;
 public interface Metadata {
 
 	/**
+	 * Return if persists should be cascaded by default.
+	 * 
+	 * @return true if persists should be cascaded by default, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	boolean cascadePersists();
+
+	/**
 	 * Returns the default access type.
 	 * 
 	 * @return the default access type
@@ -43,6 +53,26 @@ public interface Metadata {
 	AccessType getAccessType();
 
 	/**
+	 * Returns the catalog.
+	 * 
+	 * @return the catalog
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	String getCatalog();
+
+	/**
+	 * Returns the list of entity listeners.
+	 * 
+	 * @return the list of entity Listeners
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	List<EntityListenerMetadata> getEntityListeners();
+
+	/**
 	 * Returns the entity mappings.
 	 * 
 	 * @return the entity mappings
@@ -51,4 +81,44 @@ public interface Metadata {
 	 * @author hceylan
 	 */
 	List<ManagedTypeMetadata> getEntityMappings();
+
+	/**
+	 * Returns the schema.
+	 * 
+	 * @return the schema
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	String getSchema();
+
+	/**
+	 * Returns the list of sequence generators.
+	 * 
+	 * @return the list of sequence generators
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	List<SequenceGeneratorMetadata> getSequenceGenerators();
+
+	/**
+	 * Returns the list of table generators.
+	 * 
+	 * @return the list of table generators
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	List<TableGeneratorMetadata> getTableGenerators();
+
+	/**
+	 * Returns if the xml mapping metadata is complete.
+	 * 
+	 * @return true if the xml mapping metadata is complete, false otherwise.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	boolean isXmlMappingMetadataComplete();
 }
