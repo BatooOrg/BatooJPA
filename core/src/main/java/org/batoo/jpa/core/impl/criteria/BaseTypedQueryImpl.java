@@ -157,7 +157,7 @@ public abstract class BaseTypedQueryImpl<X> implements TypedQuery<X>, ResultSetH
 	public List<X> getResultList() {
 		int paramCount = 0;
 
-		final String sql = this.cq.getSql();
+		final String sql = this.cq.generate();
 
 		final List<ParameterExpressionImpl<?>> sqlParameters = this.cq.getSqlParameters();
 

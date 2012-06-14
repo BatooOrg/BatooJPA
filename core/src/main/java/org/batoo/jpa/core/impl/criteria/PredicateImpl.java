@@ -111,7 +111,7 @@ public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate 
 		final StringBuilder builder = new StringBuilder();
 
 		if (this.negated) {
-			builder.append("not (\n");
+			builder.append("not (");
 		}
 
 		final List<String> expressions = Lists.transform(this.expressions, new Function<ExpressionImpl<Boolean>, String>() {
@@ -122,10 +122,10 @@ public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate 
 			}
 		});
 
-		builder.append(Joiner.on("\t\n " + this.operator.name()).join(expressions));
+		builder.append(Joiner.on(" " + this.operator.name() + " ").join(expressions));
 
 		if (this.negated) {
-			builder.append("\n)");
+			builder.append(")");
 		}
 
 		return builder.toString();
@@ -145,7 +145,7 @@ public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate 
 			}
 		});
 
-		return "(" + Joiner.on(this.operator.name()).join(converted) + ")";
+		return "(" + Joiner.on(" " + this.operator.name() + " ").join(converted) + ")";
 	}
 
 	/**

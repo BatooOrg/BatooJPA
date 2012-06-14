@@ -23,7 +23,6 @@ import javax.persistence.EntityManager;
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -31,7 +30,6 @@ import org.junit.Test;
  * 
  * @since $version
  */
-@Ignore
 public class IdClassTestTest extends BaseCoreTest {
 
 	/**
@@ -62,5 +60,4 @@ public class IdClassTestTest extends BaseCoreTest {
 		final Foo foo3 = this.find(Foo.class, new FooPk(foo1.getIntKey(), foo1.getStrKey()));
 		Assert.assertEquals(foo1, foo3);
 	}
-
 }

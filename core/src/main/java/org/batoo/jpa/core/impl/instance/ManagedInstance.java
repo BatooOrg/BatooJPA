@@ -25,6 +25,7 @@ import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.EntityTransactionImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
@@ -32,6 +33,7 @@ import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.util.Pair;
 
 /**
  * The managed instance to track entity instances.
@@ -78,7 +80,7 @@ public class ManagedInstance<X> {
 	private Status status;
 
 	private final SingularMapping<? super X, ?> idMapping;
-	private final BasicMapping<? super X, ?>[] idMappings;
+	private final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>[] idMappings;
 	private final EmbeddableTypeImpl<?> idType;
 
 	private EntityTransactionImpl transaction;
@@ -113,7 +115,7 @@ public class ManagedInstance<X> {
 		}
 		else {
 			this.idType = (EmbeddableTypeImpl<?>) this.type.getRootType().getIdType();
-			this.idMappings = this.type.getRootType().getIdMappings();
+			this.idMappings = this.type.getIdMappings();
 			this.idMapping = null;
 		}
 	}
@@ -139,8 +141,9 @@ public class ManagedInstance<X> {
 			this.idMapping.set(this, id);
 		}
 		else {
-			for (final BasicMapping<? super X, ?> attribute : this.idMappings) {
-				attribute.set(this, id);
+			for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.idMappings) {
+				final Object value = pair.getSecond().get(id);
+				pair.getFirst().set(this, value);
 			}
 		}
 	}
@@ -244,8 +247,8 @@ public class ManagedInstance<X> {
 			return this.idMapping.fillValue(this.instance);
 		}
 		else {
-			for (final BasicMapping<? super X, ?> mapping : this.idMappings) {
-				if (!mapping.fillValue(this.instance)) {
+			for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> mapping : this.idMappings) {
+				if (!mapping.getSecond().fillValue(this.instance)) {
 					return false;
 				}
 			}
@@ -328,8 +331,9 @@ public class ManagedInstance<X> {
 		}
 
 		this.id = this.idType.newInstance();
-		for (final BasicMapping<? super X, ?> mapping : this.idMappings) {
-			mapping.set(null, null, this.id, mapping.get(this.instance));
+		for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.idMappings) {
+			final Object value = pair.getSecond().get(this.instance);
+			pair.getFirst().getAttribute().set(this.id, value);
 		}
 
 		return this.id;
@@ -397,17 +401,6 @@ public class ManagedInstance<X> {
 	}
 
 	/**
-	 * Initializes the id attributes
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	private void initialize() {
-		// TODO Auto-generated method stub
-
-	}
-
-	/**
 	 * Returns the external.
 	 * 
 	 * @return the external
@@ -415,17 +408,6 @@ public class ManagedInstance<X> {
 	 */
 	public boolean isExternal() {
 		return this.external;
-	}
-
-	/**
-	 * Sets the id.
-	 * 
-	 * @param id
-	 *            the id to set
-	 * @since $version
-	 */
-	public void setId(Object id) {
-		this.id = id;
 	}
 
 	/**

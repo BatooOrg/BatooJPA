@@ -31,7 +31,6 @@ import javax.persistence.PersistenceContext;
 import junit.framework.Assert;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.common.test.BaseTest;
 import org.batoo.jpa.core.BJPASettings;
 import org.junit.After;
 import org.junit.Before;
@@ -46,7 +45,7 @@ import com.google.common.collect.Maps;
  * 
  * @since $version
  */
-public abstract class BaseCoreTest extends BaseTest {
+public abstract class BaseCoreTest { // extends BaseTest {
 
 	private static final String DEFAULT = "default";
 

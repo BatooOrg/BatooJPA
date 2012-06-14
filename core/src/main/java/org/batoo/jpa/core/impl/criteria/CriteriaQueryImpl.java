@@ -105,14 +105,24 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	}
 
 	/**
-	 * Generates the SQL and the parameters.
+	 * Generates the SQL and the parameters then returns the SQL.
+	 * 
+	 * @return the generated SQL
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void generate() {
-		if (this.sql == null) {
-			this.sql = this.prepareSql();
+	public String generate() {
+		if (this.sql != null) {
+			return this.sql;
+		}
+
+		synchronized (this) {
+			if (this.sql != null) {
+				return this.sql;
+			}
+
+			return this.sql = this.prepareSql();
 		}
 	}
 
@@ -178,20 +188,6 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 		parameters.addAll(this.parameterMap.values());
 
 		return parameters;
-	}
-
-	/**
-	 * Returns the generated SQL.
-	 * 
-	 * @return the generated SQL
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String getSql() {
-		this.generate();
-
-		return this.sql;
 	}
 
 	/**
@@ -287,12 +283,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 * @since $version
 	 * @author hceylan
 	 */
-	private synchronized String prepareSql() {
-		// other thread prepared already?
-		if (this.sql != null) {
-			return this.sql;
-		}
-
+	private String prepareSql() {
 		CriteriaQueryImpl.LOG.debug("Preparing SQL for {0}", CriteriaQueryImpl.LOG.lazyBoxed(this));
 
 		// generate the select chunk

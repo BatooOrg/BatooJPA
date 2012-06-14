@@ -40,6 +40,7 @@ import org.batoo.jpa.core.impl.jdbc.DiscriminatorColumn;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.SecondaryTable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
@@ -47,8 +48,10 @@ import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
+import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.util.BatooUtils;
+import org.batoo.jpa.core.util.Pair;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -325,7 +328,9 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 			final SingularMapping<? super X, ?> idMapping = this.entity.getIdMapping();
 			if (idMapping instanceof BasicMapping) {
 				final BasicColumn column = ((BasicMapping<? super X, ?>) idMapping).getColumn();
-				return row.get(this.fields.inverse().get(column));
+				final String field = this.fields.inverse().get(column);
+
+				return row.get(field);
 			}
 
 			if (idMapping instanceof EmbeddedMapping) {
@@ -335,7 +340,15 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 			}
 		}
 
-		return null;
+		final Object id = ((EmbeddableTypeImpl<?>) this.entity.getIdType()).newInstance();
+		for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.entity.getIdMappings()) {
+			final BasicColumn column = pair.getFirst().getColumn();
+			final String field = this.fields.inverse().get(column);
+
+			pair.getSecond().set(id, row.get(field));
+		}
+
+		return id;
 	}
 
 	/**

@@ -16,43 +16,58 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.idclass;
-
-import javax.persistence.Embeddable;
+package org.batoo.jpa.core.util;
 
 /**
+ * A utility class to hold two values together.
+ * 
+ * @param <F>
+ *            the first type
+ * @param <S>
+ *            the second type
+ * 
  * @author hceylan
  * @since $version
  */
-@Embeddable
-public class FooPk {
-
-	private String strKey;
-
-	private Integer intKey;
+public class Pair<F, S> {
 
 	/**
-	 * @since $version
-	 * @author hceylan
-	 */
-	public FooPk() {
-		super();
-	}
-
-	/**
-	 * @param intKey
-	 *            the integer key
-	 * @param strKey
-	 *            the string key
+	 * Creates a pair.
+	 * 
+	 * @param first
+	 *            the first value
+	 * @param second
+	 *            the second value
+	 * @param <F>
+	 *            the first type
+	 * @param <S>
+	 *            the second type
+	 * @return the pair created
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public FooPk(Integer intKey, String strKey) {
-		super();
+	public static <F, S> Pair<F, S> create(F first, S second) {
+		return new Pair<F, S>(first, second);
+	}
 
-		this.intKey = intKey;
-		this.strKey = strKey;
+	private final F first;
+
+	private final S second;
+
+	/**
+	 * @param first
+	 *            the first
+	 * @param second
+	 *            the second
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Pair(F first, S second) {
+		super();
+		this.first = first;
+		this.second = second;
 	}
 
 	/**
@@ -70,44 +85,44 @@ public class FooPk {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		final FooPk other = (FooPk) obj;
-		if (this.intKey == null) {
-			if (other.intKey != null) {
+		final Pair<?, ?> other = (Pair<?, ?>) obj;
+		if (this.first == null) {
+			if (other.first != null) {
 				return false;
 			}
 		}
-		else if (!this.intKey.equals(other.intKey)) {
+		else if (!this.first.equals(other.first)) {
 			return false;
 		}
-		if (this.strKey == null) {
-			if (other.strKey != null) {
+		if (this.second == null) {
+			if (other.second != null) {
 				return false;
 			}
 		}
-		else if (!this.strKey.equals(other.strKey)) {
+		else if (!this.second.equals(other.second)) {
 			return false;
 		}
 		return true;
 	}
 
 	/**
-	 * Returns the intKey.
+	 * Returns the first.
 	 * 
-	 * @return the intKey
+	 * @return the first
 	 * @since $version
 	 */
-	public Integer getIntKey() {
-		return this.intKey;
+	public F getFirst() {
+		return this.first;
 	}
 
 	/**
-	 * Returns the strKey.
+	 * Returns the second.
 	 * 
-	 * @return the strKey
+	 * @return the second
 	 * @since $version
 	 */
-	public String getStrKey() {
-		return this.strKey;
+	public S getSecond() {
+		return this.second;
 	}
 
 	/**
@@ -118,30 +133,17 @@ public class FooPk {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = (prime * result) + ((this.intKey == null) ? 0 : this.intKey.hashCode());
-		result = (prime * result) + ((this.strKey == null) ? 0 : this.strKey.hashCode());
+		result = (prime * result) + ((this.first == null) ? 0 : this.first.hashCode());
+		result = (prime * result) + ((this.second == null) ? 0 : this.second.hashCode());
 		return result;
 	}
 
 	/**
-	 * Sets the intKey.
+	 * {@inheritDoc}
 	 * 
-	 * @param intKey
-	 *            the intKey to set
-	 * @since $version
 	 */
-	public void setIntKey(Integer intKey) {
-		this.intKey = intKey;
-	}
-
-	/**
-	 * Sets the strKey.
-	 * 
-	 * @param strKey
-	 *            the strKey to set
-	 * @since $version
-	 */
-	public void setStrKey(String strKey) {
-		this.strKey = strKey;
+	@Override
+	public String toString() {
+		return "[" + this.first + ", " + this.second + "]";
 	}
 }
