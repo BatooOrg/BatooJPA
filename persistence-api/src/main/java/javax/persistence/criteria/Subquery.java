@@ -12,6 +12,7 @@ import java.util.Set;
  *            the type of the selection item.
  */
 public interface Subquery<T> extends AbstractQuery<T>, Expression<T> {
+
 	/**
 	 * Create a subquery collection join object correlated to a collection join object of the enclosing query.
 	 * 

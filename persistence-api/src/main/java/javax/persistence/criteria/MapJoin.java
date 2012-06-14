@@ -16,6 +16,7 @@ import javax.persistence.metamodel.MapAttribute;
  *            the type of the target Map value
  */
 public interface MapJoin<Z, K, V> extends PluralJoin<Z, Map<K, V>, V> {
+
 	/**
 	 * Create an expression that corresponds to the map entry.
 	 * 

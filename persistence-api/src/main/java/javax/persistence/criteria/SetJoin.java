@@ -14,6 +14,7 @@ import javax.persistence.metamodel.SetAttribute;
  *            the element type of the target Set
  */
 public interface SetJoin<Z, E> extends PluralJoin<Z, Set<E>, E> {
+
 	/**
 	 * Return the metamodel representation for the set attribute.
 	 * 

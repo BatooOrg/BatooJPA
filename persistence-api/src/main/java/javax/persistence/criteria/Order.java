@@ -4,6 +4,7 @@ package javax.persistence.criteria;
  * An object that defines an ordering over the query results.
  */
 public interface Order {
+
 	/**
 	 * Return the expression that is used for ordering.
 	 * 

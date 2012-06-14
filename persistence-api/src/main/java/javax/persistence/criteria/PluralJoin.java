@@ -14,6 +14,7 @@ import javax.persistence.metamodel.PluralAttribute;
  *            the element type of the collection
  */
 public interface PluralJoin<Z, C, E> extends Join<Z, E> {
+
 	/**
 	 * Return the metamodel representation for the collection-valued attribute corresponding to the join.
 	 * 

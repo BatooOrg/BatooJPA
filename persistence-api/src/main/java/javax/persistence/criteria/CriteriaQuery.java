@@ -184,13 +184,20 @@ public interface CriteriaQuery<T> extends AbstractQuery<T> {
 	 * Specify the item that is to be returned in the query result. Replaces the previously specified selection(s), if any.
 	 * 
 	 * Note: Applications using the string-based API may need to specify the type of the select item when it results from a get or join
-	 * operation and the query result type is specified. For example:
+	 * operation and the query result type is specified.
 	 * 
-	 * CriteriaQuery<String> q = cb.createQuery(String.class); Root<Order> order = q.from(Order.class);
-	 * q.select(order.get("shippingAddress").<String>get("state"));
+	 * <pre>
+	 *     For example:
+	 *      
+	 *     CriteriaQuery&lt;String&gt; q = cb.createQuery(String.class);
+	 *     Root&lt;Order&gt; order = q.from(Order.class);
+	 *     q.select(order.get(&quot;shippingAddress&quot;).&lt;String&gt; get(&quot;state&quot;));
 	 * 
-	 * CriteriaQuery<Product> q2 = cb.createQuery(Product.class); q2.select(q2.from(Order.class) .join("items")
-	 * .<Item,Product>join("product"));
+	 *     CriteriaQuery&lt;Product&gt; q2 = cb.createQuery(Product.class);
+	 *     q2.select(q2.from(Order.class)
+	 *          .join(&quot;items&quot;)
+	 *          .&lt;Item, Product&gt; join(&quot;product&quot;));
+	 * </pre>
 	 * 
 	 * @param selection
 	 *            selection specifying the item that is to be returned in the query result

@@ -11,6 +11,7 @@ import javax.persistence.metamodel.Attribute;
  *            the target type of the join
  */
 public interface Join<Z, X> extends From<Z, X> {
+
 	/**
 	 * Return the metamodel attribute corresponding to the join.
 	 * 

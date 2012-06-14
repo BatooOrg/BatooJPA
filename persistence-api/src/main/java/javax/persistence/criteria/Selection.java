@@ -11,6 +11,7 @@ import javax.persistence.TupleElement;
  *            the type of the selection item
  */
 public interface Selection<X> extends TupleElement<X> {
+
 	/**
 	 * Assigns an alias to the selection item. Once assigned, an alias cannot be changed or reassigned. Returns the same selection item.
 	 * 

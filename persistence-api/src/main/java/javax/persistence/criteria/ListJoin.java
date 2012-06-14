@@ -14,6 +14,7 @@ import javax.persistence.metamodel.ListAttribute;
  *            the element type of the target List
  */
 public interface ListJoin<Z, E> extends PluralJoin<Z, List<E>, E> {
+
 	/**
 	 * Return the metamodel representation for the list attribute.
 	 * 

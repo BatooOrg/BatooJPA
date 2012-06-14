@@ -19,6 +19,7 @@ import javax.persistence.metamodel.SingularAttribute;
  *            the target type
  */
 public interface From<Z, X> extends Path<X>, FetchParent<Z, X> {
+
 	/**
 	 * Returns the parent From object from which the correlated From object has been obtained through correlation (use of a Subquery
 	 * correlate method).

@@ -7,6 +7,7 @@ package javax.persistence.criteria;
  * types will not be portable.
  */
 public enum JoinType {
+
 	/**
 	 * Inner join.
 	 */
