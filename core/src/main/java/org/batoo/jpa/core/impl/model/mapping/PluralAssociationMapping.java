@@ -56,6 +56,10 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 	private JoinTable joinTable;
 
 	/**
+	 * 
+	 * @param parent
+	 *            the parent mapping, may be <code>null</code>
+	 * 
 	 * @param entity
 	 *            the entity
 	 * @param attribute
@@ -64,11 +68,11 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PluralAssociationMapping(EntityTypeImpl<X> entity, PluralAttributeImpl<? super X, C, Z> attribute) {
-		super(entity, (AssociationAttributeMetadata) attribute.getMetadata());
+	public PluralAssociationMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity, PluralAttributeImpl<? super X, C, Z> attribute) {
+		super(parent, entity, (AssociationAttributeMetadata) attribute.getMetadata());
 
 		this.attribute = attribute;
-		final AssociationMetadata metadata = entity.getAssociationOverride(attribute, attribute.getName());
+		final AssociationMetadata metadata = this.getAssociationMetadata();
 
 		if (this.isOwner()) {
 			if ((this.getAttribute().getPersistentAttributeType() == PersistentAttributeType.MANY_TO_MANY)

@@ -50,6 +50,9 @@ public class SingularAssociationMapping<X, Z> extends AssociationMapping<X, Z, Z
 	private ForeignKey foreignKey;
 
 	/**
+	 * @param parent
+	 *            the parent mapping, may be <code>null</code>
+	 * 
 	 * @param entity
 	 *            the entity
 	 * @param attribute
@@ -58,11 +61,11 @@ public class SingularAssociationMapping<X, Z> extends AssociationMapping<X, Z, Z
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SingularAssociationMapping(EntityTypeImpl<X> entity, AssociatedSingularAttribute<X, Z> attribute) {
-		super(entity, attribute.getMetadata());
+	public SingularAssociationMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity, AssociatedSingularAttribute<X, Z> attribute) {
+		super(parent, entity, attribute.getMetadata());
 
 		this.attribute = attribute;
-		final AssociationMetadata metadata = entity.getAssociationOverride(attribute, attribute.getName());
+		final AssociationMetadata metadata = this.getAssociationMetadata();
 
 		if (this.isOwner()) {
 			if (metadata.getJoinTable() != null) {

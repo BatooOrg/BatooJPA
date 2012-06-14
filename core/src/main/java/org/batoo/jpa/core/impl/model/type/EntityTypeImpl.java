@@ -262,29 +262,29 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
-	 * @param attribute
-	 *            the attribute
+	 * Returns if attribute with the <code>path</code> is overridden by the entity.
+	 * 
 	 * @param path
 	 *            the path of the attribute
-	 * @return the column metadata or null
+	 * @return the association metadata or <code>null</code>
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AssociationMetadata getAssociationOverride(AttributeImpl<? super X, ?> attribute, String path) {
+	public AssociationMetadata getAssociationOverride(String path) {
 		for (final AssociationMetadata override : this.metadata.getAssociationOverrides()) {
 			if (override.getName().equals(path)) {
 				return override;
 			}
 		}
 
-		return (AssociationMetadata) attribute.getMetadata();
+		return null;
 	}
 
 	/**
-	 * Returns the associatedAttributes of the type.
+	 * Returns the associations of the type.
 	 * 
-	 * @return the associatedAttributes of the type
+	 * @return the associations of the type
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -453,23 +453,23 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
-	 * @param attribute
-	 *            the attribute
+	 * Returns if attribute with the <code>path</code> is overridden by the entity.
+	 * 
 	 * @param path
 	 *            the path of the attribute
-	 * @return the column metadata or null
+	 * @return the column metadata or <code>null</code>
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ColumnMetadata getAttributeOverride(BasicAttribute<? super X, ?> attribute, String path) {
+	public ColumnMetadata getAttributeOverride(String path) {
 		for (final AttributeOverrideMetadata override : this.metadata.getAttributeOverrides()) {
 			if (override.getName().equals(path)) {
 				return override.getColumn();
 			}
 		}
 
-		return attribute.getMetadata().getColumn();
+		return null;
 	}
 
 	/**
@@ -1037,7 +1037,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				case BASIC:
 					BasicMapping mapping;
 
-					mapping = new BasicMapping(this, (BasicAttribute) attribute);
+					mapping = new BasicMapping(null, this, (BasicAttribute) attribute);
 					this.mappings.put(attribute.getName(), mapping);
 
 					final BasicColumn basicColumn = ((BasicMapping<? super X, ?>) mapping).getColumn();
@@ -1060,14 +1060,15 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 					break;
 				case ONE_TO_ONE:
 				case MANY_TO_ONE:
-					this.mappings.put(attribute.getName(), new SingularAssociationMapping(this, (AssociatedSingularAttribute) attribute));
+					this.mappings.put(attribute.getName(), new SingularAssociationMapping(null, this,
+						(AssociatedSingularAttribute) attribute));
 					break;
 				case MANY_TO_MANY:
 				case ONE_TO_MANY:
-					this.mappings.put(attribute.getName(), new PluralAssociationMapping(this, (PluralAttributeImpl) attribute));
+					this.mappings.put(attribute.getName(), new PluralAssociationMapping(null, this, (PluralAttributeImpl) attribute));
 					break;
 				case EMBEDDED:
-					this.mappings.put(attribute.getName(), new EmbeddedMapping(this, (EmbeddedAttribute) attribute));
+					this.mappings.put(attribute.getName(), new EmbeddedMapping(null, this, (EmbeddedAttribute) attribute));
 				default:
 					break;
 			}

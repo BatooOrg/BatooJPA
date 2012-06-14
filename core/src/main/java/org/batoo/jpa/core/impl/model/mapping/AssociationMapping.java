@@ -30,6 +30,7 @@ import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.parser.MappingException;
+import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.MappableAssociationAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.OrphanableAssociationAttributeMetadata;
@@ -59,6 +60,10 @@ public abstract class AssociationMapping<X, Z, Y> extends AbstractMapping<X, Y> 
 	private boolean removesOrphans;
 
 	/**
+	 * 
+	 * @param parent
+	 *            the parent mapping, may be <code>null</code>
+	 * 
 	 * @param entity
 	 *            the entity
 	 * @param metadata
@@ -67,8 +72,8 @@ public abstract class AssociationMapping<X, Z, Y> extends AbstractMapping<X, Y> 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AssociationMapping(EntityTypeImpl<X> entity, AssociationAttributeMetadata metadata) {
-		super(entity);
+	public AssociationMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity, AssociationAttributeMetadata metadata) {
+		super(parent, entity);
 
 		this.eager = metadata.getFetchType() == FetchType.EAGER;
 		if ((metadata instanceof MappableAssociationAttributeMetadata)
@@ -168,6 +173,61 @@ public abstract class AssociationMapping<X, Z, Y> extends AbstractMapping<X, Y> 
 	 * @author hceylan
 	 */
 	public abstract void flush(ConnectionImpl connection, ManagedInstance<?> managedInstance) throws SQLException;
+
+	/**
+	 * Returns the association
+	 * 
+	 * @return
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected AssociationMetadata getAssociationMetadata() {
+		String path = this.getAttribute().getName();
+
+		AssociationMetadata metadata = null;
+
+		// check with the parent chain if there is an attribute override
+		AbstractMapping<?, ?> mapping = this;
+		while (mapping.getParent() != null) {
+			final EmbeddedMapping<?, ?> parent = mapping.getParent();
+
+			if (parent.getAttribute().getAttributeOverride(path) != null) {
+				metadata = parent.getAttribute().getAssociationOverride(path);
+			}
+
+			path = parent.getAttribute().getName() + "." + path;
+
+			mapping = parent;
+		}
+
+		// if the embeddable defined in this entity then return it
+		if ((metadata != null) && (mapping.getAttribute().getDeclaringType() == this.getEntity())) {
+			return metadata;
+		}
+
+		// check with the override path
+		EntityTypeImpl<? super X> entity = this.getEntity();
+		while (entity != null) {
+			// only up to declaring entity
+			if (entity == mapping.getAttribute().getDeclaringType()) {
+				break;
+			}
+
+			// if there is an override return it
+			metadata = entity.getAssociationOverride(path);
+			if (metadata != null) {
+				return metadata;
+			}
+
+			if (entity.getSupertype() instanceof EntityTypeImpl) {
+				entity = (EntityTypeImpl<? super X>) entity.getSupertype();
+			}
+		}
+
+		// fall back to attribute's column metadata
+		return (AssociationMetadata) this.getAttribute().getMetadata();
+	}
 
 	/**
 	 * Returns the foreign key of the attribute.

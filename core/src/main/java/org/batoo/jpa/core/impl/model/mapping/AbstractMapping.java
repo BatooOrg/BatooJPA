@@ -36,20 +36,24 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
  */
 public abstract class AbstractMapping<X, Y> {
 
+	private final EmbeddedMapping<?, ?> parent;
 	private final EntityTypeImpl<X> entity;
 	private final boolean inherited;
-	private EmbeddedMapping<?, ?> parent;
 
 	/**
+	 * 
+	 * @param parent
+	 *            the parent mapping, may be <code>null</code>
 	 * @param entity
 	 *            the entity
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AbstractMapping(EntityTypeImpl<X> entity) {
+	public AbstractMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity) {
 		super();
 
+		this.parent = parent;
 		this.entity = entity;
 		this.inherited = entity.getRootType().getInheritanceType() != null;
 	}
@@ -65,8 +69,8 @@ public abstract class AbstractMapping<X, Y> {
 	 * @author hceylan
 	 */
 	public final Y get(Object instance) {
-		if (this.parent != null) {
-			instance = this.parent.get(instance);
+		if (this.getParent() != null) {
+			instance = this.getParent().get(instance);
 
 			if (instance == null) {
 				return null;
@@ -99,6 +103,18 @@ public abstract class AbstractMapping<X, Y> {
 	}
 
 	/**
+	 * Returns the parent of the AbstractMapping.
+	 * 
+	 * @return the parent of the AbstractMapping
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public EmbeddedMapping<?, ?> getParent() {
+		return this.parent;
+	}
+
+	/**
 	 * Returns the root of the mapping.
 	 * 
 	 * @return the root mapping
@@ -108,8 +124,8 @@ public abstract class AbstractMapping<X, Y> {
 	 */
 	public final AbstractMapping<?, ?> getRootMapping() {
 		AbstractMapping<?, ?> rootMapping = this;
-		while (rootMapping.parent != null) {
-			rootMapping = rootMapping.parent;
+		while (rootMapping.getParent() != null) {
+			rootMapping = rootMapping.getParent();
 		}
 
 		return rootMapping;
@@ -128,12 +144,12 @@ public abstract class AbstractMapping<X, Y> {
 	 */
 	public final void set(ManagedInstance<?> managedInstance, Object value) {
 		Object instance = managedInstance.getInstance();
-		if (this.parent != null) {
-			instance = this.parent.get(managedInstance.getInstance());
+		if (this.getParent() != null) {
+			instance = this.getParent().get(managedInstance.getInstance());
 
 			if (instance == null) {
-				instance = this.parent.getAttribute().newInstance();
-				this.parent.set(managedInstance, instance);
+				instance = this.getParent().getAttribute().newInstance();
+				this.getParent().set(managedInstance, instance);
 			}
 		}
 
@@ -159,19 +175,6 @@ public abstract class AbstractMapping<X, Y> {
 	 */
 	public void set(SessionImpl session, Object id, Object instance, Object value) {
 		this.getAttribute().set(instance, value);
-	}
-
-	/**
-	 * Sets the parent mapping
-	 * 
-	 * @param parent
-	 *            the parent mapping to set
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public final void setParent(EmbeddedMapping<?, ?> parent) {
-		this.parent = parent;
 	}
 
 	/**

@@ -45,6 +45,8 @@ public class BasicMapping<X, Y> extends SingularMapping<X, Y> {
 	/**
 	 * The default constructor.
 	 * 
+	 * @param parent
+	 *            the parent mapping, may be <code>null</code>
 	 * @param entity
 	 *            the entity
 	 * @param attribute
@@ -53,13 +55,15 @@ public class BasicMapping<X, Y> extends SingularMapping<X, Y> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public BasicMapping(EntityTypeImpl<X> entity, BasicAttribute<? super X, Y> attribute) {
-		this(entity, attribute, false);
+	public BasicMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity, BasicAttribute<? super X, Y> attribute) {
+		this(parent, entity, attribute, false);
 	}
 
 	/**
 	 * Constructor for embedded attribute sub mappings.
 	 * 
+	 * @param parent
+	 *            the parent mapping, may be <code>null</code>
 	 * @param entity
 	 *            the entity
 	 * @param attribute
@@ -70,12 +74,12 @@ public class BasicMapping<X, Y> extends SingularMapping<X, Y> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public BasicMapping(EntityTypeImpl<X> entity, BasicAttribute<? super X, Y> attribute, boolean id) {
-		super(entity);
+	public BasicMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity, BasicAttribute<? super X, Y> attribute, boolean id) {
+		super(parent, entity);
 
 		this.attribute = attribute;
 
-		final ColumnMetadata columnMetadata = this.getEntity().getAttributeOverride(attribute, this.getAttribute().getName());
+		final ColumnMetadata columnMetadata = this.getColumnMetadata();
 		final int sqlType = TypeFactory.getSqlType(this.getAttribute().getJavaType(), attribute.getTemporalType(), attribute.getEnumType(),
 			attribute.isLob());
 
@@ -115,6 +119,61 @@ public class BasicMapping<X, Y> extends SingularMapping<X, Y> {
 	 */
 	public BasicColumn getColumn() {
 		return this.column;
+	}
+
+	/**
+	 * Returns the effective column metadata for the attribute checking with the parent mappings and entities.
+	 * 
+	 * @return the column metadata
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private ColumnMetadata getColumnMetadata() {
+		String path = this.attribute.getName();
+
+		ColumnMetadata metadata = null;
+
+		// check with the parent chain if there is an attribute override
+		AbstractMapping<?, ?> mapping = this;
+		while (mapping.getParent() != null) {
+			final EmbeddedMapping<?, ?> parent = mapping.getParent();
+
+			if (parent.getAttribute().getAttributeOverride(path) != null) {
+				metadata = parent.getAttribute().getAttributeOverride(path);
+			}
+
+			path = parent.getAttribute().getName() + "." + path;
+
+			mapping = parent;
+		}
+
+		// if the embeddable defined in this entity then return it
+		if ((metadata != null) && (mapping.getAttribute().getDeclaringType() == this.getEntity())) {
+			return metadata;
+		}
+
+		// check with the override path
+		EntityTypeImpl<? super X> entity = this.getEntity();
+		while (entity != null) {
+			// only up to declaring entity
+			if (entity == mapping.getAttribute().getDeclaringType()) {
+				break;
+			}
+
+			// if there is an override return it
+			metadata = entity.getAttributeOverride(path);
+			if (metadata != null) {
+				return metadata;
+			}
+
+			if (entity.getSupertype() instanceof EntityTypeImpl) {
+				entity = (EntityTypeImpl<? super X>) entity.getSupertype();
+			}
+		}
+
+		// fall back to attribute's column metadata
+		return this.attribute.getMetadata().getColumn();
 	}
 
 	/**

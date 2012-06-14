@@ -53,6 +53,10 @@ public class EmbeddedMapping<X, Y> extends SingularMapping<X, Y> {
 	private final Map<String, AbstractMapping<? super X, ?>> mappings = Maps.newHashMap();
 
 	/**
+	 * 
+	 * @param parent
+	 *            the parent mapping, may be <code>null</code>
+	 * 
 	 * @param entity
 	 *            the entity
 	 * @param attribute
@@ -61,8 +65,8 @@ public class EmbeddedMapping<X, Y> extends SingularMapping<X, Y> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EmbeddedMapping(EntityTypeImpl<X> entity, EmbeddedAttribute<? super X, Y> attribute) {
-		super(entity);
+	public EmbeddedMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity, EmbeddedAttribute<? super X, Y> attribute) {
+		super(parent, entity);
 
 		this.attribute = attribute;
 
@@ -179,7 +183,7 @@ public class EmbeddedMapping<X, Y> extends SingularMapping<X, Y> {
 
 			switch (attribute.getPersistentAttributeType()) {
 				case BASIC:
-					mapping = new BasicMapping(this.getEntity(), (BasicAttribute) attribute, this.getAttribute().isId());
+					mapping = new BasicMapping(this, this.getEntity(), (BasicAttribute) attribute, this.getAttribute().isId());
 					this.mappings.put(attribute.getName(), mapping);
 
 					final BasicColumn basicColumn = ((BasicMapping) mapping).getColumn();
@@ -202,23 +206,20 @@ public class EmbeddedMapping<X, Y> extends SingularMapping<X, Y> {
 					break;
 				case ONE_TO_ONE:
 				case MANY_TO_ONE:
-					mapping = new SingularAssociationMapping(this.getEntity(), (AssociatedSingularAttribute) attribute);
+					mapping = new SingularAssociationMapping(this, this.getEntity(), (AssociatedSingularAttribute) attribute);
 					this.mappings.put(attribute.getName(), mapping);
 					break;
 				case MANY_TO_MANY:
 				case ONE_TO_MANY:
-					mapping = new PluralAssociationMapping(this.getEntity(), (PluralAttributeImpl) attribute);
+					mapping = new PluralAssociationMapping(this, this.getEntity(), (PluralAttributeImpl) attribute);
 					this.mappings.put(attribute.getName(), mapping);
 					break;
 				case EMBEDDED:
-					mapping = new EmbeddedMapping(this.getEntity(), (EmbeddedAttribute) attribute);
+					mapping = new EmbeddedMapping(this, this.getEntity(), (EmbeddedAttribute) attribute);
 					this.mappings.put(attribute.getName(), mapping);
 				default:
 					break;
 			}
-
-			// bind the mapping to this mapping
-			mapping.setParent(this);
 		}
 	}
 }

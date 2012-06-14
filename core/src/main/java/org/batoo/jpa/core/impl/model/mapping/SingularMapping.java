@@ -35,14 +35,17 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 public abstract class SingularMapping<X, Y> extends AbstractMapping<X, Y> {
 
 	/**
+	 * 
+	 * @param parent
+	 *            the parent mapping, may be <code>null</code>
 	 * @param entity
 	 *            the entity
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SingularMapping(EntityTypeImpl<X> entity) {
-		super(entity);
+	public SingularMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity) {
+		super(parent, entity);
 	}
 
 	/**

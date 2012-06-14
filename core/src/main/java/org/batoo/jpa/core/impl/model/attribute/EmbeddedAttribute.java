@@ -28,6 +28,7 @@ import org.batoo.jpa.core.impl.model.type.IdentifiableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
+import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.EmbeddedAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.EmbeddedIdAttributeMetadata;
 
@@ -89,6 +90,46 @@ public class EmbeddedAttribute<X, T> extends SingularAttributeImpl<X, T> impleme
 
 		this.associationOverrides = metadata.getAssociationOverrides();
 		this.attributeOverrides = metadata.getAttributeOverrides();
+	}
+
+	/**
+	 * Returns the association override if one exists for the path.
+	 * 
+	 * @param path
+	 *            the path
+	 * @return the association override if one exists for the path, otherwise <code>null</code>
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public AssociationMetadata getAssociationOverride(String path) {
+		for (final AssociationMetadata override : this.associationOverrides) {
+			if (override.getName().equals(path)) {
+				return override;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the attribute override if one exists for the path.
+	 * 
+	 * @param path
+	 *            the path
+	 * @return the attribute override if one exists for the path, otherwise <code>null</code>
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ColumnMetadata getAttributeOverride(String path) {
+		for (final AttributeOverrideMetadata override : this.attributeOverrides) {
+			if (override.getName().equals(path)) {
+				return override.getColumn();
+			}
+		}
+
+		return null;
 	}
 
 	/**
