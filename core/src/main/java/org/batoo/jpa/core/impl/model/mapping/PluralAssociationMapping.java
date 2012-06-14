@@ -69,7 +69,7 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 	 * @author hceylan
 	 */
 	public PluralAssociationMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity, PluralAttributeImpl<? super X, C, Z> attribute) {
-		super(parent, entity, (AssociationAttributeMetadata) attribute.getMetadata());
+		super(parent, entity, (AssociationAttributeMetadata) attribute.getMetadata(), attribute);
 
 		this.attribute = attribute;
 		final AssociationMetadata metadata = this.getAssociationMetadata();
@@ -213,6 +213,16 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 	 * 
 	 */
 	@Override
+	public void load(ManagedInstance<?> instance) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public boolean references(Object instance, Object reference) {
 		final Object values = this.get(instance);
 
@@ -233,10 +243,11 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 	 */
 	@Override
 	@SuppressWarnings({ "unchecked" })
-	public void set(SessionImpl session, Object id, Object instance, Object value) {
-		final C collection = this.attribute.newCollection(this, session, id, (Collection<? extends Z>) value);
+	public void set(ManagedInstance<?> managedInstance, Object instance, Object value) {
+		final C collection = this.attribute.newCollection(this, managedInstance.getSession(), managedInstance.getId(),
+			(Collection<? extends Z>) value);
 
-		super.set(session, id, instance, collection);
+		super.set(managedInstance, instance, collection);
 	}
 
 	/**
@@ -246,5 +257,15 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 	@Override
 	public void setInverse(AssociationMapping<Z, X, ?> inverse) {
 		this.inverse = inverse;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void setLazy(ManagedInstance<?> instance) {
+		// TODO Auto-generated method stub
+
 	}
 }

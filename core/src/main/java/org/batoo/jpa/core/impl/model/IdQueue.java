@@ -61,8 +61,6 @@ public abstract class IdQueue extends LinkedBlockingQueue<Integer> {
 
 	private final int topupSize;
 
-	private TopUpTask topUpTask;
-
 	/**
 	 * /**
 	 * 
@@ -89,7 +87,7 @@ public abstract class IdQueue extends LinkedBlockingQueue<Integer> {
 		this.allocationSize = allocationSize;
 		this.topupSize = allocationSize / 2;
 
-		idExecuter.execute(this.topUpTask = new TopUpTask());
+		idExecuter.execute(new TopUpTask());
 	}
 
 	/**

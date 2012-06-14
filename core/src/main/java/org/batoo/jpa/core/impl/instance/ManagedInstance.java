@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.instance;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Set;
 
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
@@ -34,6 +35,8 @@ import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.util.Pair;
+
+import com.google.common.collect.Sets;
 
 /**
  * The managed instance to track entity instances.
@@ -83,9 +86,10 @@ public class ManagedInstance<X> {
 	private final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>[] idMappings;
 	private final EmbeddableTypeImpl<?> idType;
 
+	private final Set<AssociationMapping<?, ?, ?>> associationsLoaded = Sets.newHashSet();
 	private EntityTransactionImpl transaction;
-	private final boolean external = true;
 
+	private final boolean external = true;
 	private Object id;
 
 	private int h;
@@ -314,6 +318,18 @@ public class ManagedInstance<X> {
 	}
 
 	/**
+	 * Returns the associations that are loaded.
+	 * 
+	 * @return the associations that are loaded.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Set<AssociationMapping<?, ?, ?>> getAssociationsLoaded() {
+		return this.associationsLoaded;
+	}
+
+	/**
 	 * Returns the id of the instance.
 	 * 
 	 * @return the id of the instance
@@ -408,6 +424,19 @@ public class ManagedInstance<X> {
 	 */
 	public boolean isExternal() {
 		return this.external;
+	}
+
+	/**
+	 * Sets the association as loaded.
+	 * 
+	 * @param association
+	 *            the association
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setAssociationLoaded(AssociationMapping<?, ?, ?> association) {
+		this.associationsLoaded.add(association);
 	}
 
 	/**

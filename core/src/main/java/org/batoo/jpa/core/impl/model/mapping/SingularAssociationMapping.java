@@ -62,7 +62,7 @@ public class SingularAssociationMapping<X, Z> extends AssociationMapping<X, Z, Z
 	 * @author hceylan
 	 */
 	public SingularAssociationMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity, AssociatedSingularAttribute<X, Z> attribute) {
-		super(parent, entity, attribute.getMetadata());
+		super(parent, entity, attribute.getMetadata(), attribute);
 
 		this.attribute = attribute;
 		final AssociationMetadata metadata = this.getAssociationMetadata();
@@ -191,6 +191,15 @@ public class SingularAssociationMapping<X, Z> extends AssociationMapping<X, Z, Z
 	 * 
 	 */
 	@Override
+	public void load(ManagedInstance<?> instance) {
+		// TODO Auto-generated method stub
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public boolean references(Object instance, Object reference) {
 		return this.get(instance) == reference;
 	}
@@ -202,5 +211,14 @@ public class SingularAssociationMapping<X, Z> extends AssociationMapping<X, Z, Z
 	@Override
 	public void setInverse(AssociationMapping<Z, X, ?> inverse) {
 		this.inverse = inverse;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void setLazy(ManagedInstance<?> instance) {
+		// TODO Auto-generated method stub
 	}
 }

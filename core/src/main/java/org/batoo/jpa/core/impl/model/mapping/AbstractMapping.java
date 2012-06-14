@@ -19,7 +19,6 @@
 package org.batoo.jpa.core.impl.model.mapping;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
@@ -39,6 +38,7 @@ public abstract class AbstractMapping<X, Y> {
 	private final EmbeddedMapping<?, ?> parent;
 	private final EntityTypeImpl<X> entity;
 	private final boolean inherited;
+	private final String path;
 
 	/**
 	 * 
@@ -46,16 +46,35 @@ public abstract class AbstractMapping<X, Y> {
 	 *            the parent mapping, may be <code>null</code>
 	 * @param entity
 	 *            the entity
+	 * @param attribute
+	 *            the attribute
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AbstractMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity) {
+	public AbstractMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity, AttributeImpl<? super X, Y> attribute) {
 		super();
 
 		this.parent = parent;
 		this.entity = entity;
 		this.inherited = entity.getRootType().getInheritanceType() != null;
+
+		this.path = parent != null ? parent.getPath() + "." + attribute.getName() : this.entity.getName() + "." + attribute.getName();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		final AbstractMapping<?, ?> other = (AbstractMapping<?, ?>) obj;
+
+		return this.getPath().equals(other.getPath());
 	}
 
 	/**
@@ -115,6 +134,18 @@ public abstract class AbstractMapping<X, Y> {
 	}
 
 	/**
+	 * Returns the fully qualified path of the mapping.
+	 * 
+	 * @return the fully qualified path of the mapping
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getPath() {
+		return this.path;
+	}
+
+	/**
 	 * Returns the root of the mapping.
 	 * 
 	 * @return the root mapping
@@ -132,6 +163,15 @@ public abstract class AbstractMapping<X, Y> {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int hashCode() {
+		return this.path.hashCode();
+	}
+
+	/**
 	 * Sets the mapping value of instance.
 	 * 
 	 * @param managedInstance
@@ -145,26 +185,24 @@ public abstract class AbstractMapping<X, Y> {
 	public final void set(ManagedInstance<?> managedInstance, Object value) {
 		Object instance = managedInstance.getInstance();
 		if (this.getParent() != null) {
-			instance = this.getParent().get(managedInstance.getInstance());
+			instance = this.parent.get(managedInstance.getInstance());
 
 			if (instance == null) {
-				instance = this.getParent().getAttribute().newInstance();
-				this.getParent().set(managedInstance, instance);
+				instance = this.parent.getAttribute().newInstance();
+				this.parent.set(managedInstance, instance);
 			}
 		}
 
 		if (!this.inherited || managedInstance.getType().doesExtend(this.entity)) {
-			this.set(managedInstance.getSession(), managedInstance.getId(), instance, value);
+			this.set(managedInstance, instance, value);
 		}
 	}
 
 	/**
 	 * Sets the mapping value of the instance
 	 * 
-	 * @param session
-	 *            the session
-	 * @param id
-	 *            the id of the root instance
+	 * @param managedInstance
+	 *            the managed instance
 	 * @param instance
 	 *            the instance of which the value to set
 	 * @param value
@@ -173,7 +211,7 @@ public abstract class AbstractMapping<X, Y> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void set(SessionImpl session, Object id, Object instance, Object value) {
+	public void set(ManagedInstance<?> managedInstance, Object instance, Object value) {
 		this.getAttribute().set(instance, value);
 	}
 

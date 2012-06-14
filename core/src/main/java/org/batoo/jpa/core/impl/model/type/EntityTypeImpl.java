@@ -116,6 +116,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private AssociationMapping<?, ?, ?>[] associationsEager;
 	private AssociationMapping<?, ?, ?>[] associationsJoined;
 	private PluralAssociationMapping<?, ?, ?>[] associationsPlural;
+	private SingularAssociationMapping<?, ?>[] associationsSingularLazy;
 
 	private final Map<Method, Method> idMethods = Maps.newHashMap();
 
@@ -449,6 +450,41 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			associationsPlural.toArray(associationsPlural0);
 
 			return this.associationsPlural = associationsPlural0;
+		}
+	}
+
+	/**
+	 * Returns the array of singular owner lazy association of the type.
+	 * 
+	 * @return the array of singular owner lazy associations of the type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public SingularAssociationMapping<?, ?>[] getAssociationsSingularOwnerLazy() {
+		if (this.associationsSingularLazy != null) {
+			return this.associationsSingularLazy;
+		}
+
+		synchronized (this) {
+			if (this.associationsSingularLazy != null) {
+				return this.associationsSingularLazy;
+			}
+
+			final List<SingularAssociationMapping<?, ?>> associationsSingularLazy = Lists.newArrayList();
+			for (final AssociationMapping<?, ?, ?> mapping : this.getAssociations()) {
+				if (mapping instanceof SingularAssociationMapping) {
+					final SingularAssociationMapping<?, ?> singularMapping = (SingularAssociationMapping<?, ?>) mapping;
+					if (singularMapping.isOwner() && !singularMapping.isEager()) {
+						associationsSingularLazy.add(singularMapping);
+					}
+				}
+			}
+
+			final SingularAssociationMapping<?, ?>[] associationsSingularLazy0 = new SingularAssociationMapping[associationsSingularLazy.size()];
+			associationsSingularLazy.toArray(associationsSingularLazy0);
+
+			return this.associationsSingularLazy = associationsSingularLazy0;
 		}
 	}
 
@@ -1239,6 +1275,29 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				final EntityTypeImpl<?> type = association.getType();
 
 				type.prepareEagerAssociations(r2, depth + 1, association);
+			}
+		}
+	}
+
+	/**
+	 * Processes the associations of the entity after it has been loaded.
+	 * 
+	 * @param instance
+	 *            the managed instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void processAssociations(ManagedInstance<?> instance) {
+		final Set<AssociationMapping<?, ?, ?>> associationsLoaded = instance.getAssociationsLoaded();
+		for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
+			if (!associationsLoaded.contains(association)) {
+				if (association.isEager()) {
+					association.load(instance);
+				}
+				else {
+					association.setLazy(instance);
+				}
 			}
 		}
 	}

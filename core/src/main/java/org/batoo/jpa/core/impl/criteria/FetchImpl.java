@@ -18,7 +18,6 @@
  */
 package org.batoo.jpa.core.impl.criteria;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.persistence.criteria.Expression;
@@ -27,7 +26,6 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
@@ -49,7 +47,6 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	private final FetchParentImpl<?, Z> parent;
 	private final AssociationMapping<? super Z, X, ?> mapping;
 	private final JoinType joinType;
-	private ManagedInstance<?> parentInstance;
 
 	/**
 	 * @param parent
@@ -156,6 +153,18 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	}
 
 	/**
+	 * Returns the mapping of the FetchImpl.
+	 * 
+	 * @return the mapping of the FetchImpl
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public AssociationMapping<? super Z, X, ?> getMapping() {
+		return this.mapping;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -172,35 +181,6 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	@Override
 	public FetchParentImpl<?, Z> getParent() {
 		return this.parent;
-	}
-
-	/**
-	 * Handles the row.
-	 * <p>
-	 * The default implementation does nothing.
-	 * 
-	 * @param session
-	 *            the session
-	 * @param query
-	 *            the query
-	 * @param data
-	 *            the resultset data
-	 * @param rowNo
-	 *            the current row no
-	 * @param parent
-	 *            the parent managed instance
-	 * @param leap
-	 *            the jump size
-	 * @return the managed instance
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public List<X> handle(SessionImpl session, BaseTypedQueryImpl<?> query, List<Map<String, Object>> data, MutableInt rowNo, int leap,
-		ManagedInstance<?> parent) {
-		this.parentInstance = parent;
-
-		return super.handle(session, query, data, rowNo, leap);
 	}
 
 	/**
@@ -228,10 +208,10 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	 * 
 	 */
 	@Override
-	protected boolean shouldContinue(SessionImpl session, Map<String, Object> row) {
+	protected boolean shouldContinue(SessionImpl session, ManagedInstance<?> parent, Map<String, Object> row) {
 		final ManagedInstance<? extends Z> instance = this.getParent().getInstance(session, row);
 
-		return this.parentInstance.equals(instance);
+		return parent.equals(instance);
 	}
 
 	/**
@@ -241,17 +221,5 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	@Override
 	public String toString() {
 		return this.describe(this.getParent().toString());
-	}
-
-	/**
-	 * Returns the mapping of the FetchImpl.
-	 *
-	 * @return the mapping of the FetchImpl
-	 *
-	 * @since $version
-	 * @author hceylan
-	 */
-	public AssociationMapping<? super Z, X, ?> getMapping() {
-		return mapping;
 	}
 }

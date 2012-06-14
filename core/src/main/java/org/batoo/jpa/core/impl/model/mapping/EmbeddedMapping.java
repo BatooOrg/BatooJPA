@@ -66,7 +66,7 @@ public class EmbeddedMapping<X, Y> extends SingularMapping<X, Y> {
 	 * @author hceylan
 	 */
 	public EmbeddedMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity, EmbeddedAttribute<? super X, Y> attribute) {
-		super(parent, entity);
+		super(parent, entity, attribute);
 
 		this.attribute = attribute;
 

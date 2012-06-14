@@ -40,12 +40,14 @@ public abstract class SingularMapping<X, Y> extends AbstractMapping<X, Y> {
 	 *            the parent mapping, may be <code>null</code>
 	 * @param entity
 	 *            the entity
+	 * @param attribute
+	 *            the attribute
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SingularMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity) {
-		super(parent, entity);
+	public SingularMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity, SingularAttributeImpl<? super X, Y> attribute) {
+		super(parent, entity, attribute);
 	}
 
 	/**

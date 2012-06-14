@@ -28,6 +28,7 @@ import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
+import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
@@ -63,17 +64,19 @@ public abstract class AssociationMapping<X, Z, Y> extends AbstractMapping<X, Y> 
 	 * 
 	 * @param parent
 	 *            the parent mapping, may be <code>null</code>
-	 * 
 	 * @param entity
 	 *            the entity
 	 * @param metadata
 	 *            the association metadata
+	 * @param attribute
+	 *            the attribute
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AssociationMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity, AssociationAttributeMetadata metadata) {
-		super(parent, entity);
+	public AssociationMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity, AssociationAttributeMetadata metadata,
+		AttributeImpl<? super X, Y> attribute) {
+		super(parent, entity, attribute);
 
 		this.eager = metadata.getFetchType() == FetchType.EAGER;
 		if ((metadata instanceof MappableAssociationAttributeMetadata)
@@ -318,6 +321,17 @@ public abstract class AssociationMapping<X, Z, Y> extends AbstractMapping<X, Y> 
 	public abstract void link() throws MappingException;
 
 	/**
+	 * Loads the eager association.
+	 * 
+	 * @param instance
+	 *            the managed instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract void load(ManagedInstance<?> instance);
+
+	/**
 	 * @param instance
 	 *            the source instance
 	 * @param reference
@@ -330,6 +344,17 @@ public abstract class AssociationMapping<X, Z, Y> extends AbstractMapping<X, Y> 
 	public abstract boolean references(Object instance, Object reference);
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void set(ManagedInstance<?> managedInstance, Object instance, Object value) {
+		super.set(managedInstance, instance, value);
+
+		managedInstance.setAssociationLoaded(this);
+	}
+
+	/**
 	 * Sets the inverse attribute.
 	 * 
 	 * @param inverse
@@ -339,4 +364,15 @@ public abstract class AssociationMapping<X, Z, Y> extends AbstractMapping<X, Y> 
 	 * @author hceylan
 	 */
 	public abstract void setInverse(AssociationMapping<Z, X, ?> inverse);
+
+	/**
+	 * Sets the lazy instance for the association
+	 * 
+	 * @param instance
+	 *            the managed instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract void setLazy(ManagedInstance<?> instance);
 }

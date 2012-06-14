@@ -75,7 +75,7 @@ public class BasicMapping<X, Y> extends SingularMapping<X, Y> {
 	 * @author hceylan
 	 */
 	public BasicMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity, BasicAttribute<? super X, Y> attribute, boolean id) {
-		super(parent, entity);
+		super(parent, entity, attribute);
 
 		this.attribute = attribute;
 

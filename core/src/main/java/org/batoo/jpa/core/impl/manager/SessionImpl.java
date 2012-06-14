@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.persistence.PersistenceException;
 
@@ -53,6 +54,10 @@ public class SessionImpl {
 	private final HashSet<ManagedInstance<?>> externalEntities = Sets.newHashSet();
 	private final LinkedList<ManagedInstance<?>> identifiableEntities = Lists.newLinkedList();
 	private final LinkedList<ManagedInstance<?>> changedEntities = Lists.newLinkedList();
+
+	private List<ManagedInstance<?>> entitiesLoaded = Lists.newArrayList();
+
+	private int loadTracker = 0;
 
 	/**
 	 * @param entityManager
@@ -223,6 +228,10 @@ public class SessionImpl {
 		final SubRepository<? super X> subRepository = this.repository.get(type);
 
 		subRepository.put(instance);
+
+		if (this.loadTracker > 0) {
+			this.entitiesLoaded.add(instance);
+		}
 	}
 
 	/**
@@ -264,6 +273,27 @@ public class SessionImpl {
 	}
 
 	/**
+	 * Releases the load tracker, so that the entities caught to be loaded are processed for associations and <code>postload</code>
+	 * listeners.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void releaseLoadTracker() {
+		this.loadTracker--;
+
+		if (this.loadTracker == 0) {
+			// swap the set
+			final List<ManagedInstance<?>> entitiesLoaded = this.entitiesLoaded;
+			this.entitiesLoaded = Lists.newArrayList();
+
+			for (final ManagedInstance<?> instance : entitiesLoaded) {
+				instance.getType().processAssociations(instance);
+			}
+		}
+	}
+
+	/**
 	 * Removes the instance from the session.
 	 * 
 	 * @param <X>
@@ -289,5 +319,15 @@ public class SessionImpl {
 		removed.cascadeDetach(transaction);
 
 		removed.setTransaction(transaction);
+	}
+
+	/**
+	 * Sets the load tracker so that the insertions into session is tracked.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setLoadTracker() {
+		this.loadTracker++;
 	}
 }

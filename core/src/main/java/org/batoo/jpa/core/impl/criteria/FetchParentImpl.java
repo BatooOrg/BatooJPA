@@ -27,6 +27,7 @@ import java.util.Set;
 import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.FetchParent;
 import javax.persistence.criteria.JoinType;
+import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SingularAttribute;
@@ -433,9 +434,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	}
 
 	/**
-	 * Handles the row.
-	 * <p>
-	 * The default implementation does nothing.
+	 * Handles the row for multiple results.
 	 * 
 	 * @param session
 	 *            the session
@@ -447,72 +446,13 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	 *            the current row no
 	 * @param jumpSize
 	 *            the jump size
-	 * @return the managed instance
+	 * @return the list of instances
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	public List<X> handle(SessionImpl session, BaseTypedQueryImpl<?> query, List<Map<String, Object>> data, MutableInt rowNo, int jumpSize) {
-		final List<ManagedInstance<? extends X>> instances = Lists.newArrayList();
-
-		while ((rowNo.intValue() < data.size())) {
-			int leap = jumpSize;
-
-			final Map<String, Object> row = data.get(rowNo.intValue());
-
-			// if id is null then break
-			final ManagedInstance<? extends X> instance = this.getInstance(session, row);
-			if (instance == null) {
-				return null;
-			}
-
-			// if different parent then break
-			if (!this.shouldContinue(session, row)) {
-				break;
-			}
-
-			// if we processed the same instance then break
-			if (instances.contains(instance)) {
-				break;
-			}
-
-			final ManagedInstance<? extends X> managedInstance = session.get(instance);
-			if (managedInstance != null) {
-				instances.add(managedInstance);
-				rowNo.add(leap);
-
-				continue;
-			}
-
-			for (final Entry<String, AbstractColumn> entry : this.fields.entrySet()) {
-				final String field = entry.getKey();
-				final AbstractColumn column = entry.getValue();
-				column.setValue(instance, row.get(field));
-			}
-			instances.add(instance);
-			session.put(instance);
-
-			for (int i = this.fetches.size() - 1; i >= 0; i--) {
-				final FetchImpl<X, ?> fetch = this.fetches.get(i);
-				final MutableInt subRowNo = new MutableInt(rowNo);
-				final List<?> value = fetch.handle(session, query, data, subRowNo, leap, instance);
-				final AssociationMapping<? super X, ?, ?> mapping = fetch.getMapping();
-
-				if (value != null) {
-					leap = subRowNo.intValue() - rowNo.intValue();
-					if (mapping.getAttribute().isCollection()) {
-						mapping.set(instance, value);
-					}
-					else {
-						if (value.size() > 0) {
-							mapping.set(instance, value.get(0));
-						}
-					}
-				}
-			}
-
-			rowNo.add(leap);
-		}
+		final List<ManagedInstance<? extends X>> instances = this.handleMulti(session, query, data, null, rowNo, jumpSize);
 
 		return Lists.transform(instances, new Function<ManagedInstance<? extends X>, X>() {
 
@@ -521,6 +461,156 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 				return input.getInstance();
 			}
 		});
+	}
+
+	/**
+	 * Handles the row for multiple results.
+	 * 
+	 * @param session
+	 *            the session
+	 * @param query
+	 *            the query
+	 * @param data
+	 *            the resultset data
+	 * @param parent
+	 *            the parent instance
+	 * @param rowNo
+	 *            the current row no
+	 * @param jumpSize
+	 *            the jump size
+	 * @return the list of instances
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected List<ManagedInstance<? extends X>> handleMulti(SessionImpl session, BaseTypedQueryImpl<?> query,
+		List<Map<String, Object>> data, ManagedInstance<?> parent, MutableInt rowNo, int jumpSize) {
+		final List<ManagedInstance<? extends X>> instances = Lists.newArrayList();
+
+		while ((rowNo.intValue() < data.size())) {
+			final ManagedInstance<? extends X> instance = this.handleSingle(instances, session, query, data, parent, rowNo, jumpSize);
+			if (instance == null) {
+				break;
+			}
+		}
+
+		return instances;
+	}
+
+	/**
+	 * Handles the row for a single result.
+	 * 
+	 * @param instances
+	 *            the instances already loaded
+	 * @param session
+	 *            the session
+	 * @param query
+	 *            the query
+	 * @param data
+	 *            the resultset data
+	 * @param parent
+	 *            the parent instance
+	 * @param rowNo
+	 *            the current row no
+	 * @param jumpSize
+	 *            the jump size
+	 * @return the managed instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected ManagedInstance<? extends X> handleSingle(List<ManagedInstance<? extends X>> instances, SessionImpl session,
+		BaseTypedQueryImpl<?> query, List<Map<String, Object>> data, ManagedInstance<?> parent, MutableInt rowNo, int jumpSize) {
+		int leap = jumpSize;
+
+		final Map<String, Object> row = data.get(rowNo.intValue());
+
+		// if id is null then break
+		final ManagedInstance<? extends X> instance = this.getInstance(session, row);
+		if (instance == null) {
+			return null;
+		}
+
+		// if different parent then break
+		if (!this.shouldContinue(session, parent, row)) {
+			return null;
+		}
+
+		// if we processed the same instance then break
+		if ((instances != null) && instances.contains(instance)) {
+			return null;
+		}
+
+		final ManagedInstance<? extends X> managedInstance = session.get(instance);
+		if (managedInstance != null) {
+			instances.add(managedInstance);
+			rowNo.add(leap);
+
+			return managedInstance;
+		}
+
+		for (final Entry<String, AbstractColumn> entry : this.fields.entrySet()) {
+			final String field = entry.getKey();
+			final AbstractColumn column = entry.getValue();
+			column.setValue(instance, row.get(field));
+		}
+
+		instances.add(instance);
+		session.put(instance);
+
+		for (int i = this.fetches.size() - 1; i >= 0; i--) {
+			final FetchImpl<X, ?> fetch = this.fetches.get(i);
+			final MutableInt subRowNo = new MutableInt(rowNo);
+			final AssociationMapping<? super X, ?, ?> mapping = fetch.getMapping();
+
+			// if it is a plural association then get a list of instances
+			if (mapping.getAttribute().isCollection()) {
+				// resolve the children
+				final List<?> children = fetch.handleMulti(session, query, data, instance, subRowNo, leap);
+
+				// set the children
+				mapping.set(instance, Lists.transform(children, new Function<Object, Object>() {
+
+					@Override
+					public Object apply(Object input) {
+						return ((ManagedInstance<?>) input).getInstance();
+					}
+				}));
+
+				// if it is a one-to-many mapping and has an inverse then set the inverses
+				if ((mapping.getInverse() != null) && //
+					(mapping.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_MANY)) {
+					for (final Object child : children) {
+						mapping.getInverse().set((ManagedInstance<?>) child, instance.getInstance());
+					}
+				}
+
+				leap = subRowNo.intValue() - rowNo.intValue();
+			}
+			// if it is singular association then get a single instance
+			else {
+				final ManagedInstance<?> value = fetch.handleSingle(null, session, query, data, instance, subRowNo, leap);
+				if (value == null) {
+					mapping.set(instance, null);
+				}
+				else {
+					mapping.set(instance, value.getInstance());
+
+					// if this is a one-to-one mapping and has an inverse then set it
+					if ((mapping.getInverse() != null)
+						&& (mapping.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_ONE)) {
+						mapping.getInverse().set(value, instance.getInstance());
+					}
+
+					leap = subRowNo.intValue() - rowNo.intValue();
+				}
+			}
+
+		}
+
+		rowNo.add(leap);
+
+		return instance;
 	}
 
 	/**
@@ -559,6 +649,8 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	 * 
 	 * @param session
 	 *            the session
+	 * @param parent
+	 *            the parent instance
 	 * @param row
 	 *            the data row
 	 * @return true if the handling should continue, false otherwise
@@ -566,7 +658,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected boolean shouldContinue(SessionImpl session, Map<String, Object> row) {
+	protected boolean shouldContinue(SessionImpl session, ManagedInstance<?> parent, Map<String, Object> row) {
 		return true;
 	}
 
