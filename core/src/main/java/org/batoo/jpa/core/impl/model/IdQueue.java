@@ -59,7 +59,6 @@ public abstract class IdQueue extends LinkedBlockingQueue<Integer> {
 	protected final String name;
 	private final int allocationSize;
 
-	private final ExecutorService idExecuter;
 	private final int topupSize;
 
 	private TopUpTask topUpTask;
@@ -86,7 +85,6 @@ public abstract class IdQueue extends LinkedBlockingQueue<Integer> {
 
 		this.jdbcAdaptor = jdbcAdaptor;
 		this.datasource = datasource;
-		this.idExecuter = idExecuter;
 		this.name = name;
 		this.allocationSize = allocationSize;
 		this.topupSize = allocationSize / 2;
@@ -105,6 +103,10 @@ public abstract class IdQueue extends LinkedBlockingQueue<Integer> {
 	 */
 	protected void doTopUp(Runnable runnable) {
 		while (this.size() <= (this.topupSize)) {
+			if (Thread.currentThread().isInterrupted()) {
+				return;
+			}
+
 			IdQueue.LOG.debug("Ids will be fetched for {0} from the database...", this.name);
 
 			try {
@@ -113,7 +115,14 @@ public abstract class IdQueue extends LinkedBlockingQueue<Integer> {
 					this.put(nextSequence + i);
 				}
 			}
+			catch (final InterruptedException e) {
+				return;
+			}
 			catch (final Throwable e) {
+				if (Thread.currentThread().isInterrupted()) {
+					return;
+				}
+
 				IdQueue.LOG.fatal(e, "Cannot get next id from the database!");
 			}
 		}
@@ -122,9 +131,6 @@ public abstract class IdQueue extends LinkedBlockingQueue<Integer> {
 			Thread.sleep(1);
 		}
 		catch (final InterruptedException e) {}
-		if (!this.idExecuter.isShutdown()) {
-			this.idExecuter.execute(this.topUpTask);
-		}
 	}
 
 	/**

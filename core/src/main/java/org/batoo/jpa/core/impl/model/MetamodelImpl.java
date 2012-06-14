@@ -647,7 +647,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @author hceylan
 	 */
 	public void stopIdGenerators() {
-		this.idGeneratorExecuter.shutdown();
+		this.idGeneratorExecuter.shutdownNow();
 	}
 
 	/**
