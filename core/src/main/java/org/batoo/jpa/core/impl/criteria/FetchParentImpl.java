@@ -578,7 +578,9 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 			mapping.set(instance, child);
 		}
 
-		instances.add(instance);
+		if (instances != null) {
+			instances.add(instance);
+		}
 		session.put(instance);
 
 		for (int i = this.fetches.size() - 1; i >= 0; i--) {
@@ -779,7 +781,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 				final BasicColumn column = basicMapping.getColumn();
 
 				if (mapping == null) {
-					final String field = this.fields.inverse().get(column);
+					final String field = this.idFields.inverse().get(column);
 					final Object value = row.get(field);
 
 					if (value != null) {
@@ -792,7 +794,13 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 					for (final JoinColumn joinColumn : mapping.getForeignKey().getJoinColumns()) {
 						if (joinColumn.getReferencedColumnName().equals(column.getName())) {
 							final String field = this.joinFields.inverse().get(joinColumn);
-							basicMapping.getAttribute().set(id, row.get(field));
+							final Object value = row.get(field);
+
+							if (value != null) {
+								allNull.setValue(false);
+							}
+
+							basicMapping.getAttribute().set(id, value);
 						}
 					}
 				}
