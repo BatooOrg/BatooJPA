@@ -168,8 +168,7 @@ public class SingularAssociationMapping<X, Z> extends AssociationMapping<X, Z, Z
 			this.inverse = (AssociationMapping<Z, X, ?>) this.type.getMapping(this.getMappedBy());
 
 			if (this.inverse == null) {
-				throw new MappingException("Cannot find the mappedBy attribute " + this.getMappedBy() + " specified on "
-					+ this.attribute.getJavaMember());
+				throw new MappingException("Cannot find the mappedBy attribute " + this.getMappedBy() + " specified on " + this.attribute.getJavaMember());
 			}
 
 			this.inverse.setInverse(this);
@@ -192,6 +191,21 @@ public class SingularAssociationMapping<X, Z> extends AssociationMapping<X, Z, Z
 	 */
 	@Override
 	public void load(ManagedInstance<?> instance) {
+		// TODO Auto-generated method stub
+	}
+
+	/**
+	 * Loads the lazy instance
+	 * 
+	 * @param instance
+	 *            the managed instance
+	 * @param id
+	 *            the id of the relation
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void load(ManagedInstance<?> instance, Object id) {
 		// TODO Auto-generated method stub
 	}
 
@@ -219,6 +233,8 @@ public class SingularAssociationMapping<X, Z> extends AssociationMapping<X, Z, Z
 	 */
 	@Override
 	public void setLazy(ManagedInstance<?> instance) {
-		// TODO Auto-generated method stub
+		final EntityTypeImpl<Z> type = this.attribute.getType();
+		final ManagedInstance<Z> value = type.getManagedInstanceById(instance.getSession(), this, instance.getId(), null, true);
+		this.set(instance, value.getInstance());
 	}
 }

@@ -31,7 +31,6 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.ListJoin;
 import javax.persistence.criteria.MapJoin;
-import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Selection;
 import javax.persistence.criteria.SetJoin;
@@ -42,8 +41,9 @@ import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
+import org.batoo.jpa.core.impl.criteria.CompoundExpressionImpl.Comparison;
+import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
@@ -62,11 +62,10 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
  * @author hceylan
  * @since $version
  */
-public class FromImpl<Z, X> extends SelectionImpl<X> implements From<Z, X> {
+public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 
 	private final EntityTypeImpl<X> entity;
 	private final FetchParentImpl<Z, X> fetchRoot;
-	private final RootPathImpl<X> rootPath;
 
 	/**
 	 * @param entity
@@ -76,25 +75,11 @@ public class FromImpl<Z, X> extends SelectionImpl<X> implements From<Z, X> {
 	 * @author hceylan
 	 */
 	public FromImpl(EntityTypeImpl<X> entity) {
-		super();
+		super(entity);
 
 		this.fetchRoot = new FetchParentImpl<Z, X>(entity);
-		this.rootPath = new RootPathImpl<X>(entity, this.fetchRoot);
 
 		this.entity = entity;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public final FromImpl<Z, X> alias(String alias) {
-		super.alias(alias);
-
-		this.rootPath.alias(alias);
-
-		return this;
 	}
 
 	/**
@@ -105,18 +90,6 @@ public class FromImpl<Z, X> extends SelectionImpl<X> implements From<Z, X> {
 	public <X> Expression<X> as(Class<X> type) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	/**
-	 * Returns the description of the root.
-	 * 
-	 * @return the description of the root.
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String describe() {
-		return this.fetchRoot.describe(StringUtils.isNotBlank(this.getAlias()) ? this.getAlias() : this.getModel().getName());
 	}
 
 	/**
@@ -184,6 +157,28 @@ public class FromImpl<Z, X> extends SelectionImpl<X> implements From<Z, X> {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * Returns the restriction based on discrimination.
+	 * 
+	 * @return the restriction based on discrimination, <code>null</code>
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String generateDiscrimination() {
+		return this.fetchRoot.generateDiscrimination();
+	}
+
+	/**
 	 * Returns the generated joins SQL fragment.
 	 * 
 	 * @param query
@@ -195,42 +190,6 @@ public class FromImpl<Z, X> extends SelectionImpl<X> implements From<Z, X> {
 	 */
 	public String generateJoins(CriteriaQueryImpl<?> query) {
 		return this.fetchRoot.generateJoins(query);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public <K, V, M extends Map<K, V>> Expression<M> get(MapAttribute<X, K, V> map) {
-		return this.rootPath.get(map);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public <E, C extends Collection<E>> Expression<C> get(PluralAttribute<X, C, E> collection) {
-		return this.rootPath.get(collection);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public <Y> PathImpl<Y> get(SingularAttribute<? super X, Y> attribute) {
-		return this.rootPath.get(attribute);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public <Y> Path<Y> get(String attributeName) {
-		return this.rootPath.get(attributeName);
 	}
 
 	/**
@@ -306,20 +265,8 @@ public class FromImpl<Z, X> extends SelectionImpl<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public Path<?> getParentPath() {
-		return null;
-	}
-
-	/**
-	 * Returns the restriction based on discrimination.
-	 * 
-	 * @return the restriction based on discrimination, <code>null</code>
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String generateDiscrimination() {
-		return this.fetchRoot.generateDiscrimination();
+	public String getTableAlias(CriteriaQueryImpl<?> query, EntityTable table) {
+		return this.fetchRoot.getTableAlias(query, table);
 	}
 
 	/**
@@ -608,15 +555,5 @@ public class FromImpl<Z, X> extends SelectionImpl<X> implements From<Z, X> {
 	@Override
 	public String toString() {
 		return this.fetchRoot.describe("");
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public ExpressionImpl<Class<? extends X>> type() {
-		return (ExpressionImpl<Class<? extends X>>) this.rootPath;
 	}
 }

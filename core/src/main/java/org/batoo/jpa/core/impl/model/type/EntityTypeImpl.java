@@ -158,6 +158,25 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
+	 * Creates and returns a base query that selects the entity with its eager associations.
+	 * 
+	 * @return the created base query
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public CriteriaQueryImpl<X> createBaseQuery() {
+		final CriteriaBuilderImpl cb = this.getMetamodel().getEntityManagerFactory().getCriteriaBuilder();
+		CriteriaQueryImpl<X> q = cb.createQuery(this.getJavaType());
+		final RootImpl<X> r = q.from(this);
+		q = q.select(r);
+
+		this.prepareEagerAssociations(r, 0, null);
+
+		return q;
+	}
+
+	/**
 	 * Returns if this entity extends the parent entity.
 	 * 
 	 * @param parent
@@ -185,6 +204,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		if (this.constructor != null) {
 			return;
 		}
+
 		synchronized (this) {
 			// other thread got it before us?
 			if (this.constructor != null) {
@@ -194,8 +214,12 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			if (this.constructor == null) {
 				try {
 					final Class<X> enhancedClass = Enhancer.enhance(this);
-					final Constructor<X> constructor = enhancedClass.getConstructor(Class.class, SessionImpl.class, Object.class,
-						Boolean.TYPE);
+					final Constructor<X> constructor = enhancedClass.getConstructor(Class.class, // type
+						SessionImpl.class, // session
+						SingularAssociationMapping.class, // mapping
+						Object.class, // mappingId
+						Object.class, // id
+						Boolean.TYPE); // initialized
 
 					this.constructor = ReflectHelper.createConstructor(constructor);
 				}
@@ -620,8 +644,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			}
 
 			for (final AbstractMapping<? super X, ?> mapping : this.mappings.values()) {
-				if ((mapping.getAttribute() instanceof SingularAttribute)
-					&& ((SingularAttribute<? super X, ?>) mapping.getAttribute()).isId()) {
+				if ((mapping.getAttribute() instanceof SingularAttribute) && ((SingularAttribute<? super X, ?>) mapping.getAttribute()).isId()) {
 					return this.idMapping = (SingularMapping<? super X, ?>) mapping;
 				}
 			}
@@ -655,8 +678,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 			for (final AbstractMapping<? super X, ?> mapping : this.mappings.values()) {
 				// only interested in id mappings
-				if (!(mapping.getAttribute() instanceof SingularAttribute)
-					|| !((SingularAttribute<? super X, ?>) mapping.getAttribute()).isId()) {
+				if (!(mapping.getAttribute() instanceof SingularAttribute) || !((SingularAttribute<? super X, ?>) mapping.getAttribute()).isId()) {
 					continue;
 				}
 
@@ -666,8 +688,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				// must have a corresponding attribute
 				final AttributeImpl<?, ?> attribute = idType.getAttribute(mapping.getAttribute().getName());
 				if ((attribute == null) || (attribute.getClass() != mapping.getAttribute().getClass())) {
-					throw new MappingException("Attribute types mismatch: " + attribute.getJavaMember() + ", "
-						+ mapping.getAttribute().getJavaMember(), attribute.getLocator(), mapping.getAttribute().getLocator());
+					throw new MappingException("Attribute types mismatch: " + attribute.getJavaMember() + ", " + mapping.getAttribute().getJavaMember(),
+						attribute.getLocator(), mapping.getAttribute().getLocator());
 				}
 
 				// attribute must be of basic type
@@ -733,7 +755,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public ManagedInstance<X> getManagedInstanceById(SessionImpl session, Object id) {
-		return this.getManagedInstanceById(session, id, false);
+		return this.getManagedInstanceById(session, null, null, id, false);
 	}
 
 	/**
@@ -741,6 +763,10 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * 
 	 * @param session
 	 *            the session
+	 * @param mapping
+	 *            the mapping
+	 * @param mappingId
+	 *            the mapping id
 	 * @param id
 	 *            the primary key
 	 * @param lazy
@@ -751,22 +777,21 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	@SuppressWarnings({ "unchecked" })
-	public ManagedInstance<X> getManagedInstanceById(SessionImpl session, Object id, boolean lazy) {
+	public ManagedInstance<X> getManagedInstanceById(SessionImpl session, SingularAssociationMapping<?, ?> mapping, Object mappingId, Object id, boolean lazy) {
 		this.enhanceIfNeccessary();
 
-		X instance = null;
 		try {
-			instance = (X) this.constructor.newInstance(new Object[] { this.getJavaType(), session, id, !lazy });
+			final X instance = (X) this.constructor.newInstance(new Object[] { this.getJavaType(), session, mapping, mappingId, id, !lazy });
+
+			final ManagedInstance<X> managedInstance = new ManagedInstance<X>(this, session, instance, id);
+
+			((EnhancedInstance) instance).__enhanced__$$__setManagedInstance(managedInstance);
+
+			return managedInstance;
 		}
-		catch (final Exception e) {
-			e.printStackTrace();
-		} // not possible
+		catch (final Exception e) {} // not possible
 
-		final ManagedInstance<X> managedInstance = new ManagedInstance<X>(this, session, instance, id);
-
-		((EnhancedInstance) instance).__enhanced__$$__setManagedInstance(managedInstance);
-
-		return managedInstance;
+		return null;
 	}
 
 	/**
@@ -837,7 +862,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		return this.rootType;
 	}
 
-	private CriteriaQueryImpl<X> getSelectCriteria(EntityManagerImpl entityManager) {
+	private CriteriaQueryImpl<X> getSelectCriteria() {
 		if (this.selectCriteria != null) {
 			return this.selectCriteria;
 		}
@@ -848,7 +873,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.selectCriteria;
 			}
 
-			final CriteriaBuilderImpl cb = entityManager.getCriteriaBuilder();
+			final CriteriaBuilderImpl cb = this.getMetamodel().getEntityManagerFactory().getCriteriaBuilder();
 			CriteriaQueryImpl<X> q = cb.createQuery(this.getJavaType());
 			final RootImpl<X> r = q.from(this);
 			q = q.select(r);
@@ -1096,8 +1121,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 					break;
 				case ONE_TO_ONE:
 				case MANY_TO_ONE:
-					this.mappings.put(attribute.getName(), new SingularAssociationMapping(null, this,
-						(AssociatedSingularAttribute) attribute));
+					this.mappings.put(attribute.getName(), new SingularAssociationMapping(null, this, (AssociatedSingularAttribute) attribute));
 					break;
 				case MANY_TO_MANY:
 				case ONE_TO_MANY:
@@ -1133,8 +1157,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performInsert(ConnectionImpl connection, EntityTransactionImpl transaction, ManagedInstance<X> managedInstance)
-		throws SQLException {
+	public void performInsert(ConnectionImpl connection, EntityTransactionImpl transaction, ManagedInstance<X> managedInstance) throws SQLException {
 		for (final EntityTable table : this.getTables()) {
 			table.performInsert(connection, managedInstance);
 		}
@@ -1159,8 +1182,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performRemove(ConnectionImpl connection, EntityTransactionImpl transaction, ManagedInstance<X> instance)
-		throws SQLException {
+	public void performRemove(ConnectionImpl connection, EntityTransactionImpl transaction, ManagedInstance<X> instance) throws SQLException {
 	}
 
 	/**
@@ -1176,7 +1198,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public X performSelect(EntityManagerImpl entityManager, ManagedInstance<X> managedInstance) {
-		final TypedQueryImpl<X> q = entityManager.createQuery(this.getSelectCriteria(entityManager));
+		final TypedQueryImpl<X> q = entityManager.createQuery(this.getSelectCriteria());
 
 		// if has single id then pass it on
 		if (this.hasSingleIdAttribute()) {
@@ -1206,8 +1228,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performUpdate(ConnectionImpl connection, EntityTransactionImpl transaction, ManagedInstance<X> instance)
-		throws SQLException {
+	public void performUpdate(ConnectionImpl connection, EntityTransactionImpl transaction, ManagedInstance<X> instance) throws SQLException {
 	}
 
 	/**

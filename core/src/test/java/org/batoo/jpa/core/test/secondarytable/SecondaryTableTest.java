@@ -163,12 +163,10 @@ public class SecondaryTableTest extends BaseCoreTest {
 
 		this.commit();
 
-		Integer count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM FOO",
-			new SingleValueHandler<Integer>());
+		Integer count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM FOO", new SingleValueHandler<Integer>());
 		Assert.assertEquals(new Integer(1), count);
 
-		count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM FOOEXTRA",
-			new SingleValueHandler<Integer>());
+		count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM FOOEXTRA", new SingleValueHandler<Integer>());
 
 		Assert.assertEquals(new Integer(1), count);
 	}
@@ -189,20 +187,17 @@ public class SecondaryTableTest extends BaseCoreTest {
 
 		this.commit();
 
-		Integer count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM PERSON",
-			new SingleValueHandler<Integer>());
+		Integer count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM PERSON", new SingleValueHandler<Integer>());
 		Assert.assertEquals(new Integer(1), count);
 
-		count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM PERSONEXTRA",
-			new SingleValueHandler<Integer>());
+		count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM PERSONEXTRA", new SingleValueHandler<Integer>());
 
 		Assert.assertEquals(new Integer(1), count);
 
 		count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM ADDRESS", new SingleValueHandler<Integer>());
 		Assert.assertEquals(new Integer(3), count);
 
-		count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM ADDRESSEXTRA",
-			new SingleValueHandler<Integer>());
+		count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM ADDRESSEXTRA", new SingleValueHandler<Integer>());
 
 		Assert.assertEquals(new Integer(3), count);
 	}

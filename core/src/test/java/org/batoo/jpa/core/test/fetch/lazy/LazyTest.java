@@ -98,7 +98,6 @@ public class LazyTest extends BaseCoreTest {
 				Assert.assertEquals(LazyTest.COUNTRY_TURKEY, address.getCountry().getName());
 			}
 		}
-
 	}
 
 	/**

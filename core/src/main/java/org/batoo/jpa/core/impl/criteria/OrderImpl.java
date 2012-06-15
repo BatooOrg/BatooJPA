@@ -30,7 +30,7 @@ public class OrderImpl implements Order {
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public Order reverse() {
@@ -40,7 +40,7 @@ public class OrderImpl implements Order {
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public boolean isAscending() {
@@ -50,7 +50,7 @@ public class OrderImpl implements Order {
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public Expression<?> getExpression() {

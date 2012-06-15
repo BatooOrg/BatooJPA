@@ -94,8 +94,7 @@ public class EmbeddableOverrides2Test extends BaseCoreTest {
 
 		this.commit();
 
-		final Integer count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM CUSTOMER",
-			new SingleValueHandler<Integer>());
+		final Integer count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM CUSTOMER", new SingleValueHandler<Integer>());
 		Assert.assertEquals(new Integer(1), count);
 	}
 }

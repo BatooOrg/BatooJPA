@@ -22,7 +22,6 @@ import javax.persistence.metamodel.Type;
 
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 
-
 /**
  * Implementation of {@link Type}.
  * 

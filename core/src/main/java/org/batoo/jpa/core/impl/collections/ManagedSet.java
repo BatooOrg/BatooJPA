@@ -34,13 +34,38 @@ import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
  * @author hceylan
  * @since $version
  */
-public class ManagedSet<X, E> extends HashSet<E> {
+public class ManagedSet<X, E> extends HashSet<E> implements ManagedCollection {
 
 	private final PluralAssociationMapping<?, E, ?> mapping;
 	private final SessionImpl session;
 	private final Object id;
+	private final boolean initialized;
 
 	/**
+	 * Constructor for lazy initialization.
+	 * 
+	 * @param mapping
+	 *            the mapping
+	 * @param session
+	 *            the session
+	 * @param id
+	 *            the id of the root entity
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ManagedSet(PluralAssociationMapping<?, E, ?> mapping, SessionImpl session, Object id) {
+		super();
+		this.session = session;
+
+		this.id = id;
+		this.mapping = mapping;
+		this.initialized = false;
+	}
+
+	/**
+	 * Default constructor.
+	 * 
 	 * @param mapping
 	 *            the mapping
 	 * @param session
@@ -59,5 +84,7 @@ public class ManagedSet<X, E> extends HashSet<E> {
 
 		this.id = id;
 		this.mapping = mapping;
+		this.initialized = true;
 	}
+
 }

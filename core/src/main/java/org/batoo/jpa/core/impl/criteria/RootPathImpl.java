@@ -19,7 +19,6 @@
 package org.batoo.jpa.core.impl.criteria;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import javax.persistence.criteria.Path;
@@ -28,10 +27,7 @@ import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.mutable.MutableInt;
-import org.batoo.jpa.core.impl.criteria.CompoundExpressionImpl.Comparison;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
-import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
@@ -50,26 +46,22 @@ import com.google.common.collect.Maps;
  * @author hceylan
  * @since $version
  */
-public class RootPathImpl<X> extends PathImpl<X> {
+public abstract class RootPathImpl<X> extends PathImpl<X> {
 
 	private final EntityTypeImpl<X> entity;
 	private final Map<String, PathImpl<?>> children = Maps.newHashMap();
-	private final FetchParentImpl<?, X> fetchContext;
 
 	/**
 	 * @param entity
 	 *            the entity type
-	 * @param root
-	 *            the root fetch
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public RootPathImpl(EntityTypeImpl<X> entity, FetchParentImpl<?, X> root) {
+	public RootPathImpl(EntityTypeImpl<X> entity) {
 		super(null);
 
 		this.entity = entity;
-		this.fetchContext = root;
 	}
 
 	/**
@@ -87,16 +79,6 @@ public class RootPathImpl<X> extends PathImpl<X> {
 	 */
 	@Override
 	public String generate(CriteriaQueryImpl<?> query) {
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -185,17 +167,5 @@ public class RootPathImpl<X> extends PathImpl<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String getTableAlias(CriteriaQueryImpl<?> query, EntityTable table) {
-		return this.fetchContext.getTableAlias(query, table);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public List<X> handle(SessionImpl session, BaseTypedQueryImpl<?> query, List<Map<String, Object>> data, MutableInt rowNo) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public abstract String getTableAlias(CriteriaQueryImpl<?> query, EntityTable table);
 }

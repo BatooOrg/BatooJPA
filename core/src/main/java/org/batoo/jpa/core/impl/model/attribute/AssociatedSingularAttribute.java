@@ -53,8 +53,7 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AssociatedSingularAttribute(ManagedTypeImpl<X> declaringType, PersistentAttributeType attributeType,
-		AssociationAttributeMetadata metadata) {
+	public AssociatedSingularAttribute(ManagedTypeImpl<X> declaringType, PersistentAttributeType attributeType, AssociationAttributeMetadata metadata) {
 		super(declaringType, metadata);
 
 		this.attributeType = attributeType;

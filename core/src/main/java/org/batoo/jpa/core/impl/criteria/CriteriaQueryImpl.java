@@ -351,7 +351,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 		builder.append("\n\t").append(Joiner.on(", ").join(roots));
 
 		for (final Root<?> root : this.getRoots()) {
-			final String join = ((RootImpl<?>) root).describe();
+			final String join = ((RootImpl<?>) root).describeJoins();
 			if (StringUtils.isNotBlank(join)) {
 				builder.append("\n").append(join);
 			}
@@ -371,7 +371,12 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	@Override
 	@SuppressWarnings("unchecked")
 	public CriteriaQueryImpl<T> where(Expression<Boolean> restriction) {
-		this.restriction = new PredicateImpl((ExpressionImpl<Boolean>) restriction);
+		if (restriction instanceof PredicateImpl) {
+			this.restriction = (PredicateImpl) restriction;
+		}
+		else {
+			this.restriction = new PredicateImpl((ExpressionImpl<Boolean>) restriction);
+		}
 
 		return this;
 	}

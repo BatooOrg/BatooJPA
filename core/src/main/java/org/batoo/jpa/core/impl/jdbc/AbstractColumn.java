@@ -229,7 +229,7 @@ public abstract class AbstractColumn {
 		final String tableName = this.getTable() != null ? this.getTable().getName() : "N/A";
 		final String mapping = this.getMapping() != null ? " " + this.getMapping().toString() + " " : "";
 
-		return this.getClass().getSimpleName() + mapping + " [name=" + this.getName() + ", type=" + this.getSqlType() + ", length="
-			+ this.getLength() + ", precision=" + this.getPrecision() + ", scale=" + this.getScale() + ", table=" + tableName + "]";
+		return this.getClass().getSimpleName() + mapping + " [name=" + this.getName() + ", type=" + this.getSqlType() + ", length=" + this.getLength()
+			+ ", precision=" + this.getPrecision() + ", scale=" + this.getScale() + ", table=" + tableName + "]";
 	}
 }

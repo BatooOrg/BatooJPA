@@ -49,6 +49,7 @@ import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
+import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.type.BasicTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
@@ -103,6 +104,7 @@ public class MetamodelImpl implements Metamodel {
 	// TODO Consider making this configurable
 	private static final long POLL_TIMEOUT = 60;
 
+	private EntityManagerFactoryImpl emf;
 	private final JdbcAdaptor jdbcAdaptor;
 
 	private final Map<Class<?>, BasicTypeImpl<?>> basics = Maps.newHashMap();
@@ -119,6 +121,8 @@ public class MetamodelImpl implements Metamodel {
 	private ThreadPoolExecutor idGeneratorExecuter;
 
 	/**
+	 * @param entityManagerFactory
+	 *            the entity manager factory
 	 * @param jdbcAdaptor
 	 *            the JDBC Adaptor
 	 * @param metadata
@@ -128,9 +132,10 @@ public class MetamodelImpl implements Metamodel {
 	 * @author hceylan
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public MetamodelImpl(JdbcAdaptor jdbcAdaptor, MetadataImpl metadata) {
+	public MetamodelImpl(EntityManagerFactoryImpl entityManagerFactory, JdbcAdaptor jdbcAdaptor, MetadataImpl metadata) {
 		super();
 
+		this.emf = entityManagerFactory;
 		this.jdbcAdaptor = jdbcAdaptor;
 
 		final List<ManagedTypeMetadata> entities = Lists.newArrayList(metadata.getEntityMappings());
@@ -201,8 +206,7 @@ public class MetamodelImpl implements Metamodel {
 				if (type instanceof EntityMetadata) {
 					// make sure it extends an identifiable type
 					if ((parent != null) && !(parent instanceof IdentifiableTypeImpl)) {
-						throw new MappingException("Entities can only extend MappedSuperclasses or other Entities.", type.getLocator(),
-							parent.getLocator());
+						throw new MappingException("Entities can only extend MappedSuperclasses or other Entities.", type.getLocator(), parent.getLocator());
 					}
 
 					final EntityTypeImpl entity = new EntityTypeImpl(this, (IdentifiableTypeImpl) parent, clazz, (EntityMetadata) type);
@@ -212,19 +216,17 @@ public class MetamodelImpl implements Metamodel {
 				else if (type instanceof MappedSuperclassMetadata) {
 					// make sure it extends a mapped superclass type
 					if ((parent != null) && !(parent instanceof MappedSuperclassTypeImpl)) {
-						throw new MappingException("MappedSuperclasses can only extend other MappedSuperclasses.", type.getLocator(),
-							parent.getLocator());
+						throw new MappingException("MappedSuperclasses can only extend other MappedSuperclasses.", type.getLocator(), parent.getLocator());
 					}
 
-					final MappedSuperclassTypeImpl mappedSuperclass = new MappedSuperclassTypeImpl(this, (MappedSuperclassTypeImpl) parent,
-						clazz, (MappedSuperclassMetadata) type);
+					final MappedSuperclassTypeImpl mappedSuperclass = new MappedSuperclassTypeImpl(this, (MappedSuperclassTypeImpl) parent, clazz,
+						(MappedSuperclassMetadata) type);
 					this.mappedSuperclasses.put(mappedSuperclass.getJavaType(), mappedSuperclass);
 				}
 				if (type instanceof EmbeddableMetadata) {
 					// make sure it extends a embeddable type
 					if ((parent != null) && !(parent instanceof EmbeddableTypeImpl)) {
-						throw new MappingException("Embeddables can only extend a other Embeddables.", type.getLocator(),
-							parent.getLocator());
+						throw new MappingException("Embeddables can only extend a other Embeddables.", type.getLocator(), parent.getLocator());
 					}
 
 					final EmbeddableTypeImpl embeddable = new EmbeddableTypeImpl(this, clazz, (EmbeddableMetadata) type);
@@ -332,6 +334,18 @@ public class MetamodelImpl implements Metamodel {
 	}
 
 	/**
+	 * Returns the entity manager factory.
+	 * 
+	 * @return the entity manager factory
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public EntityManagerFactoryImpl getEntityManagerFactory() {
+		return this.emf;
+	}
+
+	/**
 	 * Returns the identifiable types.
 	 * 
 	 * @return the identifiable types
@@ -390,8 +404,7 @@ public class MetamodelImpl implements Metamodel {
 			return this.sequenceQueues.get(generator).poll(MetamodelImpl.POLL_TIMEOUT, TimeUnit.SECONDS);
 		}
 		catch (final InterruptedException e) {
-			throw new PersistenceException("Unable to retrieve next sequence " + generator + " in allowed " + MetamodelImpl.POLL_TIMEOUT
-				+ " seconds");
+			throw new PersistenceException("Unable to retrieve next sequence " + generator + " in allowed " + MetamodelImpl.POLL_TIMEOUT + " seconds");
 		}
 	}
 
@@ -410,8 +423,7 @@ public class MetamodelImpl implements Metamodel {
 			return this.tableIdQueues.get(generator).poll(MetamodelImpl.POLL_TIMEOUT, TimeUnit.SECONDS);
 		}
 		catch (final InterruptedException e) {
-			throw new PersistenceException("Unable to retrieve next sequence " + generator + " in allowed " + MetamodelImpl.POLL_TIMEOUT
-				+ " seconds");
+			throw new PersistenceException("Unable to retrieve next sequence " + generator + " in allowed " + MetamodelImpl.POLL_TIMEOUT + " seconds");
 		}
 	}
 
@@ -524,8 +536,7 @@ public class MetamodelImpl implements Metamodel {
 	public void performSequencesDdl(DataSourceImpl datasource, DDLMode ddlMode) {
 		for (final SequenceGenerator sequenceGenerator : this.sequenceGenerators.values()) {
 			try {
-				MetamodelImpl.LOG.info("Performing DDL operations for sequence generators for {0}, mode {1}", sequenceGenerator.getName(),
-					ddlMode);
+				MetamodelImpl.LOG.info("Performing DDL operations for sequence generators for {0}, mode {1}", sequenceGenerator.getName(), ddlMode);
 
 				this.jdbcAdaptor.createSequenceIfNecessary(datasource, sequenceGenerator);
 			}
@@ -549,8 +560,7 @@ public class MetamodelImpl implements Metamodel {
 	public void performTableGeneratorsDdl(DataSourceImpl datasource, DDLMode ddlMode) {
 		for (final TableGenerator tableGenerator : this.tableGenerators.values()) {
 			try {
-				MetamodelImpl.LOG.info("Performing DDL operations for sequence generators for mode table {1}, mode {0}",
-					tableGenerator.getName(), ddlMode);
+				MetamodelImpl.LOG.info("Performing DDL operations for sequence generators for mode table {1}, mode {0}", tableGenerator.getName(), ddlMode);
 
 				this.jdbcAdaptor.createTableGeneratorIfNecessary(datasource, tableGenerator);
 			}
@@ -631,8 +641,8 @@ public class MetamodelImpl implements Metamodel {
 			new GeneratorThreadFactory());
 
 		for (final SequenceGenerator generator : this.sequenceGenerators.values()) {
-			this.sequenceQueues.put(generator.getName(), new SequenceQueue(this.jdbcAdaptor, datasource, this.idGeneratorExecuter,
-				generator.getSequenceName(), generator.getAllocationSize()));
+			this.sequenceQueues.put(generator.getName(), new SequenceQueue(this.jdbcAdaptor, datasource, this.idGeneratorExecuter, generator.getSequenceName(),
+				generator.getAllocationSize()));
 		}
 
 		for (final TableGenerator generator : this.tableGenerators.values()) {

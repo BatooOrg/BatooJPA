@@ -295,8 +295,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 			case Types.DOUBLE:
 				return "DOUBLE" + (cd.getPrecision() > 0 ? "(" + cd.getPrecision() + ")" : "");
 			case Types.DECIMAL:
-				return "DECIMAL"
-					+ (cd.getPrecision() > 0 ? "(" + cd.getPrecision() + (cd.getScale() > 0 ? "," + cd.getScale() : "") + ")" : "");
+				return "DECIMAL" + (cd.getPrecision() > 0 ? "(" + cd.getPrecision() + (cd.getScale() > 0 ? "," + cd.getScale() : "") + ")" : "");
 		}
 
 		throw new IllegalArgumentException("Unhandled sql type: " + sqlType);
@@ -404,8 +403,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 			});
 		}
 		catch (final IOException e) {
-			throw new MappingException("Broken JDBC Adapter " + this.getClass().getSimpleName()
-				+ ". Reserved words for the adapter cannot be loaded");
+			throw new MappingException("Broken JDBC Adapter " + this.getClass().getSimpleName() + ". Reserved words for the adapter cannot be loaded");
 		}
 	}
 

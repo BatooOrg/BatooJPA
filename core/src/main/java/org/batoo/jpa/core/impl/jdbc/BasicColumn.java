@@ -70,8 +70,7 @@ public class BasicColumn extends AbstractColumn {
 		this.locator = metadata != null ? metadata.getLocator() : null;
 		this.sqlType = sqlType;
 
-		this.mappingName = (metadata != null) && StringUtils.isNotBlank(metadata.getName()) ? metadata.getName()
-			: this.mapping.getAttribute().getName();
+		this.mappingName = (metadata != null) && StringUtils.isNotBlank(metadata.getName()) ? metadata.getName() : this.mapping.getAttribute().getName();
 		this.name = this.jdbcAdaptor.escape(this.mappingName);
 
 		this.tableName = metadata != null ? metadata.getTable() : "";

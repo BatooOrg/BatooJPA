@@ -112,8 +112,7 @@ public class TableGeneratorTest extends BaseCoreTest {
 
 		this.commit();
 
-		final Integer count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM FOO",
-			new SingleValueHandler<Integer>());
+		final Integer count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM FOO", new SingleValueHandler<Integer>());
 		Assert.assertEquals(new Integer(1), count);
 	}
 }

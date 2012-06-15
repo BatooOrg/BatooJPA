@@ -24,6 +24,7 @@ import java.util.Map;
 
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 
+import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
@@ -75,8 +76,7 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 		final AssociationMetadata metadata = this.getAssociationMetadata();
 
 		if (this.isOwner()) {
-			if ((this.getAttribute().getPersistentAttributeType() == PersistentAttributeType.MANY_TO_MANY)
-				|| (metadata.getJoinColumns().size() == 0)) {
+			if ((this.getAttribute().getPersistentAttributeType() == PersistentAttributeType.MANY_TO_MANY) || (metadata.getJoinColumns().size() == 0)) {
 				this.joinTable = new JoinTable(entity, metadata.getJoinTable());
 			}
 			else {
@@ -194,8 +194,7 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 			this.inverse = (AssociationMapping<Z, X, ?>) this.type.getMapping(this.getMappedBy());
 
 			if (this.inverse == null) {
-				throw new MappingException("Cannot find the mappedBy attribute " + this.getMappedBy() + " specified on "
-					+ this.attribute.getJavaMember());
+				throw new MappingException("Cannot find the mappedBy attribute " + this.getMappedBy() + " specified on " + this.attribute.getJavaMember());
 			}
 
 			this.inverse.setInverse(this);
@@ -244,8 +243,14 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 	@Override
 	@SuppressWarnings({ "unchecked" })
 	public void set(ManagedInstance<?> managedInstance, Object instance, Object value) {
-		final C collection = this.attribute.newCollection(this, managedInstance.getSession(), managedInstance.getId(),
-			(Collection<? extends Z>) value);
+		C collection;
+
+		if (value instanceof ManagedCollection) {
+			collection = (C) value;
+		}
+		else {
+			collection = this.attribute.newCollection(this, managedInstance.getSession(), managedInstance.getId(), (Collection<? extends Z>) value);
+		}
 
 		super.set(managedInstance, instance, collection);
 	}
@@ -265,7 +270,6 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 	 */
 	@Override
 	public void setLazy(ManagedInstance<?> instance) {
-		// TODO Auto-generated method stub
-
+		this.set(instance, this.attribute.newCollection(this, instance.getSession(), instance.getId()));
 	}
 }

@@ -405,8 +405,7 @@ public class JoinColumn extends AbstractColumn {
 			this.name = jdbcAdaptor.escape(this.mappingName);
 		}
 		else {
-			this.mappingName = ((EntityTypeImpl<?>) referencedMapping.getEntity()).getName() + "_"
-				+ referencedMapping.getColumn().getName();
+			this.mappingName = ((EntityTypeImpl<?>) referencedMapping.getEntity()).getName() + "_" + referencedMapping.getColumn().getName();
 			this.name = jdbcAdaptor.escape(this.mappingName);
 		}
 

@@ -47,8 +47,7 @@ public class MappedSuperclassTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 	 * @since $version
 	 * @author hceylan
 	 */
-	public MappedSuperclassTypeImpl(MetamodelImpl metamodel, MappedSuperclassTypeImpl<? super X> parent, Class<X> javaType,
-		MappedSuperclassMetadata metadata) {
+	public MappedSuperclassTypeImpl(MetamodelImpl metamodel, MappedSuperclassTypeImpl<? super X> parent, Class<X> javaType, MappedSuperclassMetadata metadata) {
 
 		super(metamodel, parent, javaType, metadata);
 

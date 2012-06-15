@@ -78,9 +78,9 @@ public class SubRepository<X> {
 	 * @author hceylan
 	 */
 	public void put(ManagedInstance<? extends X> instance) {
-		if (this.repository.containsKey(instance)) {
-			throw new PersistenceException("Type " + instance.getType().getName() + " with id " + instance.getId()
-				+ " already exists in session");
+		final ManagedInstance<? extends X> existing = this.repository.get(instance);
+		if ((existing != null) && (existing != instance)) {
+			throw new PersistenceException("Type " + instance.getType().getName() + " with id " + instance.getId() + " already exists in session");
 		}
 
 		this.repository.put(instance, instance);

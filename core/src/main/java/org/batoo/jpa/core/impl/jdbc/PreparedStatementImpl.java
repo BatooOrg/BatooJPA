@@ -88,8 +88,7 @@ public class PreparedStatementImpl implements PreparedStatement {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PreparedStatementImpl(ConnectionImpl connection, String sql, PreparedStatement statement,
-		GenericKeyedPool<String, PreparedStatementImpl> pool) {
+	public PreparedStatementImpl(ConnectionImpl connection, String sql, PreparedStatement statement, GenericKeyedPool<String, PreparedStatementImpl> pool) {
 		super();
 
 		this.connection = connection;
@@ -193,15 +192,15 @@ public class PreparedStatementImpl implements PreparedStatement {
 		try {
 			this.statement.close();
 
-			PreparedStatementImpl.LOG.trace("{0}:{1}, used for {2} msecs, executes= {3}, selects= {4}", this.connection.connNo,
-				this.statementNo, System.currentTimeMillis() - this.opened, this.executes, this.selects);
+			PreparedStatementImpl.LOG.trace("{0}:{1}, used for {2} msecs, executes= {3}, selects= {4}", this.connection.connNo, this.statementNo,
+				System.currentTimeMillis() - this.opened, this.executes, this.selects);
 		}
 		finally {
 			final long time = System.currentTimeMillis() - start;
 
 			if (time > BJPASettings.WARN_TIME) {
-				PreparedStatementImpl.LOG.trace(new OperationTookLongTimeWarning(), "{0}:{1}:{2} {3} msecs, close()",
-					this.connection.connNo, this.statementNo, executeNo, time);
+				PreparedStatementImpl.LOG.trace(new OperationTookLongTimeWarning(), "{0}:{1}:{2} {3} msecs, close()", this.connection.connNo, this.statementNo,
+					executeNo, time);
 			}
 			else {
 				PreparedStatementImpl.LOG.trace("{0}:{1}:{2} {3} msecs, close()", this.connection.connNo, this.statementNo, executeNo, time);
@@ -304,12 +303,11 @@ public class PreparedStatementImpl implements PreparedStatement {
 			final long time = System.currentTimeMillis() - start;
 
 			if (time > BJPASettings.WARN_TIME) {
-				PreparedStatementImpl.LOG.warn(new OperationTookLongTimeWarning(), "{0}:{1}:{2} {3} msecs, executeQuery()",
-					this.connection.connNo, this.statementNo, executeNo, time);
+				PreparedStatementImpl.LOG.warn(new OperationTookLongTimeWarning(), "{0}:{1}:{2} {3} msecs, executeQuery()", this.connection.connNo,
+					this.statementNo, executeNo, time);
 			}
 			else {
-				PreparedStatementImpl.LOG.trace("{0}:{1}:{2} {3} msecs, executeQuery()", this.connection.connNo, this.statementNo,
-					executeNo, time);
+				PreparedStatementImpl.LOG.trace("{0}:{1}:{2} {3} msecs, executeQuery()", this.connection.connNo, this.statementNo, executeNo, time);
 			}
 		}
 	}
@@ -350,12 +348,11 @@ public class PreparedStatementImpl implements PreparedStatement {
 			final long time = System.currentTimeMillis() - start;
 
 			if (time > BJPASettings.WARN_TIME) {
-				PreparedStatementImpl.LOG.warn(new OperationTookLongTimeWarning(), "{0}:{1}:{2} {3} msecs, executeUpdate()",
-					this.connection.connNo, this.statementNo, executeNo, time);
+				PreparedStatementImpl.LOG.warn(new OperationTookLongTimeWarning(), "{0}:{1}:{2} {3} msecs, executeUpdate()", this.connection.connNo,
+					this.statementNo, executeNo, time);
 			}
 			else {
-				PreparedStatementImpl.LOG.debug("{0}:{1}:{2} {3} msecs, executeUpdate()", this.connection.connNo, this.statementNo,
-					executeNo, time);
+				PreparedStatementImpl.LOG.debug("{0}:{1}:{2} {3} msecs, executeUpdate()", this.connection.connNo, this.statementNo, executeNo, time);
 			}
 		}
 	}

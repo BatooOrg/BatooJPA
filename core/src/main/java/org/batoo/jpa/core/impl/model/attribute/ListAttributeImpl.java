@@ -70,8 +70,16 @@ public class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E>, E> 
 	 * 
 	 */
 	@Override
-	public List<E> newCollection(PluralAssociationMapping<?, E, List<E>> mapping, SessionImpl session, Object id,
-		Collection<? extends E> values) {
+	public List<E> newCollection(PluralAssociationMapping<?, E, List<E>> mapping, SessionImpl session, Object id) {
+		return new ManagedList<X, E>(mapping, session, id);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<E> newCollection(PluralAssociationMapping<?, E, List<E>> mapping, SessionImpl session, Object id, Collection<? extends E> values) {
 		return new ManagedList<X, E>(mapping, session, id, values);
 	}
 }

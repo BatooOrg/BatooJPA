@@ -153,13 +153,10 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	}
 
 	/**
-	 * Returns the mapping of the FetchImpl.
+	 * {@inheritDoc}
 	 * 
-	 * @return the mapping of the FetchImpl
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
+	@Override
 	public AssociationMapping<? super Z, X, ?> getMapping() {
 		return this.mapping;
 	}

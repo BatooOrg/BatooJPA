@@ -93,7 +93,7 @@ public class CompoundExpressionImpl extends ExpressionImpl<Boolean> {
 	 */
 	@Override
 	public String describe() {
-		return this.x + this.comparison.getFragment() + this.y;
+		return this.x.describe() + this.comparison.getFragment() + this.y.describe();
 	}
 
 	/**

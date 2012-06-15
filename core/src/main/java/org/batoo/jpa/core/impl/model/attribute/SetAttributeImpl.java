@@ -70,8 +70,16 @@ public class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>, E> im
 	 * 
 	 */
 	@Override
-	public Set<E> newCollection(PluralAssociationMapping<?, E, Set<E>> mapping, SessionImpl session, Object id,
-		Collection<? extends E> values) {
+	public Set<E> newCollection(PluralAssociationMapping<?, E, Set<E>> mapping, SessionImpl session, Object id) {
+		return new ManagedSet<X, E>(mapping, session, id);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Set<E> newCollection(PluralAssociationMapping<?, E, Set<E>> mapping, SessionImpl session, Object id, Collection<? extends E> values) {
 		return new ManagedSet<X, E>(mapping, session, id, values);
 	}
 }

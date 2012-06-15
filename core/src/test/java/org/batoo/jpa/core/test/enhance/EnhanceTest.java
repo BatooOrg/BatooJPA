@@ -24,6 +24,7 @@ import javax.persistence.metamodel.EntityType;
 
 import org.batoo.jpa.core.impl.instance.Enhancer;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 import org.batoo.jpa.core.test.BaseCoreTest;
 import org.junit.Test;
 
@@ -48,10 +49,9 @@ public class EnhanceTest extends BaseCoreTest {
 		final EntityType<Person> type = this.em().getMetamodel().entity(Person.class);
 
 		final Class<? extends Person> enhanced = Enhancer.enhance(type);
-
-		final Constructor<? extends Person> constructor = enhanced.getConstructor(Class.class, SessionImpl.class, Object.class,
-			boolean.class);
-		final Person newInstance = constructor.newInstance(null, null, null, true);
+		final Constructor<? extends Person> constructor = enhanced.getConstructor(Class.class, SessionImpl.class, SingularAssociationMapping.class,
+			Object.class, Object.class, boolean.class);
+		final Person newInstance = constructor.newInstance(null, null, null, null, null, true);
 
 		System.out.println(newInstance);
 	}

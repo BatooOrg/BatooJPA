@@ -131,8 +131,8 @@ public class EmbeddedAttributePathImpl<X> extends PathImpl<X> {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter,
-		EmbeddedMapping<?, ?> mapping, final List<String> fragments) {
+	private void generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter, EmbeddedMapping<?, ?> mapping,
+		final List<String> fragments) {
 		for (final AbstractMapping<?, ?> child : mapping.getMappings()) {
 			// handle basic mapping
 			if (child instanceof BasicMapping) {

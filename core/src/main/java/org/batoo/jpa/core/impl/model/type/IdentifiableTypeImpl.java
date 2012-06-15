@@ -78,8 +78,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * @since $version
 	 * @author hceylan
 	 */
-	public IdentifiableTypeImpl(MetamodelImpl metamodel, IdentifiableTypeImpl<? super X> supertype, Class<X> javaType,
-		IdentifiableTypeMetadata metadata) {
+	public IdentifiableTypeImpl(MetamodelImpl metamodel, IdentifiableTypeImpl<? super X> supertype, Class<X> javaType, IdentifiableTypeMetadata metadata) {
 		super(metamodel, javaType, metadata);
 
 		this.supertype = supertype;
@@ -118,8 +117,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 
 			if (basicAttribute.isVersion()) {
 				if (this.versionAttribute != null) {
-					throw new MappingException("Multiple version attributes not supported.", this.versionAttribute.getLocator(),
-						attribute.getLocator());
+					throw new MappingException("Multiple version attributes not supported.", this.versionAttribute.getLocator(), attribute.getLocator());
 				}
 
 				if (attribute.getDeclaringType() == this) {
@@ -272,8 +270,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 				final EmbeddableTypeImpl<?> embeddable = this.getMetamodel().embeddable(clazz);
 
 				if (embeddable == null) {
-					throw new MappingException("IdClass " + clazz + " does not have a corresponding embeddable type.",
-						metadata.getLocator());
+					throw new MappingException("IdClass " + clazz + " does not have a corresponding embeddable type.", metadata.getLocator());
 				}
 
 				return embeddable;

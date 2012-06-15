@@ -43,8 +43,7 @@ public class SequenceGenerator extends AbstractGenerator {
 	public SequenceGenerator(SequenceGeneratorMetadata metadata) {
 		super(metadata);
 
-		this.sequenceName = (metadata != null) && StringUtils.isNotBlank(metadata.getName()) ? metadata.getName()
-			: SequenceGenerator.DEFAULT_SEQUENCE_NAME;
+		this.sequenceName = (metadata != null) && StringUtils.isNotBlank(metadata.getName()) ? metadata.getName() : SequenceGenerator.DEFAULT_SEQUENCE_NAME;
 	}
 
 	/**

@@ -16,27 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import org.apache.commons.dbutils.ResultSetHandler;
+package org.batoo.jpa.core.impl.collections;
 
 /**
+ * Marker interface for managed collections.
  * 
  * @author hceylan
  * @since $version
  */
-public class NullResultSetHandler implements ResultSetHandler<Object> {
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	public Object handle(ResultSet rs) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-}
+public interface ManagedCollection {}

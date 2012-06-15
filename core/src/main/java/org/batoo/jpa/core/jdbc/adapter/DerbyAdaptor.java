@@ -83,14 +83,13 @@ public class DerbyAdaptor extends JdbcAdaptor {
 		final String referenceTableName = foreignKey.getReferencedTableName();
 		final String tableName = foreignKey.getTable().getName();
 
-		final String foreignKeyColumns = Joiner.on(", ").join(
-			Lists.transform(foreignKey.getJoinColumns(), new Function<JoinColumn, String>() {
+		final String foreignKeyColumns = Joiner.on(", ").join(Lists.transform(foreignKey.getJoinColumns(), new Function<JoinColumn, String>() {
 
-				@Override
-				public String apply(JoinColumn input) {
-					return input.getReferencedColumnName();
-				}
-			}));
+			@Override
+			public String apply(JoinColumn input) {
+				return input.getReferencedColumnName();
+			}
+		}));
 
 		final String keyColumns = Joiner.on(", ").join(Lists.transform(foreignKey.getJoinColumns(), new Function<JoinColumn, String>() {
 

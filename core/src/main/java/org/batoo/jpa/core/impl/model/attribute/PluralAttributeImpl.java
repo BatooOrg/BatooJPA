@@ -72,8 +72,7 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 * @author hceylan
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static <X> PluralAttributeImpl<X, ?, ?> create(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata,
-		PersistentAttributeType attributeType) {
+	public static <X> PluralAttributeImpl<X, ?, ?> create(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata, PersistentAttributeType attributeType) {
 		final Member member = ((AttributeMetadataImpl) metadata).getMember();
 
 		Class<?> type;
@@ -122,8 +121,7 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 
 		this.attributeType = attributeType;
 
-		if ((metadata instanceof AssociationAttributeMetadata)
-			&& StringUtils.isNotBlank(((AssociationAttributeMetadata) metadata).getTargetEntity())) {
+		if ((metadata instanceof AssociationAttributeMetadata) && StringUtils.isNotBlank(((AssociationAttributeMetadata) metadata).getTargetEntity())) {
 			try {
 				this.bindableJavaType = (Class<E>) Class.forName(((AssociationAttributeMetadata) metadata).getTargetEntity());
 			}
@@ -209,6 +207,22 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	}
 
 	/**
+	 * Creates a new lazy initialized managed collection to track changes.
+	 * 
+	 * @param mapping
+	 *            the mapping
+	 * @param session
+	 *            the session
+	 * @param id
+	 *            the id of the root entity
+	 * @return the lazy initialized managed collection
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract C newCollection(PluralAssociationMapping<?, E, C> mapping, SessionImpl session, Object id);
+
+	/**
 	 * Creates a new managed collection to track changes.
 	 * 
 	 * @param mapping
@@ -224,8 +238,7 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract C newCollection(PluralAssociationMapping<?, E, C> mapping, SessionImpl session, Object id,
-		Collection<? extends E> values);
+	public abstract C newCollection(PluralAssociationMapping<?, E, C> mapping, SessionImpl session, Object id, Collection<? extends E> values);
 
 	/**
 	 * {@inheritDoc}

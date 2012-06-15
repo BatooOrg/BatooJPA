@@ -20,8 +20,10 @@ package org.batoo.jpa.core.impl.criteria;
 
 import javax.persistence.criteria.Root;
 
+import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.util.BatooUtils;
 
 /**
  * A root type in the from clause. Query roots always reference entities.
@@ -42,6 +44,20 @@ public class RootImpl<X> extends FromImpl<X, X> implements Root<X> {
 	 */
 	public RootImpl(EntityTypeImpl<X> entity) {
 		super(entity);
+	}
+
+	/**
+	 * Returns the join descriptions.
+	 * 
+	 * @return the join descriptions
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String describeJoins() {
+		final String root = StringUtils.isNotBlank(this.getAlias()) ? this.getAlias() : this.getModel().getName();
+
+		return BatooUtils.indent(this.getFetchRoot().describe(root));
 	}
 
 	/**

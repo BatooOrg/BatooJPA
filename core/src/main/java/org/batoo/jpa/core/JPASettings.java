@@ -115,9 +115,8 @@ public interface JPASettings extends BJPASettings {
 	public static final String REMOVE_VALIDATION_GROUP = "javax.persistence.validation.group.pre-remove";
 
 	/**
-	 * Used to indicate whether second-level (what JPA terms shared cache)
-	 * caching is
-	 * enabled as per the rules defined in JPA 2 section 3.1.7.
+	 * Used to indicate whether second-level (what JPA terms shared cache) caching is enabled as per the rules defined in JPA 2 section
+	 * 3.1.7.
 	 * <p/>
 	 * See JPA 2 sections 9.4.3 and 8.2.1.7
 	 * 
@@ -163,9 +162,7 @@ public interface JPASettings extends BJPASettings {
 	public static final String VALIDATION_FACTORY = "javax.persistence.validation.factory";
 
 	/**
-	 * Used to indicate what form of automatic validation is in effect as per
-	 * rules defined
-	 * in JPA 2 section 3.6.1.1
+	 * Used to indicate what form of automatic validation is in effect as per rules defined in JPA 2 section 3.6.1.1
 	 * <p/>
 	 * See JPA 2 sections 9.4.3 and 8.2.1.8
 	 * 

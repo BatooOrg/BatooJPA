@@ -33,12 +33,16 @@ import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.Type;
 
+import org.apache.commons.lang.mutable.MutableBoolean;
 import org.apache.commons.lang.mutable.MutableInt;
+import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.jdbc.DiscriminatorColumn;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
+import org.batoo.jpa.core.impl.jdbc.JoinColumn;
+import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.jdbc.SecondaryTable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
@@ -79,10 +83,15 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 
 	private String alias;
 	private String primaryTableAlias;
+	private String discriminatorAlias;
+
 	private final HashBiMap<String, SecondaryTable> tableAliases = HashBiMap.create();
 	private final HashBiMap<String, AbstractColumn> fields = HashBiMap.create();
+	private final HashBiMap<String, AbstractColumn> idFields = HashBiMap.create();
+	private final HashBiMap<String, AbstractColumn> joinFields = HashBiMap.create();
+	private final List<SingularAssociationMapping<?, ?>> joins = Lists.newArrayList();
+
 	private int nextTableAlias = 0;
-	private String discriminatorAlias;
 
 	/**
 	 * @param entity
@@ -105,6 +114,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	 * @return the description of the fetch *
 	 */
 	public String describe(final String parent) {
+		final StringBuilder description = new StringBuilder();
 		final List<String> fetches = Lists.transform(this.fetches, new Function<FetchImpl<X, ?>, String>() {
 
 			@Override
@@ -113,7 +123,9 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 			}
 		});
 
-		return BatooUtils.indent(Joiner.on("\n").join(fetches));
+		description.append(Joiner.on("\n").join(fetches));
+
+		return BatooUtils.indent(description.toString());
 	}
 
 	/**
@@ -232,8 +244,8 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 			}
 		});
 
-		return this.primaryTableAlias + "." + this.entity.getRootType().getDiscriminatorColumn().getName() + " IN ("
-			+ Joiner.on(",").join(discriminators) + ")";
+		return this.primaryTableAlias + "." + this.entity.getRootType().getDiscriminatorColumn().getName() + " IN (" + Joiner.on(",").join(discriminators)
+			+ ")";
 	}
 
 	private String generateImpl(CriteriaQueryImpl<?> query) {
@@ -254,6 +266,20 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 				final String field = Joiner.on(".").skipNulls().join(tableAlias, column.getName());
 				if (column instanceof DiscriminatorColumn) {
 					this.discriminatorAlias = fieldAlias;
+				}
+				else if (column instanceof PkColumn) {
+					this.idFields.put(fieldAlias, column);
+				}
+				else if (column.getMapping() instanceof SingularAssociationMapping) {
+					final SingularAssociationMapping<?, ?> mapping = (SingularAssociationMapping<?, ?>) column.getMapping();
+
+					// if we are on a join on that path then ignore
+					if (this.ignoreJoin(mapping)) {
+						continue;
+					}
+
+					this.joins.add(mapping);
+					this.joinFields.put(fieldAlias, column);
 				}
 				else {
 					this.fields.put(fieldAlias, column);
@@ -329,24 +355,56 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 			final SingularMapping<? super X, ?> idMapping = this.entity.getIdMapping();
 			if (idMapping instanceof BasicMapping) {
 				final BasicColumn column = ((BasicMapping<? super X, ?>) idMapping).getColumn();
-				final String field = this.fields.inverse().get(column);
+				final String field = this.idFields.inverse().get(column);
 
 				return row.get(field);
 			}
 
-			if (idMapping instanceof EmbeddedMapping) {
-				final EmbeddedMapping<? super X, ?> mapping = (EmbeddedMapping<? super X, ?>) idMapping;
+			final MutableBoolean allNull = new MutableBoolean(true);
+			final Object id = this.populateEmbeddedId(row, (EmbeddedMapping<? super X, ?>) idMapping, null, allNull);
 
-				return this.populateEmbeddedId(row, mapping);
-			}
+			return allNull.booleanValue() ? null : id;
 		}
 
 		final Object id = ((EmbeddableTypeImpl<?>) this.entity.getIdType()).newInstance();
 		for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.entity.getIdMappings()) {
 			final BasicColumn column = pair.getFirst().getColumn();
-			final String field = this.fields.inverse().get(column);
+			final String field = this.idFields.inverse().get(column);
 
 			pair.getSecond().set(id, row.get(field));
+		}
+
+		return id;
+	}
+
+	private Object getId(SingularAssociationMapping<?, ?> mapping, Map<String, Object> row) {
+		final EntityTypeImpl<?> entity = mapping.getType();
+		if (entity.hasSingleIdAttribute()) {
+			final SingularMapping<?, ?> idMapping = entity.getIdMapping();
+			if (idMapping instanceof BasicMapping) {
+				final JoinColumn joinColumn = mapping.getForeignKey().getJoinColumns().get(0);
+				final String field = this.joinFields.inverse().get(joinColumn);
+				return row.get(field);
+			}
+
+			final MutableBoolean allNull = new MutableBoolean(true);
+			final Object id = this.populateEmbeddedId(row, (EmbeddedMapping<?, ?>) idMapping, null, allNull);
+
+			return allNull.booleanValue() ? null : id;
+		}
+
+		final Object id = ((EmbeddableTypeImpl<?>) entity.getIdType()).newInstance();
+		for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.entity.getIdMappings()) {
+			final BasicColumn column = pair.getFirst().getColumn();
+
+			for (final JoinColumn joinColumn : mapping.getForeignKey().getJoinColumns()) {
+				if (joinColumn.getReferencedColumnName().equals(column.getName())) {
+					final String field = this.joinFields.inverse().get(joinColumn);
+					pair.getSecond().set(id, row.get(field));
+
+					break;
+				}
+			}
 		}
 
 		return id;
@@ -383,6 +441,50 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 		}
 
 		return this.entity.getManagedInstanceById(session, id);
+	}
+
+	/**
+	 * Returns the associate either from the session or by creating a lazy instance.
+	 * 
+	 * @param session
+	 *            the session
+	 * @param mapping
+	 *            the mapping
+	 * @param row
+	 *            the row data
+	 * @return the instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private Object getInstance(SessionImpl session, SingularAssociationMapping<?, ?> mapping, Map<String, Object> row) {
+		final Object id = this.getId(mapping, row);
+		if (id == null) {
+			return null;
+		}
+
+		ManagedInstance<?> instance = mapping.getType().getManagedInstanceById(session, id);
+		final ManagedInstance<?> managedInstance = session.get(instance);
+		if (managedInstance != null) {
+			return managedInstance.getInstance();
+		}
+
+		instance = mapping.getType().getManagedInstanceById(session, null, null, id, true);
+		session.put(instance);
+
+		return instance.getInstance();
+	}
+
+	/**
+	 * Returns the mapping of the fetch.
+	 * 
+	 * @return the mapping of the fetch or <code>null</code> if the fetch is root
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public AssociationMapping<? super Z, X, ?> getMapping() {
+		return null;
 	}
 
 	/**
@@ -463,96 +565,17 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 		});
 	}
 
-	/**
-	 * Handles the row for multiple results.
-	 * 
-	 * @param session
-	 *            the session
-	 * @param query
-	 *            the query
-	 * @param data
-	 *            the resultset data
-	 * @param parent
-	 *            the parent instance
-	 * @param rowNo
-	 *            the current row no
-	 * @param jumpSize
-	 *            the jump size
-	 * @return the list of instances
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	protected List<ManagedInstance<? extends X>> handleMulti(SessionImpl session, BaseTypedQueryImpl<?> query,
-		List<Map<String, Object>> data, ManagedInstance<?> parent, MutableInt rowNo, int jumpSize) {
-		final List<ManagedInstance<? extends X>> instances = Lists.newArrayList();
-
-		while ((rowNo.intValue() < data.size())) {
-			final ManagedInstance<? extends X> instance = this.handleSingle(instances, session, query, data, parent, rowNo, jumpSize);
-			if (instance == null) {
-				break;
-			}
-		}
-
-		return instances;
-	}
-
-	/**
-	 * Handles the row for a single result.
-	 * 
-	 * @param instances
-	 *            the instances already loaded
-	 * @param session
-	 *            the session
-	 * @param query
-	 *            the query
-	 * @param data
-	 *            the resultset data
-	 * @param parent
-	 *            the parent instance
-	 * @param rowNo
-	 *            the current row no
-	 * @param jumpSize
-	 *            the jump size
-	 * @return the managed instance
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	protected ManagedInstance<? extends X> handleSingle(List<ManagedInstance<? extends X>> instances, SessionImpl session,
-		BaseTypedQueryImpl<?> query, List<Map<String, Object>> data, ManagedInstance<?> parent, MutableInt rowNo, int jumpSize) {
-		int leap = jumpSize;
-
-		final Map<String, Object> row = data.get(rowNo.intValue());
-
-		// if id is null then break
-		final ManagedInstance<? extends X> instance = this.getInstance(session, row);
-		if (instance == null) {
-			return null;
-		}
-
-		// if different parent then break
-		if (!this.shouldContinue(session, parent, row)) {
-			return null;
-		}
-
-		// if we processed the same instance then break
-		if ((instances != null) && instances.contains(instance)) {
-			return null;
-		}
-
-		final ManagedInstance<? extends X> managedInstance = session.get(instance);
-		if (managedInstance != null) {
-			instances.add(managedInstance);
-			rowNo.add(leap);
-
-			return managedInstance;
-		}
-
+	private ManagedInstance<? extends X> handleInstance(List<ManagedInstance<? extends X>> instances, SessionImpl session, BaseTypedQueryImpl<?> query,
+		List<Map<String, Object>> data, MutableInt rowNo, int leap, final Map<String, Object> row, ManagedInstance<? extends X> instance) {
 		for (final Entry<String, AbstractColumn> entry : this.fields.entrySet()) {
 			final String field = entry.getKey();
 			final AbstractColumn column = entry.getValue();
 			column.setValue(instance, row.get(field));
+		}
+
+		for (final SingularAssociationMapping<?, ?> mapping : this.joins) {
+			final Object child = this.getInstance(session, mapping, row);
+			mapping.set(instance, child);
 		}
 
 		instances.add(instance);
@@ -597,8 +620,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 					mapping.set(instance, value.getInstance());
 
 					// if this is a one-to-one mapping and has an inverse then set it
-					if ((mapping.getInverse() != null)
-						&& (mapping.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_ONE)) {
+					if ((mapping.getInverse() != null) && (mapping.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_ONE)) {
 						mapping.getInverse().set(value, instance.getInstance());
 					}
 
@@ -614,28 +636,169 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	}
 
 	/**
+	 * Handles the row for multiple results.
+	 * 
+	 * @param session
+	 *            the session
+	 * @param query
+	 *            the query
+	 * @param data
+	 *            the resultset data
+	 * @param parent
+	 *            the parent instance
+	 * @param rowNo
+	 *            the current row no
+	 * @param jumpSize
+	 *            the jump size
+	 * @return the list of instances
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected List<ManagedInstance<? extends X>> handleMulti(SessionImpl session, BaseTypedQueryImpl<?> query, List<Map<String, Object>> data,
+		ManagedInstance<?> parent, MutableInt rowNo, int jumpSize) {
+		final List<ManagedInstance<? extends X>> instances = Lists.newArrayList();
+
+		while ((rowNo.intValue() < data.size())) {
+			final ManagedInstance<? extends X> instance = this.handleSingle(instances, session, query, data, parent, rowNo, jumpSize);
+			if (instance == null) {
+				break;
+			}
+		}
+
+		return instances;
+	}
+
+	/**
+	 * Handles the row for a single result.
+	 * 
+	 * @param instances
+	 *            the instances already loaded
+	 * @param session
+	 *            the session
+	 * @param query
+	 *            the query
+	 * @param data
+	 *            the resultset data
+	 * @param parent
+	 *            the parent instance
+	 * @param rowNo
+	 *            the current row no
+	 * @param jumpSize
+	 *            the jump size
+	 * @return the managed instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected ManagedInstance<? extends X> handleSingle(List<ManagedInstance<? extends X>> instances, SessionImpl session, BaseTypedQueryImpl<?> query,
+		List<Map<String, Object>> data, ManagedInstance<?> parent, MutableInt rowNo, int jumpSize) {
+		final int leap = jumpSize;
+
+		final Map<String, Object> row = data.get(rowNo.intValue());
+
+		// if id is null then break
+		ManagedInstance<? extends X> instance = this.getInstance(session, row);
+		if (instance == null) {
+			return null;
+		}
+
+		// if different parent then break
+		if (!this.shouldContinue(session, parent, row)) {
+			return null;
+		}
+
+		// if we processed the same instance then break
+		if ((instances != null) && instances.contains(instance)) {
+			return null;
+		}
+
+		final ManagedInstance<? extends X> managedInstance = session.get(instance);
+		if (managedInstance != null) {
+			if ((managedInstance.getInstance() instanceof EnhancedInstance)
+				&& !((EnhancedInstance) managedInstance.getInstance()).__enhanced__$$__isInitialized()) {
+				instance = managedInstance;
+			}
+			else {
+				instances.add(managedInstance);
+				rowNo.add(leap);
+
+				return managedInstance;
+			}
+		}
+
+		return this.handleInstance(instances, session, query, data, rowNo, leap, row, instance);
+	}
+
+	/**
+	 * Returns if the join should be ignored
+	 * 
+	 * @param mapping
+	 *            the mapping
+	 * @return true if the join should be ignored, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private boolean ignoreJoin(SingularAssociationMapping<?, ?> mapping) {
+		// if we are joined on this mapping then ignore
+		if ((mapping.getInverse() != null) && (mapping.getInverse() == this.getMapping())) {
+			return true;
+		}
+
+		// if we will join on that mapping then ignore
+		for (final FetchImpl<X, ?> fetch : this.fetches) {
+			if (fetch.getMapping() == mapping) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Populates the embedded id fields from the result set
 	 * 
 	 * @param row
 	 *            the row
-	 * @param mapping
+	 * @param idMapping
 	 *            the embedded mapping
 	 * @return the generated embedded id
 	 * 
 	 * @since $version
 	 * @author hceylan
+	 * @param mapping2
 	 */
-	private Object populateEmbeddedId(Map<String, Object> row, EmbeddedMapping<? super X, ?> mapping) {
-		final Object id = mapping.getAttribute().newInstance();
+	private Object
+		populateEmbeddedId(Map<String, Object> row, EmbeddedMapping<?, ?> idMapping, SingularAssociationMapping<?, ?> mapping, MutableBoolean allNull) {
+		final Object id = idMapping.getAttribute().newInstance();
 
-		for (final AbstractMapping<?, ?> child : mapping.getMappings()) {
+		for (final AbstractMapping<?, ?> child : idMapping.getMappings()) {
 			if (child instanceof BasicMapping) {
 				final BasicMapping<?, ?> basicMapping = (BasicMapping<?, ?>) child;
-				final String field = this.fields.inverse().get(basicMapping.getColumn());
-				basicMapping.getAttribute().set(id, row.get(field));
+				final BasicColumn column = basicMapping.getColumn();
+
+				if (mapping == null) {
+					final String field = this.fields.inverse().get(column);
+					final Object value = row.get(field);
+
+					if (value != null) {
+						allNull.setValue(false);
+					}
+
+					basicMapping.getAttribute().set(id, value);
+				}
+				else {
+					for (final JoinColumn joinColumn : mapping.getForeignKey().getJoinColumns()) {
+						if (joinColumn.getReferencedColumnName().equals(column.getName())) {
+							final String field = this.joinFields.inverse().get(joinColumn);
+							basicMapping.getAttribute().set(id, row.get(field));
+						}
+					}
+				}
 			}
 			else {
-				child.getAttribute().set(id, this.populateEmbeddedId(row, mapping));
+				child.getAttribute().set(id, this.populateEmbeddedId(row, idMapping, mapping, allNull));
 			}
 		}
 

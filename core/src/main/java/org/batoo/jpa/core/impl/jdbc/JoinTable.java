@@ -56,8 +56,7 @@ public class JoinTable extends AbstractTable {
 		this.entity = entity;
 
 		this.sourceKey = new ForeignKey(metadata != null ? metadata.getJoinColumns() : Collections.<JoinColumnMetadata> emptyList());
-		this.destinationKey = new ForeignKey(metadata != null ? metadata.getInverseJoinColumns()
-			: Collections.<JoinColumnMetadata> emptyList());
+		this.destinationKey = new ForeignKey(metadata != null ? metadata.getInverseJoinColumns() : Collections.<JoinColumnMetadata> emptyList());
 	}
 
 	/**

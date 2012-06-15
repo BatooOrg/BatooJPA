@@ -63,8 +63,7 @@ public final class DeploymentUnitTask implements Callable<Void>, Comparable<Depl
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public final Void call() throws Exception {
-		final IdentifiableTypeImpl<?> parent = this.type instanceof IdentifiableTypeImpl
-			? ((IdentifiableTypeImpl) this.type).getSupertype() : null;
+		final IdentifiableTypeImpl<?> parent = this.type instanceof IdentifiableTypeImpl ? ((IdentifiableTypeImpl) this.type).getSupertype() : null;
 
 		// if the super type hasn't performed yet, then wait for to finish
 		while (!this.manager.hasPerformed(parent)) {

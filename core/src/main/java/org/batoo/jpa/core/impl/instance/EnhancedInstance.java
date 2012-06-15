@@ -36,7 +36,7 @@ public interface EnhancedInstance extends Serializable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	ManagedInstance<?> __enhanced__$$__getId();
+	Object __enhanced__$$__getId();
 
 	/**
 	 * Returns the managed instance of the instance.
@@ -68,5 +68,4 @@ public interface EnhancedInstance extends Serializable {
 	 * @author hceylan
 	 */
 	void __enhanced__$$__setManagedInstance(ManagedInstance<?> instance);
-
 }

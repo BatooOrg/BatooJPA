@@ -43,6 +43,7 @@ import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
@@ -83,8 +84,7 @@ public class EntityManagerImpl implements EntityManager {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EntityManagerImpl(EntityManagerFactoryImpl entityManagerFactory, MetamodelImpl metamodel, DataSourceImpl datasource,
-		Map<String, Object> properties) {
+	public EntityManagerImpl(EntityManagerFactoryImpl entityManagerFactory, MetamodelImpl metamodel, DataSourceImpl datasource, Map<String, Object> properties) {
 		super();
 
 		this.emf = entityManagerFactory;
@@ -334,7 +334,15 @@ public class EntityManagerImpl implements EntityManager {
 		final ManagedInstance<T> instance = type.getManagedInstanceById(this.session, primaryKey);
 		final ManagedInstance<T> existing = this.session.get(instance);
 		if (existing != null) {
-			return existing.getInstance();
+			if (existing.getInstance() instanceof EnhancedInstance) {
+				final EnhancedInstance enhanced = (EnhancedInstance) existing.getInstance();
+				if (enhanced.__enhanced__$$__isInitialized()) {
+					return existing.getInstance();
+				}
+			}
+			else {
+				return existing.getInstance();
+			}
 		}
 
 		return type.performSelect(this, instance);

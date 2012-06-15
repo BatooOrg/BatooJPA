@@ -49,8 +49,7 @@ public class TableGenerator extends AbstractGenerator {
 	public TableGenerator(TableGeneratorMetadata metadata) {
 		super(metadata);
 
-		this.table = (metadata != null) && StringUtils.isNotBlank(metadata.getTable()) ? metadata.getTable()
-			: TableGenerator.DEFAULT_TABLE_NAME;
+		this.table = (metadata != null) && StringUtils.isNotBlank(metadata.getTable()) ? metadata.getTable() : TableGenerator.DEFAULT_TABLE_NAME;
 
 		this.pkColumnName = (metadata != null) && StringUtils.isNotBlank(metadata.getPkColumnName()) ? metadata.getPkColumnName()
 			: TableGenerator.DEFAULT_PK_COLUMN_NAME;

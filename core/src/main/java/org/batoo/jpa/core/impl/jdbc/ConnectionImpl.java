@@ -462,8 +462,7 @@ public class ConnectionImpl implements Connection {
 	 * 
 	 */
 	@Override
-	public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability)
-		throws SQLException {
+	public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
 		this.throwNotImplemented();
 		return null;
 	}
@@ -514,8 +513,7 @@ public class ConnectionImpl implements Connection {
 	 * 
 	 */
 	@Override
-	public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability)
-		throws SQLException {
+	public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
 		this.throwNotImplemented();
 		return null;
 	}
@@ -557,8 +555,8 @@ public class ConnectionImpl implements Connection {
 			final long time = System.currentTimeMillis() - start;
 
 			if (time > BJPASettings.WARN_TIME) {
-				ConnectionImpl.LOG.warn(new OperationTookLongTimeWarning(), "{0}:{1} {2} msecs, prepareStatement(String): {3}",
-					this.connNo, callNo, time, ConnectionImpl.LOG.lazyBoxed(sql));
+				ConnectionImpl.LOG.warn(new OperationTookLongTimeWarning(), "{0}:{1} {2} msecs, prepareStatement(String): {3}", this.connNo, callNo, time,
+					ConnectionImpl.LOG.lazyBoxed(sql));
 			}
 			else {
 				ConnectionImpl.LOG.debug("{0}:{1} {2} msecs, prepareStatement(String)", this.connNo, callNo, time);
@@ -641,8 +639,7 @@ public class ConnectionImpl implements Connection {
 			this.connection.setAutoCommit(autoCommit);
 		}
 		finally {
-			ConnectionImpl.LOG.trace("{0}:{1} {2} msecs, setAutoCommit(boolean): {3}", this.connNo, callNo, System.currentTimeMillis()
-				- start, autoCommit);
+			ConnectionImpl.LOG.trace("{0}:{1} {2} msecs, setAutoCommit(boolean): {3}", this.connNo, callNo, System.currentTimeMillis() - start, autoCommit);
 		}
 	}
 
@@ -767,9 +764,8 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public String toString() {
-		return "ConnectionImpl [connNo=" + this.connNo + ", connected=" + (this.connection != null) + ", opened=" + this.opened
-			+ ", callNo=" + this.callNo + ", statements=" + this.statements + ", executes=" + this.executes + ", transactions="
-			+ this.transactions + "]";
+		return "ConnectionImpl [connNo=" + this.connNo + ", connected=" + (this.connection != null) + ", opened=" + this.opened + ", callNo=" + this.callNo
+			+ ", statements=" + this.statements + ", executes=" + this.executes + ", transactions=" + this.transactions + "]";
 	}
 
 	/**

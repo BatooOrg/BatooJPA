@@ -80,8 +80,7 @@ public class BasicMapping<X, Y> extends SingularMapping<X, Y> {
 		this.attribute = attribute;
 
 		final ColumnMetadata columnMetadata = this.getColumnMetadata();
-		final int sqlType = TypeFactory.getSqlType(this.getAttribute().getJavaType(), attribute.getTemporalType(), attribute.getEnumType(),
-			attribute.isLob());
+		final int sqlType = TypeFactory.getSqlType(this.getAttribute().getJavaType(), attribute.getTemporalType(), attribute.getEnumType(), attribute.isLob());
 
 		if (id || attribute.isId()) {
 			this.column = new PkColumn(this, sqlType, columnMetadata);

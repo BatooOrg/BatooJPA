@@ -49,8 +49,7 @@ public class SequenceQueue extends IdQueue {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SequenceQueue(JdbcAdaptor jdbcAdaptor, DataSourceImpl datasource, ExecutorService idExecuter, String sequenceName,
-		int allocationSize) {
+	public SequenceQueue(JdbcAdaptor jdbcAdaptor, DataSourceImpl datasource, ExecutorService idExecuter, String sequenceName, int allocationSize) {
 		super(jdbcAdaptor, datasource, idExecuter, sequenceName, allocationSize);
 	}
 

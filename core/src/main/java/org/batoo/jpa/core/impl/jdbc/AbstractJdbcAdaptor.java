@@ -206,8 +206,7 @@ public abstract class AbstractJdbcAdaptor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public final void performTableDdl(Set<String> schemas, DataSourceImpl datasource, DDLMode ddlMode, AbstractTable table)
-		throws SQLException {
+	public final void performTableDdl(Set<String> schemas, DataSourceImpl datasource, DDLMode ddlMode, AbstractTable table) throws SQLException {
 		new QueryRunner(datasource).update(this.createCreateTableStatement(table));
 	}
 }
