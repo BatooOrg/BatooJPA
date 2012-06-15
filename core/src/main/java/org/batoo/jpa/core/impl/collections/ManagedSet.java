@@ -19,10 +19,15 @@
 package org.batoo.jpa.core.impl.collections;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
-import org.batoo.jpa.core.impl.manager.SessionImpl;
+import javax.persistence.PersistenceException;
+
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
+
+import com.google.common.collect.Sets;
 
 /**
  * The set implementation of managed collection.
@@ -34,32 +39,33 @@ import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
  * @author hceylan
  * @since $version
  */
-public class ManagedSet<X, E> extends HashSet<E> implements ManagedCollection {
+public class ManagedSet<X, E> implements ManagedCollection, Set<E> {
 
-	private final PluralAssociationMapping<?, E, ?> mapping;
-	private final SessionImpl session;
-	private final Object id;
-	private final boolean initialized;
+	private final Set<E> delegate = Sets.newHashSet();
+	private Set<E> snapshot;
+
+	private final transient PluralAssociationMapping<?, E, ?> mapping;
+	private final transient ManagedInstance<?> managedInstance;
+
+	private boolean initialized;
 
 	/**
 	 * Constructor for lazy initialization.
 	 * 
 	 * @param mapping
 	 *            the mapping
-	 * @param session
-	 *            the session
-	 * @param id
-	 *            the id of the root entity
+	 * @param managedInstance
+	 *            the managed instance
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedSet(PluralAssociationMapping<?, E, ?> mapping, SessionImpl session, Object id) {
+	public ManagedSet(PluralAssociationMapping<?, E, ?> mapping, ManagedInstance<?> managedInstance) {
 		super();
-		this.session = session;
 
-		this.id = id;
 		this.mapping = mapping;
+		this.managedInstance = managedInstance;
+
 		this.initialized = false;
 	}
 
@@ -68,23 +74,232 @@ public class ManagedSet<X, E> extends HashSet<E> implements ManagedCollection {
 	 * 
 	 * @param mapping
 	 *            the mapping
-	 * @param session
-	 *            the session
-	 * @param id
-	 *            the id of the root entity
-	 * @param value
+	 * @param managedInstance
+	 *            the managed instance
+	 * @param values
 	 *            the initial values
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedSet(PluralAssociationMapping<?, E, ?> mapping, SessionImpl session, Object id, Collection<? extends E> value) {
-		super(value);
-		this.session = session;
+	public ManagedSet(PluralAssociationMapping<?, E, ?> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
+		super();
 
-		this.id = id;
+		this.delegate.addAll(values);
 		this.mapping = mapping;
+		this.managedInstance = managedInstance;
+
 		this.initialized = true;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean add(E e) {
+		this.initialize();
+		return this.delegate.add(e);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean addAll(Collection<? extends E> c) {
+		this.initialize();
+		this.snapshot();
+		return this.changed(this.delegate.addAll(c));
+	}
+
+	private <T> T changed(T value) {
+		this.managedInstance.addCollectionChanged(this.mapping);
+
+		return value;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void clear() {
+		this.initialize();
+		if (this.delegate.size() > 0) {
+			this.changed(null);
+		}
+		this.delegate.clear();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean contains(Object o) {
+		this.initialize();
+		return this.delegate.contains(o);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean containsAll(Collection<?> c) {
+		this.initialize();
+		return this.delegate.containsAll(c);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		return this.delegate.equals(obj);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int hashCode() {
+		return this.delegate.hashCode();
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void initialize() {
+		if (!this.initialized) {
+			if (this.managedInstance == null) {
+				throw new PersistenceException("No session to initialize the collection");
+			}
+
+			this.delegate.addAll(this.mapping.loadCollection(this.managedInstance));
+
+			this.initialized = true;
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isEmpty() {
+		this.initialize();
+		return this.delegate.isEmpty();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Iterator<E> iterator() {
+		this.initialize();
+		return new WrappedIterator<E>(this.delegate.iterator()) {
+			/**
+			 * {@inheritDoc}
+			 * 
+			 */
+			@Override
+			public void remove() {
+				ManagedSet.this.snapshot();
+				ManagedSet.this.changed(null);
+
+				super.remove();
+			}
+		};
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean remove(Object o) {
+		this.initialize();
+		this.snapshot();
+		return this.changed(this.delegate.remove(o));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean removeAll(Collection<?> c) {
+		this.initialize();
+		this.snapshot();
+		return this.changed(this.delegate.removeAll(c));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean retainAll(Collection<?> c) {
+		this.initialize();
+		this.snapshot();
+		return this.changed(this.delegate.retainAll(c));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int size() {
+		this.initialize();
+		return this.delegate.size();
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void snapshot() {
+		if (this.snapshot != null) {
+			this.snapshot = Sets.newHashSet(this.delegate);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Object[] toArray() {
+		this.initialize();
+		return this.delegate.toArray();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public <T> T[] toArray(T[] a) {
+		this.initialize();
+		return this.delegate.toArray(a);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "ManagedSet [initialized=" + this.initialized + ", managedInstance=" + this.managedInstance + ", delegate=" + this.delegate + ", snapshot="
+			+ this.snapshot + ", mapping=" + this.mapping + "]";
+	}
 }

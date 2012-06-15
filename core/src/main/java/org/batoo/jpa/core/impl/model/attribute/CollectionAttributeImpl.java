@@ -23,7 +23,7 @@ import java.util.Collection;
 import javax.persistence.metamodel.CollectionAttribute;
 
 import org.batoo.jpa.core.impl.collections.ManagedList;
-import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
@@ -69,8 +69,8 @@ public class CollectionAttributeImpl<X, E> extends PluralAttributeImpl<X, Collec
 	 * 
 	 */
 	@Override
-	public Collection<E> newCollection(PluralAssociationMapping<?, E, Collection<E>> mapping, SessionImpl session, Object id) {
-		return new ManagedList<X, E>(mapping, session, id);
+	public Collection<E> newCollection(PluralAssociationMapping<?, E, Collection<E>> mapping, ManagedInstance<?> managedInstance) {
+		return new ManagedList<X, E>(mapping, managedInstance);
 	}
 
 	/**
@@ -78,7 +78,8 @@ public class CollectionAttributeImpl<X, E> extends PluralAttributeImpl<X, Collec
 	 * 
 	 */
 	@Override
-	public Collection<E> newCollection(PluralAssociationMapping<?, E, Collection<E>> mapping, SessionImpl session, Object id, Collection<? extends E> values) {
-		return new ManagedList<X, E>(mapping, session, id, values);
+	public Collection<E>
+		newCollection(PluralAssociationMapping<?, E, Collection<E>> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
+		return new ManagedList<X, E>(mapping, managedInstance, values);
 	}
 }

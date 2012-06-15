@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceException;
@@ -155,31 +156,43 @@ public abstract class BaseTypedQueryImpl<X> implements TypedQuery<X>, ResultSetH
 	 */
 	@Override
 	public List<X> getResultList() {
-		int paramCount = 0;
-
-		final String sql = this.cq.generate();
-
-		final List<ParameterExpressionImpl<?>> sqlParameters = this.cq.getSqlParameters();
-
-		for (final ParameterExpressionImpl<?> parameter : sqlParameters) {
-			paramCount += parameter.getExpandedCount();
-		}
-
-		final MutableInt sqlIndex = new MutableInt(0);
-		final MutableInt paramIndex = new MutableInt(0);
-		final Object[] parameters = new Object[paramCount];
-
-		for (final ParameterExpressionImpl<?> parameter : sqlParameters) {
-			parameter.setParameter(parameters, sqlIndex, paramIndex, this.parameters.get(parameter));
-		}
-
+		this.em.getSession().setLoadTracker();
 		try {
-			return new QueryRunner().query(this.em.getConnection(), sql, this, parameters);
-		}
-		catch (final SQLException e) {
-			BaseTypedQueryImpl.LOG.error(e, "Query failed" + BaseTypedQueryImpl.LOG.lazyBoxed(sql, parameters));
 
-			throw new PersistenceException("Query failed", e);
+			int paramCount = 0;
+
+			final String sql = this.cq.generate();
+
+			final List<ParameterExpressionImpl<?>> sqlParameters = this.cq.getSqlParameters();
+
+			for (final ParameterExpressionImpl<?> parameter : sqlParameters) {
+				paramCount += parameter.getExpandedCount();
+			}
+
+			final MutableInt sqlIndex = new MutableInt(0);
+			final MutableInt paramIndex = new MutableInt(0);
+			final Object[] parameters = new Object[paramCount];
+
+			for (final ParameterExpressionImpl<?> parameter : sqlParameters) {
+				parameter.setParameter(parameters, sqlIndex, paramIndex, this.parameters.get(parameter));
+			}
+
+			try {
+				return new QueryRunner().query(this.em.getConnection(), sql, this, parameters);
+			}
+			catch (final SQLException e) {
+				BaseTypedQueryImpl.LOG.error(e, "Query failed" + BaseTypedQueryImpl.LOG.lazyBoxed(sql, parameters));
+
+				final EntityTransaction transaction = this.em.getTransaction();
+				if (transaction != null) {
+					transaction.setRollbackOnly();
+				}
+
+				throw new PersistenceException("Query failed", e);
+			}
+		}
+		finally {
+			this.em.getSession().releaseLoadTracker();
 		}
 	}
 

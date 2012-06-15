@@ -24,7 +24,6 @@ import java.util.Map;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceException;
@@ -511,7 +510,7 @@ public class EntityManagerImpl implements EntityManager {
 	 * 
 	 */
 	@Override
-	public EntityTransaction getTransaction() {
+	public EntityTransactionImpl getTransaction() {
 		// if the transaction exists simply return it
 		if (this.transaction != null) {
 			return this.transaction;

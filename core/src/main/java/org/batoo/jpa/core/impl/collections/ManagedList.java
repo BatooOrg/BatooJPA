@@ -18,11 +18,17 @@
  */
 package org.batoo.jpa.core.impl.collections;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
-import org.batoo.jpa.core.impl.manager.SessionImpl;
+import javax.persistence.PersistenceException;
+
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
+
+import com.google.common.collect.Lists;
 
 /**
  * The list implementation of managed collection.
@@ -34,32 +40,33 @@ import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
  * @author hceylan
  * @since $version
  */
-public class ManagedList<X, E> extends ArrayList<E> implements ManagedCollection {
+public class ManagedList<X, E> implements ManagedCollection, List<E> {
 
-	private final PluralAssociationMapping<?, E, ?> mapping;
-	private final SessionImpl session;
-	private final Object id;
-	private final boolean initialized;
+	private final List<E> delegate = Lists.newArrayList();
+	private List<E> snapshot;
+
+	private final transient PluralAssociationMapping<?, E, ?> mapping;
+	private final transient ManagedInstance<?> managedInstance;
+
+	private boolean initialized;
 
 	/**
 	 * Constructor for lazy initialization.
 	 * 
 	 * @param mapping
 	 *            the mapping
-	 * @param session
-	 *            the session
-	 * @param id
-	 *            the id of the root entity
+	 * @param managedInstance
+	 *            the managed instance
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedList(PluralAssociationMapping<?, E, ?> mapping, SessionImpl session, Object id) {
+	public ManagedList(PluralAssociationMapping<?, E, ?> mapping, ManagedInstance<?> managedInstance) {
 		super();
 
 		this.mapping = mapping;
-		this.session = session;
-		this.id = id;
+		this.managedInstance = managedInstance;
+
 		this.initialized = false;
 	}
 
@@ -68,22 +75,396 @@ public class ManagedList<X, E> extends ArrayList<E> implements ManagedCollection
 	 * 
 	 * @param mapping
 	 *            the mapping
-	 * @param session
-	 *            the session
-	 * @param id
-	 *            the id of the root entity
-	 * @param value
+	 * @param managedInstance
+	 *            the managed instance
+	 * @param values
 	 *            the initial values
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedList(PluralAssociationMapping<?, E, ?> mapping, SessionImpl session, Object id, Collection<? extends E> value) {
-		super(value);
+	public ManagedList(PluralAssociationMapping<?, E, ?> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
+		super();
+
+		this.delegate.addAll(Lists.newArrayList(values));
 
 		this.mapping = mapping;
-		this.session = session;
-		this.id = id;
+		this.managedInstance = managedInstance;
+
 		this.initialized = true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean add(E e) {
+		this.initialize();
+		this.snapshot();
+		return this.changed(this.delegate.add(e));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void add(int index, E element) {
+		this.initialize();
+		this.snapshot();
+		this.changed(null);
+		this.delegate.add(index, element);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean addAll(Collection<? extends E> c) {
+		this.initialize();
+		this.snapshot();
+		return this.changed(this.delegate.addAll(c));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean addAll(int index, Collection<? extends E> c) {
+		this.initialize();
+		this.snapshot();
+		return this.changed(this.delegate.addAll(index, c));
+	}
+
+	private <T> T changed(T value) {
+		this.managedInstance.addCollectionChanged(this.mapping);
+
+		return value;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void clear() {
+		this.initialize();
+		this.snapshot();
+		if (this.delegate.size() > 0) {
+			this.changed(null);
+		}
+		this.delegate.clear();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean contains(Object o) {
+		this.initialize();
+		return this.delegate.contains(o);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean containsAll(Collection<?> c) {
+		this.initialize();
+		return this.delegate.containsAll(c);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		return this.delegate.equals(obj);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public E get(int index) {
+		this.initialize();
+		return this.delegate.get(index);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int hashCode() {
+		return this.delegate.hashCode();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int indexOf(Object o) {
+		this.initialize();
+		return this.delegate.indexOf(o);
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void initialize() {
+		if (!this.initialized) {
+			if (this.managedInstance == null) {
+				throw new PersistenceException("No session to initialize the collection");
+			}
+
+			this.delegate.addAll(this.mapping.loadCollection(this.managedInstance));
+
+			this.initialized = true;
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isEmpty() {
+		this.initialize();
+		return this.delegate.isEmpty();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Iterator<E> iterator() {
+		this.initialize();
+
+		return new WrappedIterator<E>(this.delegate.iterator()) {
+
+			@Override
+			public void remove() {
+				ManagedList.this.snapshot();
+				ManagedList.this.changed(null);
+			};
+		};
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int lastIndexOf(Object o) {
+		this.initialize();
+		return this.delegate.lastIndexOf(o);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public ListIterator<E> listIterator() {
+		this.initialize();
+		return new WrappedListIterator<E>(this.delegate.listIterator()) {
+			@Override
+			public void add(E e) {
+				ManagedList.this.snapshot();
+				ManagedList.this.changed(null);
+
+				super.add(e);
+			};
+
+			/**
+			 * {@inheritDoc}
+			 * 
+			 */
+			@Override
+			public void remove() {
+				ManagedList.this.snapshot();
+				ManagedList.this.changed(null);
+
+				super.remove();
+			}
+
+			@Override
+			public void set(E e) {
+				ManagedList.this.snapshot();
+				ManagedList.this.changed(null);
+
+				super.set(e);
+			};
+		};
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public ListIterator<E> listIterator(int index) {
+		this.initialize();
+		return new WrappedListIterator<E>(this.delegate.listIterator(index)) {
+			@Override
+			public void add(E e) {
+				ManagedList.this.snapshot();
+				ManagedList.this.changed(null);
+
+				super.add(e);
+			};
+
+			/**
+			 * {@inheritDoc}
+			 * 
+			 */
+			@Override
+			public void remove() {
+				ManagedList.this.snapshot();
+				ManagedList.this.changed(null);
+
+				super.remove();
+			}
+
+			@Override
+			public void set(E e) {
+				ManagedList.this.snapshot();
+				ManagedList.this.changed(null);
+
+				super.set(e);
+			};
+		};
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public E remove(int index) {
+		this.initialize();
+		this.snapshot();
+		this.changed(null);
+		return this.delegate.remove(index);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean remove(Object o) {
+		this.initialize();
+		this.snapshot();
+		return this.changed(this.delegate.remove(o));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean removeAll(Collection<?> c) {
+		this.initialize();
+		this.snapshot();
+		return this.changed(this.delegate.retainAll(c));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean retainAll(Collection<?> c) {
+		this.initialize();
+		this.snapshot();
+		return this.changed(this.delegate.retainAll(c));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public E set(int index, E element) {
+		this.initialize();
+		this.snapshot();
+		this.changed(null);
+
+		return this.delegate.set(index, element);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int size() {
+		this.initialize();
+
+		return this.delegate.size();
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void snapshot() {
+		if (this.snapshot == null) {
+			this.snapshot = Lists.newArrayList(this.delegate);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<E> subList(int fromIndex, int toIndex) {
+		this.initialize();
+		return this.delegate.subList(fromIndex, toIndex);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Object[] toArray() {
+		this.initialize();
+		return this.delegate.toArray();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public <T> T[] toArray(T[] a) {
+		this.initialize();
+		return this.delegate.toArray(a);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "ManagedList [initialized=" + this.initialized + ", managedInstance=" + this.managedInstance + ", delegate=" + this.delegate + ", snapshot="
+			+ this.snapshot + ", mapping=" + this.mapping + "]";
 	}
 }

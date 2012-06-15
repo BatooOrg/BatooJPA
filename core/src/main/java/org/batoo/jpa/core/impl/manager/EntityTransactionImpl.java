@@ -62,6 +62,10 @@ public class EntityTransactionImpl implements EntityTransaction {
 	 * @author hceylan
 	 */
 	private void assertValid() {
+		if (this.rollbackOnly) {
+			throw new PersistenceException("Transaction is set to rollback only");
+		}
+
 		this.em.isValid(this);
 	}
 
@@ -71,6 +75,8 @@ public class EntityTransactionImpl implements EntityTransaction {
 	 */
 	@Override
 	public void begin() {
+		this.assertValid();
+
 		try {
 			if (!this.active) {
 				this.connection.setAutoCommit(false);
@@ -128,7 +134,7 @@ public class EntityTransactionImpl implements EntityTransaction {
 	 */
 	@Override
 	public boolean isActive() {
-		return this.active;
+		return this.active && !this.rollbackOnly;
 	}
 
 	/**

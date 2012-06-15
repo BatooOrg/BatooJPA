@@ -82,6 +82,7 @@ public class ManagedInstance<X> {
 	private final X instance;
 	private Status status;
 
+	private final Set<PluralAssociationMapping<?, ?, ?>> changedCollections = Sets.newHashSet();
 	private final SingularMapping<? super X, ?> idMapping;
 	private final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>[] idMappings;
 	private final EmbeddableTypeImpl<?> idType;
@@ -150,6 +151,16 @@ public class ManagedInstance<X> {
 				pair.getFirst().set(this, value);
 			}
 		}
+	}
+
+	/**
+	 * Adds a changed collection.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void addCollectionChanged(PluralAssociationMapping<?, ?, ?> mapping) {
+		this.changedCollections.add(mapping);
 	}
 
 	/**

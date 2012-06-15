@@ -217,6 +217,11 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 
 	}
 
+	public Collection<Z> loadCollection(ManagedInstance<?> managedInstance) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * 
@@ -249,7 +254,7 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 			collection = (C) value;
 		}
 		else {
-			collection = this.attribute.newCollection(this, managedInstance.getSession(), managedInstance.getId(), (Collection<? extends Z>) value);
+			collection = this.attribute.newCollection(this, managedInstance, (Collection<? extends Z>) value);
 		}
 
 		super.set(managedInstance, instance, collection);
@@ -270,6 +275,6 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 	 */
 	@Override
 	public void setLazy(ManagedInstance<?> instance) {
-		this.set(instance, this.attribute.newCollection(this, instance.getSession(), instance.getId()));
+		this.set(instance, this.attribute.newCollection(this, instance));
 	}
 }

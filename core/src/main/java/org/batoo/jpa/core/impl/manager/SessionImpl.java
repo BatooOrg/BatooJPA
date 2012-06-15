@@ -288,6 +288,11 @@ public class SessionImpl {
 			this.entitiesLoaded = Lists.newArrayList();
 
 			for (final ManagedInstance<?> instance : entitiesLoaded) {
+				final EntityTransactionImpl transaction = this.em.getTransaction();
+				if (transaction.getRollbackOnly()) {
+					return;
+				}
+
 				instance.getType().processAssociations(instance);
 			}
 		}
