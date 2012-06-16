@@ -29,7 +29,7 @@ public interface Path<X> extends Expression<X> {
 	 *            the type of the map
 	 * @return expression corresponding to the referenced attribute
 	 */
-	<K, V, M extends Map<K, V>> Expression<M> get(MapAttribute<X, K, V> map);
+	<K, V, M extends Map<K, V>> Expression<M> get(MapAttribute<? super X, K, V> map);
 
 	/**
 	 * Create a path corresponding to the referenced collection-valued attribute.
@@ -42,7 +42,7 @@ public interface Path<X> extends Expression<X> {
 	 *            the type of the collection
 	 * @return expression corresponding to the referenced attribute
 	 */
-	<E, C extends Collection<E>> Expression<C> get(PluralAttribute<X, C, E> collection);
+	<E, C extends Collection<E>> Expression<C> get(PluralAttribute<? super X, C, E> collection);
 
 	/**
 	 * Create a path corresponding to the referenced single-valued attribute.
@@ -58,6 +58,7 @@ public interface Path<X> extends Expression<X> {
 	/**
 	 * Create a path corresponding to the referenced attribute.
 	 * 
+	 * <p>
 	 * Note: Applications using the string-based API may need to specify the type resulting from the get operation in order to avoid the use
 	 * of Path variables.
 	 * 

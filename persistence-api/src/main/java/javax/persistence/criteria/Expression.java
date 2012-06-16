@@ -11,7 +11,9 @@ import java.util.Collection;
 public interface Expression<T> extends Selection<T> {
 	/**
 	 * Perform a typecast upon the expression, returning a new expression object. This method does not cause type conversion: the runtime
-	 * type is not changed. Warning: may result in a runtime failure.
+	 * type is not changed.
+	 * <p>
+	 * Warning: may result in a runtime failure.
 	 * 
 	 * @param type
 	 *            intended type of the expression
