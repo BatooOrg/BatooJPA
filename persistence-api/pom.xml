@@ -6,8 +6,9 @@
 		<groupId>org.batoo.jpa</groupId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	
+
 	<artifactId>persistence-api</artifactId>
-	
+	<name>Batoo Persistence API</name>
 	<version>2.1</version>
+	
 </project>

@@ -21,6 +21,8 @@ package org.batoo.jpa.parser.test.entity;
 import javax.persistence.Table;
 
 import org.batoo.jpa.parser.test.BaseParserTest;
+import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -29,6 +31,7 @@ import org.junit.Test;
  * @author hceylan
  * @since $version
  */
+@Ignore
 public class EntityTest extends BaseParserTest {
 
 	/**
@@ -39,6 +42,6 @@ public class EntityTest extends BaseParserTest {
 	 */
 	@Test
 	public void testSchemaAndCatalog() {
-		this.assertNotNull(this.e());
+		Assert.assertNotNull(this.e());
 	}
 }

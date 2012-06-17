@@ -32,7 +32,7 @@ import org.mockito.MockitoAnnotations;
  * @author hceylan
  * @since $version
  */
-public class BaseTest extends Assertable {
+public class BaseTest {
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(BaseTest.class);
 
@@ -82,5 +82,4 @@ public class BaseTest extends Assertable {
 	public void initMocks() {
 		MockitoAnnotations.initMocks(this);
 	}
-
 }

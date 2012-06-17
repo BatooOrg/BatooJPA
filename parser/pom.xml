@@ -30,7 +30,6 @@
 				<artifactId>jaxb2-maven-plugin</artifactId>
 				<version>1.3.1</version>
 				<configuration>
-					<verbose>true</verbose>
 					<bindingFiles>spec.xjb</bindingFiles>
 					<schemaFiles>persistence_2_0.xsd</schemaFiles>
 					<extension>true</extension>
@@ -92,6 +91,13 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
+		</dependency>
+		
+		<!-- test -->
+		<dependency>
+			<groupId>org.batoo.jpa</groupId>
+			<artifactId>test</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

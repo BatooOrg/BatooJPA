@@ -38,11 +38,13 @@ import javax.persistence.Version;
 
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.reflect.ReflectHelper;
-import org.batoo.jpa.common.test.BaseTest;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import com.google.common.collect.Sets;
 
@@ -53,7 +55,7 @@ import com.google.common.collect.Sets;
  * @author hceylan
  * @since $version
  */
-public class ReflectHelperTest extends BaseTest {
+public class ReflectHelperTest {
 
 	@SuppressWarnings({ "rawtypes", "javadoc" })
 	public static class Clazz {
@@ -122,6 +124,17 @@ public class ReflectHelperTest extends BaseTest {
 	}
 
 	/**
+	 * Initializes the mocks.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Before
+	public void initMocks() {
+		MockitoAnnotations.initMocks(this);
+	}
+
+	/**
 	 * Tests {@link ReflectHelper#createMemberName(java.lang.reflect.Member)} with a field.
 	 * 
 	 * @since $version
@@ -129,7 +142,7 @@ public class ReflectHelperTest extends BaseTest {
 	 */
 	@Test
 	public void testCreateMemberNameWithField() {
-		this.assertEquals("org.batoo.jpa.common.test.reflect.ReflectHelperTest$Clazz.field", ReflectHelper.createMemberName(this.field));
+		Assert.assertEquals("org.batoo.jpa.common.test.reflect.ReflectHelperTest$Clazz.field", ReflectHelper.createMemberName(this.field));
 	}
 
 	/**
@@ -140,7 +153,7 @@ public class ReflectHelperTest extends BaseTest {
 	 */
 	@Test
 	public void testCreateMemberNameWithMethod() {
-		this.assertEquals("org.batoo.jpa.common.test.reflect.ReflectHelperTest$Clazz.getField", ReflectHelper.createMemberName(this.method));
+		Assert.assertEquals("org.batoo.jpa.common.test.reflect.ReflectHelperTest$Clazz.getField", ReflectHelper.createMemberName(this.method));
 	}
 
 	/**
@@ -152,7 +165,7 @@ public class ReflectHelperTest extends BaseTest {
 	 */
 	@Test
 	public void testGetAnnotationWithExisting() {
-		this.assertNotNull(ReflectHelper.getAnnotation(this.field, Version.class));
+		Assert.assertNotNull(ReflectHelper.getAnnotation(this.field, Version.class));
 	}
 
 	/**
@@ -164,7 +177,7 @@ public class ReflectHelperTest extends BaseTest {
 	 */
 	@Test
 	public void testGetAnnotationWithoutExisting() {
-		this.assertNull(ReflectHelper.getAnnotation(this.field2, Version.class));
+		Assert.assertNull(ReflectHelper.getAnnotation(this.field2, Version.class));
 	}
 
 	/**
@@ -176,17 +189,17 @@ public class ReflectHelperTest extends BaseTest {
 	@Test
 	public void testGetGenericType() {
 		// test fields
-		this.assertEquals(String.class, ReflectHelper.getGenericType(this.field3, 0));
-		this.assertNull(ReflectHelper.getGenericType(this.field4, 0));
-		this.assertEquals(String.class, ReflectHelper.getGenericType(this.field5, 0));
-		this.assertEquals(Integer.class, ReflectHelper.getGenericType(this.field5, 1));
-		this.assertNull(ReflectHelper.getGenericType(this.field5, 2));
-		this.assertNull(ReflectHelper.getGenericType(this.field6, 0));
-		this.assertNull(ReflectHelper.getGenericType(this.field6, 1));
+		Assert.assertEquals(String.class, ReflectHelper.getGenericType(this.field3, 0));
+		Assert.assertNull(ReflectHelper.getGenericType(this.field4, 0));
+		Assert.assertEquals(String.class, ReflectHelper.getGenericType(this.field5, 0));
+		Assert.assertEquals(Integer.class, ReflectHelper.getGenericType(this.field5, 1));
+		Assert.assertNull(ReflectHelper.getGenericType(this.field5, 2));
+		Assert.assertNull(ReflectHelper.getGenericType(this.field6, 0));
+		Assert.assertNull(ReflectHelper.getGenericType(this.field6, 1));
 
 		// test methods
-		this.assertEquals(String.class, ReflectHelper.getGenericType(this.method3, 0));
-		this.assertNull(ReflectHelper.getGenericType(this.method4, 0));
+		Assert.assertEquals(String.class, ReflectHelper.getGenericType(this.method3, 0));
+		Assert.assertNull(ReflectHelper.getGenericType(this.method4, 0));
 	}
 
 	/**
@@ -198,7 +211,7 @@ public class ReflectHelperTest extends BaseTest {
 	 */
 	@Test
 	public void testGetMemberTypeWithField() {
-		this.assertEquals(Integer.class, ReflectHelper.getMemberType(this.field));
+		Assert.assertEquals(Integer.class, ReflectHelper.getMemberType(this.field));
 	}
 
 	/**
@@ -210,7 +223,7 @@ public class ReflectHelperTest extends BaseTest {
 	 */
 	@Test
 	public void testGetMemberTypeWithMethod() {
-		this.assertEquals(String.class, ReflectHelper.getMemberType(this.method));
+		Assert.assertEquals(String.class, ReflectHelper.getMemberType(this.method));
 	}
 
 	/**
@@ -221,14 +234,14 @@ public class ReflectHelperTest extends BaseTest {
 	 */
 	@Test
 	public void testIsCollection() {
-		this.assertTrue(ReflectHelper.isCollection(List.class));
-		this.assertTrue(ReflectHelper.isCollection(Set.class));
-		this.assertTrue(ReflectHelper.isCollection(Map.class));
-		this.assertTrue(ReflectHelper.isCollection(Collection.class));
+		Assert.assertTrue(ReflectHelper.isCollection(List.class));
+		Assert.assertTrue(ReflectHelper.isCollection(Set.class));
+		Assert.assertTrue(ReflectHelper.isCollection(Map.class));
+		Assert.assertTrue(ReflectHelper.isCollection(Collection.class));
 
-		this.assertFalse(ReflectHelper.isCollection(ArrayList.class));
-		this.assertFalse(ReflectHelper.isCollection(HashSet.class));
-		this.assertFalse(ReflectHelper.isCollection(HashMap.class));
+		Assert.assertFalse(ReflectHelper.isCollection(ArrayList.class));
+		Assert.assertFalse(ReflectHelper.isCollection(HashSet.class));
+		Assert.assertFalse(ReflectHelper.isCollection(HashMap.class));
 	}
 
 	/**
@@ -243,7 +256,7 @@ public class ReflectHelperTest extends BaseTest {
 	public void testWarnAnnotationsShouldNotWarn() {
 		ReflectHelper.warnAnnotations(this.logger, this.field, Sets.newHashSet(Version.class, Temporal.class, Basic.class));
 
-		Mockito.verify(this.logger, Mockito.times(0)).warn(Mockito.anyString());
+		Mockito.verify(this.logger, Mockito.times(0)).warn(Matchers.anyString());
 	}
 
 	/**
@@ -258,6 +271,6 @@ public class ReflectHelperTest extends BaseTest {
 	public void testWarnAnnotationsShouldWarn() {
 		ReflectHelper.warnAnnotations(this.logger, this.field2, Sets.newHashSet(Version.class, Temporal.class, Basic.class));
 
-		Mockito.verify(this.logger, Mockito.times(1)).warn(Mockito.anyString(), Mockito.any(), Mockito.any());
+		Mockito.verify(this.logger, Mockito.times(1)).warn(Matchers.anyString(), Matchers.any(), Matchers.any());
 	}
 }

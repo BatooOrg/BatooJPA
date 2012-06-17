@@ -87,7 +87,7 @@ public abstract class RootPathImpl<X> extends PathImpl<X> {
 	 * 
 	 */
 	@Override
-	public <K, V, M extends Map<K, V>> ExpressionImpl<M> get(MapAttribute<X, K, V> map) {
+	public <K, V, M extends Map<K, V>> ExpressionImpl<M> get(MapAttribute<? super X, K, V> map) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -97,7 +97,7 @@ public abstract class RootPathImpl<X> extends PathImpl<X> {
 	 * 
 	 */
 	@Override
-	public <E, C extends Collection<E>> ExpressionImpl<C> get(PluralAttribute<X, C, E> collection) {
+	public <E, C extends Collection<E>> ExpressionImpl<C> get(PluralAttribute<? super X, C, E> collection) {
 		// TODO Auto-generated method stub
 		return null;
 	}

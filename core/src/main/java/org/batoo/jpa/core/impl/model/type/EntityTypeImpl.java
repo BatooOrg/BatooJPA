@@ -818,6 +818,22 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
+	 * Returns the parent of the entity.
+	 * 
+	 * @return the parent entity or <code>null</code>
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public EntityTypeImpl<? super X> getParent() {
+		if (this.isRoot()) {
+			return null;
+		}
+
+		return (EntityTypeImpl<? super X>) this.getSupertype();
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -1052,6 +1068,18 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		}
 
 		return false;
+	}
+
+	/**
+	 * Returns if the entity is the root of the hierarchy.
+	 * 
+	 * @return true if the entity is the root of the hierarchy, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isRoot() {
+		return this.getRootType() == this;
 	}
 
 	/**

@@ -73,7 +73,7 @@ public class ReflectHelper {
 			ReflectHelper.LOG.debug("Direct access library loaded successfully");
 		}
 		catch (final Exception e) {
-			throw new AssertionError("Direct access library cannot be loaded", e);
+			throw new RuntimeException("Direct access library cannot be loaded", e);
 		}
 	}
 
@@ -138,8 +138,8 @@ public class ReflectHelper {
 
 			try {
 				final Object mag = c.newInstance();
-				return (sun.reflect.ConstructorAccessor) generateMethod.invoke(mag, constructor.getDeclaringClass(),
-					constructor.getParameterTypes(), constructor.getExceptionTypes(), constructor.getModifiers());
+				return (sun.reflect.ConstructorAccessor) generateMethod.invoke(mag, constructor.getDeclaringClass(), constructor.getParameterTypes(),
+					constructor.getExceptionTypes(), constructor.getModifiers());
 			}
 			finally {
 				ReflectHelper.setAccessible(c, false);
@@ -396,8 +396,7 @@ public class ReflectHelper {
 		});
 
 		if (filtered.size() > 0) {
-			logger.warn("Following annotations on {0} were ignored: {1}", ReflectHelper.createMemberName(member),
-				Joiner.on(", ").join(filtered));
+			logger.warn("Following annotations on {0} were ignored: {1}", ReflectHelper.createMemberName(member), Joiner.on(", ").join(filtered));
 		}
 	}
 

@@ -157,7 +157,7 @@ public class EmbeddedAttributePathImpl<X> extends PathImpl<X> {
 	 * 
 	 */
 	@Override
-	public <K, V, M extends Map<K, V>> Expression<M> get(MapAttribute<X, K, V> map) {
+	public <K, V, M extends Map<K, V>> Expression<M> get(MapAttribute<? super X, K, V> map) {
 		throw this.cannotDereference();
 	}
 
@@ -166,7 +166,7 @@ public class EmbeddedAttributePathImpl<X> extends PathImpl<X> {
 	 * 
 	 */
 	@Override
-	public <E, C extends Collection<E>> Expression<C> get(PluralAttribute<X, C, E> collection) {
+	public <E, C extends Collection<E>> Expression<C> get(PluralAttribute<? super X, C, E> collection) {
 		throw this.cannotDereference();
 	}
 

@@ -109,25 +109,27 @@
 				<version>${project.version}</version>
 				<type>bundle</type>
 			</dependency>
-
 			<dependency>
 				<groupId>org.batoo.jpa</groupId>
 				<artifactId>persistence-api</artifactId>
 				<version>2.1</version>
 			</dependency>
-
 			<dependency>
 				<groupId>org.batoo.jpa</groupId>
 				<artifactId>common</artifactId>
 				<version>${project.version}</version>
 				<type>bundle</type>
 			</dependency>
-
 			<dependency>
 				<groupId>org.batoo.jpa</groupId>
 				<artifactId>core</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 				<type>bundle</type>
+			</dependency>
+			<dependency>
+				<groupId>org.batoo.jpa</groupId>
+				<artifactId>test</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
@@ -302,6 +304,6 @@
 		<module>common</module>
 		<module>parser</module>
 		<module>core</module>
-		<module>benchmark</module>
+		<module>test</module>
 	</modules>
 </project>
