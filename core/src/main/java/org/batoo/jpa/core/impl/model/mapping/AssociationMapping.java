@@ -30,6 +30,7 @@ import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.type.MappedSuperclassTypeImpl;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
@@ -37,19 +38,17 @@ import org.batoo.jpa.parser.metadata.attribute.MappableAssociationAttributeMetad
 import org.batoo.jpa.parser.metadata.attribute.OrphanableAssociationAttributeMetadata;
 
 /**
- * The mapping for associations.
+ * Mapping for associations.
  * 
- * @param <X>
- *            the type of the entity
  * @param <Z>
- *            the inverse entity type
- * @param <Y>
- *            the attribute type of the association
+ *            the source type
+ * @param <X>
+ *            the destination type
  * 
  * @author hceylan
  * @since $version
  */
-public abstract class AssociationMapping<X, Z, Y> extends AbstractMapping<X, Y> {
+public abstract class AssociationMapping<Z, X> extends Mapping<Z, X> {
 
 	private final boolean eager;
 	private final boolean cascadesDetach;
@@ -58,25 +57,21 @@ public abstract class AssociationMapping<X, Z, Y> extends AbstractMapping<X, Y> 
 	private final boolean cascadesRefresh;
 	private final boolean cascadesRemove;
 	private final String mappedBy;
-	private boolean removesOrphans;
+	private final boolean removesOrphans;
 
 	/**
-	 * 
 	 * @param parent
-	 *            the parent mapping, may be <code>null</code>
-	 * @param entity
-	 *            the entity
+	 *            the parent mapping
 	 * @param metadata
-	 *            the association metadata
+	 *            the metadata
 	 * @param attribute
 	 *            the attribute
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AssociationMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity, AssociationAttributeMetadata metadata,
-		AttributeImpl<? super X, Y> attribute) {
-		super(parent, entity, attribute);
+	public AssociationMapping(ParentMapping<?, Z> parent, AssociationAttributeMetadata metadata, AttributeImpl<? super Z, X> attribute) {
+		super(parent, parent.getRoot().getType(), attribute.getJavaType(), attribute.getName());
 
 		this.eager = metadata.getFetchType() == FetchType.EAGER;
 		if ((metadata instanceof MappableAssociationAttributeMetadata)
@@ -178,64 +173,72 @@ public abstract class AssociationMapping<X, Z, Y> extends AbstractMapping<X, Y> 
 	public abstract void flush(ConnectionImpl connection, ManagedInstance<?> managedInstance) throws SQLException;
 
 	/**
-	 * Returns the association
+	 * Returns the effective association metadata for the attribute checking with the parent mappings and entities.
 	 * 
-	 * @return
+	 * @return the column metadata
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	protected AssociationMetadata getAssociationMetadata() {
-		String path = this.getAttribute().getName();
-
 		AssociationMetadata metadata = null;
 
-		// check with the parent chain if there is an attribute override
-		AbstractMapping<?, ?> mapping = this;
-		while (mapping.getParent() != null) {
-			final EmbeddedMapping<?, ?> parent = mapping.getParent();
+		final String path = this.getParent().getRootPath(this.getAttribute().getName());
+		final AttributeImpl<?, ?> rootAttribute = this.getParent().getRootAttribute(this.getAttribute());
 
-			if (parent.getAttribute().getAttributeOverride(path) != null) {
-				metadata = parent.getAttribute().getAssociationOverride(path);
-			}
+		/**
+		 * The priorities are like below:
+		 * 
+		 * 1. If the root attribute is defined in the root type (thus the entity) then locate the association override on the attribute
+		 * chain<br />
+		 * 2. If the root attribute is defined in a parent mapped super class then locate the association on the entity<br />
+		 * 3. If the parent is an embeddable mapping then locate the attribute override again on the association chain<br />
+		 * 4. return the association metadata from the attribute<br />
+		 */
 
-			path = parent.getAttribute().getName() + "." + path;
-
-			mapping = parent;
-		}
-
-		// if the embeddable defined in this entity then return it
-		if ((metadata != null) && (mapping.getAttribute().getDeclaringType() == this.getEntity())) {
-			return metadata;
-		}
-
-		// check with the override path
-		EntityTypeImpl<? super X> entity = this.getEntity();
-		while (entity != null) {
-			// only up to declaring entity
-			if (entity == mapping.getAttribute().getDeclaringType()) {
-				break;
-			}
-
-			// if there is an override return it
-			metadata = entity.getAssociationOverride(path);
+		// Clause 1
+		if ((rootAttribute.getDeclaringType() == this.getRoot().getType()) && (this.getParent() instanceof EmbeddedMapping)) {
+			metadata = ((EmbeddedMapping<?, ?>) this.getParent()).getAssociationOverride(path);
 			if (metadata != null) {
 				return metadata;
 			}
+		}
 
-			if (entity.getSupertype() instanceof EntityTypeImpl) {
-				entity = (EntityTypeImpl<? super X>) entity.getSupertype();
+		// Clause 2
+		if (rootAttribute.getDeclaringType() instanceof MappedSuperclassTypeImpl) {
+			metadata = this.getRoot().getType().getAssociationOverride(path);
+			if (metadata != null) {
+				return metadata;
 			}
 		}
 
-		// fall back to attribute's column metadata
+		// Clause 3
+		if (this.getParent() instanceof EmbeddedMapping) {
+			metadata = ((EmbeddedMapping<?, ?>) this.getParent()).getAssociationOverride(path);
+			if (metadata != null) {
+				return metadata;
+			}
+		}
+
+		// Clause 4: fall back to attribute's column metadata
 		return (AssociationMetadata) this.getAttribute().getMetadata();
 	}
 
 	/**
-	 * Returns the foreign key of the attribute.
+	 * Returns the attribute of the mapping
 	 * 
-	 * @return the foreign key of the attribute
+	 * @return the attribute of the mapping
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Override
+	public abstract AttributeImpl<? super Z, X> getAttribute();
+
+	/**
+	 * Returns the foreign key of the mapping.
+	 * 
+	 * @return the foreign key of the mapping
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -251,12 +254,12 @@ public abstract class AssociationMapping<X, Z, Y> extends AbstractMapping<X, Y> 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract AssociationMapping<Z, X, ?> getInverse();
+	public abstract AssociationMapping<?, ?> getInverse();
 
 	/**
-	 * Returns the join table of the attribute.
+	 * Returns the join table of the mapping.
 	 * 
-	 * @return the join table of the attribute
+	 * @return the join table of the mapping
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -264,9 +267,9 @@ public abstract class AssociationMapping<X, Z, Y> extends AbstractMapping<X, Y> 
 	public abstract JoinTable getJoinTable();
 
 	/**
-	 * Returns the mappedBy of the AssociationMapping.
+	 * Returns the mappedBy of the mapping.
 	 * 
-	 * @return the mappedBy of the AssociationMapping
+	 * @return the mappedBy of the mapping
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -283,7 +286,7 @@ public abstract class AssociationMapping<X, Z, Y> extends AbstractMapping<X, Y> 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract EntityTypeImpl<Z> getType();
+	public abstract EntityTypeImpl<?> getType();
 
 	/**
 	 * Returns if the association should be eagerly fetched.
@@ -363,7 +366,7 @@ public abstract class AssociationMapping<X, Z, Y> extends AbstractMapping<X, Y> 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract void setInverse(AssociationMapping<Z, X, ?> inverse);
+	public abstract void setInverse(AssociationMapping<?, ?> inverse);
 
 	/**
 	 * Sets the lazy instance for the association

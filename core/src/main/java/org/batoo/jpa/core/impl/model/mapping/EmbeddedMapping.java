@@ -18,104 +18,42 @@
  */
 package org.batoo.jpa.core.impl.model.mapping;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import javax.persistence.metamodel.Attribute;
-
-import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.jdbc.AbstractTable;
-import org.batoo.jpa.core.impl.jdbc.BasicColumn;
-import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
-import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
-import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.parser.MappingException;
-
-import com.google.common.collect.Maps;
+import org.batoo.jpa.parser.metadata.AssociationMetadata;
+import org.batoo.jpa.parser.metadata.ColumnMetadata;
 
 /**
- * The mapping for embedded attributes.
+ * Mapping for the entities.
  * 
+ * @param <Z>
+ *            the source type
  * @param <X>
- *            the type of the entity
- * @param <Y>
- *            the inverse entity type
+ *            the destination type
  * 
  * @author hceylan
  * @since $version
  */
-public class EmbeddedMapping<X, Y> extends SingularMapping<X, Y> {
+public class EmbeddedMapping<Z, X> extends ParentMapping<Z, X> implements SingularMapping<Z, X> {
 
-	private final EmbeddedAttribute<? super X, Y> attribute;
-	private final Map<String, AbstractMapping<? super X, ?>> mappings = Maps.newHashMap();
+	private final EmbeddableTypeImpl<X> embeddable;
+	private final EmbeddedAttribute<? super Z, X> attribute;
 
 	/**
-	 * 
 	 * @param parent
-	 *            the parent mapping, may be <code>null</code>
-	 * 
-	 * @param entity
-	 *            the entity
+	 *            the parent mapping
 	 * @param attribute
 	 *            the attribute
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EmbeddedMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity, EmbeddedAttribute<? super X, Y> attribute) {
-		super(parent, entity, attribute);
+	public EmbeddedMapping(ParentMapping<?, Z> parent, EmbeddedAttribute<? super Z, X> attribute) {
+		super(parent, parent.getRoot().getType(), attribute.getBindableJavaType(), attribute.getName());
 
 		this.attribute = attribute;
-
-		this.link();
-	}
-
-	/**
-	 * Adds the associations that are within the the embeddable.
-	 * 
-	 * @param associations
-	 *            the list to add associations
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@SuppressWarnings("unchecked")
-	public void addAssociations(List<AssociationMapping<?, ?, ?>> associations) {
-		for (final AbstractMapping<? super X, ?> mapping : this.mappings.values()) {
-			if (mapping instanceof AssociationMapping) {
-				associations.add((AssociationMapping<? super X, ?, ?>) mapping);
-			}
-
-			if (mapping instanceof EmbeddedMapping) {
-				final EmbeddedMapping<?, ?> embeddedMapping = (EmbeddedMapping<?, ?>) mapping;
-				embeddedMapping.addAssociations(associations);
-			}
-		}
-	}
-
-	/**
-	 * Adds the basic attributes that are within the the embeddable.
-	 * 
-	 * @param basicMappings
-	 *            the list to add basic mappings
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void addBasicAttributes(List<BasicMapping<?, ?>> basicMappings) {
-		for (final AbstractMapping<? super X, ?> mapping : this.mappings.values()) {
-			if (mapping instanceof BasicMapping) {
-				basicMappings.add((BasicMapping<?, ?>) mapping);
-			}
-
-			if (mapping instanceof EmbeddedMapping) {
-				final EmbeddedMapping<?, ?> embeddedMapping = (EmbeddedMapping<?, ?>) mapping;
-				embeddedMapping.addBasicAttributes(basicMappings);
-			}
-		}
+		this.embeddable = attribute.getType();
 	}
 
 	/**
@@ -123,26 +61,25 @@ public class EmbeddedMapping<X, Y> extends SingularMapping<X, Y> {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean fillValue(Object instance) {
-		final Y value = this.get(instance);
+		final X value = this.get(instance);
 
 		if (value == null) {
 			throw new NullPointerException();
 		}
 
-		for (final AbstractMapping<? super X, ?> mapping : this.mappings.values()) {
+		for (final Mapping<? super X, ?> mapping : this.getChildren()) {
 			// mapping is another embedded mapping
 			if (mapping instanceof EmbeddedMapping) {
-				((EmbeddedMapping<? super X, Y>) mapping).fillValue(value);
+				((EmbeddedMapping<? super X, ?>) mapping).fillValue(value);
 			}
 			// mapping is basic mapping
 			else if (mapping instanceof BasicMapping) {
-				((BasicMapping<? super X, Y>) mapping).getAttribute().fillValue(instance);
+				((BasicMapping<? super X, ?>) mapping).getAttribute().fillValue(instance);
 			}
 			// no other mappings allowed in id classes
 			else {
-				throw new MappingException("Embbeded ids can pnly have basic and embedded attributes.", mapping.getAttribute().getLocator());
+				throw new MappingException("Embbeded ids can only have basic and embedded attributes.", this.getType().getLocator());
 			}
 		}
 
@@ -150,76 +87,86 @@ public class EmbeddedMapping<X, Y> extends SingularMapping<X, Y> {
 	}
 
 	/**
+	 * Returns the association override or <code>null</code>
+	 * 
+	 * @param path
+	 *            the current path
+	 * @return the association override or <code>null</code>
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public AssociationMetadata getAssociationOverride(String path) {
+		AssociationMetadata metadata = null;
+
+		if (this.getParent() instanceof EmbeddedMapping) {
+			metadata = ((EmbeddedMapping<?, Z>) this.getParent()).getAssociationOverride(this.getAttribute().getName() + "." + path);
+		}
+
+		if (metadata != null) {
+			return metadata;
+		}
+
+		return this.getAttribute().getAssociationOverride(path);
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
 	@Override
-	public EmbeddedAttribute<? super X, Y> getAttribute() {
+	public EmbeddedAttribute<? super Z, X> getAttribute() {
 		return this.attribute;
 	}
 
 	/**
-	 * Returns the mappings of the EmbeddedMapping.
+	 * Returns the attribute override or <code>null</code>
 	 * 
-	 * @return the mappings of the EmbeddedMapping
+	 * @param path
+	 *            the current path
+	 * @return the attribute override or <code>null</code>
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Collection<AbstractMapping<? super X, ?>> getMappings() {
-		return this.mappings.values();
+	public ColumnMetadata getAttributeOverride(String path) {
+		ColumnMetadata metadata = null;
+
+		if (this.getParent() instanceof EmbeddedMapping) {
+			metadata = ((EmbeddedMapping<?, Z>) this.getParent()).getAttributeOverride(this.getAttribute().getName() + "." + path);
+		}
+
+		if (metadata != null) {
+			return metadata;
+		}
+
+		return this.getAttribute().getAttributeOverride(path);
 	}
 
 	/**
-	 * Links the embedded attributes.
+	 * {@inheritDoc}
 	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void link() {
-		for (final Attribute<? super Y, ?> attribute : this.attribute.getType().getAttributes()) {
-			AbstractMapping<X, Y> mapping = null;
+	@Override
+	public RootMapping<?> getRoot() {
+		return this.getParent().getRoot();
+	}
 
-			switch (attribute.getPersistentAttributeType()) {
-				case BASIC:
-					mapping = new BasicMapping(this, this.getEntity(), (BasicAttribute) attribute, this.getAttribute().isId());
-					this.mappings.put(attribute.getName(), mapping);
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public EmbeddableTypeImpl<? super X> getType() {
+		return this.embeddable;
+	}
 
-					final BasicColumn basicColumn = ((BasicMapping) mapping).getColumn();
-					final String tableName = basicColumn.getTableName();
-
-					// if table name is blank, it means the column should belong to the primary table
-					if (StringUtils.isBlank(tableName)) {
-						basicColumn.setTable(this.getEntity().getPrimaryTable());
-					}
-					// otherwise locate the table
-					else {
-						final AbstractTable table = this.getEntity().getTable(tableName);
-						if (table == null) {
-							throw new MappingException("Table " + tableName + " could not be found", basicColumn.getLocator());
-						}
-
-						basicColumn.setTable(table);
-					}
-
-					break;
-				case ONE_TO_ONE:
-				case MANY_TO_ONE:
-					mapping = new SingularAssociationMapping(this, this.getEntity(), (AssociatedSingularAttribute) attribute);
-					this.mappings.put(attribute.getName(), mapping);
-					break;
-				case MANY_TO_MANY:
-				case ONE_TO_MANY:
-					mapping = new PluralAssociationMapping(this, this.getEntity(), (PluralAttributeImpl) attribute);
-					this.mappings.put(attribute.getName(), mapping);
-					break;
-				case EMBEDDED:
-					mapping = new EmbeddedMapping(this, this.getEntity(), (EmbeddedAttribute) attribute);
-					this.mappings.put(attribute.getName(), mapping);
-				default:
-					break;
-			}
-		}
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isId() {
+		return this.attribute.isId();
 	}
 }

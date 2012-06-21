@@ -31,45 +31,43 @@ import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 
 /**
- * The mapping for one-to-one and many-to-one associations.
+ * Mappings for one-to-one and many-to-one associations.
  * 
- * @param <X>
- *            the type of the entity
  * @param <Z>
- *            the inverse entity type
+ *            the source type
+ * @param <X>
+ *            the destination type
  * 
  * @author hceylan
  * @since $version
  */
-public class SingularAssociationMapping<X, Z> extends AssociationMapping<X, Z, Z> {
+public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X> {
 
-	private final AssociatedSingularAttribute<X, Z> attribute;
-	private AssociationMapping<Z, X, ?> inverse;
-	private EntityTypeImpl<Z> type;
-	private JoinTable joinTable;
-	private ForeignKey foreignKey;
+	private final AssociatedSingularAttribute<? super Z, X> attribute;
+	private final JoinTable joinTable;
+	private final ForeignKey foreignKey;
+	private EntityTypeImpl<X> type;
+	private AssociationMapping<?, ?> inverse;
 
 	/**
 	 * @param parent
-	 *            the parent mapping, may be <code>null</code>
-	 * 
-	 * @param entity
-	 *            the entity
+	 *            the parent mapping
 	 * @param attribute
 	 *            the attribute
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SingularAssociationMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity, AssociatedSingularAttribute<X, Z> attribute) {
-		super(parent, entity, attribute.getMetadata(), attribute);
+	public SingularAssociationMapping(ParentMapping<?, Z> parent, AssociatedSingularAttribute<? super Z, X> attribute) {
+		super(parent, attribute.getMetadata(), attribute);
 
 		this.attribute = attribute;
+
 		final AssociationMetadata metadata = this.getAssociationMetadata();
 
 		if (this.isOwner()) {
 			if (metadata.getJoinTable() != null) {
-				this.joinTable = new JoinTable(entity, metadata.getJoinTable());
+				this.joinTable = new JoinTable(this.getRoot().getType(), metadata.getJoinTable());
 				this.foreignKey = null;
 			}
 			else {
@@ -89,7 +87,7 @@ public class SingularAssociationMapping<X, Z> extends AssociationMapping<X, Z, Z
 	 */
 	@Override
 	public void checkTransient(ManagedInstance<?> managedInstance) {
-		final Z instance = this.get(managedInstance.getInstance());
+		final X instance = this.get(managedInstance.getInstance());
 		if (instance != null) {
 			managedInstance.getSession().checkTransient(instance);
 		}
@@ -102,7 +100,7 @@ public class SingularAssociationMapping<X, Z> extends AssociationMapping<X, Z, Z
 	@Override
 	public void flush(ConnectionImpl connection, ManagedInstance<?> managedInstance) throws SQLException {
 		if (this.getJoinTable() != null) {
-			final Z entity = this.get(managedInstance.getInstance());
+			final X entity = this.get(managedInstance.getInstance());
 
 			this.getJoinTable().performInsert(managedInstance.getSession(), connection, managedInstance.getInstance(), entity);
 		}
@@ -113,7 +111,7 @@ public class SingularAssociationMapping<X, Z> extends AssociationMapping<X, Z, Z
 	 * 
 	 */
 	@Override
-	public AssociatedSingularAttribute<? super X, Z> getAttribute() {
+	public AssociatedSingularAttribute<? super Z, X> getAttribute() {
 		return this.attribute;
 	}
 
@@ -131,7 +129,7 @@ public class SingularAssociationMapping<X, Z> extends AssociationMapping<X, Z, Z
 	 * 
 	 */
 	@Override
-	public AssociationMapping<Z, X, ?> getInverse() {
+	public AssociationMapping<?, ?> getInverse() {
 		return this.inverse;
 	}
 
@@ -149,7 +147,7 @@ public class SingularAssociationMapping<X, Z> extends AssociationMapping<X, Z, Z
 	 * 
 	 */
 	@Override
-	public EntityTypeImpl<Z> getType() {
+	public EntityTypeImpl<?> getType() {
 		return this.type;
 	}
 
@@ -158,14 +156,14 @@ public class SingularAssociationMapping<X, Z> extends AssociationMapping<X, Z, Z
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public void link() throws MappingException {
-		final MetamodelImpl metamodel = this.getEntity().getMetamodel();
+		final EntityTypeImpl<?> entity = this.getRoot().getType();
+		final MetamodelImpl metamodel = entity.getMetamodel();
 
 		this.type = metamodel.entity(this.attribute.getJavaType());
 
 		if (!this.isOwner()) {
-			this.inverse = (AssociationMapping<Z, X, ?>) this.type.getMapping(this.getMappedBy());
+			this.inverse = (AssociationMapping<?, ?>) this.type.getRootMapping().getMapping(this.getMappedBy());
 
 			if (this.inverse == null) {
 				throw new MappingException("Cannot find the mappedBy attribute " + this.getMappedBy() + " specified on " + this.attribute.getJavaMember());
@@ -175,12 +173,12 @@ public class SingularAssociationMapping<X, Z> extends AssociationMapping<X, Z, Z
 		}
 		else {
 			// initialize the join table
-			if (this.getJoinTable() != null) {
-				this.getJoinTable().link(this.getEntity(), this.type);
+			if (this.joinTable != null) {
+				this.joinTable.link(entity, this.type);
 			}
 			// initialize the foreign key
 			else {
-				this.getForeignKey().link(this, this.type);
+				this.foreignKey.link(this, this.type);
 			}
 		}
 	}
@@ -195,18 +193,17 @@ public class SingularAssociationMapping<X, Z> extends AssociationMapping<X, Z, Z
 	}
 
 	/**
-	 * Loads the lazy instance
-	 * 
-	 * @param instance
+	 * @param managedInstance
 	 *            the managed instance
-	 * @param id
-	 *            the id of the relation
+	 * @param mappingId
+	 *            the id of the mapping
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void load(ManagedInstance<?> instance, Object id) {
+	public void load(ManagedInstance<?> managedInstance, Object mappingId) {
 		// TODO Auto-generated method stub
+
 	}
 
 	/**
@@ -223,7 +220,7 @@ public class SingularAssociationMapping<X, Z> extends AssociationMapping<X, Z, Z
 	 * 
 	 */
 	@Override
-	public void setInverse(AssociationMapping<Z, X, ?> inverse) {
+	public void setInverse(AssociationMapping<?, ?> inverse) {
 		this.inverse = inverse;
 	}
 
@@ -233,8 +230,8 @@ public class SingularAssociationMapping<X, Z> extends AssociationMapping<X, Z, Z
 	 */
 	@Override
 	public void setLazy(ManagedInstance<?> instance) {
-		final EntityTypeImpl<Z> type = this.attribute.getType();
-		final ManagedInstance<Z> value = type.getManagedInstanceById(instance.getSession(), this, instance.getId(), null, true);
+		final EntityTypeImpl<X> type = this.attribute.getType();
+		final ManagedInstance<X> value = type.getManagedInstanceById(instance.getSession(), this, instance.getId(), null, true);
 		this.set(instance, value.getInstance());
 	}
 }

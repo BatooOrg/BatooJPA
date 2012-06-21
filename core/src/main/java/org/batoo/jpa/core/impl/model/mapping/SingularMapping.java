@@ -18,37 +18,21 @@
  */
 package org.batoo.jpa.core.impl.model.mapping;
 
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 /**
  * The base class for {@link EmbeddedMapping} and {@link BasicMapping}.
  * 
+ * @param <Z>
+ *            the source type
  * @param <X>
- *            the type of the entity
- * @param <Y>
- *            the type of the value
+ *            the destination type
  * 
  * @author hceylan
  * @since $version
  */
-public abstract class SingularMapping<X, Y> extends AbstractMapping<X, Y> {
-
-	/**
-	 * 
-	 * @param parent
-	 *            the parent mapping, may be <code>null</code>
-	 * @param entity
-	 *            the entity
-	 * @param attribute
-	 *            the attribute
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public SingularMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity, SingularAttributeImpl<? super X, Y> attribute) {
-		super(parent, entity, attribute);
-	}
+public interface SingularMapping<Z, X> {
 
 	/**
 	 * Fills the sequence / table generated value.
@@ -62,12 +46,40 @@ public abstract class SingularMapping<X, Y> extends AbstractMapping<X, Y> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract boolean fillValue(Object instance);
+	boolean fillValue(Object instance);
 
 	/**
-	 * {@inheritDoc}
+	 * Returns the mapping value of instance.
 	 * 
+	 * @param instance
+	 *            the instance of which the value to be returned
+	 * @return the mapping value of instance
+	 * 
+	 * @since $version
+	 * @author hceylan
 	 */
-	@Override
-	public abstract SingularAttributeImpl<? super X, Y> getAttribute();
+	X get(Object instance);
+
+	/**
+	 * Returns the attribute of the mapping.
+	 * 
+	 * @return the attribute of the mapping
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	SingularAttributeImpl<? super Z, X> getAttribute();
+
+	/**
+	 * Sets the mapping value of instance.
+	 * 
+	 * @param managedInstance
+	 *            the instance of which the value to set
+	 * @param value
+	 *            the value to set
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	void set(ManagedInstance<?> managedInstance, Object value);
 }

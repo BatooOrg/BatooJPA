@@ -22,6 +22,7 @@ import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
+import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.impl.AbstractLocator;
@@ -55,7 +56,7 @@ public class JoinColumn extends AbstractColumn {
 	private int sqlType;
 	private int scale;
 
-	private AssociationMapping<?, ?, ?> mapping;
+	private AssociationMapping<?, ?> mapping;
 	private BasicMapping<?, ?> referencedMapping;
 
 	/**
@@ -69,7 +70,7 @@ public class JoinColumn extends AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public JoinColumn(AssociationMapping<?, ?, ?> mapping, BasicMapping<?, ?> idMapping) {
+	public JoinColumn(AssociationMapping<?, ?> mapping, BasicMapping<?, ?> idMapping) {
 		super();
 
 		this.mapping = mapping;
@@ -212,7 +213,7 @@ public class JoinColumn extends AbstractColumn {
 	 * 
 	 */
 	@Override
-	public AssociationMapping<?, ?, ?> getMapping() {
+	public Mapping<?, ?> getMapping() {
 		return this.mapping;
 	}
 
@@ -395,13 +396,13 @@ public class JoinColumn extends AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void setColumnProperties(AssociationMapping<?, ?, ?> mapping, BasicMapping<?, ?> referencedMapping) {
+	public void setColumnProperties(AssociationMapping<?, ?> mapping, BasicMapping<?, ?> referencedMapping) {
 		final JdbcAdaptor jdbcAdaptor = referencedMapping.getEntity().getMetamodel().getJdbcAdaptor();
 
 		// if attribute present then the join column belongs to an entity table
 		if (mapping != null) {
 			this.mapping = mapping;
-			this.mappingName = mapping.getAttribute().getName() + "_" + referencedMapping.getColumn().getName();
+			this.mappingName = mapping.getName() + "_" + referencedMapping.getColumn().getName();
 			this.name = jdbcAdaptor.escape(this.mappingName);
 		}
 		else {

@@ -134,6 +134,8 @@ public interface EntityManagerFactory {
 	 * @param cls
 	 *            the class of the object to be returned. This is normally either the underlying EntityManagerFactory implementation class
 	 *            or an interface that it implements.
+	 * @param <T>
+	 *            the type of the class
 	 * @return an instance of the specified class
 	 * @throws PersistenceException
 	 *             if the provider does not support the call

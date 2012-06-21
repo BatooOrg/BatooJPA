@@ -69,7 +69,7 @@ public class CollectionAttributeImpl<X, E> extends PluralAttributeImpl<X, Collec
 	 * 
 	 */
 	@Override
-	public Collection<E> newCollection(PluralAssociationMapping<?, E, Collection<E>> mapping, ManagedInstance<?> managedInstance) {
+	public Collection<E> newCollection(PluralAssociationMapping<?, Collection<E>, E> mapping, ManagedInstance<?> managedInstance) {
 		return new ManagedList<X, E>(mapping, managedInstance);
 	}
 
@@ -79,7 +79,7 @@ public class CollectionAttributeImpl<X, E> extends PluralAttributeImpl<X, Collec
 	 */
 	@Override
 	public Collection<E>
-		newCollection(PluralAssociationMapping<?, E, Collection<E>> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
+		newCollection(PluralAssociationMapping<?, Collection<E>, E> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
 		return new ManagedList<X, E>(mapping, managedInstance, values);
 	}
 }

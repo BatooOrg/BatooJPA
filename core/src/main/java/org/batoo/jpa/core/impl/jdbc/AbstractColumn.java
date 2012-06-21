@@ -20,7 +20,7 @@ package org.batoo.jpa.core.impl.jdbc;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
+import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 
 /**
@@ -69,7 +69,7 @@ public abstract class AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract AbstractMapping<?, ?> getMapping();
+	public abstract Mapping<?, ?> getMapping();
 
 	/**
 	 * Returns the mapping name of the column.

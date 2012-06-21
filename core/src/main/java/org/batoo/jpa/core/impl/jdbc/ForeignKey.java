@@ -23,10 +23,10 @@ import java.util.List;
 import javax.persistence.criteria.JoinType;
 
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
-import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
+import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.util.Pair;
@@ -169,7 +169,7 @@ public class ForeignKey {
 	}
 
 	private void createEmbeddedJoins(SecondaryTable table, EmbeddedMapping<?, ?> mapping, List<PrimaryKeyJoinColumnMetadata> metadata) {
-		for (final AbstractMapping<?, ?> child : mapping.getMappings()) {
+		for (final Mapping<?, ?> child : mapping.getChildren()) {
 			if (child instanceof BasicMapping) {
 				final BasicMapping<?, ?> basicMapping = (BasicMapping<?, ?>) child;
 
@@ -292,7 +292,7 @@ public class ForeignKey {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void link(AssociationMapping<?, ?, ?> mapping, EntityTypeImpl<?> targetEntity) {
+	public void link(AssociationMapping<?, ?> mapping, EntityTypeImpl<?> targetEntity) {
 		// single primary key
 		if (targetEntity.hasSingleIdAttribute()) {
 			final SingularMapping<?, ?> idMapping = targetEntity.getIdMapping();
@@ -314,7 +314,7 @@ public class ForeignKey {
 		}
 
 		if (mapping != null) {
-			final AbstractTable table = ((EntityTypeImpl<?>) mapping.getEntity()).getTable(this.tableName);
+			final AbstractTable table = mapping.getRoot().getType().getTable(this.tableName);
 			if (table == null) {
 				throw new MappingException("Table " + this.tableName + " could not be found");
 			}
@@ -323,8 +323,8 @@ public class ForeignKey {
 		}
 	}
 
-	private void linkEmbeddedJoins(AssociationMapping<?, ?, ?> mapping, EmbeddedMapping<?, ?> embeddedMapping) {
-		for (final AbstractMapping<?, ?> child : embeddedMapping.getMappings()) {
+	private void linkEmbeddedJoins(AssociationMapping<?, ?> mapping, EmbeddedMapping<?, ?> embeddedMapping) {
+		for (final Mapping<?, ?> child : embeddedMapping.getChildren()) {
 			if (child instanceof BasicMapping) {
 				this.linkJoinColumn(mapping, (BasicMapping<?, ?>) child);
 			}
@@ -335,7 +335,7 @@ public class ForeignKey {
 		}
 	}
 
-	private void linkJoinColumn(AssociationMapping<?, ?, ?> mapping, final BasicMapping<?, ?> idMapping) {
+	private void linkJoinColumn(AssociationMapping<?, ?> mapping, final BasicMapping<?, ?> idMapping) {
 		// no definition for the join columns
 		if (this.joinColumns.size() == 0) {
 			// create the join column

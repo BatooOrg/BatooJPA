@@ -24,7 +24,7 @@ import javax.persistence.DiscriminatorType;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
+import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.DiscriminatorColumnMetadata;
@@ -101,7 +101,7 @@ public class DiscriminatorColumn extends AbstractColumn {
 	 * 
 	 */
 	@Override
-	public AbstractMapping<?, ?> getMapping() {
+	public Mapping<?, ?> getMapping() {
 		return null;
 	}
 

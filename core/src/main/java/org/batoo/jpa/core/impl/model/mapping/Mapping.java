@@ -23,43 +23,50 @@ import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 /**
- * The base class for the mappings.
+ * The base implementation of mappings.
  * 
+ * @param <Z>
+ *            the source type
  * @param <X>
- *            the type of the entity
- * @param <Y>
- *            the type of the value
+ *            the destination type
  * 
  * @author hceylan
  * @since $version
  */
-public abstract class AbstractMapping<X, Y> {
+public abstract class Mapping<Z, X> {
 
-	private final EmbeddedMapping<?, ?> parent;
-	private final EntityTypeImpl<X> entity;
-	private final boolean inherited;
+	private final ParentMapping<?, Z> parent;
 	private final String path;
+	private final Class<X> javaType;
+	private final String name;
+	private final boolean root;
+	private final boolean inherited;
+	private final EntityTypeImpl<?> entity;
 
 	/**
-	 * 
 	 * @param parent
-	 *            the parent mapping, may be <code>null</code>
+	 *            the parent mapping
 	 * @param entity
-	 *            the entity
-	 * @param attribute
-	 *            the attribute
+	 *            the root entity
+	 * @param javaType
+	 *            the java type
+	 * @param name
+	 *            the name of the mapping
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AbstractMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity, AttributeImpl<? super X, Y> attribute) {
+	public Mapping(ParentMapping<?, Z> parent, EntityTypeImpl<?> entity, Class<X> javaType, String name) {
 		super();
 
+		this.javaType = javaType;
 		this.parent = parent;
-		this.entity = entity;
-		this.inherited = entity.getRootType().getInheritanceType() != null;
+		this.name = name;
 
-		this.path = parent != null ? parent.getPath() + "." + attribute.getName() : this.entity.getName() + "." + attribute.getName();
+		this.path = parent != null ? parent.getPath() + "." + name : name;
+		this.root = parent instanceof RootMapping;
+		this.entity = entity;
+		this.inherited = this.entity.getRootType().getInheritanceType() != null;
 	}
 
 	/**
@@ -72,7 +79,7 @@ public abstract class AbstractMapping<X, Y> {
 			return true;
 		}
 
-		final AbstractMapping<?, ?> other = (AbstractMapping<?, ?>) obj;
+		final Mapping<?, ?> other = (Mapping<?, ?>) obj;
 
 		return this.getPath().equals(other.getPath());
 	}
@@ -87,8 +94,8 @@ public abstract class AbstractMapping<X, Y> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public final Y get(Object instance) {
-		if (this.getParent() != null) {
+	public final X get(Object instance) {
+		if (!this.root) {
 			instance = this.getParent().get(instance);
 
 			if (instance == null) {
@@ -107,36 +114,48 @@ public abstract class AbstractMapping<X, Y> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract AttributeImpl<? super X, Y> getAttribute();
+	public abstract AttributeImpl<? super Z, X> getAttribute();
 
 	/**
-	 * Returns the entity of the mapping.
+	 * Returns the javaType of the mapping.
 	 * 
-	 * @return the entity of the mapping
+	 * @return the javaType of the mapping
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public final EntityTypeImpl<X> getEntity() {
-		return this.entity;
+	public Class<X> getJavaType() {
+		return this.javaType;
 	}
 
 	/**
-	 * Returns the parent of the AbstractMapping.
+	 * Returns the name of the Mapping.
 	 * 
-	 * @return the parent of the AbstractMapping
+	 * @return the name of the Mapping
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EmbeddedMapping<?, ?> getParent() {
+	public String getName() {
+		return this.name;
+	}
+
+	/**
+	 * Returns the parent of the mapping.
+	 * 
+	 * @return the parent of the mapping
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ParentMapping<?, Z> getParent() {
 		return this.parent;
 	}
 
 	/**
-	 * Returns the fully qualified path of the mapping.
+	 * Returns the path of the mapping.
 	 * 
-	 * @return the fully qualified path of the mapping
+	 * @return the path of the mapping
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -148,18 +167,13 @@ public abstract class AbstractMapping<X, Y> {
 	/**
 	 * Returns the root of the mapping.
 	 * 
-	 * @return the root mapping
+	 * @return the root of the mapping
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public final AbstractMapping<?, ?> getRootMapping() {
-		AbstractMapping<?, ?> rootMapping = this;
-		while (rootMapping.getParent() != null) {
-			rootMapping = rootMapping.getParent();
-		}
-
-		return rootMapping;
+	public RootMapping<?> getRoot() {
+		return this.parent.getRoot();
 	}
 
 	/**
@@ -184,11 +198,11 @@ public abstract class AbstractMapping<X, Y> {
 	 */
 	public final void set(ManagedInstance<?> managedInstance, Object value) {
 		Object instance = managedInstance.getInstance();
-		if (this.getParent() != null) {
+		if (!this.root) {
 			instance = this.parent.get(managedInstance.getInstance());
 
 			if (instance == null) {
-				instance = this.parent.getAttribute().newInstance();
+				instance = ((EmbeddedMapping<?, Z>) this.parent).getAttribute().newInstance();
 				this.parent.set(managedInstance, instance);
 			}
 		}
@@ -213,14 +227,5 @@ public abstract class AbstractMapping<X, Y> {
 	 */
 	public void set(ManagedInstance<?> managedInstance, Object instance, Object value) {
 		this.getAttribute().set(instance, value);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String toString() {
-		return this.getAttribute().toString();
 	}
 }

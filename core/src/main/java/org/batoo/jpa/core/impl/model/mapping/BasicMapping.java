@@ -18,75 +18,72 @@
  */
 package org.batoo.jpa.core.impl.model.mapping;
 
+import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.jdbc.TypeFactory;
+import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
-import org.batoo.jpa.core.impl.model.type.BasicTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.type.MappedSuperclassTypeImpl;
+import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 
 /**
- * Mapping for basic types, id, version, basic attributes.
+ * The mapping for basic attributes.
  * 
+ * @param <Z>
+ *            the source type
  * @param <X>
- *            the type of the entity
- * @param <Y>
- *            the type of the value
+ *            the destination type
  * 
  * @author hceylan
  * @since $version
  */
-public class BasicMapping<X, Y> extends SingularMapping<X, Y> {
+public class BasicMapping<Z, X> extends Mapping<Z, X> implements SingularMapping<Z, X> {
 
-	private final BasicAttribute<? super X, Y> attribute;
-	private BasicColumn column;
+	private final BasicAttribute<? super Z, X> attribute;
+	private final BasicColumn column;
 
 	/**
-	 * The default constructor.
-	 * 
 	 * @param parent
-	 *            the parent mapping, may be <code>null</code>
-	 * @param entity
-	 *            the entity
+	 *            the parent mapping
 	 * @param attribute
-	 *            the basic attribute
+	 *            the attribute
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public BasicMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity, BasicAttribute<? super X, Y> attribute) {
-		this(parent, entity, attribute, false);
-	}
-
-	/**
-	 * Constructor for embedded attribute sub mappings.
-	 * 
-	 * @param parent
-	 *            the parent mapping, may be <code>null</code>
-	 * @param entity
-	 *            the entity
-	 * @param attribute
-	 *            the basic attribute
-	 * @param id
-	 *            if the attribute should be treated as id
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public BasicMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity, BasicAttribute<? super X, Y> attribute, boolean id) {
-		super(parent, entity, attribute);
+	public BasicMapping(ParentMapping<?, Z> parent, BasicAttribute<? super Z, X> attribute) {
+		super(parent, parent.getRoot().getType(), attribute.getJavaType(), attribute.getName());
 
 		this.attribute = attribute;
 
 		final ColumnMetadata columnMetadata = this.getColumnMetadata();
 		final int sqlType = TypeFactory.getSqlType(this.getAttribute().getJavaType(), attribute.getTemporalType(), attribute.getEnumType(), attribute.isLob());
 
-		if (id || attribute.isId()) {
+		if (this.attribute.isId() || this.getParent().isId()) {
 			this.column = new PkColumn(this, sqlType, columnMetadata);
 		}
 		else {
 			this.column = new BasicColumn(this, sqlType, columnMetadata);
+		}
+
+		final String tableName = this.column.getTableName();
+
+		// if table name is blank, it means the column should belong to the primary table
+		if (StringUtils.isBlank(tableName)) {
+			this.column.setTable(this.getEntity().getPrimaryTable());
+		}
+		// otherwise locate the table
+		else {
+			final AbstractTable table = this.getEntity().getTable(tableName);
+			if (table == null) {
+				throw new MappingException("Table " + tableName + " could not be found", this.column.getLocator());
+			}
+
+			this.column.setTable(table);
 		}
 	}
 
@@ -104,14 +101,14 @@ public class BasicMapping<X, Y> extends SingularMapping<X, Y> {
 	 * 
 	 */
 	@Override
-	public final BasicAttribute<? super X, Y> getAttribute() {
+	public BasicAttribute<? super Z, X> getAttribute() {
 		return this.attribute;
 	}
 
 	/**
-	 * Returns the physical column of the attribute.
+	 * Returns the column of the mapping.
 	 * 
-	 * @return the physical column of the attribute
+	 * @return the column of the mapping
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -129,64 +126,57 @@ public class BasicMapping<X, Y> extends SingularMapping<X, Y> {
 	 * @author hceylan
 	 */
 	private ColumnMetadata getColumnMetadata() {
-		String path = this.attribute.getName();
-
 		ColumnMetadata metadata = null;
 
-		// check with the parent chain if there is an attribute override
-		AbstractMapping<?, ?> mapping = this;
-		while (mapping.getParent() != null) {
-			final EmbeddedMapping<?, ?> parent = mapping.getParent();
+		final String path = this.getParent().getRootPath(this.attribute.getName());
+		final AttributeImpl<?, ?> rootAttribute = this.getParent().getRootAttribute(this.attribute);
 
-			if (parent.getAttribute().getAttributeOverride(path) != null) {
-				metadata = parent.getAttribute().getAttributeOverride(path);
-			}
+		/**
+		 * The priorities are like below:
+		 * 
+		 * 1. If the root attribute is defined in the root type (thus the entity) then locate the attribute override on the attribute chain<br />
+		 * 2. If the root attribute is defined in a parent mapped super class then locate the attribute on the entity<br />
+		 * 3. If the parent is an embeddable mapping then locate the attribute override again on the attribute chain<br />
+		 * 4. return the column metadata from the attribute<br />
+		 */
 
-			path = parent.getAttribute().getName() + "." + path;
-
-			mapping = parent;
-		}
-
-		// if the embeddable defined in this entity then return it
-		if ((metadata != null) && (mapping.getAttribute().getDeclaringType() == this.getEntity())) {
-			return metadata;
-		}
-
-		// check with the override path
-		EntityTypeImpl<? super X> entity = this.getEntity();
-		while (entity != null) {
-			// only up to declaring entity
-			if (entity == mapping.getAttribute().getDeclaringType()) {
-				break;
-			}
-
-			// if there is an override return it
-			metadata = entity.getAttributeOverride(path);
+		// Clause 1
+		if ((rootAttribute.getDeclaringType() == this.getRoot().getType()) && (this.getParent() instanceof EmbeddedMapping)) {
+			metadata = ((EmbeddedMapping<?, ?>) this.getParent()).getAttributeOverride(path);
 			if (metadata != null) {
 				return metadata;
 			}
+		}
 
-			if (entity.getSupertype() instanceof EntityTypeImpl) {
-				entity = (EntityTypeImpl<? super X>) entity.getSupertype();
-			}
-			else {
-				break;
+		// Clause 2
+		if (rootAttribute.getDeclaringType() instanceof MappedSuperclassTypeImpl) {
+			metadata = this.getRoot().getType().getAttributeOverride(path);
+			if (metadata != null) {
+				return metadata;
 			}
 		}
 
-		// fall back to attribute's column metadata
+		// Clause 3
+		if (this.getParent() instanceof EmbeddedMapping) {
+			metadata = ((EmbeddedMapping<?, ?>) this.getParent()).getAttributeOverride(path);
+			if (metadata != null) {
+				return metadata;
+			}
+		}
+
+		// Clause 4: fall back to attribute's column metadata
 		return this.attribute.getMetadata().getColumn();
 	}
 
 	/**
-	 * Returns the bindable entity type.
+	 * Returns the entity of the mapping.
 	 * 
-	 * @return the bindable entity type
+	 * @return the entity of the mapping
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public final BasicTypeImpl<Y> getType() {
-		return this.getAttribute().getType();
+	public EntityTypeImpl<?> getEntity() {
+		return this.getRoot().getType();
 	}
 }

@@ -27,9 +27,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.criteria.CompoundExpressionImpl.Comparison;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
+import org.batoo.jpa.core.impl.model.mapping.Mapping;
 
 import com.google.common.collect.Maps;
 
@@ -47,7 +47,7 @@ public class ParameterExpressionImpl<T> extends ExpressionImpl<T> implements Par
 	private final String name;
 	private Integer position;
 	private int expandedCount = 0;
-	private final Map<Integer, AbstractMapping<?, ?>> mappingMap = Maps.newHashMap();
+	private final Map<Integer, Mapping<?, ?>> mappingMap = Maps.newHashMap();
 
 	/**
 	 * @param paramClass
@@ -171,7 +171,7 @@ public class ParameterExpressionImpl<T> extends ExpressionImpl<T> implements Par
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void registerParameter(CriteriaQueryImpl<?> query, AbstractMapping<?, ?> mapping) {
+	public void registerParameter(CriteriaQueryImpl<?> query, Mapping<?, ?> mapping) {
 		this.mappingMap.put(query.setNextSqlParam(this), mapping);
 	}
 
@@ -192,7 +192,7 @@ public class ParameterExpressionImpl<T> extends ExpressionImpl<T> implements Par
 	 * @author hceylan
 	 */
 	private void setParameter(Object[] parameters, MutableInt sqlParamindex, EmbeddedMapping<?, ?> mapping, Object value) {
-		for (final AbstractMapping<?, ?> child : mapping.getMappings()) {
+		for (final Mapping<?, ?> child : mapping.getChildren()) {
 			if (child instanceof BasicMapping) {
 				parameters[sqlParamindex.intValue()] = child.getAttribute().get(value);
 
@@ -220,7 +220,7 @@ public class ParameterExpressionImpl<T> extends ExpressionImpl<T> implements Par
 	 * @author hceylan
 	 */
 	public void setParameter(Object[] parameters, MutableInt paramIndex, MutableInt sqlParamindex, Object value) {
-		final AbstractMapping<?, ?> mapping = this.mappingMap.get(paramIndex.intValue());
+		final Mapping<?, ?> mapping = this.mappingMap.get(paramIndex.intValue());
 
 		if (mapping instanceof BasicMapping) {
 			parameters[sqlParamindex.intValue()] = value;

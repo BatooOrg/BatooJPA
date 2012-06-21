@@ -88,7 +88,7 @@ public class LinkManager extends DeploymentManager<EntityTypeImpl<?>> {
 	public Void perform(EntityTypeImpl<?> entity) throws BatooException {
 		switch (this.phase) {
 			case LINK_ASSOCIATIONS:
-				for (final AssociationMapping<?, ?, ?> attribute : entity.getAssociations()) {
+				for (final AssociationMapping<?, ?> attribute : entity.getAssociations()) {
 					attribute.link();
 				}
 				break;

@@ -50,5 +50,4 @@ public class FooExt2 extends Foo {
 	public void setValueExt2(String valueExt2) {
 		this.valueExt2 = valueExt2;
 	}
-
 }

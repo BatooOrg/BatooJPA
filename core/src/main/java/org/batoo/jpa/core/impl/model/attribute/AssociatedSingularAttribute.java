@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.model.attribute;
 
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;

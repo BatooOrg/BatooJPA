@@ -23,7 +23,6 @@ import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,7 +32,6 @@ import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.FetchParent;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Path;
-import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.SingularAttribute;
@@ -50,7 +48,6 @@ import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.instance.Enhancer;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
-import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.DiscriminatorColumn;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
@@ -59,16 +56,13 @@ import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.EntityTransactionImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
-import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
-import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
-import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
-import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
-import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
+import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.RootMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
 import org.batoo.jpa.core.util.Pair;
@@ -109,18 +103,17 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private CriteriaQueryImpl<X> selectCriteria;
 
 	private int dependencyCount;
-	private final HashMap<EntityTypeImpl<?>, AssociationMapping<? super X, ?, ?>[]> dependencyMap = Maps.newHashMap();
+	private final Map<EntityTypeImpl<?>, AssociationMapping<?, ?>[]> dependencyMap = Maps.newHashMap();
 
-	private AssociationMapping<?, ?, ?>[] associations;
-	private AssociationMapping<?, ?, ?>[] associationsPersistable;
-	private AssociationMapping<?, ?, ?>[] associationsEager;
-	private AssociationMapping<?, ?, ?>[] associationsJoined;
+	private AssociationMapping<?, ?>[] associations;
+	private AssociationMapping<?, ?>[] associationsPersistable;
+	private AssociationMapping<?, ?>[] associationsEager;
+	private AssociationMapping<?, ?>[] associationsJoined;
 	private PluralAssociationMapping<?, ?, ?>[] associationsPlural;
 	private SingularAssociationMapping<?, ?>[] associationsSingularLazy;
 
 	private final Map<Method, Method> idMethods = Maps.newHashMap();
 
-	private final Map<String, AbstractMapping<? super X, ?>> mappings = Maps.newHashMap();
 	private SingularMapping<? super X, ?> idMapping;
 	private Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>[] idMappings;
 
@@ -129,6 +122,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private final String discriminatorValue;
 	private DiscriminatorColumn discriminatorColumn;
 	private EntityTypeImpl<? super X> rootType;
+	private final RootMapping<X> rootMapping;
 
 	/**
 	 * @param metamodel
@@ -153,7 +147,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 		this.addAttributes(metadata);
 		this.initTables(metadata);
-
+		this.rootMapping = new RootMapping<X>(this);
 		this.linkMappings();
 	}
 
@@ -314,8 +308,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
-	public AssociationMapping<?, ?, ?>[] getAssociations() {
+	public AssociationMapping<?, ?>[] getAssociations() {
 		if (this.associations != null) {
 			return this.associations;
 		}
@@ -325,20 +318,11 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.associations;
 			}
 
-			final List<AssociationMapping<?, ?, ?>> associations = Lists.newArrayList();
+			final List<AssociationMapping<?, ?>> associations = Lists.newArrayList();
 
-			for (final AbstractMapping<? super X, ?> mapping : this.mappings.values()) {
-				if (mapping instanceof AssociationMapping) {
-					associations.add((AssociationMapping<? super X, ?, ?>) mapping);
-				}
+			this.rootMapping.addAssociations(associations);
 
-				if (mapping instanceof EmbeddedMapping) {
-					final EmbeddedMapping<? super X, ?> embeddedMapping = (EmbeddedMapping<? super X, ?>) mapping;
-					embeddedMapping.addAssociations(associations);
-				}
-			}
-
-			final AssociationMapping<? super X, ?, ?>[] associatedAttributes0 = new AssociationMapping[associations.size()];
+			final AssociationMapping<?, ?>[] associatedAttributes0 = new AssociationMapping[associations.size()];
 			associations.toArray(associatedAttributes0);
 
 			return this.associations = associatedAttributes0;
@@ -353,7 +337,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AssociationMapping<?, ?, ?>[] getAssociationsEager() {
+	public AssociationMapping<?, ?>[] getAssociationsEager() {
 		if (this.associationsEager != null) {
 			return this.associationsEager;
 		}
@@ -363,15 +347,15 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.associationsEager;
 			}
 
-			final List<AssociationMapping<?, ?, ?>> eagerAssociations = Lists.newArrayList();
+			final List<AssociationMapping<?, ?>> eagerAssociations = Lists.newArrayList();
 
-			for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
+			for (final AssociationMapping<?, ?> association : this.getAssociations()) {
 				if (association.isEager()) {
 					eagerAssociations.add(association);
 				}
 			}
 
-			final AssociationMapping<?, ?, ?>[] eagerAssociations0 = new AssociationMapping[eagerAssociations.size()];
+			final AssociationMapping<?, ?>[] eagerAssociations0 = new AssociationMapping[eagerAssociations.size()];
 			eagerAssociations.toArray(eagerAssociations0);
 
 			return this.associationsEager = eagerAssociations0;
@@ -386,7 +370,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AssociationMapping<?, ?, ?>[] getAssociationsJoined() {
+	public AssociationMapping<?, ?>[] getAssociationsJoined() {
 		if (this.associationsJoined != null) {
 			return this.associationsJoined;
 		}
@@ -396,15 +380,15 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.associationsJoined;
 			}
 
-			final List<AssociationMapping<?, ?, ?>> joinedAssociations = Lists.newArrayList();
+			final List<AssociationMapping<?, ?>> joinedAssociations = Lists.newArrayList();
 
-			for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
+			for (final AssociationMapping<?, ?> association : this.getAssociations()) {
 				if (association.getJoinTable() != null) {
 					joinedAssociations.add(association);
 				}
 			}
 
-			final AssociationMapping<?, ?, ?>[] joinedAssociations0 = new AssociationMapping[joinedAssociations.size()];
+			final AssociationMapping<?, ?>[] joinedAssociations0 = new AssociationMapping[joinedAssociations.size()];
 			joinedAssociations.toArray(joinedAssociations0);
 
 			return this.associationsJoined = joinedAssociations0;
@@ -419,7 +403,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AssociationMapping<?, ?, ?>[] getAssociationsPersistable() {
+	public AssociationMapping<?, ?>[] getAssociationsPersistable() {
 		if (this.associationsPersistable != null) {
 			return this.associationsPersistable;
 		}
@@ -429,15 +413,15 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.associationsPersistable;
 			}
 
-			final List<AssociationMapping<?, ?, ?>> persistableAssociations = Lists.newArrayList();
+			final List<AssociationMapping<?, ?>> persistableAssociations = Lists.newArrayList();
 
-			for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
+			for (final AssociationMapping<?, ?> association : this.getAssociations()) {
 				if (association.cascadesPersist()) {
 					persistableAssociations.add(association);
 				}
 			}
 
-			final AssociationMapping<?, ?, ?>[] persistableAssociations0 = new AssociationMapping[persistableAssociations.size()];
+			final AssociationMapping<?, ?>[] persistableAssociations0 = new AssociationMapping[persistableAssociations.size()];
 			persistableAssociations.toArray(persistableAssociations0);
 
 			return this.associationsPersistable = persistableAssociations0;
@@ -452,7 +436,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
 	private PluralAssociationMapping<?, ?, ?>[] getAssociationsPlural() {
 		if (this.associationsPlural != null) {
 			return this.associationsPlural;
@@ -464,9 +447,9 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			}
 
 			final List<PluralAssociationMapping<?, ?, ?>> associationsPlural = Lists.newArrayList();
-			for (final AssociationMapping<?, ?, ?> mapping : this.getAssociations()) {
+			for (final AssociationMapping<?, ?> mapping : this.getAssociations()) {
 				if (mapping instanceof PluralAssociationMapping) {
-					associationsPlural.add((PluralAssociationMapping<? super X, ?, ?>) mapping);
+					associationsPlural.add((PluralAssociationMapping<?, ?, ?>) mapping);
 				}
 			}
 
@@ -496,7 +479,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			}
 
 			final List<SingularAssociationMapping<?, ?>> associationsSingularLazy = Lists.newArrayList();
-			for (final AssociationMapping<?, ?, ?> mapping : this.getAssociations()) {
+			for (final AssociationMapping<?, ?> mapping : this.getAssociations()) {
 				if (mapping instanceof SingularAssociationMapping) {
 					final SingularAssociationMapping<?, ?> singularMapping = (SingularAssociationMapping<?, ?>) mapping;
 					if (singularMapping.isOwner() && !singularMapping.isEager()) {
@@ -574,7 +557,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AssociationMapping<? super X, ?, ?>[] getDependenciesFor(EntityTypeImpl<?> associate) {
+	public AssociationMapping<?, ?>[] getDependenciesFor(EntityTypeImpl<?> associate) {
 		return this.dependencyMap.get(associate);
 	}
 
@@ -643,8 +626,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.idMapping;
 			}
 
-			for (final AbstractMapping<? super X, ?> mapping : this.mappings.values()) {
-				if ((mapping.getAttribute() instanceof SingularAttribute) && ((SingularAttribute<? super X, ?>) mapping.getAttribute()).isId()) {
+			for (final Mapping<? super X, ?> mapping : this.rootMapping.getChildren()) {
+				if ((mapping instanceof SingularMapping) && ((SingularMapping<? super X, ?>) mapping).getAttribute().isId()) {
 					return this.idMapping = (SingularMapping<? super X, ?>) mapping;
 				}
 			}
@@ -676,9 +659,9 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			final EmbeddableTypeImpl<?> idType = (EmbeddableTypeImpl<?>) this.getIdType();
 			final List<Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>> idMappings = Lists.newArrayList();
 
-			for (final AbstractMapping<? super X, ?> mapping : this.mappings.values()) {
+			for (final Mapping<? super X, ?> mapping : this.rootMapping.getChildren()) {
 				// only interested in id mappings
-				if (!(mapping.getAttribute() instanceof SingularAttribute) || !((SingularAttribute<? super X, ?>) mapping.getAttribute()).isId()) {
+				if (!(mapping instanceof SingularMapping) || !((SingularMapping<? super X, ?>) mapping).getAttribute().isId()) {
 					continue;
 				}
 
@@ -686,10 +669,10 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				final BasicMapping<? super X, ?> basicMapping = (BasicMapping<? super X, ?>) mapping;
 
 				// must have a corresponding attribute
-				final AttributeImpl<?, ?> attribute = idType.getAttribute(mapping.getAttribute().getName());
-				if ((attribute == null) || (attribute.getClass() != mapping.getAttribute().getClass())) {
-					throw new MappingException("Attribute types mismatch: " + attribute.getJavaMember() + ", " + mapping.getAttribute().getJavaMember(),
-						attribute.getLocator(), mapping.getAttribute().getLocator());
+				final AttributeImpl<?, ?> attribute = idType.getAttribute(mapping.getName());
+				if ((attribute == null) || (attribute.getJavaType() != mapping.getJavaType())) {
+					throw new MappingException("Attribute types mismatch: " + attribute.getJavaMember() + ", " + mapping.getJavaType(), attribute.getLocator(),
+						basicMapping.getAttribute().getLocator());
 				}
 
 				// attribute must be of basic type
@@ -795,20 +778,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
-	 * Returns the mapping with the <code>name</code>.
-	 * 
-	 * @param name
-	 *            the qualified name of the mapping
-	 * @return the mapping with the <code>name</code>
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public AbstractMapping<? super X, ?> getMapping(String name) {
-		return this.mappings.get(name);
-	}
-
-	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -852,6 +821,18 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 */
 	public EntityTable getPrimaryTable() {
 		return this.primaryTable;
+	}
+
+	/**
+	 * Returns the rootMapping of the EntityTypeImpl.
+	 * 
+	 * @return the rootMapping of the EntityTypeImpl
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public RootMapping<X> getRootMapping() {
+		return this.rootMapping;
 	}
 
 	/**
@@ -1088,15 +1069,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void linkMappings() {
 		if (this.getRootType().getInheritanceType() != null) {
-			if (this.getRootType() != this) {
-				// inherit mappings from the parent
-				this.mappings.putAll(((EntityTypeImpl<? super X>) this.getSupertype()).mappings);
-
-			}
-
 			// register the discriminator value
 			IdentifiableTypeImpl<? super X> parent = this;
 			do {
@@ -1112,55 +1086,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			this.discriminatorColumn = new DiscriminatorColumn(this, this.metadata.getDiscriminatorColumn());
 		}
 
-		for (final Attribute<? super X, ?> attribute : this.getAttributes()) {
-
-			// should we process the attribute
-			final boolean process = (attribute.getDeclaringType() == this) //
-				|| (attribute.getDeclaringType() instanceof MappedSuperclassTypeImpl);
-
-			if (!process) {
-				continue;
-			}
-
-			switch (attribute.getPersistentAttributeType()) {
-				case BASIC:
-					BasicMapping mapping;
-
-					mapping = new BasicMapping(null, this, (BasicAttribute) attribute);
-					this.mappings.put(attribute.getName(), mapping);
-
-					final BasicColumn basicColumn = ((BasicMapping<? super X, ?>) mapping).getColumn();
-					final String tableName = basicColumn.getTableName();
-
-					// if table name is blank, it means the column should belong to the primary table
-					if (StringUtils.isBlank(tableName)) {
-						basicColumn.setTable(this.getPrimaryTable());
-					}
-					// otherwise locate the table
-					else {
-						final AbstractTable table = this.tableMap.get(tableName);
-						if (table == null) {
-							throw new MappingException("Table " + tableName + " could not be found", basicColumn.getLocator());
-						}
-
-						basicColumn.setTable(table);
-					}
-
-					break;
-				case ONE_TO_ONE:
-				case MANY_TO_ONE:
-					this.mappings.put(attribute.getName(), new SingularAssociationMapping(null, this, (AssociatedSingularAttribute) attribute));
-					break;
-				case MANY_TO_MANY:
-				case ONE_TO_MANY:
-					this.mappings.put(attribute.getName(), new PluralAssociationMapping(null, this, (PluralAttributeImpl) attribute));
-					break;
-				case EMBEDDED:
-					this.mappings.put(attribute.getName(), new EmbeddedMapping(null, this, (EmbeddedAttribute) attribute));
-				default:
-					break;
-			}
-		}
+		this.rootMapping.createMappings();
 
 		// link the secondary tables
 		for (final EntityTable table : this.tableMap.values()) {
@@ -1268,12 +1194,11 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
 	public void prepareDependenciesFor(EntityTypeImpl<?> associate) {
 		// prepare the related associations
-		final Set<AssociationMapping<?, ?, ?>> attributes = Sets.newHashSet();
+		final Set<AssociationMapping<?, ?>> attributes = Sets.newHashSet();
 
-		for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
+		for (final AssociationMapping<?, ?> association : this.getAssociations()) {
 
 			// only owner associations impose priority
 			if (!association.isOwner()) {
@@ -1293,7 +1218,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			}
 		}
 
-		final AssociationMapping<? super X, ?, ?>[] dependencies = new AssociationMapping[attributes.size()];
+		final AssociationMapping<?, ?>[] dependencies = new AssociationMapping[attributes.size()];
 		attributes.toArray(dependencies);
 
 		this.dependencyCount += dependencies.length;
@@ -1307,10 +1232,10 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 * @param entityTypeImpl
 	 */
-	private void prepareEagerAssociations(FetchParent<?, ?> r, int depth, AssociationMapping<?, ?, ?> parent) {
+	private void prepareEagerAssociations(FetchParent<?, ?> r, int depth, AssociationMapping<?, ?> parent) {
 		if (depth < EntityTypeImpl.MAX_DEPTH) {
 
-			for (final AssociationMapping<?, ?, ?> association : this.getAssociationsEager()) {
+			for (final AssociationMapping<?, ?> association : this.getAssociationsEager()) {
 
 				// if we are coming from the inverse side and inverse side is not many-to-one then skip
 				if ((parent != null) && //
@@ -1338,8 +1263,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public void processAssociations(ManagedInstance<?> instance) {
-		final Set<AssociationMapping<?, ?, ?>> associationsLoaded = instance.getAssociationsLoaded();
-		for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
+		final Set<AssociationMapping<?, ?>> associationsLoaded = instance.getAssociationsLoaded();
+		for (final AssociationMapping<?, ?> association : this.getAssociations()) {
 			if (!associationsLoaded.contains(association)) {
 				if (association.isEager()) {
 					association.load(instance);

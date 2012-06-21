@@ -37,47 +37,43 @@ import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
 
 /**
- * The mapping for one-to-one and many-to-one associations.
  * 
- * @param <X>
- *            the type of the entity
  * @param <Z>
- *            the inverse entity type
+ *            the source type
+ * @param <E>
+ *            the element type
  * @param <C>
- *            the collection type of the mapping
+ *            the collection type
  * 
  * @author hceylan
  * @since $version
  */
-public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, C> {
+public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C> {
 
-	private final PluralAttributeImpl<? super X, C, Z> attribute;
-	private AssociationMapping<Z, X, ?> inverse;
-	private EntityTypeImpl<Z> type;
-	private JoinTable joinTable;
+	private final PluralAttributeImpl<? super Z, C, E> attribute;
+	private final JoinTable joinTable;
+	private EntityTypeImpl<E> type;
+	private AssociationMapping<?, ?> inverse;
 
 	/**
-	 * 
 	 * @param parent
-	 *            the parent mapping, may be <code>null</code>
-	 * 
-	 * @param entity
-	 *            the entity
+	 *            the parent mapping
 	 * @param attribute
 	 *            the attribute
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PluralAssociationMapping(EmbeddedMapping<?, ?> parent, EntityTypeImpl<X> entity, PluralAttributeImpl<? super X, C, Z> attribute) {
-		super(parent, entity, (AssociationAttributeMetadata) attribute.getMetadata(), attribute);
+	public PluralAssociationMapping(ParentMapping<?, Z> parent, PluralAttributeImpl<? super Z, C, E> attribute) {
+		super(parent, (AssociationAttributeMetadata) attribute.getMetadata(), attribute);
 
 		this.attribute = attribute;
+
 		final AssociationMetadata metadata = this.getAssociationMetadata();
 
 		if (this.isOwner()) {
-			if ((this.getAttribute().getPersistentAttributeType() == PersistentAttributeType.MANY_TO_MANY) || (metadata.getJoinColumns().size() == 0)) {
-				this.joinTable = new JoinTable(entity, metadata.getJoinTable());
+			if ((this.attribute.getPersistentAttributeType() == PersistentAttributeType.MANY_TO_MANY) || (metadata.getJoinColumns().size() == 0)) {
+				this.joinTable = new JoinTable(this.getRoot().getType(), metadata.getJoinTable());
 			}
 			else {
 				this.joinTable = null;
@@ -100,12 +96,12 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 		final SessionImpl session = managedInstance.getSession();
 
 		if (values instanceof Collection) {
-			for (final Z entity : (Collection<Z>) values) {
+			for (final E entity : (Collection<E>) values) {
 				session.checkTransient(entity);
 			}
 		}
 		else if (values instanceof Map) {
-			for (final Z entity : ((Map<?, Z>) values).values()) {
+			for (final E entity : ((Map<?, E>) values).values()) {
 				session.checkTransient(entity);
 			}
 		}
@@ -123,12 +119,12 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 		final SessionImpl session = managedInstance.getSession();
 
 		if (values instanceof Collection) {
-			for (final Z entity : (Collection<Z>) values) {
+			for (final E entity : (Collection<E>) values) {
 				this.getJoinTable().performInsert(session, connection, managedInstance.getInstance(), entity);
 			}
 		}
 		else if (values instanceof Map) {
-			for (final Z entity : ((Map<?, Z>) values).values()) {
+			for (final E entity : ((Map<?, E>) values).values()) {
 				this.getJoinTable().performInsert(session, connection, managedInstance.getInstance(), entity);
 			}
 		}
@@ -139,7 +135,7 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 	 * 
 	 */
 	@Override
-	public PluralAttributeImpl<? super X, C, Z> getAttribute() {
+	public PluralAttributeImpl<? super Z, C, E> getAttribute() {
 		return this.attribute;
 	}
 
@@ -157,7 +153,7 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 	 * 
 	 */
 	@Override
-	public AssociationMapping<Z, X, ?> getInverse() {
+	public AssociationMapping<?, ?> getInverse() {
 		return this.inverse;
 	}
 
@@ -175,7 +171,7 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 	 * 
 	 */
 	@Override
-	public EntityTypeImpl<Z> getType() {
+	public EntityTypeImpl<?> getType() {
 		return this.type;
 	}
 
@@ -184,14 +180,14 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public void link() throws MappingException {
-		this.getEntity().getMetamodel();
+		final EntityTypeImpl<?> entity = this.getRoot().getType();
+		entity.getMetamodel();
 
-		this.type = (EntityTypeImpl<Z>) this.attribute.getElementType();
+		this.type = (EntityTypeImpl<E>) this.attribute.getElementType();
 
 		if (!this.isOwner()) {
-			this.inverse = (AssociationMapping<Z, X, ?>) this.type.getMapping(this.getMappedBy());
+			this.inverse = (AssociationMapping<?, ?>) this.type.getRootMapping().getMapping(this.getMappedBy());
 
 			if (this.inverse == null) {
 				throw new MappingException("Cannot find the mappedBy attribute " + this.getMappedBy() + " specified on " + this.attribute.getJavaMember());
@@ -202,7 +198,7 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 		else {
 			// initialize the join table
 			if (this.getJoinTable() != null) {
-				this.getJoinTable().link(this.getEntity(), this.type);
+				this.getJoinTable().link(entity, this.type);
 			}
 		}
 	}
@@ -214,10 +210,19 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 	@Override
 	public void load(ManagedInstance<?> instance) {
 		// TODO Auto-generated method stub
-
 	}
 
-	public Collection<Z> loadCollection(ManagedInstance<?> managedInstance) {
+	/**
+	 * Loads and returns the collection.
+	 * 
+	 * @param managedInstance
+	 *            the managed instance owning the collection
+	 * @return the loaded collection
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Collection<? extends E> loadCollection(ManagedInstance<?> managedInstance) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -246,7 +251,7 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 	 * 
 	 */
 	@Override
-	@SuppressWarnings({ "unchecked" })
+	@SuppressWarnings("unchecked")
 	public void set(ManagedInstance<?> managedInstance, Object instance, Object value) {
 		C collection;
 
@@ -254,7 +259,7 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 			collection = (C) value;
 		}
 		else {
-			collection = this.attribute.newCollection(this, managedInstance, (Collection<? extends Z>) value);
+			collection = this.attribute.newCollection(this, managedInstance, (Collection<? extends E>) value);
 		}
 
 		super.set(managedInstance, instance, collection);
@@ -265,7 +270,7 @@ public class PluralAssociationMapping<X, Z, C> extends AssociationMapping<X, Z, 
 	 * 
 	 */
 	@Override
-	public void setInverse(AssociationMapping<Z, X, ?> inverse) {
+	public void setInverse(AssociationMapping<?, ?> inverse) {
 		this.inverse = inverse;
 	}
 

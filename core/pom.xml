@@ -16,6 +16,12 @@
 			<testResource>
 				<directory>src/test/java</directory>
 			</testResource>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<includes>
+					<include>**/**</include>
+				</includes>
+			</testResource>
 		</testResources>
 
 		<plugins>
@@ -33,8 +39,8 @@
 			</plugin>
 		</plugins>
 	</build>
-	
-		<dependencies>
+
+	<dependencies>
 		<!-- Internal Dependencies -->
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>

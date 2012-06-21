@@ -29,9 +29,10 @@ import javax.persistence.metamodel.SingularAttribute;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
-import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
+import org.batoo.jpa.core.impl.model.mapping.Mapping;
+import org.batoo.jpa.core.impl.model.mapping.RootMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 import com.google.common.collect.Maps;
@@ -115,7 +116,8 @@ public abstract class RootPathImpl<X> extends PathImpl<X> {
 			return path;
 		}
 
-		final AbstractMapping<? super X, ?> mapping = this.entity.getMapping(attribute.getName());
+		final RootMapping<X> rootMapping = this.entity.getRootMapping();
+		final Mapping<?, ?> mapping = rootMapping.getMapping(attribute.getName());
 
 		if (mapping == null) {
 			throw new IllegalArgumentException("Cannot dereference");

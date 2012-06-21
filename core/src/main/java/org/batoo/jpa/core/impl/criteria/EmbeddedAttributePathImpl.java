@@ -33,9 +33,9 @@ import org.batoo.jpa.core.impl.criteria.CompoundExpressionImpl.Comparison;
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
-import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
+import org.batoo.jpa.core.impl.model.mapping.Mapping;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -96,7 +96,7 @@ public class EmbeddedAttributePathImpl<X> extends PathImpl<X> {
 	public String generate(CriteriaQueryImpl<?> query) {
 		final List<String> fragments = Lists.newArrayList();
 
-		for (final AbstractMapping<?, ?> mapping : this.mapping.getMappings()) {
+		for (final Mapping<? super X, ?> mapping : this.mapping.getChildren()) {
 			if (mapping instanceof BasicMapping) {
 				final BasicColumn column = ((BasicMapping) mapping).getColumn();
 				PathImpl<?> root = this;
@@ -133,7 +133,7 @@ public class EmbeddedAttributePathImpl<X> extends PathImpl<X> {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter, EmbeddedMapping<?, ?> mapping,
 		final List<String> fragments) {
-		for (final AbstractMapping<?, ?> child : mapping.getMappings()) {
+		for (final Mapping<?, ?> child : mapping.getChildren()) {
 			// handle basic mapping
 			if (child instanceof BasicMapping) {
 				final BasicColumn column = ((BasicMapping) child).getColumn();

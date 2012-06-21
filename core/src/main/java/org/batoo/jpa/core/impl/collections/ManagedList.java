@@ -45,7 +45,7 @@ public class ManagedList<X, E> implements ManagedCollection, List<E> {
 	private final List<E> delegate = Lists.newArrayList();
 	private List<E> snapshot;
 
-	private final transient PluralAssociationMapping<?, E, ?> mapping;
+	private final transient PluralAssociationMapping<?, ?, E> mapping;
 	private final transient ManagedInstance<?> managedInstance;
 
 	private boolean initialized;
@@ -61,7 +61,7 @@ public class ManagedList<X, E> implements ManagedCollection, List<E> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedList(PluralAssociationMapping<?, E, ?> mapping, ManagedInstance<?> managedInstance) {
+	public ManagedList(PluralAssociationMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance) {
 		super();
 
 		this.mapping = mapping;
@@ -83,7 +83,7 @@ public class ManagedList<X, E> implements ManagedCollection, List<E> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedList(PluralAssociationMapping<?, E, ?> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
+	public ManagedList(PluralAssociationMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
 		super();
 
 		this.delegate.addAll(Lists.newArrayList(values));
@@ -140,7 +140,7 @@ public class ManagedList<X, E> implements ManagedCollection, List<E> {
 	}
 
 	private <T> T changed(T value) {
-		this.managedInstance.addCollectionChanged(this.mapping);
+		this.managedInstance.markCollectionChanged(this.mapping);
 
 		return value;
 	}

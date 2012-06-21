@@ -72,6 +72,8 @@ public interface Subquery<T> extends AbstractQuery<T>, Expression<T> {
 	 * 
 	 * @param parentRoot
 	 *            a root of the containing query
+	 * @param <Y>
+	 *            the type of the root
 	 * @return subquery root
 	 */
 	<Y> Root<Y> correlate(Root<Y> parentRoot);

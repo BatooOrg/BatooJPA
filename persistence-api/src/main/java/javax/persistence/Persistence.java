@@ -112,8 +112,7 @@ public class Persistence {
 	 *            been configured elsewhere.
 	 * @return the factory that creates EntityManagers configured according to the specified persistence unit.
 	 */
-	public static EntityManagerFactory createEntityManagerFactory(String persistenceUnitName, Map properties) {
-
+	public static EntityManagerFactory createEntityManagerFactory(String persistenceUnitName, Map<String, Object> properties) {
 		EntityManagerFactory emf = null;
 		final PersistenceProviderResolver resolver = PersistenceProviderResolverHolder.getPersistenceProviderResolver();
 

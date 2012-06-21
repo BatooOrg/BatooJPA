@@ -44,7 +44,7 @@ public class ManagedSet<X, E> implements ManagedCollection, Set<E> {
 	private final Set<E> delegate = Sets.newHashSet();
 	private Set<E> snapshot;
 
-	private final transient PluralAssociationMapping<?, E, ?> mapping;
+	private final transient PluralAssociationMapping<?, ?, E> mapping;
 	private final transient ManagedInstance<?> managedInstance;
 
 	private boolean initialized;
@@ -60,7 +60,7 @@ public class ManagedSet<X, E> implements ManagedCollection, Set<E> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedSet(PluralAssociationMapping<?, E, ?> mapping, ManagedInstance<?> managedInstance) {
+	public ManagedSet(PluralAssociationMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance) {
 		super();
 
 		this.mapping = mapping;
@@ -82,7 +82,7 @@ public class ManagedSet<X, E> implements ManagedCollection, Set<E> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedSet(PluralAssociationMapping<?, E, ?> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
+	public ManagedSet(PluralAssociationMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
 		super();
 
 		this.delegate.addAll(values);
@@ -114,7 +114,7 @@ public class ManagedSet<X, E> implements ManagedCollection, Set<E> {
 	}
 
 	private <T> T changed(T value) {
-		this.managedInstance.addCollectionChanged(this.mapping);
+		this.managedInstance.markCollectionChanged(this.mapping);
 
 		return value;
 	}

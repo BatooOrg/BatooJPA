@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.parser.MappingException;
@@ -163,16 +162,16 @@ public class AbstractTable {
 						return true;
 					}
 
-					final AttributeImpl<?, ?> root;
+					final EntityTypeImpl<?> root;
 
 					if ((input instanceof JoinColumn) && (input.getMapping() == null)) {
-						root = ((JoinColumn) input).getReferencedMapping().getRootMapping().getAttribute();
+						root = ((JoinColumn) input).getReferencedMapping().getRoot().getType();
 					}
 					else {
-						root = input.getMapping().getRootMapping().getAttribute();
+						root = input.getMapping().getRoot().getType();
 					}
 
-					final Class<?> parent = root.getDeclaringType().getJavaType();
+					final Class<?> parent = root.getJavaType();
 					final Class<?> javaType = type.getJavaType();
 
 					return parent.isAssignableFrom(javaType);

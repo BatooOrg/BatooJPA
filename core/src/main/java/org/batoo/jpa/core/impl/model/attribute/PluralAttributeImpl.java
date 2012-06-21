@@ -218,7 +218,7 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract C newCollection(PluralAssociationMapping<?, E, C> mapping, ManagedInstance<?> managedInstance);
+	public abstract C newCollection(PluralAssociationMapping<?, C, E> mapping, ManagedInstance<?> managedInstance);
 
 	/**
 	 * Creates a new managed collection to track changes.
@@ -234,7 +234,7 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract C newCollection(PluralAssociationMapping<?, E, C> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values);
+	public abstract C newCollection(PluralAssociationMapping<?, C, E> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values);
 
 	/**
 	 * {@inheritDoc}
