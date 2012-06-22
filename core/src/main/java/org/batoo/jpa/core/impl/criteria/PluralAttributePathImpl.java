@@ -30,10 +30,9 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.criteria.CompoundExpressionImpl.Comparison;
-import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
-import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
+import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
+import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 
 /**
  * Physical Attribute implementation of {@link Path}.
@@ -44,9 +43,9 @@ import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
  * @author hceylan
  * @since $version
  */
-public class PhysicalAttributePathImpl<X> extends PathImpl<X> {
+public class PluralAttributePathImpl<X> extends PathImpl<X> {
 
-	private final BasicMapping<?, X> mapping;
+	private final PluralAssociationMapping<?, ?, X> mapping;
 
 	/**
 	 * @param parent
@@ -57,7 +56,7 @@ public class PhysicalAttributePathImpl<X> extends PathImpl<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PhysicalAttributePathImpl(PathImpl<?> parent, BasicMapping<?, X> mapping) {
+	public PluralAttributePathImpl(PathImpl<?> parent, PluralAssociationMapping<?, ?, X> mapping) {
 		super(parent);
 
 		this.mapping = mapping;
@@ -82,19 +81,9 @@ public class PhysicalAttributePathImpl<X> extends PathImpl<X> {
 	 * {@inheritDoc}
 	 * 
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public String generate(CriteriaQueryImpl<?> query) {
-		final BasicColumn column = this.mapping.getColumn();
-
-		PathImpl<?> root = this;
-		while (root.getParentPath() != null) {
-			root = root.getParentPath();
-		}
-
-		final String tableAlias = ((RootPathImpl<X>) root).getTableAlias(query, column.getTable());
-
-		return tableAlias + "." + column.getName();
+		return null;
 	}
 
 	/**
@@ -153,7 +142,7 @@ public class PhysicalAttributePathImpl<X> extends PathImpl<X> {
 	 * 
 	 */
 	@Override
-	public BasicAttribute<?, X> getModel() {
+	public PluralAttributeImpl<?, ?, X> getModel() {
 		return this.mapping.getAttribute();
 	}
 

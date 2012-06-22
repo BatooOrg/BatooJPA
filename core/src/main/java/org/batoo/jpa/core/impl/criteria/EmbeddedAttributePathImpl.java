@@ -68,10 +68,6 @@ public class EmbeddedAttributePathImpl<X> extends PathImpl<X> {
 		this.mapping = mapping;
 	}
 
-	private IllegalArgumentException cannotDereference() {
-		return new IllegalArgumentException("Cannot dereference");
-	}
-
 	/**
 	 * {@inheritDoc}
 	 * 

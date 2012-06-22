@@ -20,21 +20,36 @@ package org.batoo.jpa.core.impl.model.mapping;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Selection;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
+import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
+import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.criteria.PredicateImpl;
+import org.batoo.jpa.core.impl.criteria.RootImpl;
+import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
+import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.util.Pair;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
+
+import com.google.common.collect.Lists;
 
 /**
  * 
@@ -54,6 +69,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C> 
 	private final JoinTable joinTable;
 	private EntityTypeImpl<E> type;
 	private AssociationMapping<?, ?> inverse;
+	private CriteriaQueryImpl<E> selectCriteria;
 
 	/**
 	 * @param parent
@@ -166,6 +182,59 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C> 
 		return this.joinTable;
 	}
 
+	@SuppressWarnings("unchecked")
+	private CriteriaQueryImpl<E> getSelectCriteria() {
+		if (this.selectCriteria != null) {
+			return this.selectCriteria;
+		}
+
+		synchronized (this) {
+			// other thread prepared before this one
+			if (this.selectCriteria != null) {
+				return this.selectCriteria;
+			}
+
+			if (this.isOwner()) {
+				final MetamodelImpl metamodel = this.getRoot().getType().getMetamodel();
+				final CriteriaBuilderImpl cb = metamodel.getEntityManagerFactory().getCriteriaBuilder();
+
+				final EntityTypeImpl<E> entity = metamodel.entity(this.attribute.getBindableJavaType());
+
+				CriteriaQueryImpl<E> q = cb.createQuery(this.attribute.getBindableJavaType());
+				final RootImpl<?> r = q.from(this.getRoot().getType());
+				q = q.select((Selection<? extends E>) r.<C> get(this.getPath()));
+
+				entity.prepareEagerAssociations(r, 0, null);
+
+				// has single id mapping
+				final EntityTypeImpl<?> rootType = this.getRoot().getType();
+				if (rootType.hasSingleIdAttribute()) {
+					final SingularMapping<?, ?> idMapping = rootType.getIdMapping();
+					final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
+					final Path<?> path = r.get(idMapping.getAttribute().getName());
+					final PredicateImpl predicate = cb.equal(path, pe);
+
+					return this.selectCriteria = q.where(predicate);
+				}
+
+				// has multiple id mappings
+				final List<PredicateImpl> predicates = Lists.newArrayList();
+				for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
+					final BasicMapping<?, ?> idMapping = (BasicMapping<?, ?>) pair.getFirst();
+					final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
+					final Path<?> path = r.get(idMapping.getAttribute().getName());
+					final PredicateImpl predicate = cb.equal(path, pe);
+
+					predicates.add(predicate);
+				}
+
+				return this.selectCriteria = q.where(predicates.toArray(new PredicateImpl[predicates.size()]));
+			}
+
+			return this.selectCriteria = null;
+		}
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * 
@@ -223,8 +292,25 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C> 
 	 * @author hceylan
 	 */
 	public Collection<? extends E> loadCollection(ManagedInstance<?> managedInstance) {
-		// TODO Auto-generated method stub
-		return null;
+		final EntityManagerImpl em = managedInstance.getSession().getEntityManager();
+		final TypedQueryImpl<E> q = em.createQuery(this.getSelectCriteria());
+
+		final EntityTypeImpl<?> rootType = managedInstance.getType();
+
+		// if has single id then pass it on
+		if (rootType.hasSingleIdAttribute()) {
+			q.setParameter(1, managedInstance.getId());
+		}
+		else {
+			int i = 1;
+			final Object id = managedInstance.getId();
+			for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
+				q.setParameter(i++, pair.getSecond().get(id));
+			}
+		}
+
+		return q.getResultList();
+
 	}
 
 	/**

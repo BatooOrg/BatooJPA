@@ -42,6 +42,7 @@ public abstract class Mapping<Z, X> {
 	private final boolean root;
 	private final boolean inherited;
 	private final EntityTypeImpl<?> entity;
+	private int h;
 
 	/**
 	 * @param parent
@@ -63,7 +64,7 @@ public abstract class Mapping<Z, X> {
 		this.parent = parent;
 		this.name = name;
 
-		this.path = parent != null ? parent.getPath() + "." + name : name;
+		this.path = (parent != null) && (parent.getPath() != null) ? parent.getPath() + "." + name : name;
 		this.root = parent instanceof RootMapping;
 		this.entity = entity;
 		this.inherited = this.entity.getRootType().getInheritanceType() != null;
@@ -182,7 +183,16 @@ public abstract class Mapping<Z, X> {
 	 */
 	@Override
 	public int hashCode() {
-		return this.path.hashCode();
+		if (this.h != 0) {
+			return this.h;
+		}
+
+		final StringBuilder sb = new StringBuilder(this.getRoot().getType().getName());
+		if (this.path != null) {
+			sb.append(".").append(this.path);
+		}
+
+		return this.h = this.path.toString().hashCode();
 	}
 
 	/**
@@ -227,5 +237,14 @@ public abstract class Mapping<Z, X> {
 	 */
 	public void set(ManagedInstance<?> managedInstance, Object instance, Object value) {
 		this.getAttribute().set(instance, value);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + " " + this.getAttribute().toString();
 	}
 }

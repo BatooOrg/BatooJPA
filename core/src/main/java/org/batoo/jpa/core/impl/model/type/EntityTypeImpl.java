@@ -1227,12 +1227,17 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
+	 * @param r
+	 *            the fetch parent
+	 * @param depth
+	 *            the depth
+	 * @param parent
+	 *            the parent
 	 * 
 	 * @since $version
 	 * @author hceylan
-	 * @param entityTypeImpl
 	 */
-	private void prepareEagerAssociations(FetchParent<?, ?> r, int depth, AssociationMapping<?, ?> parent) {
+	public void prepareEagerAssociations(FetchParent<?, ?> r, int depth, AssociationMapping<?, ?> parent) {
 		if (depth < EntityTypeImpl.MAX_DEPTH) {
 
 			for (final AssociationMapping<?, ?> association : this.getAssociationsEager()) {

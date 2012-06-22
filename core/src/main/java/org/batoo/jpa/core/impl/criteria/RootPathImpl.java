@@ -28,10 +28,10 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
-import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.RootMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
@@ -108,32 +108,8 @@ public abstract class RootPathImpl<X> extends PathImpl<X> {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public <Y> PathImpl<Y> get(SingularAttribute<? super X, Y> attribute) {
-		// try to resolve from path
-		PathImpl<Y> path = (PathImpl<Y>) this.children.get(attribute.getName());
-		if (path != null) {
-			return path;
-		}
-
-		final RootMapping<X> rootMapping = this.entity.getRootMapping();
-		final Mapping<?, ?> mapping = rootMapping.getMapping(attribute.getName());
-
-		if (mapping == null) {
-			throw new IllegalArgumentException("Cannot dereference");
-		}
-
-		// generate and return
-		if (attribute instanceof BasicAttribute) {
-			path = new PhysicalAttributePathImpl<Y>(this, (BasicMapping<? super X, Y>) mapping);
-		}
-		else {
-			path = new EmbeddedAttributePathImpl<Y>(this, (EmbeddedMapping<? super X, Y>) mapping);
-		}
-
-		this.children.put(attribute.getName(), path);
-
-		return path;
+		return this.get(attribute.getName());
 	}
 
 	/**
@@ -141,9 +117,35 @@ public abstract class RootPathImpl<X> extends PathImpl<X> {
 	 * 
 	 */
 	@Override
-	public <Y> PathImpl<Y> get(String attributeName) {
-		// TODO Auto-generated method stub
-		return null;
+	@SuppressWarnings("unchecked")
+	public <Y> PathImpl<Y> get(String pathName) {
+		// try to resolve from path
+		PathImpl<Y> path = (PathImpl<Y>) this.children.get(pathName);
+		if (path != null) {
+			return path;
+		}
+
+		final RootMapping<X> rootMapping = this.entity.getRootMapping();
+		final Mapping<?, ?> mapping = rootMapping.getMapping(pathName);
+
+		if (mapping == null) {
+			throw this.cannotDereference();
+		}
+
+		// generate and return
+		if (mapping instanceof BasicMapping) {
+			path = new PhysicalAttributePathImpl<Y>(this, (BasicMapping<? super X, Y>) mapping);
+		}
+		else if (mapping instanceof PluralAssociationMapping) {
+			path = new PluralAttributePathImpl<Y>(this, (PluralAssociationMapping<?, ?, Y>) mapping);
+		}
+		else {
+			path = new EmbeddedAttributePathImpl<Y>(this, (EmbeddedMapping<? super X, Y>) mapping);
+		}
+
+		this.children.put(pathName, path);
+
+		return path;
 	}
 
 	/**

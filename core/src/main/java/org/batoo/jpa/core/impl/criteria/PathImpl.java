@@ -47,6 +47,18 @@ public abstract class PathImpl<X> extends ExpressionImpl<X> implements Path<X> {
 	}
 
 	/**
+	 * returns cannot dereference exception.
+	 * 
+	 * @return the exception
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected IllegalArgumentException cannotDereference() {
+		return new IllegalArgumentException("Cannot dereference");
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */

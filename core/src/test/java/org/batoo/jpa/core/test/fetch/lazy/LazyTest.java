@@ -144,7 +144,7 @@ public class LazyTest extends BaseCoreTest {
 
 		final Person person2 = this.find(Person.class, person.getId());
 		Assert.assertEquals(person.getName(), person2.getName());
-		Assert.assertEquals(2, person2.getPhones().size());
+		Assert.assertEquals(2, person2.getWorkPhones().size());
 	}
 
 	/**
