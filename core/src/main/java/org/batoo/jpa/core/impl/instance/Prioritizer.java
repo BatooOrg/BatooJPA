@@ -81,7 +81,7 @@ public class Prioritizer {
 					final EntityTypeImpl<?> e2 = mi2.getType();
 					final Object i2 = mi2.getInstance();
 
-					for (final AssociationMapping<?, ?> association : e1.getDependenciesFor(e2)) {
+					for (final AssociationMapping<?, ?, ?> association : e1.getDependenciesFor(e2)) {
 						if (association.references(i1, i2)) {
 							dependent = true;
 							break innerLoop;

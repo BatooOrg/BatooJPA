@@ -76,9 +76,9 @@ public class RootMapping<X> extends ParentMapping<X, X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Mapping<?, ?> getMapping(String path) {
+	public Mapping<?, ?, ?> getMapping(String path) {
 		final Iterator<String> segments = Splitter.on('.').split(path).iterator();
-		Mapping<?, ?> mapping = this;
+		Mapping<?, ?, ?> mapping = this;
 		while (segments.hasNext()) {
 			if (mapping instanceof ParentMapping) {
 				mapping = ((ParentMapping<?, ?>) mapping).getChild(segments.next());

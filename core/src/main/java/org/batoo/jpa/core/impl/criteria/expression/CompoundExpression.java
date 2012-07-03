@@ -16,12 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.criteria;
+package org.batoo.jpa.core.impl.criteria.expression;
 
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.mutable.MutableInt;
+import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
@@ -29,7 +30,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  * @author hceylan
  * @since $version
  */
-public class CompoundExpressionImpl extends ExpressionImpl<Boolean> {
+public class CompoundExpression extends AbstractExpression<Boolean> {
 
 	/**
 	 * The comparison types
@@ -64,8 +65,8 @@ public class CompoundExpressionImpl extends ExpressionImpl<Boolean> {
 	}
 
 	private final Comparison comparison;
-	private final ExpressionImpl<?> x;
-	private final ExpressionImpl<?> y;
+	private final AbstractExpression<?> x;
+	private final AbstractExpression<?> y;
 
 	/**
 	 * @param comparison
@@ -78,7 +79,7 @@ public class CompoundExpressionImpl extends ExpressionImpl<Boolean> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public CompoundExpressionImpl(Comparison comparison, ExpressionImpl<?> x, ExpressionImpl<?> y) {
+	public CompoundExpression(Comparison comparison, AbstractExpression<?> x, AbstractExpression<?> y) {
 		super(Boolean.class);
 
 		this.comparison = comparison;

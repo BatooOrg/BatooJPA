@@ -69,7 +69,7 @@ public abstract class AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract Mapping<?, ?> getMapping();
+	public abstract Mapping<?, ?, ?> getMapping();
 
 	/**
 	 * Returns the mapping name of the column.

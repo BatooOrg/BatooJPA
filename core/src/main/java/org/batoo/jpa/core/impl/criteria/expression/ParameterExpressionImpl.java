@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.criteria;
+package org.batoo.jpa.core.impl.criteria.expression;
 
 import java.util.List;
 import java.util.Map;
@@ -25,7 +25,8 @@ import javax.persistence.criteria.ParameterExpression;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
-import org.batoo.jpa.core.impl.criteria.CompoundExpressionImpl.Comparison;
+import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
@@ -41,12 +42,12 @@ import com.google.common.collect.Maps;
  * @author hceylan
  * @since $version
  */
-public class ParameterExpressionImpl<T> extends ExpressionImpl<T> implements ParameterExpression<T> {
+public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements ParameterExpression<T> {
 
 	private final String name;
 	private Integer position;
 	private int expandedCount = 0;
-	private final Map<Integer, Mapping<?, ?>> mappingMap = Maps.newHashMap();
+	private final Map<Integer, Mapping<?, ?, ?>> mappingMap = Maps.newHashMap();
 
 	/**
 	 * @param paramClass
@@ -170,7 +171,7 @@ public class ParameterExpressionImpl<T> extends ExpressionImpl<T> implements Par
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void registerParameter(CriteriaQueryImpl<?> query, Mapping<?, ?> mapping) {
+	public void registerParameter(CriteriaQueryImpl<?> query, Mapping<?, ?, ?> mapping) {
 		this.mappingMap.put(query.setNextSqlParam(this), mapping);
 	}
 
@@ -191,7 +192,7 @@ public class ParameterExpressionImpl<T> extends ExpressionImpl<T> implements Par
 	 * @author hceylan
 	 */
 	private void setParameter(Object[] parameters, MutableInt sqlParamindex, EmbeddedMapping<?, ?> mapping, Object value) {
-		for (final Mapping<?, ?> child : mapping.getChildren()) {
+		for (final Mapping<?, ?, ?> child : mapping.getChildren()) {
 			if (child instanceof BasicMapping) {
 				parameters[sqlParamindex.intValue()] = child.getAttribute().get(value);
 
@@ -219,7 +220,7 @@ public class ParameterExpressionImpl<T> extends ExpressionImpl<T> implements Par
 	 * @author hceylan
 	 */
 	public void setParameter(Object[] parameters, MutableInt paramIndex, MutableInt sqlParamindex, Object value) {
-		final Mapping<?, ?> mapping = this.mappingMap.get(paramIndex.intValue());
+		final Mapping<?, ?, ?> mapping = this.mappingMap.get(paramIndex.intValue());
 
 		if (mapping instanceof BasicMapping) {
 			parameters[sqlParamindex.intValue()] = value;

@@ -169,7 +169,7 @@ public class ForeignKey {
 	}
 
 	private void createEmbeddedJoins(SecondaryTable table, EmbeddedMapping<?, ?> mapping, List<PrimaryKeyJoinColumnMetadata> metadata) {
-		for (final Mapping<?, ?> child : mapping.getChildren()) {
+		for (final Mapping<?, ?, ?> child : mapping.getChildren()) {
 			if (child instanceof BasicMapping) {
 				final BasicMapping<?, ?> basicMapping = (BasicMapping<?, ?>) child;
 
@@ -292,7 +292,7 @@ public class ForeignKey {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void link(AssociationMapping<?, ?> mapping, EntityTypeImpl<?> targetEntity) {
+	public void link(AssociationMapping<?, ?, ?> mapping, EntityTypeImpl<?> targetEntity) {
 		// single primary key
 		if (targetEntity.hasSingleIdAttribute()) {
 			final SingularMapping<?, ?> idMapping = targetEntity.getIdMapping();
@@ -323,8 +323,8 @@ public class ForeignKey {
 		}
 	}
 
-	private void linkEmbeddedJoins(AssociationMapping<?, ?> mapping, EmbeddedMapping<?, ?> embeddedMapping) {
-		for (final Mapping<?, ?> child : embeddedMapping.getChildren()) {
+	private void linkEmbeddedJoins(AssociationMapping<?, ?, ?> mapping, EmbeddedMapping<?, ?> embeddedMapping) {
+		for (final Mapping<?, ?, ?> child : embeddedMapping.getChildren()) {
 			if (child instanceof BasicMapping) {
 				this.linkJoinColumn(mapping, (BasicMapping<?, ?>) child);
 			}
@@ -335,7 +335,7 @@ public class ForeignKey {
 		}
 	}
 
-	private void linkJoinColumn(AssociationMapping<?, ?> mapping, final BasicMapping<?, ?> idMapping) {
+	private void linkJoinColumn(AssociationMapping<?, ?, ?> mapping, final BasicMapping<?, ?> idMapping) {
 		// no definition for the join columns
 		if (this.joinColumns.size() == 0) {
 			// create the join column

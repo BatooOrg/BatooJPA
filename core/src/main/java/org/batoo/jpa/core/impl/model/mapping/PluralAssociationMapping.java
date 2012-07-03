@@ -30,10 +30,10 @@ import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.PredicateImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
@@ -63,12 +63,12 @@ import com.google.common.collect.Lists;
  * @author hceylan
  * @since $version
  */
-public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C> {
+public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, E> {
 
 	private final PluralAttributeImpl<? super Z, C, E> attribute;
 	private final JoinTable joinTable;
 	private EntityTypeImpl<E> type;
-	private AssociationMapping<?, ?> inverse;
+	private AssociationMapping<?, ?, ?> inverse;
 	private CriteriaQueryImpl<E> selectCriteria;
 
 	/**
@@ -169,7 +169,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C> 
 	 * 
 	 */
 	@Override
-	public AssociationMapping<?, ?> getInverse() {
+	public AssociationMapping<?, ?, ?> getInverse() {
 		return this.inverse;
 	}
 
@@ -256,7 +256,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C> 
 		this.type = (EntityTypeImpl<E>) this.attribute.getElementType();
 
 		if (!this.isOwner()) {
-			this.inverse = (AssociationMapping<?, ?>) this.type.getRootMapping().getMapping(this.getMappedBy());
+			this.inverse = (AssociationMapping<?, ?, ?>) this.type.getRootMapping().getMapping(this.getMappedBy());
 
 			if (this.inverse == null) {
 				throw new MappingException("Cannot find the mappedBy attribute " + this.getMappedBy() + " specified on " + this.attribute.getJavaMember());
@@ -356,7 +356,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C> 
 	 * 
 	 */
 	@Override
-	public void setInverse(AssociationMapping<?, ?> inverse) {
+	public void setInverse(AssociationMapping<?, ?, ?> inverse) {
 		this.inverse = inverse;
 	}
 

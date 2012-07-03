@@ -45,9 +45,9 @@ import com.google.common.collect.Maps;
  * @author hceylan
  * @since $version
  */
-public abstract class ParentMapping<Z, X> extends Mapping<Z, X> {
+public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 
-	private final Map<String, Mapping<? super X, ?>> children = Maps.newHashMap();
+	private final Map<String, Mapping<? super X, ?, ?>> children = Maps.newHashMap();
 
 	/**
 	 * @param parent
@@ -75,10 +75,10 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void addAssociations(List<AssociationMapping<?, ?>> associations) {
-		for (final Mapping<? super X, ?> mapping : this.children.values()) {
+	public void addAssociations(List<AssociationMapping<?, ?, ?>> associations) {
+		for (final Mapping<? super X, ?, ?> mapping : this.children.values()) {
 			if (mapping instanceof AssociationMapping) {
-				associations.add((AssociationMapping<?, ?>) mapping);
+				associations.add((AssociationMapping<?, ?, ?>) mapping);
 			}
 			else if (mapping instanceof ParentMapping) {
 				((ParentMapping<? super X, ?>) mapping).addAssociations(associations);
@@ -195,7 +195,7 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Mapping<? super X, ?> getChild(String name) {
+	public Mapping<? super X, ?, ?> getChild(String name) {
 		return this.children.get(name);
 	}
 
@@ -207,7 +207,7 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Collection<Mapping<? super X, ?>> getChildren() {
+	public Collection<Mapping<? super X, ?, ?>> getChildren() {
 		return this.children.values();
 	}
 
@@ -258,8 +258,8 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected void inherit(Collection<Mapping<? super X, ?>> children) {
-		for (final Mapping<? super X, ?> mapping : children) {
+	protected void inherit(Collection<Mapping<? super X, ?, ?>> children) {
+		for (final Mapping<? super X, ?, ?> mapping : children) {
 			this.children.put(mapping.getName(), mapping);
 		}
 	}

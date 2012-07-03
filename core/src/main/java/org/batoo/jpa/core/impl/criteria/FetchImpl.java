@@ -46,7 +46,7 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X> {
 
 	private final FetchParentImpl<?, Z> parent;
-	private final AssociationMapping<? super Z, X> mapping;
+	private final AssociationMapping<? super Z, ?, X> mapping;
 	private final JoinType joinType;
 
 	/**
@@ -61,7 +61,7 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public FetchImpl(FetchParentImpl<?, Z> parent, AssociationMapping<? super Z, X> mapping, JoinType joinType) {
+	public FetchImpl(FetchParentImpl<?, Z> parent, AssociationMapping<? super Z, ?, X> mapping, JoinType joinType) {
 		super((EntityTypeImpl<X>) mapping.getType());
 
 		this.parent = parent;
@@ -159,7 +159,7 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	 * 
 	 */
 	@Override
-	public AssociationMapping<? super Z, X> getMapping() {
+	public AssociationMapping<? super Z, ?, X> getMapping() {
 		return this.mapping;
 	}
 

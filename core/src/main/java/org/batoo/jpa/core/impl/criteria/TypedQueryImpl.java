@@ -29,6 +29,7 @@ import javax.persistence.Parameter;
 import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 
+import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 
 /**
@@ -39,7 +40,7 @@ import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
  * @author hceylan
  * @since $version
  */
-public class TypedQueryImpl<X> extends BaseTypedQueryImpl<X> {
+public class TypedQueryImpl<X> extends BaseTypedQuery<X> {
 
 	/**
 	 * @param criteriaQuery

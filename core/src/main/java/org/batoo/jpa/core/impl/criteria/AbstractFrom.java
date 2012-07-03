@@ -41,7 +41,9 @@ import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.mutable.MutableInt;
-import org.batoo.jpa.core.impl.criteria.CompoundExpressionImpl.Comparison;
+import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
+import org.batoo.jpa.core.impl.criteria.path.RootPath;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
@@ -61,7 +63,7 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
  * @author hceylan
  * @since $version
  */
-public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
+public class AbstractFrom<Z, X> extends RootPath<X> implements From<Z, X> {
 
 	private final EntityTypeImpl<X> entity;
 	private final FetchParentImpl<Z, X> fetchRoot;
@@ -73,7 +75,7 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public FromImpl(EntityTypeImpl<X> entity) {
+	public AbstractFrom(EntityTypeImpl<X> entity) {
 		super(entity);
 
 		this.fetchRoot = new FetchParentImpl<Z, X>(entity);
@@ -211,9 +213,9 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	}
 
 	/**
-	 * Returns the fetchRoot of the FromImpl.
+	 * Returns the fetchRoot of the AbstractFrom.
 	 * 
-	 * @return the fetchRoot of the FromImpl
+	 * @return the fetchRoot of the AbstractFrom
 	 * 
 	 * @since $version
 	 * @author hceylan

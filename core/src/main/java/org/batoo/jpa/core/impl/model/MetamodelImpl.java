@@ -502,7 +502,7 @@ public class MetamodelImpl implements Metamodel {
 			}
 		}
 
-		for (final AssociationMapping<?, ?> attribute : entity.getAssociations()) {
+		for (final AssociationMapping<?, ?, ?> attribute : entity.getAssociations()) {
 			final JoinTable table = attribute.getJoinTable();
 			// skip not applicable join tables
 			if ((table == null) || (table.getEntity() != entity)) {
@@ -606,7 +606,7 @@ public class MetamodelImpl implements Metamodel {
 		}
 
 		// create the join tables
-		for (final AssociationMapping<?, ?> attribute : entity.getAssociations()) {
+		for (final AssociationMapping<?, ?, ?> attribute : entity.getAssociations()) {
 			final JoinTable table = attribute.getJoinTable();
 
 			// skip not applicable tables

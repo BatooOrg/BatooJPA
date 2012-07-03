@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.criteria;
+package org.batoo.jpa.core.impl.criteria.path;
 
 import java.util.Collection;
 import java.util.Map;
@@ -26,20 +26,17 @@ import javax.persistence.metamodel.MapAttribute;
 import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.jdbc.EntityTable;
+import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
+import org.batoo.jpa.core.impl.model.mapping.ParentMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
-import org.batoo.jpa.core.impl.model.mapping.RootMapping;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 import com.google.common.collect.Maps;
 
 /**
- * 
- * The root implementation of {@link Path}.
+ * Abstract implementation of {@link Path}.
  * 
  * @param <X>
  *            the type referenced by the path
@@ -47,22 +44,36 @@ import com.google.common.collect.Maps;
  * @author hceylan
  * @since $version
  */
-public abstract class RootPathImpl<X> extends PathImpl<X> {
+public abstract class AbstractPath<X> extends AbstractExpression<X> implements Path<X> {
 
-	private final EntityTypeImpl<X> entity;
-	private final Map<String, PathImpl<?>> children = Maps.newHashMap();
+	private final AbstractPath<?> parent;
+	final Map<String, AbstractPath<?>> children = Maps.newHashMap();
 
 	/**
-	 * @param entity
-	 *            the entity type
+	 * @param parent
+	 *            the parent path, may be null
+	 * @param javaType
+	 *            the java type
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public RootPathImpl(EntityTypeImpl<X> entity) {
-		super(null, entity.getJavaType());
+	public AbstractPath(AbstractPath<?> parent, Class<X> javaType) {
+		super(javaType);
 
-		this.entity = entity;
+		this.parent = parent;
+	}
+
+	/**
+	 * returns cannot dereference exception.
+	 * 
+	 * @return the exception
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected IllegalArgumentException cannotDereference() {
+		return new IllegalArgumentException("Cannot dereference");
 	}
 
 	/**
@@ -70,16 +81,7 @@ public abstract class RootPathImpl<X> extends PathImpl<X> {
 	 * 
 	 */
 	@Override
-	public String describe() {
-		return StringUtils.isNotBlank(this.getAlias()) ? this.getAlias() : this.entity.getName();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generate(CriteriaQueryImpl<?> query) {
+	public final <K, V, M extends Map<K, V>> AbstractExpression<M> get(MapAttribute<? super X, K, V> map) {
 		return null;
 	}
 
@@ -88,7 +90,7 @@ public abstract class RootPathImpl<X> extends PathImpl<X> {
 	 * 
 	 */
 	@Override
-	public <K, V, M extends Map<K, V>> ExpressionImpl<M> get(MapAttribute<? super X, K, V> map) {
+	public final <E, C extends Collection<E>> AbstractExpression<C> get(PluralAttribute<? super X, C, E> collection) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -98,17 +100,7 @@ public abstract class RootPathImpl<X> extends PathImpl<X> {
 	 * 
 	 */
 	@Override
-	public <E, C extends Collection<E>> ExpressionImpl<C> get(PluralAttribute<? super X, C, E> collection) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public <Y> PathImpl<Y> get(SingularAttribute<? super X, Y> attribute) {
+	public final <Y> AbstractPath<Y> get(SingularAttribute<? super X, Y> attribute) {
 		return this.get(attribute.getName());
 	}
 
@@ -118,15 +110,18 @@ public abstract class RootPathImpl<X> extends PathImpl<X> {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public <Y> PathImpl<Y> get(String pathName) {
+	public final <Y> AbstractPath<Y> get(String pathName) {
 		// try to resolve from path
-		PathImpl<Y> path = (PathImpl<Y>) this.children.get(pathName);
+		AbstractPath<Y> path = (AbstractPath<Y>) this.children.get(pathName);
 		if (path != null) {
 			return path;
 		}
 
-		final RootMapping<X> rootMapping = this.entity.getRootMapping();
-		final Mapping<?, ?> mapping = rootMapping.getMapping(pathName);
+		if (!(this.getMapping() instanceof ParentMapping)) {
+			throw this.cannotDereference();
+		}
+
+		final Mapping<? super X, ?, Y> mapping = (Mapping<? super X, ?, Y>) ((ParentMapping<?, X>) this.getMapping()).getChild(pathName);
 
 		if (mapping == null) {
 			throw this.cannotDereference();
@@ -134,13 +129,13 @@ public abstract class RootPathImpl<X> extends PathImpl<X> {
 
 		// generate and return
 		if (mapping instanceof BasicMapping) {
-			path = new PhysicalAttributePathImpl<Y>(this, (BasicMapping<? super X, Y>) mapping);
+			path = new BasicPath<Y>(this, (BasicMapping<? super X, Y>) mapping);
 		}
 		else if (mapping instanceof PluralAssociationMapping) {
-			path = new PluralAttributePathImpl<Y>(this, (PluralAssociationMapping<?, ?, Y>) mapping);
+			path = new PluralAssociationPath<Y>(this, (PluralAssociationMapping<?, ?, Y>) mapping);
 		}
 		else {
-			path = new EmbeddedAttributePathImpl<Y>(this, (EmbeddedMapping<? super X, Y>) mapping);
+			path = new EmbeddedAttributePath<Y>(this, (EmbeddedMapping<? super X, Y>) mapping);
 		}
 
 		this.children.put(pathName, path);
@@ -149,27 +144,31 @@ public abstract class RootPathImpl<X> extends PathImpl<X> {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Returns the mapping of the path.
 	 * 
-	 */
-	@Override
-	public EntityTypeImpl<X> getModel() {
-		return this.entity;
-	}
-
-	/**
-	 * Returns the alias for the table.
-	 * <p>
-	 * if table does not have an alias, it is generated.
-	 * 
-	 * @param query
-	 *            the query
-	 * @param table
-	 *            the table
-	 * @return the alias for the table
+	 * @return the mapping of the path
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract String getTableAlias(CriteriaQueryImpl<?> query, EntityTable table);
+	protected abstract Mapping<?, ?, X> getMapping();
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public AbstractPath<?> getParentPath() {
+		return this.parent;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public AbstractPath<Class<? extends X>> type() {
+		return (AbstractPath<Class<? extends X>>) this;
+	}
 }

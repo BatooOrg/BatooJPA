@@ -16,48 +16,50 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.criteria;
+package org.batoo.jpa.core.impl.criteria.path;
 
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Path;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
+import org.batoo.jpa.core.impl.model.mapping.RootMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
-import org.batoo.jpa.core.util.BatooUtils;
 
 /**
- * A root type in the from clause. Query roots always reference entities.
+ * 
+ * The root implementation of {@link Path}.
  * 
  * @param <X>
- *            the entity type referenced by the root
+ *            the type referenced by the path
+ * 
  * @author hceylan
  * @since $version
  */
-public class RootImpl<X> extends AbstractFrom<X, X> implements Root<X> {
+public abstract class RootPath<X> extends AbstractPath<X> {
+
+	final EntityTypeImpl<X> entity;
 
 	/**
 	 * @param entity
-	 *            the entity
+	 *            the entity type
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public RootImpl(EntityTypeImpl<X> entity) {
-		super(entity);
+	public RootPath(EntityTypeImpl<X> entity) {
+		super(null, entity.getJavaType());
+
+		this.entity = entity;
 	}
 
 	/**
-	 * Returns the join descriptions.
+	 * {@inheritDoc}
 	 * 
-	 * @return the join descriptions
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	public String describeJoins() {
-		final String root = StringUtils.isNotBlank(this.getAlias()) ? this.getAlias() : this.getModel().getName();
-
-		return BatooUtils.indent(this.getFetchRoot().describe(root));
+	@Override
+	public String describe() {
+		return StringUtils.isNotBlank(this.getAlias()) ? this.getAlias() : this.entity.getName();
 	}
 
 	/**
@@ -66,22 +68,40 @@ public class RootImpl<X> extends AbstractFrom<X, X> implements Root<X> {
 	 */
 	@Override
 	public String generate(CriteriaQueryImpl<?> query) {
-		return this.getFetchRoot().generate(query);
+		return null;
 	}
 
 	/**
-	 * Returns the generated from SQL fragment.
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	protected RootMapping<X> getMapping() {
+		return this.entity.getRootMapping();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public EntityTypeImpl<X> getModel() {
+		return this.entity;
+	}
+
+	/**
+	 * Returns the alias for the table.
+	 * <p>
+	 * if table does not have an alias, it is generated.
 	 * 
 	 * @param query
 	 *            the query
-	 * @return the generated from SQL fragment
+	 * @param table
+	 *            the table
+	 * @return the alias for the table
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String generateFrom(CriteriaQueryImpl<?> query) {
-		final EntityTable primaryTable = this.getModel().getRootType().getPrimaryTable();
-
-		return primaryTable.getName() + " AS " + this.getFetchRoot().getTableAlias(query, primaryTable);
-	}
+	public abstract String getTableAlias(CriteriaQueryImpl<?> query, EntityTable table);
 }

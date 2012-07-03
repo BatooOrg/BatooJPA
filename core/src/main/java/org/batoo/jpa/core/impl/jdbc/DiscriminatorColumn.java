@@ -101,7 +101,7 @@ public class DiscriminatorColumn extends AbstractColumn {
 	 * 
 	 */
 	@Override
-	public Mapping<?, ?> getMapping() {
+	public Mapping<?, ?, ?> getMapping() {
 		return null;
 	}
 

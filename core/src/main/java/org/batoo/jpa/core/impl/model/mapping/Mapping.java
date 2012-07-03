@@ -29,11 +29,13 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
  *            the source type
  * @param <X>
  *            the destination type
+ * @param <Y>
+ *            the attribute type
  * 
  * @author hceylan
  * @since $version
  */
-public abstract class Mapping<Z, X> {
+public abstract class Mapping<Z, X, Y> {
 
 	private final ParentMapping<?, Z> parent;
 	private final String path;
@@ -80,7 +82,7 @@ public abstract class Mapping<Z, X> {
 			return true;
 		}
 
-		final Mapping<?, ?> other = (Mapping<?, ?>) obj;
+		final Mapping<?, ?, ?> other = (Mapping<?, ?, ?>) obj;
 
 		return this.getPath().equals(other.getPath());
 	}

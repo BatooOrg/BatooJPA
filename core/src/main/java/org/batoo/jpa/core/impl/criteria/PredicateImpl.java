@@ -25,7 +25,9 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 
 import org.apache.commons.lang.mutable.MutableInt;
-import org.batoo.jpa.core.impl.criteria.CompoundExpressionImpl.Comparison;
+import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
+import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 import com.google.common.base.Function;
@@ -37,11 +39,11 @@ import com.google.common.collect.Lists;
  * @author hceylan
  * @since $version
  */
-public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate {
+public class PredicateImpl extends AbstractExpression<Boolean> implements Predicate {
 
 	private final BooleanOperator operator;
 	private final boolean negated;
-	private final List<ExpressionImpl<Boolean>> expressions = Lists.newArrayList();
+	private final List<AbstractExpression<Boolean>> expressions = Lists.newArrayList();
 
 	/**
 	 * @param negated
@@ -61,7 +63,7 @@ public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate 
 		this.operator = operator;
 
 		for (final Expression<Boolean> predicate : expressions) {
-			this.expressions.add((ExpressionImpl<Boolean>) predicate);
+			this.expressions.add((AbstractExpression<Boolean>) predicate);
 		}
 	}
 
@@ -83,7 +85,7 @@ public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate 
 		this.operator = operator;
 
 		for (final Expression<Boolean> predicate : predicates) {
-			this.expressions.add((ExpressionImpl<Boolean>) predicate);
+			this.expressions.add((AbstractExpression<Boolean>) predicate);
 		}
 	}
 
@@ -94,7 +96,7 @@ public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PredicateImpl(ExpressionImpl<Boolean>... expressions) {
+	public PredicateImpl(AbstractExpression<Boolean>... expressions) {
 		this(false, BooleanOperator.AND, expressions);
 	}
 
@@ -114,10 +116,10 @@ public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate 
 			builder.append("not (");
 		}
 
-		final List<String> expressions = Lists.transform(this.expressions, new Function<ExpressionImpl<Boolean>, String>() {
+		final List<String> expressions = Lists.transform(this.expressions, new Function<AbstractExpression<Boolean>, String>() {
 
 			@Override
-			public String apply(ExpressionImpl<Boolean> input) {
+			public String apply(AbstractExpression<Boolean> input) {
 				return input.describe();
 			}
 		});
@@ -141,7 +143,7 @@ public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate 
 
 			@Override
 			public String apply(Expression<Boolean> input) {
-				return ((ExpressionImpl<Boolean>) input).generate(query);
+				return ((AbstractExpression<Boolean>) input).generate(query);
 			}
 		});
 

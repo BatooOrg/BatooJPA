@@ -16,14 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.criteria;
+package org.batoo.jpa.core.impl.criteria.expression;
 
 import java.util.Collection;
 
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 
-import org.batoo.jpa.core.impl.criteria.CompoundExpressionImpl.Comparison;
+import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.SelectionImpl;
+import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
 
 /**
  * Type for query expressions.
@@ -33,7 +35,7 @@ import org.batoo.jpa.core.impl.criteria.CompoundExpressionImpl.Comparison;
  * @author hceylan
  * @since $version
  */
-public abstract class ExpressionImpl<T> extends SelectionImpl<T> implements Expression<T> {
+public abstract class AbstractExpression<T> extends SelectionImpl<T> implements Expression<T> {
 
 	/**
 	 * @param javaType
@@ -42,7 +44,7 @@ public abstract class ExpressionImpl<T> extends SelectionImpl<T> implements Expr
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ExpressionImpl(Class<T> javaType) {
+	public AbstractExpression(Class<T> javaType) {
 		super(javaType);
 	}
 

@@ -38,6 +38,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 
 import com.google.common.collect.Lists;
@@ -52,11 +53,11 @@ import com.google.common.collect.Maps;
  * @author hceylan
  * @since $version
  */
-public abstract class BaseTypedQueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>> {
+public abstract class BaseTypedQuery<X> implements TypedQuery<X>, ResultSetHandler<List<X>> {
 
 	private static final int MAX_COL_LENGTH = 30;
 
-	private static final BLogger LOG = BLoggerFactory.getLogger(BaseTypedQueryImpl.class);
+	private static final BLogger LOG = BLoggerFactory.getLogger(BaseTypedQuery.class);
 
 	protected final CriteriaQueryImpl<X> cq;
 	private final EntityManagerImpl em;
@@ -77,7 +78,7 @@ public abstract class BaseTypedQueryImpl<X> implements TypedQuery<X>, ResultSetH
 	 * @since $version
 	 * @author hceylan
 	 */
-	public BaseTypedQueryImpl(CriteriaQueryImpl<X> criteriaQuery, EntityManagerImpl entityManager) {
+	public BaseTypedQuery(CriteriaQueryImpl<X> criteriaQuery, EntityManagerImpl entityManager) {
 		super();
 
 		this.cq = criteriaQuery;
@@ -147,7 +148,7 @@ public abstract class BaseTypedQueryImpl<X> implements TypedQuery<X>, ResultSetH
 		dump.append("\n");
 		dump.append(StringUtils.repeat("-", length));
 
-		BaseTypedQueryImpl.LOG.debug(dump.toString());
+		BaseTypedQuery.LOG.debug(dump.toString());
 	}
 
 	/**
@@ -181,7 +182,7 @@ public abstract class BaseTypedQueryImpl<X> implements TypedQuery<X>, ResultSetH
 				return new QueryRunner().query(this.em.getConnection(), sql, this, parameters);
 			}
 			catch (final SQLException e) {
-				BaseTypedQueryImpl.LOG.error(e, "Query failed" + BaseTypedQueryImpl.LOG.lazyBoxed(sql, parameters));
+				BaseTypedQuery.LOG.error(e, "Query failed" + BaseTypedQuery.LOG.lazyBoxed(sql, parameters));
 
 				final EntityTransaction transaction = this.em.getTransaction();
 				if (transaction != null) {
@@ -229,16 +230,16 @@ public abstract class BaseTypedQueryImpl<X> implements TypedQuery<X>, ResultSetH
 		}
 
 		if (this.data.size() == 0) {
-			BaseTypedQueryImpl.LOG.debug("No result returned");
+			BaseTypedQuery.LOG.debug("No result returned");
 
 			return Collections.emptyList();
 		}
 
-		if (BaseTypedQueryImpl.LOG.isDebugEnabled()) {
+		if (BaseTypedQuery.LOG.isDebugEnabled()) {
 			this.prepareLabels(this.md);
 		}
 
-		if (BaseTypedQueryImpl.LOG.isDebugEnabled()) {
+		if (BaseTypedQuery.LOG.isDebugEnabled()) {
 			this.dumpResultSet();
 		}
 
@@ -252,7 +253,7 @@ public abstract class BaseTypedQueryImpl<X> implements TypedQuery<X>, ResultSetH
 	}
 
 	private int max(int length1, int length2) {
-		return Math.min(BaseTypedQueryImpl.MAX_COL_LENGTH, Math.max(length1, length2));
+		return Math.min(BaseTypedQuery.MAX_COL_LENGTH, Math.max(length1, length2));
 	}
 
 	private void prepareLabels(final ResultSetMetaData md) throws SQLException {
@@ -260,7 +261,7 @@ public abstract class BaseTypedQueryImpl<X> implements TypedQuery<X>, ResultSetH
 
 		for (int i = 0; i < this.labels.length; i++) {
 			String label = md.getColumnName(i + 1) + " (" + md.getColumnTypeName(i + 1) + ")";
-			label = StringUtils.abbreviate(label, BaseTypedQueryImpl.MAX_COL_LENGTH);
+			label = StringUtils.abbreviate(label, BaseTypedQuery.MAX_COL_LENGTH);
 
 			this.labels[i] = label;
 		}

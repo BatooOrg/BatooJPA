@@ -41,7 +41,7 @@ import org.batoo.jpa.parser.metadata.ColumnMetadata;
  * @author hceylan
  * @since $version
  */
-public class BasicMapping<Z, X> extends Mapping<Z, X> implements SingularMapping<Z, X> {
+public class BasicMapping<Z, X> extends Mapping<Z, X, X> implements SingularMapping<Z, X> {
 
 	private final BasicAttribute<? super Z, X> attribute;
 	private final BasicColumn column;

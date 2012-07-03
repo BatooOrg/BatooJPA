@@ -36,6 +36,8 @@ import javax.persistence.criteria.Selection;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
+import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 
 import com.google.common.base.Function;
@@ -375,7 +377,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 			this.restriction = (PredicateImpl) restriction;
 		}
 		else {
-			this.restriction = new PredicateImpl((ExpressionImpl<Boolean>) restriction);
+			this.restriction = new PredicateImpl((AbstractExpression<Boolean>) restriction);
 		}
 
 		return this;

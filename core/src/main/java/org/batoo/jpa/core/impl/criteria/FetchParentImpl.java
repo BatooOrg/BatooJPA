@@ -183,20 +183,20 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	public <Y> FetchImpl<X, Y> fetch(String attributeName, JoinType jt) {
 		Type<Y> type;
 
-		final Mapping<?, ?> mapping = this.entity.getRootMapping().getMapping(attributeName);
+		final Mapping<?, ?, ?> mapping = this.entity.getRootMapping().getMapping(attributeName);
 
 		if (mapping instanceof SingularAssociationMapping) {
 			type = (Type<Y>) ((SingularAssociationMapping<X, Y>) mapping).getType();
 		}
 		else {
-			type = (Type<Y>) ((PluralAssociationMapping<X, ?, Y>) mapping).getType();
+			type = ((PluralAssociationMapping<X, ?, Y>) mapping).getType();
 		}
 
 		if (!(type instanceof EntityType)) {
 			throw new IllegalArgumentException("Cannot dereference attribute " + attributeName);
 		}
 
-		final FetchImpl<X, Y> fetch = new FetchImpl<X, Y>(this, (AssociationMapping<? super X, Y>) mapping, jt);
+		final FetchImpl<X, Y> fetch = new FetchImpl<X, Y>(this, (AssociationMapping<? super X, ?, Y>) mapping, jt);
 		this.fetches.add(fetch);
 
 		return fetch;
@@ -483,7 +483,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AssociationMapping<? super Z, X> getMapping() {
+	public AssociationMapping<? super Z, ?, X> getMapping() {
 		return null;
 	}
 
@@ -586,7 +586,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 		for (int i = this.fetches.size() - 1; i >= 0; i--) {
 			final FetchImpl<X, ?> fetch = this.fetches.get(i);
 			final MutableInt subRowNo = new MutableInt(rowNo);
-			final AssociationMapping<? super X, ?> mapping = fetch.getMapping();
+			final AssociationMapping<? super X, ?, ?> mapping = fetch.getMapping();
 
 			// if it is a plural association then get a list of instances
 			if (mapping.getAttribute().isCollection()) {
@@ -775,7 +775,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 		populateEmbeddedId(Map<String, Object> row, EmbeddedMapping<?, ?> idMapping, SingularAssociationMapping<?, ?> mapping, MutableBoolean allNull) {
 		final Object id = idMapping.getAttribute().newInstance();
 
-		for (final Mapping<?, ?> child : idMapping.getChildren()) {
+		for (final Mapping<?, ?, ?> child : idMapping.getChildren()) {
 			if (child instanceof BasicMapping) {
 				final BasicMapping<?, ?> basicMapping = (BasicMapping<?, ?>) child;
 				final BasicColumn column = basicMapping.getColumn();

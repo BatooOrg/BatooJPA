@@ -16,23 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.criteria;
+package org.batoo.jpa.core.impl.criteria.path;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
-import javax.persistence.metamodel.MapAttribute;
-import javax.persistence.metamodel.PluralAttribute;
-import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.mutable.MutableInt;
-import org.batoo.jpa.core.impl.criteria.CompoundExpressionImpl.Comparison;
+import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
+import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
-import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
+import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
+import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 
 /**
  * Physical Attribute implementation of {@link Path}.
@@ -43,9 +41,9 @@ import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
  * @author hceylan
  * @since $version
  */
-public class PluralAttributePathImpl<X> extends PathImpl<X> {
+public class BasicPath<X> extends AbstractPath<X> {
 
-	private final PluralAssociationMapping<?, ?, X> mapping;
+	private final BasicMapping<?, X> mapping;
 
 	/**
 	 * @param parent
@@ -56,8 +54,8 @@ public class PluralAttributePathImpl<X> extends PathImpl<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PluralAttributePathImpl(PathImpl<?> parent, PluralAssociationMapping<?, ?, X> mapping) {
-		super(parent, mapping.getType().getJavaType());
+	public BasicPath(AbstractPath<?> parent, BasicMapping<?, X> mapping) {
+		super(parent, mapping.getJavaType());
 
 		this.mapping = mapping;
 	}
@@ -81,9 +79,19 @@ public class PluralAttributePathImpl<X> extends PathImpl<X> {
 	 * {@inheritDoc}
 	 * 
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public String generate(CriteriaQueryImpl<?> query) {
-		return null;
+		final BasicColumn column = this.mapping.getColumn();
+
+		AbstractPath<?> root = this;
+		while (root.getParentPath() != null) {
+			root = root.getParentPath();
+		}
+
+		final String tableAlias = ((RootPath<X>) root).getTableAlias(query, column.getTable());
+
+		return tableAlias + "." + column.getName();
 	}
 
 	/**
@@ -106,8 +114,8 @@ public class PluralAttributePathImpl<X> extends PathImpl<X> {
 	 * 
 	 */
 	@Override
-	public <K, V, M extends Map<K, V>> Expression<M> get(MapAttribute<? super X, K, V> map) {
-		throw this.cannotDereference();
+	protected BasicMapping<?, X> getMapping() {
+		return this.mapping;
 	}
 
 	/**
@@ -115,34 +123,7 @@ public class PluralAttributePathImpl<X> extends PathImpl<X> {
 	 * 
 	 */
 	@Override
-	public <E, C extends Collection<E>> Expression<C> get(PluralAttribute<? super X, C, E> collection) {
-		throw this.cannotDereference();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public <Y> Path<Y> get(SingularAttribute<? super X, Y> attribute) {
-		throw this.cannotDereference();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public <Y> Path<Y> get(String attributeName) {
-		throw this.cannotDereference();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public PluralAttributeImpl<?, ?, X> getModel() {
+	public BasicAttribute<?, X> getModel() {
 		return this.mapping.getAttribute();
 	}
 

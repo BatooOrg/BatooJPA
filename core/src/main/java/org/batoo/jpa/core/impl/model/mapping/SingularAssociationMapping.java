@@ -41,13 +41,13 @@ import org.batoo.jpa.parser.metadata.AssociationMetadata;
  * @author hceylan
  * @since $version
  */
-public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X> {
+public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X> {
 
 	private final AssociatedSingularAttribute<? super Z, X> attribute;
 	private final JoinTable joinTable;
 	private final ForeignKey foreignKey;
 	private EntityTypeImpl<X> type;
-	private AssociationMapping<?, ?> inverse;
+	private AssociationMapping<?, ?, ?> inverse;
 
 	/**
 	 * @param parent
@@ -129,7 +129,7 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X> {
 	 * 
 	 */
 	@Override
-	public AssociationMapping<?, ?> getInverse() {
+	public AssociationMapping<?, ?, ?> getInverse() {
 		return this.inverse;
 	}
 
@@ -163,7 +163,7 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X> {
 		this.type = metamodel.entity(this.attribute.getJavaType());
 
 		if (!this.isOwner()) {
-			this.inverse = (AssociationMapping<?, ?>) this.type.getRootMapping().getMapping(this.getMappedBy());
+			this.inverse = (AssociationMapping<?, ?, ?>) this.type.getRootMapping().getMapping(this.getMappedBy());
 
 			if (this.inverse == null) {
 				throw new MappingException("Cannot find the mappedBy attribute " + this.getMappedBy() + " specified on " + this.attribute.getJavaMember());
@@ -220,7 +220,7 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X> {
 	 * 
 	 */
 	@Override
-	public void setInverse(AssociationMapping<?, ?> inverse) {
+	public void setInverse(AssociationMapping<?, ?, ?> inverse) {
 		this.inverse = inverse;
 	}
 

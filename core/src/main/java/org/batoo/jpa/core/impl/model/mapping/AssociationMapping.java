@@ -44,11 +44,13 @@ import org.batoo.jpa.parser.metadata.attribute.OrphanableAssociationAttributeMet
  *            the source type
  * @param <X>
  *            the destination type
+ * @param <Y>
+ *            the attribute type
  * 
  * @author hceylan
  * @since $version
  */
-public abstract class AssociationMapping<Z, X> extends Mapping<Z, X> {
+public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> {
 
 	private final boolean eager;
 	private final boolean cascadesDetach;
@@ -254,7 +256,7 @@ public abstract class AssociationMapping<Z, X> extends Mapping<Z, X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract AssociationMapping<?, ?> getInverse();
+	public abstract AssociationMapping<?, ?, ?> getInverse();
 
 	/**
 	 * Returns the join table of the mapping.
@@ -366,7 +368,7 @@ public abstract class AssociationMapping<Z, X> extends Mapping<Z, X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract void setInverse(AssociationMapping<?, ?> inverse);
+	public abstract void setInverse(AssociationMapping<?, ?, ?> inverse);
 
 	/**
 	 * Sets the lazy instance for the association

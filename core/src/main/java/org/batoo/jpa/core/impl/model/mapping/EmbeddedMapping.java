@@ -68,7 +68,7 @@ public class EmbeddedMapping<Z, X> extends ParentMapping<Z, X> implements Singul
 			throw new NullPointerException();
 		}
 
-		for (final Mapping<? super X, ?> mapping : this.getChildren()) {
+		for (final Mapping<? super X, ?, ?> mapping : this.getChildren()) {
 			// mapping is another embedded mapping
 			if (mapping instanceof EmbeddedMapping) {
 				((EmbeddedMapping<? super X, ?>) mapping).fillValue(value);

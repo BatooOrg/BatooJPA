@@ -28,9 +28,9 @@ import org.batoo.jpa.core.impl.manager.EntityTransactionImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
-import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
@@ -87,7 +87,7 @@ public class ManagedInstance<X> {
 	private final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>[] idMappings;
 	private final EmbeddableTypeImpl<?> idType;
 
-	private final Set<AssociationMapping<?, ?>> associationsLoaded = Sets.newHashSet();
+	private final Set<AssociationMapping<?, ?, ?>> associationsLoaded = Sets.newHashSet();
 	private EntityTransactionImpl transaction;
 
 	private final boolean external = true;
@@ -178,7 +178,7 @@ public class ManagedInstance<X> {
 	public boolean cascadePersist(EntityManagerImpl entityManager) {
 		boolean requiresFlush = false;
 
-		for (final AssociationMapping<?, ?> association : this.type.getAssociationsPersistable()) {
+		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsPersistable()) {
 
 			// if the association a collection attribute then we will cascade to each element
 			if (association instanceof PluralAssociationMapping) {
@@ -209,7 +209,7 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void checkTransients() {
-		for (final AssociationMapping<?, ?> association : this.type.getAssociations()) {
+		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociations()) {
 			association.checkTransient(this);
 		}
 	}
@@ -313,7 +313,7 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void flushAssociations(ConnectionImpl connection) throws SQLException {
-		for (final AssociationMapping<?, ?> association : this.type.getAssociationsJoined()) {
+		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsJoined()) {
 			association.flush(connection, this);
 		}
 	}
@@ -326,7 +326,7 @@ public class ManagedInstance<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Set<AssociationMapping<?, ?>> getAssociationsLoaded() {
+	public Set<AssociationMapping<?, ?, ?>> getAssociationsLoaded() {
 		return this.associationsLoaded;
 	}
 
@@ -446,7 +446,7 @@ public class ManagedInstance<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void setAssociationLoaded(AssociationMapping<?, ?> association) {
+	public void setAssociationLoaded(AssociationMapping<?, ?, ?> association) {
 		this.associationsLoaded.add(association);
 	}
 
