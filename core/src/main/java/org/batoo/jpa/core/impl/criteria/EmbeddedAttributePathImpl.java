@@ -63,7 +63,7 @@ public class EmbeddedAttributePathImpl<X> extends PathImpl<X> {
 	 * @author hceylan
 	 */
 	public EmbeddedAttributePathImpl(PathImpl<?> parent, EmbeddedMapping<?, X> mapping) {
-		super(parent);
+		super(parent, mapping.getType().getJavaType());
 
 		this.mapping = mapping;
 	}

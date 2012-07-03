@@ -36,12 +36,14 @@ public abstract class PathImpl<X> extends ExpressionImpl<X> implements Path<X> {
 	/**
 	 * @param parent
 	 *            the parent path, may be null
+	 * @param javaType
+	 *            the java type
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PathImpl(PathImpl<?> parent) {
-		super();
+	public PathImpl(PathImpl<?> parent, Class<X> javaType) {
+		super(javaType);
 
 		this.parent = parent;
 	}

@@ -332,5 +332,4 @@ public interface From<Z, X> extends Path<X>, FetchParent<Z, X> {
 	 *             if attribute of the given name does not exist
 	 */
 	<T, Y> SetJoin<T, Y> joinSet(String attributeName, JoinType jt);
-
 }

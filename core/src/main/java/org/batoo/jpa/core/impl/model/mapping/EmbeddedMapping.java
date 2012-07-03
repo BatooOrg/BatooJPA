@@ -157,7 +157,7 @@ public class EmbeddedMapping<Z, X> extends ParentMapping<Z, X> implements Singul
 	 * 
 	 */
 	@Override
-	public EmbeddableTypeImpl<? super X> getType() {
+	public EmbeddableTypeImpl<X> getType() {
 		return this.embeddable;
 	}
 

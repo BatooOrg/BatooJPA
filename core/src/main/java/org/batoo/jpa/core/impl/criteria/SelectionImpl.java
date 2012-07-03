@@ -39,6 +39,17 @@ public abstract class SelectionImpl<X> extends TupleElementImpl<X> implements Se
 	private String alias;
 
 	/**
+	 * @param javaType
+	 *            the java type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public SelectionImpl(Class<X> javaType) {
+		super(javaType);
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -88,8 +99,6 @@ public abstract class SelectionImpl<X> extends TupleElementImpl<X> implements Se
 	 * 
 	 * @param session
 	 *            the session
-	 * @param query
-	 *            the query
 	 * @param data
 	 *            the resultset data
 	 * @param rowNo

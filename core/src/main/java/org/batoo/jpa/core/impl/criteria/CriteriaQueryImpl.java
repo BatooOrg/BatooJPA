@@ -299,7 +299,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 		}
 
 		final String restriction = this.generateRestriction();
-		final String where = restriction != null ? "WHERE " + restriction : null;
+		final String where = StringUtils.isNotBlank(restriction) ? "WHERE " + restriction : null;
 
 		final String from = "FROM " + Joiner.on(",").join(froms);
 		final String join = Joiner.on(",").join(joins);

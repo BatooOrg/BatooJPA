@@ -79,7 +79,7 @@ public class CompoundExpressionImpl extends ExpressionImpl<Boolean> {
 	 * @author hceylan
 	 */
 	public CompoundExpressionImpl(Comparison comparison, ExpressionImpl<?> x, ExpressionImpl<?> y) {
-		super();
+		super(Boolean.class);
 
 		this.comparison = comparison;
 		this.x = x;

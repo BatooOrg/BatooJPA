@@ -32,7 +32,6 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.ListJoin;
 import javax.persistence.criteria.MapJoin;
 import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Selection;
 import javax.persistence.criteria.SetJoin;
 import javax.persistence.metamodel.CollectionAttribute;
 import javax.persistence.metamodel.ListAttribute;
@@ -197,15 +196,6 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public List<Selection<?>> getCompoundSelectionItems() {
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public From<Z, X> getCorrelationParent() {
 		// TODO Auto-generated method stub
 		return null;
@@ -230,15 +220,6 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 */
 	public FetchParentImpl<Z, X> getFetchRoot() {
 		return this.fetchRoot;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Class<? extends X> getJavaType() {
-		return this.getModel().getJavaType();
 	}
 
 	/**
@@ -453,7 +434,7 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public <X, Y> Join<X, Y> join(String attributeName) {
+	public <T, Y> Join<T, Y> join(String attributeName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -463,7 +444,7 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public <X, Y> Join<X, Y> join(String attributeName, JoinType jt) {
+	public <T, Y> Join<T, Y> join(String attributeName, JoinType jt) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -473,7 +454,7 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public <X, Y> CollectionJoin<X, Y> joinCollection(String attributeName) {
+	public <T, Y> CollectionJoin<T, Y> joinCollection(String attributeName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -483,7 +464,7 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public <X, Y> CollectionJoin<X, Y> joinCollection(String attributeName, JoinType jt) {
+	public <T, Y> CollectionJoin<T, Y> joinCollection(String attributeName, JoinType jt) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -493,7 +474,7 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public <X, Y> ListJoin<X, Y> joinList(String attributeName) {
+	public <T, Y> ListJoin<T, Y> joinList(String attributeName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -503,7 +484,7 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public <X, Y> ListJoin<X, Y> joinList(String attributeName, JoinType jt) {
+	public <T, Y> ListJoin<T, Y> joinList(String attributeName, JoinType jt) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -513,7 +494,7 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public <X, K, V> MapJoin<X, K, V> joinMap(String attributeName) {
+	public <T, K, V> MapJoin<T, K, V> joinMap(String attributeName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -523,7 +504,7 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public <X, K, V> MapJoin<X, K, V> joinMap(String attributeName, JoinType jt) {
+	public <T, K, V> MapJoin<T, K, V> joinMap(String attributeName, JoinType jt) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -533,7 +514,7 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public <X, Y> SetJoin<X, Y> joinSet(String attributeName) {
+	public <T, Y> SetJoin<T, Y> joinSet(String attributeName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -543,7 +524,7 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public <X, Y> SetJoin<X, Y> joinSet(String attributeName, JoinType jt) {
+	public <T, Y> SetJoin<T, Y> joinSet(String attributeName, JoinType jt) {
 		// TODO Auto-generated method stub
 		return null;
 	}

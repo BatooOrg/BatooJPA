@@ -57,7 +57,7 @@ public class PluralAttributePathImpl<X> extends PathImpl<X> {
 	 * @author hceylan
 	 */
 	public PluralAttributePathImpl(PathImpl<?> parent, PluralAssociationMapping<?, ?, X> mapping) {
-		super(parent);
+		super(parent, mapping.getType().getJavaType());
 
 		this.mapping = mapping;
 	}

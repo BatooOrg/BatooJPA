@@ -33,7 +33,7 @@ import javax.persistence.metamodel.Metamodel;
 import org.batoo.jpa.common.BatooException;
 import org.batoo.jpa.core.BJPASettings;
 import org.batoo.jpa.core.JPASettings;
-import org.batoo.jpa.core.impl.criteria2.CriteriaBuilderImpl;
+import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.deployment.DdlManager;
 import org.batoo.jpa.core.impl.deployment.LinkManager;
 import org.batoo.jpa.core.impl.jdbc.AbstractJdbcAdaptor;

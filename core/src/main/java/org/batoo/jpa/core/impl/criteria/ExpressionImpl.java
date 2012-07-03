@@ -36,6 +36,17 @@ import org.batoo.jpa.core.impl.criteria.CompoundExpressionImpl.Comparison;
 public abstract class ExpressionImpl<T> extends SelectionImpl<T> implements Expression<T> {
 
 	/**
+	 * @param javaType
+	 *            the java type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ExpressionImpl(Class<T> javaType) {
+		super(javaType);
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */

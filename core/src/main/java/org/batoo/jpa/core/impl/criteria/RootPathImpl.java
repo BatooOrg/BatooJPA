@@ -60,7 +60,7 @@ public abstract class RootPathImpl<X> extends PathImpl<X> {
 	 * @author hceylan
 	 */
 	public RootPathImpl(EntityTypeImpl<X> entity) {
-		super(null);
+		super(null, entity.getJavaType());
 
 		this.entity = entity;
 	}

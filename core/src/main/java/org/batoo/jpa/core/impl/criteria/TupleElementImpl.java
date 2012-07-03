@@ -33,13 +33,27 @@ import javax.persistence.TupleElement;
  */
 public abstract class TupleElementImpl<X> implements TupleElement<X> {
 
+	private final Class<X> javaType;
+
+	/**
+	 * @param javaType
+	 *            the java type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public TupleElementImpl(Class<X> javaType) {
+		super();
+
+		this.javaType = javaType;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * 
 	 */
 	@Override
 	public Class<? extends X> getJavaType() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.javaType;
 	}
 }

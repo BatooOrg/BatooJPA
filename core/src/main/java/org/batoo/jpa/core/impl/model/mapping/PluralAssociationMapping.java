@@ -28,12 +28,12 @@ import javax.persistence.criteria.Selection;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
-import org.batoo.jpa.core.impl.criteria2.CriteriaBuilderImpl;
-import org.batoo.jpa.core.impl.criteria2.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria2.ParameterExpressionImpl;
-import org.batoo.jpa.core.impl.criteria2.PredicateImpl;
-import org.batoo.jpa.core.impl.criteria2.RootImpl;
-import org.batoo.jpa.core.impl.criteria2.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
+import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.criteria.PredicateImpl;
+import org.batoo.jpa.core.impl.criteria.RootImpl;
+import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
@@ -240,7 +240,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C> 
 	 * 
 	 */
 	@Override
-	public EntityTypeImpl<?> getType() {
+	public EntityTypeImpl<E> getType() {
 		return this.type;
 	}
 

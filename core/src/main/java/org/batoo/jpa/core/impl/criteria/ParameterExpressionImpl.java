@@ -43,7 +43,6 @@ import com.google.common.collect.Maps;
  */
 public class ParameterExpressionImpl<T> extends ExpressionImpl<T> implements ParameterExpression<T> {
 
-	private final Class<T> paramClass;
 	private final String name;
 	private Integer position;
 	private int expandedCount = 0;
@@ -59,9 +58,8 @@ public class ParameterExpressionImpl<T> extends ExpressionImpl<T> implements Par
 	 * @author hceylan
 	 */
 	public ParameterExpressionImpl(Class<T> paramClass, String name) {
-		super();
+		super(paramClass);
 
-		this.paramClass = paramClass;
 		this.name = name;
 	}
 
@@ -137,8 +135,9 @@ public class ParameterExpressionImpl<T> extends ExpressionImpl<T> implements Par
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public Class<T> getParameterType() {
-		return this.paramClass;
+		return (Class<T>) this.getJavaType();
 	}
 
 	/**

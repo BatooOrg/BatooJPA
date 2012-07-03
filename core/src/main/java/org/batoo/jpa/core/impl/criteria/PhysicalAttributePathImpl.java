@@ -58,7 +58,7 @@ public class PhysicalAttributePathImpl<X> extends PathImpl<X> {
 	 * @author hceylan
 	 */
 	public PhysicalAttributePathImpl(PathImpl<?> parent, BasicMapping<?, X> mapping) {
-		super(parent);
+		super(parent, mapping.getJavaType());
 
 		this.mapping = mapping;
 	}

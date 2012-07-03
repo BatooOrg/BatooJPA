@@ -55,7 +55,7 @@ public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate 
 	 * @author hceylan
 	 */
 	public PredicateImpl(boolean negated, BooleanOperator operator, Expression<Boolean>... expressions) {
-		super();
+		super(Boolean.class);
 
 		this.negated = negated;
 		this.operator = operator;
@@ -77,7 +77,7 @@ public class PredicateImpl extends ExpressionImpl<Boolean> implements Predicate 
 	 * @author hceylan
 	 */
 	public PredicateImpl(boolean negated, BooleanOperator operator, Predicate... predicates) {
-		super();
+		super(Boolean.class);
 
 		this.negated = negated;
 		this.operator = operator;
