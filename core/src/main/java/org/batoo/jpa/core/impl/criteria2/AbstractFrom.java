@@ -16,23 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.criteria;
+package org.batoo.jpa.core.impl.criteria2;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.criteria.CollectionJoin;
-import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.From;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.ListJoin;
 import javax.persistence.criteria.MapJoin;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Selection;
 import javax.persistence.criteria.SetJoin;
 import javax.persistence.metamodel.CollectionAttribute;
 import javax.persistence.metamodel.ListAttribute;
@@ -41,18 +35,10 @@ import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.apache.commons.lang.mutable.MutableInt;
-import org.batoo.jpa.core.impl.criteria.CompoundExpressionImpl.Comparison;
-import org.batoo.jpa.core.impl.jdbc.EntityTable;
-import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.mapping.RootMapping;
 
 /**
- * Represents a bound type, usually an entity that appears in the from clause, but may also be an embeddable belonging to an entity in the
- * from clause.
- * <p>
- * Serves as a factory for Joins of associations, embeddables, and collections belonging to the type, and for Paths of attributes belonging
- * to the type.
+ * The abstract implementation of {@link From}.
  * 
  * @param <Z>
  *            the source type
@@ -62,34 +48,21 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
  * @author hceylan
  * @since $version
  */
-public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
-
-	private final EntityTypeImpl<X> entity;
-	private final FetchParentImpl<Z, X> fetchRoot;
+public abstract class AbstractFrom<Z, X> extends EntityPath<X> implements From<Z, X> {
 
 	/**
-	 * @param entity
-	 *            the entity
+	 * @param parent
+	 *            the parent mapping
+	 * @param mapping
+	 *            the mapping
+	 * @param generatedAlias
+	 *            the generated alias
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public FromImpl(EntityTypeImpl<X> entity) {
-		super(entity);
-
-		this.fetchRoot = new FetchParentImpl<Z, X>(entity);
-
-		this.entity = entity;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public <X> Expression<X> as(Class<X> type) {
-		// TODO Auto-generated method stub
-		return null;
+	public AbstractFrom(RootMapping<Z> parent, RootMapping<X> mapping, String generatedAlias) {
+		super(mapping, generatedAlias);
 	}
 
 	/**
@@ -98,7 +71,8 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 */
 	@Override
 	public <Y> Fetch<X, Y> fetch(PluralAttribute<? super X, ?, Y> attribute) {
-		return this.fetchRoot.fetch(attribute);
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -107,7 +81,8 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 */
 	@Override
 	public <Y> Fetch<X, Y> fetch(PluralAttribute<? super X, ?, Y> attribute, JoinType jt) {
-		return this.fetchRoot.fetch(attribute, jt);
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -116,7 +91,8 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 */
 	@Override
 	public <Y> Fetch<X, Y> fetch(SingularAttribute<? super X, Y> attribute) {
-		return this.fetchRoot.fetch(attribute);
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -125,7 +101,8 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 */
 	@Override
 	public <Y> Fetch<X, Y> fetch(SingularAttribute<? super X, Y> attribute, JoinType jt) {
-		return this.fetchRoot.fetch(attribute, jt);
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -134,7 +111,8 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 */
 	@Override
 	public <Y> Fetch<X, Y> fetch(String attributeName) {
-		return this.fetchRoot.fetch(attributeName);
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -143,61 +121,7 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 */
 	@Override
 	public <Y> Fetch<X, Y> fetch(String attributeName, JoinType jt) {
-		return this.fetchRoot.fetch(attributeName, jt);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generate(CriteriaQueryImpl<?> query) {
 		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * Returns the restriction based on discrimination.
-	 * 
-	 * @return the restriction based on discrimination, <code>null</code>
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String generateDiscrimination() {
-		return this.fetchRoot.generateDiscrimination();
-	}
-
-	/**
-	 * Returns the generated joins SQL fragment.
-	 * 
-	 * @param query
-	 *            the query
-	 * @return the generated joins SQL fragment
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String generateJoins(CriteriaQueryImpl<?> query) {
-		return this.fetchRoot.generateJoins(query);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public List<Selection<?>> getCompoundSelectionItems() {
 		return null;
 	}
 
@@ -217,28 +141,8 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 */
 	@Override
 	public Set<Fetch<X, ?>> getFetches() {
-		return this.fetchRoot.getFetches();
-	}
-
-	/**
-	 * Returns the fetchRoot of the FromImpl.
-	 * 
-	 * @return the fetchRoot of the FromImpl
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public FetchParentImpl<Z, X> getFetchRoot() {
-		return this.fetchRoot;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Class<? extends X> getJavaType() {
-		return this.getModel().getJavaType();
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -256,96 +160,9 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public EntityTypeImpl<X> getModel() {
-		return this.entity;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String getTableAlias(CriteriaQueryImpl<?> query, EntityTable table) {
-		return this.fetchRoot.getTableAlias(query, table);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public List<X> handle(SessionImpl session, List<Map<String, Object>> data, MutableInt rowNo) {
-		return this.fetchRoot.handle(session, data, rowNo, 1);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Predicate in(Collection<?> values) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Predicate in(Expression<?>... values) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Predicate in(Expression<Collection<?>> values) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Predicate in(Object... values) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public boolean isCorrelated() {
 		// TODO Auto-generated method stub
 		return false;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Predicate isNotNull() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Predicate isNull() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/**
@@ -453,7 +270,7 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public <X, Y> Join<X, Y> join(String attributeName) {
+	public <T, Y> Join<T, Y> join(String attributeName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -463,7 +280,7 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public <X, Y> Join<X, Y> join(String attributeName, JoinType jt) {
+	public <T, Y> Join<T, Y> join(String attributeName, JoinType jt) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -473,7 +290,7 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public <X, Y> CollectionJoin<X, Y> joinCollection(String attributeName) {
+	public <T, Y> CollectionJoin<T, Y> joinCollection(String attributeName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -483,7 +300,7 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public <X, Y> CollectionJoin<X, Y> joinCollection(String attributeName, JoinType jt) {
+	public <T, Y> CollectionJoin<T, Y> joinCollection(String attributeName, JoinType jt) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -493,7 +310,7 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public <X, Y> ListJoin<X, Y> joinList(String attributeName) {
+	public <T, Y> ListJoin<T, Y> joinList(String attributeName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -503,7 +320,7 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public <X, Y> ListJoin<X, Y> joinList(String attributeName, JoinType jt) {
+	public <T, Y> ListJoin<T, Y> joinList(String attributeName, JoinType jt) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -513,7 +330,7 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public <X, K, V> MapJoin<X, K, V> joinMap(String attributeName) {
+	public <T, K, V> MapJoin<T, K, V> joinMap(String attributeName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -523,7 +340,7 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public <X, K, V> MapJoin<X, K, V> joinMap(String attributeName, JoinType jt) {
+	public <T, K, V> MapJoin<T, K, V> joinMap(String attributeName, JoinType jt) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -533,7 +350,7 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public <X, Y> SetJoin<X, Y> joinSet(String attributeName) {
+	public <T, Y> SetJoin<T, Y> joinSet(String attributeName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -543,17 +360,8 @@ public class FromImpl<Z, X> extends RootPathImpl<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public <X, Y> SetJoin<X, Y> joinSet(String attributeName, JoinType jt) {
+	public <T, Y> SetJoin<T, Y> joinSet(String attributeName, JoinType jt) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String toString() {
-		return this.fetchRoot.describe("");
 	}
 }

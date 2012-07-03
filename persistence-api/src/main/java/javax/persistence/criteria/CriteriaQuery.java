@@ -182,7 +182,7 @@ public interface CriteriaQuery<T> extends AbstractQuery<T> {
 
 	/**
 	 * Specify the item that is to be returned in the query result. Replaces the previously specified selection(s), if any.
-	 * 
+	 * <p>
 	 * Note: Applications using the string-based API may need to specify the type of the select item when it results from a get or join
 	 * operation and the query result type is specified.
 	 * 

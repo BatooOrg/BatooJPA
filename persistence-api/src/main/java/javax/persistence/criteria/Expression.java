@@ -9,6 +9,7 @@ import java.util.Collection;
  *            the type of the expression
  */
 public interface Expression<T> extends Selection<T> {
+
 	/**
 	 * Perform a typecast upon the expression, returning a new expression object. This method does not cause type conversion: the runtime
 	 * type is not changed.
@@ -17,11 +18,11 @@ public interface Expression<T> extends Selection<T> {
 	 * 
 	 * @param type
 	 *            intended type of the expression
-	 * @param <X>
+	 * @param <Y>
 	 *            the type of the expression
 	 * @return new expression of the given type
 	 */
-	<X> Expression<X> as(Class<X> type);
+	<Y> Expression<Y> as(Class<Y> type);
 
 	/**
 	 * Create a predicate to test whether the expression is a member of the collection.

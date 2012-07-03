@@ -245,7 +245,7 @@ public abstract class BaseTypedQueryImpl<X> implements TypedQuery<X>, ResultSetH
 		// process the resultset
 		final MutableInt rowNo = new MutableInt(0);
 		while (rowNo.intValue() < this.data.size()) {
-			this.results.addAll(this.selection.handle(this.em.getSession(), this, this.data, rowNo));
+			this.results.addAll(this.selection.handle(this.em.getSession(), this.data, rowNo));
 		}
 
 		return this.results;

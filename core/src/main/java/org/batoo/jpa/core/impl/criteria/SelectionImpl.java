@@ -99,7 +99,7 @@ public abstract class SelectionImpl<X> extends TupleElementImpl<X> implements Se
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract List<X> handle(SessionImpl session, BaseTypedQueryImpl<?> query, List<Map<String, Object>> data, MutableInt rowNo);
+	public abstract List<X> handle(SessionImpl session, List<Map<String, Object>> data, MutableInt rowNo);
 
 	/**
 	 * {@inheritDoc}

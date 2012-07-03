@@ -127,7 +127,7 @@ public class CompoundExpressionImpl extends ExpressionImpl<Boolean> {
 	 * 
 	 */
 	@Override
-	public List<Boolean> handle(SessionImpl session, BaseTypedQueryImpl<?> query, List<Map<String, Object>> data, MutableInt rowNo) {
+	public List<Boolean> handle(SessionImpl session, List<Map<String, Object>> data, MutableInt rowNo) {
 		// TODO Auto-generated method stub
 		return null;
 	}

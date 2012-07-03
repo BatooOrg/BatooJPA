@@ -16,25 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.criteria;
+package org.batoo.jpa.core.impl.criteria2;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
-import javax.persistence.criteria.Fetch;
-import javax.persistence.criteria.FetchParent;
-import javax.persistence.criteria.JoinType;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
-import javax.persistence.metamodel.EntityType;
-import javax.persistence.metamodel.PluralAttribute;
-import javax.persistence.metamodel.SingularAttribute;
-import javax.persistence.metamodel.Type;
 
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.apache.commons.lang.mutable.MutableInt;
+import org.batoo.jpa.core.impl.criteria.FetchImpl;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
@@ -43,89 +37,56 @@ import org.batoo.jpa.core.impl.jdbc.DiscriminatorColumn;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.JoinColumn;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
-import org.batoo.jpa.core.impl.jdbc.SecondaryTable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
-import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.RootMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
-import org.batoo.jpa.core.util.BatooUtils;
 import org.batoo.jpa.core.util.Pair;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 /**
- * Implementation of {@link FetchParent}.
+ * The path for entity types.
  * 
- * @param <Z>
- *            the source type
  * @param <X>
- *            the target type
+ *            the type referenced by the path
  * 
  * @author hceylan
  * @since $version
  */
-public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
+public abstract class EntityPath<X> extends AbstractPath<X> {
 
-	private final EntityTypeImpl<X> entity;
-	private final List<FetchImpl<X, ?>> fetches = Lists.newArrayList();
-
-	private String alias;
-	private String primaryTableAlias;
-	private String discriminatorAlias;
-
-	private final HashBiMap<String, SecondaryTable> tableAliases = HashBiMap.create();
-	private final HashBiMap<String, AbstractColumn> fields = HashBiMap.create();
 	private final HashBiMap<String, AbstractColumn> idFields = HashBiMap.create();
+	private final HashBiMap<String, AbstractColumn> fields = HashBiMap.create();
 	private final HashBiMap<String, AbstractColumn> joinFields = HashBiMap.create();
 	private final List<SingularAssociationMapping<?, ?>> joins = Lists.newArrayList();
 
-	private int nextTableAlias = 0;
+	private String discriminatorAlias;
+	private final EntityTypeImpl<X> entity;
 
 	/**
-	 * @param entity
-	 *            the entity
+	 * @param mapping
+	 *            the mapping
+	 * @param generatedAlias
+	 *            the generated alias
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public FetchParentImpl(EntityTypeImpl<X> entity) {
-		super();
+	public EntityPath(RootMapping<X> mapping, String generatedAlias) {
+		super(mapping, generatedAlias);
 
-		this.entity = entity;
-	}
-
-	/**
-	 * Returns the description of the fetch.
-	 * 
-	 * @param parent
-	 *            the parent
-	 * @return the description of the fetch *
-	 */
-	public String describe(final String parent) {
-		final StringBuilder description = new StringBuilder();
-		final List<String> fetches = Lists.transform(this.fetches, new Function<FetchImpl<X, ?>, String>() {
-
-			@Override
-			public String apply(FetchImpl<X, ?> input) {
-				return input.describe(parent);
-			}
-		});
-
-		description.append(Joiner.on("\n").join(fetches));
-
-		return BatooUtils.indent(description.toString());
+		this.entity = mapping.getType();
 	}
 
 	/**
@@ -133,130 +94,15 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	 * 
 	 */
 	@Override
-	public final <Y> FetchImpl<X, Y> fetch(PluralAttribute<? super X, ?, Y> attribute) {
-		return this.fetch(attribute, JoinType.INNER);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public final <Y> FetchImpl<X, Y> fetch(PluralAttribute<? super X, ?, Y> attribute, JoinType jt) {
-		return this.fetch(attribute.getName(), jt);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public final <Y> FetchImpl<X, Y> fetch(SingularAttribute<? super X, Y> attribute) {
-		return this.fetch(attribute, JoinType.LEFT);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public final <Y> FetchImpl<X, Y> fetch(SingularAttribute<? super X, Y> attribute, JoinType jt) {
-		return this.fetch(attribute.getName(), jt);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public final <Y> FetchImpl<X, Y> fetch(String attributeName) {
-		return (FetchImpl<X, Y>) this.fetch(attributeName, JoinType.INNER);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public <Y> FetchImpl<X, Y> fetch(String attributeName, JoinType jt) {
-		Type<Y> type;
-
-		final Mapping<?, ?> mapping = this.entity.getRootMapping().getMapping(attributeName);
-
-		if (mapping instanceof SingularAssociationMapping) {
-			type = (Type<Y>) ((SingularAssociationMapping<X, Y>) mapping).getType();
-		}
-		else {
-			type = (Type<Y>) ((PluralAssociationMapping<X, ?, Y>) mapping).getType();
-		}
-
-		if (!(type instanceof EntityType)) {
-			throw new IllegalArgumentException("Cannot dereference attribute " + attributeName);
-		}
-
-		final FetchImpl<X, Y> fetch = new FetchImpl<X, Y>(this, (AssociationMapping<? super X, Y>) mapping, jt);
-		this.fetches.add(fetch);
-
-		return fetch;
-	}
-
-	/**
-	 * Returns the generated SQL fragment.
-	 * 
-	 * @param query
-	 *            the query
-	 * @return the generated SQL fragment
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String generate(CriteriaQueryImpl<?> query) {
-		final List<String> selects = Lists.newArrayList();
-		selects.add(this.generateImpl(query));
-
-		for (final FetchImpl<X, ?> fetch : this.fetches) {
-			selects.add(fetch.generate(query));
-		}
-
-		return Joiner.on(",\n\t").join(selects);
-	}
-
-	/**
-	 * Returns the restriction based on discrimination.
-	 * 
-	 * @return the restriction based on discrimination, <code>null</code>
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String generateDiscrimination() {
-		if (this.entity.getRootType().getInheritanceType() == null) {
-			return null;
-		}
-
-		final Collection<String> discriminators = Collections2.transform(this.entity.getDiscriminators(), new Function<String, String>() {
-
-			@Override
-			public String apply(String input) {
-				return "'" + input + "'";
-			}
-		});
-
-		return this.primaryTableAlias + "." + this.entity.getRootType().getDiscriminatorColumn().getName() + " IN (" + Joiner.on(",").join(discriminators)
-			+ ")";
-	}
-
-	private String generateImpl(CriteriaQueryImpl<?> query) {
+	public String generateSelectSql(CriteriaQueryImpl<?> query) {
 		final List<String> selects = Lists.newArrayList();
 
-		for (final EntityTable table : this.entity.getAllTables()) {
+		for (final EntityTable table : this.getModel().getAllTables()) {
 			int fieldNo = 0;
 
 			final List<String> fields = Lists.newArrayList();
 
-			final String tableAlias = this.getTableAlias(query, table);
+			final String tableAlias = this.getAlias();
 
 			final Collection<AbstractColumn> columns = table.getColumns();
 			for (final AbstractColumn column : columns) {
@@ -292,62 +138,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 		}
 
 		return Joiner.on(",\n\t\t").join(selects);
-	}
-
-	/**
-	 * Returns the generated joins SQL fragment.
-	 * 
-	 * @param query
-	 *            the query
-	 * @return the generated joins SQL fragment
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String generateJoins(CriteriaQueryImpl<?> query) {
-		final List<String> joins = Lists.newArrayList();
-
-		for (final Entry<String, SecondaryTable> e : this.tableAliases.entrySet()) {
-			final String alias = e.getKey();
-			final SecondaryTable table = e.getValue();
-
-			joins.add("\t" + table.joinPrimary(this.primaryTableAlias, alias));
-		}
-
-		for (final FetchImpl<X, ?> fetch : this.fetches) {
-			joins.add(fetch.generateJoins(query));
-		}
-
-		return Joiner.on("\n").join(joins);
-	}
-
-	/**
-	 * Returns the alias of the fetch.
-	 * 
-	 * @return the alias of the fetch
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 * @param query
-	 */
-	private String getAlias(CriteriaQueryImpl<?> query) {
-		if (this.alias == null) {
-			this.alias = query.generateEntityAlias();
-		}
-
-		return this.alias;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public final Set<Fetch<X, ?>> getFetches() {
-		final Set<Fetch<X, ?>> fetches = Sets.newHashSet();
-		fetches.addAll(this.fetches);
-
-		return fetches;
 	}
 
 	private Object getId(Map<String, Object> row) {
@@ -476,85 +266,21 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	}
 
 	/**
-	 * Returns the mapping of the fetch.
+	 * {@inheritDoc}
 	 * 
-	 * @return the mapping of the fetch or <code>null</code> if the fetch is root
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	public AssociationMapping<? super Z, X> getMapping() {
-		return null;
+	@Override
+	public EntityTypeImpl<X> getModel() {
+		return this.entity;
 	}
 
 	/**
-	 * Returns the alias of the primary table.
+	 * {@inheritDoc}
 	 * 
-	 * @param query
-	 *            the query
-	 * @return the alias of the primary table
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	public String getPrimaryTableAlias(CriteriaQueryImpl<?> query) {
-		if (this.primaryTableAlias == null) {
-			this.primaryTableAlias = this.getAlias(query) + "_P";
-		}
-		return this.primaryTableAlias;
-	}
-
-	/**
-	 * Returns the alias for the table.
-	 * <p>
-	 * if table does not have an alias, it is generated.
-	 * 
-	 * @param query
-	 *            the query
-	 * @param table
-	 *            the table
-	 * @return the alias for the table
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String getTableAlias(CriteriaQueryImpl<?> query, EntityTable table) {
-		if (table instanceof SecondaryTable) {
-			String alias = this.tableAliases.inverse().get(table);
-			if (alias == null) {
-				alias = this.alias + "_S" + this.nextTableAlias++;
-				this.tableAliases.put(alias, (SecondaryTable) table);
-			}
-
-			return alias;
-		}
-		else if (table.getEntity() != table.getEntity().getRootType()) {
-
-		}
-
-		return this.getPrimaryTableAlias(query);
-	}
-
-	/**
-	 * Handles the row for multiple results.
-	 * 
-	 * @param session
-	 *            the session
-	 * @param query
-	 *            the query
-	 * @param data
-	 *            the resultset data
-	 * @param rowNo
-	 *            the current row no
-	 * @param jumpSize
-	 *            the jump size
-	 * @return the list of instances
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public List<X> handle(SessionImpl session, List<Map<String, Object>> data, MutableInt rowNo, int jumpSize) {
-		final List<ManagedInstance<? extends X>> instances = this.handleMulti(session, data, null, rowNo, jumpSize);
+	@Override
+	public Collection<? extends X> handle(SessionImpl session, LinkedList<Map<String, Object>> data, MutableInt rowNo) {
+		final List<ManagedInstance<? extends X>> instances = this.handleMulti(session, data, null, rowNo, 1);
 
 		return Lists.transform(instances, new Function<ManagedInstance<? extends X>, X>() {
 
@@ -831,14 +557,5 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	 */
 	protected boolean shouldContinue(SessionImpl session, ManagedInstance<?> parent, Map<String, Object> row) {
 		return true;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String toString() {
-		return this.entity.getName();
 	}
 }

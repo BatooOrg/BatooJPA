@@ -16,10 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.criteria.simple.first;
+package org.batoo.jpa.core.test.criteria;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+
+import com.google.common.collect.Lists;
 
 /**
  * 
@@ -27,81 +36,62 @@ import javax.persistence.Id;
  * @since $version
  */
 @Entity
-public class Country {
+public class Person {
 
 	@Id
-	private String code;
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	private Integer id;
+
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "person")
+	private final List<Address> addresses = Lists.newArrayList();
+
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "person")
+	private final List<HomePhone> phones = Lists.newArrayList();
+
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	private final List<WorkPhone> workPhones = Lists.newArrayList();
 
 	private String name;
 
 	/**
-	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Country() {
+	public Person() {
 		super();
 	}
 
 	/**
-	 * @param code
-	 *            the code
 	 * @param name
 	 *            the name
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Country(String code, String name) {
+	public Person(String name) {
 		super();
 
-		this.code = code;
 		this.name = name;
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Returns the addresses.
 	 * 
+	 * @return the addresses
+	 * @since $version
 	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (this.getClass() != obj.getClass()) {
-			return false;
-		}
-		final Country other = (Country) obj;
-		if (this.code == null) {
-			if (other.code != null) {
-				return false;
-			}
-		}
-		else if (!this.code.equals(other.code)) {
-			return false;
-		}
-		if (this.name == null) {
-			if (other.name != null) {
-				return false;
-			}
-		}
-		else if (!this.name.equals(other.name)) {
-			return false;
-		}
-		return true;
+	public List<Address> getAddresses() {
+		return this.addresses;
 	}
 
 	/**
-	 * Returns the code.
+	 * Returns the id.
 	 * 
-	 * @return the code
+	 * @return the id
 	 * @since $version
 	 */
-	public String getCode() {
-		return this.code;
+	public Integer getId() {
+		return this.id;
 	}
 
 	/**
@@ -115,27 +105,23 @@ public class Country {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Returns the phones.
 	 * 
+	 * @return the phones
+	 * @since $version
 	 */
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = (prime * result) + ((this.code == null) ? 0 : this.code.hashCode());
-		result = (prime * result) + ((this.name == null) ? 0 : this.name.hashCode());
-		return result;
+	public List<HomePhone> getPhones() {
+		return this.phones;
 	}
 
 	/**
-	 * Sets the code.
+	 * Returns the workPhones.
 	 * 
-	 * @param code
-	 *            the code to set
+	 * @return the workPhones
 	 * @since $version
 	 */
-	public void setCode(String code) {
-		this.code = code;
+	public List<WorkPhone> getWorkPhones() {
+		return this.workPhones;
 	}
 
 	/**
@@ -147,14 +133,5 @@ public class Country {
 	 */
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String toString() {
-		return "Country" + "@" + Integer.toHexString(this.hashCode()) + " [code=" + this.code + ", name=" + this.name + "]";
 	}
 }

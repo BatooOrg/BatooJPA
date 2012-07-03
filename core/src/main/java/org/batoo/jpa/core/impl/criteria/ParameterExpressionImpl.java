@@ -155,7 +155,7 @@ public class ParameterExpressionImpl<T> extends ExpressionImpl<T> implements Par
 	 * 
 	 */
 	@Override
-	public List<T> handle(SessionImpl session, BaseTypedQueryImpl<?> query, List<Map<String, Object>> data, MutableInt rowNo) {
+	public List<T> handle(SessionImpl session, List<Map<String, Object>> data, MutableInt rowNo) {
 		// TODO Auto-generated method stub
 		return null;
 	}

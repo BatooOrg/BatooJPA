@@ -3,14 +3,19 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
 	version="2.0">
 
-	<persistence-unit name="org.batoo.jpa.core.test.criteria.simple.first">
+	<persistence-unit name="default">
 		<provider>org.batoo.jpa.core.PersistenceProvider</provider>
 		
-		<class>org.batoo.jpa.core.test.criteria.simple.first.Country</class>
+		<class>org.batoo.jpa.core.test.criteria.Address</class>
+		<class>org.batoo.jpa.core.test.criteria.Country</class>
+		<class>org.batoo.jpa.core.test.criteria.HomePhone</class>
+		<class>org.batoo.jpa.core.test.criteria.Person</class>
+		<class>org.batoo.jpa.core.test.criteria.Phone</class>
+		<class>org.batoo.jpa.core.test.criteria.WorkPhone</class>
 		
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.Driver40" />
-			<property name="javax.persistence.jdbc.url" value="jdbc:derby:memory:simple;create=true" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:derby:memory:test;create=true" />
 			<property name="javax.persistence.jdbc.user" value="sa" />
 			<property name="javax.persistence.jdbc.password" value="" />
 

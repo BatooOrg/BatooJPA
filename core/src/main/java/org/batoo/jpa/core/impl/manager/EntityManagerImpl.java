@@ -39,9 +39,9 @@ import javax.sql.DataSource;
 
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
-import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
-import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria2.CriteriaBuilderImpl;
+import org.batoo.jpa.core.impl.criteria2.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria2.TypedQueryImpl;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;

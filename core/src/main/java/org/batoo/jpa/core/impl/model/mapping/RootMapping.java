@@ -47,7 +47,7 @@ public class RootMapping<X> extends ParentMapping<X, X> {
 	 */
 	@SuppressWarnings("unchecked")
 	public RootMapping(EntityTypeImpl<X> entity) {
-		super(null, entity, entity.getJavaType(), null);
+		super(null, entity, entity.getJavaType(), entity.getName());
 
 		this.entity = entity;
 
@@ -109,7 +109,7 @@ public class RootMapping<X> extends ParentMapping<X, X> {
 	 * 
 	 */
 	@Override
-	public EntityTypeImpl<? super X> getType() {
+	public EntityTypeImpl<X> getType() {
 		return this.entity;
 	}
 
