@@ -69,7 +69,17 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * 
 	 */
 	@Override
-	public String describe() {
+	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generateJpqlRestriction() {
 		final StringBuilder builder = new StringBuilder();
 
 		if (StringUtils.isNotBlank(this.name)) {
@@ -88,7 +98,17 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * 
 	 */
 	@Override
-	public String generate(CriteriaQueryImpl<?> query) {
+	public String generateJpqlSelect() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
 		if (this.position == null) {
 			query.addParameter(this);
 		}
@@ -98,16 +118,6 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 		}
 
 		return "?";
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/**
@@ -253,6 +263,6 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 */
 	@Override
 	public String toString() {
-		return this.describe();
+		return this.generateJpqlRestriction();
 	}
 }

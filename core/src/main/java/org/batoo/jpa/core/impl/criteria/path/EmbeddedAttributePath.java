@@ -70,46 +70,6 @@ public class EmbeddedAttributePath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public String describe() {
-		final StringBuilder builder = new StringBuilder();
-
-		builder.append(this.getParentPath().describe());
-
-		builder.append(".").append(this.mapping.getAttribute().getName());
-
-		return builder.toString();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public String generate(CriteriaQueryImpl<?> query) {
-		final List<String> fragments = Lists.newArrayList();
-
-		for (final Mapping<? super X, ?, ?> mapping : this.mapping.getChildren()) {
-			if (mapping instanceof BasicMapping) {
-				final BasicColumn column = ((BasicMapping) mapping).getColumn();
-				AbstractPath<?> root = this;
-				while (root.getParentPath() != null) {
-					root = root.getParentPath();
-				}
-
-				final String tableAlias = ((RootPath<X>) root).getTableAlias(query, column.getTable());
-				fragments.add(tableAlias + "." + column.getName());
-			}
-		}
-
-		return Joiner.on(", ").join(fragments);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
 		final List<String> fragments = Lists.newArrayList();
 
@@ -136,13 +96,63 @@ public class EmbeddedAttributePath<X> extends AbstractPath<X> {
 				}
 
 				final String tableAlias = ((RootPath<X>) root).getTableAlias(query, column.getTable());
-				fragments.add(tableAlias + "." + column.getName() + comparison.getFragment() + parameter.generate(query));
+				fragments.add(tableAlias + "." + column.getName() + comparison.getFragment() + parameter.generateSqlSelect(query));
 			}
 			// further expand the embedded mappings
 			else if (child instanceof EmbeddedMapping) {
 				this.generate(query, comparison, parameter, (EmbeddedMapping<?, ?>) child, fragments);
 			}
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generateJpqlRestriction() {
+		final StringBuilder builder = new StringBuilder();
+
+		builder.append(this.getParentPath().generateJpqlRestriction());
+
+		builder.append(".").append(this.mapping.getAttribute().getName());
+
+		return builder.toString();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generateJpqlSelect() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
+		final List<String> fragments = Lists.newArrayList();
+
+		for (final Mapping<? super X, ?, ?> mapping : this.mapping.getChildren()) {
+			if (mapping instanceof BasicMapping) {
+				final BasicColumn column = ((BasicMapping) mapping).getColumn();
+				AbstractPath<?> root = this;
+				while (root.getParentPath() != null) {
+					root = root.getParentPath();
+				}
+
+				final String tableAlias = ((RootPath<X>) root).getTableAlias(query, column.getTable());
+				fragments.add(tableAlias + "." + column.getName());
+			}
+		}
+
+		return Joiner.on(", ").join(fragments);
 	}
 
 	/**
@@ -179,6 +189,6 @@ public class EmbeddedAttributePath<X> extends AbstractPath<X> {
 	 */
 	@Override
 	public String toString() {
-		return this.describe();
+		return this.generateJpqlRestriction();
 	}
 }

@@ -34,7 +34,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  * @author hceylan
  * @since $version
  */
-public abstract class SelectionImpl<X> extends TupleElementImpl<X> implements Selection<X> {
+public abstract class AbstractSelection<X> extends TupleElementImpl<X> implements Selection<X> {
 
 	private String alias;
 
@@ -45,7 +45,7 @@ public abstract class SelectionImpl<X> extends TupleElementImpl<X> implements Se
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SelectionImpl(Class<X> javaType) {
+	public AbstractSelection(Class<X> javaType) {
 		super(javaType);
 	}
 
@@ -65,23 +65,33 @@ public abstract class SelectionImpl<X> extends TupleElementImpl<X> implements Se
 	}
 
 	/**
-	 * Returns the generated SQL fragment.
+	 * Returns the JPQL select fragment.
 	 * 
-	 * @param query
-	 *            the query
-	 * @return the generated SQL fragment
+	 * @return the JPQL select fragment
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract String generate(CriteriaQueryImpl<?> query);
+	public abstract String generateJpqlSelect();
+
+	/**
+	 * Returns the SQL select fragment.
+	 * 
+	 * @param query
+	 *            the query
+	 * @return the SQL select fragment
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract String generateSqlSelect(CriteriaQueryImpl<?> query);
 
 	/**
 	 * {@inheritDoc}
 	 * 
 	 */
 	@Override
-	public final String getAlias() {
+	public String getAlias() {
 		return this.alias;
 	}
 

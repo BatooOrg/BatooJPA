@@ -356,5 +356,4 @@ public class TypedQueryImpl<X> extends BaseTypedQuery<X> {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }

@@ -61,7 +61,7 @@ public abstract class BaseTypedQuery<X> implements TypedQuery<X>, ResultSetHandl
 
 	protected final CriteriaQueryImpl<X> cq;
 	private final EntityManagerImpl em;
-	private final SelectionImpl<X> selection;
+	private final AbstractSelection<X> selection;
 	protected final Map<ParameterExpressionImpl<?>, Object> parameters = Maps.newHashMap();
 	private final List<X> results = Lists.newArrayList();
 
@@ -162,7 +162,7 @@ public abstract class BaseTypedQuery<X> implements TypedQuery<X>, ResultSetHandl
 
 			int paramCount = 0;
 
-			final String sql = this.cq.generate();
+			final String sql = this.cq.getSql();
 
 			final List<ParameterExpressionImpl<?>> sqlParameters = this.cq.getSqlParameters();
 

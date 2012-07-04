@@ -80,7 +80,7 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	 * @author hceylan
 	 */
 	@Override
-	public String describe(String parent) {
+	public String generateJpqlFetches(String parent) {
 		final StringBuilder builder = new StringBuilder();
 
 		switch (this.joinType) {
@@ -99,7 +99,7 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 
 		builder.append(parent).append(".").append(this.mapping.getAttribute().getName());
 
-		final String children = super.describe(this.mapping.getType().getName());
+		final String children = super.generateJpqlFetches(this.mapping.getType().getName());
 		if (StringUtils.isNotBlank(children)) {
 			builder.append("\n").append(children);
 		}
@@ -219,6 +219,6 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	 */
 	@Override
 	public String toString() {
-		return this.describe(this.getParent().toString());
+		return this.generateJpqlFetches(this.getParent().toString());
 	}
 }

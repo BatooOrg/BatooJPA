@@ -58,17 +58,8 @@ public abstract class RootPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public String describe() {
+	public String generateJpqlRestriction() {
 		return StringUtils.isNotBlank(this.getAlias()) ? this.getAlias() : this.entity.getName();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generate(CriteriaQueryImpl<?> query) {
-		return null;
 	}
 
 	/**
@@ -78,15 +69,6 @@ public abstract class RootPath<X> extends AbstractPath<X> {
 	@Override
 	protected RootMapping<X> getMapping() {
 		return this.entity.getRootMapping();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public EntityTypeImpl<X> getModel() {
-		return this.entity;
 	}
 
 	/**

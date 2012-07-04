@@ -40,13 +40,15 @@ import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
-import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
+import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.path.RootPath;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.util.BatooUtils;
 
 /**
  * Represents a bound type, usually an entity that appears in the from clause, but may also be an embeddable belonging to an entity in the
@@ -63,7 +65,7 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
  * @author hceylan
  * @since $version
  */
-public class AbstractFrom<Z, X> extends RootPath<X> implements From<Z, X> {
+public abstract class AbstractFrom<Z, X> extends RootPath<X> implements From<Z, X> {
 
 	private final EntityTypeImpl<X> entity;
 	private final FetchParentImpl<Z, X> fetchRoot;
@@ -81,16 +83,6 @@ public class AbstractFrom<Z, X> extends RootPath<X> implements From<Z, X> {
 		this.fetchRoot = new FetchParentImpl<Z, X>(entity);
 
 		this.entity = entity;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public <X> Expression<X> as(Class<X> type) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/**
@@ -152,16 +144,6 @@ public class AbstractFrom<Z, X> extends RootPath<X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public String generate(CriteriaQueryImpl<?> query) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
 		// TODO Auto-generated method stub
 		return null;
@@ -180,6 +162,33 @@ public class AbstractFrom<Z, X> extends RootPath<X> implements From<Z, X> {
 	}
 
 	/**
+	 * Returns the JPQL fetch joins fragment.
+	 * 
+	 * @return the JPQL fetch joins fragment
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String generateJpqlFetches() {
+		final String root = StringUtils.isNotBlank(this.getAlias()) ? this.getAlias() : this.getModel().getName();
+
+		return BatooUtils.indent(this.fetchRoot.generateJpqlFetches(root));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generateJpqlSelect() {
+		if (StringUtils.isNotBlank(this.getAlias())) {
+			return this.getAlias();
+		}
+
+		return this.getModel().getName();
+	}
+
+	/**
 	 * Returns the generated joins SQL fragment.
 	 * 
 	 * @param query
@@ -189,8 +198,17 @@ public class AbstractFrom<Z, X> extends RootPath<X> implements From<Z, X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String generateJoins(CriteriaQueryImpl<?> query) {
+	public String generateSqlJoins(CriteriaQueryImpl<?> query) {
 		return this.fetchRoot.generateJoins(query);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
+		return this.fetchRoot.generate(query);
 	}
 
 	/**
@@ -537,6 +555,6 @@ public class AbstractFrom<Z, X> extends RootPath<X> implements From<Z, X> {
 	 */
 	@Override
 	public String toString() {
-		return this.fetchRoot.describe("");
+		return this.fetchRoot.generateJpqlFetches("");
 	}
 }

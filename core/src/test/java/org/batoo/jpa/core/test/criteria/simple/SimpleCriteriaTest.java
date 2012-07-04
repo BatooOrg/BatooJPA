@@ -20,6 +20,8 @@ package org.batoo.jpa.core.test.criteria.simple;
 
 import java.util.List;
 
+import javax.persistence.TypedQuery;
+
 import junit.framework.Assert;
 
 import org.batoo.jpa.common.log.BLogger;
@@ -27,6 +29,8 @@ import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
+import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 import org.batoo.jpa.core.test.BaseCoreTest;
 import org.batoo.jpa.core.test.criteria.Address;
 import org.batoo.jpa.core.test.criteria.Country;
@@ -118,6 +122,36 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
+	public void testRestriction() {
+		this.persist(this.person());
+		this.persist(this.person());
+		this.commit();
+
+		final CriteriaBuilderImpl cb = (CriteriaBuilderImpl) this.em().getCriteriaBuilder();
+		final CriteriaQueryImpl<Person> q = cb.createQuery(Person.class);
+		final RootImpl<Person> r = q.from(Person.class);
+		q.select(r);
+		r.alias("p");
+		r.fetch("addresses");
+
+		final AbstractPath<Object> id = r.get("id");
+		final ParameterExpressionImpl<Integer> p = cb.parameter(Integer.class);
+
+		q.where(cb.equal(id, p));
+
+		final TypedQuery<Person> tq = this.em().createQuery(q);
+		tq.setParameter(1, 9);
+
+		final List<Person> resultList = tq.getResultList();
+		Assert.assertEquals(3, resultList.size());
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
 	public void testRoot() {
 		this.persist(this.person());
 		this.persist(this.person());
@@ -127,8 +161,11 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 		final CriteriaQueryImpl<Person> q = cb.createQuery(Person.class);
 		final RootImpl<Person> r = q.from(Person.class);
 		q.select(r);
+		r.alias("p");
+		r.fetch("addresses");
+
 		final List<Person> resultList = this.em().createQuery(q).getResultList();
-		Assert.assertEquals(2, resultList.size());
+		Assert.assertEquals(6, resultList.size());
 	}
 
 	/**

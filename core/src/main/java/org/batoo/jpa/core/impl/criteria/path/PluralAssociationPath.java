@@ -23,6 +23,7 @@ import java.util.Map;
 
 import javax.persistence.criteria.Path;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
@@ -64,10 +65,25 @@ public class PluralAssociationPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public String describe() {
+	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
+		// expand the mapping
+		final String sql = this.generateSqlSelect(query) + comparison.getFragment() + parameter.generateSqlSelect(query);
+
+		// seal the parameter count
+		parameter.registerParameter(query, this.mapping);
+
+		return sql;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generateJpqlRestriction() {
 		final StringBuilder builder = new StringBuilder();
 
-		builder.append(this.getParentPath().describe());
+		builder.append(this.getParentPath().generateJpqlRestriction());
 
 		builder.append(".").append(this.mapping.getAttribute().getName());
 
@@ -79,8 +95,22 @@ public class PluralAssociationPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public String generate(CriteriaQueryImpl<?> query) {
-		return null;
+	public String generateJpqlSelect() {
+		final StringBuilder builder = new StringBuilder();
+
+		if ((this.getParentPath() instanceof RootPath) && StringUtils.isNotBlank(this.getParentPath().getAlias())) {
+			builder.append(this.getParentPath().getAlias());
+		}
+		else {
+			builder.append(this.getParentPath().generateJpqlSelect());
+		}
+
+		builder.append(".").append(this.mapping.getAttribute().getName());
+		if (StringUtils.isNotBlank(this.getAlias())) {
+			builder.append(" as ").append(this.getAlias());
+		}
+
+		return builder.toString();
 	}
 
 	/**
@@ -88,14 +118,8 @@ public class PluralAssociationPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
-		// expand the mapping
-		final String sql = this.generate(query) + comparison.getFragment() + parameter.generate(query);
-
-		// seal the parameter count
-		parameter.registerParameter(query, this.mapping);
-
-		return sql;
+	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
+		return null;
 	}
 
 	/**
@@ -124,14 +148,5 @@ public class PluralAssociationPath<X> extends AbstractPath<X> {
 	public List<X> handle(SessionImpl session, List<Map<String, Object>> data, MutableInt rowNo) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String toString() {
-		return this.describe();
 	}
 }

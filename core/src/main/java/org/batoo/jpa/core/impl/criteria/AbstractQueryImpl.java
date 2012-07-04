@@ -56,7 +56,7 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	private final MetamodelImpl metamodel;
 	private final Class<T> resultType;
 
-	protected SelectionImpl<T> selection;
+	protected AbstractSelection<T> selection;
 	private final Set<RootImpl<?>> roots = Sets.newHashSet();
 	protected PredicateImpl restriction;
 	private int nextEntityAlias;
@@ -186,14 +186,14 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	 * 
 	 */
 	@Override
-	public SelectionImpl<T> getSelection() {
+	public AbstractSelection<T> getSelection() {
 		return this.selection;
 	}
 
 	/**
-	 * Returns the sqlParameters of the AbstractQueryImpl.
+	 * Returns the SQL parameters of the query.
 	 * 
-	 * @return the sqlParameters of the AbstractQueryImpl
+	 * @return the SQL Parameters of the query
 	 * 
 	 * @since $version
 	 * @author hceylan

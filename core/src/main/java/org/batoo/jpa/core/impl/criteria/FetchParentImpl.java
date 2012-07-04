@@ -113,13 +113,13 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	 *            the parent
 	 * @return the description of the fetch *
 	 */
-	public String describe(final String parent) {
+	public String generateJpqlFetches(final String parent) {
 		final StringBuilder description = new StringBuilder();
 		final List<String> fetches = Lists.transform(this.fetches, new Function<FetchImpl<X, ?>, String>() {
 
 			@Override
 			public String apply(FetchImpl<X, ?> input) {
-				return input.describe(parent);
+				return input.generateJpqlFetches(parent);
 			}
 		});
 

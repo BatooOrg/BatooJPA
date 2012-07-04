@@ -65,6 +65,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	private boolean distinct;
 
 	private String sql;
+	private String jpql;
 
 	/**
 	 * @param metamodel
@@ -106,26 +107,82 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 		return null;
 	}
 
+	private String generateJpql() {
+		final StringBuilder builder = new StringBuilder();
+
+		if (this.selection != null) {
+			builder.append("select ");
+
+			// append distinct if necessary
+			if (this.distinct) {
+				builder.append("distinct ");
+			}
+
+			builder.append(this.selection.generateJpqlSelect());
+		}
+
+		final Collection<String> roots = Collections2.transform(this.getRoots(), new Function<Root<?>, String>() {
+
+			@Override
+			public String apply(Root<?> input) {
+				final StringBuilder builder = new StringBuilder(input.getModel().getName());
+
+				if (StringUtils.isNotBlank(input.getAlias())) {
+					builder.append(" as ").append(input.getAlias());
+				}
+
+				return builder.toString();
+			}
+		});
+		builder.append("\nfrom ").append(Joiner.on(", ").join(roots));
+
+		if (this.selection instanceof AbstractFrom) {
+			final String join = ((AbstractFrom<?, ?>) this.selection).generateJpqlFetches();
+			if (StringUtils.isNotBlank(join)) {
+				builder.append("\n").append(join);
+			}
+		}
+
+		if (this.getRestriction() != null) {
+			builder.append("\nwhere\n\t").append(this.getRestriction().generateJpqlRestriction());
+		}
+
+		return builder.toString();
+	}
+
 	/**
-	 * Generates the SQL and the parameters then returns the SQL.
+	 * Returns the generated SQL.
 	 * 
 	 * @return the generated SQL
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String generate() {
-		if (this.sql != null) {
-			return this.sql;
+	private String generateSql() {
+		CriteriaQueryImpl.LOG.debug("Preparing SQL for {0}", CriteriaQueryImpl.LOG.lazyBoxed(this));
+
+		// generate the select chunk
+		final String select = "SELECT\n\t" + this.selection.generateSqlSelect(this);
+
+		// generate from chunk
+		final List<String> froms = Lists.newArrayList();
+		final List<String> joins = Lists.newArrayList();
+		for (final Root<?> r : this.getRoots()) {
+			final RootImpl<?> root = (RootImpl<?>) r;
+			froms.add(root.generateSqlFrom(this));
+			joins.add(root.generateSqlJoins(this));
 		}
 
-		synchronized (this) {
-			if (this.sql != null) {
-				return this.sql;
-			}
+		final String restriction = this.generateSqlRestriction();
+		final String where = StringUtils.isNotBlank(restriction) ? "WHERE " + restriction : null;
 
-			return this.sql = this.prepareSql();
-		}
+		final String from = "FROM " + Joiner.on(",").join(froms);
+		final String join = Joiner.on(",").join(joins);
+
+		return Joiner.on("\n").skipNulls().join(select, //
+			from, //
+			StringUtils.isBlank(join) ? null : join, //
+			StringUtils.isBlank(where) ? null : where);
 	}
 
 	/**
@@ -136,11 +193,11 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 * @since $version
 	 * @author hceylan
 	 */
-	private String generateRestriction() {
+	private String generateSqlRestriction() {
 		final String[] restrictions = new String[this.getRoots().size() + 1];
 
 		if (this.restriction != null) {
-			restrictions[0] = this.restriction.generate(this);
+			restrictions[0] = this.restriction.generateSqlSelect(this);
 		}
 
 		int i = 0;
@@ -152,6 +209,28 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 		}
 
 		return Joiner.on(" AND ").skipNulls().join(restrictions);
+	}
+
+	/**
+	 * Returns the JPQL for the query.
+	 * 
+	 * @return the the JPQL
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getJpql() {
+		if (this.jpql != null) {
+			return this.jpql;
+		}
+
+		synchronized (this) {
+			if (this.jpql != null) {
+				return this.jpql;
+			}
+
+			return this.jpql = this.generateJpql();
+		}
 	}
 
 	/**
@@ -175,7 +254,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 * @author hceylan
 	 */
 	public ParameterExpressionImpl<?> getParameter(int position) {
-		this.generate();
+		this.getSql();
 
 		return this.parameters.get(position - 1);
 	}
@@ -190,6 +269,28 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 		parameters.addAll(this.parameterMap.values());
 
 		return parameters;
+	}
+
+	/**
+	 * Returns the SQL for the query.
+	 * 
+	 * @return the the SQL
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getSql() {
+		if (this.sql != null) {
+			return this.sql;
+		}
+
+		synchronized (this) {
+			if (this.sql != null) {
+				return this.sql;
+			}
+
+			return this.sql = this.generateSql();
+		}
 	}
 
 	/**
@@ -278,48 +379,13 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	}
 
 	/**
-	 * Returns the generated SQL.
-	 * 
-	 * @return the generated SQL
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	private String prepareSql() {
-		CriteriaQueryImpl.LOG.debug("Preparing SQL for {0}", CriteriaQueryImpl.LOG.lazyBoxed(this));
-
-		// generate the select chunk
-		final String select = "SELECT\n\t" + this.selection.generate(this);
-
-		// generate from chunk
-		final List<String> froms = Lists.newArrayList();
-		final List<String> joins = Lists.newArrayList();
-		for (final Root<?> r : this.getRoots()) {
-			final RootImpl<?> root = (RootImpl<?>) r;
-			froms.add(root.generateFrom(this));
-			joins.add(root.generateJoins(this));
-		}
-
-		final String restriction = this.generateRestriction();
-		final String where = StringUtils.isNotBlank(restriction) ? "WHERE " + restriction : null;
-
-		final String from = "FROM " + Joiner.on(",").join(froms);
-		final String join = Joiner.on(",").join(joins);
-
-		return Joiner.on("\n").skipNulls().join(select, //
-			from, //
-			StringUtils.isBlank(join) ? null : join, //
-			StringUtils.isBlank(where) ? null : where);
-	}
-
-	/**
 	 * {@inheritDoc}
 	 * 
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public CriteriaQueryImpl<T> select(Selection<? extends T> selection) {
-		this.selection = (SelectionImpl<T>) selection;
+		this.selection = (AbstractSelection<T>) selection;
 
 		return this;
 	}
@@ -330,40 +396,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 */
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder("select");
-
-		// append distinct if necessary
-		if (this.distinct) {
-			builder.append(" distinct");
-		}
-
-		final Collection<String> roots = Collections2.transform(this.getRoots(), new Function<Root<?>, String>() {
-
-			@Override
-			public String apply(Root<?> input) {
-				final StringBuilder builder = new StringBuilder(input.getModel().getName());
-
-				if (StringUtils.isNotBlank(input.getAlias())) {
-					builder.append(" as ").append(input.getAlias());
-				}
-
-				return builder.toString();
-			}
-		});
-		builder.append("\n\t").append(Joiner.on(", ").join(roots));
-
-		for (final Root<?> root : this.getRoots()) {
-			final String join = ((RootImpl<?>) root).describeJoins();
-			if (StringUtils.isNotBlank(join)) {
-				builder.append("\n").append(join);
-			}
-		}
-
-		if (this.getRestriction() != null) {
-			builder.append("\nwhere\n\t").append(this.getRestriction().describe());
-		}
-
-		return builder.toString();
+		return this.getJpql();
 	}
 
 	/**

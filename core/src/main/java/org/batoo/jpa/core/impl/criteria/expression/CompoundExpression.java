@@ -93,8 +93,9 @@ public class CompoundExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String describe() {
-		return this.x.describe() + this.comparison.getFragment() + this.y.describe();
+	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -102,7 +103,26 @@ public class CompoundExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String generate(CriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction() {
+		return this.x.generateJpqlRestriction() + this.comparison.getFragment() + this.y.generateJpqlRestriction();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generateJpqlSelect() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
 		if (this.x instanceof ParameterExpressionImpl) {
 			return this.y.generate(query, this.comparison, (ParameterExpressionImpl<?>) this.x);
 		}
@@ -110,17 +130,7 @@ public class CompoundExpression extends AbstractExpression<Boolean> {
 			return this.x.generate(query, this.comparison, (ParameterExpressionImpl<?>) this.y);
 		}
 
-		return this.x.generate(query) + this.comparison.getFragment() + this.y.generate(query);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.x.generateSqlSelect(query) + this.comparison.getFragment() + this.y.generateSqlSelect(query);
 	}
 
 	/**
@@ -139,6 +149,6 @@ public class CompoundExpression extends AbstractExpression<Boolean> {
 	 */
 	@Override
 	public String toString() {
-		return this.describe();
+		return this.generateJpqlRestriction();
 	}
 }

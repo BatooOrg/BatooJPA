@@ -20,10 +20,8 @@ package org.batoo.jpa.core.impl.criteria;
 
 import javax.persistence.criteria.Root;
 
-import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
-import org.batoo.jpa.core.util.BatooUtils;
 
 /**
  * A root type in the from clause. Query roots always reference entities.
@@ -47,29 +45,6 @@ public class RootImpl<X> extends AbstractFrom<X, X> implements Root<X> {
 	}
 
 	/**
-	 * Returns the join descriptions.
-	 * 
-	 * @return the join descriptions
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String describeJoins() {
-		final String root = StringUtils.isNotBlank(this.getAlias()) ? this.getAlias() : this.getModel().getName();
-
-		return BatooUtils.indent(this.getFetchRoot().describe(root));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generate(CriteriaQueryImpl<?> query) {
-		return this.getFetchRoot().generate(query);
-	}
-
-	/**
 	 * Returns the generated from SQL fragment.
 	 * 
 	 * @param query
@@ -79,7 +54,7 @@ public class RootImpl<X> extends AbstractFrom<X, X> implements Root<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String generateFrom(CriteriaQueryImpl<?> query) {
+	public String generateSqlFrom(CriteriaQueryImpl<?> query) {
 		final EntityTable primaryTable = this.getModel().getRootType().getPrimaryTable();
 
 		return primaryTable.getName() + " AS " + this.getFetchRoot().getTableAlias(query, primaryTable);

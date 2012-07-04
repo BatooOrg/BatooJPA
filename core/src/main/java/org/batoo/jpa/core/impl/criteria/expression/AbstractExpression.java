@@ -23,8 +23,8 @@ import java.util.Collection;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 
+import org.batoo.jpa.core.impl.criteria.AbstractSelection;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.SelectionImpl;
 import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
 
 /**
@@ -35,7 +35,7 @@ import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison
  * @author hceylan
  * @since $version
  */
-public abstract class AbstractExpression<T> extends SelectionImpl<T> implements Expression<T> {
+public abstract class AbstractExpression<T> extends AbstractSelection<T> implements Expression<T> {
 
 	/**
 	 * @param javaType
@@ -66,7 +66,7 @@ public abstract class AbstractExpression<T> extends SelectionImpl<T> implements 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract String describe();
+	public abstract String generateJpqlRestriction();
 
 	/**
 	 * Returns the generated SQL fragment with comparison to parameter expression.
