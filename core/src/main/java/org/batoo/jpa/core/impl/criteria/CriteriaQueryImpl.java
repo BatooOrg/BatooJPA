@@ -38,7 +38,9 @@ import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.criteria.path.EntityPath;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.core.util.BatooUtils;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -136,10 +138,10 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 		});
 		builder.append("\nfrom ").append(Joiner.on(", ").join(roots));
 
-		if (this.selection instanceof AbstractFrom) {
-			final String join = ((AbstractFrom<?, ?>) this.selection).generateJpqlFetches();
+		if (this.selection instanceof EntityPath) {
+			final String join = ((EntityPath<?, ?>) this.selection).generateJpqlFetches();
 			if (StringUtils.isNotBlank(join)) {
-				builder.append("\n").append(join);
+				builder.append("\n").append(BatooUtils.indent(join));
 			}
 		}
 
@@ -161,23 +163,29 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	private String generateSql() {
 		CriteriaQueryImpl.LOG.debug("Preparing SQL for {0}", CriteriaQueryImpl.LOG.lazyBoxed(this));
 
+		final Map<Joinable, String> joins = Maps.newLinkedHashMap();
+
+		this.selection.generateSqlJoinsUp(this, joins);
+
 		// generate the select chunk
 		final String select = "SELECT\n\t" + this.selection.generateSqlSelect(this);
 
 		// generate from chunk
 		final List<String> froms = Lists.newArrayList();
-		final List<String> joins = Lists.newArrayList();
 		for (final Root<?> r : this.getRoots()) {
 			final RootImpl<?> root = (RootImpl<?>) r;
 			froms.add(root.generateSqlFrom(this));
-			joins.add(root.generateSqlJoins(this));
+		}
+
+		if (this.selection instanceof EntityPath) {
+			((EntityPath<?, ?>) this.selection).generateSqlJoins(this, joins);
 		}
 
 		final String restriction = this.generateSqlRestriction();
 		final String where = StringUtils.isNotBlank(restriction) ? "WHERE " + restriction : null;
 
 		final String from = "FROM " + Joiner.on(",").join(froms);
-		final String join = Joiner.on(",").join(joins);
+		final String join = Joiner.on("\n").skipNulls().join(joins.values());
 
 		return Joiner.on("\n").skipNulls().join(select, //
 			from, //

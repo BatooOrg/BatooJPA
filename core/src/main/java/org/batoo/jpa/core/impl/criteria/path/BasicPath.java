@@ -26,7 +26,6 @@ import javax.persistence.criteria.Path;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
@@ -100,7 +99,7 @@ public class BasicPath<X> extends AbstractPath<X> {
 	public String generateJpqlSelect() {
 		final StringBuilder builder = new StringBuilder();
 
-		if ((this.getParentPath() instanceof RootPath) && StringUtils.isNotBlank(this.getParentPath().getAlias())) {
+		if ((this.getParentPath() instanceof EntityPath) && StringUtils.isNotBlank(this.getParentPath().getAlias())) {
 			builder.append(this.getParentPath().getAlias());
 		}
 		else {
@@ -120,16 +119,10 @@ public class BasicPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
 		final BasicColumn column = this.mapping.getColumn();
 
-		AbstractPath<?> root = this;
-		while (root.getParentPath() != null) {
-			root = root.getParentPath();
-		}
-
-		final String tableAlias = ((RootImpl<X>) root).getTableAlias(query, column.getTable());
+		final String tableAlias = this.getRootPath().getTableAlias(query, column.getTable());
 
 		return tableAlias + "." + column.getName();
 	}
@@ -160,14 +153,5 @@ public class BasicPath<X> extends AbstractPath<X> {
 	public List<X> handle(SessionImpl session, List<Map<String, Object>> data, MutableInt rowNo) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String toString() {
-		return this.generateJpqlRestriction();
 	}
 }

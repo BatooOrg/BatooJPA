@@ -55,7 +55,6 @@ import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
-import org.batoo.jpa.core.util.BatooUtils;
 import org.batoo.jpa.core.util.Pair;
 
 import com.google.common.base.Function;
@@ -76,7 +75,7 @@ import com.google.common.collect.Sets;
  * @author hceylan
  * @since $version
  */
-public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
+public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 
 	private final EntityTypeImpl<X> entity;
 	private final List<FetchImpl<X, ?>> fetches = Lists.newArrayList();
@@ -104,28 +103,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 		super();
 
 		this.entity = entity;
-	}
-
-	/**
-	 * Returns the description of the fetch.
-	 * 
-	 * @param parent
-	 *            the parent
-	 * @return the description of the fetch *
-	 */
-	public String generateJpqlFetches(final String parent) {
-		final StringBuilder description = new StringBuilder();
-		final List<String> fetches = Lists.transform(this.fetches, new Function<FetchImpl<X, ?>, String>() {
-
-			@Override
-			public String apply(FetchImpl<X, ?> input) {
-				return input.generateJpqlFetches(parent);
-			}
-		});
-
-		description.append(Joiner.on("\n").join(fetches));
-
-		return BatooUtils.indent(description.toString());
 	}
 
 	/**
@@ -203,27 +180,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	}
 
 	/**
-	 * Returns the generated SQL fragment.
-	 * 
-	 * @param query
-	 *            the query
-	 * @return the generated SQL fragment
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String generate(CriteriaQueryImpl<?> query) {
-		final List<String> selects = Lists.newArrayList();
-		selects.add(this.generateImpl(query));
-
-		for (final FetchImpl<X, ?> fetch : this.fetches) {
-			selects.add(fetch.generate(query));
-		}
-
-		return Joiner.on(",\n\t").join(selects);
-	}
-
-	/**
 	 * Returns the restriction based on discrimination.
 	 * 
 	 * @return the restriction based on discrimination, <code>null</code>
@@ -248,7 +204,98 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 			+ ")";
 	}
 
-	private String generateImpl(CriteriaQueryImpl<?> query) {
+	/**
+	 * Returns the description of the fetch.
+	 * 
+	 * @param parent
+	 *            the parent
+	 * @return the description of the fetch *
+	 */
+	public String generateJpqlFetches(final String parent) {
+		final StringBuilder description = new StringBuilder();
+		final List<String> fetches = Lists.transform(this.fetches, new Function<FetchImpl<X, ?>, String>() {
+
+			@Override
+			public String apply(FetchImpl<X, ?> input) {
+				return input.generateJpqlFetches(parent);
+			}
+		});
+
+		description.append(Joiner.on("\n").join(fetches));
+
+		return description.toString();
+	}
+
+	/**
+	 * Generates the self SQL joins fragments.
+	 * 
+	 * @param query
+	 *            the query
+	 * @param selfJoins
+	 *            the list of self joins
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void generateSqlJoins(CriteriaQueryImpl<?> query, final List<String> selfJoins) {
+		for (final Entry<String, SecondaryTable> e : this.tableAliases.entrySet()) {
+			final String alias = e.getKey();
+			final SecondaryTable table = e.getValue();
+
+			selfJoins.add(table.joinPrimary(this.primaryTableAlias, alias));
+		}
+	}
+
+	/**
+	 * Generates joins SQL fragment for the fetch chain.
+	 * 
+	 * @param query
+	 *            the query
+	 * @param joins
+	 *            the map of joins
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void generateSqlJoins(CriteriaQueryImpl<?> query, Map<Joinable, String> joins) {
+		final List<String> selfJoins = Lists.newArrayList();
+
+		this.generateSqlJoins(query, selfJoins);
+
+		if (selfJoins.size() > 0) {
+			joins.put(this, Joiner.on("\n").join(selfJoins));
+		}
+		else {
+			joins.put(this, null);
+		}
+
+		for (final FetchImpl<X, ?> fetch : this.fetches) {
+			fetch.generateSqlJoins(query, joins);
+		}
+	}
+
+	/**
+	 * Returns the generated SQL fragment.
+	 * 
+	 * @param query
+	 *            the query
+	 * @return the generated SQL fragment
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
+		final List<String> selects = Lists.newArrayList();
+		selects.add(this.generateSqlSelectImpl(query));
+
+		for (final FetchImpl<X, ?> fetch : this.fetches) {
+			selects.add(fetch.generateSqlSelect(query));
+		}
+
+		return Joiner.on(",\n\t").join(selects);
+	}
+
+	private String generateSqlSelectImpl(CriteriaQueryImpl<?> query) {
 		final List<String> selects = Lists.newArrayList();
 
 		for (final EntityTable table : this.entity.getAllTables()) {
@@ -292,33 +339,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 		}
 
 		return Joiner.on(",\n\t\t").join(selects);
-	}
-
-	/**
-	 * Returns the generated joins SQL fragment.
-	 * 
-	 * @param query
-	 *            the query
-	 * @return the generated joins SQL fragment
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String generateJoins(CriteriaQueryImpl<?> query) {
-		final List<String> joins = Lists.newArrayList();
-
-		for (final Entry<String, SecondaryTable> e : this.tableAliases.entrySet()) {
-			final String alias = e.getKey();
-			final SecondaryTable table = e.getValue();
-
-			joins.add("\t" + table.joinPrimary(this.primaryTableAlias, alias));
-		}
-
-		for (final FetchImpl<X, ?> fetch : this.fetches) {
-			joins.add(fetch.generateJoins(query));
-		}
-
-		return Joiner.on("\n").join(joins);
 	}
 
 	/**
@@ -528,9 +548,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 
 			return alias;
 		}
-		else if (table.getEntity() != table.getEntity().getRootType()) {
-
-		}
 
 		return this.getPrimaryTableAlias(query);
 	}
@@ -540,8 +557,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X> {
 	 * 
 	 * @param session
 	 *            the session
-	 * @param query
-	 *            the query
 	 * @param data
 	 *            the resultset data
 	 * @param rowNo

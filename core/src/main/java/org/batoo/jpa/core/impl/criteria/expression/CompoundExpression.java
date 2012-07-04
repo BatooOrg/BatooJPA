@@ -113,8 +113,7 @@ public class CompoundExpression extends AbstractExpression<Boolean> {
 	 */
 	@Override
 	public String generateJpqlSelect() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.x.generateJpqlSelect() + this.comparison.getFragment() + this.y.generateJpqlSelect();
 	}
 
 	/**

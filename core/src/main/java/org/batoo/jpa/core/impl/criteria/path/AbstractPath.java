@@ -26,6 +26,9 @@ import javax.persistence.metamodel.MapAttribute;
 import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.Joinable;
+import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
@@ -74,6 +77,17 @@ public abstract class AbstractPath<X> extends AbstractExpression<X> implements P
 	 */
 	protected IllegalArgumentException cannotDereference() {
 		return new IllegalArgumentException("Cannot dereference");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void generateSqlJoinsUp(CriteriaQueryImpl<?> query, Map<Joinable, String> joins) {
+		if (this.getParentPath() != null) {
+			this.getParentPath().generateSqlJoinsUp(query, joins);
+		}
 	}
 
 	/**
@@ -132,7 +146,7 @@ public abstract class AbstractPath<X> extends AbstractExpression<X> implements P
 			path = new BasicPath<Y>(this, (BasicMapping<? super X, Y>) mapping);
 		}
 		else if (mapping instanceof PluralAssociationMapping) {
-			path = new PluralAssociationPath<Y>(this, (PluralAssociationMapping<?, ?, Y>) mapping);
+			path = new PluralAssociationPath<X, Y>(this, (PluralAssociationMapping<?, ?, Y>) mapping);
 		}
 		else {
 			path = new EmbeddedAttributePath<Y>(this, (EmbeddedMapping<? super X, Y>) mapping);
@@ -160,6 +174,23 @@ public abstract class AbstractPath<X> extends AbstractExpression<X> implements P
 	@Override
 	public AbstractPath<?> getParentPath() {
 		return this.parent;
+	}
+
+	/**
+	 * Returns the root of the path.
+	 * 
+	 * @return the root of the path
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected RootImpl<?> getRootPath() {
+		AbstractPath<?> root = this;
+		while (root.getParentPath() != null) {
+			root = root.getParentPath();
+		}
+
+		return (RootImpl<?>) root;
 	}
 
 	/**

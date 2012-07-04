@@ -40,15 +40,12 @@ import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
-import org.batoo.jpa.core.impl.criteria.path.RootPath;
-import org.batoo.jpa.core.impl.jdbc.EntityTable;
+import org.batoo.jpa.core.impl.criteria.path.EntityPath;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
-import org.batoo.jpa.core.util.BatooUtils;
 
 /**
  * Represents a bound type, usually an entity that appears in the from clause, but may also be an embeddable belonging to an entity in the
@@ -65,10 +62,9 @@ import org.batoo.jpa.core.util.BatooUtils;
  * @author hceylan
  * @since $version
  */
-public abstract class AbstractFrom<Z, X> extends RootPath<X> implements From<Z, X> {
+public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements From<Z, X> {
 
 	private final EntityTypeImpl<X> entity;
-	private final FetchParentImpl<Z, X> fetchRoot;
 
 	/**
 	 * @param entity
@@ -78,9 +74,7 @@ public abstract class AbstractFrom<Z, X> extends RootPath<X> implements From<Z, 
 	 * @author hceylan
 	 */
 	public AbstractFrom(EntityTypeImpl<X> entity) {
-		super(entity);
-
-		this.fetchRoot = new FetchParentImpl<Z, X>(entity);
+		super(null, entity);
 
 		this.entity = entity;
 	}
@@ -91,7 +85,7 @@ public abstract class AbstractFrom<Z, X> extends RootPath<X> implements From<Z, 
 	 */
 	@Override
 	public <Y> Fetch<X, Y> fetch(PluralAttribute<? super X, ?, Y> attribute) {
-		return this.fetchRoot.fetch(attribute);
+		return this.getFetchRoot().fetch(attribute);
 	}
 
 	/**
@@ -100,7 +94,7 @@ public abstract class AbstractFrom<Z, X> extends RootPath<X> implements From<Z, 
 	 */
 	@Override
 	public <Y> Fetch<X, Y> fetch(PluralAttribute<? super X, ?, Y> attribute, JoinType jt) {
-		return this.fetchRoot.fetch(attribute, jt);
+		return this.getFetchRoot().fetch(attribute, jt);
 	}
 
 	/**
@@ -109,7 +103,7 @@ public abstract class AbstractFrom<Z, X> extends RootPath<X> implements From<Z, 
 	 */
 	@Override
 	public <Y> Fetch<X, Y> fetch(SingularAttribute<? super X, Y> attribute) {
-		return this.fetchRoot.fetch(attribute);
+		return this.getFetchRoot().fetch(attribute);
 	}
 
 	/**
@@ -118,7 +112,7 @@ public abstract class AbstractFrom<Z, X> extends RootPath<X> implements From<Z, 
 	 */
 	@Override
 	public <Y> Fetch<X, Y> fetch(SingularAttribute<? super X, Y> attribute, JoinType jt) {
-		return this.fetchRoot.fetch(attribute, jt);
+		return this.getFetchRoot().fetch(attribute, jt);
 	}
 
 	/**
@@ -127,7 +121,7 @@ public abstract class AbstractFrom<Z, X> extends RootPath<X> implements From<Z, 
 	 */
 	@Override
 	public <Y> Fetch<X, Y> fetch(String attributeName) {
-		return this.fetchRoot.fetch(attributeName);
+		return this.getFetchRoot().fetch(attributeName);
 	}
 
 	/**
@@ -136,7 +130,7 @@ public abstract class AbstractFrom<Z, X> extends RootPath<X> implements From<Z, 
 	 */
 	@Override
 	public <Y> Fetch<X, Y> fetch(String attributeName, JoinType jt) {
-		return this.fetchRoot.fetch(attributeName, jt);
+		return this.getFetchRoot().fetch(attributeName, jt);
 	}
 
 	/**
@@ -158,57 +152,7 @@ public abstract class AbstractFrom<Z, X> extends RootPath<X> implements From<Z, 
 	 * @author hceylan
 	 */
 	public String generateDiscrimination() {
-		return this.fetchRoot.generateDiscrimination();
-	}
-
-	/**
-	 * Returns the JPQL fetch joins fragment.
-	 * 
-	 * @return the JPQL fetch joins fragment
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String generateJpqlFetches() {
-		final String root = StringUtils.isNotBlank(this.getAlias()) ? this.getAlias() : this.getModel().getName();
-
-		return BatooUtils.indent(this.fetchRoot.generateJpqlFetches(root));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generateJpqlSelect() {
-		if (StringUtils.isNotBlank(this.getAlias())) {
-			return this.getAlias();
-		}
-
-		return this.getModel().getName();
-	}
-
-	/**
-	 * Returns the generated joins SQL fragment.
-	 * 
-	 * @param query
-	 *            the query
-	 * @return the generated joins SQL fragment
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String generateSqlJoins(CriteriaQueryImpl<?> query) {
-		return this.fetchRoot.generateJoins(query);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
-		return this.fetchRoot.generate(query);
+		return this.getFetchRoot().generateDiscrimination();
 	}
 
 	/**
@@ -227,19 +171,7 @@ public abstract class AbstractFrom<Z, X> extends RootPath<X> implements From<Z, 
 	 */
 	@Override
 	public Set<Fetch<X, ?>> getFetches() {
-		return this.fetchRoot.getFetches();
-	}
-
-	/**
-	 * Returns the fetchRoot of the AbstractFrom.
-	 * 
-	 * @return the fetchRoot of the AbstractFrom
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public FetchParentImpl<Z, X> getFetchRoot() {
-		return this.fetchRoot;
+		return this.getFetchRoot().getFetches();
 	}
 
 	/**
@@ -266,17 +198,8 @@ public abstract class AbstractFrom<Z, X> extends RootPath<X> implements From<Z, 
 	 * 
 	 */
 	@Override
-	public String getTableAlias(CriteriaQueryImpl<?> query, EntityTable table) {
-		return this.fetchRoot.getTableAlias(query, table);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public List<X> handle(SessionImpl session, List<Map<String, Object>> data, MutableInt rowNo) {
-		return this.fetchRoot.handle(session, data, rowNo, 1);
+		return this.getFetchRoot().handle(session, data, rowNo, 1);
 	}
 
 	/**
@@ -555,6 +478,6 @@ public abstract class AbstractFrom<Z, X> extends RootPath<X> implements From<Z, 
 	 */
 	@Override
 	public String toString() {
-		return this.fetchRoot.generateJpqlFetches("");
+		return this.getFetchRoot().generateJpqlFetches("");
 	}
 }

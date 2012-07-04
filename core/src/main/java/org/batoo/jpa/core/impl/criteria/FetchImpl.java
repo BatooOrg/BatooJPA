@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.criteria;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.criteria.Expression;
@@ -112,28 +113,13 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	 * 
 	 */
 	@Override
-	public String generateJoins(CriteriaQueryImpl<?> query) {
+	public void generateSqlJoins(CriteriaQueryImpl<?> query, List<String> selfJoins) {
 		final String parentAlias = this.getParent().getPrimaryTableAlias(query);
 		final String alias = this.getPrimaryTableAlias(query);
 
-		String join;
+		selfJoins.add(this.mapping.join(parentAlias, alias, this.joinType));
 
-		if (this.mapping.getForeignKey() != null) {
-			join = this.mapping.getForeignKey().createDestinationJoin(this.joinType, parentAlias, alias);
-		}
-		else if ((this.mapping.getInverse() != null) && (this.mapping.getInverse().getForeignKey() != null)) {
-			join = this.mapping.getInverse().getForeignKey().createSourceJoin(this.joinType, parentAlias, alias);
-		}
-		else if (this.mapping.getJoinTable() != null) {
-			join = this.mapping.getJoinTable().createJoin(this.joinType, parentAlias, alias, true);
-		}
-		else {
-			join = this.mapping.getInverse().getJoinTable().createJoin(this.joinType, parentAlias, alias, false);
-		}
-
-		final String joins = super.generateJoins(query);
-
-		return join + (StringUtils.isBlank(joins) ? "" : "\n") + joins;
+		super.generateSqlJoins(query, selfJoins);
 	}
 
 	/**

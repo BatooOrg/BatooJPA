@@ -99,8 +99,7 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 */
 	@Override
 	public String generateJpqlSelect() {
-		// TODO Auto-generated method stub
-		return null;
+		return "?";
 	}
 
 	/**

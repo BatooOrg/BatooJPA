@@ -29,19 +29,20 @@ import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 
 /**
  * Physical Attribute implementation of {@link Path}.
  * 
+ * @param <Z>
+ *            the source type
  * @param <X>
- *            the type referenced by the path
+ *            the target type
  * 
  * @author hceylan
  * @since $version
  */
-public class PluralAssociationPath<X> extends AbstractPath<X> {
+public class PluralAssociationPath<Z, X> extends EntityPath<Z, X> {
 
 	private final PluralAssociationMapping<?, ?, X> mapping;
 
@@ -54,8 +55,8 @@ public class PluralAssociationPath<X> extends AbstractPath<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PluralAssociationPath(AbstractPath<?> parent, PluralAssociationMapping<?, ?, X> mapping) {
-		super(parent, mapping.getType().getJavaType());
+	public PluralAssociationPath(AbstractPath<Z> parent, PluralAssociationMapping<?, ?, X> mapping) {
+		super(parent, mapping.getType());
 
 		this.mapping = mapping;
 	}
@@ -98,7 +99,7 @@ public class PluralAssociationPath<X> extends AbstractPath<X> {
 	public String generateJpqlSelect() {
 		final StringBuilder builder = new StringBuilder();
 
-		if ((this.getParentPath() instanceof RootPath) && StringUtils.isNotBlank(this.getParentPath().getAlias())) {
+		if ((this.getParentPath() instanceof EntityPath) && StringUtils.isNotBlank(this.getParentPath().getAlias())) {
 			builder.append(this.getParentPath().getAlias());
 		}
 		else {
@@ -118,35 +119,7 @@ public class PluralAssociationPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	protected PluralAssociationMapping<?, ?, X> getMapping() {
-		return this.mapping;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public PluralAttributeImpl<?, ?, X> getModel() {
-		return this.mapping.getAttribute();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public List<X> handle(SessionImpl session, List<Map<String, Object>> data, MutableInt rowNo) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.getFetchRoot().handle(session, data, rowNo, 1);
 	}
 }

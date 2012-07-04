@@ -83,7 +83,7 @@ public class EmbeddedAttributePath<X> extends AbstractPath<X> {
 		return Joiner.on(" AND ").join(fragments);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "rawtypes" })
 	private void generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter, EmbeddedMapping<?, ?> mapping,
 		final List<String> fragments) {
 		for (final Mapping<?, ?, ?> child : mapping.getChildren()) {
@@ -95,7 +95,7 @@ public class EmbeddedAttributePath<X> extends AbstractPath<X> {
 					root = root.getParentPath();
 				}
 
-				final String tableAlias = ((RootPath<X>) root).getTableAlias(query, column.getTable());
+				final String tableAlias = this.getRootPath().getTableAlias(query, column.getTable());
 				fragments.add(tableAlias + "." + column.getName() + comparison.getFragment() + parameter.generateSqlSelect(query));
 			}
 			// further expand the embedded mappings
@@ -135,7 +135,7 @@ public class EmbeddedAttributePath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "rawtypes" })
 	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
 		final List<String> fragments = Lists.newArrayList();
 
@@ -147,7 +147,7 @@ public class EmbeddedAttributePath<X> extends AbstractPath<X> {
 					root = root.getParentPath();
 				}
 
-				final String tableAlias = ((RootPath<X>) root).getTableAlias(query, column.getTable());
+				final String tableAlias = this.getRootPath().getTableAlias(query, column.getTable());
 				fragments.add(tableAlias + "." + column.getName());
 			}
 		}

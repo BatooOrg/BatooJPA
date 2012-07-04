@@ -22,6 +22,7 @@ import java.sql.SQLException;
 
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
+import javax.persistence.criteria.JoinType;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
@@ -312,6 +313,36 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> {
 	 */
 	public final boolean isOwner() {
 		return this.mappedBy == null;
+	}
+
+	/**
+	 * Returns the join SQL for the mapping.
+	 * 
+	 * @return the join SQL for the mapping
+	 * 
+	 * @param parentAlias
+	 *            the parent table alias
+	 * @param alias
+	 *            the primary table alias
+	 * @param joinType
+	 *            the join type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String join(String parentAlias, String alias, JoinType joinType) {
+		if (this.getForeignKey() != null) {
+			return this.getForeignKey().createDestinationJoin(joinType, parentAlias, alias);
+		}
+		else if ((this.getInverse() != null) && (this.getInverse().getForeignKey() != null)) {
+			return this.getInverse().getForeignKey().createSourceJoin(joinType, parentAlias, alias);
+		}
+		else if (this.getJoinTable() != null) {
+			return this.getJoinTable().createJoin(joinType, parentAlias, alias, true);
+		}
+		else {
+			return this.getInverse().getJoinTable().createJoin(joinType, parentAlias, alias, false);
+		}
 	}
 
 	/**

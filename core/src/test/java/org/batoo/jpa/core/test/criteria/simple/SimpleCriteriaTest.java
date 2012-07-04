@@ -162,7 +162,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 		final RootImpl<Person> r = q.from(Person.class);
 		q.select(r);
 		r.alias("p");
-		r.fetch("addresses");
+		r.fetch("addresses").fetch("country");
 
 		final List<Person> resultList = this.em().createQuery(q).getResultList();
 		Assert.assertEquals(6, resultList.size());

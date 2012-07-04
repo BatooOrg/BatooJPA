@@ -59,16 +59,6 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	}
 
 	/**
-	 * Returns the description of the expression.
-	 * 
-	 * @return the description of the expression
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public abstract String generateJpqlRestriction();
-
-	/**
 	 * Returns the generated SQL fragment with comparison to parameter expression.
 	 * 
 	 * @param query
@@ -83,6 +73,16 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 * @author hceylan
 	 */
 	public abstract String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter);
+
+	/**
+	 * Returns the JPQL where fragment.
+	 * 
+	 * @return the JPQL where fragment
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract String generateJpqlRestriction();
 
 	/**
 	 * {@inheritDoc}

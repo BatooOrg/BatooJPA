@@ -75,6 +75,20 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	public abstract String generateJpqlSelect();
 
 	/**
+	 * Generates SQL joins fragment that connects to root.
+	 * 
+	 * @param query
+	 *            the query
+	 * @param joins
+	 *            the map of joins
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void generateSqlJoinsUp(CriteriaQueryImpl<?> query, Map<Joinable, String> joins) {
+	}
+
+	/**
 	 * Returns the SQL select fragment.
 	 * 
 	 * @param query

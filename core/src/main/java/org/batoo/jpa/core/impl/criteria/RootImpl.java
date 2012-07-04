@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.criteria;
 
 import javax.persistence.criteria.Root;
 
+import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
@@ -45,6 +46,19 @@ public class RootImpl<X> extends AbstractFrom<X, X> implements Root<X> {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generateJpqlSelect() {
+		if (StringUtils.isNotBlank(this.getAlias())) {
+			return this.getAlias();
+		}
+
+		return this.getModel().getName();
+	}
+
+	/**
 	 * Returns the generated from SQL fragment.
 	 * 
 	 * @param query
@@ -58,5 +72,23 @@ public class RootImpl<X> extends AbstractFrom<X, X> implements Root<X> {
 		final EntityTable primaryTable = this.getModel().getRootType().getPrimaryTable();
 
 		return primaryTable.getName() + " AS " + this.getFetchRoot().getTableAlias(query, primaryTable);
+	}
+
+	/**
+	 * Returns the alias for the table.
+	 * <p>
+	 * if table does not have an alias, it is generated.
+	 * 
+	 * @param query
+	 *            the query
+	 * @param table
+	 *            the table
+	 * @return the alias for the table
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getTableAlias(CriteriaQueryImpl<?> query, EntityTable table) {
+		return this.getFetchRoot().getTableAlias(query, table);
 	}
 }

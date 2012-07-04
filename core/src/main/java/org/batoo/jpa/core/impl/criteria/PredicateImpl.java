@@ -130,7 +130,7 @@ public class PredicateImpl extends AbstractExpression<Boolean> implements Predic
 
 			@Override
 			public String apply(AbstractExpression<Boolean> input) {
-				return input.generateJpqlRestriction();
+				return input.generateJpqlSelect();
 			}
 		});
 
