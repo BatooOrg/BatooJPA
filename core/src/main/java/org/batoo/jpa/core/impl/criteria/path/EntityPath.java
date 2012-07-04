@@ -22,12 +22,15 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.criteria.Fetch;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Path;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.FetchImpl;
 import org.batoo.jpa.core.impl.criteria.FetchParentImpl;
 import org.batoo.jpa.core.impl.criteria.Joinable;
+import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.RootMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
@@ -46,26 +49,54 @@ import com.google.common.collect.Lists;
  * @author hceylan
  * @since $version
  */
-public abstract class EntityPath<Z, X> extends AbstractPath<X> implements Joinable {
+public abstract class EntityPath<Z, X> extends AbstractPath<X> implements Joinable, ParentPath<Z, X> {
 
 	final EntityTypeImpl<X> entity;
 	private final FetchParentImpl<Z, X> fetchRoot;
 
 	/**
-	 * @param parent
-	 *            the parent
+	 * Constructor for root paths.
+	 * 
 	 * @param entity
-	 *            the entity type
+	 *            the entity
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EntityPath(AbstractPath<?> parent, EntityTypeImpl<X> entity) {
-		super(parent, entity.getJavaType());
+	public EntityPath(EntityTypeImpl<X> entity) {
+		super(null, entity.getJavaType());
 
 		this.entity = entity;
 
 		this.fetchRoot = new FetchParentImpl<Z, X>(entity);
+	}
+
+	/**
+	 * Constructor for child paths.
+	 * 
+	 * @param parent
+	 *            the parent path
+	 * @param entity
+	 *            the entity type
+	 * @param mapping
+	 *            the mapping
+	 * @param joinType
+	 *            the join type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public EntityPath(ParentPath<?, Z> parent, EntityTypeImpl<X> entity, AssociationMapping<? super Z, ?, X> mapping, JoinType joinType) {
+		super(parent, entity.getJavaType());
+
+		this.entity = entity;
+
+		if (parent != null) {
+			this.fetchRoot = new FetchImpl<Z, X>(parent.getFetchRoot(), mapping, joinType);
+		}
+		else {
+			this.fetchRoot = new FetchParentImpl<Z, X>(entity);
+		}
 	}
 
 	/**
@@ -130,14 +161,11 @@ public abstract class EntityPath<Z, X> extends AbstractPath<X> implements Joinab
 	}
 
 	/**
-	 * Returns the fetch root of the entity path.
+	 * {@inheritDoc}
 	 * 
-	 * @return the fetch root of the entity path
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	protected FetchParentImpl<Z, X> getFetchRoot() {
+	@Override
+	public FetchParentImpl<Z, X> getFetchRoot() {
 		return this.fetchRoot;
 	}
 

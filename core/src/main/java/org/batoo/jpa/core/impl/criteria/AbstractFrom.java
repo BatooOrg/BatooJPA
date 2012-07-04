@@ -74,7 +74,7 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 * @author hceylan
 	 */
 	public AbstractFrom(EntityTypeImpl<X> entity) {
-		super(null, entity);
+		super(entity);
 
 		this.entity = entity;
 	}

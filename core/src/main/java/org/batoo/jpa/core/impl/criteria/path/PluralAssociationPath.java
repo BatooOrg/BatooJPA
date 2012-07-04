@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.criteria.path;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Path;
 
 import org.apache.commons.lang.StringUtils;
@@ -55,8 +56,8 @@ public class PluralAssociationPath<Z, X> extends EntityPath<Z, X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PluralAssociationPath(AbstractPath<Z> parent, PluralAssociationMapping<?, ?, X> mapping) {
-		super(parent, mapping.getType());
+	public PluralAssociationPath(ParentPath<?, Z> parent, PluralAssociationMapping<Z, ?, X> mapping) {
+		super(parent, mapping.getType(), mapping, JoinType.INNER);
 
 		this.mapping = mapping;
 	}
@@ -71,7 +72,7 @@ public class PluralAssociationPath<Z, X> extends EntityPath<Z, X> {
 		final String sql = this.generateSqlSelect(query) + comparison.getFragment() + parameter.generateSqlSelect(query);
 
 		// seal the parameter count
-		parameter.registerParameter(query, this.mapping);
+		parameter.registerParameter(query, this.getMapping());
 
 		return sql;
 	}

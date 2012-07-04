@@ -165,7 +165,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 
 		final Map<Joinable, String> joins = Maps.newLinkedHashMap();
 
-		this.selection.generateSqlJoinsUp(this, joins);
+		// this.selection.generateSqlJoinsUp(this, joins);
 
 		// generate the select chunk
 		final StringBuilder select = new StringBuilder();
