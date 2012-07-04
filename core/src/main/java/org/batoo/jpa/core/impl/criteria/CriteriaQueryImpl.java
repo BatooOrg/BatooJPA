@@ -168,7 +168,13 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 		this.selection.generateSqlJoinsUp(this, joins);
 
 		// generate the select chunk
-		final String select = "SELECT\n\t" + this.selection.generateSqlSelect(this);
+		final StringBuilder select = new StringBuilder();
+		select.append("SELECT");
+		if (this.distinct) {
+			select.append(" DISTINCT");
+		}
+		select.append("\n\t");
+		select.append(this.selection.generateSqlSelect(this));
 
 		// generate from chunk
 		final List<String> froms = Lists.newArrayList();

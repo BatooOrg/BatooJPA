@@ -85,6 +85,10 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 	 */
 	@Override
 	public EntityTypeImpl<T> getType() {
+		if (this.type == null) {
+			this.type = this.getMetamodel().entity(this.getBindableJavaType());
+		}
+
 		return this.type;
 	}
 

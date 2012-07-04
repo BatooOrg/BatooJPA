@@ -90,7 +90,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	private final HashBiMap<String, AbstractColumn> joinFields = HashBiMap.create();
 	private final List<SingularAssociationMapping<?, ?>> joins = Lists.newArrayList();
 
-	private int nextTableAlias = 0;
+	private int nextTableAlias = 1;
 
 	/**
 	 * @param entity
@@ -307,15 +307,14 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 
 			final Collection<AbstractColumn> columns = table.getColumns();
 			for (final AbstractColumn column : columns) {
-
 				final String fieldAlias = tableAlias + "_F" + fieldNo++;
 
 				final String field = Joiner.on(".").skipNulls().join(tableAlias, column.getName());
-				if (column instanceof DiscriminatorColumn) {
-					this.discriminatorAlias = fieldAlias;
-				}
-				else if (column instanceof PkColumn) {
+				if (column instanceof PkColumn) {
 					this.idFields.put(fieldAlias, column);
+				}
+				else if (column instanceof DiscriminatorColumn) {
+					this.discriminatorAlias = fieldAlias;
 				}
 				else if (column.getMapping() instanceof SingularAssociationMapping) {
 					final SingularAssociationMapping<?, ?> mapping = (SingularAssociationMapping<?, ?>) column.getMapping();
@@ -737,7 +736,9 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 				instance = managedInstance;
 			}
 			else {
-				instances.add(managedInstance);
+				if (instances != null) {
+					instances.add(managedInstance);
+				}
 				rowNo.add(leap);
 
 				return managedInstance;

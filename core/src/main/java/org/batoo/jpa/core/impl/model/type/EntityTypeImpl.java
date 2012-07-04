@@ -874,6 +874,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			CriteriaQueryImpl<X> q = cb.createQuery(this.getJavaType());
 			final RootImpl<X> r = q.from(this);
 			q = q.select(r);
+			q.distinct(true);
 
 			this.prepareEagerAssociations(r, 0, null);
 

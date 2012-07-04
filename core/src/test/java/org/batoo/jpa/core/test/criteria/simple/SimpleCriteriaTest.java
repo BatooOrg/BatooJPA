@@ -157,6 +157,8 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 		this.persist(this.person());
 		this.commit();
 
+		this.close();
+
 		final CriteriaBuilderImpl cb = (CriteriaBuilderImpl) this.em().getCriteriaBuilder();
 		final CriteriaQueryImpl<Person> q = cb.createQuery(Person.class);
 		final RootImpl<Person> r = q.from(Person.class);
@@ -166,6 +168,31 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 
 		final List<Person> resultList = this.em().createQuery(q).getResultList();
 		Assert.assertEquals(6, resultList.size());
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testRootDistinct() {
+		this.persist(this.person());
+		this.persist(this.person());
+		this.commit();
+
+		this.close();
+
+		final CriteriaBuilderImpl cb = (CriteriaBuilderImpl) this.em().getCriteriaBuilder();
+		final CriteriaQueryImpl<Person> q = cb.createQuery(Person.class);
+		final RootImpl<Person> r = q.from(Person.class);
+		q.select(r);
+		r.alias("p");
+		r.fetch("addresses").fetch("country");
+		q.distinct(true);
+
+		final List<Person> resultList = this.em().createQuery(q).getResultList();
+		Assert.assertEquals(2, resultList.size());
 	}
 
 	/**

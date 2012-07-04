@@ -230,8 +230,7 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 	 */
 	@Override
 	public void setLazy(ManagedInstance<?> instance) {
-		final EntityTypeImpl<X> type = this.attribute.getType();
-		final ManagedInstance<X> value = type.getManagedInstanceById(instance.getSession(), this, instance.getId(), null, true);
+		final ManagedInstance<X> value = this.type.getManagedInstanceById(instance.getSession(), this, instance.getId(), null, true);
 		this.set(instance, value.getInstance());
 	}
 }

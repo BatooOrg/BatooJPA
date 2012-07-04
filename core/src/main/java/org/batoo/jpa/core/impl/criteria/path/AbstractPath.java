@@ -186,7 +186,7 @@ public abstract class AbstractPath<X> extends AbstractExpression<X> implements P
 	 */
 	protected RootImpl<?> getRootPath() {
 		AbstractPath<?> root = this;
-		while (root.getParentPath() != null) {
+		while ((root.getParentPath() != null) && !(root instanceof EntityPath)) {
 			root = root.getParentPath();
 		}
 

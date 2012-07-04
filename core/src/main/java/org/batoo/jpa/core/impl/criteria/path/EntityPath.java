@@ -79,7 +79,7 @@ public abstract class EntityPath<Z, X> extends AbstractPath<X> implements Joinab
 	public String generateJpqlFetches() {
 		final String root = StringUtils.isNotBlank(this.getAlias()) ? this.getAlias() : this.getModel().getName();
 
-		return this.getFetchRoot().generateJpqlFetches(root);
+		return this.fetchRoot.generateJpqlFetches(root);
 	}
 
 	/**
@@ -115,25 +115,9 @@ public abstract class EntityPath<Z, X> extends AbstractPath<X> implements Joinab
 			joins.put(this, null);
 		}
 
-		for (final Fetch<X, ?> fetch : this.getFetchRoot().getFetches()) {
+		for (final Fetch<X, ?> fetch : this.fetchRoot.getFetches()) {
 			((FetchParentImpl<Z, X>) fetch).generateSqlJoins(query, joins);
 		}
-	}
-
-	/**
-	 * Generates SQL joins fragment.
-	 * 
-	 * @param query
-	 *            the query
-	 * @param joins
-	 *            the map of joins
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@Override
-	public void generateSqlJoinsUp(CriteriaQueryImpl<?> query, Map<Joinable, String> joins) {
-		this.getFetchRoot().generateSqlJoins(query, joins);
 	}
 
 	/**
