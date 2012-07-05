@@ -81,7 +81,7 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	 */
 	@Override
 	public int compareTo(TimeElement o) {
-		return this.selfHit > o.selfHit ? -1 : o.selfHit > this.selfHit ? 1 : 0;
+		return this.key.compareTo(o.key);
 	}
 
 	/**

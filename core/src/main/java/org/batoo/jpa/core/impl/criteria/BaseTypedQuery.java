@@ -161,8 +161,8 @@ public abstract class BaseTypedQuery<X> implements TypedQuery<X>, ResultSetHandl
 	@Override
 	public List<X> getResultList() {
 		this.em.getSession().setLoadTracker();
-		try {
 
+		try {
 			int paramCount = 0;
 
 			final String sql = this.cq.getSql();
@@ -261,10 +261,6 @@ public abstract class BaseTypedQuery<X> implements TypedQuery<X>, ResultSetHandl
 			}
 
 			rowNo++;
-		}
-
-		for (final ManagedInstance<?> instance : instances.values()) {
-			session.put(instance);
 		}
 
 		return this.results;

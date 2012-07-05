@@ -630,6 +630,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		}
 
 		instances.put(instance, instance);
+		session.put(instance);
 
 		return this.handleFetches(session, row, instances, instance);
 	}
