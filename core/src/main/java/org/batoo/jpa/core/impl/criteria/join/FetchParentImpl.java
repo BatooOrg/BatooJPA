@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.criteria;
+package org.batoo.jpa.core.impl.criteria.join;
 
 import java.util.Collection;
 import java.util.List;
@@ -35,6 +35,7 @@ import javax.persistence.metamodel.Type;
 
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.apache.commons.lang.mutable.MutableInt;
+import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
@@ -163,7 +164,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		final Mapping<?, ?, ?> mapping = this.entity.getRootMapping().getMapping(attributeName);
 
 		if (mapping instanceof SingularAssociationMapping) {
-			type = (Type<Y>) ((SingularAssociationMapping<X, Y>) mapping).getType();
+			type = ((SingularAssociationMapping<X, Y>) mapping).getType();
 		}
 		else {
 			type = ((PluralAssociationMapping<X, ?, Y>) mapping).getType();
@@ -711,22 +712,35 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		ManagedInstance<?> parent, MutableInt rowNo, int jumpSize) {
 		final int leap = jumpSize;
 
-		final Map<String, Object> row = data.get(rowNo.intValue());
+		ManagedInstance<? extends X> instance;
+		Map<String, Object> row;
 
-		// if id is null then break
-		ManagedInstance<? extends X> instance = this.getInstance(session, row);
-		if (instance == null) {
-			return null;
-		}
+		while (true) {
+			row = data.get(rowNo.intValue());
 
-		// if different parent then break
-		if (!this.shouldContinue(session, parent, row)) {
-			return null;
-		}
+			// if the same row then continue
+			if ((rowNo.intValue() > 0) && row.equals(data.get(rowNo.intValue() - 1))) {
+				rowNo.increment();
+				continue;
+			}
 
-		// if we processed the same instance then break
-		if ((instances != null) && instances.contains(instance)) {
-			return null;
+			// if id is null then break
+			instance = this.getInstance(session, row);
+			if (instance == null) {
+				return null;
+			}
+
+			// if different parent then break
+			if (!this.shouldContinue(session, parent, row)) {
+				return null;
+			}
+
+			// if we processed the same instance then break
+			if ((instances != null) && instances.contains(instance)) {
+				return null;
+			}
+
+			break;
 		}
 
 		final ManagedInstance<? extends X> managedInstance = session.get(instance);

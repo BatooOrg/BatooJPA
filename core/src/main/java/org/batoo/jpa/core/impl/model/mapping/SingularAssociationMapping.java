@@ -147,7 +147,7 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 	 * 
 	 */
 	@Override
-	public EntityTypeImpl<?> getType() {
+	public EntityTypeImpl<X> getType() {
 		return this.type;
 	}
 

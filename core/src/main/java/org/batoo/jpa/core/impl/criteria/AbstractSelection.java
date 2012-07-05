@@ -24,6 +24,7 @@ import java.util.Map;
 import javax.persistence.criteria.Selection;
 
 import org.apache.commons.lang.mutable.MutableInt;
+import org.batoo.jpa.core.impl.criteria.join.Joinable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
@@ -81,7 +82,6 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	 *            the query
 	 * @param joins
 	 *            the map of joins
-	 * 
 	 * @since $version
 	 * @author hceylan
 	 */

@@ -20,7 +20,7 @@ package org.batoo.jpa.core.impl.criteria.path;
 
 import javax.persistence.criteria.Path;
 
-import org.batoo.jpa.core.impl.criteria.FetchParentImpl;
+import org.batoo.jpa.core.impl.criteria.join.FetchParentImpl;
 
 /**
  * The interface for the paths that can be parent.

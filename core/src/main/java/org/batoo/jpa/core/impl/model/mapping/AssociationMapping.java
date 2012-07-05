@@ -289,7 +289,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract EntityTypeImpl<?> getType();
+	public abstract EntityTypeImpl<Y> getType();
 
 	/**
 	 * Returns if the association should be eagerly fetched.

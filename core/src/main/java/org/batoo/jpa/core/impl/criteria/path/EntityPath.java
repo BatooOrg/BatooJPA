@@ -27,11 +27,13 @@ import javax.persistence.criteria.Path;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.FetchImpl;
-import org.batoo.jpa.core.impl.criteria.FetchParentImpl;
-import org.batoo.jpa.core.impl.criteria.Joinable;
+import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
+import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.criteria.join.FetchImpl;
+import org.batoo.jpa.core.impl.criteria.join.FetchParentImpl;
+import org.batoo.jpa.core.impl.criteria.join.Joinable;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
-import org.batoo.jpa.core.impl.model.mapping.RootMapping;
+import org.batoo.jpa.core.impl.model.mapping.ParentMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 import com.google.common.base.Joiner;
@@ -100,6 +102,16 @@ public abstract class EntityPath<Z, X> extends AbstractPath<X> implements Joinab
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
 	 * Returns the JPQL fetch joins fragment.
 	 * 
 	 * @return the JPQL fetch joins fragment
@@ -108,7 +120,7 @@ public abstract class EntityPath<Z, X> extends AbstractPath<X> implements Joinab
 	 * @author hceylan
 	 */
 	public String generateJpqlFetches() {
-		final String root = StringUtils.isNotBlank(this.getAlias()) ? this.getAlias() : this.getModel().getName();
+		final String root = StringUtils.isNotBlank(this.getAlias()) ? this.getAlias() : this.entity.getName();
 
 		return this.fetchRoot.generateJpqlFetches(root);
 	}
@@ -174,16 +186,7 @@ public abstract class EntityPath<Z, X> extends AbstractPath<X> implements Joinab
 	 * 
 	 */
 	@Override
-	protected RootMapping<X> getMapping() {
+	protected ParentMapping<X, X> getMapping() {
 		return this.entity.getRootMapping();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public EntityTypeImpl<X> getModel() {
-		return this.entity;
 	}
 }

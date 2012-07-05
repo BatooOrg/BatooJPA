@@ -175,14 +175,12 @@ public interface From<Z, X> extends Path<X>, FetchParent<Z, X> {
 	 * @param attributeName
 	 *            name of the attribute for the target of the join
 	 * @return the resulting join
-	 * @param <T>
-	 *            the source type of the join
 	 * @param <Y>
 	 *            the target type of the join
 	 * @throws IllegalArgumentException
 	 *             if attribute of the given name does not exist
 	 */
-	<T, Y> Join<T, Y> join(String attributeName);
+	<Y> Join<X, Y> join(String attributeName);
 
 	/**
 	 * Create a join to the specified attribute using the given join type.
@@ -191,30 +189,26 @@ public interface From<Z, X> extends Path<X>, FetchParent<Z, X> {
 	 *            name of the attribute for the target of the join
 	 * @param jt
 	 *            join type
-	 * @param <T>
-	 *            the source type of the join
 	 * @param <Y>
 	 *            the target type of the join
 	 * @return the resulting join
 	 * @throws IllegalArgumentException
 	 *             if attribute of the given name does not exist
 	 */
-	<T, Y> Join<T, Y> join(String attributeName, JoinType jt);
+	<Y> Join<X, Y> join(String attributeName, JoinType jt);
 
 	/**
 	 * Create an inner join to the specified Collection-valued attribute.
 	 * 
 	 * @param attributeName
 	 *            name of the attribute for the target of the join
-	 * @param <T>
-	 *            the source type of the join
 	 * @param <Y>
 	 *            the target type of the join
 	 * @return the resulting join
 	 * @throws IllegalArgumentException
 	 *             if attribute of the given name does not exist
 	 */
-	<T, Y> CollectionJoin<T, Y> joinCollection(String attributeName);
+	<Y> CollectionJoin<X, Y> joinCollection(String attributeName);
 
 	/**
 	 * Create a join to the specified Collection-valued attribute using the given join type.
@@ -223,30 +217,26 @@ public interface From<Z, X> extends Path<X>, FetchParent<Z, X> {
 	 *            name of the attribute for the target of the join
 	 * @param jt
 	 *            join type
-	 * @param <T>
-	 *            the source type of the join
 	 * @param <Y>
 	 *            the target type of the join
 	 * @return the resulting join
 	 * @throws IllegalArgumentException
 	 *             if attribute of the given name does not exist
 	 */
-	<T, Y> CollectionJoin<T, Y> joinCollection(String attributeName, JoinType jt);
+	<Y> CollectionJoin<X, Y> joinCollection(String attributeName, JoinType jt);
 
 	/**
 	 * Create an inner join to the specified List-valued attribute.
 	 * 
 	 * @param attributeName
 	 *            name of the attribute for the target of the join
-	 * @param <T>
-	 *            the source type of the join
 	 * @param <Y>
 	 *            the target type of the join
 	 * @return the resulting join
 	 * @throws IllegalArgumentException
 	 *             if attribute of the given name does not exist
 	 */
-	<T, Y> ListJoin<T, Y> joinList(String attributeName);
+	<Y> ListJoin<X, Y> joinList(String attributeName);
 
 	/**
 	 * Create a join to the specified List-valued attribute using the given join type.
@@ -256,22 +246,18 @@ public interface From<Z, X> extends Path<X>, FetchParent<Z, X> {
 	 * @param jt
 	 *            join type
 	 * @return the resulting join
-	 * @param <T>
-	 *            the source type of the join
 	 * @param <Y>
 	 *            the target type of the join
 	 * @throws IllegalArgumentException
 	 *             if attribute of the given name does not exist
 	 */
-	<T, Y> ListJoin<T, Y> joinList(String attributeName, JoinType jt);
+	<Y> ListJoin<X, Y> joinList(String attributeName, JoinType jt);
 
 	/**
 	 * Create an inner join to the specified Map-valued attribute.
 	 * 
 	 * @param attributeName
 	 *            name of the attribute for the target of the join
-	 * @param <T>
-	 *            the source type of the join
 	 * @param <K>
 	 *            the target key type of the join
 	 * @param <V>
@@ -280,7 +266,7 @@ public interface From<Z, X> extends Path<X>, FetchParent<Z, X> {
 	 * @throws IllegalArgumentException
 	 *             if attribute of the given name does not exist
 	 */
-	<T, K, V> MapJoin<T, K, V> joinMap(String attributeName);
+	<K, V> MapJoin<X, K, V> joinMap(String attributeName);
 
 	/**
 	 * Create a join to the specified Map-valued attribute using the given join type.
@@ -289,8 +275,6 @@ public interface From<Z, X> extends Path<X>, FetchParent<Z, X> {
 	 *            name of the attribute for the target of the join
 	 * @param jt
 	 *            join type
-	 * @param <T>
-	 *            the source type of the join
 	 * @param <K>
 	 *            the target key type of the join
 	 * @param <V>
@@ -299,22 +283,20 @@ public interface From<Z, X> extends Path<X>, FetchParent<Z, X> {
 	 * @throws IllegalArgumentException
 	 *             if attribute of the given name does not exist
 	 */
-	<T, K, V> MapJoin<T, K, V> joinMap(String attributeName, JoinType jt);
+	<K, V> MapJoin<X, K, V> joinMap(String attributeName, JoinType jt);
 
 	/**
 	 * Create an inner join to the specified Set-valued attribute.
 	 * 
 	 * @param attributeName
 	 *            name of the attribute for the target of the join
-	 * @param <T>
-	 *            the source type of the join
 	 * @param <Y>
 	 *            the target type of the join
 	 * @return the resulting join
 	 * @throws IllegalArgumentException
 	 *             if attribute of the given name does not exist
 	 */
-	<T, Y> SetJoin<T, Y> joinSet(String attributeName);
+	<Y> SetJoin<X, Y> joinSet(String attributeName);
 
 	/**
 	 * Create a join to the specified Set-valued attribute using the given join type.
@@ -323,13 +305,11 @@ public interface From<Z, X> extends Path<X>, FetchParent<Z, X> {
 	 *            name of the attribute for the target of the join
 	 * @param jt
 	 *            join type
-	 * @param <T>
-	 *            the source type of the join
 	 * @param <Y>
 	 *            the target type of the join
 	 * @return the resulting join
 	 * @throws IllegalArgumentException
 	 *             if attribute of the given name does not exist
 	 */
-	<T, Y> SetJoin<T, Y> joinSet(String attributeName, JoinType jt);
+	<Y> SetJoin<X, Y> joinSet(String attributeName, JoinType jt);
 }

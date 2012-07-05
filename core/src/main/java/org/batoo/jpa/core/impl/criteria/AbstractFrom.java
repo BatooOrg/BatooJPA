@@ -34,18 +34,32 @@ import javax.persistence.criteria.MapJoin;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.SetJoin;
 import javax.persistence.metamodel.CollectionAttribute;
+import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.MapAttribute;
 import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
+import javax.persistence.metamodel.Type;
 
 import org.apache.commons.lang.mutable.MutableInt;
-import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
-import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.criteria.join.AbstractJoin;
+import org.batoo.jpa.core.impl.criteria.join.CollectionJoinImpl;
+import org.batoo.jpa.core.impl.criteria.join.Joinable;
+import org.batoo.jpa.core.impl.criteria.join.ListJoinImpl;
+import org.batoo.jpa.core.impl.criteria.join.SetJoinImpl;
+import org.batoo.jpa.core.impl.criteria.join.SingularJoin;
 import org.batoo.jpa.core.impl.criteria.path.EntityPath;
+import org.batoo.jpa.core.impl.criteria.path.ParentPath;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
+import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.Mapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+
+import com.google.common.collect.Lists;
 
 /**
  * Represents a bound type, usually an entity that appears in the from clause, but may also be an embeddable belonging to an entity in the
@@ -65,8 +79,11 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements From<Z, X> {
 
 	private final EntityTypeImpl<X> entity;
+	private final List<AbstractJoin<X, ?>> joins = Lists.newArrayList();
 
 	/**
+	 * Constructor for root types
+	 * 
 	 * @param entity
 	 *            the entity
 	 * 
@@ -75,6 +92,27 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 */
 	public AbstractFrom(EntityTypeImpl<X> entity) {
 		super(entity);
+
+		this.entity = entity;
+	}
+
+	/**
+	 * Constructor for joined types
+	 * 
+	 * @param parent
+	 *            the parent
+	 * @param entity
+	 *            the joined type
+	 * @param mapping
+	 *            the join mapping
+	 * @param jointType
+	 *            the join type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public AbstractFrom(ParentPath<?, Z> parent, EntityTypeImpl<X> entity, AssociationMapping<? super Z, ?, X> mapping, JoinType jointType) {
+		super(parent, entity, mapping, jointType);
 
 		this.entity = entity;
 	}
@@ -134,16 +172,6 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	}
 
 	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
 	 * Returns the restriction based on discrimination.
 	 * 
 	 * @return the restriction based on discrimination, <code>null</code>
@@ -153,6 +181,19 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 */
 	public String generateDiscrimination() {
 		return this.getFetchRoot().generateDiscrimination();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void generateSqlJoins(CriteriaQueryImpl<?> query, Map<Joinable, String> joins) {
+		super.generateSqlJoins(query, joins);
+
+		for (final AbstractJoin<X, ?> join : this.joins) {
+			join.generateSqlJoins(query, joins);
+		}
 	}
 
 	/**
@@ -182,15 +223,6 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	public Set<Join<X, ?>> getJoins() {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public EntityTypeImpl<X> getModel() {
-		return this.entity;
 	}
 
 	/**
@@ -278,8 +310,7 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 */
 	@Override
 	public <Y> CollectionJoin<X, Y> join(CollectionAttribute<? super X, Y> collection) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.join(collection, JoinType.INNER);
 	}
 
 	/**
@@ -287,9 +318,9 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <Y> CollectionJoin<X, Y> join(CollectionAttribute<? super X, Y> collection, JoinType jt) {
-		// TODO Auto-generated method stub
-		return null;
+		return (CollectionJoin<X, Y>) this.join(collection.getName(), jt);
 	}
 
 	/**
@@ -298,8 +329,7 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 */
 	@Override
 	public <Y> ListJoin<X, Y> join(ListAttribute<? super X, Y> list) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.join(list, JoinType.INNER);
 	}
 
 	/**
@@ -307,9 +337,9 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <Y> ListJoin<X, Y> join(ListAttribute<? super X, Y> list, JoinType jt) {
-		// TODO Auto-generated method stub
-		return null;
+		return (ListJoin<X, Y>) this.join(list.getName(), jt);
 	}
 
 	/**
@@ -318,8 +348,7 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 */
 	@Override
 	public <K, V> MapJoin<X, K, V> join(MapAttribute<? super X, K, V> map) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.join(map, JoinType.INNER);
 	}
 
 	/**
@@ -327,9 +356,9 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <K, V> MapJoin<X, K, V> join(MapAttribute<? super X, K, V> map, JoinType jt) {
-		// TODO Auto-generated method stub
-		return null;
+		return (MapJoin<X, K, V>) this.join(map.getName(), jt);
 	}
 
 	/**
@@ -338,8 +367,7 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 */
 	@Override
 	public <Y> SetJoin<X, Y> join(SetAttribute<? super X, Y> set) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.join(set, JoinType.INNER);
 	}
 
 	/**
@@ -347,9 +375,9 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <Y> SetJoin<X, Y> join(SetAttribute<? super X, Y> set, JoinType jt) {
-		// TODO Auto-generated method stub
-		return null;
+		return (SetJoin<X, Y>) this.join(set.getName(), jt);
 	}
 
 	/**
@@ -358,8 +386,7 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 */
 	@Override
 	public <Y> Join<X, Y> join(SingularAttribute<? super X, Y> attribute) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.join(attribute, JoinType.INNER);
 	}
 
 	/**
@@ -368,8 +395,7 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 */
 	@Override
 	public <Y> Join<X, Y> join(SingularAttribute<? super X, Y> attribute, JoinType jt) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.join(attribute.getName(), jt);
 	}
 
 	/**
@@ -377,9 +403,8 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 * 
 	 */
 	@Override
-	public <T, Y> Join<T, Y> join(String attributeName) {
-		// TODO Auto-generated method stub
-		return null;
+	public <Y> Join<X, Y> join(String attributeName) {
+		return this.join(attributeName, JoinType.INNER);
 	}
 
 	/**
@@ -387,9 +412,46 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 * 
 	 */
 	@Override
-	public <T, Y> Join<T, Y> join(String attributeName, JoinType jt) {
-		// TODO Auto-generated method stub
-		return null;
+	@SuppressWarnings("unchecked")
+	public <Y> Join<X, Y> join(String attributeName, JoinType jt) {
+		Type<Y> type;
+
+		final Mapping<? super X, ?, ?> mapping = this.entity.getRootMapping().getChild(attributeName);
+
+		if (mapping instanceof SingularAssociationMapping) {
+			type = ((SingularAssociationMapping<X, Y>) mapping).getType();
+		}
+		else {
+			type = ((PluralAssociationMapping<X, ?, Y>) mapping).getType();
+		}
+
+		if (!(type instanceof EntityType)) {
+			throw new IllegalArgumentException("Cannot dereference attribute " + attributeName);
+		}
+
+		AbstractJoin<X, Y> join = null;
+		if (mapping instanceof SingularAssociationMapping) {
+			join = new SingularJoin<X, Y>(this, (SingularAssociationMapping<? super X, Y>) mapping, jt);
+		}
+		else if (mapping instanceof PluralAssociationMapping) {
+			final PluralAssociationMapping<? super X, ?, Y> pluralAssociationMapping = (PluralAssociationMapping<? super X, ?, Y>) mapping;
+
+			final PluralAttributeImpl<? super X, ?, Y> attribute = pluralAssociationMapping.getAttribute();
+			if (attribute instanceof SetAttribute) {
+				join = new SetJoinImpl<X, Y>(this, (PluralAssociationMapping<? super X, Set<Y>, Y>) pluralAssociationMapping, jt);
+			}
+			if (attribute instanceof ListAttribute) {
+				join = new ListJoinImpl<X, Y>(this, (PluralAssociationMapping<? super X, List<Y>, Y>) pluralAssociationMapping, jt);
+			}
+			else {
+				join = new CollectionJoinImpl<X, Y>(this, (PluralAssociationMapping<? super X, Collection<Y>, Y>) pluralAssociationMapping, jt);
+			}
+
+		}
+
+		this.joins.add(join);
+
+		return join;
 	}
 
 	/**
@@ -397,9 +459,8 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 * 
 	 */
 	@Override
-	public <T, Y> CollectionJoin<T, Y> joinCollection(String attributeName) {
-		// TODO Auto-generated method stub
-		return null;
+	public <Y> CollectionJoin<X, Y> joinCollection(String attributeName) {
+		return this.joinCollection(attributeName, JoinType.INNER);
 	}
 
 	/**
@@ -407,9 +468,9 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 * 
 	 */
 	@Override
-	public <T, Y> CollectionJoin<T, Y> joinCollection(String attributeName, JoinType jt) {
-		// TODO Auto-generated method stub
-		return null;
+	@SuppressWarnings("unchecked")
+	public <Y> CollectionJoin<X, Y> joinCollection(String attributeName, JoinType jt) {
+		return (CollectionJoin<X, Y>) this.join(attributeName, jt);
 	}
 
 	/**
@@ -417,9 +478,8 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 * 
 	 */
 	@Override
-	public <T, Y> ListJoin<T, Y> joinList(String attributeName) {
-		// TODO Auto-generated method stub
-		return null;
+	public <Y> ListJoin<X, Y> joinList(String attributeName) {
+		return this.joinList(attributeName, JoinType.INNER);
 	}
 
 	/**
@@ -427,9 +487,9 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 * 
 	 */
 	@Override
-	public <T, Y> ListJoin<T, Y> joinList(String attributeName, JoinType jt) {
-		// TODO Auto-generated method stub
-		return null;
+	@SuppressWarnings("unchecked")
+	public <Y> ListJoin<X, Y> joinList(String attributeName, JoinType jt) {
+		return (ListJoin<X, Y>) this.join(attributeName, jt);
 	}
 
 	/**
@@ -437,9 +497,8 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 * 
 	 */
 	@Override
-	public <T, K, V> MapJoin<T, K, V> joinMap(String attributeName) {
-		// TODO Auto-generated method stub
-		return null;
+	public <K, V> MapJoin<X, K, V> joinMap(String attributeName) {
+		return this.joinMap(attributeName, JoinType.INNER);
 	}
 
 	/**
@@ -447,9 +506,9 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 * 
 	 */
 	@Override
-	public <T, K, V> MapJoin<T, K, V> joinMap(String attributeName, JoinType jt) {
-		// TODO Auto-generated method stub
-		return null;
+	@SuppressWarnings("unchecked")
+	public <K, V> MapJoin<X, K, V> joinMap(String attributeName, JoinType jt) {
+		return (MapJoin<X, K, V>) this.join(attributeName, jt);
 	}
 
 	/**
@@ -457,9 +516,8 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 * 
 	 */
 	@Override
-	public <T, Y> SetJoin<T, Y> joinSet(String attributeName) {
-		// TODO Auto-generated method stub
-		return null;
+	public <Y> SetJoin<X, Y> joinSet(String attributeName) {
+		return this.joinSet(attributeName, JoinType.INNER);
 	}
 
 	/**
@@ -467,17 +525,8 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 * 
 	 */
 	@Override
-	public <T, Y> SetJoin<T, Y> joinSet(String attributeName, JoinType jt) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String toString() {
-		return this.getFetchRoot().generateJpqlFetches("");
+	@SuppressWarnings("unchecked")
+	public <Y> SetJoin<X, Y> joinSet(String attributeName, JoinType jt) {
+		return (SetJoin<X, Y>) this.join(attributeName, jt);
 	}
 }

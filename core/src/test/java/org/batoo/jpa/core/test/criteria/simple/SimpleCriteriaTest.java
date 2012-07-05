@@ -21,6 +21,7 @@ package org.batoo.jpa.core.test.criteria.simple;
 import java.util.List;
 
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.Join;
 
 import junit.framework.Assert;
 
@@ -112,8 +113,31 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 		final CriteriaQueryImpl<Address> q = cb.createQuery(Address.class);
 		final RootImpl<Person> r = q.from(Person.class);
 		q.select(r.<Address> get("addresses"));
+
 		final List<Address> resultList = this.em().createQuery(q).getResultList();
-		Assert.assertEquals(4, resultList.size());
+		Assert.assertEquals(6, resultList.size());
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testAssociationJoin() {
+		this.persist(this.person());
+		this.persist(this.person());
+		this.commit();
+
+		final CriteriaBuilderImpl cb = (CriteriaBuilderImpl) this.em().getCriteriaBuilder();
+		final CriteriaQueryImpl<Address> q = cb.createQuery(Address.class);
+		final RootImpl<Person> r = q.from(Person.class);
+		final Join<Person, Address> a = r.<Address> join("addresses");
+		// a.alias("a");
+		q.select(a);
+
+		final List<Address> resultList = this.em().createQuery(q).getResultList();
+		Assert.assertEquals(6, resultList.size());
 	}
 
 	/**
@@ -144,30 +168,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 
 		final List<Person> resultList = tq.getResultList();
 		Assert.assertEquals(3, resultList.size());
-	}
-
-	/**
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@Test
-	public void testRoot() {
-		this.persist(this.person());
-		this.persist(this.person());
-		this.commit();
-
-		this.close();
-
-		final CriteriaBuilderImpl cb = (CriteriaBuilderImpl) this.em().getCriteriaBuilder();
-		final CriteriaQueryImpl<Person> q = cb.createQuery(Person.class);
-		final RootImpl<Person> r = q.from(Person.class);
-		q.select(r);
-		r.alias("p");
-		r.fetch("addresses").fetch("country");
-
-		final List<Person> resultList = this.em().createQuery(q).getResultList();
-		Assert.assertEquals(6, resultList.size());
+		Assert.assertEquals(3, resultList.get(0).getAddresses().size());
 	}
 
 	/**
@@ -193,6 +194,59 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 
 		final List<Person> resultList = this.em().createQuery(q).getResultList();
 		Assert.assertEquals(2, resultList.size());
+		Assert.assertEquals(3, resultList.get(0).getAddresses().size());
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testRootFetch() {
+		this.persist(this.person());
+		this.persist(this.person());
+		this.commit();
+
+		this.close();
+
+		final CriteriaBuilderImpl cb = (CriteriaBuilderImpl) this.em().getCriteriaBuilder();
+		final CriteriaQueryImpl<Person> q = cb.createQuery(Person.class);
+		final RootImpl<Person> r = q.from(Person.class);
+		q.select(r);
+		r.alias("p");
+		r.fetch("addresses").fetch("country");
+		r.fetch("phones");
+
+		final List<Person> resultList = this.em().createQuery(q).getResultList();
+		Assert.assertEquals(6, resultList.size());
+		Assert.assertEquals(3, resultList.get(0).getAddresses().size());
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testRootJoin() {
+		this.persist(this.person());
+		this.persist(this.person());
+		this.commit();
+
+		this.close();
+
+		final CriteriaBuilderImpl cb = (CriteriaBuilderImpl) this.em().getCriteriaBuilder();
+		final CriteriaQueryImpl<Person> q = cb.createQuery(Person.class);
+		final RootImpl<Person> r = q.from(Person.class);
+		q.select(r);
+		r.alias("p");
+		r.fetch("addresses");
+		r.join("addresses");
+
+		final List<Person> resultList = this.em().createQuery(q).getResultList();
+		Assert.assertEquals(18, resultList.size());
+		Assert.assertEquals(3, resultList.get(0).getAddresses().size());
 	}
 
 	/**

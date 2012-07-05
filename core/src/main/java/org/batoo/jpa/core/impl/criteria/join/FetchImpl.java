@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.criteria;
+package org.batoo.jpa.core.impl.criteria.join;
 
 import java.util.List;
 import java.util.Map;
@@ -27,11 +27,11 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 /**
  * Implementation of {@link Fetch}.
@@ -61,9 +61,8 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
 	public FetchImpl(FetchParentImpl<?, Z> parent, AssociationMapping<? super Z, ?, X> mapping, JoinType joinType) {
-		super((EntityTypeImpl<X>) mapping.getType());
+		super(mapping.getType());
 
 		this.parent = parent;
 		this.mapping = mapping;
@@ -194,6 +193,10 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	 */
 	@Override
 	protected boolean shouldContinue(SessionImpl session, ManagedInstance<?> parent, Map<String, Object> row) {
+		if (parent == null) {
+			return true;
+		}
+
 		final ManagedInstance<? extends Z> instance = this.getParent().getInstance(session, row);
 
 		return parent.equals(instance);

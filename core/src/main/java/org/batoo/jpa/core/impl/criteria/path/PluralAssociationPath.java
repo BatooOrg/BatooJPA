@@ -30,6 +30,7 @@ import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 
 /**
@@ -45,7 +46,7 @@ import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
  */
 public class PluralAssociationPath<Z, X> extends EntityPath<Z, X> {
 
-	private final PluralAssociationMapping<?, ?, X> mapping;
+	private final PluralAssociationMapping<Z, ?, X> mapping;
 
 	/**
 	 * @param parent
@@ -113,6 +114,15 @@ public class PluralAssociationPath<Z, X> extends EntityPath<Z, X> {
 		}
 
 		return builder.toString();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public PluralAttributeImpl<? super Z, ?, X> getModel() {
+		return this.mapping.getAttribute();
 	}
 
 	/**

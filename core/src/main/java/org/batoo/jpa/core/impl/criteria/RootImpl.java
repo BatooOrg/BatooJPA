@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.impl.criteria;
 
 import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.EntityType;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
@@ -34,6 +35,8 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
  */
 public class RootImpl<X> extends AbstractFrom<X, X> implements Root<X> {
 
+	private final EntityTypeImpl<X> entity;
+
 	/**
 	 * @param entity
 	 *            the entity
@@ -43,6 +46,8 @@ public class RootImpl<X> extends AbstractFrom<X, X> implements Root<X> {
 	 */
 	public RootImpl(EntityTypeImpl<X> entity) {
 		super(entity);
+
+		this.entity = entity;
 	}
 
 	/**
@@ -69,9 +74,18 @@ public class RootImpl<X> extends AbstractFrom<X, X> implements Root<X> {
 	 * @author hceylan
 	 */
 	public String generateSqlFrom(CriteriaQueryImpl<?> query) {
-		final EntityTable primaryTable = this.getModel().getRootType().getPrimaryTable();
+		final EntityTable primaryTable = this.entity.getRootType().getPrimaryTable();
 
 		return primaryTable.getName() + " AS " + this.getFetchRoot().getTableAlias(query, primaryTable);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public EntityType<X> getModel() {
+		return this.entity;
 	}
 
 	/**

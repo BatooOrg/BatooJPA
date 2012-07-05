@@ -27,9 +27,9 @@ import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.Joinable;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
+import org.batoo.jpa.core.impl.criteria.join.Joinable;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;

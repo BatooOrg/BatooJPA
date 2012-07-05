@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.criteria;
+package org.batoo.jpa.core.impl.criteria.join;
 
 /**
  * Interface for joinable types.

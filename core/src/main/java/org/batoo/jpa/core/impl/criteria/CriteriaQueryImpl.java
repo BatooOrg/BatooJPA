@@ -38,6 +38,7 @@ import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.criteria.join.Joinable;
 import org.batoo.jpa.core.impl.criteria.path.EntityPath;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.util.BatooUtils;
@@ -164,8 +165,6 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 		CriteriaQueryImpl.LOG.debug("Preparing SQL for {0}", CriteriaQueryImpl.LOG.lazyBoxed(this));
 
 		final Map<Joinable, String> joins = Maps.newLinkedHashMap();
-
-		// this.selection.generateSqlJoinsUp(this, joins);
 
 		// generate the select chunk
 		final StringBuilder select = new StringBuilder();
