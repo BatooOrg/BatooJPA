@@ -26,7 +26,6 @@ import javax.persistence.criteria.ListJoin;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.metamodel.ListAttribute;
 
-import org.batoo.jpa.core.impl.criteria.AbstractFrom;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 
 /**

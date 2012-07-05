@@ -18,13 +18,14 @@
  */
 package org.batoo.jpa.core.impl.criteria;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.criteria.Selection;
 
-import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
@@ -123,16 +124,16 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	 * 
 	 * @param session
 	 *            the session
-	 * @param data
-	 *            the resultset data
-	 * @param rowNo
-	 *            the row no
+	 * @param row
+	 *            the row
+	 * @param instances
+	 *            the set of instances processed
 	 * @return the managed instance
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract List<X> handle(SessionImpl session, List<Map<String, Object>> data, MutableInt rowNo);
+	public abstract X handle(SessionImpl session, Map<String, Object> row, HashMap<ManagedInstance<?>, ManagedInstance<?>> instances);
 
 	/**
 	 * {@inheritDoc}

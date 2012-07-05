@@ -23,7 +23,6 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 
-import org.batoo.jpa.core.impl.criteria.AbstractFrom;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 

@@ -18,11 +18,11 @@
  */
 package org.batoo.jpa.core.impl.criteria.expression;
 
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
@@ -137,7 +137,7 @@ public class CompoundExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public List<Boolean> handle(SessionImpl session, List<Map<String, Object>> data, MutableInt rowNo) {
+	public Boolean handle(SessionImpl session, Map<String, Object> row, HashMap<ManagedInstance<?>, ManagedInstance<?>> instances) {
 		// TODO Auto-generated method stub
 		return null;
 	}

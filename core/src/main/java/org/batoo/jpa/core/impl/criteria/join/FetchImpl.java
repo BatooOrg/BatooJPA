@@ -19,7 +19,6 @@
 package org.batoo.jpa.core.impl.criteria.join;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Fetch;
@@ -28,8 +27,6 @@ import javax.persistence.criteria.Predicate;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 
@@ -185,21 +182,6 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	public Fetch<Z, X> on(Predicate... restrictions) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	protected boolean shouldContinue(SessionImpl session, ManagedInstance<?> parent, Map<String, Object> row) {
-		if (parent == null) {
-			return true;
-		}
-
-		final ManagedInstance<? extends Z> instance = this.getParent().getInstance(session, row);
-
-		return parent.equals(instance);
 	}
 
 	/**

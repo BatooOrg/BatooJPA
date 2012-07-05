@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,9 @@ import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -243,10 +246,25 @@ public abstract class BaseTypedQuery<X> implements TypedQuery<X>, ResultSetHandl
 			this.dumpResultSet();
 		}
 
+		final HashMap<ManagedInstance<?>, ManagedInstance<?>> instances = Maps.newHashMap();
+
+		final SessionImpl session = this.em.getSession();
+
 		// process the resultset
-		final MutableInt rowNo = new MutableInt(0);
-		while (rowNo.intValue() < this.data.size()) {
-			this.results.addAll(this.selection.handle(this.em.getSession(), this.data, rowNo));
+		int rowNo = 0;
+		while (rowNo < this.data.size()) {
+			final Map<String, Object> row = this.data.get(rowNo);
+
+			final X instance = this.selection.handle(session, row, instances);
+			if (!this.cq.isDistinct() || !this.results.contains(instance)) {
+				this.results.add(instance);
+			}
+
+			rowNo++;
+		}
+
+		for (final ManagedInstance<?> instance : instances.values()) {
+			session.put(instance);
 		}
 
 		return this.results;

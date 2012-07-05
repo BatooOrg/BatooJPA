@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.criteria;
+package org.batoo.jpa.core.impl.criteria.join;
 
 import java.util.Collection;
 import java.util.List;
@@ -42,16 +42,9 @@ import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.Type;
 
-import org.apache.commons.lang.mutable.MutableInt;
-import org.batoo.jpa.core.impl.criteria.join.AbstractJoin;
-import org.batoo.jpa.core.impl.criteria.join.CollectionJoinImpl;
-import org.batoo.jpa.core.impl.criteria.join.Joinable;
-import org.batoo.jpa.core.impl.criteria.join.ListJoinImpl;
-import org.batoo.jpa.core.impl.criteria.join.SetJoinImpl;
-import org.batoo.jpa.core.impl.criteria.join.SingularJoin;
+import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.path.EntityPath;
 import org.batoo.jpa.core.impl.criteria.path.ParentPath;
-import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
@@ -223,15 +216,6 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	public Set<Join<X, ?>> getJoins() {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public List<X> handle(SessionImpl session, List<Map<String, Object>> data, MutableInt rowNo) {
-		return this.getFetchRoot().handle(session, data, rowNo, 1);
 	}
 
 	/**

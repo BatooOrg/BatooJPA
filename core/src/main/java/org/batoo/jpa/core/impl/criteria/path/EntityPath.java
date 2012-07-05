@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.criteria.path;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +33,8 @@ import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.join.FetchImpl;
 import org.batoo.jpa.core.impl.criteria.join.FetchParentImpl;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.ParentMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
@@ -188,5 +191,14 @@ public abstract class EntityPath<Z, X> extends AbstractPath<X> implements Joinab
 	@Override
 	protected ParentMapping<X, X> getMapping() {
 		return this.entity.getRootMapping();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public X handle(SessionImpl session, Map<String, Object> row, HashMap<ManagedInstance<?>, ManagedInstance<?>> instances) {
+		return this.fetchRoot.handle(session, row, instances);
 	}
 }

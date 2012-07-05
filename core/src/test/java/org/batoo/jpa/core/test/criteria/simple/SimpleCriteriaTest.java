@@ -109,6 +109,8 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 		this.persist(this.person());
 		this.commit();
 
+		this.close();
+
 		final CriteriaBuilderImpl cb = (CriteriaBuilderImpl) this.em().getCriteriaBuilder();
 		final CriteriaQueryImpl<Address> q = cb.createQuery(Address.class);
 		final RootImpl<Person> r = q.from(Person.class);
@@ -128,6 +130,8 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 		this.persist(this.person());
 		this.persist(this.person());
 		this.commit();
+
+		this.close();
 
 		final CriteriaBuilderImpl cb = (CriteriaBuilderImpl) this.em().getCriteriaBuilder();
 		final CriteriaQueryImpl<Address> q = cb.createQuery(Address.class);
@@ -150,6 +154,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 		this.persist(this.person());
 		this.persist(this.person());
 		this.commit();
+		this.close();
 
 		final CriteriaBuilderImpl cb = (CriteriaBuilderImpl) this.em().getCriteriaBuilder();
 		final CriteriaQueryImpl<Person> q = cb.createQuery(Person.class);
@@ -219,7 +224,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 		r.fetch("phones");
 
 		final List<Person> resultList = this.em().createQuery(q).getResultList();
-		Assert.assertEquals(6, resultList.size());
+		Assert.assertEquals(12, resultList.size());
 		Assert.assertEquals(3, resultList.get(0).getAddresses().size());
 	}
 
