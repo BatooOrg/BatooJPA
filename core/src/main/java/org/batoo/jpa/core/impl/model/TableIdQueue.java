@@ -44,6 +44,8 @@ public class TableIdQueue extends IdQueue {
 
 	private Integer nextId;
 
+	private final DataSourceImpl datasource;
+
 	/**
 	 * @param jdbcAdaptor
 	 *            the JDBC adaptor
@@ -58,8 +60,9 @@ public class TableIdQueue extends IdQueue {
 	 * @author hceylan
 	 */
 	public TableIdQueue(JdbcAdaptor jdbcAdaptor, DataSourceImpl datasource, ExecutorService idExecuter, TableGenerator generator) {
-		super(jdbcAdaptor, datasource, idExecuter, generator.getPkColumnValue(), generator.getAllocationSize());
+		super(idExecuter, generator.getPkColumnValue(), generator.getAllocationSize());
 
+		this.datasource = datasource;
 		this.generator = generator;
 	}
 

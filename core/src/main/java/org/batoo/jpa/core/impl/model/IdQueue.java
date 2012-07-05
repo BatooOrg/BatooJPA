@@ -24,8 +24,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
-import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
-import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 
 /**
  * 
@@ -51,23 +49,11 @@ public abstract class IdQueue extends LinkedBlockingQueue<Integer> {
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(IdQueue.class);
 
-	@SuppressWarnings("javadoc")
-	protected final JdbcAdaptor jdbcAdaptor;
-	@SuppressWarnings("javadoc")
-	protected final DataSourceImpl datasource;
-	@SuppressWarnings("javadoc")
-	protected final String name;
+	private final String name;
 	private final int allocationSize;
-
 	private final int topupSize;
 
 	/**
-	 * /**
-	 * 
-	 * @param jdbcAdaptor
-	 *            the jdbc adaptor
-	 * @param datasource
-	 *            the datasource to use
 	 * @param idExecuter
 	 *            the executor service to submit refill tasks
 	 * @param name
@@ -78,11 +64,9 @@ public abstract class IdQueue extends LinkedBlockingQueue<Integer> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public IdQueue(JdbcAdaptor jdbcAdaptor, DataSourceImpl datasource, ExecutorService idExecuter, String name, int allocationSize) {
+	public IdQueue(ExecutorService idExecuter, String name, int allocationSize) {
 		super();
 
-		this.jdbcAdaptor = jdbcAdaptor;
-		this.datasource = datasource;
 		this.name = name;
 		this.allocationSize = allocationSize;
 		this.topupSize = allocationSize / 2;
@@ -100,35 +84,39 @@ public abstract class IdQueue extends LinkedBlockingQueue<Integer> {
 	 * @author hceylan
 	 */
 	protected void doTopUp(Runnable runnable) {
-		while (this.size() <= (this.topupSize)) {
+		while (true) {
 			if (Thread.currentThread().isInterrupted()) {
 				return;
 			}
 
-			IdQueue.LOG.debug("Ids will be fetched for {0} from the database...", this.name);
+			if (this.size() <= (this.topupSize)) {
+				IdQueue.LOG.debug("Ids will be fetched for {0} from the database...", this.name);
+
+				try {
+					final int nextSequence = this.getNextId();
+					for (int i = 0; i < this.allocationSize; i++) {
+						this.put(nextSequence + i);
+					}
+				}
+				catch (final InterruptedException e) {
+					return;
+				}
+				catch (final Throwable e) {
+					if (Thread.currentThread().isInterrupted()) {
+						return;
+					}
+
+					IdQueue.LOG.fatal(e, "Cannot get next id from the database!");
+				}
+			}
 
 			try {
-				final int nextSequence = this.getNextId();
-				for (int i = 0; i < this.allocationSize; i++) {
-					this.put(nextSequence + i);
-				}
+				Thread.sleep(1);
 			}
 			catch (final InterruptedException e) {
 				return;
 			}
-			catch (final Throwable e) {
-				if (Thread.currentThread().isInterrupted()) {
-					return;
-				}
-
-				IdQueue.LOG.fatal(e, "Cannot get next id from the database!");
-			}
 		}
-
-		try {
-			Thread.sleep(1);
-		}
-		catch (final InterruptedException e) {}
 	}
 
 	/**

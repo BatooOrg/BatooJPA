@@ -41,10 +41,28 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	private int selfHit;
 	private long timeWithoutDerby;
 
+	/**
+	 * @param key
+	 *            the key
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
 	public TimeElement(String key) {
 		this.key = key;
 	}
 
+	/**
+	 * @param used
+	 *            the time used
+	 * @param self
+	 *            time used by self
+	 * @param inDerby
+	 *            time is in derby stack
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
 	public void addTime(long used, boolean self, boolean inDerby) {
 		this.hits++;
 		this.time += used / 1000;
@@ -66,6 +84,16 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 		return this.selfHit > o.selfHit ? -1 : o.selfHit > this.selfHit ? 1 : 0;
 	}
 
+	/**
+	 * @param rowNo
+	 *            the row no
+	 * @param depth
+	 *            the depth
+	 * @return the row no
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
 	public int dump(int rowNo, int depth) {
 		if ((depth > 0) && (this.timeWithoutDerby > 10000)) {
 			rowNo++;
@@ -91,6 +119,7 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 
 	/**
 	 * @param rowNo
+	 *            the row no
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -118,7 +147,7 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	}
 
 	/**
-	 * @return
+	 * @return self
 	 * 
 	 * @since $version
 	 * @author hceylan

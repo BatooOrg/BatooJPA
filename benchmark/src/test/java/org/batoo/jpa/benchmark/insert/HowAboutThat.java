@@ -28,37 +28,38 @@ import com.google.common.collect.Lists;
  * @author hceylan
  * @since $version
  */
+@SuppressWarnings("javadoc")
 public class HowAboutThat {
 	private static final int COUNT = 10000;
 
 	public static void main(String[] args) {
 
 		final ArrayList<Integer> list = Lists.newArrayList();
-		for (int i = 0; i < COUNT; i++) {
+		for (int i = 0; i < HowAboutThat.COUNT; i++) {
 			list.add(i);
 		}
 
 		long time = System.currentTimeMillis();
 
-		for (int i = 0; i < COUNT; i++) {
+		for (int i = 0; i < HowAboutThat.COUNT; i++) {
 			HowAboutThat.test1(list);
 		}
 		System.out.println(System.currentTimeMillis() - time);
 		time = System.currentTimeMillis();
 
-		for (int i = 0; i < COUNT; i++) {
+		for (int i = 0; i < HowAboutThat.COUNT; i++) {
 			HowAboutThat.test2(list);
 		}
 		System.out.println(System.currentTimeMillis() - time);
 		time = System.currentTimeMillis();
 
-		for (int i = 0; i < COUNT; i++) {
+		for (int i = 0; i < HowAboutThat.COUNT; i++) {
 			HowAboutThat.test3(list);
 		}
 		System.out.println(System.currentTimeMillis() - time);
 		time = System.currentTimeMillis();
 
-		for (int i = 0; i < COUNT; i++) {
+		for (int i = 0; i < HowAboutThat.COUNT; i++) {
 			HowAboutThat.test4(list);
 		}
 		System.out.println(System.currentTimeMillis() - time);

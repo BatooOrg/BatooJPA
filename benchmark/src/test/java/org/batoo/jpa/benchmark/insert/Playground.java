@@ -53,9 +53,17 @@ public class Playground {
 
 	private static final String PU_NAME = "insert";
 
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
 	@BeforeClass
-	public static void boot() throws SQLException, InterruptedException {
-		DriverManager.getConnection("jdbc:derby:memory:testDB;create=true");
+	public static void boot() {
+		try {
+			DriverManager.getConnection("jdbc:derby:memory:testDB;create=true");
+		}
+		catch (final SQLException e) {}
 	}
 
 	private Country country;
@@ -65,6 +73,12 @@ public class Playground {
 	private boolean running;
 	private long oldTime;
 
+	/**
+	 * @param id
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
 	protected void _measure(final long id) {
 		this.element = new TimeElement("");
 
@@ -90,13 +104,18 @@ public class Playground {
 		pool.shutdownNow();
 	}
 
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
 	@After
 	public void _measureAfter() {
 		this.running = false;
 
 		this.element.dump(0, 0);
 
-		System.out.println("\n\n\n");
+		System.out.println("\n");
 
 		int rowNo = 0;
 		final ArrayList<TimeElement> elements = Lists.newArrayList(this.elements.values());
@@ -112,8 +131,15 @@ public class Playground {
 			rowNo++;
 			element.dump2(rowNo);
 		}
+
+		System.out.println("\n");
 	}
 
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
 	@Before
 	public void _measureBefore() {
 		final long id = Thread.currentThread().getId();
@@ -219,8 +245,13 @@ public class Playground {
 		this.doTest(Type.BATOO);
 	}
 
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
 	@Test
-	public void doBatoo() throws InterruptedException {
+	public void doBatoo() {
 		this.dobatoo();
 	}
 
@@ -233,6 +264,11 @@ public class Playground {
 		}
 	}
 
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
 	@Test
 	public void dohibernate() {
 		this.doTest(Type.HIBERNATE);
@@ -262,11 +298,10 @@ public class Playground {
 	private void doTest(Type type) {
 		final ClassLoader old = Thread.currentThread().getContextClassLoader();
 		try {
-			Thread.currentThread().setContextClassLoader(new BenchmarkClassLoader(old, type, PU_NAME));
+			Thread.currentThread().setContextClassLoader(new BenchmarkClassLoader(old, type, Playground.PU_NAME));
 			System.currentTimeMillis();
 
-			final EntityManagerFactory emf = Persistence.createEntityManagerFactory(PU_NAME);
-			// LOG.info("{0} - deploy {1}", type, System.currentTimeMillis() - start);
+			final EntityManagerFactory emf = Persistence.createEntityManagerFactory(Playground.PU_NAME);
 
 			System.currentTimeMillis();
 

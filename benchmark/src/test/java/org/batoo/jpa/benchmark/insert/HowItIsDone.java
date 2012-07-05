@@ -27,7 +27,6 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
 import org.batoo.jpa.benchmark.insert.BenchmarkClassLoader.Type;
-import org.batoo.jpa.core.BLogger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -38,13 +37,19 @@ import org.junit.Test;
  */
 public class HowItIsDone {
 
-	private static final BLogger LOG = BLogger.getLogger(HowItIsDone.class);
-
 	private static final String PU_NAME = "insert";
 
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
 	@BeforeClass
-	public static void boot() throws SQLException, InterruptedException {
-		DriverManager.getConnection("jdbc:derby:memory:testDB;create=true");
+	public static void boot() {
+		try {
+			DriverManager.getConnection("jdbc:derby:memory:testDB;create=true");
+		}
+		catch (final SQLException e) {}
 	}
 
 	private Country country;
@@ -79,13 +84,19 @@ public class HowItIsDone {
 		return person;
 	}
 
+	/**
+	 * The actual test.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
 	@Test
 	public void doTest() {
 		final ClassLoader old = Thread.currentThread().getContextClassLoader();
 		try {
-			Thread.currentThread().setContextClassLoader(new BenchmarkClassLoader(old, Type.HIBERNATE, PU_NAME));
+			Thread.currentThread().setContextClassLoader(new BenchmarkClassLoader(old, Type.HIBERNATE, HowItIsDone.PU_NAME));
 
-			Persistence.createEntityManagerFactory(PU_NAME);
+			Persistence.createEntityManagerFactory(HowItIsDone.PU_NAME);
 
 			this.testImpl();
 		}
@@ -95,7 +106,7 @@ public class HowItIsDone {
 	}
 
 	private void testImpl() {
-		final EntityManagerFactory emf = Persistence.createEntityManagerFactory(PU_NAME);
+		final EntityManagerFactory emf = Persistence.createEntityManagerFactory(HowItIsDone.PU_NAME);
 
 		EntityManager em = emf.createEntityManager();
 

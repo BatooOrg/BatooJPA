@@ -32,9 +32,21 @@ import java.util.Locale;
  */
 public class BenchmarkClassLoader extends ClassLoader {
 
+	/**
+	 * Benchmark type.
+	 * 
+	 * @author hceylan
+	 * @since $version
+	 */
 	public enum Type {
+		/**
+		 * Batoo
+		 */
 		BATOO,
 
+		/**
+		 * Hibernate
+		 */
 		HIBERNATE
 	}
 
@@ -43,6 +55,11 @@ public class BenchmarkClassLoader extends ClassLoader {
 
 	/**
 	 * @param parent
+	 *            the parent class loader
+	 * @param type
+	 *            the type
+	 * @param xml
+	 *            the xml
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -52,6 +69,19 @@ public class BenchmarkClassLoader extends ClassLoader {
 
 		this.type = type;
 		this.xml = xml;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public URL getResource(String name) {
+		if ("META-INF/persistence.xml".equals(name)) {
+			return super.getResource(this.type.name().toLowerCase(Locale.ENGLISH) + "-" + this.xml + ".xml");
+		}
+
+		return super.getResource(name);
 	}
 
 	/**

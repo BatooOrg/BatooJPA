@@ -33,6 +33,9 @@ import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 public class SequenceQueue extends IdQueue {
 
 	private static final long serialVersionUID = 1L;
+	private final JdbcAdaptor jdbcAdaptor;
+	private final DataSourceImpl datasource;
+	private final String sequenceName;
 
 	/**
 	 * @param jdbcAdaptor
@@ -50,7 +53,11 @@ public class SequenceQueue extends IdQueue {
 	 * @author hceylan
 	 */
 	public SequenceQueue(JdbcAdaptor jdbcAdaptor, DataSourceImpl datasource, ExecutorService idExecuter, String sequenceName, int allocationSize) {
-		super(jdbcAdaptor, datasource, idExecuter, sequenceName, allocationSize);
+		super(idExecuter, sequenceName, allocationSize);
+
+		this.jdbcAdaptor = jdbcAdaptor;
+		this.datasource = datasource;
+		this.sequenceName = sequenceName;
 	}
 
 	/**
@@ -59,6 +66,6 @@ public class SequenceQueue extends IdQueue {
 	 */
 	@Override
 	protected Integer getNextId() throws SQLException {
-		return this.jdbcAdaptor.getNextSequence(this.datasource, this.name);
+		return this.jdbcAdaptor.getNextSequence(this.datasource, this.sequenceName);
 	}
 }
