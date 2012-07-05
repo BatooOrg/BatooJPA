@@ -18,9 +18,9 @@
  */
 package org.batoo.jpa.core.pool;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 
@@ -48,7 +48,7 @@ public class GenericKeyedPool<K, V> implements KeyedObjectPool<K, V> {
 	private static final int MAX_SIZE = 15;
 
 	private final KeyedPoolableObjectFactory<K, V> factory;
-	private final Map<K, LinkedList<V>> poolMap;
+	private final HashMap<K, LinkedList<V>> poolMap = Maps.newHashMap();
 
 	/**
 	 * @param factory
@@ -61,7 +61,6 @@ public class GenericKeyedPool<K, V> implements KeyedObjectPool<K, V> {
 		super();
 
 		this.factory = factory;
-		this.poolMap = Maps.newConcurrentMap();
 	}
 
 	/**
@@ -78,11 +77,15 @@ public class GenericKeyedPool<K, V> implements KeyedObjectPool<K, V> {
 	 * 
 	 */
 	@Override
-	public synchronized V borrowObject(K key) throws Exception, NoSuchElementException, IllegalStateException {
+	public V borrowObject(K key) throws Exception, NoSuchElementException, IllegalStateException {
 		final LinkedList<V> pool = this.getPool(key);
 
-		while (pool.size() <= GenericKeyedPool.MIN_SIZE) {
-			pool.addLast(this.factory.makeObject(key));
+		if (pool.size() <= GenericKeyedPool.MIN_SIZE) {
+			synchronized (this) {
+				while (pool.size() <= GenericKeyedPool.MIN_SIZE) {
+					pool.addLast(this.factory.makeObject(key));
+				}
+			}
 		}
 
 		return pool.pollFirst();
@@ -158,14 +161,21 @@ public class GenericKeyedPool<K, V> implements KeyedObjectPool<K, V> {
 	}
 
 	private LinkedList<V> getPool(K key) {
-		if (this.poolMap.containsKey(key)) {
-			return this.poolMap.get(key);
+		LinkedList<V> pool = this.poolMap.get(key);
+		if (pool != null) {
+			return pool;
 		}
 
-		final LinkedList<V> pool = new LinkedList<V>();
-		this.poolMap.put(key, pool);
+		synchronized (this) {
+			pool = this.poolMap.get(key);
+			if (pool != null) {
+				return pool;
+			}
 
-		return pool;
+			this.poolMap.put(key, pool = new LinkedList<V>());
+
+			return pool;
+		}
 	}
 
 	/**

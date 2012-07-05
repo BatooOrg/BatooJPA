@@ -295,7 +295,8 @@ public abstract class BaseTypedQuery<X> implements TypedQuery<X>, ResultSetHandl
 	public void storeData(ResultSet rs) throws SQLException {
 		final HashMap<String, Object> data = Maps.newHashMap();
 
-		for (int i = 0; i < this.md.getColumnCount(); i++) {
+		int columnCount = this.md.getColumnCount();
+		for (int i = 0; i < columnCount; i++) {
 			final Object value = rs.getObject(i + 1);
 			data.put(this.md.getColumnName(i + 1), value);
 		}

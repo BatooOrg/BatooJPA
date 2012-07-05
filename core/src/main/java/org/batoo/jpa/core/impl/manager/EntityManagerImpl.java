@@ -148,7 +148,6 @@ public class EntityManagerImpl implements EntityManager {
 			EntityManagerImpl.LOG.warn("Entity manager closed with an active transaction. Updated persistent types will become stale...");
 		}
 
-		this.session.clear();
 		try {
 			if (this.connection != null) {
 				this.connection.close();

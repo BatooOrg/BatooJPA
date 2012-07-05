@@ -71,6 +71,8 @@ public class ConnectionImpl implements Connection {
 
 	private final GenericKeyedPool<String, PreparedStatementImpl> preparedStatementPool;
 
+	private boolean debug;
+
 	/**
 	 * @param connection
 	 *            the connection
@@ -129,6 +131,9 @@ public class ConnectionImpl implements Connection {
 				throw new SQLException(e);
 			}
 		}
+		else {
+			this.close0();
+		}
 	}
 
 	/* package */void close0() throws SQLException {
@@ -168,7 +173,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public void commit() throws SQLException {
-		if (!ConnectionImpl.LOG.isDebugEnabled()) {
+		if (!this.debug) {
 			this.connection.commit();
 
 			return;
@@ -407,7 +412,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public boolean isReadOnly() throws SQLException {
-		return this.isReadOnly();
+		return this.connection.isReadOnly();
 	}
 
 	/**
@@ -416,7 +421,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public boolean isValid(int timeout) throws SQLException {
-		return this.isValid(timeout);
+		return this.connection.isValid(timeout);
 	}
 
 	/**
@@ -425,7 +430,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public boolean isWrapperFor(Class<?> iface) throws SQLException {
-		return this.isWrapperFor(iface);
+		return this.connection.isWrapperFor(iface);
 	}
 
 	/**
@@ -434,7 +439,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public String nativeSQL(String sql) throws SQLException {
-		return this.nativeSQL(sql);
+		return this.connection.nativeSQL(sql);
 	}
 
 	/**
@@ -473,19 +478,20 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public PreparedStatement prepareStatement(String sql) throws SQLException {
-		if (this.preparedStatementPool == null) {
-			return this.prepareStatement0(sql);
-		}
-		try {
-			return this.preparedStatementPool.borrowObject(sql);
-		}
-		catch (final Exception e) {
-			if (e instanceof SQLException) {
-				throw (SQLException) e;
+		if (this.preparedStatementPool != null) {
+			try {
+				return this.preparedStatementPool.borrowObject(sql).reset();
 			}
+			catch (final Exception e) {
+				if (e instanceof SQLException) {
+					throw (SQLException) e;
+				}
 
-			throw new SQLException(e);
+				throw new SQLException(e);
+			}
 		}
+
+		return this.prepareStatement0(sql);
 	}
 
 	/**
@@ -575,15 +581,27 @@ public class ConnectionImpl implements Connection {
 	}
 
 	/**
+	 * Resets the connection
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void reset() {
+		this.debug = ConnectionImpl.LOG.isDebugEnabled();
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
 	@Override
 	public void rollback() throws SQLException {
-		if (!ConnectionImpl.LOG.isDebugEnabled()) {
+		if (!this.debug) {
 			if (this.connection != null) {
 				this.connection.rollback();
 			}
+
+			return;
 		}
 
 		final long callNo = ++this.callNo;
@@ -624,7 +642,7 @@ public class ConnectionImpl implements Connection {
 	 */
 	@Override
 	public void setAutoCommit(boolean autoCommit) throws SQLException {
-		if (!ConnectionImpl.LOG.isDebugEnabled()) {
+		if (!this.debug) {
 			this.connection.setAutoCommit(autoCommit);
 
 			return;

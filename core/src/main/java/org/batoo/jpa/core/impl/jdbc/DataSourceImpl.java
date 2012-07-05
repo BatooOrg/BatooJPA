@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.pool.ObjectPool;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.BJPASettings;
@@ -50,7 +49,7 @@ public class DataSourceImpl implements DataSource {
 	private final String jdbcUser;
 	private final String jdbcPassword;
 
-	private final ObjectPool<ConnectionImpl> pool;
+	private final GenericPool<ConnectionImpl> pool;
 
 	private PrintWriter printer;
 	private int loginTimeout;
@@ -114,11 +113,11 @@ public class DataSourceImpl implements DataSource {
 		}
 
 		try {
-			if (this.pool == null) {
-				return this.getConnection0();
+			if (this.pool != null) {
+				return this.pool.borrowObject();
 			}
 
-			return this.pool.borrowObject();
+			return this.getConnection0();
 		}
 		catch (final Exception e) {
 			if (e instanceof SQLException) {

@@ -56,6 +56,15 @@ public class ConnectionFactory extends BasePoolableObjectFactory<ConnectionImpl>
 	 * 
 	 */
 	@Override
+	public void activateObject(ConnectionImpl obj) throws Exception {
+		obj.reset();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public void destroyObject(ConnectionImpl obj) throws Exception {
 		obj.close0();
 	}

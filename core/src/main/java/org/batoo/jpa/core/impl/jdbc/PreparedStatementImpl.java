@@ -75,6 +75,8 @@ public class PreparedStatementImpl implements PreparedStatement {
 	private final GenericKeyedPool<String, PreparedStatementImpl> pool;
 	private ParameterMetaData parameterMetaData;
 
+	private boolean debug;
+
 	/**
 	 * @param connection
 	 *            the connection
@@ -328,7 +330,7 @@ public class PreparedStatementImpl implements PreparedStatement {
 	 */
 	@Override
 	public int executeUpdate() throws SQLException {
-		if (!PreparedStatementImpl.LOG.isDebugEnabled()) {
+		if (!this.debug) {
 			return this.statement.executeUpdate();
 		}
 
@@ -614,6 +616,20 @@ public class PreparedStatementImpl implements PreparedStatement {
 	public boolean isWrapperFor(Class<?> iface) throws SQLException {
 		this.throwNotImplemented();
 		return false;
+	}
+
+	/**
+	 * Resets the prepared statement and returns itself
+	 * 
+	 * @return self
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public PreparedStatement reset() {
+		this.debug = PreparedStatementImpl.LOG.isDebugEnabled();
+
+		return this;
 	}
 
 	/**
@@ -1002,7 +1018,7 @@ public class PreparedStatementImpl implements PreparedStatement {
 	 */
 	@Override
 	public void setNull(int parameterIndex, int sqlType) throws SQLException {
-		if (PreparedStatementImpl.LOG.isDebugEnabled()) {
+		if (this.debug) {
 			this.parameters[parameterIndex - 1] = null;
 		}
 
@@ -1024,7 +1040,7 @@ public class PreparedStatementImpl implements PreparedStatement {
 	 */
 	@Override
 	public void setObject(int parameterIndex, Object x) throws SQLException {
-		if (PreparedStatementImpl.LOG.isDebugEnabled()) {
+		if (this.debug) {
 			this.parameters[parameterIndex - 1] = x;
 		}
 
@@ -1194,5 +1210,4 @@ public class PreparedStatementImpl implements PreparedStatement {
 		this.throwNotImplemented();
 		return null;
 	}
-
 }
