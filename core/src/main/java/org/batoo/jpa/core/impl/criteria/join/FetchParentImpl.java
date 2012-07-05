@@ -587,7 +587,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	@SuppressWarnings("unchecked")
 	public ManagedInstance<? extends X> handleFetch(SessionImpl session, Map<String, Object> row, HashMap<ManagedInstance<?>, ManagedInstance<?>> instances) {
 		// if id is null then break
-		final ManagedInstance<? extends X> instance = this.getInstance(session, row);
+		ManagedInstance<? extends X> instance = this.getInstance(session, row);
 		if (instance == null) {
 			return null;
 		}
@@ -604,6 +604,9 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 				if (((EnhancedInstance) managedInstance.getInstance()).__enhanced__$$__isInitialized()) {
 					return managedInstance;
 				}
+				else {
+					instance = managedInstance;
+				}
 			}
 			else {
 				return managedInstance;
@@ -619,6 +622,11 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		for (final SingularAssociationMapping<?, ?> mapping : this.joins) {
 			final Object child = this.getInstance(session, mapping, row);
 			mapping.set(instance, child);
+		}
+
+		for (final FetchImpl<X, ?> fetch : this.fetches) {
+			final AssociationMapping<? super X, ?, ?> mapping = fetch.getMapping();
+			instance.setAssociationLoaded(mapping);
 		}
 
 		instances.put(instance, instance);

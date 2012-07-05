@@ -293,7 +293,7 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 * 
 	 */
 	@Override
-	public <Y> CollectionJoin<X, Y> join(CollectionAttribute<? super X, Y> collection) {
+	public <Y> CollectionJoinImpl<X, Y> join(CollectionAttribute<? super X, Y> collection) {
 		return this.join(collection, JoinType.INNER);
 	}
 
@@ -303,8 +303,8 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public <Y> CollectionJoin<X, Y> join(CollectionAttribute<? super X, Y> collection, JoinType jt) {
-		return (CollectionJoin<X, Y>) this.join(collection.getName(), jt);
+	public <Y> CollectionJoinImpl<X, Y> join(CollectionAttribute<? super X, Y> collection, JoinType jt) {
+		return (CollectionJoinImpl<X, Y>) this.join(collection.getName(), jt);
 	}
 
 	/**
@@ -312,7 +312,7 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 * 
 	 */
 	@Override
-	public <Y> ListJoin<X, Y> join(ListAttribute<? super X, Y> list) {
+	public <Y> ListJoinImpl<X, Y> join(ListAttribute<? super X, Y> list) {
 		return this.join(list, JoinType.INNER);
 	}
 
@@ -322,8 +322,8 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public <Y> ListJoin<X, Y> join(ListAttribute<? super X, Y> list, JoinType jt) {
-		return (ListJoin<X, Y>) this.join(list.getName(), jt);
+	public <Y> ListJoinImpl<X, Y> join(ListAttribute<? super X, Y> list, JoinType jt) {
+		return (ListJoinImpl<X, Y>) this.join(list.getName(), jt);
 	}
 
 	/**
@@ -350,7 +350,7 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 * 
 	 */
 	@Override
-	public <Y> SetJoin<X, Y> join(SetAttribute<? super X, Y> set) {
+	public <Y> SetJoinImpl<X, Y> join(SetAttribute<? super X, Y> set) {
 		return this.join(set, JoinType.INNER);
 	}
 
@@ -360,8 +360,8 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public <Y> SetJoin<X, Y> join(SetAttribute<? super X, Y> set, JoinType jt) {
-		return (SetJoin<X, Y>) this.join(set.getName(), jt);
+	public <Y> SetJoinImpl<X, Y> join(SetAttribute<? super X, Y> set, JoinType jt) {
+		return (SetJoinImpl<X, Y>) this.join(set.getName(), jt);
 	}
 
 	/**
@@ -369,7 +369,7 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 * 
 	 */
 	@Override
-	public <Y> Join<X, Y> join(SingularAttribute<? super X, Y> attribute) {
+	public <Y> AbstractJoin<X, Y> join(SingularAttribute<? super X, Y> attribute) {
 		return this.join(attribute, JoinType.INNER);
 	}
 
@@ -378,7 +378,7 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 * 
 	 */
 	@Override
-	public <Y> Join<X, Y> join(SingularAttribute<? super X, Y> attribute, JoinType jt) {
+	public <Y> AbstractJoin<X, Y> join(SingularAttribute<? super X, Y> attribute, JoinType jt) {
 		return this.join(attribute.getName(), jt);
 	}
 
@@ -387,7 +387,7 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 * 
 	 */
 	@Override
-	public <Y> Join<X, Y> join(String attributeName) {
+	public <Y> AbstractJoin<X, Y> join(String attributeName) {
 		return this.join(attributeName, JoinType.INNER);
 	}
 
@@ -397,7 +397,7 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public <Y> Join<X, Y> join(String attributeName, JoinType jt) {
+	public <Y> AbstractJoin<X, Y> join(String attributeName, JoinType jt) {
 		Type<Y> type;
 
 		final Mapping<? super X, ?, ?> mapping = this.entity.getRootMapping().getChild(attributeName);

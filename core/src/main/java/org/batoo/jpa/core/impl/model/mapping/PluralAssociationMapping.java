@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Selection;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
@@ -34,6 +33,7 @@ import org.batoo.jpa.core.impl.criteria.PredicateImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.criteria.join.AbstractJoin;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
@@ -182,7 +182,6 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 		return this.joinTable;
 	}
 
-	@SuppressWarnings("unchecked")
 	private CriteriaQueryImpl<E> getSelectCriteria() {
 		if (this.selectCriteria != null) {
 			return this.selectCriteria;
@@ -194,44 +193,43 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 				return this.selectCriteria;
 			}
 
-			if (this.isOwner()) {
-				final MetamodelImpl metamodel = this.getRoot().getType().getMetamodel();
-				final CriteriaBuilderImpl cb = metamodel.getEntityManagerFactory().getCriteriaBuilder();
+			final MetamodelImpl metamodel = this.getRoot().getType().getMetamodel();
+			final CriteriaBuilderImpl cb = metamodel.getEntityManagerFactory().getCriteriaBuilder();
 
-				final EntityTypeImpl<E> entity = metamodel.entity(this.attribute.getBindableJavaType());
+			final EntityTypeImpl<E> entity = metamodel.entity(this.attribute.getBindableJavaType());
 
-				CriteriaQueryImpl<E> q = cb.createQuery(this.attribute.getBindableJavaType());
-				final RootImpl<?> r = q.from(this.getRoot().getType());
-				q = q.select((Selection<? extends E>) r.<C> get(this.getPath()));
+			CriteriaQueryImpl<E> q = cb.createQuery(this.attribute.getBindableJavaType());
+			q.distinct(true);
+			final RootImpl<?> r = q.from(this.getRoot().getType());
+			// TODO handle embeddables along the path
+			final AbstractJoin<?, E> join = r.<E> join(this.attribute.getName());
+			q = q.select(join);
 
-				entity.prepareEagerAssociations(r, 0, null);
+			entity.prepareEagerAssociations(join, 0, null);
 
-				// has single id mapping
-				final EntityTypeImpl<?> rootType = this.getRoot().getType();
-				if (rootType.hasSingleIdAttribute()) {
-					final SingularMapping<?, ?> idMapping = rootType.getIdMapping();
-					final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
-					final Path<?> path = r.get(idMapping.getAttribute().getName());
-					final PredicateImpl predicate = cb.equal(path, pe);
+			// has single id mapping
+			final EntityTypeImpl<?> rootType = this.getRoot().getType();
+			if (rootType.hasSingleIdAttribute()) {
+				final SingularMapping<?, ?> idMapping = rootType.getIdMapping();
+				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
+				final Path<?> path = r.get(idMapping.getAttribute().getName());
+				final PredicateImpl predicate = cb.equal(path, pe);
 
-					return this.selectCriteria = q.where(predicate);
-				}
-
-				// has multiple id mappings
-				final List<PredicateImpl> predicates = Lists.newArrayList();
-				for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
-					final BasicMapping<?, ?> idMapping = (BasicMapping<?, ?>) pair.getFirst();
-					final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
-					final Path<?> path = r.get(idMapping.getAttribute().getName());
-					final PredicateImpl predicate = cb.equal(path, pe);
-
-					predicates.add(predicate);
-				}
-
-				return this.selectCriteria = q.where(predicates.toArray(new PredicateImpl[predicates.size()]));
+				return this.selectCriteria = q.where(predicate);
 			}
 
-			return this.selectCriteria = null;
+			// has multiple id mappings
+			final List<PredicateImpl> predicates = Lists.newArrayList();
+			for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
+				final BasicMapping<?, ?> idMapping = (BasicMapping<?, ?>) pair.getFirst();
+				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
+				final Path<?> path = r.get(idMapping.getAttribute().getName());
+				final PredicateImpl predicate = cb.equal(path, pe);
+
+				predicates.add(predicate);
+			}
+
+			return this.selectCriteria = q.where(predicates.toArray(new PredicateImpl[predicates.size()]));
 		}
 	}
 
@@ -278,7 +276,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 */
 	@Override
 	public void load(ManagedInstance<?> instance) {
-		// TODO Auto-generated method stub
+		this.set(instance, this.loadCollection(instance));
 	}
 
 	/**

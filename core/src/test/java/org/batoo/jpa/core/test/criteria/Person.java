@@ -42,10 +42,10 @@ public class Person {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Integer id;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "person")
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "person")
 	private final List<Address> addresses = Lists.newArrayList();
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "person")
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "person", fetch = FetchType.EAGER)
 	private final List<HomePhone> phones = Lists.newArrayList();
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)

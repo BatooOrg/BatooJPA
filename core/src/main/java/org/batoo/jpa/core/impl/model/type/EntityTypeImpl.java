@@ -1279,6 +1279,9 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 					association.setLazy(instance);
 				}
 			}
+			else {
+				association.set(instance, association.get(instance.getInstance()));
+			}
 		}
 	}
 

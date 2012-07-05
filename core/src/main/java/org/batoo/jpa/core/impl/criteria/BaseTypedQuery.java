@@ -109,7 +109,7 @@ public abstract class BaseTypedQuery<X> implements TypedQuery<X>, ResultSetHandl
 			length += l + 3;
 		}
 
-		final StringBuffer dump = new StringBuffer("\n");
+		final StringBuffer dump = new StringBuffer("Query returned {0} row(s):\n");
 
 		// the labels
 		dump.append(StringUtils.repeat("-", length));
@@ -151,7 +151,7 @@ public abstract class BaseTypedQuery<X> implements TypedQuery<X>, ResultSetHandl
 		dump.append("\n");
 		dump.append(StringUtils.repeat("-", length));
 
-		BaseTypedQuery.LOG.debug(dump.toString());
+		BaseTypedQuery.LOG.debug(dump.toString(), this.data.size());
 	}
 
 	/**
