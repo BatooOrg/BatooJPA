@@ -82,12 +82,12 @@ public class ManagedInstance<X> {
 	private final X instance;
 	private Status status;
 
-	private final Set<PluralAssociationMapping<?, ?, ?>> changedCollections = Sets.newHashSet();
+	private final Set<PluralAssociationMapping<?, ?, ?>> changedCollections;
 	private final SingularMapping<? super X, ?> idMapping;
 	private final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>[] idMappings;
 	private final EmbeddableTypeImpl<?> idType;
 
-	private final Set<AssociationMapping<?, ?, ?>> associationsLoaded = Sets.newHashSet();
+	private final Set<AssociationMapping<?, ?, ?>> associationsLoaded;
 	private EntityTransactionImpl transaction;
 
 	private final boolean external = true;
@@ -112,6 +112,9 @@ public class ManagedInstance<X> {
 		this.type = type;
 		this.session = session;
 		this.instance = instance;
+
+		this.changedCollections = Sets.newHashSet();
+		this.associationsLoaded = Sets.newHashSet();
 
 		if (type.getRootType().hasSingleIdAttribute()) {
 			this.idMapping = type.getRootType().getIdMapping();
@@ -231,7 +234,7 @@ public class ManagedInstance<X> {
 			return true;
 		}
 
-		if (this.getType() != other.getType()) {
+		if (this.getType().getRootType() != other.getType().getRootType()) {
 			return false;
 		}
 
@@ -406,13 +409,15 @@ public class ManagedInstance<X> {
 			return this.h;
 		}
 
+		final Object id = this.getId();
+		if (id == null) {
+			return 1;
+		}
+
 		final int prime = 31;
 		final int result = 1;
 
-		final Object id = this.getId();
-		if (id == null) {
-			return result;
-		}
+		this.h = (prime * result) + this.type.getRootType().getName().hashCode();
 
 		return this.h = (prime * result) + id.hashCode();
 	}

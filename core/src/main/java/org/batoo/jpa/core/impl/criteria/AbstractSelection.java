@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.core.impl.criteria;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -129,11 +131,13 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	 * @param instances
 	 *            the set of instances processed
 	 * @return the managed instance
+	 * @throws SQLException
+	 *             thrown in case of an underlying SQL Error
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract X handle(SessionImpl session, Map<String, Object> row, HashMap<ManagedInstance<?>, ManagedInstance<?>> instances);
+	public abstract X handle(SessionImpl session, ResultSet row, HashMap<ManagedInstance<?>, ManagedInstance<?>> instances) throws SQLException;
 
 	/**
 	 * {@inheritDoc}

@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.core.impl.criteria.path;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -198,7 +200,7 @@ public abstract class EntityPath<Z, X> extends AbstractPath<X> implements Joinab
 	 * 
 	 */
 	@Override
-	public X handle(SessionImpl session, Map<String, Object> row, HashMap<ManagedInstance<?>, ManagedInstance<?>> instances) {
+	public X handle(SessionImpl session, ResultSet row, HashMap<ManagedInstance<?>, ManagedInstance<?>> instances) throws SQLException {
 		return this.fetchRoot.handle(session, row, instances);
 	}
 }

@@ -21,9 +21,7 @@ package org.batoo.jpa.core.impl.criteria;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -68,7 +66,7 @@ public abstract class BaseTypedQuery<X> implements TypedQuery<X>, ResultSetHandl
 	protected final Map<ParameterExpressionImpl<?>, Object> parameters = Maps.newHashMap();
 	private final List<X> results = Lists.newArrayList();
 
-	private final LinkedList<Map<String, Object>> data = Lists.newLinkedList();
+	private final List<Map<String, Object>> data = Lists.newArrayList();
 	private ResultSetMetaData md;
 	private String[] labels;
 
@@ -227,40 +225,27 @@ public abstract class BaseTypedQuery<X> implements TypedQuery<X>, ResultSetHandl
 	public List<X> handle(ResultSet rs) throws SQLException {
 		this.md = rs.getMetaData();
 
-		// store the data
-		while (rs.next()) {
-			this.storeData(rs);
-		}
-
-		if (this.data.size() == 0) {
-			BaseTypedQuery.LOG.debug("No result returned");
-
-			return Collections.emptyList();
-		}
-
-		if (BaseTypedQuery.LOG.isDebugEnabled()) {
+		final boolean debug = BaseTypedQuery.LOG.isDebugEnabled();
+		if (debug) {
 			this.prepareLabels(this.md);
 		}
-
-		if (BaseTypedQuery.LOG.isDebugEnabled()) {
-			this.dumpResultSet();
-		}
-
-		final HashMap<ManagedInstance<?>, ManagedInstance<?>> instances = Maps.newHashMap();
 
 		final SessionImpl session = this.em.getSession();
 
 		// process the resultset
-		int rowNo = 0;
-		while (rowNo < this.data.size()) {
-			final Map<String, Object> row = this.data.get(rowNo);
-
-			final X instance = this.selection.handle(session, row, instances);
+		while (rs.next()) {
+			final X instance = this.selection.handle(session, rs, Maps.<ManagedInstance<?>, ManagedInstance<?>> newHashMap());
 			if (!this.cq.isDistinct() || !this.results.contains(instance)) {
 				this.results.add(instance);
 			}
 
-			rowNo++;
+			if (debug) {
+				this.storeData(rs);
+			}
+		}
+
+		if (debug) {
+			this.dumpResultSet();
 		}
 
 		return this.results;
@@ -295,7 +280,7 @@ public abstract class BaseTypedQuery<X> implements TypedQuery<X>, ResultSetHandl
 	public void storeData(ResultSet rs) throws SQLException {
 		final HashMap<String, Object> data = Maps.newHashMap();
 
-		int columnCount = this.md.getColumnCount();
+		final int columnCount = this.md.getColumnCount();
 		for (int i = 0; i < columnCount; i++) {
 			final Object value = rs.getObject(i + 1);
 			data.put(this.md.getColumnName(i + 1), value);

@@ -18,9 +18,9 @@
  */
 package org.batoo.jpa.core.impl.criteria.path;
 
+import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.criteria.Path;
 
@@ -179,7 +179,7 @@ public class EmbeddedAttributePath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public X handle(SessionImpl session, Map<String, Object> row, HashMap<ManagedInstance<?>, ManagedInstance<?>> instances) {
+	public X handle(SessionImpl session, ResultSet row, HashMap<ManagedInstance<?>, ManagedInstance<?>> instances) {
 		// TODO Auto-generated method stub
 		return null;
 	}

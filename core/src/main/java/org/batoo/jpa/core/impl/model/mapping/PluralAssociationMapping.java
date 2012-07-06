@@ -112,7 +112,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 		final SessionImpl session = managedInstance.getSession();
 
 		if (values instanceof Collection) {
-			for (final E entity : (Collection<E>) values) {
+			for (final Object entity : ((Collection<E>) values).toArray()) {
 				session.checkTransient(entity);
 			}
 		}

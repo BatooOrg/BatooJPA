@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.manager;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,6 +36,7 @@ import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 /**
@@ -49,8 +51,8 @@ public class SessionImpl {
 	private final EntityManagerImpl em;
 	private final MetamodelImpl metamodel;
 	private final int sessionId;
-	private Repository repository;
 
+	private final HashMap<ManagedInstance<?>, ManagedInstance<?>> repository = Maps.newHashMap();
 	private final HashSet<ManagedInstance<?>> externalEntities = Sets.newHashSet();
 	private final LinkedList<ManagedInstance<?>> identifiableEntities = Lists.newLinkedList();
 	private final LinkedList<ManagedInstance<?>> changedEntities = Lists.newLinkedList();
@@ -74,8 +76,6 @@ public class SessionImpl {
 		this.em = entityManager;
 		this.metamodel = metamodel;
 		this.sessionId = ++SessionImpl.nextSessionId;
-
-		this.clear();
 	}
 
 	/**
@@ -110,7 +110,7 @@ public class SessionImpl {
 	 */
 	public void clear() {
 		// XXX detach all the entities if there is an existing repository
-		this.repository = new Repository();
+		this.repository.clear();
 		this.externalEntities.clear();
 	}
 
@@ -164,10 +164,7 @@ public class SessionImpl {
 	 */
 	@SuppressWarnings("unchecked")
 	public <X> ManagedInstance<X> get(ManagedInstance<X> instance) {
-		final EntityTypeImpl<? super X> type = instance.getType();
-		final SubRepository<? super X> subRepository = this.repository.get(type);
-
-		return (ManagedInstance<X>) subRepository.get(instance);
+		return (ManagedInstance<X>) this.repository.get(instance);
 	}
 
 	/**
@@ -224,10 +221,7 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public <X> void put(ManagedInstance<X> instance) {
-		final EntityTypeImpl<? super X> type = instance.getType();
-		final SubRepository<? super X> subRepository = this.repository.get(type);
-
-		subRepository.put(instance);
+		this.repository.put(instance, instance);
 
 		if (this.loadTracker > 0) {
 			this.entitiesLoaded.add(instance);
@@ -273,8 +267,8 @@ public class SessionImpl {
 	}
 
 	/**
-	 * Releases the load tracker, so that the entities caught to be loaded are processed for associations and <code>postload</code>
-	 * listeners.
+	 * Releases the load tracker, so that the entities loaded are processed for associations and <code>postload</code> listeners are
+	 * invoked.
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -312,10 +306,7 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public <X> void remove(EntityTransactionImpl transaction, ManagedInstance<X> instance) {
-		final EntityTypeImpl<? super X> type = instance.getType();
-		final SubRepository<? super X> subRepository = this.repository.get(type);
-
-		final ManagedInstance<?> removed = subRepository.remove(instance);
+		final ManagedInstance<?> removed = this.repository.remove(instance);
 
 		if (removed.isExternal()) {
 			this.externalEntities.remove(instance);

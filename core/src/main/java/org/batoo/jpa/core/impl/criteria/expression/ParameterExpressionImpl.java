@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.criteria.expression;
 
+import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -165,7 +166,7 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * 
 	 */
 	@Override
-	public T handle(SessionImpl session, Map<String, Object> row, HashMap<ManagedInstance<?>, ManagedInstance<?>> instances) {
+	public T handle(SessionImpl session, ResultSet row, HashMap<ManagedInstance<?>, ManagedInstance<?>> instances) {
 		// TODO Auto-generated method stub
 		return null;
 	}
