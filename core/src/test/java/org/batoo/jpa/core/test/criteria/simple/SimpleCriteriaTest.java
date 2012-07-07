@@ -260,16 +260,11 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testSimple() {
-		try {
-			final CriteriaBuilderImpl cb = (CriteriaBuilderImpl) this.em().getCriteriaBuilder();
-			final CriteriaQueryImpl<Country> q = cb.createQuery(Country.class);
-			final RootImpl<Country> r = q.from(Country.class);
-			q.select(r);
-			final List<Country> resultList = this.em().createQuery(q).getResultList();
-			Assert.assertEquals(3, resultList.size());
-		}
-		catch (final Exception e) {
-			SimpleCriteriaTest.LOG.error(e, "");
-		}
+		final CriteriaBuilderImpl cb = (CriteriaBuilderImpl) this.em().getCriteriaBuilder();
+		final CriteriaQueryImpl<Country> q = cb.createQuery(Country.class);
+		final RootImpl<Country> r = q.from(Country.class);
+		q.select(r);
+		final List<Country> resultList = this.em().createQuery(q).getResultList();
+		Assert.assertEquals(3, resultList.size());
 	}
 }

@@ -461,6 +461,11 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 
 		// if found then return it
 		if (instance != null) {
+			// if it is a new instance simply return it
+			if (!(instance.getInstance() instanceof EnhancedInstance)) {
+				return instance;
+			}
+
 			final EnhancedInstance enhancedInstance = (EnhancedInstance) instance.getInstance();
 
 			// if it is a lazy instance mark as loading and initialize
