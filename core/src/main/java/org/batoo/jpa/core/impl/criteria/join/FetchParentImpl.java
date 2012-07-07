@@ -724,6 +724,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		for (final SingularAssociationMapping<?, ?> mapping : this.joins) {
 			final Object child = this.getInstance(session, mapping, row);
 			mapping.set(instance, child);
+			instance.setAssociationLoaded(mapping);
 		}
 
 		for (final FetchImpl<X, ?> fetch : this.fetches) {
