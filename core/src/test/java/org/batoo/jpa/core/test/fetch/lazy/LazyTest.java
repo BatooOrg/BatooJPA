@@ -94,7 +94,7 @@ public class LazyTest extends BaseCoreTest {
 
 		for (final Address address : person2.getAddresses()) {
 			if (LazyTest.CITY_ISTANBUL.equals(address.getCity())) {
-//				Assert.assertEquals(LazyTest.TR.getId(), address.getCountry().getId());
+				Assert.assertEquals(LazyTest.TR.getId(), address.getCountry().getId());
 				Assert.assertEquals(LazyTest.COUNTRY_TURKEY, address.getCountry().getName());
 			}
 		}
