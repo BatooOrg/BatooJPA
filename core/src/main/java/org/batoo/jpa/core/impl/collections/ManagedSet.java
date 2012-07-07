@@ -68,7 +68,7 @@ public class ManagedSet<X, E> implements ManagedCollection, Set<E> {
 		this.mapping = mapping;
 		this.managedInstance = managedInstance;
 
-		this.initialized = lazy;
+		this.initialized = !lazy;
 	}
 
 	/**
