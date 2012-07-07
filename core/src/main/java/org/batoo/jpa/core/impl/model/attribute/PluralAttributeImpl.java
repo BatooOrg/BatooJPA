@@ -213,12 +213,14 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 *            the mapping
 	 * @param managedInstance
 	 *            the managed instance
+	 * @param lazy
+	 *            if the collection is lazy
 	 * @return the lazy initialized managed collection
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract C newCollection(PluralAssociationMapping<?, C, E> mapping, ManagedInstance<?> managedInstance);
+	public abstract C newCollection(PluralAssociationMapping<?, C, E> mapping, ManagedInstance<?> managedInstance, boolean lazy);
 
 	/**
 	 * Creates a new managed collection to track changes.

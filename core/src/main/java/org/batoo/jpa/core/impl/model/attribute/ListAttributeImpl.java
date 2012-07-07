@@ -70,8 +70,8 @@ public class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E>, E> 
 	 * 
 	 */
 	@Override
-	public List<E> newCollection(PluralAssociationMapping<?, List<E>, E> mapping, ManagedInstance<?> managedInstance) {
-		return new ManagedList<X, E>(mapping, managedInstance);
+	public List<E> newCollection(PluralAssociationMapping<?, List<E>, E> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
+		return new ManagedList<X, E>(mapping, managedInstance, lazy);
 	}
 
 	/**

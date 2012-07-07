@@ -20,7 +20,6 @@ package org.batoo.jpa.core.impl.criteria.path;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +34,6 @@ import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.join.FetchImpl;
 import org.batoo.jpa.core.impl.criteria.join.FetchParentImpl;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.ParentMapping;
@@ -200,7 +198,7 @@ public abstract class EntityPath<Z, X> extends AbstractPath<X> implements Joinab
 	 * 
 	 */
 	@Override
-	public X handle(SessionImpl session, ResultSet row, HashMap<ManagedInstance<?>, ManagedInstance<?>> instances) throws SQLException {
-		return this.fetchRoot.handle(session, row, instances);
+	public X handle(SessionImpl session, ResultSet row) throws SQLException {
+		return this.fetchRoot.handle(session, row);
 	}
 }

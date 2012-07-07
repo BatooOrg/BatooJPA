@@ -56,17 +56,19 @@ public class ManagedSet<X, E> implements ManagedCollection, Set<E> {
 	 *            the mapping
 	 * @param managedInstance
 	 *            the managed instance
+	 * @param lazy
+	 *            if the collection is lazy
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedSet(PluralAssociationMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance) {
+	public ManagedSet(PluralAssociationMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
 		super();
 
 		this.mapping = mapping;
 		this.managedInstance = managedInstance;
 
-		this.initialized = false;
+		this.initialized = lazy;
 	}
 
 	/**

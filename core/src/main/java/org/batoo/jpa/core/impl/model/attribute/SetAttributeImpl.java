@@ -70,8 +70,8 @@ public class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>, E> im
 	 * 
 	 */
 	@Override
-	public Set<E> newCollection(PluralAssociationMapping<?, Set<E>, E> mapping, ManagedInstance<?> managedInstance) {
-		return new ManagedSet<X, E>(mapping, managedInstance);
+	public Set<E> newCollection(PluralAssociationMapping<?, Set<E>, E> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
+		return new ManagedSet<X, E>(mapping, managedInstance, lazy);
 	}
 
 	/**

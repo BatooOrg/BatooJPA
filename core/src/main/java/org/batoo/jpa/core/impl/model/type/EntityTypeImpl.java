@@ -703,6 +703,30 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
+	 * Returns the id of the instance.
+	 * 
+	 * @param instance
+	 *            the instance
+	 * @return the id of the instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Object getInstanceId(X instance) {
+		if (this.getIdMapping() != null) {
+			return this.idMapping.get(instance);
+		}
+
+		final Object id = ((EmbeddableTypeImpl<?>) this.getIdType()).newInstance();
+		for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.getIdMappings()) {
+			final Object value = pair.getSecond().get(instance);
+			pair.getFirst().getAttribute().set(id, value);
+		}
+
+		return id;
+	}
+
+	/**
 	 * Returns the managed instance for the instance.
 	 * 
 	 * @param instance
@@ -1145,23 +1169,22 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * 
 	 * @param entityManager
 	 *            the entity manager to use
-	 * @param managedInstance
-	 *            the managed instance to perform insert for
+	 * @param id
+	 *            the id of the instance to select
 	 * @return the instance found or null
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public X performSelect(EntityManagerImpl entityManager, ManagedInstance<X> managedInstance) {
+	public X performSelect(EntityManagerImpl entityManager, Object id) {
 		final TypedQueryImpl<X> q = entityManager.createQuery(this.getSelectCriteria());
 
 		// if has single id then pass it on
 		if (this.hasSingleIdAttribute()) {
-			q.setParameter(1, managedInstance.getId());
+			q.setParameter(1, id);
 		}
 		else {
 			int i = 1;
-			final Object id = managedInstance.getId();
 			for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.getIdMappings()) {
 				q.setParameter(i++, pair.getSecond().get(id));
 			}
@@ -1255,32 +1278,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				final EntityTypeImpl<?> type = association.getType();
 
 				type.prepareEagerAssociations(r2, depth + 1, association);
-			}
-		}
-	}
-
-	/**
-	 * Processes the associations of the entity after it has been loaded.
-	 * 
-	 * @param instance
-	 *            the managed instance
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void processAssociations(ManagedInstance<?> instance) {
-		final Set<AssociationMapping<?, ?, ?>> associationsLoaded = instance.getAssociationsLoaded();
-		for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
-			if (!associationsLoaded.contains(association)) {
-				if (association.isEager()) {
-					association.load(instance);
-				}
-				else {
-					association.setLazy(instance);
-				}
-			}
-			else {
-				association.set(instance, association.get(instance.getInstance()));
 			}
 		}
 	}

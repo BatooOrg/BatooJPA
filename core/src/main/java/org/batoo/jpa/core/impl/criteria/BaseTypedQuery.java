@@ -38,7 +38,6 @@ import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
@@ -234,7 +233,7 @@ public abstract class BaseTypedQuery<X> implements TypedQuery<X>, ResultSetHandl
 
 		// process the resultset
 		while (rs.next()) {
-			final X instance = this.selection.handle(session, rs, Maps.<ManagedInstance<?>, ManagedInstance<?>> newHashMap());
+			final X instance = this.selection.handle(session, rs);
 			if (!this.cq.isDistinct() || !this.results.contains(instance)) {
 				this.results.add(instance);
 			}

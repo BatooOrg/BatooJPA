@@ -57,17 +57,19 @@ public class ManagedList<X, E> implements ManagedCollection, List<E> {
 	 *            the mapping
 	 * @param managedInstance
 	 *            the managed instance
+	 * @param lazy
+	 *            if the collection is lazy
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedList(PluralAssociationMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance) {
+	public ManagedList(PluralAssociationMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
 		super();
 
 		this.mapping = mapping;
 		this.managedInstance = managedInstance;
 
-		this.initialized = false;
+		this.initialized = !lazy;
 	}
 
 	/**

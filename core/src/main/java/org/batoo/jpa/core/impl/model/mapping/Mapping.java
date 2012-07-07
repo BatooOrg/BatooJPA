@@ -220,25 +220,8 @@ public abstract class Mapping<Z, X, Y> {
 		}
 
 		if (!this.inherited || managedInstance.getType().doesExtend(this.entity)) {
-			this.set(managedInstance, instance, value);
+			this.getAttribute().set(instance, value);
 		}
-	}
-
-	/**
-	 * Sets the mapping value of the instance
-	 * 
-	 * @param managedInstance
-	 *            the managed instance
-	 * @param instance
-	 *            the instance of which the value to set
-	 * @param value
-	 *            the value to set
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void set(ManagedInstance<?> managedInstance, Object instance, Object value) {
-		this.getAttribute().set(instance, value);
 	}
 
 	/**

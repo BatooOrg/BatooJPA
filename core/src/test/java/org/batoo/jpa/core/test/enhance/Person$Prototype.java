@@ -83,10 +83,11 @@ public class Person$Prototype extends Person implements EnhancedInstance {
 		return this.__enhanced_$$__initialized;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
+	@Override
+	public void __enhanced__$$__setInitialized() {
+		this.__enhanced_$$__initialized = true;
+	}
+
 	@Override
 	public void __enhanced__$$__setManagedInstance(ManagedInstance<?> instance) {
 		this.__enhanced__$$__managedInstance = instance;

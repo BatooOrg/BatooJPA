@@ -20,14 +20,12 @@ package org.batoo.jpa.core.impl.criteria;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.criteria.Selection;
 
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
@@ -128,8 +126,6 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	 *            the session
 	 * @param row
 	 *            the row
-	 * @param instances
-	 *            the set of instances processed
 	 * @return the managed instance
 	 * @throws SQLException
 	 *             thrown in case of an underlying SQL Error
@@ -137,7 +133,7 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract X handle(SessionImpl session, ResultSet row, HashMap<ManagedInstance<?>, ManagedInstance<?>> instances) throws SQLException;
+	public abstract X handle(SessionImpl session, ResultSet row) throws SQLException;
 
 	/**
 	 * {@inheritDoc}

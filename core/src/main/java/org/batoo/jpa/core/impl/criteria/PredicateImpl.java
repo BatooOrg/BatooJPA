@@ -19,7 +19,6 @@
 package org.batoo.jpa.core.impl.criteria;
 
 import java.sql.ResultSet;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.persistence.criteria.Expression;
@@ -28,7 +27,6 @@ import javax.persistence.criteria.Predicate;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 import com.google.common.base.Function;
@@ -197,7 +195,7 @@ public class PredicateImpl extends AbstractExpression<Boolean> implements Predic
 	 * 
 	 */
 	@Override
-	public Boolean handle(SessionImpl session, ResultSet row, HashMap<ManagedInstance<?>, ManagedInstance<?>> instances) {
+	public Boolean handle(SessionImpl session, ResultSet row) {
 		// TODO Auto-generated method stub
 		return null;
 	}

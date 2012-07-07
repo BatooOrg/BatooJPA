@@ -26,7 +26,6 @@ import java.util.Map;
 import javax.persistence.criteria.Path;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 
-import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.PredicateImpl;
@@ -243,6 +242,19 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	}
 
 	/**
+	 * Initializes the managed collection of the instance
+	 * 
+	 * @param instance
+	 *            the instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void initialize(ManagedInstance<?> instance) {
+		this.set(instance, this.attribute.newCollection(this, instance, false));
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -295,13 +307,14 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 
 		final EntityTypeImpl<?> rootType = managedInstance.getType();
 
+		final Object id = managedInstance.getId().getId();
+
 		// if has single id then pass it on
 		if (rootType.hasSingleIdAttribute()) {
-			q.setParameter(1, managedInstance.getId());
+			q.setParameter(1, id);
 		}
 		else {
 			int i = 1;
-			final Object id = managedInstance.getId();
 			for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
 				q.setParameter(i++, pair.getSecond().get(id));
 			}
@@ -335,25 +348,6 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
-	public void set(ManagedInstance<?> managedInstance, Object instance, Object value) {
-		C collection;
-
-		if (value instanceof ManagedCollection) {
-			collection = (C) value;
-		}
-		else {
-			collection = this.attribute.newCollection(this, managedInstance, (Collection<? extends E>) value);
-		}
-
-		super.set(managedInstance, instance, collection);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public void setInverse(AssociationMapping<?, ?, ?> inverse) {
 		this.inverse = inverse;
 	}
@@ -364,6 +358,6 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 */
 	@Override
 	public void setLazy(ManagedInstance<?> instance) {
-		this.set(instance, this.attribute.newCollection(this, instance));
+		this.set(instance, this.attribute.newCollection(this, instance, true));
 	}
 }

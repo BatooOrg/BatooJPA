@@ -69,8 +69,8 @@ public class CollectionAttributeImpl<X, E> extends PluralAttributeImpl<X, Collec
 	 * 
 	 */
 	@Override
-	public Collection<E> newCollection(PluralAssociationMapping<?, Collection<E>, E> mapping, ManagedInstance<?> managedInstance) {
-		return new ManagedList<X, E>(mapping, managedInstance);
+	public Collection<E> newCollection(PluralAssociationMapping<?, Collection<E>, E> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
+		return new ManagedList<X, E>(mapping, managedInstance, lazy);
 	}
 
 	/**

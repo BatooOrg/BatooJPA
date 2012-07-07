@@ -59,6 +59,14 @@ public interface EnhancedInstance extends Serializable {
 	boolean __enhanced__$$__isInitialized();
 
 	/**
+	 * Marks the instance as initialized.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	void __enhanced__$$__setInitialized();
+
+	/**
 	 * Sets the managed instance of the instance.
 	 * 
 	 * @param instance

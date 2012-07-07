@@ -48,6 +48,7 @@ public final class Enhancer implements Opcodes {
 	private static final String FIELD_ENHANCED_MANAGED_INSTANCE = "__enhanced_$$__managedInstance";
 
 	private static final String METHOD_ENHANCED_IS_INITIALIZED = "__enhanced__$$__isInitialized";
+	private static final String METHOD_ENHANCED_SET_INITIALIZED = "__enhanced__$$__setInitialized";
 	private static final String METHOD_ENHANCED_CHECK = "__enhanced_$$__check";
 	private static final String METHOD_ENHANCED_GET_ID = "__enhanced__$$__getId";
 	private static final String METHOD_GET_ENTITY_MANAGER = "getEntityManager";
@@ -96,6 +97,7 @@ public final class Enhancer implements Opcodes {
 		Enhancer.createNoArgConstructor(enhancingClassName, enhancedClassName, descEnhancer, cw);
 		Enhancer.createContainerConstructor(enhancingClassName, enhancedClassName, descEnhancer, cw);
 		Enhancer.createMethodIsInitialized(enhancedClassName, descEnhancer, cw);
+		Enhancer.createMethodSetInitialized(enhancedClassName, descEnhancer, cw);
 		Enhancer.createMethodCheck(enhancedClassName, descEnhancer, cw);
 		Enhancer.createMethodGetId(enhancedClassName, descEnhancer, cw);
 		Enhancer.createMethodGetManagedInstance(enhancedClassName, descEnhancer, cw);
@@ -316,6 +318,25 @@ public final class Enhancer implements Opcodes {
 		mv.visitVarInsn(Opcodes.ALOAD, 0);
 		mv.visitFieldInsn(Opcodes.GETFIELD, enhancedClassName, Enhancer.FIELD_ENHANCED_INITIALIZED, Enhancer.DESCRIPTOR_BOOLEAN);
 		mv.visitInsn(Opcodes.IRETURN);
+
+		final Label l1 = new Label();
+		mv.visitLabel(l1);
+		mv.visitLocalVariable(Enhancer.THIS, descEnhancer, null, l0, l1, 0);
+		mv.visitMaxs(0, 0);
+		mv.visitEnd();
+	}
+
+	private static void createMethodSetInitialized(final String enhancedClassName, final String descEnhancer, final ClassWriter cw) {
+		final MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, Enhancer.METHOD_ENHANCED_SET_INITIALIZED, Enhancer.makeDescription(Void.TYPE), null, null);
+		mv.visitCode();
+
+		final Label l0 = new Label();
+		mv.visitLabel(l0);
+		mv.visitVarInsn(Opcodes.ALOAD, 0);
+		mv.visitInsn(Opcodes.ICONST_1);
+		mv.visitFieldInsn(Opcodes.PUTFIELD, enhancedClassName, Enhancer.FIELD_ENHANCED_INITIALIZED, Enhancer.DESCRIPTOR_BOOLEAN);
+
+		mv.visitInsn(Opcodes.RETURN);
 
 		final Label l1 = new Label();
 		mv.visitLabel(l1);

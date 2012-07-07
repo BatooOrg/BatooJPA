@@ -21,7 +21,6 @@ package org.batoo.jpa.core.impl.criteria.join;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -39,6 +38,7 @@ import javax.persistence.metamodel.Type;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
+import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
@@ -81,6 +81,7 @@ import com.google.common.collect.Sets;
 public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 
 	private final EntityTypeImpl<X> entity;
+
 	private final List<FetchImpl<X, ?>> fetches = Lists.newArrayList();
 
 	private String alias;
@@ -446,7 +447,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedInstance<? extends X> getInstance(SessionImpl session, ResultSet row) throws SQLException {
+	private ManagedInstance<? extends X> getInstance(SessionImpl session, ResultSet row) throws SQLException {
 		// get the id of for the instance
 		final Object id = this.getId(row);
 
@@ -454,17 +455,50 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			return null;
 		}
 
-		// if inheritance is in place then locate the correct child type
-		if (this.entity.getRootType().getInheritanceType() != null) {
-			final Object discriminatorValue = row.getObject(this.discriminatorAlias);
+		// look for it in the session
+		final ManagedId<X> managedId = new ManagedId<X>(id, this.entity);
+		ManagedInstance<? extends X> instance = session.get(managedId);
 
-			final EntityTypeImpl<? extends X> effectiveType = this.entity.getChildType(discriminatorValue);
-			if (effectiveType != null) {
-				return effectiveType.getManagedInstanceById(session, id);
+		// if found then return it
+		if (instance != null) {
+			final EnhancedInstance enhancedInstance = (EnhancedInstance) instance.getInstance();
+
+			// if it is a lazy instance mark as loading and initialize
+			if (!enhancedInstance.__enhanced__$$__isInitialized()) {
+				this.initializeInstance(session, row, instance);
+
+				session.lazyInstanceLoading(instance);
+				enhancedInstance.__enhanced__$$__setInitialized();
 			}
+
+			return instance;
 		}
 
-		return this.entity.getManagedInstanceById(session, id);
+		// if no inheritance then initialize and return
+		if (this.entity.getInheritanceType() == null) {
+			instance = this.entity.getManagedInstanceById(session, id);
+
+			this.initializeInstance(session, row, instance);
+			session.put(instance);
+
+			return instance;
+		}
+
+		// inheritance is in place then locate the correct child type
+		final Object discriminatorValue = row.getObject(this.discriminatorAlias);
+
+		// check if we have a legal discriminator value
+		final EntityTypeImpl<? extends X> effectiveType = this.entity.getChildType(discriminatorValue);
+		if (effectiveType == null) {
+			throw new IllegalArgumentException("Discriminator " + discriminatorValue + " not found in the type " + this.entity.getName());
+		}
+
+		// initialize and return
+		instance = effectiveType.getManagedInstanceById(session, id);
+		this.initializeInstance(session, row, instance);
+		session.put(instance);
+
+		return instance;
 	}
 
 	/**
@@ -483,16 +517,16 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @since $version
 	 * @author hceylan
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private Object getInstance(SessionImpl session, SingularAssociationMapping<?, ?> mapping, ResultSet row) throws SQLException {
 		final Object id = this.getId(mapping, row);
 		if (id == null) {
 			return null;
 		}
 
-		ManagedInstance<?> instance = mapping.getType().getManagedInstanceById(session, id);
-		final ManagedInstance<?> managedInstance = session.get(instance);
-		if (managedInstance != null) {
-			return managedInstance.getInstance();
+		ManagedInstance<?> instance = session.get(new ManagedId(id, mapping.getType()));
+		if (instance != null) {
+			return instance.getInstance();
 		}
 
 		instance = mapping.getType().getManagedInstanceById(session, null, null, id, true);
@@ -565,8 +599,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 *            the session
 	 * @param row
 	 *            the current row
-	 * @param instances
-	 *            the set of instances processed
 	 * @return the instance
 	 * @throws SQLException
 	 *             thrown in case of an underlying SQL Error
@@ -574,8 +606,8 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public X handle(SessionImpl session, ResultSet row, HashMap<ManagedInstance<?>, ManagedInstance<?>> instances) throws SQLException {
-		return this.handleFetch(session, row, instances).getInstance();
+	public X handle(SessionImpl session, ResultSet row) throws SQLException {
+		return this.handleFetch(session, row).getInstance();
 	}
 
 	/**
@@ -585,8 +617,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 *            the session
 	 * @param row
 	 *            the current row
-	 * @param instances
-	 *            the set of instances processed
 	 * @return the instance
 	 * @throws SQLException
 	 *             thrown in case of an underlying SQL Error
@@ -594,66 +624,33 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
-	public ManagedInstance<? extends X> handleFetch(SessionImpl session, ResultSet row, HashMap<ManagedInstance<?>, ManagedInstance<?>> instances)
-		throws SQLException {
-		// if id is null then break
-		ManagedInstance<? extends X> instance = this.getInstance(session, row);
+	public ManagedInstance<? extends X> handleFetch(SessionImpl session, ResultSet row) throws SQLException {
+		// if instance is null then break
+		final ManagedInstance<? extends X> instance = this.getInstance(session, row);
 		if (instance == null) {
 			return null;
 		}
 
-		// if it is a processed instance then do not initialize
-		final ManagedInstance<?> processedInstance = instances.get(instance);
-		if (processedInstance != null) {
-			return this.handleFetches(session, row, instances, (ManagedInstance<? extends X>) processedInstance);
+		// if the instance is loading then continue processing
+		if (instance.isLoading()) {
+			return this.handleFetches(session, row, instance);
 		}
 
-		final ManagedInstance<? extends X> managedInstance = session.get(instance);
-		if (managedInstance != null) {
-			if (managedInstance.getInstance() instanceof EnhancedInstance) {
-				if (((EnhancedInstance) managedInstance.getInstance()).__enhanced__$$__isInitialized()) {
-					return managedInstance;
-				}
-				else {
-					instance = managedInstance;
-				}
-			}
-			else {
-				return managedInstance;
-			}
-		}
-
-		for (final Entry<String, AbstractColumn> entry : this.fields.entrySet()) {
-			final String field = entry.getKey();
-			final AbstractColumn column = entry.getValue();
-			column.setValue(instance, row.getObject(field));
-		}
-
-		for (final SingularAssociationMapping<?, ?> mapping : this.joins) {
-			final Object child = this.getInstance(session, mapping, row);
-			mapping.set(instance, child);
-		}
-
-		for (final FetchImpl<X, ?> fetch : this.fetches) {
-			final AssociationMapping<? super X, ?, ?> mapping = fetch.getMapping();
-			instance.setAssociationLoaded(mapping);
-		}
-
-		instances.put(instance, instance);
-		session.put(instance);
-
-		return this.handleFetches(session, row, instances, instance);
+		return instance;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private ManagedInstance<? extends X> handleFetches(SessionImpl session, final ResultSet row, HashMap<ManagedInstance<?>, ManagedInstance<?>> instances,
-		ManagedInstance<? extends X> instance) throws SQLException {
+	private ManagedInstance<? extends X> handleFetches(SessionImpl session, final ResultSet row, ManagedInstance<? extends X> instance) throws SQLException {
 		for (final FetchImpl<X, ?> fetch : this.fetches) {
 			final AssociationMapping<? super X, ?, ?> mapping = fetch.getMapping();
 
 			// resolve the child
-			final ManagedInstance<?> child = fetch.handleFetch(session, row, instances);
+			final ManagedInstance<?> child = fetch.handleFetch(session, row);
+
+			// if null then continue
+			if (child == null) {
+				continue;
+			}
 
 			// if it is a plural association then we will test if we processed the child
 			if (mapping instanceof PluralAssociationMapping) {
@@ -670,24 +667,20 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 					if ((mapping.getInverse() != null) && //
 						(mapping.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_MANY)) {
 						mapping.getInverse().set(child, instance.getInstance());
+						child.setAssociationLoaded(mapping.getInverse());
 					}
 				}
 			}
-			// if it is singular association then get a single instance
+			// if it is singular association then set the instance
 			else {
-				if (child == null) {
-					mapping.set(instance, null);
-				}
-				else {
-					mapping.set(instance, child.getInstance());
+				mapping.set(instance, child.getInstance());
 
-					// if this is a one-to-one mapping and has an inverse then set it
-					if ((mapping.getInverse() != null) && (mapping.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_ONE)) {
-						mapping.getInverse().set(child, instance.getInstance());
-					}
+				// if this is a one-to-one mapping and has an inverse then set it
+				if ((mapping.getInverse() != null) && (mapping.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_ONE)) {
+					mapping.getInverse().set(child, instance.getInstance());
+					child.setAssociationLoaded(mapping);
 				}
 			}
-
 		}
 
 		return instance;
@@ -717,6 +710,30 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		}
 
 		return false;
+	}
+
+	private void initializeInstance(SessionImpl session, ResultSet row, ManagedInstance<? extends X> instance) throws SQLException {
+		instance.setLoading(true);
+
+		for (final Entry<String, AbstractColumn> entry : this.fields.entrySet()) {
+			final String field = entry.getKey();
+			final AbstractColumn column = entry.getValue();
+			column.setValue(instance, row.getObject(field));
+		}
+
+		for (final SingularAssociationMapping<?, ?> mapping : this.joins) {
+			final Object child = this.getInstance(session, mapping, row);
+			mapping.set(instance, child);
+		}
+
+		for (final FetchImpl<X, ?> fetch : this.fetches) {
+			final AssociationMapping<? super X, ?, ?> mapping = fetch.getMapping();
+			if (mapping instanceof PluralAssociationMapping) {
+				((PluralAssociationMapping<? super X, ?, ?>) mapping).initialize(instance);
+			}
+
+			instance.setAssociationLoaded(mapping);
+		}
 	}
 
 	/**

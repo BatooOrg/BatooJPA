@@ -43,6 +43,7 @@ import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
+import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
@@ -329,21 +330,21 @@ public class EntityManagerImpl implements EntityManager {
 
 		// try to locate in the session
 		final EntityTypeImpl<T> type = this.metamodel.entity(entityClass);
-		final ManagedInstance<T> instance = type.getManagedInstanceById(this.session, primaryKey);
-		final ManagedInstance<T> existing = this.session.get(instance);
-		if (existing != null) {
-			if (existing.getInstance() instanceof EnhancedInstance) {
-				final EnhancedInstance enhanced = (EnhancedInstance) existing.getInstance();
+
+		final ManagedInstance<T> instance = this.session.get(new ManagedId<T>(primaryKey, type));
+		if (instance != null) {
+			if (instance.getInstance() instanceof EnhancedInstance) {
+				final EnhancedInstance enhanced = (EnhancedInstance) instance.getInstance();
 				if (enhanced.__enhanced__$$__isInitialized()) {
-					return existing.getInstance();
+					return instance.getInstance();
 				}
 			}
 			else {
-				return existing.getInstance();
+				return instance.getInstance();
 			}
 		}
 
-		return type.performSelect(this, instance);
+		return type.performSelect(this, primaryKey);
 	}
 
 	/**
@@ -621,10 +622,7 @@ public class EntityManagerImpl implements EntityManager {
 	public boolean persistImpl(Object entity) {
 		boolean requiresFlush = false;
 
-		final EntityTypeImpl<?> type = this.metamodel.entity(entity.getClass());
-		final ManagedInstance<?> instance = type.getManagedInstance(this.session, entity);
-
-		final ManagedInstance<?> existing = this.session.get(instance);
+		final ManagedInstance<?> existing = this.session.get(entity);
 		if (existing != null) {
 			switch (existing.getStatus()) {
 				case DETACHED:
@@ -640,6 +638,9 @@ public class EntityManagerImpl implements EntityManager {
 			}
 		}
 		else {
+			final EntityTypeImpl<?> type = this.metamodel.entity(entity.getClass());
+			final ManagedInstance<?> instance = type.getManagedInstance(this.session, entity);
+
 			requiresFlush = !instance.fillIdValues();
 			requiresFlush |= instance.cascadePersist(this);
 

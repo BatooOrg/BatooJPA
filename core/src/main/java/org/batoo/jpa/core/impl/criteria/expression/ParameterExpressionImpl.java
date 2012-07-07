@@ -19,7 +19,6 @@
 package org.batoo.jpa.core.impl.criteria.expression;
 
 import java.sql.ResultSet;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.persistence.criteria.ParameterExpression;
@@ -28,7 +27,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
@@ -166,7 +164,7 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * 
 	 */
 	@Override
-	public T handle(SessionImpl session, ResultSet row, HashMap<ManagedInstance<?>, ManagedInstance<?>> instances) {
+	public T handle(SessionImpl session, ResultSet row) {
 		// TODO Auto-generated method stub
 		return null;
 	}

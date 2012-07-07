@@ -32,7 +32,6 @@ import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
-import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.util.Pair;
 
@@ -85,14 +84,14 @@ public class ManagedInstance<X> {
 	private final Set<PluralAssociationMapping<?, ?, ?>> changedCollections;
 	private final SingularMapping<? super X, ?> idMapping;
 	private final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>[] idMappings;
-	private final EmbeddableTypeImpl<?> idType;
 
 	private final Set<AssociationMapping<?, ?, ?>> associationsLoaded;
 	private EntityTransactionImpl transaction;
 
+	private boolean loading;
 	private final boolean external = true;
-	private Object id;
 
+	private ManagedId<X> id;
 	private int h;
 
 	/**
@@ -119,10 +118,8 @@ public class ManagedInstance<X> {
 		if (type.getRootType().hasSingleIdAttribute()) {
 			this.idMapping = type.getRootType().getIdMapping();
 			this.idMappings = null;
-			this.idType = null;
 		}
 		else {
-			this.idType = (EmbeddableTypeImpl<?>) this.type.getRootType().getIdType();
 			this.idMappings = this.type.getIdMappings();
 			this.idMapping = null;
 		}
@@ -144,7 +141,6 @@ public class ManagedInstance<X> {
 	public ManagedInstance(EntityTypeImpl<X> type, SessionImpl session, X instance, Object id) {
 		this(type, session, instance);
 
-		this.id = id;
 		if (this.idMapping != null) {
 			this.idMapping.set(this, id);
 		}
@@ -154,6 +150,8 @@ public class ManagedInstance<X> {
 				pair.getFirst().set(this, value);
 			}
 		}
+
+		this.id = new ManagedId<X>(type, instance);
 	}
 
 	/**
@@ -230,11 +228,7 @@ public class ManagedInstance<X> {
 		@SuppressWarnings("unchecked")
 		final ManagedInstance<? super X> other = (ManagedInstance<? super X>) obj;
 
-		if ((this.instance != null) && (this.instance == other.instance)) {
-			return true;
-		}
-
-		if (this.getType().getRootType() != other.getType().getRootType()) {
+		if (this.getId() == null) {
 			return false;
 		}
 
@@ -341,22 +335,12 @@ public class ManagedInstance<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Object getId() {
+	public ManagedId<X> getId() {
 		if (this.id != null) {
 			return this.id;
 		}
 
-		if (this.idMapping != null) {
-			return this.id = this.idMapping.get(this.instance);
-		}
-
-		this.id = this.idType.newInstance();
-		for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.idMappings) {
-			final Object value = pair.getSecond().get(this.instance);
-			pair.getFirst().getAttribute().set(this.id, value);
-		}
-
-		return this.id;
+		return this.id = new ManagedId<X>(this.type, this.instance);
 	}
 
 	/**
@@ -433,6 +417,18 @@ public class ManagedInstance<X> {
 	}
 
 	/**
+	 * Returns if the instance is loading.
+	 * 
+	 * @return true if the instance is loading, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isLoading() {
+		return this.loading;
+	}
+
+	/**
 	 * Marks a collection as changed.
 	 * 
 	 * @since $version
@@ -440,6 +436,25 @@ public class ManagedInstance<X> {
 	 */
 	public void markCollectionChanged(PluralAssociationMapping<?, ?, ?> mapping) {
 		this.changedCollections.add(mapping);
+	}
+
+	/**
+	 * Processes the associations.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void processAssociations() {
+		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociations()) {
+			if (!this.associationsLoaded.contains(association)) {
+				if (association.isEager()) {
+					association.load(this);
+				}
+				else {
+					association.setLazy(this);
+				}
+			}
+		}
 	}
 
 	/**
@@ -453,6 +468,19 @@ public class ManagedInstance<X> {
 	 */
 	public void setAssociationLoaded(AssociationMapping<?, ?, ?> association) {
 		this.associationsLoaded.add(association);
+	}
+
+	/**
+	 * Sets the loading
+	 * 
+	 * @param loading
+	 *            to set
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setLoading(boolean loading) {
+		this.loading = loading;
 	}
 
 	/**

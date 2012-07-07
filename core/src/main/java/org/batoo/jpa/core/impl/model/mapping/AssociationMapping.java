@@ -380,17 +380,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> {
 	public abstract boolean references(Object instance, Object reference);
 
 	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public void set(ManagedInstance<?> managedInstance, Object instance, Object value) {
-		super.set(managedInstance, instance, value);
-
-		managedInstance.setAssociationLoaded(this);
-	}
-
-	/**
 	 * Sets the inverse attribute.
 	 * 
 	 * @param inverse

@@ -28,6 +28,7 @@ import java.util.List;
 import javax.persistence.PersistenceException;
 
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
+import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
 import org.batoo.jpa.core.impl.instance.Prioritizer;
@@ -52,12 +53,13 @@ public class SessionImpl {
 	private final MetamodelImpl metamodel;
 	private final int sessionId;
 
-	private final HashMap<ManagedInstance<?>, ManagedInstance<?>> repository = Maps.newHashMap();
+	private final HashMap<ManagedId<?>, ManagedInstance<?>> repository = Maps.newHashMap();
+
 	private final HashSet<ManagedInstance<?>> externalEntities = Sets.newHashSet();
 	private final LinkedList<ManagedInstance<?>> identifiableEntities = Lists.newLinkedList();
 	private final LinkedList<ManagedInstance<?>> changedEntities = Lists.newLinkedList();
 
-	private List<ManagedInstance<?>> entitiesLoaded = Lists.newArrayList();
+	private List<ManagedInstance<?>> entitiesLoading = Lists.newArrayList();
 
 	private int loadTracker = 0;
 
@@ -151,20 +153,20 @@ public class SessionImpl {
 	}
 
 	/**
-	 * Returns the managed instance in the session.
+	 * Returns the managed instance instance in the session
 	 * 
-	 * @param instance
-	 *            the instance.
+	 * @param id
+	 *            the managed id
 	 * @param <X>
 	 *            the type of the instance
-	 * @return managed instance or null
+	 * @return the managed instance or null
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public <X> ManagedInstance<X> get(ManagedInstance<X> instance) {
-		return (ManagedInstance<X>) this.repository.get(instance);
+	public <X> ManagedInstance<X> get(ManagedId<X> id) {
+		return (ManagedInstance<X>) this.repository.get(id);
 	}
 
 	/**
@@ -181,10 +183,11 @@ public class SessionImpl {
 	 */
 	@SuppressWarnings("unchecked")
 	public <X> ManagedInstance<X> get(X entity) {
-		final EntityTypeImpl<?> type = this.metamodel.entity(entity.getClass());
-		final ManagedInstance<X> managedInstance = (ManagedInstance<X>) type.getManagedInstance(this, entity);
+		final EntityTypeImpl<X> type = (EntityTypeImpl<X>) this.metamodel.entity(entity.getClass());
 
-		return this.get(managedInstance);
+		final ManagedId<X> id = new ManagedId<X>(type, entity);
+
+		return (ManagedInstance<X>) this.repository.get(id);
 	}
 
 	/**
@@ -210,6 +213,19 @@ public class SessionImpl {
 	}
 
 	/**
+	 * Notifies the session that the lazy instance is loading
+	 * 
+	 * @param instance
+	 *            the instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void lazyInstanceLoading(ManagedInstance<?> instance) {
+		this.entitiesLoading.add(instance);
+	}
+
+	/**
 	 * Puts the instance into the session.
 	 * 
 	 * @param <X>
@@ -221,10 +237,10 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public <X> void put(ManagedInstance<X> instance) {
-		this.repository.put(instance, instance);
+		this.repository.put(instance.getId(), instance);
 
 		if (this.loadTracker > 0) {
-			this.entitiesLoaded.add(instance);
+			this.entitiesLoading.add(instance);
 		}
 	}
 
@@ -267,7 +283,7 @@ public class SessionImpl {
 	}
 
 	/**
-	 * Releases the load tracker, so that the entities loaded are processed for associations and <code>postload</code> listeners are
+	 * Releases the load tracker, so that the entities loaded are processed for associations and <code>PostLoad</code> listeners are
 	 * invoked.
 	 * 
 	 * @since $version
@@ -278,16 +294,21 @@ public class SessionImpl {
 
 		if (this.loadTracker == 0) {
 			// swap the set
-			final List<ManagedInstance<?>> entitiesLoaded = this.entitiesLoaded;
-			this.entitiesLoaded = Lists.newArrayList();
+			final List<ManagedInstance<?>> entitiesLoaded = this.entitiesLoading;
+			this.entitiesLoading = Lists.newArrayList();
 
 			for (final ManagedInstance<?> instance : entitiesLoaded) {
+				// check if the transaction is marked as rollback
 				final EntityTransactionImpl transaction = this.em.getTransaction();
 				if (transaction.getRollbackOnly()) {
 					return;
 				}
 
-				instance.getType().processAssociations(instance);
+				// mark as loaded
+				instance.setLoading(false);
+
+				// process the associations
+				instance.processAssociations();
 			}
 		}
 	}
