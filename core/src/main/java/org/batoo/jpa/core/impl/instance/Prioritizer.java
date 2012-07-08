@@ -19,12 +19,15 @@
 package org.batoo.jpa.core.impl.instance;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 
 import javax.persistence.PersistenceException;
 
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+
+import com.google.common.collect.Sets;
 
 /**
  * 
@@ -48,14 +51,44 @@ public class Prioritizer {
 
 		int instanceNo = 0;
 
-		// separate out the ones we know that have no dependencies
-		for (final Iterator<ManagedInstance<?>> i = instances.iterator(); i.hasNext();) {
-			final ManagedInstance<?> instance = i.next();
+		final HashSet<EntityTypeImpl<?>> entities = Sets.newHashSet();
+		for (final ManagedInstance<?> instance : instances) {
+			entities.add(instance.getType());
+		}
 
-			if (instance.getType().getDependencyCount() == 0) {
-				i.remove();
+		while (true) {
+			boolean removed = false;
 
-				sorted[instanceNo++] = instance;
+			for (final Iterator<EntityTypeImpl<?>> i = entities.iterator(); i.hasNext();) {
+				boolean hasDependency = false;
+
+				final EntityTypeImpl<?> e1 = i.next();
+
+				for (final EntityTypeImpl<?> e2 : entities) {
+					if (e1.getDependenciesFor(e2).length != 0) {
+						hasDependency = true;
+						break;
+					}
+				}
+
+				if (!hasDependency) {
+					i.remove();
+
+					for (final Iterator<ManagedInstance<?>> i2 = instances.iterator(); i2.hasNext();) {
+						final ManagedInstance<?> instance = i2.next();
+						if (instance.getType() == e1) {
+							i2.remove();
+
+							sorted[instanceNo++] = instance;
+						}
+					}
+
+					removed = true;
+				}
+			}
+
+			if (!removed) {
+				break;
 			}
 		}
 
