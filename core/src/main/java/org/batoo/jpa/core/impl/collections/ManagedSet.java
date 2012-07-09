@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.impl.collections;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -39,10 +40,10 @@ import com.google.common.collect.Sets;
  * @author hceylan
  * @since $version
  */
-public class ManagedSet<X, E> extends ManagedCollection implements Set<E> {
+public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 
-	private final Set<E> delegate = Sets.newHashSet();
-	private Set<E> snapshot;
+	private final HashSet<E> delegate = Sets.newHashSet();
+	private HashSet<E> snapshot;
 
 	private final transient PluralAssociationMapping<?, ?, E> mapping;
 	private final transient ManagedInstance<?> managedInstance;
@@ -175,6 +176,15 @@ public class ManagedSet<X, E> extends ManagedCollection implements Set<E> {
 	@Override
 	public boolean equals(Object obj) {
 		return this.delegate.equals(obj);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Set<E> getDelegate() {
+		return this.delegate;
 	}
 
 	/**

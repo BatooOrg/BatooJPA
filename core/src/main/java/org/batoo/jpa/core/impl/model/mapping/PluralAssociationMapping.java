@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.persistence.criteria.Path;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 
+import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.PredicateImpl;
@@ -207,7 +208,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 			join.alias(BatooUtils.acronym(entity.getName()).toLowerCase());
 			q = q.select(join);
 
-			entity.prepareEagerAssociations(join, 0, null);
+			entity.prepareEagerAssociations(join, 0, this);
 
 			// has single id mapping
 			final EntityTypeImpl<?> rootType = this.getRoot().getType();
@@ -290,8 +291,11 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public void load(ManagedInstance<?> instance) {
-		this.set(instance, this.loadCollection(instance));
+		final ManagedCollection<E> collection = (ManagedCollection<E>) this.attribute.newCollection(this, instance, false);
+		collection.getDelegate().addAll(this.loadCollection(instance));
+		this.set(instance, collection);
 	}
 
 	/**

@@ -20,6 +20,8 @@ package org.batoo.jpa.core.impl.model.mapping;
 
 import java.sql.SQLException;
 
+import javax.persistence.PersistenceException;
+
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
@@ -89,7 +91,10 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 	public void checkTransient(ManagedInstance<?> managedInstance) {
 		final X instance = this.get(managedInstance.getInstance());
 		if (instance != null) {
-			managedInstance.getSession().checkTransient(instance);
+			final Object instanceId = this.type.getInstanceId(instance);
+			if (instanceId == null) {
+				throw new PersistenceException("Instance " + instance + " is not managed");
+			}
 		}
 	}
 
@@ -230,7 +235,6 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 	 */
 	@Override
 	public void setLazy(ManagedInstance<?> instance) {
-		final ManagedInstance<X> value = this.type.getManagedInstanceById(instance.getSession(), this, instance.getId(), null, true);
-		this.set(instance, value.getInstance());
+		this.set(instance, this.type.getManagedInstanceById(instance.getSession(), this, instance.getId(), null, true).getInstance());
 	}
 }

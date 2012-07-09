@@ -487,24 +487,21 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		// if no inheritance then initialize and return
 		if (this.entity.getInheritanceType() == null) {
 			instance = (ManagedInstance<Y>) this.entity.getManagedInstanceById(session, managedId);
-
-			this.initializeInstance(session, row, instance);
-			session.put(instance);
-
-			return instance;
 		}
-
 		// inheritance is in place then locate the correct child type
-		final Object discriminatorValue = row.getObject(this.discriminatorAlias);
+		else {
+			final Object discriminatorValue = row.getObject(this.discriminatorAlias);
 
-		// check if we have a legal discriminator value
-		final EntityTypeImpl<Y> effectiveType = (EntityTypeImpl<Y>) this.entity.getChildType(discriminatorValue);
-		if (effectiveType == null) {
-			throw new IllegalArgumentException("Discriminator " + discriminatorValue + " not found in the type " + this.entity.getName());
+			// check if we have a legal discriminator value
+			final EntityTypeImpl<Y> effectiveType = (EntityTypeImpl<Y>) this.entity.getChildType(discriminatorValue);
+			if (effectiveType == null) {
+				throw new IllegalArgumentException("Discriminator " + discriminatorValue + " not found in the type " + this.entity.getName());
+			}
+
+			// initialize and return
+			instance = effectiveType.getManagedInstanceById(session, (ManagedId<Y>) managedId);
 		}
 
-		// initialize and return
-		instance = effectiveType.getManagedInstanceById(session, (ManagedId<Y>) managedId);
 		this.initializeInstance(session, row, instance);
 		session.put(instance);
 
@@ -664,9 +661,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 
 			// if it is a plural association then we will test if we processed the child
 			if (mapping instanceof PluralAssociationMapping) {
-				final PluralAssociationMapping<? super X, ?, ?> pluralMapping = (PluralAssociationMapping<? super X, ?, ?>) mapping;
-
-				if (((ManagedCollection) pluralMapping.get(instance.getInstance())).addChild(child.getInstance())) {
+				if (((ManagedCollection<?>) mapping.get(instance.getInstance())).addChild(child.getInstance())) {
 					// if it is a one-to-many mapping and has an inverse then set the inverses
 					if ((mapping.getInverse() != null) && //
 						(mapping.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_MANY)) {

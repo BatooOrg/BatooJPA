@@ -18,13 +18,18 @@
  */
 package org.batoo.jpa.core.impl.collections;
 
+import java.util.Collection;
+
 /**
  * Marker interface for managed collections.
+ * 
+ * @param <E>
+ *            the element type of the collection
  * 
  * @author hceylan
  * @since $version
  */
-public abstract class ManagedCollection {
+public abstract class ManagedCollection<E> {
 
 	/**
 	 * Adds the child to the managed list without initialize checks.
@@ -37,4 +42,14 @@ public abstract class ManagedCollection {
 	 * @author hceylan
 	 */
 	public abstract boolean addChild(Object child);
+
+	/**
+	 * Returns the delegate collection.
+	 * 
+	 * @return the delegate collection
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract Collection<E> getDelegate();
 }

@@ -181,7 +181,7 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void checkTransients() {
-		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociations()) {
+		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsNotPersistable()) {
 			association.checkTransient(this);
 		}
 	}

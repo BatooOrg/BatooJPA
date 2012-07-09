@@ -220,7 +220,8 @@ public abstract class Mapping<Z, X, Y> {
 		}
 
 		if (!this.inherited || managedInstance.getType().extendz(this.entity)) {
-			this.getAttribute().set(instance, value);
+			AttributeImpl<? super Z, X> attribute = this.getAttribute();
+			attribute.set(instance, value);
 		}
 	}
 

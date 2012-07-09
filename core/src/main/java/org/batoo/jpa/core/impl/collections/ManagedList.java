@@ -41,10 +41,10 @@ import com.google.common.collect.Lists;
  * @author hceylan
  * @since $version
  */
-public class ManagedList<X, E> extends ManagedCollection implements List<E> {
+public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 
 	private final ArrayList<E> delegate = Lists.newArrayList();
-	private List<E> snapshot;
+	private ArrayList<E> snapshot;
 
 	private final transient PluralAssociationMapping<?, ?, E> mapping;
 	private final transient ManagedInstance<?> managedInstance;
@@ -213,6 +213,15 @@ public class ManagedList<X, E> extends ManagedCollection implements List<E> {
 	public E get(int index) {
 		this.initialize();
 		return this.delegate.get(index);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public ArrayList<E> getDelegate() {
+		return this.delegate;
 	}
 
 	/**

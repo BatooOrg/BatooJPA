@@ -110,6 +110,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 	private AssociationMapping<?, ?, ?>[] associations;
 	private AssociationMapping<?, ?, ?>[] associationsPersistable;
+	private AssociationMapping<?, ?, ?>[] associationsNotPersistable;
 	private AssociationMapping<?, ?, ?>[] associationsEager;
 	private AssociationMapping<?, ?, ?>[] associationsJoined;
 	private PluralAssociationMapping<?, ?, ?>[] associationsPlural;
@@ -152,25 +153,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		this.initTables(metadata);
 		this.rootMapping = new RootMapping<X>(this);
 		this.linkMappings();
-	}
-
-	/**
-	 * Creates and returns a base query that selects the entity with its eager associations.
-	 * 
-	 * @return the created base query
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public CriteriaQueryImpl<X> createBaseQuery() {
-		final CriteriaBuilderImpl cb = this.getMetamodel().getEntityManagerFactory().getCriteriaBuilder();
-		CriteriaQueryImpl<X> q = cb.createQuery(this.getJavaType());
-		final RootImpl<X> r = q.from(this);
-		q = q.select(r);
-
-		this.prepareEagerAssociations(r, 0, null);
-
-		return q;
 	}
 
 	private void enhanceIfNeccessary() {
@@ -395,6 +377,41 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			joinedAssociations.toArray(joinedAssociations0);
 
 			return this.associationsJoined = joinedAssociations0;
+		}
+	}
+
+	/**
+	 * Returns the plural associations that are not persistable.
+	 * 
+	 * @return the plural associations that are not persistable
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public AssociationMapping<?, ?, ?>[] getAssociationsNotPersistable() {
+		if (this.associationsNotPersistable != null) {
+			return this.associationsNotPersistable;
+		}
+
+		synchronized (this) {
+			if (this.associationsNotPersistable != null) {
+				return this.associationsNotPersistable;
+			}
+
+			final List<AssociationMapping<?, ?, ?>> associationsNotPersistable = Lists.newArrayList();
+			for (final AssociationMapping<?, ?, ?> mapping : this.getAssociations()) {
+				// skip persistable associations
+				if (mapping.cascadesPersist()) {
+					continue;
+				}
+
+				associationsNotPersistable.add(mapping);
+			}
+
+			final AssociationMapping<?, ?, ?>[] associationsNotPersistable0 = new AssociationMapping[associationsNotPersistable.size()];
+			associationsNotPersistable.toArray(associationsNotPersistable0);
+
+			return this.associationsNotPersistable = associationsNotPersistable0;
 		}
 	}
 
@@ -840,6 +857,35 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
+	 * Returns the associations of the type.
+	 * 
+	 * @return the associations of the type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public AssociationMapping<?, ?, ?>[] getPluralAssociations() {
+		if (this.associations != null) {
+			return this.associations;
+		}
+
+		synchronized (this) {
+			if (this.associations != null) {
+				return this.associations;
+			}
+
+			final List<AssociationMapping<?, ?, ?>> associations = Lists.newArrayList();
+
+			this.rootMapping.addAssociations(associations);
+
+			final AssociationMapping<?, ?, ?>[] associatedAttributes0 = new AssociationMapping[associations.size()];
+			associations.toArray(associatedAttributes0);
+
+			return this.associations = associatedAttributes0;
+		}
+	}
+
+	/**
 	 * Returns the primary table of the type
 	 * 
 	 * @return the primary table
@@ -1267,26 +1313,23 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public void prepareEagerAssociations(FetchParent<?, ?> r, int depth, AssociationMapping<?, ?, ?> parent) {
-		if (true) {
-			return;
-		}
-
 		if (depth < EntityTypeImpl.MAX_DEPTH) {
 
 			for (final AssociationMapping<?, ?, ?> association : this.getAssociationsEager()) {
+				if (!association.getAttribute().isCollection()) {
+					// if we are coming from the inverse side and inverse side is not many-to-one then skip
+					if ((parent != null) && //
+						(association.getInverse() == parent) && //
+						(parent.getAttribute().getPersistentAttributeType() != PersistentAttributeType.MANY_TO_ONE)) {
+						continue;
+					}
 
-				// if we are coming from the inverse side and inverse side is not many-to-one then skip
-				if ((parent != null) && //
-					(association.getInverse() == parent) && //
-					(parent.getAttribute().getPersistentAttributeType() != PersistentAttributeType.MANY_TO_ONE)) {
-					continue;
+					final Fetch<?, Object> r2 = r.fetch(association.getAttribute().getName(), JoinType.LEFT);
+
+					final EntityTypeImpl<?> type = association.getType();
+
+					type.prepareEagerAssociations(r2, depth + 1, association);
 				}
-
-				final Fetch<?, Object> r2 = r.fetch(association.getAttribute().getName(), JoinType.LEFT);
-
-				final EntityTypeImpl<?> type = association.getType();
-
-				type.prepareEagerAssociations(r2, depth + 1, association);
 			}
 		}
 	}
