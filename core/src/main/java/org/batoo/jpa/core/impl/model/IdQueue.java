@@ -51,7 +51,6 @@ public abstract class IdQueue extends LinkedBlockingQueue<Integer> {
 
 	private final String name;
 	private final int allocationSize;
-	private final int topupSize;
 
 	/**
 	 * @param idExecuter
@@ -69,7 +68,6 @@ public abstract class IdQueue extends LinkedBlockingQueue<Integer> {
 
 		this.name = name;
 		this.allocationSize = allocationSize;
-		this.topupSize = allocationSize / 2;
 
 		idExecuter.execute(new TopUpTask());
 	}
@@ -89,7 +87,7 @@ public abstract class IdQueue extends LinkedBlockingQueue<Integer> {
 				return;
 			}
 
-			if (this.size() <= (this.topupSize)) {
+			if (this.size() <= (this.allocationSize)) {
 				IdQueue.LOG.debug("Ids will be fetched for {0} from the database...", this.name);
 
 				try {
