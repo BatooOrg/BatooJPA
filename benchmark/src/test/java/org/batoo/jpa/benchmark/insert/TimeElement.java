@@ -65,13 +65,13 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	 */
 	public void addTime(long used, boolean self, boolean inDerby) {
 		this.hits++;
-		this.time += used / 1000;
+		this.time += used;
 		if (!inDerby) {
-			this.timeWithoutDerby += used / 1000;
+			this.timeWithoutDerby += used;
 		}
 		if (self) {
 			this.selfHit++;
-			this.self += used / 1000;
+			this.self += used;
 		}
 	}
 
@@ -95,16 +95,16 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	 * @author hceylan
 	 */
 	public int dump(int rowNo, int depth) {
-		if ((depth > 0) && (this.timeWithoutDerby > 10000)) {
+		if (this.timeWithoutDerby > 10000000) {
 			rowNo++;
 			final String tabs = StringUtils.repeat(" ", depth);
 			System.out.println(String.format("%010d", rowNo) + //
 				" " + String.format("%010d", depth) + //
 				" " + String.format("%010d", this.hits) + //
 				" " + String.format("%010d", this.selfHit) + //
-				" " + String.format("%010d", this.time / 1000) + //
-				" " + String.format("%010d", this.timeWithoutDerby / 1000) + //
-				" " + String.format("%010d", this.self / 1000) + //
+				" " + String.format("%010d", this.time / 1000000) + //
+				" " + String.format("%010d", this.timeWithoutDerby / 1000000) + //
+				" " + String.format("%010d", this.self / 1000000) + //
 				tabs + this.key);
 		}
 

@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.collections;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -40,9 +41,9 @@ import com.google.common.collect.Lists;
  * @author hceylan
  * @since $version
  */
-public class ManagedList<X, E> implements ManagedCollection, List<E> {
+public class ManagedList<X, E> extends ManagedCollection implements List<E> {
 
-	private final List<E> delegate = Lists.newArrayList();
+	private final ArrayList<E> delegate = Lists.newArrayList();
 	private List<E> snapshot;
 
 	private final transient PluralAssociationMapping<?, ?, E> mapping;
@@ -139,6 +140,20 @@ public class ManagedList<X, E> implements ManagedCollection, List<E> {
 		this.initialize();
 		this.snapshot();
 		return this.changed(this.delegate.addAll(index, c));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public boolean addChild(Object child) {
+		if (!this.delegate.contains(child)) {
+			return this.delegate.add((E) child);
+		}
+
+		return false;
 	}
 
 	private <T> T changed(T value) {

@@ -67,6 +67,18 @@ public class RootMapping<X> extends ParentMapping<X, X> {
 	}
 
 	/**
+	 * Returns the entity of the root mapping.
+	 * 
+	 * @return the entity of the root mapping
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public EntityTypeImpl<X> getEntity() {
+		return this.entity;
+	}
+
+	/**
 	 * Returns the mapping corresponding to the path.
 	 * 
 	 * @param path

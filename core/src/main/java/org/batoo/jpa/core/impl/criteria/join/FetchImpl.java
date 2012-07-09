@@ -96,7 +96,7 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 
 		builder.append(parent).append(".").append(this.mapping.getAttribute().getName());
 
-		final String children = super.generateJpqlFetches(this.mapping.getType().getName());
+		final String children = super.generateJpqlFetches(parent + "." + this.mapping.getAttribute().getName());
 		if (StringUtils.isNotBlank(children)) {
 			builder.append("\n").append(children);
 		}

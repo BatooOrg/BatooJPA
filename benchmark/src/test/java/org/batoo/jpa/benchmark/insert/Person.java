@@ -18,7 +18,7 @@
  */
 package org.batoo.jpa.benchmark.insert;
 
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -28,7 +28,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * 
@@ -43,10 +43,10 @@ public class Person {
 	private Integer id;
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "person")
-	private final List<Address> addresses = Lists.newArrayList();
+	private final Set<Address> addresses = Sets.newHashSet();
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "person")
-	private final List<Phone> phones = Lists.newArrayList();
+	private final Set<Phone> phones = Sets.newHashSet();
 
 	private String name;
 
@@ -56,7 +56,7 @@ public class Person {
 	 * @return the addresses
 	 * @since $version
 	 */
-	public List<Address> getAddresses() {
+	public Set<Address> getAddresses() {
 		return this.addresses;
 	}
 
@@ -86,7 +86,7 @@ public class Person {
 	 * @return the phones
 	 * @since $version
 	 */
-	public List<Phone> getPhones() {
+	public Set<Phone> getPhones() {
 		return this.phones;
 	}
 

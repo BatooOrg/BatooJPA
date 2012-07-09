@@ -22,7 +22,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.PersistenceException;
@@ -30,8 +29,8 @@ import javax.persistence.PersistenceException;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
 import org.batoo.jpa.core.impl.instance.Prioritizer;
+import org.batoo.jpa.core.impl.instance.Status;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
@@ -56,8 +55,8 @@ public class SessionImpl {
 	private final HashMap<ManagedId<?>, ManagedInstance<?>> repository = Maps.newHashMap();
 
 	private final HashSet<ManagedInstance<?>> externalEntities = Sets.newHashSet();
-	private final LinkedList<ManagedInstance<?>> identifiableEntities = Lists.newLinkedList();
-	private final LinkedList<ManagedInstance<?>> changedEntities = Lists.newLinkedList();
+	private final HashSet<ManagedInstance<?>> identifiableEntities = Sets.newHashSet();
+	private final HashSet<ManagedInstance<?>> changedEntities = Sets.newHashSet();
 
 	private List<ManagedInstance<?>> entitiesLoading = Lists.newArrayList();
 
@@ -130,7 +129,7 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public void flush(ConnectionImpl connection, EntityTransactionImpl transaction) throws SQLException {
-		final int totalSize = this.externalEntities.size() + this.externalEntities.size() + this.changedEntities.size();
+		final int totalSize = this.externalEntities.size() + this.identifiableEntities.size() + this.changedEntities.size();
 		final ArrayList<ManagedInstance<?>> instances = Lists.newArrayListWithCapacity(totalSize);
 
 		instances.addAll(this.externalEntities);
@@ -165,8 +164,8 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public <X> ManagedInstance<X> get(ManagedId<X> id) {
-		return (ManagedInstance<X>) this.repository.get(id);
+	public <Y, X> ManagedInstance<Y> get(ManagedId<X> id) {
+		return (ManagedInstance<Y>) this.repository.get(id);
 	}
 
 	/**
@@ -329,9 +328,7 @@ public class SessionImpl {
 	public <X> void remove(EntityTransactionImpl transaction, ManagedInstance<X> instance) {
 		final ManagedInstance<?> removed = this.repository.remove(instance);
 
-		if (removed.isExternal()) {
-			this.externalEntities.remove(instance);
-		}
+		this.externalEntities.remove(instance);
 
 		removed.cascadeDetach(transaction);
 

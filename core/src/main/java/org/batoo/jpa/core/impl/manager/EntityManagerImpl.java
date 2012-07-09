@@ -45,7 +45,7 @@ import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.instance.ManagedInstance.Status;
+import org.batoo.jpa.core.impl.instance.Status;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
@@ -331,7 +331,7 @@ public class EntityManagerImpl implements EntityManager {
 		// try to locate in the session
 		final EntityTypeImpl<T> type = this.metamodel.entity(entityClass);
 
-		final ManagedInstance<T> instance = this.session.get(new ManagedId<T>(primaryKey, type));
+		final ManagedInstance<? extends T> instance = this.session.get(new ManagedId<T>(primaryKey, type));
 		if (instance != null) {
 			if (instance.getInstance() instanceof EnhancedInstance) {
 				final EnhancedInstance enhanced = (EnhancedInstance) instance.getInstance();
@@ -614,15 +614,18 @@ public class EntityManagerImpl implements EntityManager {
 	 * 
 	 * @param entity
 	 *            the entity to cascade
+	 * @param <X>
+	 *            the type of the entity
 	 * @return true if an implicit flush is required, false otherwise
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public boolean persistImpl(Object entity) {
+	@SuppressWarnings("unchecked")
+	public <X> boolean persistImpl(X entity) {
 		boolean requiresFlush = false;
 
-		final ManagedInstance<?> existing = this.session.get(entity);
+		final ManagedInstance<X> existing = this.session.get(entity);
 		if (existing != null) {
 			switch (existing.getStatus()) {
 				case DETACHED:
@@ -638,8 +641,8 @@ public class EntityManagerImpl implements EntityManager {
 			}
 		}
 		else {
-			final EntityTypeImpl<?> type = this.metamodel.entity(entity.getClass());
-			final ManagedInstance<?> instance = type.getManagedInstance(this.session, entity);
+			final EntityTypeImpl<X> type = (EntityTypeImpl<X>) this.metamodel.entity(entity.getClass());
+			final ManagedInstance<X> instance = type.getManagedInstance(this.session, entity);
 
 			requiresFlush = !instance.fillIdValues();
 			requiresFlush |= instance.cascadePersist(this);

@@ -121,9 +121,9 @@ public class ManagedId<X> {
 		}
 
 		final int prime = 31;
-		int h = 1;
+		this.h = 1;
 
-		h = (prime * h) + this.id.hashCode();
-		return h = (prime * h) + this.type.getName().hashCode();
+		this.h = (prime * this.h) + this.id.hashCode();
+		return this.h = (prime * this.h) + this.type.getName().hashCode();
 	}
 }

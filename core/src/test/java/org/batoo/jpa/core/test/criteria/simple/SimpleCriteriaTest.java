@@ -25,8 +25,6 @@ import javax.persistence.criteria.Join;
 
 import junit.framework.Assert;
 
-import org.batoo.jpa.common.log.BLogger;
-import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
@@ -47,8 +45,6 @@ import org.junit.Test;
  * @since $version
  */
 public class SimpleCriteriaTest extends BaseCoreTest {
-
-	private static final BLogger LOG = BLoggerFactory.getLogger(SimpleCriteriaTest.class);
 
 	private static final String COUNTRY_UK = "United Kingdom";
 	private static final String COUNTRY_USA = "United States of America";
@@ -160,8 +156,10 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 		final CriteriaQueryImpl<Person> q = cb.createQuery(Person.class);
 		final RootImpl<Person> r = q.from(Person.class);
 		q.select(r);
+		r.join("addresses");
 		r.alias("p");
-		r.fetch("addresses");
+		r.fetch("addresses").fetch("country");
+		r.fetch("phones");
 
 		final AbstractPath<Object> id = r.get("id");
 		final ParameterExpressionImpl<Integer> p = cb.parameter(Integer.class);
@@ -172,7 +170,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 		tq.setParameter(1, 9);
 
 		final List<Person> resultList = tq.getResultList();
-		Assert.assertEquals(3, resultList.size());
+		Assert.assertEquals(18, resultList.size());
 		Assert.assertEquals(3, resultList.get(0).getAddresses().size());
 	}
 
@@ -246,7 +244,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 		final RootImpl<Person> r = q.from(Person.class);
 		q.select(r);
 		r.alias("p");
-		r.fetch("addresses");
+		r.fetch("addresses").fetch("country");
 		r.join("addresses");
 
 		final List<Person> resultList = this.em().createQuery(q).getResultList();

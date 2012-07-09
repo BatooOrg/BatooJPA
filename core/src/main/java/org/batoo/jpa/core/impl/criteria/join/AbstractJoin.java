@@ -23,6 +23,7 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.metamodel.Attribute;
 
+import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 
 /**
@@ -40,7 +41,7 @@ public abstract class AbstractJoin<Z, X> extends AbstractFrom<Z, X> implements J
 
 	private final AbstractFrom<?, Z> parent;
 	private final AssociationMapping<? super Z, ?, X> mapping;
-	private final JoinType jointType;
+	private final JoinType joinType;
 
 	/**
 	 * @param parent
@@ -58,7 +59,7 @@ public abstract class AbstractJoin<Z, X> extends AbstractFrom<Z, X> implements J
 
 		this.parent = parent;
 		this.mapping = mapping;
-		this.jointType = jointType;
+		this.joinType = jointType;
 	}
 
 	/**
@@ -67,8 +68,15 @@ public abstract class AbstractJoin<Z, X> extends AbstractFrom<Z, X> implements J
 	 */
 	@Override
 	public String generateJpqlSelect() {
-		// TODO Auto-generated method stub
-		return null;
+		final StringBuilder builder = new StringBuilder();
+
+		builder.append(this.getParent().generateJpqlSelect());
+		builder.append(".").append(this.mapping.getAttribute().getName());
+		if (StringUtils.isNotBlank(this.getAlias())) {
+			builder.append(" as ").append(this.getAlias());
+		}
+
+		return builder.toString();
 	}
 
 	/**
@@ -86,7 +94,7 @@ public abstract class AbstractJoin<Z, X> extends AbstractFrom<Z, X> implements J
 	 */
 	@Override
 	public JoinType getJoinType() {
-		return this.jointType;
+		return this.joinType;
 	}
 
 	/**

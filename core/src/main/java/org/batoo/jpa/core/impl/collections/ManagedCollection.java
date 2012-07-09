@@ -24,4 +24,17 @@ package org.batoo.jpa.core.impl.collections;
  * @author hceylan
  * @since $version
  */
-public interface ManagedCollection {}
+public abstract class ManagedCollection {
+
+	/**
+	 * Adds the child to the managed list without initialize checks.
+	 * 
+	 * @param child
+	 *            the child to add
+	 * @return if the child is added
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract boolean addChild(Object child);
+}

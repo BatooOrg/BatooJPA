@@ -36,6 +36,8 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
 import org.batoo.jpa.benchmark.insert.BenchmarkClassLoader.Type;
+import org.batoo.jpa.common.log.BLogger;
+import org.batoo.jpa.common.log.BLoggerFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -50,6 +52,8 @@ import com.google.common.collect.Maps;
  * @since $version
  */
 public class Playground {
+
+	private static final BLogger LOG = BLoggerFactory.getLogger(Playground.class);
 
 	private static final String PU_NAME = "insert";
 
@@ -94,7 +98,7 @@ public class Playground {
 				while (Playground.this.running) {
 					Playground.this._measureSingleTime(id, mxBean);
 					try {
-						Thread.sleep(1);
+						Thread.sleep(0, 100);
 					}
 					catch (final InterruptedException e) {}
 				}
@@ -183,8 +187,8 @@ public class Playground {
 
 				gotStart = true;
 
-				// final String key = stElement.getClassName() + "." + stElement.getMethodName();
-				final String key = stElement.getClassName() + "." + stElement.getMethodName() + "." + stElement.getLineNumber();
+				final String key = stElement.getClassName() + "." + stElement.getMethodName();
+				// final String key = stElement.getClassName() + "." + stElement.getMethodName() + "." + stElement.getLineNumber();
 				child = child.get(key);
 				TimeElement child2 = this.elements.get(key);
 				if (child2 == null) {
@@ -303,6 +307,16 @@ public class Playground {
 
 			final EntityManagerFactory emf = Persistence.createEntityManagerFactory(Playground.PU_NAME);
 
+			// final EntityManager em = emf.createEntityManager();
+			// final Country country = new Country();
+			//
+			// country.setName("Turkey");
+			// em.getTransaction().begin();
+			// em.persist(country);
+			// em.getTransaction().commit();
+			//
+			// em.close();
+
 			System.currentTimeMillis();
 
 			this.test(type, emf);
@@ -327,8 +341,11 @@ public class Playground {
 			catch (final InterruptedException e) {}
 		}
 
-		for (int i = 0; i < 25000; i++) {
-			this.singleTest(emf);
+		for (int i = 0; i < 250; i++) {
+			Playground.LOG.warn("{0}", i);
+			for (int j = 0; j < 100; j++) {
+				this.singleTest(emf);
+			}
 		}
 	}
 }

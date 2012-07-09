@@ -219,7 +219,7 @@ public abstract class Mapping<Z, X, Y> {
 			}
 		}
 
-		if (!this.inherited || managedInstance.getType().doesExtend(this.entity)) {
+		if (!this.inherited || managedInstance.getType().extendz(this.entity)) {
 			this.getAttribute().set(instance, value);
 		}
 	}

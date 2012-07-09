@@ -33,6 +33,15 @@ public class HowAboutThat {
 	private static final int COUNT = 10000;
 
 	public static void main(String[] args) {
+		final long time = System.currentTimeMillis();
+		for (int i = 0; i < (250000 * 50); i++) {
+			new ArrayList<HowAboutThat>();
+		}
+
+		System.out.println(System.currentTimeMillis() - time);
+	}
+
+	public static void main1(String[] args) {
 
 		final ArrayList<Integer> list = Lists.newArrayList();
 		for (int i = 0; i < HowAboutThat.COUNT; i++) {

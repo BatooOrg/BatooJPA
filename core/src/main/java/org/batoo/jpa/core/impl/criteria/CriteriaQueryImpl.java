@@ -66,6 +66,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	private final Map<String, ParameterExpressionImpl<?>> parameterMap = Maps.newHashMap();
 	private final List<ParameterExpressionImpl<?>> parameters = Lists.newArrayList();
 	private boolean distinct;
+	private boolean internal;
 
 	private String sql;
 	private String jpql;
@@ -104,10 +105,10 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 * 
 	 */
 	@Override
-	public CriteriaQuery<T> distinct(boolean distinct) {
+	public CriteriaQueryImpl<T> distinct(boolean distinct) {
 		this.distinct = distinct;
 
-		return null;
+		return this;
 	}
 
 	private String generateJpql() {
@@ -169,7 +170,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 		// generate the select chunk
 		final StringBuilder select = new StringBuilder();
 		select.append("SELECT");
-		if (this.distinct) {
+		if (this.distinct && !this.internal) {
 			select.append(" DISTINCT");
 		}
 		select.append("\n\t");
@@ -340,6 +341,21 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	@Override
 	public CriteriaQuery<T> having(Predicate... restrictions) {
 		return (CriteriaQuery<T>) super.having(restrictions);
+	}
+
+	/**
+	 * Marks the query as internal entity query.
+	 * 
+	 * @return self
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public CriteriaQueryImpl<T> internal() {
+		this.internal = true;
+		this.distinct = true;
+
+		return this;
 	}
 
 	/**

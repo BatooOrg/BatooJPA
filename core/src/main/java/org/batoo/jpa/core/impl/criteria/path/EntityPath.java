@@ -172,7 +172,7 @@ public abstract class EntityPath<Z, X> extends AbstractPath<X> implements Joinab
 	 */
 	@Override
 	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
-		return this.fetchRoot.generateSqlSelect(query);
+		return this.fetchRoot.generateSqlSelect(query, true);
 	}
 
 	/**

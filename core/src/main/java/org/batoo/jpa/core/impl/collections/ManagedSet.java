@@ -39,7 +39,7 @@ import com.google.common.collect.Sets;
  * @author hceylan
  * @since $version
  */
-public class ManagedSet<X, E> implements ManagedCollection, Set<E> {
+public class ManagedSet<X, E> extends ManagedCollection implements Set<E> {
 
 	private final Set<E> delegate = Sets.newHashSet();
 	private Set<E> snapshot;
@@ -113,6 +113,20 @@ public class ManagedSet<X, E> implements ManagedCollection, Set<E> {
 		this.initialize();
 		this.snapshot();
 		return this.changed(this.delegate.addAll(c));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public boolean addChild(Object child) {
+		if (!this.delegate.contains(child)) {
+			return this.delegate.add((E) child);
+		}
+
+		return false;
 	}
 
 	private <T> T changed(T value) {

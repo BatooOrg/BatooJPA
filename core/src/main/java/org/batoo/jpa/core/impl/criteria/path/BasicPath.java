@@ -97,12 +97,7 @@ public class BasicPath<X> extends AbstractPath<X> {
 	public String generateJpqlSelect() {
 		final StringBuilder builder = new StringBuilder();
 
-		if ((this.getParentPath() instanceof EntityPath) && StringUtils.isNotBlank(this.getParentPath().getAlias())) {
-			builder.append(this.getParentPath().getAlias());
-		}
-		else {
-			builder.append(this.getParentPath().generateJpqlSelect());
-		}
+		builder.append(this.getParentPath().generateJpqlSelect());
 
 		builder.append(".").append(this.mapping.getAttribute().getName());
 		if (StringUtils.isNotBlank(this.getAlias())) {

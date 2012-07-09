@@ -43,6 +43,7 @@ import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.util.BatooUtils;
 import org.batoo.jpa.core.util.Pair;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
@@ -198,10 +199,12 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 			final EntityTypeImpl<E> entity = metamodel.entity(this.attribute.getBindableJavaType());
 
 			CriteriaQueryImpl<E> q = cb.createQuery(this.attribute.getBindableJavaType());
-			q.distinct(true);
+			q.internal();
 			final RootImpl<?> r = q.from(this.getRoot().getType());
+			r.alias(BatooUtils.acronym(this.getRoot().getName()).toLowerCase());
 			// TODO handle embeddables along the path
 			final AbstractJoin<?, E> join = r.<E> join(this.attribute.getName());
+			join.alias(BatooUtils.acronym(entity.getName()).toLowerCase());
 			q = q.select(join);
 
 			entity.prepareEagerAssociations(join, 0, null);

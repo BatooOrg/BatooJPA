@@ -48,34 +48,6 @@ import com.google.common.collect.Sets;
  */
 public class ManagedInstance<X> {
 
-	/**
-	 * The states for a managed instance
-	 * 
-	 * @author hceylan
-	 * @since $version
-	 */
-	public enum Status {
-		/**
-		 * Instance is new
-		 */
-		NEW,
-
-		/**
-		 * Instance is managed
-		 */
-		MANAGED,
-
-		/**
-		 * Instance is removed
-		 */
-		REMOVED,
-
-		/**
-		 * Instance is detached
-		 */
-		DETACHED,
-	}
-
 	private final EntityTypeImpl<X> type;
 	private final SessionImpl session;
 	private final X instance;
@@ -89,9 +61,8 @@ public class ManagedInstance<X> {
 	private EntityTransactionImpl transaction;
 
 	private boolean loading;
-	private final boolean external = true;
 
-	private ManagedId<X> id;
+	private ManagedId<? super X> id;
 	private int h;
 
 	/**
@@ -138,20 +109,20 @@ public class ManagedInstance<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedInstance(EntityTypeImpl<X> type, SessionImpl session, X instance, Object id) {
+	public ManagedInstance(EntityTypeImpl<X> type, SessionImpl session, X instance, ManagedId<? super X> id) {
 		this(type, session, instance);
 
 		if (this.idMapping != null) {
-			this.idMapping.set(this, id);
+			this.idMapping.set(this, id.getId());
 		}
 		else {
 			for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.idMappings) {
-				final Object value = pair.getSecond().get(id);
+				final Object value = pair.getSecond().get(id.getId());
 				pair.getFirst().set(this, value);
 			}
 		}
 
-		this.id = new ManagedId<X>(type, instance);
+		this.id = id;
 	}
 
 	/**
@@ -335,7 +306,7 @@ public class ManagedInstance<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedId<X> getId() {
+	public ManagedId<? super X> getId() {
 		if (this.id != null) {
 			return this.id;
 		}
@@ -404,16 +375,6 @@ public class ManagedInstance<X> {
 		this.h = (prime * result) + this.type.getRootType().getName().hashCode();
 
 		return this.h = (prime * result) + id.hashCode();
-	}
-
-	/**
-	 * Returns the external.
-	 * 
-	 * @return the external
-	 * @since $version
-	 */
-	public boolean isExternal() {
-		return this.external;
 	}
 
 	/**
@@ -524,7 +485,6 @@ public class ManagedInstance<X> {
 			+ ", type=" + this.type.getName() //
 			+ ", status=" + this.status //
 			+ ", id=" + this.id //
-			+ ", external=" + this.external //
 			+ ", instance=" //
 			+ this.instance + "]";
 	}

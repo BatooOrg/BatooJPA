@@ -16,54 +16,32 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.util;
-
-import org.apache.commons.lang.StringUtils;
+package org.batoo.jpa.core.impl.instance;
 
 /**
- * 
+ * The states for a managed instance
  * 
  * @author hceylan
  * @since $version
  */
-public class BatooUtils {
+public enum Status {
+	/**
+	 * Instance is new
+	 */
+	NEW,
 
 	/**
-	 * Returns the acronym of the name
-	 * 
-	 * @param name
-	 *            the name
-	 * @return the acronym
-	 * 
-	 * @since $version
-	 * @author hceylan
+	 * Instance is managed
 	 */
-	public static String acronym(String name) {
-		final StringBuilder builder = new StringBuilder();
-		for (int i = 0; i < name.length(); i++) {
-			if (Character.isUpperCase(name.charAt(i))) {
-				builder.append(name.charAt(i));
-			}
-		}
-
-		return builder.toString();
-	}
+	MANAGED,
 
 	/**
-	 * Indents the <code>string</code> by one <code>tab</code>.
-	 * 
-	 * @param str
-	 *            string to indent
-	 * @return the indented string
-	 * 
-	 * @since $version
-	 * @author hceylan
+	 * Instance is removed
 	 */
-	public static String indent(String str) {
-		if (StringUtils.isBlank(str)) {
-			return "";
-		}
+	REMOVED,
 
-		return "\t" + str.replaceAll("\n", "\n\t");
-	}
+	/**
+	 * Instance is detached
+	 */
+	DETACHED,
 }

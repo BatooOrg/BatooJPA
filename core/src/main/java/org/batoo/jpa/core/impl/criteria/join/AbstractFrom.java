@@ -52,7 +52,7 @@ import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * Represents a bound type, usually an entity that appears in the from clause, but may also be an embeddable belonging to an entity in the
@@ -72,7 +72,7 @@ import com.google.common.collect.Lists;
 public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements From<Z, X> {
 
 	private final EntityTypeImpl<X> entity;
-	private final List<AbstractJoin<X, ?>> joins = Lists.newArrayList();
+	private final Set<AbstractJoin<X, ?>> joins = Sets.newHashSet();
 
 	/**
 	 * Constructor for root types
@@ -214,8 +214,9 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 */
 	@Override
 	public Set<Join<X, ?>> getJoins() {
-		// TODO Auto-generated method stub
-		return null;
+		final Set<Join<X, ?>> joins = Sets.newHashSet();
+		joins.addAll(this.joins);
+		return joins;
 	}
 
 	/**

@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -46,6 +47,7 @@ import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.instance.Enhancer;
+import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
@@ -65,6 +67,7 @@ import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.RootMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
+import org.batoo.jpa.core.util.BatooUtils;
 import org.batoo.jpa.core.util.Pair;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
@@ -103,7 +106,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private CriteriaQueryImpl<X> selectCriteria;
 
 	private int dependencyCount;
-	private final Map<EntityTypeImpl<?>, AssociationMapping<?, ?, ?>[]> dependencyMap = Maps.newHashMap();
+	private final HashMap<EntityTypeImpl<?>, AssociationMapping<?, ?, ?>[]> dependencyMap = Maps.newHashMap();
 
 	private AssociationMapping<?, ?, ?>[] associations;
 	private AssociationMapping<?, ?, ?>[] associationsPersistable;
@@ -170,30 +173,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		return q;
 	}
 
-	/**
-	 * Returns if this entity extends the parent entity.
-	 * 
-	 * @param parent
-	 *            the parent to test
-	 * @return true if this entity extends the parent entity, false otherwise
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public boolean doesExtend(EntityTypeImpl<?> parent) {
-		IdentifiableTypeImpl<? super X> supertype = this;
-
-		do {
-			if (supertype == parent) {
-				return true;
-			}
-			supertype = supertype.getSupertype();
-		}
-		while (supertype != null);
-
-		return false;
-	}
-
 	private void enhanceIfNeccessary() {
 		if (this.constructor != null) {
 			return;
@@ -222,6 +201,30 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				}
 			}
 		}
+	}
+
+	/**
+	 * Returns if this entity extends the parent entity.
+	 * 
+	 * @param parent
+	 *            the parent to test
+	 * @return true if this entity extends the parent entity, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean extendz(EntityTypeImpl<?> parent) {
+		IdentifiableTypeImpl<? super X> supertype = this;
+
+		do {
+			if (supertype == parent) {
+				return true;
+			}
+			supertype = supertype.getSupertype();
+		}
+		while (supertype != null);
+
+		return false;
 	}
 
 	/**
@@ -740,13 +743,12 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
-	public ManagedInstance<X> getManagedInstance(SessionImpl session, Object instance) {
+	public ManagedInstance<X> getManagedInstance(SessionImpl session, X instance) {
 		if (instance == null) {
 			throw new NullPointerException();
 		}
 
-		return new ManagedInstance<X>(this, session, (X) instance);
+		return new ManagedInstance<X>(this, session, instance);
 	}
 
 	/**
@@ -761,7 +763,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedInstance<X> getManagedInstanceById(SessionImpl session, Object id) {
+	public ManagedInstance<X> getManagedInstanceById(SessionImpl session, ManagedId<X> id) {
 		return this.getManagedInstanceById(session, null, null, id, false);
 	}
 
@@ -784,11 +786,13 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	@SuppressWarnings({ "unchecked" })
-	public ManagedInstance<X> getManagedInstanceById(SessionImpl session, SingularAssociationMapping<?, ?> mapping, Object mappingId, Object id, boolean lazy) {
+	public ManagedInstance<X> getManagedInstanceById(SessionImpl session, SingularAssociationMapping<?, ?> mapping, ManagedId<?> mappingId, ManagedId<X> id,
+		boolean lazy) {
 		this.enhanceIfNeccessary();
 
 		try {
-			final X instance = (X) this.constructor.newInstance(new Object[] { this.getJavaType(), session, mapping, mappingId, id, !lazy });
+			final X instance = (X) this.constructor.newInstance(new Object[] { this.getJavaType(), session, mapping, mappingId, id != null ? id.getId() : id,
+				!lazy });
 
 			final ManagedInstance<X> managedInstance = new ManagedInstance<X>(this, session, instance, id);
 
@@ -896,9 +900,10 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 			final CriteriaBuilderImpl cb = this.getMetamodel().getEntityManagerFactory().getCriteriaBuilder();
 			CriteriaQueryImpl<X> q = cb.createQuery(this.getJavaType());
+			q.internal();
 			final RootImpl<X> r = q.from(this);
 			q = q.select(r);
-			q.distinct(true);
+			r.alias(BatooUtils.acronym(this.name).toLowerCase());
 
 			this.prepareEagerAssociations(r, 0, null);
 
@@ -1262,6 +1267,10 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public void prepareEagerAssociations(FetchParent<?, ?> r, int depth, AssociationMapping<?, ?, ?> parent) {
+		if (true) {
+			return;
+		}
+
 		if (depth < EntityTypeImpl.MAX_DEPTH) {
 
 			for (final AssociationMapping<?, ?, ?> association : this.getAssociationsEager()) {
