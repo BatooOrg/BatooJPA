@@ -318,7 +318,10 @@ public class EntityManagerImpl implements EntityManager {
 	public void detach(Object entity) {
 		this.assertOpen();
 
-		this.session.remove(entity);
+		final ManagedInstance<?> instance = this.session.remove(entity);
+		if (instance != null) {
+			instance.cascadeDetach(this);
+		}
 	}
 
 	/**
@@ -388,7 +391,7 @@ public class EntityManagerImpl implements EntityManager {
 		this.assertOpen();
 
 		try {
-			this.session.flush(this.getConnection(), this.transaction);
+			this.session.flush(this.getConnection());
 		}
 		catch (final SQLException e) {
 			EntityManagerImpl.LOG.error(e, "Flush failed");
@@ -670,7 +673,19 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public void refresh(Object entity) {
-		// TODO Auto-generated method stub
+		this.assertOpen();
+
+		ManagedInstance<?> instance = null;
+
+		if (entity instanceof EnhancedInstance) {
+			instance = ((EnhancedInstance) entity).__enhanced__$$__getManagedInstance();
+		}
+
+		if ((instance == null) || (this.session.get(instance.getId()) == null)) {
+			throw new IllegalArgumentException("entity is not managed");
+		}
+
+		instance.refresh(this, this.getConnection());
 	}
 
 	/**

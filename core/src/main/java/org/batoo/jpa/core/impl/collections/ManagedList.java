@@ -284,6 +284,8 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 			public void remove() {
 				ManagedList.this.snapshot();
 				ManagedList.this.changed(null);
+
+				super.remove();
 			};
 		};
 	}
@@ -372,6 +374,18 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 				super.set(e);
 			};
 		};
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void refreshChildren(Collection<? extends E> children) {
+		this.snapshot = null;
+
+		this.delegate.clear();
+		this.delegate.addAll(children);
 	}
 
 	/**

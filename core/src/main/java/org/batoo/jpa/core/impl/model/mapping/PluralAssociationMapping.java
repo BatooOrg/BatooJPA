@@ -351,6 +351,32 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	}
 
 	/**
+	 * Refreshes the collection.
+	 * 
+	 * @param entityManager
+	 *            the entity manager
+	 * @param instance
+	 *            the managed instance owning the collection
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	public void refreshCollection(EntityManagerImpl entityManager, ManagedInstance<?> instance) {
+		// load the children
+		final Collection<? extends E> children = this.loadCollection(instance);
+
+		final ManagedCollection<E> collection = (ManagedCollection<E>) this.get(instance.getInstance());
+		collection.refreshChildren(children);
+
+		if (this.cascadesRefresh()) {
+			for (final E child : children) {
+				entityManager.refresh(child);
+			}
+		}
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */

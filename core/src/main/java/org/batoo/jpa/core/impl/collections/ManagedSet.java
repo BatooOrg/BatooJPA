@@ -250,6 +250,18 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 * 
 	 */
 	@Override
+	public void refreshChildren(Collection<? extends E> children) {
+		this.snapshot = null;
+
+		this.delegate.clear();
+		this.delegate.addAll(children);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public boolean remove(Object o) {
 		this.initialize();
 		this.snapshot();

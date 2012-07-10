@@ -651,6 +651,11 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			return null;
 		}
 
+		// if instance is refreshing then re-initialize instance
+		if (instance.isRefreshing()) {
+			this.initializeInstance(session, row, instance);
+		}
+
 		// if the instance is loading then continue processing
 		if (instance.isLoading()) {
 			return this.handleFetches(session, row, instance);

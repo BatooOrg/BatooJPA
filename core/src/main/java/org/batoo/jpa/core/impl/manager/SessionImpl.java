@@ -120,15 +120,13 @@ public class SessionImpl {
 	 * 
 	 * @param connection
 	 *            the connection to use
-	 * @param transaction
-	 *            the transaction for which the flush will take place
 	 * @throws SQLException
 	 *             thrown in case of an SQL error
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void flush(ConnectionImpl connection, EntityTransactionImpl transaction) throws SQLException {
+	public void flush(ConnectionImpl connection) throws SQLException {
 		final int totalSize = this.externalEntities.size() + this.identifiableEntities.size() + this.changedEntities.size();
 		final ArrayList<ManagedInstance<?>> instances = Lists.newArrayListWithCapacity(totalSize);
 
@@ -139,7 +137,7 @@ public class SessionImpl {
 		final ManagedInstance<?>[] sortedInstances = Prioritizer.sort(instances);
 
 		for (final ManagedInstance<?> instance : sortedInstances) {
-			instance.flush(connection, transaction);
+			instance.flush(connection);
 		}
 
 		for (final ManagedInstance<?> instance : sortedInstances) {
@@ -158,6 +156,8 @@ public class SessionImpl {
 	 *            the managed id
 	 * @param <X>
 	 *            the type of the instance
+	 * @param <Y>
+	 *            the actual type of the instance
 	 * @return the managed instance or null
 	 * 
 	 * @since $version
@@ -317,25 +317,24 @@ public class SessionImpl {
 	 * 
 	 * @param entity
 	 *            the entity to remove
-	 * @param <X>
-	 *            the type of the entity
+	 * @return returns the entity
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
-	public <X> void remove(X entity) {
-		final EntityTypeImpl<X> type = (EntityTypeImpl<X>) this.metamodel.entity(entity.getClass());
-		final ManagedId<X> instanceId = new ManagedId<X>(type, entity);
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public ManagedInstance<?> remove(Object entity) {
+		final EntityTypeImpl<?> type = this.metamodel.entity(entity.getClass());
+		final ManagedId<?> instanceId = new ManagedId(type, entity);
 
 		final ManagedInstance<?> instance = this.repository.get(instanceId);
 		if (instance != null) {
 			this.repository.remove(instanceId);
 			this.externalEntities.remove(instance);
 			this.identifiableEntities.remove(instance);
-
-			instance.cascadeDetach(this.em);
 		}
+
+		return instance;
 	}
 
 	/**

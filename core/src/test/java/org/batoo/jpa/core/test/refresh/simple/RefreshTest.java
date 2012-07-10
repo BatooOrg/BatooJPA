@@ -26,7 +26,6 @@ import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -34,11 +33,11 @@ import org.junit.Test;
  * 
  * @since $version
  */
-@Ignore
 public class RefreshTest extends BaseCoreTest {
 
 	private static final String COUNTRY_UK = "UK";
 	private static final String COUNTRY_USA = "USA";
+	private static final String COUNTRY_GERMANY = "Germany";
 	private static final String COUNTRY_TURKEY = "Turkey";
 
 	private static final String CITY_LONDON = "London";
@@ -90,8 +89,15 @@ public class RefreshTest extends BaseCoreTest {
 
 		person = this.find(Person.class, person.getId());
 
+		Address address = null;
+		Country country = null;
 		for (final Iterator<Address> i = person.getAddresses().iterator(); i.hasNext();) {
-			if (RefreshTest.CITY_ISTANBUL.equals(i.next().getCity())) {
+			address = i.next();
+			if (RefreshTest.CITY_ISTANBUL.equals(address.getCity())) {
+				address.setCity("SomeCity");
+				country = address.getCountry();
+				country.setName(RefreshTest.COUNTRY_GERMANY);
+				address.setCountry(null);
 				i.remove();
 				break;
 			}
@@ -102,7 +108,9 @@ public class RefreshTest extends BaseCoreTest {
 		this.refresh(person);
 
 		Assert.assertEquals("Ceylan", person.getName());
+		Assert.assertEquals(RefreshTest.CITY_ISTANBUL, address.getCity());
+		Assert.assertEquals(country, address.getCountry());
+		Assert.assertEquals(RefreshTest.COUNTRY_GERMANY, country.getName());
 		Assert.assertEquals(3, person.getAddresses().size());
 	}
-
 }

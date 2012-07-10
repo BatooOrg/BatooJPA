@@ -55,7 +55,6 @@ import org.batoo.jpa.core.impl.jdbc.DiscriminatorColumn;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.SecondaryTable;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
-import org.batoo.jpa.core.impl.manager.EntityTransactionImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
@@ -104,16 +103,17 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private sun.reflect.ConstructorAccessor constructor;
 
 	private CriteriaQueryImpl<X> selectCriteria;
+	private CriteriaQueryImpl<X> refreshCriteria;
 
 	private int dependencyCount;
 	private final HashMap<EntityTypeImpl<?>, AssociationMapping<?, ?, ?>[]> dependencyMap = Maps.newHashMap();
 
 	private AssociationMapping<?, ?, ?>[] associations;
 	private AssociationMapping<?, ?, ?>[] associationsDetachable;
-	private AssociationMapping<?, ?, ?>[] associationsPersistable;
-	private AssociationMapping<?, ?, ?>[] associationsNotPersistable;
 	private AssociationMapping<?, ?, ?>[] associationsEager;
 	private AssociationMapping<?, ?, ?>[] associationsJoined;
+	private AssociationMapping<?, ?, ?>[] associationsNotPersistable;
+	private AssociationMapping<?, ?, ?>[] associationsPersistable;
 	private PluralAssociationMapping<?, ?, ?>[] associationsPlural;
 	private SingularAssociationMapping<?, ?>[] associationsSingularLazy;
 
@@ -490,7 +490,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	private PluralAssociationMapping<?, ?, ?>[] getAssociationsPlural() {
+	public PluralAssociationMapping<?, ?, ?>[] getAssociationsPlural() {
 		if (this.associationsPlural != null) {
 			return this.associationsPlural;
 		}
@@ -599,6 +599,94 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 */
 	public EntityTypeImpl<? extends X> getChildType(Object discriminatorValue) {
 		return this.children.get(discriminatorValue);
+	}
+
+	private CriteriaQueryImpl<X> getCriteriaRefresh() {
+		if (this.refreshCriteria != null) {
+			return this.refreshCriteria;
+		}
+
+		synchronized (this) {
+			// other thread prepared before this one
+			if (this.refreshCriteria != null) {
+				return this.refreshCriteria;
+			}
+
+			final CriteriaBuilderImpl cb = this.getMetamodel().getEntityManagerFactory().getCriteriaBuilder();
+			CriteriaQueryImpl<X> q = cb.createQuery(this.getJavaType());
+			q.internal();
+			final RootImpl<X> r = q.from(this);
+			q = q.select(r);
+			r.alias(BatooUtils.acronym(this.name).toLowerCase());
+
+			// has single id mapping
+			if (this.getRootType().hasSingleIdAttribute()) {
+				final SingularMapping<? super X, ?> idMapping = this.getRootType().getIdMapping();
+				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
+				final Path<?> path = r.get(idMapping.getAttribute());
+				final PredicateImpl predicate = cb.equal(path, pe);
+
+				return this.selectCriteria = q.where(predicate);
+			}
+
+			// has multiple id mappings
+			final List<PredicateImpl> predicates = Lists.newArrayList();
+			for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.getIdMappings()) {
+				final BasicMapping<? super X, ?> idMapping = pair.getFirst();
+				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
+				final Path<?> path = r.get(idMapping.getAttribute());
+				final PredicateImpl predicate = cb.equal(path, pe);
+
+				predicates.add(predicate);
+			}
+
+			return this.refreshCriteria = q.where(predicates.toArray(new PredicateImpl[predicates.size()]));
+		}
+	}
+
+	private CriteriaQueryImpl<X> getCriteriaSelect() {
+		if (this.selectCriteria != null) {
+			return this.selectCriteria;
+		}
+
+		synchronized (this) {
+			// other thread prepared before this one
+			if (this.selectCriteria != null) {
+				return this.selectCriteria;
+			}
+
+			final CriteriaBuilderImpl cb = this.getMetamodel().getEntityManagerFactory().getCriteriaBuilder();
+			CriteriaQueryImpl<X> q = cb.createQuery(this.getJavaType());
+			q.internal();
+			final RootImpl<X> r = q.from(this);
+			q = q.select(r);
+			r.alias(BatooUtils.acronym(this.name).toLowerCase());
+
+			this.prepareEagerAssociations(r, 0, null);
+
+			// has single id mapping
+			if (this.getRootType().hasSingleIdAttribute()) {
+				final SingularMapping<? super X, ?> idMapping = this.getRootType().getIdMapping();
+				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
+				final Path<?> path = r.get(idMapping.getAttribute());
+				final PredicateImpl predicate = cb.equal(path, pe);
+
+				return this.selectCriteria = q.where(predicate);
+			}
+
+			// has multiple id mappings
+			final List<PredicateImpl> predicates = Lists.newArrayList();
+			for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.getIdMappings()) {
+				final BasicMapping<? super X, ?> idMapping = pair.getFirst();
+				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
+				final Path<?> path = r.get(idMapping.getAttribute());
+				final PredicateImpl predicate = cb.equal(path, pe);
+
+				predicates.add(predicate);
+			}
+
+			return this.selectCriteria = q.where(predicates.toArray(new PredicateImpl[predicates.size()]));
+		}
 	}
 
 	/**
@@ -891,35 +979,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
-	 * Returns the associations of the type.
-	 * 
-	 * @return the associations of the type
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public AssociationMapping<?, ?, ?>[] getPluralAssociations() {
-		if (this.associations != null) {
-			return this.associations;
-		}
-
-		synchronized (this) {
-			if (this.associations != null) {
-				return this.associations;
-			}
-
-			final List<AssociationMapping<?, ?, ?>> associations = Lists.newArrayList();
-
-			this.rootMapping.addAssociations(associations);
-
-			final AssociationMapping<?, ?, ?>[] associatedAttributes0 = new AssociationMapping[associations.size()];
-			associations.toArray(associatedAttributes0);
-
-			return this.associations = associatedAttributes0;
-		}
-	}
-
-	/**
 	 * Returns the primary table of the type
 	 * 
 	 * @return the primary table
@@ -965,51 +1024,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		this.rootType = supertype;
 
 		return this.rootType;
-	}
-
-	private CriteriaQueryImpl<X> getSelectCriteria() {
-		if (this.selectCriteria != null) {
-			return this.selectCriteria;
-		}
-
-		synchronized (this) {
-			// other thread prepared before this one
-			if (this.selectCriteria != null) {
-				return this.selectCriteria;
-			}
-
-			final CriteriaBuilderImpl cb = this.getMetamodel().getEntityManagerFactory().getCriteriaBuilder();
-			CriteriaQueryImpl<X> q = cb.createQuery(this.getJavaType());
-			q.internal();
-			final RootImpl<X> r = q.from(this);
-			q = q.select(r);
-			r.alias(BatooUtils.acronym(this.name).toLowerCase());
-
-			this.prepareEagerAssociations(r, 0, null);
-
-			// has single id mapping
-			if (this.getRootType().hasSingleIdAttribute()) {
-				final SingularMapping<? super X, ?> idMapping = this.getRootType().getIdMapping();
-				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
-				final Path<?> path = r.get(idMapping.getAttribute());
-				final PredicateImpl predicate = cb.equal(path, pe);
-
-				return this.selectCriteria = q.where(predicate);
-			}
-
-			// has multiple id mappings
-			final List<PredicateImpl> predicates = Lists.newArrayList();
-			for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.getIdMappings()) {
-				final BasicMapping<? super X, ?> idMapping = pair.getFirst();
-				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
-				final Path<?> path = r.get(idMapping.getAttribute());
-				final PredicateImpl predicate = cb.equal(path, pe);
-
-				predicates.add(predicate);
-			}
-
-			return this.selectCriteria = q.where(predicates.toArray(new PredicateImpl[predicates.size()]));
-		}
 	}
 
 	/**
@@ -1211,8 +1225,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * 
 	 * @param connection
 	 *            the connection to use
-	 * @param transaction
-	 *            the transaction for which the insert will be performed
 	 * @param managedInstance
 	 *            the managed instance to perform insert for
 	 * @throws SQLException
@@ -1221,7 +1233,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performInsert(ConnectionImpl connection, EntityTransactionImpl transaction, ManagedInstance<X> managedInstance) throws SQLException {
+	public void performInsert(ConnectionImpl connection, ManagedInstance<X> managedInstance) throws SQLException {
 		for (final EntityTable table : this.getTables()) {
 			table.performInsert(connection, managedInstance);
 		}
@@ -1232,10 +1244,42 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
+	 * Performs refresh for the instance
+	 * 
+	 * @param connection
+	 *            the connection
+	 * @param managedInstance
+	 *            the managed instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void performRefresh(ConnectionImpl connection, ManagedInstance<X> managedInstance) {
+		final SessionImpl session = managedInstance.getSession();
+
+		final TypedQueryImpl<X> q = session.getEntityManager().createQuery(this.getCriteriaRefresh());
+
+		final Object id = managedInstance.getId().getId();
+
+		// if has single id then pass it on
+		if (this.hasSingleIdAttribute()) {
+			q.setParameter(1, id);
+		}
+		else {
+			int i = 1;
+			for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.getIdMappings()) {
+				q.setParameter(i++, pair.getSecond().get(id));
+			}
+		}
+
+		managedInstance.setRefreshing(true);
+
+		q.getSingleResult();
+	}
+
+	/**
 	 * @param connection
 	 *            the connection to use
-	 * @param transaction
-	 *            the transaction for which the remove will be performed
 	 * @param instance
 	 *            the managed instance to perform remove for
 	 * @throws SQLException
@@ -1244,7 +1288,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performRemove(ConnectionImpl connection, EntityTransactionImpl transaction, ManagedInstance<X> instance) throws SQLException {
+	public void performRemove(ConnectionImpl connection, ManagedInstance<X> instance) throws SQLException {
 	}
 
 	/**
@@ -1260,7 +1304,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public X performSelect(EntityManagerImpl entityManager, Object id) {
-		final TypedQueryImpl<X> q = entityManager.createQuery(this.getSelectCriteria());
+		final TypedQueryImpl<X> q = entityManager.createQuery(this.getCriteriaSelect());
 
 		// if has single id then pass it on
 		if (this.hasSingleIdAttribute()) {
@@ -1279,8 +1323,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	/**
 	 * @param connection
 	 *            the connection to use
-	 * @param transaction
-	 *            the transaction for which the update will be performed
 	 * @param instance
 	 *            the managed instance to perform update for
 	 * @throws SQLException
@@ -1289,7 +1331,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performUpdate(ConnectionImpl connection, EntityTransactionImpl transaction, ManagedInstance<X> instance) throws SQLException {
+	public void performUpdate(ConnectionImpl connection, ManagedInstance<X> instance) throws SQLException {
 	}
 
 	/**

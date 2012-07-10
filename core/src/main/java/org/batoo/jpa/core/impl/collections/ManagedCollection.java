@@ -52,4 +52,15 @@ public abstract class ManagedCollection<E> {
 	 * @author hceylan
 	 */
 	public abstract Collection<E> getDelegate();
+
+	/**
+	 * Refreshes the children of the managed collection.
+	 * 
+	 * @param children
+	 *            the new children
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract void refreshChildren(Collection<? extends E> children);
 }

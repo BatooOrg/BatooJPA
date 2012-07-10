@@ -27,7 +27,6 @@ import javax.persistence.metamodel.PluralAttribute.CollectionType;
 
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
-import org.batoo.jpa.core.impl.manager.EntityTransactionImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
@@ -63,6 +62,7 @@ public class ManagedInstance<X> {
 	private final HashSet<AssociationMapping<?, ?, ?>> associationsLoaded;
 
 	private boolean loading;
+	private boolean refreshing;
 
 	private ManagedId<? super X> id;
 	private int h;
@@ -269,8 +269,6 @@ public class ManagedInstance<X> {
 	 * 
 	 * Flushes the state of the instance to the database.
 	 * 
-	 * @param transaction
-	 *            the transaction to perform flush against
 	 * @param connection
 	 *            the connection to use to flush
 	 * @throws SQLException
@@ -279,9 +277,9 @@ public class ManagedInstance<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void flush(ConnectionImpl connection, EntityTransactionImpl transaction) throws SQLException {
+	public void flush(ConnectionImpl connection) throws SQLException {
 		if (this.status == null) {
-			this.type.performInsert(connection, transaction, this);
+			this.type.performInsert(connection, this);
 
 			this.status = Status.MANAGED;
 			this.session.putNew(this);
@@ -289,14 +287,14 @@ public class ManagedInstance<X> {
 		else {
 			switch (this.status) {
 				case NEW:
-					this.type.performInsert(connection, transaction, this);
+					this.type.performInsert(connection, this);
 					this.status = Status.MANAGED;
 					break;
 				case MANAGED:
-					this.type.performUpdate(connection, transaction, this);
+					this.type.performUpdate(connection, this);
 					break;
 				case REMOVED:
-					this.type.performRemove(connection, transaction, this);
+					this.type.performRemove(connection, this);
 					break;
 			}
 		}
@@ -423,6 +421,18 @@ public class ManagedInstance<X> {
 	}
 
 	/**
+	 * Returns if the instance is refreshing.
+	 * 
+	 * @return true if the instance is refreshing, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isRefreshing() {
+		return this.refreshing;
+	}
+
+	/**
 	 * Marks a collection as changed.
 	 * 
 	 * @since $version
@@ -452,6 +462,32 @@ public class ManagedInstance<X> {
 	}
 
 	/**
+	 * Refreshes the instance from the database.
+	 * 
+	 * @param entityManager
+	 *            the entity manager
+	 * @param connection
+	 *            the connection
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void refresh(EntityManagerImpl entityManager, ConnectionImpl connection) {
+		this.type.performRefresh(connection, this);
+
+		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociations()) {
+			if (association instanceof PluralAssociationMapping) {
+				((PluralAssociationMapping<?, ?, ?>) association).refreshCollection(entityManager, this);
+			}
+			else if (association.cascadesRefresh()) {
+				final Object associate = association.get(this.instance);
+
+				entityManager.refresh(associate);
+			}
+		}
+	}
+
+	/**
 	 * Sets the association as loaded.
 	 * 
 	 * @param association
@@ -465,16 +501,29 @@ public class ManagedInstance<X> {
 	}
 
 	/**
-	 * Sets the loading
+	 * Marks the instance as loading.
 	 * 
 	 * @param loading
-	 *            to set
+	 *            loading to set
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	public void setLoading(boolean loading) {
 		this.loading = loading;
+	}
+
+	/**
+	 * Marks the instance as refreshing.
+	 * 
+	 * @param refreshing
+	 *            refreshing to set
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setRefreshing(boolean refreshing) {
+		this.refreshing = refreshing;
 	}
 
 	/**
