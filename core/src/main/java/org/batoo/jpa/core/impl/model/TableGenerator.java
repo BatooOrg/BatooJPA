@@ -108,5 +108,4 @@ public class TableGenerator extends AbstractGenerator {
 	public String getValueColumnName() {
 		return this.valueColumnName;
 	}
-
 }

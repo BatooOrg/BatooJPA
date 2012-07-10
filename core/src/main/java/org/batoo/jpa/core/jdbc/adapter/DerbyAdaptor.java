@@ -155,7 +155,7 @@ public class DerbyAdaptor extends JdbcAdaptor {
 
 			final String sql = "CREATE TABLE " + schema + "." + table.getTable() + " ("//
 				+ "\n\t" + table.getPkColumnName() + " VARCHAR(255)," //
-				+ "\n\t" + table.getValueColumnName() + " BIGINT," //
+				+ "\n\t" + table.getValueColumnName() + " INT," //
 				+ "\nPRIMARY KEY(" + table.getPkColumnName() + "))";
 
 			new QueryRunner(datasource).update(sql);
