@@ -91,12 +91,13 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	private String discriminatorAlias;
 
 	private final HashMap<SecondaryTable, String> tableAliases = Maps.newHashMap();
-	private final HashMap<AbstractColumn, String> fields = Maps.newHashMap();
 	private final HashMap<AbstractColumn, String> idFields = Maps.newHashMap();
 	private final HashMap<AbstractColumn, String> joinFields = Maps.newHashMap();
 	private final List<SingularAssociationMapping<?, ?>> joins = Lists.newArrayList();
 
 	private int nextTableAlias = 1;
+	private AbstractColumn[] columns;
+	private String[] fields;
 
 	/**
 	 * @param entity
@@ -305,6 +306,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 
 	private String generateSqlSelectImpl(CriteriaQueryImpl<?> query, boolean root) {
 		final List<String> selects = Lists.newArrayList();
+		final Map<AbstractColumn, String> fieldMap = Maps.newHashMap();
 
 		for (final EntityTable table : this.entity.getAllTables()) {
 			int fieldNo = 0;
@@ -336,13 +338,23 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 					this.joinFields.put(column, fieldAlias);
 				}
 				else {
-					this.fields.put(column, fieldAlias);
+					fieldMap.put(column, fieldAlias);
 				}
 
 				fields.add(field + " AS " + fieldAlias);
 			}
 
 			selects.add(Joiner.on(", ").join(fields));
+		}
+
+		this.columns = new AbstractColumn[fieldMap.size()];
+		this.fields = new String[fieldMap.size()];
+
+		int i = 0;
+		for (final Entry<AbstractColumn, String> entry : fieldMap.entrySet()) {
+			this.columns[i] = entry.getKey();
+			this.fields[i] = entry.getValue();
+			i++;
 		}
 
 		return Joiner.on(",\n\t\t").join(selects);
@@ -649,8 +661,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 
 	private ManagedInstance<? extends X> handleFetches(SessionImpl session, final ResultSet row, ManagedInstance<? extends X> instance) throws SQLException {
 		for (final FetchImpl<X, ?> fetch : this.fetches) {
-			final AssociationMapping<? super X, ?, ?> mapping = fetch.getMapping();
-
 			// resolve the child
 			final ManagedInstance<?> child = fetch.handleFetch(session, row);
 
@@ -658,6 +668,8 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			if (child == null) {
 				continue;
 			}
+
+			final AssociationMapping<? super X, ?, ?> mapping = fetch.getMapping();
 
 			// if it is a plural association then we will test if we processed the child
 			if (mapping instanceof PluralAssociationMapping) {
@@ -714,10 +726,8 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	private void initializeInstance(SessionImpl session, ResultSet row, ManagedInstance<? extends X> instance) throws SQLException {
 		instance.setLoading(true);
 
-		for (final Entry<AbstractColumn, String> entry : this.fields.entrySet()) {
-			final String field = entry.getValue();
-			final AbstractColumn column = entry.getKey();
-			column.setValue(instance, row.getObject(field));
+		for (int i = 0; i < this.fields.length; i++) {
+			this.columns[i].setValue(instance, row.getObject(this.fields[i]));
 		}
 
 		for (final SingularAssociationMapping<?, ?> mapping : this.joins) {
@@ -790,14 +800,5 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		}
 
 		return id;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String toString() {
-		return this.entity.getName();
 	}
 }

@@ -183,13 +183,4 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String toString() {
-		return this.generateJpqlFetches(this.getParent().toString());
-	}
 }

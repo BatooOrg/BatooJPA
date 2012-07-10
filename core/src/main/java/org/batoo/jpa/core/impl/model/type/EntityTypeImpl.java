@@ -1316,20 +1316,18 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		if (depth < EntityTypeImpl.MAX_DEPTH) {
 
 			for (final AssociationMapping<?, ?, ?> association : this.getAssociationsEager()) {
-				if (!association.getAttribute().isCollection()) {
-					// if we are coming from the inverse side and inverse side is not many-to-one then skip
-					if ((parent != null) && //
-						(association.getInverse() == parent) && //
-						(parent.getAttribute().getPersistentAttributeType() != PersistentAttributeType.MANY_TO_ONE)) {
-						continue;
-					}
-
-					final Fetch<?, Object> r2 = r.fetch(association.getAttribute().getName(), JoinType.LEFT);
-
-					final EntityTypeImpl<?> type = association.getType();
-
-					type.prepareEagerAssociations(r2, depth + 1, association);
+				// if we are coming from the inverse side and inverse side is not many-to-one then skip
+				if ((parent != null) && //
+					(association.getInverse() == parent) && //
+					(parent.getAttribute().getPersistentAttributeType() != PersistentAttributeType.MANY_TO_ONE)) {
+					continue;
 				}
+
+				final Fetch<?, Object> r2 = r.fetch(association.getAttribute().getName(), JoinType.LEFT);
+
+				final EntityTypeImpl<?> type = association.getType();
+
+				type.prepareEagerAssociations(r2, depth + 1, association);
 			}
 		}
 	}

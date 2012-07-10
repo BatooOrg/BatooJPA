@@ -45,12 +45,15 @@ public abstract class Mapping<Z, X, Y> {
 	private final boolean inherited;
 	private final EntityTypeImpl<?> entity;
 	private int h;
+	private final AttributeImpl<? super Z, X> attribute;
 
 	/**
 	 * @param parent
 	 *            the parent mapping
 	 * @param entity
 	 *            the root entity
+	 * @param attribute
+	 *            the attribute
 	 * @param javaType
 	 *            the java type
 	 * @param name
@@ -59,11 +62,12 @@ public abstract class Mapping<Z, X, Y> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Mapping(ParentMapping<?, Z> parent, EntityTypeImpl<?> entity, Class<X> javaType, String name) {
+	public Mapping(ParentMapping<?, Z> parent, EntityTypeImpl<?> entity, AttributeImpl<? super Z, X> attribute, Class<X> javaType, String name) {
 		super();
 
 		this.javaType = javaType;
 		this.parent = parent;
+		this.attribute = attribute;
 		this.name = name;
 
 		this.path = (parent != null) && (parent.getPath() != null) ? parent.getPath() + "." + name : name;
@@ -106,7 +110,7 @@ public abstract class Mapping<Z, X, Y> {
 			}
 		}
 
-		return this.getAttribute().get(instance);
+		return this.attribute.get(instance);
 	}
 
 	/**
@@ -220,8 +224,7 @@ public abstract class Mapping<Z, X, Y> {
 		}
 
 		if (!this.inherited || managedInstance.getType().extendz(this.entity)) {
-			AttributeImpl<? super Z, X> attribute = this.getAttribute();
-			attribute.set(instance, value);
+			this.attribute.set(instance, value);
 		}
 	}
 

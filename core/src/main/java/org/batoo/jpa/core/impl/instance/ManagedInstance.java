@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.instance;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
@@ -57,7 +58,7 @@ public class ManagedInstance<X> {
 	private final SingularMapping<? super X, ?> idMapping;
 	private final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>[] idMappings;
 
-	private final Set<AssociationMapping<?, ?, ?>> associationsLoaded;
+	private final HashSet<AssociationMapping<?, ?, ?>> associationsLoaded;
 	private EntityTransactionImpl transaction;
 
 	private boolean loading;
@@ -294,7 +295,7 @@ public class ManagedInstance<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Set<AssociationMapping<?, ?, ?>> getAssociationsLoaded() {
+	public HashSet<AssociationMapping<?, ?, ?>> getAssociationsLoaded() {
 		return this.associationsLoaded;
 	}
 

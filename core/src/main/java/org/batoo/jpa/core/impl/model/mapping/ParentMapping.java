@@ -54,6 +54,8 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	 *            the parent mapping
 	 * @param entity
 	 *            the entity
+	 * @param attribute
+	 *            the attribute
 	 * @param javaType
 	 *            the java type
 	 * @param name
@@ -62,8 +64,8 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ParentMapping(ParentMapping<?, Z> parent, EntityTypeImpl<?> entity, Class<X> javaType, String name) {
-		super(parent, entity, javaType, name);
+	public ParentMapping(ParentMapping<?, Z> parent, EntityTypeImpl<?> entity, EmbeddedAttribute<? super Z, X> attribute, Class<X> javaType, String name) {
+		super(parent, entity, attribute, javaType, name);
 	}
 
 	/**

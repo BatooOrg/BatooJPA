@@ -42,6 +42,31 @@ public class Phone {
 	private String phoneNo;
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		final Phone other = (Phone) obj;
+		if (this.id == null) {
+			return false;
+		}
+		else if (!this.id.equals(other.id)) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
 	 * Returns the id.
 	 * 
 	 * @return the id
@@ -69,6 +94,18 @@ public class Phone {
 	 */
 	public String getPhoneNo() {
 		return this.phoneNo;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = (prime * result) + ((this.id == null) ? 0 : this.id.hashCode());
+		return result;
 	}
 
 	/**

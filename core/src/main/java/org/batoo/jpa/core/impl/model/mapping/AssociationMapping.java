@@ -74,7 +74,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> {
 	 * @author hceylan
 	 */
 	public AssociationMapping(ParentMapping<?, Z> parent, AssociationAttributeMetadata metadata, AttributeImpl<? super Z, X> attribute) {
-		super(parent, parent.getRoot().getType(), attribute.getJavaType(), attribute.getName());
+		super(parent, parent.getRoot().getType(), attribute, attribute.getJavaType(), attribute.getName());
 
 		this.eager = metadata.getFetchType() == FetchType.EAGER;
 		if ((metadata instanceof MappableAssociationAttributeMetadata)

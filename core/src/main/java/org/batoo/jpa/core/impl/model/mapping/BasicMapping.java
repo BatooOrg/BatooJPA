@@ -56,7 +56,7 @@ public class BasicMapping<Z, X> extends Mapping<Z, X, X> implements SingularMapp
 	 * @author hceylan
 	 */
 	public BasicMapping(ParentMapping<?, Z> parent, BasicAttribute<? super Z, X> attribute) {
-		super(parent, parent.getRoot().getType(), attribute.getJavaType(), attribute.getName());
+		super(parent, parent.getRoot().getType(), attribute, attribute.getJavaType(), attribute.getName());
 
 		this.attribute = attribute;
 

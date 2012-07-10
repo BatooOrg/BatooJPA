@@ -18,7 +18,7 @@
  */
 package org.batoo.jpa.benchmark.insert;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -28,7 +28,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 
 /**
  * 
@@ -43,12 +43,37 @@ public class Person {
 	private Integer id;
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "person")
-	private final Set<Address> addresses = Sets.newHashSet();
+	private final List<Address> addresses = Lists.newArrayList();
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "person")
-	private final Set<Phone> phones = Sets.newHashSet();
+	private final List<Phone> phones = Lists.newArrayList();
 
 	private String name;
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		final Person other = (Person) obj;
+		if (this.id == null) {
+			return false;
+		}
+		else if (!this.id.equals(other.id)) {
+			return false;
+		}
+		return true;
+	}
 
 	/**
 	 * Returns the addresses.
@@ -56,7 +81,7 @@ public class Person {
 	 * @return the addresses
 	 * @since $version
 	 */
-	public Set<Address> getAddresses() {
+	public List<Address> getAddresses() {
 		return this.addresses;
 	}
 
@@ -86,8 +111,20 @@ public class Person {
 	 * @return the phones
 	 * @since $version
 	 */
-	public Set<Phone> getPhones() {
+	public List<Phone> getPhones() {
 		return this.phones;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = (prime * result) + ((this.id == null) ? 0 : this.id.hashCode());
+		return result;
 	}
 
 	/**

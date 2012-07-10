@@ -19,7 +19,6 @@
 package org.batoo.jpa.benchmark.insert;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -40,10 +39,35 @@ public class Address {
 	@ManyToOne
 	private Person person;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	private Country country;
 
 	private String city;
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		final Address other = (Address) obj;
+		if (this.id == null) {
+			return false;
+		}
+		else if (!this.id.equals(other.id)) {
+			return false;
+		}
+		return true;
+	}
 
 	/**
 	 * Returns the city.
@@ -83,6 +107,18 @@ public class Address {
 	 */
 	public Person getPerson() {
 		return this.person;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = (prime * result) + ((this.id == null) ? 0 : this.id.hashCode());
+		return result;
 	}
 
 	/**

@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -98,7 +99,7 @@ public class Playground {
 				while (Playground.this.running) {
 					Playground.this._measureSingleTime(id, mxBean);
 					try {
-						Thread.sleep(0, 100);
+						Thread.sleep(0, 10);
 					}
 					catch (final InterruptedException e) {}
 				}
@@ -187,8 +188,7 @@ public class Playground {
 
 				gotStart = true;
 
-				final String key = stElement.getClassName() + "." + stElement.getMethodName();
-				// final String key = stElement.getClassName() + "." + stElement.getMethodName() + "." + stElement.getLineNumber();
+				final String key = stElement.getClassName() + "." + stElement.getMethodName();// + "." + stElement.getLineNumber();
 				child = child.get(key);
 				TimeElement child2 = this.elements.get(key);
 				if (child2 == null) {
@@ -215,34 +215,40 @@ public class Playground {
 		this.oldTime = newTime;
 	}
 
-	private Person createPerson() {
-		final Person person = new Person();
+	private List<Person> createPersons() {
+		final List<Person> persons = Lists.newArrayList();
 
-		person.setName("Hasan Ceylan");
+		for (int i = 0; i < 10; i++) {
+			final Person person = new Person();
 
-		final Address address = new Address();
-		address.setCity("Istanbul");
-		address.setPerson(person);
-		address.setCountry(this.country);
-		person.getAddresses().add(address);
+			person.setName("Hasan Ceylan");
 
-		final Address address2 = new Address();
-		address2.setCity("Istanbul");
-		address2.setPerson(person);
-		address2.setCountry(this.country);
-		person.getAddresses().add(address2);
+			final Address address = new Address();
+			address.setCity("Istanbul");
+			address.setPerson(person);
+			address.setCountry(this.country);
+			person.getAddresses().add(address);
 
-		final Phone phone = new Phone();
-		phone.setPhoneNo("111 222-3344");
-		phone.setPerson(person);
-		person.getPhones().add(phone);
+			final Address address2 = new Address();
+			address2.setCity("Istanbul");
+			address2.setPerson(person);
+			address2.setCountry(this.country);
+			person.getAddresses().add(address2);
 
-		final Phone phone2 = new Phone();
-		phone2.setPhoneNo("111 222-3344");
-		phone2.setPerson(person);
-		person.getPhones().add(phone2);
+			final Phone phone = new Phone();
+			phone.setPhoneNo("111 222-3344");
+			phone.setPerson(person);
+			person.getPhones().add(phone);
 
-		return person;
+			final Phone phone2 = new Phone();
+			phone2.setPhoneNo("111 222-3344");
+			phone2.setPerson(person);
+			person.getPhones().add(phone2);
+
+			persons.add(person);
+		}
+
+		return persons;
 	}
 
 	private void dobatoo() {
@@ -264,6 +270,7 @@ public class Playground {
 			final EntityManager em = emf.createEntityManager();
 
 			em.find(Person.class, person.getId());
+			// person2.getPhones().size();
 			em.close();
 		}
 	}
@@ -278,25 +285,20 @@ public class Playground {
 		this.doTest(Type.HIBERNATE);
 	}
 
-	private Person doPersist(final EntityManagerFactory emf) {
+	private void doPersist(final EntityManagerFactory emf, List<Person> persons) {
 		final EntityManager em = emf.createEntityManager();
 
 		final EntityTransaction tx = em.getTransaction();
 
 		tx.begin();
 
-		Person person = null;
-		for (int i = 0; i < 10; i++) {
-			person = this.createPerson();
+		for (final Person person : persons) {
 			em.persist(person);
-
 		}
 
 		tx.commit();
 
 		em.close();
-
-		return person;
 	}
 
 	private void doTest(Type type) {
@@ -307,15 +309,15 @@ public class Playground {
 
 			final EntityManagerFactory emf = Persistence.createEntityManagerFactory(Playground.PU_NAME);
 
-			// final EntityManager em = emf.createEntityManager();
-			// final Country country = new Country();
-			//
-			// country.setName("Turkey");
-			// em.getTransaction().begin();
-			// em.persist(country);
-			// em.getTransaction().commit();
-			//
-			// em.close();
+			final EntityManager em = emf.createEntityManager();
+			this.country = new Country();
+
+			this.country.setName("Turkey");
+			em.getTransaction().begin();
+			em.persist(this.country);
+			em.getTransaction().commit();
+
+			em.close();
 
 			System.currentTimeMillis();
 
@@ -327,10 +329,10 @@ public class Playground {
 		}
 	}
 
-	private void singleTest(final EntityManagerFactory emf) {
-		final Person person = this.doPersist(emf);
+	private void singleTest(final EntityManagerFactory emf, List<Person> persons) {
+		this.doPersist(emf, persons);
 
-		this.doFind(emf, person);
+		this.doFind(emf, persons.get(0));
 	}
 
 	private void test(Type type, final EntityManagerFactory emf) {
@@ -342,9 +344,11 @@ public class Playground {
 		}
 
 		for (int i = 0; i < 250; i++) {
-			Playground.LOG.warn("{0}", i);
+			// Playground.LOG.warn("{0}", i);
 			for (int j = 0; j < 100; j++) {
-				this.singleTest(emf);
+				final List<Person> persons = this.createPersons();
+
+				this.singleTest(emf, persons);
 			}
 		}
 	}
