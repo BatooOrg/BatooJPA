@@ -68,3 +68,4 @@ cascadable
 discriminators
 metatada
 xml
+detachable

@@ -269,8 +269,8 @@ public class Playground {
 		for (int i = 0; i < 50; i++) {
 			final EntityManager em = emf.createEntityManager();
 
-			em.find(Person.class, person.getId());
-			// person2.getPhones().size();
+			final Person person2 = em.find(Person.class, person.getId());
+			person2.getPhones().size();
 			em.close();
 		}
 	}
@@ -343,13 +343,8 @@ public class Playground {
 			catch (final InterruptedException e) {}
 		}
 
-		for (int i = 0; i < 250; i++) {
-			// Playground.LOG.warn("{0}", i);
-			for (int j = 0; j < 100; j++) {
-				final List<Person> persons = this.createPersons();
-
-				this.singleTest(emf, persons);
-			}
+		for (int i = 0; i < 10000; i++) {
+			this.singleTest(emf, this.createPersons());
 		}
 	}
 }

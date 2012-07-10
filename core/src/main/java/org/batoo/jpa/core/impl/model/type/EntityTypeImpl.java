@@ -109,6 +109,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private final HashMap<EntityTypeImpl<?>, AssociationMapping<?, ?, ?>[]> dependencyMap = Maps.newHashMap();
 
 	private AssociationMapping<?, ?, ?>[] associations;
+	private AssociationMapping<?, ?, ?>[] associationsDetachable;
 	private AssociationMapping<?, ?, ?>[] associationsPersistable;
 	private AssociationMapping<?, ?, ?>[] associationsNotPersistable;
 	private AssociationMapping<?, ?, ?>[] associationsEager;
@@ -311,6 +312,39 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			associations.toArray(associatedAttributes0);
 
 			return this.associations = associatedAttributes0;
+		}
+	}
+
+	/**
+	 * Returns the associated attributes that are detachable by the type.
+	 * 
+	 * @return the associated attributes that are detachable by the type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public AssociationMapping<?, ?, ?>[] getAssociationsDetachable() {
+		if (this.associationsDetachable != null) {
+			return this.associationsDetachable;
+		}
+
+		synchronized (this) {
+			if (this.associationsDetachable != null) {
+				return this.associationsDetachable;
+			}
+
+			final List<AssociationMapping<?, ?, ?>> associationsDetachable = Lists.newArrayList();
+
+			for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
+				if (association.cascadesDetach()) {
+					associationsDetachable.add(association);
+				}
+			}
+
+			final AssociationMapping<?, ?, ?>[] associationsDetachable0 = new AssociationMapping[associationsDetachable.size()];
+			associationsDetachable.toArray(associationsDetachable0);
+
+			return this.associationsDetachable = associationsDetachable0;
 		}
 	}
 
@@ -1195,8 +1229,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		for (final PluralAssociationMapping<?, ?, ?> association : this.getAssociationsPlural()) {
 			association.set(managedInstance, association.get(managedInstance.getInstance()));
 		}
-
-		managedInstance.setTransaction(transaction);
 	}
 
 	/**

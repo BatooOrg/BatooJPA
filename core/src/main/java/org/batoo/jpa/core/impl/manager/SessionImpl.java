@@ -315,24 +315,27 @@ public class SessionImpl {
 	/**
 	 * Removes the instance from the session.
 	 * 
+	 * @param entity
+	 *            the entity to remove
 	 * @param <X>
-	 *            the type of the instance
-	 * @param instance
-	 *            the instance to remove
-	 * @param transaction
-	 *            the transaction to check against the validity of the transaction
+	 *            the type of the entity
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public <X> void remove(EntityTransactionImpl transaction, ManagedInstance<X> instance) {
-		final ManagedInstance<?> removed = this.repository.remove(instance);
+	@SuppressWarnings("unchecked")
+	public <X> void remove(X entity) {
+		final EntityTypeImpl<X> type = (EntityTypeImpl<X>) this.metamodel.entity(entity.getClass());
+		final ManagedId<X> instanceId = new ManagedId<X>(type, entity);
 
-		this.externalEntities.remove(instance);
+		final ManagedInstance<?> instance = this.repository.get(instanceId);
+		if (instance != null) {
+			this.repository.remove(instanceId);
+			this.externalEntities.remove(instance);
+			this.identifiableEntities.remove(instance);
 
-		removed.cascadeDetach(transaction);
-
-		removed.setTransaction(transaction);
+			instance.cascadeDetach(this.em);
+		}
 	}
 
 	/**

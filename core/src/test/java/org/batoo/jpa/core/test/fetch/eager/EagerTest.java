@@ -26,7 +26,6 @@ import junit.framework.Assert;
 import org.batoo.jpa.core.test.BaseCoreTest;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -34,11 +33,9 @@ import org.junit.Test;
  * 
  * @since $version
  */
-@Ignore
 public class EagerTest extends BaseCoreTest {
 
 	private static Country TR;
-
 	private static Country USA;
 	private static Country UK;
 

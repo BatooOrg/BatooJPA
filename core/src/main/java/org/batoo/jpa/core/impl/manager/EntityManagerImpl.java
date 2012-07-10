@@ -166,6 +166,8 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public boolean contains(Object entity) {
+		this.assertOpen();
+
 		return this.session.get(entity) != null;
 	}
 
@@ -314,8 +316,9 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public void detach(Object entity) {
-		// TODO Auto-generated method stub
+		this.assertOpen();
 
+		this.session.remove(entity);
 	}
 
 	/**

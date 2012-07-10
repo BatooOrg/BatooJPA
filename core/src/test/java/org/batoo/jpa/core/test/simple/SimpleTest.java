@@ -24,7 +24,6 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.TransactionRequiredException;
 import javax.persistence.metamodel.EntityType;
 import javax.sql.DataSource;
 
@@ -34,7 +33,6 @@ import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.jdbc.SingleValueHandler;
 import org.batoo.jpa.core.test.BaseCoreTest;
 import org.batoo.jpa.core.test.NullResultSetHandler;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -95,7 +93,6 @@ public class SimpleTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
-	@Ignore
 	public void testDetach() {
 		final Foo foo = this.newFoo();
 		this.persist(foo);
@@ -117,7 +114,6 @@ public class SimpleTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
-	@Ignore
 	public void testDetachThenCommit() throws SQLException {
 		final Foo foo = this.newFoo();
 		this.persist(foo);
@@ -153,13 +149,12 @@ public class SimpleTest extends BaseCoreTest {
 	 * Tests {@link EntityManager#flush()} then {@link EntityManager#detach(Object)}
 	 * 
 	 * @throws SQLException
-	 *             thrown if fails
+	 *             thrown if test fails.
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	@Test
-	@Ignore
 	public void testFlushThenDetach() throws SQLException {
 		final Foo foo = this.newFoo();
 		this.persist(foo);
@@ -168,12 +163,10 @@ public class SimpleTest extends BaseCoreTest {
 
 		this.detach(foo);
 
-		try {
-			this.commit();
+		this.commit();
 
-			Assert.fail("TransactionRequiredException expected");
-		}
-		catch (final TransactionRequiredException e) {}
+		final Integer count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM FOO", new SingleValueHandler<Integer>());
+		Assert.assertEquals(new Integer(1), count);
 	}
 
 	/**

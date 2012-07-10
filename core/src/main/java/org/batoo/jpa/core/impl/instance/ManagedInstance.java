@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.metamodel.PluralAttribute.CollectionType;
+
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.EntityTransactionImpl;
@@ -59,7 +61,6 @@ public class ManagedInstance<X> {
 	private final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>[] idMappings;
 
 	private final HashSet<AssociationMapping<?, ?, ?>> associationsLoaded;
-	private EntityTransactionImpl transaction;
 
 	private boolean loading;
 
@@ -127,15 +128,43 @@ public class ManagedInstance<X> {
 	}
 
 	/**
+	 * Cascades the detach operation.
 	 * 
-	 * @param transaction
+	 * @param entityManager
+	 *            the entity manager
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void cascadeDetach(EntityTransactionImpl transaction) {
-		// TODO Auto-generated method stub
+	public void cascadeDetach(EntityManagerImpl entityManager) {
+		this.status = Status.DETACHED;
 
+		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsDetachable()) {
+
+			// if the association a collection attribute then we will cascade to each element
+			if (association instanceof PluralAssociationMapping) {
+				final PluralAssociationMapping<?, ?, ?> mapping = (PluralAssociationMapping<?, ?, ?>) association;
+
+				if (mapping.getAttribute().getCollectionType() == CollectionType.MAP) {
+					// TODO handle map
+				}
+				else {
+					// extract the collection
+					final Collection<?> collection = (Collection<?>) mapping.get(this.instance);
+
+					// cascade to each element in the collection
+					for (final Object element : collection) {
+						entityManager.detach(element);
+					}
+				}
+			}
+			else {
+				final SingularAssociationMapping<?, ?> mapping = (SingularAssociationMapping<?, ?>) association;
+				final Object associate = mapping.get(this.instance);
+
+				entityManager.detach(associate);
+			}
+		}
 	}
 
 	/**
@@ -157,12 +186,17 @@ public class ManagedInstance<X> {
 			if (association instanceof PluralAssociationMapping) {
 				final PluralAssociationMapping<?, ?, ?> mapping = (PluralAssociationMapping<?, ?, ?>) association;
 
-				// extract the collection
-				final Collection<?> collection = (Collection<?>) mapping.get(this.instance);
+				if (mapping.getAttribute().getCollectionType() == CollectionType.MAP) {
+					// TODO handle map
+				}
+				else {
+					// extract the collection
+					final Collection<?> collection = (Collection<?>) mapping.get(this.instance);
 
-				// cascade to each element in the collection
-				for (final Object element : collection) {
-					requiresFlush |= entityManager.persistImpl(element);
+					// cascade to each element in the collection
+					for (final Object element : collection) {
+						requiresFlush |= entityManager.persistImpl(element);
+					}
 				}
 			}
 			else {
@@ -266,8 +300,6 @@ public class ManagedInstance<X> {
 					break;
 			}
 		}
-
-		this.transaction = transaction;
 	}
 
 	/**
@@ -454,26 +486,6 @@ public class ManagedInstance<X> {
 	 */
 	public void setStatus(Status status) {
 		this.status = status;
-	}
-
-	/**
-	 * Sets the transaction for the instance.
-	 * <p>
-	 * Having a transaction as a mark on an instance is useful in case of detaching, if the transaction is still active the transaction will
-	 * be set to roll back only.
-	 * 
-	 * @param transaction
-	 *            the transaction to set
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void setTransaction(EntityTransactionImpl transaction) {
-		if ((this.transaction != null) && (this.transaction.isActive())) {
-			this.transaction.setRollbackOnly();
-		}
-
-		this.transaction = transaction;
 	}
 
 	/**
