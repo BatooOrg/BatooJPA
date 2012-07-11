@@ -170,13 +170,15 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> {
 	 *            the managed instance
 	 * @param removals
 	 *            true if the removals should be flushed and false for the additions
+	 * @param force
+	 *            true to force, effective only for insertions and for new entities.
 	 * @throws SQLException
 	 *             thrown if there is an underlying SQL Exception
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract void flush(ConnectionImpl connection, ManagedInstance<?> managedInstance, boolean removals) throws SQLException;
+	public abstract void flush(ConnectionImpl connection, ManagedInstance<?> managedInstance, boolean removals, boolean force) throws SQLException;
 
 	/**
 	 * Returns the effective association metadata for the attribute checking with the parent mappings and entities.

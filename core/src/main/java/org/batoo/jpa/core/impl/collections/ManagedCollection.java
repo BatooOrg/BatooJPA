@@ -100,6 +100,8 @@ public abstract class ManagedCollection<E> {
 	 *            the connection
 	 * @param removals
 	 *            true if the removals should be flushed and false for the additions
+	 * @param force
+	 *            true to force, effective only for insertions and for new entities.
 	 * @throws SQLException
 	 *             thrown in case of an SQL error
 	 * 
@@ -107,7 +109,7 @@ public abstract class ManagedCollection<E> {
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public void flush(ConnectionImpl connection, boolean removals) throws SQLException {
+	public void flush(ConnectionImpl connection, boolean removals, boolean force) throws SQLException {
 		final Object source = this.managedInstance.getInstance();
 
 		// if the instance removed remove all the relations
@@ -119,6 +121,15 @@ public abstract class ManagedCollection<E> {
 
 			for (final E child : children) {
 				this.association.getJoinTable().performRemove(connection, source, child);
+			}
+
+			return;
+		}
+
+		// forced creation of relations for the new entities
+		if (force) {
+			for (final E child : this.getDelegate()) {
+				this.association.getJoinTable().performInsert(connection, source, child);
 			}
 
 			return;

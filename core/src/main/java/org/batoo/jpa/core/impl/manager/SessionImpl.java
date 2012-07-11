@@ -54,8 +54,8 @@ public class SessionImpl {
 
 	private final HashMap<ManagedId<?>, ManagedInstance<?>> repository = Maps.newHashMap();
 
+	private final ArrayList<ManagedInstance<?>> newEntities = Lists.newArrayList();
 	private final HashSet<ManagedInstance<?>> externalEntities = Sets.newHashSet();
-	private final HashSet<ManagedInstance<?>> identifiableEntities = Sets.newHashSet();
 	private final HashSet<ManagedInstance<?>> changedEntities = Sets.newHashSet();
 
 	private List<ManagedInstance<?>> entitiesLoading = Lists.newArrayList();
@@ -142,12 +142,11 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public void flush(ConnectionImpl connection) throws SQLException {
-		final int totalSize = this.externalEntities.size() + this.identifiableEntities.size() + this.changedEntities.size();
+		final int totalSize = this.externalEntities.size() + this.changedEntities.size();
 		final ArrayList<ManagedInstance<?>> updates = Lists.newArrayListWithCapacity(totalSize);
 		final ArrayList<ManagedInstance<?>> removals = Lists.newArrayListWithCapacity(totalSize);
 
 		updates.addAll(this.externalEntities);
-		updates.addAll(this.identifiableEntities);
 
 		for (final ManagedInstance<?> instance : this.changedEntities) {
 			(instance.getStatus() == Status.REMOVED ? removals : updates).add(instance);
@@ -159,7 +158,7 @@ public class SessionImpl {
 		Prioritizer.sort(updates, removals, sortedUpdates, sortedRemovals);
 
 		for (final ManagedInstance<?> instance : this.changedEntities) {
-			instance.flushAssociations(connection, true);
+			instance.flushAssociations(connection, true, false);
 		}
 
 		for (final ManagedInstance<?> instance : sortedRemovals) {
@@ -168,19 +167,15 @@ public class SessionImpl {
 
 		for (final ManagedInstance<?> instance : sortedUpdates) {
 			instance.flush(connection);
+			instance.checkTransients();
 		}
 
-		for (final ManagedInstance<?> instance : this.changedEntities) {
-			instance.checkTransients();
-			instance.flushAssociations(connection, false);
+		for (final ManagedInstance<?> instance : sortedUpdates) {
+			instance.flushAssociations(connection, false, !this.newEntities.isEmpty() && this.newEntities.contains(instance));
 			instance.reset();
 		}
 
-		for (final ManagedInstance<?> instance : this.identifiableEntities) {
-			this.repository.put(instance.getId(), instance);
-			this.externalEntities.add(instance);
-		}
-		this.identifiableEntities.clear();
+		this.newEntities.clear();
 	}
 
 	/**
@@ -309,29 +304,11 @@ public class SessionImpl {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public <X> void putNew(ManagedInstance<X> instance) {
+	public <X> void putExternal(ManagedInstance<X> instance) {
 		this.externalEntities.add(instance);
+		this.newEntities.add(instance);
 
 		this.put(instance);
-	}
-
-	/**
-	 * Puts the new instance into the session. The difference from {@link #putNew(ManagedInstance)} is that the instance needs an insert
-	 * execution to obtain its id.
-	 * <p>
-	 * Under normal circumstances, an implicit flush should be followed by this call.
-	 * <p>
-	 * Post to the flush operation, the instance will be moved into a safe repository that it knows the changes are not traced by
-	 * enhancement.
-	 * 
-	 * @param instance
-	 *            the instance to put
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void putNewIdentifiable(ManagedInstance<?> instance) {
-		this.identifiableEntities.add(instance);
 	}
 
 	/**
@@ -384,7 +361,6 @@ public class SessionImpl {
 		if (instance != null) {
 			this.repository.remove(instanceId);
 			this.externalEntities.remove(instance);
-			this.identifiableEntities.remove(instance);
 		}
 
 		return instance;
@@ -404,7 +380,6 @@ public class SessionImpl {
 
 		if (instance.getStatus() == Status.REMOVED) {
 			this.externalEntities.remove(instance);
-			this.identifiableEntities.remove(instance);
 		}
 	}
 

@@ -663,12 +663,7 @@ public class EntityManagerImpl implements EntityManager {
 		boolean requiresFlush = !instance.fillIdValues();
 		requiresFlush |= instance.cascadeMerge(this);
 
-		if (!requiresFlush) {
-			this.session.putNew(instance);
-		}
-		else {
-			this.session.putNewIdentifiable(instance);
-		}
+		this.session.putExternal(instance);
 
 		return requiresFlush;
 	}
@@ -728,12 +723,7 @@ public class EntityManagerImpl implements EntityManager {
 
 		boolean requiresFlush = !instance.fillIdValues();
 
-		if (!requiresFlush) {
-			this.session.putNew(instance);
-		}
-		else {
-			this.session.putNewIdentifiable(instance);
-		}
+		this.session.putExternal(instance);
 
 		requiresFlush |= instance.cascadePersist(this);
 

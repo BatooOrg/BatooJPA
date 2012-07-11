@@ -150,11 +150,10 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public void flush(ConnectionImpl connection, ManagedInstance<?> managedInstance, boolean removals) throws SQLException {
-		final Object source = managedInstance.getInstance();
-		final Object collection = this.get(source);
+	public void flush(ConnectionImpl connection, ManagedInstance<?> managedInstance, boolean removals, boolean force) throws SQLException {
+		final Object collection = this.get(managedInstance.getInstance());
 
-		((ManagedCollection<E>) collection).flush(connection, removals);
+		((ManagedCollection<E>) collection).flush(connection, removals, force);
 	}
 
 	/**

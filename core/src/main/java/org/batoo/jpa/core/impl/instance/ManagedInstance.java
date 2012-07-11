@@ -387,7 +387,7 @@ public class ManagedInstance<X> {
 			this.type.performInsert(connection, this);
 
 			this.status = Status.MANAGED;
-			this.session.putNew(this);
+			this.session.putExternal(this);
 		}
 		else {
 			switch (this.status) {
@@ -412,15 +412,17 @@ public class ManagedInstance<X> {
 	 *            the connection
 	 * @param removals
 	 *            true if the removals should be flushed and false for the additions
+	 * @param force
+	 *            true to force, effective only for insertions and for new entities.
 	 * @throws SQLException
 	 *             thrown if there is an underlying SQL Exception
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void flushAssociations(ConnectionImpl connection, boolean removals) throws SQLException {
+	public void flushAssociations(ConnectionImpl connection, boolean removals, boolean force) throws SQLException {
 		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsJoined()) {
-			association.flush(connection, this, removals);
+			association.flush(connection, this, removals, force);
 		}
 	}
 

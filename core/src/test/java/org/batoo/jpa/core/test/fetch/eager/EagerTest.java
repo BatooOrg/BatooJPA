@@ -128,18 +128,11 @@ public class EagerTest extends BaseCoreTest {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@Test
+	@Test(expected = PersistenceException.class)
 	public void testPersistAddress() {
 		this.persist(this.person().getAddresses().get(0));
 
-		try {
-			this.commit();
-
-			Assert.fail("No PersistenceException thrown");
-		}
-		catch (final PersistenceException e) {
-			// expected
-		}
+		this.commit();
 	}
 
 	/**
