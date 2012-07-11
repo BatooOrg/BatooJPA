@@ -29,6 +29,7 @@ import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
+import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.MappedSuperclassTypeImpl;
@@ -167,13 +168,15 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> {
 	 *            the connection to use
 	 * @param managedInstance
 	 *            the managed instance
+	 * @param removals
+	 *            true if the removals should be flushed and false for the additions
 	 * @throws SQLException
 	 *             thrown if there is an underlying SQL Exception
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract void flush(ConnectionImpl connection, ManagedInstance<?> managedInstance) throws SQLException;
+	public abstract void flush(ConnectionImpl connection, ManagedInstance<?> managedInstance, boolean removals) throws SQLException;
 
 	/**
 	 * Returns the effective association metadata for the attribute checking with the parent mappings and entities.
@@ -368,6 +371,21 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> {
 	public abstract void load(ManagedInstance<?> instance);
 
 	/**
+	 * Merges the association of the instance with the entity.
+	 * 
+	 * @param entityManager
+	 *            the entity manager
+	 * @param instance
+	 *            the instance
+	 * @param entity
+	 *            the entity
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract void mergeWith(EntityManagerImpl entityManager, ManagedInstance<?> instance, Object entity);
+
+	/**
 	 * @param instance
 	 *            the source instance
 	 * @param reference
@@ -378,6 +396,18 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> {
 	 * @author hceylan
 	 */
 	public abstract boolean references(Object instance, Object reference);
+
+	/**
+	 * Returns the if the mapping removes orphans.
+	 * 
+	 * @return true if the mapping removes orphans, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean removesOrphans() {
+		return this.removesOrphans;
+	}
 
 	/**
 	 * Sets the inverse attribute.

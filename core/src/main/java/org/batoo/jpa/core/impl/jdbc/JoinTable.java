@@ -20,14 +20,17 @@ package org.batoo.jpa.core.impl.jdbc;
 
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.List;
 
 import javax.persistence.criteria.JoinType;
 
 import org.apache.commons.dbutils.QueryRunner;
-import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
 import org.batoo.jpa.parser.metadata.JoinTableMetadata;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 
 /**
  * 
@@ -40,6 +43,10 @@ public class JoinTable extends AbstractTable {
 	private final ForeignKey sourceKey;
 	private final ForeignKey destinationKey;
 	private final EntityTypeImpl<?> entity;
+
+	private String removeSql;
+	private JoinColumn[] sourceRemoveColumns;
+	private JoinColumn[] destinationRemoveColumns;
 
 	/**
 	 * @param entity
@@ -114,6 +121,36 @@ public class JoinTable extends AbstractTable {
 		return this.entity;
 	}
 
+	private String getRemoveSql() {
+		if (this.removeSql != null) {
+			return this.removeSql;
+		}
+
+		synchronized (this) {
+			if (this.removeSql != null) {
+				return this.removeSql;
+			}
+
+			final List<String> restrictions = Lists.newArrayList();
+			this.sourceRemoveColumns = new JoinColumn[this.sourceKey.getJoinColumns().size()];
+			this.destinationRemoveColumns = new JoinColumn[this.sourceKey.getJoinColumns().size()];
+
+			int i = 0;
+			for (final JoinColumn column : this.sourceKey.getJoinColumns()) {
+				restrictions.add(column.getName() + " = ?");
+				this.sourceRemoveColumns[i++] = column;
+			}
+
+			i = 0;
+			for (final JoinColumn column : this.destinationKey.getJoinColumns()) {
+				restrictions.add(column.getName() + " = ?");
+				this.destinationRemoveColumns[i++] = column;
+			}
+
+			return this.removeSql = "DELETE FROM " + this.getQName() + " WHERE " + Joiner.on(" AND ").join(restrictions);
+		}
+	}
+
 	/**
 	 * Returns the sourceKey of the JoinTable.
 	 * 
@@ -150,21 +187,20 @@ public class JoinTable extends AbstractTable {
 	/**
 	 * Performs the insert for the join.
 	 * 
-	 * @param session
-	 *            the session
 	 * @param connection
 	 *            the connection
 	 * @param source
 	 *            the source instance
 	 * @param destination
 	 *            the destination instance
+	 * 
 	 * @throws SQLException
 	 *             thrown if there is an underlying SQL Exception
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performInsert(SessionImpl session, ConnectionImpl connection, Object source, Object destination) throws SQLException {
+	public void performInsert(ConnectionImpl connection, Object source, Object destination) throws SQLException {
 		final String insertSql = this.getInsertSql(null);
 		final AbstractColumn[] insertColumns = this.getInsertColumns(null);
 
@@ -174,10 +210,43 @@ public class JoinTable extends AbstractTable {
 			final AbstractColumn column = insertColumns[i];
 
 			final Object object = this.sourceKey.getJoinColumns().contains(column) ? source : destination;
-			params[i] = column.getValue(session, object);
+			params[i] = column.getValue(object);
 		}
 
 		new QueryRunner().update(connection, insertSql, params);
+	}
+
+	/**
+	 * Performs the remove for the join.
+	 * 
+	 * @param connection
+	 *            the connection
+	 * @param source
+	 *            the source instance
+	 * @param destination
+	 *            the destination instance
+	 * 
+	 * @throws SQLException
+	 *             thrown if there is an underlying SQL Exception
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void performRemove(ConnectionImpl connection, Object source, Object destination) throws SQLException {
+		final String removeSql = this.getRemoveSql();
+
+		final Object[] params = new Object[this.sourceKey.getJoinColumns().size() + this.destinationKey.getJoinColumns().size()];
+
+		int i = 0;
+		for (final JoinColumn sourceRemoveColumn : this.sourceRemoveColumns) {
+			params[i++] = sourceRemoveColumn.getValue(source);
+		}
+
+		for (final JoinColumn destinationRemoveColumn : this.destinationRemoveColumns) {
+			params[i++] = destinationRemoveColumn.getValue(destination);
+		}
+
+		new QueryRunner().update(connection, removeSql, params);
 	}
 
 	/**

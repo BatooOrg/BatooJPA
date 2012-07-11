@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.refresh.simple;
+package org.batoo.jpa.core.test.remove;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -30,92 +30,101 @@ import javax.persistence.ManyToOne;
  * @since $version
  */
 @Entity
-public class Phone {
+public class Child2 {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Integer id;
 
+	private String value;
+
 	@ManyToOne
-	private Person person;
-
-	private String phoneNo;
+	private Parent parent;
 
 	/**
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Phone() {
+	public Child2() {
 		super();
 	}
 
 	/**
-	 * @param person
+	 * @param parent
 	 *            the person
-	 * @param phoneNo
-	 *            the phone number
+	 * @param value
+	 *            the value
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Phone(Person person, String phoneNo) {
+	public Child2(Parent parent, String value) {
 		super();
 
-		this.person = person;
-		this.phoneNo = phoneNo;
+		this.parent = parent;
+		this.value = value;
 
-		this.person.getPhones().add(this);
+		parent.getChildren2().add(this);
 	}
 
 	/**
-	 * Returns the id.
+	 * Returns the id of the Child1.
 	 * 
-	 * @return the id
+	 * @return the id of the Child1
+	 * 
 	 * @since $version
+	 * @author hceylan
 	 */
 	public Integer getId() {
 		return this.id;
 	}
 
 	/**
-	 * Returns the person.
+	 * Returns the value of the Child1.
 	 * 
-	 * @return the person
+	 * @return the value of the Child1
+	 * 
 	 * @since $version
+	 * @author hceylan
 	 */
-	public Person getPerson() {
-		return this.person;
+	public String getValue() {
+		return this.value;
 	}
 
 	/**
-	 * Returns the phoneNo.
+	 * Sets the value of the Child1.
 	 * 
-	 * @return the phoneNo
+	 * @param value
+	 *            the value to set for Child1
+	 * 
 	 * @since $version
+	 * @author hceylan
 	 */
-	public String getPhoneNo() {
-		return this.phoneNo;
+	public void setValue(String value) {
+		this.value = value;
 	}
 
 	/**
-	 * Sets the person.
-	 * 
-	 * @param person
-	 *            the person to set
+	 * Returns the parent of the Child2.
+	 *
+	 * @return the parent of the Child2
+	 *
 	 * @since $version
+	 * @author hceylan
 	 */
-	public void setPerson(Person person) {
-		this.person = person;
+	public Parent getParent() {
+		return parent;
 	}
 
 	/**
-	 * Sets the phoneNo.
-	 * 
-	 * @param phoneNo
-	 *            the phoneNo to set
+	 * Sets the parent of the Child2.
+	 *
+	 * @param parent the parent to set for Child2
+	 *
 	 * @since $version
+	 * @author hceylan
 	 */
-	public void setPhoneNo(String phoneNo) {
-		this.phoneNo = phoneNo;
+	public void setParent(Parent parent) {
+		this.parent = parent;
 	}
 }

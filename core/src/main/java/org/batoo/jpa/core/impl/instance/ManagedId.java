@@ -32,9 +32,10 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 public class ManagedId<X> {
 
 	private final EntityTypeImpl<? super X> type;
-	private final Object id;
+	private Object id;
 
 	private int h;
+	private final X instance;
 
 	/**
 	 * Constructor for the instances.
@@ -50,6 +51,7 @@ public class ManagedId<X> {
 	public ManagedId(EntityTypeImpl<X> type, X instance) {
 		super();
 
+		this.instance = instance;
 		this.type = type.getRootType();
 		this.id = this.type.getInstanceId(instance);
 	}
@@ -68,6 +70,7 @@ public class ManagedId<X> {
 	public ManagedId(Object id, EntityTypeImpl<X> type) {
 		super();
 
+		this.instance = null;
 		this.type = type.getRootType();
 		this.id = id;
 	}
@@ -103,6 +106,9 @@ public class ManagedId<X> {
 	 * @author hceylan
 	 */
 	public Object getId() {
+		if (this.id == null) {
+			return this.id = this.type.getInstanceId(this.instance);
+		}
 		return this.id;
 	}
 
@@ -116,7 +122,7 @@ public class ManagedId<X> {
 			return this.h;
 		}
 
-		if (this.id == null) {
+		if (this.getId() == null) {
 			return 1;
 		}
 

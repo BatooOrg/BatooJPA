@@ -80,6 +80,20 @@ public class SessionImpl {
 	}
 
 	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void cascadeRemovals() {
+		final ArrayList<ManagedInstance<?>> instances = Lists.newArrayList(this.changedEntities);
+		for (final ManagedInstance<?> instance : instances) {
+			if (instance.getStatus() == Status.REMOVED) {
+				instance.cascadeRemove(this.em);
+			}
+		}
+	}
+
+	/**
 	 * Checks if the instance is managed in this session
 	 * 
 	 * @param instance
@@ -110,9 +124,10 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public void clear() {
-		// XXX detach all the entities if there is an existing repository
+		// TODO detach all the entities if there is in existing repository
 		this.repository.clear();
 		this.externalEntities.clear();
+		this.changedEntities.clear();
 	}
 
 	/**
@@ -128,24 +143,43 @@ public class SessionImpl {
 	 */
 	public void flush(ConnectionImpl connection) throws SQLException {
 		final int totalSize = this.externalEntities.size() + this.identifiableEntities.size() + this.changedEntities.size();
-		final ArrayList<ManagedInstance<?>> instances = Lists.newArrayListWithCapacity(totalSize);
+		final ArrayList<ManagedInstance<?>> updates = Lists.newArrayListWithCapacity(totalSize);
+		final ArrayList<ManagedInstance<?>> removals = Lists.newArrayListWithCapacity(totalSize);
 
-		instances.addAll(this.externalEntities);
-		instances.addAll(this.identifiableEntities);
-		instances.addAll(this.changedEntities);
+		updates.addAll(this.externalEntities);
+		updates.addAll(this.identifiableEntities);
 
-		final ManagedInstance<?>[] sortedInstances = Prioritizer.sort(instances);
+		for (final ManagedInstance<?> instance : this.changedEntities) {
+			(instance.getStatus() == Status.REMOVED ? removals : updates).add(instance);
+		}
 
-		for (final ManagedInstance<?> instance : sortedInstances) {
+		final ManagedInstance<?>[] sortedUpdates = new ManagedInstance[updates.size()];
+		final ManagedInstance<?>[] sortedRemovals = new ManagedInstance[removals.size()];
+
+		Prioritizer.sort(updates, removals, sortedUpdates, sortedRemovals);
+
+		for (final ManagedInstance<?> instance : this.changedEntities) {
+			instance.flushAssociations(connection, true);
+		}
+
+		for (final ManagedInstance<?> instance : sortedRemovals) {
 			instance.flush(connection);
 		}
 
-		for (final ManagedInstance<?> instance : sortedInstances) {
-			instance.checkTransients();
-			instance.flushAssociations(connection);
+		for (final ManagedInstance<?> instance : sortedUpdates) {
+			instance.flush(connection);
 		}
 
-		this.externalEntities.addAll(this.identifiableEntities);
+		for (final ManagedInstance<?> instance : this.changedEntities) {
+			instance.checkTransients();
+			instance.flushAssociations(connection, false);
+			instance.reset();
+		}
+
+		for (final ManagedInstance<?> instance : this.identifiableEntities) {
+			this.repository.put(instance.getId(), instance);
+			this.externalEntities.add(instance);
+		}
 		this.identifiableEntities.clear();
 	}
 
@@ -182,6 +216,11 @@ public class SessionImpl {
 	 */
 	@SuppressWarnings("unchecked")
 	public <X> ManagedInstance<X> get(X entity) {
+		if (entity instanceof EnhancedInstance) {
+			final ManagedId<?> id = ((EnhancedInstance) entity).__enhanced__$$__getManagedInstance().getId();
+			return (ManagedInstance<X>) this.repository.get(id);
+		}
+
 		final EntityTypeImpl<X> type = (EntityTypeImpl<X>) this.metamodel.entity(entity.getClass());
 
 		final ManagedId<X> id = new ManagedId<X>(type, entity);
@@ -209,6 +248,20 @@ public class SessionImpl {
 	 */
 	public int getSessionId() {
 		return this.sessionId;
+	}
+
+	/**
+	 * Removes entities that have been orphaned
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void handleOrphans() {
+		for (final ManagedInstance<?> instance : this.changedEntities) {
+			if (instance.getStatus() != Status.REMOVED) {
+				instance.handleOrphans(this.em);
+			}
+		}
 	}
 
 	/**
@@ -335,6 +388,24 @@ public class SessionImpl {
 		}
 
 		return instance;
+	}
+
+	/**
+	 * Marks the instance as changed.
+	 * 
+	 * @param instance
+	 *            the instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setChanged(ManagedInstance<?> instance) {
+		this.changedEntities.add(instance);
+
+		if (instance.getStatus() == Status.REMOVED) {
+			this.externalEntities.remove(instance);
+			this.identifiableEntities.remove(instance);
+		}
 	}
 
 	/**

@@ -20,7 +20,6 @@ package org.batoo.jpa.core.impl.jdbc;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.impl.AbstractLocator;
@@ -192,7 +191,7 @@ public class BasicColumn extends AbstractColumn {
 	 * 
 	 */
 	@Override
-	public Object getValue(SessionImpl session, Object instance) {
+	public Object getValue(Object instance) {
 		return this.mapping.get(instance);
 	}
 

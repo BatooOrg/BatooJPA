@@ -23,7 +23,6 @@ import java.sql.Types;
 import javax.persistence.DiscriminatorType;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.parser.impl.AbstractLocator;
@@ -179,7 +178,7 @@ public class DiscriminatorColumn extends AbstractColumn {
 	 * 
 	 */
 	@Override
-	public Object getValue(SessionImpl sesssion, Object instance) {
+	public Object getValue(Object instance) {
 		return null;
 	}
 

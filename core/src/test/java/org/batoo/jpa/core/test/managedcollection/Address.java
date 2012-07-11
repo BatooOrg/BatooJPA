@@ -16,14 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.refresh.simple;
+package org.batoo.jpa.core.test.managedcollection;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 
 /**
  * 
@@ -37,13 +35,7 @@ public class Address {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Integer id;
 
-	@ManyToOne
-	private Person person;
-
 	private String city;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	private Country country;
 
 	/**
 	 * @since $version
@@ -58,20 +50,16 @@ public class Address {
 	 *            the person
 	 * @param city
 	 *            the city
-	 * @param country
-	 *            the country
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Address(Person person, String city, Country country) {
+	public Address(Person person, String city) {
 		super();
 
-		this.person = person;
 		this.city = city;
-		this.country = country;
 
-		this.person.getAddresses().add(this);
+		person.getAddresses().add(this);
 	}
 
 	/**
@@ -85,16 +73,6 @@ public class Address {
 	}
 
 	/**
-	 * Returns the country.
-	 * 
-	 * @return the country
-	 * @since $version
-	 */
-	public Country getCountry() {
-		return this.country;
-	}
-
-	/**
 	 * Returns the id.
 	 * 
 	 * @return the id
@@ -102,16 +80,6 @@ public class Address {
 	 */
 	public Integer getId() {
 		return this.id;
-	}
-
-	/**
-	 * Returns the person.
-	 * 
-	 * @return the person
-	 * @since $version
-	 */
-	public Person getPerson() {
-		return this.person;
 	}
 
 	/**
@@ -125,25 +93,4 @@ public class Address {
 		this.city = city;
 	}
 
-	/**
-	 * Sets the country.
-	 * 
-	 * @param country
-	 *            the country to set
-	 * @since $version
-	 */
-	public void setCountry(Country country) {
-		this.country = country;
-	}
-
-	/**
-	 * Sets the person.
-	 * 
-	 * @param person
-	 *            the person to set
-	 * @since $version
-	 */
-	public void setPerson(Person person) {
-		this.person = person;
-	}
 }

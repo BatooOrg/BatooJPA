@@ -70,3 +70,4 @@ metatada
 xml
 detachable
 refreshable
+mergable

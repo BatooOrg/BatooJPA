@@ -26,6 +26,7 @@ import java.util.Set;
 import javax.persistence.PersistenceException;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 
 import com.google.common.collect.Sets;
@@ -45,16 +46,13 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	private final HashSet<E> delegate = Sets.newHashSet();
 	private HashSet<E> snapshot;
 
-	private final transient PluralAssociationMapping<?, ?, E> mapping;
-	private final transient ManagedInstance<?> managedInstance;
-
 	private boolean initialized;
 
 	/**
 	 * Constructor for lazy initialization.
 	 * 
-	 * @param mapping
-	 *            the mapping
+	 * @param association
+	 *            the association
 	 * @param managedInstance
 	 *            the managed instance
 	 * @param lazy
@@ -63,11 +61,8 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedSet(PluralAssociationMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
-		super();
-
-		this.mapping = mapping;
-		this.managedInstance = managedInstance;
+	public ManagedSet(PluralAssociationMapping<?, ?, E> association, ManagedInstance<?> managedInstance, boolean lazy) {
+		super(association, managedInstance);
 
 		this.initialized = !lazy;
 	}
@@ -75,8 +70,8 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	/**
 	 * Default constructor.
 	 * 
-	 * @param mapping
-	 *            the mapping
+	 * @param association
+	 *            the association
 	 * @param managedInstance
 	 *            the managed instance
 	 * @param values
@@ -85,12 +80,10 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedSet(PluralAssociationMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
-		super();
+	public ManagedSet(PluralAssociationMapping<?, ?, E> association, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
+		super(association, managedInstance);
 
 		this.delegate.addAll(values);
-		this.mapping = mapping;
-		this.managedInstance = managedInstance;
 
 		this.initialized = true;
 	}
@@ -101,8 +94,15 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 */
 	@Override
 	public boolean add(E e) {
-		this.initialize();
-		return this.delegate.add(e);
+		this.snapshot();
+
+		if (!this.delegate.add(e)) {
+			this.changed();
+
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -111,9 +111,15 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 */
 	@Override
 	public boolean addAll(Collection<? extends E> c) {
-		this.initialize();
 		this.snapshot();
-		return this.changed(this.delegate.addAll(c));
+
+		if (this.delegate.addAll(c)) {
+			this.changed();
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -130,10 +136,19 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 		return false;
 	}
 
-	private <T> T changed(T value) {
-		this.managedInstance.markCollectionChanged(this.mapping);
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void clear() {
+		this.snapshot();
 
-		return value;
+		if (this.delegate.size() > 0) {
+			this.changed();
+		}
+
+		this.delegate.clear();
 	}
 
 	/**
@@ -141,12 +156,9 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 * 
 	 */
 	@Override
-	public void clear() {
-		this.initialize();
-		if (this.delegate.size() > 0) {
-			this.changed(null);
-		}
-		this.delegate.clear();
+	protected void clearSnapshot() {
+		// TODO Auto-generated method stub
+
 	}
 
 	/**
@@ -156,6 +168,7 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	@Override
 	public boolean contains(Object o) {
 		this.initialize();
+
 		return this.delegate.contains(o);
 	}
 
@@ -166,6 +179,7 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	@Override
 	public boolean containsAll(Collection<?> c) {
 		this.initialize();
+
 		return this.delegate.containsAll(c);
 	}
 
@@ -175,6 +189,8 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 */
 	@Override
 	public boolean equals(Object obj) {
+		this.initialize();
+
 		return this.delegate.equals(obj);
 	}
 
@@ -192,7 +208,28 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 * 
 	 */
 	@Override
+	protected Collection<E> getItemsRemoved() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	protected Collection<E> getSnapshot() {
+		return this.snapshot;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public int hashCode() {
+		this.initialize();
+
 		return this.delegate.hashCode();
 	}
 
@@ -203,11 +240,11 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 */
 	private void initialize() {
 		if (!this.initialized) {
-			if (this.managedInstance == null) {
+			if (this.getManagedInstance() == null) {
 				throw new PersistenceException("No session to initialize the collection");
 			}
 
-			this.delegate.addAll(this.mapping.loadCollection(this.managedInstance));
+			this.delegate.addAll(this.getAssociation().loadCollection(this.getManagedInstance()));
 
 			this.initialized = true;
 		}
@@ -220,6 +257,7 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	@Override
 	public boolean isEmpty() {
 		this.initialize();
+
 		return this.delegate.isEmpty();
 	}
 
@@ -230,6 +268,7 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	@Override
 	public Iterator<E> iterator() {
 		this.initialize();
+
 		return new WrappedIterator<E>(this.delegate.iterator()) {
 			/**
 			 * {@inheritDoc}
@@ -238,7 +277,7 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 			@Override
 			public void remove() {
 				ManagedSet.this.snapshot();
-				ManagedSet.this.changed(null);
+				ManagedSet.this.changed();
 
 				super.remove();
 			}
@@ -250,7 +289,19 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 * 
 	 */
 	@Override
+	public void mergeWith(EntityManagerImpl entityManager, Object entity) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public void refreshChildren(Collection<? extends E> children) {
+		this.reset();
+
 		this.snapshot = null;
 
 		this.delegate.clear();
@@ -263,9 +314,15 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 */
 	@Override
 	public boolean remove(Object o) {
-		this.initialize();
 		this.snapshot();
-		return this.changed(this.delegate.remove(o));
+
+		if (this.delegate.remove(o)) {
+			this.changed();
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -274,9 +331,13 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 */
 	@Override
 	public boolean removeAll(Collection<?> c) {
-		this.initialize();
 		this.snapshot();
-		return this.changed(this.delegate.removeAll(c));
+
+		if (this.delegate.removeAll(c)) {
+			this.changed();
+		}
+
+		return false;
 	}
 
 	/**
@@ -285,9 +346,15 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 */
 	@Override
 	public boolean retainAll(Collection<?> c) {
-		this.initialize();
 		this.snapshot();
-		return this.changed(this.delegate.retainAll(c));
+
+		if (this.delegate.retainAll(c)) {
+			this.changed();
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -297,6 +364,7 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	@Override
 	public int size() {
 		this.initialize();
+
 		return this.delegate.size();
 	}
 
@@ -306,8 +374,11 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 * @author hceylan
 	 */
 	private void snapshot() {
-		if (this.snapshot != null) {
+		this.initialize();
+
+		if (this.snapshot == null) {
 			this.snapshot = Sets.newHashSet(this.delegate);
+			this.reset();
 		}
 	}
 
@@ -318,6 +389,7 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	@Override
 	public Object[] toArray() {
 		this.initialize();
+
 		return this.delegate.toArray();
 	}
 
@@ -328,6 +400,7 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	@Override
 	public <T> T[] toArray(T[] a) {
 		this.initialize();
+
 		return this.delegate.toArray(a);
 	}
 
@@ -337,7 +410,7 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 */
 	@Override
 	public String toString() {
-		return "ManagedSet [initialized=" + this.initialized + ", managedInstance=" + this.managedInstance + ", delegate=" + this.delegate + ", snapshot="
-			+ this.snapshot + ", mapping=" + this.mapping + "]";
+		return "ManagedSet [initialized=" + this.initialized + ", managedInstance=" + this.getManagedInstance() + ", delegate=" + this.delegate + ", snapshot="
+			+ this.snapshot + ", mapping=" + this.getAssociation() + "]";
 	}
 }

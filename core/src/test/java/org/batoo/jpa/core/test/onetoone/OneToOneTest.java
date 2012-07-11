@@ -69,7 +69,7 @@ public class OneToOneTest extends BaseCoreTest {
 	}
 
 	/**
-	 * Tests to {@link EntityManager#persist(Object)} Person which cascades to Cubicle.
+	 * Tests to {@link EntityManager#persist(Object)} Parent which cascades to Cubicle.
 	 * 
 	 * @since $version
 	 * @author hceylan

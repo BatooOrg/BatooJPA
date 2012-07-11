@@ -19,11 +19,11 @@
 package org.batoo.jpa.core.impl.jdbc;
 
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Map;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
@@ -47,6 +47,8 @@ public class EntityTable extends AbstractTable {
 
 	private final JdbcAdaptor jdbcAdaptor;
 	private PkColumn identityColumn;
+	private String removeSql;
+	private PkColumn[] removeColumns;
 
 	/**
 	 * @param entity
@@ -108,6 +110,31 @@ public class EntityTable extends AbstractTable {
 		return this.pkColumns;
 	}
 
+	private String getRemoveSql() {
+		if (this.removeSql != null) {
+			return this.removeSql;
+		}
+
+		synchronized (this) {
+			if (this.removeSql != null) {
+				return this.removeSql;
+			}
+
+			this.removeColumns = new PkColumn[this.pkColumns.size()];
+			this.pkColumns.values().toArray(this.removeColumns);
+
+			final Collection<String> restrictions = Collections2.transform(this.pkColumns.values(), new Function<PkColumn, String>() {
+
+				@Override
+				public String apply(PkColumn input) {
+					return input.getName() + " = ?";
+				}
+			});
+
+			return this.removeSql = "DELETE FROM " + this.getQName() + " WHERE " + Joiner.on(" AND ").join(restrictions);
+		}
+	}
+
 	/**
 	 * Performs inserts to the table for the managed instance or joins.
 	 * 
@@ -122,8 +149,6 @@ public class EntityTable extends AbstractTable {
 	 * @author hceylan
 	 */
 	public void performInsert(ConnectionImpl connection, final ManagedInstance<?> managedInstance) throws SQLException {
-		final SessionImpl session = managedInstance.getSession();
-
 		final EntityTypeImpl<?> entityType = managedInstance.getType();
 		final Object instance = managedInstance.getInstance();
 
@@ -139,7 +164,7 @@ public class EntityTable extends AbstractTable {
 				params[i] = managedInstance.getType().getDiscriminatorValue();
 			}
 			else {
-				params[i] = column.getValue(session, instance);
+				params[i] = column.getValue(instance);
 			}
 		}
 
@@ -154,6 +179,33 @@ public class EntityTable extends AbstractTable {
 
 			this.identityColumn.setValue(managedInstance, id);
 		}
+	}
+
+	/**
+	 * Performs removes from the table for the managed instance or joins.
+	 * 
+	 * @param connection
+	 *            the connection to use
+	 * @param managedInstance
+	 *            the managed instance to perform insert for
+	 * @throws SQLException
+	 *             thrown in case of underlying SQLException
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void performRemove(ConnectionImpl connection, final ManagedInstance<?> managedInstance) throws SQLException {
+		final String removeSql = this.getRemoveSql();
+
+		// prepare the parameters
+		final Object[] params = new Object[this.removeColumns.length];
+		for (int i = 0; i < this.removeColumns.length; i++) {
+			final PkColumn column = this.removeColumns[i];
+			params[i] = column.getValue(managedInstance.getInstance());
+		}
+
+		final QueryRunner runner = new QueryRunner();
+		runner.update(connection, removeSql, params);
 	}
 
 	/**

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.manytoonetomany;
+package org.batoo.jpa.core.test.refresh;
 
 import java.util.List;
 
@@ -45,7 +45,7 @@ public class Person {
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "person")
 	private final List<Address> addresses = Lists.newArrayList();
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "person")
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "person")
 	private final List<Phone> phones = Lists.newArrayList();
 
 	private String name;
@@ -60,7 +60,7 @@ public class Person {
 
 	/**
 	 * @param name
-	 *            the name of the person
+	 *            the name
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -102,12 +102,10 @@ public class Person {
 	}
 
 	/**
-	 * Returns the phones of the Parent.
+	 * Returns the phones.
 	 * 
-	 * @return the phones of the Parent
-	 * 
+	 * @return the phones
 	 * @since $version
-	 * @author hceylan
 	 */
 	public List<Phone> getPhones() {
 		return this.phones;
@@ -123,5 +121,4 @@ public class Person {
 	public void setName(String name) {
 		this.name = name;
 	}
-
 }

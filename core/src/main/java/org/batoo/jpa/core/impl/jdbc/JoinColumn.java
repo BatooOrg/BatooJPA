@@ -19,7 +19,6 @@
 package org.batoo.jpa.core.impl.jdbc;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
@@ -325,7 +324,7 @@ public class JoinColumn extends AbstractColumn {
 	 * 
 	 */
 	@Override
-	public Object getValue(SessionImpl session, Object instance) {
+	public Object getValue(Object instance) {
 		if (this.mapping != null) {
 			instance = this.mapping.get(instance);
 		}

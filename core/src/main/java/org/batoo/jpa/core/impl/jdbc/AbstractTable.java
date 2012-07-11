@@ -55,9 +55,10 @@ public class AbstractTable {
 	private final List<ForeignKey> foreignKeys = Lists.newArrayList();
 
 	private final Map<EntityTypeImpl<?>, String> insertSqlMap = Maps.newHashMap();
-	private final Map<EntityTypeImpl<?>, AbstractColumn[]> insertColumnsMap = Maps.newHashMap();
 	private String insertSql;
+
 	private AbstractColumn[] insertColumns;
+	private final Map<EntityTypeImpl<?>, AbstractColumn[]> insertColumnsMap = Maps.newHashMap();
 
 	/**
 	 * @param defaultName

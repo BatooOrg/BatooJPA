@@ -108,12 +108,15 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private int dependencyCount;
 	private final HashMap<EntityTypeImpl<?>, AssociationMapping<?, ?, ?>[]> dependencyMap = Maps.newHashMap();
 
+	private BasicMapping<?, ?>[] basicMappings;
 	private AssociationMapping<?, ?, ?>[] associations;
 	private AssociationMapping<?, ?, ?>[] associationsDetachable;
 	private AssociationMapping<?, ?, ?>[] associationsEager;
 	private AssociationMapping<?, ?, ?>[] associationsJoined;
+	private AssociationMapping<?, ?, ?>[] associationsMergable;
 	private AssociationMapping<?, ?, ?>[] associationsNotPersistable;
 	private AssociationMapping<?, ?, ?>[] associationsPersistable;
+	private AssociationMapping<?, ?, ?>[] associationsRemovable;
 	private PluralAssociationMapping<?, ?, ?>[] associationsPlural;
 	private SingularAssociationMapping<?, ?>[] associationsSingularLazy;
 
@@ -415,6 +418,39 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
+	 * Returns the associated attributes that are mergable by the type.
+	 * 
+	 * @return the associated attributes that are mergable by the type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public AssociationMapping<?, ?, ?>[] getAssociationsMergable() {
+		if (this.associationsMergable != null) {
+			return this.associationsMergable;
+		}
+
+		synchronized (this) {
+			if (this.associationsMergable != null) {
+				return this.associationsMergable;
+			}
+
+			final List<AssociationMapping<?, ?, ?>> associationsMergable = Lists.newArrayList();
+
+			for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
+				if (association.cascadesMerge()) {
+					associationsMergable.add(association);
+				}
+			}
+
+			final AssociationMapping<?, ?, ?>[] associationsMergable0 = new AssociationMapping[associationsMergable.size()];
+			associationsMergable.toArray(associationsMergable0);
+
+			return this.associationsMergable = associationsMergable0;
+		}
+	}
+
+	/**
 	 * Returns the plural associations that are not persistable.
 	 * 
 	 * @return the plural associations that are not persistable
@@ -515,6 +551,39 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
+	 * Returns the associated attributes that are removable by the type.
+	 * 
+	 * @return the associated attributes that are removable by the type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public AssociationMapping<?, ?, ?>[] getAssociationsRemovable() {
+		if (this.associationsRemovable != null) {
+			return this.associationsRemovable;
+		}
+
+		synchronized (this) {
+			if (this.associationsRemovable != null) {
+				return this.associationsRemovable;
+			}
+
+			final List<AssociationMapping<?, ?, ?>> associationsRemovable = Lists.newArrayList();
+
+			for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
+				if (association.cascadesRemove() || association.removesOrphans()) {
+					associationsRemovable.add(association);
+				}
+			}
+
+			final AssociationMapping<?, ?, ?>[] associationsRemovable0 = new AssociationMapping[associationsRemovable.size()];
+			associationsRemovable.toArray(associationsRemovable0);
+
+			return this.associationsRemovable = associationsRemovable0;
+		}
+	}
+
+	/**
 	 * Returns the array of singular owner lazy association of the type.
 	 * 
 	 * @return the array of singular owner lazy associations of the type
@@ -567,6 +636,35 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		}
 
 		return null;
+	}
+
+	/**
+	 * Returns the basic mappings of the type.
+	 * 
+	 * @return the basic mappings of the type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public BasicMapping<?, ?>[] getBasicMappings() {
+		if (this.basicMappings != null) {
+			return this.basicMappings;
+		}
+
+		synchronized (this) {
+			if (this.basicMappings != null) {
+				return this.basicMappings;
+			}
+
+			final List<BasicMapping<?, ?>> basicMappings = Lists.newArrayList();
+
+			this.rootMapping.addBasicMappings(basicMappings);
+
+			final BasicMapping<?, ?>[] basicMappings0 = new BasicMapping[basicMappings.size()];
+			basicMappings.toArray(basicMappings0);
+
+			return this.basicMappings = basicMappings0;
+		}
 	}
 
 	/**
@@ -1225,7 +1323,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * 
 	 * @param connection
 	 *            the connection to use
-	 * @param managedInstance
+	 * @param instance
 	 *            the managed instance to perform insert for
 	 * @throws SQLException
 	 *             thrown in case of an SQL Error
@@ -1233,13 +1331,9 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performInsert(ConnectionImpl connection, ManagedInstance<X> managedInstance) throws SQLException {
+	public void performInsert(ConnectionImpl connection, ManagedInstance<X> instance) throws SQLException {
 		for (final EntityTable table : this.getTables()) {
-			table.performInsert(connection, managedInstance);
-		}
-
-		for (final PluralAssociationMapping<?, ?, ?> association : this.getAssociationsPlural()) {
-			association.set(managedInstance, association.get(managedInstance.getInstance()));
+			table.performInsert(connection, instance);
 		}
 	}
 
@@ -1248,18 +1342,18 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * 
 	 * @param connection
 	 *            the connection
-	 * @param managedInstance
+	 * @param instance
 	 *            the managed instance
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performRefresh(ConnectionImpl connection, ManagedInstance<X> managedInstance) {
-		final SessionImpl session = managedInstance.getSession();
+	public void performRefresh(ConnectionImpl connection, ManagedInstance<X> instance) {
+		final SessionImpl session = instance.getSession();
 
 		final TypedQueryImpl<X> q = session.getEntityManager().createQuery(this.getCriteriaRefresh());
 
-		final Object id = managedInstance.getId().getId();
+		final Object id = instance.getId().getId();
 
 		// if has single id then pass it on
 		if (this.hasSingleIdAttribute()) {
@@ -1272,7 +1366,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			}
 		}
 
-		managedInstance.setRefreshing(true);
+		instance.setRefreshing(true);
 
 		q.getSingleResult();
 	}
@@ -1289,6 +1383,9 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public void performRemove(ConnectionImpl connection, ManagedInstance<X> instance) throws SQLException {
+		for (final EntityTable table : this.getTables()) {
+			table.performRemove(connection, instance);
+		}
 	}
 
 	/**

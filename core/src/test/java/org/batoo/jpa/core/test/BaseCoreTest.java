@@ -301,6 +301,20 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	}
 
 	/**
+	 * Persists the entity.
+	 * 
+	 * @param entity
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected void remove(Object entity) {
+		this.ensureTx();
+
+		this.em().remove(entity);
+	}
+
+	/**
 	 * Rolls the transaction back.
 	 * 
 	 * @since $version

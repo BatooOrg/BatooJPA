@@ -55,14 +55,15 @@ public class ManagedInstance<X> {
 	private final X instance;
 	private Status status;
 
-	private final Set<PluralAssociationMapping<?, ?, ?>> changedCollections;
 	private final SingularMapping<? super X, ?> idMapping;
 	private final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>[] idMappings;
 
 	private final HashSet<AssociationMapping<?, ?, ?>> associationsLoaded;
+	private final Set<PluralAssociationMapping<?, ?, ?>> associationsChanged;
 
 	private boolean loading;
 	private boolean refreshing;
+	private boolean changed;
 
 	private ManagedId<? super X> id;
 	private int h;
@@ -85,7 +86,7 @@ public class ManagedInstance<X> {
 		this.session = session;
 		this.instance = instance;
 
-		this.changedCollections = Sets.newHashSet();
+		this.associationsChanged = Sets.newHashSet();
 		this.associationsLoaded = Sets.newHashSet();
 
 		if (type.getRootType().hasSingleIdAttribute()) {
@@ -96,6 +97,8 @@ public class ManagedInstance<X> {
 			this.idMappings = this.type.getIdMappings();
 			this.idMapping = null;
 		}
+
+		this.status = Status.MANAGED;
 	}
 
 	/**
@@ -168,6 +171,49 @@ public class ManagedInstance<X> {
 	}
 
 	/**
+	 * Cascades the merge operation
+	 * 
+	 * @param entityManager
+	 *            the entity manager
+	 * @return true if an implicit flush is required, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean cascadeMerge(EntityManagerImpl entityManager) {
+		boolean requiresFlush = false;
+
+		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsMergable()) {
+
+			// if the association a collection attribute then we will cascade to each element
+			if (association instanceof PluralAssociationMapping) {
+				final PluralAssociationMapping<?, ?, ?> mapping = (PluralAssociationMapping<?, ?, ?>) association;
+
+				if (mapping.getAttribute().getCollectionType() == CollectionType.MAP) {
+					// TODO handle map
+				}
+				else {
+					// extract the collection
+					final Collection<?> collection = (Collection<?>) mapping.get(this.instance);
+
+					// cascade to each element in the collection
+					for (final Object element : collection) {
+						requiresFlush |= entityManager.mergeImpl(element);
+					}
+				}
+			}
+			else {
+				final SingularAssociationMapping<?, ?> mapping = (SingularAssociationMapping<?, ?>) association;
+				final Object associate = mapping.get(this.instance);
+				requiresFlush |= entityManager.mergeImpl(associate);
+			}
+		}
+
+		return requiresFlush;
+
+	}
+
+	/**
 	 * Cascades the persist operation.
 	 * 
 	 * @param entityManager
@@ -210,6 +256,51 @@ public class ManagedInstance<X> {
 	}
 
 	/**
+	 * Cascades the remove operation
+	 * 
+	 * @param entityManager
+	 *            the entity manager
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void cascadeRemove(EntityManagerImpl entityManager) {
+		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsRemovable()) {
+
+			// if the association a collection attribute then we will cascade to each element
+			if (association instanceof PluralAssociationMapping) {
+				final PluralAssociationMapping<?, ?, ?> mapping = (PluralAssociationMapping<?, ?, ?>) association;
+
+				if (mapping.getAttribute().getCollectionType() == CollectionType.MAP) {
+					// TODO handle map
+				}
+				else {
+					// extract the collection
+					final Collection<?> collection = (Collection<?>) mapping.get(this.instance);
+
+					// cascade to each element in the collection
+					for (final Object element : collection) {
+						entityManager.remove(element);
+					}
+				}
+			}
+			else {
+				final SingularAssociationMapping<?, ?> mapping = (SingularAssociationMapping<?, ?>) association;
+				final Object associate = mapping.get(this.instance);
+				entityManager.remove(associate);
+			}
+		}
+	}
+
+	public void changed() {
+		if (!this.changed && (this.associationsChanged.size() == 0)) {
+			this.session.setChanged(this);
+		}
+
+		this.changed = true;
+	}
+
+	/**
 	 * Checks that no association of the instance is transient
 	 * 
 	 * @since $version
@@ -218,6 +309,18 @@ public class ManagedInstance<X> {
 	public void checkTransients() {
 		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsNotPersistable()) {
 			association.checkTransient(this);
+		}
+	}
+
+	/**
+	 * Enhances the collections of the managed instance.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void enhanceCollections() {
+		for (final PluralAssociationMapping<?, ?, ?> association : this.type.getAssociationsPlural()) {
+			association.enhance(this);
 		}
 	}
 
@@ -305,15 +408,17 @@ public class ManagedInstance<X> {
 	 * 
 	 * @param connection
 	 *            the connection
+	 * @param removals
+	 *            true if the removals should be flushed and false for the additions
 	 * @throws SQLException
 	 *             thrown if there is an underlying SQL Exception
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void flushAssociations(ConnectionImpl connection) throws SQLException {
+	public void flushAssociations(ConnectionImpl connection, boolean removals) throws SQLException {
 		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsJoined()) {
-			association.flush(connection, this);
+			association.flush(connection, this, removals);
 		}
 	}
 
@@ -386,6 +491,19 @@ public class ManagedInstance<X> {
 	}
 
 	/**
+	 * @param entityManager
+	 *            the entity manager
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void handleOrphans(EntityManagerImpl entityManager) {
+		for (final PluralAssociationMapping<?, ?, ?> association : this.associationsChanged) {
+			association.removeOrphans(entityManager, this);
+		}
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -433,13 +551,35 @@ public class ManagedInstance<X> {
 	}
 
 	/**
-	 * Marks a collection as changed.
+	 * Merges the entity state with the <code>entity</code>. Also handles cascades.
+	 * 
+	 * @param entityManager
+	 *            the entity manager
+	 * @param entity
+	 *            the entity to merge
+	 * @return if flush is required
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void markCollectionChanged(PluralAssociationMapping<?, ?, ?> mapping) {
-		this.changedCollections.add(mapping);
+	public boolean mergeWith(EntityManagerImpl entityManager, X entity) {
+		if (this.instance != entity) {
+			for (final BasicMapping<?, ?> mapping : this.type.getBasicMappings()) {
+				mapping.set(this, mapping.get(entity));
+			}
+
+			final boolean requiresFlush = this.cascadeMerge(entityManager);
+
+			for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsMergable()) {
+				association.mergeWith(entityManager, this, entity);
+			}
+
+			this.session.setChanged(this);
+
+			return requiresFlush;
+		}
+
+		return false;
 	}
 
 	/**
@@ -485,6 +625,34 @@ public class ManagedInstance<X> {
 				entityManager.refresh(associate);
 			}
 		}
+	}
+
+	/**
+	 * Resets the change status of the instance.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void reset() {
+		this.associationsChanged.clear();
+		this.changed = false;
+	}
+
+	/**
+	 * Marks the plural association as changed.
+	 * 
+	 * @param association
+	 *            the association that has changed
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setAssociationChanged(PluralAssociationMapping<?, ?, ?> association) {
+		if ((this.associationsChanged.size() == 0) && !this.changed) {
+			this.session.setChanged(this);
+		}
+
+		this.associationsChanged.add(association);
 	}
 
 	/**

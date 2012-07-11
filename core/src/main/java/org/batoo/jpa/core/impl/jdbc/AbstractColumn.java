@@ -19,7 +19,6 @@
 package org.batoo.jpa.core.impl.jdbc;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 
@@ -143,17 +142,15 @@ public abstract class AbstractColumn {
 
 	/**
 	 * Returns the value for the column
-	 * 
-	 * @param sesssion
-	 *            the session
 	 * @param instance
 	 *            the instance
+	 * 
 	 * @return the value
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract Object getValue(SessionImpl sesssion, Object instance);
+	public abstract Object getValue(Object instance);
 
 	/**
 	 * Returns the insertable of the column.

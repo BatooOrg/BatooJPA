@@ -61,7 +61,7 @@ public class BasicMapping<Z, X> extends Mapping<Z, X, X> implements SingularMapp
 		this.attribute = attribute;
 
 		final ColumnMetadata columnMetadata = this.getColumnMetadata();
-		final int sqlType = TypeFactory.getSqlType(this.getAttribute().getJavaType(), attribute.getTemporalType(), attribute.getEnumType(), attribute.isLob());
+		final int sqlType = TypeFactory.getSqlType(this.attribute.getJavaType(), attribute.getTemporalType(), attribute.getEnumType(), attribute.isLob());
 
 		if (this.attribute.isId() || this.getParent().isId()) {
 			this.column = new PkColumn(this, sqlType, columnMetadata);
@@ -93,7 +93,7 @@ public class BasicMapping<Z, X> extends Mapping<Z, X, X> implements SingularMapp
 	 */
 	@Override
 	public boolean fillValue(Object instance) {
-		return this.getAttribute().fillValue(instance);
+		return this.attribute.fillValue(instance);
 	}
 
 	/**

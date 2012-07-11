@@ -16,9 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.refresh.simple;
+package org.batoo.jpa.core.test.remove;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 /**
@@ -27,66 +29,73 @@ import javax.persistence.Id;
  * @since $version
  */
 @Entity
-public class Country {
+public class Child3 {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Integer id;
 
-	private String name;
+	private String value;
 
 	/**
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Country() {
+	public Child3() {
 		super();
 	}
 
 	/**
-	 * @param id
-	 *            the id
-	 * @param name
-	 *            the name
+	 * @param parent
+	 *            the person
+	 * @param value
+	 *            the value
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Country(Integer id, String name) {
+	public Child3(Parent parent, String value) {
 		super();
 
-		this.id = id;
-		this.name = name;
+		this.value = value;
+
+		parent.getChildren3().add(this);
 	}
 
 	/**
-	 * Returns the id.
+	 * Returns the id of the Child1.
 	 * 
-	 * @return the id
+	 * @return the id of the Child1
+	 * 
 	 * @since $version
+	 * @author hceylan
 	 */
 	public Integer getId() {
 		return this.id;
 	}
 
 	/**
-	 * Returns the name.
+	 * Returns the value of the Child1.
 	 * 
-	 * @return the name
+	 * @return the value of the Child1
+	 * 
 	 * @since $version
+	 * @author hceylan
 	 */
-	public String getName() {
-		return this.name;
+	public String getValue() {
+		return this.value;
 	}
 
 	/**
-	 * Sets the name.
+	 * Sets the value of the Child1.
 	 * 
-	 * @param name
-	 *            the name to set
+	 * @param value
+	 *            the value to set for Child1
+	 * 
 	 * @since $version
+	 * @author hceylan
 	 */
-	public void setName(String name) {
-		this.name = name;
+	public void setValue(String value) {
+		this.value = value;
 	}
-
 }

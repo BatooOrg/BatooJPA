@@ -16,19 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.manytoonetomany;
+package org.batoo.jpa.core.test.priotizer;
 
-import java.util.List;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-
-import com.google.common.collect.Lists;
+import javax.persistence.ManyToOne;
 
 /**
  * 
@@ -36,92 +30,71 @@ import com.google.common.collect.Lists;
  * @since $version
  */
 @Entity
-public class Person {
+public class Child {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Integer id;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "person")
-	private final List<Address> addresses = Lists.newArrayList();
-
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "person")
-	private final List<Phone> phones = Lists.newArrayList();
-
-	private String name;
+	@ManyToOne
+	private Parent parent;
 
 	/**
-	 * @since $version
-	 * @author hceylan
-	 */
-	public Person() {
-		super();
-	}
-
-	/**
-	 * @param name
-	 *            the name of the person
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Person(String name) {
+	public Child() {
+		super();
+	}
+
+	/**
+	 * @param parent
+	 *            the parent
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Child(Parent parent) {
 		super();
 
-		this.name = name;
+		this.parent = parent;
 	}
 
 	/**
-	 * Returns the addresses.
+	 * Returns the id of the Child.
 	 * 
-	 * @return the addresses
-	 * @since $version
-	 */
-	public List<Address> getAddresses() {
-		return this.addresses;
-	}
-
-	/**
-	 * Returns the id.
+	 * @return the id of the Child
 	 * 
-	 * @return the id
 	 * @since $version
+	 * @author hceylan
 	 */
 	public Integer getId() {
 		return this.id;
 	}
 
 	/**
-	 * Returns the name.
+	 * Returns the parent of the Child.
 	 * 
-	 * @return the name
-	 * @since $version
-	 */
-	public String getName() {
-		return this.name;
-	}
-
-	/**
-	 * Returns the phones of the Parent.
-	 * 
-	 * @return the phones of the Parent
+	 * @return the parent of the Child
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public List<Phone> getPhones() {
-		return this.phones;
+	public Parent getParent() {
+		return this.parent;
 	}
 
 	/**
-	 * Sets the name.
+	 * Sets the parent of the Child.
 	 * 
-	 * @param name
-	 *            the name to set
+	 * @param parent
+	 *            the parent to set for Child
+	 * 
 	 * @since $version
+	 * @author hceylan
 	 */
-	public void setName(String name) {
-		this.name = name;
+	public void setParent(Parent parent) {
+		this.parent = parent;
 	}
-
 }

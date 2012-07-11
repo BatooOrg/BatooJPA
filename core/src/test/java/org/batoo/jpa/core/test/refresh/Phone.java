@@ -16,19 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.manytoonetomany;
+package org.batoo.jpa.core.test.refresh;
 
-import java.util.List;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-
-import com.google.common.collect.Lists;
+import javax.persistence.ManyToOne;
 
 /**
  * 
@@ -36,49 +30,41 @@ import com.google.common.collect.Lists;
  * @since $version
  */
 @Entity
-public class Person {
+public class Phone {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Integer id;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "person")
-	private final List<Address> addresses = Lists.newArrayList();
+	@ManyToOne
+	private Person person;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "person")
-	private final List<Phone> phones = Lists.newArrayList();
-
-	private String name;
+	private String phoneNo;
 
 	/**
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Person() {
+	public Phone() {
 		super();
 	}
 
 	/**
-	 * @param name
-	 *            the name of the person
+	 * @param person
+	 *            the person
+	 * @param phoneNo
+	 *            the phone number
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Person(String name) {
+	public Phone(Person person, String phoneNo) {
 		super();
 
-		this.name = name;
-	}
+		this.person = person;
+		this.phoneNo = phoneNo;
 
-	/**
-	 * Returns the addresses.
-	 * 
-	 * @return the addresses
-	 * @since $version
-	 */
-	public List<Address> getAddresses() {
-		return this.addresses;
+		this.person.getPhones().add(this);
 	}
 
 	/**
@@ -92,36 +78,44 @@ public class Person {
 	}
 
 	/**
-	 * Returns the name.
+	 * Returns the person.
 	 * 
-	 * @return the name
+	 * @return the person
 	 * @since $version
 	 */
-	public String getName() {
-		return this.name;
+	public Person getPerson() {
+		return this.person;
 	}
 
 	/**
-	 * Returns the phones of the Parent.
+	 * Returns the phoneNo.
 	 * 
-	 * @return the phones of the Parent
-	 * 
+	 * @return the phoneNo
 	 * @since $version
-	 * @author hceylan
 	 */
-	public List<Phone> getPhones() {
-		return this.phones;
+	public String getPhoneNo() {
+		return this.phoneNo;
 	}
 
 	/**
-	 * Sets the name.
+	 * Sets the person.
 	 * 
-	 * @param name
-	 *            the name to set
+	 * @param person
+	 *            the person to set
 	 * @since $version
 	 */
-	public void setName(String name) {
-		this.name = name;
+	public void setPerson(Person person) {
+		this.person = person;
 	}
 
+	/**
+	 * Sets the phoneNo.
+	 * 
+	 * @param phoneNo
+	 *            the phoneNo to set
+	 * @since $version
+	 */
+	public void setPhoneNo(String phoneNo) {
+		this.phoneNo = phoneNo;
+	}
 }

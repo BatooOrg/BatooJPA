@@ -39,23 +39,34 @@ public class Prioritizer {
 	/**
 	 * Sorts the managed instances based on their dependencies.
 	 * 
-	 * @param instances
-	 *            the list of instances
-	 * @return the sorted array of instances
+	 * @param updates
+	 *            the list of instances to be updated
+	 * @param removals
+	 *            the list of instances to be removed
+	 * @param sortedRemovals
+	 *            the sorted array of instances to be removed
+	 * @param sortedUpdates
+	 *            the sorted array of instances to be updated
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public static ManagedInstance<?>[] sort(ArrayList<ManagedInstance<?>> instances) {
-		final ManagedInstance<?>[] sorted = new ManagedInstance[instances.size()];
+	public static void sort(ArrayList<ManagedInstance<?>> updates, ArrayList<ManagedInstance<?>> removals, ManagedInstance<?>[] sortedUpdates,
+		ManagedInstance<?>[] sortedRemovals) {
 
+		Prioritizer.sort(updates, sortedUpdates, true);
+		Prioritizer.sort(removals, sortedRemovals, false);
+	}
+
+	private static void sort(ArrayList<ManagedInstance<?>> updates, ManagedInstance<?>[] sortedUpdates, boolean forward) {
 		int instanceNo = 0;
 
 		final HashSet<EntityTypeImpl<?>> entities = Sets.newHashSet();
-		for (final ManagedInstance<?> instance : instances) {
+		for (final ManagedInstance<?> instance : updates) {
 			entities.add(instance.getType());
 		}
 
+		// quick sort based on entity relations
 		while (true) {
 			boolean removed = false;
 
@@ -65,7 +76,11 @@ public class Prioritizer {
 				final EntityTypeImpl<?> e1 = i.next();
 
 				for (final EntityTypeImpl<?> e2 : entities) {
-					if (e1.getDependenciesFor(e2).length != 0) {
+
+					final EntityTypeImpl<?> dependent = forward ? e1 : e2;
+					final EntityTypeImpl<?> dependency = forward ? e2 : e1;
+
+					if (dependent.getDependenciesFor(dependency).length != 0) {
 						hasDependency = true;
 						break;
 					}
@@ -74,12 +89,12 @@ public class Prioritizer {
 				if (!hasDependency) {
 					i.remove();
 
-					for (final Iterator<ManagedInstance<?>> i2 = instances.iterator(); i2.hasNext();) {
+					for (final Iterator<ManagedInstance<?>> i2 = updates.iterator(); i2.hasNext();) {
 						final ManagedInstance<?> instance = i2.next();
 						if (instance.getType() == e1) {
 							i2.remove();
 
-							sorted[instanceNo++] = instance;
+							sortedUpdates[instanceNo++] = instance;
 						}
 					}
 
@@ -92,12 +107,12 @@ public class Prioritizer {
 			}
 		}
 
-		while ((instances.size() > 0)) {
+		while ((updates.size() > 0)) {
 
 			boolean found = false;
 
-			for (final Iterator<ManagedInstance<?>> i = instances.iterator(); i.hasNext();) {
-				boolean dependent = false;
+			for (final Iterator<ManagedInstance<?>> i = updates.iterator(); i.hasNext();) {
+				boolean hasDependency = false;
 
 				final ManagedInstance<?> mi1 = i.next();
 				final EntityTypeImpl<?> e1 = mi1.getType();
@@ -105,8 +120,8 @@ public class Prioritizer {
 				final Object i1 = mi1.getInstance();
 
 				innerLoop:
-				for (int j = 0; j < instances.size(); j++) {
-					final ManagedInstance<?> mi2 = instances.get(j);
+				for (int j = 0; j < updates.size(); j++) {
+					final ManagedInstance<?> mi2 = updates.get(j);
 					if (mi1 == mi2) {
 						continue;
 					}
@@ -115,16 +130,18 @@ public class Prioritizer {
 					final Object i2 = mi2.getInstance();
 
 					for (final AssociationMapping<?, ?, ?> association : e1.getDependenciesFor(e2)) {
-						if (association.references(i1, i2)) {
-							dependent = true;
+						final Object dependent = forward ? i1 : i2;
+						final Object dependency = forward ? i2 : i1;
+						if (association.references(dependent, dependency)) {
+							hasDependency = true;
 							break innerLoop;
 						}
 					}
 
 				}
 
-				if (!dependent) {
-					sorted[instanceNo++] = mi1;
+				if (!hasDependency) {
+					sortedUpdates[instanceNo++] = mi1;
 
 					i.remove();
 
@@ -136,8 +153,6 @@ public class Prioritizer {
 				throw new PersistenceException("Circular dependencies not yet supported");
 			}
 		}
-
-		return sorted;
 	}
 
 	/**

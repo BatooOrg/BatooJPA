@@ -89,6 +89,26 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	}
 
 	/**
+	 * Adds the basic mappings to the list of mappings.
+	 * 
+	 * @param mappings
+	 *            the list of mappings
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void addBasicMappings(List<BasicMapping<?, ?>> mappings) {
+		for (final Mapping<? super X, ?, ?> mapping : this.children.values()) {
+			if (mapping instanceof BasicMapping) {
+				mappings.add((BasicMapping<?, ?>) mapping);
+			}
+			else if (mapping instanceof ParentMapping) {
+				((ParentMapping<? super X, ?>) mapping).addBasicMappings(mappings);
+			}
+		}
+	}
+
+	/**
 	 * Creates a basic mapping for the attribute.
 	 * 
 	 * @param attribute

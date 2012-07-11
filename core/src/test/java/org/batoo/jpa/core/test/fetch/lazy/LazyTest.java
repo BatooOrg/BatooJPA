@@ -175,7 +175,7 @@ public class LazyTest extends BaseCoreTest {
 	}
 
 	/**
-	 * Tests to {@link EntityManager#persist(Object)} address which does not cascade to Person. PersistenceException expected.
+	 * Tests to {@link EntityManager#persist(Object)} address which does not cascade to Parent. PersistenceException expected.
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -188,7 +188,7 @@ public class LazyTest extends BaseCoreTest {
 	}
 
 	/**
-	 * Tests to {@link EntityManager#persist(Object)} Person which cascades to Address.
+	 * Tests to {@link EntityManager#persist(Object)} Parent which cascades to Child1.
 	 * 
 	 * @since $version
 	 * @author hceylan

@@ -127,7 +127,7 @@ public class ManyToOneToManyTest extends BaseCoreTest {
 	}
 
 	/**
-	 * Tests to {@link EntityManager#persist(Object)} address which does not cascade to Person. PersistenceException expected.
+	 * Tests to {@link EntityManager#persist(Object)} address which does not cascade to Parent. PersistenceException expected.
 	 * 
 	 * 
 	 * @since $version
@@ -141,7 +141,7 @@ public class ManyToOneToManyTest extends BaseCoreTest {
 	}
 
 	/**
-	 * Tests to {@link EntityManager#persist(Object)} Person which cascades to Address.
+	 * Tests to {@link EntityManager#persist(Object)} Parent which cascades to Child1.
 	 * 
 	 * @throws SQLException
 	 *             ins case of an underlying SQL Exception

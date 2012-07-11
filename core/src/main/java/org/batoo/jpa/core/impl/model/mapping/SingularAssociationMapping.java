@@ -21,11 +21,13 @@ package org.batoo.jpa.core.impl.model.mapping;
 import java.sql.SQLException;
 
 import javax.persistence.PersistenceException;
+import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
+import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
@@ -103,11 +105,11 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 	 * 
 	 */
 	@Override
-	public void flush(ConnectionImpl connection, ManagedInstance<?> managedInstance) throws SQLException {
+	public void flush(ConnectionImpl connection, ManagedInstance<?> managedInstance, boolean removals) throws SQLException {
 		if (this.getJoinTable() != null) {
 			final X entity = this.get(managedInstance.getInstance());
 
-			this.getJoinTable().performInsert(managedInstance.getSession(), connection, managedInstance.getInstance(), entity);
+			this.getJoinTable().performInsert(connection, managedInstance.getInstance(), entity);
 		}
 	}
 
@@ -209,6 +211,29 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 	public void load(ManagedInstance<?> managedInstance, Object mappingId) {
 		// TODO Auto-generated method stub
 
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void mergeWith(EntityManagerImpl entityManager, ManagedInstance<?> instance, Object entity) {
+		if (this.removesOrphans() || (this.inverse != null)) {
+			final X oldEntity = this.get(instance.getInstance());
+			if (oldEntity != null) {
+				if (this.removesOrphans()) {
+					entityManager.remove(oldEntity);
+				}
+
+				if ((this.inverse != null) && (this.inverse.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_ONE)) {
+					final ManagedInstance<X> oldInstance = instance.getSession().get(oldEntity);
+					this.inverse.set(oldInstance, null);
+				}
+			}
+		}
+
+		this.set(instance, this.get(entity));
 	}
 
 	/**

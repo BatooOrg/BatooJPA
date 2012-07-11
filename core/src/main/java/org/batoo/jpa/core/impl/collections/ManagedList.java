@@ -26,10 +26,14 @@ import java.util.ListIterator;
 
 import javax.persistence.PersistenceException;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * The list implementation of managed collection.
@@ -43,19 +47,96 @@ import com.google.common.collect.Lists;
  */
 public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 
+	/**
+	 * 
+	 * @author hceylan
+	 * @since $version
+	 */
+	private final class ManagedListIterator extends WrappedListIterator<E> {
+		private E last;
+
+		/**
+		 * 
+		 * @since $version
+		 * @author hceylan
+		 */
+		private ManagedListIterator(ListIterator<E> delegate) {
+			super(delegate);
+		}
+
+		@Override
+		public void add(E e) {
+			ManagedList.this.snapshot();
+			ManagedList.this.changed();
+
+			if (e == null) {
+				throw new NullPointerException();
+			}
+
+			if (ManagedList.this.delegate.contains(e)) {
+				throw ManagedList.this.noDuplicates();
+			}
+
+			super.add(e);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 */
+		@Override
+		public E next() {
+			return this.last = super.next();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 */
+		@Override
+		public E previous() {
+			return this.last = super.previous();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 */
+		@Override
+		public void remove() {
+			ManagedList.this.snapshot();
+			ManagedList.this.changed();
+
+			super.remove();
+		}
+
+		@Override
+		public void set(E e) {
+			ManagedList.this.snapshot();
+			ManagedList.this.changed();
+
+			if (e == null) {
+				throw new NullPointerException();
+			}
+
+			if (ManagedList.this.delegate.contains(e) && ObjectUtils.notEqual(e, this.last)) {
+				throw ManagedList.this.noDuplicates();
+			}
+
+			super.set(e);
+		}
+	}
+
 	private final ArrayList<E> delegate = Lists.newArrayList();
 	private ArrayList<E> snapshot;
-
-	private final transient PluralAssociationMapping<?, ?, E> mapping;
-	private final transient ManagedInstance<?> managedInstance;
 
 	private boolean initialized;
 
 	/**
 	 * Constructor for lazy initialization.
 	 * 
-	 * @param mapping
-	 *            the mapping
+	 * @param association
+	 *            the association
 	 * @param managedInstance
 	 *            the managed instance
 	 * @param lazy
@@ -64,11 +145,8 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedList(PluralAssociationMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
-		super();
-
-		this.mapping = mapping;
-		this.managedInstance = managedInstance;
+	public ManagedList(PluralAssociationMapping<?, ?, E> association, ManagedInstance<?> managedInstance, boolean lazy) {
+		super(association, managedInstance);
 
 		this.initialized = !lazy;
 	}
@@ -76,8 +154,8 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	/**
 	 * Default constructor.
 	 * 
-	 * @param mapping
-	 *            the mapping
+	 * @param association
+	 *            the association
 	 * @param managedInstance
 	 *            the managed instance
 	 * @param values
@@ -86,13 +164,20 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedList(PluralAssociationMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
-		super();
+	public ManagedList(PluralAssociationMapping<?, ?, E> association, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
+		super(association, managedInstance);
 
 		this.delegate.addAll(Lists.newArrayList(values));
 
-		this.mapping = mapping;
-		this.managedInstance = managedInstance;
+		for (final E e : values) {
+			if (e == null) {
+				throw new NullPointerException();
+			}
+		}
+
+		if (Sets.newHashSet(values).size() != values.size()) {
+			throw this.noDuplicates();
+		}
 
 		this.initialized = true;
 	}
@@ -103,9 +188,19 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 */
 	@Override
 	public boolean add(E e) {
-		this.initialize();
 		this.snapshot();
-		return this.changed(this.delegate.add(e));
+
+		if (e == null) {
+			throw new NullPointerException();
+		}
+
+		if (this.delegate.contains(e)) {
+			throw this.noDuplicates();
+		}
+
+		this.delegate.add(e);
+		this.changed();
+		return true;
 	}
 
 	/**
@@ -114,10 +209,19 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 */
 	@Override
 	public void add(int index, E element) {
-		this.initialize();
 		this.snapshot();
-		this.changed(null);
+
+		if (element == null) {
+			throw new NullPointerException();
+		}
+
+		if (this.contains(element)) {
+			throw this.noDuplicates();
+		}
+
 		this.delegate.add(index, element);
+
+		this.changed();
 	}
 
 	/**
@@ -126,9 +230,20 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 */
 	@Override
 	public boolean addAll(Collection<? extends E> c) {
-		this.initialize();
 		this.snapshot();
-		return this.changed(this.delegate.addAll(c));
+
+		for (final E e : c) {
+			if (this.delegate.contains(e)) {
+				throw this.noDuplicates();
+			}
+		}
+
+		if (this.delegate.addAll(c)) {
+			this.changed();
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -137,9 +252,20 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 */
 	@Override
 	public boolean addAll(int index, Collection<? extends E> c) {
-		this.initialize();
 		this.snapshot();
-		return this.changed(this.delegate.addAll(index, c));
+
+		for (final E e : c) {
+			if (this.delegate.contains(e)) {
+				throw this.noDuplicates();
+			}
+		}
+
+		if (this.delegate.addAll(index, c)) {
+			this.changed();
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -156,10 +282,19 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 		return false;
 	}
 
-	private <T> T changed(T value) {
-		this.managedInstance.markCollectionChanged(this.mapping);
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void clear() {
+		this.snapshot();
 
-		return value;
+		if (this.delegate.size() > 0) {
+			this.changed();
+		}
+
+		this.delegate.clear();
 	}
 
 	/**
@@ -167,13 +302,9 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 * 
 	 */
 	@Override
-	public void clear() {
-		this.initialize();
-		this.snapshot();
-		if (this.delegate.size() > 0) {
-			this.changed(null);
-		}
-		this.delegate.clear();
+	protected void clearSnapshot() {
+		// TODO Auto-generated method stub
+
 	}
 
 	/**
@@ -183,6 +314,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	@Override
 	public boolean contains(Object o) {
 		this.initialize();
+
 		return this.delegate.contains(o);
 	}
 
@@ -193,6 +325,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	@Override
 	public boolean containsAll(Collection<?> c) {
 		this.initialize();
+
 		return this.delegate.containsAll(c);
 	}
 
@@ -202,6 +335,8 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 */
 	@Override
 	public boolean equals(Object obj) {
+		this.initialize();
+
 		return this.delegate.equals(obj);
 	}
 
@@ -212,6 +347,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	@Override
 	public E get(int index) {
 		this.initialize();
+
 		return this.delegate.get(index);
 	}
 
@@ -229,7 +365,28 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 * 
 	 */
 	@Override
+	protected Collection<E> getItemsRemoved() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	protected Collection<E> getSnapshot() {
+		return this.snapshot;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public int hashCode() {
+		this.initialize();
+
 		return this.delegate.hashCode();
 	}
 
@@ -240,6 +397,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	@Override
 	public int indexOf(Object o) {
 		this.initialize();
+
 		return this.delegate.indexOf(o);
 	}
 
@@ -250,11 +408,11 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 */
 	private void initialize() {
 		if (!this.initialized) {
-			if (this.managedInstance == null) {
+			if (this.getManagedInstance() == null) {
 				throw new PersistenceException("No session to initialize the collection");
 			}
 
-			this.delegate.addAll(this.mapping.loadCollection(this.managedInstance));
+			this.delegate.addAll(this.getAssociation().loadCollection(this.getManagedInstance()));
 
 			this.initialized = true;
 		}
@@ -267,6 +425,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	@Override
 	public boolean isEmpty() {
 		this.initialize();
+
 		return this.delegate.isEmpty();
 	}
 
@@ -283,7 +442,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 			@Override
 			public void remove() {
 				ManagedList.this.snapshot();
-				ManagedList.this.changed(null);
+				ManagedList.this.changed();
 
 				super.remove();
 			};
@@ -297,6 +456,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	@Override
 	public int lastIndexOf(Object o) {
 		this.initialize();
+
 		return this.delegate.lastIndexOf(o);
 	}
 
@@ -307,35 +467,8 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	@Override
 	public ListIterator<E> listIterator() {
 		this.initialize();
-		return new WrappedListIterator<E>(this.delegate.listIterator()) {
-			@Override
-			public void add(E e) {
-				ManagedList.this.snapshot();
-				ManagedList.this.changed(null);
 
-				super.add(e);
-			};
-
-			/**
-			 * {@inheritDoc}
-			 * 
-			 */
-			@Override
-			public void remove() {
-				ManagedList.this.snapshot();
-				ManagedList.this.changed(null);
-
-				super.remove();
-			}
-
-			@Override
-			public void set(E e) {
-				ManagedList.this.snapshot();
-				ManagedList.this.changed(null);
-
-				super.set(e);
-			};
-		};
+		return new ManagedListIterator(this.delegate.listIterator());
 	}
 
 	/**
@@ -345,35 +478,45 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	@Override
 	public ListIterator<E> listIterator(int index) {
 		this.initialize();
-		return new WrappedListIterator<E>(this.delegate.listIterator(index)) {
-			@Override
-			public void add(E e) {
-				ManagedList.this.snapshot();
-				ManagedList.this.changed(null);
 
-				super.add(e);
-			};
+		return new ManagedListIterator(this.delegate.listIterator(index));
+	}
 
-			/**
-			 * {@inheritDoc}
-			 * 
-			 */
-			@Override
-			public void remove() {
-				ManagedList.this.snapshot();
-				ManagedList.this.changed(null);
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public void mergeWith(EntityManagerImpl entityManager, Object entity) {
+		// get the children from the new entity
+		List<E> children = (List<E>) this.getAssociation().get(entity);
+		if (children == null) {
+			children = Lists.newArrayList();
+		}
 
-				super.remove();
+		final SessionImpl session = this.getManagedInstance().getSession();
+
+		// iterate over the new children
+		final List<ManagedInstance<E>> childInstances = Lists.newArrayList();
+		for (final E child : children) {
+			childInstances.add(session.get(child));
+		}
+
+		for (final E child : this) {
+			final ManagedInstance<E> childInstance = session.get(child);
+			if ((childInstance != null) && this.delegate.contains(childInstance.getInstance())) {
+				this.remove(childInstance.getInstance());
 			}
+		}
 
-			@Override
-			public void set(E e) {
-				ManagedList.this.snapshot();
-				ManagedList.this.changed(null);
+		for (final E child : children) {
+			// if the child already exists then remove it from the list
+		}
+	}
 
-				super.set(e);
-			};
-		};
+	private UnsupportedOperationException noDuplicates() {
+		return new UnsupportedOperationException("Duplicates are not supported");
 	}
 
 	/**
@@ -382,6 +525,8 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 */
 	@Override
 	public void refreshChildren(Collection<? extends E> children) {
+		super.reset();
+
 		this.snapshot = null;
 
 		this.delegate.clear();
@@ -394,10 +539,13 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 */
 	@Override
 	public E remove(int index) {
-		this.initialize();
 		this.snapshot();
-		this.changed(null);
-		return this.delegate.remove(index);
+
+		final E e = this.delegate.remove(index);
+
+		this.changed();
+
+		return e;
 	}
 
 	/**
@@ -406,9 +554,14 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 */
 	@Override
 	public boolean remove(Object o) {
-		this.initialize();
 		this.snapshot();
-		return this.changed(this.delegate.remove(o));
+
+		if (this.delegate.remove(o)) {
+			this.changed();
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -417,9 +570,15 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 */
 	@Override
 	public boolean removeAll(Collection<?> c) {
-		this.initialize();
 		this.snapshot();
-		return this.changed(this.delegate.retainAll(c));
+
+		if (this.delegate.retainAll(c)) {
+			this.changed();
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -428,9 +587,15 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 */
 	@Override
 	public boolean retainAll(Collection<?> c) {
-		this.initialize();
 		this.snapshot();
-		return this.changed(this.delegate.retainAll(c));
+
+		if (this.delegate.retainAll(c)) {
+			this.changed();
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -439,10 +604,13 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 */
 	@Override
 	public E set(int index, E element) {
-		this.initialize();
 		this.snapshot();
-		this.changed(null);
 
+		if (this.delegate.contains(element) && ObjectUtils.notEqual(element, this.delegate.get(index))) {
+			throw this.noDuplicates();
+		}
+
+		this.changed();
 		return this.delegate.set(index, element);
 	}
 
@@ -463,8 +631,11 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 * @author hceylan
 	 */
 	private void snapshot() {
+		this.initialize();
+
 		if (this.snapshot == null) {
 			this.snapshot = Lists.newArrayList(this.delegate);
+			this.reset();
 		}
 	}
 
@@ -475,6 +646,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	@Override
 	public List<E> subList(int fromIndex, int toIndex) {
 		this.initialize();
+
 		return this.delegate.subList(fromIndex, toIndex);
 	}
 
@@ -485,6 +657,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	@Override
 	public Object[] toArray() {
 		this.initialize();
+
 		return this.delegate.toArray();
 	}
 
@@ -495,6 +668,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	@Override
 	public <T> T[] toArray(T[] a) {
 		this.initialize();
+
 		return this.delegate.toArray(a);
 	}
 
@@ -504,7 +678,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 */
 	@Override
 	public String toString() {
-		return "ManagedList [initialized=" + this.initialized + ", managedInstance=" + this.managedInstance + ", delegate=" + this.delegate + ", snapshot="
-			+ this.snapshot + ", mapping=" + this.mapping + "]";
+		return "ManagedList [initialized=" + this.initialized + ", managedInstance=" + this.getManagedInstance() + ", delegate=" + this.delegate
+			+ ", snapshot=" + this.snapshot + ", mapping=" + this.getAssociation() + "]";
 	}
 }

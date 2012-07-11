@@ -6,10 +6,11 @@
 	<persistence-unit name="default">
 		<provider>org.batoo.jpa.core.PersistenceProvider</provider>
 		
-		<class>org.batoo.jpa.core.test.refresh.simple.Address</class>
-		<class>org.batoo.jpa.core.test.refresh.simple.Country</class>
-		<class>org.batoo.jpa.core.test.refresh.simple.Person</class>
-		<class>org.batoo.jpa.core.test.refresh.simple.Phone</class>
+		<class>org.batoo.jpa.core.test.remove.Parent</class>
+		<class>org.batoo.jpa.core.test.remove.Child1</class>
+		<class>org.batoo.jpa.core.test.remove.Child2</class>
+		<class>org.batoo.jpa.core.test.remove.Child3</class>
+		<class>org.batoo.jpa.core.test.remove.Child4</class>
 		
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.Driver40" />

@@ -125,26 +125,36 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	}
 
 	/**
+	 * Enhances the collection to the managed collection
+	 * 
+	 * @param instance
+	 *            the managed instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	public void enhance(ManagedInstance<?> instance) {
+		final Collection<? extends E> collection = (Collection<? extends E>) this.get(instance.getInstance());
+		if (collection == null) {
+			this.set(instance, this.attribute.newCollection(this, instance, false));
+		}
+		else {
+			this.set(instance, this.attribute.newCollection(this, instance, collection));
+		}
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public void flush(ConnectionImpl connection, ManagedInstance<?> managedInstance) throws SQLException {
-		final Object values = this.get(managedInstance.getInstance());
+	public void flush(ConnectionImpl connection, ManagedInstance<?> managedInstance, boolean removals) throws SQLException {
+		final Object source = managedInstance.getInstance();
+		final Object collection = this.get(source);
 
-		final SessionImpl session = managedInstance.getSession();
-
-		if (values instanceof Collection) {
-			for (final E entity : (Collection<E>) values) {
-				this.getJoinTable().performInsert(session, connection, managedInstance.getInstance(), entity);
-			}
-		}
-		else if (values instanceof Map) {
-			for (final E entity : ((Map<?, E>) values).values()) {
-				this.getJoinTable().performInsert(session, connection, managedInstance.getInstance(), entity);
-			}
-		}
+		((ManagedCollection<E>) collection).flush(connection, removals);
 	}
 
 	/**
@@ -336,6 +346,20 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
+	public void mergeWith(EntityManagerImpl entityManager, ManagedInstance<?> instance, Object entity) {
+		// get the managed collection
+		final ManagedCollection<E> collection = (ManagedCollection<E>) this.get(instance.getInstance());
+
+		// merge with the new entities
+		collection.mergeWith(entityManager, entity);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public boolean references(Object instance, Object reference) {
 		final Object values = this.get(instance);
 
@@ -373,6 +397,25 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 			for (final E child : children) {
 				entityManager.refresh(child);
 			}
+		}
+	}
+
+	/**
+	 * Removes the children that have been orphaned due to removal from the managed collection
+	 * 
+	 * @param entityManager
+	 *            the entity manager
+	 * @param instance
+	 *            the managed instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	public void removeOrphans(EntityManagerImpl entityManager, ManagedInstance<?> instance) {
+		if (this.removesOrphans()) {
+			final ManagedCollection<E> collection = (ManagedCollection<E>) this.get(instance.getInstance());
+			collection.removeOrphans(entityManager);
 		}
 	}
 

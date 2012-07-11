@@ -388,9 +388,11 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public void flush() {
-		this.assertOpen();
+		this.assertTransaction();
 
 		try {
+			this.session.cascadeRemovals();
+			this.session.handleOrphans();
 			this.session.flush(this.getConnection());
 		}
 		catch (final SQLException e) {
@@ -594,9 +596,81 @@ public class EntityManagerImpl implements EntityManager {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <T> T merge(T entity) {
-		// TODO Auto-generated method stub
-		return null;
+		this.assertTransaction();
+
+		if (this.mergeImpl(entity)) {
+			this.flush();
+		}
+
+		return (T) this.session.get(entity);
+	}
+
+	/**
+	 * Cascaded implementation of {@link #merge(Object)}.
+	 * <p>
+	 * Also manages a direct or indirect requirement to an implicit flush.
+	 * 
+	 * @param entity
+	 *            the entity to cascade
+	 * @param <T>
+	 *            the type of the entity
+	 * @return true if an implicit flush is required, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> boolean mergeImpl(T entity) {
+		// try to locate the instance in the session
+		ManagedInstance<T> instance = this.session.get(entity);
+
+		// if it is in the session then test its status
+		if (instance != null) {
+			// if it is a removed entity then throw
+			if (instance.getStatus() == Status.REMOVED) {
+				throw new IllegalArgumentException("Entity has been previously removed");
+			}
+
+			// if it is an existing instance then merge and return
+			if ((instance.getStatus() == Status.MANAGED) || (instance.getStatus() == Status.NEW)) {
+				return instance.mergeWith(this, entity);
+			}
+		}
+
+		final EntityTypeImpl<T> type = (EntityTypeImpl<T>) this.metamodel.entity(entity.getClass());
+
+		// get the id of the entity
+		final Object id = type.getInstanceId(entity);
+
+		// if it has an id try to locate instance in the database
+		if (id != null) {
+			final T existingEntity = this.find((Class<T>) entity.getClass(), id);
+
+			// if it is found in the database then merge and return
+			if (existingEntity != null) {
+				instance = (ManagedInstance<T>) ((EnhancedInstance) existingEntity).__enhanced__$$__getManagedInstance();
+
+				return instance.mergeWith(this, entity);
+			}
+		}
+
+		// it is a new instance, handle like persist
+		instance = type.getManagedInstance(this.session, entity);
+		instance.setStatus(Status.NEW);
+
+		boolean requiresFlush = !instance.fillIdValues();
+		requiresFlush |= instance.cascadeMerge(this);
+
+		if (!requiresFlush) {
+			this.session.putNew(instance);
+		}
+		else {
+			this.session.putNewIdentifiable(instance);
+		}
+
+		return requiresFlush;
 	}
 
 	/**
@@ -607,8 +681,7 @@ public class EntityManagerImpl implements EntityManager {
 	public void persist(Object entity) {
 		this.assertTransaction();
 
-		final boolean flush = this.persistImpl(entity);
-		if (flush) {
+		if (this.persistImpl(entity)) {
 			this.flush();
 		}
 	}
@@ -620,7 +693,7 @@ public class EntityManagerImpl implements EntityManager {
 	 * 
 	 * @param entity
 	 *            the entity to cascade
-	 * @param <X>
+	 * @param <T>
 	 *            the type of the entity
 	 * @return true if an implicit flush is required, false otherwise
 	 * 
@@ -628,41 +701,41 @@ public class EntityManagerImpl implements EntityManager {
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public <X> boolean persistImpl(X entity) {
-		boolean requiresFlush = false;
+	public <T> boolean persistImpl(T entity) {
+		if (entity instanceof EnhancedInstance) {
+			final ManagedInstance<T> instance = (ManagedInstance<T>) ((EnhancedInstance) entity).__enhanced__$$__getManagedInstance();
+			if (instance.getStatus() == Status.DETACHED) {
+				throw new EntityExistsException("Entity has been previously detached");
+			}
+		}
 
-		final ManagedInstance<X> existing = this.session.get(entity);
+		final ManagedInstance<T> existing = this.session.get(entity);
 		if (existing != null) {
 			switch (existing.getStatus()) {
-				case DETACHED:
-					throw new EntityExistsException("Entity has been previously detached");
+				case NEW:
 				case MANAGED:
-					requiresFlush |= existing.cascadePersist(this);
-					break;
+					return existing.cascadePersist(this);
 				case REMOVED:
 					existing.setStatus(Status.MANAGED);
-					break;
-				case NEW:
-					break;
+					return existing.cascadePersist(this);
 			}
+		}
+
+		final EntityTypeImpl<T> type = (EntityTypeImpl<T>) this.metamodel.entity(entity.getClass());
+		final ManagedInstance<T> instance = type.getManagedInstance(this.session, entity);
+		instance.setStatus(Status.NEW);
+		instance.enhanceCollections();
+
+		boolean requiresFlush = !instance.fillIdValues();
+
+		if (!requiresFlush) {
+			this.session.putNew(instance);
 		}
 		else {
-			final EntityTypeImpl<X> type = (EntityTypeImpl<X>) this.metamodel.entity(entity.getClass());
-			final ManagedInstance<X> instance = type.getManagedInstance(this.session, entity);
-
-			requiresFlush = !instance.fillIdValues();
-			requiresFlush |= instance.cascadePersist(this);
-
-			if (!requiresFlush) {
-				instance.setStatus(Status.NEW);
-
-				this.session.putNew(instance);
-			}
-			else {
-				this.session.putNewIdentifiable(instance);
-			}
-
+			this.session.putNewIdentifiable(instance);
 		}
+
+		requiresFlush |= instance.cascadePersist(this);
 
 		return requiresFlush;
 	}
@@ -679,13 +752,14 @@ public class EntityManagerImpl implements EntityManager {
 
 		if (entity instanceof EnhancedInstance) {
 			instance = ((EnhancedInstance) entity).__enhanced__$$__getManagedInstance();
+			if ((instance.getSession() == this.session) && (instance.getStatus() == Status.MANAGED)) {
+				instance.refresh(this, this.getConnection());
+
+				return;
+			}
 		}
 
-		if ((instance == null) || (this.session.get(instance.getId()) == null)) {
-			throw new IllegalArgumentException("entity is not managed");
-		}
-
-		instance.refresh(this, this.getConnection());
+		throw new IllegalArgumentException("entity is not managed");
 	}
 
 	/**
@@ -721,7 +795,30 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public void remove(Object entity) {
-		// TODO Auto-generated method stub
+		if (entity instanceof EnhancedInstance) {
+			final EnhancedInstance enhancedInstance = (EnhancedInstance) entity;
+			final ManagedInstance<?> instance = enhancedInstance.__enhanced__$$__getManagedInstance();
+			if (instance.getStatus() == Status.DETACHED) {
+				throw new IllegalArgumentException("Entity has been previously detached");
+			}
+		}
+
+		final ManagedInstance<Object> instance = this.session.get(entity);
+		if (instance != null) {
+			if (instance.getStatus() == Status.MANAGED) {
+				instance.setStatus(Status.REMOVED);
+				this.session.setChanged(instance);
+
+				instance.cascadeRemove(this);
+
+			}
+			else if (instance.getStatus() == Status.NEW) {
+				this.session.remove(instance.getInstance());
+				instance.setStatus(Status.DETACHED);
+
+				instance.cascadeRemove(this);
+			}
+		}
 	}
 
 	/**

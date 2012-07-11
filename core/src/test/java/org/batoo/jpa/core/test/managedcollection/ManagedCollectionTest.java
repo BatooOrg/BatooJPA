@@ -16,11 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.onetomany;
-
-import javax.persistence.EntityManager;
-
-import junit.framework.Assert;
+package org.batoo.jpa.core.test.managedcollection;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
 import org.junit.Test;
@@ -30,7 +26,7 @@ import org.junit.Test;
  * 
  * @since $version
  */
-public class OneToManyTest extends BaseCoreTest {
+public class ManagedCollectionTest extends BaseCoreTest {
 
 	private Person person() {
 		final Person person = new Person("Ceylan");
@@ -42,53 +38,30 @@ public class OneToManyTest extends BaseCoreTest {
 	}
 
 	/**
-	 * Tests to {@link EntityManager#find(Class, Object)} person.
+	 * Tests that managed collection does not allow duplicates.
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	@Test
-	public void testFind() {
+	@Test(expected = UnsupportedOperationException.class)
+	public void testNoDuplicates() {
 		final Person person = this.person();
+		person.getAddresses().add(person.getAddresses().get(0));
+
 		this.persist(person);
-
-		this.commit();
-		this.close();
-
-		final Person person2 = this.find(Person.class, person.getId());
-		Assert.assertEquals(person.getName(), person2.getName());
-		Assert.assertEquals(person.getAddresses().size(), person2.getAddresses().size());
 	}
 
 	/**
-	 * Tests to {@link EntityManager#find(Class, Object)} person that is in the session.
+	 * Tests that managed collection does not allow duplicates.
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	@Test
-	public void testFindInSession() {
+	@Test(expected = UnsupportedOperationException.class)
+	public void testNoDuplicatesAfterPersist() {
 		final Person person = this.person();
 		this.persist(person);
 
-		this.commit();
-
-		final Person person2 = this.find(Person.class, person.getId());
-		Assert.assertSame(person, person2);
-	}
-
-	/**
-	 * Tests to {@link EntityManager#persist(Object)} Parent which cascades to Child1.
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@Test
-	public void testPersistPerson() {
-		Assert.assertEquals(2, this.em().getMetamodel().getEntities().size());
-
-		this.persist(this.person());
-
-		this.commit();
+		person.getAddresses().add(person.getAddresses().get(0));
 	}
 }
