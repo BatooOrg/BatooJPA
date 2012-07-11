@@ -18,10 +18,12 @@
  */
 package org.batoo.jpa.core.test.identity;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
 /**
  * 
@@ -37,6 +39,9 @@ public class Foo {
 
 	private String value;
 
+	@OneToOne(cascade = CascadeType.ALL)
+	private Foo other;
+
 	/**
 	 * Returns the key.
 	 * 
@@ -48,6 +53,18 @@ public class Foo {
 	}
 
 	/**
+	 * Returns the other of the Foo.
+	 * 
+	 * @return the other of the Foo
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Foo getOther() {
+		return this.other;
+	}
+
+	/**
 	 * Returns the value.
 	 * 
 	 * @return the value
@@ -55,6 +72,19 @@ public class Foo {
 	 */
 	public String getValue() {
 		return this.value;
+	}
+
+	/**
+	 * Sets the other of the Foo.
+	 * 
+	 * @param other
+	 *            the other to set for Foo
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setOther(Foo other) {
+		this.other = other;
 	}
 
 	/**

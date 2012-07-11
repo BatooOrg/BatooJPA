@@ -43,14 +43,19 @@ public class IdentityTest extends BaseCoreTest {
 		final Foo foo = new Foo();
 		foo.setValue("Bar");
 
-		this.persist(foo);
+		final Foo foo2 = new Foo();
+		foo2.setValue("Bar");
+		foo2.setOther(foo);
+
+		this.persist(foo2);
 
 		this.commit();
 
 		this.close();
 
-		final Foo foo2 = this.find(Foo.class, foo.getKey());
-		Assert.assertEquals(foo.getKey(), foo2.getKey());
+		final Foo foo3 = this.find(Foo.class, foo2.getKey());
+		Assert.assertEquals(foo2.getKey(), foo3.getKey());
+		Assert.assertEquals(foo2.getOther().getKey(), foo3.getOther().getKey());
 	}
 
 }

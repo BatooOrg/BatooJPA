@@ -248,7 +248,9 @@ public class ManagedInstance<X> {
 			else {
 				final SingularAssociationMapping<?, ?> mapping = (SingularAssociationMapping<?, ?>) association;
 				final Object associate = mapping.get(this.instance);
-				requiresFlush |= entityManager.persistImpl(associate);
+				if (associate != null) {
+					requiresFlush |= entityManager.persistImpl(associate);
+				}
 			}
 		}
 

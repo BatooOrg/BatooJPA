@@ -147,7 +147,7 @@ public final class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 				if (this.idType == IdType.SEQUENCE) {
 					metamodel.addSequenceGenerator(null);
 				}
-				else {
+				else if (this.idType == IdType.TABLE) {
 					metamodel.addTableGenerator(null);
 				}
 			}
