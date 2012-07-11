@@ -142,7 +142,7 @@ public abstract class ManagedCollection<E> {
 
 		if (removals) {
 			// delete the removals
-			final Collection<E> childrenRemoved = CollectionUtils.subtract(this.getDelegate(), snapshot);
+			final Collection<E> childrenRemoved = CollectionUtils.subtract(snapshot, this.getDelegate());
 			for (final E child : childrenRemoved) {
 				this.association.getJoinTable().performRemove(connection, source, child);
 			}

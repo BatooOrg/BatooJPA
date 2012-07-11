@@ -157,7 +157,11 @@ public class SessionImpl {
 
 		Prioritizer.sort(updates, removals, sortedUpdates, sortedRemovals);
 
-		for (final ManagedInstance<?> instance : this.changedEntities) {
+		for (final ManagedInstance<?> instance : sortedRemovals) {
+			instance.flushAssociations(connection, true, false);
+		}
+
+		for (final ManagedInstance<?> instance : sortedUpdates) {
 			instance.flushAssociations(connection, true, false);
 		}
 

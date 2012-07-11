@@ -107,9 +107,10 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 	@Override
 	public void flush(ConnectionImpl connection, ManagedInstance<?> managedInstance, boolean removals, boolean force) throws SQLException {
 		if (this.getJoinTable() != null) {
-			final X entity = this.get(managedInstance.getInstance());
-
-			this.getJoinTable().performInsert(connection, managedInstance.getInstance(), entity);
+			if (!removals) {
+				final X entity = this.get(managedInstance.getInstance());
+				this.getJoinTable().performInsert(connection, managedInstance.getInstance(), entity);
+			}
 		}
 	}
 
