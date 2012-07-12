@@ -147,8 +147,6 @@ public class SessionImpl {
 		final ArrayList<ManagedInstance<?>> updates = Lists.newArrayListWithCapacity(totalSize);
 		final ArrayList<ManagedInstance<?>> removals = Lists.newArrayListWithCapacity(totalSize);
 
-		updates.addAll(this.externalEntities);
-
 		for (final ManagedInstance<?> instance : this.changedEntities) {
 			(instance.getStatus() == Status.REMOVED ? removals : updates).add(instance);
 		}
@@ -180,6 +178,7 @@ public class SessionImpl {
 			instance.reset();
 		}
 
+		this.changedEntities.clear();
 		this.newEntities.clear();
 	}
 
@@ -259,6 +258,18 @@ public class SessionImpl {
 	public void handleAdditions() {
 		for (final ManagedInstance<?> instance : this.changedEntities) {
 			instance.handleAdditions(this.em);
+		}
+	}
+
+	/**
+	 * Handles the external entities that are updated
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void handleExternals() {
+		for (final ManagedInstance<?> instance : this.externalEntities) {
+			instance.checkUpdated();
 		}
 	}
 

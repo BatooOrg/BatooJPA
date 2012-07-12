@@ -303,6 +303,24 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	}
 
 	/**
+	 * Returns a reference to the entity.
+	 * 
+	 * @param cls
+	 *            the class of the entity
+	 * @param pk
+	 *            the primary key of the entity
+	 * @param <T>
+	 *            the type of entity
+	 * @return entity or null
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected <T> T reference(Class<T> cls, Object pk) {
+		return this.em().getReference(cls, pk);
+	}
+
+	/**
 	 * Persists the entity.
 	 * 
 	 * @param entity

@@ -55,10 +55,14 @@ public class AbstractTable {
 	private final List<ForeignKey> foreignKeys = Lists.newArrayList();
 
 	private final Map<EntityTypeImpl<?>, String> insertSqlMap = Maps.newHashMap();
+	private final Map<EntityTypeImpl<?>, String> updateSqlMap = Maps.newHashMap();
 	private String insertSql;
+	private String updateSql;
 
 	private AbstractColumn[] insertColumns;
+	private AbstractColumn[] updateColumns;
 	private final Map<EntityTypeImpl<?>, AbstractColumn[]> insertColumnsMap = Maps.newHashMap();
+	private final Map<EntityTypeImpl<?>, AbstractColumn[]> updateColumnsMap = Maps.newHashMap();
 
 	/**
 	 * @param defaultName
@@ -138,6 +142,8 @@ public class AbstractTable {
 	 * 
 	 * @param type
 	 *            the type to generate the insert statement for
+	 * @param pkColumns
+	 *            the primary key columns
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -216,6 +222,94 @@ public class AbstractTable {
 		else {
 			this.insertSql = sql;
 			this.insertColumns = insertColumns.toArray(new AbstractColumn[insertColumns.size()]);
+		}
+	}
+
+	/**
+	 * Generates the update statement for the type.
+	 * 
+	 * @param type
+	 *            the type to generate the update statement for
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 * @param pkColumns
+	 */
+	private synchronized void generateUpdateSql(final EntityTypeImpl<?> type, Map<String, PkColumn> pkColumns) {
+		String sql = type != null ? this.updateSqlMap.get(type) : this.insertSql;
+		if (sql != null) { // other thread finished the job for us
+			return;
+		}
+
+		final List<AbstractColumn> updateColumns = Lists.newArrayList();
+		// Filter out the identity physicalColumns
+		final Collection<AbstractColumn> filteredColumns = type == null ? this.getColumns() : Collections2.filter(this.getColumns(),
+			new Predicate<AbstractColumn>() {
+
+				@Override
+				public boolean apply(AbstractColumn input) {
+					if (input instanceof PkColumn) {
+						return true;
+					}
+
+					final EntityTypeImpl<?> root;
+
+					if ((input instanceof JoinColumn) && (input.getMapping() == null)) {
+						root = ((JoinColumn) input).getReferencedMapping().getRoot().getType();
+					}
+					else {
+						root = input.getMapping().getRoot().getType();
+					}
+
+					final Class<?> parent = root.getJavaType();
+					final Class<?> javaType = type.getJavaType();
+
+					return parent.isAssignableFrom(javaType);
+				}
+			});
+
+		// prepare the names tuple in the form of "COLNAME = ? [, COLNAME = ?]*"
+		final Collection<String> columnNames = Collections2.transform(filteredColumns, new Function<AbstractColumn, String>() {
+
+			@Override
+			public String apply(AbstractColumn input) {
+				if (!(input instanceof PkColumn)) {
+					updateColumns.add(input);
+
+					return input.getName() + " = ?";
+				}
+
+				return null;
+			}
+		});
+
+		final Collection<String> restrictions = Collections2.transform(pkColumns.values(), new Function<PkColumn, String>() {
+
+			@Override
+			public String apply(PkColumn input) {
+				updateColumns.add(input);
+
+				return input.getName() + " = ?";
+			}
+		});
+
+		final String columnNamesStr = Joiner.on(", ").skipNulls().join(columnNames);
+		final String restrictionStr = Joiner.on(" AND ").join(restrictions);
+
+		// UPDATE SCHEMA.TABLE SET
+		// (COL [, COL]*)
+		// VALUES (PARAM [, PARAM]*)
+		sql = "UPDATE " + this.getQName() + " SET"//
+			+ "\n" + columnNamesStr //
+			+ "\nWHERE " + restrictionStr;
+
+		if (type != null) {
+			this.updateSqlMap.put(type, sql);
+			this.updateColumnsMap.put(type, updateColumns.toArray(new AbstractColumn[updateColumns.size()]));
+		}
+		else {
+			this.updateSql = sql;
+			this.updateColumns = updateColumns.toArray(new AbstractColumn[updateColumns.size()]);
 		}
 	}
 
@@ -360,6 +454,55 @@ public class AbstractTable {
 	 */
 	public Map<String, String[]> getUniqueConstraints() {
 		return this.uniqueConstraints;
+	}
+
+	/**
+	 * Returns the columns for the update.
+	 * 
+	 * @param entity
+	 *            the entity to returns columns for or null for generic columns
+	 * @return the insert columns
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected AbstractColumn[] getUpdateColumns(final EntityTypeImpl<?> entity) {
+		if (entity == null) {
+			return this.updateColumns;
+		}
+
+		return this.updateColumnsMap.get(entity);
+	}
+
+	/**
+	 * Returns the update statement for the table specifically.
+	 * 
+	 * @param entity
+	 *            the entity to return update statement for or null for generic SQL
+	 * @param pkColumns
+	 *            the primary key columns
+	 * @return the insert statement
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected String getUpdateSql(EntityTypeImpl<?> entity, Map<String, PkColumn> pkColumns) {
+		if (entity == null) {
+			if (this.updateSql == null) {
+				this.generateUpdateSql(null, pkColumns);
+			}
+
+			return this.updateSql;
+		}
+
+		String sql = this.updateSqlMap.get(entity);
+		if (sql == null) {
+			this.generateUpdateSql(entity, pkColumns);
+
+			sql = this.updateSqlMap.get(entity);
+		}
+
+		return sql;
 	}
 
 	/**

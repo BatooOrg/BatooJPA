@@ -109,6 +109,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private final HashMap<EntityTypeImpl<?>, AssociationMapping<?, ?, ?>[]> dependencyMap = Maps.newHashMap();
 
 	private BasicMapping<?, ?>[] basicMappings;
+	private Mapping<?, ?, ?>[] singularMappings;
 	private AssociationMapping<?, ?, ?>[] associations;
 	private AssociationMapping<?, ?, ?>[] associationsDetachable;
 	private AssociationMapping<?, ?, ?>[] associationsEager;
@@ -985,7 +986,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			throw new NullPointerException();
 		}
 
-		return new ManagedInstance<X>(this, session, instance);
+		return new ManagedInstance<X>(this, session, instance, true);
 	}
 
 	/**
@@ -1040,6 +1041,35 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		catch (final Exception e) {} // not possible
 
 		return null;
+	}
+
+	/**
+	 * Returns the singular mappings.
+	 * 
+	 * @return the singular mappings
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Mapping<?, ?, ?>[] getMappingsSingular() {
+		if (this.singularMappings != null) {
+			return this.singularMappings;
+		}
+
+		synchronized (this) {
+			if (this.singularMappings != null) {
+				return this.singularMappings;
+			}
+
+			final List<Mapping<?, ?, ?>> singularMappings = Lists.newArrayList();
+
+			this.rootMapping.addSingularMappings(singularMappings);
+
+			final Mapping<?, ?, ?>[] singularMappings0 = new Mapping[singularMappings.size()];
+			singularMappings.toArray(singularMappings0);
+
+			return this.singularMappings = singularMappings0;
+		}
 	}
 
 	/**
@@ -1429,6 +1459,9 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public void performUpdate(ConnectionImpl connection, ManagedInstance<X> instance) throws SQLException {
+		for (final EntityTable table : this.getTables()) {
+			table.performUpdate(connection, instance);
+		}
 	}
 
 	/**

@@ -94,7 +94,7 @@ public class Person$Prototype extends Person implements EnhancedInstance {
 	}
 
 	private void __enhanced_$$__check() {
-		if (this.__enhanced_$$__initialized) {
+		if (!this.__enhanced_$$__initialized) {
 			if (this.__enhanced_$$__session == null) {
 				throw new PersistenceException("No session to initialize the instance");
 			}
@@ -108,6 +108,12 @@ public class Person$Prototype extends Person implements EnhancedInstance {
 
 			this.__enhanced_$$__initialized = true;
 		}
+
+		if (this.__enhanced_$$__session != null) {
+			this.__enhanced__$$__managedInstance.changed();
+		}
+
+		return;
 	}
 
 	public Object get__enhanced__$$__id() {

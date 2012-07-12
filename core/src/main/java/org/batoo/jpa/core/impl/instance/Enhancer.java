@@ -56,6 +56,7 @@ public final class Enhancer implements Opcodes {
 	private static final String METHOD_ENHANCED_SET_MANAGED_INSTANCE = "__enhanced__$$__setManagedInstance";
 	private static final String METHOD_FIND = "find";
 	private static final String METHOD_LOAD = "load";
+	private static final String METHOD_CHANGED = "changed";
 
 	private static final String DESCRIPTOR_BOOLEAN = Type.getDescriptor(Boolean.TYPE);
 	private static final String DESCRIPTOR_MANAGED_INSTANCE = Type.getDescriptor(ManagedInstance.class);
@@ -68,6 +69,7 @@ public final class Enhancer implements Opcodes {
 	private static final String INTERNAL_PERSISTENCE_EXCEPTION = Type.getInternalName(PersistenceException.class);
 	private static final String INTERNAL_SESSION = Type.getInternalName(SessionImpl.class);
 	private static final String INTERNAL_ENTITY_MANAGER = Type.getInternalName(EntityManagerImpl.class);
+	private static final String INTERNAL_MANAGED_INSTANCE = Type.getInternalName(ManagedInstance.class);
 
 	//@formatter:off
 	private static byte[] create(EntityType<?> type, Class<?> clazz) throws Exception {
@@ -201,40 +203,41 @@ public final class Enhancer implements Opcodes {
 		final MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PRIVATE, Enhancer.METHOD_ENHANCED_CHECK, Enhancer.makeDescription(Void.TYPE), null, null);
 		mv.visitCode();
 
-		final Label l0 = new Label();
-		final Label l1 = new Label();
-		final Label l2 = new Label();
-		final Label l3 = new Label();
-		final Label l4 = new Label();
-		final Label l5 = new Label();
+		final Label lCheckInitialized = new Label();
+		final Label lReturn = new Label();
+		final Label lHasMapping = new Label();
+		final Label lFind = new Label();
+		final Label lInitialized = new Label();
+		final Label lChanged = new Label();
+		final Label lOut = new Label();
 
-		// if (this.__enhanced__$$__initialized) {
-		mv.visitLabel(l0);
+		// if (!this.__enhanced__$$__initialized) {
+		mv.visitLabel(lCheckInitialized);
 		mv.visitFrame(Opcodes.F_NEW, 1, new Object[] { enhancedClassName }, 0, new Object[] {});
 		mv.visitVarInsn(Opcodes.ALOAD, 0);
 		mv.visitFieldInsn(Opcodes.GETFIELD, enhancedClassName, Enhancer.FIELD_ENHANCED_INITIALIZED, Enhancer.DESCRIPTOR_BOOLEAN);
-		mv.visitJumpInsn(Opcodes.IFNE, l1);
+		mv.visitJumpInsn(Opcodes.IFNE, lChanged);
 
-		// if (this.__enhanced_$$__session == null) {
+		//     if (this.__enhanced_$$__session == null)
 		mv.visitVarInsn(Opcodes.ALOAD, 0);
 		mv.visitFieldInsn(Opcodes.GETFIELD, enhancedClassName, Enhancer.FIELD_ENHANCED_SESSION, Enhancer.DESCRIPTOR_SESSION);
-		mv.visitJumpInsn(Opcodes.IFNONNULL, l2);
+		mv.visitJumpInsn(Opcodes.IFNONNULL, lChanged);
 
-		// throw new PersistenceException("No session to initialize the instance");
+		//         throw new PersistenceException("No session to initialize the instance");
 		mv.visitTypeInsn(Opcodes.NEW, Enhancer.INTERNAL_PERSISTENCE_EXCEPTION);
 		mv.visitInsn(Opcodes.DUP);
 		mv.visitLdcInsn("No session to initialize the instance");
 		mv.visitMethodInsn(Opcodes.INVOKESPECIAL, Enhancer.INTERNAL_PERSISTENCE_EXCEPTION, Enhancer.CONSTRUCTOR_INIT, Enhancer.makeDescription(Void.TYPE, String.class));
 		mv.visitInsn(Opcodes.ATHROW);
 
-		// if (this.__enhanced_$$__mapping != null) {
-		mv.visitLabel(l2);
+		//     if (this.__enhanced_$$__mapping != null)
+		mv.visitLabel(lHasMapping);
 		mv.visitFrame(Opcodes.F_NEW, 1, new Object[] { enhancedClassName }, 0, new Object[] {});
 		mv.visitVarInsn(Opcodes.ALOAD, 0);
 		mv.visitFieldInsn(Opcodes.GETFIELD, enhancedClassName, Enhancer.FIELD_ENHANCED_MAPPING, Enhancer.DESCRIPTOR_MAPPING);
-		mv.visitJumpInsn(Opcodes.IFNULL, l3);
+		mv.visitJumpInsn(Opcodes.IFNULL, lFind);
 
-		// this.__enhanced_$$__mapping.load(this.__enhanced__$$__managedInstance, this.__enhanced__$$__id);
+		//         this.__enhanced_$$__mapping.load(this.__enhanced__$$__managedInstance, this.__enhanced__$$__id);
 		mv.visitVarInsn(Opcodes.ALOAD, 0);
 		mv.visitFieldInsn(Opcodes.GETFIELD, enhancedClassName, Enhancer.FIELD_ENHANCED_MAPPING, Enhancer.DESCRIPTOR_MAPPING);
 		mv.visitVarInsn(Opcodes.ALOAD, 0);
@@ -242,10 +245,10 @@ public final class Enhancer implements Opcodes {
 		mv.visitVarInsn(Opcodes.ALOAD, 0);
 		mv.visitFieldInsn(Opcodes.GETFIELD, enhancedClassName, Enhancer.FIELD_ENHANCED_ID, Enhancer.DESCRIPTOR_OBJECT);
 		mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Enhancer.INTERNAL_MAPPING, Enhancer.METHOD_LOAD, Enhancer.makeDescription(Void.TYPE, ManagedInstance.class, Object.class));
-		mv.visitJumpInsn(Opcodes.GOTO, l4);
+		mv.visitJumpInsn(Opcodes.GOTO, lInitialized);
 
-		//	this.__enhanced_$$__session.getEntityManager().find(this.__enhanced_$$__type, this.__enhanced__$$__id);
-		mv.visitLabel(l3);
+		//	    else this.__enhanced_$$__session.getEntityManager().find(this.__enhanced_$$__type, this.__enhanced__$$__id);
+		mv.visitLabel(lFind);
 		mv.visitFrame(Opcodes.F_NEW, 1, new Object[] { enhancedClassName }, 0, new Object[] {});
 		mv.visitVarInsn(Opcodes.ALOAD, 0);
 		mv.visitFieldInsn(Opcodes.GETFIELD, enhancedClassName, Enhancer.FIELD_ENHANCED_SESSION, Enhancer.DESCRIPTOR_SESSION);
@@ -258,19 +261,30 @@ public final class Enhancer implements Opcodes {
 		mv.visitInsn(Opcodes.POP);
 
 		//	this.__enhanced__$$__initialized = true;
-		mv.visitLabel(l4);
+		mv.visitLabel(lInitialized);
 		mv.visitFrame(Opcodes.F_NEW, 1, new Object[] { enhancedClassName }, 0, new Object[] {});
 		mv.visitVarInsn(Opcodes.ALOAD, 0);
 		mv.visitInsn(Opcodes.ICONST_1);
 		mv.visitFieldInsn(Opcodes.PUTFIELD, enhancedClassName, Enhancer.FIELD_ENHANCED_INITIALIZED, Enhancer.DESCRIPTOR_BOOLEAN);
 
+		// if (this.__enhanced_$$__session != null)
+		mv.visitLabel(lChanged);
+		mv.visitVarInsn(Opcodes.ALOAD, 0);
+		mv.visitFieldInsn(Opcodes.GETFIELD, enhancedClassName, Enhancer.FIELD_ENHANCED_SESSION, Enhancer.DESCRIPTOR_SESSION);
+		mv.visitJumpInsn(Opcodes.IFNULL, lReturn);
+
+		//     this.__enhanced__$$__managedInstance.changed();
+		mv.visitVarInsn(Opcodes.ALOAD, 0);
+		mv.visitFieldInsn(Opcodes.GETFIELD, enhancedClassName, Enhancer.FIELD_ENHANCED_MANAGED_INSTANCE, Enhancer.DESCRIPTOR_MANAGED_INSTANCE);
+		mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, Enhancer.INTERNAL_MANAGED_INSTANCE, Enhancer.METHOD_CHANGED, Enhancer.makeDescription(Void.TYPE));
+
 		// return;
-		mv.visitLabel(l1);
+		mv.visitLabel(lReturn);
 		mv.visitFrame(Opcodes.F_NEW, 1, new Object[] { enhancedClassName }, 0, new Object[] {});
 		mv.visitInsn(Opcodes.RETURN);
 
-		mv.visitLabel(l5);
-		mv.visitLocalVariable(Enhancer.THIS, descEnhancer, null, l0, l5, 0);
+		mv.visitLabel(lOut);
+		mv.visitLocalVariable(Enhancer.THIS, descEnhancer, null, lCheckInitialized, lOut, 0);
 		mv.visitMaxs(0, 0);
 		mv.visitEnd();
 	}
@@ -409,47 +423,23 @@ public final class Enhancer implements Opcodes {
 		final String methodDescription = Enhancer.makeDescription(method.getReturnType(), method.getParameterTypes());
 		Enhancer.LOG.debug("Enhancing method: {0}", method);
 
+		// TODO Exception types
 		for (int i = 0; i < method.getExceptionTypes().length; i++) {}
-		/**
-		 * initialize
-		 */
-		Enhancer.LOG.trace("mv = cw.visitMethod({0}, \"{1}\", \"{2}\", null, null);", method.getModifiers(), method.getName(), methodDescription);
-		final MethodVisitor mv = cw.visitMethod(method.getModifiers(), method.getName(), methodDescription, null, null);
 
-		Enhancer.LOG.trace("mv.visitCode();");
+		final MethodVisitor mv = cw.visitMethod(method.getModifiers(), method.getName(), methodDescription, null, null);
 		mv.visitCode();
 
-		/**
-		 * Label 0
-		 */
-		Enhancer.LOG.trace("Label l0 = new Label();");
-		final Label l0 = new Label();
-
-		Enhancer.LOG.trace("mv.visitLabel(l0);");
-		mv.visitLabel(l0);
-
-		Enhancer.LOG.trace("mv.visitVarInsn(ALOAD, 0);");
+		// this.__enhanced_$$__check();
+		final Label lCheck = new Label();
+		mv.visitLabel(lCheck);
 		mv.visitVarInsn(Opcodes.ALOAD, 0);
-
-		Enhancer.LOG.trace("mv.visitMethodInsn(INVOKESPECIAL, \"{0}\", \"{1}\", \"{2}\");", enhancedClassName, Enhancer.METHOD_ENHANCED_CHECK,
-			Enhancer.makeDescription(Void.TYPE));
 		mv.visitMethodInsn(Opcodes.INVOKESPECIAL, enhancedClassName, Enhancer.METHOD_ENHANCED_CHECK, Enhancer.makeDescription(Void.TYPE));
 
-		/**
-		 * Label 1
-		 */
-		Enhancer.LOG.trace("Label l1 = new Label();");
-		final Label l1 = new Label();
-
-		Enhancer.LOG.trace("mv.visitLabel(l1);");
-		mv.visitLabel(l1);
-
-		Enhancer.LOG.trace("mv.visitVarInsn(ALOAD, 0);");
 		mv.visitVarInsn(Opcodes.ALOAD, 0); // load this
 
+		// infer the method parameters
 		for (int i = 0, r = 1; i < method.getParameterTypes().length; i++, r++) {
 			final Class<?> paramClass = method.getParameterTypes()[i];
-			Enhancer.LOG.trace("mv.visitVarInsn({0}, {1});", Enhancer.getLoadType(paramClass), r);
 			mv.visitVarInsn(Enhancer.getLoadType(paramClass), r); // load parameter
 
 			if ((paramClass == Double.TYPE) || (paramClass == Long.TYPE)) {
@@ -457,58 +447,23 @@ public final class Enhancer implements Opcodes {
 			}
 		}
 
-		Enhancer.LOG.trace("mv.visitMethodInsn(INVOKESPECIAL, \"{0}\", \"{1}\", \"{2}\");", enhancingClassName, method.getName(), methodDescription);
+		// super.method(...);
 		mv.visitMethodInsn(Opcodes.INVOKESPECIAL, enhancingClassName, method.getName(), methodDescription);
 
 		if (method.getReturnType() != Void.TYPE) {
-			Enhancer.LOG.trace("mv.visitInsn(ARETURN);");
+			// non void return
 			mv.visitInsn(Enhancer.getReturnType(method.getReturnType()));
-
-			/**
-			 * Label 2
-			 */
-			Enhancer.LOG.trace("Label l2 = new Label();");
-			final Label l2 = new Label();
-
-			Enhancer.LOG.trace("mv.visitLabel(l2);");
-			mv.visitLabel(l2);
-
-			Enhancer.LOG.trace("mv.visitLocalVariable(\"{0}\", \"{1}\", null, l0, l2, 0);", Enhancer.THIS, descEnhancer);
-			Enhancer.registerLocals(descEnhancer, method, mv, l0, l2);
 		}
 		else {
-			/**
-			 * Label 2
-			 */
-			Enhancer.LOG.trace("Label l2 = new Label();");
-			final Label l2 = new Label();
-
-			Enhancer.LOG.trace("mv.visitLabel(l2);");
-			mv.visitLabel(l2);
-
-			Enhancer.LOG.trace("mv.visitInsn(RETURN);");
+			// void return
 			mv.visitInsn(Opcodes.RETURN);
-
-			/**
-			 * Label 3
-			 */
-			Enhancer.LOG.trace("Label l3 = new Label();");
-			final Label l3 = new Label();
-
-			Enhancer.LOG.trace("mv.visitLabel(l3);");
-			mv.visitLabel(l3);
-
-			Enhancer.LOG.trace("mv.visitLocalVariable(\"{0}\", \"{1}\", null, l0, l3, 0);", Enhancer.THIS, descEnhancer);
-			Enhancer.registerLocals(descEnhancer, method, mv, l0, l3);
 		}
 
-		Enhancer.LOG.trace("mv.visitMaxs(0, 0);");
+		final Label lOut = new Label();
+		mv.visitLabel(lOut);
+		Enhancer.registerLocals(descEnhancer, method, mv, lCheck, lOut);
 		mv.visitMaxs(0, 0);
-		Enhancer.LOG.trace("mv.visitEnd();");
 		mv.visitEnd();
-
-		Enhancer.LOG.trace("");
-		Enhancer.LOG.trace("Finished enhancing method: {0}", method);
 	}
 
 	/**

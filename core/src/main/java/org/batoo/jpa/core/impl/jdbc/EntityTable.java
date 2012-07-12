@@ -209,6 +209,39 @@ public class EntityTable extends AbstractTable {
 	}
 
 	/**
+	 * Performs update to the table for the managed instance or joins.
+	 * 
+	 * @param connection
+	 *            the connection to use
+	 * @param managedInstance
+	 *            the managed instance to perform insert for
+	 * @throws SQLException
+	 *             thrown in case of underlying SQLException
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void performUpdate(ConnectionImpl connection, final ManagedInstance<?> managedInstance) throws SQLException {
+		final EntityTypeImpl<?> entityType = managedInstance.getType();
+		final Object instance = managedInstance.getInstance();
+
+		// Do not inline, generation of the update SQL will initialize the insertColumns!
+		final String updateSql = this.getUpdateSql(entityType, this.pkColumns);
+		final AbstractColumn[] updateColumns = this.getUpdateColumns(entityType);
+
+		// prepare the parameters
+		final Object[] params = new Object[updateColumns.length];
+		for (int i = 0; i < updateColumns.length; i++) {
+			final AbstractColumn column = updateColumns[i];
+			params[i] = column.getValue(instance);
+		}
+
+		// execute the insert
+		final QueryRunner runner = new QueryRunner();
+		runner.update(connection, updateSql, params);
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */

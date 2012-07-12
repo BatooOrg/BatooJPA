@@ -109,6 +109,26 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	}
 
 	/**
+	 * Adds the singular mappings to the list of mappings.
+	 * 
+	 * @param mappings
+	 *            the list of mappings
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void addSingularMappings(List<Mapping<?, ?, ?>> mappings) {
+		for (final Mapping<? super X, ?, ?> mapping : this.children.values()) {
+			if (mapping instanceof ParentMapping) {
+				((ParentMapping<? super X, ?>) mapping).addSingularMappings(mappings);
+			}
+			else if (!mapping.getAttribute().isCollection()) {
+				mappings.add(mapping);
+			}
+		}
+	}
+
+	/**
 	 * Creates a basic mapping for the attribute.
 	 * 
 	 * @param attribute

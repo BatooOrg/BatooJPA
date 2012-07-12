@@ -391,10 +391,11 @@ public class EntityManagerImpl implements EntityManager {
 		this.assertTransaction();
 
 		try {
+			this.session.handleExternals();
 			this.session.handleAdditions();
 			this.session.cascadeRemovals();
 			this.session.handleOrphans();
-			this.session.flush(this.getConnection());
+			this.session.flush(this.connection);
 		}
 		catch (final SQLException e) {
 			EntityManagerImpl.LOG.error(e, "Flush failed");
@@ -498,8 +499,26 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public <T> T getReference(Class<T> entityClass, Object primaryKey) {
-		// TODO Auto-generated method stub
-		return null;
+		if (primaryKey == null) {
+			throw new NullPointerException();
+		}
+
+		// try to locate in the session
+		final EntityTypeImpl<T> type = this.metamodel.entity(entityClass);
+		final ManagedId<T> managedId = new ManagedId<T>(primaryKey, type);
+
+		// try to locate in the session
+		ManagedInstance<? extends T> instance = this.session.get(managedId);
+		if (instance != null) {
+			return instance.getInstance();
+		}
+
+		// create a lazy instance
+		instance = type.getManagedInstanceById(this.session, null, null, managedId, true);
+		this.session.put(instance);
+
+		// and return it
+		return instance.getInstance();
 	}
 
 	/**
@@ -720,6 +739,7 @@ public class EntityManagerImpl implements EntityManager {
 		final EntityTypeImpl<T> type = (EntityTypeImpl<T>) this.metamodel.entity(entity.getClass());
 		final ManagedInstance<T> instance = type.getManagedInstance(this.session, entity);
 		instance.setStatus(Status.NEW);
+		this.session.setChanged(instance);
 		instance.enhanceCollections();
 
 		boolean requiresFlush = !instance.fillIdValues();

@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.instance;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,12 +32,14 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
+import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.util.Pair;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 /**
@@ -53,11 +56,13 @@ public class ManagedInstance<X> {
 	private final EntityTypeImpl<X> type;
 	private final SessionImpl session;
 	private final X instance;
+	private final boolean external;
 	private Status status;
 
 	private final SingularMapping<? super X, ?> idMapping;
 	private final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>[] idMappings;
 
+	private final HashMap<Mapping<?, ?, ?>, Object> snapshot = Maps.newHashMap();
 	private final HashSet<AssociationMapping<?, ?, ?>> associationsLoaded;
 	private final Set<PluralAssociationMapping<?, ?, ?>> associationsChanged;
 
@@ -75,16 +80,19 @@ public class ManagedInstance<X> {
 	 *            the session
 	 * @param instance
 	 *            the instance
+	 * @param external
+	 *            if the instance is external
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedInstance(EntityTypeImpl<X> type, SessionImpl session, X instance) {
+	public ManagedInstance(EntityTypeImpl<X> type, SessionImpl session, X instance, boolean external) {
 		super();
 
 		this.type = type;
 		this.session = session;
 		this.instance = instance;
+		this.external = external;
 
 		this.associationsChanged = Sets.newHashSet();
 		this.associationsLoaded = Sets.newHashSet();
@@ -115,7 +123,7 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public ManagedInstance(EntityTypeImpl<X> type, SessionImpl session, X instance, ManagedId<? super X> id) {
-		this(type, session, instance);
+		this(type, session, instance, false);
 
 		if (this.idMapping != null) {
 			this.idMapping.set(this, id.getId());
@@ -294,11 +302,19 @@ public class ManagedInstance<X> {
 		}
 	}
 
+	/**
+	 * Marks the instance as may have changed.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
 	public void changed() {
 		if (!this.changed && (this.associationsChanged.size() == 0)) {
 			this.session.setChanged(this);
+
 		}
 
+		this.snapshot();
 		this.changed = true;
 	}
 
@@ -311,6 +327,32 @@ public class ManagedInstance<X> {
 	public void checkTransients() {
 		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsNotPersistable()) {
 			association.checkTransient(this);
+		}
+	}
+
+	/**
+	 * Checks if the instance updated.
+	 * <p>
+	 * Only meaningful for external entities as their instances' are not enhanced.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void checkUpdated() {
+		// no snapshot, nothing to check
+		if ((this.snapshot.size() == 0) || this.changed) {
+			return;
+		}
+
+		for (final Mapping<?, ?, ?> mapping : this.type.getMappingsSingular()) {
+			final Object newValue = mapping.get(this.instance);
+			final Object oldValue = this.snapshot.get(mapping);
+
+			if (oldValue != newValue) {
+				this.changed();
+
+				return;
+			}
 		}
 	}
 
@@ -383,25 +425,19 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void flush(ConnectionImpl connection) throws SQLException {
-		if (this.status == null) {
-			this.type.performInsert(connection, this);
-
-			this.status = Status.MANAGED;
-			this.session.putExternal(this);
-		}
-		else {
-			switch (this.status) {
-				case NEW:
-					this.type.performInsert(connection, this);
-					this.status = Status.MANAGED;
-					break;
-				case MANAGED:
+		switch (this.status) {
+			case NEW:
+				this.type.performInsert(connection, this);
+				this.status = Status.MANAGED;
+				break;
+			case MANAGED:
+				if (this.changed) {
 					this.type.performUpdate(connection, this);
-					break;
-				case REMOVED:
-					this.type.performRemove(connection, this);
-					break;
-			}
+				}
+				break;
+			case REMOVED:
+				this.type.performRemove(connection, this);
+				break;
 		}
 	}
 
@@ -656,7 +692,10 @@ public class ManagedInstance<X> {
 	 */
 	public void reset() {
 		this.associationsChanged.clear();
+
 		this.changed = false;
+
+		this.snapshot();
 	}
 
 	/**
@@ -727,6 +766,18 @@ public class ManagedInstance<X> {
 	}
 
 	/**
+	 * Creates a snapshot of the entity.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void snapshot() {
+		for (final Mapping<?, ?, ?> mapping : this.type.getMappingsSingular()) {
+			this.snapshot.put(mapping, mapping.get(this.instance));
+		}
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -735,7 +786,7 @@ public class ManagedInstance<X> {
 		return "ManagedInstance [session=" + this.session.getSessionId() //
 			+ ", type=" + this.type.getName() //
 			+ ", status=" + this.status //
-			+ ", id=" + this.id //
+			+ ", id=" + this.id.getId() //
 			+ ", instance=" //
 			+ this.instance + "]";
 	}
