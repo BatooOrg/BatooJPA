@@ -37,8 +37,6 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
 import org.batoo.jpa.benchmark.insert.BenchmarkClassLoader.Type;
-import org.batoo.jpa.common.log.BLogger;
-import org.batoo.jpa.common.log.BLoggerFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -53,8 +51,6 @@ import com.google.common.collect.Maps;
  * @since $version
  */
 public class Playground {
-
-	private static final BLogger LOG = BLoggerFactory.getLogger(Playground.class);
 
 	private static final String PU_NAME = "insert";
 
@@ -221,7 +217,7 @@ public class Playground {
 		for (int i = 0; i < 10; i++) {
 			final Person person = new Person();
 
-			person.setName("Hasan Ceylan");
+			person.setName("Hasan");
 
 			final Address address = new Address();
 			address.setCity("Istanbul");
@@ -266,7 +262,7 @@ public class Playground {
 	}
 
 	private void doFind(final EntityManagerFactory emf, final Person person) {
-		for (int i = 0; i < 50; i++) {
+		for (int i = 0; i < 25; i++) {
 			final EntityManager em = emf.createEntityManager();
 
 			final Person person2 = em.find(Person.class, person.getId());
@@ -329,10 +325,27 @@ public class Playground {
 		}
 	}
 
+	private void doUpdate(final EntityManagerFactory emf, final Person person) {
+		for (int i = 0; i < 25; i++) {
+			final EntityManager em = emf.createEntityManager();
+
+			final Person person2 = em.find(Person.class, person.getId());
+
+			final EntityTransaction tx = em.getTransaction();
+			tx.begin();
+			person2.setName("Ceylan");
+			tx.commit();
+
+			em.close();
+		}
+	}
+
 	private void singleTest(final EntityManagerFactory emf, List<Person> persons) {
 		this.doPersist(emf, persons);
 
 		this.doFind(emf, persons.get(0));
+
+		this.doUpdate(emf, persons.get(0));
 	}
 
 	private void test(Type type, final EntityManagerFactory emf) {

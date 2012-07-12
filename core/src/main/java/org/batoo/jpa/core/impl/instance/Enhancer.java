@@ -3,6 +3,7 @@ package org.batoo.jpa.core.impl.instance;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.metamodel.EntityType;
@@ -20,6 +21,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * The helper class to enhance a persistent class.
@@ -30,6 +32,14 @@ import com.google.common.collect.Maps;
 public final class Enhancer implements Opcodes {
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(Enhancer.class);
+
+	private static final Set<String> IGNORED_METHODS = Sets.newHashSet();
+
+	static {
+		for (final Method method : Object.class.getMethods()) {
+			Enhancer.IGNORED_METHODS.add(method.getName());
+		}
+	}
 
 	private static final String THIS = "this";
 	private static final String SUFFIX_ENHANCED = "$Enhanced";
@@ -140,7 +150,9 @@ public final class Enhancer implements Opcodes {
 		}
 
 		for (final Method method : methods.values()) {
-			Enhancer.createOverrriddenMethod(enhancingClassName, enhancedClassName, descEnhancer, cw, method);
+			if (!Enhancer.IGNORED_METHODS.contains(method.getName())) {
+				Enhancer.createOverrriddenMethod(enhancingClassName, enhancedClassName, descEnhancer, cw, method);
+			}
 		}
 
 		cw.visitEnd();
