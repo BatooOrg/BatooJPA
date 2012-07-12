@@ -11,6 +11,8 @@
 		<class>org.batoo.jpa.core.test.merge.Child2</class>
 		<class>org.batoo.jpa.core.test.merge.Child3</class>
 		<class>org.batoo.jpa.core.test.merge.Child4</class>
+		<class>org.batoo.jpa.core.test.merge.Foo1</class>
+		<class>org.batoo.jpa.core.test.merge.Foo2</class>
 		
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.Driver40" />

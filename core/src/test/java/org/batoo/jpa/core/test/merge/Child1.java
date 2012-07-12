@@ -50,6 +50,8 @@ public class Child1 {
 	}
 
 	/**
+	 * @param id
+	 *            the id
 	 * @param parent
 	 *            the person
 	 * @param value
@@ -58,9 +60,10 @@ public class Child1 {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Child1(Parent parent, String value) {
+	public Child1(Integer id, Parent parent, String value) {
 		super();
 
+		this.id = id < 0 ? null : id;
 		this.parent = parent;
 		this.value = value;
 
@@ -80,6 +83,18 @@ public class Child1 {
 	}
 
 	/**
+	 * Returns the parent of the Child1.
+	 * 
+	 * @return the parent of the Child1
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Parent getParent() {
+		return this.parent;
+	}
+
+	/**
 	 * Returns the value of the Child1.
 	 * 
 	 * @return the value of the Child1
@@ -89,6 +104,19 @@ public class Child1 {
 	 */
 	public String getValue() {
 		return this.value;
+	}
+
+	/**
+	 * Sets the parent of the Child1.
+	 * 
+	 * @param parent
+	 *            the parent to set for Child1
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setParent(Parent parent) {
+		this.parent = parent;
 	}
 
 	/**
@@ -102,29 +130,5 @@ public class Child1 {
 	 */
 	public void setValue(String value) {
 		this.value = value;
-	}
-
-	/**
-	 * Returns the parent of the Child1.
-	 *
-	 * @return the parent of the Child1
-	 *
-	 * @since $version
-	 * @author hceylan
-	 */
-	public Parent getParent() {
-		return parent;
-	}
-
-	/**
-	 * Sets the parent of the Child1.
-	 *
-	 * @param parent the parent to set for Child1
-	 *
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void setParent(Parent parent) {
-		this.parent = parent;
 	}
 }

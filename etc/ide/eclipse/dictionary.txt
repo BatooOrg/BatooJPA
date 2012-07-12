@@ -71,3 +71,4 @@ xml
 detachable
 refreshable
 mergable
+foo

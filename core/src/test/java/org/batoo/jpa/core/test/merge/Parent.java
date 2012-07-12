@@ -65,15 +65,18 @@ public class Parent {
 	}
 
 	/**
+	 * @param id
+	 *            the id
 	 * @param value
 	 *            the value
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Parent(String value) {
+	public Parent(Integer id, String value) {
 		super();
 
+		this.id = id < 0 ? null : id;
 		this.value = value;
 	}
 

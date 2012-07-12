@@ -53,9 +53,9 @@ public class Foo {
 	}
 
 	/**
-	 * Returns the other of the Foo.
+	 * Returns the other of the Foo1.
 	 * 
-	 * @return the other of the Foo
+	 * @return the other of the Foo1
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -75,10 +75,10 @@ public class Foo {
 	}
 
 	/**
-	 * Sets the other of the Foo.
+	 * Sets the other of the Foo1.
 	 * 
 	 * @param other
-	 *            the other to set for Foo
+	 *            the other to set for Foo1
 	 * 
 	 * @since $version
 	 * @author hceylan

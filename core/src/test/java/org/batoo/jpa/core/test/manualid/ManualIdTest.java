@@ -42,11 +42,11 @@ public class ManualIdTest extends BaseCoreTest {
 	public void testIdentiy() {
 		final Foo foo = new Foo();
 		foo.setKey(1);
-		foo.setValue("Bar");
+		foo.setValue("Foo2");
 
 		final Foo foo2 = new Foo();
 		foo2.setKey(2);
-		foo2.setValue("Bar");
+		foo2.setValue("Foo2");
 
 		this.persist(foo);
 		this.persist(foo2);

@@ -19,6 +19,8 @@
 package org.batoo.jpa.core.impl.manager;
 
 import java.sql.SQLException;
+import java.util.Collection;
+import java.util.IdentityHashMap;
 import java.util.Map;
 
 import javax.persistence.EntityExistsException;
@@ -35,8 +37,10 @@ import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.metamodel.Metamodel;
+import javax.persistence.metamodel.PluralAttribute.CollectionType;
 import javax.sql.DataSource;
 
+import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
@@ -49,7 +53,11 @@ import org.batoo.jpa.core.impl.instance.Status;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+
+import com.google.common.collect.Maps;
 
 /**
  * Implementation of {@link EntityManager}.
@@ -106,6 +114,53 @@ public class EntityManagerImpl implements EntityManager {
 	private void assertTransaction() {
 		if ((this.transaction == null) || !this.transaction.isActive()) {
 			throw new TransactionRequiredException("No active transaction");
+		}
+	}
+
+	/**
+	 * Cascades the merge operation
+	 * 
+	 * @param type
+	 *            the entity type
+	 * @param entity
+	 *            the entity
+	 * @param requiresFlush
+	 *            if an implicit flush is required
+	 * @param processed
+	 *            registry of processed entities
+	 * @param <T>
+	 *            the type of the entity
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public <T> void cascadeMerge(EntityTypeImpl<T> type, T entity, MutableBoolean requiresFlush, IdentityHashMap<Object, Object> processed) {
+		for (final AssociationMapping<?, ?, ?> association : type.getAssociations()) {
+
+			// if the association is a plural association
+			if (association instanceof PluralAssociationMapping) {
+				final PluralAssociationMapping<?, ?, ?> mapping = (PluralAssociationMapping<?, ?, ?>) association;
+
+				if (mapping.getAttribute().getCollectionType() == CollectionType.MAP) {
+					// TODO handle map
+				}
+				else {
+					// get the children
+					final Collection<?> children = (Collection<?>) mapping.get(entity);
+
+					if (children != null) {
+						// iterate over children and merge them all
+						for (final Object child : children) {
+							this.mergeImpl(child, requiresFlush, processed, association.cascadesMerge());
+						}
+					}
+				}
+			}
+			// if the association is a singular association
+			else {
+				// merge the entity
+				this.mergeImpl(entity, requiresFlush, processed, association.cascadesMerge());
+			}
 		}
 	}
 
@@ -616,15 +671,17 @@ public class EntityManagerImpl implements EntityManager {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public <T> T merge(T entity) {
 		this.assertTransaction();
 
-		if (this.mergeImpl(entity)) {
+		final MutableBoolean requiresFlush = new MutableBoolean(false);
+		final T mergedEntity = this.mergeImpl(entity, requiresFlush, Maps.<Object, Object> newIdentityHashMap(), true);
+
+		if (requiresFlush.booleanValue()) {
 			this.flush();
 		}
 
-		return (T) this.session.get(entity);
+		return mergedEntity;
 	}
 
 	/**
@@ -634,6 +691,12 @@ public class EntityManagerImpl implements EntityManager {
 	 * 
 	 * @param entity
 	 *            the entity to cascade
+	 * @param requiresFlush
+	 *            if an implicit flush is required
+	 * @param processed
+	 *            registry of processed entities
+	 * @param cascade
+	 *            cascades the merge operation
 	 * @param <T>
 	 *            the type of the entity
 	 * @return true if an implicit flush is required, false otherwise
@@ -642,9 +705,21 @@ public class EntityManagerImpl implements EntityManager {
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> boolean mergeImpl(T entity) {
+	public <T> T mergeImpl(T entity, MutableBoolean requiresFlush, IdentityHashMap<Object, Object> processed, boolean cascade) {
+		// if already processed just return
+		final T processedEntity = (T) processed.get(entity);
+		if (processedEntity != null) {
+			return processedEntity;
+		}
+
+		if (entity == null) {
+			return null;
+		}
+
 		// try to locate the instance in the session
 		ManagedInstance<T> instance = this.session.get(entity);
+
+		final EntityTypeImpl<T> type = (EntityTypeImpl<T>) this.metamodel.entity(entity.getClass());
 
 		// if it is in the session then test its status
 		if (instance != null) {
@@ -655,11 +730,18 @@ public class EntityManagerImpl implements EntityManager {
 
 			// if it is an existing instance then merge and return
 			if ((instance.getStatus() == Status.MANAGED) || (instance.getStatus() == Status.NEW)) {
-				return instance.mergeWith(this, entity);
+				processed.put(entity, instance.getInstance());
+
+				if (instance.getInstance() != entity) {
+					instance.mergeWith(this, entity, requiresFlush, processed);
+				}
+				else {
+					this.cascadeMerge(type, entity, requiresFlush, processed);
+				}
+
+				return instance.getInstance();
 			}
 		}
-
-		final EntityTypeImpl<T> type = (EntityTypeImpl<T>) this.metamodel.entity(entity.getClass());
 
 		// get the id of the entity
 		final Object id = type.getInstanceId(entity);
@@ -672,20 +754,31 @@ public class EntityManagerImpl implements EntityManager {
 			if (existingEntity != null) {
 				instance = (ManagedInstance<T>) ((EnhancedInstance) existingEntity).__enhanced__$$__getManagedInstance();
 
-				return instance.mergeWith(this, entity);
+				processed.put(entity, instance.getInstance());
+
+				instance.mergeWith(this, entity, requiresFlush, processed);
+
+				return instance.getInstance();
 			}
 		}
 
-		// it is a new instance, handle like persist
-		instance = type.getManagedInstance(this.session, entity);
+		// it is a new instance, create a new instance and merge with it
+		final ManagedId<T> managedId = new ManagedId<T>(id, type);
+		instance = type.getManagedInstanceById(this.session, managedId, false);
+
 		instance.setStatus(Status.NEW);
 		instance.enhanceCollections();
+		this.session.put(instance);
 
-		boolean requiresFlush = !instance.fillIdValues();
-		requiresFlush |= instance.cascadeMerge(this);
-		this.session.putExternal(instance);
+		processed.put(entity, instance.getInstance());
 
-		return requiresFlush;
+		instance.mergeWith(this, entity, requiresFlush, processed);
+
+		if (!instance.fillIdValues()) {
+			requiresFlush.setValue(true);
+		}
+
+		return instance.getInstance();
 	}
 
 	/**
@@ -696,7 +789,7 @@ public class EntityManagerImpl implements EntityManager {
 	public void persist(Object entity) {
 		this.assertTransaction();
 
-		if (this.persistImpl(entity)) {
+		if (this.persistImpl(entity, Maps.<Object, Object> newIdentityHashMap())) {
 			this.flush();
 		}
 	}
@@ -708,6 +801,8 @@ public class EntityManagerImpl implements EntityManager {
 	 * 
 	 * @param entity
 	 *            the entity to cascade
+	 * @param processed
+	 *            registry of processed entities
 	 * @param <T>
 	 *            the type of the entity
 	 * @return true if an implicit flush is required, false otherwise
@@ -716,7 +811,11 @@ public class EntityManagerImpl implements EntityManager {
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> boolean persistImpl(T entity) {
+	public <T> boolean persistImpl(T entity, IdentityHashMap<Object, Object> processed) {
+		if (processed.containsKey(entity)) {
+			return false;
+		}
+
 		if (entity instanceof EnhancedInstance) {
 			final ManagedInstance<T> instance = (ManagedInstance<T>) ((EnhancedInstance) entity).__enhanced__$$__getManagedInstance();
 			if (instance.getStatus() == Status.DETACHED) {
@@ -726,13 +825,14 @@ public class EntityManagerImpl implements EntityManager {
 
 		final ManagedInstance<T> existing = this.session.get(entity);
 		if (existing != null) {
+			processed.put(entity, existing.getInstance());
+
 			switch (existing.getStatus()) {
-				case NEW:
-				case MANAGED:
-					return existing.cascadePersist(this);
 				case REMOVED:
 					existing.setStatus(Status.MANAGED);
-					return existing.cascadePersist(this);
+				case NEW:
+				case MANAGED:
+					return existing.cascadePersist(this, processed);
 			}
 		}
 
@@ -745,7 +845,9 @@ public class EntityManagerImpl implements EntityManager {
 		boolean requiresFlush = !instance.fillIdValues();
 		this.session.putExternal(instance);
 
-		requiresFlush |= instance.cascadePersist(this);
+		processed.put(entity, instance.getInstance());
+
+		requiresFlush |= instance.cascadePersist(this, processed);
 
 		return requiresFlush;
 	}

@@ -46,6 +46,8 @@ public class Child4 {
 	}
 
 	/**
+	 * @param id
+	 *            the id
 	 * @param parent
 	 *            the person
 	 * @param value
@@ -54,9 +56,10 @@ public class Child4 {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Child4(Parent parent, String value) {
+	public Child4(Integer id, Parent parent, String value) {
 		super();
 
+		this.id = id < 0 ? null : id;
 		this.value = value;
 
 		parent.getChildren4().add(this);

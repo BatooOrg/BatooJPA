@@ -28,8 +28,6 @@ import javax.persistence.PersistenceException;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
-import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 
 import com.google.common.collect.Lists;
@@ -302,16 +300,6 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 * 
 	 */
 	@Override
-	protected void clearSnapshot() {
-		// TODO Auto-generated method stub
-
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public boolean contains(Object o) {
 		this.initialize();
 
@@ -358,16 +346,6 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	@Override
 	public ArrayList<E> getDelegate() {
 		return this.delegate;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	protected Collection<E> getItemsRemoved() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/**
@@ -482,39 +460,6 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 		return new ManagedListIterator(this.delegate.listIterator(index));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public void mergeWith(EntityManagerImpl entityManager, Object entity) {
-		// get the children from the new entity
-		List<E> children = (List<E>) this.getAssociation().get(entity);
-		if (children == null) {
-			children = Lists.newArrayList();
-		}
-
-		final SessionImpl session = this.getManagedInstance().getSession();
-
-		// iterate over the new children
-		final List<ManagedInstance<E>> childInstances = Lists.newArrayList();
-		for (final E child : children) {
-			childInstances.add(session.get(child));
-		}
-
-		for (final E child : this) {
-			final ManagedInstance<E> childInstance = session.get(child);
-			if ((childInstance != null) && this.delegate.contains(childInstance.getInstance())) {
-				this.remove(childInstance.getInstance());
-			}
-		}
-
-		for (final E child : children) {
-			// if the child already exists then remove it from the list
-		}
-	}
-
 	private UnsupportedOperationException noDuplicates() {
 		return new UnsupportedOperationException("Duplicates are not supported");
 	}
@@ -586,6 +531,15 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 * 
 	 */
 	@Override
+	protected void removeChild(E child) {
+		this.delegate.remove(child);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public boolean retainAll(Collection<?> c) {
 		this.snapshot();
 
@@ -626,11 +580,11 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	}
 
 	/**
+	 * {@inheritDoc}
 	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	private void snapshot() {
+	@Override
+	protected void snapshot() {
 		this.initialize();
 
 		if (this.snapshot == null) {

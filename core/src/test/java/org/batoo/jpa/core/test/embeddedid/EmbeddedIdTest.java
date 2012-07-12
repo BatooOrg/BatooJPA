@@ -45,14 +45,14 @@ public class EmbeddedIdTest extends BaseCoreTest {
 		pk1.setStrKey("key1");
 		pk1.setIntKey(1);
 		foo1.setId(pk1);
-		foo1.setValue("Bar");
+		foo1.setValue("Foo2");
 
 		final Foo foo2 = new Foo();
 		final FooPk pk2 = new FooPk();
 		pk2.setStrKey("key1");
 		pk2.setIntKey(2);
 		foo2.setId(pk2);
-		foo2.setValue("Bar");
+		foo2.setValue("Foo2");
 
 		this.persist(foo1);
 		this.persist(foo2);

@@ -26,7 +26,6 @@ import java.util.Set;
 import javax.persistence.PersistenceException;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 
 import com.google.common.collect.Sets;
@@ -156,16 +155,6 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 * 
 	 */
 	@Override
-	protected void clearSnapshot() {
-		// TODO Auto-generated method stub
-
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public boolean contains(Object o) {
 		this.initialize();
 
@@ -201,16 +190,6 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	@Override
 	public Set<E> getDelegate() {
 		return this.delegate;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	protected Collection<E> getItemsRemoved() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/**
@@ -289,16 +268,6 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 * 
 	 */
 	@Override
-	public void mergeWith(EntityManagerImpl entityManager, Object entity) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public void refreshChildren(Collection<? extends E> children) {
 		this.reset();
 
@@ -345,6 +314,15 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 * 
 	 */
 	@Override
+	protected void removeChild(E child) {
+		this.delegate.remove(child);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public boolean retainAll(Collection<?> c) {
 		this.snapshot();
 
@@ -369,11 +347,11 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	}
 
 	/**
+	 * {@inheritDoc}
 	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	private void snapshot() {
+	@Override
+	protected void snapshot() {
 		this.initialize();
 
 		if (this.snapshot == null) {

@@ -19,12 +19,14 @@
 package org.batoo.jpa.core.impl.model.mapping;
 
 import java.sql.SQLException;
+import java.util.IdentityHashMap;
 
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
 import javax.persistence.criteria.JoinType;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
@@ -370,11 +372,16 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> {
 	 *            the instance
 	 * @param entity
 	 *            the entity
+	 * @param requiresFlush
+	 *            if an implicit flush is required
+	 * @param processed
+	 *            registry of processed entities
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract void mergeWith(EntityManagerImpl entityManager, ManagedInstance<?> instance, Object entity);
+	public abstract void mergeWith(EntityManagerImpl entityManager, ManagedInstance<?> instance, Object entity, MutableBoolean requiresFlush,
+		IdentityHashMap<Object, Object> processed);
 
 	/**
 	 * @param instance

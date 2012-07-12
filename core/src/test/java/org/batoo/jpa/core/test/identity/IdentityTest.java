@@ -41,10 +41,10 @@ public class IdentityTest extends BaseCoreTest {
 	@Test
 	public void testIdentiy() {
 		final Foo foo = new Foo();
-		foo.setValue("Bar");
+		foo.setValue("Foo2");
 
 		final Foo foo2 = new Foo();
-		foo2.setValue("Bar");
+		foo2.setValue("Foo2");
 		foo2.setOther(foo);
 
 		this.persist(foo2);

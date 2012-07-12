@@ -19,10 +19,12 @@
 package org.batoo.jpa.core.impl.model.mapping;
 
 import java.sql.SQLException;
+import java.util.IdentityHashMap;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 
+import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
@@ -196,22 +198,35 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 	 * 
 	 */
 	@Override
-	public void mergeWith(EntityManagerImpl entityManager, ManagedInstance<?> instance, Object entity) {
-		if (this.removesOrphans() || (this.inverse != null)) {
-			final X oldEntity = this.get(instance.getInstance());
-			if (oldEntity != null) {
-				if (this.removesOrphans()) {
-					entityManager.remove(oldEntity);
-				}
+	public void mergeWith(EntityManagerImpl entityManager, ManagedInstance<?> instance, Object entity, MutableBoolean requiresFlush,
+		IdentityHashMap<Object, Object> processed) {
+		// get the new value as merged
+		final X newEntity = entityManager.mergeImpl(this.get(entity), requiresFlush, processed, this.cascadesMerge());
 
-				if ((this.inverse != null) && (this.inverse.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_ONE)) {
-					final ManagedInstance<X> oldInstance = instance.getSession().get(oldEntity);
-					this.inverse.set(oldInstance, null);
-				}
+		// get the old value
+		final X oldEntity = this.get(instance.getInstance());
+
+		// if no change nothing to do here
+		if (oldEntity == newEntity) {
+			return;
+		}
+
+		// handle the remove orphans and inverse
+		if ((oldEntity != null) && (this.removesOrphans() || (this.inverse != null))) {
+			// handle orphan removal
+			if (this.removesOrphans()) {
+				entityManager.remove(oldEntity);
+			}
+
+			// update the other side of the relation
+			if ((this.inverse != null) && (this.inverse.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_ONE)) {
+				final ManagedInstance<X> oldInstance = instance.getSession().get(oldEntity);
+				this.inverse.set(oldInstance, null);
 			}
 		}
 
-		this.set(instance, this.get(entity));
+		// set the new value
+		this.set(instance, newEntity);
 	}
 
 	/**

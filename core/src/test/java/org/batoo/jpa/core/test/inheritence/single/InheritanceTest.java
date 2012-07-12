@@ -42,7 +42,7 @@ public class InheritanceTest extends BaseCoreTest {
 	@Test
 	public void testInheritance() {
 		final FooExt1 foo = new FooExt1();
-		foo.setValue("Bar");
+		foo.setValue("Foo2");
 		foo.setValueExt1("Bar1");
 
 		this.persist(foo);
@@ -66,7 +66,7 @@ public class InheritanceTest extends BaseCoreTest {
 	@Test
 	public void testSimpleInheritance2() {
 		final FooExt11 foo = new FooExt11();
-		foo.setValue("Bar");
+		foo.setValue("Foo2");
 
 		this.persist(foo);
 
@@ -89,7 +89,7 @@ public class InheritanceTest extends BaseCoreTest {
 	@Test(expected = NoResultException.class)
 	public void testSimpleInheritance3() {
 		final FooExt1 foo = new FooExt1();
-		foo.setValue("Bar");
+		foo.setValue("Foo2");
 
 		this.persist(foo);
 

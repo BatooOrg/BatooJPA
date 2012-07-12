@@ -114,7 +114,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private AssociationMapping<?, ?, ?>[] associationsDetachable;
 	private AssociationMapping<?, ?, ?>[] associationsEager;
 	private AssociationMapping<?, ?, ?>[] associationsJoined;
-	private AssociationMapping<?, ?, ?>[] associationsMergable;
 	private AssociationMapping<?, ?, ?>[] associationsNotPersistable;
 	private AssociationMapping<?, ?, ?>[] associationsPersistable;
 	private AssociationMapping<?, ?, ?>[] associationsRemovable;
@@ -413,39 +412,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			joinedAssociations.toArray(joinedAssociations0);
 
 			return this.associationsJoined = joinedAssociations0;
-		}
-	}
-
-	/**
-	 * Returns the associated attributes that are mergable by the type.
-	 * 
-	 * @return the associated attributes that are mergable by the type
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public AssociationMapping<?, ?, ?>[] getAssociationsMergable() {
-		if (this.associationsMergable != null) {
-			return this.associationsMergable;
-		}
-
-		synchronized (this) {
-			if (this.associationsMergable != null) {
-				return this.associationsMergable;
-			}
-
-			final List<AssociationMapping<?, ?, ?>> associationsMergable = Lists.newArrayList();
-
-			for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
-				if (association.cascadesMerge()) {
-					associationsMergable.add(association);
-				}
-			}
-
-			final AssociationMapping<?, ?, ?>[] associationsMergable0 = new AssociationMapping[associationsMergable.size()];
-			associationsMergable.toArray(associationsMergable0);
-
-			return this.associationsMergable = associationsMergable0;
 		}
 	}
 
@@ -985,22 +951,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		}
 
 		return new ManagedInstance<X>(this, session, instance);
-	}
-
-	/**
-	 * Creates a new managed instance with the id.
-	 * 
-	 * @param session
-	 *            the session
-	 * @param id
-	 *            the primary key
-	 * @return the managed instance created
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public ManagedInstance<X> getManagedInstanceById(SessionImpl session, ManagedId<X> id) {
-		return this.getManagedInstanceById(session, id, false);
 	}
 
 	/**

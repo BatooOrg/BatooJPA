@@ -16,26 +16,69 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.simple;
+package org.batoo.jpa.core.test.merge;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
 /**
+ * 
  * 
  * @author hceylan
  * @since $version
  */
 @Entity
-public class Foo {
+public class Foo1 {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Integer id;
 
 	private String value;
+
+	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "foo1")
+	private Foo2 foo2;
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Foo1() {
+		super();
+	}
+
+	/**
+	 * @param id
+	 *            the id
+	 * @param value
+	 *            the value
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Foo1(Integer id, String value) {
+		super();
+
+		this.id = id < 0 ? null : id;
+		this.value = value;
+	}
+
+	/**
+	 * Returns the foo2 of the Foo1.
+	 * 
+	 * @return the foo2 of the Foo1
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Foo2 getFoo2() {
+		return this.foo2;
+	}
 
 	/**
 	 * Returns the id of the Foo1.
@@ -62,6 +105,27 @@ public class Foo {
 	}
 
 	/**
+	 * Sets the foo2 of the Foo1.
+	 * 
+	 * @param foo2
+	 *            the foo2 to set for Foo1
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setFoo2(Foo2 foo2) {
+		if (this.foo2 != null) {
+			this.foo2.setFoo1(null);
+		}
+
+		this.foo2 = foo2;
+
+		if (this.foo2 != null) {
+			this.foo2.setFoo1(this);
+		}
+	}
+
+	/**
 	 * Sets the value of the Foo1.
 	 * 
 	 * @param value
@@ -73,4 +137,5 @@ public class Foo {
 	public void setValue(String value) {
 		this.value = value;
 	}
+
 }

@@ -43,7 +43,7 @@ public class ElementCollectionTest extends BaseCoreTest {
 	@Test
 	public void testElementCollection() {
 		final Foo foo = new Foo();
-		foo.setValue("Bar");
+		foo.setValue("Foo2");
 
 		foo.getCodes().add("TR");
 		foo.getCodes().add("UK");

@@ -43,12 +43,12 @@ public class IdClassTestTest extends BaseCoreTest {
 		final Foo foo1 = new Foo();
 		foo1.setStrKey("key1");
 		foo1.setIntKey(1);
-		foo1.setValue("Bar");
+		foo1.setValue("Foo2");
 
 		final Foo foo2 = new Foo();
 		foo2.setStrKey("key1");
 		foo2.setIntKey(2);
-		foo2.setValue("Bar");
+		foo2.setValue("Foo2");
 
 		this.persist(foo1);
 		this.persist(foo2);

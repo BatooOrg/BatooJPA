@@ -498,7 +498,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 
 		// if no inheritance then initialize and return
 		if (this.entity.getInheritanceType() == null) {
-			instance = (ManagedInstance<Y>) this.entity.getManagedInstanceById(session, managedId);
+			instance = (ManagedInstance<Y>) this.entity.getManagedInstanceById(session, managedId, false);
 		}
 		// inheritance is in place then locate the correct child type
 		else {
@@ -511,7 +511,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			}
 
 			// initialize and return
-			instance = effectiveType.getManagedInstanceById(session, (ManagedId<Y>) managedId);
+			instance = effectiveType.getManagedInstanceById(session, (ManagedId<Y>) managedId, false);
 		}
 
 		this.initializeInstance(session, row, instance);

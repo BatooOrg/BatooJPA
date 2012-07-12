@@ -20,12 +20,14 @@ package org.batoo.jpa.core.impl.model.mapping;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.criteria.Path;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 
+import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
@@ -350,12 +352,13 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public void mergeWith(EntityManagerImpl entityManager, ManagedInstance<?> instance, Object entity) {
+	public void mergeWith(EntityManagerImpl entityManager, ManagedInstance<?> instance, Object entity, MutableBoolean requiresFlush,
+		IdentityHashMap<Object, Object> processed) {
 		// get the managed collection
 		final ManagedCollection<E> collection = (ManagedCollection<E>) this.get(instance.getInstance());
 
 		// merge with the new entities
-		collection.mergeWith(entityManager, entity);
+		collection.mergeWith(entityManager, entity, requiresFlush, processed);
 	}
 
 	/**

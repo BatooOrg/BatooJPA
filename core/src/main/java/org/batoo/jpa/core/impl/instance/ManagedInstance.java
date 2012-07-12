@@ -22,10 +22,12 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Set;
 
 import javax.persistence.metamodel.PluralAttribute.CollectionType;
 
+import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -175,59 +177,18 @@ public class ManagedInstance<X> {
 	}
 
 	/**
-	 * Cascades the merge operation
-	 * 
-	 * @param entityManager
-	 *            the entity manager
-	 * @return true if an implicit flush is required, false otherwise
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public boolean cascadeMerge(EntityManagerImpl entityManager) {
-		boolean requiresFlush = false;
-
-		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsMergable()) {
-
-			// if the association a collection attribute then we will cascade to each element
-			if (association instanceof PluralAssociationMapping) {
-				final PluralAssociationMapping<?, ?, ?> mapping = (PluralAssociationMapping<?, ?, ?>) association;
-
-				if (mapping.getAttribute().getCollectionType() == CollectionType.MAP) {
-					// TODO handle map
-				}
-				else {
-					// extract the collection
-					final Collection<?> collection = (Collection<?>) mapping.get(this.instance);
-
-					// cascade to each element in the collection
-					for (final Object element : collection) {
-						requiresFlush |= entityManager.mergeImpl(element);
-					}
-				}
-			}
-			else {
-				final SingularAssociationMapping<?, ?> mapping = (SingularAssociationMapping<?, ?>) association;
-				final Object associate = mapping.get(this.instance);
-				requiresFlush |= entityManager.mergeImpl(associate);
-			}
-		}
-
-		return requiresFlush;
-
-	}
-
-	/**
 	 * Cascades the persist operation.
 	 * 
 	 * @param entityManager
 	 *            the entity manager
+	 * @param processed
+	 *            registry of processed entities
 	 * @return true if an implicit flush is required, false otherwise
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public boolean cascadePersist(EntityManagerImpl entityManager) {
+	public boolean cascadePersist(EntityManagerImpl entityManager, IdentityHashMap<Object, Object> processed) {
 		boolean requiresFlush = false;
 
 		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsPersistable()) {
@@ -245,7 +206,7 @@ public class ManagedInstance<X> {
 
 					// cascade to each element in the collection
 					for (final Object element : collection) {
-						requiresFlush |= entityManager.persistImpl(element);
+						requiresFlush |= entityManager.persistImpl(element, processed);
 					}
 				}
 			}
@@ -253,7 +214,7 @@ public class ManagedInstance<X> {
 				final SingularAssociationMapping<?, ?> mapping = (SingularAssociationMapping<?, ?>) association;
 				final Object associate = mapping.get(this.instance);
 				if (associate != null) {
-					requiresFlush |= entityManager.persistImpl(associate);
+					requiresFlush |= entityManager.persistImpl(associate, processed);
 				}
 			}
 		}
@@ -293,7 +254,10 @@ public class ManagedInstance<X> {
 			else {
 				final SingularAssociationMapping<?, ?> mapping = (SingularAssociationMapping<?, ?>) association;
 				final Object associate = mapping.get(this.instance);
-				entityManager.remove(associate);
+
+				if (associate != null) {
+					entityManager.remove(associate);
+				}
 			}
 		}
 	}
@@ -340,10 +304,12 @@ public class ManagedInstance<X> {
 			return;
 		}
 
+		// iterate over old values
 		for (final Mapping<?, ?, ?> mapping : this.type.getMappingsSingular()) {
 			final Object newValue = mapping.get(this.instance);
 			final Object oldValue = this.snapshot.get(mapping);
 
+			// if it is changed then mark as changed and bail out
 			if (oldValue != newValue) {
 				this.changed();
 
@@ -604,35 +570,32 @@ public class ManagedInstance<X> {
 	}
 
 	/**
-	 * Merges the entity state with the <code>entity</code>. Also handles cascades.
+	 * Merges the instance state with the <code>entity</code>.
 	 * 
 	 * @param entityManager
 	 *            the entity manager
 	 * @param entity
 	 *            the entity to merge
-	 * @return if flush is required
+	 * @param requiresFlush
+	 *            if an implicit flush is required
+	 * @param processed
+	 *            registry of processed entities
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public boolean mergeWith(EntityManagerImpl entityManager, X entity) {
-		if (this.instance != entity) {
-			for (final BasicMapping<?, ?> mapping : this.type.getBasicMappings()) {
-				mapping.set(this, mapping.get(entity));
-			}
+	public void mergeWith(EntityManagerImpl entityManager, X entity, MutableBoolean requiresFlush, IdentityHashMap<Object, Object> processed) {
+		this.snapshot();
 
-			final boolean requiresFlush = this.cascadeMerge(entityManager);
-
-			for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsMergable()) {
-				association.mergeWith(entityManager, this, entity);
-			}
-
-			this.session.setChanged(this);
-
-			return requiresFlush;
+		for (final BasicMapping<?, ?> mapping : this.type.getBasicMappings()) {
+			mapping.set(this, mapping.get(entity));
 		}
 
-		return false;
+		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociations()) {
+			association.mergeWith(entityManager, this, entity, requiresFlush, processed);
+		}
+
+		this.checkUpdated();
 	}
 
 	/**

@@ -20,13 +20,18 @@ package org.batoo.jpa.core.impl.collections;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.IdentityHashMap;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.Status;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
+
+import com.google.common.collect.Lists;
 
 /**
  * Marker interface for managed collections.
@@ -84,14 +89,6 @@ public abstract class ManagedCollection<E> {
 			this.managedInstance.setAssociationChanged(this.association);
 		}
 	}
-
-	/**
-	 * Clears the snapshot.
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	protected abstract void clearSnapshot();
 
 	/**
 	 * Flushes the collection
@@ -179,16 +176,6 @@ public abstract class ManagedCollection<E> {
 	public abstract Collection<E> getDelegate();
 
 	/**
-	 * Return the items that are removed.
-	 * 
-	 * @return the items that are removed
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	protected abstract Collection<E> getItemsRemoved();
-
-	/**
 	 * Returns the managed instance of the managed collection.
 	 * 
 	 * @return the managed instance of the managed collection
@@ -217,11 +204,72 @@ public abstract class ManagedCollection<E> {
 	 *            the entity manager
 	 * @param entity
 	 *            the new entity
+	 * @param requiresFlush
+	 *            if an implicit flush is required
+	 * @param processed
+	 *            registry of processed entities
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract void mergeWith(EntityManagerImpl entityManager, Object entity);
+	@SuppressWarnings("unchecked")
+	public void mergeWith(EntityManagerImpl entityManager, Object entity, MutableBoolean requiresFlush, IdentityHashMap<Object, Object> processed) {
+		final Collection<E> mergedChildren = Lists.newArrayList();
+
+		final Object children = this.association.get(entity);
+
+		// if it is a collection, handle like collection
+		if (children instanceof Collection) {
+			final Collection<E> collection = (Collection<E>) children;
+
+			// merge all the new children
+			for (final E child : collection) {
+				mergedChildren.add(entityManager.mergeImpl(child, requiresFlush, processed, this.association.cascadesMerge()));
+			}
+		}
+		// handle like a map
+		else {
+			// TODO Map implementation
+		}
+
+		// make a snapshot
+		this.snapshot();
+		final Collection<E> delegate = this.getDelegate();
+
+		boolean changed = false;
+
+		final SessionImpl session = entityManager.getSession();
+
+		// add the new children
+		for (final E child : mergedChildren) {
+			if (!delegate.contains(child)) {
+				this.addChild(child);
+
+				if (this.association.getInverse() != null) {
+					this.association.getInverse().set(session.get(child), this.managedInstance.getInstance());
+				}
+
+				changed = true;
+			}
+		}
+
+		// remove the non existent children
+		for (final E child : Lists.newArrayList(delegate)) {
+			if (!mergedChildren.contains(child)) {
+				this.removeChild(child);
+
+				if (this.association.getInverse() != null) {
+					this.association.getInverse().set(session.get(child), null);
+				}
+
+				changed = true;
+			}
+		}
+
+		if (changed) {
+			this.changed();
+		}
+	}
 
 	/**
 	 * Persists the entities that have been added to the collection.
@@ -252,6 +300,17 @@ public abstract class ManagedCollection<E> {
 	public abstract void refreshChildren(Collection<? extends E> children);
 
 	/**
+	 * Removes the child from the managed list without initialize checks.
+	 * 
+	 * @param child
+	 *            the child to add
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected abstract void removeChild(E child);
+
+	/**
 	 * Removes the entities that have been orphaned by removal from the collection.
 	 * 
 	 * @param entityManager
@@ -277,4 +336,12 @@ public abstract class ManagedCollection<E> {
 	protected void reset() {
 		this.changed = false;
 	}
+
+	/**
+	 * Makes a snapshot of the collection
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected abstract void snapshot();
 }
