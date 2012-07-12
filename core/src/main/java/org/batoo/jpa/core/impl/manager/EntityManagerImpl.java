@@ -514,7 +514,7 @@ public class EntityManagerImpl implements EntityManager {
 		}
 
 		// create a lazy instance
-		instance = type.getManagedInstanceById(this.session, null, null, managedId, true);
+		instance = type.getManagedInstanceById(this.session, managedId, true);
 		this.session.put(instance);
 
 		// and return it

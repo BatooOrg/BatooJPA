@@ -362,17 +362,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> {
 	public abstract void link() throws MappingException;
 
 	/**
-	 * Loads the eager association.
-	 * 
-	 * @param instance
-	 *            the managed instance
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public abstract void load(ManagedInstance<?> instance);
-
-	/**
 	 * Merges the association of the instance with the entity.
 	 * 
 	 * @param entityManager
@@ -421,15 +410,4 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> {
 	 * @author hceylan
 	 */
 	public abstract void setInverse(AssociationMapping<?, ?, ?> inverse);
-
-	/**
-	 * Sets the lazy instance for the association
-	 * 
-	 * @param instance
-	 *            the managed instance
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public abstract void setLazy(ManagedInstance<?> instance);
 }

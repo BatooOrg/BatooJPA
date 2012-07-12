@@ -176,8 +176,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 					final Class<X> enhancedClass = Enhancer.enhance(this);
 					final Constructor<X> constructor = enhancedClass.getConstructor(Class.class, // type
 						SessionImpl.class, // session
-						SingularAssociationMapping.class, // mapping
-						Object.class, // mappingId
 						Object.class, // id
 						Boolean.TYPE); // initialized
 
@@ -1002,7 +1000,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public ManagedInstance<X> getManagedInstanceById(SessionImpl session, ManagedId<X> id) {
-		return this.getManagedInstanceById(session, null, null, id, false);
+		return this.getManagedInstanceById(session, id, false);
 	}
 
 	/**
@@ -1010,10 +1008,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * 
 	 * @param session
 	 *            the session
-	 * @param mapping
-	 *            the mapping
-	 * @param mappingId
-	 *            the mapping id
 	 * @param id
 	 *            the primary key
 	 * @param lazy
@@ -1024,13 +1018,11 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	@SuppressWarnings({ "unchecked" })
-	public ManagedInstance<X> getManagedInstanceById(SessionImpl session, SingularAssociationMapping<?, ?> mapping, ManagedId<?> mappingId, ManagedId<X> id,
-		boolean lazy) {
+	public ManagedInstance<X> getManagedInstanceById(SessionImpl session, ManagedId<X> id, boolean lazy) {
 		this.enhanceIfNeccessary();
 
 		try {
-			final X instance = (X) this.constructor.newInstance(new Object[] { this.getJavaType(), session, mapping, mappingId, id != null ? id.getId() : id,
-				!lazy });
+			final X instance = (X) this.constructor.newInstance(new Object[] { this.getJavaType(), session, id.getId(), !lazy });
 
 			final ManagedInstance<X> managedInstance = new ManagedInstance<X>(this, session, instance, id);
 

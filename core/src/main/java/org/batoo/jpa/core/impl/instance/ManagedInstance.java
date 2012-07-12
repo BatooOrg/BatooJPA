@@ -646,7 +646,7 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void processAssociations() {
-		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociations()) {
+		for (final PluralAssociationMapping<?, ?, ?> association : this.type.getAssociationsPlural()) {
 			if (!this.associationsLoaded.contains(association)) {
 				if (association.isEager()) {
 					association.load(this);

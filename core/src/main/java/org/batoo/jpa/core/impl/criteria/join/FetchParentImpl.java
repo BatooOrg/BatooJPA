@@ -549,7 +549,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		}
 
 		final ManagedId managedId = new ManagedId(id, mapping.getType());
-		instance = mapping.getType().getManagedInstanceById(session, null, null, managedId, true);
+		instance = mapping.getType().getManagedInstanceById(session, managedId, true);
 		session.put(instance);
 
 		return instance.getInstance();

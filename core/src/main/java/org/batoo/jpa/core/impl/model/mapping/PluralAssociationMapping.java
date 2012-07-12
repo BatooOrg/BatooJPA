@@ -296,10 +296,14 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Loads the eager association.
 	 * 
+	 * @param instance
+	 *            the managed instance
+	 * 
+	 * @since $version
+	 * @author hceylan
 	 */
-	@Override
 	@SuppressWarnings("unchecked")
 	public void load(ManagedInstance<?> instance) {
 		final ManagedCollection<E> collection = (ManagedCollection<E>) this.attribute.newCollection(this, instance, false);
@@ -448,10 +452,14 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Sets the lazy instance for the association
 	 * 
+	 * @param instance
+	 *            the managed instance
+	 * 
+	 * @since $version
+	 * @author hceylan
 	 */
-	@Override
 	public void setLazy(ManagedInstance<?> instance) {
 		this.set(instance, this.attribute.newCollection(this, instance, true));
 	}

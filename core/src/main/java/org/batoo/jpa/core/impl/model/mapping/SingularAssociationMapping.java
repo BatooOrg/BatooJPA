@@ -196,29 +196,6 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 	 * 
 	 */
 	@Override
-	public void load(ManagedInstance<?> instance) {
-		// TODO Auto-generated method stub
-	}
-
-	/**
-	 * @param managedInstance
-	 *            the managed instance
-	 * @param mappingId
-	 *            the id of the mapping
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void load(ManagedInstance<?> managedInstance, Object mappingId) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public void mergeWith(EntityManagerImpl entityManager, ManagedInstance<?> instance, Object entity) {
 		if (this.removesOrphans() || (this.inverse != null)) {
 			final X oldEntity = this.get(instance.getInstance());
@@ -253,14 +230,5 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 	@Override
 	public void setInverse(AssociationMapping<?, ?, ?> inverse) {
 		this.inverse = inverse;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public void setLazy(ManagedInstance<?> instance) {
-		this.set(instance, this.type.getManagedInstanceById(instance.getSession(), this, instance.getId(), null, true).getInstance());
 	}
 }

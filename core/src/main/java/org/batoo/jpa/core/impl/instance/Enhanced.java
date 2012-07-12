@@ -21,7 +21,6 @@ package org.batoo.jpa.core.impl.instance;
 import javax.persistence.PersistenceException;
 
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 
 /**
  * A Sample class for the enhanced type. Only exists as a reference
@@ -38,8 +37,6 @@ public class Enhanced implements EnhancedInstance {
 	private transient final Object __enhanced_$$__id;
 	private transient final Class<?> __enhanced_$$__type;
 	private transient final SessionImpl __enhanced_$$__session;
-	private transient final SingularAssociationMapping<?, ?> __enhanced_$$__mapping;
-	private transient final Object __enhanced_$$__mappingId;
 	private transient ManagedInstance<?> __enhanced__$$__managedInstance;
 
 	public Enhanced() {
@@ -48,17 +45,13 @@ public class Enhanced implements EnhancedInstance {
 		this.__enhanced_$$__id = null;
 		this.__enhanced_$$__type = null;
 		this.__enhanced_$$__session = null;
-		this.__enhanced_$$__mapping = null;
-		this.__enhanced_$$__mappingId = null;
 	}
 
-	public Enhanced(Class<?> type, SessionImpl session, SingularAssociationMapping<?, ?> mapping, Object mappingId, Object id, boolean initialized) {
+	public Enhanced(Class<?> type, SessionImpl session, Object id, boolean initialized) {
 		super();
 
 		this.__enhanced_$$__type = type;
 		this.__enhanced_$$__session = session;
-		this.__enhanced_$$__mapping = mapping;
-		this.__enhanced_$$__mappingId = mappingId;
 		this.__enhanced_$$__id = id;
 		this.__enhanced_$$__initialized = initialized;
 	}
@@ -95,12 +88,7 @@ public class Enhanced implements EnhancedInstance {
 				throw new PersistenceException("No session to initialize the instance");
 			}
 
-			if (this.__enhanced_$$__mapping != null) {
-				this.__enhanced_$$__mapping.load(this.__enhanced__$$__managedInstance, this.__enhanced_$$__mappingId);
-			}
-			else {
-				this.__enhanced_$$__session.getEntityManager().find(this.__enhanced_$$__type, this.__enhanced_$$__id);
-			}
+			this.__enhanced_$$__session.getEntityManager().find(this.__enhanced_$$__type, this.__enhanced_$$__id);
 
 			this.__enhanced_$$__initialized = true;
 		}
