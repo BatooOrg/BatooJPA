@@ -56,7 +56,6 @@ public class ManagedInstance<X> {
 	private final EntityTypeImpl<X> type;
 	private final SessionImpl session;
 	private final X instance;
-	private final boolean external;
 	private Status status;
 
 	private final SingularMapping<? super X, ?> idMapping;
@@ -80,19 +79,16 @@ public class ManagedInstance<X> {
 	 *            the session
 	 * @param instance
 	 *            the instance
-	 * @param external
-	 *            if the instance is external
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedInstance(EntityTypeImpl<X> type, SessionImpl session, X instance, boolean external) {
+	public ManagedInstance(EntityTypeImpl<X> type, SessionImpl session, X instance) {
 		super();
 
 		this.type = type;
 		this.session = session;
 		this.instance = instance;
-		this.external = external;
 
 		this.associationsChanged = Sets.newHashSet();
 		this.associationsLoaded = Sets.newHashSet();
@@ -123,7 +119,7 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public ManagedInstance(EntityTypeImpl<X> type, SessionImpl session, X instance, ManagedId<? super X> id) {
-		this(type, session, instance, false);
+		this(type, session, instance);
 
 		if (this.idMapping != null) {
 			this.idMapping.set(this, id.getId());

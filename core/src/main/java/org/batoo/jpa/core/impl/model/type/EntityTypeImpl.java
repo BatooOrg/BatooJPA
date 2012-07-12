@@ -984,7 +984,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			throw new NullPointerException();
 		}
 
-		return new ManagedInstance<X>(this, session, instance, true);
+		return new ManagedInstance<X>(this, session, instance);
 	}
 
 	/**

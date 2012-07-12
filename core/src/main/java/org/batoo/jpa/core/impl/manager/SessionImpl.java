@@ -388,6 +388,7 @@ public class SessionImpl {
 		final ManagedInstance<?> instance = this.repository.get(instanceId);
 		if (instance != null) {
 			this.repository.remove(instanceId);
+			this.changedEntities.remove(instance);
 			this.externalEntities.remove(instance);
 		}
 
