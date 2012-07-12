@@ -355,6 +355,26 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	}
 
 	/**
+	 * Persists the children that have been added to the managed collection
+	 * 
+	 * @param entityManager
+	 *            the entity manager
+	 * @param instance
+	 *            the managed instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	public void persistAdditions(EntityManagerImpl entityManager, ManagedInstance<?> instance) {
+		if (this.cascadesPersist()) {
+			final ManagedCollection<E> collection = (ManagedCollection<E>) this.get(instance.getInstance());
+
+			collection.persistAdditions(entityManager);
+		}
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */

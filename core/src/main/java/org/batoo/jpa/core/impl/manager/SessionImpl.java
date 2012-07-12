@@ -80,6 +80,7 @@ public class SessionImpl {
 	}
 
 	/**
+	 * Cascades the removals.
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -247,6 +248,18 @@ public class SessionImpl {
 	 */
 	public int getSessionId() {
 		return this.sessionId;
+	}
+
+	/**
+	 * Handles the additions to the collections.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void handleAdditions() {
+		for (final ManagedInstance<?> instance : this.changedEntities) {
+			instance.handleAdditions(this.em);
+		}
 	}
 
 	/**

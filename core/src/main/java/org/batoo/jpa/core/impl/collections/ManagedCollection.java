@@ -224,6 +224,23 @@ public abstract class ManagedCollection<E> {
 	public abstract void mergeWith(EntityManagerImpl entityManager, Object entity);
 
 	/**
+	 * Persists the entities that have been added to the collection.
+	 * 
+	 * @param entityManager
+	 *            the entity manager
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	public void persistAdditions(EntityManagerImpl entityManager) {
+		final Collection<E> added = CollectionUtils.subtract(this.getDelegate(), this.getSnapshot());
+		for (final E e : added) {
+			entityManager.persist(e);
+		}
+	}
+
+	/**
 	 * Refreshes the children of the managed collection.
 	 * 
 	 * @param children

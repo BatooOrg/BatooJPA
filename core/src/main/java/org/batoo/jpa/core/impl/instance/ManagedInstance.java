@@ -495,6 +495,23 @@ public class ManagedInstance<X> {
 	}
 
 	/**
+	 * Handles the entities that have been added.
+	 * 
+	 * @param entityManager
+	 *            the entity manager
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void handleAdditions(EntityManagerImpl entityManager) {
+		for (final PluralAssociationMapping<?, ?, ?> association : this.associationsChanged) {
+			association.persistAdditions(entityManager, this);
+		}
+	}
+
+	/**
+	 * Handles the entities that have been orphaned.
+	 * 
 	 * @param entityManager
 	 *            the entity manager
 	 * 

@@ -275,6 +275,20 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	}
 
 	/**
+	 * Merges the entity.
+	 * 
+	 * @param entity
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected <T> T merge(T entity) {
+		this.ensureTx();
+
+		return this.em().merge(entity);
+	}
+
+	/**
 	 * Persists the entity.
 	 * 
 	 * @param entity

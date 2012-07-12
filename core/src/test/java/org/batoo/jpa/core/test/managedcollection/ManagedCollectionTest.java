@@ -38,6 +38,64 @@ public class ManagedCollectionTest extends BaseCoreTest {
 	}
 
 	/**
+	 * Tests that additions to managed collection that are committed
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testAdditionsCommitted() {
+		Person person = this.person();
+		this.persist(person);
+
+		this.commit();
+
+		person = this.find(Person.class, person.getId());
+
+		this.begin();
+		new Address(person, "Paris");
+		this.commit();
+	}
+
+	/**
+	 * Tests that additions to existing managed collection
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testAdditionsExisting() {
+		Person person = this.person();
+		this.persist(person);
+
+		this.commit();
+		this.close();
+
+		person = this.find(Person.class, person.getId());
+
+		this.begin();
+		new Address(person, "Paris");
+		this.commit();
+	}
+
+	/**
+	 * Tests that additions to managed collection that are committed
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testAdditionsPersist() {
+		Person person = this.person();
+		this.persist(person);
+
+		person = this.find(Person.class, person.getId());
+
+		new Address(person, "Paris");
+		this.commit();
+	}
+
+	/**
 	 * Tests that managed collection does not allow duplicates.
 	 * 
 	 * @since $version

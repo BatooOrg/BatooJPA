@@ -391,6 +391,7 @@ public class EntityManagerImpl implements EntityManager {
 		this.assertTransaction();
 
 		try {
+			this.session.handleAdditions();
 			this.session.cascadeRemovals();
 			this.session.handleOrphans();
 			this.session.flush(this.getConnection());
@@ -659,10 +660,10 @@ public class EntityManagerImpl implements EntityManager {
 		// it is a new instance, handle like persist
 		instance = type.getManagedInstance(this.session, entity);
 		instance.setStatus(Status.NEW);
+		instance.enhanceCollections();
 
 		boolean requiresFlush = !instance.fillIdValues();
 		requiresFlush |= instance.cascadeMerge(this);
-
 		this.session.putExternal(instance);
 
 		return requiresFlush;
@@ -722,7 +723,6 @@ public class EntityManagerImpl implements EntityManager {
 		instance.enhanceCollections();
 
 		boolean requiresFlush = !instance.fillIdValues();
-
 		this.session.putExternal(instance);
 
 		requiresFlush |= instance.cascadePersist(this);
