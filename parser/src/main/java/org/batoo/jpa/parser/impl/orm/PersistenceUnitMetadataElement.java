@@ -18,15 +18,7 @@
  */
 package org.batoo.jpa.parser.impl.orm;
 
-import java.util.List;
 import java.util.Map;
-
-import javax.persistence.AccessType;
-
-import org.batoo.jpa.parser.impl.orm.CascadesElement.CascadePersistElement;
-import org.batoo.jpa.parser.metadata.EntityListenerMetadata;
-
-import com.google.common.collect.Lists;
 
 /**
  * Element for <code>persistence-unit-metadata</code> elements.
@@ -36,12 +28,8 @@ import com.google.common.collect.Lists;
  */
 public class PersistenceUnitMetadataElement extends ParentElement {
 
-	private final List<EntityListenerMetadata> listeners = Lists.newArrayList();
 	private boolean xmlMappingMetadataComplete;
-	private String catalog;
-	private String schema;
-	private boolean cascadePersist;
-	private AccessType accessType;
+	private PersistenceUnitDefaults persistenceUnitDefaults;
 
 	/**
 	 * @param parent
@@ -54,60 +42,20 @@ public class PersistenceUnitMetadataElement extends ParentElement {
 	 */
 	public PersistenceUnitMetadataElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, //
-			ElementConstants.ELEMENT_ACCESS, //
 			ElementConstants.ELEMENT_XML_MAPPING_METADATA_COMPLETE, //
-			ElementConstants.ELEMENT_CATALOG, //
-			ElementConstants.ELEMENT_SCHEMA, //
-			ElementConstants.ELEMENT_CASCADE_PERSIST, //
-			ElementConstants.ELEMENT_ENTITY_LISTENERS);
+			ElementConstants.ELEMENT_PERSISTENCE_UNIT_DEFAULTS);
 	}
 
 	/**
-	 * Returns the accessType.
+	 * Returns the persistence unit defaults.
 	 * 
-	 * @return the accessType
+	 * @return the persistence unit defaults
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AccessType getAccessType() {
-		return this.accessType;
-	}
-
-	/**
-	 * Returns the catalog.
-	 * 
-	 * @return the catalog
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String getCatalog() {
-		return this.catalog;
-	}
-
-	/**
-	 * Returns the listeners of the EntityListenersElement.
-	 * 
-	 * @return the listeners of the EntityListenersElement
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public List<EntityListenerMetadata> getListeners() {
-		return this.listeners;
-	}
-
-	/**
-	 * Returns the schema.
-	 * 
-	 * @return the schema
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String getSchema() {
-		return this.schema;
+	public PersistenceUnitDefaults getPersistenceUnitDefaults() {
+		return this.persistenceUnitDefaults;
 	}
 
 	/**
@@ -116,41 +64,13 @@ public class PersistenceUnitMetadataElement extends ParentElement {
 	 */
 	@Override
 	protected void handleChild(Element child) {
-		if (child instanceof AccessElement) {
-			this.accessType = ((AccessElement) child).getAccessType();
-		}
-
 		if (child instanceof XmlMappingMetadataCompleteElement) {
 			this.xmlMappingMetadataComplete = true;
 		}
 
-		if (child instanceof CatalogElement) {
-			this.catalog = ((CatalogElement) child).getCatalog();
+		if (child instanceof PersistenceUnitDefaults) {
+			this.persistenceUnitDefaults = (PersistenceUnitDefaults) child;
 		}
-
-		if (child instanceof SchemaElement) {
-			this.schema = ((SchemaElement) child).getSchema();
-		}
-
-		if (child instanceof CascadePersistElement) {
-			this.cascadePersist = true;
-		}
-
-		if (child instanceof EntityListenersElement) {
-			this.listeners.addAll(((EntityListenersElement) child).getListeners());
-		}
-	}
-
-	/**
-	 * Returns the cascadePersist.
-	 * 
-	 * @return the cascadePersist
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public boolean isCascadePersist() {
-		return this.cascadePersist;
 	}
 
 	/**

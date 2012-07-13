@@ -7,7 +7,9 @@
 		<provider>org.batoo.jpa.core.BatooPersistenceProvider</provider>
 		
 		<class>org.batoo.jpa.core.test.lock.Foo</class>
+		<class>org.batoo.jpa.core.test.lock.Foo2</class>
 		<class>org.batoo.jpa.core.test.lock.Bar</class>
+		<class>org.batoo.jpa.core.test.lock.Bar2</class>
 		
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.Driver40" />

@@ -56,6 +56,7 @@ import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 
 import com.google.common.collect.Maps;
 
@@ -72,8 +73,11 @@ public class EntityManagerImpl implements EntityManager {
 	private final EntityManagerFactoryImpl emf;
 	private final MetamodelImpl metamodel;
 	private final DataSourceImpl datasource;
+	private final JdbcAdaptor jdbcAdaptor;
+
 	private boolean open;
 	private EntityTransactionImpl transaction;
+
 	private ConnectionImpl connection;
 	private final SessionImpl session;
 	private final CriteriaBuilderImpl criteriaBuilder;
@@ -88,16 +92,20 @@ public class EntityManagerImpl implements EntityManager {
 	 *            the datasource
 	 * @param properties
 	 *            properties for the entity manager
+	 * @param jdbcAdaptor
+	 *            the JDBC adaptor
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EntityManagerImpl(EntityManagerFactoryImpl entityManagerFactory, MetamodelImpl metamodel, DataSourceImpl datasource, Map<String, Object> properties) {
+	public EntityManagerImpl(EntityManagerFactoryImpl entityManagerFactory, MetamodelImpl metamodel, DataSourceImpl datasource, Map<String, Object> properties,
+		JdbcAdaptor jdbcAdaptor) {
 		super();
 
 		this.emf = entityManagerFactory;
 		this.metamodel = metamodel;
 		this.datasource = datasource;
+		this.jdbcAdaptor = jdbcAdaptor;
 		this.session = new SessionImpl(this, metamodel);
 		this.criteriaBuilder = this.emf.getCriteriaBuilder();
 		this.properties = properties;
@@ -533,13 +541,26 @@ public class EntityManagerImpl implements EntityManager {
 	}
 
 	/**
+	 * Returns the JDBC adaptor.
+	 * 
+	 * @return the JDBC adaptor
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public JdbcAdaptor getJdbcAdaptor() {
+		return this.jdbcAdaptor;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
 	@Override
 	public LockModeType getLockMode(Object entity) {
-		// TODO Auto-generated method stub
-		return null;
+		final ManagedInstance<Object> instance = this.session.get(entity);
+
+		return instance.getLockMode();
 	}
 
 	/**
@@ -938,7 +959,7 @@ public class EntityManagerImpl implements EntityManager {
 		if (entity instanceof EnhancedInstance) {
 			instance = ((EnhancedInstance) entity).__enhanced__$$__getManagedInstance();
 			if ((instance.getSession() == this.session) && (instance.getStatus() == Status.MANAGED)) {
-				instance.refresh(this, this.getConnection());
+				instance.refresh(this, this.getConnection(), lockMode);
 
 				this.lock(instance, lockMode, properties);
 

@@ -18,17 +18,26 @@
  */
 package org.batoo.jpa.parser.impl.orm.type;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.AccessType;
 
 import org.batoo.jpa.parser.impl.orm.Element;
 import org.batoo.jpa.parser.impl.orm.ElementConstants;
+import org.batoo.jpa.parser.impl.orm.EntityListenerElement;
+import org.batoo.jpa.parser.impl.orm.EntityListenersElement;
 import org.batoo.jpa.parser.impl.orm.EntityMappings;
+import org.batoo.jpa.parser.impl.orm.ExcludeDefaultListenersElement;
+import org.batoo.jpa.parser.impl.orm.ExcludeSuperclassListenersElement;
 import org.batoo.jpa.parser.impl.orm.IdClassElement;
 import org.batoo.jpa.parser.impl.orm.ParentElement;
 import org.batoo.jpa.parser.impl.orm.attribute.AttributesElement;
+import org.batoo.jpa.parser.metadata.CallbackMetadata;
+import org.batoo.jpa.parser.metadata.EntityListenerMetadata;
 import org.batoo.jpa.parser.metadata.type.MappedSuperclassMetadata;
+
+import com.google.common.collect.Lists;
 
 /**
  * Element for <code>mapped-superclass</code> elements.
@@ -43,6 +52,10 @@ public class MappedSuperclassElementFactory extends ParentElement implements Map
 	private AccessType accessType;
 	private AttributesElement attrs;
 	private String idClass;
+	private boolean excludeDefaultListeners;
+	private boolean excludeSuperclassListeners;
+	private final List<EntityListenerMetadata> listeners = Lists.newArrayList();
+	private final List<CallbackMetadata> callbacks = Lists.newArrayList();
 
 	/**
 	 * Constructor for ORM File parsing
@@ -58,7 +71,35 @@ public class MappedSuperclassElementFactory extends ParentElement implements Map
 	public MappedSuperclassElementFactory(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, //
 			ElementConstants.ELEMENT_ATTRIBUTES, //
-			ElementConstants.ELEMENT_ID_CLASS);
+			ElementConstants.ELEMENT_ID_CLASS, //
+			ElementConstants.ELEMENT_ENTITY_LISTENERS, //
+			ElementConstants.ELEMENT_PRE_PERSIST, //
+			ElementConstants.ELEMENT_PRE_REMOVE, //
+			ElementConstants.ELEMENT_PRE_UPDATE, //
+			ElementConstants.ELEMENT_POST_LOAD, //
+			ElementConstants.ELEMENT_POST_PERSIST, //
+			ElementConstants.ELEMENT_POST_REMOVE, //
+			ElementConstants.ELEMENT_POST_UPDATE, //
+			ElementConstants.ELEMENT_EXCLUDE_DEFAULT_LISTENERS, //
+			ElementConstants.ELEMENT_EXCLUDE_SUPERCLASS_LISTENERS);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean excludeDefaultListeners() {
+		return this.excludeDefaultListeners;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean excludeSuperclassListeners() {
+		return this.excludeSuperclassListeners;
 	}
 
 	/**
@@ -69,8 +110,7 @@ public class MappedSuperclassElementFactory extends ParentElement implements Map
 	protected void generate() {
 		this.className = this.getAttribute(ElementConstants.ATTR_CLASS, ElementConstants.EMPTY);
 		this.metadataComplete = this.getAttribute(ElementConstants.ATTR_METADATA_COMPLETE, false);
-		this.accessType = this.getAttribute(ElementConstants.ATTR_ACCESS) != null
-			? AccessType.valueOf(this.getAttribute(ElementConstants.ATTR_ACCESS)) : null;
+		this.accessType = this.getAttribute(ElementConstants.ATTR_ACCESS) != null ? AccessType.valueOf(this.getAttribute(ElementConstants.ATTR_ACCESS)) : null;
 	}
 
 	/**
@@ -96,6 +136,15 @@ public class MappedSuperclassElementFactory extends ParentElement implements Map
 	 * 
 	 */
 	@Override
+	public List<CallbackMetadata> getCallbacks() {
+		return this.callbacks;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public String getClassName() {
 		return this.className;
 	}
@@ -114,6 +163,15 @@ public class MappedSuperclassElementFactory extends ParentElement implements Map
 	 * 
 	 */
 	@Override
+	public List<EntityListenerMetadata> getListeners() {
+		return this.listeners;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	protected void handleChild(Element child) {
 		if (child instanceof AttributesElement) {
 			this.attrs = (AttributesElement) child;
@@ -121,6 +179,22 @@ public class MappedSuperclassElementFactory extends ParentElement implements Map
 
 		if (child instanceof IdClassElement) {
 			this.idClass = ((IdClassElement) child).getIdClass();
+		}
+
+		if (child instanceof EntityListenerElement) {
+			this.listeners.addAll(((EntityListenersElement) child).getListeners());
+		}
+
+		if (child instanceof CallbackMetadata) {
+			this.callbacks.add((CallbackMetadata) this.callbacks);
+		}
+
+		if (child instanceof ExcludeDefaultListenersElement) {
+			this.excludeDefaultListeners = true;
+		}
+
+		if (child instanceof ExcludeSuperclassListenersElement) {
+			this.excludeSuperclassListeners = true;
 		}
 	}
 

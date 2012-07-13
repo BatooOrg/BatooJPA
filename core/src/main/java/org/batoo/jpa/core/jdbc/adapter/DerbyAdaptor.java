@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import javax.persistence.GenerationType;
+import javax.persistence.LockModeType;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.QueryRunner;
@@ -57,6 +58,23 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	 */
 	public DerbyAdaptor() {
 		super();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String applyLock(String sql, LockModeType lockMode) {
+		switch (lockMode) {
+			case PESSIMISTIC_FORCE_INCREMENT:
+			case PESSIMISTIC_READ:
+				return sql + "\nFOR READ ONLY";
+			case PESSIMISTIC_WRITE:
+				return sql + "\nFOR UPDATE";
+		}
+
+		return sql;
 	}
 
 	/**

@@ -20,6 +20,7 @@ package org.batoo.jpa.core.test.lock;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.LockModeType;
 import javax.persistence.PersistenceException;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
@@ -30,75 +31,49 @@ import org.junit.Test;
  * 
  * @since $version
  */
-public class OptimisticLockTest extends BaseCoreTest {
+public class PessimisticLockTest extends BaseCoreTest {
 
-	private Foo newFoo(boolean withChildren) {
-		final Foo foo = new Foo();
+	private Foo2 newFoo(boolean withChildren) {
+		final Foo2 foo = new Foo2();
 
 		foo.setValue("test");
 
 		if (withChildren) {
-			new Bar(foo, "barValue1");
-			new Bar(foo, "barValue2");
+			new Bar2(foo, "barValue1");
+			new Bar2(foo, "barValue2");
 		}
 
 		return foo;
 	}
 
 	/**
-	 * Tests the optimistic lock.
+	 * Tests the pessimistic lock.
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	@Test(expected = PersistenceException.class)
-	public void testOptimisticLockRemove() {
-		final Foo foo = this.newFoo(false);
-
-		this.persist(foo);
-		this.commit();
-
-		final EntityManager em2 = this.emf().createEntityManager();
-		final Foo foo2 = em2.find(Foo.class, foo.getId());
-
-		final EntityTransaction tx2 = em2.getTransaction();
-		tx2.begin();
-		em2.remove(foo2);
-		tx2.commit();
-
-		this.begin();
-		foo.setValue("test3");
-		this.commit();
-	}
-
-	/**
-	 * Tests the optimistic lock.
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@Test(expected = PersistenceException.class)
-	public void testOptimisticLockRollback() {
-		Foo foo = this.newFoo(false);
+	@Test
+	public void testPessimisticLockRemove() {
+		Foo2 foo = this.newFoo(false);
 
 		this.persist(foo);
 		this.commit();
 		this.close();
 
-		this.begin();
-		foo = this.find(Foo.class, foo.getId());
-		foo.setValue("NewValue1");
-		this.flush();
+		foo = this.find(Foo2.class, foo.getId(), LockModeType.PESSIMISTIC_WRITE);
 
 		final EntityManager em2 = this.emf().createEntityManager();
+		final Foo2 foo2 = em2.find(Foo2.class, foo.getId(), LockModeType.PESSIMISTIC_WRITE);
+
 		final EntityTransaction tx2 = em2.getTransaction();
 		tx2.begin();
+		em2.remove(foo2);
 
-		tx2.begin();
-		final Foo foo2 = em2.find(Foo.class, foo.getId());
-		foo2.setValue("NewValue2");
-		this.rollback();
+		this.begin();
+		foo.setValue("test3");
+
 		tx2.commit();
+		this.commit();
 	}
 
 	/**
@@ -108,14 +83,14 @@ public class OptimisticLockTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test(expected = PersistenceException.class)
-	public void testOptimisticLockUpdate() {
-		final Foo foo = this.newFoo(false);
+	public void testPessimisticLockUpdate() {
+		final Foo2 foo = this.newFoo(false);
 
 		this.persist(foo);
 		this.commit();
 
 		final EntityManager em2 = this.emf().createEntityManager();
-		final Foo foo2 = em2.find(Foo.class, foo.getId());
+		final Foo2 foo2 = em2.find(Foo2.class, foo.getId());
 
 		final EntityTransaction tx2 = em2.getTransaction();
 		tx2.begin();
@@ -134,14 +109,14 @@ public class OptimisticLockTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test(expected = PersistenceException.class)
-	public void testOptimisticLockUpdateChild() {
-		final Foo foo = this.newFoo(true);
+	public void testPessimisticLockUpdateChild() {
+		final Foo2 foo = this.newFoo(false);
 
 		this.persist(foo);
 		this.commit();
 
 		final EntityManager em2 = this.emf().createEntityManager();
-		final Foo foo2 = em2.find(Foo.class, foo.getId());
+		final Foo2 foo2 = em2.find(Foo2.class, foo.getId());
 
 		final EntityTransaction tx2 = em2.getTransaction();
 		tx2.begin();
@@ -160,24 +135,22 @@ public class OptimisticLockTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test(expected = PersistenceException.class)
-	public void testOptimisticLockUpdateChildren() {
-		final Foo foo = this.newFoo(true);
+	public void testPessimisticLockUpdateChildren() {
+		final Foo2 foo = this.newFoo(false);
 
 		this.persist(foo);
 		this.commit();
 
-		this.begin();
 		final EntityManager em2 = this.emf().createEntityManager();
+		final Foo2 foo2 = em2.find(Foo2.class, foo.getId());
+
 		final EntityTransaction tx2 = em2.getTransaction();
 		tx2.begin();
-
-		final Foo foo2 = em2.find(Foo.class, foo.getId());
-
-		new Bar(foo2, "barValue3");
+		new Bar2(foo2, "barValue3");
 		tx2.commit();
 
 		this.begin();
-		new Bar(foo, "barValue3");
+		new Bar2(foo, "barValue3");
 		this.commit();
 	}
 }

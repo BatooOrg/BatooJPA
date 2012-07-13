@@ -90,7 +90,7 @@ public class ManagedId<X> {
 		if ((other == null) || (other.id == null)) {
 			return false;
 		}
-		if (this.type != other.type) {
+		if (this.type.getRootType() != other.type.getRootType()) {
 			return false;
 		}
 

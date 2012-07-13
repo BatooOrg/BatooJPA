@@ -42,7 +42,7 @@ import com.google.common.collect.Lists;
  */
 public class EntityMappings extends ParentElement implements Metadata {
 
-	private AccessType accessType;
+	private AccessType accessType = AccessType.FIELD;
 	private boolean xmlMappingMetadataComplete;
 	private String catalog;
 	private String schema;
@@ -158,13 +158,16 @@ public class EntityMappings extends ParentElement implements Metadata {
 
 		if (child instanceof PersistenceUnitMetadataElement) {
 			final PersistenceUnitMetadataElement element = (PersistenceUnitMetadataElement) child;
-			this.accessType = element.getAccessType();
-			this.catalog = element.getCatalog();
-			this.schema = element.getSchema();
-			this.xmlMappingMetadataComplete = element.isXmlMappingMetadataComplete();
-			this.cascadePersist = element.isCascadePersist();
-			this.entityListeners.addAll(element.getListeners());
+			final PersistenceUnitDefaults persistenceUnitDefaults = element.getPersistenceUnitDefaults();
+			if (persistenceUnitDefaults != null) {
+				this.accessType = persistenceUnitDefaults.getAccessType();
+				this.catalog = persistenceUnitDefaults.getCatalog();
+				this.schema = persistenceUnitDefaults.getSchema();
+				this.cascadePersist = persistenceUnitDefaults.isCascadePersist();
+				this.entityListeners.addAll(persistenceUnitDefaults.getListeners());
+			}
 
+			this.xmlMappingMetadataComplete = element.isXmlMappingMetadataComplete();
 		}
 
 		if (child instanceof CatalogElement) {

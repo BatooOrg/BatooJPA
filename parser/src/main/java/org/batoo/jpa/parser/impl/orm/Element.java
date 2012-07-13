@@ -80,6 +80,8 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 		Element.factoryMap.put(ElementConstants.ELEMENT_XML_MAPPING_METADATA_COMPLETE, XmlMappingMetadataCompleteElement.class);
 
 		// listeners
+		Element.factoryMap.put(ElementConstants.ELEMENT_EXCLUDE_DEFAULT_LISTENERS, ExcludeDefaultListenersElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_EXCLUDE_SUPERCLASS_LISTENERS, ExcludeSuperclassListenersElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_ENTITY_LISTENERS, EntityListenersElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_ENTITY_LISTENER, EntityListenerElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_POST_LOAD, PostLoadElement.class);

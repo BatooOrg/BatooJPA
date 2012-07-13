@@ -39,6 +39,7 @@ import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
@@ -160,10 +161,26 @@ public abstract class BaseTypedQuery<X> implements TypedQuery<X>, ResultSetHandl
 	public List<X> getResultList() {
 		this.em.getSession().setLoadTracker();
 
+		ManagedInstance.LOCK_CONTEXT.set(this.getLockMode());
+		try {
+			return this.getResultListImpl();
+		}
+		finally {
+			ManagedInstance.LOCK_CONTEXT.set(null);
+		}
+	}
+
+	private List<X> getResultListImpl() {
 		try {
 			int paramCount = 0;
 
-			final String sql = this.cq.getSql();
+			String sql = this.cq.getSql();
+
+			final LockModeType lockMode = this.getLockMode();
+			if ((lockMode == LockModeType.PESSIMISTIC_READ) || (lockMode == LockModeType.PESSIMISTIC_WRITE)
+				|| (lockMode == LockModeType.PESSIMISTIC_FORCE_INCREMENT)) {
+				sql = this.em.getJdbcAdaptor().applyLock(sql, lockMode);
+			}
 
 			final List<ParameterExpressionImpl<?>> sqlParameters = this.cq.getSqlParameters();
 

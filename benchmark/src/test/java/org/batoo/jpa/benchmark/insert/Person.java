@@ -27,6 +27,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Version;
 
 import com.google.common.collect.Lists;
 
@@ -47,6 +48,9 @@ public class Person {
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "person")
 	private final List<Phone> phones = Lists.newArrayList();
+
+	@Version
+	private Integer version;
 
 	private String name;
 
@@ -113,6 +117,18 @@ public class Person {
 	 */
 	public List<Phone> getPhones() {
 		return this.phones;
+	}
+
+	/**
+	 * Returns the version of the Person.
+	 * 
+	 * @return the version of the Person
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Integer getVersion() {
+		return this.version;
 	}
 
 	/**

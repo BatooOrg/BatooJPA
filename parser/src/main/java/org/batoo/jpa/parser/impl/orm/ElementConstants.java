@@ -47,6 +47,7 @@ public class ElementConstants {
 	protected static final String ELEMENT_BASIC = "basic";
 	protected static final String ELEMENT_CATALOG = "catalog";
 	protected static final String ELEMENT_XML_MAPPING_METADATA_COMPLETE = "xml-mapping-metadata-complete";
+	protected static final String ELEMENT_PERSISTENCE_UNIT_DEFAULTS = "persistence-unit-defaults";
 	protected static final String ELEMENT_SCHEMA = "schema";
 	protected static final String ELEMENT_CASCADE = "cascade";
 	protected static final String ELEMENT_CASCADE_ALL = "cascade-all";
@@ -86,6 +87,8 @@ public class ElementConstants {
 	protected static final String ELEMENT_INHERITANCE = "inheritance";
 	protected static final String ELEMENT_DISCRIMINATOR_COLUMN = "discriminator-column";
 	protected static final String ELEMENT_DISCRIMINATOR_VALUE = "discriminator-value";
+	protected static final String ELEMENT_EXCLUDE_DEFAULT_LISTENERS = "exclude-default-listeners";
+	protected static final String ELEMENT_EXCLUDE_SUPERCLASS_LISTENERS = "exclude-superclass-listeners";
 	protected static final String ELEMENT_ENTITY_LISTENERS = "entity-listeners";
 	protected static final String ELEMENT_ENTITY_LISTENER = "entity-listener";
 	protected static final String ELEMENT_POST_LOAD = "post-load";

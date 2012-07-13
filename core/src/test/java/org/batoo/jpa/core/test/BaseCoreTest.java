@@ -25,6 +25,7 @@ import java.util.HashMap;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.LockModeType;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceContext;
 
@@ -218,7 +219,25 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 * @author hceylan
 	 */
 	protected <T> T find(Class<T> cls, Object pk) {
-		return this.em().find(cls, pk);
+		return this.find(cls, pk, null);
+	}
+
+	/**
+	 * Finds and returns the entity.
+	 * 
+	 * @param cls
+	 *            the class of the entity
+	 * @param pk
+	 *            the primary key of the entity
+	 * @param <T>
+	 *            the type of entity
+	 * @return entity or null
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected <T> T find(Class<T> cls, Object pk, LockModeType lockMode) {
+		return this.em().find(cls, pk, lockMode);
 	}
 
 	/**

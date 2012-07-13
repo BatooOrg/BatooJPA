@@ -21,4 +21,5 @@
 		</attributes>
 	</entity>
 	<embeddable class=""></embeddable>
+	<mapped-superclass class="">e<exclude-superclass-listeners/></mapped-superclass>
 </entity-mappings>

@@ -18,7 +18,7 @@
  */
 package org.batoo.jpa.parser.metadata;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * The definition for entity listeners.
@@ -26,7 +26,7 @@ import java.util.Map;
  * @author hceylan
  * @since $version
  */
-public interface EntityListenerMetadata {
+public interface EntityListenerMetadata extends LocatableMatadata {
 
 	/**
 	 * 
@@ -73,6 +73,16 @@ public interface EntityListenerMetadata {
 	}
 
 	/**
+	 * Returns the list of callbacks.
+	 * 
+	 * @return the list of callbacks
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	List<CallbackMetadata> getCallbacks();
+
+	/**
 	 * Returns the entity listener class.
 	 * 
 	 * @return the entity listener class
@@ -80,15 +90,5 @@ public interface EntityListenerMetadata {
 	 * @since $version
 	 * @author hceylan
 	 */
-	String getClazz();
-
-	/**
-	 * Returns the map of entity listeners.
-	 * 
-	 * @return the map of entity listeners
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	Map<EntityListenerType, String> getListeners();
+	String getClassName();
 }

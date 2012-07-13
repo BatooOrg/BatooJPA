@@ -135,9 +135,9 @@ public abstract class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
 	}
 
 	/**
-	 * Returns the clazz of the ManagedTypeMetadatImpl.
+	 * Returns the clazz of the managed type.
 	 * 
-	 * @return the clazz of the ManagedTypeMetadatImpl
+	 * @return the clazz of the managed type
 	 * 
 	 * @since $version
 	 * @author hceylan

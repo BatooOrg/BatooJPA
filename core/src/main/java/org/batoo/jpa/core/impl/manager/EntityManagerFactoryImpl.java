@@ -138,7 +138,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	public EntityManager createEntityManager() {
 		this.assertOpen();
 
-		return new EntityManagerImpl(this, this.metamodel, this.datasource, Collections.<String, Object> emptyMap());
+		return new EntityManagerImpl(this, this.metamodel, this.datasource, Collections.<String, Object> emptyMap(), this.jdbcAdaptor);
 	}
 
 	/**
@@ -149,7 +149,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	public EntityManager createEntityManager(Map<String, Object> map) {
 		this.assertOpen();
 
-		return new EntityManagerImpl(this, this.metamodel, this.datasource, map);
+		return new EntityManagerImpl(this, this.metamodel, this.datasource, map, this.jdbcAdaptor);
 	}
 
 	/**

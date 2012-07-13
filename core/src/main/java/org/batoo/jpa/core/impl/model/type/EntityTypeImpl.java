@@ -1317,14 +1317,17 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 *            the connection
 	 * @param instance
 	 *            the managed instance
+	 * @param lockMode
+	 *            the lock mode
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performRefresh(ConnectionImpl connection, ManagedInstance<X> instance) {
+	public void performRefresh(ConnectionImpl connection, ManagedInstance<X> instance, LockModeType lockMode) {
 		final SessionImpl session = instance.getSession();
 
 		final TypedQueryImpl<X> q = session.getEntityManager().createQuery(this.getCriteriaRefresh());
+		q.setLockMode(lockMode);
 
 		final Object id = instance.getId().getId();
 

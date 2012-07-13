@@ -29,7 +29,11 @@ import org.batoo.jpa.parser.impl.orm.AttributeOverrideElement;
 import org.batoo.jpa.parser.impl.orm.DiscriminatorValueElement;
 import org.batoo.jpa.parser.impl.orm.Element;
 import org.batoo.jpa.parser.impl.orm.ElementConstants;
+import org.batoo.jpa.parser.impl.orm.EntityListenerElement;
+import org.batoo.jpa.parser.impl.orm.EntityListenersElement;
 import org.batoo.jpa.parser.impl.orm.EntityMappings;
+import org.batoo.jpa.parser.impl.orm.ExcludeDefaultListenersElement;
+import org.batoo.jpa.parser.impl.orm.ExcludeSuperclassListenersElement;
 import org.batoo.jpa.parser.impl.orm.IdClassElement;
 import org.batoo.jpa.parser.impl.orm.ParentElement;
 import org.batoo.jpa.parser.impl.orm.SecondaryTableElement;
@@ -37,7 +41,9 @@ import org.batoo.jpa.parser.impl.orm.TableElement;
 import org.batoo.jpa.parser.impl.orm.attribute.AttributesElement;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
+import org.batoo.jpa.parser.metadata.CallbackMetadata;
 import org.batoo.jpa.parser.metadata.DiscriminatorColumnMetadata;
+import org.batoo.jpa.parser.metadata.EntityListenerMetadata;
 import org.batoo.jpa.parser.metadata.InheritanceMetadata;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
@@ -71,6 +77,10 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 	private DiscriminatorColumnMetadata discriminatorColumn;
 	private String discriminatorValue;
 	private String idClass;
+	private boolean excludeDefaultListeners;
+	private boolean excludeSuperclassListeners;
+	private final List<EntityListenerMetadata> listeners = Lists.newArrayList();
+	private final List<CallbackMetadata> callbacks = Lists.newArrayList();
 
 	/**
 	 * Constructor for ORM File parsing
@@ -95,7 +105,35 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 			ElementConstants.ELEMENT_INHERITANCE, //
 			ElementConstants.ELEMENT_DISCRIMINATOR_COLUMN, //
 			ElementConstants.ELEMENT_DISCRIMINATOR_VALUE, //
-			ElementConstants.ELEMENT_ID_CLASS);
+			ElementConstants.ELEMENT_ID_CLASS, //
+			ElementConstants.ELEMENT_ENTITY_LISTENERS, //
+			ElementConstants.ELEMENT_PRE_PERSIST, //
+			ElementConstants.ELEMENT_PRE_REMOVE, //
+			ElementConstants.ELEMENT_PRE_UPDATE, //
+			ElementConstants.ELEMENT_POST_LOAD, //
+			ElementConstants.ELEMENT_POST_PERSIST, //
+			ElementConstants.ELEMENT_POST_REMOVE, //
+			ElementConstants.ELEMENT_POST_UPDATE, //
+			ElementConstants.ELEMENT_EXCLUDE_DEFAULT_LISTENERS, //
+			ElementConstants.ELEMENT_EXCLUDE_SUPERCLASS_LISTENERS);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean excludeDefaultListeners() {
+		return this.excludeDefaultListeners;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean excludeSuperclassListeners() {
+		return this.excludeSuperclassListeners;
 	}
 
 	/**
@@ -107,10 +145,8 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 		this.name = this.getAttribute(ElementConstants.ATTR_NAME, ElementConstants.EMPTY);
 		this.className = this.getAttribute(ElementConstants.ATTR_CLASS, ElementConstants.EMPTY);
 		this.metadataComplete = this.getAttribute(ElementConstants.ATTR_METADATA_COMPLETE, false);
-		this.cachable = this.getAttribute(ElementConstants.ATTR_CACHABLE) != null
-			? Boolean.valueOf(this.getAttribute(ElementConstants.ATTR_CACHABLE)) : null;
-		this.accessType = this.getAttribute(ElementConstants.ATTR_ACCESS) != null
-			? AccessType.valueOf(this.getAttribute(ElementConstants.ATTR_ACCESS)) : null;
+		this.cachable = this.getAttribute(ElementConstants.ATTR_CACHABLE) != null ? Boolean.valueOf(this.getAttribute(ElementConstants.ATTR_CACHABLE)) : null;
+		this.accessType = this.getAttribute(ElementConstants.ATTR_ACCESS) != null ? AccessType.valueOf(this.getAttribute(ElementConstants.ATTR_ACCESS)) : null;
 	}
 
 	/**
@@ -163,6 +199,15 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 	 * 
 	 */
 	@Override
+	public List<CallbackMetadata> getCallbacks() {
+		return this.callbacks;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public String getClassName() {
 		return this.className;
 	}
@@ -201,6 +246,15 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 	@Override
 	public InheritanceType getInheritanceType() {
 		return this.inheritanceType;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<EntityListenerMetadata> getListeners() {
+		return this.listeners;
 	}
 
 	/**
@@ -296,6 +350,22 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 
 		if (child instanceof IdClassElement) {
 			this.idClass = ((IdClassElement) child).getIdClass();
+		}
+
+		if (child instanceof EntityListenerElement) {
+			this.listeners.addAll(((EntityListenersElement) child).getListeners());
+		}
+
+		if (child instanceof CallbackMetadata) {
+			this.callbacks.add((CallbackMetadata) this.callbacks);
+		}
+
+		if (child instanceof ExcludeDefaultListenersElement) {
+			this.excludeDefaultListeners = true;
+		}
+
+		if (child instanceof ExcludeSuperclassListenersElement) {
+			this.excludeSuperclassListeners = true;
 		}
 	}
 

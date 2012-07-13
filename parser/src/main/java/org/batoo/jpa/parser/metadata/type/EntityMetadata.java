@@ -110,9 +110,9 @@ public interface EntityMetadata extends IdentifiableTypeMetadata, BindableMetada
 	List<SecondaryTableMetadata> getSecondaryTables();
 
 	/**
-	 * Returns the sequenceGenerator of the entity.
+	 * Returns the sequence Generator of the entity.
 	 * 
-	 * @return the sequenceGenerator of the entity
+	 * @return the sequence Generator of the entity
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -130,9 +130,9 @@ public interface EntityMetadata extends IdentifiableTypeMetadata, BindableMetada
 	TableMetadata getTable();
 
 	/**
-	 * Returns the tableGenerator of the entity.
+	 * Returns the table generator of the entity.
 	 * 
-	 * @return the tableGenerator of the entity
+	 * @return the table Generator of the entity
 	 * 
 	 * @since $version
 	 * @author hceylan

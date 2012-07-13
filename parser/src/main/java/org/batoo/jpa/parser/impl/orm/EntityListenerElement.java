@@ -18,11 +18,13 @@
  */
 package org.batoo.jpa.parser.impl.orm;
 
+import java.util.List;
 import java.util.Map;
 
+import org.batoo.jpa.parser.metadata.CallbackMetadata;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.Lists;
 
 /**
  * Element for <code>entity-listener</code> elements.
@@ -32,11 +34,14 @@ import com.google.common.collect.Maps;
  */
 public class EntityListenerElement extends ParentElement implements EntityListenerMetadata {
 
-	private abstract static class Callback extends ChildElement {
+	private abstract static class CallbackElement extends ChildElement implements CallbackMetadata {
 
 		private String name;
+		private final EntityListenerType type;
 
 		/**
+		 * @param type
+		 *            the callback type
 		 * @param parent
 		 *            the parent element factory
 		 * @param attributes
@@ -45,8 +50,10 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 * @since $version
 		 * @author hceylan
 		 */
-		public Callback(ParentElement parent, Map<String, String> attributes) {
+		public CallbackElement(EntityListenerType type, ParentElement parent, Map<String, String> attributes) {
 			super(parent, attributes);
+
+			this.type = type;
 		}
 
 		/**
@@ -66,8 +73,22 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 * @since $version
 		 * @author hceylan
 		 */
+		@Override
 		public String getName() {
 			return this.name;
+		}
+
+		/**
+		 * Returns the type of the callback.
+		 * 
+		 * @return the type of the callback
+		 * 
+		 * @since $version
+		 * @author hceylan
+		 */
+		@Override
+		public EntityListenerType getType() {
+			return this.type;
 		}
 	}
 
@@ -76,7 +97,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 	 * @author hceylan
 	 * @since $version
 	 */
-	public static class PostLoadElement extends Callback {
+	public static class PostLoadElement extends CallbackElement {
 
 		/**
 		 * @param parent
@@ -88,7 +109,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 * @author hceylan
 		 */
 		public PostLoadElement(ParentElement parent, Map<String, String> attributes) {
-			super(parent, attributes);
+			super(EntityListenerType.POST_LOAD, parent, attributes);
 		}
 	};
 
@@ -97,7 +118,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 	 * @author hceylan
 	 * @since $version
 	 */
-	public static class PostPersistElement extends Callback {
+	public static class PostPersistElement extends CallbackElement {
 
 		/**
 		 * @param parent
@@ -109,7 +130,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 * @author hceylan
 		 */
 		public PostPersistElement(ParentElement parent, Map<String, String> attributes) {
-			super(parent, attributes);
+			super(EntityListenerType.POST_PERSIST, parent, attributes);
 		}
 	};
 
@@ -118,7 +139,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 	 * @author hceylan
 	 * @since $version
 	 */
-	public static class PostRemoveElement extends Callback {
+	public static class PostRemoveElement extends CallbackElement {
 
 		/**
 		 * @param parent
@@ -130,7 +151,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 * @author hceylan
 		 */
 		public PostRemoveElement(ParentElement parent, Map<String, String> attributes) {
-			super(parent, attributes);
+			super(EntityListenerType.POST_REMOVE, parent, attributes);
 		}
 	};
 
@@ -139,7 +160,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 	 * @author hceylan
 	 * @since $version
 	 */
-	public static class PostUpdateElement extends Callback {
+	public static class PostUpdateElement extends CallbackElement {
 
 		/**
 		 * @param parent
@@ -151,7 +172,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 * @author hceylan
 		 */
 		public PostUpdateElement(ParentElement parent, Map<String, String> attributes) {
-			super(parent, attributes);
+			super(EntityListenerType.PRE_UPDATE, parent, attributes);
 		}
 	};
 
@@ -160,7 +181,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 	 * @author hceylan
 	 * @since $version
 	 */
-	public static class PrePersistElement extends Callback {
+	public static class PrePersistElement extends CallbackElement {
 
 		/**
 		 * @param parent
@@ -172,7 +193,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 * @author hceylan
 		 */
 		public PrePersistElement(ParentElement parent, Map<String, String> attributes) {
-			super(parent, attributes);
+			super(EntityListenerType.PRE_PERSIST, parent, attributes);
 		}
 	};
 
@@ -181,7 +202,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 	 * @author hceylan
 	 * @since $version
 	 */
-	public static class PreRemoveElement extends Callback {
+	public static class PreRemoveElement extends CallbackElement {
 
 		/**
 		 * @param parent
@@ -193,7 +214,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 * @author hceylan
 		 */
 		public PreRemoveElement(ParentElement parent, Map<String, String> attributes) {
-			super(parent, attributes);
+			super(EntityListenerType.PRE_REMOVE, parent, attributes);
 		}
 	};
 
@@ -202,7 +223,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 	 * @author hceylan
 	 * @since $version
 	 */
-	public static class PreUpdateElement extends Callback {
+	public static class PreUpdateElement extends CallbackElement {
 
 		/**
 		 * @param parent
@@ -214,12 +235,12 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 * @author hceylan
 		 */
 		public PreUpdateElement(ParentElement parent, Map<String, String> attributes) {
-			super(parent, attributes);
+			super(EntityListenerType.PRE_UPDATE, parent, attributes);
 		}
 	};
 
 	private String clazz;
-	private final Map<EntityListenerType, String> listeners = Maps.newHashMap();
+	private final List<CallbackMetadata> callbacks = Lists.newArrayList();
 
 	/**
 	 * @param parent
@@ -256,7 +277,16 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 	 * 
 	 */
 	@Override
-	public String getClazz() {
+	public List<CallbackMetadata> getCallbacks() {
+		return this.callbacks;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getClassName() {
 		return this.clazz;
 	}
 
@@ -265,45 +295,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 	 * 
 	 */
 	@Override
-	public Map<EntityListenerType, String> getListeners() {
-		return this.listeners;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	protected void handleChild(Element child) {
-		final Callback callback = (Callback) child;
-
-		if (child instanceof PostLoadElement) {
-			this.listeners.put(EntityListenerType.POST_LOAD, callback.getName());
-		}
-
-		if (child instanceof PostPersistElement) {
-			this.listeners.put(EntityListenerType.POST_PERSIST, callback.getName());
-		}
-
-		if (child instanceof PostRemoveElement) {
-			this.listeners.put(EntityListenerType.POST_REMOVE, callback.getName());
-		}
-
-		if (child instanceof PostUpdateElement) {
-			this.listeners.put(EntityListenerType.POST_UPDATE, callback.getName());
-		}
-
-		if (child instanceof PrePersistElement) {
-			this.listeners.put(EntityListenerType.PRE_PERSIST, callback.getName());
-		}
-
-		if (child instanceof PreRemoveElement) {
-			this.listeners.put(EntityListenerType.PRE_REMOVE, callback.getName());
-		}
-
-		if (child instanceof PreUpdateElement) {
-			this.listeners.put(EntityListenerType.PRE_UPDATE, callback.getName());
-		}
-
+		this.callbacks.add((CallbackMetadata) child);
 	}
 }

@@ -27,6 +27,7 @@ import java.util.Locale;
 
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.LockModeType;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.DbUtils;
@@ -67,6 +68,20 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 
 		this.loadReservedWords();
 	}
+
+	/**
+	 * Applies the lock to SQL string.
+	 * 
+	 * @param sql
+	 *            the SQL to apply
+	 * @param lockMode
+	 *            the lock mode
+	 * @return the modified SQL
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract String applyLock(String sql, LockModeType lockMode);
 
 	/**
 	 * Creates the BasicColumn Definition DDL For the column.

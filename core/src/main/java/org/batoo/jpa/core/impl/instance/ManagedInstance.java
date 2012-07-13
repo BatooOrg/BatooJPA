@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Set;
 
+import javax.persistence.LockModeType;
 import javax.persistence.PersistenceException;
 import javax.persistence.metamodel.PluralAttribute.CollectionType;
 
@@ -67,6 +68,7 @@ public class ManagedInstance<X> {
 	private final X instance;
 	private Status status;
 	private boolean optimisticLock;
+	private LockModeType lockMode;
 
 	private final SingularMapping<? super X, ?> idMapping;
 	private final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>[] idMappings;
@@ -81,6 +83,11 @@ public class ManagedInstance<X> {
 
 	private ManagedId<? super X> id;
 	private int h;
+
+	/**
+	 * The current lock mode context.
+	 */
+	public static ThreadLocal<LockModeType> LOCK_CONTEXT = new ThreadLocal<LockModeType>();
 
 	/**
 	 * @param type
@@ -99,6 +106,7 @@ public class ManagedInstance<X> {
 		this.type = type;
 		this.session = session;
 		this.instance = instance;
+		this.lockMode = ManagedInstance.LOCK_CONTEXT.get();
 
 		this.associationsChanged = Sets.newHashSet();
 		this.associationsLoaded = Sets.newHashSet();
@@ -515,6 +523,18 @@ public class ManagedInstance<X> {
 	}
 
 	/**
+	 * Returns the lock mode of the instance.
+	 * 
+	 * @return the lock mode
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public LockModeType getLockMode() {
+		return this.lockMode;
+	}
+
+	/**
 	 * Returns the session.
 	 * 
 	 * @return the session
@@ -772,14 +792,16 @@ public class ManagedInstance<X> {
 	 *            the entity manager
 	 * @param connection
 	 *            the connection
+	 * @param lockMode
+	 *            the lock mode
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void refresh(EntityManagerImpl entityManager, ConnectionImpl connection) {
+	public void refresh(EntityManagerImpl entityManager, ConnectionImpl connection, LockModeType lockMode) {
 		ManagedInstance.LOG.debug("Refeshing instance {0}", this);
 
-		this.type.performRefresh(connection, this);
+		this.type.performRefresh(connection, this, lockMode);
 
 		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociations()) {
 			if (association instanceof PluralAssociationMapping) {

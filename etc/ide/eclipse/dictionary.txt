@@ -72,3 +72,4 @@ detachable
 refreshable
 mergable
 foo
+callbacks

@@ -144,5 +144,4 @@ public class JoinColumnMetadataImpl implements JoinColumnMetadata {
 	public boolean isUpdatable() {
 		return this.updatable;
 	}
-
 }
