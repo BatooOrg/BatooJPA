@@ -19,15 +19,20 @@
 package org.batoo.jpa.core.impl.instance;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Set;
 
+import javax.persistence.PersistenceException;
 import javax.persistence.metamodel.PluralAttribute.CollectionType;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.mutable.MutableBoolean;
+import org.batoo.jpa.common.log.BLogger;
+import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -55,10 +60,13 @@ import com.google.common.collect.Sets;
  */
 public class ManagedInstance<X> {
 
+	private static final BLogger LOG = BLoggerFactory.getLogger(ManagedInstance.class);
+
 	private final EntityTypeImpl<X> type;
 	private final SessionImpl session;
 	private final X instance;
 	private Status status;
+	private boolean optimisticLock;
 
 	private final SingularMapping<? super X, ?> idMapping;
 	private final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>[] idMappings;
@@ -148,6 +156,8 @@ public class ManagedInstance<X> {
 	public void cascadeDetach(EntityManagerImpl entityManager) {
 		this.status = Status.DETACHED;
 
+		ManagedInstance.LOG.debug("Cascading detach on {0}", this);
+
 		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsDetachable()) {
 
 			// if the association a collection attribute then we will cascade to each element
@@ -189,6 +199,8 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public boolean cascadePersist(EntityManagerImpl entityManager, IdentityHashMap<Object, Object> processed) {
+		ManagedInstance.LOG.debug("Cascading persist on {0}", this);
+
 		boolean requiresFlush = false;
 
 		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsPersistable()) {
@@ -232,6 +244,8 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void cascadeRemove(EntityManagerImpl entityManager) {
+		ManagedInstance.LOG.debug("Cascading remove on {0}", this);
+
 		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsRemovable()) {
 
 			// if the association a collection attribute then we will cascade to each element
@@ -319,6 +333,38 @@ public class ManagedInstance<X> {
 	}
 
 	/**
+	 * Checks the optimistic lock for the instance.
+	 * 
+	 * @param connection
+	 *            the connection
+	 * @throws SQLException
+	 *             thrown in case of an SQL error
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void checkVersion(ConnectionImpl connection) throws SQLException {
+		// no optimistic lock, nothing to check
+		if (!this.optimisticLock) {
+			ManagedInstance.LOG.debug("No optimistic lock support on {0}", this);
+			return;
+		}
+
+		final EntityTypeImpl<? super X> rootType = this.type.getRootType();
+		final Object currentVersion = rootType.getVersionAttribute().get(this.instance);
+		final Object expectedVersion = rootType.performSelectVersion(connection, this);
+
+		if (ObjectUtils.notEqual(currentVersion, expectedVersion)) {
+			ManagedInstance.LOG.debug("Optimistic lock matches on {0}: {1}", this, expectedVersion);
+
+			throw new PersistenceException("Entity was updated by a different transaction " + this.instance);
+		}
+		else {
+			ManagedInstance.LOG.debug("Optimistic lock mismatches on {0}, found {1}, expected {2}", this, expectedVersion);
+		}
+	}
+
+	/**
 	 * Enhances the collections of the managed instance.
 	 * 
 	 * @since $version
@@ -360,6 +406,8 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public boolean fillIdValues() {
+		ManagedInstance.LOG.debug("Auto generating id values for {0}", this);
+
 		if (this.idMapping != null) {
 			return this.idMapping.fillValue(this.instance);
 		}
@@ -387,6 +435,8 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void flush(ConnectionImpl connection) throws SQLException {
+		ManagedInstance.LOG.debug("Flushing instance {0}", this);
+
 		switch (this.status) {
 			case NEW:
 				this.type.performInsert(connection, this);
@@ -419,6 +469,8 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void flushAssociations(ConnectionImpl connection, boolean removals, boolean force) throws SQLException {
+		ManagedInstance.LOG.debug("Flushing associations for instance {0}", this);
+
 		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsJoined()) {
 			association.flush(connection, this, removals, force);
 		}
@@ -502,6 +554,8 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void handleAdditions(EntityManagerImpl entityManager) {
+		ManagedInstance.LOG.debug("Inspecting additions for instance {0}", this);
+
 		for (final PluralAssociationMapping<?, ?, ?> association : this.associationsChanged) {
 			association.persistAdditions(entityManager, this);
 		}
@@ -517,6 +571,8 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void handleOrphans(EntityManagerImpl entityManager) {
+		ManagedInstance.LOG.debug("Inspecting orphans for instance {0}", this);
+
 		for (final PluralAssociationMapping<?, ?, ?> association : this.associationsChanged) {
 			association.removeOrphans(entityManager, this);
 		}
@@ -543,6 +599,94 @@ public class ManagedInstance<X> {
 		this.h = (prime * result) + this.type.getRootType().getName().hashCode();
 
 		return this.h = (prime * result) + id.hashCode();
+	}
+
+	/**
+	 * Increments the version of the instance.
+	 * 
+	 * @param connection
+	 *            the connection
+	 * @param commit
+	 *            true if version update should be committed immediately
+	 * @throws SQLException
+	 *             thrown in case of an underlying SQL error
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void incrementVersion(ConnectionImpl connection, boolean commit) throws SQLException {
+		if (!this.type.getRootType().hasVersionAttribute()) {
+			return;
+		}
+
+		final EntityTypeImpl<? super X> rootType = this.type.getRootType();
+
+		final BasicAttribute<? super X, ?> version = rootType.getVersionAttribute();
+
+		switch (this.type.getVersionType()) {
+			case SHORT:
+				final short shortValue = (short) (((Number) version.get(this.instance)).shortValue() + 1);
+				version.set(this.instance, shortValue);
+
+				ManagedInstance.LOG.debug("Version upgraded instance: {0} - {1}", this, shortValue);
+
+				break;
+			case SHORT_OBJECT:
+				final Short shortObjValue = version.get(this.instance) == null ? 0 //
+					: new Short((short) (((Number) version.get(this.instance)).shortValue() + 1));
+				version.set(this.instance, shortObjValue);
+
+				ManagedInstance.LOG.debug("Version upgraded instance: {0} - {1}", this, shortObjValue);
+
+				break;
+
+			case INT:
+				final int intValue = (((Number) version.get(this.instance)).intValue() + 1);
+				version.set(this.instance, intValue);
+
+				ManagedInstance.LOG.debug("Version upgraded instance: {0} - {1}", this, intValue);
+
+				break;
+			case INT_OBJECT:
+				final Integer intObjValue = version.get(this.instance) == null ? 0 : //
+					new Integer((((Number) version.get(this.instance)).intValue() + 1));
+				version.set(this.instance, intObjValue);
+
+				ManagedInstance.LOG.debug("Version upgraded instance: {0} - {1}", this, intObjValue);
+
+				break;
+
+			case LONG:
+				final long longValue = (((Number) version.get(this.instance)).longValue() + 1);
+				version.set(this.instance, longValue);
+
+				ManagedInstance.LOG.debug("Version upgraded instance: {0} - {1}", this, longValue);
+
+				break;
+			case LONG_OBJECT:
+				final Long longObjValue = version.get(this.instance) == null ? 0 : //
+					new Long((((Number) version.get(this.instance)).longValue() + 1));
+				version.set(this.instance, longObjValue);
+
+				ManagedInstance.LOG.debug("Version upgraded instance: {0} - {1}", this, longObjValue);
+
+				break;
+
+			case TIMESTAMP:
+				final Timestamp value = new Timestamp(System.currentTimeMillis());
+				version.set(this.instance, value);
+
+				ManagedInstance.LOG.debug("Version upgraded instance: {0} - {1}", this, value);
+		}
+
+		if (commit) {
+			rootType.performVersionUpdate(connection, this);
+
+			ManagedInstance.LOG.debug("Version committed instance: {0} - {1}", this);
+		}
+		else {
+			this.changed = true;
+		}
 	}
 
 	/**
@@ -585,6 +729,8 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void mergeWith(EntityManagerImpl entityManager, X entity, MutableBoolean requiresFlush, IdentityHashMap<Object, Object> processed) {
+		ManagedInstance.LOG.debug("Merging instance  {0} with {1}", this, entity);
+
 		this.snapshot();
 
 		for (final BasicMapping<?, ?> mapping : this.type.getBasicMappings()) {
@@ -605,6 +751,8 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void processAssociations() {
+		ManagedInstance.LOG.debug("Post processing associations for instance {0}", this);
+
 		for (final PluralAssociationMapping<?, ?, ?> association : this.type.getAssociationsPlural()) {
 			if (!this.associationsLoaded.contains(association)) {
 				if (association.isEager()) {
@@ -629,6 +777,8 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void refresh(EntityManagerImpl entityManager, ConnectionImpl connection) {
+		ManagedInstance.LOG.debug("Refeshing instance {0}", this);
+
 		this.type.performRefresh(connection, this);
 
 		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociations()) {
@@ -650,6 +800,8 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void reset() {
+		ManagedInstance.LOG.debug("Reset instance {0}", this);
+
 		this.associationsChanged.clear();
 
 		this.changed = false;
@@ -667,6 +819,8 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void setAssociationChanged(PluralAssociationMapping<?, ?, ?> association) {
+		ManagedInstance.LOG.debug("Association changed for instance: {0}", this, association);
+
 		if ((this.associationsChanged.size() == 0) && !this.changed) {
 			this.session.setChanged(this);
 		}
@@ -701,6 +855,18 @@ public class ManagedInstance<X> {
 	}
 
 	/**
+	 * Sets the optimistic lock on
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setOptimisticLock() {
+		ManagedInstance.LOG.debug("Optimistic lock enabled for instance {0}", this);
+
+		this.optimisticLock = true;
+	}
+
+	/**
 	 * Marks the instance as refreshing.
 	 * 
 	 * @param refreshing
@@ -721,7 +887,11 @@ public class ManagedInstance<X> {
 	 * @since $version
 	 */
 	public void setStatus(Status status) {
-		this.status = status;
+		if (status != this.status) {
+			ManagedInstance.LOG.debug("Instance status changing for {0}: {1} -> {2}", this, this.status, status);
+
+			this.status = status;
+		}
 	}
 
 	/**
@@ -731,6 +901,8 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	private void snapshot() {
+		ManagedInstance.LOG.debug("Snapshot generated for instance {0}", this);
+
 		for (final Mapping<?, ?, ?> mapping : this.type.getMappingsSingular()) {
 			this.snapshot.put(mapping, mapping.get(this.instance));
 		}
@@ -745,7 +917,7 @@ public class ManagedInstance<X> {
 		return "ManagedInstance [session=" + this.session.getSessionId() //
 			+ ", type=" + this.type.getName() //
 			+ ", status=" + this.status //
-			+ ", id=" + this.id.getId() //
+			+ ", id=" + (this.id != null ? this.id.getId() : null) //
 			+ ", instance=" //
 			+ this.instance + "]";
 	}

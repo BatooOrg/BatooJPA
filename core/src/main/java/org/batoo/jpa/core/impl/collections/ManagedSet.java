@@ -388,7 +388,10 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 */
 	@Override
 	public String toString() {
-		return "ManagedSet [initialized=" + this.initialized + ", managedInstance=" + this.getManagedInstance() + ", delegate=" + this.delegate + ", snapshot="
-			+ this.snapshot + ", mapping=" + this.getAssociation() + "]";
+		final Object id = this.getManagedInstance().getId() != null ? this.getManagedInstance().getId().getId() : null;
+		final String instance = this.getManagedInstance().getType().getName() + "@" + id;
+
+		return "ManagedSet [initialized=" + this.initialized + ", managedInstance=" + instance + ", delegate=" + this.delegate + ", snapshot=" + this.snapshot
+			+ ", mapping=" + this.getAssociation() + "]";
 	}
 }

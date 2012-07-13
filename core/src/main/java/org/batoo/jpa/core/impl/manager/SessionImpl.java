@@ -26,6 +26,8 @@ import java.util.List;
 
 import javax.persistence.PersistenceException;
 
+import org.batoo.jpa.common.log.BLogger;
+import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
@@ -45,6 +47,8 @@ import com.google.common.collect.Sets;
  * @since $version
  */
 public class SessionImpl {
+
+	private static final BLogger LOG = BLoggerFactory.getLogger(SessionImpl.class);
 
 	private static volatile int nextSessionId = 0;
 
@@ -86,6 +90,8 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public void cascadeRemovals() {
+		SessionImpl.LOG.debug("Cascading removals on session {0}", this.sessionId);
+
 		final ArrayList<ManagedInstance<?>> instances = Lists.newArrayList(this.changedEntities);
 		for (final ManagedInstance<?> instance : instances) {
 			if (instance.getStatus() == Status.REMOVED) {
@@ -104,6 +110,8 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public void checkTransient(Object instance) {
+		SessionImpl.LOG.debug("Transients are being checked on instance {0}", instance);
+
 		if (instance instanceof EnhancedInstance) {
 			final ManagedInstance<?> associate = ((EnhancedInstance) instance).__enhanced__$$__getManagedInstance();
 			if ((associate.getStatus() != Status.MANAGED) && (associate.getSession() == this)) {
@@ -125,10 +133,60 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public void clear() {
+		SessionImpl.LOG.debug("Session clearing {0}", this.sessionId);
+
 		// TODO detach all the entities if there is in existing repository
 		this.repository.clear();
 		this.externalEntities.clear();
 		this.changedEntities.clear();
+	}
+
+	/**
+	 * Checks the versions for Optimistic locking on instances.
+	 * 
+	 * @param connection
+	 *            the connection
+	 * @param removals
+	 *            the removals
+	 * @param updates
+	 *            the updates
+	 * @throws SQLException
+	 *             thrown in case of an SQL error
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void doVersionChecks(ConnectionImpl connection, ManagedInstance<?>[] removals, ManagedInstance<?>[] updates) throws SQLException {
+		SessionImpl.LOG.debug("Performing version checks on session {0}", this.sessionId);
+
+		for (final ManagedInstance<?> instance : removals) {
+			instance.checkVersion(connection);
+		}
+
+		for (final ManagedInstance<?> instance : updates) {
+			instance.checkVersion(connection);
+		}
+	}
+
+	/**
+	 * Increments the versions.
+	 * 
+	 * @param connection
+	 *            the connection
+	 * @param updates
+	 *            the updates
+	 * @throws SQLException
+	 *             thrown in case of an SQL error
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void doVersionUpgrades(ConnectionImpl connection, ManagedInstance<?>[] updates) throws SQLException {
+		SessionImpl.LOG.debug("Performing version upgrades on session {0}", this.sessionId);
+
+		for (final ManagedInstance<?> instance : updates) {
+			instance.incrementVersion(connection, false);
+		}
 	}
 
 	/**
@@ -143,6 +201,8 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public void flush(ConnectionImpl connection) throws SQLException {
+		SessionImpl.LOG.debug("Flushing session {0}", this.sessionId);
+
 		final int totalSize = this.externalEntities.size() + this.changedEntities.size();
 		final ArrayList<ManagedInstance<?>> updates = Lists.newArrayListWithCapacity(totalSize);
 		final ArrayList<ManagedInstance<?>> removals = Lists.newArrayListWithCapacity(totalSize);
@@ -155,6 +215,12 @@ public class SessionImpl {
 		final ManagedInstance<?>[] sortedRemovals = new ManagedInstance[removals.size()];
 
 		Prioritizer.sort(updates, removals, sortedUpdates, sortedRemovals);
+
+		SessionImpl.LOG.debug("Flushing session {0}: updates {1}, removals {2}", this.sessionId, sortedUpdates.length, sortedRemovals.length);
+
+		this.doVersionChecks(connection, sortedRemovals, sortedUpdates);
+
+		this.doVersionUpgrades(connection, sortedUpdates);
 
 		for (final ManagedInstance<?> instance : sortedRemovals) {
 			instance.flushAssociations(connection, true, false);
@@ -177,6 +243,8 @@ public class SessionImpl {
 			instance.flushAssociations(connection, false, !this.newEntities.isEmpty() && this.newEntities.contains(instance));
 			instance.reset();
 		}
+
+		SessionImpl.LOG.debug("Flush successful for session {0}", this.sessionId);
 
 		this.changedEntities.clear();
 		this.newEntities.clear();
@@ -256,6 +324,8 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public void handleAdditions() {
+		SessionImpl.LOG.debug("Processing additions to the session {0}", this.sessionId);
+
 		for (final ManagedInstance<?> instance : this.changedEntities) {
 			instance.handleAdditions(this.em);
 		}
@@ -268,6 +338,8 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public void handleExternals() {
+		SessionImpl.LOG.debug("Inspecting updated external entities on session {0}", this.sessionId);
+
 		for (final ManagedInstance<?> instance : this.externalEntities) {
 			instance.checkUpdated();
 		}
@@ -280,6 +352,8 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public void handleOrphans() {
+		SessionImpl.LOG.debug("Inspecting orphan on session {0}", this.sessionId);
+
 		for (final ManagedInstance<?> instance : this.changedEntities) {
 			if (instance.getStatus() != Status.REMOVED) {
 				instance.handleOrphans(this.em);
@@ -297,6 +371,8 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public void lazyInstanceLoading(ManagedInstance<?> instance) {
+		SessionImpl.LOG.debug("Lazy instance is being loaded {0}", instance);
+
 		this.entitiesLoading.add(instance);
 	}
 
@@ -350,6 +426,8 @@ public class SessionImpl {
 		this.loadTracker--;
 
 		if (this.loadTracker == 0) {
+			SessionImpl.LOG.debug("Load tracker is released on session {0}", this.sessionId);
+
 			// swap the set
 			final List<ManagedInstance<?>> entitiesLoaded = this.entitiesLoading;
 			this.entitiesLoading = Lists.newArrayList();
@@ -405,6 +483,8 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public void setChanged(ManagedInstance<?> instance) {
+		SessionImpl.LOG.debug("Instance changed {0}", instance);
+
 		this.changedEntities.add(instance);
 
 		if (instance.getStatus() == Status.REMOVED) {
@@ -420,5 +500,10 @@ public class SessionImpl {
 	 */
 	public void setLoadTracker() {
 		this.loadTracker++;
+
+		if (this.loadTracker == 1) {
+			SessionImpl.LOG.debug("Load tracker is triggered on session {0}", this.sessionId);
+		}
+
 	}
 }

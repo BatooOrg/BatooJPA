@@ -632,7 +632,10 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 */
 	@Override
 	public String toString() {
-		return "ManagedList [initialized=" + this.initialized + ", managedInstance=" + this.getManagedInstance() + ", delegate=" + this.delegate
-			+ ", snapshot=" + this.snapshot + ", mapping=" + this.getAssociation() + "]";
+		final Object id = this.getManagedInstance().getId() != null ? this.getManagedInstance().getId().getId() : null;
+		final String instance = this.getManagedInstance().getType().getName() + "@" + id;
+
+		return "ManagedList [initialized=" + this.initialized + ", managedInstance=" + instance + ", delegate=" + this.delegate + ", snapshot=" + this.snapshot
+			+ ", mapping=" + this.getAssociation() + "]";
 	}
 }

@@ -32,6 +32,7 @@ import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
 import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
+import org.batoo.jpa.core.impl.model.attribute.VersionType;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
 import org.batoo.jpa.parser.metadata.attribute.EmbeddedIdAttributeMetadata;
@@ -64,6 +65,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 
 	private BasicAttribute<X, ?> declaredVersionAttribute;
 	private BasicAttribute<? super X, ?> versionAttribute;
+	private VersionType versionType;
 
 	/**
 	 * @param metamodel
@@ -125,6 +127,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 				}
 
 				this.versionAttribute = basicAttribute;
+				this.versionType = VersionType.versionType(this.versionAttribute.getJavaType());
 			}
 
 		}
@@ -339,6 +342,30 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 		}
 
 		return (BasicAttribute<? super X, Y>) this.versionAttribute;
+	}
+
+	/**
+	 * Returns the version attribute.
+	 * 
+	 * @return the version attribute
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public BasicAttribute<? super X, ?> getVersionAttribute() {
+		return this.versionAttribute;
+	}
+
+	/**
+	 * Returns the type of the version attribute.
+	 * 
+	 * @return the type of the version attribute
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public VersionType getVersionType() {
+		return this.versionType;
 	}
 
 	/**

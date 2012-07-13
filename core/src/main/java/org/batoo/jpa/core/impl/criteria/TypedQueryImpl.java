@@ -42,6 +42,8 @@ import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
  */
 public class TypedQueryImpl<X> extends BaseTypedQuery<X> {
 
+	private LockModeType lockMode;
+
 	/**
 	 * @param criteriaQuery
 	 *            the criteria query
@@ -101,8 +103,7 @@ public class TypedQueryImpl<X> extends BaseTypedQuery<X> {
 	 */
 	@Override
 	public LockModeType getLockMode() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.lockMode;
 	}
 
 	/**
@@ -241,8 +242,9 @@ public class TypedQueryImpl<X> extends BaseTypedQuery<X> {
 	 */
 	@Override
 	public TypedQuery<X> setLockMode(LockModeType lockMode) {
-		// TODO Auto-generated method stub
-		return null;
+		this.lockMode = lockMode;
+
+		return this;
 	}
 
 	/**

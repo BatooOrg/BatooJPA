@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
+import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.parser.MappingException;
@@ -58,10 +60,15 @@ public class AbstractTable {
 	private final Map<EntityTypeImpl<?>, String> updateSqlMap = Maps.newHashMap();
 	private String insertSql;
 	private String updateSql;
+	private String versionUpdateSql;
+	private String versionSelectSql;
 
 	private AbstractColumn[] insertColumns;
 	private AbstractColumn[] updateColumns;
+	private AbstractColumn[] versionUpdateColumns;
+	private PkColumn[] selectVersionColumns;
 	private final Map<EntityTypeImpl<?>, AbstractColumn[]> insertColumnsMap = Maps.newHashMap();
+
 	private final Map<EntityTypeImpl<?>, AbstractColumn[]> updateColumnsMap = Maps.newHashMap();
 
 	/**
@@ -226,6 +233,52 @@ public class AbstractTable {
 	}
 
 	/**
+	 * Generates the version select statement for the type.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 * @param pkColumns
+	 */
+	private synchronized void generateSelectVersionSql(Map<String, PkColumn> pkColumns) {
+		if (this.versionSelectSql != null) {
+			return;
+		}
+
+		AbstractColumn versionColumn = null;
+
+		for (final AbstractColumn column : this.getColumns()) {
+			final AttributeImpl<?, ?> attribute = column.getMapping().getAttribute();
+
+			if ((attribute instanceof BasicAttribute) && ((BasicAttribute<?, ?>) attribute).isVersion()) {
+				versionColumn = column;
+
+				break;
+			}
+		}
+
+		final List<PkColumn> selectVersionColumns = Lists.newArrayList();
+
+		final Collection<String> restrictions = Collections2.transform(pkColumns.values(), new Function<PkColumn, String>() {
+
+			@Override
+			public String apply(PkColumn input) {
+				selectVersionColumns.add(input);
+
+				return input.getName() + " = ?";
+			}
+		});
+
+		final String restrictionStr = Joiner.on(" AND ").join(restrictions);
+
+		// SELECT VERSION_COLUMN FROM SCHEMA.TABLE SET
+		// WHERE (PARAM [, PARAM]*)
+		this.versionSelectSql = "SELECT " + versionColumn.getName() + " FROM " + this.getQName() //
+			+ "\nWHERE " + restrictionStr;
+
+		this.selectVersionColumns = selectVersionColumns.toArray(new PkColumn[selectVersionColumns.size()]);
+	}
+
+	/**
 	 * Generates the update statement for the type.
 	 * 
 	 * @param type
@@ -298,7 +351,7 @@ public class AbstractTable {
 
 		// UPDATE SCHEMA.TABLE SET
 		// (COL [, COL]*)
-		// VALUES (PARAM [, PARAM]*)
+		// WHERE ID = ? [, ID = ?]*)
 		sql = "UPDATE " + this.getQName() + " SET"//
 			+ "\n" + columnNamesStr //
 			+ "\nWHERE " + restrictionStr;
@@ -311,6 +364,53 @@ public class AbstractTable {
 			this.updateSql = sql;
 			this.updateColumns = updateColumns.toArray(new AbstractColumn[updateColumns.size()]);
 		}
+	}
+
+	/**
+	 * Generates the version update statement for the type.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 * @param pkColumns
+	 */
+	private synchronized void generateVersionUpdateSql(Map<String, PkColumn> pkColumns) {
+		if (this.versionUpdateSql != null) {
+			return;
+		}
+
+		final List<AbstractColumn> versionUpdateColumns = Lists.newArrayList();
+
+		for (final AbstractColumn column : this.getColumns()) {
+			final AttributeImpl<?, ?> attribute = column.getMapping().getAttribute();
+
+			if ((attribute instanceof BasicAttribute) && ((BasicAttribute<?, ?>) attribute).isVersion()) {
+				versionUpdateColumns.add(column);
+
+				break;
+			}
+		}
+
+		final Collection<String> restrictions = Collections2.transform(pkColumns.values(), new Function<PkColumn, String>() {
+
+			@Override
+			public String apply(PkColumn input) {
+				versionUpdateColumns.add(input);
+
+				return input.getName() + " = ?";
+			}
+		});
+
+		final String columnNamesStr = versionUpdateColumns.get(0).getName() + " = ?";
+		final String restrictionStr = Joiner.on(" AND ").join(restrictions);
+
+		// UPDATE SCHEMA.TABLE SET
+		// (COL [, COL]*)
+		// VALUES (PARAM [, PARAM]*)
+		this.versionUpdateSql = "UPDATE " + this.getQName() + " SET"//
+			+ "\n" + columnNamesStr //
+			+ "\nWHERE " + restrictionStr;
+
+		this.versionUpdateColumns = versionUpdateColumns.toArray(new AbstractColumn[versionUpdateColumns.size()]);
 	}
 
 	/**
@@ -445,6 +545,36 @@ public class AbstractTable {
 	}
 
 	/**
+	 * Returns the select version columns.
+	 * 
+	 * @return the select version columns
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public PkColumn[] getSelectVersionColumns() {
+		return this.selectVersionColumns;
+	}
+
+	/**
+	 * Returns the version select statement for the table specifically.
+	 * 
+	 * @param pkColumns
+	 *            the primary key columns
+	 * @return the select statement
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected String getSelectVersionSql(Map<String, PkColumn> pkColumns) {
+		if (this.versionSelectSql == null) {
+			this.generateSelectVersionSql(pkColumns);
+		}
+
+		return this.versionSelectSql;
+	}
+
+	/**
 	 * Returns the unique constraints.
 	 * 
 	 * @return the unique constraints
@@ -503,6 +633,36 @@ public class AbstractTable {
 		}
 
 		return sql;
+	}
+
+	/**
+	 * Returns the version update columns.
+	 * 
+	 * @return the version update columns
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public AbstractColumn[] getVersionUpdateColumns() {
+		return this.versionUpdateColumns;
+	}
+
+	/**
+	 * Returns the version update statement for the table specifically.
+	 * 
+	 * @param pkColumns
+	 *            the primary key columns
+	 * @return the update statement
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected String getVersionUpdateSql(Map<String, PkColumn> pkColumns) {
+		if (this.updateSql == null) {
+			this.generateVersionUpdateSql(pkColumns);
+		}
+
+		return this.updateSql;
 	}
 
 	/**

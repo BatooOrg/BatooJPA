@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.InheritanceType;
+import javax.persistence.LockModeType;
 import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.FetchParent;
 import javax.persistence.criteria.JoinType;
@@ -1367,13 +1368,17 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 *            the entity manager to use
 	 * @param id
 	 *            the id of the instance to select
+	 * @param lockMode
+	 *            the lock mode
 	 * @return the instance found or null
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public X performSelect(EntityManagerImpl entityManager, Object id) {
+	public X performSelect(EntityManagerImpl entityManager, Object id, LockModeType lockMode) {
 		final TypedQueryImpl<X> q = entityManager.createQuery(this.getCriteriaSelect());
+
+		q.setLockMode(lockMode);
 
 		// if has single id then pass it on
 		if (this.hasSingleIdAttribute()) {
@@ -1390,6 +1395,26 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
+	 * Selects the version for the instance.
+	 * 
+	 * @param connection
+	 *            the connection to use
+	 * @param instance
+	 *            the managed instance to perform update for
+	 * @throws SQLException
+	 *             thrown in case of an SQL Error
+	 * @return returns the current version
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Object performSelectVersion(ConnectionImpl connection, ManagedInstance<? extends X> instance) throws SQLException {
+		return this.getTables()[0].performSelectVersion(connection, instance);
+	}
+
+	/**
+	 * Performs the update for the instance.
+	 * 
 	 * @param connection
 	 *            the connection to use
 	 * @param instance
@@ -1404,6 +1429,23 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		for (final EntityTable table : this.getTables()) {
 			table.performUpdate(connection, instance);
 		}
+	}
+
+	/**
+	 * Performs the version update for the instance.
+	 * 
+	 * @param connection
+	 *            the connection to use
+	 * @param instance
+	 *            the managed instance to perform update for
+	 * @throws SQLException
+	 *             thrown in case of an SQL Error
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void performVersionUpdate(ConnectionImpl connection, ManagedInstance<? extends X> instance) throws SQLException {
+		this.getTables()[0].performVersionUpdate(connection, instance);
 	}
 
 	/**

@@ -187,7 +187,7 @@ public class EntityTable extends AbstractTable {
 	 * @param connection
 	 *            the connection to use
 	 * @param managedInstance
-	 *            the managed instance to perform insert for
+	 *            the managed instance to perform remove for
 	 * @throws SQLException
 	 *             thrown in case of underlying SQLException
 	 * 
@@ -209,12 +209,46 @@ public class EntityTable extends AbstractTable {
 	}
 
 	/**
+	 * Selects the version from the table.
+	 * 
+	 * @param connection
+	 *            the connection to use
+	 * @param managedInstance
+	 *            the managed instance to perform select for
+	 * @return the version
+	 * @throws SQLException
+	 *             thrown in case of underlying SQLException
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Object performSelectVersion(ConnectionImpl connection, final ManagedInstance<?> managedInstance) throws SQLException {
+		final Object instance = managedInstance.getInstance();
+
+		// Do not inline, generation of the update SQL will initialize the insertColumns!
+		final String updateSql = this.getSelectVersionSql(this.pkColumns);
+		final AbstractColumn[] selectVersionColumns = this.getSelectVersionColumns();
+
+		// prepare the parameters
+		final Object[] params = new Object[selectVersionColumns.length];
+		for (int i = 0; i < selectVersionColumns.length; i++) {
+			final AbstractColumn column = selectVersionColumns[i];
+			params[i] = column.getValue(instance);
+		}
+
+		// execute the insert
+		final QueryRunner runner = new QueryRunner();
+
+		return runner.query(connection, updateSql, new SingleValueHandler<Object>(), params);
+	}
+
+	/**
 	 * Performs update to the table for the managed instance or joins.
 	 * 
 	 * @param connection
 	 *            the connection to use
 	 * @param managedInstance
-	 *            the managed instance to perform insert for
+	 *            the managed instance to perform update for
 	 * @throws SQLException
 	 *             thrown in case of underlying SQLException
 	 * 
@@ -233,6 +267,38 @@ public class EntityTable extends AbstractTable {
 		final Object[] params = new Object[updateColumns.length];
 		for (int i = 0; i < updateColumns.length; i++) {
 			final AbstractColumn column = updateColumns[i];
+			params[i] = column.getValue(instance);
+		}
+
+		// execute the insert
+		final QueryRunner runner = new QueryRunner();
+		runner.update(connection, updateSql, params);
+	}
+
+	/**
+	 * Performs version update to the table.
+	 * 
+	 * @param connection
+	 *            the connection to use
+	 * @param managedInstance
+	 *            the managed instance to perform version update for
+	 * @throws SQLException
+	 *             thrown in case of underlying SQLException
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void performVersionUpdate(ConnectionImpl connection, final ManagedInstance<?> managedInstance) throws SQLException {
+		final Object instance = managedInstance.getInstance();
+
+		// Do not inline, generation of the update SQL will initialize the insertColumns!
+		final String updateSql = this.getVersionUpdateSql(this.pkColumns);
+		final AbstractColumn[] versionUpdateColumns = this.getVersionUpdateColumns();
+
+		// prepare the parameters
+		final Object[] params = new Object[versionUpdateColumns.length];
+		for (int i = 0; i < versionUpdateColumns.length; i++) {
+			final AbstractColumn column = versionUpdateColumns[i];
 			params[i] = column.getValue(instance);
 		}
 

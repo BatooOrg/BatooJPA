@@ -385,27 +385,7 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public <T> T find(Class<T> entityClass, Object primaryKey) {
-		if (primaryKey == null) {
-			throw new NullPointerException();
-		}
-
-		// try to locate in the session
-		final EntityTypeImpl<T> type = this.metamodel.entity(entityClass);
-
-		final ManagedInstance<? extends T> instance = this.session.get(new ManagedId<T>(primaryKey, type));
-		if (instance != null) {
-			if (instance.getInstance() instanceof EnhancedInstance) {
-				final EnhancedInstance enhanced = (EnhancedInstance) instance.getInstance();
-				if (enhanced.__enhanced__$$__isInitialized()) {
-					return instance.getInstance();
-				}
-			}
-			else {
-				return instance.getInstance();
-			}
-		}
-
-		return type.performSelect(this, primaryKey);
+		return this.find(entityClass, primaryKey, null, null);
 	}
 
 	/**
@@ -414,7 +394,7 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public <T> T find(Class<T> entityClass, Object primaryKey, LockModeType lockMode) {
-		return null;
+		return this.find(entityClass, primaryKey, lockMode, null);
 	}
 
 	/**
@@ -423,8 +403,36 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public <T> T find(Class<T> entityClass, Object primaryKey, LockModeType lockMode, Map<String, Object> properties) {
-		// TODO Auto-generated method stub
-		return null;
+		if (primaryKey == null) {
+			throw new NullPointerException();
+		}
+
+		// try to locate in the session
+		final EntityTypeImpl<T> type = this.metamodel.entity(entityClass);
+
+		if ((lockMode == null) && type.getRootType().hasVersionAttribute()) {
+			lockMode = LockModeType.OPTIMISTIC;
+		}
+
+		final ManagedInstance<? extends T> instance = this.session.get(new ManagedId<T>(primaryKey, type));
+		if (instance != null) {
+			if (instance.getInstance() instanceof EnhancedInstance) {
+				final EnhancedInstance enhanced = (EnhancedInstance) instance.getInstance();
+				if (enhanced.__enhanced__$$__isInitialized()) {
+
+					this.lock(instance, lockMode, properties);
+
+					return instance.getInstance();
+				}
+			}
+			else {
+				this.lock(instance, lockMode, properties);
+
+				return instance.getInstance();
+			}
+		}
+
+		return type.performSelect(this, primaryKey, lockMode);
 	}
 
 	/**
@@ -433,8 +441,7 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public <T> T find(Class<T> entityClass, Object primaryKey, Map<String, Object> properties) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.find(entityClass, primaryKey, null, properties);
 	}
 
 	/**
@@ -456,6 +463,11 @@ public class EntityManagerImpl implements EntityManager {
 			EntityManagerImpl.LOG.error(e, "Flush failed");
 
 			throw new PersistenceException("Flush failed", e);
+		}
+		catch (final RuntimeException e) {
+			EntityManagerImpl.LOG.error(e, "Flush failed");
+
+			throw e;
 		}
 	}
 
@@ -649,12 +661,49 @@ public class EntityManagerImpl implements EntityManager {
 	}
 
 	/**
+	 * Locks the entity.
+	 * 
+	 * @param instance
+	 *            the managed instance
+	 * @param lockMode
+	 *            the lock mode
+	 * @param properties
+	 *            the properties
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void lock(ManagedInstance<?> instance, LockModeType lockMode, Map<String, Object> properties) {
+		// check optimistic lock is supported
+		if ((lockMode == LockModeType.OPTIMISTIC) || (lockMode == LockModeType.OPTIMISTIC_FORCE_INCREMENT)) {
+			final EntityTypeImpl<?> type = instance.getType().getRootType();
+			if (!type.hasVersionAttribute()) {
+				throw new PersistenceException("OPTIMISTIC and OPTIMISTIC_FORCE_INCREMENT not supported on non-versioned entity "
+					+ instance.getType().getName());
+			}
+
+			instance.setOptimisticLock();
+		}
+
+		if (lockMode == LockModeType.OPTIMISTIC_FORCE_INCREMENT) {
+			this.assertTransaction();
+
+			try {
+				instance.incrementVersion(this.getConnection(), true);
+			}
+			catch (final SQLException e) {
+				throw new PersistenceException("Unable to update version", e);
+			}
+		}
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
 	@Override
 	public void lock(Object entity, LockModeType lockMode) {
-		// TODO Auto-generated method stub
+		this.lock(entity, lockMode, null);
 	}
 
 	/**
@@ -663,7 +712,7 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public void lock(Object entity, LockModeType lockMode, Map<String, Object> properties) {
-		// TODO Auto-generated method stub
+		this.lock(this.session.get(entity), lockMode, properties);
 	}
 
 	/**
@@ -769,6 +818,9 @@ public class EntityManagerImpl implements EntityManager {
 		instance.setStatus(Status.NEW);
 		instance.enhanceCollections();
 		this.session.put(instance);
+		if (type.getRootType().hasVersionAttribute()) {
+			instance.setOptimisticLock();
+		}
 
 		processed.put(entity, instance.getInstance());
 
@@ -841,6 +893,9 @@ public class EntityManagerImpl implements EntityManager {
 		instance.setStatus(Status.NEW);
 		this.session.setChanged(instance);
 		instance.enhanceCollections();
+		if (type.getRootType().hasVersionAttribute()) {
+			instance.setOptimisticLock();
+		}
 
 		boolean requiresFlush = !instance.fillIdValues();
 		this.session.putExternal(instance);
@@ -858,6 +913,24 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public void refresh(Object entity) {
+		this.refresh(entity, LockModeType.NONE, null);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void refresh(Object entity, LockModeType lockMode) {
+		this.refresh(entity, lockMode, null);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void refresh(Object entity, LockModeType lockMode, Map<String, Object> properties) {
 		this.assertOpen();
 
 		ManagedInstance<?> instance = null;
@@ -866,6 +939,8 @@ public class EntityManagerImpl implements EntityManager {
 			instance = ((EnhancedInstance) entity).__enhanced__$$__getManagedInstance();
 			if ((instance.getSession() == this.session) && (instance.getStatus() == Status.MANAGED)) {
 				instance.refresh(this, this.getConnection());
+
+				this.lock(instance, lockMode, properties);
 
 				return;
 			}
@@ -879,26 +954,8 @@ public class EntityManagerImpl implements EntityManager {
 	 * 
 	 */
 	@Override
-	public void refresh(Object entity, LockModeType lockMode) {
-		// TODO Auto-generated method stub
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public void refresh(Object entity, LockModeType lockMode, Map<String, Object> properties) {
-		// TODO Auto-generated method stub
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public void refresh(Object entity, Map<String, Object> properties) {
-		// TODO Auto-generated method stub
+		this.refresh(entity, LockModeType.NONE, properties);
 	}
 
 	/**

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityTransaction;
+import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceException;
@@ -240,6 +241,13 @@ public abstract class BaseTypedQuery<X> implements TypedQuery<X>, ResultSetHandl
 
 			if (debug) {
 				this.storeData(rs);
+			}
+		}
+
+		final LockModeType lockMode = this.getLockMode();
+		if (lockMode != null) {
+			for (final X instance : this.results) {
+				this.em.lock(session.get(instance), lockMode, null);
 			}
 		}
 
