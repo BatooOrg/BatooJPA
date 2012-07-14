@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.impl.manager;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -58,6 +59,7 @@ import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
@@ -862,7 +864,7 @@ public class EntityManagerImpl implements EntityManager {
 	public void persist(Object entity) {
 		this.assertTransaction();
 
-		if (this.persistImpl(entity, Maps.<Object, Object> newIdentityHashMap())) {
+		if (this.persistImpl(entity, Lists.newArrayList())) {
 			this.flush();
 		}
 	}
@@ -884,8 +886,8 @@ public class EntityManagerImpl implements EntityManager {
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> boolean persistImpl(T entity, IdentityHashMap<Object, Object> processed) {
-		if (processed.containsKey(entity)) {
+	public <T> boolean persistImpl(T entity, ArrayList<Object> processed) {
+		if (processed.contains(entity)) {
 			return false;
 		}
 
@@ -898,7 +900,7 @@ public class EntityManagerImpl implements EntityManager {
 
 		final ManagedInstance<T> existing = this.session.get(entity);
 		if (existing != null) {
-			processed.put(entity, existing.getInstance());
+			processed.add(entity);
 
 			switch (existing.getStatus()) {
 				case REMOVED:
@@ -912,7 +914,7 @@ public class EntityManagerImpl implements EntityManager {
 		final EntityTypeImpl<T> type = (EntityTypeImpl<T>) this.metamodel.entity(entity.getClass());
 		final ManagedInstance<T> instance = type.getManagedInstance(this.session, entity);
 		instance.setStatus(Status.NEW);
-		this.session.setChanged(instance);
+
 		instance.enhanceCollections();
 		if (type.getRootType().hasVersionAttribute()) {
 			instance.setOptimisticLock();
@@ -921,7 +923,7 @@ public class EntityManagerImpl implements EntityManager {
 		boolean requiresFlush = !instance.fillIdValues();
 		this.session.putExternal(instance);
 
-		processed.put(entity, instance.getInstance());
+		processed.add(entity);
 
 		requiresFlush |= instance.cascadePersist(this, processed);
 

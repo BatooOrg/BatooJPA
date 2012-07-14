@@ -59,7 +59,7 @@ public class SessionImpl {
 	private final HashMap<ManagedId<?>, ManagedInstance<?>> repository = Maps.newHashMap();
 
 	private final ArrayList<ManagedInstance<?>> newEntities = Lists.newArrayList();
-	private final HashSet<ManagedInstance<?>> externalEntities = Sets.newHashSet();
+	private final ArrayList<ManagedInstance<?>> externalEntities = Lists.newArrayList();
 	private final HashSet<ManagedInstance<?>> changedEntities = Sets.newHashSet();
 
 	private List<ManagedInstance<?>> entitiesLoading = Lists.newArrayList();
@@ -203,9 +203,8 @@ public class SessionImpl {
 	public void flush(ConnectionImpl connection) throws SQLException {
 		SessionImpl.LOG.debug("Flushing session {0}", this.sessionId);
 
-		final int totalSize = this.externalEntities.size() + this.changedEntities.size();
-		final ArrayList<ManagedInstance<?>> updates = Lists.newArrayListWithCapacity(totalSize);
-		final ArrayList<ManagedInstance<?>> removals = Lists.newArrayListWithCapacity(totalSize);
+		final ArrayList<ManagedInstance<?>> updates = Lists.newArrayList(this.newEntities);
+		final ArrayList<ManagedInstance<?>> removals = Lists.newArrayListWithCapacity(this.changedEntities.size());
 
 		for (final ManagedInstance<?> instance : this.changedEntities) {
 			(instance.getStatus() == Status.REMOVED ? removals : updates).add(instance);
@@ -248,6 +247,15 @@ public class SessionImpl {
 
 		SessionImpl.LOG.debug("Flush successful for session {0}", this.sessionId);
 
+		// move new entities to external entities
+		this.externalEntities.addAll(this.newEntities);
+
+		for (final ManagedInstance<?> instance : this.newEntities) {
+			if (!instance.hasInitialId()) {
+				this.repository.put(instance.getId(), instance);
+			}
+		}
+
 		this.changedEntities.clear();
 		this.newEntities.clear();
 	}
@@ -286,12 +294,13 @@ public class SessionImpl {
 	@SuppressWarnings("unchecked")
 	public <X> ManagedInstance<X> get(X entity) {
 		if (entity instanceof EnhancedInstance) {
-			final ManagedId<?> id = ((EnhancedInstance) entity).__enhanced__$$__getManagedInstance().getId();
-			return (ManagedInstance<X>) this.repository.get(id);
+			final ManagedInstance<?> instance = ((EnhancedInstance) entity).__enhanced__$$__getManagedInstance();
+			if (instance.getSession() == this) {
+				return (ManagedInstance<X>) instance;
+			}
 		}
 
 		final EntityTypeImpl<X> type = (EntityTypeImpl<X>) this.metamodel.entity(entity.getClass());
-
 		final ManagedId<X> id = new ManagedId<X>(type, entity);
 
 		return (ManagedInstance<X>) this.repository.get(id);
@@ -411,10 +420,11 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public <X> void putExternal(ManagedInstance<X> instance) {
-		this.externalEntities.add(instance);
-		this.newEntities.add(instance);
+		if (instance.hasInitialId()) {
+			this.repository.put(instance.getId(), instance);
+		}
 
-		this.put(instance);
+		this.newEntities.add(instance);
 	}
 
 	/**
@@ -470,6 +480,7 @@ public class SessionImpl {
 			this.repository.remove(instanceId);
 			this.changedEntities.remove(instance);
 			this.externalEntities.remove(instance);
+			this.newEntities.remove(instance);
 		}
 
 		return instance;

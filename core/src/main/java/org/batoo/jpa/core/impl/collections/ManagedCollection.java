@@ -284,7 +284,7 @@ public abstract class ManagedCollection<E> {
 	public void persistAdditions(EntityManagerImpl entityManager) {
 		final Collection<E> added = CollectionUtils.subtract(this.getDelegate(), this.getSnapshot());
 		for (final E e : added) {
-			entityManager.persist(e);
+			entityManager.persistImpl(e, Lists.newArrayList());
 		}
 	}
 

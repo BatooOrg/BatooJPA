@@ -81,6 +81,10 @@ public class ManagedId<X> {
 	 */
 	@Override
 	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
 		if (this.getId() == null) {
 			return false;
 		}

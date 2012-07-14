@@ -184,7 +184,7 @@ public class Playground {
 
 				gotStart = true;
 
-				final String key = stElement.getClassName() + "." + stElement.getMethodName();// + "." + stElement.getLineNumber();
+				final String key = stElement.getClassName() + "." + stElement.getMethodName() + "." + stElement.getLineNumber();
 				child = child.get(key);
 				TimeElement child2 = this.elements.get(key);
 				if (child2 == null) {

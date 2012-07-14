@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.instance;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -81,6 +82,7 @@ public class ManagedInstance<X> {
 	private boolean refreshing;
 	private boolean changed;
 
+	private boolean hasInitialId;
 	private ManagedId<? super X> id;
 	private int h;
 
@@ -206,7 +208,7 @@ public class ManagedInstance<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public boolean cascadePersist(EntityManagerImpl entityManager, IdentityHashMap<Object, Object> processed) {
+	public boolean cascadePersist(EntityManagerImpl entityManager, ArrayList<Object> processed) {
 		ManagedInstance.LOG.debug("Cascading persist on {0}", this);
 
 		boolean requiresFlush = false;
@@ -416,6 +418,10 @@ public class ManagedInstance<X> {
 	public boolean fillIdValues() {
 		ManagedInstance.LOG.debug("Auto generating id values for {0}", this);
 
+		return this.hasInitialId = this.fillValuesImpl();
+	}
+
+	private boolean fillValuesImpl() {
 		if (this.idMapping != null) {
 			return this.idMapping.fillValue(this.instance);
 		}
@@ -813,6 +819,18 @@ public class ManagedInstance<X> {
 				entityManager.refresh(associate);
 			}
 		}
+	}
+
+	/**
+	 * Returns if the instance has initial id.
+	 * 
+	 * @return true if the instance has initial id, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean hasInitialId() {
+		return this.hasInitialId;
 	}
 
 	/**
