@@ -131,6 +131,11 @@ public class EntityListenerMetadataImpl implements EntityListenerMetadata {
 		return new CallbackMetadata() {
 
 			@Override
+			public AbstractLocator getLocator() {
+				return new JavaLocator(method);
+			}
+
+			@Override
 			public String getName() {
 				return method.getName();
 			}

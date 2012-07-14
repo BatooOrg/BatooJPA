@@ -231,6 +231,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 *            the primary key of the entity
 	 * @param <T>
 	 *            the type of entity
+	 * @param lockMode
 	 * @return entity or null
 	 * 
 	 * @since $version

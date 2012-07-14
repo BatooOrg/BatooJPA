@@ -214,7 +214,9 @@ public class SessionImpl {
 		final ManagedInstance<?>[] sortedUpdates = new ManagedInstance[updates.size()];
 		final ManagedInstance<?>[] sortedRemovals = new ManagedInstance[removals.size()];
 
-		Prioritizer.sort(updates, removals, sortedUpdates, sortedRemovals);
+		final boolean[] hasCallbacks = new boolean[] { false, false, false, false };
+
+		Prioritizer.sort(updates, removals, sortedUpdates, sortedRemovals, hasCallbacks);
 
 		SessionImpl.LOG.debug("Flushing session {0}: updates {1}, removals {2}", this.sessionId, sortedUpdates.length, sortedRemovals.length);
 

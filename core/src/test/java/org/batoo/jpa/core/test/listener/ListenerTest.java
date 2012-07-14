@@ -16,35 +16,32 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.parser.metadata;
+package org.batoo.jpa.core.test.listener;
 
-import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
+import junit.framework.Assert;
+
+import org.batoo.jpa.core.test.BaseCoreTest;
+import org.junit.Test;
 
 /**
- * Metatada for callbacks.
- * 
  * @author hceylan
+ * 
  * @since $version
  */
-public interface CallbackMetadata extends LocatableMatadata {
+public class ListenerTest extends BaseCoreTest {
 
 	/**
-	 * Returns the method name of the callback.
-	 * 
-	 * @return the method name of the callback
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	String getName();
+	@Test
+	public void testListener() {
+		final Foo1 foo1 = new Foo1();
+		this.persist(foo1);
 
-	/**
-	 * Returns the type of the callback.
-	 * 
-	 * @return the type of the callback
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	EntityListenerType getType();
+		this.commit();
+
+		Assert.assertEquals("postPersist", foo1.getValue());
+	}
 }

@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.core.impl.model.type;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,6 +29,8 @@ import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.Type;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.core.impl.manager.Callback;
+import org.batoo.jpa.core.impl.manager.Callback.CallbackType;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
@@ -34,6 +38,8 @@ import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
 import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.VersionType;
 import org.batoo.jpa.parser.MappingException;
+import org.batoo.jpa.parser.metadata.CallbackMetadata;
+import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
 import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
 import org.batoo.jpa.parser.metadata.attribute.EmbeddedIdAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.IdAttributeMetadata;
@@ -41,6 +47,7 @@ import org.batoo.jpa.parser.metadata.attribute.VersionAttributeMetadata;
 import org.batoo.jpa.parser.metadata.type.IdentifiableTypeMetadata;
 import org.batoo.jpa.parser.metadata.type.ManagedTypeMetadata;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -66,6 +73,8 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	private BasicAttribute<X, ?> declaredVersionAttribute;
 	private BasicAttribute<? super X, ?> versionAttribute;
 	private VersionType versionType;
+
+	private final HashMap<EntityListenerType, List<Callback>> callbacks = Maps.newHashMap();
 
 	/**
 	 * @param metamodel
@@ -384,5 +393,36 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	@Override
 	public boolean hasVersionAttribute() {
 		return this.versionAttribute != null;
+	}
+
+	/**
+	 * Links the callbacks.
+	 * 
+	 * @param metadata
+	 *            the metadata
+	 * @return true if there is no call backs.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected boolean linkCallbacks(IdentifiableTypeMetadata metadata) {
+		if (this.getSupertype() != null) {
+			this.callbacks.putAll(this.getSupertype().callbacks);
+		}
+
+		for (final CallbackMetadata callbackMetadata : metadata.getCallbacks()) {
+			final Callback callback = new Callback(callbackMetadata.getLocator(), this.getJavaType(), callbackMetadata.getName(), callbackMetadata.getType(),
+				CallbackType.CALLBACK);
+
+			List<Callback> list = this.callbacks.get(callback.getListenerType());
+			if (list == null) {
+				list = Lists.newArrayList();
+				this.callbacks.put(callback.getListenerType(), list);
+			}
+
+			list.add(callback);
+		}
+
+		return this.callbacks.size() > 0;
 	}
 }

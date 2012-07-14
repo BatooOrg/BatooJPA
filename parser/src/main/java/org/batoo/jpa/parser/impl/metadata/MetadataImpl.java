@@ -186,8 +186,7 @@ public class MetadataImpl implements Metadata {
 
 			if (existing != null) {
 				if (existing != null) {
-					throw new MappingException("Duplicate definitions for " + managedType.getClassName(), managedType.getLocator(),
-						existing.getLocator());
+					throw new MappingException("Duplicate definitions for " + managedType.getClassName(), managedType.getLocator(), existing.getLocator());
 				}
 			}
 		}
@@ -200,6 +199,8 @@ public class MetadataImpl implements Metadata {
 	 * @author hceylan
 	 */
 	public void parse() {
+		this.parseDefaultListeners();
+
 		for (final Entry<String, ManagedTypeMetadata> entry : this.entityMap.entrySet()) {
 			final String className = entry.getKey();
 			final ManagedTypeMetadata metadata = entry.getValue();
@@ -233,5 +234,16 @@ public class MetadataImpl implements Metadata {
 				throw new MappingException("Class " + className + " cound not be found.", metadata.getLocator());
 			}
 		}
+	}
+
+	/**
+	 * 
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void parseDefaultListeners() {
+		// TODO Auto-generated method stub
+
 	}
 }

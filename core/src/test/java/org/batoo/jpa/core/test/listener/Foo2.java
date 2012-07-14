@@ -16,35 +16,61 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.parser.metadata;
+package org.batoo.jpa.core.test.listener;
 
-import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 /**
- * Metatada for callbacks.
  * 
  * @author hceylan
  * @since $version
  */
-public interface CallbackMetadata extends LocatableMatadata {
+@Entity
+public class Foo2 {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Integer id;
+
+	private String value;
 
 	/**
-	 * Returns the method name of the callback.
+	 * Returns the id of the Foo1.
 	 * 
-	 * @return the method name of the callback
+	 * @return the id of the Foo1
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	String getName();
+	public Integer getId() {
+		return this.id;
+	}
 
 	/**
-	 * Returns the type of the callback.
+	 * Returns the value of the Foo1.
 	 * 
-	 * @return the type of the callback
+	 * @return the value of the Foo1
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	EntityListenerType getType();
+	public String getValue() {
+		return this.value;
+	}
+
+	/**
+	 * Sets the value of the Foo1.
+	 * 
+	 * @param value
+	 *            the value to set for Foo1
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setValue(String value) {
+		this.value = value;
+	}
 }

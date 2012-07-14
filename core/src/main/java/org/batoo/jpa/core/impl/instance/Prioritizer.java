@@ -38,6 +38,14 @@ public class Prioritizer {
 
 	/**
 	 * Sorts the managed instances based on their dependencies.
+	 * <p>
+	 * Below is the array of callbacks:
+	 * <ul>
+	 * <li>Element 0, has PreRemove callback
+	 * <li>Element 1, has PrePersist or PreUpdate
+	 * <li>Element 2, has PostRemove
+	 * <li>Element 3, has PostPersist, PostRemove
+	 * </ul>
 	 * 
 	 * @param updates
 	 *            the list of instances to be updated
@@ -47,23 +55,30 @@ public class Prioritizer {
 	 *            the sorted array of instances to be removed
 	 * @param sortedUpdates
 	 *            the sorted array of instances to be updated
+	 * @param hasCallbacks
+	 *            array of callbacks
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	public static void sort(ArrayList<ManagedInstance<?>> updates, ArrayList<ManagedInstance<?>> removals, ManagedInstance<?>[] sortedUpdates,
-		ManagedInstance<?>[] sortedRemovals) {
+		ManagedInstance<?>[] sortedRemovals, boolean[] hasCallbacks) {
 
-		Prioritizer.sort(updates, sortedUpdates, true);
-		Prioritizer.sort(removals, sortedRemovals, false);
+		Prioritizer.sort(updates, sortedUpdates, true, hasCallbacks);
+		Prioritizer.sort(removals, sortedRemovals, false, hasCallbacks);
 	}
 
-	private static void sort(ArrayList<ManagedInstance<?>> updates, ManagedInstance<?>[] sortedUpdates, boolean forward) {
+	private static void sort(ArrayList<ManagedInstance<?>> updates, ManagedInstance<?>[] sortedUpdates, boolean forward, boolean[] hasCallbacks) {
 		int instanceNo = 0;
 
 		final HashSet<EntityTypeImpl<?>> entities = Sets.newHashSet();
 		for (final ManagedInstance<?> instance : updates) {
-			entities.add(instance.getType());
+			final EntityTypeImpl<?> type = instance.getType();
+			entities.add(type);
+		}
+
+		for (final EntityTypeImpl<?> entity : entities) {
+			entity.addCallbacks(hasCallbacks, forward);
 		}
 
 		// quick sort based on entity relations
