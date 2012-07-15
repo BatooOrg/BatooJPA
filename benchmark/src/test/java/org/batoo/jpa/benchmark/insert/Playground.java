@@ -297,6 +297,20 @@ public class Playground {
 		em.close();
 	}
 
+	private void doRemove(final EntityManagerFactory emf, final List<Person> persons) {
+		final EntityManager em = emf.createEntityManager();
+		em.getTransaction().begin();
+
+		for (final Person person : persons) {
+
+			final Person person2 = em.find(Person.class, person.getId());
+			em.remove(person2);
+		}
+
+		em.getTransaction().commit();
+		em.close();
+	}
+
 	private void doTest(Type type) {
 		final ClassLoader old = Thread.currentThread().getContextClassLoader();
 		try {
@@ -346,6 +360,8 @@ public class Playground {
 		this.doFind(emf, persons.get(0));
 
 		this.doUpdate(emf, persons.get(0));
+
+		this.doRemove(emf, persons.subList(5, 9));
 	}
 
 	private void test(Type type, final EntityManagerFactory emf) {
