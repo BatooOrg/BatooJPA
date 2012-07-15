@@ -6,12 +6,10 @@
 	<persistence-unit name="default">
 		<provider>org.batoo.jpa.core.BatooPersistenceProvider</provider>
 		
+		<class>org.batoo.jpa.core.test.listener.Foo</class>
 		<class>org.batoo.jpa.core.test.listener.Foo1</class>
 		<class>org.batoo.jpa.core.test.listener.Foo2</class>
 		<class>org.batoo.jpa.core.test.listener.Foo3</class>
-		<class>org.batoo.jpa.core.test.listener.Foo4</class>
-		<class>org.batoo.jpa.core.test.listener.Foo5</class>
-		<class>org.batoo.jpa.core.test.listener.Foo6</class>
 		
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.Driver40" />

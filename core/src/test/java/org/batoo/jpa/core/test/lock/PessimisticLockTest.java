@@ -24,6 +24,7 @@ import javax.persistence.LockModeType;
 import javax.persistence.PersistenceException;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -31,6 +32,7 @@ import org.junit.Test;
  * 
  * @since $version
  */
+@Ignore
 public class PessimisticLockTest extends BaseCoreTest {
 
 	private Foo2 newFoo(boolean withChildren) {

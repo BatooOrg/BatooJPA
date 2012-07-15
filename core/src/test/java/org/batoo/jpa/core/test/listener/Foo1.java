@@ -19,10 +19,8 @@
 package org.batoo.jpa.core.test.listener;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.PostPersist;
+import javax.persistence.PrePersist;
 import javax.persistence.Transient;
 
 /**
@@ -31,26 +29,10 @@ import javax.persistence.Transient;
  * @since $version
  */
 @Entity
-public class Foo1 {
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Integer id;
+public class Foo1 extends Foo implements FooType {
 
 	@Transient
-	private String value;
-
-	/**
-	 * Returns the id of the Foo1.
-	 * 
-	 * @return the id of the Foo1
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public Integer getId() {
-		return this.id;
-	}
+	private String value = "";
 
 	/**
 	 * Returns the value of the Foo1.
@@ -60,6 +42,7 @@ public class Foo1 {
 	 * @since $version
 	 * @author hceylan
 	 */
+	@Override
 	public String getValue() {
 		return this.value;
 	}
@@ -71,7 +54,17 @@ public class Foo1 {
 	 */
 	@PostPersist
 	public void postPersist() {
-		this.value = this.value + "postPersist";
+		this.setValue(this.getValue() + "postPersist");
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@PrePersist
+	public void prePersist() {
+		this.setValue(this.getValue() + "prePersist");
 	}
 
 	/**

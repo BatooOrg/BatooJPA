@@ -24,6 +24,7 @@ import java.util.Iterator;
 
 import javax.persistence.PersistenceException;
 
+import org.batoo.jpa.core.impl.manager.CallbackAvailability;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
@@ -55,20 +56,21 @@ public class Prioritizer {
 	 *            the sorted array of instances to be removed
 	 * @param sortedUpdates
 	 *            the sorted array of instances to be updated
-	 * @param hasCallbacks
+	 * @param callbackAvailability
 	 *            array of callbacks
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	public static void sort(ArrayList<ManagedInstance<?>> updates, ArrayList<ManagedInstance<?>> removals, ManagedInstance<?>[] sortedUpdates,
-		ManagedInstance<?>[] sortedRemovals, boolean[] hasCallbacks) {
+		ManagedInstance<?>[] sortedRemovals, CallbackAvailability callbackAvailability) {
 
-		Prioritizer.sort(updates, sortedUpdates, true, hasCallbacks);
-		Prioritizer.sort(removals, sortedRemovals, false, hasCallbacks);
+		Prioritizer.sort(updates, sortedUpdates, true, callbackAvailability);
+		Prioritizer.sort(removals, sortedRemovals, false, callbackAvailability);
 	}
 
-	private static void sort(ArrayList<ManagedInstance<?>> updates, ManagedInstance<?>[] sortedUpdates, boolean forward, boolean[] hasCallbacks) {
+	private static void sort(ArrayList<ManagedInstance<?>> updates, ManagedInstance<?>[] sortedUpdates, boolean forUpdates,
+		CallbackAvailability callbackAvailability) {
 		int instanceNo = 0;
 
 		final HashSet<EntityTypeImpl<?>> entities = Sets.newHashSet();
@@ -78,7 +80,7 @@ public class Prioritizer {
 		}
 
 		for (final EntityTypeImpl<?> entity : entities) {
-			entity.addCallbacks(hasCallbacks, forward);
+			entity.updateAvailability(callbackAvailability, forUpdates);
 		}
 
 		// quick sort based on entity relations
@@ -92,8 +94,8 @@ public class Prioritizer {
 
 				for (final EntityTypeImpl<?> e2 : entities) {
 
-					final EntityTypeImpl<?> dependent = forward ? e1 : e2;
-					final EntityTypeImpl<?> dependency = forward ? e2 : e1;
+					final EntityTypeImpl<?> dependent = forUpdates ? e1 : e2;
+					final EntityTypeImpl<?> dependency = forUpdates ? e2 : e1;
 
 					if (dependent.getDependenciesFor(dependency).length != 0) {
 						hasDependency = true;
@@ -145,8 +147,8 @@ public class Prioritizer {
 					final Object i2 = mi2.getInstance();
 
 					for (final AssociationMapping<?, ?, ?> association : e1.getDependenciesFor(e2)) {
-						final Object dependent = forward ? i1 : i2;
-						final Object dependency = forward ? i2 : i1;
+						final Object dependent = forUpdates ? i1 : i2;
+						final Object dependency = forUpdates ? i2 : i1;
 						if (association.references(dependent, dependency)) {
 							hasDependency = true;
 							break innerLoop;

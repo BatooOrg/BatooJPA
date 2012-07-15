@@ -49,6 +49,8 @@ import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
+import org.batoo.jpa.core.impl.manager.CallbackAvailability;
+import org.batoo.jpa.core.impl.manager.CallbackManager;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.type.BasicTypeImpl;
@@ -62,6 +64,7 @@ import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.metadata.MetadataImpl;
+import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.type.EmbeddableMetadata;
@@ -111,6 +114,8 @@ public class MetamodelImpl implements Metamodel {
 	private final Map<Class<?>, MappedSuperclassType<?>> mappedSuperclasses = Maps.newHashMap();
 	private final Map<Class<?>, EmbeddableType<?>> embeddables = Maps.newHashMap();
 	private final Map<Class<?>, EntityTypeImpl<?>> entities = Maps.newHashMap();
+
+	private final CallbackManager callbackManager;
 
 	private final Map<String, SequenceGenerator> sequenceGenerators = Maps.newHashMap();
 	private final Map<String, TableGenerator> tableGenerators = Maps.newHashMap();
@@ -186,9 +191,7 @@ public class MetamodelImpl implements Metamodel {
 				}
 			}
 		}
-		catch (final Exception e) {
-			e.printStackTrace();
-		} // not possible at this stage
+		catch (final Exception e) {} // not possible at this stage
 
 		for (final ManagedTypeMetadata type : sortedEntities) {
 			try {
@@ -236,6 +239,8 @@ public class MetamodelImpl implements Metamodel {
 			}
 			catch (final ClassNotFoundException e) {} // not possible at this time
 		}
+
+		this.callbackManager = new CallbackManager(metadata.getEntityListeners());
 	}
 
 	/**
@@ -307,6 +312,33 @@ public class MetamodelImpl implements Metamodel {
 	@SuppressWarnings("unchecked")
 	public <X> EntityTypeImpl<X> entity(Class<X> clazz) {
 		return (EntityTypeImpl<X>) this.entities.get(clazz);
+	}
+
+	/**
+	 * Fires the callbacks.
+	 * 
+	 * @param instance
+	 *            the instance
+	 * @param type
+	 *            the type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void fireCallbacks(Object instance, EntityListenerType type) {
+		this.callbackManager.fireCallbacks(instance, type);
+	}
+
+	/**
+	 * Returns the callback manager of the metamodel.
+	 * 
+	 * @return the callback manager of the metamodel
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public CallbackManager getCallbackManager() {
+		return this.callbackManager;
 	}
 
 	/**
@@ -680,5 +712,19 @@ public class MetamodelImpl implements Metamodel {
 		}
 
 		return this.managedType(clazz);
+	}
+
+	/**
+	 * Updates the callback availability.
+	 * 
+	 * @param availability
+	 *            the callback availability
+	 * @return the callback availability
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public CallbackAvailability updateAvailability(CallbackAvailability availability) {
+		return availability.updateAvailability(this.callbackManager);
 	}
 }

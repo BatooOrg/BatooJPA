@@ -242,8 +242,8 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <T> T unwrap(Class<T> cls) {
-		// TODO Auto-generated method stub
-		return null;
+		return (T) this;
 	}
 }

@@ -185,6 +185,10 @@ public class EntityListenerMetadataImpl implements EntityListenerMetadata {
 	 */
 	private void handleCallbacks(Class<?> clazz, Set<Class<? extends Annotation>> annotationsParsed) {
 		for (final Method method : clazz.getMethods()) {
+			if (method.getDeclaringClass() != clazz) {
+				continue;
+			}
+
 			if (method.getAnnotation(PrePersist.class) != null) {
 				if (annotationsParsed != null) {
 					annotationsParsed.add(PrePersist.class);

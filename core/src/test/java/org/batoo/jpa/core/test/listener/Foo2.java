@@ -19,9 +19,10 @@
 package org.batoo.jpa.core.test.listener;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.ExcludeSuperclassListeners;
+import javax.persistence.PostLoad;
+import javax.persistence.PostPersist;
+import javax.persistence.Transient;
 
 /**
  * 
@@ -29,47 +30,56 @@ import javax.persistence.Id;
  * @since $version
  */
 @Entity
-public class Foo2 {
+@ExcludeSuperclassListeners
+public class Foo2 extends Foo implements FooType {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Integer id;
-
-	private String value;
+	@Transient
+	private String value = "";
 
 	/**
-	 * Returns the id of the Foo1.
+	 * Returns the value of the Foo2.
 	 * 
-	 * @return the id of the Foo1
+	 * @return the value of the Foo2
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Integer getId() {
-		return this.id;
-	}
-
-	/**
-	 * Returns the value of the Foo1.
-	 * 
-	 * @return the value of the Foo1
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
+	@Override
 	public String getValue() {
 		return this.value;
 	}
 
 	/**
-	 * Sets the value of the Foo1.
 	 * 
-	 * @param value
-	 *            the value to set for Foo1
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
+	@PostLoad
+	public void postLoad() {
+		this.setValue(this.getValue() + "postLoad");
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@PostPersist
+	public void postPersist() {
+		this.setValue(this.getValue() + "postPersist");
+	}
+
+	/**
+	 * Sets the value of the Foo2.
+	 * 
+	 * @param value
+	 *            the value to set for Foo2
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Override
 	public void setValue(String value) {
 		this.value = value;
 	}

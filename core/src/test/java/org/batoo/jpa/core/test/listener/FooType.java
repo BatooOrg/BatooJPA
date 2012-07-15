@@ -18,36 +18,13 @@
  */
 package org.batoo.jpa.core.test.listener;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-
 /**
+ * 
  * 
  * @author hceylan
  * @since $version
  */
-@Entity
-public class Foo4 {
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Integer id;
-
-	private String value;
-
-	/**
-	 * Returns the id of the Foo1.
-	 * 
-	 * @return the id of the Foo1
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public Integer getId() {
-		return this.id;
-	}
+public interface FooType {
 
 	/**
 	 * Returns the value of the Foo1.
@@ -57,9 +34,7 @@ public class Foo4 {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String getValue() {
-		return this.value;
-	}
+	String getValue();
 
 	/**
 	 * Sets the value of the Foo1.
@@ -70,7 +45,5 @@ public class Foo4 {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void setValue(String value) {
-		this.value = value;
-	}
+	void setValue(String value);
 }

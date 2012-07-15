@@ -47,6 +47,7 @@ import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.util.Pair;
+import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -68,6 +69,7 @@ public class ManagedInstance<X> {
 	private final SessionImpl session;
 	private final X instance;
 	private Status status;
+	private Status oldStatus;
 	private boolean optimisticLock;
 	private LockModeType lockMode;
 
@@ -437,6 +439,27 @@ public class ManagedInstance<X> {
 	}
 
 	/**
+	 * Fires the callbacks.
+	 * 
+	 * @param type
+	 *            the type of the callbacks
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void fireCallbacks(EntityListenerType type) {
+		if ((type == EntityListenerType.PRE_UPDATE) && (this.status == Status.NEW)) {
+			type = EntityListenerType.PRE_PERSIST;
+		}
+
+		if ((type == EntityListenerType.POST_UPDATE) && (this.oldStatus == Status.NEW)) {
+			type = EntityListenerType.POST_PERSIST;
+		}
+
+		this.type.fireCallbacks(this.instance, type);
+	}
+
+	/**
 	 * 
 	 * Flushes the state of the instance to the database.
 	 * 
@@ -625,6 +648,18 @@ public class ManagedInstance<X> {
 		this.h = (prime * result) + this.type.getRootType().getName().hashCode();
 
 		return this.h = (prime * result) + id.hashCode();
+	}
+
+	/**
+	 * Returns if the instance has initial id.
+	 * 
+	 * @return true if the instance has initial id, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean hasInitialId() {
+		return this.hasInitialId;
 	}
 
 	/**
@@ -822,18 +857,6 @@ public class ManagedInstance<X> {
 	}
 
 	/**
-	 * Returns if the instance has initial id.
-	 * 
-	 * @return true if the instance has initial id, false otherwise
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public boolean hasInitialId() {
-		return this.hasInitialId;
-	}
-
-	/**
 	 * Resets the change status of the instance.
 	 * 
 	 * @since $version
@@ -927,6 +950,8 @@ public class ManagedInstance<X> {
 	 * @since $version
 	 */
 	public void setStatus(Status status) {
+		this.oldStatus = status;
+
 		if (status != this.status) {
 			ManagedInstance.LOG.debug("Instance status changing for {0}: {1} -> {2}", this, this.status, status);
 

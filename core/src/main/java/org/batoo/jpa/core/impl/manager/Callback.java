@@ -22,6 +22,8 @@ import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
+import javax.persistence.PersistenceException;
+
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
@@ -101,6 +103,29 @@ public class Callback {
 		}
 		catch (final Exception e) {
 			throw new MappingException("Unable to map callback " + clazz.getName() + "." + name, locator);
+		}
+	}
+
+	/**
+	 * Fires the callback.
+	 * 
+	 * @param instance
+	 *            the instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void fire(Object instance) {
+		try {
+			if (this.callbackType == CallbackType.CALLBACK) {
+				this.method.invoke(instance);
+			}
+			else {
+				this.method.invoke(this.instance, instance);
+			}
+		}
+		catch (final Exception e) {
+			throw new PersistenceException("Error while invoking callback or listener", e);
 		}
 	}
 

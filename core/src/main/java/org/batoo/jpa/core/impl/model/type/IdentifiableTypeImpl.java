@@ -18,8 +18,6 @@
  */
 package org.batoo.jpa.core.impl.model.type;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,8 +27,8 @@ import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.Type;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.manager.Callback;
-import org.batoo.jpa.core.impl.manager.Callback.CallbackType;
+import org.batoo.jpa.core.impl.manager.CallbackAvailability;
+import org.batoo.jpa.core.impl.manager.CallbackManager;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
@@ -38,7 +36,6 @@ import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
 import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.VersionType;
 import org.batoo.jpa.parser.MappingException;
-import org.batoo.jpa.parser.metadata.CallbackMetadata;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
 import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
 import org.batoo.jpa.parser.metadata.attribute.EmbeddedIdAttributeMetadata;
@@ -47,7 +44,6 @@ import org.batoo.jpa.parser.metadata.attribute.VersionAttributeMetadata;
 import org.batoo.jpa.parser.metadata.type.IdentifiableTypeMetadata;
 import org.batoo.jpa.parser.metadata.type.ManagedTypeMetadata;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -73,8 +69,8 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	private BasicAttribute<X, ?> declaredVersionAttribute;
 	private BasicAttribute<? super X, ?> versionAttribute;
 	private VersionType versionType;
-
-	private final HashMap<EntityListenerType, List<Callback>> callbacks = Maps.newHashMap();
+	private final CallbackManager callbackManager;
+	private CallbackAvailability callbackAvailability;
 
 	/**
 	 * @param metamodel
@@ -96,6 +92,8 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 		this.idType = this.getIdClass(metadata);
 
 		this.addIdAttributes(metadata);
+
+		this.callbackManager = new CallbackManager(metadata, this.getJavaType());
 	}
 
 	/**
@@ -212,6 +210,65 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 			this.declaredVersionAttribute = new BasicAttribute(this, attribute);
 			this.addAttribute(this.declaredVersionAttribute);
 		}
+	}
+
+	/**
+	 * Fires the callbacks.
+	 * 
+	 * @param instance
+	 *            the instance
+	 * @param type
+	 *            the listener type
+	 * @param self
+	 *            if the object belongs to this type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void fireCallbacks(boolean self, Object instance, EntityListenerType type) {
+		if (!this.callbackManager.excludeDefaultListeners() && self) {
+			this.getMetamodel().fireCallbacks(instance, type);
+		}
+
+		if ((this.getSupertype() != null) && !this.callbackManager.excludeSuperclassListeners()) {
+			this.getSupertype().fireCallbacks(false, instance, type);
+		}
+
+		this.callbackManager.fireCallbacks(instance, type);
+	}
+
+	/**
+	 * Returns the callback availability.
+	 * 
+	 * @return the callback availability
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public CallbackAvailability getAvailability() {
+		if (this.callbackAvailability != null) {
+			return this.callbackAvailability;
+		}
+
+		synchronized (this) {
+			if (this.callbackAvailability != null) {
+				return this.callbackAvailability;
+			}
+
+			return this.callbackAvailability = this.callbackManager.getAvailibility(this.getMetamodel(), this.getSupertype());
+		}
+	}
+
+	/**
+	 * Returns the callbackManager.
+	 * 
+	 * @return the callbackManager
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected CallbackManager getCallbackManager() {
+		return this.callbackManager;
 	}
 
 	/**
@@ -396,33 +453,17 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	}
 
 	/**
-	 * Links the callbacks.
+	 * Updates the callback availability.
 	 * 
-	 * @param metadata
-	 *            the metadata
-	 * @return true if there is no call backs.
+	 * @param availability
+	 *            the callback availability
+	 * @param forUpdates
+	 *            true if for updates or false for removals
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected boolean linkCallbacks(IdentifiableTypeMetadata metadata) {
-		if (this.getSupertype() != null) {
-			this.callbacks.putAll(this.getSupertype().callbacks);
-		}
-
-		for (final CallbackMetadata callbackMetadata : metadata.getCallbacks()) {
-			final Callback callback = new Callback(callbackMetadata.getLocator(), this.getJavaType(), callbackMetadata.getName(), callbackMetadata.getType(),
-				CallbackType.CALLBACK);
-
-			List<Callback> list = this.callbacks.get(callback.getListenerType());
-			if (list == null) {
-				list = Lists.newArrayList();
-				this.callbacks.put(callback.getListenerType(), list);
-			}
-
-			list.add(callback);
-		}
-
-		return this.callbacks.size() > 0;
+	public void updateAvailability(CallbackAvailability availability, Boolean forUpdates) {
+		availability.updateAvailability(this.getAvailability(), forUpdates);
 	}
 }

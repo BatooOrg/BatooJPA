@@ -36,6 +36,7 @@ import org.batoo.jpa.core.impl.instance.Status;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -190,6 +191,61 @@ public class SessionImpl {
 	}
 
 	/**
+	 * Fires the post callbacks.
+	 * 
+	 * @param updates
+	 *            the list of updates
+	 * @param removals
+	 *            the list of removals
+	 * @param callbackAvailability
+	 *            the callback availability
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void firePostCallbacks(final ManagedInstance<?>[] updates, final ManagedInstance<?>[] removals, final CallbackAvailability callbackAvailability) {
+		if (callbackAvailability.postRemove()) {
+			for (final ManagedInstance<?> instance : removals) {
+				instance.fireCallbacks(EntityListenerType.POST_REMOVE);
+			}
+		}
+
+		if (callbackAvailability.postWrite()) {
+			for (final ManagedInstance<?> instance : updates) {
+				instance.fireCallbacks(EntityListenerType.POST_UPDATE);
+			}
+		}
+	}
+
+	/**
+	 * Fires the pre callbacks.
+	 * 
+	 * @param updates
+	 *            the list of updates
+	 * @param removals
+	 *            the list of removals
+	 * @param callbackAvailability
+	 *            the callback availability
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void firePreCallbacks(final ManagedInstance<?>[] sortedUpdates, final ManagedInstance<?>[] sortedRemovals,
+		final CallbackAvailability callbackAvailability) {
+		if (callbackAvailability.preRemove()) {
+			for (final ManagedInstance<?> instance : sortedRemovals) {
+				instance.fireCallbacks(EntityListenerType.PRE_REMOVE);
+			}
+		}
+
+		if (callbackAvailability.preWrite()) {
+			for (final ManagedInstance<?> instance : sortedUpdates) {
+				instance.fireCallbacks(EntityListenerType.PRE_UPDATE);
+			}
+		}
+	}
+
+	/**
 	 * Flushes the session persisting changes to the database.
 	 * 
 	 * @param connection
@@ -213,11 +269,14 @@ public class SessionImpl {
 		final ManagedInstance<?>[] sortedUpdates = new ManagedInstance[updates.size()];
 		final ManagedInstance<?>[] sortedRemovals = new ManagedInstance[removals.size()];
 
-		final boolean[] hasCallbacks = new boolean[] { false, false, false, false };
+		final CallbackAvailability callbackAvailability = new CallbackAvailability();
 
-		Prioritizer.sort(updates, removals, sortedUpdates, sortedRemovals, hasCallbacks);
+		Prioritizer.sort(updates, removals, sortedUpdates, sortedRemovals, callbackAvailability);
 
 		SessionImpl.LOG.debug("Flushing session {0}: updates {1}, removals {2}", this.sessionId, sortedUpdates.length, sortedRemovals.length);
+
+		// fire callbacks
+		this.firePreCallbacks(sortedUpdates, sortedRemovals, callbackAvailability);
 
 		this.doVersionChecks(connection, sortedRemovals, sortedUpdates);
 
@@ -244,6 +303,9 @@ public class SessionImpl {
 			instance.flushAssociations(connection, false, !this.newEntities.isEmpty() && this.newEntities.contains(instance));
 			instance.reset();
 		}
+
+		// fire callbacks
+		this.firePostCallbacks(sortedUpdates, sortedRemovals, callbackAvailability);
 
 		SessionImpl.LOG.debug("Flush successful for session {0}", this.sessionId);
 
@@ -456,6 +518,10 @@ public class SessionImpl {
 
 				// process the associations
 				instance.processAssociations();
+			}
+
+			for (final ManagedInstance<?> instance : entitiesLoaded) {
+				instance.fireCallbacks(EntityListenerType.POST_LOAD);
 			}
 		}
 	}

@@ -19,9 +19,9 @@
 package org.batoo.jpa.core.test.listener;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.EntityListeners;
+import javax.persistence.PostPersist;
+import javax.persistence.Transient;
 
 /**
  * 
@@ -29,47 +29,72 @@ import javax.persistence.Id;
  * @since $version
  */
 @Entity
-public class Foo3 {
+@EntityListeners(value = FooListener.class)
+public class Foo3 extends Foo implements FooType {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Integer id;
+	@Transient
+	private String value = "";
 
-	private String value;
+	private String fooValue;
 
 	/**
-	 * Returns the id of the Foo1.
+	 * Returns the fooValue of the Foo3.
 	 * 
-	 * @return the id of the Foo1
+	 * @return the fooValue of the Foo3
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Integer getId() {
-		return this.id;
+	protected String getFooValue() {
+		return this.fooValue;
 	}
 
 	/**
-	 * Returns the value of the Foo1.
+	 * Returns the value of the Foo3.
 	 * 
-	 * @return the value of the Foo1
+	 * @return the value of the Foo3
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
+	@Override
 	public String getValue() {
 		return this.value;
 	}
 
 	/**
-	 * Sets the value of the Foo1.
-	 * 
-	 * @param value
-	 *            the value to set for Foo1
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
+	@PostPersist
+	public void postPersist() {
+		this.setValue(this.getValue() + "postPersist");
+	}
+
+	/**
+	 * Sets the fooValue of the Foo3.
+	 * 
+	 * @param fooValue
+	 *            the fooValue to set for Foo3
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected void setFooValue(String fooValue) {
+		this.fooValue = fooValue;
+	}
+
+	/**
+	 * Sets the value of the Foo3.
+	 * 
+	 * @param value
+	 *            the value to set for Foo3
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Override
 	public void setValue(String value) {
 		this.value = value;
 	}

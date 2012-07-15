@@ -73,6 +73,7 @@ import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
+import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 
@@ -133,8 +134,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private EntityTypeImpl<? super X> rootType;
 	private final RootMapping<X> rootMapping;
 
-	private final boolean noCallbacks;
-
 	/**
 	 * @param metamodel
 	 *            the metamodel
@@ -160,25 +159,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		this.initTables(metadata);
 		this.rootMapping = new RootMapping<X>(this);
 		this.linkMappings();
-		this.noCallbacks = this.linkCallbacks(this.metadata);
-	}
-
-	/**
-	 * Adds the marks to <code>hasCallbacks</code>.
-	 * 
-	 * @param hasCallbacks
-	 *            the callback marks
-	 * @param updates
-	 *            updates or removals.
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void addCallbacks(boolean[] hasCallbacks, boolean updates) {
-		if (this.noCallbacks) {
-			return;
-		}
-
 	}
 
 	private void enhanceIfNeccessary() {
@@ -231,6 +211,21 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		while (supertype != null);
 
 		return false;
+	}
+
+	/**
+	 * Fires the callbacks.
+	 * 
+	 * @param instance
+	 *            the instance
+	 * @param type
+	 *            the type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void fireCallbacks(Object instance, EntityListenerType type) {
+		this.fireCallbacks(true, instance, type);
 	}
 
 	/**
