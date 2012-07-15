@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.core.impl.model.attribute;
 
+import java.sql.Timestamp;
+
 import javax.persistence.EnumType;
 import javax.persistence.TemporalType;
 import javax.persistence.metamodel.SingularAttribute;
@@ -80,7 +82,17 @@ public final class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 		this.enumType = null;
 
 		this.type = this.getDeclaringType().getMetamodel().createBasicType(this.getJavaType());
-		this.temporalType = metadata.getTemporalType();
+		if (this.getJavaType() == Timestamp.class) {
+			if (metadata.getTemporalType() == null) {
+				this.temporalType = TemporalType.TIMESTAMP;
+			}
+			else {
+				this.temporalType = metadata.getTemporalType();
+			}
+		}
+		else {
+			this.temporalType = null;
+		}
 	}
 
 	/**
@@ -104,12 +116,35 @@ public final class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 		this.lob = metadata.isLob();
 		this.type = this.getDeclaringType().getMetamodel().createBasicType(this.getJavaType());
 		this.optional = metadata.isOptional();
-		this.temporalType = metadata.getTemporalType();
-		this.enumType = metadata.getEnumType();
+
+		if (this.getJavaType() == Timestamp.class) {
+			if (metadata.getTemporalType() == null) {
+				this.temporalType = TemporalType.TIMESTAMP;
+			}
+			else {
+				this.temporalType = metadata.getTemporalType();
+			}
+		}
+		else {
+			this.temporalType = null;
+		}
+
+		if (this.getJavaType().getSuperclass() == Enum.class) {
+			if (metadata.getEnumType() != null) {
+				this.enumType = metadata.getEnumType();
+			}
+			else {
+				this.enumType = EnumType.ORDINAL;
+			}
+		}
+		else {
+			this.enumType = null;
+		}
+
 	}
 
 	/**
-	 * Constructor for id attributes.
+	 * Constructor for basic id attributes.
 	 * 
 	 * @param declaringType
 	 *            the declaring type

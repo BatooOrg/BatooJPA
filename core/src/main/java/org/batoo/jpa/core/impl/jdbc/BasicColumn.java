@@ -18,10 +18,15 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
+import java.lang.reflect.Method;
+
+import javax.persistence.EnumType;
+
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
+import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 
@@ -49,6 +54,9 @@ public class BasicColumn extends AbstractColumn {
 	private final String mappingName;
 	private final BasicMapping<?, ?> mapping;
 	private final JdbcAdaptor jdbcAdaptor;
+	private final EnumType enumType;
+	private final Enum<?>[] values;
+	private final Method method;
 
 	/**
 	 * @param mapping
@@ -61,6 +69,7 @@ public class BasicColumn extends AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
+	@SuppressWarnings("unchecked")
 	public BasicColumn(BasicMapping<?, ?> mapping, int sqlType, ColumnMetadata metadata) {
 		super();
 
@@ -81,6 +90,29 @@ public class BasicColumn extends AbstractColumn {
 		this.nullable = metadata != null ? metadata.isNullable() : true;
 		this.unique = metadata != null ? metadata.isUnique() : false;
 		this.updatable = metadata != null ? metadata.isUpdatable() : true;
+
+		this.enumType = mapping.getAttribute().getEnumType();
+		if (this.enumType != null) {
+			Class<Enum<?>> enumJavaType;
+			enumJavaType = (Class<Enum<?>>) mapping.getAttribute().getJavaType();
+			try {
+				if (this.enumType == EnumType.ORDINAL) {
+					this.values = (Enum<?>[]) enumJavaType.getMethod("values").invoke(null);
+					this.method = null;
+				}
+				else {
+					this.values = null;
+					this.method = enumJavaType.getMethod("valueOf", String.class);
+				}
+			}
+			catch (final Exception e) {
+				throw new MappingException("Unable to map enum type", this.mapping.getAttribute().getLocator());
+			}
+		}
+		else {
+			this.values = null;
+			this.method = null;
+		}
 	}
 
 	/**
@@ -192,7 +224,22 @@ public class BasicColumn extends AbstractColumn {
 	 */
 	@Override
 	public Object getValue(Object instance) {
-		return this.mapping.get(instance);
+		final Object value = this.mapping.get(instance);
+
+		if (value == null) {
+			return null;
+		}
+
+		if (this.enumType == null) {
+			return value;
+		}
+
+		final Enum<?> enumValue = (Enum<?>) value;
+		if (this.enumType == EnumType.ORDINAL) {
+			return enumValue.ordinal();
+		}
+
+		return enumValue.name();
 	}
 
 	/**
@@ -261,6 +308,18 @@ public class BasicColumn extends AbstractColumn {
 	@Override
 	@SuppressWarnings("rawtypes")
 	public void setValue(ManagedInstance managedInstance, Object value) {
+		if ((value != null) && (this.enumType != null)) {
+			if (this.enumType == EnumType.ORDINAL) {
+				value = this.values[(Integer) value];
+			}
+			else {
+				try {
+					value = this.method.invoke(null, value);
+				}
+				catch (final Exception e) {}
+			}
+		}
+
 		this.mapping.set(managedInstance, value);
 	}
 }
