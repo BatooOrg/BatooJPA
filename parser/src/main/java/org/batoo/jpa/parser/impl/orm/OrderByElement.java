@@ -16,27 +16,41 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.parser.metadata.attribute;
+package org.batoo.jpa.parser.impl.orm;
 
-import org.batoo.jpa.parser.metadata.ColumnMetadata;
+import java.util.Map;
 
 /**
- * Definitions for plural attributes.
+ * Element for <code>order-by</code> elements.
  * 
  * @author hceylan
  * @since $version
  */
-public interface PluralAttributeMetadata {
+public class OrderByElement extends ChildElement {
+
+	private String orderBy = "";
 
 	/**
-	 * Returns the map key.
-	 * 
-	 * @return the map key
+	 * @param parent
+	 *            the parent element factory
+	 * @param attributes
+	 *            the attributes
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	String getMapKey();
+	public OrderByElement(ParentElement parent, Map<String, String> attributes) {
+		super(parent, attributes);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void cdata(String cdata) {
+		this.orderBy = cdata;
+	}
 
 	/**
 	 * Returns the order by.
@@ -46,15 +60,7 @@ public interface PluralAttributeMetadata {
 	 * @since $version
 	 * @author hceylan
 	 */
-	String getOrderBy();
-
-	/**
-	 * Returns the order column definition.
-	 * 
-	 * @return the order column definition
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	ColumnMetadata getOrderColumn();
+	public String getOrderBy() {
+		return this.orderBy;
+	}
 }

@@ -24,6 +24,7 @@ import java.util.Set;
 
 import javax.persistence.OneToMany;
 
+import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.OneToManyAttributeMetadata;
 
 /**
@@ -37,6 +38,8 @@ public class OneToManyAttributeMetadataImpl extends AssociationAttributeMetadata
 	private final String mappedBy;
 	private final boolean removesOprhans;
 	private final String mapKey;
+	private final ColumnMetadata orderColumn;
+	private final String orderBy;
 
 	/**
 	 * @param member
@@ -53,6 +56,8 @@ public class OneToManyAttributeMetadataImpl extends AssociationAttributeMetadata
 		this.mappedBy = metadata.getMappedBy();
 		this.removesOprhans = metadata.removesOrphans();
 		this.mapKey = metadata.getMapKey();
+		this.orderBy = metadata.getOrderBy();
+		this.orderColumn = metadata.getOrderColumn();
 	}
 
 	/**
@@ -76,6 +81,8 @@ public class OneToManyAttributeMetadataImpl extends AssociationAttributeMetadata
 		this.mappedBy = oneToMany.mappedBy();
 		this.removesOprhans = oneToMany.orphanRemoval();
 		this.mapKey = this.handleMapKey(member, parsed);
+		this.orderBy = this.handleOrderBy(member, parsed);
+		this.orderColumn = this.handleOrderColumn(member, parsed);
 	}
 
 	/**
@@ -94,6 +101,24 @@ public class OneToManyAttributeMetadataImpl extends AssociationAttributeMetadata
 	@Override
 	public String getMappedBy() {
 		return this.mappedBy;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getOrderBy() {
+		return this.orderBy;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public ColumnMetadata getOrderColumn() {
+		return this.orderColumn;
 	}
 
 	/**

@@ -301,6 +301,7 @@ public class SessionImpl {
 
 		for (final ManagedInstance<?> instance : sortedUpdates) {
 			instance.flushAssociations(connection, false, !this.newEntities.isEmpty() && this.newEntities.contains(instance));
+			instance.sortLists();
 			instance.reset();
 		}
 
@@ -518,6 +519,7 @@ public class SessionImpl {
 
 				// process the associations
 				instance.processAssociations();
+				instance.sortLists();
 			}
 
 			for (final ManagedInstance<?> instance : entitiesLoaded) {
@@ -583,6 +585,5 @@ public class SessionImpl {
 		if (this.loadTracker == 1) {
 			SessionImpl.LOG.debug("Load tracker is triggered on session {0}", this.sessionId);
 		}
-
 	}
 }

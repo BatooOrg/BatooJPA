@@ -113,6 +113,8 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 		Element.factoryMap.put(ElementConstants.ELEMENT_MANY_TO_MANY, ManyToManyAttributeElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_MANY_TO_ONE, ManyToOneAttributeElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_MAP_KEY, MapKeyElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_ORDER_BY, OrderByElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_ORDER_COLUMN, OrderColumnElement.class);
 
 		// id
 		Element.factoryMap.put(ElementConstants.ELEMENT_GENERATED_VALUE, GeneratedValueElement.class);

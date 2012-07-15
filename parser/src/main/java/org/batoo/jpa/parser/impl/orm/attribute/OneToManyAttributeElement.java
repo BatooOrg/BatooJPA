@@ -26,8 +26,11 @@ import javax.persistence.FetchType;
 import org.batoo.jpa.parser.impl.orm.Element;
 import org.batoo.jpa.parser.impl.orm.ElementConstants;
 import org.batoo.jpa.parser.impl.orm.MapKeyElement;
+import org.batoo.jpa.parser.impl.orm.OrderByElement;
+import org.batoo.jpa.parser.impl.orm.OrderColumnElement;
 import org.batoo.jpa.parser.impl.orm.ParentElement;
 import org.batoo.jpa.parser.impl.orm.PrimaryKeyJoinColumnElement;
+import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.PrimaryKeyJoinColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.OneToManyAttributeMetadata;
 
@@ -46,6 +49,8 @@ public class OneToManyAttributeElement extends AssociationElement implements One
 
 	private final List<PrimaryKeyJoinColumnMetadata> primaryKeyJoinColumns = Lists.newArrayList();
 	private String mapKey;
+	private String orderBy;
+	private OrderColumnElement orderColumn;
 
 	/**
 	 * @param parent
@@ -63,7 +68,9 @@ public class OneToManyAttributeElement extends AssociationElement implements One
 			ElementConstants.ELEMENT_CASCADE,//
 			ElementConstants.ELEMENT_JOIN_COLUMN, //
 			ElementConstants.ELEMENT_JOIN_TABLE, //
-			ElementConstants.ELEMENT_MAP_KEY);
+			ElementConstants.ELEMENT_MAP_KEY, //
+			ElementConstants.ELEMENT_ORDER_BY, //
+			ElementConstants.ELEMENT_ORDER_COLUMN);
 	}
 
 	/**
@@ -101,6 +108,24 @@ public class OneToManyAttributeElement extends AssociationElement implements One
 	 * 
 	 */
 	@Override
+	public String getOrderBy() {
+		return this.orderBy;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public ColumnMetadata getOrderColumn() {
+		return this.orderColumn;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	protected void handleChild(Element child) {
 		super.handleChild(child);
 
@@ -110,6 +135,14 @@ public class OneToManyAttributeElement extends AssociationElement implements One
 
 		if (child instanceof MapKeyElement) {
 			this.mapKey = ((MapKeyElement) child).getName();
+		}
+
+		if (child instanceof OrderByElement) {
+			this.orderBy = ((OrderByElement) child).getOrderBy();
+		}
+
+		if (child instanceof OrderColumnElement) {
+			this.orderColumn = ((OrderColumnElement) child);
 		}
 	}
 

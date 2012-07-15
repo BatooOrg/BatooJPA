@@ -9,7 +9,7 @@
 		<inheritance strategy="SINGLE_TABLE" />
 		<discriminator-column />
 		<attributes>
-			<one-to-many name=""><map-key name=""/></one-to-many>
+			<one-to-many name=""><order-by></order-by><map-key name=""/></one-to-many>
 		</attributes>
 	</entity>
 	<embeddable class=""></embeddable>

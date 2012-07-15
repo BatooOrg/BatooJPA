@@ -24,6 +24,7 @@ import java.util.Set;
 
 import javax.persistence.ManyToMany;
 
+import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.ManyToManyAttributeMetadata;
 
 /**
@@ -36,6 +37,8 @@ public class ManyToManyAttributeMetadataImpl extends AssociationAttributeMetadat
 
 	private final String mappedBy;
 	private final String mapKey;
+	private final String orderBy;
+	private final ColumnMetadata orderColumn;
 
 	/**
 	 * @param member
@@ -51,6 +54,8 @@ public class ManyToManyAttributeMetadataImpl extends AssociationAttributeMetadat
 
 		this.mappedBy = metadata.getMappedBy();
 		this.mapKey = metadata.getMapKey();
+		this.orderBy = metadata.getOrderBy();
+		this.orderColumn = metadata.getOrderColumn();
 	}
 
 	/**
@@ -73,6 +78,8 @@ public class ManyToManyAttributeMetadataImpl extends AssociationAttributeMetadat
 
 		this.mappedBy = manyToMany.mappedBy();
 		this.mapKey = this.handleMapKey(member, parsed);
+		this.orderBy = this.handleOrderBy(member, parsed);
+		this.orderColumn = this.handleOrderColumn(member, parsed);
 	}
 
 	/**
@@ -91,5 +98,23 @@ public class ManyToManyAttributeMetadataImpl extends AssociationAttributeMetadat
 	@Override
 	public String getMappedBy() {
 		return this.mappedBy;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getOrderBy() {
+		return this.orderBy;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public ColumnMetadata getOrderColumn() {
+		return this.orderColumn;
 	}
 }

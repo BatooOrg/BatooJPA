@@ -19,7 +19,10 @@
 package org.batoo.jpa.core.impl.model.mapping;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +35,7 @@ import javax.persistence.metamodel.Type;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
+import org.batoo.jpa.core.impl.collections.ManagedList;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.PredicateImpl;
@@ -47,6 +51,7 @@ import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
+import org.batoo.jpa.core.impl.model.attribute.ListAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.MapAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
@@ -82,6 +87,8 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	private SingularMapping<? super E, ?> keyMapping;
 	private Pair<BasicMapping<? super E, ?>, BasicAttribute<?, ?>>[] keyMappings;
 	private EmbeddableTypeImpl<?> keyClass;
+	private String orderBy;
+	private Comparator<E> comparator;
 
 	/**
 	 * @param parent
@@ -175,6 +182,19 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 		return this.attribute;
 	}
 
+	private Comparator<E> getComparator() {
+		if (this.comparator != null) {
+			return this.comparator;
+		}
+		synchronized (this) {
+			if (this.comparator != null) {
+				return this.comparator;
+			}
+
+			return this.comparator = new ListComparator<E>(this);
+		}
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * 
@@ -236,6 +256,18 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 */
 	public Pair<BasicMapping<? super E, ?>, BasicAttribute<?, ?>>[] getKeyMappins() {
 		return this.keyMappings;
+	}
+
+	/**
+	 * Returns the order by of the association.
+	 * 
+	 * @return the order by of the association
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getOrderBy() {
+		return this.orderBy;
 	}
 
 	private CriteriaQueryImpl<E> getSelectCriteria() {
@@ -356,6 +388,10 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 			else {
 				this.keyMapping = (SingularMapping<? super E, ?>) this.type.getRootMapping().getMapping(mapKey);
 			}
+		}
+		else if (this.attribute.getCollectionType() == CollectionType.LIST) {
+			final ListAttributeImpl<? super Z, E> listAttribute = (ListAttributeImpl<? super Z, E>) this.attribute;
+			this.orderBy = listAttribute.getOrderBy();
 		}
 	}
 
@@ -527,5 +563,23 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 */
 	public void setLazy(ManagedInstance<?> instance) {
 		this.set(instance, this.attribute.newCollection(this, instance, true));
+	}
+
+	/**
+	 * Sorts the managed list of the instance
+	 * 
+	 * @param instance
+	 *            the owner instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	public void sortList(Object instance) {
+		final ManagedList<Z, E> list = (ManagedList<Z, E>) this.get(instance);
+		final ArrayList<E> delegate = list.getDelegate();
+		if ((list != null) && list.isInitialized()) {
+			Collections.sort(delegate, this.getComparator());
+		}
 	}
 }

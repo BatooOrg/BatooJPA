@@ -853,7 +853,12 @@ public class ManagedInstance<X> {
 
 		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociations()) {
 			if (association instanceof PluralAssociationMapping) {
-				((PluralAssociationMapping<?, ?, ?>) association).refreshCollection(entityManager, this);
+				final PluralAssociationMapping<?, ?, ?> pluralAssociationMapping = (PluralAssociationMapping<?, ?, ?>) association;
+				pluralAssociationMapping.refreshCollection(entityManager, this);
+
+				if (pluralAssociationMapping.getOrderBy() != null) {
+					pluralAssociationMapping.sortList(this.instance);
+				}
 			}
 			else if (association.cascadesRefresh()) {
 				final Object associate = association.get(this.instance);
@@ -977,6 +982,18 @@ public class ManagedInstance<X> {
 
 		for (final Mapping<?, ?, ?> mapping : this.type.getMappingsSingular()) {
 			this.snapshot.put(mapping, mapping.get(this.instance));
+		}
+	}
+
+	/**
+	 * Sorts the list associations.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void sortLists() {
+		for (final PluralAssociationMapping<?, ?, ?> mapping : this.type.getAssociationsPluralSorted()) {
+			mapping.sortList(this.instance);
 		}
 	}
 

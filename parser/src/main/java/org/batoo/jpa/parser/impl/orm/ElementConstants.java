@@ -76,6 +76,8 @@ public class ElementConstants {
 	protected static final String ELEMENT_ONE_TO_MANY = "one-to-many";
 	protected static final String ELEMENT_ONE_TO_ONE = "one-to-one";
 	protected static final String ELEMENT_MAP_KEY = "map-key";
+	protected static final String ELEMENT_ORDER_BY = "order-by";
+	protected static final String ELEMENT_ORDER_COLUMN = "order-column";
 	protected static final String ELEMENT_PRIMARY_KEY_JOIN_COLUMN = "primary-key-join-column";
 	protected static final String ELEMENT_SEQUENCE_GENERATOR = "sequence-generator";
 	protected static final String ELEMENT_TABLE_GENERATOR = "sequence-generator";

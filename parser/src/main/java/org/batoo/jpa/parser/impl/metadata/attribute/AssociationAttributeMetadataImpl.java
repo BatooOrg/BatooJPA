@@ -29,10 +29,15 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.JoinTable;
 import javax.persistence.MapKey;
+import javax.persistence.OrderBy;
+import javax.persistence.OrderColumn;
 
 import org.batoo.jpa.common.reflect.ReflectHelper;
+import org.batoo.jpa.parser.impl.AbstractLocator;
+import org.batoo.jpa.parser.impl.metadata.JavaLocator;
 import org.batoo.jpa.parser.impl.metadata.JoinColumnMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.JoinTableMetadaImpl;
+import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
 import org.batoo.jpa.parser.metadata.JoinTableMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
@@ -173,7 +178,7 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	}
 
 	/**
-	 * Handles the MapKey annotation
+	 * Handles the {@link MapKey} annotation
 	 * 
 	 * @param member
 	 *            the member
@@ -190,6 +195,108 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 			parsed.add(MapKey.class);
 
 			return annotation.name();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Handles the OrderBy annotation
+	 * 
+	 * @param member
+	 *            the member
+	 * @param parsed
+	 *            the list of annotations parsed
+	 * @return the map key value
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected String handleOrderBy(Member member, Set<Class<? extends Annotation>> parsed) {
+		final OrderBy annotation = ReflectHelper.getAnnotation(member, OrderBy.class);
+		if (annotation != null) {
+			parsed.add(OrderBy.class);
+
+			return annotation.value();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Handles the OrderBy annotation
+	 * 
+	 * @param member
+	 *            the member
+	 * @param parsed
+	 *            the list of annotations parsed
+	 * @return the map key value
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected ColumnMetadata handleOrderColumn(final Member member, Set<Class<? extends Annotation>> parsed) {
+		final OrderColumn annotation = ReflectHelper.getAnnotation(member, OrderColumn.class);
+		if (annotation != null) {
+			parsed.add(OrderColumn.class);
+
+			return new ColumnMetadata() {
+
+				@Override
+				public String getColumnDefinition() {
+					return annotation.columnDefinition();
+				}
+
+				@Override
+				public int getLength() {
+					return 0;
+				}
+
+				@Override
+				public AbstractLocator getLocator() {
+					return new JavaLocator(member);
+				}
+
+				@Override
+				public String getName() {
+					return annotation.name();
+				}
+
+				@Override
+				public int getPrecision() {
+					return 0;
+				}
+
+				@Override
+				public int getScale() {
+					return 0;
+				}
+
+				@Override
+				public String getTable() {
+					return null;
+				}
+
+				@Override
+				public boolean isInsertable() {
+					return annotation.insertable();
+				}
+
+				@Override
+				public boolean isNullable() {
+					return annotation.nullable();
+				}
+
+				@Override
+				public boolean isUnique() {
+					return false;
+				}
+
+				@Override
+				public boolean isUpdatable() {
+					return annotation.updatable();
+				}
+			};
 		}
 
 		return null;

@@ -127,7 +127,6 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 
 	private final ArrayList<E> delegate = Lists.newArrayList();
 	private ArrayList<E> snapshot;
-
 	private boolean initialized;
 
 	/**
@@ -393,6 +392,8 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 
 			this.delegate.addAll(this.getAssociation().loadCollection(this.getManagedInstance()));
 
+			this.getAssociation().sortList(this.getManagedInstance().getInstance());
+
 			this.initialized = true;
 		}
 	}
@@ -406,6 +407,18 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 		this.initialize();
 
 		return this.delegate.isEmpty();
+	}
+
+	/**
+	 * Returns if the list is initialized.
+	 * 
+	 * @return true if the list is initialized, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isInitialized() {
+		return this.initialized;
 	}
 
 	/**
