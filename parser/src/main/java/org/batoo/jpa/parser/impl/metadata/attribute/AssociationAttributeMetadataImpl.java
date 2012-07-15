@@ -28,6 +28,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.JoinTable;
+import javax.persistence.MapKey;
 
 import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.parser.impl.metadata.JoinColumnMetadataImpl;
@@ -88,8 +89,8 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AssociationAttributeMetadataImpl(Member member, String name, Set<Class<? extends Annotation>> parsed, String targetEntity,
-		FetchType fetchType, CascadeType[] cascades) {
+	public AssociationAttributeMetadataImpl(Member member, String name, Set<Class<? extends Annotation>> parsed, String targetEntity, FetchType fetchType,
+		CascadeType[] cascades) {
 		super(member, name);
 
 		this.targetEntity = "void".equals(targetEntity) ? null : targetEntity;
@@ -169,5 +170,28 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	@Override
 	public String getTargetEntity() {
 		return this.targetEntity;
+	}
+
+	/**
+	 * Handles the MapKey annotation
+	 * 
+	 * @param member
+	 *            the member
+	 * @param parsed
+	 *            the list of annotations parsed
+	 * @return the map key value
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected String handleMapKey(Member member, Set<Class<? extends Annotation>> parsed) {
+		final MapKey annotation = ReflectHelper.getAnnotation(member, MapKey.class);
+		if (annotation != null) {
+			parsed.add(MapKey.class);
+
+			return annotation.name();
+		}
+
+		return null;
 	}
 }

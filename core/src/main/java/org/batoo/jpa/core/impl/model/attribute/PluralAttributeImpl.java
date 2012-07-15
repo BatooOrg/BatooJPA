@@ -93,7 +93,7 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 			return new CollectionAttributeImpl(declaringType, metadata, attributeType);
 		}
 		else if (Map.class == type) {
-			return null;
+			return new MapAttributeImpl(declaringType, metadata, attributeType);
 		}
 
 		throw new MappingException("Cannot determine collection type for " + type, metadata.getLocator());
@@ -111,12 +111,15 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 *            the metadata
 	 * @param attributeType
 	 *            the attribute type
+	 * @param valueIndexNo
+	 *            the index of the generic value parameter, typically 0 for {@link Collection}, {@link List} and {@link Set} attributes and
+	 *            1 for {@link Map} attributes
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public PluralAttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata, PersistentAttributeType attributeType) {
+	public PluralAttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata, PersistentAttributeType attributeType, int valueIndexNo) {
 		super(declaringType, metadata);
 
 		this.attributeType = attributeType;
@@ -130,10 +133,22 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 			}
 		}
 		else {
-			this.bindableJavaType = ReflectHelper.getGenericType(this.getJavaMember(), 0);
+			this.bindableJavaType = ReflectHelper.getGenericType(this.getJavaMember(), valueIndexNo);
 		}
 
 		this.association = attributeType != PersistentAttributeType.ELEMENT_COLLECTION;
+	}
+
+	/**
+	 * Returns the attributeType of the PluralAttributeImpl.
+	 * 
+	 * @return the attributeType of the PluralAttributeImpl
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public javax.persistence.metamodel.Attribute.PersistentAttributeType getAttributeType() {
+		return this.attributeType;
 	}
 
 	/**
@@ -236,7 +251,7 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract C newCollection(PluralAssociationMapping<?, C, E> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values);
+	public abstract C newCollection(PluralAssociationMapping<?, C, E> mapping, ManagedInstance<?> managedInstance, Object values);
 
 	/**
 	 * {@inheritDoc}

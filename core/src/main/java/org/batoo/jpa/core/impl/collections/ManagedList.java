@@ -198,6 +198,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 
 		this.delegate.add(e);
 		this.changed();
+
 		return true;
 	}
 

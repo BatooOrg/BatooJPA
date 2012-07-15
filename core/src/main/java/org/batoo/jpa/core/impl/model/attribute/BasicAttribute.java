@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.model.attribute;
 import java.sql.Timestamp;
 
 import javax.persistence.EnumType;
+import javax.persistence.PersistenceException;
 import javax.persistence.TemporalType;
 import javax.persistence.metamodel.SingularAttribute;
 
@@ -235,7 +236,7 @@ public final class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 			case MANUAL:
 				// only check if the id is not null
 				if (value == null) {
-					throw new NullPointerException();
+					throw new PersistenceException("Manual id cannot be null");
 				}
 			case SEQUENCE:
 				// fill with the sequence

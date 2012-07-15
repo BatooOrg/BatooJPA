@@ -53,7 +53,7 @@ public class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E>, E> 
 	 * @author hceylan
 	 */
 	public ListAttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata, PersistentAttributeType attributeType) {
-		super(declaringType, metadata, attributeType);
+		super(declaringType, metadata, attributeType, 0);
 	}
 
 	/**
@@ -79,7 +79,8 @@ public class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E>, E> 
 	 * 
 	 */
 	@Override
-	public List<E> newCollection(PluralAssociationMapping<?, List<E>, E> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
-		return new ManagedList<X, E>(mapping, managedInstance, values);
+	@SuppressWarnings("unchecked")
+	public List<E> newCollection(PluralAssociationMapping<?, List<E>, E> mapping, ManagedInstance<?> managedInstance, Object values) {
+		return new ManagedList<X, E>(mapping, managedInstance, (Collection<? extends E>) values);
 	}
 }

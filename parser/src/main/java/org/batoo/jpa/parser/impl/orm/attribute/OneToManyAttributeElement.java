@@ -25,6 +25,7 @@ import javax.persistence.FetchType;
 
 import org.batoo.jpa.parser.impl.orm.Element;
 import org.batoo.jpa.parser.impl.orm.ElementConstants;
+import org.batoo.jpa.parser.impl.orm.MapKeyElement;
 import org.batoo.jpa.parser.impl.orm.ParentElement;
 import org.batoo.jpa.parser.impl.orm.PrimaryKeyJoinColumnElement;
 import org.batoo.jpa.parser.metadata.PrimaryKeyJoinColumnMetadata;
@@ -44,6 +45,7 @@ public class OneToManyAttributeElement extends AssociationElement implements One
 	private String mappedBy;
 
 	private final List<PrimaryKeyJoinColumnMetadata> primaryKeyJoinColumns = Lists.newArrayList();
+	private String mapKey;
 
 	/**
 	 * @param parent
@@ -60,7 +62,8 @@ public class OneToManyAttributeElement extends AssociationElement implements One
 		super(parent, attributes, FetchType.LAZY, //
 			ElementConstants.ELEMENT_CASCADE,//
 			ElementConstants.ELEMENT_JOIN_COLUMN, //
-			ElementConstants.ELEMENT_JOIN_TABLE);
+			ElementConstants.ELEMENT_JOIN_TABLE, //
+			ElementConstants.ELEMENT_MAP_KEY);
 	}
 
 	/**
@@ -73,6 +76,15 @@ public class OneToManyAttributeElement extends AssociationElement implements One
 
 		this.orphanRemoval = this.getAttribute(ElementConstants.ATTR_ORPHAN_REMOVAL, Boolean.FALSE);
 		this.mappedBy = this.getAttribute(ElementConstants.ATTR_MAPPED_BY, ElementConstants.EMPTY);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getMapKey() {
+		return this.mapKey;
 	}
 
 	/**
@@ -94,6 +106,10 @@ public class OneToManyAttributeElement extends AssociationElement implements One
 
 		if (child instanceof PrimaryKeyJoinColumnElement) {
 			this.primaryKeyJoinColumns.add((PrimaryKeyJoinColumnMetadata) child);
+		}
+
+		if (child instanceof MapKeyElement) {
+			this.mapKey = ((MapKeyElement) child).getName();
 		}
 	}
 

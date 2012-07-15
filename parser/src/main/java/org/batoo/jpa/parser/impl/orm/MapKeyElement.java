@@ -16,12 +16,51 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.parser.metadata.attribute;
+package org.batoo.jpa.parser.impl.orm;
+
+import java.util.Map;
 
 /**
- * The definition of the one to many attributes.
+ * Element for <code>map-key</code> elements.
  * 
  * @author hceylan
  * @since $version
  */
-public interface ManyToManyAttributeMetadata extends AssociationAttributeMetadata, MappableAssociationAttributeMetadata, PluralAttributeMetadata {}
+public class MapKeyElement extends ChildElement {
+
+	private String name;
+
+	/**
+	 * @param parent
+	 *            the parent element factory
+	 * @param attributes
+	 *            the attributes
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public MapKeyElement(ParentElement parent, Map<String, String> attributes) {
+		super(parent, attributes);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	protected void generate() {
+		this.name = this.getAttribute(ElementConstants.ATTR_NAME, "");
+	}
+
+	/**
+	 * Returns the name of the map key.
+	 * 
+	 * @return the name of the map key
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getName() {
+		return this.name;
+	}
+}

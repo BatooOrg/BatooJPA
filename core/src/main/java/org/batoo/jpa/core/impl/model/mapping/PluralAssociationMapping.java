@@ -26,7 +26,10 @@ import java.util.Map;
 
 import javax.persistence.criteria.Path;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
+import javax.persistence.metamodel.PluralAttribute.CollectionType;
+import javax.persistence.metamodel.Type;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
@@ -44,7 +47,9 @@ import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
+import org.batoo.jpa.core.impl.model.attribute.MapAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
+import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.util.BatooUtils;
 import org.batoo.jpa.core.util.Pair;
@@ -73,6 +78,10 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	private EntityTypeImpl<E> type;
 	private AssociationMapping<?, ?, ?> inverse;
 	private CriteriaQueryImpl<E> selectCriteria;
+
+	private SingularMapping<? super E, ?> keyMapping;
+	private Pair<BasicMapping<? super E, ?>, BasicAttribute<?, ?>>[] keyMappings;
+	private EmbeddableTypeImpl<?> keyClass;
 
 	/**
 	 * @param parent
@@ -135,14 +144,13 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
 	public void enhance(ManagedInstance<?> instance) {
-		final Collection<? extends E> collection = (Collection<? extends E>) this.get(instance.getInstance());
-		if (collection == null) {
+		final C c = this.get(instance.getInstance());
+		if (c == null) {
 			this.set(instance, this.attribute.newCollection(this, instance, false));
 		}
 		else {
-			this.set(instance, this.attribute.newCollection(this, instance, collection));
+			this.set(instance, this.attribute.newCollection(this, instance, c));
 		}
 	}
 
@@ -192,6 +200,42 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	@Override
 	public JoinTable getJoinTable() {
 		return this.joinTable;
+	}
+
+	/**
+	 * Returns the key class of the association.
+	 * 
+	 * @return the key class of the association
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Type<?> getKeyClass() {
+		return this.keyClass;
+	}
+
+	/**
+	 * Returns the key mapping of the association.
+	 * 
+	 * @return the key mapping of the association
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public SingularMapping<? super E, ?> getKeyMapping() {
+		return this.keyMapping;
+	}
+
+	/**
+	 * Returns the key mappings of the association.
+	 * 
+	 * @return the key mappings of the association
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Pair<BasicMapping<? super E, ?>, BasicAttribute<?, ?>>[] getKeyMappins() {
+		return this.keyMappings;
 	}
 
 	private CriteriaQueryImpl<E> getSelectCriteria() {
@@ -274,6 +318,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public void link() throws MappingException {
 		final EntityTypeImpl<?> entity = this.getRoot().getType();
 		entity.getMetamodel();
@@ -293,6 +338,23 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 			// initialize the join table
 			if (this.getJoinTable() != null) {
 				this.getJoinTable().link(entity, this.type);
+			}
+		}
+
+		if (this.attribute.getCollectionType() == CollectionType.MAP) {
+			final MapAttributeImpl<? super Z, Map<?, E>, E> mapAttribute = (MapAttributeImpl<? super Z, Map<?, E>, E>) this.attribute;
+			final String mapKey = mapAttribute.getMapKey();
+			if (StringUtils.isBlank(mapKey)) {
+				if (this.type.hasSingleIdAttribute()) {
+					this.keyMapping = this.type.getIdMapping();
+				}
+				else {
+					this.keyMappings = this.type.getIdMappings();
+					this.keyClass = (EmbeddableTypeImpl<?>) this.type.getIdType();
+				}
+			}
+			else {
+				this.keyMapping = (SingularMapping<? super E, ?>) this.type.getRootMapping().getMapping(mapKey);
 			}
 		}
 	}

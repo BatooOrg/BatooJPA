@@ -3,12 +3,13 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd" version="2.0">
 	<access>PROPERTY</access>
 
-	<mapped-superclass class="" ></mapped-superclass>
+	<mapped-superclass class=""></mapped-superclass>
 
-	<entity name="Entity" class="org.batoo.jpa.parser.test.Entity"> <inheritance strategy="SINGLE_TABLE"/><discriminator-column />
-	<secondary-table name=""></secondary-table>
+	<entity name="Entity" class="org.batoo.jpa.parser.test.Entity">
+		<inheritance strategy="SINGLE_TABLE" />
+		<discriminator-column />
 		<attributes>
-		<one-to-many name=""></one-to-many>
+			<one-to-many name=""><map-key name=""/></one-to-many>
 		</attributes>
 	</entity>
 	<embeddable class=""></embeddable>

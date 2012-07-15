@@ -52,7 +52,7 @@ public class CollectionAttributeImpl<X, E> extends PluralAttributeImpl<X, Collec
 	 * @author hceylan
 	 */
 	public CollectionAttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata, PersistentAttributeType attributeType) {
-		super(declaringType, metadata, attributeType);
+		super(declaringType, metadata, attributeType, 0);
 	}
 
 	/**
@@ -78,8 +78,8 @@ public class CollectionAttributeImpl<X, E> extends PluralAttributeImpl<X, Collec
 	 * 
 	 */
 	@Override
-	public Collection<E>
-		newCollection(PluralAssociationMapping<?, Collection<E>, E> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
-		return new ManagedList<X, E>(mapping, managedInstance, values);
+	@SuppressWarnings("unchecked")
+	public Collection<E> newCollection(PluralAssociationMapping<?, Collection<E>, E> mapping, ManagedInstance<?> managedInstance, Object values) {
+		return new ManagedList<X, E>(mapping, managedInstance, (Collection<? extends E>) values);
 	}
 }

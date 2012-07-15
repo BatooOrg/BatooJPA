@@ -36,6 +36,7 @@ public class OneToManyAttributeMetadataImpl extends AssociationAttributeMetadata
 
 	private final String mappedBy;
 	private final boolean removesOprhans;
+	private final String mapKey;
 
 	/**
 	 * @param member
@@ -51,6 +52,7 @@ public class OneToManyAttributeMetadataImpl extends AssociationAttributeMetadata
 
 		this.mappedBy = metadata.getMappedBy();
 		this.removesOprhans = metadata.removesOrphans();
+		this.mapKey = metadata.getMapKey();
 	}
 
 	/**
@@ -73,6 +75,16 @@ public class OneToManyAttributeMetadataImpl extends AssociationAttributeMetadata
 
 		this.mappedBy = oneToMany.mappedBy();
 		this.removesOprhans = oneToMany.orphanRemoval();
+		this.mapKey = this.handleMapKey(member, parsed);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getMapKey() {
+		return this.mapKey;
 	}
 
 	/**
@@ -92,5 +104,4 @@ public class OneToManyAttributeMetadataImpl extends AssociationAttributeMetadata
 	public boolean removesOrphans() {
 		return this.removesOprhans;
 	}
-
 }

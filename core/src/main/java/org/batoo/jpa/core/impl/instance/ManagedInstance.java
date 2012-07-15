@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.LockModeType;
@@ -222,7 +223,13 @@ public class ManagedInstance<X> {
 				final PluralAssociationMapping<?, ?, ?> mapping = (PluralAssociationMapping<?, ?, ?>) association;
 
 				if (mapping.getAttribute().getCollectionType() == CollectionType.MAP) {
-					// TODO handle map
+					// extract the collection
+					final Map<?, ?> map = (Map<?, ?>) mapping.get(this.instance);
+
+					// cascade to each element in the collection
+					for (final Object element : map.values()) {
+						requiresFlush |= entityManager.persistImpl(element, processed);
+					}
 				}
 				else {
 					// extract the collection

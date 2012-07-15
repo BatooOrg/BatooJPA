@@ -18,14 +18,11 @@
  */
 package org.batoo.jpa.parser.metadata.attribute;
 
-
 /**
- * The definition of the many to many attributes.
+ * The definition of the one to many attributes.
  * 
  * @author hceylan
  * @since $version
  */
-public interface OneToManyAttributeMetadata extends AssociationAttributeMetadata, MappableAssociationAttributeMetadata,
-	OrphanableAssociationAttributeMetadata {
-
-}
+public interface OneToManyAttributeMetadata extends AssociationAttributeMetadata, MappableAssociationAttributeMetadata, OrphanableAssociationAttributeMetadata,
+	PluralAttributeMetadata {}

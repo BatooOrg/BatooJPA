@@ -53,7 +53,7 @@ public class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>, E> im
 	 * @author hceylan
 	 */
 	public SetAttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata, PersistentAttributeType attributeType) {
-		super(declaringType, metadata, attributeType);
+		super(declaringType, metadata, attributeType, 0);
 	}
 
 	/**
@@ -79,7 +79,8 @@ public class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>, E> im
 	 * 
 	 */
 	@Override
-	public Set<E> newCollection(PluralAssociationMapping<?, Set<E>, E> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
-		return new ManagedSet<X, E>(mapping, managedInstance, values);
+	@SuppressWarnings("unchecked")
+	public Set<E> newCollection(PluralAssociationMapping<?, Set<E>, E> mapping, ManagedInstance<?> managedInstance, Object values) {
+		return new ManagedSet<X, E>(mapping, managedInstance, (Collection<? extends E>) values);
 	}
 }

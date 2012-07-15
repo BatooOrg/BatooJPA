@@ -19,9 +19,20 @@
 package org.batoo.jpa.parser.metadata.attribute;
 
 /**
- * The definition of the one to many attributes.
+ * Definitions for plural attributes.
  * 
  * @author hceylan
  * @since $version
  */
-public interface ManyToManyAttributeMetadata extends AssociationAttributeMetadata, MappableAssociationAttributeMetadata, PluralAttributeMetadata {}
+public interface PluralAttributeMetadata {
+
+	/**
+	 * Returns the map key.
+	 * 
+	 * @return the map key
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	String getMapKey();
+}

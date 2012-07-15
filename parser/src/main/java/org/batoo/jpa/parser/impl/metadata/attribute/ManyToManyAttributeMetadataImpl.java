@@ -35,6 +35,7 @@ import org.batoo.jpa.parser.metadata.attribute.ManyToManyAttributeMetadata;
 public class ManyToManyAttributeMetadataImpl extends AssociationAttributeMetadataImpl implements ManyToManyAttributeMetadata {
 
 	private final String mappedBy;
+	private final String mapKey;
 
 	/**
 	 * @param member
@@ -49,6 +50,7 @@ public class ManyToManyAttributeMetadataImpl extends AssociationAttributeMetadat
 		super(member, metadata);
 
 		this.mappedBy = metadata.getMappedBy();
+		this.mapKey = metadata.getMapKey();
 	}
 
 	/**
@@ -70,6 +72,16 @@ public class ManyToManyAttributeMetadataImpl extends AssociationAttributeMetadat
 		parsed.add(ManyToMany.class);
 
 		this.mappedBy = manyToMany.mappedBy();
+		this.mapKey = this.handleMapKey(member, parsed);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getMapKey() {
+		return this.mapKey;
 	}
 
 	/**
@@ -80,5 +92,4 @@ public class ManyToManyAttributeMetadataImpl extends AssociationAttributeMetadat
 	public String getMappedBy() {
 		return this.mappedBy;
 	}
-
 }

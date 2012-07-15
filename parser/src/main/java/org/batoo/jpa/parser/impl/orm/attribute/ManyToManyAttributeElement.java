@@ -25,6 +25,7 @@ import javax.persistence.FetchType;
 
 import org.batoo.jpa.parser.impl.orm.Element;
 import org.batoo.jpa.parser.impl.orm.ElementConstants;
+import org.batoo.jpa.parser.impl.orm.MapKeyElement;
 import org.batoo.jpa.parser.impl.orm.ParentElement;
 import org.batoo.jpa.parser.impl.orm.PrimaryKeyJoinColumnElement;
 import org.batoo.jpa.parser.metadata.PrimaryKeyJoinColumnMetadata;
@@ -41,7 +42,7 @@ import com.google.common.collect.Lists;
 public class ManyToManyAttributeElement extends AssociationElement implements ManyToManyAttributeMetadata {
 
 	private String mappedBy;
-
+	private String mapKey;
 	private final List<PrimaryKeyJoinColumnMetadata> primaryKeyJoinColumns = Lists.newArrayList();
 
 	/**
@@ -60,7 +61,8 @@ public class ManyToManyAttributeElement extends AssociationElement implements Ma
 			ElementConstants.ELEMENT_CASCADE,//
 			ElementConstants.ELEMENT_JOIN_COLUMN, //
 			ElementConstants.ELEMENT_JOIN_TABLE, //
-			ElementConstants.ELEMENT_PRIMARY_KEY_JOIN_COLUMN);
+			ElementConstants.ELEMENT_PRIMARY_KEY_JOIN_COLUMN, //
+			ElementConstants.ELEMENT_MAP_KEY);
 	}
 
 	/**
@@ -72,6 +74,15 @@ public class ManyToManyAttributeElement extends AssociationElement implements Ma
 		super.generate();
 
 		this.mappedBy = this.getAttribute(ElementConstants.ATTR_MAPPED_BY, ElementConstants.EMPTY);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getMapKey() {
+		return this.mapKey;
 	}
 
 	/**
@@ -93,6 +104,10 @@ public class ManyToManyAttributeElement extends AssociationElement implements Ma
 
 		if (child instanceof PrimaryKeyJoinColumnElement) {
 			this.primaryKeyJoinColumns.add((PrimaryKeyJoinColumnMetadata) child);
+		}
+
+		if (child instanceof MapKeyElement) {
+			this.mapKey = ((MapKeyElement) child).getName();
 		}
 	}
 }
