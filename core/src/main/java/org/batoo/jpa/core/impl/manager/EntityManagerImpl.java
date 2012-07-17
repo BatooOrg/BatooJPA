@@ -151,18 +151,21 @@ public class EntityManagerImpl implements EntityManager {
 			if (association instanceof PluralAssociationMapping) {
 				final PluralAssociationMapping<?, ?, ?> mapping = (PluralAssociationMapping<?, ?, ?>) association;
 
+				Collection<?> children;
 				if (mapping.getAttribute().getCollectionType() == CollectionType.MAP) {
-					// TODO handle map
+					final Map<?, ?> map = (Map<?, ?>) mapping.get(entity);
+					children = map.values();
 				}
 				else {
 					// get the children
-					final Collection<?> children = (Collection<?>) mapping.get(entity);
+					children = (Collection<?>) mapping.get(entity);
 
-					if (children != null) {
-						// iterate over children and merge them all
-						for (final Object child : children) {
-							this.mergeImpl(child, requiresFlush, processed, association.cascadesMerge());
-						}
+				}
+
+				if (children != null) {
+					// iterate over children and merge them all
+					for (final Object child : children) {
+						this.mergeImpl(child, requiresFlush, processed, association.cascadesMerge());
 					}
 				}
 			}
