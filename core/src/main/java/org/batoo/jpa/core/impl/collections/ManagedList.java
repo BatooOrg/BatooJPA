@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.collections;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -28,6 +29,7 @@ import javax.persistence.PersistenceException;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 
 import com.google.common.collect.Lists;
@@ -326,6 +328,45 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 		this.initialize();
 
 		return this.delegate.equals(obj);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void flush(ConnectionImpl connection, boolean removals, boolean force) throws SQLException {
+		if (this.removed(connection, removals)) {
+			return;
+		}
+
+		// for lists the index is maintained in the database
+		final ManagedInstance<?> instance = this.getManagedInstance();
+		final PluralAssociationMapping<?, ?, E> association = this.getAssociation();
+		final Object source = instance.getInstance();
+
+		// forced creation of relations for the new entities
+		if (force) {
+			for (int i = 0; i < this.delegate.size(); i++) {
+				association.getJoinTable().performInsert(connection, source, this.delegate.get(i), i);
+			}
+
+			return;
+		}
+
+		if (this.snapshot == null) {
+			return;
+		}
+
+		if (removals) {
+			association.getJoinTable().performRemoveAll(connection, source);
+		}
+		else {
+			// create the additions
+			for (int i = 0; i < this.delegate.size(); i++) {
+				association.getJoinTable().performInsert(connection, source, this.delegate.get(i), i);
+			}
+		}
 	}
 
 	/**

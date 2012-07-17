@@ -26,6 +26,7 @@ import javax.persistence.criteria.JoinType;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
 import org.batoo.jpa.parser.metadata.JoinTableMetadata;
 
@@ -44,9 +45,13 @@ public class JoinTable extends AbstractTable {
 	private final ForeignKey destinationKey;
 	private final EntityTypeImpl<?> entity;
 
+	private OrderColumn orderColumn;
+
 	private String removeSql;
+	private String removeAllSql;
 	private JoinColumn[] sourceRemoveColumns;
 	private JoinColumn[] destinationRemoveColumns;
+	private JoinColumn[] removeAllColumns;
 
 	/**
 	 * @param entity
@@ -121,6 +126,29 @@ public class JoinTable extends AbstractTable {
 		return this.entity;
 	}
 
+	private String getRemoveAllSql() {
+		if (this.removeAllSql != null) {
+			return this.removeAllSql;
+		}
+
+		synchronized (this) {
+			if (this.removeAllSql != null) {
+				return this.removeAllSql;
+			}
+
+			final List<String> restrictions = Lists.newArrayList();
+			this.removeAllColumns = new JoinColumn[this.sourceKey.getJoinColumns().size()];
+
+			int i = 0;
+			for (final JoinColumn column : this.sourceKey.getJoinColumns()) {
+				restrictions.add(column.getName() + " = ?");
+				this.removeAllColumns[i++] = column;
+			}
+
+			return this.removeSql = "DELETE FROM " + this.getQName() + " WHERE " + Joiner.on(" AND ").join(restrictions);
+		}
+	}
+
 	private String getRemoveSql() {
 		if (this.removeSql != null) {
 			return this.removeSql;
@@ -193,6 +221,8 @@ public class JoinTable extends AbstractTable {
 	 *            the source instance
 	 * @param destination
 	 *            the destination instance
+	 * @param order
+	 *            the order of the column
 	 * 
 	 * @throws SQLException
 	 *             thrown if there is an underlying SQL Exception
@@ -200,7 +230,7 @@ public class JoinTable extends AbstractTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performInsert(ConnectionImpl connection, Object source, Object destination) throws SQLException {
+	public void performInsert(ConnectionImpl connection, Object source, Object destination, int order) throws SQLException {
 		final String insertSql = this.getInsertSql(null);
 		final AbstractColumn[] insertColumns = this.getInsertColumns(null);
 
@@ -210,7 +240,12 @@ public class JoinTable extends AbstractTable {
 			final AbstractColumn column = insertColumns[i];
 
 			final Object object = this.sourceKey.getJoinColumns().contains(column) ? source : destination;
-			params[i] = column.getValue(object);
+			if (column == this.orderColumn) {
+				params[i] = order;
+			}
+			else {
+				params[i] = column.getValue(object);
+			}
 		}
 
 		new QueryRunner().update(connection, insertSql, params);
@@ -250,12 +285,44 @@ public class JoinTable extends AbstractTable {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Performs the remove for the join.
 	 * 
+	 * @param connection
+	 *            the connection
+	 * @param source
+	 *            the source instance
+	 * 
+	 * @throws SQLException
+	 *             thrown if there is an underlying SQL Exception
+	 * 
+	 * @since $version
+	 * @author hceylan
 	 */
-	@Override
-	public String toString() {
-		// TODO Auto-generated method stub
-		return super.toString();
+	public void performRemoveAll(ConnectionImpl connection, Object source) throws SQLException {
+		final String removeSql = this.getRemoveAllSql();
+
+		final Object[] params = new Object[this.removeAllColumns.length];
+
+		int i = 0;
+		for (final JoinColumn sourceRemoveColumn : this.removeAllColumns) {
+			params[i++] = sourceRemoveColumn.getValue(source);
+		}
+
+		new QueryRunner().update(connection, removeSql, params);
+	}
+
+	/**
+	 * Sets the order column for the owned list type joins
+	 * 
+	 * @param orderColumn
+	 *            the order column definition
+	 * @param name
+	 *            the name of the column
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setOrderColumn(ColumnMetadata orderColumn, String name) {
+		this.orderColumn = new OrderColumn(this, orderColumn, name);
 	}
 }

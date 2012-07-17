@@ -60,6 +60,7 @@ import org.batoo.jpa.core.util.BatooUtils;
 import org.batoo.jpa.core.util.Pair;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
+import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
 
 import com.google.common.collect.Lists;
@@ -353,7 +354,6 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	@SuppressWarnings("unchecked")
 	public void link() throws MappingException {
 		final EntityTypeImpl<?> entity = this.getRoot().getType();
-		entity.getMetamodel();
 
 		this.type = (EntityTypeImpl<E>) this.attribute.getElementType();
 
@@ -370,6 +370,15 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 			// initialize the join table
 			if (this.getJoinTable() != null) {
 				this.getJoinTable().link(entity, this.type);
+
+				if (this.attribute.getCollectionType() == CollectionType.LIST) {
+					final ListAttributeImpl<? super Z, E> listAttribute = (ListAttributeImpl<? super Z, E>) this.attribute;
+					final ColumnMetadata orderColumn = listAttribute.getOrderColumn();
+					if (orderColumn != null) {
+						final String name = StringUtils.isNotBlank(orderColumn.getName()) ? orderColumn.getName() : this.attribute.getName() + "_ORDER";
+						this.getJoinTable().setOrderColumn(listAttribute.getOrderColumn(), name);
+					}
+				}
 			}
 		}
 

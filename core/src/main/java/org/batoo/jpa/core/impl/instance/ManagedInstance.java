@@ -307,8 +307,10 @@ public class ManagedInstance<X> {
 
 		}
 
-		this.snapshot();
-		this.changed = true;
+		if (!this.changed) {
+			this.snapshot();
+			this.changed = true;
+		}
 	}
 
 	/**

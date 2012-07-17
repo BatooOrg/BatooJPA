@@ -107,26 +107,17 @@ public abstract class ManagedCollection<E> {
 	 */
 	@SuppressWarnings("unchecked")
 	public void flush(ConnectionImpl connection, boolean removals, boolean force) throws SQLException {
-		final Object source = this.managedInstance.getInstance();
 
-		// if the instance removed remove all the relations
-		if (removals && (this.managedInstance.getStatus() == Status.REMOVED)) {
-			Collection<E> children = this.getSnapshot();
-			if (children == null) {
-				children = this.getDelegate();
-			}
-
-			for (final E child : children) {
-				this.association.getJoinTable().performRemove(connection, source, child);
-			}
-
+		if (this.removed(connection, removals)) {
 			return;
 		}
+
+		final Object source = this.managedInstance.getInstance();
 
 		// forced creation of relations for the new entities
 		if (force) {
 			for (final E child : this.getDelegate()) {
-				this.association.getJoinTable().performInsert(connection, source, child);
+				this.association.getJoinTable().performInsert(connection, source, child, -1);
 			}
 
 			return;
@@ -148,7 +139,7 @@ public abstract class ManagedCollection<E> {
 			// create the additions
 			final Collection<E> childrenAdded = CollectionUtils.subtract(this.getDelegate(), snapshot);
 			for (final E child : childrenAdded) {
-				this.association.getJoinTable().performInsert(connection, source, child);
+				this.association.getJoinTable().performInsert(connection, source, child, -1);
 			}
 		}
 	}
@@ -309,6 +300,38 @@ public abstract class ManagedCollection<E> {
 	 * @author hceylan
 	 */
 	protected abstract void removeChild(E child);
+
+	/**
+	 * @param connection
+	 *            the connection
+	 * @param removals
+	 *            true if the removals should be flushed and false for the additions
+	 * @return returns true if the instance has been removed
+	 * @throws SQLException
+	 *             thrown in case of an SQL error
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected boolean removed(ConnectionImpl connection, boolean removals) throws SQLException {
+		final Object source = this.managedInstance.getInstance();
+
+		// if the instance removed remove all the relations
+		if (removals && (this.managedInstance.getStatus() == Status.REMOVED)) {
+			Collection<E> children = this.getSnapshot();
+			if (children == null) {
+				children = this.getDelegate();
+			}
+
+			for (final E child : children) {
+				this.association.getJoinTable().performRemove(connection, source, child);
+			}
+
+			return true;
+		}
+
+		return false;
+	}
 
 	/**
 	 * Removes the entities that have been orphaned by removal from the collection.
