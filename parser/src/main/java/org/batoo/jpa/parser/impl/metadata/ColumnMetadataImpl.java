@@ -19,6 +19,7 @@
 package org.batoo.jpa.parser.impl.metadata;
 
 import javax.persistence.Column;
+import javax.persistence.OrderColumn;
 
 import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
@@ -66,6 +67,32 @@ public class ColumnMetadataImpl implements ColumnMetadata {
 		this.table = annotation.table();
 		this.unique = annotation.unique();
 		this.updatable = annotation.updatable();
+	}
+
+	/**
+	 * @param locator
+	 *            the java locator
+	 * @param annotation
+	 *            the annotation
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ColumnMetadataImpl(AbstractLocator locator, OrderColumn annotation) {
+		super();
+
+		this.locator = locator;
+		this.name = annotation.name();
+		this.columnDefinition = annotation.columnDefinition();
+		this.insertable = annotation.insertable();
+		this.nullable = annotation.nullable();
+		this.updatable = annotation.updatable();
+
+		this.length = 0;
+		this.precision = 0;
+		this.scale = 0;
+		this.table = null;
+		this.unique = false;
 	}
 
 	/**

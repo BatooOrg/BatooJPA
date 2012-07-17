@@ -20,31 +20,31 @@ package org.batoo.jpa.parser.impl.metadata;
 
 import java.util.List;
 
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.SecondaryTable;
+import javax.persistence.CollectionTable;
+import javax.persistence.JoinColumn;
 import javax.persistence.UniqueConstraint;
 
 import org.batoo.jpa.parser.impl.AbstractLocator;
-import org.batoo.jpa.parser.metadata.PrimaryKeyJoinColumnMetadata;
-import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
+import org.batoo.jpa.parser.metadata.CollectionTableMetadata;
+import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
 import org.batoo.jpa.parser.metadata.UniqueConstraintMetadata;
 
 import com.google.common.collect.Lists;
 
 /**
- * The implementation of {@link SecondaryTableMetadata}.
+ * The implementation of {@link CollectionTableMetadata}.
  * 
  * @author hceylan
  * @since $version
  */
-public class SecondaryTableMetadataImpl implements SecondaryTableMetadata {
+public class CollectionTableMetadataImpl implements CollectionTableMetadata {
 
 	private final AbstractLocator locator;
 	private final String catalog;
 	private final String schema;
 	private final String name;
-	private final List<PrimaryKeyJoinColumnMetadata> primaryKeyJoinColumns = Lists.newArrayList();
 	private final List<UniqueConstraintMetadata> uniqueConstraints = Lists.newArrayList();
+	private final List<JoinColumnMetadata> joinColumns = Lists.newArrayList();
 
 	/**
 	 * @param locator
@@ -55,7 +55,7 @@ public class SecondaryTableMetadataImpl implements SecondaryTableMetadata {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SecondaryTableMetadataImpl(AbstractLocator locator, SecondaryTable annotation) {
+	public CollectionTableMetadataImpl(AbstractLocator locator, CollectionTable annotation) {
 		super();
 
 		this.locator = locator;
@@ -67,8 +67,8 @@ public class SecondaryTableMetadataImpl implements SecondaryTableMetadata {
 			this.uniqueConstraints.add(new UniqueConstraintMetadataImpl(locator, constraint));
 		}
 
-		for (final PrimaryKeyJoinColumn joinColumn : annotation.pkJoinColumns()) {
-			this.primaryKeyJoinColumns.add(new PrimaryKeyJoinColumnMetadataImpl(this.locator, joinColumn));
+		for (final JoinColumn joinColumn : annotation.joinColumns()) {
+			this.joinColumns.add(new JoinColumnMetadataImpl(this.locator, joinColumn));
 		}
 	}
 
@@ -79,6 +79,15 @@ public class SecondaryTableMetadataImpl implements SecondaryTableMetadata {
 	@Override
 	public String getCatalog() {
 		return this.catalog;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<JoinColumnMetadata> getJoinColumns() {
+		return this.joinColumns;
 	}
 
 	/**
@@ -97,15 +106,6 @@ public class SecondaryTableMetadataImpl implements SecondaryTableMetadata {
 	@Override
 	public String getName() {
 		return this.name;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public List<PrimaryKeyJoinColumnMetadata> getPrimaryKeyJoinColumnMetadata() {
-		return this.primaryKeyJoinColumns;
 	}
 
 	/**

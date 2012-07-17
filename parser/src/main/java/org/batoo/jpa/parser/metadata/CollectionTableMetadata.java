@@ -16,28 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.parser.metadata.attribute;
+package org.batoo.jpa.parser.metadata;
 
 import java.util.List;
 
-import org.batoo.jpa.parser.metadata.PrimaryKeyJoinColumnMetadata;
-
 /**
- * The definition of the one to one attributes.
+ * The definition for collection tables.
  * 
  * @author hceylan
  * @since $version
  */
-public interface OneToOneAttributeMetadata extends AssociationAttributeMetadata, OrphanableAssociationAttributeMetadata, OptionalAssociationAttributeMetadata,
-	MappableAssociationAttributeMetadata {
+public interface CollectionTableMetadata extends TableMetadata {
 
 	/**
-	 * Returns the primary key join columns definition of the one to one attribute.
+	 * Returns the list of join columns of the table..
 	 * 
-	 * @return the primary key join columns definition of the one to one attribute
+	 * @return the list of join columns of the table.
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	List<PrimaryKeyJoinColumnMetadata> getPrimaryKeyJoinColumns();
+	List<JoinColumnMetadata> getJoinColumns();
 }

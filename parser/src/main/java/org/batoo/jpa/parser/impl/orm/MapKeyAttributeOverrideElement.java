@@ -16,28 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.parser.metadata.attribute;
+package org.batoo.jpa.parser.impl.orm;
 
-import java.util.List;
-
-import org.batoo.jpa.parser.metadata.PrimaryKeyJoinColumnMetadata;
+import java.util.Map;
 
 /**
- * The definition of the one to one attributes.
+ * 
  * 
  * @author hceylan
  * @since $version
  */
-public interface OneToOneAttributeMetadata extends AssociationAttributeMetadata, OrphanableAssociationAttributeMetadata, OptionalAssociationAttributeMetadata,
-	MappableAssociationAttributeMetadata {
+public class MapKeyAttributeOverrideElement extends AttributeOverrideElement {
 
 	/**
-	 * Returns the primary key join columns definition of the one to one attribute.
-	 * 
-	 * @return the primary key join columns definition of the one to one attribute
+	 * @param parent
+	 *            the metamodel
+	 * @param attributes
+	 *            the attributes
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	List<PrimaryKeyJoinColumnMetadata> getPrimaryKeyJoinColumns();
+	public MapKeyAttributeOverrideElement(ParentElement parent, Map<String, String> attributes) {
+		super(parent, attributes);
+	}
 }

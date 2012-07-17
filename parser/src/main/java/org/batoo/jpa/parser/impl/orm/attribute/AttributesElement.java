@@ -26,6 +26,7 @@ import org.batoo.jpa.parser.impl.orm.ElementConstants;
 import org.batoo.jpa.parser.impl.orm.ParentElement;
 import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
 import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.ElementCollectionAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.EmbeddedAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.EmbeddedIdAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.IdAttributeMetadata;
@@ -52,6 +53,7 @@ public class AttributesElement extends ParentElement implements AttributesMetada
 	private final List<EmbeddedAttributeMetadata> embeddeds = Lists.newArrayList();
 	private final List<BasicAttributeMetadata> basics = Lists.newArrayList();
 	private final List<VersionAttributeMetadata> versions = Lists.newArrayList();
+	private final List<ElementCollectionAttributeMetadata> elementCollections = Lists.newArrayList();
 	private final List<OneToOneAttributeMetadata> oneToOnes = Lists.newArrayList();
 	private final List<ManyToOneAttributeMetadata> manyToOnes = Lists.newArrayList();
 	private final List<OneToManyAttributeMetadata> oneToManies = Lists.newArrayList();
@@ -74,6 +76,7 @@ public class AttributesElement extends ParentElement implements AttributesMetada
 			ElementConstants.ELEMENT_EMBEDDED, //
 			ElementConstants.ELEMENT_VERSION, //
 			ElementConstants.ELEMENT_BASIC, //
+			ElementConstants.ELEMENT_ELEMENT_COLLECTION, //
 			ElementConstants.ELEMENT_ONE_TO_ONE, //
 			ElementConstants.ELEMENT_MANY_TO_ONE, //
 			ElementConstants.ELEMENT_ONE_TO_MANY, //
@@ -87,6 +90,15 @@ public class AttributesElement extends ParentElement implements AttributesMetada
 	@Override
 	public List<BasicAttributeMetadata> getBasics() {
 		return this.basics;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<ElementCollectionAttributeMetadata> getElementCollections() {
+		return this.elementCollections;
 	}
 
 	/**
@@ -198,6 +210,10 @@ public class AttributesElement extends ParentElement implements AttributesMetada
 
 		if (child instanceof EmbeddedAttributeElement) {
 			this.embeddeds.add((EmbeddedAttributeMetadata) child);
+		}
+
+		if (child instanceof ElementCollectionAttributeElement) {
+			this.elementCollections.add((ElementCollectionAttributeMetadata) child);
 		}
 
 		if (child instanceof OneToOneAttributeMetadata) {

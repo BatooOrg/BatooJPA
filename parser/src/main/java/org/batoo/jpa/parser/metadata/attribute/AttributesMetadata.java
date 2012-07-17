@@ -20,7 +20,6 @@ package org.batoo.jpa.parser.metadata.attribute;
 
 import java.util.List;
 
-
 /**
  * 
  * 
@@ -38,6 +37,16 @@ public interface AttributesMetadata {
 	 * @author hceylan
 	 */
 	List<BasicAttributeMetadata> getBasics();
+
+	/**
+	 * Returns the element collection attributes.
+	 * 
+	 * @return the element collection attributes
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	List<ElementCollectionAttributeMetadata> getElementCollections();
 
 	/**
 	 * Returns the embedded id attributes.
@@ -128,5 +137,4 @@ public interface AttributesMetadata {
 	 * @author hceylan
 	 */
 	List<VersionAttributeMetadata> getVersions();
-
 }

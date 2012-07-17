@@ -33,6 +33,7 @@ import java.util.Set;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Id;
@@ -53,6 +54,7 @@ import org.batoo.jpa.parser.impl.metadata.type.EntityMetadataImpl;
 import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
 import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.ElementCollectionAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.EmbeddedAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.EmbeddedIdAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.IdAttributeMetadata;
@@ -200,6 +202,11 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	private final List<EmbeddedIdAttributeMetadata> embeddedIds;
 	private final List<BasicAttributeMetadata> basics;
 	private final List<VersionAttributeMetadata> versions;
+
+	private final List<EmbeddedAttributeMetadata> embeddeds;
+
+	private final List<ElementCollectionAttributeMetadata> elementCollections;
+
 	private final List<OneToOneAttributeMetadata> oneToOnes;
 	private final List<OneToManyAttributeMetadata> oneToManies;
 	private final List<ManyToOneAttributeMetadata> manyToOnes;
@@ -207,8 +214,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 
 	private final Map<String, AttributeMetadata> ormAttributeMap = Maps.newHashMap();
 	private final Map<String, Member> memberMap = Maps.newHashMap();
-
-	private final List<EmbeddedAttributeMetadata> embeddeds;
 
 	/**
 	 * 
@@ -242,6 +247,9 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 		// embeddeds
 		this.embeddeds = this.handleEmbeddeds();
 
+		// element collections
+		this.elementCollections = this.handleElementCollections();
+
 		// associations
 		this.oneToOnes = this.handleOneToOnes();
 		this.manyToOnes = this.handleManyToOnes();
@@ -274,8 +282,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 			this.consolidateAttributes(this.metadata.getVersions());
 		}
 
-		AttributesMetadataImpl.LOG.debug("{0} ORM Attribute(s) obtained for entity {1}", this.ormAttributeMap.size(),
-			this.parent.getClassName());
+		AttributesMetadataImpl.LOG.debug("{0} ORM Attribute(s) obtained for entity {1}", this.ormAttributeMap.size(), this.parent.getClassName());
 	}
 
 	/**
@@ -306,6 +313,15 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	@Override
 	public List<BasicAttributeMetadata> getBasics() {
 		return this.basics;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<ElementCollectionAttributeMetadata> getElementCollections() {
+		return this.elementCollections;
 	}
 
 	/**
@@ -403,13 +419,41 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 		return new AttributesParser<BasicAttributeMetadata>(this.memberMap, list, null) {
 
 			@Override
-			protected BasicAttributeMetadata parseAttribute(String name, Member member, BasicAttributeMetadata metadata,
-				Set<Class<? extends Annotation>> parsed) {
+			protected BasicAttributeMetadata
+				parseAttribute(String name, Member member, BasicAttributeMetadata metadata, Set<Class<? extends Annotation>> parsed) {
 				if (metadata != null) {
 					return new BasicAttributeMetadataImpl(member, metadata);
 				}
 				else {
 					return new BasicAttributeMetadataImpl(member, name, parsed);
+				}
+			}
+		};
+	}
+
+	/**
+	 * Handles the element collection attributes.
+	 * 
+	 * @return list of element collections attributes.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private List<ElementCollectionAttributeMetadata> handleElementCollections() {
+		final List<ElementCollectionAttributeMetadata> list = this.metadata != null ? this.metadata.getElementCollections() : null;
+
+		return new AttributesParser<ElementCollectionAttributeMetadata>(this.memberMap, list, ElementCollection.class) {
+
+			@Override
+			protected ElementCollectionAttributeMetadata parseAttribute(String name, Member member, ElementCollectionAttributeMetadata metadata,
+				Set<Class<? extends Annotation>> parsed) {
+				if (metadata != null) {
+					return new ElementCollectionAttributeMetadataImpl(member, metadata);
+				}
+				else {
+					final ElementCollection elementCollection = ReflectHelper.getAnnotation(member, ElementCollection.class);
+
+					return new ElementCollectionAttributeMetadataImpl(member, name, elementCollection, parsed);
 				}
 			}
 		};
@@ -481,8 +525,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 		return new AttributesParser<IdAttributeMetadata>(this.memberMap, list, Id.class) {
 
 			@Override
-			protected IdAttributeMetadata parseAttribute(String name, Member member, IdAttributeMetadata metadata,
-				Set<Class<? extends Annotation>> parsed) {
+			protected IdAttributeMetadata parseAttribute(String name, Member member, IdAttributeMetadata metadata, Set<Class<? extends Annotation>> parsed) {
 				if (metadata != null) {
 					return new IdAttributeMetadataImpl(member, metadata);
 				}

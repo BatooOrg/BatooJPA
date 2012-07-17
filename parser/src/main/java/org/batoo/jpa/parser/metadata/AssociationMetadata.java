@@ -29,9 +29,9 @@ import java.util.List;
 public interface AssociationMetadata extends BindableMetadata {
 
 	/**
-	 * Returns the list of join column definition of the override.
+	 * Returns the list of join column definition.
 	 * 
-	 * @return the list of join column definition of the override
+	 * @return the list of join column definition
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -39,9 +39,9 @@ public interface AssociationMetadata extends BindableMetadata {
 	List<JoinColumnMetadata> getJoinColumns();
 
 	/**
-	 * Returns the join table definition of the override.
+	 * Returns the join table definition.
 	 * 
-	 * @return the join table definition of the override
+	 * @return the join table definition
 	 * 
 	 * @since $version
 	 * @author hceylan

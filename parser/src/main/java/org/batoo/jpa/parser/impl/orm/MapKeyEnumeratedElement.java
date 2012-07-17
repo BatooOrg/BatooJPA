@@ -16,28 +16,53 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.parser.metadata.attribute;
+package org.batoo.jpa.parser.impl.orm;
 
-import java.util.List;
+import java.util.Map;
 
-import org.batoo.jpa.parser.metadata.PrimaryKeyJoinColumnMetadata;
+import javax.persistence.EnumType;
 
 /**
- * The definition of the one to one attributes.
+ * Element for <code>enumerated</code> elements.
  * 
  * @author hceylan
  * @since $version
  */
-public interface OneToOneAttributeMetadata extends AssociationAttributeMetadata, OrphanableAssociationAttributeMetadata, OptionalAssociationAttributeMetadata,
-	MappableAssociationAttributeMetadata {
+public class MapKeyEnumeratedElement extends ChildElement {
+
+	private EnumType enumType;
 
 	/**
-	 * Returns the primary key join columns definition of the one to one attribute.
-	 * 
-	 * @return the primary key join columns definition of the one to one attribute
+	 * @param parent
+	 *            the parent element factory
+	 * @param attributes
+	 *            the attributes
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	List<PrimaryKeyJoinColumnMetadata> getPrimaryKeyJoinColumns();
+	public MapKeyEnumeratedElement(ParentElement parent, Map<String, String> attributes) {
+		super(parent, attributes);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void cdata(String cdata) {
+		this.enumType = EnumType.valueOf(cdata);
+	}
+
+	/**
+	 * Returns the enumType.
+	 * 
+	 * @return the enumType
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public EnumType getEnumType() {
+		return this.enumType;
+	}
 }

@@ -69,13 +69,19 @@ public class ElementConstants {
 	protected static final String ELEMENT_ID_CLASS = "id-class";
 	protected static final String ELEMENT_INVERSE_JOIN_COLUMN = "inverse-join-column";
 	protected static final String ELEMENT_JOIN_COLUMN = "join-column";
+	protected static final String ELEMENT_COLLECTION_TABLE = "collection-table";
 	protected static final String ELEMENT_JOIN_TABLE = "join-table";
 	protected static final String ELEMENT_LOB = "lob";
+	protected static final String ELEMENT_ELEMENT_COLLECTION = "element-collection";
 	protected static final String ELEMENT_MANY_TO_MANY = "many-to-many";
 	protected static final String ELEMENT_MANY_TO_ONE = "many-to-one";
 	protected static final String ELEMENT_ONE_TO_MANY = "one-to-many";
 	protected static final String ELEMENT_ONE_TO_ONE = "one-to-one";
 	protected static final String ELEMENT_MAP_KEY = "map-key";
+	protected static final String ELEMENT_MAP_KEY_ATTRIBUTE_OVERRIDE = "map-key-attribute-override";
+	protected static final String ELEMENT_MAP_KEY_CLASS = "map-key-class";
+	protected static final String ELEMENT_MAP_KEY_ENUMERATED = "map-key-enumerated";
+	protected static final String ELEMENT_MAP_KEY_TEMPORAL = "map-key-temporal";
 	protected static final String ELEMENT_ORDER_BY = "order-by";
 	protected static final String ELEMENT_ORDER_COLUMN = "order-column";
 	protected static final String ELEMENT_PRIMARY_KEY_JOIN_COLUMN = "primary-key-join-column";
@@ -141,6 +147,7 @@ public class ElementConstants {
 	 */
 	protected static final String ATTR_MAPPED_BY = "mapped-by";
 	protected static final String ATTR_TARGET_ENTITY = "target-entity";
+	protected static final String ATTR_TARGET_CLASS = "target-entity";
 	protected static final String ATTR_ORPHAN_REMOVAL = "orphan-removal";
 	protected static final String ATTR_FETCH = "fetch";
 	protected static final String ATTR_OPTIONAL = "optional";

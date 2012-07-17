@@ -18,89 +18,88 @@
  */
 package org.batoo.jpa.parser.metadata.attribute;
 
-import java.util.List;
-
 import javax.persistence.EnumType;
+import javax.persistence.FetchType;
 import javax.persistence.TemporalType;
 
-import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
+import org.batoo.jpa.parser.metadata.CollectionTableMetadata;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 
 /**
- * Definitions for plural attributes.
+ * Definition for element collection attributes.
  * 
  * @author hceylan
  * @since $version
  */
-public interface PluralAttributeMetadata {
+public interface ElementCollectionAttributeMetadata extends PluralAttributeMetadata, EmbeddedAttributeMetadata {
 
 	/**
-	 * Returns the map key.
+	 * Returns the collection table definition.
 	 * 
-	 * @return the map key
+	 * @return the collection table definition
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	String getMapKey();
+	CollectionTableMetadata getCollectionTable();
 
 	/**
-	 * Returns the list of map key attribute overrides.
+	 * Returns the column definition.
 	 * 
-	 * @return the list of map key attribute overrides
+	 * @return the column definition
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	List<AttributeOverrideMetadata> getMapKeyAttributeOverrides();
+	ColumnMetadata getColumn();
 
 	/**
-	 * Returns the class name of the map key.
+	 * Returns the enum type.
 	 * 
-	 * @return the class name of the map key
+	 * @return the enum type
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	String getMapKeyClassName();
+	EnumType getEnumType();
 
 	/**
-	 * Returns the enum type of the map key.
+	 * Returns the fetch type.
 	 * 
-	 * @return the enum type of the map key
+	 * @return the fetch type
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	EnumType getMapKeyEnumType();
+	FetchType getFetchType();
 
 	/**
-	 * Returns the temporal type of the map key.
+	 * Returns the name of the target class.
 	 * 
-	 * @return the temporal type of the map key
+	 * @return the name of the target class
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	TemporalType getMapKeyTemporalType();
+	String getTargetClass();
 
 	/**
-	 * Returns the order by.
+	 * Returns the temporal type.
 	 * 
-	 * @return the order by
+	 * @return the enum type
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	String getOrderBy();
+	TemporalType getTemporalType();
 
 	/**
-	 * Returns the order column definition.
+	 * Returns if the attribute is lob type.
 	 * 
-	 * @return the order column definition
+	 * @return true if the attribute is lob type, false othwerwise
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	ColumnMetadata getOrderColumn();
+	boolean isLob();
 }

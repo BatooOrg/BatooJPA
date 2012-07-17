@@ -40,6 +40,7 @@ import org.batoo.jpa.parser.impl.orm.EntityListenerElement.PreRemoveElement;
 import org.batoo.jpa.parser.impl.orm.EntityListenerElement.PreUpdateElement;
 import org.batoo.jpa.parser.impl.orm.attribute.AttributesElement;
 import org.batoo.jpa.parser.impl.orm.attribute.BasicAttributeElement;
+import org.batoo.jpa.parser.impl.orm.attribute.ElementCollectionAttributeElement;
 import org.batoo.jpa.parser.impl.orm.attribute.EmbeddedAttributeElement;
 import org.batoo.jpa.parser.impl.orm.attribute.EmbeddedIdAttributeElement;
 import org.batoo.jpa.parser.impl.orm.attribute.IdAttributeElement;
@@ -108,11 +109,15 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 		Element.factoryMap.put(ElementConstants.ELEMENT_VERSION, VersionAttributeElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_BASIC, BasicAttributeElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_EMBEDDED, EmbeddedAttributeElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_ELEMENT_COLLECTION, ElementCollectionAttributeElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_ONE_TO_ONE, OneToOneAttributeElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_ONE_TO_MANY, OneToManyAttributeElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_MANY_TO_MANY, ManyToManyAttributeElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_MANY_TO_ONE, ManyToOneAttributeElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_MAP_KEY, MapKeyElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_MAP_KEY_CLASS, MapKeyElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_MAP_KEY_ENUMERATED, MapKeyEnumeratedElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_MAP_KEY_TEMPORAL, MapKeyTemporalElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_ORDER_BY, OrderByElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_ORDER_COLUMN, OrderColumnElement.class);
 
@@ -129,6 +134,7 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 		// overrides
 		Element.factoryMap.put(ElementConstants.ELEMENT_ASSOCIATION_OVERRIDE, AssociationOverrideElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_ATTRIBUTE_OVERRIDE, AttributeOverrideElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_MAP_KEY_ATTRIBUTE_OVERRIDE, MapKeyAttributeOverrideElement.class);
 
 		// cascades
 		Element.factoryMap.put(ElementConstants.ELEMENT_CASCADE, CascadesElement.class);
@@ -152,6 +158,7 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 		Element.factoryMap.put(ElementConstants.ELEMENT_TABLE, TableElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_SECONDARY_TABLE, SecondaryTableElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_JOIN_TABLE, JoinTableElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_COLLECTION_TABLE, JoinTableElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_UNIQUE_CONSTRAINT, UniqueConstraintsElement.class);
 	}
 

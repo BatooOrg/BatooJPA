@@ -16,28 +16,53 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.parser.metadata.attribute;
+package org.batoo.jpa.parser.impl.orm;
 
-import java.util.List;
-
-import org.batoo.jpa.parser.metadata.PrimaryKeyJoinColumnMetadata;
+import java.util.Map;
 
 /**
- * The definition of the one to one attributes.
+ * Element for <code>map-key-class</code> elements.
  * 
  * @author hceylan
  * @since $version
  */
-public interface OneToOneAttributeMetadata extends AssociationAttributeMetadata, OrphanableAssociationAttributeMetadata, OptionalAssociationAttributeMetadata,
-	MappableAssociationAttributeMetadata {
+public class MapKeyClassElement extends ChildElement {
+
+	private String clazz;
 
 	/**
-	 * Returns the primary key join columns definition of the one to one attribute.
-	 * 
-	 * @return the primary key join columns definition of the one to one attribute
+	 * @param parent
+	 *            the parent element factory
+	 * @param attributes
+	 *            the attributes
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	List<PrimaryKeyJoinColumnMetadata> getPrimaryKeyJoinColumns();
+	public MapKeyClassElement(ParentElement parent, Map<String, String> attributes) {
+		super(parent, attributes);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	protected void generate() {
+		super.generate();
+
+		this.clazz = this.getAttribute(ElementConstants.ATTR_CLASS);
+	}
+
+	/**
+	 * Returns the class Name.
+	 * 
+	 * @return the class Name
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getClazz() {
+		return this.clazz;
+	}
 }

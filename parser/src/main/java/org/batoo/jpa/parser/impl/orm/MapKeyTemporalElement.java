@@ -16,28 +16,53 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.parser.metadata.attribute;
+package org.batoo.jpa.parser.impl.orm;
 
-import java.util.List;
+import java.util.Map;
 
-import org.batoo.jpa.parser.metadata.PrimaryKeyJoinColumnMetadata;
+import javax.persistence.TemporalType;
 
 /**
- * The definition of the one to one attributes.
+ * Element for <code>map-key-temporal</code> elements.
  * 
  * @author hceylan
  * @since $version
  */
-public interface OneToOneAttributeMetadata extends AssociationAttributeMetadata, OrphanableAssociationAttributeMetadata, OptionalAssociationAttributeMetadata,
-	MappableAssociationAttributeMetadata {
+public class MapKeyTemporalElement extends ChildElement {
+
+	private TemporalType temporalType;
 
 	/**
-	 * Returns the primary key join columns definition of the one to one attribute.
-	 * 
-	 * @return the primary key join columns definition of the one to one attribute
+	 * @param parent
+	 *            the parent element factory
+	 * @param attributes
+	 *            the attributes
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	List<PrimaryKeyJoinColumnMetadata> getPrimaryKeyJoinColumns();
+	public MapKeyTemporalElement(ParentElement parent, Map<String, String> attributes) {
+		super(parent, attributes);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void cdata(String cdata) {
+		this.temporalType = TemporalType.valueOf(cdata);
+	}
+
+	/**
+	 * Returns the temporalType of the TemporalElement.
+	 * 
+	 * @return the temporalType of the TemporalElement
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public TemporalType getTemporalType() {
+		return this.temporalType;
+	}
 }

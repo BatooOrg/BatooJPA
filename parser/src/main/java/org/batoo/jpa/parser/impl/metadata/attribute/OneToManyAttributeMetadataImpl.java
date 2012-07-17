@@ -20,12 +20,18 @@ package org.batoo.jpa.parser.impl.metadata.attribute;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
+import java.util.List;
 import java.util.Set;
 
+import javax.persistence.EnumType;
 import javax.persistence.OneToMany;
+import javax.persistence.TemporalType;
 
+import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.OneToManyAttributeMetadata;
+
+import com.google.common.collect.Lists;
 
 /**
  * Implementation of {@link OneToManyAttributeMetadata}.
@@ -38,8 +44,12 @@ public class OneToManyAttributeMetadataImpl extends AssociationAttributeMetadata
 	private final String mappedBy;
 	private final boolean removesOprhans;
 	private final String mapKey;
+	private final String mapKeyClassName;
+	private final EnumType mapKeyEnumType;
+	private final TemporalType mapKeyTemporalType;
 	private final ColumnMetadata orderColumn;
 	private final String orderBy;
+	private final List<AttributeOverrideMetadata> mapKeyAttributeOverrides = Lists.newArrayList();
 
 	/**
 	 * @param member
@@ -56,6 +66,10 @@ public class OneToManyAttributeMetadataImpl extends AssociationAttributeMetadata
 		this.mappedBy = metadata.getMappedBy();
 		this.removesOprhans = metadata.removesOrphans();
 		this.mapKey = metadata.getMapKey();
+		this.mapKeyClassName = metadata.getMapKeyClassName();
+		this.mapKeyEnumType = metadata.getMapKeyEnumType();
+		this.mapKeyTemporalType = metadata.getMapKeyTemporalType();
+		this.mapKeyAttributeOverrides.addAll(metadata.getMapKeyAttributeOverrides());
 		this.orderBy = metadata.getOrderBy();
 		this.orderColumn = metadata.getOrderColumn();
 	}
@@ -81,6 +95,9 @@ public class OneToManyAttributeMetadataImpl extends AssociationAttributeMetadata
 		this.mappedBy = oneToMany.mappedBy();
 		this.removesOprhans = oneToMany.orphanRemoval();
 		this.mapKey = this.handleMapKey(member, parsed);
+		this.mapKeyClassName = this.handleMapKeyClassName(member, parsed);
+		this.mapKeyEnumType = this.handleMapKeyEnumType(member, parsed);
+		this.mapKeyTemporalType = this.handleMapKeyTemporalType(member, parsed);
 		this.orderBy = this.handleOrderBy(member, parsed);
 		this.orderColumn = this.handleOrderColumn(member, parsed);
 	}
@@ -92,6 +109,42 @@ public class OneToManyAttributeMetadataImpl extends AssociationAttributeMetadata
 	@Override
 	public String getMapKey() {
 		return this.mapKey;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<AttributeOverrideMetadata> getMapKeyAttributeOverrides() {
+		return this.mapKeyAttributeOverrides;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getMapKeyClassName() {
+		return this.mapKeyClassName;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public EnumType getMapKeyEnumType() {
+		return this.mapKeyEnumType;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public TemporalType getMapKeyTemporalType() {
+		return this.mapKeyTemporalType;
 	}
 
 	/**

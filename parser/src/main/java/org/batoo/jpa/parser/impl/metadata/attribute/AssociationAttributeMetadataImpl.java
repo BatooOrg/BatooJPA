@@ -24,17 +24,21 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.EnumType;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.JoinTable;
 import javax.persistence.MapKey;
+import javax.persistence.MapKeyClass;
+import javax.persistence.MapKeyEnumerated;
+import javax.persistence.MapKeyTemporal;
 import javax.persistence.OrderBy;
 import javax.persistence.OrderColumn;
+import javax.persistence.TemporalType;
 
 import org.batoo.jpa.common.reflect.ReflectHelper;
-import org.batoo.jpa.parser.impl.AbstractLocator;
-import org.batoo.jpa.parser.impl.metadata.JavaLocator;
+import org.batoo.jpa.parser.impl.metadata.ColumnMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.JoinColumnMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.JoinTableMetadaImpl;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
@@ -178,7 +182,7 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	}
 
 	/**
-	 * Handles the {@link MapKey} annotation
+	 * Handles the {@link MapKey} annotation.
 	 * 
 	 * @param member
 	 *            the member
@@ -201,7 +205,76 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	}
 
 	/**
-	 * Handles the OrderBy annotation
+	 * Handles the {@link MapKeyClass} annotation.
+	 * 
+	 * @param member
+	 *            the member
+	 * @param parsed
+	 *            the list of annotations parsed
+	 * @return the map key value
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected String handleMapKeyClassName(Member member, Set<Class<? extends Annotation>> parsed) {
+		final MapKeyClass annotation = ReflectHelper.getAnnotation(member, MapKeyClass.class);
+		if (annotation != null) {
+			parsed.add(MapKeyClass.class);
+
+			return annotation.value().getName();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Handles the {@link MapKeyEnumerated} annotation.
+	 * 
+	 * @param member
+	 *            the member
+	 * @param parsed
+	 *            the list of annotations parsed
+	 * @return the map key value
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected EnumType handleMapKeyEnumType(Member member, Set<Class<? extends Annotation>> parsed) {
+		final MapKeyEnumerated annotation = ReflectHelper.getAnnotation(member, MapKeyEnumerated.class);
+		if (annotation != null) {
+			parsed.add(MapKeyEnumerated.class);
+
+			return annotation.value();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Handles the {@link MapKeyTemporal} annotation.
+	 * 
+	 * @param member
+	 *            the member
+	 * @param parsed
+	 *            the list of annotations parsed
+	 * @return the map key value
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected TemporalType handleMapKeyTemporalType(Member member, Set<Class<? extends Annotation>> parsed) {
+		final MapKeyTemporal annotation = ReflectHelper.getAnnotation(member, MapKeyTemporal.class);
+		if (annotation != null) {
+			parsed.add(MapKeyTemporal.class);
+
+			return annotation.value();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Handles the {@link OrderBy} annotation.
 	 * 
 	 * @param member
 	 *            the member
@@ -224,7 +297,7 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	}
 
 	/**
-	 * Handles the OrderBy annotation
+	 * Handles the {@link OrderColumn} annotation.
 	 * 
 	 * @param member
 	 *            the member
@@ -240,63 +313,7 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 		if (annotation != null) {
 			parsed.add(OrderColumn.class);
 
-			return new ColumnMetadata() {
-
-				@Override
-				public String getColumnDefinition() {
-					return annotation.columnDefinition();
-				}
-
-				@Override
-				public int getLength() {
-					return 0;
-				}
-
-				@Override
-				public AbstractLocator getLocator() {
-					return new JavaLocator(member);
-				}
-
-				@Override
-				public String getName() {
-					return annotation.name();
-				}
-
-				@Override
-				public int getPrecision() {
-					return 0;
-				}
-
-				@Override
-				public int getScale() {
-					return 0;
-				}
-
-				@Override
-				public String getTable() {
-					return null;
-				}
-
-				@Override
-				public boolean isInsertable() {
-					return annotation.insertable();
-				}
-
-				@Override
-				public boolean isNullable() {
-					return annotation.nullable();
-				}
-
-				@Override
-				public boolean isUnique() {
-					return false;
-				}
-
-				@Override
-				public boolean isUpdatable() {
-					return annotation.updatable();
-				}
-			};
+			return new ColumnMetadataImpl(this.getLocator(), annotation);
 		}
 
 		return null;

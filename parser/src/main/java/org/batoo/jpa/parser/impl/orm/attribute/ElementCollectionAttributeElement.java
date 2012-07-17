@@ -25,9 +25,12 @@ import javax.persistence.EnumType;
 import javax.persistence.FetchType;
 import javax.persistence.TemporalType;
 
+import org.batoo.jpa.parser.impl.orm.AssociationOverrideElement;
 import org.batoo.jpa.parser.impl.orm.AttributeOverrideElement;
 import org.batoo.jpa.parser.impl.orm.Element;
 import org.batoo.jpa.parser.impl.orm.ElementConstants;
+import org.batoo.jpa.parser.impl.orm.EnumeratedElement;
+import org.batoo.jpa.parser.impl.orm.LobElement;
 import org.batoo.jpa.parser.impl.orm.MapKeyAttributeOverrideElement;
 import org.batoo.jpa.parser.impl.orm.MapKeyClassElement;
 import org.batoo.jpa.parser.impl.orm.MapKeyElement;
@@ -36,31 +39,39 @@ import org.batoo.jpa.parser.impl.orm.MapKeyTemporalElement;
 import org.batoo.jpa.parser.impl.orm.OrderByElement;
 import org.batoo.jpa.parser.impl.orm.OrderColumnElement;
 import org.batoo.jpa.parser.impl.orm.ParentElement;
-import org.batoo.jpa.parser.impl.orm.PrimaryKeyJoinColumnElement;
+import org.batoo.jpa.parser.impl.orm.TemporalElement;
+import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
+import org.batoo.jpa.parser.metadata.CollectionTableMetadata;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
-import org.batoo.jpa.parser.metadata.PrimaryKeyJoinColumnMetadata;
-import org.batoo.jpa.parser.metadata.attribute.ManyToManyAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.ElementCollectionAttributeMetadata;
 
 import com.google.common.collect.Lists;
 
 /**
- * Element for <code>many-to-many</code> elements.
+ * Element for <code>element-collection</code> elements.
  * 
  * @author hceylan
  * @since $version
  */
-public class ManyToManyAttributeElement extends AssociationElement implements ManyToManyAttributeMetadata {
+public class ElementCollectionAttributeElement extends AttributeElement implements ElementCollectionAttributeMetadata {
 
-	private String mappedBy;
 	private String mapKey;
 	private String orderBy;
 	private OrderColumnElement orderColumn;
+	private final List<AttributeOverrideMetadata> attributeOverrides = Lists.newArrayList();
+	private final List<AttributeOverrideMetadata> mapKeyAttributeOverrides = Lists.newArrayList();
+	private final List<AssociationMetadata> associationOverrides = Lists.newArrayList();
+	private CollectionTableMetadata collectionTable;
+	private ColumnMetadata column;
+	private EnumType enumType;
+	private boolean lob;
 	private String mapKeyClassName;
 	private EnumType mapKeyEnumType;
 	private TemporalType mapKeyTemporalType;
-	private final List<PrimaryKeyJoinColumnMetadata> primaryKeyJoinColumns = Lists.newArrayList();
-	private final List<AttributeOverrideMetadata> mapKeyAttributeOverrides = Lists.newArrayList();
+	private String targetClass;
+	private FetchType fetchType;
+	private TemporalType temporalType;
 
 	/**
 	 * @param parent
@@ -73,12 +84,15 @@ public class ManyToManyAttributeElement extends AssociationElement implements Ma
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManyToManyAttributeElement(ParentElement parent, Map<String, String> attributes, String... expectedChildElements) {
-		super(parent, attributes, FetchType.LAZY, //
-			ElementConstants.ELEMENT_CASCADE,//
-			ElementConstants.ELEMENT_JOIN_COLUMN, //
-			ElementConstants.ELEMENT_JOIN_TABLE, //
-			ElementConstants.ELEMENT_PRIMARY_KEY_JOIN_COLUMN, //
+	public ElementCollectionAttributeElement(ParentElement parent, Map<String, String> attributes, String... expectedChildElements) {
+		super(parent, attributes, //
+			ElementConstants.ELEMENT_ASSOCIATION_OVERRIDE, //
+			ElementConstants.ELEMENT_ATTRIBUTE_OVERRIDE, //
+			ElementConstants.ELEMENT_COLLECTION_TABLE, //
+			ElementConstants.ELEMENT_COLUMN, //
+			ElementConstants.ELEMENT_ENUMERATED, //
+			ElementConstants.ELEMENT_TEMPORAL, //
+			ElementConstants.ELEMENT_LOB, //
 			ElementConstants.ELEMENT_MAP_KEY, //
 			ElementConstants.ELEMENT_MAP_KEY_ATTRIBUTE_OVERRIDE, //
 			ElementConstants.ELEMENT_MAP_KEY_CLASS, //
@@ -96,7 +110,62 @@ public class ManyToManyAttributeElement extends AssociationElement implements Ma
 	protected void generate() {
 		super.generate();
 
-		this.mappedBy = this.getAttribute(ElementConstants.ATTR_MAPPED_BY, ElementConstants.EMPTY);
+		this.targetClass = this.getAttribute(ElementConstants.ATTR_TARGET_CLASS);
+		this.fetchType = FetchType.valueOf(this.getAttribute(ElementConstants.ATTR_FETCH, FetchType.LAZY.name()));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<AssociationMetadata> getAssociationOverrides() {
+		return this.associationOverrides;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<AttributeOverrideMetadata> getAttributeOverrides() {
+		return this.attributeOverrides;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public CollectionTableMetadata getCollectionTable() {
+		return this.collectionTable;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public ColumnMetadata getColumn() {
+		return this.column;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public EnumType getEnumType() {
+		return this.enumType;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public FetchType getFetchType() {
+		return this.fetchType;
 	}
 
 	/**
@@ -149,15 +218,6 @@ public class ManyToManyAttributeElement extends AssociationElement implements Ma
 	 * 
 	 */
 	@Override
-	public String getMappedBy() {
-		return this.mappedBy;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public String getOrderBy() {
 		return this.orderBy;
 	}
@@ -176,11 +236,51 @@ public class ManyToManyAttributeElement extends AssociationElement implements Ma
 	 * 
 	 */
 	@Override
-	protected void handleChild(Element child) {
-		super.handleChild(child);
+	public String getTargetClass() {
+		return this.targetClass;
+	}
 
-		if (child instanceof PrimaryKeyJoinColumnElement) {
-			this.primaryKeyJoinColumns.add((PrimaryKeyJoinColumnMetadata) child);
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public TemporalType getTemporalType() {
+		return this.temporalType;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	protected void handleChild(Element child) {
+		if (child instanceof AttributeOverrideElement) {
+			this.attributeOverrides.add((AttributeOverrideElement) child);
+		}
+
+		if (child instanceof AssociationOverrideElement) {
+			this.associationOverrides.add((AssociationOverrideElement) child);
+		}
+
+		if (child instanceof CollectionTableMetadata) {
+			this.collectionTable = (CollectionTableMetadata) child;
+		}
+
+		if (child instanceof ColumnMetadata) {
+			this.column = (ColumnMetadata) child;
+		}
+
+		if (child instanceof EnumeratedElement) {
+			this.enumType = ((EnumeratedElement) child).getEnumType();
+		}
+
+		if (child instanceof TemporalElement) {
+			this.temporalType = ((TemporalElement) child).getTemporalType();
+		}
+
+		if (child instanceof LobElement) {
+			this.lob = true;
 		}
 
 		if (child instanceof MapKeyElement) {
@@ -210,5 +310,14 @@ public class ManyToManyAttributeElement extends AssociationElement implements Ma
 		if (child instanceof OrderColumnElement) {
 			this.orderColumn = ((OrderColumnElement) child);
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isLob() {
+		return this.lob;
 	}
 }

@@ -21,15 +21,23 @@ package org.batoo.jpa.parser.impl.orm.attribute;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EnumType;
 import javax.persistence.FetchType;
+import javax.persistence.TemporalType;
 
+import org.batoo.jpa.parser.impl.orm.AttributeOverrideElement;
 import org.batoo.jpa.parser.impl.orm.Element;
 import org.batoo.jpa.parser.impl.orm.ElementConstants;
+import org.batoo.jpa.parser.impl.orm.MapKeyAttributeOverrideElement;
+import org.batoo.jpa.parser.impl.orm.MapKeyClassElement;
 import org.batoo.jpa.parser.impl.orm.MapKeyElement;
+import org.batoo.jpa.parser.impl.orm.MapKeyEnumeratedElement;
+import org.batoo.jpa.parser.impl.orm.MapKeyTemporalElement;
 import org.batoo.jpa.parser.impl.orm.OrderByElement;
 import org.batoo.jpa.parser.impl.orm.OrderColumnElement;
 import org.batoo.jpa.parser.impl.orm.ParentElement;
 import org.batoo.jpa.parser.impl.orm.PrimaryKeyJoinColumnElement;
+import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.PrimaryKeyJoinColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.OneToManyAttributeMetadata;
@@ -47,10 +55,14 @@ public class OneToManyAttributeElement extends AssociationElement implements One
 	private boolean orphanRemoval;
 	private String mappedBy;
 
-	private final List<PrimaryKeyJoinColumnMetadata> primaryKeyJoinColumns = Lists.newArrayList();
 	private String mapKey;
 	private String orderBy;
 	private OrderColumnElement orderColumn;
+	private String mapKeyClassName;
+	private EnumType mapKeyEnumType;
+	private TemporalType mapKeyTemporalType;
+	private final List<PrimaryKeyJoinColumnMetadata> primaryKeyJoinColumns = Lists.newArrayList();
+	private final List<AttributeOverrideMetadata> mapKeyAttributeOverrides = Lists.newArrayList();
 
 	/**
 	 * @param parent
@@ -69,6 +81,10 @@ public class OneToManyAttributeElement extends AssociationElement implements One
 			ElementConstants.ELEMENT_JOIN_COLUMN, //
 			ElementConstants.ELEMENT_JOIN_TABLE, //
 			ElementConstants.ELEMENT_MAP_KEY, //
+			ElementConstants.ELEMENT_MAP_KEY_ATTRIBUTE_OVERRIDE, //
+			ElementConstants.ELEMENT_MAP_KEY_CLASS, //
+			ElementConstants.ELEMENT_MAP_KEY_ENUMERATED, //
+			ElementConstants.ELEMENT_MAP_KEY_TEMPORAL, //
 			ElementConstants.ELEMENT_ORDER_BY, //
 			ElementConstants.ELEMENT_ORDER_COLUMN);
 	}
@@ -92,6 +108,54 @@ public class OneToManyAttributeElement extends AssociationElement implements One
 	@Override
 	public String getMapKey() {
 		return this.mapKey;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<AttributeOverrideMetadata> getMapKeyAttributeOverrides() {
+		return this.mapKeyAttributeOverrides;
+	}
+
+	/**
+	 * Returns the mapKeyClass of the OneToManyAttributeElement.
+	 * 
+	 * @return the mapKeyClass of the OneToManyAttributeElement
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getMapKeyClass() {
+		return this.mapKeyClassName;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getMapKeyClassName() {
+		return this.mapKeyClassName;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public EnumType getMapKeyEnumType() {
+		return this.mapKeyEnumType;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public TemporalType getMapKeyTemporalType() {
+		return this.mapKeyTemporalType;
 	}
 
 	/**
@@ -135,6 +199,22 @@ public class OneToManyAttributeElement extends AssociationElement implements One
 
 		if (child instanceof MapKeyElement) {
 			this.mapKey = ((MapKeyElement) child).getName();
+		}
+
+		if (child instanceof MapKeyAttributeOverrideElement) {
+			this.mapKeyAttributeOverrides.add((AttributeOverrideElement) child);
+		}
+
+		if (child instanceof MapKeyClassElement) {
+			this.mapKeyClassName = ((MapKeyClassElement) child).getClazz();
+		}
+
+		if (child instanceof MapKeyEnumeratedElement) {
+			this.mapKeyEnumType = ((MapKeyEnumeratedElement) child).getEnumType();
+		}
+
+		if (child instanceof MapKeyTemporalElement) {
+			this.mapKeyTemporalType = ((MapKeyTemporalElement) child).getTemporalType();
 		}
 
 		if (child instanceof OrderByElement) {

@@ -32,7 +32,6 @@ import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.parser.MappingException;
-import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.PluralAttributeMetadata;
 
@@ -69,9 +68,10 @@ public class MapAttributeImpl<X, K, V> extends PluralAttributeImpl<X, Map<K, V>,
 	public MapAttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata, PersistentAttributeType attributeType) {
 		super(declaringType, metadata, attributeType, 1);
 
-		if ((metadata instanceof AssociationAttributeMetadata) && StringUtils.isNotBlank(((AssociationAttributeMetadata) metadata).getTargetEntity())) {
+		final PluralAttributeMetadata pluralAttributeMetadata = (PluralAttributeMetadata) metadata;
+		if (StringUtils.isNotBlank(pluralAttributeMetadata.getMapKeyClassName())) {
 			try {
-				this.keyJavaType = (Class<K>) Class.forName(((AssociationAttributeMetadata) metadata).getTargetEntity());
+				this.keyJavaType = (Class<K>) Class.forName(pluralAttributeMetadata.getMapKeyClassName());
 			}
 			catch (final ClassNotFoundException e) {
 				throw new MappingException("Target enttity class not found", metadata.getLocator());
@@ -81,7 +81,7 @@ public class MapAttributeImpl<X, K, V> extends PluralAttributeImpl<X, Map<K, V>,
 			this.keyJavaType = ReflectHelper.getGenericType(this.getJavaMember(), 0);
 		}
 
-		this.mapKey = ((PluralAttributeMetadata) metadata).getMapKey();
+		this.mapKey = pluralAttributeMetadata.getMapKey();
 	}
 
 	/**
