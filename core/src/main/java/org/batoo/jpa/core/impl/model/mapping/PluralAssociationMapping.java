@@ -81,6 +81,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 
 	private final PluralAttributeImpl<? super Z, C, E> attribute;
 	private final JoinTable joinTable;
+	private final ForeignKey foreignKey;
 	private EntityTypeImpl<E> type;
 	private AssociationMapping<?, ?, ?> inverse;
 	private CriteriaQueryImpl<E> selectCriteria;
@@ -111,13 +112,16 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 		if (this.isOwner()) {
 			if ((this.attribute.getPersistentAttributeType() == PersistentAttributeType.MANY_TO_MANY) || (metadata.getJoinColumns().size() == 0)) {
 				this.joinTable = new JoinTable(this.getRoot().getType(), metadata.getJoinTable());
+				this.foreignKey = null;
 			}
 			else {
+				this.foreignKey = new ForeignKey(metadata.getJoinColumns(), true);
 				this.joinTable = null;
 			}
 		}
 		else {
 			this.joinTable = null;
+			this.foreignKey = null;
 		}
 
 		final PluralAttributeMetadata pluralAttributeMetadata = (PluralAttributeMetadata) attribute.getMetadata();
@@ -128,6 +132,20 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 		else {
 			this.orderBy = null;
 			this.orderColumn = null;
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void attach(ConnectionImpl connection, ManagedInstance<?> instance, Object child, int index) throws SQLException {
+		if (this.joinTable != null) {
+			this.joinTable.performInsert(connection, instance.getInstance(), child, index);
+		}
+		else if (this.foreignKey != null) {
+			this.foreignKey.performAttachChild(connection, instance, child, index);
 		}
 	}
 
@@ -151,6 +169,34 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 			for (final E entity : ((Map<?, E>) values).values()) {
 				session.checkTransient(entity);
 			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void detach(ConnectionImpl connection, ManagedInstance<?> instance, Object child) throws SQLException {
+		if (this.joinTable != null) {
+			this.joinTable.performRemove(connection, instance.getInstance(), child);
+		}
+		else if (this.foreignKey != null) {
+			this.foreignKey.performDetachChild(connection, child);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void detachAll(ConnectionImpl connection, ManagedInstance<?> instance) throws SQLException {
+		if (this.joinTable != null) {
+			this.joinTable.performRemoveAll(connection, instance.getInstance());
+		}
+		else if (this.foreignKey != null) {
+			this.foreignKey.performDetachAll(connection, instance);
 		}
 	}
 
@@ -209,7 +255,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 */
 	@Override
 	public ForeignKey getForeignKey() {
-		return null;
+		return this.foreignKey;
 	}
 
 	/**
@@ -379,6 +425,15 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * 
 	 */
 	@Override
+	public boolean isJoined() {
+		return (this.joinTable != null) || (this.foreignKey != null);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public void link() throws MappingException {
 		final EntityTypeImpl<?> entity = this.getRoot().getType();
@@ -405,6 +460,18 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 							this.orderColumn.getName() : this.attribute.getName() + "_ORDER";
 						this.joinTable.setOrderColumn(this.orderColumn, name);
 					}
+				}
+			}
+
+			if (this.foreignKey != null) {
+				this.foreignKey.link(null, this.getRoot().getEntity());
+				this.foreignKey.setTable(this.type.getPrimaryTable());
+
+				if (this.orderColumn != null) {
+					final String name = StringUtils.isNotBlank(this.orderColumn.getName()) ? //
+						this.orderColumn.getName() : this.attribute.getName() + "_ORDER";
+
+					this.foreignKey.setOrderColumn(this.orderColumn, name);
 				}
 			}
 		}

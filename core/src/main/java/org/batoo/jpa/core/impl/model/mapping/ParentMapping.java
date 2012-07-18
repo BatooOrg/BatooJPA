@@ -151,7 +151,7 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 			if (mapping instanceof JoinedMapping) {
 				final JoinedMapping<?, ?, ?> joinedMapping = (JoinedMapping<?, ?, ?>) mapping;
 
-				if ((joinedMapping.getTable() != null)) {
+				if ((joinedMapping.isJoined())) {
 					mappingsJoined.add(joinedMapping);
 				}
 			}

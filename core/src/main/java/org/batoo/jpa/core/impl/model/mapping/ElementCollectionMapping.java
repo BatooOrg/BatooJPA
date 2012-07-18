@@ -133,8 +133,35 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	 * 
 	 */
 	@Override
+	public void attach(ConnectionImpl connection, ManagedInstance<?> instance, Object child, int index) throws SQLException {
+		this.collectionTable.performInsert(connection, instance.getInstance(), child, index);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public boolean cascadesMerge() {
 		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void detach(ConnectionImpl connection, ManagedInstance<?> instance, Object child) throws SQLException {
+		this.collectionTable.performRemove(connection, instance.getInstance(), child);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void detachAll(ConnectionImpl connection, ManagedInstance<?> instance) throws SQLException {
+		this.collectionTable.performRemoveAll(connection, instance.getInstance());
 	}
 
 	/**
@@ -327,6 +354,15 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	@Override
 	public boolean isEager() {
 		return this.eager;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isJoined() {
+		return true;
 	}
 
 	/**

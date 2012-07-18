@@ -18,9 +18,11 @@
  */
 package org.batoo.jpa.core.impl.model.mapping;
 
+import java.sql.SQLException;
 import java.util.Collection;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
 
 /**
@@ -39,6 +41,25 @@ import org.batoo.jpa.core.impl.model.type.TypeImpl;
 public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 
 	/**
+	 * Attaches the child.
+	 * 
+	 * @param connection
+	 *            the connection
+	 * @param instance
+	 *            the instance
+	 * @param child
+	 *            the child
+	 * @param index
+	 *            the index
+	 * @throws SQLException
+	 *             thrown in case of an SQL error
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	void attach(ConnectionImpl connection, ManagedInstance<?> instance, Object child, int index) throws SQLException;
+
+	/**
 	 * Returns if merges are cascaded.
 	 * 
 	 * @return true if merges are cascaded, false otherwise
@@ -47,6 +68,38 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @author hceylan
 	 */
 	boolean cascadesMerge();
+
+	/**
+	 * detaches the child.
+	 * 
+	 * @param connection
+	 *            the connection
+	 * @param instance
+	 *            the instance
+	 * @param child
+	 *            the child
+	 * @throws SQLException
+	 *             thrown in case of an SQL error
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	void detach(ConnectionImpl connection, ManagedInstance<?> instance, Object child) throws SQLException;
+
+	/**
+	 * Details all the children.
+	 * 
+	 * @param connection
+	 *            the connection
+	 * @param instance
+	 *            the instance
+	 * @throws SQLException
+	 *             thrown in case of an SQL error
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	void detachAll(ConnectionImpl connection, ManagedInstance<?> instance) throws SQLException;
 
 	/**
 	 * Enhances the collection to the managed collection

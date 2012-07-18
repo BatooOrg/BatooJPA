@@ -26,6 +26,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 
 import com.google.common.collect.Lists;
@@ -44,6 +45,10 @@ public class Person {
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private final List<Address> addresses = Lists.newArrayList();
+
+	@OneToMany(cascade = CascadeType.ALL)
+	@JoinColumn(name = "person")
+	private final List<Phone> phones = Lists.newArrayList();
 
 	private String name;
 
@@ -96,6 +101,18 @@ public class Person {
 	 */
 	public String getName() {
 		return this.name;
+	}
+
+	/**
+	 * Returns the phones of the Person.
+	 * 
+	 * @return the phones of the Person
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public List<Phone> getPhones() {
+		return this.phones;
 	}
 
 	/**

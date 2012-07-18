@@ -18,10 +18,14 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.persistence.criteria.JoinType;
 
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
@@ -31,10 +35,13 @@ import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.util.Pair;
 import org.batoo.jpa.parser.MappingException;
+import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
 import org.batoo.jpa.parser.metadata.PrimaryKeyJoinColumnMetadata;
 
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
 /**
@@ -46,9 +53,18 @@ import com.google.common.collect.Lists;
 public class ForeignKey {
 
 	private final List<JoinColumn> joinColumns = Lists.newArrayList();
-
+	private final boolean inverseOwner;
 	private AbstractTable table;
+
 	private String tableName;
+	private OrderColumn orderColumn;
+
+	private String singleChildSql;
+	private PkColumn[] singleChildRestrictions;
+	private AbstractColumn[] singleChildUpdates;
+
+	private String allChildrenSql;
+	private JoinColumn[] allChildrenRestrictions;
 
 	/**
 	 * Constructor to create a join foreign key
@@ -60,7 +76,24 @@ public class ForeignKey {
 	 * @author hceylan
 	 */
 	public ForeignKey(List<JoinColumnMetadata> metadata) {
+		this(metadata, false);
+	}
+
+	/**
+	 * Constructor to create a join foreign key
+	 * 
+	 * @param metadata
+	 *            the metadata for join column
+	 * @param inverseOwner
+	 *            true if the foreign key is inverse owner
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ForeignKey(List<JoinColumnMetadata> metadata, boolean inverseOwner) {
 		super();
+
+		this.inverseOwner = inverseOwner;
 
 		for (final JoinColumnMetadata columnMetadata : metadata) {
 			this.joinColumns.add(new JoinColumn(columnMetadata));
@@ -80,6 +113,8 @@ public class ForeignKey {
 	 */
 	public ForeignKey(SecondaryTable table, EntityTypeImpl<?> entity, List<PrimaryKeyJoinColumnMetadata> metadata) {
 		super();
+
+		this.inverseOwner = false;
 
 		/**
 		 * Here's how this works:
@@ -165,6 +200,10 @@ public class ForeignKey {
 	 * @author hceylan
 	 */
 	public String createDestinationJoin(JoinType joinType, String parentAlias, String alias) {
+		if (this.inverseOwner) {
+			return this.createSourceJoin(joinType, parentAlias, alias);
+		}
+
 		return this.createJoin(joinType, parentAlias, alias, this.joinColumns.get(0).getReferencedTable().getName(), false);
 	}
 
@@ -232,6 +271,58 @@ public class ForeignKey {
 		return this.createJoin(joinType, parentAlias, alias, this.joinColumns.get(0).getTable().getName(), true);
 	}
 
+	/**
+	 * Returns the single child SQL.
+	 * 
+	 * @return the single child SQL
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private String getAllChildrenSql() {
+		if (this.allChildrenSql != null) {
+			return this.allChildrenSql;
+		}
+
+		synchronized (this) {
+			if (this.allChildrenSql != null) {
+				return this.allChildrenSql;
+			}
+
+			final List<JoinColumn> allChildrenRestrictions = Lists.newArrayList();
+
+			final String updates = Joiner.on(", ").join(Lists.transform(this.joinColumns, new Function<JoinColumn, String>() {
+
+				@Override
+				public String apply(JoinColumn input) {
+					return input.getName() + " = NULL";
+				}
+			}));
+
+			final String restrictions = Joiner.on(", ").join(Lists.transform(this.joinColumns, new Function<JoinColumn, String>() {
+
+				@Override
+				public String apply(JoinColumn input) {
+					allChildrenRestrictions.add(input);
+
+					return input.getName() + " = ?";
+				}
+			}));
+
+			final String order;
+			if (this.orderColumn != null) {
+				order = ", " + this.orderColumn.getName() + " = NULL";
+			}
+			else {
+				order = "";
+			}
+
+			this.allChildrenRestrictions = allChildrenRestrictions.toArray(new JoinColumn[allChildrenRestrictions.size()]);
+
+			return this.allChildrenSql = "UPDATE " + this.table.getQName() + "\nSET " + updates + order + "\nWHERE " + restrictions;
+		}
+	}
+
 	private PrimaryKeyJoinColumnMetadata getColumnMetadata(List<PrimaryKeyJoinColumnMetadata> metadata, BasicMapping<?, ?> basicMapping) {
 		final String columnName = basicMapping.getColumn().getMappingName();
 		for (final PrimaryKeyJoinColumnMetadata columnMetadata : metadata) {
@@ -266,6 +357,65 @@ public class ForeignKey {
 	 */
 	public String getReferencedTableName() {
 		return this.joinColumns.get(0).getReferencedTable().getName();
+	}
+
+	/**
+	 * Returns the single child SQL.
+	 * 
+	 * @return the single child SQL
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private String getSingleChildSql() {
+		if (this.singleChildSql != null) {
+			return this.singleChildSql;
+		}
+
+		synchronized (this) {
+			if (this.singleChildSql != null) {
+				return this.singleChildSql;
+			}
+
+			final List<PkColumn> singleChildRestrictions = Lists.newArrayList();
+			final List<AbstractColumn> singleChildUpdates = Lists.newArrayList();
+
+			final String updates = Joiner.on(", ").join(Lists.transform(this.joinColumns, new Function<JoinColumn, String>() {
+
+				@Override
+				public String apply(JoinColumn input) {
+					singleChildUpdates.add(input);
+
+					return input.getName() + " = ?";
+				}
+			}));
+
+			final String order;
+			if (this.orderColumn != null) {
+				singleChildUpdates.add(this.orderColumn);
+
+				order = ", " + this.orderColumn.getName() + " = ?";
+			}
+			else {
+				order = "";
+			}
+
+			final EntityTable table = (EntityTable) this.table;
+			final String restrictions = Joiner.on(", ").join(Collections2.transform(table.getPkColumns().values(), new Function<PkColumn, String>() {
+
+				@Override
+				public String apply(PkColumn input) {
+					singleChildRestrictions.add(input);
+
+					return input.getName() + " = ?";
+				}
+			}));
+
+			this.singleChildRestrictions = singleChildRestrictions.toArray(new PkColumn[singleChildRestrictions.size()]);
+			this.singleChildUpdates = singleChildUpdates.toArray(new AbstractColumn[singleChildUpdates.size()]);
+
+			return this.singleChildSql = "UPDATE " + this.table.getQName() + "\nSET " + updates + order + "\nWHERE " + restrictions;
+		}
 	}
 
 	/**
@@ -345,13 +495,17 @@ public class ForeignKey {
 		else {
 			// locate the corresponding join column
 			JoinColumn joinColumn = null;
-			for (final JoinColumn column : this.joinColumns) {
-				if (idMapping.getColumn().getName().equals(column.getReferencedColumnName())) {
-					joinColumn = column;
-					break;
+			if ((this.joinColumns.size() == 1) && StringUtils.isBlank(this.joinColumns.get(0).getReferencedColumnName())) {
+				joinColumn = this.joinColumns.get(0);
+			}
+			else {
+				for (final JoinColumn column : this.joinColumns) {
+					if (idMapping.getColumn().getName().equals(column.getReferencedColumnName())) {
+						joinColumn = column;
+						break;
+					}
 				}
 			}
-
 			// if cannot be found then throw
 			if (joinColumn == null) {
 				throw new MappingException("Join column cannot be located in a composite key target entity");
@@ -360,6 +514,121 @@ public class ForeignKey {
 			// link the join column
 			joinColumn.setColumnProperties(mapping, idMapping);
 		}
+	}
+
+	/**
+	 * Attaches the child to the managed instance.
+	 * 
+	 * @param connection
+	 *            the connection
+	 * @param instance
+	 *            the instance
+	 * @param child
+	 *            the child
+	 * @param index
+	 *            the index
+	 * @throws SQLException
+	 *             thrown in case of an SQL error
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void performAttachChild(ConnectionImpl connection, ManagedInstance<?> instance, Object child, int index) throws SQLException {
+		final String sql = this.getSingleChildSql();
+
+		final Object[] parameters = new Object[this.singleChildUpdates.length + this.singleChildRestrictions.length];
+
+		int i = 0;
+		for (final AbstractColumn column : this.singleChildUpdates) {
+			if (column instanceof JoinColumn) {
+				parameters[i++] = column.getValue(instance.getInstance());
+			}
+			else {
+				parameters[i++] = index;
+			}
+		}
+
+		for (final PkColumn column : this.singleChildRestrictions) {
+			parameters[i++] = column.getValue(child);
+		}
+
+		new QueryRunner().update(connection, sql, parameters);
+	}
+
+	/**
+	 * Detaches the instance from all the children.
+	 * 
+	 * @param connection
+	 *            the connection
+	 * @param instance
+	 *            the instance
+	 * @throws SQLException
+	 *             thrown in case of an SQL error
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void performDetachAll(ConnectionImpl connection, ManagedInstance<?> instance) throws SQLException {
+		final String sql = this.getAllChildrenSql();
+
+		final Object[] parameters = new Object[this.allChildrenRestrictions.length];
+
+		int i = 0;
+		for (final AbstractColumn column : this.allChildrenRestrictions) {
+			parameters[i++] = column.getValue(instance.getInstance());
+		}
+
+		new QueryRunner().update(connection, sql, parameters);
+	}
+
+	/**
+	 * Detaches the child.
+	 * 
+	 * @param connection
+	 *            the connection
+	 * @param child
+	 *            the child
+	 * @throws SQLException
+	 *             thrown in case of an SQL error
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void performDetachChild(ConnectionImpl connection, Object child) throws SQLException {
+		final String sql = this.getSingleChildSql();
+
+		final Object[] parameters = new Object[this.singleChildUpdates.length + this.singleChildRestrictions.length];
+
+		int i = 0;
+		for (final AbstractColumn column : this.singleChildUpdates) {
+			if (column instanceof JoinColumn) {
+				parameters[i++] = null;
+			}
+			else {
+				parameters[i++] = 0;
+			}
+		}
+
+		for (final PkColumn column : this.singleChildRestrictions) {
+			parameters[i++] = column.getValue(child);
+		}
+
+		new QueryRunner().update(connection, sql, parameters);
+	}
+
+	/**
+	 * Sets the order column.
+	 * 
+	 * @param orderColumn
+	 *            the order column
+	 * @param name
+	 *            the name of the column
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setOrderColumn(ColumnMetadata orderColumn, String name) {
+		this.orderColumn = new OrderColumn(this.table, orderColumn, name);
 	}
 
 	/**

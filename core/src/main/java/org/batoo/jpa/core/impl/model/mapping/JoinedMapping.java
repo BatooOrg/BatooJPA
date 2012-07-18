@@ -164,6 +164,16 @@ public interface JoinedMapping<Z, X, Y> {
 	boolean isEager();
 
 	/**
+	 * Returns if the mapping is a joined mapping.
+	 * 
+	 * @return true if the mapping is a joined mapping, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	boolean isJoined();
+
+	/**
 	 * Returns the join SQL for the mapping.
 	 * 
 	 * @return the join SQL for the mapping

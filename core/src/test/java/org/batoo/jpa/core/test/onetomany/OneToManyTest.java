@@ -38,6 +38,9 @@ public class OneToManyTest extends BaseCoreTest {
 		new Address(person, "London");
 		new Address(person, "New York");
 
+		new Phone(person, "111", "111-1111");
+		new Phone(person, "222", "222-2222");
+
 		return person;
 	}
 
@@ -58,6 +61,7 @@ public class OneToManyTest extends BaseCoreTest {
 		final Person person2 = this.find(Person.class, person.getId());
 		Assert.assertEquals(person.getName(), person2.getName());
 		Assert.assertEquals(person.getAddresses().size(), person2.getAddresses().size());
+		Assert.assertEquals(person.getPhones().size(), person2.getPhones().size());
 	}
 
 	/**
@@ -78,17 +82,22 @@ public class OneToManyTest extends BaseCoreTest {
 	}
 
 	/**
-	 * Tests to {@link EntityManager#persist(Object)} Parent which cascades to Child1.
+	 * Tests to {@link EntityManager#find(Class, Object)} person.
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	@Test
-	public void testPersistPerson() {
-		Assert.assertEquals(2, this.em().getMetamodel().getEntities().size());
-
-		this.persist(this.person());
+	public void testRemove() {
+		Person person = this.person();
+		this.persist(person);
 
 		this.commit();
+		this.close();
+
+		person = this.find(Person.class, person.getId());
+		this.remove(person);
+		this.commit();
+		this.close();
 	}
 }

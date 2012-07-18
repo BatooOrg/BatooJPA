@@ -30,7 +30,6 @@ import javax.persistence.PersistenceException;
 import org.apache.commons.lang.ObjectUtils;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
-import org.batoo.jpa.core.impl.jdbc.JoinableTable;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 
 import com.google.common.collect.Lists;
@@ -344,13 +343,11 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 		// for lists the index is maintained in the database
 		final ManagedInstance<?> instance = this.getManagedInstance();
 		final PluralMapping<?, ?, E> mapping = this.getMapping();
-		final Object source = instance.getInstance();
 
 		// forced creation of relations for the new entities
 		if (force) {
 			for (int i = 0; i < this.delegate.size(); i++) {
-				final JoinableTable table = mapping.getTable();
-				table.performInsert(connection, source, this.delegate.get(i), i);
+				mapping.attach(connection, instance, this.delegate.get(i), i);
 			}
 
 			return;
@@ -361,12 +358,12 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 		}
 
 		if (removals) {
-			mapping.getTable().performRemoveAll(connection, source);
+			mapping.detachAll(connection, instance);
 		}
 		else {
 			// create the additions
 			for (int i = 0; i < this.delegate.size(); i++) {
-				mapping.getTable().performInsert(connection, source, this.delegate.get(i), i);
+				mapping.attach(connection, instance, this.delegate.get(i), i);
 			}
 		}
 	}

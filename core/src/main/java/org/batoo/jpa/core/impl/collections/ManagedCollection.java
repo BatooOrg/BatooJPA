@@ -119,12 +119,10 @@ public abstract class ManagedCollection<E> {
 			return;
 		}
 
-		final Object source = this.managedInstance.getInstance();
-
 		// forced creation of relations for the new entities
 		if (force) {
 			for (final E child : this.getDelegate()) {
-				this.mapping.getTable().performInsert(connection, source, child, -1);
+				this.mapping.attach(connection, this.managedInstance, child, -1);
 			}
 
 			return;
@@ -139,14 +137,14 @@ public abstract class ManagedCollection<E> {
 			// delete the removals
 			final Collection<E> childrenRemoved = CollectionUtils.subtract(snapshot, this.getDelegate());
 			for (final E child : childrenRemoved) {
-				this.mapping.getTable().performRemove(connection, source, child);
+				this.mapping.detach(connection, this.managedInstance, child);
 			}
 		}
 		else {
 			// create the additions
 			final Collection<E> childrenAdded = CollectionUtils.subtract(this.getDelegate(), snapshot);
 			for (final E child : childrenAdded) {
-				this.mapping.getTable().performInsert(connection, source, child, -1);
+				this.mapping.attach(connection, this.managedInstance, child, -1);
 			}
 		}
 	}
@@ -321,18 +319,9 @@ public abstract class ManagedCollection<E> {
 	 * @author hceylan
 	 */
 	protected boolean removed(ConnectionImpl connection, boolean removals) throws SQLException {
-		final Object source = this.managedInstance.getInstance();
-
 		// if the instance removed remove all the relations
 		if (removals && (this.managedInstance.getStatus() == Status.REMOVED)) {
-			Collection<E> children = this.getSnapshot();
-			if (children == null) {
-				children = this.getDelegate();
-			}
-
-			for (final E child : children) {
-				this.mapping.getTable().performRemove(connection, source, child);
-			}
+			this.mapping.detachAll(connection, this.managedInstance);
 
 			return true;
 		}

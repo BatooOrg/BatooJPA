@@ -8,6 +8,7 @@
 		
 		<class>org.batoo.jpa.core.test.onetomany.Person</class>
 		<class>org.batoo.jpa.core.test.onetomany.Address</class>
+		<class>org.batoo.jpa.core.test.onetomany.Phone</class>
 		
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.Driver40" />

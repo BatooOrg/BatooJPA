@@ -193,6 +193,15 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 	 * 
 	 */
 	@Override
+	public boolean isJoined() {
+		return (this.joinTable != null) || (this.foreignKey != null);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public void link() throws MappingException {
 		final EntityTypeImpl<?> entity = this.getRoot().getType();
 		final MetamodelImpl metamodel = entity.getMetamodel();
@@ -213,6 +222,7 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 			if (this.joinTable != null) {
 				this.joinTable.link(entity, this.type);
 			}
+
 			// initialize the foreign key
 			else {
 				this.foreignKey.link(this, this.type);

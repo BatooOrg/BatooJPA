@@ -237,6 +237,15 @@ public class EmbeddedMapping<Z, X> extends ParentMapping<Z, X> implements Singul
 	 * 
 	 */
 	@Override
+	public boolean isJoined() {
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public String join(String parentAlias, String alias, JoinType joinType) {
 		return null;
 	}
