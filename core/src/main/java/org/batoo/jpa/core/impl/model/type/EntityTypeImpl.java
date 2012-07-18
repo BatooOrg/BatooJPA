@@ -58,6 +58,7 @@ import org.batoo.jpa.core.impl.jdbc.SecondaryTable;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
@@ -104,6 +105,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private final Map<String, EntityTable> tableMap = Maps.newHashMap();
 	private EntityTable[] tables;
 	private EntityTable[] allTables;
+	private final HashMap<String, AssociatedSingularAttribute<? super X, ?>> idMap = Maps.newHashMap();
 
 	private sun.reflect.ConstructorAccessor constructor;
 
@@ -165,6 +167,23 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		this.initTables(metadata);
 		this.rootMapping = new RootMapping<X>(this);
 		this.linkMappings();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	protected void addAttribute(AttributeImpl<? super X, ?> attribute) {
+		super.addAttribute(attribute);
+
+		if ((attribute.getPersistentAttributeType() == PersistentAttributeType.MANY_TO_ONE)
+			|| (attribute.getPersistentAttributeType() == PersistentAttributeType.ONE_TO_ONE)) {
+			final AssociatedSingularAttribute<? super X, ?> singularAttribute = (AssociatedSingularAttribute<? super X, ?>) attribute;
+			if (singularAttribute.getMapsId() != null) {
+				this.idMap.put(singularAttribute.getMapsId(), singularAttribute);
+			}
+		}
 	}
 
 	private void enhanceIfNeccessary() {
@@ -971,6 +990,38 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			return managedInstance;
 		}
 		catch (final Exception e) {} // not possible
+
+		return null;
+	}
+
+	/**
+	 * Returns the mapped id.
+	 * 
+	 * @param name
+	 *            thename of the id field
+	 * @param instance
+	 *            the instance
+	 * @return the id
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Object getMappedId(String name, Object instance) {
+		final AssociatedSingularAttribute<? super X, ?> attribute = this.idMap.get(name);
+		if (attribute == null) {
+			return null;
+		}
+
+		final Object mappedEntity = attribute.get(instance);
+		if (mappedEntity == null) {
+			return null;
+		}
+
+		final EntityTypeImpl<?> entity = this.getMetamodel().entity(mappedEntity.getClass());
+		if (entity.hasSingleIdAttribute()) {
+			final SingularMapping<?, ?> idMapping = entity.getIdMapping();
+			return idMapping.get(mappedEntity);
+		}
 
 		return null;
 	}

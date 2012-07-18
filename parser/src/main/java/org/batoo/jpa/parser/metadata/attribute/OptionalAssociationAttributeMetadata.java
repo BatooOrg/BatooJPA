@@ -27,6 +27,16 @@ package org.batoo.jpa.parser.metadata.attribute;
 public interface OptionalAssociationAttributeMetadata {
 
 	/**
+	 * Returns the maps id.
+	 * 
+	 * @return the maps id
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	String getMapsId();
+
+	/**
 	 * Returns if the association attribute is optional.
 	 * 
 	 * @return true if the association attribute is optional.

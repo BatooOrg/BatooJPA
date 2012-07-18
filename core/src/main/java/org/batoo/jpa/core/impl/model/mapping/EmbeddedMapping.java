@@ -27,6 +27,7 @@ import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.JoinableTable;
 import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
@@ -68,21 +69,21 @@ public class EmbeddedMapping<Z, X> extends ParentMapping<Z, X> implements Singul
 	 * 
 	 */
 	@Override
-	public boolean fillValue(Object instance) {
-		final X value = this.get(instance);
-
+	public boolean fillValue(EntityTypeImpl<?> type, ManagedInstance<?> managedInstance, Object instance) {
+		X value = this.get(instance);
 		if (value == null) {
-			throw new NullPointerException();
+			value = this.getAttribute().newInstance();
+			this.getAttribute().set(instance, value);
 		}
 
 		for (final Mapping<? super X, ?, ?> mapping : this.getChildren()) {
 			// mapping is another embedded mapping
 			if (mapping instanceof EmbeddedMapping) {
-				((EmbeddedMapping<? super X, ?>) mapping).fillValue(value);
+				((EmbeddedMapping<? super X, ?>) mapping).fillValue(type, managedInstance, value);
 			}
 			// mapping is basic mapping
 			else if (mapping instanceof BasicMapping) {
-				((BasicMapping<? super X, ?>) mapping).getAttribute().fillValue(instance);
+				((BasicMapping<? super X, ?>) mapping).getAttribute().fillValue(type, managedInstance, value);
 			}
 			// no other mappings allowed in id classes
 			else {

@@ -35,6 +35,7 @@ import org.batoo.jpa.parser.metadata.attribute.ManyToOneAttributeMetadata;
 public class ManyToOneAttributeElement extends AssociationElement implements ManyToOneAttributeMetadata {
 
 	private boolean optional;
+	private String mapsId;
 
 	/**
 	 * @param parent
@@ -63,6 +64,16 @@ public class ManyToOneAttributeElement extends AssociationElement implements Man
 		super.generate();
 
 		this.optional = this.getAttribute(ElementConstants.ATTR_OPTIONAL, Boolean.TRUE);
+		this.mapsId = this.getAttribute(ElementConstants.ATTR_MAPS_ID);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getMapsId() {
+		return this.mapsId;
 	}
 
 	/**

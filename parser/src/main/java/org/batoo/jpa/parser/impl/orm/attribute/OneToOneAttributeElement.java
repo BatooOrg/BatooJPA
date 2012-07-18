@@ -43,7 +43,7 @@ public class OneToOneAttributeElement extends AssociationElement implements OneT
 	private boolean orphanRemoval;
 	private boolean optional;
 	private String mappedBy;
-
+	private String mapsId;
 	private final List<PrimaryKeyJoinColumnMetadata> primaryKeyJoinColumns = Lists.newArrayList();
 
 	/**
@@ -76,6 +76,7 @@ public class OneToOneAttributeElement extends AssociationElement implements OneT
 		this.orphanRemoval = this.getAttribute(ElementConstants.ATTR_ORPHAN_REMOVAL, Boolean.FALSE);
 		this.optional = this.getAttribute(ElementConstants.ATTR_OPTIONAL, Boolean.TRUE);
 		this.mappedBy = this.getAttribute(ElementConstants.ATTR_MAPPED_BY, ElementConstants.EMPTY);
+		this.mapsId = this.getAttribute(ElementConstants.ATTR_MAPS_ID);
 	}
 
 	/**
@@ -85,6 +86,15 @@ public class OneToOneAttributeElement extends AssociationElement implements OneT
 	@Override
 	public String getMappedBy() {
 		return this.mappedBy;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getMapsId() {
+		return this.mapsId;
 	}
 
 	/**

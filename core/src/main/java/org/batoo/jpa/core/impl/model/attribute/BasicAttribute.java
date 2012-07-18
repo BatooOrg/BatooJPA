@@ -26,9 +26,11 @@ import javax.persistence.TemporalType;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.AbstractGenerator;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.BasicTypeImpl;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.IdentifiableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.core.jdbc.IdType;
@@ -209,6 +211,10 @@ public final class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 	 * <p>
 	 * The operation returns false if at least one entity needs to obtain identity from the database.
 	 * 
+	 * @param type
+	 *            the entity type
+	 * @param managedInstance
+	 *            the managed instance
 	 * @param instance
 	 *            the instance to fill ids.
 	 * @return false if all OK, true if if at least one entity needs to obtain identity from the database
@@ -216,8 +222,9 @@ public final class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public boolean fillValue(Object instance) {
-		final T value = this.get(instance);
+	@SuppressWarnings("unchecked")
+	public boolean fillValue(EntityTypeImpl<?> type, ManagedInstance<?> managedInstance, Object instance) {
+		T value = this.get(instance);
 
 		// if the attribute already has value, bail out
 		if (value != null) {
@@ -225,7 +232,16 @@ public final class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 		}
 
 		if (this.idType == null) {
-			throw new NullPointerException();
+			if (value == null) {
+				value = (T) type.getMappedId(this.getName(), managedInstance.getInstance());
+				if (value != null) {
+					this.set(instance, value);
+
+					return true;
+				}
+			}
+
+			throw new PersistenceException("Ids should be manually assigned");
 		}
 
 		// fill the id

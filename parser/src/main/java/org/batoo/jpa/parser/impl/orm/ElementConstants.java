@@ -123,6 +123,7 @@ public class ElementConstants {
 	protected static final String ATTR_SCALE = "scale";
 	protected static final String ATTR_REFERENCED_COLUMN_NAME = "referenced-column-name";
 	protected static final String ATTR_DISCRIMINATOR_TYPE = "discriminator-type";
+	protected static final String ATTR_MAPS_ID = "maps-id";
 
 	/**
 	 * Schema, Catalog, table, etc.

@@ -33,6 +33,7 @@ import javax.persistence.MapKey;
 import javax.persistence.MapKeyClass;
 import javax.persistence.MapKeyEnumerated;
 import javax.persistence.MapKeyTemporal;
+import javax.persistence.MapsId;
 import javax.persistence.OrderBy;
 import javax.persistence.OrderColumn;
 import javax.persistence.TemporalType;
@@ -266,6 +267,29 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 		final MapKeyTemporal annotation = ReflectHelper.getAnnotation(member, MapKeyTemporal.class);
 		if (annotation != null) {
 			parsed.add(MapKeyTemporal.class);
+
+			return annotation.value();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Handles the {@link MapsId} annotation.
+	 * 
+	 * @param member
+	 *            the member
+	 * @param parsed
+	 *            the list of annotations parsed
+	 * @return the map key value
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected String handleMapsId(Member member, Set<Class<? extends Annotation>> parsed) {
+		final MapsId annotation = ReflectHelper.getAnnotation(member, MapsId.class);
+		if (annotation != null) {
+			parsed.add(MapsId.class);
 
 			return annotation.value();
 		}

@@ -40,6 +40,7 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 
 	private final PersistentAttributeType attributeType;
 	private final boolean optional;
+	private final String mapsId;
 
 	private EntityTypeImpl<T> type;
 
@@ -58,7 +59,21 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 		super(declaringType, metadata);
 
 		this.attributeType = attributeType;
-		this.optional = ((OptionalAssociationAttributeMetadata) metadata).isOptional();
+		final OptionalAssociationAttributeMetadata optionalAssociationMetadata = (OptionalAssociationAttributeMetadata) metadata;
+		this.optional = optionalAssociationMetadata.isOptional();
+		this.mapsId = optionalAssociationMetadata.getMapsId();
+	}
+
+	/**
+	 * Returns the mapsId of the AssociatedSingularAttribute.
+	 * 
+	 * @return the mapsId of the AssociatedSingularAttribute
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getMapsId() {
+		return this.mapsId;
 	}
 
 	/**

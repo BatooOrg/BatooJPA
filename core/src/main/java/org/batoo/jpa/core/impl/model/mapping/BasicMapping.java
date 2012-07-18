@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.impl.model.mapping;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
@@ -92,8 +93,8 @@ public class BasicMapping<Z, X> extends Mapping<Z, X, X> implements SingularMapp
 	 * 
 	 */
 	@Override
-	public boolean fillValue(Object instance) {
-		return this.attribute.fillValue(instance);
+	public boolean fillValue(EntityTypeImpl<?> type, ManagedInstance<?> managedInstance, Object instance) {
+		return this.attribute.fillValue(type, managedInstance, instance);
 	}
 
 	/**

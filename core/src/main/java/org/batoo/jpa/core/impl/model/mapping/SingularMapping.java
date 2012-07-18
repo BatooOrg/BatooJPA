@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.model.mapping;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 /**
  * The base class for {@link EmbeddedMapping} and {@link BasicMapping}.
@@ -39,6 +40,10 @@ public interface SingularMapping<Z, X> {
 	 * <p>
 	 * The operation returns false if at least one entity needs to obtain identity from the database.
 	 * 
+	 * @param type
+	 *            the entity type
+	 * @param managedInstance
+	 *            the managed instance
 	 * @param instance
 	 *            the instance to fill ids.
 	 * @return false if all OK, true if if at least one entity needs to obtain identity from the database
@@ -46,7 +51,7 @@ public interface SingularMapping<Z, X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	boolean fillValue(Object instance);
+	boolean fillValue(EntityTypeImpl<?> type, ManagedInstance<?> managedInstance, Object instance);
 
 	/**
 	 * Returns the mapping value of instance.

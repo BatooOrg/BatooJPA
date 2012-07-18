@@ -45,6 +45,7 @@ public class OneToOneAttributeMetadataImpl extends AssociationAttributeMetadataI
 	private final String mappedBy;
 	private final boolean removesOprhans;
 	private final boolean optional;
+	private final String mapsId;
 	private final List<PrimaryKeyJoinColumnMetadata> pkJoinColumns = Lists.newArrayList();
 
 	/**
@@ -62,6 +63,7 @@ public class OneToOneAttributeMetadataImpl extends AssociationAttributeMetadataI
 		this.mappedBy = metadata.getMappedBy();
 		this.optional = metadata.isOptional();
 		this.removesOprhans = metadata.removesOrphans();
+		this.mapsId = metadata.getMapsId();
 		this.pkJoinColumns.addAll(Lists.newArrayList(metadata.getPrimaryKeyJoinColumns()));
 	}
 
@@ -84,6 +86,7 @@ public class OneToOneAttributeMetadataImpl extends AssociationAttributeMetadataI
 		this.mappedBy = oneToOne.mappedBy();
 		this.optional = oneToOne.optional();
 		this.removesOprhans = oneToOne.orphanRemoval();
+		this.mapsId = this.handleMapsId(member, parsed);
 
 		parsed.add(OneToOne.class);
 
@@ -120,6 +123,15 @@ public class OneToOneAttributeMetadataImpl extends AssociationAttributeMetadataI
 	 * 
 	 */
 	@Override
+	public String getMapsId() {
+		return this.mapsId;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public List<PrimaryKeyJoinColumnMetadata> getPrimaryKeyJoinColumns() {
 		return this.pkJoinColumns;
 	}
@@ -141,5 +153,4 @@ public class OneToOneAttributeMetadataImpl extends AssociationAttributeMetadataI
 	public boolean removesOrphans() {
 		return this.removesOprhans;
 	}
-
 }

@@ -35,6 +35,7 @@ import org.batoo.jpa.parser.metadata.attribute.ManyToOneAttributeMetadata;
 public class ManyToOneAttributeMetadataImpl extends AssociationAttributeMetadataImpl implements ManyToOneAttributeMetadata {
 
 	private final boolean optional;
+	private final String mapsId;
 
 	/**
 	 * @param member
@@ -49,6 +50,7 @@ public class ManyToOneAttributeMetadataImpl extends AssociationAttributeMetadata
 		super(member, metadata);
 
 		this.optional = metadata.isOptional();
+		this.mapsId = metadata.getMapsId();
 	}
 
 	/**
@@ -70,6 +72,16 @@ public class ManyToOneAttributeMetadataImpl extends AssociationAttributeMetadata
 		parsed.add(ManyToOne.class);
 
 		this.optional = manyToOne.optional();
+		this.mapsId = this.handleMapsId(member, parsed);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getMapsId() {
+		return this.mapsId;
 	}
 
 	/**
@@ -80,5 +92,4 @@ public class ManyToOneAttributeMetadataImpl extends AssociationAttributeMetadata
 	public boolean isOptional() {
 		return this.optional;
 	}
-
 }

@@ -437,11 +437,11 @@ public class ManagedInstance<X> {
 
 	private boolean fillValuesImpl() {
 		if (this.idMapping != null) {
-			return this.idMapping.fillValue(this.instance);
+			return this.idMapping.fillValue(this.type.getRootType(), this, this.instance);
 		}
 		else {
 			for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> mapping : this.idMappings) {
-				if (!mapping.getSecond().fillValue(this.instance)) {
+				if (!mapping.getSecond().fillValue(this.type.getRootType(), this, this.instance)) {
 					return false;
 				}
 			}
@@ -894,19 +894,6 @@ public class ManagedInstance<X> {
 	}
 
 	/**
-	 * Sets the association as loaded.
-	 * 
-	 * @param mapping
-	 *            the association
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void setJoinLoaded(JoinedMapping<?, ?, ?> mapping) {
-		this.joinsLoaded.add(mapping);
-	}
-
-	/**
 	 * Marks the plural association as changed.
 	 * 
 	 * @param association
@@ -923,6 +910,19 @@ public class ManagedInstance<X> {
 		}
 
 		this.collectionsChanged.add(association);
+	}
+
+	/**
+	 * Sets the association as loaded.
+	 * 
+	 * @param mapping
+	 *            the association
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setJoinLoaded(JoinedMapping<?, ?, ?> mapping) {
+		this.joinsLoaded.add(mapping);
 	}
 
 	/**
