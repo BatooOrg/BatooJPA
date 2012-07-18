@@ -38,8 +38,8 @@ import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
-import org.batoo.jpa.core.impl.criteria.path.EntityPath;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.util.BatooUtils;
 
@@ -140,8 +140,8 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 		});
 		builder.append("\nfrom ").append(Joiner.on(", ").join(roots));
 
-		if (this.selection instanceof EntityPath) {
-			final String join = ((EntityPath<?, ?>) this.selection).generateJpqlFetches();
+		if (this.selection instanceof AbstractFrom) {
+			final String join = ((AbstractFrom<?, ?>) this.selection).generateJpqlFetches();
 			if (StringUtils.isNotBlank(join)) {
 				builder.append("\n").append(BatooUtils.indent(join));
 			}
@@ -183,8 +183,8 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 			froms.add(root.generateSqlFrom(this));
 		}
 
-		if (this.selection instanceof EntityPath) {
-			((EntityPath<?, ?>) this.selection).generateSqlJoins(this, joins);
+		for (final Root<?> root : this.getRoots()) {
+			((RootImpl<?>) root).generateSqlJoins(this, joins);
 		}
 
 		final String restriction = this.generateSqlRestriction();

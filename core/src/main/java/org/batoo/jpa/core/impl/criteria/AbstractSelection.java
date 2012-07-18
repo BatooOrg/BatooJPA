@@ -21,11 +21,9 @@ package org.batoo.jpa.core.impl.criteria;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.criteria.Selection;
 
-import org.batoo.jpa.core.impl.criteria.join.Joinable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
@@ -75,19 +73,6 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	 * @author hceylan
 	 */
 	public abstract String generateJpqlSelect();
-
-	/**
-	 * Generates SQL joins fragment that connects to root.
-	 * 
-	 * @param query
-	 *            the query
-	 * @param joins
-	 *            the map of joins
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void generateSqlJoinsUp(CriteriaQueryImpl<?> query, Map<Joinable, String> joins) {
-	}
 
 	/**
 	 * Returns the SQL select fragment.

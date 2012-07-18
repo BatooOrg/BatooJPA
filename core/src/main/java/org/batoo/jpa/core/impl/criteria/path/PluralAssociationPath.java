@@ -18,13 +18,19 @@
  */
 package org.batoo.jpa.core.impl.criteria.path;
 
-import javax.persistence.criteria.JoinType;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import javax.persistence.criteria.Path;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
+import org.batoo.jpa.core.impl.criteria.join.FetchImpl;
+import org.batoo.jpa.core.impl.criteria.join.Joinable;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 
@@ -39,9 +45,10 @@ import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
  * @author hceylan
  * @since $version
  */
-public class PluralAssociationPath<Z, X> extends EntityPath<Z, X> {
+public class PluralAssociationPath<Z, X> extends AbstractPath<X> implements Joinable {
 
 	private final PluralAssociationMapping<Z, ?, X> mapping;
+	private final FetchImpl<Z, X> fetchRoot;
 
 	/**
 	 * @param parent
@@ -53,9 +60,10 @@ public class PluralAssociationPath<Z, X> extends EntityPath<Z, X> {
 	 * @author hceylan
 	 */
 	public PluralAssociationPath(ParentPath<?, Z> parent, PluralAssociationMapping<Z, ?, X> mapping) {
-		super(parent, mapping.getType(), mapping, JoinType.INNER);
+		super(parent, mapping.getType().getJavaType());
 
 		this.mapping = mapping;
+		this.fetchRoot = parent.getFetchRoot().fetch(mapping.getAttribute());
 	}
 
 	/**
@@ -96,7 +104,7 @@ public class PluralAssociationPath<Z, X> extends EntityPath<Z, X> {
 	public String generateJpqlSelect() {
 		final StringBuilder builder = new StringBuilder();
 
-		if ((this.getParentPath() instanceof EntityPath) && StringUtils.isNotBlank(this.getParentPath().getAlias())) {
+		if ((this.getParentPath() instanceof AbstractFrom) && StringUtils.isNotBlank(this.getParentPath().getAlias())) {
 			builder.append(this.getParentPath().getAlias());
 		}
 		else {
@@ -116,7 +124,34 @@ public class PluralAssociationPath<Z, X> extends EntityPath<Z, X> {
 	 * 
 	 */
 	@Override
+	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
+		return this.fetchRoot.generateSqlSelect(query, false);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	protected PluralAssociationMapping<?, ?, X> getMapping() {
+		return this.mapping;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public PluralAttributeImpl<? super Z, ?, X> getModel() {
 		return this.mapping.getAttribute();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public X handle(SessionImpl session, ResultSet row) throws SQLException {
+		return this.fetchRoot.handle(session, row);
 	}
 }

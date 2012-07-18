@@ -95,13 +95,13 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	public boolean add(E e) {
 		this.snapshot();
 
-		if (!this.delegate.add(e)) {
+		if (this.delegate.add(e)) {
 			this.changed();
 
-			return false;
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	/**

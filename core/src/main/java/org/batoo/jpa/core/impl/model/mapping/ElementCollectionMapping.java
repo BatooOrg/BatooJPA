@@ -249,15 +249,13 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 			final MetamodelImpl metamodel = this.getRoot().getType().getMetamodel();
 			final CriteriaBuilderImpl cb = metamodel.getEntityManagerFactory().getCriteriaBuilder();
 
-			final EntityTypeImpl<E> entity = metamodel.entity(this.attribute.getBindableJavaType());
-
 			CriteriaQueryImpl<E> q = cb.createQuery(this.attribute.getBindableJavaType());
 			q.internal();
 			final RootImpl<?> r = q.from(this.getRoot().getType());
 			r.alias(BatooUtils.acronym(this.getRoot().getName()).toLowerCase());
 			// TODO handle embeddables along the path
 			final AbstractJoin<?, E> join = r.<E> join(this.attribute.getName());
-			join.alias(BatooUtils.acronym(entity.getName()).toLowerCase());
+			join.alias(BatooUtils.acronym(this.attribute.getName()));
 			q = q.select(join);
 
 			// has single id mapping

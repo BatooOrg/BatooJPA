@@ -31,7 +31,6 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
-import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
 
 import com.google.common.base.Joiner;
@@ -48,7 +47,7 @@ import com.google.common.collect.Lists;
  */
 public class EmbeddedAttributePath<X> extends AbstractPath<X> {
 
-	private final JoinedMapping<?, ?, X> mapping;
+	private final EmbeddedMapping<?, X> mapping;
 
 	/**
 	 * @param parent
@@ -59,7 +58,7 @@ public class EmbeddedAttributePath<X> extends AbstractPath<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EmbeddedAttributePath(ParentPath<?, ?> parent, JoinedMapping<?, ?, X> mapping) {
+	public EmbeddedAttributePath(ParentPath<?, ?> parent, EmbeddedMapping<?, X> mapping) {
 		super(parent, mapping.getType().getJavaType());
 
 		this.mapping = mapping;

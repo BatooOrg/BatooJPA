@@ -26,6 +26,9 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.SetJoin;
 import javax.persistence.metamodel.SetAttribute;
 
+import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
+import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 
 /**
@@ -54,6 +57,16 @@ public class SetJoinImpl<Z, E> extends AbstractJoin<Z, E> implements SetJoin<Z, 
 	 */
 	public SetJoinImpl(AbstractFrom<?, Z> parent, PluralMapping<? super Z, Set<E>, E> mapping, JoinType jointType) {
 		super(parent, mapping, jointType);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**

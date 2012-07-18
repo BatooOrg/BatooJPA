@@ -46,6 +46,10 @@ public class BatooUtils {
 			}
 		}
 
+		if (builder.length() == 0) {
+			builder.append(name.charAt(0));
+		}
+
 		return builder.toString();
 	}
 

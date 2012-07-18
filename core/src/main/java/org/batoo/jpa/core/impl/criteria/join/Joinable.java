@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.criteria.join;
 
+
 /**
  * Interface for joinable types.
  * 

@@ -77,8 +77,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	public AssociationMapping(ParentMapping<?, Z> parent, AssociationAttributeMetadata metadata, AttributeImpl<? super Z, X> attribute) {
 		super(parent, parent.getRoot().getType(), attribute, attribute.getJavaType(), attribute.getName());
 
-		this.eager = metadata.getFetchType() == FetchType.EAGER;
-
 		if ((metadata instanceof MappableAssociationAttributeMetadata)
 			&& StringUtils.isNotBlank(((MappableAssociationAttributeMetadata) metadata).getMappedBy())) {
 			this.mappedBy = ((MappableAssociationAttributeMetadata) metadata).getMappedBy();
@@ -86,6 +84,8 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 		else {
 			this.mappedBy = null;
 		}
+
+		this.eager = attribute.isCollection() || (this.mappedBy == null) ? metadata.getFetchType() == FetchType.EAGER : true;
 
 		if (metadata instanceof OrphanableAssociationAttributeMetadata) {
 			this.removesOrphans = ((OrphanableAssociationAttributeMetadata) metadata).removesOrphans();

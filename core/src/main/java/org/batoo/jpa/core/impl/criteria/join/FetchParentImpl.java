@@ -60,7 +60,6 @@ import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping.MappingType;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
-import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
@@ -204,8 +203,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			mapping = ((ElementCollectionMapping<? super Z, ?, X>) this.getMapping()).getMapping(attributeName);
 		}
 
-		if (!(mapping instanceof SingularAssociationMapping) && !(mapping instanceof PluralAssociationMapping)
-			&& !(mapping instanceof ElementCollectionMapping)) {
+		if (!(mapping instanceof JoinedMapping)) {
 			throw new IllegalArgumentException("Cannot dereference attribute " + attributeName);
 		}
 
@@ -695,7 +693,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		return this.handleFetch(session, row).getInstance();
 	}
 
-	@SuppressWarnings("unchecked")
 	private void handleAssociationFetch(SessionImpl session, final ResultSet row, ManagedInstance<? extends X> instance, final FetchImpl<X, ?> fetch)
 		throws SQLException {
 		final ManagedInstance<?> child = fetch.handleFetch(session, row);
@@ -705,7 +702,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			return;
 		}
 
-		final AssociationMapping<? super X, ?, ?> mapping = (AssociationMapping<? super X, ?, ?>) this.getMapping();
+		final AssociationMapping<? super X, ?, ?> mapping = (AssociationMapping<? super X, ?, ?>) fetch.getMapping();
 
 		if (mapping.getMappingType() == MappingType.PLURAL_ASSOCIATION) {
 			// if it is a plural association then we will test if we processed the child

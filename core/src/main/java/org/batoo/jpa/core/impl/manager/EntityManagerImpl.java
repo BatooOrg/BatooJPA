@@ -781,14 +781,14 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> T mergeImpl(T entity, MutableBoolean requiresFlush, IdentityHashMap<Object, Object> processed, boolean cascade) {
+		if (entity == null) {
+			return null;
+		}
+
 		// if already processed just return
 		final T processedEntity = (T) processed.get(entity);
 		if (processedEntity != null) {
 			return processedEntity;
-		}
-
-		if (entity == null) {
-			return null;
 		}
 
 		// try to locate the instance in the session

@@ -63,6 +63,7 @@ import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
+import org.batoo.jpa.core.impl.model.mapping.JoinedMapping.MappingType;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
@@ -992,16 +993,11 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.mappingsEager;
 			}
 
-			final List<JoinedMapping<?, ?, ?>> eagerAssociations = Lists.newArrayList();
+			final List<JoinedMapping<?, ?, ?>> mappingsEager = Lists.newArrayList();
+			this.rootMapping.addEagerMappings(mappingsEager);
 
-			for (final JoinedMapping<?, ?, ?> mapping : this.getMappingsJoined()) {
-				if (mapping.isEager()) {
-					eagerAssociations.add(mapping);
-				}
-			}
-
-			final JoinedMapping<?, ?, ?>[] eagerAssociations0 = new JoinedMapping[eagerAssociations.size()];
-			eagerAssociations.toArray(eagerAssociations0);
+			final JoinedMapping<?, ?, ?>[] eagerAssociations0 = new JoinedMapping[mappingsEager.size()];
+			mappingsEager.toArray(eagerAssociations0);
 
 			return this.mappingsEager = eagerAssociations0;
 		}
@@ -1616,7 +1612,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		if (depth < EntityTypeImpl.MAX_DEPTH) {
 
 			for (final JoinedMapping<?, ?, ?> mapping : this.getMappingsEager()) {
-				if (!mapping.isAssociation()) {
+				if (mapping.getMappingType() == MappingType.ELEMENT_COLLECTION) {
 					r.fetch(mapping.getAttribute().getName(), JoinType.LEFT);
 					continue;
 				}

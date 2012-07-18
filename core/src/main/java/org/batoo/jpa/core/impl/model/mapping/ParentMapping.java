@@ -29,6 +29,7 @@ import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
+import org.batoo.jpa.core.impl.model.mapping.JoinedMapping.MappingType;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.core.impl.model.type.MappedSuperclassTypeImpl;
@@ -109,6 +110,34 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	}
 
 	/**
+	 * Adds the eager mappings.
+	 * 
+	 * @param mappingsEager
+	 *            the list of mappings eager
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void addEagerMappings(List<JoinedMapping<?, ?, ?>> mappingsEager) {
+		for (final Mapping<? super X, ?, ?> mapping : this.children.values()) {
+			if (mapping instanceof JoinedMapping) {
+				final JoinedMapping<?, ?, ?> joinedMapping = (JoinedMapping<?, ?, ?>) mapping;
+
+				if (joinedMapping.getMappingType() == MappingType.EMBEDDABLE) {
+					continue;
+				}
+
+				if (joinedMapping.isEager()) {
+					mappingsEager.add(joinedMapping);
+				}
+			}
+			else if (mapping instanceof ParentMapping) {
+				((ParentMapping<? super X, ?>) mapping).addJoinedMappings(mappingsEager);
+			}
+		}
+	}
+
+	/**
 	 * Adds the joined mappings to the list of mappings.
 	 * 
 	 * @param mappingsJoined
@@ -122,8 +151,8 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 			if (mapping instanceof JoinedMapping) {
 				final JoinedMapping<?, ?, ?> joinedMapping = (JoinedMapping<?, ?, ?>) mapping;
 
-				if (joinedMapping.getTable() != null) {
-					mappingsJoined.add((JoinedMapping<?, ?, ?>) mapping);
+				if ((joinedMapping.getTable() != null)) {
+					mappingsJoined.add(joinedMapping);
 				}
 			}
 			else if (mapping instanceof ParentMapping) {

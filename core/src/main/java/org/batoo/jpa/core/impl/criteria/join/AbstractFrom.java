@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.core.impl.criteria.join;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -41,15 +43,15 @@ import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.Type.PersistenceType;
 
+import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.path.EmbeddedAttributePath;
-import org.batoo.jpa.core.impl.criteria.path.EntityPath;
+import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 import org.batoo.jpa.core.impl.criteria.path.ParentPath;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping.MappingType;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
-import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
@@ -71,31 +73,12 @@ import com.google.common.collect.Sets;
  * @author hceylan
  * @since $version
  */
-public abstract class AbstractFrom<Z, X> implements From<Z, X> {
+public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From<Z, X>, Joinable, ParentPath<Z, X> {
 
+	private final FetchParentImpl<Z, X> fetchRoot;
 	private final EntityTypeImpl<X> entity;
 	private final Set<AbstractJoin<X, ?>> joins = Sets.newHashSet();
-	private JoinedMapping<? super Z, ?, X> mapping;
-	private EntityPath<Z, X> entityPath;
-	private EmbeddedAttributePath<X> mappingPath;
-
-	/**
-	 * Constructor for root types
-	 * 
-	 * @param entity
-	 *            the entity
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public AbstractFrom(EntityTypeImpl<X> entity) {
-		super();
-
-		this.entity = entity;
-		this.mapping = null;
-
-		this.entityPath = new EntityPath<Z, X>(entity);
-	}
+	private final JoinedMapping<? super Z, ?, X> mapping;
 
 	/**
 	 * Constructor for joined types
@@ -112,19 +95,36 @@ public abstract class AbstractFrom<Z, X> implements From<Z, X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AbstractFrom(ParentPath<?, Z> parent, TypeImpl<X> type, JoinedMapping<? super Z, ?, X> mapping, JoinType joinType) {
-		super();
+	public AbstractFrom(AbstractFrom<?, Z> parent, TypeImpl<X> type, JoinedMapping<? super Z, ?, X> mapping, JoinType joinType) {
+		super(parent, type.getJavaType());
+
+		this.fetchRoot = parent.getFetchRoot().fetch(mapping.getAttribute().getName(), joinType);
 
 		if (type.getPersistenceType() == PersistenceType.ENTITY) {
 			this.entity = (EntityTypeImpl<X>) type;
-			this.entityPath = new EntityPath<Z, X>(parent, this.entity, mapping, joinType);
 			this.mapping = null;
 		}
 		else {
 			this.entity = null;
-			this.mappingPath = new EmbeddedAttributePath<X>(parent, mapping);
 			this.mapping = mapping;
 		}
+	}
+
+	/**
+	 * Constructor for root types
+	 * 
+	 * @param entity
+	 *            the entity
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public AbstractFrom(EntityTypeImpl<X> entity) {
+		super(null, entity.getJavaType());
+
+		this.fetchRoot = new FetchParentImpl<Z, X>(entity);
+		this.entity = entity;
+		this.mapping = null;
 	}
 
 	/**
@@ -133,7 +133,7 @@ public abstract class AbstractFrom<Z, X> implements From<Z, X> {
 	 */
 	@Override
 	public <Y> Fetch<X, Y> fetch(PluralAttribute<? super X, ?, Y> attribute) {
-		return this.entityPath.getFetchRoot().fetch(attribute);
+		return this.fetchRoot.fetch(attribute);
 	}
 
 	/**
@@ -142,7 +142,7 @@ public abstract class AbstractFrom<Z, X> implements From<Z, X> {
 	 */
 	@Override
 	public <Y> Fetch<X, Y> fetch(PluralAttribute<? super X, ?, Y> attribute, JoinType jt) {
-		return this.getFetchRoot().fetch(attribute, jt);
+		return this.fetchRoot.fetch(attribute, jt);
 	}
 
 	/**
@@ -151,7 +151,7 @@ public abstract class AbstractFrom<Z, X> implements From<Z, X> {
 	 */
 	@Override
 	public <Y> Fetch<X, Y> fetch(SingularAttribute<? super X, Y> attribute) {
-		return this.getFetchRoot().fetch(attribute);
+		return this.fetchRoot.fetch(attribute);
 	}
 
 	/**
@@ -160,7 +160,7 @@ public abstract class AbstractFrom<Z, X> implements From<Z, X> {
 	 */
 	@Override
 	public <Y> Fetch<X, Y> fetch(SingularAttribute<? super X, Y> attribute, JoinType jt) {
-		return this.getFetchRoot().fetch(attribute, jt);
+		return this.fetchRoot.fetch(attribute, jt);
 	}
 
 	/**
@@ -169,7 +169,7 @@ public abstract class AbstractFrom<Z, X> implements From<Z, X> {
 	 */
 	@Override
 	public <Y> Fetch<X, Y> fetch(String attributeName) {
-		return this.getFetchRoot().fetch(attributeName);
+		return this.fetchRoot.fetch(attributeName);
 	}
 
 	/**
@@ -178,7 +178,7 @@ public abstract class AbstractFrom<Z, X> implements From<Z, X> {
 	 */
 	@Override
 	public <Y> Fetch<X, Y> fetch(String attributeName, JoinType jt) {
-		return this.getFetchRoot().fetch(attributeName, jt);
+		return this.fetchRoot.fetch(attributeName, jt);
 	}
 
 	/**
@@ -190,7 +190,21 @@ public abstract class AbstractFrom<Z, X> implements From<Z, X> {
 	 * @author hceylan
 	 */
 	public String generateDiscrimination() {
-		return this.getFetchRoot().generateDiscrimination();
+		return this.fetchRoot.generateDiscrimination();
+	}
+
+	/**
+	 * Returns the JPQL fetch joins fragment.
+	 * 
+	 * @return the JPQL fetch joins fragment
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String generateJpqlFetches() {
+		final String root = StringUtils.isNotBlank(this.getAlias()) ? this.getAlias() : this.entity.getName();
+
+		return this.fetchRoot.generateJpqlFetches(root);
 	}
 
 	/**
@@ -198,12 +212,32 @@ public abstract class AbstractFrom<Z, X> implements From<Z, X> {
 	 * 
 	 */
 	@Override
-	public void generateSqlJoins(CriteriaQueryImpl<?> query, Map<Joinable, String> joins) {
-		super.generateSqlJoins(query, joins);
+	public String generateJpqlRestriction() {
+		return StringUtils.isNotBlank(this.getAlias()) ? this.getAlias() : this.entity.getName();
+	}
 
-		for (final AbstractJoin<X, ?> join : this.joins) {
-			join.generateSqlJoins(query, joins);
-		}
+	/**
+	 * Generates SQL joins fragment.
+	 * 
+	 * @param query
+	 *            the query
+	 * @param joins
+	 *            the map of joins
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void generateSqlJoins(CriteriaQueryImpl<?> query, Map<Joinable, String> joins) {
+		this.fetchRoot.generateSqlJoins(query, joins);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
+		return this.fetchRoot.generateSqlSelect(query, this.getParentPath() == null);
 	}
 
 	/**
@@ -222,7 +256,20 @@ public abstract class AbstractFrom<Z, X> implements From<Z, X> {
 	 */
 	@Override
 	public Set<Fetch<X, ?>> getFetches() {
-		return this.getFetchRoot().getFetches();
+		return this.fetchRoot.getFetches();
+	}
+
+	/**
+	 * Returns the fetchRoot of the AbstractFrom.
+	 * 
+	 * @return the fetchRoot of the AbstractFrom
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Override
+	public FetchParentImpl<Z, X> getFetchRoot() {
+		return this.fetchRoot;
 	}
 
 	/**
@@ -234,6 +281,37 @@ public abstract class AbstractFrom<Z, X> implements From<Z, X> {
 		final Set<Join<X, ?>> joins = Sets.newHashSet();
 		joins.addAll(this.joins);
 		return joins;
+	}
+
+	/**
+	 * Returns the mapping of the path.
+	 * 
+	 * @return the mapping of the path
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	protected Mapping<?, ?, X> getMapping() {
+		if (this.entity != null) {
+			return this.entity.getRootMapping();
+		}
+
+		return (Mapping<?, ?, X>) this.mapping;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public X handle(SessionImpl session, ResultSet row) throws SQLException {
+		if (this.entity != null) {
+			return this.fetchRoot.handle(session, row);
+		}
+
+		return this.fetchRoot.handleElementFetch(row);
 	}
 
 	/**
@@ -436,7 +514,7 @@ public abstract class AbstractFrom<Z, X> implements From<Z, X> {
 		if (joinedMapping.getMappingType() == MappingType.SINGULAR_ASSOCIATION) {
 			join = new SingularJoin<X, Y>(this, joinedMapping, jt);
 		}
-		else if (mapping instanceof PluralAssociationMapping) {
+		else {
 			final PluralAttributeImpl<? super X, ?, Y> attribute = (PluralAttributeImpl<? super X, ?, Y>) mapping.getAttribute();
 
 			switch (attribute.getCollectionType()) {

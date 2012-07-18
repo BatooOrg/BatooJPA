@@ -26,10 +26,9 @@ import javax.persistence.metamodel.MapAttribute;
 import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
-import org.batoo.jpa.core.impl.criteria.join.Joinable;
+import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
@@ -77,17 +76,6 @@ public abstract class AbstractPath<X> extends AbstractExpression<X> implements P
 	 */
 	protected IllegalArgumentException cannotDereference() {
 		return new IllegalArgumentException("Cannot dereference");
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public void generateSqlJoinsUp(CriteriaQueryImpl<?> query, Map<Joinable, String> joins) {
-		if (this.getParentPath() != null) {
-			this.getParentPath().generateSqlJoinsUp(query, joins);
-		}
 	}
 
 	/**
@@ -149,7 +137,7 @@ public abstract class AbstractPath<X> extends AbstractExpression<X> implements P
 			path = new PluralAssociationPath<X, Y>((ParentPath<?, X>) this, (PluralAssociationMapping<X, ?, Y>) mapping);
 		}
 		else {
-			path = new EmbeddedAttributePath<Y>(this, (EmbeddedMapping<? super X, Y>) mapping);
+			path = new EmbeddedAttributePath<Y>((ParentPath<?, X>) this, (EmbeddedMapping<? super X, Y>) mapping);
 		}
 
 		this.children.put(pathName, path);
@@ -186,7 +174,7 @@ public abstract class AbstractPath<X> extends AbstractExpression<X> implements P
 	 */
 	protected RootImpl<?> getRootPath() {
 		AbstractPath<?> root = this;
-		while ((root.getParentPath() != null) && !(root instanceof EntityPath)) {
+		while ((root.getParentPath() != null) && !(root instanceof AbstractFrom)) {
 			root = root.getParentPath();
 		}
 
