@@ -116,10 +116,10 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private Mapping<?, ?, ?>[] singularMappings;
 	private PluralMapping<?, ?, ?>[] mappingsPluralSorted;
 	private PluralMapping<?, ?, ?>[] mappingsPlural;
+	private JoinedMapping<?, ?, ?>[] mappingsEager;
 	private JoinedMapping<?, ?, ?>[] mappingsJoined;
 	private AssociationMapping<?, ?, ?>[] associations;
 	private AssociationMapping<?, ?, ?>[] associationsDetachable;
-	private AssociationMapping<?, ?, ?>[] associationsEager;
 	private AssociationMapping<?, ?, ?>[] associationsJoined;
 	private AssociationMapping<?, ?, ?>[] associationsNotPersistable;
 	private AssociationMapping<?, ?, ?>[] associationsPersistable;
@@ -368,39 +368,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			associationsDetachable.toArray(associationsDetachable0);
 
 			return this.associationsDetachable = associationsDetachable0;
-		}
-	}
-
-	/**
-	 * Returns the associated attributes that are eager.
-	 * 
-	 * @return the associated attributes that are eager
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public AssociationMapping<?, ?, ?>[] getAssociationsEager() {
-		if (this.associationsEager != null) {
-			return this.associationsEager;
-		}
-
-		synchronized (this) {
-			if (this.associationsEager != null) {
-				return this.associationsEager;
-			}
-
-			final List<AssociationMapping<?, ?, ?>> eagerAssociations = Lists.newArrayList();
-
-			for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
-				if (association.isEager()) {
-					eagerAssociations.add(association);
-				}
-			}
-
-			final AssociationMapping<?, ?, ?>[] eagerAssociations0 = new AssociationMapping[eagerAssociations.size()];
-			eagerAssociations.toArray(eagerAssociations0);
-
-			return this.associationsEager = eagerAssociations0;
 		}
 	}
 
@@ -747,7 +714,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			q = q.select(r);
 			r.alias(BatooUtils.acronym(this.name).toLowerCase());
 
-			this.prepareEagerAssociations(r, 0, null);
+			this.prepareEagerJoins(r, 0, null);
 
 			// has single id mapping
 			if (this.getRootType().hasSingleIdAttribute()) {
@@ -1005,6 +972,39 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		catch (final Exception e) {} // not possible
 
 		return null;
+	}
+
+	/**
+	 * Returns the plural attributes that are eager.
+	 * 
+	 * @return the plural attributes that are eager
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public JoinedMapping<?, ?, ?>[] getMappingsEager() {
+		if (this.mappingsEager != null) {
+			return this.mappingsEager;
+		}
+
+		synchronized (this) {
+			if (this.mappingsEager != null) {
+				return this.mappingsEager;
+			}
+
+			final List<JoinedMapping<?, ?, ?>> eagerAssociations = Lists.newArrayList();
+
+			for (final JoinedMapping<?, ?, ?> mapping : this.getMappingsJoined()) {
+				if (mapping.isEager()) {
+					eagerAssociations.add(mapping);
+				}
+			}
+
+			final JoinedMapping<?, ?, ?>[] eagerAssociations0 = new JoinedMapping[eagerAssociations.size()];
+			eagerAssociations.toArray(eagerAssociations0);
+
+			return this.mappingsEager = eagerAssociations0;
+		}
 	}
 
 	/**
@@ -1612,10 +1612,16 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void prepareEagerAssociations(FetchParent<?, ?> r, int depth, AssociationMapping<?, ?, ?> parent) {
+	public void prepareEagerJoins(FetchParent<?, ?> r, int depth, AssociationMapping<?, ?, ?> parent) {
 		if (depth < EntityTypeImpl.MAX_DEPTH) {
 
-			for (final AssociationMapping<?, ?, ?> association : this.getAssociationsEager()) {
+			for (final JoinedMapping<?, ?, ?> mapping : this.getMappingsEager()) {
+				if (!mapping.isAssociation()) {
+					r.fetch(mapping.getAttribute().getName(), JoinType.LEFT);
+					continue;
+				}
+
+				final AssociationMapping<?, ?, ?> association = (AssociationMapping<?, ?, ?>) mapping;
 				// if we are coming from the inverse side and inverse side is not many-to-one then skip
 				if ((parent != null) && //
 					(association.getInverse() == parent) && //
@@ -1623,11 +1629,11 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 					continue;
 				}
 
-				final Fetch<?, Object> r2 = r.fetch(association.getAttribute().getName(), JoinType.LEFT);
+				final Fetch<?, Object> r2 = r.fetch(mapping.getAttribute().getName(), JoinType.LEFT);
 
 				final EntityTypeImpl<?> type = association.getType();
 
-				type.prepareEagerAssociations(r2, depth + 1, association);
+				type.prepareEagerJoins(r2, depth + 1, association);
 			}
 		}
 	}

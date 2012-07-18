@@ -18,6 +18,13 @@
  */
 package org.batoo.jpa.core.impl.model.mapping;
 
+import java.sql.SQLException;
+
+import javax.persistence.criteria.JoinType;
+
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
+import org.batoo.jpa.core.impl.jdbc.JoinableTable;
 import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.parser.MappingException;
@@ -35,7 +42,7 @@ import org.batoo.jpa.parser.metadata.ColumnMetadata;
  * @author hceylan
  * @since $version
  */
-public class EmbeddedMapping<Z, X> extends ParentMapping<Z, X> implements SingularMapping<Z, X> {
+public class EmbeddedMapping<Z, X> extends ParentMapping<Z, X> implements SingularMapping<Z, X>, JoinedMapping<Z, X, X> {
 
 	private final EmbeddableTypeImpl<X> embeddable;
 	private final EmbeddedAttribute<? super Z, X> attribute;
@@ -84,6 +91,16 @@ public class EmbeddedMapping<Z, X> extends ParentMapping<Z, X> implements Singul
 		}
 
 		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void flush(ConnectionImpl connection, ManagedInstance<?> managedInstance, boolean removals, boolean force) throws SQLException {
+		// TODO Auto-generated method stub
+
 	}
 
 	/**
@@ -148,8 +165,26 @@ public class EmbeddedMapping<Z, X> extends ParentMapping<Z, X> implements Singul
 	 * 
 	 */
 	@Override
+	public MappingType getMappingType() {
+		return MappingType.EMBEDDABLE;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public RootMapping<?> getRoot() {
 		return this.getParent().getRoot();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public JoinableTable getTable() {
+		return null; // N/A
 	}
 
 	/**
@@ -166,7 +201,43 @@ public class EmbeddedMapping<Z, X> extends ParentMapping<Z, X> implements Singul
 	 * 
 	 */
 	@Override
+	public void initialize(ManagedInstance<?> instance) {
+		// noop
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isAssociation() {
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isEager() {
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public boolean isId() {
 		return this.attribute.isId();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String join(String parentAlias, String alias, JoinType joinType) {
+		return null;
 	}
 }

@@ -26,7 +26,7 @@ import javax.persistence.criteria.ListJoin;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.metamodel.ListAttribute;
 
-import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 
 /**
  * Implementation of {@link ListJoin}.
@@ -52,7 +52,7 @@ public class ListJoinImpl<Z, E> extends AbstractJoin<Z, E> implements ListJoin<Z
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ListJoinImpl(AbstractFrom<?, Z> parent, PluralAssociationMapping<? super Z, List<E>, E> mapping, JoinType jointType) {
+	public ListJoinImpl(AbstractFrom<?, Z> parent, PluralMapping<? super Z, List<E>, E> mapping, JoinType jointType) {
 		super(parent, mapping, jointType);
 	}
 

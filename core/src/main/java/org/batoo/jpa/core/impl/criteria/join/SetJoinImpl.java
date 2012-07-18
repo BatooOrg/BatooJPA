@@ -26,7 +26,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.SetJoin;
 import javax.persistence.metamodel.SetAttribute;
 
-import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 
 /**
  * Implementation of {@link SetJoin}.
@@ -52,7 +52,7 @@ public class SetJoinImpl<Z, E> extends AbstractJoin<Z, E> implements SetJoin<Z, 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SetJoinImpl(AbstractFrom<?, Z> parent, PluralAssociationMapping<? super Z, Set<E>, E> mapping, JoinType jointType) {
+	public SetJoinImpl(AbstractFrom<?, Z> parent, PluralMapping<? super Z, Set<E>, E> mapping, JoinType jointType) {
 		super(parent, mapping, jointType);
 	}
 

@@ -518,7 +518,7 @@ public class SessionImpl {
 				instance.setLoading(false);
 
 				// process the associations
-				instance.processAssociations();
+				instance.processJoinedMappings();
 				instance.sortLists();
 			}
 

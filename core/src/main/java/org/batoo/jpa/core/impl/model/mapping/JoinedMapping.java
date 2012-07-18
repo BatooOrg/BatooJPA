@@ -63,7 +63,12 @@ public interface JoinedMapping<Z, X, Y> {
 		/**
 		 * Element collection
 		 */
-		ELEMENT_COLLECTION
+		ELEMENT_COLLECTION,
+
+		/**
+		 * Embeddable mapping
+		 */
+		EMBEDDABLE
 	}
 
 	/**
@@ -128,6 +133,17 @@ public interface JoinedMapping<Z, X, Y> {
 	TypeImpl<Y> getType();
 
 	/**
+	 * Initializes the mapping.
+	 * 
+	 * @param instance
+	 *            the instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	void initialize(ManagedInstance<?> instance);
+
+	/**
 	 * Returns if the mapping is an association.
 	 * 
 	 * @return true if the mapping is an association, false otherwise
@@ -136,6 +152,16 @@ public interface JoinedMapping<Z, X, Y> {
 	 * @author hceylan
 	 */
 	boolean isAssociation();
+
+	/**
+	 * Returns if the association should be eagerly fetched.
+	 * 
+	 * @return true if the association should be eagerly fetched
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	boolean isEager();
 
 	/**
 	 * Returns the join SQL for the mapping.
@@ -153,5 +179,4 @@ public interface JoinedMapping<Z, X, Y> {
 	 * @author hceylan
 	 */
 	String join(String parentAlias, String alias, JoinType joinType);
-
 }

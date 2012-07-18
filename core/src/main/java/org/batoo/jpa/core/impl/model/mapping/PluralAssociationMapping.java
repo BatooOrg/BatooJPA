@@ -310,7 +310,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 			join.alias(BatooUtils.acronym(entity.getName()).toLowerCase());
 			q = q.select(join);
 
-			entity.prepareEagerAssociations(join, 0, this);
+			entity.prepareEagerJoins(join, 0, this);
 
 			// has single id mapping
 			final EntityTypeImpl<?> rootType = this.getRoot().getType();
@@ -357,14 +357,10 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	}
 
 	/**
-	 * Initializes the managed collection of the instance
+	 * {@inheritDoc}
 	 * 
-	 * @param instance
-	 *            the instance
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
+	@Override
 	public void initialize(ManagedInstance<?> instance) {
 		this.set(instance, this.attribute.newCollection(this, instance, false));
 	}
@@ -436,18 +432,16 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	}
 
 	/**
-	 * Loads the eager association.
+	 * {@inheritDoc}
 	 * 
-	 * @param instance
-	 *            the managed instance
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public void load(ManagedInstance<?> instance) {
 		final ManagedCollection<E> collection = (ManagedCollection<E>) this.attribute.newCollection(this, instance, false);
+
 		collection.getDelegate().addAll(this.loadCollection(instance));
+
 		this.set(instance, collection);
 	}
 
@@ -456,13 +450,13 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * 
 	 */
 	@Override
-	public Collection<? extends E> loadCollection(ManagedInstance<?> managedInstance) {
-		final EntityManagerImpl em = managedInstance.getSession().getEntityManager();
+	public Collection<? extends E> loadCollection(ManagedInstance<?> instance) {
+		final EntityManagerImpl em = instance.getSession().getEntityManager();
 		final TypedQueryImpl<E> q = em.createQuery(this.getSelectCriteria());
 
-		final EntityTypeImpl<?> rootType = managedInstance.getType();
+		final EntityTypeImpl<?> rootType = instance.getType();
 
-		final Object id = managedInstance.getId().getId();
+		final Object id = instance.getId().getId();
 
 		// if has single id then pass it on
 		if (rootType.hasSingleIdAttribute()) {
@@ -476,7 +470,6 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 		}
 
 		return q.getResultList();
-
 	}
 
 	/**
@@ -495,10 +488,16 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Persists the children that have been added to the managed collection
 	 * 
+	 * @param entityManager
+	 *            the entity manager
+	 * @param instance
+	 *            the managed instance
+	 * 
+	 * @since $version
+	 * @author hceylan
 	 */
-	@Override
 	@SuppressWarnings("unchecked")
 	public void persistAdditions(EntityManagerImpl entityManager, ManagedInstance<?> instance) {
 		if (this.cascadesPersist()) {

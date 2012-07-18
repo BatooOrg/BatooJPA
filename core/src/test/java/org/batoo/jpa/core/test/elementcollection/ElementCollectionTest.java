@@ -39,7 +39,7 @@ public class ElementCollectionTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testElementCollection1() {
-		final Foo foo = new Foo();
+		Foo foo = new Foo();
 		foo.setValue("Foo2");
 
 		foo.getCodes().add("TR");
@@ -56,8 +56,9 @@ public class ElementCollectionTest extends BaseCoreTest {
 
 		this.close();
 
-		final Foo foo2 = this.find(Foo.class, foo.getKey());
-		Assert.assertEquals(foo.getKey(), foo2.getKey());
+		foo = this.find(Foo.class, foo.getKey());
+		Assert.assertEquals(foo.getKey(), foo.getKey());
+		Assert.assertEquals(4, foo.getCodes().size());
 	}
 
 	/**
@@ -68,7 +69,7 @@ public class ElementCollectionTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testElementCollection2() {
-		final Foo foo = new Foo();
+		Foo foo = new Foo();
 		foo.setValue("Foo2");
 
 		foo.getCodes2().add("TR");
@@ -80,13 +81,14 @@ public class ElementCollectionTest extends BaseCoreTest {
 		this.commit();
 
 		this.begin();
-		foo.getCodes().add("FR");
+		foo.getCodes2().add("FR");
 		this.commit();
 
 		this.close();
 
-		final Foo foo2 = this.find(Foo.class, foo.getKey());
-		Assert.assertEquals(foo.getKey(), foo2.getKey());
+		foo = this.find(Foo.class, foo.getKey());
+		Assert.assertEquals(foo.getKey(), foo.getKey());
+		Assert.assertEquals(4, foo.getCodes2().size());
 	}
 
 	/**
@@ -97,7 +99,7 @@ public class ElementCollectionTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testElementCollection3() {
-		final Foo foo = new Foo();
+		Foo foo = new Foo();
 		foo.setValue("Foo2");
 
 		foo.getCodes3().add(FooType.TYPE1);
@@ -114,8 +116,9 @@ public class ElementCollectionTest extends BaseCoreTest {
 
 		this.close();
 
-		final Foo foo2 = this.find(Foo.class, foo.getKey());
-		Assert.assertEquals(foo.getKey(), foo2.getKey());
+		foo = this.find(Foo.class, foo.getKey());
+		Assert.assertEquals(foo.getKey(), foo.getKey());
+		Assert.assertEquals(2, foo.getCodes3().size());
 	}
 
 	/**
@@ -126,7 +129,7 @@ public class ElementCollectionTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testElementCollection4() {
-		final Foo foo = new Foo();
+		Foo foo = new Foo();
 		foo.setValue("Foo2");
 
 		foo.getCodes4().add(FooType.TYPE1);
@@ -143,7 +146,8 @@ public class ElementCollectionTest extends BaseCoreTest {
 
 		this.close();
 
-		final Foo foo2 = this.find(Foo.class, foo.getKey());
-		Assert.assertEquals(foo.getKey(), foo2.getKey());
+		foo = this.find(Foo.class, foo.getKey());
+		Assert.assertEquals(foo.getKey(), foo.getKey());
+		Assert.assertEquals(2, foo.getCodes4().size());
 	}
 }

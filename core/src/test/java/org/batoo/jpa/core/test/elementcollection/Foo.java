@@ -25,6 +25,7 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
@@ -52,7 +53,7 @@ public class Foo {
 	@GeneratedValue
 	private Integer key;
 
-	@ElementCollection
+	@ElementCollection(fetch = FetchType.EAGER)
 	private final List<String> codes = Lists.newArrayList();
 
 	@ElementCollection

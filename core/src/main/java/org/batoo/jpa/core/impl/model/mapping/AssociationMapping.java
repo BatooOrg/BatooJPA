@@ -78,6 +78,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 		super(parent, parent.getRoot().getType(), attribute, attribute.getJavaType(), attribute.getName());
 
 		this.eager = metadata.getFetchType() == FetchType.EAGER;
+
 		if ((metadata instanceof MappableAssociationAttributeMetadata)
 			&& StringUtils.isNotBlank(((MappableAssociationAttributeMetadata) metadata).getMappedBy())) {
 			this.mappedBy = ((MappableAssociationAttributeMetadata) metadata).getMappedBy();
@@ -265,13 +266,10 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	public abstract EntityTypeImpl<Y> getType();
 
 	/**
-	 * Returns if the association should be eagerly fetched.
+	 * {@inheritDoc}
 	 * 
-	 * @return true if the association should be eagerly fetched
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
+	@Override
 	public final boolean isEager() {
 		return this.eager;
 	}

@@ -21,7 +21,6 @@ package org.batoo.jpa.core.impl.model.mapping;
 import java.util.Collection;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
 
 /**
@@ -104,32 +103,30 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	String getOrderBy();
 
 	/**
-	 * Loads and returns the collection.
+	 * Loads the collection eagerly.
 	 * 
-	 * @param managedInstance
-	 *            the managed instance owning the collection
-	 * @return the loaded collection
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	Collection<? extends E> loadCollection(ManagedInstance<?> managedInstance);
-
-	/**
-	 * Persists the children that have been added to the managed collection
-	 * 
-	 * @param entityManager
-	 *            the entity manager
 	 * @param instance
 	 *            the managed instance
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	void persistAdditions(EntityManagerImpl entityManager, ManagedInstance<?> instance);
+	void load(ManagedInstance<?> instance);
 
 	/**
-	 * Sets the lazy instance for the association
+	 * Loads and returns the collection.
+	 * 
+	 * @param instance
+	 *            the managed instance owning the collection
+	 * @return the loaded collection
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	Collection<? extends E> loadCollection(ManagedInstance<?> instance);
+
+	/**
+	 * Sets the lazy instance for the collection
 	 * 
 	 * @param instance
 	 *            the managed instance

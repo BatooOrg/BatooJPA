@@ -34,6 +34,7 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SingularAttribute;
+import javax.persistence.metamodel.Type.PersistenceType;
 
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
@@ -713,7 +714,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 				if ((mapping.getInverse() != null) && //
 					(mapping.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_MANY)) {
 					mapping.getInverse().set(child, instance.getInstance());
-					child.setAssociationLoaded(mapping.getInverse());
+					child.setJoinLoaded(mapping.getInverse());
 				}
 			}
 		}
@@ -724,13 +725,13 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			// if this is a one-to-one mapping and has an inverse then set it
 			if ((mapping.getInverse() != null) && (mapping.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_ONE)) {
 				mapping.getInverse().set(child, instance.getInstance());
-				child.setAssociationLoaded(mapping);
+				child.setJoinLoaded(mapping);
 			}
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private void handleElementCollectionFetch(SessionImpl session, ResultSet row, ManagedInstance<? extends X> instance, FetchImpl<X, ?> fetch) {
+	private void handleElementCollectionFetch(SessionImpl session, ResultSet row, ManagedInstance<? extends X> instance, FetchImpl<X, ?> fetch)
+		throws SQLException {
 		final Object child = fetch.handleElementFetch(row);
 
 		// if null then continue
@@ -738,7 +739,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			return;
 		}
 
-		final ElementCollectionMapping<? super X, ?, ?> mapping = (ElementCollectionMapping<? super X, ?, ?>) this.getMapping();
+		final ElementCollectionMapping<? super X, ?, ?> mapping = (ElementCollectionMapping<? super X, ?, ?>) fetch.getMapping();
 
 		// if it is a plural association then we will test if we processed the child
 		((ManagedCollection<?>) mapping.get(instance.getInstance())).addChild(child);
@@ -750,12 +751,19 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @param row
 	 *            the row
 	 * @return the collection element
+	 * @throws SQLException
+	 *             thrown in case of an underlying SQL Error
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public X handleElementFetch(ResultSet row) {
-		// TODO Auto-generated method stub
+	@SuppressWarnings("unchecked")
+	public X handleElementFetch(ResultSet row) throws SQLException {
+		if (this.type.getPersistenceType() == PersistenceType.BASIC) {
+			return (X) row.getObject(this.fields[0]);
+		}
+
+		// TODO handle embeddables
 		return null;
 	}
 
@@ -842,16 +850,14 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		for (final SingularAssociationMapping<?, ?> mapping : this.joins) {
 			final Object child = this.getInstance(session, mapping, row);
 			mapping.set(instance, child);
-			instance.setAssociationLoaded(mapping);
+			instance.setJoinLoaded(mapping);
 		}
 
 		for (final FetchImpl<X, ?> fetch : this.fetches) {
 			final JoinedMapping<? super X, ?, ?> mapping = fetch.getMapping();
-			if (mapping.getMappingType() == MappingType.PLURAL_ASSOCIATION) {
-				((PluralAssociationMapping<? super X, ?, ?>) mapping).initialize(instance);
-			}
+			mapping.initialize(instance);
 
-			instance.setAssociationLoaded(mapping);
+			instance.setJoinLoaded(mapping);
 		}
 	}
 

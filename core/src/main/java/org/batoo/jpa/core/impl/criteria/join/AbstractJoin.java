@@ -24,7 +24,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.metamodel.Attribute;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
 
 /**
  * Abstract implementation of joins.
@@ -40,7 +40,7 @@ import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 public abstract class AbstractJoin<Z, X> extends AbstractFrom<Z, X> implements Join<Z, X> {
 
 	private final AbstractFrom<?, Z> parent;
-	private final AssociationMapping<? super Z, ?, X> mapping;
+	private final JoinedMapping<? super Z, ?, X> mapping;
 	private final JoinType joinType;
 
 	/**
@@ -54,7 +54,7 @@ public abstract class AbstractJoin<Z, X> extends AbstractFrom<Z, X> implements J
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AbstractJoin(AbstractFrom<?, Z> parent, AssociationMapping<? super Z, ?, X> mapping, JoinType jointType) {
+	public AbstractJoin(AbstractFrom<?, Z> parent, JoinedMapping<? super Z, ?, X> mapping, JoinType jointType) {
 		super(parent, mapping.getType(), mapping, jointType);
 
 		this.parent = parent;
@@ -115,5 +115,4 @@ public abstract class AbstractJoin<Z, X> extends AbstractFrom<Z, X> implements J
 	public AbstractFrom<?, Z> getParent() {
 		return this.parent;
 	}
-
 }

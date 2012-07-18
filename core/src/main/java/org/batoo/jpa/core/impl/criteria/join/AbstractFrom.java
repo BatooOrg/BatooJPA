@@ -34,23 +34,25 @@ import javax.persistence.criteria.MapJoin;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.SetJoin;
 import javax.persistence.metamodel.CollectionAttribute;
-import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.MapAttribute;
 import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
-import javax.persistence.metamodel.Type;
+import javax.persistence.metamodel.Type.PersistenceType;
 
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.path.EmbeddedAttributePath;
 import org.batoo.jpa.core.impl.criteria.path.EntityPath;
 import org.batoo.jpa.core.impl.criteria.path.ParentPath;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
-import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
+import org.batoo.jpa.core.impl.model.mapping.JoinedMapping.MappingType;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
-import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.type.TypeImpl;
 
 import com.google.common.collect.Sets;
 
@@ -69,10 +71,13 @@ import com.google.common.collect.Sets;
  * @author hceylan
  * @since $version
  */
-public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements From<Z, X> {
+public abstract class AbstractFrom<Z, X> implements From<Z, X> {
 
 	private final EntityTypeImpl<X> entity;
 	private final Set<AbstractJoin<X, ?>> joins = Sets.newHashSet();
+	private JoinedMapping<? super Z, ?, X> mapping;
+	private EntityPath<Z, X> entityPath;
+	private EmbeddedAttributePath<X> mappingPath;
 
 	/**
 	 * Constructor for root types
@@ -84,9 +89,12 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 * @author hceylan
 	 */
 	public AbstractFrom(EntityTypeImpl<X> entity) {
-		super(entity);
+		super();
 
 		this.entity = entity;
+		this.mapping = null;
+
+		this.entityPath = new EntityPath<Z, X>(entity);
 	}
 
 	/**
@@ -94,20 +102,29 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 * 
 	 * @param parent
 	 *            the parent
-	 * @param entity
+	 * @param type
 	 *            the joined type
 	 * @param mapping
 	 *            the join mapping
-	 * @param jointType
+	 * @param joinType
 	 *            the join type
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AbstractFrom(ParentPath<?, Z> parent, EntityTypeImpl<X> entity, AssociationMapping<? super Z, ?, X> mapping, JoinType jointType) {
-		super(parent, entity, mapping, jointType);
+	public AbstractFrom(ParentPath<?, Z> parent, TypeImpl<X> type, JoinedMapping<? super Z, ?, X> mapping, JoinType joinType) {
+		super();
 
-		this.entity = entity;
+		if (type.getPersistenceType() == PersistenceType.ENTITY) {
+			this.entity = (EntityTypeImpl<X>) type;
+			this.entityPath = new EntityPath<Z, X>(parent, this.entity, mapping, joinType);
+			this.mapping = null;
+		}
+		else {
+			this.entity = null;
+			this.mappingPath = new EmbeddedAttributePath<X>(parent, mapping);
+			this.mapping = mapping;
+		}
 	}
 
 	/**
@@ -116,7 +133,7 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 */
 	@Override
 	public <Y> Fetch<X, Y> fetch(PluralAttribute<? super X, ?, Y> attribute) {
-		return this.getFetchRoot().fetch(attribute);
+		return this.entityPath.getFetchRoot().fetch(attribute);
 	}
 
 	/**
@@ -397,41 +414,44 @@ public abstract class AbstractFrom<Z, X> extends EntityPath<Z, X> implements Fro
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public <Y> AbstractJoin<X, Y> join(String attributeName, JoinType jt) {
-		Type<Y> type;
 
-		final Mapping<? super X, ?, ?> mapping = this.entity.getRootMapping().getChild(attributeName);
+		Mapping<? super X, ?, ?> mapping = null;
 
-		if (mapping instanceof SingularAssociationMapping) {
-			type = ((SingularAssociationMapping<X, Y>) mapping).getType();
+		if (this.entity != null) {
+			mapping = this.entity.getRootMapping().getChild(attributeName);
 		}
-		else {
-			type = ((PluralAssociationMapping<X, ?, Y>) mapping).getType();
+		else if (this.mapping.getMappingType() == MappingType.ELEMENT_COLLECTION) {
+			// TODO handle embeddable element collections
 		}
 
-		if (!(type instanceof EntityType)) {
+		if (!(mapping instanceof JoinedMapping)) {
 			throw new IllegalArgumentException("Cannot dereference attribute " + attributeName);
 		}
 
 		AbstractJoin<X, Y> join = null;
-		if (mapping instanceof SingularAssociationMapping) {
-			join = new SingularJoin<X, Y>(this, (SingularAssociationMapping<? super X, Y>) mapping, jt);
+
+		final JoinedMapping<X, ?, Y> joinedMapping = (JoinedMapping<X, ?, Y>) mapping;
+		if (joinedMapping.getMappingType() == MappingType.SINGULAR_ASSOCIATION) {
+			join = new SingularJoin<X, Y>(this, joinedMapping, jt);
 		}
 		else if (mapping instanceof PluralAssociationMapping) {
-			final PluralAssociationMapping<? super X, ?, Y> pluralAssociationMapping = (PluralAssociationMapping<? super X, ?, Y>) mapping;
+			final PluralAttributeImpl<? super X, ?, Y> attribute = (PluralAttributeImpl<? super X, ?, Y>) mapping.getAttribute();
 
-			final PluralAttributeImpl<? super X, ?, Y> attribute = pluralAssociationMapping.getAttribute();
-			if (attribute instanceof SetAttribute) {
-				join = new SetJoinImpl<X, Y>(this, (PluralAssociationMapping<? super X, Set<Y>, Y>) pluralAssociationMapping, jt);
+			switch (attribute.getCollectionType()) {
+				case SET:
+					join = new SetJoinImpl<X, Y>(this, (PluralMapping<? super X, Set<Y>, Y>) joinedMapping, jt);
+					break;
+				case COLLECTION:
+					join = new CollectionJoinImpl<X, Y>(this, (PluralMapping<? super X, Collection<Y>, Y>) joinedMapping, jt);
+					break;
+				case LIST:
+					join = new ListJoinImpl<X, Y>(this, (PluralMapping<? super X, List<Y>, Y>) joinedMapping, jt);
+					break;
+				case MAP:
+					join = new MapJoinImpl(this, (PluralMapping<? super X, Map<?, Y>, Y>) joinedMapping, jt);
 			}
-			if (attribute instanceof ListAttribute) {
-				join = new ListJoinImpl<X, Y>(this, (PluralAssociationMapping<? super X, List<Y>, Y>) pluralAssociationMapping, jt);
-			}
-			else {
-				join = new CollectionJoinImpl<X, Y>(this, (PluralAssociationMapping<? super X, Collection<Y>, Y>) pluralAssociationMapping, jt);
-			}
-
 		}
 
 		this.joins.add(join);

@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Path;
+import javax.persistence.metamodel.Bindable;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
@@ -35,7 +36,7 @@ import org.batoo.jpa.core.impl.criteria.join.FetchImpl;
 import org.batoo.jpa.core.impl.criteria.join.FetchParentImpl;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
 import org.batoo.jpa.core.impl.model.mapping.ParentMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
@@ -54,7 +55,7 @@ import com.google.common.collect.Lists;
  * @author hceylan
  * @since $version
  */
-public abstract class EntityPath<Z, X> extends AbstractPath<X> implements Joinable, ParentPath<Z, X> {
+public class EntityPath<Z, X> extends AbstractPath<X> implements Joinable, ParentPath<Z, X> {
 
 	final EntityTypeImpl<X> entity;
 	private final FetchParentImpl<Z, X> fetchRoot;
@@ -91,7 +92,7 @@ public abstract class EntityPath<Z, X> extends AbstractPath<X> implements Joinab
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EntityPath(ParentPath<?, Z> parent, EntityTypeImpl<X> entity, AssociationMapping<? super Z, ?, X> mapping, JoinType joinType) {
+	public EntityPath(ParentPath<?, Z> parent, EntityTypeImpl<X> entity, JoinedMapping<? super Z, ?, X> mapping, JoinType joinType) {
 		super(parent, entity.getJavaType());
 
 		this.entity = entity;
@@ -135,6 +136,16 @@ public abstract class EntityPath<Z, X> extends AbstractPath<X> implements Joinab
 	@Override
 	public String generateJpqlRestriction() {
 		return StringUtils.isNotBlank(this.getAlias()) ? this.getAlias() : this.entity.getName();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generateJpqlSelect() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -191,6 +202,16 @@ public abstract class EntityPath<Z, X> extends AbstractPath<X> implements Joinab
 	@Override
 	protected ParentMapping<X, X> getMapping() {
 		return this.entity.getRootMapping();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Bindable<X> getModel() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**

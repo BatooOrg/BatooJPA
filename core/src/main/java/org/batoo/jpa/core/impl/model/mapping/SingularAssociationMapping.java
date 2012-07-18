@@ -175,6 +175,15 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 	 * 
 	 */
 	@Override
+	public void initialize(ManagedInstance<?> instance) {
+		// noop
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public boolean isAssociation() {
 		return true;
 	}

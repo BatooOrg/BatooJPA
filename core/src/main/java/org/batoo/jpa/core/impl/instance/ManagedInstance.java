@@ -827,16 +827,16 @@ public class ManagedInstance<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void processAssociations() {
+	public void processJoinedMappings() {
 		ManagedInstance.LOG.debug("Post processing associations for instance {0}", this);
 
-		for (final PluralAssociationMapping<?, ?, ?> association : this.type.getAssociationsPlural()) {
-			if (!this.joinsLoaded.contains(association)) {
-				if (association.isEager()) {
-					association.load(this);
+		for (final PluralMapping<?, ?, ?> mapping : this.type.getMappingsPlural()) {
+			if (!this.joinsLoaded.contains(mapping)) {
+				if (mapping.isEager()) {
+					mapping.load(this);
 				}
 				else {
-					association.setLazy(this);
+					mapping.setLazy(this);
 				}
 			}
 		}
@@ -902,7 +902,7 @@ public class ManagedInstance<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void setAssociationLoaded(JoinedMapping<?, ?, ?> mapping) {
+	public void setJoinLoaded(JoinedMapping<?, ?, ?> mapping) {
 		this.joinsLoaded.add(mapping);
 	}
 

@@ -24,6 +24,4 @@ package org.batoo.jpa.core.impl.criteria.join;
  * @author hceylan
  * @since $version
  */
-public interface Joinable {
-
-}
+public interface Joinable {}

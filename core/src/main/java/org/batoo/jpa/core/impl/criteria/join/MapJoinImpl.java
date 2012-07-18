@@ -18,28 +18,33 @@
  */
 package org.batoo.jpa.core.impl.criteria.join;
 
-import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
 
-import javax.persistence.criteria.CollectionJoin;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.ListJoin;
+import javax.persistence.criteria.MapJoin;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
-import javax.persistence.metamodel.CollectionAttribute;
+import javax.persistence.metamodel.MapAttribute;
 
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 
 /**
- * Implementation of {@link CollectionJoin}.
+ * Implementation of {@link ListJoin}.
  * 
  * @param <Z>
  *            the source type
- * @param <E>
- *            the element type
+ * @param <K>
+ *            the key type
+ * @param <V>
+ *            the value type
  * 
  * @author hceylan
  * @since $version
  */
-public class CollectionJoinImpl<Z, E> extends AbstractJoin<Z, E> implements CollectionJoin<Z, E> {
+public class MapJoinImpl<Z, K, V> extends AbstractJoin<Z, V> implements MapJoin<Z, K, V> {
 
 	/**
 	 * @param parent
@@ -52,7 +57,7 @@ public class CollectionJoinImpl<Z, E> extends AbstractJoin<Z, E> implements Coll
 	 * @since $version
 	 * @author hceylan
 	 */
-	public CollectionJoinImpl(AbstractFrom<?, Z> parent, PluralMapping<? super Z, Collection<E>, E> mapping, JoinType jointType) {
+	public MapJoinImpl(AbstractFrom<?, Z> parent, PluralMapping<? super Z, Map<K, V>, V> mapping, JoinType jointType) {
 		super(parent, mapping, jointType);
 	}
 
@@ -61,17 +66,7 @@ public class CollectionJoinImpl<Z, E> extends AbstractJoin<Z, E> implements Coll
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
-	public CollectionAttribute<? super Z, E> getModel() {
-		return (CollectionAttribute<? super Z, E>) this.getMapping().getAttribute();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public CollectionJoin<Z, E> on(Expression<Boolean> restriction) {
+	public Expression<Entry<K, V>> entry() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -81,7 +76,47 @@ public class CollectionJoinImpl<Z, E> extends AbstractJoin<Z, E> implements Coll
 	 * 
 	 */
 	@Override
-	public CollectionJoin<Z, E> on(Predicate... restrictions) {
+	public MapAttribute<? super Z, K, V> getModel() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Path<K> key() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public MapJoin<Z, K, V> on(Expression<Boolean> restriction) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public MapJoin<Z, K, V> on(Predicate... restrictions) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Path<V> value() {
 		// TODO Auto-generated method stub
 		return null;
 	}
