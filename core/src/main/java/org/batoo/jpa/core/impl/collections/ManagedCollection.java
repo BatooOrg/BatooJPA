@@ -29,7 +29,9 @@ import org.batoo.jpa.core.impl.instance.Status;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 
 import com.google.common.collect.Lists;
 
@@ -44,24 +46,29 @@ import com.google.common.collect.Lists;
  */
 public abstract class ManagedCollection<E> {
 
-	private final transient PluralAssociationMapping<?, ?, E> association;
+	private final transient PluralMapping<?, ?, E> mapping;
 	private final transient ManagedInstance<?> managedInstance;
 	private boolean changed;
+	private AssociationMapping<?, ?, ?> inverse;
 
 	/**
-	 * @param association
-	 *            the association
+	 * @param mapping
+	 *            the mapping
 	 * @param managedInstance
 	 *            the managed instance
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedCollection(PluralAssociationMapping<?, ?, E> association, ManagedInstance<?> managedInstance) {
+	public ManagedCollection(PluralMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance) {
 		super();
 
-		this.association = association;
+		this.mapping = mapping;
 		this.managedInstance = managedInstance;
+
+		if (mapping instanceof PluralAssociationMapping) {
+			this.inverse = ((PluralAssociationMapping<?, ?, E>) mapping).getInverse();
+		}
 	}
 
 	/**
@@ -86,7 +93,7 @@ public abstract class ManagedCollection<E> {
 		if (!this.changed && (this.managedInstance != null)) {
 			this.changed = true;
 
-			this.managedInstance.setAssociationChanged(this.association);
+			this.managedInstance.setChanged(this.mapping);
 		}
 	}
 
@@ -117,7 +124,7 @@ public abstract class ManagedCollection<E> {
 		// forced creation of relations for the new entities
 		if (force) {
 			for (final E child : this.getDelegate()) {
-				this.association.getJoinTable().performInsert(connection, source, child, -1);
+				this.mapping.getTable().performInsert(connection, source, child, -1);
 			}
 
 			return;
@@ -132,28 +139,16 @@ public abstract class ManagedCollection<E> {
 			// delete the removals
 			final Collection<E> childrenRemoved = CollectionUtils.subtract(snapshot, this.getDelegate());
 			for (final E child : childrenRemoved) {
-				this.association.getJoinTable().performRemove(connection, source, child);
+				this.mapping.getTable().performRemove(connection, source, child);
 			}
 		}
 		else {
 			// create the additions
 			final Collection<E> childrenAdded = CollectionUtils.subtract(this.getDelegate(), snapshot);
 			for (final E child : childrenAdded) {
-				this.association.getJoinTable().performInsert(connection, source, child, -1);
+				this.mapping.getTable().performInsert(connection, source, child, -1);
 			}
 		}
-	}
-
-	/**
-	 * Returns the association of the managed collection.
-	 * 
-	 * @return the association of the managed collection
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	protected PluralAssociationMapping<?, ?, E> getAssociation() {
-		return this.association;
 	}
 
 	/**
@@ -179,6 +174,18 @@ public abstract class ManagedCollection<E> {
 	}
 
 	/**
+	 * Returns the mapping of the managed collection.
+	 * 
+	 * @return the mapping of the managed collection
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected PluralMapping<?, ?, E> getMapping() {
+		return this.mapping;
+	}
+
+	/**
 	 * Return the items that are added.
 	 * 
 	 * @return the items that are added
@@ -193,7 +200,7 @@ public abstract class ManagedCollection<E> {
 	 * 
 	 * @param entityManager
 	 *            the entity manager
-	 * @param entity
+	 * @param instance
 	 *            the new entity
 	 * @param requiresFlush
 	 *            if an implicit flush is required
@@ -204,10 +211,10 @@ public abstract class ManagedCollection<E> {
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public void mergeWith(EntityManagerImpl entityManager, Object entity, MutableBoolean requiresFlush, IdentityHashMap<Object, Object> processed) {
+	public void mergeWith(EntityManagerImpl entityManager, Object instance, MutableBoolean requiresFlush, IdentityHashMap<Object, Object> processed) {
 		final Collection<E> mergedChildren = Lists.newArrayList();
 
-		final Object children = this.association.get(entity);
+		final Object children = this.mapping.get(instance);
 
 		// if it is a collection, handle like collection
 		if (children instanceof Collection) {
@@ -215,7 +222,7 @@ public abstract class ManagedCollection<E> {
 
 			// merge all the new children
 			for (final E child : collection) {
-				mergedChildren.add(entityManager.mergeImpl(child, requiresFlush, processed, this.association.cascadesMerge()));
+				mergedChildren.add(entityManager.mergeImpl(child, requiresFlush, processed, this.mapping.cascadesMerge()));
 			}
 		}
 		// handle like a map
@@ -236,8 +243,8 @@ public abstract class ManagedCollection<E> {
 			if (!delegate.contains(child)) {
 				this.addChild(child);
 
-				if (this.association.getInverse() != null) {
-					this.association.getInverse().set(session.get(child), this.managedInstance.getInstance());
+				if (this.inverse != null) {
+					this.inverse.set(session.get(child), this.managedInstance.getInstance());
 				}
 
 				changed = true;
@@ -249,8 +256,8 @@ public abstract class ManagedCollection<E> {
 			if (!mergedChildren.contains(child)) {
 				this.removeChild(child);
 
-				if (this.association.getInverse() != null) {
-					this.association.getInverse().set(session.get(child), null);
+				if (this.inverse != null) {
+					this.inverse.set(session.get(child), null);
 				}
 
 				changed = true;
@@ -324,7 +331,7 @@ public abstract class ManagedCollection<E> {
 			}
 
 			for (final E child : children) {
-				this.association.getJoinTable().performRemove(connection, source, child);
+				this.mapping.getTable().performRemove(connection, source, child);
 			}
 
 			return true;

@@ -109,6 +109,50 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	}
 
 	/**
+	 * Adds the joined mappings to the list of mappings.
+	 * 
+	 * @param mappingsJoined
+	 *            the list of mappings
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void addJoinedMappings(List<JoinedMapping<?, ?, ?>> mappingsJoined) {
+		for (final Mapping<? super X, ?, ?> mapping : this.children.values()) {
+			if (mapping instanceof JoinedMapping) {
+				final JoinedMapping<?, ?, ?> joinedMapping = (JoinedMapping<?, ?, ?>) mapping;
+
+				if (joinedMapping.getTable() != null) {
+					mappingsJoined.add((JoinedMapping<?, ?, ?>) mapping);
+				}
+			}
+			else if (mapping instanceof ParentMapping) {
+				((ParentMapping<? super X, ?>) mapping).addJoinedMappings(mappingsJoined);
+			}
+		}
+	}
+
+	/**
+	 * Adds the plural mappings to the list of element collections.
+	 * 
+	 * @param elementCollections
+	 *            the list of element collections
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void addPluralMappings(List<PluralMapping<?, ?, ?>> elementCollections) {
+		for (final Mapping<? super X, ?, ?> mapping : this.children.values()) {
+			if (mapping instanceof PluralMapping) {
+				elementCollections.add((PluralMapping<?, ?, ?>) mapping);
+			}
+			else if (mapping instanceof ParentMapping) {
+				((ParentMapping<? super X, ?>) mapping).addPluralMappings(elementCollections);
+			}
+		}
+	}
+
+	/**
 	 * Adds the singular mappings to the list of mappings.
 	 * 
 	 * @param mappings
@@ -141,6 +185,21 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	 */
 	private <Y> void createBasicMapping(BasicAttribute<? super X, Y> attribute) {
 		this.children.put(attribute.getName(), new BasicMapping<X, Y>(this, attribute));
+	}
+
+	/**
+	 * Creates an element collection mapping for the attribute.
+	 * 
+	 * @param attribute
+	 *            the attribute
+	 * @param <Y>
+	 *            the type of the attribute
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private <C, E> void createElementCollectionMapping(PluralAttributeImpl<? super X, C, E> attribute) {
+		this.children.put(attribute.getName(), new ElementCollectionMapping<X, C, E>(this, attribute));
 	}
 
 	/**
@@ -182,6 +241,9 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 			switch (attribute.getPersistentAttributeType()) {
 				case BASIC:
 					this.createBasicMapping((BasicAttribute<? super X, ?>) attribute);
+					break;
+				case ELEMENT_COLLECTION:
+					this.createElementCollectionMapping((PluralAttributeImpl<? super X, ?, ?>) attribute);
 					break;
 				case ONE_TO_ONE:
 				case MANY_TO_ONE:

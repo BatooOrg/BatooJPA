@@ -30,7 +30,8 @@ import javax.persistence.PersistenceException;
 import org.apache.commons.lang.ObjectUtils;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
-import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
+import org.batoo.jpa.core.impl.jdbc.JoinableTable;
+import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -134,8 +135,8 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	/**
 	 * Constructor for lazy initialization.
 	 * 
-	 * @param association
-	 *            the association
+	 * @param mapping
+	 *            the mapping
 	 * @param managedInstance
 	 *            the managed instance
 	 * @param lazy
@@ -144,8 +145,8 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedList(PluralAssociationMapping<?, ?, E> association, ManagedInstance<?> managedInstance, boolean lazy) {
-		super(association, managedInstance);
+	public ManagedList(PluralMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
+		super(mapping, managedInstance);
 
 		this.initialized = !lazy;
 	}
@@ -153,8 +154,8 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	/**
 	 * Default constructor.
 	 * 
-	 * @param association
-	 *            the association
+	 * @param mapping
+	 *            the mapping
 	 * @param managedInstance
 	 *            the managed instance
 	 * @param values
@@ -163,8 +164,8 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedList(PluralAssociationMapping<?, ?, E> association, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
-		super(association, managedInstance);
+	public ManagedList(PluralMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
+		super(mapping, managedInstance);
 
 		this.delegate.addAll(Lists.newArrayList(values));
 
@@ -342,13 +343,14 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 
 		// for lists the index is maintained in the database
 		final ManagedInstance<?> instance = this.getManagedInstance();
-		final PluralAssociationMapping<?, ?, E> association = this.getAssociation();
+		final PluralMapping<?, ?, E> mapping = this.getMapping();
 		final Object source = instance.getInstance();
 
 		// forced creation of relations for the new entities
 		if (force) {
 			for (int i = 0; i < this.delegate.size(); i++) {
-				association.getJoinTable().performInsert(connection, source, this.delegate.get(i), i);
+				final JoinableTable table = mapping.getTable();
+				table.performInsert(connection, source, this.delegate.get(i), i);
 			}
 
 			return;
@@ -359,12 +361,12 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 		}
 
 		if (removals) {
-			association.getJoinTable().performRemoveAll(connection, source);
+			mapping.getTable().performRemoveAll(connection, source);
 		}
 		else {
 			// create the additions
 			for (int i = 0; i < this.delegate.size(); i++) {
-				association.getJoinTable().performInsert(connection, source, this.delegate.get(i), i);
+				mapping.getTable().performInsert(connection, source, this.delegate.get(i), i);
 			}
 		}
 	}
@@ -431,9 +433,9 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 				throw new PersistenceException("No session to initialize the collection");
 			}
 
-			this.delegate.addAll(this.getAssociation().loadCollection(this.getManagedInstance()));
+			this.delegate.addAll(this.getMapping().loadCollection(this.getManagedInstance()));
 
-			this.getAssociation().sortList(this.getManagedInstance().getInstance());
+			this.getMapping().sortList(this.getManagedInstance().getInstance());
 
 			this.initialized = true;
 		}
@@ -691,6 +693,6 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 		final String instance = this.getManagedInstance().getType().getName() + "@" + id;
 
 		return "ManagedList [initialized=" + this.initialized + ", managedInstance=" + instance + ", delegate=" + this.delegate + ", snapshot=" + this.snapshot
-			+ ", mapping=" + this.getAssociation() + "]";
+			+ ", mapping=" + this.getMapping() + "]";
 	}
 }

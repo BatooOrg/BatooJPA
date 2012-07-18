@@ -25,6 +25,8 @@ import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.ElementCollectionMapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 /**
@@ -44,12 +46,17 @@ public class LinkManager extends DeploymentManager<EntityTypeImpl<?>> {
 	public static enum Phase {
 
 		/**
-		 * The association linking phase
+		 * The association linking phase.
 		 */
 		LINK_ASSOCIATIONS,
 
 		/**
-		 * The dependency linking phase
+		 * The element collection phase.
+		 */
+		LINK_ELEMENT_COLLECTIONS,
+
+		/**
+		 * The dependency linking phase.
 		 */
 		LINK_DEPENDENCIES
 	}
@@ -69,6 +76,7 @@ public class LinkManager extends DeploymentManager<EntityTypeImpl<?>> {
 	 */
 	public static void perform(MetamodelImpl metamodel) throws BatooException {
 		new LinkManager(metamodel, Phase.LINK_ASSOCIATIONS).perform();
+		new LinkManager(metamodel, Phase.LINK_ELEMENT_COLLECTIONS).perform();
 		new LinkManager(metamodel, Phase.LINK_DEPENDENCIES).perform();
 	}
 
@@ -88,8 +96,15 @@ public class LinkManager extends DeploymentManager<EntityTypeImpl<?>> {
 	public Void perform(EntityTypeImpl<?> entity) throws BatooException {
 		switch (this.phase) {
 			case LINK_ASSOCIATIONS:
-				for (final AssociationMapping<?, ?, ?> attribute : entity.getAssociations()) {
-					attribute.link();
+				for (final AssociationMapping<?, ?, ?> mapping : entity.getAssociations()) {
+					mapping.link();
+				}
+				break;
+			case LINK_ELEMENT_COLLECTIONS:
+				for (final PluralMapping<?, ?, ?> mapping : entity.getMappingsPlural()) {
+					if (mapping instanceof ElementCollectionMapping) {
+						((ElementCollectionMapping<?, ?, ?>) mapping).link();
+					}
 				}
 				break;
 			case LINK_DEPENDENCIES:

@@ -22,108 +22,69 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 
-import javax.persistence.criteria.JoinType;
+import javax.persistence.EnumType;
+import javax.persistence.TemporalType;
 
 import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.core.impl.model.mapping.ElementMapping;
+import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.type.TypeImpl;
+import org.batoo.jpa.parser.metadata.CollectionTableMetadata;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
-import org.batoo.jpa.parser.metadata.JoinTableMetadata;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 /**
- * 
+ * The table for element collection attributes.
  * 
  * @author hceylan
  * @since $version
  */
-public class JoinTable extends AbstractTable implements JoinableTable {
+public class CollectionTable extends AbstractTable implements JoinableTable {
 
-	private final ForeignKey sourceKey;
-	private final ForeignKey destinationKey;
 	private final EntityTypeImpl<?> entity;
+	private final ForeignKey key;
 
 	private OrderColumn orderColumn;
+	private TypeImpl<?> type;
+	private ElementColumn elementColumn;
 
 	private String removeSql;
 	private String removeAllSql;
-	private JoinColumn[] sourceRemoveColumns;
-	private JoinColumn[] destinationRemoveColumns;
+	private AbstractColumn[] removeColumns;
 	private JoinColumn[] removeAllColumns;
 
 	/**
 	 * @param entity
-	 *            the owner entity
+	 *            the owner type
 	 * @param metadata
 	 *            the metadata
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public JoinTable(EntityTypeImpl<?> entity, JoinTableMetadata metadata) {
+	public CollectionTable(EntityTypeImpl<?> entity, CollectionTableMetadata metadata) {
 		super(metadata);
 
 		this.entity = entity;
 
-		this.sourceKey = new ForeignKey(metadata != null ? metadata.getJoinColumns() : Collections.<JoinColumnMetadata> emptyList());
-		this.destinationKey = new ForeignKey(metadata != null ? metadata.getInverseJoinColumns() : Collections.<JoinColumnMetadata> emptyList());
+		this.key = new ForeignKey(metadata != null ? metadata.getJoinColumns() : Collections.<JoinColumnMetadata> emptyList());
 	}
 
 	/**
-	 * Creates a join between the source and destination entities
+	 * Returns the key.
 	 * 
-	 * @param joinType
-	 *            the type of the join
-	 * @param parentAlias
-	 *            the alias of the parent table
-	 * @param alias
-	 *            the alias of the table
-	 * @param forward
-	 *            if the join if forward or backwards
-	 * @return the join SQL fragment
+	 * @return the key
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String createJoin(JoinType joinType, String parentAlias, String alias, boolean forward) {
-		String sourceJoin, destinationJoin;
-
-		if (forward) {
-			sourceJoin = this.sourceKey.createSourceJoin(joinType, parentAlias, alias + "_J");
-			destinationJoin = this.destinationKey.createDestinationJoin(joinType, alias + "_J", alias);
-		}
-		else {
-			sourceJoin = this.destinationKey.createSourceJoin(joinType, parentAlias, alias + "_J");
-			destinationJoin = this.sourceKey.createDestinationJoin(joinType, alias + "_J", alias);
-		}
-
-		return sourceJoin + "\n" + destinationJoin;
-	}
-
-	/**
-	 * Returns the destinationKey of the JoinTable.
-	 * 
-	 * @return the destinationKey of the JoinTable
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public ForeignKey getDestinationKey() {
-		return this.destinationKey;
-	}
-
-	/**
-	 * Returns the oner entity of the table.
-	 * 
-	 * @return the oner entity of the table
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public EntityTypeImpl<?> getEntity() {
-		return this.entity;
+	public ForeignKey getKey() {
+		return this.key;
 	}
 
 	private String getRemoveAllSql() {
@@ -137,10 +98,10 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 			}
 
 			final List<String> restrictions = Lists.newArrayList();
-			this.removeAllColumns = new JoinColumn[this.sourceKey.getJoinColumns().size()];
+			this.removeAllColumns = new JoinColumn[this.key.getJoinColumns().size()];
 
 			int i = 0;
-			for (final JoinColumn column : this.sourceKey.getJoinColumns()) {
+			for (final JoinColumn column : this.key.getJoinColumns()) {
 				restrictions.add(column.getName() + " = ?");
 				this.removeAllColumns[i++] = column;
 			}
@@ -160,19 +121,14 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 			}
 
 			final List<String> restrictions = Lists.newArrayList();
-			this.sourceRemoveColumns = new JoinColumn[this.sourceKey.getJoinColumns().size()];
-			this.destinationRemoveColumns = new JoinColumn[this.sourceKey.getJoinColumns().size()];
+			this.removeColumns = new AbstractColumn[this.getColumns().size()];
 
 			int i = 0;
-			for (final JoinColumn column : this.sourceKey.getJoinColumns()) {
-				restrictions.add(column.getName() + " = ?");
-				this.sourceRemoveColumns[i++] = column;
-			}
-
-			i = 0;
-			for (final JoinColumn column : this.destinationKey.getJoinColumns()) {
-				restrictions.add(column.getName() + " = ?");
-				this.destinationRemoveColumns[i++] = column;
+			for (final AbstractColumn column : this.getColumns()) {
+				if (column != this.orderColumn) {
+					restrictions.add(column.getName() + " = ?");
+					this.removeColumns[i++] = column;
+				}
 			}
 
 			return this.removeSql = "DELETE FROM " + this.getQName() + " WHERE " + Joiner.on(" AND ").join(restrictions);
@@ -180,36 +136,66 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 	}
 
 	/**
-	 * Returns the sourceKey of the JoinTable.
+	 * Links
 	 * 
-	 * @return the sourceKey of the JoinTable
+	 * @param type
+	 *            the type of the collection
+	 * @param defaultName
+	 *            the default name
+	 * @param elementMapping
+	 *            the element mapping
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ForeignKey getSourceKey() {
-		return this.sourceKey;
+	public void link(EmbeddableTypeImpl<?> type, String defaultName, ElementMapping<?> elementMapping) {
+		if (StringUtils.isBlank(this.getName())) {
+			this.setName(defaultName);
+		}
+
+		this.type = type;
+
+		this.key.link(null, this.entity);
+		this.key.setTable(this);
+
+		// TODO go through the mappings
 	}
 
 	/**
-	 * @param source
-	 *            the source entity
-	 * @param destination
-	 *            the destination entity
+	 * @param type
+	 *            the type of the collection
+	 * @param defaultName
+	 *            the default name
+	 * @param metadata
+	 *            the column metadata
+	 * @param lob
+	 *            if the column is a lob type
+	 * @param temporalType
+	 *            the temporal type
+	 * @param enumType
+	 *            the enum type
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void link(EntityTypeImpl<?> source, EntityTypeImpl<?> destination) {
-		if (this.getName() == null) {
-			this.setName(source.getName() + "_" + destination.getName());
+	public void link(TypeImpl<?> type, String defaultName, ColumnMetadata metadata, EnumType enumType, TemporalType temporalType, boolean lob) {
+		if (StringUtils.isBlank(this.getName())) {
+			this.setName(this.entity.getName() + "_" + defaultName);
 		}
 
-		this.sourceKey.link(null, source);
-		this.destinationKey.link(null, destination);
+		this.type = type;
 
-		this.sourceKey.setTable(this);
-		this.destinationKey.setTable(this);
+		this.key.link(null, this.entity);
+		this.key.setTable(this);
+
+		this.elementColumn = new ElementColumn(this.entity.getMetamodel().getJdbcAdaptor(), //
+			this, //
+			(metadata == null) || StringUtils.isBlank(metadata.getName()) ? defaultName : metadata.getName(), //
+			type.getJavaType(), //
+			enumType, //
+			temporalType, //
+			lob, //
+			metadata);
 	}
 
 	/**
@@ -226,12 +212,14 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 		for (int i = 0; i < insertColumns.length; i++) {
 			final AbstractColumn column = insertColumns[i];
 
-			final Object object = this.sourceKey.getJoinColumns().contains(column) ? source : destination;
 			if (column == this.orderColumn) {
 				params[i] = order;
 			}
+			else if (this.elementColumn == column) {
+				params[i] = this.elementColumn.getValue(destination);
+			}
 			else {
-				params[i] = column.getValue(object);
+				params[i] = column.getValue(source);
 			}
 		}
 
@@ -246,15 +234,16 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 	public void performRemove(ConnectionImpl connection, Object source, Object destination) throws SQLException {
 		final String removeSql = this.getRemoveSql();
 
-		final Object[] params = new Object[this.sourceKey.getJoinColumns().size() + this.destinationKey.getJoinColumns().size()];
+		final Object[] params = new Object[this.removeColumns.length];
 
 		int i = 0;
-		for (final JoinColumn sourceRemoveColumn : this.sourceRemoveColumns) {
-			params[i++] = sourceRemoveColumn.getValue(source);
-		}
-
-		for (final JoinColumn destinationRemoveColumn : this.destinationRemoveColumns) {
-			params[i++] = destinationRemoveColumn.getValue(destination);
+		for (final AbstractColumn column : this.removeColumns) {
+			if (column instanceof ElementColumn) {
+				params[i++] = column.getValue(destination);
+			}
+			else {
+				params[i++] = column.getValue(source);
+			}
 		}
 
 		new QueryRunner().update(connection, removeSql, params);

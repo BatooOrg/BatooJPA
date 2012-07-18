@@ -45,6 +45,7 @@ import javax.persistence.metamodel.Metamodel;
 import org.batoo.jpa.common.BatooException;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
@@ -53,6 +54,7 @@ import org.batoo.jpa.core.impl.manager.CallbackAvailability;
 import org.batoo.jpa.core.impl.manager.CallbackManager;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 import org.batoo.jpa.core.impl.model.type.BasicTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
@@ -534,8 +536,8 @@ public class MetamodelImpl implements Metamodel {
 			}
 		}
 
-		for (final AssociationMapping<?, ?, ?> attribute : entity.getAssociations()) {
-			final JoinTable table = attribute.getJoinTable();
+		for (final AssociationMapping<?, ?, ?> mapping : entity.getAssociations()) {
+			final JoinTable table = mapping.getTable();
 			// skip not applicable join tables
 			if ((table == null) || (table.getEntity() != entity)) {
 				continue;
@@ -549,6 +551,22 @@ public class MetamodelImpl implements Metamodel {
 				}
 				catch (final SQLException e) {
 					throw new MappingException("DDL operation failed on table " + table.getName(), e);
+				}
+			}
+		}
+
+		for (final PluralMapping<?, ?, ?> mapping : entity.getMappingsPlural()) {
+			if (!mapping.isAssociation()) {
+				final AbstractTable table = (AbstractTable) mapping.getTable();
+				MetamodelImpl.LOG.info("Performing foreign key DDL operations for join table {0}, mode {1}", table.getName(), ddlMode);
+
+				for (final ForeignKey foreignKey : table.getForeignKeys()) {
+					try {
+						this.jdbcAdaptor.createForeignKey(datasource, foreignKey);
+					}
+					catch (final SQLException e) {
+						throw new MappingException("DDL operation failed on table " + table.getName(), e);
+					}
 				}
 			}
 		}
@@ -638,8 +656,8 @@ public class MetamodelImpl implements Metamodel {
 		}
 
 		// create the join tables
-		for (final AssociationMapping<?, ?, ?> attribute : entity.getAssociations()) {
-			final JoinTable table = attribute.getJoinTable();
+		for (final AssociationMapping<?, ?, ?> mapping : entity.getAssociations()) {
+			final JoinTable table = mapping.getTable();
 
 			// skip not applicable tables
 			if ((table == null) || (table.getEntity() != entity)) {
@@ -647,10 +665,24 @@ public class MetamodelImpl implements Metamodel {
 			}
 
 			try {
-				this.jdbcAdaptor.createTable(attribute.getJoinTable(), datasource);
+				this.jdbcAdaptor.createTable(mapping.getTable(), datasource);
 			}
 			catch (final SQLException e) {
 				throw new MappingException("DDL operation failed on table " + table.getName(), e);
+			}
+		}
+
+		// create the join tables
+		for (final PluralMapping<?, ?, ?> mapping : entity.getMappingsPlural()) {
+			if (!mapping.isAssociation()) {
+				final AbstractTable table = (AbstractTable) mapping.getTable();
+
+				try {
+					this.jdbcAdaptor.createTable(table, datasource);
+				}
+				catch (final SQLException e) {
+					throw new MappingException("DDL operation failed on table " + table.getName(), e);
+				}
 			}
 		}
 	}

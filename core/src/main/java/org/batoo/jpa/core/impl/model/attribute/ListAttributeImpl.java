@@ -25,11 +25,9 @@ import javax.persistence.metamodel.ListAttribute;
 
 import org.batoo.jpa.core.impl.collections.ManagedList;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
-import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
-import org.batoo.jpa.parser.metadata.attribute.PluralAttributeMetadata;
 
 /**
  * Implementation of {@link ListAttribute}.
@@ -44,9 +42,6 @@ import org.batoo.jpa.parser.metadata.attribute.PluralAttributeMetadata;
  */
 public class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E>, E> implements ListAttribute<X, E> {
 
-	private final String orderBy;
-	private final ColumnMetadata orderColumn;
-
 	/**
 	 * @param declaringType
 	 *            the declaring type
@@ -59,10 +54,6 @@ public class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E>, E> 
 	 */
 	public ListAttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata, PersistentAttributeType attributeType) {
 		super(declaringType, metadata, attributeType, 0);
-
-		final PluralAttributeMetadata pluralAttributeMetadata = (PluralAttributeMetadata) metadata;
-		this.orderBy = pluralAttributeMetadata.getOrderBy();
-		this.orderColumn = pluralAttributeMetadata.getOrderColumn();
 	}
 
 	/**
@@ -75,35 +66,11 @@ public class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E>, E> 
 	}
 
 	/**
-	 * Returns the order by of the List Attribute.
-	 * 
-	 * @return the order by of the List Attribute
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String getOrderBy() {
-		return this.orderBy;
-	}
-
-	/**
-	 * Returns the order column of the ListAttribute.
-	 * 
-	 * @return the order column of the List Attribute
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public ColumnMetadata getOrderColumn() {
-		return this.orderColumn;
-	}
-
-	/**
 	 * {@inheritDoc}
 	 * 
 	 */
 	@Override
-	public List<E> newCollection(PluralAssociationMapping<?, List<E>, E> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
+	public List<E> newCollection(PluralMapping<?, List<E>, E> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
 		return new ManagedList<X, E>(mapping, managedInstance, lazy);
 	}
 
@@ -113,7 +80,7 @@ public class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E>, E> 
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<E> newCollection(PluralAssociationMapping<?, List<E>, E> mapping, ManagedInstance<?> managedInstance, Object values) {
+	public List<E> newCollection(PluralMapping<?, List<E>, E> mapping, ManagedInstance<?> managedInstance, Object values) {
 		return new ManagedList<X, E>(mapping, managedInstance, (Collection<? extends E>) values);
 	}
 }

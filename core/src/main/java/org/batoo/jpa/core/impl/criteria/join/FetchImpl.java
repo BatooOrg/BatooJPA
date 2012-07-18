@@ -28,7 +28,7 @@ import javax.persistence.criteria.Predicate;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
-import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
 
 /**
  * Implementation of {@link Fetch}.
@@ -44,7 +44,7 @@ import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X> {
 
 	private final FetchParentImpl<?, Z> parent;
-	private final AssociationMapping<? super Z, ?, X> mapping;
+	private final JoinedMapping<? super Z, ?, X> mapping;
 	private final JoinType joinType;
 
 	/**
@@ -58,8 +58,8 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	 * @since $version
 	 * @author hceylan
 	 */
-	public FetchImpl(FetchParentImpl<?, Z> parent, AssociationMapping<? super Z, ?, X> mapping, JoinType joinType) {
-		super(mapping.getType());
+	public FetchImpl(FetchParentImpl<?, Z> parent, JoinedMapping<? super Z, ?, X> mapping, JoinType joinType) {
+		super(mapping);
 
 		this.parent = parent;
 		this.mapping = mapping;
@@ -141,7 +141,7 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	 * 
 	 */
 	@Override
-	public AssociationMapping<? super Z, ?, X> getMapping() {
+	public JoinedMapping<? super Z, ?, X> getMapping() {
 		return this.mapping;
 	}
 

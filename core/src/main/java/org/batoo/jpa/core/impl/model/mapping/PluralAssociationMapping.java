@@ -30,7 +30,6 @@ import java.util.Map;
 import javax.persistence.criteria.Path;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 import javax.persistence.metamodel.PluralAttribute.CollectionType;
-import javax.persistence.metamodel.Type;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableBoolean;
@@ -51,17 +50,18 @@ import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
-import org.batoo.jpa.core.impl.model.attribute.ListAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.MapAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.type.TypeImpl;
 import org.batoo.jpa.core.util.BatooUtils;
 import org.batoo.jpa.core.util.Pair;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.PluralAttributeMetadata;
 
 import com.google.common.collect.Lists;
 
@@ -77,7 +77,7 @@ import com.google.common.collect.Lists;
  * @author hceylan
  * @since $version
  */
-public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, E> {
+public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, E> implements PluralMapping<Z, C, E> {
 
 	private final PluralAttributeImpl<? super Z, C, E> attribute;
 	private final JoinTable joinTable;
@@ -85,11 +85,12 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	private AssociationMapping<?, ?, ?> inverse;
 	private CriteriaQueryImpl<E> selectCriteria;
 
-	private SingularMapping<? super E, ?> keyMapping;
-	private Pair<BasicMapping<? super E, ?>, BasicAttribute<?, ?>>[] keyMappings;
+	private SingularMapping<? super E, ?> mapKeyIdMapping;
+	private Pair<BasicMapping<? super E, ?>, BasicAttribute<?, ?>>[] mapKeyIdMappings;
 	private EmbeddableTypeImpl<?> keyClass;
 	private String orderBy;
 	private Comparator<E> comparator;
+	private ColumnMetadata orderColumn;
 
 	/**
 	 * @param parent
@@ -118,6 +119,16 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 		else {
 			this.joinTable = null;
 		}
+
+		final PluralAttributeMetadata pluralAttributeMetadata = (PluralAttributeMetadata) attribute.getMetadata();
+		if (attribute.getCollectionType() == CollectionType.LIST) {
+			this.orderBy = pluralAttributeMetadata.getOrderBy();
+			this.orderColumn = pluralAttributeMetadata.getOrderColumn();
+		}
+		else {
+			this.orderBy = null;
+			this.orderColumn = null;
+		}
 	}
 
 	/**
@@ -144,14 +155,10 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	}
 
 	/**
-	 * Enhances the collection to the managed collection
+	 * {@inheritDoc}
 	 * 
-	 * @param instance
-	 *            the managed instance
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
+	@Override
 	public void enhance(ManagedInstance<?> instance) {
 		final C c = this.get(instance.getInstance());
 		if (c == null) {
@@ -215,15 +222,6 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	}
 
 	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public JoinTable getJoinTable() {
-		return this.joinTable;
-	}
-
-	/**
 	 * Returns the key class of the association.
 	 * 
 	 * @return the key class of the association
@@ -231,7 +229,8 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Type<?> getKeyClass() {
+	@Override
+	public TypeImpl<?> getMapKeyClass() {
 		return this.keyClass;
 	}
 
@@ -243,30 +242,45 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SingularMapping<? super E, ?> getKeyMapping() {
-		return this.keyMapping;
+	public SingularMapping<? super E, ?> getMapKeyIdMapping() {
+		return this.mapKeyIdMapping;
 	}
 
 	/**
-	 * Returns the key mappings of the association.
+	 * Returns the map key id mappings of the association.
 	 * 
-	 * @return the key mappings of the association
+	 * @return the map key id mappings of the association
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Pair<BasicMapping<? super E, ?>, BasicAttribute<?, ?>>[] getKeyMappins() {
-		return this.keyMappings;
+	public Pair<BasicMapping<? super E, ?>, BasicAttribute<?, ?>>[] getMapKeyIdMappings() {
+		return this.mapKeyIdMappings;
 	}
 
 	/**
-	 * Returns the order by of the association.
+	 * {@inheritDoc}
 	 * 
-	 * @return the order by of the association
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
+	@Override
+	public Mapping<?, ?, ?> getMapping(String path) {
+		return this.type.getRootMapping().getMapping(path);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public MappingType getMappingType() {
+		return MappingType.PLURAL_ASSOCIATION;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public String getOrderBy() {
 		return this.orderBy;
 	}
@@ -329,6 +343,15 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * 
 	 */
 	@Override
+	public JoinTable getTable() {
+		return this.joinTable;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public EntityTypeImpl<E> getType() {
 		return this.type;
 	}
@@ -344,6 +367,15 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 */
 	public void initialize(ManagedInstance<?> instance) {
 		this.set(instance, this.attribute.newCollection(this, instance, false));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isAssociation() {
+		return true;
 	}
 
 	/**
@@ -368,15 +400,14 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 		}
 		else {
 			// initialize the join table
-			if (this.getJoinTable() != null) {
-				this.getJoinTable().link(entity, this.type);
+			if (this.joinTable != null) {
+				this.joinTable.link(entity, this.type);
 
 				if (this.attribute.getCollectionType() == CollectionType.LIST) {
-					final ListAttributeImpl<? super Z, E> listAttribute = (ListAttributeImpl<? super Z, E>) this.attribute;
-					final ColumnMetadata orderColumn = listAttribute.getOrderColumn();
-					if (orderColumn != null) {
-						final String name = StringUtils.isNotBlank(orderColumn.getName()) ? orderColumn.getName() : this.attribute.getName() + "_ORDER";
-						this.getJoinTable().setOrderColumn(listAttribute.getOrderColumn(), name);
+					if (this.orderColumn != null) {
+						final String name = StringUtils.isNotBlank(this.orderColumn.getName()) ? //
+							this.orderColumn.getName() : this.attribute.getName() + "_ORDER";
+						this.joinTable.setOrderColumn(this.orderColumn, name);
 					}
 				}
 			}
@@ -387,20 +418,20 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 			final String mapKey = mapAttribute.getMapKey();
 			if (StringUtils.isBlank(mapKey)) {
 				if (this.type.hasSingleIdAttribute()) {
-					this.keyMapping = this.type.getIdMapping();
+					this.mapKeyIdMapping = this.type.getIdMapping();
 				}
 				else {
-					this.keyMappings = this.type.getIdMappings();
+					this.mapKeyIdMappings = this.type.getIdMappings();
 					this.keyClass = (EmbeddableTypeImpl<?>) this.type.getIdType();
 				}
 			}
 			else {
-				this.keyMapping = (SingularMapping<? super E, ?>) this.type.getRootMapping().getMapping(mapKey);
+				this.mapKeyIdMapping = (SingularMapping<? super E, ?>) this.type.getRootMapping().getMapping(mapKey);
+
+				if (this.mapKeyIdMapping == null) {
+					throw new MappingException("Cannot locate the MapKey: " + mapKey, this.attribute.getLocator());
+				}
 			}
-		}
-		else if (this.attribute.getCollectionType() == CollectionType.LIST) {
-			final ListAttributeImpl<? super Z, E> listAttribute = (ListAttributeImpl<? super Z, E>) this.attribute;
-			this.orderBy = listAttribute.getOrderBy();
 		}
 	}
 
@@ -421,15 +452,10 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	}
 
 	/**
-	 * Loads and returns the collection.
+	 * {@inheritDoc}
 	 * 
-	 * @param managedInstance
-	 *            the managed instance owning the collection
-	 * @return the loaded collection
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
+	@Override
 	public Collection<? extends E> loadCollection(ManagedInstance<?> managedInstance) {
 		final EntityManagerImpl em = managedInstance.getSession().getEntityManager();
 		final TypedQueryImpl<E> q = em.createQuery(this.getSelectCriteria());
@@ -469,16 +495,10 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	}
 
 	/**
-	 * Persists the children that have been added to the managed collection
+	 * {@inheritDoc}
 	 * 
-	 * @param entityManager
-	 *            the entity manager
-	 * @param instance
-	 *            the managed instance
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public void persistAdditions(EntityManagerImpl entityManager, ManagedInstance<?> instance) {
 		if (this.cascadesPersist()) {
@@ -562,27 +582,19 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	}
 
 	/**
-	 * Sets the lazy instance for the association
+	 * {@inheritDoc}
 	 * 
-	 * @param instance
-	 *            the managed instance
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
+	@Override
 	public void setLazy(ManagedInstance<?> instance) {
 		this.set(instance, this.attribute.newCollection(this, instance, true));
 	}
 
 	/**
-	 * Sorts the managed list of the instance
+	 * {@inheritDoc}
 	 * 
-	 * @param instance
-	 *            the owner instance
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public void sortList(Object instance) {
 		final ManagedList<Z, E> list = (ManagedList<Z, E>) this.get(instance);

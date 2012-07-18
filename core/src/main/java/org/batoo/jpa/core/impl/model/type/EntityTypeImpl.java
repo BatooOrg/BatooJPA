@@ -60,12 +60,12 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
-import org.batoo.jpa.core.impl.model.attribute.ListAttributeImpl;
-import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
+import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 import org.batoo.jpa.core.impl.model.mapping.RootMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
@@ -114,6 +114,9 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 	private BasicMapping<?, ?>[] basicMappings;
 	private Mapping<?, ?, ?>[] singularMappings;
+	private PluralMapping<?, ?, ?>[] mappingsPluralSorted;
+	private PluralMapping<?, ?, ?>[] mappingsPlural;
+	private JoinedMapping<?, ?, ?>[] mappingsJoined;
 	private AssociationMapping<?, ?, ?>[] associations;
 	private AssociationMapping<?, ?, ?>[] associationsDetachable;
 	private AssociationMapping<?, ?, ?>[] associationsEager;
@@ -135,8 +138,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private DiscriminatorColumn discriminatorColumn;
 	private EntityTypeImpl<? super X> rootType;
 	private final RootMapping<X> rootMapping;
-
-	private PluralAssociationMapping<?, ?, ?>[] associationsPluralSorted;
 
 	/**
 	 * @param metamodel
@@ -424,7 +425,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			final List<AssociationMapping<?, ?, ?>> joinedAssociations = Lists.newArrayList();
 
 			for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
-				if (association.getJoinTable() != null) {
+				if (association.getTable() != null) {
 					joinedAssociations.add(association);
 				}
 			}
@@ -533,42 +534,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			associationsPlural.toArray(associationsPlural0);
 
 			return this.associationsPlural = associationsPlural0;
-		}
-	}
-
-	/**
-	 * Returns the sorted plural associations.
-	 * 
-	 * @return the sorted plural associations
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public PluralAssociationMapping<?, ?, ?>[] getAssociationsPluralSorted() {
-		if (this.associationsPluralSorted != null) {
-			return this.associationsPluralSorted;
-		}
-
-		synchronized (this) {
-			if (this.associationsPluralSorted != null) {
-				return this.associationsPluralSorted;
-			}
-
-			final List<PluralAssociationMapping<?, ?, ?>> associationsPluralSorted = Lists.newArrayList();
-			for (final PluralAssociationMapping<?, ?, ?> mapping : this.getAssociationsPlural()) {
-				final PluralAttributeImpl<?, ?, ?> attribute = mapping.getAttribute();
-				if (attribute instanceof ListAttributeImpl) {
-					final ListAttributeImpl<?, ?> listAttribute = (ListAttributeImpl<?, ?>) attribute;
-					if (StringUtils.isNotBlank(listAttribute.getOrderBy())) {
-						associationsPluralSorted.add(mapping);
-					}
-				}
-			}
-
-			final PluralAssociationMapping<?, ?, ?>[] associationsPluralSorted0 = new PluralAssociationMapping[associationsPluralSorted.size()];
-			associationsPluralSorted.toArray(associationsPluralSorted0);
-
-			return this.associationsPluralSorted = associationsPluralSorted0;
 		}
 	}
 
@@ -1040,6 +1005,94 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		catch (final Exception e) {} // not possible
 
 		return null;
+	}
+
+	/**
+	 * Retuns the element collection mappings.
+	 * 
+	 * @return the element collection mappings
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public JoinedMapping<?, ?, ?>[] getMappingsJoined() {
+		if (this.mappingsJoined != null) {
+			return this.mappingsJoined;
+		}
+
+		synchronized (this) {
+			if (this.mappingsJoined != null) {
+				return this.mappingsJoined;
+			}
+
+			final List<JoinedMapping<?, ?, ?>> mappingsJoined = Lists.newArrayList();
+			this.rootMapping.addJoinedMappings(mappingsJoined);
+
+			final JoinedMapping<?, ?, ?>[] mappingsJoined0 = new JoinedMapping[mappingsJoined.size()];
+			mappingsJoined.toArray(mappingsJoined0);
+
+			return this.mappingsJoined = mappingsJoined0;
+		}
+	}
+
+	/**
+	 * Retuns the element collection mappings.
+	 * 
+	 * @return the element collection mappings
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public PluralMapping<?, ?, ?>[] getMappingsPlural() {
+		if (this.mappingsPlural != null) {
+			return this.mappingsPlural;
+		}
+
+		synchronized (this) {
+			if (this.mappingsPlural != null) {
+				return this.mappingsPlural;
+			}
+
+			final List<PluralMapping<?, ?, ?>> mappingsPlural = Lists.newArrayList();
+			this.rootMapping.addPluralMappings(mappingsPlural);
+
+			final PluralMapping<?, ?, ?>[] mappingsPlural0 = new PluralMapping[mappingsPlural.size()];
+			mappingsPlural.toArray(mappingsPlural0);
+
+			return this.mappingsPlural = mappingsPlural0;
+		}
+	}
+
+	/**
+	 * Returns the sorted plural associations.
+	 * 
+	 * @return the sorted plural associations
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public PluralMapping<?, ?, ?>[] getMappingsPluralSorted() {
+		if (this.mappingsPluralSorted != null) {
+			return this.mappingsPluralSorted;
+		}
+
+		synchronized (this) {
+			if (this.mappingsPluralSorted != null) {
+				return this.mappingsPluralSorted;
+			}
+
+			final List<PluralMapping<?, ?, ?>> mappingsPluralSorted = Lists.newArrayList();
+			for (final PluralMapping<?, ?, ?> mapping : this.getMappingsPlural()) {
+				if (StringUtils.isNotBlank(mapping.getOrderBy())) {
+					mappingsPluralSorted.add(mapping);
+				}
+			}
+
+			final PluralMapping<?, ?, ?>[] mappingsPluralSorted0 = new PluralMapping[mappingsPluralSorted.size()];
+			mappingsPluralSorted.toArray(mappingsPluralSorted0);
+
+			return this.mappingsPluralSorted = mappingsPluralSorted0;
+		}
 	}
 
 	/**

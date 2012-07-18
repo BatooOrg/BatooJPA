@@ -29,10 +29,12 @@ import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.collections.ManagedMap;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
-import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.parser.MappingException;
+import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.ElementCollectionAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.PluralAttributeMetadata;
 
 /**
@@ -53,6 +55,7 @@ public class MapAttributeImpl<X, K, V> extends PluralAttributeImpl<X, Map<K, V>,
 	private Type<K> keyType;
 	private Class<K> keyJavaType;
 	private final String mapKey;
+	private ColumnMetadata mapKeyColumn;
 
 	/**
 	 * @param declaringType
@@ -82,6 +85,9 @@ public class MapAttributeImpl<X, K, V> extends PluralAttributeImpl<X, Map<K, V>,
 		}
 
 		this.mapKey = pluralAttributeMetadata.getMapKey();
+		if (metadata instanceof ElementCollectionAttributeMetadata) {
+			this.mapKeyColumn = ((ElementCollectionAttributeMetadata) metadata).getMapKeyColumn();
+		}
 	}
 
 	/**
@@ -135,7 +141,7 @@ public class MapAttributeImpl<X, K, V> extends PluralAttributeImpl<X, Map<K, V>,
 	 * 
 	 */
 	@Override
-	public Map<K, V> newCollection(PluralAssociationMapping<?, Map<K, V>, V> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
+	public Map<K, V> newCollection(PluralMapping<?, Map<K, V>, V> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
 		return new ManagedMap<X, K, V>(mapping, managedInstance, lazy);
 	}
 
@@ -145,7 +151,7 @@ public class MapAttributeImpl<X, K, V> extends PluralAttributeImpl<X, Map<K, V>,
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public Map<K, V> newCollection(PluralAssociationMapping<?, Map<K, V>, V> mapping, ManagedInstance<?> managedInstance, Object values) {
+	public Map<K, V> newCollection(PluralMapping<?, Map<K, V>, V> mapping, ManagedInstance<?> managedInstance, Object values) {
 		return new ManagedMap<X, K, V>(mapping, managedInstance, (Map<? extends K, ? extends V>) values);
 	}
 }

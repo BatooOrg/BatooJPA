@@ -29,6 +29,7 @@ import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.util.Pair;
@@ -53,7 +54,7 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	private final HashMap<K, V> delegate = Maps.newHashMap();
 	private HashMap<K, V> snapshot;
 	private SingularMapping<? super V, ?> keyMapping;
-	private Pair<BasicMapping<? super V, ?>, BasicAttribute<?, ?>>[] keyMappins;
+	private Pair<BasicMapping<? super V, ?>, BasicAttribute<?, ?>>[] keyMappings;
 
 	private boolean initialized;
 	private EmbeddableTypeImpl<K> keyClass;
@@ -61,8 +62,8 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	/**
 	 * Constructor for lazy initialization.
 	 * 
-	 * @param association
-	 *            the association
+	 * @param mapping
+	 *            the mapping
 	 * @param managedInstance
 	 *            the managed instance
 	 * @param lazy
@@ -72,20 +73,28 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public ManagedMap(PluralAssociationMapping<?, ?, V> association, ManagedInstance<?> managedInstance, boolean lazy) {
-		super(association, managedInstance);
+	public ManagedMap(PluralMapping<?, ?, V> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
+		super(mapping, managedInstance);
 
 		this.initialized = !lazy;
-		this.keyMapping = association.getKeyMapping();
-		this.keyMappins = association.getKeyMappins();
-		this.keyClass = (EmbeddableTypeImpl<K>) association.getKeyClass();
+		if (mapping instanceof PluralAssociationMapping) {
+			final PluralAssociationMapping<?, ?, V> pluralAssociationMapping = (PluralAssociationMapping<?, ?, V>) mapping;
+
+			this.keyMapping = pluralAssociationMapping.getMapKeyIdMapping();
+			this.keyMappings = pluralAssociationMapping.getMapKeyIdMappings();
+		}
+		else {
+			this.keyMapping = null;
+			this.keyMappings = null;
+		}
+		this.keyClass = (EmbeddableTypeImpl<K>) mapping.getMapKeyClass();
 	}
 
 	/**
 	 * Default constructor.
 	 * 
-	 * @param association
-	 *            the association
+	 * @param mapping
+	 *            the mapping
 	 * @param managedInstance
 	 *            the managed instance
 	 * @param values
@@ -94,8 +103,8 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedMap(PluralAssociationMapping<?, ?, V> association, ManagedInstance<?> managedInstance, Map<? extends K, ? extends V> values) {
-		super(association, managedInstance);
+	public ManagedMap(PluralMapping<?, ?, V> mapping, ManagedInstance<?> managedInstance, Map<? extends K, ? extends V> values) {
+		super(mapping, managedInstance);
 
 		this.delegate.putAll(values);
 
@@ -119,7 +128,7 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 		}
 		else {
 			key = this.keyClass.newInstance();
-			for (final Pair<BasicMapping<? super V, ?>, BasicAttribute<?, ?>> pair : this.keyMappins) {
+			for (final Pair<BasicMapping<? super V, ?>, BasicAttribute<?, ?>> pair : this.keyMappings) {
 				pair.getSecond().set(key, pair.getFirst().get(child));
 			}
 		}
@@ -214,7 +223,7 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 				throw new PersistenceException("No session to initialize the collection");
 			}
 
-			this.putAll(this.getAssociation().loadCollection(this.getManagedInstance()));
+			this.putAll(this.getMapping().loadCollection(this.getManagedInstance()));
 
 			this.initialized = true;
 		}
@@ -372,7 +381,7 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 		final String instance = this.getManagedInstance().getType().getName() + "@" + id;
 
 		return "ManagedMap [initialized=" + this.initialized + ", managedInstance=" + instance + ", delegate=" + this.delegate + ", snapshot=" + this.snapshot
-			+ ", mapping=" + this.getAssociation() + "]";
+			+ ", mapping=" + this.getMapping() + "]";
 	}
 
 	/**

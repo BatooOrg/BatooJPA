@@ -16,16 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.elementcollection;
+package org.batoo.jpa.core.test.criteria;
 
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 import org.batoo.jpa.core.test.enums.Foo.FooType;
@@ -39,7 +41,7 @@ import com.google.common.collect.Sets;
  * @since $version
  */
 @Entity
-public class Foo {
+public class ElementCollectionParent {
 
 	@SuppressWarnings("javadoc")
 	public enum FooTypes {
@@ -49,32 +51,36 @@ public class Foo {
 	}
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Integer key;
 
 	@ElementCollection
-	private final List<String> codes = Lists.newArrayList();
+	@CollectionTable(name = "CODES1")
+	private final List<String> codes1 = Lists.newArrayList();
 
 	@ElementCollection
+	@CollectionTable(name = "CODES2")
 	private final Set<String> codes2 = Sets.newHashSet();
 
 	@ElementCollection
+	@CollectionTable(name = "CODES3")
 	private final Set<FooType> codes3 = Sets.newHashSet();
 
 	@ElementCollection
+	@CollectionTable(name = "CODES4")
 	@Enumerated(EnumType.STRING)
 	private final Set<FooType> codes4 = Sets.newHashSet();
 
 	private String value;
 
 	/**
-	 * Returns the codes.
+	 * Returns the codes1.
 	 * 
-	 * @return the codes
+	 * @return the codes1
 	 * @since $version
 	 */
-	public List<String> getCodes() {
-		return this.codes;
+	public List<String> getCodes1() {
+		return this.codes1;
 	}
 
 	/**
@@ -85,7 +91,7 @@ public class Foo {
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected Set<String> getCodes2() {
+	public Set<String> getCodes2() {
 		return this.codes2;
 	}
 
@@ -97,19 +103,19 @@ public class Foo {
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected Set<FooType> getCodes3() {
+	public Set<FooType> getCodes3() {
 		return this.codes3;
 	}
 
 	/**
-	 * Returns the codes4 of the Foo.
+	 * Returns the codes4 of the ElementCollectionParent.
 	 * 
-	 * @return the codes4 of the Foo
+	 * @return the codes4 of the ElementCollectionParent
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected Set<FooType> getCodes4() {
+	public Set<FooType> getCodes4() {
 		return this.codes4;
 	}
 

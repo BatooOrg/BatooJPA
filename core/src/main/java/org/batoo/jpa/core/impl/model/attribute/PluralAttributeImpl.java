@@ -27,14 +27,14 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.metamodel.PluralAttribute;
-import javax.persistence.metamodel.Type;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
-import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
+import org.batoo.jpa.core.impl.model.type.TypeImpl;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.metadata.attribute.AttributeMetadataImpl;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
@@ -102,7 +102,7 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	private final Class<E> bindableJavaType;
 	private final javax.persistence.metamodel.Attribute.PersistentAttributeType attributeType;
 	private final boolean association;
-	private Type<E> type;
+	private TypeImpl<E> type;
 
 	/**
 	 * @param declaringType
@@ -174,7 +174,7 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 * 
 	 */
 	@Override
-	public Type<E> getElementType() {
+	public TypeImpl<E> getElementType() {
 		if (this.type != null) {
 			return this.type;
 		}
@@ -184,14 +184,11 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 		switch (this.attributeType) {
 			case ONE_TO_MANY:
 			case MANY_TO_MANY:
-				this.type = metamodel.entity(this.bindableJavaType);
-				break;
-			case ELEMENT_COLLECTION:
-				this.type = metamodel.embeddable(this.bindableJavaType) != null ? metamodel.embeddable(this.bindableJavaType)
+				return this.type = metamodel.entity(this.bindableJavaType);
+			default: // ELEMENT_COLLECTION:
+				return this.type = metamodel.embeddable(this.bindableJavaType) != null ? metamodel.embeddable(this.bindableJavaType)
 					: metamodel.createBasicType(this.bindableJavaType);
 		}
-
-		return this.type;
 	}
 
 	/**
@@ -235,7 +232,7 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract C newCollection(PluralAssociationMapping<?, C, E> mapping, ManagedInstance<?> managedInstance, boolean lazy);
+	public abstract C newCollection(PluralMapping<?, C, E> mapping, ManagedInstance<?> managedInstance, boolean lazy);
 
 	/**
 	 * Creates a new managed collection to track changes.
@@ -251,7 +248,7 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract C newCollection(PluralAssociationMapping<?, C, E> mapping, ManagedInstance<?> managedInstance, Object values);
+	public abstract C newCollection(PluralMapping<?, C, E> mapping, ManagedInstance<?> managedInstance, Object values);
 
 	/**
 	 * {@inheritDoc}

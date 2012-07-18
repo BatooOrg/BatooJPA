@@ -18,7 +18,6 @@
  */
 package org.batoo.jpa.core.impl.model.mapping;
 
-import java.sql.SQLException;
 import java.util.IdentityHashMap;
 
 import javax.persistence.CascadeType;
@@ -28,7 +27,6 @@ import javax.persistence.criteria.JoinType;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
@@ -54,7 +52,7 @@ import org.batoo.jpa.parser.metadata.attribute.OrphanableAssociationAttributeMet
  * @author hceylan
  * @since $version
  */
-public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> {
+public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> implements JoinedMapping<Z, X, Y> {
 
 	private final boolean eager;
 	private final boolean cascadesDetach;
@@ -164,25 +162,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> {
 	public abstract void checkTransient(ManagedInstance<?> managedInstance);
 
 	/**
-	 * Flushes the associates.
-	 * 
-	 * @param connection
-	 *            the connection to use
-	 * @param managedInstance
-	 *            the managed instance
-	 * @param removals
-	 *            true if the removals should be flushed and false for the additions
-	 * @param force
-	 *            true to force, effective only for insertions and for new entities.
-	 * @throws SQLException
-	 *             thrown if there is an underlying SQL Exception
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public abstract void flush(ConnectionImpl connection, ManagedInstance<?> managedInstance, boolean removals, boolean force) throws SQLException;
-
-	/**
 	 * Returns the effective association metadata for the attribute checking with the parent mappings and entities.
 	 * 
 	 * @return the column metadata
@@ -235,17 +214,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> {
 	}
 
 	/**
-	 * Returns the attribute of the mapping
-	 * 
-	 * @return the attribute of the mapping
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@Override
-	public abstract AttributeImpl<? super Z, X> getAttribute();
-
-	/**
 	 * Returns the foreign key of the mapping.
 	 * 
 	 * @return the foreign key of the mapping
@@ -267,16 +235,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> {
 	public abstract AssociationMapping<?, ?, ?> getInverse();
 
 	/**
-	 * Returns the join table of the mapping.
-	 * 
-	 * @return the join table of the mapping
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public abstract JoinTable getJoinTable();
-
-	/**
 	 * Returns the mappedBy of the mapping.
 	 * 
 	 * @return the mappedBy of the mapping
@@ -289,13 +247,21 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> {
 	}
 
 	/**
-	 * Returns the bindable entity type.
+	 * Returns the join table of the mapping.
 	 * 
-	 * @return the bindable entity type
+	 * @return the join table of the mapping
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
+	@Override
+	public abstract JoinTable getTable();
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public abstract EntityTypeImpl<Y> getType();
 
 	/**
@@ -323,20 +289,10 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> {
 	}
 
 	/**
-	 * Returns the join SQL for the mapping.
+	 * {@inheritDoc}
 	 * 
-	 * @return the join SQL for the mapping
-	 * 
-	 * @param parentAlias
-	 *            the parent table alias
-	 * @param alias
-	 *            the primary table alias
-	 * @param joinType
-	 *            the join type
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
+	@Override
 	public String join(String parentAlias, String alias, JoinType joinType) {
 		if (this.getForeignKey() != null) {
 			return this.getForeignKey().createDestinationJoin(joinType, parentAlias, alias);
@@ -344,11 +300,11 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> {
 		else if ((this.getInverse() != null) && (this.getInverse().getForeignKey() != null)) {
 			return this.getInverse().getForeignKey().createSourceJoin(joinType, parentAlias, alias);
 		}
-		else if (this.getJoinTable() != null) {
-			return this.getJoinTable().createJoin(joinType, parentAlias, alias, true);
+		else if (this.getTable() != null) {
+			return this.getTable().createJoin(joinType, parentAlias, alias, true);
 		}
 		else {
-			return this.getInverse().getJoinTable().createJoin(joinType, parentAlias, alias, false);
+			return this.getInverse().getTable().createJoin(joinType, parentAlias, alias, false);
 		}
 	}
 

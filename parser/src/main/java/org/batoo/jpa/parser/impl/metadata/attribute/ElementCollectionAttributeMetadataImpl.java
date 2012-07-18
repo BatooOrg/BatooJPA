@@ -34,6 +34,7 @@ import javax.persistence.FetchType;
 import javax.persistence.Lob;
 import javax.persistence.MapKey;
 import javax.persistence.MapKeyClass;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.MapKeyEnumerated;
 import javax.persistence.MapKeyTemporal;
 import javax.persistence.OrderBy;
@@ -77,6 +78,7 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	private final TemporalType mapKeyTemporalType;
 	private final ColumnMetadata orderColumn;
 	private final TemporalType temporalType;
+	private final ColumnMetadata mapKeyColumn;
 
 	/**
 	 * @param member
@@ -102,6 +104,7 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 		this.mapKey = metadata.getMapKey();
 		this.mapKeyAttributeOverrides.addAll(metadata.getMapKeyAttributeOverrides());
 		this.mapKeyClassName = metadata.getMapKeyClassName();
+		this.mapKeyColumn = metadata.getMapKeyColumn();
 		this.mapKeyEnumType = metadata.getMapKeyEnumType();
 		this.mapKeyTemporalType = metadata.getMapKeyTemporalType();
 		this.orderBy = metadata.getOrderBy();
@@ -137,6 +140,7 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 		this.temporalType = this.handleTemporalType(member, parsed);
 		this.mapKey = this.handleMapKey(member, parsed);
 		this.mapKeyClassName = this.handleMapKeyClassName(member, parsed);
+		this.mapKeyColumn = this.handleMapKeyColumn(member, parsed);
 		this.mapKeyEnumType = this.handleMapKeyEnumType(member, parsed);
 		this.mapKeyTemporalType = this.handleMapKeyTemporalType(member, parsed);
 		this.orderColumn = this.handleOrderColumn(member, parsed);
@@ -222,6 +226,15 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	@Override
 	public String getMapKeyClassName() {
 		return this.mapKeyClassName;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public ColumnMetadata getMapKeyColumn() {
+		return this.mapKeyColumn;
 	}
 
 	/**
@@ -439,6 +452,29 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 			parsed.add(MapKeyClass.class);
 
 			return annotation.value().getName();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Handles the {@link MapKeyColumn} annotation.
+	 * 
+	 * @param member
+	 *            the member
+	 * @param parsed
+	 *            the list of annotations parsed
+	 * @return the map key value
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private ColumnMetadata handleMapKeyColumn(final Member member, Set<Class<? extends Annotation>> parsed) {
+		final MapKeyColumn annotation = ReflectHelper.getAnnotation(member, MapKeyColumn.class);
+		if (annotation != null) {
+			parsed.add(MapKeyColumn.class);
+
+			return new ColumnMetadataImpl(this.getLocator(), annotation);
 		}
 
 		return null;

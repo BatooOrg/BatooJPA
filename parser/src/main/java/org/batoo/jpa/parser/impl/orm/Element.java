@@ -147,6 +147,7 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 
 		// columns
 		Element.factoryMap.put(ElementConstants.ELEMENT_COLUMN, ColumnElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_MAP_KEY_COLUMN, MapKeyColumnElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_COLUMN_NAME, ColumnNameElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_INVERSE_JOIN_COLUMN, InverseJoinColumnElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_JOIN_COLUMN, JoinColumnElement.class);

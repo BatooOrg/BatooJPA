@@ -33,6 +33,7 @@ import org.batoo.jpa.parser.impl.orm.EnumeratedElement;
 import org.batoo.jpa.parser.impl.orm.LobElement;
 import org.batoo.jpa.parser.impl.orm.MapKeyAttributeOverrideElement;
 import org.batoo.jpa.parser.impl.orm.MapKeyClassElement;
+import org.batoo.jpa.parser.impl.orm.MapKeyColumnElement;
 import org.batoo.jpa.parser.impl.orm.MapKeyElement;
 import org.batoo.jpa.parser.impl.orm.MapKeyEnumeratedElement;
 import org.batoo.jpa.parser.impl.orm.MapKeyTemporalElement;
@@ -72,6 +73,7 @@ public class ElementCollectionAttributeElement extends AttributeElement implemen
 	private String targetClass;
 	private FetchType fetchType;
 	private TemporalType temporalType;
+	private ColumnMetadata mapKeyColumn;
 
 	/**
 	 * @param parent
@@ -96,6 +98,7 @@ public class ElementCollectionAttributeElement extends AttributeElement implemen
 			ElementConstants.ELEMENT_MAP_KEY, //
 			ElementConstants.ELEMENT_MAP_KEY_ATTRIBUTE_OVERRIDE, //
 			ElementConstants.ELEMENT_MAP_KEY_CLASS, //
+			ElementConstants.ELEMENT_MAP_KEY_COLUMN, //
 			ElementConstants.ELEMENT_MAP_KEY_ENUMERATED, //
 			ElementConstants.ELEMENT_MAP_KEY_TEMPORAL, //
 			ElementConstants.ELEMENT_ORDER_BY, //
@@ -200,6 +203,15 @@ public class ElementCollectionAttributeElement extends AttributeElement implemen
 	 * 
 	 */
 	@Override
+	public ColumnMetadata getMapKeyColumn() {
+		return this.mapKeyColumn;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public EnumType getMapKeyEnumType() {
 		return this.mapKeyEnumType;
 	}
@@ -265,6 +277,10 @@ public class ElementCollectionAttributeElement extends AttributeElement implemen
 
 		if (child instanceof CollectionTableMetadata) {
 			this.collectionTable = (CollectionTableMetadata) child;
+		}
+
+		if (child instanceof MapKeyColumnElement) {
+			this.mapKeyColumn = (ColumnMetadata) child;
 		}
 
 		if (child instanceof ColumnMetadata) {

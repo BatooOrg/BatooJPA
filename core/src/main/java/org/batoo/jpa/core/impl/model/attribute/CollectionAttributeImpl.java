@@ -24,7 +24,7 @@ import javax.persistence.metamodel.CollectionAttribute;
 
 import org.batoo.jpa.core.impl.collections.ManagedList;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
 
@@ -69,7 +69,7 @@ public class CollectionAttributeImpl<X, E> extends PluralAttributeImpl<X, Collec
 	 * 
 	 */
 	@Override
-	public Collection<E> newCollection(PluralAssociationMapping<?, Collection<E>, E> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
+	public Collection<E> newCollection(PluralMapping<?, Collection<E>, E> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
 		return new ManagedList<X, E>(mapping, managedInstance, lazy);
 	}
 
@@ -79,7 +79,7 @@ public class CollectionAttributeImpl<X, E> extends PluralAttributeImpl<X, Collec
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public Collection<E> newCollection(PluralAssociationMapping<?, Collection<E>, E> mapping, ManagedInstance<?> managedInstance, Object values) {
+	public Collection<E> newCollection(PluralMapping<?, Collection<E>, E> mapping, ManagedInstance<?> managedInstance, Object values) {
 		return new ManagedList<X, E>(mapping, managedInstance, (Collection<? extends E>) values);
 	}
 }

@@ -41,6 +41,7 @@ import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
 import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.ElementCollectionAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.EmbeddedAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.ManyToManyAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.ManyToOneAttributeMetadata;
@@ -136,6 +137,11 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 		// basic attributes
 		for (final BasicAttributeMetadata metadata : attributesMetadata.getBasics()) {
 			this.addAttribute(new BasicAttribute(this, metadata));
+		}
+
+		// element collection attributes
+		for (final ElementCollectionAttributeMetadata metadata : attributesMetadata.getElementCollections()) {
+			this.addAttribute(PluralAttributeImpl.create(this, metadata, PersistentAttributeType.ELEMENT_COLLECTION));
 		}
 
 		// many to one attributes

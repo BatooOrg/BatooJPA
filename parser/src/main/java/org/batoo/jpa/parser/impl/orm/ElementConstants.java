@@ -57,6 +57,7 @@ public class ElementConstants {
 	protected static final String ELEMENT_CASCADE_REFRESH = "cascade-refresh";
 	protected static final String ELEMENT_CASCADE_REMOVE = "cascade-remove";
 	protected static final String ELEMENT_COLUMN = "column";
+	protected static final String ELEMENT_MAP_KEY_COLUMN = "map-key-column";
 	protected static final String ELEMENT_COLUMN_NAME = "column-name";
 	protected static final String ELEMENT_EMBEDDED = "embedded";
 	protected static final String ELEMENT_EMBEDDED_ID = "embedded-id";

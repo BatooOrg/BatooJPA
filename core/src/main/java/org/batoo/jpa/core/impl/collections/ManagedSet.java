@@ -26,7 +26,7 @@ import java.util.Set;
 import javax.persistence.PersistenceException;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 
 import com.google.common.collect.Sets;
 
@@ -50,8 +50,8 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	/**
 	 * Constructor for lazy initialization.
 	 * 
-	 * @param association
-	 *            the association
+	 * @param mapping
+	 *            the mapping
 	 * @param managedInstance
 	 *            the managed instance
 	 * @param lazy
@@ -60,8 +60,8 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedSet(PluralAssociationMapping<?, ?, E> association, ManagedInstance<?> managedInstance, boolean lazy) {
-		super(association, managedInstance);
+	public ManagedSet(PluralMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
+		super(mapping, managedInstance);
 
 		this.initialized = !lazy;
 	}
@@ -69,8 +69,8 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	/**
 	 * Default constructor.
 	 * 
-	 * @param association
-	 *            the association
+	 * @param mapping
+	 *            the mapping
 	 * @param managedInstance
 	 *            the managed instance
 	 * @param values
@@ -79,8 +79,8 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedSet(PluralAssociationMapping<?, ?, E> association, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
-		super(association, managedInstance);
+	public ManagedSet(PluralMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
+		super(mapping, managedInstance);
 
 		this.delegate.addAll(values);
 
@@ -223,7 +223,7 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 				throw new PersistenceException("No session to initialize the collection");
 			}
 
-			this.delegate.addAll(this.getAssociation().loadCollection(this.getManagedInstance()));
+			this.delegate.addAll(this.getMapping().loadCollection(this.getManagedInstance()));
 
 			this.initialized = true;
 		}
@@ -392,6 +392,6 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 		final String instance = this.getManagedInstance().getType().getName() + "@" + id;
 
 		return "ManagedSet [initialized=" + this.initialized + ", managedInstance=" + instance + ", delegate=" + this.delegate + ", snapshot=" + this.snapshot
-			+ ", mapping=" + this.getAssociation() + "]";
+			+ ", mapping=" + this.getMapping() + "]";
 	}
 }

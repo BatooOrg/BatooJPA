@@ -23,6 +23,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 
 import javax.persistence.OrderBy;
+import javax.persistence.metamodel.Type.PersistenceType;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
@@ -89,7 +90,7 @@ public class ListComparator<E> implements Comparator<E> {
 		}
 	}
 
-	private final PluralAssociationMapping<?, ?, E> mapping;
+	private final PluralMapping<?, ?, E> mapping;
 	private final ArrayList<ComparableMapping> comparables = Lists.newArrayList();
 
 	/**
@@ -99,7 +100,7 @@ public class ListComparator<E> implements Comparator<E> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ListComparator(PluralAssociationMapping<?, ?, E> mapping) {
+	public ListComparator(PluralMapping<?, ?, E> mapping) {
 		super();
 
 		this.mapping = mapping;
@@ -140,16 +141,24 @@ public class ListComparator<E> implements Comparator<E> {
 	 * @author hceylan
 	 */
 	private void createComparables() {
-		final EntityTypeImpl<E> type = this.mapping.getType();
 		// order on id
 		if (this.mapping.getOrderBy().trim().length() == 0) {
-			if (type.hasSingleIdAttribute()) {
-				this.comparables.add(new ComparableMapping(true, (Mapping<?, ?, ?>) type.getIdMapping()));
+			if (this.mapping.isAssociation()) {
+				final EntityTypeImpl<E> type = ((PluralAssociationMapping<?, ?, E>) this.mapping).getType();
+				if (type.hasSingleIdAttribute()) {
+					this.comparables.add(new ComparableMapping(true, (Mapping<?, ?, ?>) type.getIdMapping()));
+				}
+				else {
+					for (final Pair<BasicMapping<? super E, ?>, BasicAttribute<?, ?>> pair : type.getIdMappings()) {
+						this.comparables.add(new ComparableMapping(true, pair.getFirst()));
+					}
+				}
+			}
+			else if (this.mapping.getType().getPersistenceType() == PersistenceType.EMBEDDABLE) {
+				throw new MappingException("Embeddable element collections requires OrderBy value", this.mapping.getAttribute().getLocator());
 			}
 			else {
-				for (final Pair<BasicMapping<? super E, ?>, BasicAttribute<?, ?>> pair : type.getIdMappings()) {
-					this.comparables.add(new ComparableMapping(true, pair.getFirst()));
-				}
+				this.comparables.add(new ComparableMapping(true, null));
 			}
 		}
 		else {
@@ -174,7 +183,11 @@ public class ListComparator<E> implements Comparator<E> {
 					index++;
 				}
 
-				final Mapping<?, ?, ?> mapping = type.getRootMapping().getMapping(path);
+				if (this.mapping.getType().getPersistenceType() == PersistenceType.BASIC) {
+					throw new MappingException("Basic element collection must not have OrderBy value", this.mapping.getAttribute().getLocator());
+				}
+
+				final Mapping<?, ?, ?> mapping = this.mapping.getMapping(path);
 				if (mapping == null) {
 					throw new MappingException("Sort property cannot be found: " + path, this.mapping.getAttribute().getLocator());
 				}

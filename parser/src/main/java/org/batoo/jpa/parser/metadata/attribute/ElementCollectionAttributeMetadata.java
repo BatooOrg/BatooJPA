@@ -74,6 +74,16 @@ public interface ElementCollectionAttributeMetadata extends PluralAttributeMetad
 	FetchType getFetchType();
 
 	/**
+	 * Returns the map key column definition.
+	 * 
+	 * @return the map key column definition
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	ColumnMetadata getMapKeyColumn();
+
+	/**
 	 * Returns the name of the target class.
 	 * 
 	 * @return the name of the target class

@@ -115,13 +115,15 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	/**
 	 * Returns the generated entity alias.
 	 * 
+	 * @param entity
+	 *            true if the table is an entity table, false for element collections
 	 * @return the generated entity alias
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String generateEntityAlias() {
-		return "E" + this.nextEntityAlias++;
+	public String generateTableAlias(boolean entity) {
+		return "E" + (!entity ? "C" : "") + this.nextEntityAlias++;
 	}
 
 	/**

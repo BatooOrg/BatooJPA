@@ -18,11 +18,10 @@
  */
 package org.batoo.jpa.core.test.elementcollection;
 
-import javax.persistence.EntityManager;
-
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
+import org.batoo.jpa.core.test.enums.Foo.FooType;
 import org.junit.Test;
 
 /**
@@ -33,13 +32,13 @@ import org.junit.Test;
 public class ElementCollectionTest extends BaseCoreTest {
 
 	/**
-	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with identity value
+	 * Tests the element collections
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	@Test
-	public void testElementCollection() {
+	public void testElementCollection1() {
 		final Foo foo = new Foo();
 		foo.setValue("Foo2");
 
@@ -51,10 +50,100 @@ public class ElementCollectionTest extends BaseCoreTest {
 
 		this.commit();
 
+		this.begin();
+		foo.getCodes().add("FR");
+		this.commit();
+
 		this.close();
 
 		final Foo foo2 = this.find(Foo.class, foo.getKey());
 		Assert.assertEquals(foo.getKey(), foo2.getKey());
 	}
 
+	/**
+	 * Tests the element collections
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testElementCollection2() {
+		final Foo foo = new Foo();
+		foo.setValue("Foo2");
+
+		foo.getCodes2().add("TR");
+		foo.getCodes2().add("UK");
+		foo.getCodes2().add("US");
+
+		this.persist(foo);
+
+		this.commit();
+
+		this.begin();
+		foo.getCodes().add("FR");
+		this.commit();
+
+		this.close();
+
+		final Foo foo2 = this.find(Foo.class, foo.getKey());
+		Assert.assertEquals(foo.getKey(), foo2.getKey());
+	}
+
+	/**
+	 * Tests the element collections
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testElementCollection3() {
+		final Foo foo = new Foo();
+		foo.setValue("Foo2");
+
+		foo.getCodes3().add(FooType.TYPE1);
+		foo.getCodes3().add(FooType.TYPE2);
+
+		this.persist(foo);
+
+		this.commit();
+
+		this.begin();
+		foo.getCodes3().remove(FooType.TYPE1);
+		foo.getCodes3().add(FooType.TYPE3);
+		this.commit();
+
+		this.close();
+
+		final Foo foo2 = this.find(Foo.class, foo.getKey());
+		Assert.assertEquals(foo.getKey(), foo2.getKey());
+	}
+
+	/**
+	 * Tests the element collections
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testElementCollection4() {
+		final Foo foo = new Foo();
+		foo.setValue("Foo2");
+
+		foo.getCodes4().add(FooType.TYPE1);
+		foo.getCodes4().add(FooType.TYPE2);
+
+		this.persist(foo);
+
+		this.commit();
+
+		this.begin();
+		foo.getCodes4().remove(FooType.TYPE1);
+		foo.getCodes4().add(FooType.TYPE3);
+		this.commit();
+
+		this.close();
+
+		final Foo foo2 = this.find(Foo.class, foo.getKey());
+		Assert.assertEquals(foo.getKey(), foo2.getKey());
+	}
 }
