@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +45,7 @@ import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.join.AbstractJoin;
+import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.CollectionTable;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
@@ -63,6 +65,7 @@ import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.ElementCollectionAttributeMetadata;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * Mapping for element collections.
@@ -87,13 +90,21 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	private final boolean lob;
 	private final TemporalType temporalType;
 	private final String orderBy;
+
 	private final ColumnMetadata orderColumn;
 
+	private final ColumnMetadata mapKeyColumn;
+	private final String mapKey;
+	private final EnumType mapKeyEnumType;
+	private final TemporalType mapKeyTemporalType;
 	private TypeImpl<E> type;
+
 	private SingularMapping<? super E, ?> keyMapping;
 	private ElementMapping<E> rootMapping;
 	private Comparator<E> comparator;
+
 	private CriteriaQueryImpl<E> selectCriteria;
+	private CriteriaQueryImpl<Object[]> selectMapCriteria;
 
 	/**
 	 * @param parent
@@ -126,6 +137,19 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 			this.orderBy = null;
 			this.orderColumn = null;
 		}
+
+		if (this.attribute.getCollectionType() == CollectionType.MAP) {
+			this.mapKeyColumn = metadata.getMapKeyColumn();
+			this.mapKeyTemporalType = metadata.getMapKeyTemporalType();
+			this.mapKeyEnumType = metadata.getMapKeyEnumType();
+			this.mapKey = metadata.getMapKey();
+		}
+		else {
+			this.mapKeyColumn = null;
+			this.mapKeyTemporalType = null;
+			this.mapKeyEnumType = null;
+			this.mapKey = null;
+		}
 	}
 
 	/**
@@ -133,8 +157,8 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	 * 
 	 */
 	@Override
-	public void attach(ConnectionImpl connection, ManagedInstance<?> instance, Object child, int index) throws SQLException {
-		this.collectionTable.performInsert(connection, instance.getInstance(), child, index);
+	public void attach(ConnectionImpl connection, ManagedInstance<?> instance, Object key, Object child, int index) throws SQLException {
+		this.collectionTable.performInsert(connection, instance.getInstance(), key, child, index);
 	}
 
 	/**
@@ -151,8 +175,8 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	 * 
 	 */
 	@Override
-	public void detach(ConnectionImpl connection, ManagedInstance<?> instance, Object child) throws SQLException {
-		this.collectionTable.performRemove(connection, instance.getInstance(), child);
+	public void detach(ConnectionImpl connection, ManagedInstance<?> instance, Object key, Object child) throws SQLException {
+		this.collectionTable.performRemove(connection, instance.getInstance(), key, child);
 	}
 
 	/**
@@ -177,6 +201,15 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 		else {
 			this.set(instance, this.attribute.newCollection(this, instance, c));
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Object extractKey(E value) {
+		return this.keyMapping.get(value);
 	}
 
 	/**
@@ -223,6 +256,30 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 
 			return this.comparator = new ListComparator<E>(this);
 		}
+	}
+
+	/**
+	 * Returns the key mapping of the element collection mapping.
+	 * 
+	 * @return the key mapping of the element collection mapping
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public SingularMapping<? super E, ?> getKeyMapping() {
+		return this.keyMapping;
+	}
+
+	/**
+	 * Returns the map key of the element collection mapping.
+	 * 
+	 * @return the map key of the element collection mapping
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getMapKey() {
+		return this.mapKey;
 	}
 
 	/**
@@ -280,7 +337,6 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 			q.internal();
 			final RootImpl<?> r = q.from(this.getRoot().getType());
 			r.alias(BatooUtils.acronym(this.getRoot().getName()).toLowerCase());
-			// TODO handle embeddables along the path
 			final AbstractJoin<?, E> join = r.<E> join(this.attribute.getName());
 			join.alias(BatooUtils.acronym(this.attribute.getName()));
 			q = q.select(join);
@@ -308,6 +364,56 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 			}
 
 			return this.selectCriteria = q.where(predicates.toArray(new PredicateImpl[predicates.size()]));
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private CriteriaQueryImpl<Object[]> getSelectMapCriteria() {
+		if (this.selectCriteria != null) {
+			return this.selectMapCriteria;
+		}
+
+		synchronized (this) {
+			// other thread prepared before this one
+			if (this.selectCriteria != null) {
+				return this.selectMapCriteria;
+			}
+
+			final MetamodelImpl metamodel = this.getRoot().getType().getMetamodel();
+			final CriteriaBuilderImpl cb = metamodel.getEntityManagerFactory().getCriteriaBuilder();
+
+			CriteriaQueryImpl<Object[]> q = cb.createQuery(Object[].class);
+			q.internal();
+			final RootImpl<?> r = q.from(this.getRoot().getType());
+			r.alias(BatooUtils.acronym(this.getRoot().getName()).toLowerCase());
+			final MapJoinImpl<?, ?, E> join = (MapJoinImpl<?, ?, E>) r.<E> join(this.attribute.getName());
+			join.alias(BatooUtils.acronym(this.attribute.getName()));
+
+			q = q.multiselect(join.key(), join.value());
+
+			// has single id mapping
+			final EntityTypeImpl<?> rootType = this.getRoot().getType();
+			if (rootType.hasSingleIdAttribute()) {
+				final SingularMapping<?, ?> idMapping = rootType.getIdMapping();
+				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
+				final Path<?> path = r.get(idMapping.getAttribute().getName());
+				final PredicateImpl predicate = cb.equal(path, pe);
+
+				return this.selectMapCriteria = q.where(predicate);
+			}
+
+			// has multiple id mappings
+			final List<PredicateImpl> predicates = Lists.newArrayList();
+			for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
+				final BasicMapping<?, ?> idMapping = (BasicMapping<?, ?>) pair.getFirst();
+				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
+				final Path<?> path = r.get(idMapping.getAttribute().getName());
+				final PredicateImpl predicate = cb.equal(path, pe);
+
+				predicates.add(predicate);
+			}
+
+			return this.selectMapCriteria = q.where(predicates.toArray(new PredicateImpl[predicates.size()]));
 		}
 	}
 
@@ -370,6 +476,15 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	 * 
 	 */
 	@Override
+	public boolean isMap() {
+		return this.getAttribute().getCollectionType() == CollectionType.MAP;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public String join(String parentAlias, String alias, JoinType joinType) {
 		return this.collectionTable.getKey().createSourceJoin(joinType, parentAlias, alias);
 	}
@@ -385,8 +500,6 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	 */
 	@SuppressWarnings("unchecked")
 	public void link() {
-		this.getRoot().getType();
-
 		this.type = this.attribute.getElementType();
 
 		if (this.type.getPersistenceType() == PersistenceType.EMBEDDABLE) {
@@ -395,15 +508,19 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 
 		if (this.attribute.getCollectionType() == CollectionType.MAP) {
 			final MapAttributeImpl<? super Z, Map<?, E>, E> mapAttribute = (MapAttributeImpl<? super Z, Map<?, E>, E>) this.attribute;
-			final String mapKey = mapAttribute.getMapKey();
-			if (mapKey != null) {
+			if (this.mapKey != null) {
 				if (this.type.getPersistenceType() == PersistenceType.EMBEDDABLE) {
-					this.keyMapping = (SingularMapping<? super E, ?>) this.rootMapping.getMapping(mapKey);
+					this.keyMapping = (SingularMapping<? super E, ?>) this.rootMapping.getMapping(this.mapKey);
 				}
 
 				if (this.keyMapping == null) {
-					throw new MappingException("Cannot locate the MapKey: " + mapKey, this.attribute.getLocator());
+					throw new MappingException("Cannot locate the MapKey: " + this.mapKey, this.attribute.getLocator());
 				}
+			}
+			else {
+				final String name = (this.mapKeyColumn != null) && StringUtils.isNotBlank(this.mapKeyColumn.getName()) ? //
+					this.mapKeyColumn.getName() : this.attribute.getName() + "_KEY";
+				this.collectionTable.setKeyColumn(this.mapKeyColumn, name, this.mapKeyTemporalType, this.mapKeyEnumType, mapAttribute.getKeyJavaType());
 			}
 		}
 
@@ -413,6 +530,7 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 		}
 		else {
 			this.collectionTable.link(this.type, defaultName, this.column, this.enumType, this.temporalType, this.lob);
+
 		}
 
 		if (this.attribute.getCollectionType() == CollectionType.LIST) {
@@ -462,6 +580,40 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 		}
 
 		return q.getResultList();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public <K> Map<? extends K, ? extends E> loadMap(ManagedInstance<?> instance) {
+		final EntityManagerImpl em = instance.getSession().getEntityManager();
+		final TypedQueryImpl<Object[]> q = em.createQuery(this.getSelectMapCriteria());
+
+		final EntityTypeImpl<?> rootType = instance.getType();
+
+		final Object id = instance.getId().getId();
+
+		// if has single id then pass it on
+		if (rootType.hasSingleIdAttribute()) {
+			q.setParameter(1, id);
+		}
+		else {
+			int i = 1;
+			for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
+				q.setParameter(i++, pair.getSecond().get(id));
+			}
+		}
+
+		final HashMap<K, E> resultMap = Maps.newHashMap();
+
+		for (final Object[] pair : q.getResultList()) {
+			resultMap.put((K) pair[0], (E) pair[1]);
+		}
+
+		return resultMap;
 	}
 
 	/**

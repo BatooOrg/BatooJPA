@@ -76,7 +76,7 @@ public class SetJoinImpl<Z, E> extends AbstractJoin<Z, E> implements SetJoin<Z, 
 	@Override
 	@SuppressWarnings("unchecked")
 	public SetAttribute<? super Z, E> getModel() {
-		return (SetAttribute<? super Z, E>) this.getMapping().getAttribute();
+		return (SetAttribute<? super Z, E>) this.getAttribute();
 	}
 
 	/**

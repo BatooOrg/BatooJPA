@@ -16,47 +16,47 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.criteria.join;
+package org.batoo.jpa.core.impl.criteria.expression;
 
-import java.util.List;
-
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.ListJoin;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.metamodel.ListAttribute;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Map.Entry;
 
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
-import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
-import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
+import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl;
+import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl.MapSelectType;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
- * Implementation of {@link ListJoin}.
+ * Expression for map join entries.
  * 
- * @param <Z>
- *            the source type
- * @param <E>
- *            the element type
+ * @param <K>
+ *            the key type
+ * @param <V>
+ *            the value type
  * 
  * @author hceylan
  * @since $version
  */
-public class ListJoinImpl<Z, E> extends AbstractJoin<Z, E> implements ListJoin<Z, E> {
+public class MapEntryExpression<K, V> extends AbstractExpression<Entry<K, V>> {
+
+	private final MapJoinImpl<?, K, V> mapJoin;
 
 	/**
-	 * @param parent
-	 *            the parent
-	 * @param mapping
-	 *            the mapping
-	 * @param jointType
-	 *            the join type
+	 * @param mapJoin
+	 *            the map join
+	 * @param javaType
+	 *            the java type
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ListJoinImpl(AbstractFrom<?, Z> parent, PluralMapping<? super Z, List<E>, E> mapping, JoinType jointType) {
-		super(parent, mapping, jointType);
+	public MapEntryExpression(MapJoinImpl<?, K, V> mapJoin, Class<Entry<K, V>> javaType) {
+		super(javaType);
+
+		this.mapJoin = mapJoin;
 	}
 
 	/**
@@ -74,38 +74,35 @@ public class ListJoinImpl<Z, E> extends AbstractJoin<Z, E> implements ListJoin<Z
 	 * 
 	 */
 	@Override
+	public String generateJpqlRestriction() {
+		return this.mapJoin.generateJpqlRestriction() + ".entry";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generateJpqlSelect() {
+		return this.mapJoin.generateJpqlSelect() + ".entry";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
+		return this.mapJoin.generateSqlSelect(query, MapSelectType.ENTRY);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	@SuppressWarnings("unchecked")
-	public ListAttribute<? super Z, E> getModel() {
-		return (ListAttribute<? super Z, E>) this.getAttribute();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Expression<Integer> index() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public ListJoin<Z, E> on(Expression<Boolean> restriction) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public ListJoin<Z, E> on(Predicate... restrictions) {
-		// TODO Auto-generated method stub
-		return null;
+	public EntryImpl<K, V> handle(SessionImpl session, ResultSet row) throws SQLException {
+		return (EntryImpl<K, V>) this.mapJoin.handle(session, row, MapSelectType.ENTRY);
 	}
 }

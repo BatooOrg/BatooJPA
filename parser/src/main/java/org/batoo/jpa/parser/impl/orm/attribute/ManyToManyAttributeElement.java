@@ -30,6 +30,7 @@ import org.batoo.jpa.parser.impl.orm.Element;
 import org.batoo.jpa.parser.impl.orm.ElementConstants;
 import org.batoo.jpa.parser.impl.orm.MapKeyAttributeOverrideElement;
 import org.batoo.jpa.parser.impl.orm.MapKeyClassElement;
+import org.batoo.jpa.parser.impl.orm.MapKeyColumnElement;
 import org.batoo.jpa.parser.impl.orm.MapKeyElement;
 import org.batoo.jpa.parser.impl.orm.MapKeyEnumeratedElement;
 import org.batoo.jpa.parser.impl.orm.MapKeyTemporalElement;
@@ -55,10 +56,11 @@ public class ManyToManyAttributeElement extends AssociationElement implements Ma
 	private String mappedBy;
 	private String mapKey;
 	private String orderBy;
-	private OrderColumnElement orderColumn;
+	private ColumnMetadata mapKeyColumn;
 	private String mapKeyClassName;
 	private EnumType mapKeyEnumType;
 	private TemporalType mapKeyTemporalType;
+	private OrderColumnElement orderColumn;
 	private final List<PrimaryKeyJoinColumnMetadata> primaryKeyJoinColumns = Lists.newArrayList();
 	private final List<AttributeOverrideMetadata> mapKeyAttributeOverrides = Lists.newArrayList();
 
@@ -82,6 +84,7 @@ public class ManyToManyAttributeElement extends AssociationElement implements Ma
 			ElementConstants.ELEMENT_MAP_KEY, //
 			ElementConstants.ELEMENT_MAP_KEY_ATTRIBUTE_OVERRIDE, //
 			ElementConstants.ELEMENT_MAP_KEY_CLASS, //
+			ElementConstants.ELEMENT_MAP_KEY_COLUMN,//
 			ElementConstants.ELEMENT_MAP_KEY_ENUMERATED, //
 			ElementConstants.ELEMENT_MAP_KEY_TEMPORAL, //
 			ElementConstants.ELEMENT_ORDER_BY, //
@@ -124,6 +127,15 @@ public class ManyToManyAttributeElement extends AssociationElement implements Ma
 	@Override
 	public String getMapKeyClassName() {
 		return this.mapKeyClassName;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public ColumnMetadata getMapKeyColumn() {
+		return this.mapKeyColumn;
 	}
 
 	/**
@@ -193,6 +205,10 @@ public class ManyToManyAttributeElement extends AssociationElement implements Ma
 
 		if (child instanceof MapKeyClassElement) {
 			this.mapKeyClassName = ((MapKeyClassElement) child).getClazz();
+		}
+
+		if (child instanceof MapKeyColumnElement) {
+			this.mapKeyColumn = (ColumnMetadata) child;
 		}
 
 		if (child instanceof MapKeyEnumeratedElement) {

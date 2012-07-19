@@ -27,6 +27,8 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EnumType;
+import javax.persistence.TemporalType;
 import javax.persistence.criteria.Path;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 import javax.persistence.metamodel.PluralAttribute.CollectionType;
@@ -86,12 +88,16 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	private AssociationMapping<?, ?, ?> inverse;
 	private CriteriaQueryImpl<E> selectCriteria;
 
-	private SingularMapping<? super E, ?> mapKeyIdMapping;
-	private Pair<BasicMapping<? super E, ?>, BasicAttribute<?, ?>>[] mapKeyIdMappings;
+	private SingularMapping<? super E, ?> mapKeyMapping;
+	private Pair<BasicMapping<? super E, ?>, BasicAttribute<?, ?>>[] mapKeyMappings;
 	private EmbeddableTypeImpl<?> keyClass;
 	private String orderBy;
 	private Comparator<E> comparator;
 	private ColumnMetadata orderColumn;
+	private final String mapKey;
+	private ColumnMetadata mapKeyColumn;
+	private TemporalType mapKeyTemporalType;
+	private EnumType mapKeyEnumType;
 
 	/**
 	 * @param parent
@@ -133,6 +139,19 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 			this.orderBy = null;
 			this.orderColumn = null;
 		}
+
+		if (this.attribute.getCollectionType() == CollectionType.MAP) {
+			this.mapKeyColumn = pluralAttributeMetadata.getMapKeyColumn();
+			this.mapKeyTemporalType = pluralAttributeMetadata.getMapKeyTemporalType();
+			this.mapKeyEnumType = pluralAttributeMetadata.getMapKeyEnumType();
+			this.mapKey = pluralAttributeMetadata.getMapKey();
+		}
+		else {
+			this.mapKeyColumn = null;
+			this.mapKeyTemporalType = null;
+			this.mapKeyEnumType = null;
+			this.mapKey = null;
+		}
 	}
 
 	/**
@@ -140,12 +159,12 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * 
 	 */
 	@Override
-	public void attach(ConnectionImpl connection, ManagedInstance<?> instance, Object child, int index) throws SQLException {
+	public void attach(ConnectionImpl connection, ManagedInstance<?> instance, Object key, Object child, int index) throws SQLException {
 		if (this.joinTable != null) {
-			this.joinTable.performInsert(connection, instance.getInstance(), child, index);
+			this.joinTable.performInsert(connection, instance.getInstance(), key, child, index);
 		}
 		else if (this.foreignKey != null) {
-			this.foreignKey.performAttachChild(connection, instance, child, index);
+			this.foreignKey.performAttachChild(connection, instance, key, child, index);
 		}
 	}
 
@@ -177,12 +196,12 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * 
 	 */
 	@Override
-	public void detach(ConnectionImpl connection, ManagedInstance<?> instance, Object child) throws SQLException {
+	public void detach(ConnectionImpl connection, ManagedInstance<?> instance, Object key, Object child) throws SQLException {
 		if (this.joinTable != null) {
-			this.joinTable.performRemove(connection, instance.getInstance(), child);
+			this.joinTable.performRemove(connection, instance.getInstance(), key, child);
 		}
 		else if (this.foreignKey != null) {
-			this.foreignKey.performDetachChild(connection, child);
+			this.foreignKey.performDetachChild(connection, key, child);
 		}
 	}
 
@@ -213,6 +232,26 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 		else {
 			this.set(instance, this.attribute.newCollection(this, instance, c));
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Object extractKey(E value) {
+		Object key = null;
+
+		if (this.mapKeyMapping != null) {
+			return this.mapKeyMapping.get(value);
+		}
+
+		key = this.keyClass.newInstance();
+		for (final Pair<BasicMapping<? super E, ?>, BasicAttribute<?, ?>> pair : this.mapKeyMappings) {
+			pair.getSecond().set(key, pair.getFirst().get(value));
+		}
+
+		return key;
 	}
 
 	/**
@@ -289,7 +328,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * @author hceylan
 	 */
 	public SingularMapping<? super E, ?> getMapKeyIdMapping() {
-		return this.mapKeyIdMapping;
+		return this.mapKeyMapping;
 	}
 
 	/**
@@ -301,7 +340,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * @author hceylan
 	 */
 	public Pair<BasicMapping<? super E, ?>, BasicAttribute<?, ?>>[] getMapKeyIdMappings() {
-		return this.mapKeyIdMappings;
+		return this.mapKeyMappings;
 	}
 
 	/**
@@ -434,6 +473,15 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * 
 	 */
 	@Override
+	public boolean isMap() {
+		return this.getAttribute().getCollectionType() == CollectionType.MAP;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public void link() throws MappingException {
 		final EntityTypeImpl<?> entity = this.getRoot().getType();
@@ -477,24 +525,32 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 		}
 
 		if (this.attribute.getCollectionType() == CollectionType.MAP) {
-			final MapAttributeImpl<? super Z, Map<?, E>, E> mapAttribute = (MapAttributeImpl<? super Z, Map<?, E>, E>) this.attribute;
-			final String mapKey = mapAttribute.getMapKey();
-			if (StringUtils.isBlank(mapKey)) {
-				if (this.type.hasSingleIdAttribute()) {
-					this.mapKeyIdMapping = this.type.getIdMapping();
-				}
-				else {
-					this.mapKeyIdMappings = this.type.getIdMappings();
-					this.keyClass = (EmbeddableTypeImpl<?>) this.type.getIdType();
-				}
+			if (this.mapKeyColumn != null) {
+				final MapAttributeImpl<? super Z, Map<?, E>, E> mapAttribute = (MapAttributeImpl<? super Z, Map<?, E>, E>) this.attribute;
+
+				final String name = StringUtils.isNotBlank(this.mapKeyColumn.getName()) ? this.mapKeyColumn.getName() : this.attribute.getName() + "_KEY";
+
+				this.joinTable.setKeyColumn(this.mapKeyColumn, name, this.mapKeyTemporalType, this.mapKeyEnumType, mapAttribute.getKeyJavaType());
 			}
 			else {
-				this.mapKeyIdMapping = (SingularMapping<? super E, ?>) this.type.getRootMapping().getMapping(mapKey);
+				if (StringUtils.isBlank(this.mapKey)) {
+					if (this.type.hasSingleIdAttribute()) {
+						this.mapKeyMapping = this.type.getIdMapping();
+					}
+					else {
+						this.mapKeyMappings = this.type.getIdMappings();
+						this.keyClass = (EmbeddableTypeImpl<?>) this.type.getIdType();
+					}
+				}
+				else {
+					this.mapKeyMapping = (SingularMapping<? super E, ?>) this.type.getRootMapping().getMapping(this.mapKey);
 
-				if (this.mapKeyIdMapping == null) {
-					throw new MappingException("Cannot locate the MapKey: " + mapKey, this.attribute.getLocator());
+					if (this.mapKeyMapping == null) {
+						throw new MappingException("Cannot locate the MapKey: " + this.mapKey, this.attribute.getLocator());
+					}
 				}
 			}
+
 		}
 	}
 
@@ -537,6 +593,16 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 		}
 
 		return q.getResultList();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public <K> Map<? extends K, ? extends E> loadMap(ManagedInstance<?> instance) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -606,14 +672,11 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 */
 	@SuppressWarnings("unchecked")
 	public void refreshCollection(EntityManagerImpl entityManager, ManagedInstance<?> instance) {
-		// load the children
-		final Collection<? extends E> children = this.loadCollection(instance);
-
 		final ManagedCollection<E> collection = (ManagedCollection<E>) this.get(instance.getInstance());
-		collection.refreshChildren(children);
+		collection.refreshChildren();
 
 		if (this.cascadesRefresh()) {
-			for (final E child : children) {
+			for (final E child : collection.getDelegate()) {
 				entityManager.refresh(child);
 			}
 		}

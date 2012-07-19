@@ -45,6 +45,7 @@ public class OneToManyAttributeMetadataImpl extends AssociationAttributeMetadata
 	private final boolean removesOprhans;
 	private final String mapKey;
 	private final String mapKeyClassName;
+	private final ColumnMetadata mapKeyColumn;
 	private final EnumType mapKeyEnumType;
 	private final TemporalType mapKeyTemporalType;
 	private final ColumnMetadata orderColumn;
@@ -67,6 +68,7 @@ public class OneToManyAttributeMetadataImpl extends AssociationAttributeMetadata
 		this.removesOprhans = metadata.removesOrphans();
 		this.mapKey = metadata.getMapKey();
 		this.mapKeyClassName = metadata.getMapKeyClassName();
+		this.mapKeyColumn = metadata.getMapKeyColumn();
 		this.mapKeyEnumType = metadata.getMapKeyEnumType();
 		this.mapKeyTemporalType = metadata.getMapKeyTemporalType();
 		this.mapKeyAttributeOverrides.addAll(metadata.getMapKeyAttributeOverrides());
@@ -96,6 +98,7 @@ public class OneToManyAttributeMetadataImpl extends AssociationAttributeMetadata
 		this.removesOprhans = oneToMany.orphanRemoval();
 		this.mapKey = this.handleMapKey(member, parsed);
 		this.mapKeyClassName = this.handleMapKeyClassName(member, parsed);
+		this.mapKeyColumn = this.handleMapKeyColumn(member, parsed);
 		this.mapKeyEnumType = this.handleMapKeyEnumType(member, parsed);
 		this.mapKeyTemporalType = this.handleMapKeyTemporalType(member, parsed);
 		this.orderBy = this.handleOrderBy(member, parsed);
@@ -127,6 +130,15 @@ public class OneToManyAttributeMetadataImpl extends AssociationAttributeMetadata
 	@Override
 	public String getMapKeyClassName() {
 		return this.mapKeyClassName;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public ColumnMetadata getMapKeyColumn() {
+		return this.mapKeyColumn;
 	}
 
 	/**

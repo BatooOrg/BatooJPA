@@ -53,7 +53,7 @@ public class BasicPath<X> extends AbstractPath<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public BasicPath(AbstractPath<?> parent, BasicMapping<?, X> mapping) {
+	public BasicPath(ParentPath<?, ?> parent, BasicMapping<?, X> mapping) {
 		super(parent, mapping.getJavaType());
 
 		this.mapping = mapping;
@@ -125,7 +125,7 @@ public class BasicPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	protected BasicMapping<?, X> getMapping() {
+	public BasicMapping<?, X> getMapping() {
 		return this.mapping;
 	}
 

@@ -72,6 +72,18 @@ public interface JoinedMapping<Z, X, Y> {
 	}
 
 	/**
+	 * Extracts key from the value.
+	 * 
+	 * @param value
+	 *            the value
+	 * @return the key of the value
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Object extractKey(Y value);
+
+	/**
 	 * Flushes the associates.
 	 * 
 	 * @param connection
@@ -172,6 +184,16 @@ public interface JoinedMapping<Z, X, Y> {
 	 * @author hceylan
 	 */
 	boolean isJoined();
+
+	/**
+	 * Returns if the mapping is a map collection.
+	 * 
+	 * @return true if the mapping is a map collection, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	boolean isMap();
 
 	/**
 	 * Returns the join SQL for the mapping.

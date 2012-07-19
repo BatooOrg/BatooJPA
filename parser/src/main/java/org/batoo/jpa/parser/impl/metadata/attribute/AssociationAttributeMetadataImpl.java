@@ -31,6 +31,7 @@ import javax.persistence.JoinColumns;
 import javax.persistence.JoinTable;
 import javax.persistence.MapKey;
 import javax.persistence.MapKeyClass;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.MapKeyEnumerated;
 import javax.persistence.MapKeyTemporal;
 import javax.persistence.MapsId;
@@ -223,6 +224,29 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 			parsed.add(MapKeyClass.class);
 
 			return annotation.value().getName();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Handles the {@link MapKeyEnumerated} annotation.
+	 * 
+	 * @param member
+	 *            the member
+	 * @param parsed
+	 *            the list of annotations parsed
+	 * @return the map key value
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected ColumnMetadata handleMapKeyColumn(Member member, Set<Class<? extends Annotation>> parsed) {
+		final MapKeyColumn annotation = ReflectHelper.getAnnotation(member, MapKeyColumn.class);
+		if (annotation != null) {
+			parsed.add(MapKeyColumn.class);
+
+			return new ColumnMetadataImpl(this.getLocator(), annotation);
 		}
 
 		return null;

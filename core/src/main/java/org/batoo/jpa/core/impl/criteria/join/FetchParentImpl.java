@@ -39,6 +39,8 @@ import javax.persistence.metamodel.Type.PersistenceType;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.EntryImpl;
+import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl.MapSelectType;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
@@ -105,6 +107,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	private int nextTableAlias = 1;
 	private AbstractColumn[] columns;
 	private String[] fields;
+	private String keyColumnAlias;
 
 	/**
 	 * @param entity
@@ -130,15 +133,15 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	public FetchParentImpl(JoinedMapping<? super Z, ?, X> mapping) {
 		super();
 
+		this.mapping = mapping;
+
 		if (mapping.getType() instanceof EntityTypeImpl) {
 			this.entity = (EntityTypeImpl<X>) mapping.getType();
 			this.type = null;
-			this.mapping = null;
 		}
 		else {
 			this.type = mapping.getType();
 			this.entity = null;
-			this.mapping = mapping;
 		}
 	}
 
@@ -196,6 +199,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	@SuppressWarnings("unchecked")
 	public <Y> FetchImpl<X, Y> fetch(String attributeName, JoinType jt) {
 		Mapping<?, ?, ?> mapping = null;
+
 		if (this.entity instanceof EntityTypeImpl) {
 			mapping = this.entity.getRootMapping().getMapping(attributeName);
 		}
@@ -321,8 +325,26 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @author hceylan
 	 */
 	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean root) {
+		return this.generateSqlSelect(query, root, MapSelectType.VALUE);
+	}
+
+	/**
+	 * Returns the generated SQL fragment.
+	 * 
+	 * @param query
+	 *            the query
+	 * @param root
+	 *            if the generation is at root
+	 * @param selectType
+	 *            the select type
+	 * @return the generated SQL fragment
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean root, MapSelectType selectType) {
 		final List<String> selects = Lists.newArrayList();
-		selects.add(this.generateSqlSelectImpl(query, root));
+		selects.add(this.generateSqlSelectImpl(query, root, selectType));
 
 		for (final FetchImpl<X, ?> fetch : this.fetches) {
 			selects.add(fetch.generateSqlSelect(query, false));
@@ -331,7 +353,8 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		return Joiner.on(",\n\t").join(selects);
 	}
 
-	private void generateSqlSelectForElementCollection(CriteriaQueryImpl<?> query, List<String> selects, Map<AbstractColumn, String> fieldMap) {
+	private void generateSqlSelectForElementCollection(CriteriaQueryImpl<?> query, List<String> selects, Map<AbstractColumn, String> fieldMap,
+		MapSelectType selectType) {
 		int fieldNo = 0;
 
 		final List<String> fields1 = Lists.newArrayList();
@@ -339,18 +362,34 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		final CollectionTable table = (CollectionTable) this.mapping.getTable();
 		final String tableAlias = this.getTableAlias(query, table);
 
-		final Collection<AbstractColumn> columns1 = table.getColumns();
-		for (final AbstractColumn column : columns1) {
-			final String fieldAlias = tableAlias + "_F" + fieldNo++;
-
+		for (final AbstractColumn column : table.getColumns()) {
+			// we are not insterested in join columns at all
 			if (column instanceof JoinColumn) {
 				continue;
 			}
 
-			final String field = Joiner.on(".").skipNulls().join(tableAlias, column.getName());
-			fieldMap.put(column, fieldAlias);
+			// if we are selecting only keys and the there is a key column, we are only interested in key column
+			if ((selectType == MapSelectType.KEY) && (table.getKeyColumn() != null) && (table.getKeyColumn() != column)) {
+				continue;
+			}
 
+			// if we are selecting only values and the there is a key column, we are only interested in value columns
+			if ((selectType == MapSelectType.VALUE) && (table.getKeyColumn() == column)) {
+				continue;
+			}
+
+			final String fieldAlias = tableAlias + "_F" + fieldNo++;
+
+			final String field = Joiner.on(".").skipNulls().join(tableAlias, column.getName());
 			fields1.add(field + " AS " + fieldAlias);
+
+			// seperate out the key column from the rest
+			if (column == table.getKeyColumn()) {
+				this.keyColumnAlias = fieldAlias;
+			}
+			else {
+				fieldMap.put(column, fieldAlias);
+			}
 		}
 
 		selects.add(Joiner.on(", ").join(fields1));
@@ -395,7 +434,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		selects.add(Joiner.on(", ").join(fields1));
 	}
 
-	private String generateSqlSelectImpl(CriteriaQueryImpl<?> query, boolean root) {
+	private String generateSqlSelectImpl(CriteriaQueryImpl<?> query, boolean root, MapSelectType selectType) {
 		final List<String> selects = Lists.newArrayList();
 		final Map<AbstractColumn, String> fieldMap = Maps.newHashMap();
 
@@ -405,7 +444,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			}
 		}
 		else {
-			this.generateSqlSelectForElementCollection(query, selects, fieldMap);
+			this.generateSqlSelectForElementCollection(query, selects, fieldMap, selectType);
 		}
 
 		this.columns = new AbstractColumn[fieldMap.size()];
@@ -689,24 +728,47 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @since $version
 	 * @author hceylan
 	 */
+	@SuppressWarnings("unchecked")
 	public X handle(SessionImpl session, ResultSet row) throws SQLException {
-		return this.handleFetch(session, row).getInstance();
+		return (X) this.handle(session, row, MapSelectType.VALUE).getValue().getInstance();
+	}
+
+	/**
+	 * Handles the row.
+	 * 
+	 * @param session
+	 *            the session
+	 * @param row
+	 *            the current row
+	 * @param selectType
+	 *            the map select type
+	 * @return the instance
+	 * @throws SQLException
+	 *             thrown in case of an underlying SQL Error
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public EntryImpl<Object, ManagedInstance<?>> handle(SessionImpl session, ResultSet row, MapSelectType selectType) throws SQLException {
+		return this.handleFetch(session, row, selectType);
 	}
 
 	private void handleAssociationFetch(SessionImpl session, final ResultSet row, ManagedInstance<? extends X> instance, final FetchImpl<X, ?> fetch)
 		throws SQLException {
-		final ManagedInstance<?> child = fetch.handleFetch(session, row);
 
+		final EntryImpl<Object, ManagedInstance<?>> pair = fetch.handleFetch(session, row, MapSelectType.ENTRY);
 		// if null then continue
-		if (child == null) {
+		if (pair == null) {
 			return;
 		}
+
+		final ManagedInstance<?> child = pair.getValue();
 
 		final AssociationMapping<? super X, ?, ?> mapping = (AssociationMapping<? super X, ?, ?>) fetch.getMapping();
 
 		if (mapping.getMappingType() == MappingType.PLURAL_ASSOCIATION) {
 			// if it is a plural association then we will test if we processed the child
-			if (((ManagedCollection<?>) mapping.get(instance.getInstance())).addChild(child.getInstance())) {
+			if (((ManagedCollection<?>) mapping.get(instance.getInstance())).addChild(pair)) {
 				// if it is a one-to-many mapping and has an inverse then set the inverses
 				if ((mapping.getInverse() != null) && //
 					(mapping.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_MANY)) {
@@ -727,9 +789,19 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	private X handleElement(ResultSet row) throws SQLException {
+		if (this.type.getPersistenceType() == PersistenceType.BASIC) {
+			return (X) row.getObject(this.fields[0]);
+		}
+
+		// TODO handle embeddables
+		return null;
+	}
+
 	private void handleElementCollectionFetch(SessionImpl session, ResultSet row, ManagedInstance<? extends X> instance, FetchImpl<X, ?> fetch)
 		throws SQLException {
-		final Object child = fetch.handleElementFetch(row);
+		final EntryImpl<Object, ?> child = fetch.handleElementFetch(row, MapSelectType.ENTRY);
 
 		// if null then continue
 		if (child == null) {
@@ -739,7 +811,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		final ElementCollectionMapping<? super X, ?, ?> mapping = (ElementCollectionMapping<? super X, ?, ?>) fetch.getMapping();
 
 		// if it is a plural association then we will test if we processed the child
-		((ManagedCollection<?>) mapping.get(instance.getInstance())).addChild(child);
+		((ManagedCollection<?>) mapping.get(instance.getInstance())).addElement(child);
 	}
 
 	/**
@@ -754,14 +826,42 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
-	public X handleElementFetch(ResultSet row) throws SQLException {
-		if (this.type.getPersistenceType() == PersistenceType.BASIC) {
-			return (X) row.getObject(this.fields[0]);
+	public EntryImpl<Object, X> handleElementFetch(ResultSet row) throws SQLException {
+		return this.handleElementFetch(row, MapSelectType.VALUE);
+	}
+
+	/**
+	 * Handles the row
+	 * 
+	 * @param row
+	 *            the row
+	 * @param selectType
+	 *            the select type
+	 * @return the collection element
+	 * @throws SQLException
+	 *             thrown in case of an underlying SQL Error
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public EntryImpl<Object, X> handleElementFetch(ResultSet row, MapSelectType selectType) throws SQLException {
+		if ((selectType == MapSelectType.VALUE) || !this.mapping.isMap()) {
+			return new EntryImpl<Object, X>(null, this.handleElement(row));
 		}
 
-		// TODO handle embeddables
-		return null;
+		if (this.keyColumnAlias != null) {
+			if (selectType == MapSelectType.KEY) {
+				return new EntryImpl<Object, X>(row.getObject(this.keyColumnAlias), null);
+			}
+			else {
+				return new EntryImpl<Object, X>(row.getObject(this.keyColumnAlias), this.handleElement(row));
+			}
+		}
+
+		final X value = this.handleElement(row);
+		final Object key = ((ElementCollectionMapping<? super Z, ?, X>) this.mapping).extractKey(value);
+
+		return new EntryImpl<Object, X>(key, value);
 	}
 
 	/**
@@ -771,6 +871,8 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 *            the session
 	 * @param row
 	 *            the current row
+	 * @param selectType
+	 *            the map select type
 	 * @return the instance
 	 * @throws SQLException
 	 *             thrown in case of an underlying SQL Error
@@ -778,7 +880,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedInstance<? extends X> handleFetch(SessionImpl session, ResultSet row) throws SQLException {
+	public EntryImpl<Object, ManagedInstance<?>> handleFetch(SessionImpl session, ResultSet row, MapSelectType selectType) throws SQLException {
 		// if instance is null then break
 		final ManagedInstance<? extends X> instance = this.getInstance(session, row);
 		if (instance == null) {
@@ -792,13 +894,23 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 
 		// if the instance is loading then continue processing
 		if (instance.isLoading()) {
-			return this.handleFetches(session, row, instance);
+			this.handleFetches(session, row, instance);
 		}
 
-		return instance;
+		if ((selectType == MapSelectType.VALUE) || (this.mapping == null) || !this.mapping.isMap()) {
+			return new EntryImpl<Object, ManagedInstance<?>>(null, instance);
+		}
+
+		if (this.keyColumnAlias != null) {
+			final Object key = row.getObject(this.keyColumnAlias);
+			return new EntryImpl<Object, ManagedInstance<?>>(key, instance);
+		}
+
+		final Object key = this.mapping.extractKey(instance.getInstance());
+		return new EntryImpl<Object, ManagedInstance<?>>(key, instance);
 	}
 
-	private ManagedInstance<? extends X> handleFetches(SessionImpl session, final ResultSet row, ManagedInstance<? extends X> instance) throws SQLException {
+	private void handleFetches(SessionImpl session, final ResultSet row, ManagedInstance<? extends X> instance) throws SQLException {
 		for (final FetchImpl<X, ?> fetch : this.fetches) {
 			if (fetch.getMapping().isAssociation()) {
 				this.handleAssociationFetch(session, row, instance, fetch);
@@ -807,8 +919,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 				this.handleElementCollectionFetch(session, row, instance, fetch);
 			}
 		}
-
-		return instance;
 	}
 
 	/**

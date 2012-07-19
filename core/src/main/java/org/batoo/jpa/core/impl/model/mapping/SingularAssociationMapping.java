@@ -107,11 +107,20 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 	 * 
 	 */
 	@Override
+	public Object extractKey(X value) {
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public void flush(ConnectionImpl connection, ManagedInstance<?> managedInstance, boolean removals, boolean force) throws SQLException {
 		if (this.getTable() != null) {
 			if (!removals) {
 				final X entity = this.get(managedInstance.getInstance());
-				this.getTable().performInsert(connection, managedInstance.getInstance(), entity, -1);
+				this.getTable().performInsert(connection, managedInstance.getInstance(), null, entity, -1);
 			}
 		}
 	}
@@ -195,6 +204,15 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 	@Override
 	public boolean isJoined() {
 		return (this.joinTable != null) || (this.foreignKey != null);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isMap() {
+		return false;
 	}
 
 	/**

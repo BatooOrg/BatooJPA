@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.collections;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -25,7 +26,10 @@ import java.util.Set;
 
 import javax.persistence.PersistenceException;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 
 import com.google.common.collect.Sets;
@@ -127,9 +131,27 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public boolean addChild(Object child) {
-		if (!this.delegate.contains(child)) {
-			return this.delegate.add((E) child);
+	public boolean addChild(EntryImpl<Object, ManagedInstance<?>> child) {
+		final E e = (E) child.getValue().getInstance();
+
+		if (!this.delegate.contains(e)) {
+			return this.delegate.add(e);
+		}
+
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public boolean addElement(EntryImpl<Object, ?> child) {
+		final E e = (E) child.getValue();
+
+		if (!this.delegate.contains(e)) {
+			return this.delegate.add(e);
 		}
 
 		return false;
@@ -181,6 +203,49 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 		this.initialize();
 
 		return this.delegate.equals(obj);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public void flush(ConnectionImpl connection, boolean removals, boolean force) throws SQLException {
+		if (this.removed(connection, removals)) {
+			return;
+		}
+
+		final ManagedInstance<?> managedInstance = this.getManagedInstance();
+		final PluralMapping<?, ?, E> mapping = this.getMapping();
+
+		// forced creation of relations for the new entities
+		if (force) {
+			for (final E child : this.delegate) {
+				mapping.attach(connection, managedInstance, null, child, -1);
+			}
+
+			return;
+		}
+
+		if (this.snapshot == null) {
+			return;
+		}
+
+		if (removals) {
+			// delete the removals
+			final Collection<E> childrenRemoved = CollectionUtils.subtract(this.snapshot, this.delegate);
+			for (final E child : childrenRemoved) {
+				mapping.detach(connection, managedInstance, null, child);
+			}
+		}
+		else {
+			// create the additions
+			final Collection<E> childrenAdded = CollectionUtils.subtract(this.delegate, this.snapshot);
+			for (final E child : childrenAdded) {
+				mapping.attach(connection, managedInstance, null, child, -1);
+			}
+		}
 	}
 
 	/**
@@ -268,13 +333,13 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 * 
 	 */
 	@Override
-	public void refreshChildren(Collection<? extends E> children) {
+	public void refreshChildren() {
 		this.reset();
 
 		this.snapshot = null;
 
 		this.delegate.clear();
-		this.delegate.addAll(children);
+		this.delegate.addAll(this.getMapping().loadCollection(this.getManagedInstance()));
 	}
 
 	/**

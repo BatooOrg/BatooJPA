@@ -65,6 +65,16 @@ public interface PluralAttributeMetadata {
 	String getMapKeyClassName();
 
 	/**
+	 * Returns the map key column definition.
+	 * 
+	 * @return the map key column definition
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	ColumnMetadata getMapKeyColumn();
+
+	/**
 	 * Returns the enum type of the map key.
 	 * 
 	 * @return the enum type of the map key

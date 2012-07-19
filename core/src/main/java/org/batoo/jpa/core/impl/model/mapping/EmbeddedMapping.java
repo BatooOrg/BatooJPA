@@ -69,6 +69,15 @@ public class EmbeddedMapping<Z, X> extends ParentMapping<Z, X> implements Singul
 	 * 
 	 */
 	@Override
+	public Object extractKey(X value) {
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public boolean fillValue(EntityTypeImpl<?> type, ManagedInstance<?> managedInstance, Object instance) {
 		X value = this.get(instance);
 		if (value == null) {
@@ -240,6 +249,15 @@ public class EmbeddedMapping<Z, X> extends ParentMapping<Z, X> implements Singul
 	@Override
 	public boolean isJoined() {
 		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isMap() {
+		return false;
 	}
 
 	/**

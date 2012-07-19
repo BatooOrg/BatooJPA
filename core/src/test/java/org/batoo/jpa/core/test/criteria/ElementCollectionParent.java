@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.test.criteria;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.CollectionTable;
@@ -33,6 +34,7 @@ import javax.persistence.Id;
 import org.batoo.jpa.core.test.enums.Foo.FooType;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 /**
@@ -70,6 +72,10 @@ public class ElementCollectionParent {
 	@CollectionTable(name = "CODES4")
 	@Enumerated(EnumType.STRING)
 	private final Set<FooType> codes4 = Sets.newHashSet();
+
+	@ElementCollection
+	@CollectionTable(name = "MAP")
+	private final Map<String, String> codes5 = Maps.newHashMap();
 
 	private String value;
 
@@ -117,6 +123,18 @@ public class ElementCollectionParent {
 	 */
 	public Set<FooType> getCodes4() {
 		return this.codes4;
+	}
+
+	/**
+	 * Returns the codes5 of the ElementCollectionParent.
+	 * 
+	 * @return the codes5 of the ElementCollectionParent
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Map<String, String> getCodes5() {
+		return this.codes5;
 	}
 
 	/**

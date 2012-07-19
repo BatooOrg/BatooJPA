@@ -76,7 +76,7 @@ public class CollectionJoinImpl<Z, E> extends AbstractJoin<Z, E> implements Coll
 	@Override
 	@SuppressWarnings("unchecked")
 	public CollectionAttribute<? super Z, E> getModel() {
-		return (CollectionAttribute<? super Z, E>) this.getMapping().getAttribute();
+		return (CollectionAttribute<? super Z, E>) this.getAttribute();
 	}
 
 	/**

@@ -44,6 +44,7 @@ public class ManyToManyAttributeMetadataImpl extends AssociationAttributeMetadat
 	private final String mappedBy;
 	private final String mapKey;
 	private final String mapKeyClassName;
+	private final ColumnMetadata mapKeyColumn;
 	private final EnumType mapKeyEnumType;
 	private final TemporalType mapKeyTemporalType;
 	private final String orderBy;
@@ -65,6 +66,7 @@ public class ManyToManyAttributeMetadataImpl extends AssociationAttributeMetadat
 		this.mappedBy = metadata.getMappedBy();
 		this.mapKey = metadata.getMapKey();
 		this.mapKeyClassName = metadata.getMapKeyClassName();
+		this.mapKeyColumn = metadata.getMapKeyColumn();
 		this.mapKeyEnumType = metadata.getMapKeyEnumType();
 		this.mapKeyTemporalType = metadata.getMapKeyTemporalType();
 		this.mapKeyAttributeOverrides.addAll(metadata.getMapKeyAttributeOverrides());
@@ -93,6 +95,7 @@ public class ManyToManyAttributeMetadataImpl extends AssociationAttributeMetadat
 		this.mappedBy = manyToMany.mappedBy();
 		this.mapKey = this.handleMapKey(member, parsed);
 		this.mapKeyClassName = this.handleMapKeyClassName(member, parsed);
+		this.mapKeyColumn = this.handleMapKeyColumn(member, parsed);
 		this.mapKeyEnumType = this.handleMapKeyEnumType(member, parsed);
 		this.mapKeyTemporalType = this.handleMapKeyTemporalType(member, parsed);
 		this.orderBy = this.handleOrderBy(member, parsed);
@@ -124,6 +127,15 @@ public class ManyToManyAttributeMetadataImpl extends AssociationAttributeMetadat
 	@Override
 	public String getMapKeyClassName() {
 		return this.mapKeyClassName;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public ColumnMetadata getMapKeyColumn() {
+		return this.mapKeyColumn;
 	}
 
 	/**

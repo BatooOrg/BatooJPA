@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.model.mapping;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Map;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
@@ -47,6 +48,8 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 *            the connection
 	 * @param instance
 	 *            the instance
+	 * @param key
+	 *            the key, may be null
 	 * @param child
 	 *            the child
 	 * @param index
@@ -57,7 +60,7 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	void attach(ConnectionImpl connection, ManagedInstance<?> instance, Object child, int index) throws SQLException;
+	void attach(ConnectionImpl connection, ManagedInstance<?> instance, Object key, Object child, int index) throws SQLException;
 
 	/**
 	 * Returns if merges are cascaded.
@@ -76,6 +79,8 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 *            the connection
 	 * @param instance
 	 *            the instance
+	 * @param key
+	 *            the key, may be null
 	 * @param child
 	 *            the child
 	 * @throws SQLException
@@ -84,7 +89,7 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	void detach(ConnectionImpl connection, ManagedInstance<?> instance, Object child) throws SQLException;
+	void detach(ConnectionImpl connection, ManagedInstance<?> instance, Object key, Object child) throws SQLException;
 
 	/**
 	 * Details all the children.
@@ -177,6 +182,19 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @author hceylan
 	 */
 	Collection<? extends E> loadCollection(ManagedInstance<?> instance);
+
+	/**
+	 * Loads and returns the map
+	 * 
+	 * @param instance
+	 * @return the loaded map
+	 * @param <K>
+	 *            the key type of the map
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	<K> Map<? extends K, ? extends E> loadMap(ManagedInstance<?> instance);
 
 	/**
 	 * Sets the lazy instance for the collection

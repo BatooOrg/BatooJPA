@@ -251,6 +251,18 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	}
 
 	/**
+	 * Returns the entity of the from.
+	 * 
+	 * @return the entity of the from
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public EntityTypeImpl<X> getEntity() {
+		return this.entity;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -293,7 +305,7 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	protected Mapping<?, ?, X> getMapping() {
+	public Mapping<?, ?, X> getMapping() {
 		if (this.entity != null) {
 			return this.entity.getRootMapping();
 		}
@@ -311,7 +323,7 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 			return this.fetchRoot.handle(session, row);
 		}
 
-		return this.fetchRoot.handleElementFetch(row);
+		return this.fetchRoot.handleElementFetch(row).getValue();
 	}
 
 	/**

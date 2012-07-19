@@ -28,6 +28,7 @@ import java.util.ListIterator;
 import javax.persistence.PersistenceException;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
@@ -274,9 +275,27 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public boolean addChild(Object child) {
-		if (!this.delegate.contains(child)) {
-			return this.delegate.add((E) child);
+	public boolean addChild(EntryImpl<Object, ManagedInstance<?>> child) {
+		final E e = (E) child.getValue().getInstance();
+
+		if (!this.delegate.contains(e)) {
+			return this.delegate.add(e);
+		}
+
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public boolean addElement(EntryImpl<Object, ?> child) {
+		final E e = (E) child.getValue();
+
+		if (!this.delegate.contains(e)) {
+			return this.delegate.add(e);
 		}
 
 		return false;
@@ -347,7 +366,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 		// forced creation of relations for the new entities
 		if (force) {
 			for (int i = 0; i < this.delegate.size(); i++) {
-				mapping.attach(connection, instance, this.delegate.get(i), i);
+				mapping.attach(connection, instance, null, this.delegate.get(i), i);
 			}
 
 			return;
@@ -363,7 +382,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 		else {
 			// create the additions
 			for (int i = 0; i < this.delegate.size(); i++) {
-				mapping.attach(connection, instance, this.delegate.get(i), i);
+				mapping.attach(connection, instance, null, this.delegate.get(i), i);
 			}
 		}
 	}
@@ -523,13 +542,13 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 * 
 	 */
 	@Override
-	public void refreshChildren(Collection<? extends E> children) {
+	public void refreshChildren() {
 		super.reset();
 
 		this.snapshot = null;
 
 		this.delegate.clear();
-		this.delegate.addAll(children);
+		this.delegate.addAll(this.getMapping().loadCollection(this.getManagedInstance()));
 	}
 
 	/**

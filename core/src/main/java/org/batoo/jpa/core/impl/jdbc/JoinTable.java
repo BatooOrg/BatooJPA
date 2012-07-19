@@ -22,6 +22,8 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 
+import javax.persistence.EnumType;
+import javax.persistence.TemporalType;
 import javax.persistence.criteria.JoinType;
 
 import org.apache.commons.dbutils.QueryRunner;
@@ -52,6 +54,7 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 	private JoinColumn[] sourceRemoveColumns;
 	private JoinColumn[] destinationRemoveColumns;
 	private JoinColumn[] removeAllColumns;
+	private MapKeyColumn keyColumn;
 
 	/**
 	 * @param entity
@@ -217,7 +220,7 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 	 * 
 	 */
 	@Override
-	public void performInsert(ConnectionImpl connection, Object source, Object destination, int order) throws SQLException {
+	public void performInsert(ConnectionImpl connection, Object source, Object key, Object destination, int order) throws SQLException {
 		final String insertSql = this.getInsertSql(null);
 		final AbstractColumn[] insertColumns = this.getInsertColumns(null);
 
@@ -243,7 +246,7 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 	 * 
 	 */
 	@Override
-	public void performRemove(ConnectionImpl connection, Object source, Object destination) throws SQLException {
+	public void performRemove(ConnectionImpl connection, Object source, Object key, Object destination) throws SQLException {
 		final String removeSql = this.getRemoveSql();
 
 		final Object[] params = new Object[this.sourceKey.getJoinColumns().size() + this.destinationKey.getJoinColumns().size()];
@@ -276,6 +279,27 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 		}
 
 		new QueryRunner().update(connection, removeAllSql, params);
+	}
+
+	/**
+	 * Sets the map key column.
+	 * 
+	 * @param mapKeyColumn
+	 *            the map key column definition
+	 * @param name
+	 *            the name of the column
+	 * @param mapKeyTemporalType
+	 *            the temporal type of the map key
+	 * @param mapKeyEnumType
+	 *            the enum type of the map key
+	 * @param mapKeyJavaType
+	 *            the java type of the map's key
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setKeyColumn(ColumnMetadata mapKeyColumn, String name, TemporalType mapKeyTemporalType, EnumType mapKeyEnumType, Class<?> mapKeyJavaType) {
+		this.keyColumn = new MapKeyColumn(this, mapKeyColumn, name, mapKeyTemporalType, mapKeyEnumType, mapKeyJavaType);
 	}
 
 	/**

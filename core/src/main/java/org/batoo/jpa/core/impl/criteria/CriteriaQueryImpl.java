@@ -373,8 +373,9 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 */
 	@Override
 	public CriteriaQuery<T> multiselect(List<Selection<?>> selectionList) {
-		// TODO Auto-generated method stub
-		return null;
+		this.selection = new CompoundSelectionImpl<T>(this.getResultType(), selectionList);
+
+		return this;
 	}
 
 	/**
@@ -382,9 +383,10 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 * 
 	 */
 	@Override
-	public CriteriaQuery<T> multiselect(Selection<?>... selections) {
-		// TODO Auto-generated method stub
-		return null;
+	public CriteriaQueryImpl<T> multiselect(Selection<?>... selections) {
+		this.selection = new CompoundSelectionImpl<T>(this.getResultType(), selections);
+
+		return this;
 	}
 
 	/**

@@ -35,6 +35,8 @@ public interface JoinableTable {
 	 *            the connection
 	 * @param source
 	 *            the source instance
+	 * @param key
+	 *            the key object
 	 * @param destination
 	 *            the destination instance
 	 * @param order
@@ -46,7 +48,7 @@ public interface JoinableTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	void performInsert(ConnectionImpl connection, Object source, Object destination, int order) throws SQLException;
+	void performInsert(ConnectionImpl connection, Object source, Object key, Object destination, int order) throws SQLException;
 
 	/**
 	 * Performs the remove for the join.
@@ -55,6 +57,8 @@ public interface JoinableTable {
 	 *            the connection
 	 * @param source
 	 *            the source instance
+	 * @param key
+	 *            the key object
 	 * @param destination
 	 *            the destination instance
 	 * 
@@ -64,7 +68,7 @@ public interface JoinableTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	void performRemove(ConnectionImpl connection, Object source, Object destination) throws SQLException;
+	void performRemove(ConnectionImpl connection, Object source, Object key, Object destination) throws SQLException;
 
 	/**
 	 * Performs the remove for the join.

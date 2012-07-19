@@ -523,6 +523,8 @@ public class ForeignKey {
 	 *            the connection
 	 * @param instance
 	 *            the instance
+	 * @param key
+	 *            the key object
 	 * @param child
 	 *            the child
 	 * @param index
@@ -533,7 +535,7 @@ public class ForeignKey {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performAttachChild(ConnectionImpl connection, ManagedInstance<?> instance, Object child, int index) throws SQLException {
+	public void performAttachChild(ConnectionImpl connection, ManagedInstance<?> instance, Object key, Object child, int index) throws SQLException {
 		final String sql = this.getSingleChildSql();
 
 		final Object[] parameters = new Object[this.singleChildUpdates.length + this.singleChildRestrictions.length];
@@ -586,6 +588,8 @@ public class ForeignKey {
 	 * 
 	 * @param connection
 	 *            the connection
+	 * @param key
+	 *            the key object
 	 * @param child
 	 *            the child
 	 * @throws SQLException
@@ -594,7 +598,7 @@ public class ForeignKey {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performDetachChild(ConnectionImpl connection, Object child) throws SQLException {
+	public void performDetachChild(ConnectionImpl connection, Object key, Object child) throws SQLException {
 		final String sql = this.getSingleChildSql();
 
 		final Object[] parameters = new Object[this.singleChildUpdates.length + this.singleChildRestrictions.length];

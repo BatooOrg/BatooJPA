@@ -133,7 +133,7 @@ public class PluralAssociationPath<Z, X> extends AbstractPath<X> implements Join
 	 * 
 	 */
 	@Override
-	protected PluralAssociationMapping<?, ?, X> getMapping() {
+	public PluralAssociationMapping<?, ?, X> getMapping() {
 		return this.mapping;
 	}
 

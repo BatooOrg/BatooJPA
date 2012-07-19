@@ -24,6 +24,7 @@ import java.util.IdentityHashMap;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.mutable.MutableBoolean;
+import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.Status;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
@@ -81,7 +82,19 @@ public abstract class ManagedCollection<E> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract boolean addChild(Object child);
+	public abstract boolean addChild(EntryImpl<Object, ManagedInstance<?>> child);
+
+	/**
+	 * Adds the child to the managed list without initialize checks.
+	 * 
+	 * @param child
+	 *            the child to add
+	 * @return if the child is added
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract boolean addElement(EntryImpl<Object, ?> child);
 
 	/**
 	 * Marks the collection as changed.
@@ -112,42 +125,7 @@ public abstract class ManagedCollection<E> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
-	public void flush(ConnectionImpl connection, boolean removals, boolean force) throws SQLException {
-
-		if (this.removed(connection, removals)) {
-			return;
-		}
-
-		// forced creation of relations for the new entities
-		if (force) {
-			for (final E child : this.getDelegate()) {
-				this.mapping.attach(connection, this.managedInstance, child, -1);
-			}
-
-			return;
-		}
-
-		final Collection<E> snapshot = this.getSnapshot();
-		if (snapshot == null) {
-			return;
-		}
-
-		if (removals) {
-			// delete the removals
-			final Collection<E> childrenRemoved = CollectionUtils.subtract(snapshot, this.getDelegate());
-			for (final E child : childrenRemoved) {
-				this.mapping.detach(connection, this.managedInstance, child);
-			}
-		}
-		else {
-			// create the additions
-			final Collection<E> childrenAdded = CollectionUtils.subtract(this.getDelegate(), snapshot);
-			for (final E child : childrenAdded) {
-				this.mapping.attach(connection, this.managedInstance, child, -1);
-			}
-		}
-	}
+	public abstract void flush(ConnectionImpl connection, boolean removals, boolean force) throws SQLException;
 
 	/**
 	 * Returns the delegate collection.
@@ -236,10 +214,11 @@ public abstract class ManagedCollection<E> {
 
 		final SessionImpl session = entityManager.getSession();
 
+		// TODO needs to be overriden by ManagedMap
 		// add the new children
 		for (final E child : mergedChildren) {
 			if (!delegate.contains(child)) {
-				this.addChild(child);
+				this.getDelegate().add(child);
 
 				if (this.inverse != null) {
 					this.inverse.set(session.get(child), this.managedInstance.getInstance());
@@ -287,13 +266,10 @@ public abstract class ManagedCollection<E> {
 	/**
 	 * Refreshes the children of the managed collection.
 	 * 
-	 * @param children
-	 *            the new children
-	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract void refreshChildren(Collection<? extends E> children);
+	public abstract void refreshChildren();
 
 	/**
 	 * Removes the child from the managed list without initialize checks.

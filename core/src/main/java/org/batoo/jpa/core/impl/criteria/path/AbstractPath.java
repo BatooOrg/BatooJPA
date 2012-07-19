@@ -60,7 +60,7 @@ public abstract class AbstractPath<X> extends AbstractExpression<X> implements P
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AbstractPath(Path<?> parent, Class<X> javaType) {
+	public AbstractPath(ParentPath<?, ?> parent, Class<X> javaType) {
 		super(javaType);
 
 		this.parent = (AbstractPath<?>) parent;
@@ -131,7 +131,7 @@ public abstract class AbstractPath<X> extends AbstractExpression<X> implements P
 
 		// generate and return
 		if (mapping instanceof BasicMapping) {
-			path = new BasicPath<Y>(this, (BasicMapping<? super X, Y>) mapping);
+			path = new BasicPath<Y>((ParentPath<?, ?>) this, (BasicMapping<? super X, Y>) mapping);
 		}
 		else if (mapping instanceof PluralAssociationMapping) {
 			path = new PluralAssociationPath<X, Y>((ParentPath<?, X>) this, (PluralAssociationMapping<X, ?, Y>) mapping);
@@ -153,7 +153,7 @@ public abstract class AbstractPath<X> extends AbstractExpression<X> implements P
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected abstract Mapping<?, ?, X> getMapping();
+	public abstract Mapping<?, ?, X> getMapping();
 
 	/**
 	 * {@inheritDoc}

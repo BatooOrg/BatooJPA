@@ -50,13 +50,13 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	private final ForeignKey key;
 
 	private OrderColumn orderColumn;
-	private TypeImpl<?> type;
 	private ElementColumn elementColumn;
 
 	private String removeSql;
 	private String removeAllSql;
 	private AbstractColumn[] removeColumns;
 	private JoinColumn[] removeAllColumns;
+	private MapKeyColumn keyColumn;
 
 	/**
 	 * @param entity
@@ -85,6 +85,18 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	 */
 	public ForeignKey getKey() {
 		return this.key;
+	}
+
+	/**
+	 * Returns the key column of the collection table.
+	 * 
+	 * @return the key column of the collection table
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public MapKeyColumn getKeyColumn() {
+		return this.keyColumn;
 	}
 
 	private String getRemoveAllSql() {
@@ -153,8 +165,6 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 			this.setName(defaultName);
 		}
 
-		this.type = type;
-
 		this.key.link(null, this.entity);
 		this.key.setTable(this);
 
@@ -183,8 +193,6 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 			this.setName(this.entity.getName() + "_" + defaultName);
 		}
 
-		this.type = type;
-
 		this.key.link(null, this.entity);
 		this.key.setTable(this);
 
@@ -203,7 +211,7 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	 * 
 	 */
 	@Override
-	public void performInsert(ConnectionImpl connection, Object source, Object destination, int order) throws SQLException {
+	public void performInsert(ConnectionImpl connection, Object source, Object key, Object destination, int order) throws SQLException {
 		final String insertSql = this.getInsertSql(null);
 		final AbstractColumn[] insertColumns = this.getInsertColumns(null);
 
@@ -214,6 +222,9 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 
 			if (column == this.orderColumn) {
 				params[i] = order;
+			}
+			else if (column == this.keyColumn) {
+				params[i] = key;
 			}
 			else if (this.elementColumn == column) {
 				params[i] = this.elementColumn.getValue(destination);
@@ -231,7 +242,7 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	 * 
 	 */
 	@Override
-	public void performRemove(ConnectionImpl connection, Object source, Object destination) throws SQLException {
+	public void performRemove(ConnectionImpl connection, Object source, Object key, Object destination) throws SQLException {
 		final String removeSql = this.getRemoveSql();
 
 		final Object[] params = new Object[this.removeColumns.length];
@@ -240,6 +251,9 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 		for (final AbstractColumn column : this.removeColumns) {
 			if (column instanceof ElementColumn) {
 				params[i++] = column.getValue(destination);
+			}
+			else if (column == this.keyColumn) {
+				params[i++] = key;
 			}
 			else {
 				params[i++] = column.getValue(source);
@@ -265,6 +279,27 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 		}
 
 		new QueryRunner().update(connection, removeAllSql, params);
+	}
+
+	/**
+	 * Sets the map key column.
+	 * 
+	 * @param mapKeyColumn
+	 *            the map key column definition
+	 * @param name
+	 *            the name of the column
+	 * @param mapKeyTemporalType
+	 *            the temporal type of the map key
+	 * @param mapKeyEnumType
+	 *            the enum type of the map key
+	 * @param mapKeyJavaType
+	 *            the java type of the map's key
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setKeyColumn(ColumnMetadata mapKeyColumn, String name, TemporalType mapKeyTemporalType, EnumType mapKeyEnumType, Class<?> mapKeyJavaType) {
+		this.keyColumn = new MapKeyColumn(this, mapKeyColumn, name, mapKeyTemporalType, mapKeyEnumType, mapKeyJavaType);
 	}
 
 	/**

@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.collections;
 
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,14 +26,11 @@ import java.util.Set;
 
 import javax.persistence.PersistenceException;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
-import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
-import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
+import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
-import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
-import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
-import org.batoo.jpa.core.util.Pair;
 
 import com.google.common.collect.Maps;
 
@@ -53,11 +51,8 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 
 	private final HashMap<K, V> delegate = Maps.newHashMap();
 	private HashMap<K, V> snapshot;
-	private SingularMapping<? super V, ?> keyMapping;
-	private Pair<BasicMapping<? super V, ?>, BasicAttribute<?, ?>>[] keyMappings;
 
 	private boolean initialized;
-	private EmbeddableTypeImpl<K> keyClass;
 
 	/**
 	 * Constructor for lazy initialization.
@@ -72,22 +67,10 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
 	public ManagedMap(PluralMapping<?, ?, V> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
 		super(mapping, managedInstance);
 
 		this.initialized = !lazy;
-		if (mapping instanceof PluralAssociationMapping) {
-			final PluralAssociationMapping<?, ?, V> pluralAssociationMapping = (PluralAssociationMapping<?, ?, V>) mapping;
-
-			this.keyMapping = pluralAssociationMapping.getMapKeyIdMapping();
-			this.keyMappings = pluralAssociationMapping.getMapKeyIdMappings();
-		}
-		else {
-			this.keyMapping = null;
-			this.keyMappings = null;
-		}
-		this.keyClass = (EmbeddableTypeImpl<K>) mapping.getMapKeyClass();
 	}
 
 	/**
@@ -104,7 +87,7 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	 * @author hceylan
 	 */
 	public ManagedMap(PluralMapping<?, ?, V> mapping, ManagedInstance<?> managedInstance, Map<? extends K, ? extends V> values) {
-		super(mapping, managedInstance);
+		this(mapping, managedInstance, false);
 
 		this.delegate.putAll(values);
 
@@ -117,25 +100,36 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public boolean addChild(Object child) {
-		if (this.delegate.values().contains(child)) {
-			return false;
+	public boolean addChild(EntryImpl<Object, ManagedInstance<?>> child) {
+		final K k = (K) child.getKey();
+		final V v = (V) child.getValue().getInstance();
+
+		if (!this.delegate.keySet().contains(k) && !this.delegate.values().contains(v)) {
+			this.delegate.put(k, v);
+
+			return true;
 		}
 
-		Object key = null;
-		if (this.keyMapping != null) {
-			key = this.keyMapping.get(child);
-		}
-		else {
-			key = this.keyClass.newInstance();
-			for (final Pair<BasicMapping<? super V, ?>, BasicAttribute<?, ?>> pair : this.keyMappings) {
-				pair.getSecond().set(key, pair.getFirst().get(child));
-			}
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public boolean addElement(EntryImpl<Object, ?> child) {
+		final K k = (K) child.getKey();
+		final V v = (V) child.getValue();
+
+		if (!this.delegate.keySet().contains(k) && !this.delegate.values().contains(v)) {
+			this.delegate.put(k, v);
+
+			return true;
 		}
 
-		this.delegate.put((K) key, (V) child);
-
-		return true;
+		return false;
 	}
 
 	/**
@@ -188,6 +182,49 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
+	public void flush(ConnectionImpl connection, boolean removals, boolean force) throws SQLException {
+		if (this.removed(connection, removals)) {
+			return;
+		}
+
+		final ManagedInstance<?> managedInstance = this.getManagedInstance();
+		final PluralMapping<?, ?, V> mapping = this.getMapping();
+
+		// forced creation of relations for the new entities
+		if (force) {
+			for (final Entry<K, V> entry : this.delegate.entrySet()) {
+				mapping.attach(connection, managedInstance, entry.getKey(), entry.getValue(), -1);
+			}
+
+			return;
+		}
+
+		if (this.snapshot == null) {
+			return;
+		}
+
+		if (removals) {
+			// delete the removals
+			final Collection<K> childrenRemoved = CollectionUtils.subtract(this.snapshot.keySet(), this.delegate.keySet());
+			for (final K key : childrenRemoved) {
+				mapping.detach(connection, managedInstance, key, this.snapshot.get(key));
+			}
+		}
+		else {
+			// create the additions
+			final Collection<K> childrenAdded = CollectionUtils.subtract(this.delegate.keySet(), this.snapshot.keySet());
+			for (final K key : childrenAdded) {
+				mapping.attach(connection, managedInstance, key, this.delegate.get(key), -1);
+			}
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public V get(Object key) {
 		this.initialize();
 
@@ -223,7 +260,7 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 				throw new PersistenceException("No session to initialize the collection");
 			}
 
-			this.putAll(this.getMapping().loadCollection(this.getManagedInstance()));
+			this.delegate.putAll(this.getMapping().<K> loadMap(this.getManagedInstance()));
 
 			this.initialized = true;
 		}
@@ -268,26 +305,19 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 			throw new NullPointerException();
 		}
 
-		V v = this.delegate.get(key);
-		if (v.equals(value) && (v != value)) {
-			return this.delegate.put(key, value);
+		if (this.delegate.values().contains(value)) {
+			throw this.noDuplicates();
 		}
 
 		if (this.delegate.values().contains(key)) {
 			throw this.noDuplicates();
 		}
 
-		v = this.delegate.put(key, value);
+		final V v = this.delegate.put(key, value);
 
 		this.changed();
 
 		return v;
-	}
-
-	private void putAll(Collection<? extends V> children) {
-		for (final V child : children) {
-			this.addChild(child);
-		}
 	}
 
 	/**
@@ -308,13 +338,13 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	 * 
 	 */
 	@Override
-	public void refreshChildren(Collection<? extends V> children) {
+	public void refreshChildren() {
 		super.reset();
 
 		this.snapshot = null;
-
 		this.delegate.clear();
-		this.putAll(children);
+
+		this.delegate.putAll(this.getMapping().<K> loadMap(this.getManagedInstance()));
 	}
 
 	/**
