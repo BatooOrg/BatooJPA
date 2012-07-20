@@ -92,7 +92,7 @@ public class SecondaryTable extends EntityTable {
 	 */
 	public void link() {
 		if (this.foreignKey == null) {
-			this.foreignKey = new ForeignKey(this, this.getEntity(), this.metadata);
+			this.foreignKey = new ForeignKey(this.getJdbcAdaptor(), this, this.getEntity(), this.metadata);
 		}
 	}
 }

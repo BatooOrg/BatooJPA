@@ -18,7 +18,6 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
@@ -36,6 +35,7 @@ import org.batoo.jpa.parser.metadata.PrimaryKeyJoinColumnMetadata;
  */
 public class JoinColumn extends AbstractColumn {
 
+	private final JdbcAdaptor jdbcAdaptor;
 	private final AbstractLocator locator;
 	private AbstractTable table;
 
@@ -61,6 +61,8 @@ public class JoinColumn extends AbstractColumn {
 	/**
 	 * Constructor with no metadata.
 	 * 
+	 * @param jdbcAdaptor
+	 *            the JDBC Adaptor
 	 * @param mapping
 	 *            the mapping
 	 * @param idMapping
@@ -69,9 +71,10 @@ public class JoinColumn extends AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public JoinColumn(AssociationMapping<?, ?, ?> mapping, BasicMapping<?, ?> idMapping) {
+	public JoinColumn(JdbcAdaptor jdbcAdaptor, AssociationMapping<?, ?, ?> mapping, BasicMapping<?, ?> idMapping) {
 		super();
 
+		this.jdbcAdaptor = jdbcAdaptor;
 		this.mapping = mapping;
 		this.locator = null;
 
@@ -88,6 +91,8 @@ public class JoinColumn extends AbstractColumn {
 	/**
 	 * Constructor for inheritance and secondary table joins.
 	 * 
+	 * @param jdbcAdaptor
+	 *            the JDBC Adaptor
 	 * @param table
 	 *            the table
 	 * @param idMapping
@@ -96,9 +101,10 @@ public class JoinColumn extends AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public JoinColumn(EntityTable table, BasicMapping<?, ?> idMapping) {
+	public JoinColumn(JdbcAdaptor jdbcAdaptor, EntityTable table, BasicMapping<?, ?> idMapping) {
 		super();
 
+		this.jdbcAdaptor = jdbcAdaptor;
 		this.locator = null;
 		this.referencedMapping = idMapping;
 		final PkColumn referencedColumn = (PkColumn) idMapping.getColumn();
@@ -120,15 +126,18 @@ public class JoinColumn extends AbstractColumn {
 	/**
 	 * Constructor with metadata.
 	 * 
+	 * @param jdbcAdaptor
+	 *            the JDBC adaptor
 	 * @param metadata
 	 *            the metadata for the join
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public JoinColumn(JoinColumnMetadata metadata) {
+	public JoinColumn(JdbcAdaptor jdbcAdaptor, JoinColumnMetadata metadata) {
 		super();
 
+		this.jdbcAdaptor = jdbcAdaptor;
 		this.locator = metadata.getLocator();
 
 		this.referencedColumnName = metadata.getReferencedColumnName();
@@ -143,6 +152,8 @@ public class JoinColumn extends AbstractColumn {
 	/**
 	 * Constructor for secondary table join column with metadata.
 	 * 
+	 * @param jdbcAdaptor
+	 *            the JDBC Adaptor
 	 * @param metadata
 	 *            the metadata for the join
 	 * @param table
@@ -153,9 +164,10 @@ public class JoinColumn extends AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public JoinColumn(PrimaryKeyJoinColumnMetadata metadata, SecondaryTable table, BasicMapping<?, ?> idMapping) {
+	public JoinColumn(JdbcAdaptor jdbcAdaptor, PrimaryKeyJoinColumnMetadata metadata, SecondaryTable table, BasicMapping<?, ?> idMapping) {
 		super();
 
+		this.jdbcAdaptor = jdbcAdaptor;
 		this.locator = metadata.getLocator();
 		this.tableName = table.getName();
 
@@ -396,17 +408,16 @@ public class JoinColumn extends AbstractColumn {
 	 * @author hceylan
 	 */
 	public void setColumnProperties(AssociationMapping<?, ?, ?> mapping, BasicMapping<?, ?> referencedMapping) {
-		final JdbcAdaptor jdbcAdaptor = referencedMapping.getEntity().getMetamodel().getJdbcAdaptor();
-
 		// if attribute present then the join column belongs to an entity table
 		if (mapping != null) {
 			this.mapping = mapping;
 			this.mappingName = mapping.getName() + "_" + referencedMapping.getColumn().getName();
-			this.name = jdbcAdaptor.escape(this.mappingName);
+			this.name = this.jdbcAdaptor.escape(this.mappingName);
 		}
 		else {
-			this.mappingName = ((EntityTypeImpl<?>) referencedMapping.getEntity()).getName() + "_" + referencedMapping.getColumn().getName();
-			this.name = jdbcAdaptor.escape(this.mappingName);
+			final EntityTypeImpl<?> type = (EntityTypeImpl<?>) referencedMapping.getRoot().getType();
+			this.mappingName = type.getName() + "_" + referencedMapping.getColumn().getName();
+			this.name = this.jdbcAdaptor.escape(this.mappingName);
 		}
 
 		this.setColumnProperties(referencedMapping);
@@ -439,10 +450,9 @@ public class JoinColumn extends AbstractColumn {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("rawtypes")
-	public void setValue(ManagedInstance managedInstance, Object value) {
+	public void setValue(Object instance, Object value) {
 		if (this.mapping != null) {
-			this.mapping.set(managedInstance, value);
+			this.mapping.set(instance, value);
 		}
 	}
 }

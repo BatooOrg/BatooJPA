@@ -23,7 +23,6 @@ import java.lang.reflect.Method;
 import javax.persistence.EnumType;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.MappingException;
@@ -38,7 +37,7 @@ import org.batoo.jpa.parser.metadata.ColumnMetadata;
  */
 public class BasicColumn extends AbstractColumn {
 
-	private EntityTable table;
+	private AbstractTable table;
 	private final int sqlType;
 	private final String name;
 	private final String columnDefinition;
@@ -59,6 +58,8 @@ public class BasicColumn extends AbstractColumn {
 	private final Method method;
 
 	/**
+	 * @param jdbcAdaptor
+	 *            the jdbc adaptor
 	 * @param mapping
 	 *            the mapping
 	 * @param sqlType
@@ -70,10 +71,10 @@ public class BasicColumn extends AbstractColumn {
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public BasicColumn(BasicMapping<?, ?> mapping, int sqlType, ColumnMetadata metadata) {
+	public BasicColumn(JdbcAdaptor jdbcAdaptor, BasicMapping<?, ?> mapping, int sqlType, ColumnMetadata metadata) {
 		super();
 
-		this.jdbcAdaptor = mapping.getEntity().getMetamodel().getJdbcAdaptor();
+		this.jdbcAdaptor = jdbcAdaptor;
 		this.mapping = mapping;
 		this.locator = metadata != null ? metadata.getLocator() : null;
 		this.sqlType = sqlType;
@@ -205,7 +206,7 @@ public class BasicColumn extends AbstractColumn {
 	 * 
 	 */
 	@Override
-	public EntityTable getTable() {
+	public AbstractTable getTable() {
 		return this.table;
 	}
 
@@ -289,7 +290,7 @@ public class BasicColumn extends AbstractColumn {
 	 */
 	@Override
 	public void setTable(AbstractTable table) {
-		this.table = (EntityTable) table;
+		this.table = table;
 
 		this.table.addColumn(this);
 	}
@@ -297,7 +298,7 @@ public class BasicColumn extends AbstractColumn {
 	/**
 	 * Sets the value for the instance
 	 * 
-	 * @param managedInstance
+	 * @param instance
 	 *            the instance of which to set value
 	 * @param value
 	 *            the value to set
@@ -306,8 +307,7 @@ public class BasicColumn extends AbstractColumn {
 	 * @author hceylan
 	 */
 	@Override
-	@SuppressWarnings("rawtypes")
-	public void setValue(ManagedInstance managedInstance, Object value) {
+	public void setValue(Object instance, Object value) {
 		if ((value != null) && (this.enumType != null)) {
 			if (this.enumType == EnumType.ORDINAL) {
 				value = this.values[(Integer) value];
@@ -320,6 +320,6 @@ public class BasicColumn extends AbstractColumn {
 			}
 		}
 
-		this.mapping.set(managedInstance, value);
+		this.mapping.set(instance, value);
 	}
 }

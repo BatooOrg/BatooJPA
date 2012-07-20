@@ -49,8 +49,6 @@ public class EnhanceTest extends BaseCoreTest {
 
 		final Class<? extends Person> enhanced = Enhancer.enhance(type);
 		final Constructor<? extends Person> constructor = enhanced.getConstructor(Class.class, SessionImpl.class, Object.class, boolean.class);
-		final Person newInstance = constructor.newInstance(null, null, null, true);
-
-		System.out.println(newInstance);
+		constructor.newInstance(null, null, null, true);
 	}
 }

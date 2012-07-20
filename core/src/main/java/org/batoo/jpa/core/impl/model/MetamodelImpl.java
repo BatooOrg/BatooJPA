@@ -368,6 +368,30 @@ public class MetamodelImpl implements Metamodel {
 	}
 
 	/**
+	 * Returns the entity that corresponds to clazz's parant chain.
+	 * 
+	 * @param clazz
+	 *            the class
+	 * @return the entity
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public EntityTypeImpl<?> getEntity(Class<?> clazz) {
+		EntityTypeImpl<?> entity = null;
+
+		while ((entity == null) && (clazz != Object.class)) {
+			entity = this.entity(clazz);
+			if (entity != null) {
+				break;
+			}
+			clazz = clazz.getSuperclass();
+		}
+
+		return entity;
+	}
+
+	/**
 	 * Returns the entity manager factory.
 	 * 
 	 * @return the entity manager factory

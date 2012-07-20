@@ -350,12 +350,11 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			selects.add(fetch.generateSqlSelect(query, false));
 		}
 
-		return Joiner.on(",\n\t").join(selects);
+		return Joiner.on(",\n").join(selects);
 	}
 
 	private void generateSqlSelectForElementCollection(CriteriaQueryImpl<?> query, List<String> selects, Map<AbstractColumn, String> fieldMap,
 		MapSelectType selectType) {
-		int fieldNo = 0;
 
 		final List<String> fields1 = Lists.newArrayList();
 
@@ -378,9 +377,9 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 				continue;
 			}
 
-			final String fieldAlias = tableAlias + "_F" + fieldNo++;
-
+			final String fieldAlias = tableAlias + "_F" + query.getFieldAlias(tableAlias, column);
 			final String field = Joiner.on(".").skipNulls().join(tableAlias, column.getName());
+
 			fields1.add(field + " AS " + fieldAlias);
 
 			// seperate out the key column from the rest
@@ -397,20 +396,25 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 
 	private void generateSqlSelectForEntityTable(CriteriaQueryImpl<?> query, boolean root, final List<String> selects,
 		final Map<AbstractColumn, String> fieldMap, final EntityTable table) {
-		int fieldNo = 0;
 
 		final List<String> fields1 = Lists.newArrayList();
 
 		final String tableAlias = this.getTableAlias(query, table);
 
 		for (final AbstractColumn column : table.getColumns()) {
-			final String fieldAlias = tableAlias + "_F" + fieldNo++;
+			final String fieldAlias;
+			final String field;
 
-			final String field = Joiner.on(".").skipNulls().join(tableAlias, column.getName());
 			if (column instanceof PkColumn) {
+				fieldAlias = tableAlias + "_F" + query.getFieldAlias(tableAlias, column);
+				field = Joiner.on(".").skipNulls().join(tableAlias, column.getName());
+
 				this.idFields.put(column, fieldAlias);
 			}
 			else if (column instanceof DiscriminatorColumn) {
+				fieldAlias = tableAlias + "_F" + query.getFieldAlias(tableAlias, column);
+				field = Joiner.on(".").skipNulls().join(tableAlias, column.getName());
+
 				this.discriminatorAlias = fieldAlias;
 			}
 			else if (column.getMapping() instanceof SingularAssociationMapping) {
@@ -421,10 +425,16 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 					continue;
 				}
 
+				fieldAlias = tableAlias + "_F" + query.getFieldAlias(tableAlias, column);
+				field = Joiner.on(".").skipNulls().join(tableAlias, column.getName());
+
 				this.joins.add(mapping);
 				this.joinFields.put(column, fieldAlias);
 			}
 			else {
+				fieldAlias = tableAlias + "_F" + query.getFieldAlias(tableAlias, column);
+				field = Joiner.on(".").skipNulls().join(tableAlias, column.getName());
+
 				fieldMap.put(column, fieldAlias);
 			}
 
@@ -457,7 +467,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			i++;
 		}
 
-		return Joiner.on(",\n\t\t").join(selects);
+		return Joiner.on(",\n\t").join(selects);
 	}
 
 	/**
@@ -772,18 +782,18 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 				// if it is a one-to-many mapping and has an inverse then set the inverses
 				if ((mapping.getInverse() != null) && //
 					(mapping.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_MANY)) {
-					mapping.getInverse().set(child, instance.getInstance());
+					mapping.getInverse().set(child.getInstance(), instance.getInstance());
 					child.setJoinLoaded(mapping.getInverse());
 				}
 			}
 		}
 		// if it is singular association then set the instance
 		else {
-			mapping.set(instance, child.getInstance());
+			mapping.set(instance.getInstance(), child.getInstance());
 
 			// if this is a one-to-one mapping and has an inverse then set it
 			if ((mapping.getInverse() != null) && (mapping.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_ONE)) {
-				mapping.getInverse().set(child, instance.getInstance());
+				mapping.getInverse().set(child.getInstance(), instance.getInstance());
 				child.setJoinLoaded(mapping);
 			}
 		}
@@ -795,8 +805,12 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			return (X) row.getObject(this.fields[0]);
 		}
 
-		// TODO handle embeddables
-		return null;
+		final X instance = ((EmbeddableTypeImpl<X>) this.type).newInstance();
+		for (int i = 0; i < this.fields.length; i++) {
+			this.columns[i].setValue(instance, row.getObject(this.fields[i]));
+		}
+
+		return instance;
 	}
 
 	private void handleElementCollectionFetch(SessionImpl session, ResultSet row, ManagedInstance<? extends X> instance, FetchImpl<X, ?> fetch)
@@ -947,8 +961,10 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		return false;
 	}
 
-	private void initializeInstance(SessionImpl session, ResultSet row, ManagedInstance<? extends X> instance) throws SQLException {
-		instance.setLoading(true);
+	private void initializeInstance(SessionImpl session, ResultSet row, ManagedInstance<? extends X> managedInstance) throws SQLException {
+		managedInstance.setLoading(true);
+
+		final X instance = managedInstance.getInstance();
 
 		for (int i = 0; i < this.fields.length; i++) {
 			this.columns[i].setValue(instance, row.getObject(this.fields[i]));
@@ -957,14 +973,14 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		for (final SingularAssociationMapping<?, ?> mapping : this.joins) {
 			final Object child = this.getInstance(session, mapping, row);
 			mapping.set(instance, child);
-			instance.setJoinLoaded(mapping);
+			managedInstance.setJoinLoaded(mapping);
 		}
 
 		for (final FetchImpl<X, ?> fetch : this.fetches) {
 			final JoinedMapping<? super X, ?, ?> mapping = fetch.getMapping();
-			mapping.initialize(instance);
+			mapping.initialize(managedInstance);
 
-			instance.setJoinLoaded(mapping);
+			managedInstance.setJoinLoaded(mapping);
 		}
 	}
 

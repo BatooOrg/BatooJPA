@@ -58,7 +58,7 @@ public class EmbeddedMapping<Z, X> extends ParentMapping<Z, X> implements Singul
 	 * @author hceylan
 	 */
 	public EmbeddedMapping(ParentMapping<?, Z> parent, EmbeddedAttribute<? super Z, X> attribute) {
-		super(parent, parent.getRoot().getType(), attribute, attribute.getBindableJavaType(), attribute.getName());
+		super(parent, attribute, attribute.getBindableJavaType(), attribute.getName());
 
 		this.attribute = attribute;
 		this.embeddable = attribute.getType();

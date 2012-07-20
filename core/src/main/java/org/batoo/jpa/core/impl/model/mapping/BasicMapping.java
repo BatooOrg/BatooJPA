@@ -28,6 +28,7 @@ import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.MappedSuperclassTypeImpl;
+import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 
@@ -57,35 +58,44 @@ public class BasicMapping<Z, X> extends Mapping<Z, X, X> implements SingularMapp
 	 * @author hceylan
 	 */
 	public BasicMapping(ParentMapping<?, Z> parent, BasicAttribute<? super Z, X> attribute) {
-		super(parent, parent.getRoot().getType(), attribute, attribute.getJavaType(), attribute.getName());
+		super(parent, attribute, attribute.getJavaType(), attribute.getName());
 
 		this.attribute = attribute;
 
 		final ColumnMetadata columnMetadata = this.getColumnMetadata();
 		final int sqlType = TypeFactory.getSqlType(this.attribute.getJavaType(), attribute.getTemporalType(), attribute.getEnumType(), attribute.isLob());
 
+		final JdbcAdaptor jdbcAdaptor = attribute.getMetamodel().getJdbcAdaptor();
+
 		if (this.attribute.isId() || this.getParent().isId()) {
-			this.column = new PkColumn(this, sqlType, columnMetadata);
+			this.column = new PkColumn(jdbcAdaptor, this, sqlType, columnMetadata);
 		}
 		else {
-			this.column = new BasicColumn(this, sqlType, columnMetadata);
+			this.column = new BasicColumn(jdbcAdaptor, this, sqlType, columnMetadata);
 		}
 
 		final String tableName = this.column.getTableName();
 
-		// if table name is blank, it means the column should belong to the primary table
-		if (StringUtils.isBlank(tableName)) {
-			this.column.setTable(this.getEntity().getPrimaryTable());
-		}
-		// otherwise locate the table
-		else {
-			final AbstractTable table = this.getEntity().getTable(tableName);
-			if (table == null) {
-				throw new MappingException("Table " + tableName + " could not be found", this.column.getLocator());
+		if (this.getRoot().isEntity()) {
+			final EntityTypeImpl<?> type = (EntityTypeImpl<?>) this.getRoot().getType();
+			// if table name is blank, it means the column should belong to the primary table
+			if (StringUtils.isBlank(tableName)) {
+				this.column.setTable(type.getPrimaryTable());
 			}
+			// otherwise locate the table
+			else {
+				final AbstractTable table = type.getTable(tableName);
+				if (table == null) {
+					throw new MappingException("Table " + tableName + " could not be found", this.column.getLocator());
+				}
 
-			this.column.setTable(table);
+				this.column.setTable(table);
+			}
 		}
+		else {
+			this.column.setTable(((ElementMapping<?>) this.getRoot()).getCollectionTable());
+		}
+
 	}
 
 	/**
@@ -141,6 +151,14 @@ public class BasicMapping<Z, X> extends Mapping<Z, X, X> implements SingularMapp
 		 * 4. return the column metadata from the attribute<br />
 		 */
 
+		// Clause 0
+		if ((rootAttribute.getDeclaringType() == this.getRoot().getType()) && (this.getParent() instanceof EmbeddedMapping)) {
+			metadata = ((EmbeddedMapping<?, ?>) this.getParent()).getAttributeOverride(path);
+			if (metadata != null) {
+				return metadata;
+			}
+		}
+
 		// Clause 1
 		if ((rootAttribute.getDeclaringType() == this.getRoot().getType()) && (this.getParent() instanceof EmbeddedMapping)) {
 			metadata = ((EmbeddedMapping<?, ?>) this.getParent()).getAttributeOverride(path);
@@ -151,7 +169,7 @@ public class BasicMapping<Z, X> extends Mapping<Z, X, X> implements SingularMapp
 
 		// Clause 2
 		if (rootAttribute.getDeclaringType() instanceof MappedSuperclassTypeImpl) {
-			metadata = this.getRoot().getType().getAttributeOverride(path);
+			metadata = ((EntityTypeImpl<?>) this.getRoot().getType()).getAttributeOverride(path);
 			if (metadata != null) {
 				return metadata;
 			}
@@ -167,17 +185,5 @@ public class BasicMapping<Z, X> extends Mapping<Z, X, X> implements SingularMapp
 
 		// Clause 4: fall back to attribute's column metadata
 		return this.attribute.getMetadata().getColumn();
-	}
-
-	/**
-	 * Returns the entity of the mapping.
-	 * 
-	 * @return the entity of the mapping
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public EntityTypeImpl<?> getEntity() {
-		return this.getRoot().getType();
 	}
 }

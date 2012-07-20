@@ -63,12 +63,12 @@ import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
+import org.batoo.jpa.core.impl.model.mapping.EntityMapping;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping.MappingType;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
-import org.batoo.jpa.core.impl.model.mapping.RootMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
 import org.batoo.jpa.core.util.BatooUtils;
@@ -140,7 +140,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private final String discriminatorValue;
 	private DiscriminatorColumn discriminatorColumn;
 	private EntityTypeImpl<? super X> rootType;
-	private final RootMapping<X> rootMapping;
+	private final EntityMapping<X> entityMapping;
 
 	/**
 	 * @param metamodel
@@ -165,7 +165,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 		this.addAttributes(metadata);
 		this.initTables(metadata);
-		this.rootMapping = new RootMapping<X>(this);
+		this.entityMapping = new EntityMapping<X>(this);
 		this.linkMappings();
 	}
 
@@ -349,7 +349,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 			final List<AssociationMapping<?, ?, ?>> associations = Lists.newArrayList();
 
-			this.rootMapping.addAssociations(associations);
+			this.entityMapping.addAssociations(associations);
 
 			final AssociationMapping<?, ?, ?>[] associatedAttributes0 = new AssociationMapping[associations.size()];
 			associations.toArray(associatedAttributes0);
@@ -632,7 +632,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 			final List<BasicMapping<?, ?>> basicMappings = Lists.newArrayList();
 
-			this.rootMapping.addBasicMappings(basicMappings);
+			this.entityMapping.addBasicMappings(basicMappings);
 
 			final BasicMapping<?, ?>[] basicMappings0 = new BasicMapping[basicMappings.size()];
 			basicMappings.toArray(basicMappings0);
@@ -840,7 +840,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.idMapping;
 			}
 
-			for (final Mapping<? super X, ?, ?> mapping : this.rootMapping.getChildren()) {
+			for (final Mapping<? super X, ?, ?> mapping : this.entityMapping.getChildren()) {
 				if ((mapping instanceof SingularMapping) && ((SingularMapping<? super X, ?>) mapping).getAttribute().isId()) {
 					return this.idMapping = (SingularMapping<? super X, ?>) mapping;
 				}
@@ -873,7 +873,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			final EmbeddableTypeImpl<?> idType = (EmbeddableTypeImpl<?>) this.getIdType();
 			final List<Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>> idMappings = Lists.newArrayList();
 
-			for (final Mapping<? super X, ?, ?> mapping : this.rootMapping.getChildren()) {
+			for (final Mapping<? super X, ?, ?> mapping : this.entityMapping.getChildren()) {
 				// only interested in id mappings
 				if (!(mapping instanceof SingularMapping) || !((SingularMapping<? super X, ?>) mapping).getAttribute().isId()) {
 					continue;
@@ -1045,7 +1045,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			}
 
 			final List<JoinedMapping<?, ?, ?>> mappingsEager = Lists.newArrayList();
-			this.rootMapping.addEagerMappings(mappingsEager);
+			this.entityMapping.addEagerMappings(mappingsEager);
 
 			final JoinedMapping<?, ?, ?>[] eagerAssociations0 = new JoinedMapping[mappingsEager.size()];
 			mappingsEager.toArray(eagerAssociations0);
@@ -1073,7 +1073,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			}
 
 			final List<JoinedMapping<?, ?, ?>> mappingsJoined = Lists.newArrayList();
-			this.rootMapping.addJoinedMappings(mappingsJoined);
+			this.entityMapping.addJoinedMappings(mappingsJoined);
 
 			final JoinedMapping<?, ?, ?>[] mappingsJoined0 = new JoinedMapping[mappingsJoined.size()];
 			mappingsJoined.toArray(mappingsJoined0);
@@ -1101,7 +1101,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			}
 
 			final List<PluralMapping<?, ?, ?>> mappingsPlural = Lists.newArrayList();
-			this.rootMapping.addPluralMappings(mappingsPlural);
+			this.entityMapping.addPluralMappings(mappingsPlural);
 
 			final PluralMapping<?, ?, ?>[] mappingsPlural0 = new PluralMapping[mappingsPlural.size()];
 			mappingsPlural.toArray(mappingsPlural0);
@@ -1162,7 +1162,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 			final List<Mapping<?, ?, ?>> singularMappings = Lists.newArrayList();
 
-			this.rootMapping.addSingularMappings(singularMappings);
+			this.entityMapping.addSingularMappings(singularMappings);
 
 			final Mapping<?, ?, ?>[] singularMappings0 = new Mapping[singularMappings.size()];
 			singularMappings.toArray(singularMappings0);
@@ -1218,15 +1218,15 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
-	 * Returns the rootMapping of the EntityTypeImpl.
+	 * Returns the entityMapping of the EntityTypeImpl.
 	 * 
-	 * @return the rootMapping of the EntityTypeImpl
+	 * @return the entityMapping of the EntityTypeImpl
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public RootMapping<X> getRootMapping() {
-		return this.rootMapping;
+	public EntityMapping<X> getRootMapping() {
+		return this.entityMapping;
 	}
 
 	/**
@@ -1437,7 +1437,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			this.discriminatorColumn = new DiscriminatorColumn(this, this.metadata.getDiscriminatorColumn());
 		}
 
-		this.rootMapping.createMappings();
+		this.entityMapping.createMappings();
 
 		// link the secondary tables
 		for (final EntityTable table : this.tableMap.values()) {

@@ -20,7 +20,6 @@ package org.batoo.jpa.core.impl.jdbc;
 
 import java.sql.Types;
 
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
@@ -216,6 +215,7 @@ public class OrderColumn extends AbstractColumn {
 	 */
 	@Override
 	public void setTable(AbstractTable table) {
+		// noop
 	}
 
 	/**
@@ -223,8 +223,8 @@ public class OrderColumn extends AbstractColumn {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("rawtypes")
-	public void setValue(ManagedInstance instance, Object value) {
+	public void setValue(Object instance, Object value) {
+		// noop
 	}
 
 }

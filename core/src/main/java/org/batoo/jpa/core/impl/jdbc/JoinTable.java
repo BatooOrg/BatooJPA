@@ -28,6 +28,7 @@ import javax.persistence.criteria.JoinType;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
 import org.batoo.jpa.parser.metadata.JoinTableMetadata;
@@ -54,7 +55,6 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 	private JoinColumn[] sourceRemoveColumns;
 	private JoinColumn[] destinationRemoveColumns;
 	private JoinColumn[] removeAllColumns;
-	private MapKeyColumn keyColumn;
 
 	/**
 	 * @param entity
@@ -70,8 +70,10 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 
 		this.entity = entity;
 
-		this.sourceKey = new ForeignKey(metadata != null ? metadata.getJoinColumns() : Collections.<JoinColumnMetadata> emptyList());
-		this.destinationKey = new ForeignKey(metadata != null ? metadata.getInverseJoinColumns() : Collections.<JoinColumnMetadata> emptyList());
+		final JdbcAdaptor jdbcAdaptor = this.entity.getMetamodel().getJdbcAdaptor();
+
+		this.sourceKey = new ForeignKey(jdbcAdaptor, metadata != null ? metadata.getJoinColumns() : Collections.<JoinColumnMetadata> emptyList());
+		this.destinationKey = new ForeignKey(jdbcAdaptor, metadata != null ? metadata.getInverseJoinColumns() : Collections.<JoinColumnMetadata> emptyList());
 	}
 
 	/**
@@ -299,7 +301,7 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 	 * @author hceylan
 	 */
 	public void setKeyColumn(ColumnMetadata mapKeyColumn, String name, TemporalType mapKeyTemporalType, EnumType mapKeyEnumType, Class<?> mapKeyJavaType) {
-		this.keyColumn = new MapKeyColumn(this, mapKeyColumn, name, mapKeyTemporalType, mapKeyEnumType, mapKeyJavaType);
+		new MapKeyColumn(this, mapKeyColumn, name, mapKeyTemporalType, mapKeyEnumType, mapKeyJavaType);
 	}
 
 	/**

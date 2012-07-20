@@ -72,7 +72,8 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 
 		this.entity = entity;
 
-		this.key = new ForeignKey(metadata != null ? metadata.getJoinColumns() : Collections.<JoinColumnMetadata> emptyList());
+		this.key = new ForeignKey(entity.getMetamodel().getJdbcAdaptor(), //
+			metadata != null ? metadata.getJoinColumns() : Collections.<JoinColumnMetadata> emptyList());
 	}
 
 	/**
@@ -167,8 +168,6 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 
 		this.key.link(null, this.entity);
 		this.key.setTable(this);
-
-		// TODO go through the mappings
 	}
 
 	/**
@@ -229,8 +228,11 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 			else if (this.elementColumn == column) {
 				params[i] = this.elementColumn.getValue(destination);
 			}
-			else {
+			else if (column instanceof JoinColumn) {
 				params[i] = column.getValue(source);
+			}
+			else {
+				params[i] = column.getValue(destination);
 			}
 		}
 
@@ -255,8 +257,11 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 			else if (column == this.keyColumn) {
 				params[i++] = key;
 			}
-			else {
+			else if (column instanceof JoinColumn) {
 				params[i++] = column.getValue(source);
+			}
+			else {
+				params[i++] = column.getValue(destination);
 			}
 		}
 

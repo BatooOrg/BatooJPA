@@ -18,7 +18,6 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 
@@ -142,6 +141,7 @@ public abstract class AbstractColumn {
 
 	/**
 	 * Returns the value for the column
+	 * 
 	 * @param instance
 	 *            the instance
 	 * 
@@ -214,8 +214,7 @@ public abstract class AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("rawtypes")
-	public abstract void setValue(ManagedInstance instance, Object value);
+	public abstract void setValue(Object instance, Object value);
 
 	/**
 	 * {@inheritDoc}

@@ -146,12 +146,12 @@ public class ManagedInstance<X> {
 		this(type, session, instance);
 
 		if (this.idMapping != null) {
-			this.idMapping.set(this, id.getId());
+			this.idMapping.set(instance, id.getId());
 		}
 		else {
 			for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.idMappings) {
 				final Object value = pair.getSecond().get(id.getId());
-				pair.getFirst().set(this, value);
+				pair.getFirst().set(this.instance, value);
 			}
 		}
 
@@ -811,7 +811,7 @@ public class ManagedInstance<X> {
 		this.snapshot();
 
 		for (final BasicMapping<?, ?> mapping : this.type.getBasicMappings()) {
-			mapping.set(this, mapping.get(entity));
+			mapping.set(this.instance, mapping.get(entity));
 		}
 
 		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociations()) {

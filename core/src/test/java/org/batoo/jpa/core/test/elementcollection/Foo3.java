@@ -16,63 +16,71 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.model.mapping;
+package org.batoo.jpa.core.test.elementcollection;
 
-import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
+import java.util.Map;
+import java.util.Set;
+
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
- * The interface for root mappings.
- * 
- * @param <X>
- *            the type of the mapping
- * 
  * 
  * @author hceylan
  * @since $version
  */
-public interface RootMapping<X> {
+@Entity
+public class Foo3 {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	private Integer key;
+
+	@ElementCollection
+	private final Set<Bar3> images = Sets.newHashSet();
+
+	@ElementCollection
+	private final Map<Integer, Bar3> images2 = Maps.newHashMap();
 
 	/**
-	 * Returns the mapping corresponding to the name.
+	 * Returns the images of the Foo3.
 	 * 
-	 * @param name
-	 *            the name of the child mapping
-	 * @return the mapping or null
+	 * @return the images of the Foo3
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	Mapping<? super X, ?, ?> getChild(String name);
+	public Set<Bar3> getImages() {
+		return this.images;
+	}
 
 	/**
-	 * Returns the mapping corresponding to the path.
+	 * Returns the images2 of the Foo3.
 	 * 
-	 * @param path
-	 *            the path of the mapping
-	 * @return the mapping
+	 * @return the images2 of the Foo3
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	Mapping<?, ?, ?> getMapping(String path);
+	public Map<Integer, Bar3> getImages2() {
+		return this.images2;
+	}
 
 	/**
-	 * Returns the type of the root mapping.
+	 * Returns the key of the Foo3.
 	 * 
-	 * @return the type of the root mapping
+	 * @return the key of the Foo3
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	ManagedTypeImpl<?> getType();
-
-	/**
-	 * Returns if the root is an entity.
-	 * 
-	 * @return true if the root is an entity, false otherwise
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	boolean isEntity();
+	public Integer getKey() {
+		return this.key;
+	}
 }

@@ -136,4 +136,13 @@ public class ManagedId<X> {
 		this.h = (prime * this.h) + this.id.hashCode();
 		return this.h = (prime * this.h) + this.type.getName().hashCode();
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "ManagedId [type=" + this.type + ", id=" + this.id + "]";
+	}
 }

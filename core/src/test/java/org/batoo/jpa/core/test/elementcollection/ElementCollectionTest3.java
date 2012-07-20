@@ -28,35 +28,65 @@ import org.junit.Test;
  * 
  * @since $version
  */
-public class ElementCollectionTest2 extends BaseCoreTest {
+public class ElementCollectionTest3 extends BaseCoreTest {
 
 	/**
-	 * Tests the element collections
+	 * Tests the embeddable element collections
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	@Test
-	public void testElementCollection() {
-		Foo2 foo = new Foo2();
+	public void testElementCollection1() {
+		Foo3 foo = new Foo3();
 
-		foo.getImages().put("photo1", "~/home/photos/photo1.jpg");
-		foo.getImages().put("photo2", "~/home/photos/photo2.jpg");
-		foo.getImages().put("photo3", "~/home/photos/photo3.jpg");
+		foo.getImages().add(new Bar3(1, "~/home/photos/photo1.jpg"));
+		foo.getImages().add(new Bar3(2, "~/home/photos/photo2.jpg"));
+		foo.getImages().add(new Bar3(3, "~/home/photos/photo3.jpg"));
 
 		this.persist(foo);
 
 		this.commit();
 
 		this.begin();
-		foo.getImages().remove("photo1");
-		foo.getImages().put("photo4", "~/home/photos/photo4.jpg");
+		foo.getImages().remove(new Bar3(1, "~/home/photos/photo1.jpg"));
+		foo.getImages().add(new Bar3(4, "~/home/photos/photo4.jpg"));
 		this.commit();
 
 		this.close();
 
-		foo = this.find(Foo2.class, foo.getKey());
+		foo = this.find(Foo3.class, foo.getKey());
 		Assert.assertEquals(foo.getKey(), foo.getKey());
 		Assert.assertEquals(3, foo.getImages().size());
+	}
+
+	/**
+	 * Tests the embeddable element collections
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testElementCollection2() {
+		Foo3 foo = new Foo3();
+
+		foo.getImages2().put(1, new Bar3(1, "~/home/photos/photo1.jpg"));
+		foo.getImages2().put(2, new Bar3(2, "~/home/photos/photo2.jpg"));
+		foo.getImages2().put(3, new Bar3(3, "~/home/photos/photo3.jpg"));
+
+		this.persist(foo);
+
+		this.commit();
+
+		this.begin();
+		foo.getImages2().remove(1);
+		foo.getImages2().put(4, new Bar3(4, "~/home/photos/photo4.jpg"));
+		this.commit();
+
+		this.close();
+
+		foo = this.find(Foo3.class, foo.getKey());
+		Assert.assertEquals(foo.getKey(), foo.getKey());
+		Assert.assertEquals(3, foo.getImages2().size());
 	}
 }

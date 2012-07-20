@@ -99,6 +99,18 @@ public class EntityTable extends AbstractTable {
 	}
 
 	/**
+	 * Returns the jdbcAdaptor of the EntityTable.
+	 * 
+	 * @return the jdbcAdaptor of the EntityTable
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected JdbcAdaptor getJdbcAdaptor() {
+		return this.jdbcAdaptor;
+	}
+
+	/**
 	 * Returns the pkColumns of the EntityTable.
 	 * 
 	 * @return the pkColumns of the EntityTable
@@ -177,7 +189,7 @@ public class EntityTable extends AbstractTable {
 			final String selectLastIdSql = this.jdbcAdaptor.getSelectLastIdentitySql();
 			final Number id = runner.query(connection, selectLastIdSql, new SingleValueHandler<Number>());
 
-			this.identityColumn.setValue(managedInstance, id);
+			this.identityColumn.setValue(managedInstance.getInstance(), id);
 		}
 	}
 

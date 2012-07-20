@@ -73,11 +73,11 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 
 		if (this.isOwner()) {
 			if (metadata.getJoinTable() != null) {
-				this.joinTable = new JoinTable(this.getRoot().getType(), metadata.getJoinTable());
+				this.joinTable = new JoinTable((EntityTypeImpl<?>) this.getRoot().getType(), metadata.getJoinTable());
 				this.foreignKey = null;
 			}
 			else {
-				this.foreignKey = new ForeignKey(metadata.getJoinColumns());
+				this.foreignKey = new ForeignKey(this.getAttribute().getMetamodel().getJdbcAdaptor(), metadata.getJoinColumns());
 				this.joinTable = null;
 			}
 		}
@@ -221,9 +221,7 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 	 */
 	@Override
 	public void link() throws MappingException {
-		final EntityTypeImpl<?> entity = this.getRoot().getType();
-		final MetamodelImpl metamodel = entity.getMetamodel();
-
+		final MetamodelImpl metamodel = this.getAttribute().getMetamodel();
 		this.type = metamodel.entity(this.attribute.getJavaType());
 
 		if (!this.isOwner()) {
@@ -236,6 +234,8 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 			this.inverse.setInverse(this);
 		}
 		else {
+			final EntityTypeImpl<?> entity = (EntityTypeImpl<?>) this.getRoot().getType();
+
 			// initialize the join table
 			if (this.joinTable != null) {
 				this.joinTable.link(entity, this.type);
@@ -276,12 +276,12 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 			// update the other side of the relation
 			if ((this.inverse != null) && (this.inverse.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_ONE)) {
 				final ManagedInstance<X> oldInstance = instance.getSession().get(oldEntity);
-				this.inverse.set(oldInstance, null);
+				this.inverse.set(oldInstance.getInstance(), null);
 			}
 		}
 
 		// set the new value
-		this.set(instance, newEntity);
+		this.set(instance.getInstance(), newEntity);
 	}
 
 	/**

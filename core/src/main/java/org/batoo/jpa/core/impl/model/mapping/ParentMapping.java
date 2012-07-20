@@ -30,7 +30,6 @@ import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping.MappingType;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.core.impl.model.type.MappedSuperclassTypeImpl;
 
@@ -53,8 +52,6 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	/**
 	 * @param parent
 	 *            the parent mapping
-	 * @param entity
-	 *            the entity
 	 * @param attribute
 	 *            the attribute
 	 * @param javaType
@@ -65,8 +62,8 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ParentMapping(ParentMapping<?, Z> parent, EntityTypeImpl<?> entity, EmbeddedAttribute<? super Z, X> attribute, Class<X> javaType, String name) {
-		super(parent, entity, attribute, javaType, name);
+	public ParentMapping(ParentMapping<?, Z> parent, EmbeddedAttribute<? super Z, X> attribute, Class<X> javaType, String name) {
+		super(parent, attribute, javaType, name);
 	}
 
 	/**

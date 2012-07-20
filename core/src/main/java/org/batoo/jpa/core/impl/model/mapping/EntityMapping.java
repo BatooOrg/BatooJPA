@@ -20,42 +20,41 @@ package org.batoo.jpa.core.impl.model.mapping;
 
 import java.util.Iterator;
 
-import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
-import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 import com.google.common.base.Splitter;
 
 /**
- * Root mapping for Embeddable element mappings.
+ * Mapping for the entities.
  * 
  * @param <X>
- *            the embeddable type
+ *            the type of the entity
  * 
  * @author hceylan
  * @since $version
  */
-public class ElementMapping<X> extends ParentMapping<X, X> implements RootMapping<X> {
+public class EntityMapping<X> extends ParentMapping<X, X> implements RootMapping<X> {
 
-	private final EmbeddableTypeImpl<X> embeddable;
-	private final ElementCollectionMapping<?, ?, X> mapping;
+	private final EntityTypeImpl<X> entity;
 
 	/**
-	 * @param mapping
-	 *            the element collection mapping
-	 * @param embeddable
-	 *            the embeddable
+	 * @param entity
+	 *            the entity
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ElementMapping(ElementCollectionMapping<?, ?, X> mapping, EmbeddableTypeImpl<X> embeddable) {
-		super(null, null, embeddable.getJavaType(), null);
+	@SuppressWarnings("unchecked")
+	public EntityMapping(EntityTypeImpl<X> entity) {
+		super(null, null, entity.getJavaType(), entity.getName());
 
-		this.mapping = mapping;
-		this.embeddable = embeddable;
+		this.entity = entity;
 
-		this.createMappings();
+		// inherit the mappings
+		if (!entity.isRoot()) {
+			this.inherit(((EntityMapping<X>) entity.getParent().getRootMapping()).getChildren());
+		}
 	}
 
 	/**
@@ -64,37 +63,29 @@ public class ElementMapping<X> extends ParentMapping<X, X> implements RootMappin
 	 */
 	@Override
 	public AttributeImpl<? super X, X> getAttribute() {
-		return null;
+		return null; // N/A
 	}
 
 	/**
-	 * Returns the collection table.
+	 * Returns the entity of the root mapping.
 	 * 
-	 * @return the collection table
+	 * @return the entity of the root mapping
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AbstractTable getCollectionTable() {
-		return this.mapping.getCollectionTable();
+	public EntityTypeImpl<X> getEntity() {
+		return this.entity;
 	}
 
 	/**
-	 * Returns the mapping corresponding to the path.
+	 * {@inheritDoc}
 	 * 
-	 * @param path
-	 *            the path of the mapping
-	 * @return the mapping
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
 	@Override
 	public Mapping<?, ?, ?> getMapping(String path) {
 		final Iterator<String> segments = Splitter.on('.').split(path).iterator();
-
 		Mapping<?, ?, ?> mapping = this;
-
 		while (segments.hasNext()) {
 			if (mapping instanceof ParentMapping) {
 				mapping = ((ParentMapping<?, ?>) mapping).getChild(segments.next());
@@ -116,7 +107,7 @@ public class ElementMapping<X> extends ParentMapping<X, X> implements RootMappin
 	 * 
 	 */
 	@Override
-	public RootMapping<?> getRoot() {
+	public EntityMapping<?> getRoot() {
 		return this;
 	}
 
@@ -125,8 +116,8 @@ public class ElementMapping<X> extends ParentMapping<X, X> implements RootMappin
 	 * 
 	 */
 	@Override
-	public EmbeddableTypeImpl<X> getType() {
-		return this.embeddable;
+	public EntityTypeImpl<X> getType() {
+		return this.entity;
 	}
 
 	/**
@@ -135,7 +126,7 @@ public class ElementMapping<X> extends ParentMapping<X, X> implements RootMappin
 	 */
 	@Override
 	public boolean isEntity() {
-		return false;
+		return true;
 	}
 
 	/**

@@ -25,7 +25,6 @@ import javax.persistence.EntityManager;
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Sets;
@@ -35,7 +34,6 @@ import com.google.common.collect.Sets;
  * 
  * @since $version
  */
-@Ignore
 public class JoinedInheritanceTest extends BaseCoreTest {
 
 	/**

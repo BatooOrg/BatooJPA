@@ -78,7 +78,7 @@ public interface SingularMapping<Z, X> {
 	/**
 	 * Sets the mapping value of instance.
 	 * 
-	 * @param managedInstance
+	 * @param instance
 	 *            the instance of which the value to set
 	 * @param value
 	 *            the value to set
@@ -86,5 +86,5 @@ public interface SingularMapping<Z, X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	void set(ManagedInstance<?> managedInstance, Object value);
+	void set(Object instance, Object value);
 }

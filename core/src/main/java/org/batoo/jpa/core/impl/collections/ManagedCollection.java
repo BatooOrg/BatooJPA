@@ -221,7 +221,7 @@ public abstract class ManagedCollection<E> {
 				this.getDelegate().add(child);
 
 				if (this.inverse != null) {
-					this.inverse.set(session.get(child), this.managedInstance.getInstance());
+					this.inverse.set(session.get(child).getInstance(), this.managedInstance.getInstance());
 				}
 
 				changed = true;
@@ -234,7 +234,7 @@ public abstract class ManagedCollection<E> {
 				this.removeChild(child);
 
 				if (this.inverse != null) {
-					this.inverse.set(session.get(child), null);
+					this.inverse.set(session.get(child).getInstance(), null);
 				}
 
 				changed = true;

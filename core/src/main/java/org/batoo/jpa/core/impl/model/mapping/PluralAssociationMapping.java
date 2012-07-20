@@ -117,11 +117,11 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 
 		if (this.isOwner()) {
 			if ((this.attribute.getPersistentAttributeType() == PersistentAttributeType.MANY_TO_MANY) || (metadata.getJoinColumns().size() == 0)) {
-				this.joinTable = new JoinTable(this.getRoot().getType(), metadata.getJoinTable());
+				this.joinTable = new JoinTable((EntityTypeImpl<?>) this.getRoot().getType(), metadata.getJoinTable());
 				this.foreignKey = null;
 			}
 			else {
-				this.foreignKey = new ForeignKey(metadata.getJoinColumns(), true);
+				this.foreignKey = new ForeignKey(this.getAttribute().getMetamodel().getJdbcAdaptor(), metadata.getJoinColumns(), true);
 				this.joinTable = null;
 			}
 		}
@@ -227,10 +227,10 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	public void enhance(ManagedInstance<?> instance) {
 		final C c = this.get(instance.getInstance());
 		if (c == null) {
-			this.set(instance, this.attribute.newCollection(this, instance, false));
+			this.set(instance.getInstance(), this.attribute.newCollection(this, instance, false));
 		}
 		else {
-			this.set(instance, this.attribute.newCollection(this, instance, c));
+			this.set(instance.getInstance(), this.attribute.newCollection(this, instance, c));
 		}
 	}
 
@@ -388,8 +388,9 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 
 			CriteriaQueryImpl<E> q = cb.createQuery(this.attribute.getBindableJavaType());
 			q.internal();
-			final RootImpl<?> r = q.from(this.getRoot().getType());
-			r.alias(BatooUtils.acronym(this.getRoot().getName()).toLowerCase());
+			final EntityTypeImpl<?> type = (EntityTypeImpl<?>) this.getRoot().getType();
+			final RootImpl<?> r = q.from(type);
+			r.alias(BatooUtils.acronym(type.getName()).toLowerCase());
 			// TODO handle embeddables along the path
 			final AbstractJoin<?, E> join = r.<E> join(this.attribute.getName());
 			join.alias(BatooUtils.acronym(entity.getName()).toLowerCase());
@@ -398,9 +399,8 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 			entity.prepareEagerJoins(join, 0, this);
 
 			// has single id mapping
-			final EntityTypeImpl<?> rootType = this.getRoot().getType();
-			if (rootType.hasSingleIdAttribute()) {
-				final SingularMapping<?, ?> idMapping = rootType.getIdMapping();
+			if (type.hasSingleIdAttribute()) {
+				final SingularMapping<?, ?> idMapping = type.getIdMapping();
 				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
 				final Path<?> path = r.get(idMapping.getAttribute().getName());
 				final PredicateImpl predicate = cb.equal(path, pe);
@@ -410,7 +410,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 
 			// has multiple id mappings
 			final List<PredicateImpl> predicates = Lists.newArrayList();
-			for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
+			for (final Pair<?, BasicAttribute<?, ?>> pair : type.getIdMappings()) {
 				final BasicMapping<?, ?> idMapping = (BasicMapping<?, ?>) pair.getFirst();
 				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
 				final Path<?> path = r.get(idMapping.getAttribute().getName());
@@ -447,7 +447,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 */
 	@Override
 	public void initialize(ManagedInstance<?> instance) {
-		this.set(instance, this.attribute.newCollection(this, instance, false));
+		this.set(instance.getInstance(), this.attribute.newCollection(this, instance, false));
 	}
 
 	/**
@@ -484,7 +484,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	@Override
 	@SuppressWarnings("unchecked")
 	public void link() throws MappingException {
-		final EntityTypeImpl<?> entity = this.getRoot().getType();
+		final EntityTypeImpl<?> entity = (EntityTypeImpl<?>) this.getRoot().getType();
 
 		this.type = (EntityTypeImpl<E>) this.attribute.getElementType();
 
@@ -512,7 +512,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 			}
 
 			if (this.foreignKey != null) {
-				this.foreignKey.link(null, this.getRoot().getEntity());
+				this.foreignKey.link(null, (EntityTypeImpl<?>) this.getRoot().getType());
 				this.foreignKey.setTable(this.type.getPrimaryTable());
 
 				if (this.orderColumn != null) {
@@ -565,7 +565,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 
 		collection.getDelegate().addAll(this.loadCollection(instance));
 
-		this.set(instance, collection);
+		this.set(instance.getInstance(), collection);
 	}
 
 	/**
@@ -716,7 +716,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 */
 	@Override
 	public void setLazy(ManagedInstance<?> instance) {
-		this.set(instance, this.attribute.newCollection(this, instance, true));
+		this.set(instance.getInstance(), this.attribute.newCollection(this, instance, true));
 	}
 
 	/**

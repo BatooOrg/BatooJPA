@@ -23,7 +23,6 @@ import java.lang.reflect.Method;
 import javax.persistence.EnumType;
 import javax.persistence.TemporalType;
 
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.MappingException;
@@ -285,6 +284,7 @@ public class ElementColumn extends AbstractColumn {
 	 */
 	@Override
 	public void setTable(AbstractTable table) {
+		// noop
 	}
 
 	/**
@@ -292,8 +292,7 @@ public class ElementColumn extends AbstractColumn {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("rawtypes")
-	public void setValue(ManagedInstance instance, Object value) {
+	public void setValue(Object instance, Object value) {
 		if ((value != null) && (this.enumType != null)) {
 			if (this.enumType == EnumType.ORDINAL) {
 				value = this.values[(Integer) value];

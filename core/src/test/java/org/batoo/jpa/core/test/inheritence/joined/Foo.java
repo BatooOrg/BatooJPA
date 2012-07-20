@@ -54,6 +54,9 @@ public class Foo {
 		if (obj == null) {
 			return false;
 		}
+		if (!(obj instanceof Foo)) {
+			return false;
+		}
 		final Foo other = (Foo) obj;
 		if (this.key == null) {
 			return false;

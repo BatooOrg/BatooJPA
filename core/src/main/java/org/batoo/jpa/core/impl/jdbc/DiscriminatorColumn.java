@@ -22,7 +22,6 @@ import java.sql.Types;
 
 import javax.persistence.DiscriminatorType;
 
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.parser.impl.AbstractLocator;
@@ -232,8 +231,7 @@ public class DiscriminatorColumn extends AbstractColumn {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("rawtypes")
-	public void setValue(ManagedInstance instance, Object value) {
+	public void setValue(Object instance, Object value) {
 		// noop
 	}
 }

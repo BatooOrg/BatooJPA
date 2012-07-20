@@ -75,7 +75,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * @author hceylan
 	 */
 	public AssociationMapping(ParentMapping<?, Z> parent, AssociationAttributeMetadata metadata, AttributeImpl<? super Z, X> attribute) {
-		super(parent, parent.getRoot().getType(), attribute, attribute.getJavaType(), attribute.getName());
+		super(parent, attribute, attribute.getJavaType(), attribute.getName());
 
 		if ((metadata instanceof MappableAssociationAttributeMetadata)
 			&& StringUtils.isNotBlank(((MappableAssociationAttributeMetadata) metadata).getMappedBy())) {
@@ -170,6 +170,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * @since $version
 	 * @author hceylan
 	 */
+	@SuppressWarnings("unchecked")
 	protected AssociationMetadata getAssociationMetadata() {
 		AssociationMetadata metadata = null;
 
@@ -196,7 +197,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 
 		// Clause 2
 		if (rootAttribute.getDeclaringType() instanceof MappedSuperclassTypeImpl) {
-			metadata = this.getRoot().getType().getAssociationOverride(path);
+			metadata = ((EntityTypeImpl<Y>) this.getRoot().getType()).getAssociationOverride(path);
 			if (metadata != null) {
 				return metadata;
 			}

@@ -40,6 +40,7 @@ import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
+import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.util.BatooUtils;
 
@@ -65,6 +66,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 
 	private final Map<String, ParameterExpressionImpl<?>> parameterMap = Maps.newHashMap();
 	private final List<ParameterExpressionImpl<?>> parameters = Lists.newArrayList();
+	private final Map<String, List<AbstractColumn>> fields = Maps.newHashMap();
 	private boolean distinct;
 	private boolean internal;
 
@@ -223,6 +225,32 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 		}
 
 		return Joiner.on(" AND ").skipNulls().join(restrictions);
+	}
+
+	/**
+	 * @param tableAlias
+	 *            the alias of the table
+	 * @param column
+	 *            the column
+	 * @return the field alias
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getFieldAlias(String tableAlias, AbstractColumn column) {
+		List<AbstractColumn> fields = this.fields.get(tableAlias);
+		if (fields == null) {
+			fields = Lists.newArrayList();
+			this.fields.put(tableAlias, fields);
+		}
+
+		final int i = fields.indexOf(column);
+		if (i >= 0) {
+			return Integer.toString(i);
+		}
+
+		fields.add(column);
+		return Integer.toString(fields.size() - 1);
 	}
 
 	/**

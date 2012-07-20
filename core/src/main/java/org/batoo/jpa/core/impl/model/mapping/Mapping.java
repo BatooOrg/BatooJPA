@@ -18,7 +18,7 @@
  */
 package org.batoo.jpa.core.impl.model.mapping;
 
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
@@ -41,17 +41,17 @@ public abstract class Mapping<Z, X, Y> {
 	private final String path;
 	private final Class<X> javaType;
 	private final String name;
+	private final MetamodelImpl metamodel;
 	private final boolean root;
 	private final boolean inherited;
 	private final EntityTypeImpl<?> entity;
-	private int h;
 	private final AttributeImpl<? super Z, X> attribute;
+
+	private int h;
 
 	/**
 	 * @param parent
 	 *            the parent mapping
-	 * @param entity
-	 *            the root entity
 	 * @param attribute
 	 *            the attribute
 	 * @param javaType
@@ -62,18 +62,19 @@ public abstract class Mapping<Z, X, Y> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Mapping(ParentMapping<?, Z> parent, EntityTypeImpl<?> entity, AttributeImpl<? super Z, X> attribute, Class<X> javaType, String name) {
+	public Mapping(ParentMapping<?, Z> parent, AttributeImpl<? super Z, X> attribute, Class<X> javaType, String name) {
 		super();
 
 		this.javaType = javaType;
 		this.parent = parent;
 		this.attribute = attribute;
 		this.name = name;
+		this.metamodel = attribute != null ? attribute.getMetamodel() : null;
 
 		this.path = (parent != null) && (parent.getPath() != null) ? parent.getPath() + "." + name : name;
 		this.root = parent instanceof RootMapping;
-		this.entity = entity;
-		this.inherited = this.entity.getRootType().getInheritanceType() != null;
+		this.entity = (EntityTypeImpl<?>) (this.getRoot().isEntity() ? this.getRoot().getType() : null);
+		this.inherited = (this.entity != null) && (this.entity.getRootType().getInheritanceType() != null);
 	}
 
 	/**
@@ -204,7 +205,7 @@ public abstract class Mapping<Z, X, Y> {
 	/**
 	 * Sets the mapping value of instance.
 	 * 
-	 * @param managedInstance
+	 * @param instance
 	 *            the instance of which the value to set
 	 * @param value
 	 *            the value to set
@@ -212,19 +213,25 @@ public abstract class Mapping<Z, X, Y> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public final void set(ManagedInstance<?> managedInstance, Object value) {
-		Object instance = managedInstance.getInstance();
+	public final void set(Object instance, Object value) {
 		if (!this.root) {
-			instance = this.parent.get(managedInstance.getInstance());
+			Z newInstance = this.parent.get(instance);
 
-			if (instance == null) {
-				instance = ((EmbeddedMapping<?, Z>) this.parent).getAttribute().newInstance();
-				this.parent.set(managedInstance, instance);
+			if (newInstance == null) {
+				newInstance = ((EmbeddedMapping<?, Z>) this.parent).getAttribute().newInstance();
+				this.parent.set(instance, newInstance);
+				instance = newInstance;
 			}
 		}
 
-		if (!this.inherited || managedInstance.getType().extendz(this.entity)) {
+		if (!this.inherited) {
 			this.attribute.set(instance, value);
+		}
+		else {
+			final EntityTypeImpl<? extends Object> type = this.metamodel.getEntity(instance.getClass());
+			if (type.extendz(this.entity)) {
+				this.attribute.set(instance, value);
+			}
 		}
 	}
 

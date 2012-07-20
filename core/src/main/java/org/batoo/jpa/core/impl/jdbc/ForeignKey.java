@@ -33,6 +33,7 @@ import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.core.util.Pair;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
@@ -65,23 +66,28 @@ public class ForeignKey {
 
 	private String allChildrenSql;
 	private JoinColumn[] allChildrenRestrictions;
+	private final JdbcAdaptor jdbcAdaptor;
 
 	/**
 	 * Constructor to create a join foreign key
 	 * 
+	 * @param jdbcAdaptor
+	 *            the JDBC Adaptor
 	 * @param metadata
 	 *            the metadata for join column
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ForeignKey(List<JoinColumnMetadata> metadata) {
-		this(metadata, false);
+	public ForeignKey(JdbcAdaptor jdbcAdaptor, List<JoinColumnMetadata> metadata) {
+		this(jdbcAdaptor, metadata, false);
 	}
 
 	/**
 	 * Constructor to create a join foreign key
 	 * 
+	 * @param jdbcAdaptor
+	 *            the JDBC Adaptor
 	 * @param metadata
 	 *            the metadata for join column
 	 * @param inverseOwner
@@ -90,17 +96,20 @@ public class ForeignKey {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ForeignKey(List<JoinColumnMetadata> metadata, boolean inverseOwner) {
+	public ForeignKey(JdbcAdaptor jdbcAdaptor, List<JoinColumnMetadata> metadata, boolean inverseOwner) {
 		super();
 
+		this.jdbcAdaptor = jdbcAdaptor;
 		this.inverseOwner = inverseOwner;
 
 		for (final JoinColumnMetadata columnMetadata : metadata) {
-			this.joinColumns.add(new JoinColumn(columnMetadata));
+			this.joinColumns.add(new JoinColumn(jdbcAdaptor, columnMetadata));
 		}
 	}
 
 	/**
+	 * @param jdbcAdaptor
+	 *            the JDBC Adaptor
 	 * @param table
 	 *            the secondary table
 	 * @param entity
@@ -111,9 +120,10 @@ public class ForeignKey {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ForeignKey(SecondaryTable table, EntityTypeImpl<?> entity, List<PrimaryKeyJoinColumnMetadata> metadata) {
+	public ForeignKey(JdbcAdaptor jdbcAdaptor, SecondaryTable table, EntityTypeImpl<?> entity, List<PrimaryKeyJoinColumnMetadata> metadata) {
 		super();
 
+		this.jdbcAdaptor = jdbcAdaptor;
 		this.inverseOwner = false;
 
 		/**
@@ -138,7 +148,7 @@ public class ForeignKey {
 
 				// single basic id attribute
 				if (idMapping instanceof BasicMapping) {
-					this.joinColumns.add(new JoinColumn(table, (BasicMapping<?, ?>) idMapping));
+					this.joinColumns.add(new JoinColumn(jdbcAdaptor, table, (BasicMapping<?, ?>) idMapping));
 				}
 				// embedded id
 				else {
@@ -148,7 +158,7 @@ public class ForeignKey {
 			// has multiple id
 			else {
 				for (final Pair<?, BasicAttribute<?, ?>> pair : entity.getIdMappings()) {
-					this.joinColumns.add(new JoinColumn(table, (BasicMapping<?, ?>) pair.getFirst()));
+					this.joinColumns.add(new JoinColumn(jdbcAdaptor, table, (BasicMapping<?, ?>) pair.getFirst()));
 				}
 			}
 		}
@@ -163,7 +173,7 @@ public class ForeignKey {
 					final BasicMapping<?, ?> basicMapping = (BasicMapping<?, ?>) idMapping;
 					final PrimaryKeyJoinColumnMetadata columnMetadata = this.getColumnMetadata(metadata, basicMapping);
 
-					this.joinColumns.add(new JoinColumn(columnMetadata, table, basicMapping));
+					this.joinColumns.add(new JoinColumn(jdbcAdaptor, columnMetadata, table, basicMapping));
 				}
 				// embedded id
 				else {
@@ -176,7 +186,7 @@ public class ForeignKey {
 					final BasicMapping<?, ?> basicMapping = (BasicMapping<?, ?>) pair.getFirst();
 					final PrimaryKeyJoinColumnMetadata columnMetadata = this.getColumnMetadata(metadata, basicMapping);
 
-					this.joinColumns.add(new JoinColumn(columnMetadata, table, basicMapping));
+					this.joinColumns.add(new JoinColumn(jdbcAdaptor, columnMetadata, table, basicMapping));
 				}
 			}
 		}
@@ -215,11 +225,11 @@ public class ForeignKey {
 				// if metadata present, we match it
 				if ((metadata != null) && (metadata.size() > 0)) {
 					final PrimaryKeyJoinColumnMetadata columnMetadata = this.getColumnMetadata(metadata, basicMapping);
-					this.joinColumns.add(new JoinColumn(columnMetadata, table, basicMapping));
+					this.joinColumns.add(new JoinColumn(this.jdbcAdaptor, columnMetadata, table, basicMapping));
 				}
 				// otherwise we create with the defaults
 				else {
-					this.joinColumns.add(new JoinColumn(table, basicMapping));
+					this.joinColumns.add(new JoinColumn(this.jdbcAdaptor, table, basicMapping));
 				}
 			}
 			// recursively process embedded child
@@ -464,7 +474,7 @@ public class ForeignKey {
 		}
 
 		if (mapping != null) {
-			final AbstractTable table = mapping.getRoot().getType().getTable(this.tableName);
+			final AbstractTable table = ((EntityTypeImpl<?>) mapping.getRoot().getType()).getTable(this.tableName);
 			if (table == null) {
 				throw new MappingException("Table " + this.tableName + " could not be found");
 			}
@@ -489,7 +499,7 @@ public class ForeignKey {
 		// no definition for the join columns
 		if (this.joinColumns.size() == 0) {
 			// create the join column
-			this.joinColumns.add(new JoinColumn(mapping, idMapping));
+			this.joinColumns.add(new JoinColumn(this.jdbcAdaptor, mapping, idMapping));
 		}
 		// existing definition for the join column
 		else {

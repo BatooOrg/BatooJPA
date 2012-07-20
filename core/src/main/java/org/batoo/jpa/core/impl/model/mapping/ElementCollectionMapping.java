@@ -116,14 +116,14 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	 * @author hceylan
 	 */
 	public ElementCollectionMapping(ParentMapping<?, Z> parent, PluralAttributeImpl<? super Z, C, E> attribute) {
-		super(parent, parent.getRoot().getType(), attribute, attribute.getJavaType(), attribute.getName());
+		super(parent, attribute, attribute.getJavaType(), attribute.getName());
 
 		final ElementCollectionAttributeMetadata metadata = (ElementCollectionAttributeMetadata) attribute.getMetadata();
 
 		this.attribute = attribute;
 		this.eager = metadata.getFetchType() == FetchType.EAGER;
 
-		this.collectionTable = new CollectionTable(this.getRoot().getType(), metadata.getCollectionTable());
+		this.collectionTable = new CollectionTable((EntityTypeImpl<?>) this.getRoot().getType(), metadata.getCollectionTable());
 		this.column = metadata.getColumn();
 		this.enumType = metadata.getEnumType();
 		this.lob = metadata.isLob();
@@ -196,10 +196,10 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	public void enhance(ManagedInstance<?> instance) {
 		final C c = this.get(instance.getInstance());
 		if (c == null) {
-			this.set(instance, this.attribute.newCollection(this, instance, false));
+			this.set(instance.getInstance(), this.attribute.newCollection(this, instance, false));
 		}
 		else {
-			this.set(instance, this.attribute.newCollection(this, instance, c));
+			this.set(instance.getInstance(), this.attribute.newCollection(this, instance, c));
 		}
 	}
 
@@ -335,16 +335,17 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 
 			CriteriaQueryImpl<E> q = cb.createQuery(this.attribute.getBindableJavaType());
 			q.internal();
-			final RootImpl<?> r = q.from(this.getRoot().getType());
-			r.alias(BatooUtils.acronym(this.getRoot().getName()).toLowerCase());
+
+			final EntityTypeImpl<?> type = (EntityTypeImpl<?>) this.getRoot().getType();
+			final RootImpl<?> r = q.from(type);
+			r.alias(BatooUtils.acronym(type.getName()).toLowerCase());
 			final AbstractJoin<?, E> join = r.<E> join(this.attribute.getName());
 			join.alias(BatooUtils.acronym(this.attribute.getName()));
 			q = q.select(join);
 
 			// has single id mapping
-			final EntityTypeImpl<?> rootType = this.getRoot().getType();
-			if (rootType.hasSingleIdAttribute()) {
-				final SingularMapping<?, ?> idMapping = rootType.getIdMapping();
+			if (type.hasSingleIdAttribute()) {
+				final SingularMapping<?, ?> idMapping = type.getIdMapping();
 				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
 				final Path<?> path = r.get(idMapping.getAttribute().getName());
 				final PredicateImpl predicate = cb.equal(path, pe);
@@ -354,7 +355,7 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 
 			// has multiple id mappings
 			final List<PredicateImpl> predicates = Lists.newArrayList();
-			for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
+			for (final Pair<?, BasicAttribute<?, ?>> pair : type.getIdMappings()) {
 				final BasicMapping<?, ?> idMapping = (BasicMapping<?, ?>) pair.getFirst();
 				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
 				final Path<?> path = r.get(idMapping.getAttribute().getName());
@@ -384,17 +385,18 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 
 			CriteriaQueryImpl<Object[]> q = cb.createQuery(Object[].class);
 			q.internal();
-			final RootImpl<?> r = q.from(this.getRoot().getType());
-			r.alias(BatooUtils.acronym(this.getRoot().getName()).toLowerCase());
+
+			final EntityTypeImpl<?> type = (EntityTypeImpl<?>) this.getRoot().getType();
+			final RootImpl<?> r = q.from(type);
+			r.alias(BatooUtils.acronym(type.getName()).toLowerCase());
 			final MapJoinImpl<?, ?, E> join = (MapJoinImpl<?, ?, E>) r.<E> join(this.attribute.getName());
 			join.alias(BatooUtils.acronym(this.attribute.getName()));
 
 			q = q.multiselect(join.key(), join.value());
 
 			// has single id mapping
-			final EntityTypeImpl<?> rootType = this.getRoot().getType();
-			if (rootType.hasSingleIdAttribute()) {
-				final SingularMapping<?, ?> idMapping = rootType.getIdMapping();
+			if (type.hasSingleIdAttribute()) {
+				final SingularMapping<?, ?> idMapping = type.getIdMapping();
 				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
 				final Path<?> path = r.get(idMapping.getAttribute().getName());
 				final PredicateImpl predicate = cb.equal(path, pe);
@@ -404,7 +406,7 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 
 			// has multiple id mappings
 			final List<PredicateImpl> predicates = Lists.newArrayList();
-			for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
+			for (final Pair<?, BasicAttribute<?, ?>> pair : type.getIdMappings()) {
 				final BasicMapping<?, ?> idMapping = (BasicMapping<?, ?>) pair.getFirst();
 				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
 				final Path<?> path = r.get(idMapping.getAttribute().getName());
@@ -441,7 +443,7 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	 */
 	@Override
 	public void initialize(ManagedInstance<?> instance) {
-		this.set(instance, this.attribute.newCollection(this, instance, false));
+		this.set(instance.getInstance(), this.attribute.newCollection(this, instance, false));
 	}
 
 	/**
@@ -503,7 +505,7 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 		this.type = this.attribute.getElementType();
 
 		if (this.type.getPersistenceType() == PersistenceType.EMBEDDABLE) {
-			this.rootMapping = new ElementMapping<E>((EmbeddableTypeImpl<E>) this.type);
+			this.rootMapping = new ElementMapping<E>(this, (EmbeddableTypeImpl<E>) this.type);
 		}
 
 		if (this.attribute.getCollectionType() == CollectionType.MAP) {
@@ -552,7 +554,7 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 
 		collection.getDelegate().addAll(this.loadCollection(instance));
 
-		this.set(instance, collection);
+		this.set(instance.getInstance(), collection);
 	}
 
 	/**
@@ -622,7 +624,7 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	 */
 	@Override
 	public void setLazy(ManagedInstance<?> instance) {
-		this.set(instance, this.attribute.newCollection(this, instance, true));
+		this.set(instance.getInstance(), this.attribute.newCollection(this, instance, true));
 	}
 
 	/**

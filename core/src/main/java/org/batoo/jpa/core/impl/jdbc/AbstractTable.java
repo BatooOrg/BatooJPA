@@ -179,10 +179,10 @@ public class AbstractTable {
 					final EntityTypeImpl<?> root;
 
 					if ((input instanceof JoinColumn) && (input.getMapping() == null)) {
-						root = ((JoinColumn) input).getReferencedMapping().getRoot().getType();
+						root = (EntityTypeImpl<?>) ((JoinColumn) input).getReferencedMapping().getRoot().getType();
 					}
 					else {
-						root = input.getMapping().getRoot().getType();
+						root = (EntityTypeImpl<?>) input.getMapping().getRoot().getType();
 					}
 
 					final Class<?> parent = root.getJavaType();
@@ -308,10 +308,10 @@ public class AbstractTable {
 					final EntityTypeImpl<?> root;
 
 					if ((input instanceof JoinColumn) && (input.getMapping() == null)) {
-						root = ((JoinColumn) input).getReferencedMapping().getRoot().getType();
+						root = (EntityTypeImpl<?>) ((JoinColumn) input).getReferencedMapping().getRoot().getType();
 					}
 					else {
-						root = input.getMapping().getRoot().getType();
+						root = (EntityTypeImpl<?>) input.getMapping().getRoot().getType();
 					}
 
 					final Class<?> parent = root.getJavaType();
