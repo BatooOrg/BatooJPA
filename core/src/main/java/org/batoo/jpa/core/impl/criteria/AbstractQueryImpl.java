@@ -56,11 +56,19 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	private final MetamodelImpl metamodel;
 	private final Class<T> resultType;
 
-	protected AbstractSelection<T> selection;
 	private final Set<RootImpl<?>> roots = Sets.newHashSet();
-	protected PredicateImpl restriction;
 	private int nextEntityAlias;
 	private final List<ParameterExpressionImpl<?>> sqlParameters = Lists.newArrayList();
+
+	/**
+	 * The selection
+	 */
+	protected AbstractSelection<T> selection;
+
+	/**
+	 * The restriction
+	 */
+	protected PredicateImpl restriction;
 
 	/**
 	 * @param metamodel

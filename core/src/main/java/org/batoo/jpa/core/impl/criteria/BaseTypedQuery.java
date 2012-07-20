@@ -61,10 +61,18 @@ public abstract class BaseTypedQuery<X> implements TypedQuery<X>, ResultSetHandl
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(BaseTypedQuery.class);
 
+	/**
+	 * The criteria query
+	 */
 	protected final CriteriaQueryImpl<X> cq;
+
+	/**
+	 * The parameters
+	 */
+	protected final Map<ParameterExpressionImpl<?>, Object> parameters = Maps.newHashMap();
+
 	private final EntityManagerImpl em;
 	private final AbstractSelection<X> selection;
-	protected final Map<ParameterExpressionImpl<?>, Object> parameters = Maps.newHashMap();
 	private final List<X> results = Lists.newArrayList();
 
 	private final List<Map<String, Object>> data = Lists.newArrayList();
