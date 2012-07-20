@@ -29,11 +29,12 @@ import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
 import org.batoo.jpa.core.impl.criteria.join.FetchImpl;
+import org.batoo.jpa.core.impl.criteria.join.FetchParentImpl;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
-import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
+import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
+import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 
 /**
  * Physical Attribute implementation of {@link Path}.
@@ -46,9 +47,9 @@ import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
  * @author hceylan
  * @since $version
  */
-public class PluralAssociationPath<Z, X> extends AbstractPath<X> implements Joinable {
+public class SingularAssociationPath<Z, X> extends AbstractPath<X> implements Joinable, ParentPath<Z, X> {
 
-	private final PluralAssociationMapping<Z, ?, X> mapping;
+	private final SingularAssociationMapping<Z, X> mapping;
 	private final FetchImpl<Z, X> fetchRoot;
 
 	/**
@@ -60,7 +61,7 @@ public class PluralAssociationPath<Z, X> extends AbstractPath<X> implements Join
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PluralAssociationPath(ParentPath<?, Z> parent, PluralAssociationMapping<Z, ?, X> mapping) {
+	public SingularAssociationPath(ParentPath<?, Z> parent, SingularAssociationMapping<Z, X> mapping) {
 		super(parent, mapping.getType().getJavaType());
 
 		this.mapping = mapping;
@@ -144,7 +145,16 @@ public class PluralAssociationPath<Z, X> extends AbstractPath<X> implements Join
 	 * 
 	 */
 	@Override
-	public PluralAssociationMapping<?, ?, X> getMapping() {
+	public FetchParentImpl<?, X> getFetchRoot() {
+		return this.fetchRoot;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public SingularAssociationMapping<Z, X> getMapping() {
 		return this.mapping;
 	}
 
@@ -153,7 +163,7 @@ public class PluralAssociationPath<Z, X> extends AbstractPath<X> implements Join
 	 * 
 	 */
 	@Override
-	public PluralAttributeImpl<? super Z, ?, X> getModel() {
+	public AssociatedSingularAttribute<? super Z, X> getModel() {
 		return this.mapping.getAttribute();
 	}
 
@@ -163,7 +173,7 @@ public class PluralAssociationPath<Z, X> extends AbstractPath<X> implements Join
 	 */
 	@Override
 	public String getTableAlias(CriteriaQueryImpl<?> query, AbstractTable table) {
-		return this.fetchRoot.getTableAlias(query, table);
+		return this.getFetchRoot().getTableAlias(query, table);
 	}
 
 	/**

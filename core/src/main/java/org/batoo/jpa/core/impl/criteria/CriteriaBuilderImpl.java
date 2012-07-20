@@ -49,8 +49,8 @@ import javax.persistence.criteria.Subquery;
 
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression;
-import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
+import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 
 /**
@@ -253,8 +253,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <Y> CompoundSelection<Y> construct(Class<Y> resultClass, Selection<?>... selections) {
-		// TODO Auto-generated method stub
-		return null;
+		return new CompoundSelectionImpl<Y>(resultClass, selections);
 	}
 
 	/**

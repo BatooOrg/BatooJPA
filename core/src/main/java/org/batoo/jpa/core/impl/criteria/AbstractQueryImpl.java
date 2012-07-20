@@ -71,6 +71,11 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	protected PredicateImpl restriction;
 
 	/**
+	 * If the query is distinc
+	 */
+	protected boolean distinct;
+
+	/**
 	 * @param metamodel
 	 *            the metamodel
 	 * @param resultType
@@ -84,16 +89,6 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 
 		this.metamodel = metamodel;
 		this.resultType = resultType;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public AbstractQuery<T> distinct(boolean distinct) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/**

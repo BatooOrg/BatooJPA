@@ -48,6 +48,7 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	private Integer position;
 	private int expandedCount = 0;
 	private final Map<Integer, Mapping<?, ?, ?>> mappingMap = Maps.newHashMap();
+	private String alias;
 
 	/**
 	 * @param paramClass
@@ -107,7 +108,7 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
+	public String generateSqlRestriction(CriteriaQueryImpl<?> query) {
 		if (this.position == null) {
 			query.addParameter(this);
 		}
@@ -117,6 +118,25 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 		}
 
 		return "?";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
+		this.alias = query.getAlias(this);
+
+		if (this.position == null) {
+			query.addParameter(this);
+		}
+
+		if (this.mappingMap.isEmpty()) {
+			this.expandedCount++;
+		}
+
+		return "? AS " + this.alias;
 	}
 
 	/**

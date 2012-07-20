@@ -75,6 +75,18 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	public abstract String generateJpqlSelect();
 
 	/**
+	 * Returns the SQL where fragment.
+	 * 
+	 * @param query
+	 *            the query
+	 * @return the SQL select fragment
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract String generateSqlRestriction(CriteriaQueryImpl<?> query);
+
+	/**
 	 * Returns the SQL select fragment.
 	 * 
 	 * @param query

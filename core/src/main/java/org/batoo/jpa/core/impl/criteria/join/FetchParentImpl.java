@@ -301,7 +301,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		this.generateSqlJoins(query, selfJoins);
 
 		if (selfJoins.size() > 0) {
-			joins.put(this, Joiner.on("\n").join(selfJoins));
+			joins.put(this, Joiner.on("\n").skipNulls().join(selfJoins));
 		}
 		else {
 			joins.put(this, null);
@@ -347,6 +347,10 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		selects.add(this.generateSqlSelectImpl(query, root, selectType));
 
 		for (final FetchImpl<X, ?> fetch : this.fetches) {
+			// skip the embeddable mappings
+			if (fetch.getMapping() instanceof EmbeddedMapping) {
+				continue;
+			}
 			selects.add(fetch.generateSqlSelect(query, false));
 		}
 
@@ -710,6 +714,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @since $version
 	 * @author hceylan
 	 */
+	@Override
 	public String getTableAlias(CriteriaQueryImpl<?> query, AbstractTable table) {
 		if (table instanceof SecondaryTable) {
 			String alias = this.tableAliases.get(table);
@@ -926,7 +931,14 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 
 	private void handleFetches(SessionImpl session, final ResultSet row, ManagedInstance<? extends X> instance) throws SQLException {
 		for (final FetchImpl<X, ?> fetch : this.fetches) {
-			if (fetch.getMapping().isAssociation()) {
+			final JoinedMapping<? super X, ?, ?> mapping = fetch.getMapping();
+
+			// skip embeddables
+			if (mapping instanceof EmbeddedMapping) {
+				continue;
+			}
+
+			if (mapping.isAssociation()) {
 				this.handleAssociationFetch(session, row, instance, fetch);
 			}
 			else {

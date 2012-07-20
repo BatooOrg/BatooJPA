@@ -66,5 +66,4 @@ public class EmbeddedIdTest extends BaseCoreTest {
 		Assert.assertEquals(foo1.getId(), foo3.getId());
 		Assert.assertSame(foo4, foo3);
 	}
-
 }

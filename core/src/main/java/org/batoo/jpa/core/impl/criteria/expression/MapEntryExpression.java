@@ -92,6 +92,15 @@ public class MapEntryExpression<K, V> extends AbstractExpression<Entry<K, V>> {
 	 * 
 	 */
 	@Override
+	public String generateSqlRestriction(CriteriaQueryImpl<?> query) {
+		return this.mapJoin.generateSqlRestriction(query);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
 		return this.mapJoin.generateSqlSelect(query, MapSelectType.ENTRY);
 	}

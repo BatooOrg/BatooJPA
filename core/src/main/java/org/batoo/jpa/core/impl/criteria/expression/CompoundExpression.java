@@ -65,6 +65,7 @@ public class CompoundExpression extends AbstractExpression<Boolean> {
 	private final Comparison comparison;
 	private final AbstractExpression<?> x;
 	private final AbstractExpression<?> y;
+	private String alias;
 
 	/**
 	 * @param comparison
@@ -119,7 +120,7 @@ public class CompoundExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
+	public String generateSqlRestriction(CriteriaQueryImpl<?> query) {
 		if (this.x instanceof ParameterExpressionImpl) {
 			return this.y.generate(query, this.comparison, (ParameterExpressionImpl<?>) this.x);
 		}
@@ -128,6 +129,17 @@ public class CompoundExpression extends AbstractExpression<Boolean> {
 		}
 
 		return this.x.generateSqlSelect(query) + this.comparison.getFragment() + this.y.generateSqlSelect(query);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
+		this.alias = query.getAlias(this);
+
+		return this.generateSqlRestriction(query) + " AS " + this.alias;
 	}
 
 	/**

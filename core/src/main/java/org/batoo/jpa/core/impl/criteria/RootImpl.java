@@ -25,7 +25,6 @@ import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
-import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
@@ -100,23 +99,5 @@ public class RootImpl<X> extends AbstractFrom<X, X> implements Root<X> {
 	@Override
 	public EntityType<X> getModel() {
 		return this.entity;
-	}
-
-	/**
-	 * Returns the alias for the table.
-	 * <p>
-	 * if table does not have an alias, it is generated.
-	 * 
-	 * @param query
-	 *            the query
-	 * @param table
-	 *            the table
-	 * @return the alias for the table
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String getTableAlias(CriteriaQueryImpl<?> query, AbstractTable table) {
-		return this.getFetchRoot().getTableAlias(query, table);
 	}
 }

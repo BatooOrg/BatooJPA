@@ -222,6 +222,9 @@ public abstract class Mapping<Z, X, Y> {
 				this.parent.set(instance, newInstance);
 				instance = newInstance;
 			}
+			else {
+				instance = newInstance;
+			}
 		}
 
 		if (!this.inherited) {

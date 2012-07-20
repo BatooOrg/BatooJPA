@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.impl.criteria.path;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.persistence.criteria.Path;
 
@@ -43,6 +44,7 @@ import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 public class BasicPath<X> extends AbstractPath<X> {
 
 	private final BasicMapping<?, X> mapping;
+	private String fieldAlias;
 
 	/**
 	 * @param parent
@@ -66,7 +68,7 @@ public class BasicPath<X> extends AbstractPath<X> {
 	@Override
 	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
 		// expand the mapping
-		final String sql = this.generateSqlSelect(query) + comparison.getFragment() + parameter.generateSqlSelect(query);
+		final String sql = this.generateSqlRestriction(query) + comparison.getFragment() + parameter.generateSqlRestriction(query);
 
 		// seal the parameter count
 		parameter.registerParameter(query, this.mapping);
@@ -112,12 +114,27 @@ public class BasicPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
+	public String generateSqlRestriction(CriteriaQueryImpl<?> query) {
 		final BasicColumn column = this.mapping.getColumn();
 
 		final String tableAlias = this.getRootPath().getTableAlias(query, column.getTable());
 
 		return tableAlias + "." + column.getName();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
+		final BasicColumn column = this.mapping.getColumn();
+
+		final String tableAlias = this.getRootPath().getTableAlias(query, column.getTable());
+
+		this.fieldAlias = tableAlias + "_F" + query.getFieldAlias(tableAlias, column);
+
+		return tableAlias + "." + column.getName() + " AS " + this.fieldAlias;
 	}
 
 	/**
@@ -143,8 +160,8 @@ public class BasicPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public X handle(SessionImpl session, ResultSet row) {
-		// TODO Auto-generated method stub
-		return null;
+	@SuppressWarnings("unchecked")
+	public X handle(SessionImpl session, ResultSet row) throws SQLException {
+		return (X) this.mapping.getColumn().convertValue(row.getObject(this.fieldAlias));
 	}
 }

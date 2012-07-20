@@ -26,14 +26,16 @@ import javax.persistence.metamodel.MapAttribute;
 import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
+import org.batoo.jpa.core.impl.criteria.join.Joinable;
+import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.core.impl.model.mapping.ParentMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 
 import com.google.common.collect.Maps;
 
@@ -112,18 +114,29 @@ public abstract class AbstractPath<X> extends AbstractExpression<X> implements P
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public final <Y> AbstractPath<Y> get(String pathName) {
+	public final <Y> AbstractPath<Y> get(String name) {
 		// try to resolve from path
-		AbstractPath<Y> path = (AbstractPath<Y>) this.children.get(pathName);
+		AbstractPath<Y> path = (AbstractPath<Y>) this.children.get(name);
 		if (path != null) {
 			return path;
 		}
 
-		if (!(this.getMapping() instanceof ParentMapping)) {
+		if (!(this instanceof ParentPath)) {
 			throw this.cannotDereference();
 		}
 
-		final Mapping<? super X, ?, Y> mapping = (Mapping<? super X, ?, Y>) ((ParentMapping<?, X>) this.getMapping()).getChild(pathName);
+		Mapping<? super X, ?, Y> mapping = null;
+		if (this.getMapping() instanceof ParentPath) {
+			mapping = (Mapping<? super X, ?, Y>) ((ParentMapping<?, X>) this.getMapping()).getChild(name);
+		}
+		else {
+			if (this instanceof AbstractFrom) {
+				mapping = (Mapping<? super X, ?, Y>) ((AbstractFrom<?, X>) this).getEntity().getRootMapping().getChild(name);
+			}
+			else if (this.getMapping() instanceof AssociationMapping) {
+				mapping = (Mapping<? super X, ?, Y>) ((AssociationMapping<?, ?, X>) this.getMapping()).getType().getRootMapping().getChild(name);
+			}
+		}
 
 		if (mapping == null) {
 			throw this.cannotDereference();
@@ -136,11 +149,14 @@ public abstract class AbstractPath<X> extends AbstractExpression<X> implements P
 		else if (mapping instanceof PluralAssociationMapping) {
 			path = new PluralAssociationPath<X, Y>((ParentPath<?, X>) this, (PluralAssociationMapping<X, ?, Y>) mapping);
 		}
+		else if (mapping instanceof SingularAssociationMapping) {
+			path = new SingularAssociationPath<X, Y>((ParentPath<?, X>) this, (SingularAssociationMapping<X, Y>) mapping);
+		}
 		else {
-			path = new EmbeddedAttributePath<Y>((ParentPath<?, X>) this, (EmbeddedMapping<? super X, Y>) mapping);
+			path = new EmbeddedAttributePath<X, Y>((ParentPath<?, X>) this, (EmbeddedMapping<? super X, Y>) mapping);
 		}
 
-		this.children.put(pathName, path);
+		this.children.put(name, path);
 
 		return path;
 	}
@@ -172,13 +188,13 @@ public abstract class AbstractPath<X> extends AbstractExpression<X> implements P
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected RootImpl<?> getRootPath() {
+	protected Joinable getRootPath() {
 		AbstractPath<?> root = this;
-		while ((root.getParentPath() != null) && !(root instanceof AbstractFrom)) {
+		while ((root.getParentPath() != null) && !(root instanceof Joinable)) {
 			root = root.getParentPath();
 		}
 
-		return (RootImpl<?>) root;
+		return (Joinable) root;
 	}
 
 	/**

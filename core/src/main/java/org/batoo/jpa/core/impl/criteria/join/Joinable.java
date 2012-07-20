@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.core.impl.criteria.join;
 
+import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 
 /**
  * Interface for joinable types.
@@ -25,4 +27,21 @@ package org.batoo.jpa.core.impl.criteria.join;
  * @author hceylan
  * @since $version
  */
-public interface Joinable {}
+public interface Joinable {
+
+	/**
+	 * Returns the alias for the table.
+	 * <p>
+	 * if table does not have an alias, it is generated.
+	 * 
+	 * @param query
+	 *            the query
+	 * @param table
+	 *            the table
+	 * @return the alias for the table
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	String getTableAlias(CriteriaQueryImpl<?> query, AbstractTable table);
+}

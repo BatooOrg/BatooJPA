@@ -115,6 +115,21 @@ public class CompoundSelectionImpl<X> extends AbstractSelection<X> implements Co
 	 * 
 	 */
 	@Override
+	public String generateSqlRestriction(final CriteriaQueryImpl<?> query) {
+		return Joiner.on(" AND ").join(Lists.transform(this.selections, new Function<AbstractSelection<?>, String>() {
+
+			@Override
+			public String apply(AbstractSelection<?> input) {
+				return input.generateSqlRestriction(query);
+			}
+		}));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public String generateSqlSelect(final CriteriaQueryImpl<?> query) {
 		return Joiner.on(",\n").join(Lists.transform(this.selections, new Function<AbstractSelection<?>, String>() {
 

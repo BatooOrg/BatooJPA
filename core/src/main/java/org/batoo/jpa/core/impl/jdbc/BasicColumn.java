@@ -117,6 +117,33 @@ public class BasicColumn extends AbstractColumn {
 	}
 
 	/**
+	 * Converts the value corresponding to enum or temporal type
+	 * 
+	 * @param value
+	 *            the raw value
+	 * @return the converted value
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Object convertValue(final Object value) {
+		if (value == null) {
+			return null;
+		}
+
+		if (this.enumType == null) {
+			return value;
+		}
+
+		final Enum<?> enumValue = (Enum<?>) value;
+		if (this.enumType == EnumType.ORDINAL) {
+			return enumValue.ordinal();
+		}
+
+		return enumValue.name();
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -227,20 +254,7 @@ public class BasicColumn extends AbstractColumn {
 	public Object getValue(Object instance) {
 		final Object value = this.mapping.get(instance);
 
-		if (value == null) {
-			return null;
-		}
-
-		if (this.enumType == null) {
-			return value;
-		}
-
-		final Enum<?> enumValue = (Enum<?>) value;
-		if (this.enumType == EnumType.ORDINAL) {
-			return enumValue.ordinal();
-		}
-
-		return enumValue.name();
+		return this.convertValue(value);
 	}
 
 	/**

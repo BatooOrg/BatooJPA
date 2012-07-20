@@ -47,6 +47,7 @@ import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 import org.batoo.jpa.core.impl.criteria.path.ParentPath;
+import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
@@ -236,6 +237,16 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 * 
 	 */
 	@Override
+	public String generateSqlRestriction(CriteriaQueryImpl<?> query) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
 		return this.fetchRoot.generateSqlSelect(query, this.getParentPath() == null);
 	}
@@ -311,6 +322,25 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 		}
 
 		return (Mapping<?, ?, X>) this.mapping;
+	}
+
+	/**
+	 * Returns the alias for the table.
+	 * <p>
+	 * if table does not have an alias, it is generated.
+	 * 
+	 * @param query
+	 *            the query
+	 * @param table
+	 *            the table
+	 * @return the alias for the table
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Override
+	public String getTableAlias(CriteriaQueryImpl<?> query, AbstractTable table) {
+		return this.getFetchRoot().getTableAlias(query, table);
 	}
 
 	/**

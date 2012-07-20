@@ -67,8 +67,9 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	private final Map<String, ParameterExpressionImpl<?>> parameterMap = Maps.newHashMap();
 	private final List<ParameterExpressionImpl<?>> parameters = Lists.newArrayList();
 	private final Map<String, List<AbstractColumn>> fields = Maps.newHashMap();
-	private boolean distinct;
+	private final Map<Selection<?>, String> selections = Maps.newHashMap();
 	private boolean internal;
+	private int nextSelection;
 
 	private String sql;
 	private String jpql;
@@ -175,8 +176,8 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 		if (this.distinct && !this.internal) {
 			select.append(" DISTINCT");
 		}
-		select.append("\n\t");
-		select.append(this.selection.generateSqlSelect(this));
+		select.append("\n");
+		select.append(BatooUtils.indent(this.selection.generateSqlSelect(this)));
 
 		// generate from chunk
 		final List<String> froms = Lists.newArrayList();
@@ -213,7 +214,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 		final String[] restrictions = new String[this.getRoots().size() + 1];
 
 		if (this.restriction != null) {
-			restrictions[0] = this.restriction.generateSqlSelect(this);
+			restrictions[0] = this.restriction.generateSqlRestriction(this);
 		}
 
 		int i = 0;
@@ -225,6 +226,26 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 		}
 
 		return Joiner.on(" AND ").skipNulls().join(restrictions);
+	}
+
+	/**
+	 * Returns the generated alias for the selection.
+	 * 
+	 * @param selection
+	 *            the selection
+	 * @return the alias
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getAlias(AbstractSelection<?> selection) {
+		String alias = this.selections.get(selection);
+		if (alias == null) {
+			alias = "S" + this.nextSelection++;
+			this.selections.put(selection, alias);
+		}
+
+		return alias;
 	}
 
 	/**

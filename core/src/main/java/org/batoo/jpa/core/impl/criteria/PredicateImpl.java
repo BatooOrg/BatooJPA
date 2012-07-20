@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.impl.criteria;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.persistence.criteria.Expression;
@@ -34,6 +35,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 /**
+ * Implementation of {@link Predicate}.
  * 
  * @author hceylan
  * @since $version
@@ -43,6 +45,7 @@ public class PredicateImpl extends AbstractExpression<Boolean> implements Predic
 	private final BooleanOperator operator;
 	private final boolean negated;
 	private final List<AbstractExpression<Boolean>> expressions = Lists.newArrayList();
+	private String alias;
 
 	/**
 	 * @param expressions
@@ -105,8 +108,7 @@ public class PredicateImpl extends AbstractExpression<Boolean> implements Predic
 	 */
 	@Override
 	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
-		// TODO Auto-generated method stub
-		return null;
+		return null; // N/A
 	}
 
 	/**
@@ -129,7 +131,7 @@ public class PredicateImpl extends AbstractExpression<Boolean> implements Predic
 
 			@Override
 			public String apply(AbstractExpression<Boolean> input) {
-				return input.generateJpqlSelect();
+				return input.generateJpqlRestriction();
 			}
 		});
 
@@ -148,8 +150,7 @@ public class PredicateImpl extends AbstractExpression<Boolean> implements Predic
 	 */
 	@Override
 	public String generateJpqlSelect() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.generateJpqlRestriction();
 	}
 
 	/**
@@ -157,16 +158,28 @@ public class PredicateImpl extends AbstractExpression<Boolean> implements Predic
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(final CriteriaQueryImpl<?> query) {
+	public String generateSqlRestriction(final CriteriaQueryImpl<?> query) {
+
 		final List<String> converted = Lists.transform(this.expressions, new Function<Expression<Boolean>, String>() {
 
 			@Override
 			public String apply(Expression<Boolean> input) {
-				return ((AbstractExpression<Boolean>) input).generateSqlSelect(query);
+				return ((AbstractExpression<Boolean>) input).generateSqlRestriction(query);
 			}
 		});
 
 		return "(" + Joiner.on(" " + this.operator.name() + " ").join(converted) + ")";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
+		this.alias = query.getAlias(this);
+
+		return this.generateSqlRestriction(query) + " AS " + this.alias;
 	}
 
 	/**
@@ -195,9 +208,8 @@ public class PredicateImpl extends AbstractExpression<Boolean> implements Predic
 	 * 
 	 */
 	@Override
-	public Boolean handle(SessionImpl session, ResultSet row) {
-		// TODO Auto-generated method stub
-		return null;
+	public Boolean handle(SessionImpl session, ResultSet row) throws SQLException {
+		return row.getBoolean(this.alias);
 	}
 
 	/**

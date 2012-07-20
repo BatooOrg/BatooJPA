@@ -18,10 +18,12 @@
  */
 package org.batoo.jpa.core.test.criteria.simple;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Selection;
 
 import junit.framework.Assert;
 
@@ -138,6 +140,31 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 
 		final List<Address> resultList = this.em().createQuery(q).getResultList();
 		Assert.assertEquals(6, resultList.size());
+	}
+
+	/**
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testConstructor() {
+		this.persist(this.person());
+		this.commit();
+		this.close();
+
+		final CriteriaBuilderImpl cb = (CriteriaBuilderImpl) this.em().getCriteriaBuilder();
+
+		final CriteriaQueryImpl<SimpleCity> q = cb.createQuery(SimpleCity.class);
+		final RootImpl<Address> r = q.from(Address.class);
+		final Selection<String> city = r.<String> get("city");
+		final Selection<String> country = r.<String> get("country").get("name");
+		q.select(cb.construct(SimpleCity.class, city, country));
+
+		final List<SimpleCity> resultList = this.em().createQuery(q).getResultList();
+		Collections.sort(resultList);
+		Assert.assertEquals(
+			"[SimpleCity [city=Istanbul, country=Turkey], SimpleCity [city=London, country=United Kingdom], SimpleCity [city=New York, country=United States of America]]",
+			resultList.toString());
 	}
 
 	/**
