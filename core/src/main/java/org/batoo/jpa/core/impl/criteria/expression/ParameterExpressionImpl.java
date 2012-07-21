@@ -68,6 +68,13 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 		}
 	}
 
+	private void ensureAlias(CriteriaQueryImpl<?> query) {
+		if (StringUtils.isBlank(this.getAlias())) {
+			this.position = query.getAlias(this);
+			this.alias("param" + this.position);
+		}
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * 
@@ -76,10 +83,7 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
 		final StringBuilder builder = new StringBuilder();
 
-		if (StringUtils.isBlank(this.getAlias())) {
-			this.position = query.getAlias(this);
-			this.alias("param" + this.position);
-		}
+		this.ensureAlias(query);
 
 		return builder.append(":").append(this.getAlias()).toString();
 	}
@@ -155,6 +159,8 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 */
 	@Override
 	public String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query) {
+		this.ensureAlias(query);
+
 		query.setNextSqlParam(this);
 
 		final String[] restrictions = new String[this.getExpandedCount()];

@@ -25,6 +25,32 @@ package org.batoo.jpa.common.log;
 public interface BLogger {
 
 	/**
+	 * Returns an object that boxes the block.
+	 * 
+	 * @param block
+	 *            the block to box
+	 * @return the object
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	Object boxed(String block);
+
+	/**
+	 * Returns an object that boxes the block.
+	 * 
+	 * @param block
+	 *            the block to box
+	 * @param parameters
+	 *            the parameters
+	 * @return the object
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	Object boxed(String block, Object[] parameters);
+
+	/**
 	 * Convenience method to log a message
 	 * 
 	 * @param message

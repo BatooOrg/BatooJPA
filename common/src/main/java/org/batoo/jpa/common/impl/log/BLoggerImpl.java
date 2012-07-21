@@ -97,7 +97,21 @@ public class BLoggerImpl implements BLogger {
 		this.fatalMarker = MarkerFactory.getMarker("FATAL");
 	}
 
-	private String boxed(String block, Object[] parameters) {
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Object boxed(String block) {
+		return this.boxed(block, null);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String boxed(String block, Object[] parameters) {
 		try {
 			if ((parameters != null) && (parameters.length > 0)) {
 				block += "\n\n" + Arrays.toString(parameters);
