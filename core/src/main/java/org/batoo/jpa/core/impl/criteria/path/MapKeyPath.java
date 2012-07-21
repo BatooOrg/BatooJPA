@@ -22,8 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
-import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl.MapSelectType;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -63,9 +62,8 @@ public class MapKeyPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
-		// TODO Auto-generated method stub
-		return null;
+	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
+		return this.mapJoin.generateJpqlRestriction(query) + ".key";
 	}
 
 	/**
@@ -73,26 +71,8 @@ public class MapKeyPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction() {
-		return this.mapJoin.generateJpqlRestriction() + ".key";
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generateJpqlSelect() {
-		return this.mapJoin.generateJpqlSelect() + ".key";
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generateSqlRestriction(CriteriaQueryImpl<?> query) {
-		return this.mapJoin.generateSqlRestriction(query);
+	public String generateJpqlSelect(CriteriaQueryImpl<?> query) {
+		return this.mapJoin.generateJpqlSelect(null) + ".key";
 	}
 
 	/**
@@ -128,8 +108,17 @@ public class MapKeyPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
+	public String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query) {
+		return this.mapJoin.getSqlRestrictionFragments(query, MapSelectType.KEY);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	@SuppressWarnings("unchecked")
-	public X handle(SessionImpl session, ResultSet row) throws SQLException {
+	public X handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		return (X) this.mapJoin.handle(session, row, MapSelectType.KEY);
 	}
 }

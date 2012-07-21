@@ -91,4 +91,12 @@ public class Country {
 		this.name = name;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "Country [name=" + this.name + "]";
+	}
 }

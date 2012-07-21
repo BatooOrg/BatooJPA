@@ -583,10 +583,10 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 
 		// if has single id then pass it on
 		if (rootType.hasSingleIdAttribute()) {
-			q.setParameter(1, id);
+			q.setParameter(0, id);
 		}
 		else {
-			int i = 1;
+			int i = 0;
 			for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
 				q.setParameter(i++, pair.getSecond().get(id));
 			}

@@ -16,50 +16,36 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.criteria;
-
-import javax.persistence.Entity;
+package org.batoo.jpa.core.impl.criteria.expression;
 
 /**
+ * The comparison types
  * 
  * @author hceylan
  * @since $version
  */
-@Entity
-public class WorkPhone extends Phone {
+public enum Comparison {
 
 	/**
-	 * 
-	 * @since $version
-	 * @author hceylan
+	 * Equal comparison
 	 */
-	public WorkPhone() {
-		super();
+	EQUAL(" = ");
+
+	private final String fragment;
+
+	Comparison(String fragment) {
+		this.fragment = fragment;
 	}
 
 	/**
-	 * @param person
-	 *            the person
-	 * @param phone
-	 *            the phone
+	 * Returns the fragment of the Comparison.
+	 * 
+	 * @return the fragment of the Comparison
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public WorkPhone(Person person, String phone) {
-		super(phone);
-
-		person.getWorkPhones().add(this);
-	}
-
-	/**
-	 * @param phone
-	 *            the phone
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public WorkPhone(String phone) {
-		super(phone);
+	public String getFragment() {
+		return this.fragment;
 	}
 }

@@ -26,9 +26,6 @@ import javax.persistence.criteria.ListJoin;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.metamodel.ListAttribute;
 
-import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
-import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 
 /**
@@ -57,16 +54,6 @@ public class ListJoinImpl<Z, E> extends AbstractJoin<Z, E> implements ListJoin<Z
 	 */
 	public ListJoinImpl(AbstractFrom<?, Z> parent, PluralMapping<? super Z, List<E>, E> mapping, JoinType jointType) {
 		super(parent, mapping, jointType);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/**

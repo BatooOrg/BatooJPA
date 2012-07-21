@@ -19,18 +19,24 @@
 package org.batoo.jpa.core.impl.model.mapping;
 
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import javax.persistence.criteria.JoinType;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.JoinableTable;
+import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
+
+import com.google.common.collect.Lists;
 
 /**
  * Mapping for the entities.
@@ -47,6 +53,7 @@ public class EmbeddedMapping<Z, X> extends ParentMapping<Z, X> implements Singul
 
 	private final EmbeddableTypeImpl<X> embeddable;
 	private final EmbeddedAttribute<? super Z, X> attribute;
+	private Mapping<? super X, ?, ?>[] singularMappings;
 
 	/**
 	 * @param parent
@@ -186,6 +193,60 @@ public class EmbeddedMapping<Z, X> extends ParentMapping<Z, X> implements Singul
 	@Override
 	public RootMapping<?> getRoot() {
 		return this.getParent().getRoot();
+	}
+
+	/**
+	 * Returns the sorted singular mappings of the embeddable
+	 * 
+	 * @return the list of sorted singular attributes
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	public Mapping<? super X, ?, ?>[] getSingularMappings() {
+		if (this.singularMappings != null) {
+			return this.singularMappings;
+		}
+
+		synchronized (this) {
+			if (this.singularMappings != null) {
+				return this.singularMappings;
+			}
+
+			final List<Mapping<? super X, ?, ?>> singularMappings = Lists.newArrayList();
+			for (final Mapping<? super X, ?, ?> mapping : this.getChildren()) {
+				final AttributeImpl<?, ?> attribute = mapping.getAttribute();
+				switch (attribute.getPersistentAttributeType()) {
+					case BASIC:
+					case EMBEDDED:
+						singularMappings.add(mapping);
+						break;
+					case MANY_TO_ONE:
+					case ONE_TO_ONE:
+						final SingularAssociationMapping<? super X, ?> association = (SingularAssociationMapping<? super X, ?>) mapping;
+						if (!association.isOwner()) {
+							continue;
+						}
+
+						if (association.getTable() != null) {
+							continue;
+						}
+
+						singularMappings.add(mapping);
+				}
+			}
+
+			Collections.sort(singularMappings, new Comparator<Mapping<? super X, ?, ?>>() {
+
+				@Override
+				public int compare(Mapping<? super X, ?, ?> o1, Mapping<? super X, ?, ?> o2) {
+					return o1.getAttribute().getAttributeId().compareTo(o2.getAttribute().getAttributeId());
+				}
+			});
+
+			return this.singularMappings = singularMappings.toArray(new Mapping[singularMappings.size()]);
+		}
 	}
 
 	/**

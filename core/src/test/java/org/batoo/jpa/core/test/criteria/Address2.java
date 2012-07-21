@@ -18,75 +18,86 @@
  */
 package org.batoo.jpa.core.test.criteria;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.Embeddable;
+import javax.persistence.ManyToOne;
 
 /**
  * 
  * @author hceylan
  * @since $version
  */
-@MappedSuperclass
-public class Phone {
+@Embeddable
+public class Address2 {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
-	private Integer id;
+	private String city;
 
-	private String phoneNo;
+	@ManyToOne
+	private Country country;
 
 	/**
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Phone() {
+	public Address2() {
 		super();
 	}
 
 	/**
-	 * @param phone
-	 *            the phone number
+	 * @param city
+	 *            the city
+	 * @param country
+	 *            the country
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Phone(String phone) {
+	public Address2(String city, Country country) {
 		super();
 
-		this.phoneNo = phone;
+		this.city = city;
+		this.country = country;
 	}
 
 	/**
-	 * Returns the id.
+	 * Returns the city.
 	 * 
-	 * @return the id
+	 * @return the city
 	 * @since $version
 	 */
-	public Integer getId() {
-		return this.id;
+	public String getCity() {
+		return this.city;
 	}
 
 	/**
-	 * Returns the phoneNo.
+	 * Returns the country.
 	 * 
-	 * @return the phoneNo
+	 * @return the country
 	 * @since $version
 	 */
-	public String getPhoneNo() {
-		return this.phoneNo;
+	public Country getCountry() {
+		return this.country;
 	}
 
 	/**
-	 * Sets the phoneNo.
+	 * Sets the city.
 	 * 
-	 * @param phoneNo
-	 *            the phoneNo to set
+	 * @param city
+	 *            the city to set
 	 * @since $version
 	 */
-	public void setPhoneNo(String phoneNo) {
-		this.phoneNo = phoneNo;
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	/**
+	 * Sets the country.
+	 * 
+	 * @param country
+	 *            the country to set
+	 * @since $version
+	 */
+	public void setCountry(Country country) {
+		this.country = country;
 	}
 
 	/**
@@ -95,6 +106,6 @@ public class Phone {
 	 */
 	@Override
 	public String toString() {
-		return "Phone [phoneNo=" + this.phoneNo + "]";
+		return "Address2 [country=" + this.country + ", city=" + this.city + "]";
 	}
 }

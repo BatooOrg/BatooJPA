@@ -24,6 +24,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.metamodel.Attribute;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
 
 /**
@@ -67,10 +68,10 @@ public abstract class AbstractJoin<Z, X> extends AbstractFrom<Z, X> implements J
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect() {
+	public String generateJpqlSelect(CriteriaQueryImpl<?> query) {
 		final StringBuilder builder = new StringBuilder();
 
-		builder.append(this.getParent().generateJpqlSelect());
+		builder.append(this.getParent().generateJpqlSelect(query));
 		builder.append(".").append(this.mapping.getAttribute().getName());
 		if (StringUtils.isNotBlank(this.getAlias())) {
 			builder.append(" as ").append(this.getAlias());

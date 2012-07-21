@@ -30,6 +30,7 @@ import junit.framework.Assert;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
+import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 import org.batoo.jpa.core.test.BaseCoreTest;
@@ -109,7 +110,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 
 		this.close();
 
-		final CriteriaBuilderImpl cb = (CriteriaBuilderImpl) this.em().getCriteriaBuilder();
+		final CriteriaBuilderImpl cb = this.em().getCriteriaBuilder();
 		final CriteriaQueryImpl<Address> q = cb.createQuery(Address.class);
 		final RootImpl<Person> r = q.from(Person.class);
 		q.select(r.<Address> get("addresses"));
@@ -131,7 +132,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 
 		this.close();
 
-		final CriteriaBuilderImpl cb = (CriteriaBuilderImpl) this.em().getCriteriaBuilder();
+		final CriteriaBuilderImpl cb = this.em().getCriteriaBuilder();
 		final CriteriaQueryImpl<Address> q = cb.createQuery(Address.class);
 		final RootImpl<Person> r = q.from(Person.class);
 		final Join<Person, Address> a = r.<Address> join("addresses");
@@ -152,7 +153,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 		this.commit();
 		this.close();
 
-		final CriteriaBuilderImpl cb = (CriteriaBuilderImpl) this.em().getCriteriaBuilder();
+		final CriteriaBuilderImpl cb = this.em().getCriteriaBuilder();
 
 		final CriteriaQueryImpl<SimpleCity> q = cb.createQuery(SimpleCity.class);
 		final RootImpl<Address> r = q.from(Address.class);
@@ -179,7 +180,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 		this.commit();
 		this.close();
 
-		final CriteriaBuilderImpl cb = (CriteriaBuilderImpl) this.em().getCriteriaBuilder();
+		final CriteriaBuilderImpl cb = this.em().getCriteriaBuilder();
 		final CriteriaQueryImpl<Person> q = cb.createQuery(Person.class);
 		final RootImpl<Person> r = q.from(Person.class);
 		q.select(r);
@@ -194,7 +195,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 		q.where(cb.equal(id, p));
 
 		final TypedQuery<Person> tq = this.em().createQuery(q);
-		tq.setParameter(1, 9);
+		tq.setParameter(0, 9);
 
 		final List<Person> resultList = tq.getResultList();
 		Assert.assertEquals(18, resultList.size());
@@ -214,7 +215,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 
 		this.close();
 
-		final CriteriaBuilderImpl cb = (CriteriaBuilderImpl) this.em().getCriteriaBuilder();
+		final CriteriaBuilderImpl cb = this.em().getCriteriaBuilder();
 		final CriteriaQueryImpl<Person> q = cb.createQuery(Person.class);
 		final RootImpl<Person> r = q.from(Person.class);
 		q.select(r);
@@ -240,7 +241,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 
 		this.close();
 
-		final CriteriaBuilderImpl cb = (CriteriaBuilderImpl) this.em().getCriteriaBuilder();
+		final CriteriaBuilderImpl cb = this.em().getCriteriaBuilder();
 		final CriteriaQueryImpl<Person> q = cb.createQuery(Person.class);
 		final RootImpl<Person> r = q.from(Person.class);
 		q.select(r);
@@ -266,7 +267,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 
 		this.close();
 
-		final CriteriaBuilderImpl cb = (CriteriaBuilderImpl) this.em().getCriteriaBuilder();
+		final CriteriaBuilderImpl cb = this.em().getCriteriaBuilder();
 		final CriteriaQueryImpl<Person> q = cb.createQuery(Person.class);
 		final RootImpl<Person> r = q.from(Person.class);
 		q.select(r);
@@ -285,11 +286,37 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testSimple() {
-		final CriteriaBuilderImpl cb = (CriteriaBuilderImpl) this.em().getCriteriaBuilder();
+		final CriteriaBuilderImpl cb = this.em().getCriteriaBuilder();
+
 		final CriteriaQueryImpl<Country> q = cb.createQuery(Country.class);
 		final RootImpl<Country> r = q.from(Country.class);
 		q.select(r);
+
 		final List<Country> resultList = this.em().createQuery(q).getResultList();
+
 		Assert.assertEquals(3, resultList.size());
+	}
+
+	/**
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testSimple2() {
+		final CriteriaBuilderImpl cb = this.em().getCriteriaBuilder();
+
+		final CriteriaQueryImpl<Country> q = cb.createQuery(Country.class);
+		final RootImpl<Country> r = q.from(Country.class);
+		q.select(r);
+
+		final ParameterExpressionImpl<Country> p = cb.parameter(Country.class);
+		q.where(cb.equal(r, p));
+
+		final TypedQueryImpl<Country> tq = this.em().createQuery(q);
+		tq.setParameter(p, SimpleCriteriaTest.TR);
+
+		final List<Country> resultList = tq.getResultList();
+
+		Assert.assertEquals(1, resultList.size());
 	}
 }

@@ -32,9 +32,8 @@ import javax.persistence.criteria.Predicate;
 
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
-import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
+import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.MapEntryExpression;
-import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.path.MapKeyPath;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -110,16 +109,6 @@ public class MapJoinImpl<Z, K, V> extends AbstractJoin<Z, V> implements MapJoin<
 	 * 
 	 */
 	@Override
-	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
 		return this.generateSqlSelect(query, MapSelectType.VALUE);
 	}
@@ -156,7 +145,7 @@ public class MapJoinImpl<Z, K, V> extends AbstractJoin<Z, V> implements MapJoin<
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public V handle(SessionImpl session, ResultSet row) throws SQLException {
+	public V handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		return (V) this.handle(session, row, MapSelectType.VALUE);
 	}
 

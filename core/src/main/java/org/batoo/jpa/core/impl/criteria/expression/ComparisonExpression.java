@@ -19,48 +19,23 @@
 package org.batoo.jpa.core.impl.criteria.expression;
 
 import java.sql.ResultSet;
+import java.util.List;
+
+import javax.persistence.criteria.Expression;
 
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 
 /**
  * 
  * @author hceylan
  * @since $version
  */
-public class CompoundExpression extends AbstractExpression<Boolean> {
-
-	/**
-	 * The comparison types
-	 * 
-	 * @author hceylan
-	 * @since $version
-	 */
-	public enum Comparison {
-
-		/**
-		 * Equal comparison
-		 */
-		EQUAL(" = ");
-
-		private final String fragment;
-
-		Comparison(String fragment) {
-			this.fragment = fragment;
-		}
-
-		/**
-		 * Returns the fragment of the Comparison.
-		 * 
-		 * @return the fragment of the Comparison
-		 * 
-		 * @since $version
-		 * @author hceylan
-		 */
-		public String getFragment() {
-			return this.fragment;
-		}
-	}
+public class ComparisonExpression extends BooleanExpression {
 
 	private final Comparison comparison;
 	private final AbstractExpression<?> x;
@@ -78,12 +53,12 @@ public class CompoundExpression extends AbstractExpression<Boolean> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public CompoundExpression(Comparison comparison, AbstractExpression<?> x, AbstractExpression<?> y) {
-		super(Boolean.class);
+	public ComparisonExpression(Comparison comparison, Expression<?> x, Expression<?> y) {
+		super();
 
 		this.comparison = comparison;
-		this.x = x;
-		this.y = y;
+		this.x = (AbstractExpression<?>) x;
+		this.y = (AbstractExpression<?>) y;
 
 	}
 
@@ -92,9 +67,8 @@ public class CompoundExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
-		// TODO Auto-generated method stub
-		return null;
+	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
+		return this.x.generateJpqlRestriction(query) + this.comparison.getFragment() + this.y.generateJpqlRestriction(query);
 	}
 
 	/**
@@ -102,17 +76,8 @@ public class CompoundExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction() {
-		return this.x.generateJpqlRestriction() + this.comparison.getFragment() + this.y.generateJpqlRestriction();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generateJpqlSelect() {
-		return this.x.generateJpqlSelect() + this.comparison.getFragment() + this.y.generateJpqlSelect();
+	public String generateJpqlSelect(CriteriaQueryImpl<?> query) {
+		return this.x.generateJpqlSelect(null) + this.comparison.getFragment() + this.y.generateJpqlSelect(null);
 	}
 
 	/**
@@ -121,14 +86,16 @@ public class CompoundExpression extends AbstractExpression<Boolean> {
 	 */
 	@Override
 	public String generateSqlRestriction(CriteriaQueryImpl<?> query) {
-		if (this.x instanceof ParameterExpressionImpl) {
-			return this.y.generate(query, this.comparison, (ParameterExpressionImpl<?>) this.x);
-		}
-		else if (this.y instanceof ParameterExpressionImpl) {
-			return this.x.generate(query, this.comparison, (ParameterExpressionImpl<?>) this.y);
+		final String[] left = this.x.getSqlRestrictionFragments(query);
+		final String[] right = this.y.getSqlRestrictionFragments(query);
+
+		final List<String> restrictions = Lists.newArrayList();
+
+		for (int i = 0; i < left.length; i++) {
+			restrictions.add(left[i] + this.comparison.getFragment() + right[i]);
 		}
 
-		return this.x.generateSqlSelect(query) + this.comparison.getFragment() + this.y.generateSqlSelect(query);
+		return Joiner.on(" AND ").join(restrictions);
 	}
 
 	/**
@@ -147,17 +114,8 @@ public class CompoundExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public Boolean handle(SessionImpl session, ResultSet row) {
+	public Boolean handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String toString() {
-		return this.generateJpqlRestriction();
 	}
 }

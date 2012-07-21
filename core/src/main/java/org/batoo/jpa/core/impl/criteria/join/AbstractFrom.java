@@ -45,6 +45,8 @@ import javax.persistence.metamodel.Type.PersistenceType;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl.MapSelectType;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 import org.batoo.jpa.core.impl.criteria.path.ParentPath;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
@@ -213,7 +215,7 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction() {
+	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
 		return StringUtils.isNotBlank(this.getAlias()) ? this.getAlias() : this.entity.getName();
 	}
 
@@ -230,16 +232,6 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 */
 	public void generateSqlJoins(CriteriaQueryImpl<?> query, Map<Joinable, String> joins) {
 		this.fetchRoot.generateSqlJoins(query, joins);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generateSqlRestriction(CriteriaQueryImpl<?> query) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/**
@@ -325,6 +317,31 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query) {
+		return this.fetchRoot.getSqlRestrictionFragments(query, MapSelectType.VALUE);
+	}
+
+	/**
+	 * Returns the SQL restriction in pairs of table alias and column.
+	 * 
+	 * @param query
+	 *            the query
+	 * @param selectType
+	 *            the select type
+	 * @return the SQL restriction in pairs of table alias and column
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query, MapSelectType selectType) {
+		return this.fetchRoot.getSqlRestrictionFragments(query, selectType);
+	}
+
+	/**
 	 * Returns the alias for the table.
 	 * <p>
 	 * if table does not have an alias, it is generated.
@@ -348,7 +365,7 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 * 
 	 */
 	@Override
-	public X handle(SessionImpl session, ResultSet row) throws SQLException {
+	public X handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		if (this.entity != null) {
 			return this.fetchRoot.handle(session, row);
 		}

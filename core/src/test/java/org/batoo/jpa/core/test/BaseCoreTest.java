@@ -22,8 +22,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.LockModeType;
 import javax.persistence.Persistence;
@@ -33,6 +31,8 @@ import junit.framework.Assert;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.BJPASettings;
+import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
+import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -78,9 +78,9 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	};
 
 	private String persistenceUnitName;
-	private EntityManagerFactory emf;
+	private EntityManagerFactoryImpl emf;
 	private ClassLoader oldContextClassLoader;
-	private EntityManager em;
+	private EntityManagerImpl em;
 	private EntityTransaction tx;
 
 	/**
@@ -172,7 +172,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected EntityManager em() {
+	protected EntityManagerImpl em() {
 		if (this.em != null) {
 			return this.em;
 		}
@@ -186,7 +186,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 * @return the Entity Manager Factory
 	 * @since $version
 	 */
-	public EntityManagerFactory emf() {
+	public EntityManagerFactoryImpl emf() {
 		if (this.emf == null) {
 			this.setupEmf();
 		}
@@ -402,7 +402,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 		currentThread.setContextClassLoader(cl);
 		cl.setRoot(this.getRootPackage());
 
-		this.emf = Persistence.createEntityManagerFactory(this.persistenceUnitName);
+		this.emf = (EntityManagerFactoryImpl) Persistence.createEntityManagerFactory(this.persistenceUnitName);
 
 		Assert.assertNotNull("EntityManagerFactory is null", this.emf);
 	}

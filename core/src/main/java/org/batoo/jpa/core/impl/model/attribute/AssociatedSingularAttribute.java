@@ -20,10 +20,12 @@ package org.batoo.jpa.core.impl.model.attribute;
 
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.OneToOneAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.OptionalAssociationAttributeMetadata;
 
 /**
@@ -43,6 +45,8 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 	private final String mapsId;
 
 	private EntityTypeImpl<T> type;
+	private final boolean owner;
+	private final boolean joined;
 
 	/**
 	 * @param declaringType
@@ -62,6 +66,14 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 		final OptionalAssociationAttributeMetadata optionalAssociationMetadata = (OptionalAssociationAttributeMetadata) metadata;
 		this.optional = optionalAssociationMetadata.isOptional();
 		this.mapsId = optionalAssociationMetadata.getMapsId();
+		if (metadata instanceof OneToOneAttributeMetadata) {
+			this.owner = StringUtils.isBlank(((OneToOneAttributeMetadata) metadata).getMappedBy());
+		}
+		else {
+			this.owner = true;
+		}
+
+		this.joined = metadata.getJoinTable() == null;
 	}
 
 	/**
@@ -126,12 +138,36 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 	}
 
 	/**
+	 * Returns if the association is joined.
+	 * 
+	 * @return true if the association is joined.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isJoined() {
+		return this.joined;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
 	@Override
 	public boolean isOptional() {
 		return this.optional;
+	}
+
+	/**
+	 * Returns if the attribute is the owner.
+	 * 
+	 * @return true if the attribute is the owner, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isOwner() {
+		return this.owner;
 	}
 
 	/**

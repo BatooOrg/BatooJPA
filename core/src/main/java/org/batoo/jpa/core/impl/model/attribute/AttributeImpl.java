@@ -43,6 +43,9 @@ import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
  */
 public abstract class AttributeImpl<X, Y> implements Attribute<X, Y> {
 
+	private static int nextAttributeId;
+
+	private final int attributeId;
 	private final AttributeMetadata metadata;
 	private final ManagedTypeImpl<X> declaringType;
 	private final String name;
@@ -64,6 +67,7 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y> {
 	public AttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata) {
 		super();
 
+		this.attributeId = AttributeImpl.nextAttributeId++;
 		this.metadata = metadata;
 
 		this.declaringType = declaringType;
@@ -91,6 +95,18 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y> {
 		}
 
 		return (Y) this.accessor.get(instance);
+	}
+
+	/**
+	 * Returns the ordinal id of the attribute.
+	 * 
+	 * @return the ordinal id of the attribute
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Integer getAttributeId() {
+		return this.attributeId;
 	}
 
 	/**

@@ -29,10 +29,10 @@ import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
-import org.batoo.jpa.core.impl.model.mapping.JoinedMapping.MappingType;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.core.impl.model.type.MappedSuperclassTypeImpl;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
@@ -48,6 +48,7 @@ import com.google.common.collect.Maps;
 public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 
 	private final Map<String, Mapping<? super X, ?, ?>> children = Maps.newHashMap();
+	private JoinedMapping<?, ?, ?>[] eagerMappings;
 
 	/**
 	 * @param parent
@@ -102,34 +103,6 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 			}
 			else if (mapping instanceof ParentMapping) {
 				((ParentMapping<? super X, ?>) mapping).addBasicMappings(mappings);
-			}
-		}
-	}
-
-	/**
-	 * Adds the eager mappings.
-	 * 
-	 * @param mappingsEager
-	 *            the list of mappings eager
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void addEagerMappings(List<JoinedMapping<?, ?, ?>> mappingsEager) {
-		for (final Mapping<? super X, ?, ?> mapping : this.children.values()) {
-			if (mapping instanceof JoinedMapping) {
-				final JoinedMapping<?, ?, ?> joinedMapping = (JoinedMapping<?, ?, ?>) mapping;
-
-				if (joinedMapping.getMappingType() == MappingType.EMBEDDABLE) {
-					continue;
-				}
-
-				if (joinedMapping.isEager()) {
-					mappingsEager.add(joinedMapping);
-				}
-			}
-			else if (mapping instanceof ParentMapping) {
-				((ParentMapping<? super X, ?>) mapping).addJoinedMappings(mappingsEager);
 			}
 		}
 	}
@@ -339,6 +312,43 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	 */
 	public Collection<Mapping<? super X, ?, ?>> getChildren() {
 		return this.children.values();
+	}
+
+	/**
+	 * Returns the eager mappings.
+	 * 
+	 * @return the array of mappings eager
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public JoinedMapping<?, ?, ?>[] getEagerMappings() {
+		if (this.eagerMappings != null) {
+			return this.eagerMappings;
+		}
+
+		synchronized (this) {
+			if (this.eagerMappings != null) {
+				return this.eagerMappings;
+			}
+
+			final List<JoinedMapping<?, ?, ?>> eagerMappings = Lists.newArrayList();
+
+			for (final Mapping<? super X, ?, ?> mapping : this.children.values()) {
+				if (mapping instanceof JoinedMapping) {
+					final JoinedMapping<?, ?, ?> joinedMapping = (JoinedMapping<?, ?, ?>) mapping;
+
+					if (joinedMapping.isEager()) {
+						eagerMappings.add(joinedMapping);
+					}
+				}
+			}
+
+			final JoinedMapping<?, ?, ?>[] eagerMappings0 = new JoinedMapping[eagerMappings.size()];
+			eagerMappings.toArray(eagerMappings0);
+
+			return this.eagerMappings = eagerMappings0;
+		}
 	}
 
 	/**

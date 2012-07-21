@@ -411,7 +411,7 @@ public class ForeignKey {
 			}
 
 			final EntityTable table = (EntityTable) this.table;
-			final String restrictions = Joiner.on(", ").join(Collections2.transform(table.getPkColumns().values(), new Function<PkColumn, String>() {
+			final String restrictions = Joiner.on(", ").join(Collections2.transform(table.getPkColumns(), new Function<PkColumn, String>() {
 
 				@Override
 				public String apply(PkColumn input) {

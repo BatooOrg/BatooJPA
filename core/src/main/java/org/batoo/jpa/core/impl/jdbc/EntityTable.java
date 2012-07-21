@@ -118,8 +118,8 @@ public class EntityTable extends AbstractTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Map<String, PkColumn> getPkColumns() {
-		return this.pkColumns;
+	public Collection<PkColumn> getPkColumns() {
+		return this.pkColumns.values();
 	}
 
 	private String getRemoveSql() {

@@ -63,6 +63,7 @@ import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
+import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
 import org.batoo.jpa.core.impl.model.mapping.EntityMapping;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping.MappingType;
@@ -1027,34 +1028,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
-	 * Returns the plural attributes that are eager.
-	 * 
-	 * @return the plural attributes that are eager
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public JoinedMapping<?, ?, ?>[] getMappingsEager() {
-		if (this.mappingsEager != null) {
-			return this.mappingsEager;
-		}
-
-		synchronized (this) {
-			if (this.mappingsEager != null) {
-				return this.mappingsEager;
-			}
-
-			final List<JoinedMapping<?, ?, ?>> mappingsEager = Lists.newArrayList();
-			this.entityMapping.addEagerMappings(mappingsEager);
-
-			final JoinedMapping<?, ?, ?>[] eagerAssociations0 = new JoinedMapping[mappingsEager.size()];
-			mappingsEager.toArray(eagerAssociations0);
-
-			return this.mappingsEager = eagerAssociations0;
-		}
-	}
-
-	/**
 	 * Retuns the element collection mappings.
 	 * 
 	 * @return the element collection mappings
@@ -1489,10 +1462,10 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 		// if has single id then pass it on
 		if (this.hasSingleIdAttribute()) {
-			q.setParameter(1, id);
+			q.setParameter(0, id);
 		}
 		else {
-			int i = 1;
+			int i = 0;
 			for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.getIdMappings()) {
 				q.setParameter(i++, pair.getSecond().get(id));
 			}
@@ -1541,10 +1514,10 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 		// if has single id then pass it on
 		if (this.hasSingleIdAttribute()) {
-			q.setParameter(1, id);
+			q.setParameter(0, id);
 		}
 		else {
-			int i = 1;
+			int i = 0;
 			for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.getIdMappings()) {
 				q.setParameter(i++, pair.getSecond().get(id));
 			}
@@ -1661,13 +1634,27 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 */
 	public void prepareEagerJoins(FetchParent<?, ?> r, int depth, AssociationMapping<?, ?, ?> parent) {
 		if (depth < EntityTypeImpl.MAX_DEPTH) {
+			this.prepareEagerJoins(r, depth, parent, this.entityMapping.getEagerMappings());
+		}
+	}
 
-			for (final JoinedMapping<?, ?, ?> mapping : this.getMappingsEager()) {
-				if (mapping.getMappingType() == MappingType.ELEMENT_COLLECTION) {
-					r.fetch(mapping.getAttribute().getName(), JoinType.LEFT);
-					continue;
-				}
+	private void prepareEagerJoins(FetchParent<?, ?> r, int depth, AssociationMapping<?, ?, ?> parent, JoinedMapping<?, ?, ?>[] mappings) {
+		for (final JoinedMapping<?, ?, ?> mapping : mappings) {
+			// Element collection
+			if (mapping.getMappingType() == MappingType.ELEMENT_COLLECTION) {
+				r.fetch(mapping.getAttribute().getName(), JoinType.LEFT);
+				continue;
+			}
+			// embeddable
+			else if (mapping.getMappingType() == MappingType.EMBEDDABLE) {
+				final Fetch<?, Object> r2 = r.fetch(mapping.getAttribute().getName(), JoinType.LEFT);
 
+				this.prepareEagerJoins(r2, depth, parent, ((EmbeddedMapping<?, ?>) mapping).getEagerMappings());
+
+				continue;
+			}
+			// association
+			else {
 				final AssociationMapping<?, ?, ?> association = (AssociationMapping<?, ?, ?>) mapping;
 				// if we are coming from the inverse side and inverse side is not many-to-one then skip
 				if ((parent != null) && //

@@ -25,8 +25,7 @@ import javax.persistence.criteria.Path;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
-import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
@@ -66,25 +65,10 @@ public class BasicPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
-		// expand the mapping
-		final String sql = this.generateSqlRestriction(query) + comparison.getFragment() + parameter.generateSqlRestriction(query);
-
-		// seal the parameter count
-		parameter.registerParameter(query, this.mapping);
-
-		return sql;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generateJpqlRestriction() {
+	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
 		final StringBuilder builder = new StringBuilder();
 
-		builder.append(this.getParentPath().generateJpqlRestriction());
+		builder.append(this.getParentPath().generateJpqlRestriction(query));
 
 		builder.append(".").append(this.mapping.getAttribute().getName());
 
@@ -96,10 +80,10 @@ public class BasicPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect() {
+	public String generateJpqlSelect(CriteriaQueryImpl<?> query) {
 		final StringBuilder builder = new StringBuilder();
 
-		builder.append(this.getParentPath().generateJpqlSelect());
+		builder.append(this.getParentPath().generateJpqlSelect(query));
 
 		builder.append(".").append(this.mapping.getAttribute().getName());
 		if (StringUtils.isNotBlank(this.getAlias())) {
@@ -107,19 +91,6 @@ public class BasicPath<X> extends AbstractPath<X> {
 		}
 
 		return builder.toString();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generateSqlRestriction(CriteriaQueryImpl<?> query) {
-		final BasicColumn column = this.mapping.getColumn();
-
-		final String tableAlias = this.getRootPath().getTableAlias(query, column.getTable());
-
-		return tableAlias + "." + column.getName();
 	}
 
 	/**
@@ -160,8 +131,21 @@ public class BasicPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
+	public String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query) {
+		final BasicColumn column = this.mapping.getColumn();
+
+		final String tableAlias = this.getRootPath().getTableAlias(query, column.getTable());
+
+		return new String[] { tableAlias + "." + column.getName() };
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	@SuppressWarnings("unchecked")
-	public X handle(SessionImpl session, ResultSet row) throws SQLException {
+	public X handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		return (X) this.mapping.getColumn().convertValue(row.getObject(this.fieldAlias));
 	}
 }

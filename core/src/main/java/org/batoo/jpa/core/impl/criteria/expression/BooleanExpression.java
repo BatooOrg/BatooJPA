@@ -20,43 +20,45 @@ package org.batoo.jpa.core.impl.criteria.expression;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map.Entry;
+
+import javax.persistence.criteria.Expression;
 
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
-import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl;
-import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl.MapSelectType;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
- * Expression for map join entries.
  * 
- * @param <K>
- *            the key type
- * @param <V>
- *            the value type
  * 
  * @author hceylan
  * @since $version
  */
-public class MapEntryExpression<K, V> extends AbstractExpression<Entry<K, V>> {
+public class BooleanExpression extends AbstractExpression<Boolean> {
 
-	private final MapJoinImpl<?, K, V> mapJoin;
+	private final AbstractExpression<Boolean> inner;
 
 	/**
-	 * @param mapJoin
-	 *            the map join
-	 * @param javaType
-	 *            the java type
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public MapEntryExpression(MapJoinImpl<?, K, V> mapJoin, Class<Entry<K, V>> javaType) {
-		super(javaType);
+	public BooleanExpression() {
+		super(Boolean.class);
 
-		this.mapJoin = mapJoin;
+		this.inner = null;
+	}
+
+	/**
+	 * @param inner
+	 *            the inner expression
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public BooleanExpression(Expression<Boolean> inner) {
+		super(Boolean.class);
+
+		this.inner = (AbstractExpression<Boolean>) inner;
 	}
 
 	/**
@@ -65,7 +67,7 @@ public class MapEntryExpression<K, V> extends AbstractExpression<Entry<K, V>> {
 	 */
 	@Override
 	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
-		return this.mapJoin.generateJpqlRestriction(query) + ".entry";
+		return this.inner.generateJpqlRestriction(query);
 	}
 
 	/**
@@ -74,7 +76,21 @@ public class MapEntryExpression<K, V> extends AbstractExpression<Entry<K, V>> {
 	 */
 	@Override
 	public String generateJpqlSelect(CriteriaQueryImpl<?> query) {
-		return this.mapJoin.generateJpqlSelect(null) + ".entry";
+		return this.inner.generateJpqlSelect(null);
+	}
+
+	/**
+	 * Returns the SQL where fragment.
+	 * 
+	 * @param query
+	 *            the query
+	 * @return the SQL select fragment
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String generateSqlRestriction(final CriteriaQueryImpl<?> query) {
+		throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -83,7 +99,7 @@ public class MapEntryExpression<K, V> extends AbstractExpression<Entry<K, V>> {
 	 */
 	@Override
 	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
-		return this.mapJoin.generateSqlSelect(query, MapSelectType.ENTRY);
+		return this.inner.generateSqlSelect(query);
 	}
 
 	/**
@@ -91,8 +107,8 @@ public class MapEntryExpression<K, V> extends AbstractExpression<Entry<K, V>> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query) {
-		return this.mapJoin.getSqlRestrictionFragments(query, MapSelectType.ENTRY);
+	public final String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query) {
+		return this.inner.getSqlRestrictionFragments(query);
 	}
 
 	/**
@@ -100,8 +116,7 @@ public class MapEntryExpression<K, V> extends AbstractExpression<Entry<K, V>> {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
-	public EntryImpl<K, V> handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
-		return (EntryImpl<K, V>) this.mapJoin.handle(session, row, MapSelectType.ENTRY);
+	public Boolean handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+		return this.inner.handle(query, session, row);
 	}
 }

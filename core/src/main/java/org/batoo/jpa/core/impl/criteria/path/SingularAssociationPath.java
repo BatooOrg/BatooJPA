@@ -25,12 +25,12 @@ import javax.persistence.criteria.Path;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
-import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
 import org.batoo.jpa.core.impl.criteria.join.FetchImpl;
 import org.batoo.jpa.core.impl.criteria.join.FetchParentImpl;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
+import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl.MapSelectType;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
@@ -73,25 +73,10 @@ public class SingularAssociationPath<Z, X> extends AbstractPath<X> implements Jo
 	 * 
 	 */
 	@Override
-	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
-		// expand the mapping
-		final String sql = this.generateSqlSelect(query) + comparison.getFragment() + parameter.generateSqlSelect(query);
-
-		// seal the parameter count
-		parameter.registerParameter(query, this.getMapping());
-
-		return sql;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generateJpqlRestriction() {
+	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
 		final StringBuilder builder = new StringBuilder();
 
-		builder.append(this.getParentPath().generateJpqlRestriction());
+		builder.append(this.getParentPath().generateJpqlRestriction(query));
 
 		builder.append(".").append(this.mapping.getAttribute().getName());
 
@@ -103,14 +88,14 @@ public class SingularAssociationPath<Z, X> extends AbstractPath<X> implements Jo
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect() {
+	public String generateJpqlSelect(CriteriaQueryImpl<?> query) {
 		final StringBuilder builder = new StringBuilder();
 
 		if ((this.getParentPath() instanceof AbstractFrom) && StringUtils.isNotBlank(this.getParentPath().getAlias())) {
 			builder.append(this.getParentPath().getAlias());
 		}
 		else {
-			builder.append(this.getParentPath().generateJpqlSelect());
+			builder.append(this.getParentPath().generateJpqlSelect(null));
 		}
 
 		builder.append(".").append(this.mapping.getAttribute().getName());
@@ -119,16 +104,6 @@ public class SingularAssociationPath<Z, X> extends AbstractPath<X> implements Jo
 		}
 
 		return builder.toString();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generateSqlRestriction(CriteriaQueryImpl<?> query) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/**
@@ -172,6 +147,15 @@ public class SingularAssociationPath<Z, X> extends AbstractPath<X> implements Jo
 	 * 
 	 */
 	@Override
+	public String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query) {
+		return this.fetchRoot.getSqlRestrictionFragments(query, MapSelectType.VALUE);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public String getTableAlias(CriteriaQueryImpl<?> query, AbstractTable table) {
 		return this.getFetchRoot().getTableAlias(query, table);
 	}
@@ -181,7 +165,7 @@ public class SingularAssociationPath<Z, X> extends AbstractPath<X> implements Jo
 	 * 
 	 */
 	@Override
-	public X handle(SessionImpl session, ResultSet row) throws SQLException {
+	public X handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		return this.fetchRoot.handle(session, row);
 	}
 }

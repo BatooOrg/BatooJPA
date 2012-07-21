@@ -47,11 +47,12 @@ import javax.persistence.criteria.Selection;
 import javax.persistence.criteria.SetJoin;
 import javax.persistence.criteria.Subquery;
 
-import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
-import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression;
-import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
+import org.batoo.jpa.core.impl.criteria.expression.Comparison;
+import org.batoo.jpa.core.impl.criteria.expression.ComparisonExpression;
+import org.batoo.jpa.core.impl.criteria.expression.ConstantExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.core.impl.model.type.TypeImpl;
 
 /**
  * Used to construct criteria queries, compound selections, expressions, predicates, orderings.
@@ -410,9 +411,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public PredicateImpl equal(Expression<?> x, Expression<?> y) {
-		return new PredicateImpl(new CompoundExpression(Comparison.EQUAL, (AbstractExpression<?>) x, (AbstractExpression<?>) y));
+		return new PredicateImpl(new ComparisonExpression(Comparison.EQUAL, x, y));
 	}
 
 	/**
@@ -421,8 +421,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Predicate equal(Expression<?> x, Object y) {
-		// TODO Auto-generated method stub
-		return null;
+		final TypeImpl<?> type = this.metamodel.type(y.getClass());
+
+		return new PredicateImpl(new ComparisonExpression(Comparison.EQUAL, x, new ConstantExpression(type, y)));
 	}
 
 	/**
@@ -1099,7 +1100,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <T> ParameterExpressionImpl<T> parameter(Class<T> paramClass, String name) {
-		return new ParameterExpressionImpl<T>(paramClass, name);
+		return new ParameterExpressionImpl<T>(this.metamodel.type(paramClass), paramClass, name);
 	}
 
 	/**

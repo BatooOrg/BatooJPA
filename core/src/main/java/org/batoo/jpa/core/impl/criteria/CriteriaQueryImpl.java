@@ -47,6 +47,7 @@ import org.batoo.jpa.core.util.BatooUtils;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -64,12 +65,14 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(CriteriaQueryImpl.class);
 
-	private final Map<String, ParameterExpressionImpl<?>> parameterMap = Maps.newHashMap();
-	private final List<ParameterExpressionImpl<?>> parameters = Lists.newArrayList();
 	private final Map<String, List<AbstractColumn>> fields = Maps.newHashMap();
 	private final Map<Selection<?>, String> selections = Maps.newHashMap();
+	private final HashBiMap<ParameterExpressionImpl<?>, Integer> parameters = HashBiMap.create();
+	private final List<ParameterExpressionImpl<?>> parameterOrder = Lists.newArrayList();
 	private boolean internal;
+
 	private int nextSelection;
+	private int nextparam;
 
 	private String sql;
 	private String jpql;
@@ -85,22 +88,6 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 */
 	public CriteriaQueryImpl(MetamodelImpl metamodel, Class<T> resultType) {
 		super(metamodel, resultType);
-	}
-
-	/**
-	 * Adds the parameter to the query.
-	 * 
-	 * @param parameter
-	 *            the parameter to add
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void addParameter(ParameterExpressionImpl<?> parameter) {
-		this.parameters.add(parameter);
-		this.parameterMap.put(parameter.getName(), parameter);
-
-		parameter.setPosition(this.parameters.size());
 	}
 
 	/**
@@ -125,7 +112,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 				builder.append("distinct ");
 			}
 
-			builder.append(this.selection.generateJpqlSelect());
+			builder.append(this.selection.generateJpqlSelect(this));
 		}
 
 		final Collection<String> roots = Collections2.transform(this.getRoots(), new Function<Root<?>, String>() {
@@ -151,7 +138,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 		}
 
 		if (this.getRestriction() != null) {
-			builder.append("\nwhere\n\t").append(this.getRestriction().generateJpqlRestriction());
+			builder.append("\nwhere\n\t").append(this.getRestriction().generateJpqlRestriction(this));
 		}
 
 		return builder.toString();
@@ -249,6 +236,26 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	}
 
 	/**
+	 * Returns the generated alias for the parameter.
+	 * 
+	 * @param parameter
+	 *            the parameter
+	 * @return the alias
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Integer getAlias(ParameterExpressionImpl<?> parameter) {
+		Integer alias = this.parameters.get(parameter);
+		if (alias == null) {
+			alias = this.nextparam++;
+			this.parameters.put(parameter, alias);
+		}
+
+		return alias;
+	}
+
+	/**
 	 * @param tableAlias
 	 *            the alias of the table
 	 * @param column
@@ -307,19 +314,17 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	}
 
 	/**
-	 * Returns the parameter at the position.
+	 * Returns the parameter at position.
 	 * 
 	 * @param position
-	 *            the position of the parameter
-	 * @return the parameter at the position
+	 *            the position
+	 * @return the parameter at position
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	public ParameterExpressionImpl<?> getParameter(int position) {
-		this.getSql();
-
-		return this.parameters.get(position - 1);
+		return this.parameters.inverse().get(position);
 	}
 
 	/**
@@ -329,7 +334,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	@Override
 	public Set<ParameterExpression<?>> getParameters() {
 		final Set<ParameterExpression<?>> parameters = Sets.newHashSet();
-		parameters.addAll(this.parameterMap.values());
+		parameters.addAll(this.parameters.keySet());
 
 		return parameters;
 	}
@@ -459,6 +464,19 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	}
 
 	/**
+	 * Registers the parameter as the nex SQL parameter
+	 * 
+	 * @param parameter
+	 *            the parameter to register
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void registerParameter(ParameterExpressionImpl<?> parameter) {
+		this.parameterOrder.add(parameter);
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -484,7 +502,6 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public CriteriaQueryImpl<T> where(Expression<Boolean> restriction) {
 		if (restriction instanceof PredicateImpl) {
 			this.restriction = (PredicateImpl) restriction;

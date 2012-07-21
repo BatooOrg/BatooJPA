@@ -20,43 +20,35 @@ package org.batoo.jpa.core.impl.criteria.expression;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map.Entry;
 
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
-import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl;
-import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl.MapSelectType;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.model.type.TypeImpl;
 
 /**
- * Expression for map join entries.
- * 
- * @param <K>
- *            the key type
- * @param <V>
- *            the value type
+ * Expressipons for constants.
  * 
  * @author hceylan
  * @since $version
  */
-public class MapEntryExpression<K, V> extends AbstractExpression<Entry<K, V>> {
+public class ConstantExpression extends ParameterExpressionImpl<Object> {
 
-	private final MapJoinImpl<?, K, V> mapJoin;
+	private final Object value;
 
 	/**
-	 * @param mapJoin
-	 *            the map join
-	 * @param javaType
-	 *            the java type
+	 * @param type
+	 *            the type of the constant.
+	 * @param value
+	 *            the value
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public MapEntryExpression(MapJoinImpl<?, K, V> mapJoin, Class<Entry<K, V>> javaType) {
-		super(javaType);
+	public ConstantExpression(TypeImpl<?> type, Object value) {
+		super(type, Object.class, null);
 
-		this.mapJoin = mapJoin;
+		this.value = value;
 	}
 
 	/**
@@ -65,7 +57,7 @@ public class MapEntryExpression<K, V> extends AbstractExpression<Entry<K, V>> {
 	 */
 	@Override
 	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
-		return this.mapJoin.generateJpqlRestriction(query) + ".entry";
+		return this.value.toString();
 	}
 
 	/**
@@ -74,7 +66,7 @@ public class MapEntryExpression<K, V> extends AbstractExpression<Entry<K, V>> {
 	 */
 	@Override
 	public String generateJpqlSelect(CriteriaQueryImpl<?> query) {
-		return this.mapJoin.generateJpqlSelect(null) + ".entry";
+		return this.value.toString();
 	}
 
 	/**
@@ -83,7 +75,7 @@ public class MapEntryExpression<K, V> extends AbstractExpression<Entry<K, V>> {
 	 */
 	@Override
 	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
-		return this.mapJoin.generateSqlSelect(query, MapSelectType.ENTRY);
+		return this.value instanceof CharSequence ? "'" + this.value.toString() + "'" : this.value.toString();
 	}
 
 	/**
@@ -91,17 +83,7 @@ public class MapEntryExpression<K, V> extends AbstractExpression<Entry<K, V>> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query) {
-		return this.mapJoin.getSqlRestrictionFragments(query, MapSelectType.ENTRY);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public EntryImpl<K, V> handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
-		return (EntryImpl<K, V>) this.mapJoin.handle(session, row, MapSelectType.ENTRY);
+	public Object handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+		return this.value;
 	}
 }

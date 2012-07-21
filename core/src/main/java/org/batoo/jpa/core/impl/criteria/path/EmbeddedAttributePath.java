@@ -19,20 +19,25 @@
 package org.batoo.jpa.core.impl.criteria.path;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.persistence.criteria.Path;
 
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
-import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.criteria.join.FetchParentImpl;
+import org.batoo.jpa.core.impl.criteria.join.Joinable;
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
+import org.batoo.jpa.core.impl.jdbc.JoinColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
+import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -74,50 +79,10 @@ public class EmbeddedAttributePath<Z, X> extends AbstractPath<X> implements Pare
 	 * 
 	 */
 	@Override
-	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
-		final List<String> fragments = Lists.newArrayList();
-
-		// expand the mappings
-		this.generate(query, comparison, parameter, this.mapping, fragments);
-
-		// seal the parameter count
-		parameter.registerParameter(query, this.mapping);
-
-		// return the joined restriction
-		return Joiner.on(" AND ").join(fragments);
-	}
-
-	@SuppressWarnings({ "rawtypes" })
-	private void generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter, EmbeddedMapping<?, ?> mapping,
-		final List<String> fragments) {
-		for (final Mapping<?, ?, ?> child : mapping.getChildren()) {
-			// handle basic mapping
-			if (child instanceof BasicMapping) {
-				final BasicColumn column = ((BasicMapping) child).getColumn();
-				AbstractPath<?> root = this;
-				while (root.getParentPath() != null) {
-					root = root.getParentPath();
-				}
-
-				final String tableAlias = this.getRootPath().getTableAlias(query, column.getTable());
-				fragments.add(tableAlias + "." + column.getName() + comparison.getFragment() + parameter.generateSqlRestriction(query));
-			}
-			// further expand the embedded mappings
-			else if (child instanceof EmbeddedMapping) {
-				this.generate(query, comparison, parameter, (EmbeddedMapping<?, ?>) child, fragments);
-			}
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generateJpqlRestriction() {
+	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
 		final StringBuilder builder = new StringBuilder();
 
-		builder.append(this.getParentPath().generateJpqlRestriction());
+		builder.append(this.getParentPath().generateJpqlRestriction(query));
 
 		builder.append(".").append(this.mapping.getAttribute().getName());
 
@@ -129,7 +94,7 @@ public class EmbeddedAttributePath<Z, X> extends AbstractPath<X> implements Pare
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect() {
+	public String generateJpqlSelect(CriteriaQueryImpl<?> query) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -139,32 +104,41 @@ public class EmbeddedAttributePath<Z, X> extends AbstractPath<X> implements Pare
 	 * 
 	 */
 	@Override
-	public String generateSqlRestriction(CriteriaQueryImpl<?> query) {
+	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
+		AbstractPath<?> root = this;
+		while (root.getParentPath() != null) {
+			root = root.getParentPath();
+		}
+
 		final List<String> fragments = Lists.newArrayList();
 
-		for (final Mapping<? super X, ?, ?> mapping : this.mapping.getChildren()) {
-			if (mapping instanceof BasicMapping) {
-				final BasicColumn column = ((BasicMapping<? super X, ?>) mapping).getColumn();
-				AbstractPath<?> root = this;
-				while (root.getParentPath() != null) {
-					root = root.getParentPath();
-				}
-
-				final String tableAlias = this.getRootPath().getTableAlias(query, column.getTable());
-				fragments.add(tableAlias + "." + column.getName());
-			}
-		}
+		this.generateSqlSelect(query, fragments, this.mapping.getSingularMappings());
 
 		return Joiner.on(", ").join(fragments);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
-		return this.generateSqlRestriction(query);
+	private void generateSqlSelect(CriteriaQueryImpl<?> query, final List<String> fragments, Mapping<?, ?, ?>[] mappings) {
+		for (final Mapping<?, ?, ?> mapping : mappings) {
+			if (mapping instanceof BasicMapping) {
+				final BasicColumn column = ((BasicMapping<?, ?>) mapping).getColumn();
+
+				final String tableAlias = this.getRootPath().getTableAlias(query, column.getTable());
+				fragments.add(tableAlias + "." + column.getName());
+			}
+
+			if (mapping instanceof SingularAssociationMapping) {
+				final SingularAssociationMapping<?, ?> associationMapping = (SingularAssociationMapping<?, ?>) mapping;
+				for (final JoinColumn column : associationMapping.getForeignKey().getJoinColumns()) {
+					final String tableAlias = this.getRootPath().getTableAlias(query, column.getTable());
+					fragments.add(tableAlias + "." + column.getName());
+				}
+			}
+
+			if (mapping instanceof EmbeddedMapping) {
+				final EmbeddedMapping<?, ?> embeddedMapping = (EmbeddedMapping<?, ?>) mapping;
+				this.generateSqlSelect(query, fragments, embeddedMapping.getSingularMappings());
+			}
+		}
 	}
 
 	/**
@@ -199,9 +173,33 @@ public class EmbeddedAttributePath<Z, X> extends AbstractPath<X> implements Pare
 	 * 
 	 */
 	@Override
-	public X handle(SessionImpl session, ResultSet row) {
-		// TODO Auto-generated method stub
-		return null;
+	public String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query) {
+		final List<String> restrictions = Lists.newArrayList();
+
+		final Joinable rootPath = this.getRootPath();
+
+		final List<BasicMapping<?, ?>> mappings = Lists.newArrayList();
+
+		for (final Mapping<? super X, ?, ?> mapping : this.mapping.getChildren()) {
+			if (mapping instanceof BasicMapping) {
+				mappings.add((BasicMapping<?, ?>) mapping);
+			}
+		}
+
+		Collections.sort(mappings, new Comparator<BasicMapping<?, ?>>() {
+
+			@Override
+			public int compare(BasicMapping<?, ?> o1, BasicMapping<?, ?> o2) {
+				return o1.getAttribute().getAttributeId().compareTo(o2.getAttribute().getAttributeId());
+			}
+		});
+
+		for (final BasicMapping<?, ?> mapping : mappings) {
+			final BasicColumn column = mapping.getColumn();
+			restrictions.add(rootPath.getTableAlias(query, column.getTable()) + "." + column.getName());
+		}
+
+		return restrictions.toArray(new String[restrictions.size()]);
 	}
 
 	/**
@@ -209,7 +207,9 @@ public class EmbeddedAttributePath<Z, X> extends AbstractPath<X> implements Pare
 	 * 
 	 */
 	@Override
-	public String toString() {
-		return this.generateJpqlRestriction();
+	public X handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+		final Object instance = this.getParentPath().handle(query, session, row);
+
+		return this.getMapping().get(instance);
 	}
 }

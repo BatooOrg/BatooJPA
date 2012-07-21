@@ -135,7 +135,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * 
 	 */
 	@Override
-	public EntityManager createEntityManager() {
+	public EntityManagerImpl createEntityManager() {
 		this.assertOpen();
 
 		return new EntityManagerImpl(this, this.metamodel, this.datasource, Collections.<String, Object> emptyMap(), this.jdbcAdaptor);

@@ -18,44 +18,67 @@
  */
 package org.batoo.jpa.core.test.criteria;
 
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
 
 /**
  * 
  * @author hceylan
  * @since $version
  */
-@MappedSuperclass
-public class Phone {
+@Entity
+public class Person2 {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Integer id;
 
-	private String phoneNo;
+	@Embedded
+	private Contact contact;
+
+	private String name;
 
 	/**
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Phone() {
+	public Person2() {
 		super();
 	}
 
 	/**
+	 * @param name
+	 *            the name
+	 * @param city
+	 *            the city
+	 * @param country
+	 *            the country
 	 * @param phone
-	 *            the phone number
+	 *            the phone
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Phone(String phone) {
+	public Person2(String name, String city, Country country, String phone) {
 		super();
 
-		this.phoneNo = phone;
+		this.name = name;
+		this.contact = new Contact(city, country, phone);
+	}
+
+	/**
+	 * Returns the contact of the Person2.
+	 * 
+	 * @return the contact of the Person2
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected Contact getContact() {
+		return this.contact;
 	}
 
 	/**
@@ -69,24 +92,37 @@ public class Phone {
 	}
 
 	/**
-	 * Returns the phoneNo.
+	 * Returns the name.
 	 * 
-	 * @return the phoneNo
+	 * @return the name
 	 * @since $version
 	 */
-	public String getPhoneNo() {
-		return this.phoneNo;
+	public String getName() {
+		return this.name;
 	}
 
 	/**
-	 * Sets the phoneNo.
+	 * Sets the contact of the Person2.
 	 * 
-	 * @param phoneNo
-	 *            the phoneNo to set
+	 * @param contact
+	 *            the contact to set for Person2
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected void setContact(Contact contact) {
+		this.contact = contact;
+	}
+
+	/**
+	 * Sets the name.
+	 * 
+	 * @param name
+	 *            the name to set
 	 * @since $version
 	 */
-	public void setPhoneNo(String phoneNo) {
-		this.phoneNo = phoneNo;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/**
@@ -95,6 +131,6 @@ public class Phone {
 	 */
 	@Override
 	public String toString() {
-		return "Phone [phoneNo=" + this.phoneNo + "]";
+		return "[name=" + this.name + ", contact=" + this.contact + "]";
 	}
 }

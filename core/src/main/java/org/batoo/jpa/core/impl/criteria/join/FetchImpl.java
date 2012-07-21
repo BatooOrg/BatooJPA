@@ -24,6 +24,7 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
+import javax.persistence.metamodel.Type.PersistenceType;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
@@ -162,6 +163,19 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	@Override
 	public FetchParentImpl<?, Z> getParent() {
 		return this.parent;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getPrimaryTableAlias(CriteriaQueryImpl<?> query) {
+		if (this.mapping.getType().getPersistenceType() == PersistenceType.EMBEDDABLE) {
+			return this.parent.getPrimaryTableAlias(query);
+		}
+
+		return super.getPrimaryTableAlias(query);
 	}
 
 	/**

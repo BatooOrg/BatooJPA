@@ -19,20 +19,21 @@
 package org.batoo.jpa.core.impl.criteria.expression;
 
 import java.sql.ResultSet;
-import java.util.Map;
+import java.sql.SQLException;
 
 import javax.persistence.criteria.ParameterExpression;
+import javax.persistence.metamodel.Type.PersistenceType;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.expression.CompoundExpression.Comparison;
+import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
-import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
-import org.batoo.jpa.core.impl.model.mapping.Mapping;
-
-import com.google.common.collect.Maps;
+import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
+import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.type.TypeImpl;
 
 /**
  * Type of criteria query parameter expressions.
@@ -44,13 +45,12 @@ import com.google.common.collect.Maps;
  */
 public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements ParameterExpression<T> {
 
-	private final String name;
+	private final TypeImpl<?> type;
 	private Integer position;
-	private int expandedCount = 0;
-	private final Map<Integer, Mapping<?, ?, ?>> mappingMap = Maps.newHashMap();
-	private String alias;
 
 	/**
+	 * @param type
+	 *            the persistent type of the parameter
 	 * @param paramClass
 	 *            the class of the parameter
 	 * @param name
@@ -59,10 +59,13 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ParameterExpressionImpl(Class<T> paramClass, String name) {
+	public ParameterExpressionImpl(TypeImpl<?> type, Class<T> paramClass, String name) {
 		super(paramClass);
 
-		this.name = name;
+		this.type = type;
+		if (StringUtils.isNotBlank(name)) {
+			this.alias(name);
+		}
 	}
 
 	/**
@@ -70,28 +73,15 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * 
 	 */
 	@Override
-	public String generate(CriteriaQueryImpl<?> query, Comparison comparison, ParameterExpressionImpl<?> parameter) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generateJpqlRestriction() {
+	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
 		final StringBuilder builder = new StringBuilder();
 
-		if (StringUtils.isNotBlank(this.name)) {
-			return builder.append(":").append(this.name).toString();
+		if (StringUtils.isBlank(this.getAlias())) {
+			this.position = query.getAlias(this);
+			this.alias("param" + this.position);
 		}
 
-		if (this.position != null) {
-			return builder.append("?").append(this.position).toString();
-		}
-
-		return builder.append("?").toString();
+		return builder.append(":").append(this.getAlias()).toString();
 	}
 
 	/**
@@ -99,25 +89,8 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect() {
-		return "?";
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generateSqlRestriction(CriteriaQueryImpl<?> query) {
-		if (this.position == null) {
-			query.addParameter(this);
-		}
-
-		if (this.mappingMap.isEmpty()) {
-			this.expandedCount++;
-		}
-
-		return "?";
+	public String generateJpqlSelect(CriteriaQueryImpl<?> query) {
+		return this.generateJpqlRestriction(query);
 	}
 
 	/**
@@ -126,29 +99,26 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 */
 	@Override
 	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
-		this.alias = query.getAlias(this);
-
-		if (this.position == null) {
-			query.addParameter(this);
-		}
-
-		if (this.mappingMap.isEmpty()) {
-			this.expandedCount++;
-		}
-
-		return "? AS " + this.alias;
+		return null;
 	}
 
 	/**
-	 * Returns the expanded parameter count of the parameter.
+	 * Returns the number of SQL parameters when expanded.
 	 * 
-	 * @return the expanded parameter count of the parameter
+	 * @return the number of SQL parameters when expanded
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	public int getExpandedCount() {
-		return this.expandedCount;
+		if (this.type.getPersistenceType() == PersistenceType.BASIC) {
+			return 1;
+		}
+		else if (this.type.getPersistenceType() == PersistenceType.EMBEDDABLE) {
+			return ((EmbeddableTypeImpl<?>) this.type).getAttributeCount();
+		}
+
+		return ((EntityTypeImpl<?>) this.type).getPrimaryTable().getPkColumns().size();
 	}
 
 	/**
@@ -157,7 +127,7 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 */
 	@Override
 	public String getName() {
-		return this.name;
+		return this.getAlias();
 	}
 
 	/**
@@ -184,96 +154,16 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * 
 	 */
 	@Override
-	public T handle(SessionImpl session, ResultSet row) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query) {
+		query.setNextSqlParam(this);
 
-	/**
-	 * Registers the parameter with the query.
-	 * 
-	 * @param query
-	 *            the query
-	 * @param mapping
-	 *            the mapping to bind to
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void registerParameter(CriteriaQueryImpl<?> query, Mapping<?, ?, ?> mapping) {
-		this.mappingMap.put(query.setNextSqlParam(this), mapping);
-	}
+		final String[] restrictions = new String[this.getExpandedCount()];
 
-	/**
-	 * Sets the parameters by expanding the embedded mapping.
-	 * 
-	 * @param parameters
-	 *            the SQL parameters
-	 * @param paramIndex
-	 *            the index corresponding to the parameter
-	 * @param mapping
-	 *            the embedded mapping
-	 * @param value
-	 *            the value to set to the parameter
-	 * 
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	private void setParameter(Object[] parameters, MutableInt sqlParamindex, EmbeddedMapping<?, ?> mapping, Object value) {
-		for (final Mapping<?, ?, ?> child : mapping.getChildren()) {
-			if (child instanceof BasicMapping) {
-				parameters[sqlParamindex.intValue()] = child.getAttribute().get(value);
-
-				sqlParamindex.increment();
-			}
-			else if (child instanceof EmbeddedMapping) {
-				this.setParameter(parameters, sqlParamindex, (EmbeddedMapping<?, ?>) child, mapping.getAttribute().get(value));
-			}
-		}
-	}
-
-	/**
-	 * Sets the parameters expanding if necessary.
-	 * 
-	 * @param parameters
-	 *            the SQL parameters
-	 * @param paramIndex
-	 *            the index corresponding to the parameter
-	 * @param sqlParamindex
-	 *            the index corresponding to expanded SQL parameter
-	 * @param value
-	 *            the value to set to the parameter
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void setParameter(Object[] parameters, MutableInt paramIndex, MutableInt sqlParamindex, Object value) {
-		final Mapping<?, ?, ?> mapping = this.mappingMap.get(paramIndex.intValue());
-
-		if (mapping instanceof BasicMapping) {
-			parameters[sqlParamindex.intValue()] = value;
-
-			sqlParamindex.increment();
-		}
-		else if (mapping instanceof EmbeddedMapping) {
-			this.setParameter(parameters, sqlParamindex, (EmbeddedMapping<?, ?>) mapping, value);
+		for (int i = 0; i < restrictions.length; i++) {
+			restrictions[i] = "?";
 		}
 
-		paramIndex.increment();
-	}
-
-	/**
-	 * Sets the position of the parameter
-	 * 
-	 * @param position
-	 *            the position
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void setPosition(int position) {
-		this.position = position;
+		return restrictions;
 	}
 
 	/**
@@ -281,7 +171,65 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * 
 	 */
 	@Override
-	public String toString() {
-		return this.generateJpqlRestriction();
+	public T handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+		return query.getParameterValue(this);
+	}
+
+	/**
+	 * Sets the parameters expanding if necessary.
+	 * 
+	 * @param parameters
+	 *            the SQL parameters
+	 * @param sqlIndex
+	 *            the index corresponding to expanded SQL parameter
+	 * @param value
+	 *            the value to set to the parameter
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setParameter(Object[] parameters, MutableInt sqlIndex, Object value) {
+		if (this.type.getPersistenceType() == PersistenceType.BASIC) {
+			parameters[sqlIndex.intValue()] = value;
+
+			sqlIndex.increment();
+		}
+		else if (this.type.getPersistenceType() == PersistenceType.ENTITY) {
+			final EntityTypeImpl<?> type = (EntityTypeImpl<?>) this.type;
+
+			this.setParameter(parameters, sqlIndex, value, type);
+		}
+		else {
+			final EmbeddableTypeImpl<?> type = (EmbeddableTypeImpl<?>) this.type;
+
+			this.setParameter(parameters, sqlIndex, value, type);
+		}
+	}
+
+	private void setParameter(Object[] parameters, MutableInt sqlIndex, Object value, final EmbeddableTypeImpl<?> type) {
+		final SingularAttributeImpl<?, ?>[] attributes = type.getSingularMappings();
+
+		for (final SingularAttributeImpl<?, ?> attribute : attributes) {
+			switch (attribute.getPersistentAttributeType()) {
+				case BASIC:
+					parameters[sqlIndex.intValue()] = attribute.get(value);
+					sqlIndex.increment();
+					break;
+				case MANY_TO_ONE:
+				case ONE_TO_ONE:
+					this.setParameter(parameters, sqlIndex, attribute.get(value), (EntityTypeImpl<?>) attribute.getType());
+					break;
+				case EMBEDDED:
+					this.setParameter(parameters, sqlIndex, attribute.get(value), (EmbeddableTypeImpl<?>) this.type);
+			}
+		}
+	}
+
+	private void setParameter(Object[] parameters, MutableInt sqlIndex, Object value, final EntityTypeImpl<?> type) {
+		for (final PkColumn column : type.getPrimaryTable().getPkColumns()) {
+			parameters[sqlIndex.intValue()] = column.getMapping().get(value);
+
+			sqlIndex.increment();
+		}
 	}
 }

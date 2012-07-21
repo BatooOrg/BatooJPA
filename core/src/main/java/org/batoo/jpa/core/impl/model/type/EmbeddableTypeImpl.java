@@ -18,14 +18,23 @@
  */
 package org.batoo.jpa.core.impl.model.type;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import javax.persistence.metamodel.EmbeddableType;
+import javax.persistence.metamodel.SingularAttribute;
 
 import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
+import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.type.EmbeddableMetadata;
 
 import sun.reflect.ConstructorAccessor;
+
+import com.google.common.collect.Lists;
 
 /**
  * Implementation of {@link EmbeddableType}.
@@ -41,6 +50,8 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	private static final Object[] EMPTY_PARAMS = new Object[] {};
 
 	private ConstructorAccessor constructor;
+	private Integer attributeCount;
+	private SingularAttributeImpl<?, ?>[] singularMappings;
 
 	/**
 	 * @param metamodel
@@ -67,12 +78,95 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	}
 
 	/**
+	 * Returns the attribute count of the embeddable.
+	 * 
+	 * @return the attribute count of the embeddable
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public int getAttributeCount() {
+		if (this.attributeCount != null) {
+			return this.attributeCount;
+		}
+		synchronized (this) {
+			if (this.attributeCount != null) {
+				return this.attributeCount;
+			}
+
+			int attributeCount = 0;
+			for (final SingularAttribute<?, ?> attribute : this.getSingularAttributes()) {
+				switch (attribute.getPersistentAttributeType()) {
+					case BASIC:
+						attributeCount++;
+						break;
+					case EMBEDDED:
+						attributeCount += ((EmbeddableTypeImpl<?>) attribute).getAttributeCount();
+					case MANY_TO_ONE:
+					case ONE_TO_ONE:
+						attributeCount += ((EntityTypeImpl<?>) attribute.getType()).getPrimaryTable().getPkColumns().size();
+				}
+			}
+
+			return this.attributeCount = attributeCount;
+		}
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
 	@Override
 	public PersistenceType getPersistenceType() {
 		return PersistenceType.EMBEDDABLE;
+	}
+
+	/**
+	 * Returns the sorted singular mappings of the embeddable.
+	 * 
+	 * @return the list of sorted singular attributes
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public SingularAttributeImpl<?, ?>[] getSingularMappings() {
+		if (this.singularMappings != null) {
+			return this.singularMappings;
+		}
+
+		synchronized (this) {
+			if (this.singularMappings != null) {
+				return this.singularMappings;
+			}
+
+			final List<SingularAttributeImpl<? super X, ?>> singularMappings = Lists.newArrayList();
+			for (final SingularAttribute<? super X, ?> attribute : this.getSingularAttributes()) {
+				switch (attribute.getPersistentAttributeType()) {
+					case BASIC:
+					case EMBEDDED:
+						singularMappings.add((SingularAttributeImpl<? super X, ?>) attribute);
+						break;
+					case MANY_TO_ONE:
+					case ONE_TO_ONE:
+						final AssociatedSingularAttribute<? super X, ?> association = (AssociatedSingularAttribute<? super X, ?>) attribute;
+						if (!association.isOwner() || !association.isJoined()) {
+							continue;
+						}
+
+						singularMappings.add((SingularAttributeImpl<? super X, ?>) attribute);
+				}
+			}
+
+			Collections.sort(singularMappings, new Comparator<SingularAttributeImpl<? super X, ?>>() {
+
+				@Override
+				public int compare(SingularAttributeImpl<? super X, ?> o1, SingularAttributeImpl<? super X, ?> o2) {
+					return o1.getAttributeId().compareTo(o2.getAttributeId());
+				}
+			});
+
+			return this.singularMappings = singularMappings.toArray(new SingularAttributeImpl[singularMappings.size()]);
+		}
 	}
 
 	/**
