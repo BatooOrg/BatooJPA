@@ -70,4 +70,22 @@ public class BatooUtils {
 
 		return "\t" + str.replaceAll("\n", "\n\t");
 	}
+
+	/**
+	 * Indents the <code>string</code> by one <code>tab</code>.
+	 * 
+	 * @param str
+	 *            string to indent
+	 * @return the indented string
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public static String tree(String str) {
+		if (StringUtils.isBlank(str)) {
+			return "";
+		}
+
+		return "|-->" + str.replaceAll("\n", "\n|   ");
+	}
 }
