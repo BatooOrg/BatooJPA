@@ -21,19 +21,21 @@ package org.batoo.jpa.core.impl.manager;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import javax.persistence.Cache;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceException;
 import javax.persistence.PersistenceUnitUtil;
 import javax.persistence.Query;
 import javax.persistence.SynchronizationType;
-import javax.persistence.metamodel.Metamodel;
 
 import org.batoo.jpa.common.BatooException;
 import org.batoo.jpa.core.BJPASettings;
 import org.batoo.jpa.core.JPASettings;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
+import org.batoo.jpa.core.impl.criteria.jpql.JpqlQuery;
 import org.batoo.jpa.core.impl.deployment.DdlManager;
 import org.batoo.jpa.core.impl.deployment.LinkManager;
 import org.batoo.jpa.core.impl.jdbc.AbstractJdbcAdaptor;
@@ -42,6 +44,10 @@ import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.PersistenceParser;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 /**
  * Implementation of {@link EntityManagerFactory}.
@@ -57,6 +63,13 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	private final Map<String, Object> properties;
 	private boolean open;
 	private final CriteriaBuilderImpl criteriaBuilder;
+
+	LoadingCache<String, JpqlQuery> graphs = CacheBuilder.newBuilder().maximumSize(1000).build(new CacheLoader<String, JpqlQuery>() {
+		@Override
+		public JpqlQuery load(String jpql) {
+			return new JpqlQuery(EntityManagerFactoryImpl.this, jpql);
+		}
+	});
 
 	/**
 	 * @param name
@@ -205,7 +218,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * 
 	 */
 	@Override
-	public Metamodel getMetamodel() {
+	public MetamodelImpl getMetamodel() {
 		return this.metamodel;
 	}
 
@@ -217,6 +230,29 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	public PersistenceUnitUtil getPersistenceUnitUtil() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	/**
+	 * Returns a lazy created {@link JpqlQuery} for the query.
+	 * 
+	 * @param qlString
+	 *            the JPQL query string
+	 * @return the Jpql Query object
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public JpqlQuery getpqlQuery(String qlString) {
+		try {
+			return this.graphs.get(qlString);
+		}
+		catch (final ExecutionException e) {
+			if (e.getCause() instanceof PersistenceException) {
+				throw (PersistenceException) e.getCause();
+			}
+
+			throw new PersistenceException("Cannot parse query: " + e.getMessage(), e);
+		}
 	}
 
 	/**

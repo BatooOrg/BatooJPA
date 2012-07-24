@@ -44,6 +44,7 @@ import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
+import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
@@ -57,43 +58,34 @@ import com.google.common.collect.Maps;
 /**
  * The class that constructs a {@link CriteriaQuery} out of JPQL.
  * 
- * @param <T>
- *            The result class
- * 
  * @author hceylan
  * @since $version
  */
-public class JpqlQuery<T> {
+public class JpqlQuery {
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(JpqlQuery.class);
 
-	private final EntityManagerImpl entityManager;
 	private final MetamodelImpl metamodel;
 	private final String qlString;
-	private final Class<T> resultClass;
 
-	private final CriteriaQueryImpl<T> criteriaQuery;
+	private final CriteriaQueryImpl<?> criteriaQuery;
 	private final Map<String, AbstractFrom<?, ?>> aliasMap = Maps.newHashMap();
 	private final Map<String, AbstractSelection<?>> selectMap = Maps.newHashMap();
 
 	/**
-	 * @param entityManager
-	 *            the entity manager
+	 * @param entityManagerFactory
+	 *            the entity manager factorey
 	 * @param qlString
 	 *            the query string
-	 * @param resultClass
-	 *            the result class
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public JpqlQuery(EntityManagerImpl entityManager, String qlString, Class<T> resultClass) {
+	public JpqlQuery(EntityManagerFactoryImpl entityManagerFactory, String qlString) {
 		super();
 
-		this.entityManager = entityManager;
-		this.metamodel = entityManager.getMetamodel();
+		this.metamodel = entityManagerFactory.getMetamodel();
 		this.qlString = qlString;
-		this.resultClass = resultClass;
 
 		this.criteriaQuery = this.parse();
 	}
@@ -107,9 +99,9 @@ public class JpqlQuery<T> {
 	 * @author hceylan
 	 * @return
 	 */
-	private CriteriaQueryImpl<T> construct(CommonTree tree) {
+	private CriteriaQueryImpl<Object> construct(CommonTree tree) {
 		final CriteriaBuilderImpl cb = this.metamodel.getEntityManagerFactory().getCriteriaBuilder();
-		final CriteriaQueryImpl<T> q = cb.createQuery(this.resultClass);
+		final CriteriaQueryImpl<Object> q = cb.createQuery(Object.class);
 
 		final Tree type = tree.getChild(0);
 		if (type.getType() == JpqlParser.SELECT) {
@@ -145,7 +137,7 @@ public class JpqlQuery<T> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private void constructFrom(CriteriaBuilderImpl cb, CriteriaQueryImpl<T> q, Tree froms) {
+	private void constructFrom(CriteriaBuilderImpl cb, CriteriaQueryImpl<?> q, Tree froms) {
 		for (int i = 0; i < froms.getChildCount(); i++) {
 			final Tree from = froms.getChild(i);
 			final Aliased fromDef = new Aliased(this.aliasMap, from.getChild(0), false);
@@ -178,7 +170,7 @@ public class JpqlQuery<T> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private void constructJoins(CriteriaBuilderImpl cb, CriteriaQueryImpl<T> q, RootImpl<Object> r, Tree joins) {
+	private void constructJoins(CriteriaBuilderImpl cb, CriteriaQueryImpl<?> q, RootImpl<Object> r, Tree joins) {
 		for (int i = 0; i < joins.getChildCount(); i++) {
 			final Tree join = joins.getChild(i);
 
@@ -288,8 +280,7 @@ public class JpqlQuery<T> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
-	private void constructSelect(CriteriaBuilderImpl cb, CriteriaQuery<T> q, Tree selects) {
+	private void constructSelect(CriteriaBuilderImpl cb, CriteriaQueryImpl<Object> q, Tree selects) {
 		final List<Selection<?>> selections = Lists.newArrayList();
 
 		for (int i = 0; i < selects.getChildCount(); i++) {
@@ -317,7 +308,7 @@ public class JpqlQuery<T> {
 		}
 
 		if (selections.size() == 1) {
-			q.select((Selection<? extends T>) selections.get(0));
+			q.select(selections.get(0));
 		}
 		else {
 			q.multiselect(selections);
@@ -325,14 +316,22 @@ public class JpqlQuery<T> {
 	}
 
 	/**
-	 * Returns the typed query for the query.
+	 * Creates a typed query for the JPQL.
 	 * 
+	 * @param entityManager
+	 *            the entity manager
+	 * @param resutClass
+	 *            the result class
+	 * @param <T>
+	 *            the result type
 	 * @return the typed query
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public TypedQueryImpl<T> createTypedQuery() {
-		return new TypedQueryImpl<T>(this.criteriaQuery, this.entityManager);
+	@SuppressWarnings("unchecked")
+	public <T> TypedQueryImpl<T> createTypedQuery(EntityManagerImpl entityManager, Class<T> resutClass) {
+		return new TypedQueryImpl<T>((CriteriaQueryImpl<T>) this.criteriaQuery, entityManager);
 	}
 
 	/**
@@ -386,7 +385,7 @@ public class JpqlQuery<T> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private CriteriaQueryImpl<T> parse() {
+	private CriteriaQueryImpl<?> parse() {
 		final CommonTree tree = this.parse(this.qlString);
 
 		JpqlQuery.LOG.debug("Parsed query successfully {0}", JpqlQuery.LOG.lazyBoxed(this.qlString, new Object[] { tree.toStringTree() }));

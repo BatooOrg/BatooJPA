@@ -217,37 +217,42 @@ public class Playground {
 		this.oldTime = newTime;
 	}
 
-	private List<Person> createPersons() {
-		final List<Person> persons = Lists.newArrayList();
+	@SuppressWarnings("unchecked")
+	private List<Person>[] createPersons() {
+		final List<Person>[] persons = new List[10];
 
 		for (int i = 0; i < 10; i++) {
-			final Person person = new Person();
+			persons[i] = Lists.newArrayList();
 
-			person.setName("Hasan");
+			for (int j = 0; j < 10; j++) {
+				final Person person = new Person();
 
-			final Address address = new Address();
-			address.setCity("Istanbul");
-			address.setPerson(person);
-			address.setCountry(this.country);
-			person.getAddresses().add(address);
+				person.setName("Hasan");
 
-			final Address address2 = new Address();
-			address2.setCity("Istanbul");
-			address2.setPerson(person);
-			address2.setCountry(this.country);
-			person.getAddresses().add(address2);
+				final Address address = new Address();
+				address.setCity("Istanbul");
+				address.setPerson(person);
+				address.setCountry(this.country);
+				person.getAddresses().add(address);
 
-			final Phone phone = new Phone();
-			phone.setPhoneNo("111 222-3344");
-			phone.setPerson(person);
-			person.getPhones().add(phone);
+				final Address address2 = new Address();
+				address2.setCity("Istanbul");
+				address2.setPerson(person);
+				address2.setCountry(this.country);
+				person.getAddresses().add(address2);
 
-			final Phone phone2 = new Phone();
-			phone2.setPhoneNo("111 222-3344");
-			phone2.setPerson(person);
-			person.getPhones().add(phone2);
+				final Phone phone = new Phone();
+				phone.setPhoneNo("111 222-3344");
+				phone.setPerson(person);
+				person.getPhones().add(phone);
 
-			persons.add(person);
+				final Phone phone2 = new Phone();
+				phone2.setPhoneNo("111 222-3344");
+				phone2.setPerson(person);
+				person.getPhones().add(phone2);
+
+				persons[i].add(person);
+			}
 		}
 
 		return persons;
@@ -267,20 +272,8 @@ public class Playground {
 		this.dobatoo();
 	}
 
-	private void doCriteria(final EntityManagerFactory emf, final Person person) {
-		final CriteriaBuilder cb = emf.getCriteriaBuilder();
-		final CriteriaQuery<Address> cq = cb.createQuery(Address.class);
-
-		final Root<Person> r = cq.from(Person.class);
-		final Join<Person, Address> a = r.join("addresses");
-		a.fetch("country");
-		a.fetch("person");
-		cq.select(a);
-
-		final ParameterExpression<Person> p = cb.parameter(Person.class);
-		cq.where(cb.equal(r, p));
-
-		for (int i = 0; i < 5; i++) {
+	private void doCriteria(final EntityManagerFactory emf, final Person person, CriteriaQuery<Address> cq, ParameterExpression<Person> p) {
+		for (int i = 1; i < 5; i++) {
 			final EntityManager em = emf.createEntityManager();
 
 			final TypedQuery<Address> q = em.createQuery(cq);
@@ -292,7 +285,7 @@ public class Playground {
 	}
 
 	private void doFind(final EntityManagerFactory emf, final Person person) {
-		for (int i = 0; i < 25; i++) {
+		for (int i = 0; i < 250; i++) {
 			final EntityManager em = emf.createEntityManager();
 
 			final Person person2 = em.find(Person.class, person.getId());
@@ -319,8 +312,8 @@ public class Playground {
 			final TypedQuery<Address> q = em.createQuery(//
 				"select a from Person p\n" + //
 					"left join p.addresses a\n" + //
-					"fetch join a.country\n" + //
-					"fetch join a.person\n" + //
+					"join fetch a.country\n" + //
+					"join fetch a.person\n" + //
 					"where p = :person", Address.class);
 
 			q.setParameter("person", person);
@@ -330,30 +323,33 @@ public class Playground {
 		}
 	}
 
-	private void doPersist(final EntityManagerFactory emf, List<Person> persons) {
-		final EntityManager em = emf.createEntityManager();
+	private void doPersist(final EntityManagerFactory emf, List<Person>[] persons) {
+		for (final List<Person> list : persons) {
+			final EntityManager em = emf.createEntityManager();
 
-		final EntityTransaction tx = em.getTransaction();
+			final EntityTransaction tx = em.getTransaction();
 
-		tx.begin();
+			tx.begin();
 
-		for (final Person person : persons) {
-			em.persist(person);
+			for (final Person person : list) {
+				em.persist(person);
+			}
+
+			tx.commit();
+
+			em.close();
 		}
-
-		tx.commit();
-
-		em.close();
 	}
 
-	private void doRemove(final EntityManagerFactory emf, final List<Person> persons) {
+	private void doRemove(final EntityManagerFactory emf, final List<Person>[] persons) {
 		final EntityManager em = emf.createEntityManager();
 		em.getTransaction().begin();
 
-		for (final Person person : persons) {
-
-			final Person person2 = em.find(Person.class, person.getId());
-			em.remove(person2);
+		for (int i = 0; i < 5; i++) {
+			for (final Person person : persons[i]) {
+				final Person person2 = em.find(Person.class, person.getId());
+				em.remove(person2);
+			}
 		}
 
 		em.getTransaction().commit();
@@ -389,7 +385,7 @@ public class Playground {
 	}
 
 	private void doUpdate(final EntityManagerFactory emf, final Person person) {
-		for (int i = 0; i < 25; i++) {
+		for (int i = 0; i < 100; i++) {
 			final EntityManager em = emf.createEntityManager();
 
 			final Person person2 = em.find(Person.class, person.getId());
@@ -403,21 +399,33 @@ public class Playground {
 		}
 	}
 
-	private void singleTest(final EntityManagerFactory emf, List<Person> persons) {
+	private void singleTest(final EntityManagerFactory emf, List<Person>[] persons, CriteriaQuery<Address> cq, ParameterExpression<Person> p) {
 		this.doPersist(emf, persons);
 
-		// this.doFind(emf, persons.get(0));
+		this.doFind(emf, persons[0].get(0));
 
-		// this.doUpdate(emf, persons.get(0));
+		this.doUpdate(emf, persons[0].get(0));
 
-		// this.doRemove(emf, persons.subList(5, 9));
+		this.doCriteria(emf, persons[0].get(0), cq, p);
 
-		// this.doCriteria(emf, persons.get(0));
+		this.doJpql(emf, persons[0].get(0));
 
-		// this.doJpql(emf, persons.get(0));
+		this.doRemove(emf, persons);
 	}
 
 	private void test(Type type, final EntityManagerFactory emf) {
+		final CriteriaBuilder cb = emf.getCriteriaBuilder();
+		final CriteriaQuery<Address> cq = cb.createQuery(Address.class);
+
+		final Root<Person> r = cq.from(Person.class);
+		final Join<Person, Address> a = r.join("addresses");
+		a.fetch("country");
+		a.fetch("person");
+		cq.select(a);
+
+		final ParameterExpression<Person> p = cb.parameter(Person.class);
+		cq.where(cb.equal(r, p));
+
 		while (!this.running) {
 			try {
 				Thread.sleep(1);
@@ -425,8 +433,8 @@ public class Playground {
 			catch (final InterruptedException e) {}
 		}
 
-		for (int i = 0; i < 10000; i++) {
-			this.singleTest(emf, this.createPersons());
+		for (int i = 0; i < 1000; i++) {
+			this.singleTest(emf, this.createPersons(), cq, p);
 		}
 	}
 }

@@ -37,7 +37,6 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
-import javax.persistence.metamodel.Metamodel;
 import javax.persistence.metamodel.PluralAttribute.CollectionType;
 import javax.sql.DataSource;
 
@@ -345,7 +344,8 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public <T> TypedQuery<T> createQuery(String qlString, Class<T> resultClass) {
-		return new JpqlQuery<T>(this, qlString, resultClass).createTypedQuery();
+		final JpqlQuery jpqlQuery = this.emf.getpqlQuery(qlString);
+		return jpqlQuery.createTypedQuery(this, resultClass);
 	}
 
 	/**
