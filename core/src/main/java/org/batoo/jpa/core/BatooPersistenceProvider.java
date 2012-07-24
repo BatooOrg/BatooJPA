@@ -67,5 +67,4 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }

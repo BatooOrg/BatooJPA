@@ -303,8 +303,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public CriteriaQuery<Object> createQuery() {
-		// TODO Auto-generated method stub
-		return null;
+		return new CriteriaQueryImpl<Object>(this.metamodel, Object.class);
 	}
 
 	/**

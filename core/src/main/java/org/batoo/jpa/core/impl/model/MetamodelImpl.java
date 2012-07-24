@@ -116,6 +116,7 @@ public class MetamodelImpl implements Metamodel {
 	private final Map<Class<?>, MappedSuperclassType<?>> mappedSuperclasses = Maps.newHashMap();
 	private final Map<Class<?>, EmbeddableType<?>> embeddables = Maps.newHashMap();
 	private final Map<Class<?>, EntityTypeImpl<?>> entities = Maps.newHashMap();
+	private final Map<String, EntityTypeImpl<?>> entitiesByName = Maps.newHashMap();
 
 	private final CallbackManager callbackManager;
 
@@ -217,6 +218,8 @@ public class MetamodelImpl implements Metamodel {
 					final EntityTypeImpl entity = new EntityTypeImpl(this, (IdentifiableTypeImpl) parent, clazz, (EntityMetadata) type);
 
 					this.entities.put(entity.getJavaType(), entity);
+					this.entitiesByName.put(entity.getName(), entity);
+					this.entitiesByName.put(entity.getJavaType().getName(), entity);
 				}
 				else if (type instanceof MappedSuperclassMetadata) {
 					// make sure it extends a mapped superclass type
@@ -314,6 +317,23 @@ public class MetamodelImpl implements Metamodel {
 	@SuppressWarnings("unchecked")
 	public <X> EntityTypeImpl<X> entity(Class<X> clazz) {
 		return (EntityTypeImpl<X>) this.entities.get(clazz);
+	}
+
+	/**
+	 * Returns the entity by name.
+	 * 
+	 * @param name
+	 *            the simple or fully qualified name of the entity.
+	 * @param <X>
+	 *            the type of the entity
+	 * @return the entity or null
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	public <X> EntityTypeImpl<X> entity(String name) {
+		return (EntityTypeImpl<X>) this.entitiesByName.get(name);
 	}
 
 	/**

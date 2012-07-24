@@ -69,9 +69,11 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	}
 
 	private void ensureAlias(CriteriaQueryImpl<?> query) {
-		if (StringUtils.isBlank(this.getAlias())) {
+		if (this.position == null) {
 			this.position = query.getAlias(this);
-			this.alias("param" + this.position);
+			if (StringUtils.isBlank(this.getAlias())) {
+				this.alias("param" + this.position);
+			}
 		}
 	}
 

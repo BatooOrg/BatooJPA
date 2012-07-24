@@ -107,6 +107,6 @@ public class SimpleTest {
 	@Test
 	public void testTestSimpleSelect() {
 		final CommonTree tree = this.parse("first.jpql");
-		System.out.println(tree.toStringTree());
+		System.out.println(this.print(tree));
 	}
 }

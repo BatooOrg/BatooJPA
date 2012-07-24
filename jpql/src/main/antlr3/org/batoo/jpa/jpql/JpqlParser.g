@@ -23,6 +23,7 @@ tokens {
     ST_COLL;
     ST_JOIN;
     ST_ID_AS;
+    ST_SELECT;
 }
 
 @header {
@@ -55,26 +56,30 @@ from_declaration_or_collection_member_declaration :
     | collection_member_declaration;
 
 from_declaration :
-    aliased_qid ( join)*
+    faliased_qid ( join)*
         -> ^( 
-                ST_FROM aliased_qid
+                ST_FROM faliased_qid
                 ^( 
                     LJOINS ( join)*
                   )
               );
 
 join :
-    ((LEFT ( OUTER)? JOIN (FETCH)?)
-    | INNER JOIN)
-     aliased_fqid
+    (
+    (
+    LEFT ( OUTER)? JOIN ( FETCH)?
+    )
+    | INNER JOIN
+    )
+    ID Period faliased_qid
         -> ^( 
-                ST_JOIN ( INNER)? (FETCH)? aliased_fqid
+                ST_JOIN ( INNER)? ( FETCH)? ID faliased_qid
               );
 
 collection_member_declaration :
-    IN Left_Paren fqid Right_Paren ( ( AS)? ID)?
+    IN Left_Paren ID Period qid Right_Paren ( ( AS)? ID)?
         -> ^( 
-                ST_COLL fqid ( ID)?
+                ST_COLL ID qid ( ID)?
               );
 
 update_clause :
@@ -110,11 +115,20 @@ select_expressions :
               );
 
 select_expression :
-    aliased_qid
+    (
+    ID ( AS? ID)?
+        -> ^( 
+                ST_SELECT
+                ^( ST_ID_AS ID ID  )
+              )
+    )
+    | ( aliased_fqid
+        -> ^( ST_SELECT aliased_fqid  )
+)
 //  | aggregate_expression
-    //  | 'OBJECT' Left_Paren ID Right_Paren
-    //  | constructor_expression
-    ;
+//  | 'OBJECT' Left_Paren ID Right_Paren
+//  | constructor_expression
+;
 
 //constructor_expression
 //  :
@@ -447,7 +461,8 @@ boolean_expression :
     ;
 
 boolean_primary :
-    qid
+    ID
+    | ID Period qid
     //  | boolean_literal
     | input_parameter;
 
@@ -467,7 +482,7 @@ boolean_primary :
 //entity_expression
 //  :
 //  single_valued_association_path_expression
-//  | simple_entity_expression
+//  | simple_entity_expressioni
 //  ;
 //
 //simple_entity_expression
@@ -559,6 +574,12 @@ input_parameter :
 //  )
 //  ;
 //
+
+faliased_qid :
+    qid ( AS)? ID
+        -> ^( 
+                ST_ID_AS qid ( ID)?
+              );
 
 aliased_qid :
     qid ( ( AS)? ID)?

@@ -1,10 +1,10 @@
-SELECT DISTINCT p.id pid, p.name, p.surname, ph.primary.area, ph.primary.phoneNo
+SELECT DISTINCT p, p2 as pp2, p.id pid, p.name, p.surname, ph.primary.area, ph.primary.phoneNo
 --, a.country.city
 FROM 
 	com.example.Person  p  
 		left join Fetch p.manager m
 		left outer join p.employees eeeeeeeee 
-		inner join p.boss, 
+		inner join p.boss b, 
 	IN (p.phones) ph, 
 	Address a 
 		LEFT OUTER JOIN a.country c
