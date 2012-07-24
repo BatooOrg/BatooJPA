@@ -71,12 +71,11 @@ public class BooleanExpression extends AbstractExpression<Boolean> {
 	}
 
 	/**
-	 * {@inheritDoc}
-	 * 
+	 * {@inheritDoc} // TODO Auto-generated method stub return null;
 	 */
 	@Override
-	public String generateJpqlSelect(CriteriaQueryImpl<?> query) {
-		return this.inner.generateJpqlSelect(null);
+	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+		return this.inner.generateJpqlSelect(null, selected);
 	}
 
 	/**
@@ -98,8 +97,8 @@ public class BooleanExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
-		return this.inner.generateSqlSelect(query);
+	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+		return this.inner.generateSqlSelect(query, selected);
 	}
 
 	/**

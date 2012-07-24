@@ -65,17 +65,8 @@ public class ConstantExpression extends ParameterExpressionImpl<Object> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(CriteriaQueryImpl<?> query) {
+	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
 		return this.value.toString();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
-		return this.value instanceof CharSequence ? "'" + this.value.toString() + "'" : this.value.toString();
 	}
 
 	/**

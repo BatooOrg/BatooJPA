@@ -255,11 +255,11 @@ public class ForeignKey {
 		// append the join part
 		switch (joinType) {
 			case INNER:
-				return "\tINNER JOIN " + tableName + " AS " + alias + " ON " + join;
+				return "INNER JOIN " + tableName + " AS " + alias + " ON " + join;
 			case LEFT:
-				return "\tLEFT JOIN " + tableName + " AS " + alias + " ON " + join;
+				return "LEFT JOIN " + tableName + " AS " + alias + " ON " + join;
 			default:
-				return "\tRIGHT JOIN " + tableName + " AS " + alias + " ON " + join;
+				return "RIGHT JOIN " + tableName + " AS " + alias + " ON " + join;
 		}
 	}
 

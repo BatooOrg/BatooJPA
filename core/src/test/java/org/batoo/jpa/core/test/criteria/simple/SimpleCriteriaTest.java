@@ -135,8 +135,9 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 		final CriteriaBuilderImpl cb = this.em().getCriteriaBuilder();
 		final CriteriaQueryImpl<Address> q = cb.createQuery(Address.class);
 		final RootImpl<Person> r = q.from(Person.class);
-		final Join<Person, Address> a = r.<Address> join("addresses");
-		// a.alias("a");
+		final Join<Person, Address> a = r.join("addresses");
+		a.fetch("person");
+		a.fetch("country");
 		q.select(a);
 
 		final List<Address> resultList = this.em().createQuery(q).getResultList();

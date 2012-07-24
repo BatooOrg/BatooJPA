@@ -109,8 +109,8 @@ public class MapJoinImpl<Z, K, V> extends AbstractJoin<Z, V> implements MapJoin<
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
-		return this.generateSqlSelect(query, MapSelectType.VALUE);
+	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+		return this.generateSqlSelect(query, selected, MapSelectType.VALUE);
 	}
 
 	/**
@@ -118,6 +118,8 @@ public class MapJoinImpl<Z, K, V> extends AbstractJoin<Z, V> implements MapJoin<
 	 * 
 	 * @param query
 	 *            the query
+	 * @param selected
+	 *            id the join is selected
 	 * @param selectType
 	 *            the select type
 	 * @return the SQL select fragment
@@ -125,7 +127,9 @@ public class MapJoinImpl<Z, K, V> extends AbstractJoin<Z, V> implements MapJoin<
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String generateSqlSelect(CriteriaQueryImpl<?> query, MapSelectType selectType) {
+	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected, MapSelectType selectType) {
+		this.select(selected);
+
 		return this.getFetchRoot().generateSqlSelect(query, this.getParentPath() == null, selectType);
 	}
 
@@ -137,16 +141,6 @@ public class MapJoinImpl<Z, K, V> extends AbstractJoin<Z, V> implements MapJoin<
 	@SuppressWarnings("unchecked")
 	public MapAttributeImpl<? super Z, K, V> getModel() {
 		return (MapAttributeImpl<? super Z, K, V>) this.getAttribute();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public V handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
-		return (V) this.handle(session, row, MapSelectType.VALUE);
 	}
 
 	/**
@@ -192,6 +186,16 @@ public class MapJoinImpl<Z, K, V> extends AbstractJoin<Z, V> implements MapJoin<
 			default:
 				return result;
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public V handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+		return (V) this.handle(session, row, MapSelectType.VALUE);
 	}
 
 	/**

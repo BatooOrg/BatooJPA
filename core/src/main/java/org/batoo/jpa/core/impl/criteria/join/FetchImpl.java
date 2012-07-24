@@ -81,19 +81,7 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	public String generateJpqlFetches(String parent) {
 		final StringBuilder builder = new StringBuilder();
 
-		switch (this.joinType) {
-			case INNER:
-				builder.append("inner");
-				break;
-			case LEFT:
-				builder.append("left");
-				break;
-			case RIGHT:
-				builder.append("right");
-				break;
-		}
-
-		builder.append(" join fetch ");
+		builder.append("left join fetch ");
 
 		builder.append(parent).append(".").append(this.mapping.getAttribute().getName());
 

@@ -31,9 +31,12 @@ package org.batoo.jpa.jpql;
 }
 
 ql_statement :
+    (
     select_statement
     | update_statement
-    | delete_statement EOF;
+    | delete_statement
+    )
+    EOF;
 
 select_statement :
     select_clause from_clause ( where_clause)? //(groupby_clause)? (having_clause)? (orderby_clause)?
@@ -65,15 +68,28 @@ from_declaration :
               );
 
 join :
+    fetch_join
+    | left_join
+    | inner_join;
+
+fetch_join :
     (
-    (
-    LEFT ( OUTER)? JOIN ( FETCH)?
+    ( LEFT)? ( OUTER)? JOIN FETCH ID Period qid
     )
-    | INNER JOIN
-    )
-    ID Period faliased_qid
+        -> ^( ST_JOIN FETCH ID qid  );
+
+left_join :
+    ( LEFT ( OUTER)? JOIN ID Period qid AS? ID)
         -> ^( 
-                ST_JOIN ( INNER)? ( FETCH)? ID faliased_qid
+                ST_JOIN LEFT ID
+                ^( ST_ID_AS qid ID  )
+              );
+
+inner_join :
+    ( ( INNER)? JOIN ID Period qid AS? ID)
+        -> ^( 
+                ST_JOIN JOIN ID 
+                ^( ST_ID_AS qid ID  )
               );
 
 collection_member_declaration :

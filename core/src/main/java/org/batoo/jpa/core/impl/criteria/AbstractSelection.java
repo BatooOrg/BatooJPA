@@ -68,26 +68,30 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	 * Returns the JPQL select fragment.
 	 * 
 	 * @param query
-	 *            TODO
+	 *            the criteria query
+	 * @param selected
+	 *            if the selection is selected
 	 * 
 	 * @return the JPQL select fragment
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract String generateJpqlSelect(CriteriaQueryImpl<?> query);
+	public abstract String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected);
 
 	/**
 	 * Returns the SQL select fragment.
 	 * 
 	 * @param query
 	 *            the query
+	 * @param selected
+	 *            if the selection is selected
 	 * @return the SQL select fragment
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract String generateSqlSelect(CriteriaQueryImpl<?> query);
+	public abstract String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected);
 
 	/**
 	 * {@inheritDoc}

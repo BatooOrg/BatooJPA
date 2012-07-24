@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.criteria.path;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Path;
 
 import org.apache.commons.lang.StringUtils;
@@ -64,7 +65,7 @@ public class PluralAssociationPath<Z, X> extends AbstractPath<X> implements Join
 		super(parent, mapping.getType().getJavaType());
 
 		this.mapping = mapping;
-		this.fetchRoot = parent.getFetchRoot().fetch(mapping.getAttribute());
+		this.fetchRoot = parent.getFetchRoot().join(mapping.getAttribute().getName(), JoinType.LEFT);
 	}
 
 	/**
@@ -87,14 +88,14 @@ public class PluralAssociationPath<Z, X> extends AbstractPath<X> implements Join
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(CriteriaQueryImpl<?> query) {
+	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
 		final StringBuilder builder = new StringBuilder();
 
 		if ((this.getParentPath() instanceof AbstractFrom) && StringUtils.isNotBlank(this.getParentPath().getAlias())) {
 			builder.append(this.getParentPath().getAlias());
 		}
 		else {
-			builder.append(this.getParentPath().generateJpqlSelect(null));
+			builder.append(this.getParentPath().generateJpqlSelect(null, false));
 		}
 
 		builder.append(".").append(this.mapping.getAttribute().getName());
@@ -110,7 +111,7 @@ public class PluralAssociationPath<Z, X> extends AbstractPath<X> implements Join
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
+	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
 		return this.fetchRoot.generateSqlSelect(query, false);
 	}
 

@@ -1,11 +1,5 @@
-SELECT DISTINCT p, p2 as pp2, p.id pid, p.name, p.surname, ph.primary.area, ph.primary.phoneNo
---, a.country.city
-FROM 
-	com.example.Person  p  
-		left join Fetch p.manager m
-		left outer join p.employees eeeeeeeee 
-		inner join p.boss b, 
-	IN (p.phones) ph, 
-	Address a 
-		LEFT OUTER JOIN a.country c
-WHERE p.age = :name2 AND p.name = ?1 OR p.name = :name /*OR p.surname = :surname*/
+select p from Person p
+	join fetch p.addresses
+	join fetch p.addresses.country
+	left join p.addresses a 
+	inner join p.addresses a2

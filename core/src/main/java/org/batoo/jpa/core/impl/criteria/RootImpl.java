@@ -56,7 +56,9 @@ public class RootImpl<X> extends AbstractFrom<X, X> implements Root<X> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(CriteriaQueryImpl<?> query) {
+	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+		super.generateJpqlSelect(query, selected);
+
 		if (StringUtils.isNotBlank(this.getAlias())) {
 			return this.getAlias();
 		}

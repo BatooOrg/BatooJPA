@@ -95,7 +95,7 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(CriteriaQueryImpl<?> query) {
+	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
 		return this.generateJpqlRestriction(query);
 	}
 
@@ -104,7 +104,7 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
+	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
 		return null;
 	}
 

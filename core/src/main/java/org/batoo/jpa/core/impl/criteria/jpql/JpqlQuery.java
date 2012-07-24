@@ -25,6 +25,8 @@ import java.util.Map;
 import javax.persistence.PersistenceException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.FetchParent;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Selection;
 
@@ -153,6 +155,61 @@ public class JpqlQuery<T> {
 			r.alias(fromDef.getAlias());
 
 			this.aliasMap.put(fromDef.getAlias(), r);
+
+			if (from.getChildCount() == 2) {
+				this.constructJoins(cb, q, r, from.getChild(1));
+			}
+
+		}
+	}
+
+	/**
+	 * Creates the from fragment of the query.
+	 * 
+	 * @param cb
+	 *            the criteria builder
+	 * @param q
+	 *            the query join
+	 * @param r
+	 *            the root
+	 * @param joins
+	 *            the joins metadata
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void constructJoins(CriteriaBuilderImpl cb, CriteriaQueryImpl<T> q, RootImpl<Object> r, Tree joins) {
+		for (int i = 0; i < joins.getChildCount(); i++) {
+			final Tree join = joins.getChild(i);
+
+			final int joinType = join.getChild(0).getType();
+			if (joinType == JpqlParser.FETCH) {
+				FetchParent<?, ?> parent = this.aliasMap.get(join.getChild(1).getText());
+
+				final Qualified qualified = new Qualified(join.getChild(2), false);
+
+				for (final String segment : qualified.getSegments()) {
+					parent = parent.fetch(segment);
+				}
+			}
+			else {
+				final Aliased aliased = new Aliased(this.aliasMap, join.getChild(2), false);
+
+				AbstractFrom<?, ?> parent = this.aliasMap.get(join.getChild(1).getText());
+
+				for (final String segment : aliased.getQualified().getSegments()) {
+					if (joinType == JpqlParser.LEFT) {
+						parent = parent.join(segment, JoinType.LEFT);
+					}
+					else {
+						parent = parent.join(segment, JoinType.INNER);
+					}
+				}
+
+				parent.alias(aliased.getAlias());
+
+				this.aliasMap.put(aliased.getAlias(), parent);
+			}
 		}
 	}
 

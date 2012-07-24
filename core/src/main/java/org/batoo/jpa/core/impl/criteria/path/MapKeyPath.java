@@ -71,8 +71,8 @@ public class MapKeyPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(CriteriaQueryImpl<?> query) {
-		return this.mapJoin.generateJpqlSelect(null) + ".key";
+	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+		return this.mapJoin.generateJpqlSelect(null, selected) + ".key";
 	}
 
 	/**
@@ -80,8 +80,8 @@ public class MapKeyPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
-		return this.mapJoin.generateSqlSelect(query, MapSelectType.KEY);
+	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+		return this.mapJoin.generateSqlSelect(query, selected, MapSelectType.KEY);
 	}
 
 	/**

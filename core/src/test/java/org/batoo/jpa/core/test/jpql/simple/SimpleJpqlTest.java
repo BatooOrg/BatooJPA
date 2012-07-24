@@ -95,6 +95,77 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
+	public void testAssociation() {
+		this.persist(this.person());
+		this.persist(this.person());
+		this.commit();
+
+		this.close();
+
+		final TypedQuery<Address> q = this.em().createQuery("select a from Person p inner join p.addresses a", Address.class);
+
+		final List<Address> resultList = q.getResultList();
+		Assert.assertEquals(6, resultList.size());
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testAssociationJoin() {
+		final Person person = this.person();
+		this.persist(person);
+		this.persist(this.person());
+		this.commit();
+
+		this.close();
+
+		final TypedQuery<Address> q = this.em().createQuery(//
+			"select a from Person p\n" + //
+				"left join p.addresses as a \n" + //
+				"join fetch a.country \n" + //
+				"join fetch a.person \n" + //
+				"where p = :person", Address.class);
+		q.setParameter("person", person);
+
+		final List<Address> resultList = q.getResultList();
+		Assert.assertEquals(3, resultList.size());
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testRootJoin() {
+		this.persist(this.person());
+		this.persist(this.person());
+		this.commit();
+
+		this.close();
+
+		final TypedQuery<Person> q = this.em().createQuery(//
+			"select p from Person p\n" + //
+				"    join fetch p.addresses\n" + //
+				"    join fetch p.addresses.country\n" + //
+				"    left join p.addresses a", //
+			Person.class);
+
+		final List<Person> resultList = q.getResultList();
+
+		Assert.assertEquals(18, resultList.size());
+		Assert.assertEquals(3, resultList.get(0).getAddresses().size());
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
 	public void testSimple0() {
 		final TypedQuery<Country> q = this.em().createQuery("select c from Country c", Country.class);
 		final List<Country> resultList = q.getResultList();

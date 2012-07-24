@@ -26,6 +26,7 @@ import java.util.List;
 
 import javax.persistence.criteria.Path;
 
+import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.criteria.join.FetchParentImpl;
@@ -94,9 +95,17 @@ public class EmbeddedAttributePath<Z, X> extends AbstractPath<X> implements Pare
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(CriteriaQueryImpl<?> query) {
-		// TODO Auto-generated method stub
-		return null;
+	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+		final StringBuilder builder = new StringBuilder();
+
+		builder.append(this.getParentPath().generateJpqlSelect(query, false));
+
+		builder.append(".").append(this.mapping.getAttribute().getName());
+		if (StringUtils.isNotBlank(this.getAlias())) {
+			builder.append(" as ").append(this.getAlias());
+		}
+
+		return builder.toString();
 	}
 
 	/**
@@ -104,12 +113,7 @@ public class EmbeddedAttributePath<Z, X> extends AbstractPath<X> implements Pare
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
-		AbstractPath<?> root = this;
-		while (root.getParentPath() != null) {
-			root = root.getParentPath();
-		}
-
+	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
 		final List<String> fragments = Lists.newArrayList();
 
 		this.generateSqlSelect(query, fragments, this.mapping.getSingularMappings());

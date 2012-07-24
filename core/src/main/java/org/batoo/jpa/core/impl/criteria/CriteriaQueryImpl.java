@@ -38,7 +38,6 @@ import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
-import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
@@ -107,35 +106,36 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 		if (this.selection != null) {
 			builder.append("select ");
 
-			// append distinct if necessary
+			// append distinct if necessary * @param selected
+
 			if (this.distinct) {
 				builder.append("distinct ");
 			}
 
-			builder.append(this.selection.generateJpqlSelect(this));
+			builder.append(this.selection.generateJpqlSelect(this, true));
 		}
 
 		final Collection<String> roots = Collections2.transform(this.getRoots(), new Function<Root<?>, String>() {
 
 			@Override
 			public String apply(Root<?> input) {
+				final RootImpl<?> root = (RootImpl<?>) input;
+
 				final StringBuilder builder = new StringBuilder(input.getModel().getName());
 
 				if (StringUtils.isNotBlank(input.getAlias())) {
 					builder.append(" as ").append(input.getAlias());
 				}
 
+				final String joins = root.generateJpqlJoins(CriteriaQueryImpl.this);
+
+				if (StringUtils.isNotBlank(joins)) {
+					builder.append("\n").append(BatooUtils.indent(joins));
+				}
 				return builder.toString();
 			}
 		});
 		builder.append("\nfrom ").append(Joiner.on(", ").join(roots));
-
-		if (this.selection instanceof AbstractFrom) {
-			final String join = ((AbstractFrom<?, ?>) this.selection).generateJpqlFetches();
-			if (StringUtils.isNotBlank(join)) {
-				builder.append("\n").append(BatooUtils.indent(join));
-			}
-		}
 
 		if (this.getRestriction() != null) {
 			builder.append("\nwhere\n\t").append(this.getRestriction().generateJpqlRestriction(this));
@@ -164,7 +164,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 			select.append(" DISTINCT");
 		}
 		select.append("\n");
-		select.append(BatooUtils.indent(this.selection.generateSqlSelect(this)));
+		select.append(BatooUtils.indent(this.selection.generateSqlSelect(this, true)));
 
 		// generate from chunk
 		final List<String> froms = Lists.newArrayList();
@@ -185,7 +185,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 
 		return Joiner.on("\n").skipNulls().join(select, //
 			from, //
-			StringUtils.isBlank(join) ? null : join, //
+			StringUtils.isBlank(join) ? null : BatooUtils.indent(join), //
 			StringUtils.isBlank(where) ? null : where);
 	}
 

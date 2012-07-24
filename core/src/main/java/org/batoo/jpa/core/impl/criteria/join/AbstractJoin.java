@@ -68,10 +68,35 @@ public abstract class AbstractJoin<Z, X> extends AbstractFrom<Z, X> implements J
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(CriteriaQueryImpl<?> query) {
+	public String generateJpqlJoins(CriteriaQueryImpl<?> criteriaQuery) {
+		this.ensureAlias(criteriaQuery);
+
 		final StringBuilder builder = new StringBuilder();
 
-		builder.append(this.getParent().generateJpqlSelect(query));
+		builder.append(this.joinType == JoinType.LEFT ? "left" : "inner");
+		builder.append(" join ") //
+		.append(this.parent.getAlias()).append(".").append(this.mapping.getAttribute().getName()) //
+		.append(" as ").append(this.getAlias());
+
+		final String joins = super.generateJpqlJoins(criteriaQuery);
+		if (StringUtils.isNotBlank(joins)) {
+			builder.append("\n").append(joins);
+		}
+
+		return builder.toString();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+		super.generateJpqlSelect(query, selected);
+
+		final StringBuilder builder = new StringBuilder();
+
+		builder.append(this.getParent().generateJpqlSelect(query, false));
 		builder.append(".").append(this.mapping.getAttribute().getName());
 		if (StringUtils.isNotBlank(this.getAlias())) {
 			builder.append(" as ").append(this.getAlias());

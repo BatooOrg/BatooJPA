@@ -70,8 +70,8 @@ public class Qualified {
 		}
 
 		for (; i < tree.getChildCount(); i++) {
-			tree = tree.getChild(i);
-			this.getSegments().add(tree.getText());
+			final Tree child = tree.getChild(i);
+			this.getSegments().add(child.getText());
 		}
 	}
 

@@ -76,8 +76,8 @@ public class ComparisonExpression extends BooleanExpression {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(CriteriaQueryImpl<?> query) {
-		return this.x.generateJpqlSelect(null) + this.comparison.getFragment() + this.y.generateJpqlSelect(null);
+	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+		return this.x.generateJpqlSelect(null, selected) + this.comparison.getFragment() + this.y.generateJpqlSelect(null, selected);
 	}
 
 	/**
@@ -103,7 +103,7 @@ public class ComparisonExpression extends BooleanExpression {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
+	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
 		this.alias = query.getAlias(this);
 
 		return this.generateSqlRestriction(query) + " AS " + this.alias;

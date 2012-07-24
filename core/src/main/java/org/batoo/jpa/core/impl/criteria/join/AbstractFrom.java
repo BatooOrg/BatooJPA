@@ -59,6 +59,8 @@ import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 /**
@@ -82,6 +84,7 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	private final EntityTypeImpl<X> entity;
 	private final Set<AbstractJoin<X, ?>> joins = Sets.newHashSet();
 	private final JoinedMapping<? super Z, ?, X> mapping;
+	private boolean selected;
 
 	/**
 	 * Constructor for joined types
@@ -101,7 +104,7 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	public AbstractFrom(AbstractFrom<?, Z> parent, TypeImpl<X> type, JoinedMapping<? super Z, ?, X> mapping, JoinType joinType) {
 		super(parent, type.getJavaType());
 
-		this.fetchRoot = parent.getFetchRoot().fetch(mapping.getAttribute().getName(), joinType);
+		this.fetchRoot = parent.getFetchRoot().join(mapping.getAttribute().getName(), joinType);
 
 		if (type.getPersistenceType() == PersistenceType.ENTITY) {
 			this.entity = (EntityTypeImpl<X>) type;
@@ -128,6 +131,21 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 		this.fetchRoot = new FetchParentImpl<Z, X>(entity);
 		this.entity = entity;
 		this.mapping = null;
+	}
+
+	/**
+	 * Ensure that the alias is assigned.
+	 * 
+	 * @param query
+	 *            the criteria query
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected void ensureAlias(CriteriaQueryImpl<?> query) {
+		if (StringUtils.isBlank(this.getAlias())) {
+			this.alias(query.getAlias(this));
+		}
 	}
 
 	/**
@@ -197,17 +215,31 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	}
 
 	/**
-	 * Returns the JPQL fetch joins fragment.
+	 * Returns the JPQL joins fragment.
 	 * 
-	 * @return the JPQL fetch joins fragment
+	 * @param criteriaQuery
+	 *            the criteria query
+	 * @return the JPQL joins fragment
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String generateJpqlFetches() {
-		final String root = StringUtils.isNotBlank(this.getAlias()) ? this.getAlias() : this.entity.getName();
+	public String generateJpqlJoins(CriteriaQueryImpl<?> criteriaQuery) {
+		this.ensureAlias(criteriaQuery);
 
-		return this.fetchRoot.generateJpqlFetches(root);
+		final List<String> joins = Lists.newArrayList();
+		if (this.selected) {
+			final String fetches = this.fetchRoot.generateJpqlFetches(this.getAlias());
+			if (StringUtils.isNotBlank(fetches)) {
+				joins.add(fetches);
+			}
+		}
+
+		for (final AbstractJoin<X, ?> join : this.joins) {
+			joins.add(join.generateJpqlJoins(criteriaQuery));
+		}
+
+		return Joiner.on("\n").join(joins);
 	}
 
 	/**
@@ -216,7 +248,20 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 */
 	@Override
 	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
-		return StringUtils.isNotBlank(this.getAlias()) ? this.getAlias() : this.entity.getName();
+		this.ensureAlias(query);
+
+		return this.getAlias();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+		this.selected |= selected;
+
+		return null;
 	}
 
 	/**
@@ -231,7 +276,11 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 * @author hceylan
 	 */
 	public void generateSqlJoins(CriteriaQueryImpl<?> query, Map<Joinable, String> joins) {
-		this.fetchRoot.generateSqlJoins(query, joins);
+		this.fetchRoot.generateSqlJoins(query, joins, this.selected);
+
+		for (final AbstractJoin<X, ?> join : this.joins) {
+			join.generateSqlJoins(query, joins);
+		}
 	}
 
 	/**
@@ -239,7 +288,9 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
+	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+		this.select(selected);
+
 		return this.fetchRoot.generateSqlSelect(query, this.getParentPath() == null);
 	}
 
@@ -553,7 +604,6 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public <Y> AbstractJoin<X, Y> join(String attributeName, JoinType jt) {
-
 		Mapping<? super X, ?, ?> mapping = null;
 
 		if (this.entity != null) {
@@ -670,5 +720,18 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	@SuppressWarnings("unchecked")
 	public <Y> SetJoin<X, Y> joinSet(String attributeName, JoinType jt) {
 		return (SetJoin<X, Y>) this.join(attributeName, jt);
+	}
+
+	/**
+	 * Updates the selected status.
+	 * 
+	 * @param selected
+	 *            if selected
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void select(boolean selected) {
+		this.selected |= selected;
 	}
 }

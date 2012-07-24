@@ -26,6 +26,7 @@ import javax.persistence.criteria.Path;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.join.Joinable;
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
@@ -80,10 +81,10 @@ public class BasicPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(CriteriaQueryImpl<?> query) {
+	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean seleselectedcted) {
 		final StringBuilder builder = new StringBuilder();
 
-		builder.append(this.getParentPath().generateJpqlSelect(query));
+		builder.append(this.getParentPath().generateJpqlSelect(query, false));
 
 		builder.append(".").append(this.mapping.getAttribute().getName());
 		if (StringUtils.isNotBlank(this.getAlias())) {
@@ -98,10 +99,11 @@ public class BasicPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
+	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
 		final BasicColumn column = this.mapping.getColumn();
 
-		final String tableAlias = this.getRootPath().getTableAlias(query, column.getTable());
+		final Joinable rootPath = this.getRootPath();
+		final String tableAlias = rootPath.getTableAlias(query, column.getTable());
 
 		this.fieldAlias = tableAlias + "_F" + query.getFieldAlias(tableAlias, column);
 

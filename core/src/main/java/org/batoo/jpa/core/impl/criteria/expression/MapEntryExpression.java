@@ -73,8 +73,8 @@ public class MapEntryExpression<K, V> extends AbstractExpression<Entry<K, V>> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(CriteriaQueryImpl<?> query) {
-		return this.mapJoin.generateJpqlSelect(null) + ".entry";
+	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+		return this.mapJoin.generateJpqlSelect(null, selected) + ".entry";
 	}
 
 	/**
@@ -82,8 +82,8 @@ public class MapEntryExpression<K, V> extends AbstractExpression<Entry<K, V>> {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query) {
-		return this.mapJoin.generateSqlSelect(query, MapSelectType.ENTRY);
+	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+		return this.mapJoin.generateSqlSelect(query, selected, MapSelectType.ENTRY);
 	}
 
 	/**

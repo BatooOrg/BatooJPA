@@ -83,6 +83,8 @@ public class CompoundSelectionImpl<X> extends AbstractSelection<X> implements Co
 	}
 
 	/**
+	 * constructJoins
+	 * 
 	 * @param javaType
 	 *            the java type
 	 * @param selections
@@ -100,12 +102,12 @@ public class CompoundSelectionImpl<X> extends AbstractSelection<X> implements Co
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(CriteriaQueryImpl<?> query) {
+	public String generateJpqlSelect(CriteriaQueryImpl<?> query, final boolean selected) {
 		return Joiner.on(", ").join(Lists.transform(this.selections, new Function<AbstractSelection<?>, String>() {
 
 			@Override
 			public String apply(AbstractSelection<?> input) {
-				return input.generateJpqlSelect(null);
+				return input.generateJpqlSelect(null, selected);
 			}
 		}));
 	}
@@ -115,12 +117,12 @@ public class CompoundSelectionImpl<X> extends AbstractSelection<X> implements Co
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(final CriteriaQueryImpl<?> query) {
+	public String generateSqlSelect(final CriteriaQueryImpl<?> query, final boolean selected) {
 		return Joiner.on(",\n").join(Lists.transform(this.selections, new Function<AbstractSelection<?>, String>() {
 
 			@Override
 			public String apply(AbstractSelection<?> input) {
-				return input.generateSqlSelect(query);
+				return input.generateSqlSelect(query, selected);
 			}
 		}));
 	}
