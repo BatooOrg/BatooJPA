@@ -35,6 +35,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.ParameterExpression;
+import javax.persistence.criteria.Root;
 
 import org.batoo.jpa.benchmark.insert.BenchmarkClassLoader.Type;
 import org.junit.After;
@@ -261,6 +267,30 @@ public class Playground {
 		this.dobatoo();
 	}
 
+	private void doCriteria(final EntityManagerFactory emf, final Person person) {
+		final CriteriaBuilder cb = emf.getCriteriaBuilder();
+		final CriteriaQuery<Address> cq = cb.createQuery(Address.class);
+
+		final Root<Person> r = cq.from(Person.class);
+		final Join<Person, Address> a = r.join("addresses");
+		a.fetch("country");
+		a.fetch("person");
+		cq.select(a);
+
+		final ParameterExpression<Person> p = cb.parameter(Person.class);
+		cq.where(cb.equal(r, p));
+
+		for (int i = 0; i < 5; i++) {
+			final EntityManager em = emf.createEntityManager();
+
+			final TypedQuery<Address> q = em.createQuery(cq);
+			q.setParameter(p, person);
+			q.getResultList();
+
+			em.close();
+		}
+	}
+
 	private void doFind(final EntityManagerFactory emf, final Person person) {
 		for (int i = 0; i < 25; i++) {
 			final EntityManager em = emf.createEntityManager();
@@ -279,6 +309,25 @@ public class Playground {
 	@Test
 	public void dohibernate() {
 		this.doTest(Type.HIBERNATE);
+	}
+
+	private void doJpql(final EntityManagerFactory emf, final Person person) {
+		for (int i = 0; i < 5; i++) {
+			final EntityManager em = emf.createEntityManager();
+
+			emf.getCriteriaBuilder();
+			final TypedQuery<Address> q = em.createQuery(//
+				"select a from Person p\n" + //
+					"left join p.addresses a\n" + //
+					"fetch join a.country\n" + //
+					"fetch join a.person\n" + //
+					"where p = :person", Address.class);
+
+			q.setParameter("person", person);
+			q.getResultList();
+
+			em.close();
+		}
 	}
 
 	private void doPersist(final EntityManagerFactory emf, List<Person> persons) {
@@ -357,11 +406,15 @@ public class Playground {
 	private void singleTest(final EntityManagerFactory emf, List<Person> persons) {
 		this.doPersist(emf, persons);
 
-		this.doFind(emf, persons.get(0));
+		// this.doFind(emf, persons.get(0));
 
-		this.doUpdate(emf, persons.get(0));
+		// this.doUpdate(emf, persons.get(0));
 
-		this.doRemove(emf, persons.subList(5, 9));
+		// this.doRemove(emf, persons.subList(5, 9));
+
+		// this.doCriteria(emf, persons.get(0));
+
+		// this.doJpql(emf, persons.get(0));
 	}
 
 	private void test(Type type, final EntityManagerFactory emf) {

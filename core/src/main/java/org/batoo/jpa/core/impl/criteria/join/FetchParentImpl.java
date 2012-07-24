@@ -985,14 +985,16 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		for (final FetchImpl<X, ?> fetch : this.fetches.values()) {
 			final JoinedMapping<? super X, ?, ?> mapping = fetch.getMapping();
 
-			if (mapping instanceof EmbeddedMapping) {
-				fetch.handleFetches(session, row, instance);
-			}
-			else if (mapping.isAssociation()) {
-				this.handleAssociationFetch(session, row, instance, fetch);
-			}
-			else {
-				this.handleElementCollectionFetch(session, row, instance, fetch);
+			final MappingType mappingType = mapping.getMappingType();
+			switch (mappingType) {
+				case EMBEDDABLE:
+					fetch.handleFetches(session, row, instance);
+					break;
+				case ELEMENT_COLLECTION:
+					this.handleElementCollectionFetch(session, row, instance, fetch);
+					break;
+				default:
+					this.handleAssociationFetch(session, row, instance, fetch);
 			}
 		}
 	}

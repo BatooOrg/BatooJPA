@@ -259,6 +259,8 @@ public class SessionImpl {
 	public void flush(ConnectionImpl connection) throws SQLException {
 		SessionImpl.LOG.debug("Flushing session {0}", this.sessionId);
 
+		Sets.newHashSet(this.newEntities);
+
 		final ArrayList<ManagedInstance<?>> updates = Lists.newArrayList(this.newEntities);
 		final ArrayList<ManagedInstance<?>> removals = Lists.newArrayListWithCapacity(this.changedEntities.size());
 
@@ -300,7 +302,7 @@ public class SessionImpl {
 		}
 
 		for (final ManagedInstance<?> instance : sortedUpdates) {
-			instance.flushAssociations(connection, false, !this.newEntities.isEmpty() && this.newEntities.contains(instance));
+			instance.flushAssociations(connection, false, this.newEntities.contains(instance));
 			instance.sortLists();
 			instance.reset();
 		}
