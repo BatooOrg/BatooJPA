@@ -272,6 +272,7 @@ public class JpqlQuery {
 			|| (predictionDef.getType() == JpqlParser.Greater_Or_Equals_Operator) //
 			|| (predictionDef.getType() == JpqlParser.Less_Than_Operator) //
 			|| (predictionDef.getType() == JpqlParser.Less_Or_Equals_Operator) //
+			|| (predictionDef.getType() == JpqlParser.BETWEEN) //
 			|| (predictionDef.getType() == JpqlParser.LIKE)) {
 
 			final AbstractExpression<X> left = this.<X> getExpression(cb, predictionDef.getChild(0), null);
@@ -315,6 +316,15 @@ public class JpqlQuery {
 					else {
 						return cb.le((Expression<? extends Number>) left, (Expression<? extends Number>) right);
 					}
+				case JpqlParser.BETWEEN:
+					final AbstractExpression<?> right2 = this.getExpression(cb, predictionDef.getChild(2), left.getJavaType());
+
+					final Predicate between = cb.between((AbstractExpression) left, (AbstractExpression) right, (AbstractExpression) right2);
+					if (predictionDef.getChildCount() == 4) {
+						return between.not();
+					}
+
+					return between;
 				case JpqlParser.LIKE:
 					return cb.like((Expression<String>) left, (Expression<String>) right);
 			}

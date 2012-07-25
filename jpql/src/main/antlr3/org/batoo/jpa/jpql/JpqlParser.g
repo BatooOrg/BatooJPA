@@ -280,22 +280,18 @@ conditional_primary :
 simple_cond_expression :
     boolean_expression
     | comparison_expression
-//  | between_expression
-    //  | like_expression
-    //  | in_expression
+    | between_expression
+//  | in_expression
     //  | null_comparison_expression
     //  | empty_collection_comparison_expression
     //  | collection_member_expression
     //  | exists_expression
     ;
 
-//between_expression
-//  :
-//  arithmetic_expression (NOT)? 'BETWEEN' arithmetic_expression AND arithmetic_expression
-//  | string_expression (NOT)? 'BETWEEN' string_expression AND string_expression
-//  | datetime_expression (NOT)? 'BETWEEN' datetime_expression AND datetime_expression
-//  ;
-//
+between_expression :
+    boolean_expression ( NOT)? BETWEEN boolean_expression AND boolean_expression
+        -> ^( BETWEEN boolean_expression boolean_expression boolean_expression (NOT)?  );
+
 //in_expression
 //  :
 //  state_field_path_expression (NOT)? 'IN' Left_Paren
@@ -310,11 +306,6 @@ simple_cond_expression :
 //  :
 //  literal
 //  | input_parameter
-//  ;
-//
-//like_expression
-//  :
-//  string_expression (NOT)? 'LIKE' pattern_value ('ESCAPE' ESCAPE_CHARACTER)?
 //  ;
 //
 //null_comparison_expression
@@ -368,11 +359,6 @@ comparison_expression :
     //  )
     //  (
     //    enum_expression
-    //    | all_or_any_expression
-    //  )
-    //  | datetime_expression comparison_operator
-    //  (
-    //    datetime_expression
     //    | all_or_any_expression
     //  )
     //  | entity_expression

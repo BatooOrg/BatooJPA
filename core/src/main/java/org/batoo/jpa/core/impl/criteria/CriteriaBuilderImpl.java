@@ -163,8 +163,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <Y extends Comparable<? super Y>> Predicate between(Expression<? extends Y> v, Expression<? extends Y> x, Expression<? extends Y> y) {
-		// TODO Auto-generated method stub
-		return null;
+		return new PredicateImpl(new ComparisonExpression(Comparison.BETWEEN, v, x, y));
 	}
 
 	/**
@@ -173,8 +172,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <Y extends Comparable<? super Y>> Predicate between(Expression<? extends Y> v, Y x, Y y) {
-		// TODO Auto-generated method stub
-		return null;
+		final TypeImpl<?> type = this.metamodel.type(y.getClass());
+
+		return new PredicateImpl(new ComparisonExpression(Comparison.BETWEEN, v, new ConstantExpression(type, x), new ConstantExpression(type, y)));
 	}
 
 	/**

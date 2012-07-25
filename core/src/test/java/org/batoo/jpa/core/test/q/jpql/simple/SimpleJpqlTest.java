@@ -138,7 +138,9 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		this.close();
 
-		TypedQuery<Person> q = this.cq("select p from Person p where p.age > :age", Person.class).setParameter("age", 40);
+		TypedQuery<Person> q;
+
+		q = this.cq("select p from Person p where p.age > :age", Person.class).setParameter("age", 40);
 		Assert.assertEquals(0, q.getResultList().size());
 
 		q = this.cq("select p from Person p where p.age < :age", Person.class).setParameter("age", 40);
@@ -149,6 +151,15 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		q = this.cq("select p from Person p where p.age <= :age", Person.class).setParameter("age", 40);
 		Assert.assertEquals(2, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.age between :age1 and :age2", Person.class).setParameter("age1", 38).setParameter("age2", 41);
+		Assert.assertEquals(1, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.age between :age1 and :age2", Person.class).setParameter("age1", 30).setParameter("age2", 50);
+		Assert.assertEquals(2, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.age between :age1 and :age2", Person.class).setParameter("age1", 10).setParameter("age2", 20);
+		Assert.assertEquals(0, q.getResultList().size());
 	}
 
 	/**
@@ -348,5 +359,7 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		q = this.cq("select p from Person p where p.name like :name", Person.class).setParameter("name", "De%");
 		Assert.assertEquals(0, q.getResultList().size());
 
+		q = this.cq("select p from Person p where p.name not (like :name)", Person.class).setParameter("name", "De%");
+		Assert.assertEquals(2, q.getResultList().size());
 	}
 }

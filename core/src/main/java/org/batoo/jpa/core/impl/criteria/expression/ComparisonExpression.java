@@ -41,6 +41,7 @@ public class ComparisonExpression extends BooleanExpression {
 	private final Comparison comparison;
 	private final AbstractExpression<?> x;
 	private final AbstractExpression<?> y;
+	private final AbstractExpression<?> z;
 	private String alias;
 
 	/**
@@ -55,11 +56,30 @@ public class ComparisonExpression extends BooleanExpression {
 	 * @author hceylan
 	 */
 	public ComparisonExpression(Comparison comparison, Expression<?> x, Expression<?> y) {
+		this(comparison, x, y, null);
+	}
+
+	/**
+	 * @param comparison
+	 *            the comparison
+	 * @param x
+	 *            the left side expression
+	 * @param y
+	 *            the first right side expression
+	 * @param z
+	 *            the second right side expression
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ComparisonExpression(Comparison comparison, Expression<?> x, Expression<?> y, Expression<?> z) {
 		super();
 
 		this.comparison = comparison;
+
 		this.x = (AbstractExpression<?>) x;
 		this.y = (AbstractExpression<?>) y;
+		this.z = (AbstractExpression<?>) z;
 	}
 
 	/**
@@ -68,7 +88,16 @@ public class ComparisonExpression extends BooleanExpression {
 	 */
 	@Override
 	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
-		return MessageFormat.format(this.comparison.getFragment(), this.x.generateJpqlRestriction(query), this.y.generateJpqlRestriction(query));
+		if (this.z != null) {
+			return MessageFormat.format(this.comparison.getFragment(), //
+				this.x.generateJpqlRestriction(query), //
+				this.y.generateJpqlRestriction(query), //
+				this.z.generateJpqlRestriction(query));
+		}
+
+		return MessageFormat.format(this.comparison.getFragment(), //
+			this.x.generateJpqlRestriction(query), //
+			this.y.generateJpqlRestriction(query));
 	}
 
 	/**
@@ -77,6 +106,13 @@ public class ComparisonExpression extends BooleanExpression {
 	 */
 	@Override
 	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+		if (this.z != null) {
+			return MessageFormat.format(this.comparison.getFragment(), //
+				this.x.generateJpqlSelect(null, selected), //
+				this.y.generateJpqlSelect(null, selected), //
+				this.z.generateJpqlSelect(null, selected));
+		}
+
 		return MessageFormat.format(this.comparison.getFragment(), this.x.generateJpqlSelect(null, selected), this.y.generateJpqlSelect(null, selected));
 	}
 
@@ -87,12 +123,18 @@ public class ComparisonExpression extends BooleanExpression {
 	@Override
 	public String generateSqlRestriction(CriteriaQueryImpl<?> query) {
 		final String[] left = this.x.getSqlRestrictionFragments(query);
-		final String[] right = this.y.getSqlRestrictionFragments(query);
+		final String[] right1 = this.y.getSqlRestrictionFragments(query);
+		final String[] right2 = this.z != null ? this.z.getSqlRestrictionFragments(query) : null;
 
 		final List<String> restrictions = Lists.newArrayList();
 
 		for (int i = 0; i < left.length; i++) {
-			restrictions.add(MessageFormat.format(this.comparison.getFragment(), left[i], right[i]));
+			if (this.z != null) {
+				restrictions.add(MessageFormat.format(this.comparison.getFragment(), left[i], right1[i], right2[i]));
+			}
+			else {
+				restrictions.add(MessageFormat.format(this.comparison.getFragment(), left[i], right1[i]));
+			}
 		}
 
 		return Joiner.on(" AND ").join(restrictions);
