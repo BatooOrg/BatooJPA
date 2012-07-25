@@ -326,7 +326,13 @@ public class JpqlQuery {
 
 					return between;
 				case JpqlParser.LIKE:
-					return cb.like((Expression<String>) left, (Expression<String>) right);
+					final Predicate like = cb.like((Expression<String>) left, (Expression<String>) right);
+
+					if (predictionDef.getChildCount() == 3) {
+						return like.not();
+					}
+
+					return like;
 			}
 		}
 

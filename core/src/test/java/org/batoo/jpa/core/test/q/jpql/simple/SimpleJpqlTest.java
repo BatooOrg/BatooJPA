@@ -160,6 +160,9 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		q = this.cq("select p from Person p where p.age between :age1 and :age2", Person.class).setParameter("age1", 10).setParameter("age2", 20);
 		Assert.assertEquals(0, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.age not between :age1 and :age2", Person.class).setParameter("age1", 10).setParameter("age2", 20);
+		Assert.assertEquals(2, q.getResultList().size());
 	}
 
 	/**
@@ -359,7 +362,7 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		q = this.cq("select p from Person p where p.name like :name", Person.class).setParameter("name", "De%");
 		Assert.assertEquals(0, q.getResultList().size());
 
-		q = this.cq("select p from Person p where p.name not (like :name)", Person.class).setParameter("name", "De%");
+		q = this.cq("select p from Person p where p.name not like :name", Person.class).setParameter("name", "De%");
 		Assert.assertEquals(2, q.getResultList().size());
 	}
 }

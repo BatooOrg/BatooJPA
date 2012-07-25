@@ -171,7 +171,11 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 			}
 		});
 
-		return "(" + Joiner.on(" " + this.operator.name() + " ").join(converted) + ")";
+		if (this.negated) {
+			return "NOT (" + Joiner.on(" " + this.operator.name() + " ").join(converted) + ")";
+		}
+
+		return Joiner.on(" " + this.operator.name() + " ").join(converted);
 	}
 
 	/**

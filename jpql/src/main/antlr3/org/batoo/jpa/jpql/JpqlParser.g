@@ -281,6 +281,7 @@ simple_cond_expression :
     boolean_expression
     | comparison_expression
     | between_expression
+    | like_expression
 //  | in_expression
     //  | null_comparison_expression
     //  | empty_collection_comparison_expression
@@ -291,6 +292,10 @@ simple_cond_expression :
 between_expression :
     boolean_expression ( NOT)? BETWEEN boolean_expression AND boolean_expression
         -> ^( BETWEEN boolean_expression boolean_expression boolean_expression (NOT)?  );
+
+like_expression :
+    boolean_expression ( NOT)? LIKE boolean_expression
+        -> ^( LIKE boolean_expression boolean_expression (NOT)?  );
 
 //in_expression
 //  :
@@ -378,8 +383,7 @@ comparison_operator :
     | Greater_Or_Equals_Operator
     | Less_Than_Operator
     | Less_Or_Equals_Operator
-    | Not_Equals_Operator
-    | LIKE;
+    | Not_Equals_Operator;
 
 //arithmetic_expression
 //  :
