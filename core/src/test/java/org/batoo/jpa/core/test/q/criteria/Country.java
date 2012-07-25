@@ -16,88 +16,79 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.criteria;
+package org.batoo.jpa.core.test.q.criteria;
 
-import javax.persistence.Embeddable;
-import javax.persistence.ManyToOne;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 /**
  * 
  * @author hceylan
  * @since $version
  */
-@Embeddable
-public class Address2 {
+@Entity
+public class Country {
 
-	private String city;
+	@Id
+	private String code;
 
-	@ManyToOne
-	private Country country;
+	private String name;
 
 	/**
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Address2() {
+	public Country() {
 		super();
 	}
 
 	/**
-	 * @param city
-	 *            the city
-	 * @param country
-	 *            the country
+	 * @param code
+	 *            the id
+	 * @param name
+	 *            the name
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Address2(String city, Country country) {
+	public Country(String code, String name) {
 		super();
 
-		this.city = city;
-		this.country = country;
+		this.code = code;
+		this.name = name;
 	}
 
 	/**
-	 * Returns the city.
+	 * Returns the code of the Country.
 	 * 
-	 * @return the city
+	 * @return the code of the Country
+	 * 
 	 * @since $version
+	 * @author hceylan
 	 */
-	public String getCity() {
-		return this.city;
+	public String getCode() {
+		return this.code;
 	}
 
 	/**
-	 * Returns the country.
+	 * Returns the name.
 	 * 
-	 * @return the country
+	 * @return the name
 	 * @since $version
 	 */
-	public Country getCountry() {
-		return this.country;
+	public String getName() {
+		return this.name;
 	}
 
 	/**
-	 * Sets the city.
+	 * Sets the name.
 	 * 
-	 * @param city
-	 *            the city to set
+	 * @param name
+	 *            the name to set
 	 * @since $version
 	 */
-	public void setCity(String city) {
-		this.city = city;
-	}
-
-	/**
-	 * Sets the country.
-	 * 
-	 * @param country
-	 *            the country to set
-	 * @since $version
-	 */
-	public void setCountry(Country country) {
-		this.country = country;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/**
@@ -106,6 +97,6 @@ public class Address2 {
 	 */
 	@Override
 	public String toString() {
-		return "Address2 [country=" + this.country + ", city=" + this.city + "]";
+		return "Country [name=" + this.name + "]";
 	}
 }

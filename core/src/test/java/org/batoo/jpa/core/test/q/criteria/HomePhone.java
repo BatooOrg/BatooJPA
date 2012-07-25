@@ -16,85 +16,68 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.criteria;
+package org.batoo.jpa.core.test.q.criteria;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
 
 /**
  * 
  * @author hceylan
  * @since $version
  */
-@MappedSuperclass
-public class Phone {
+@Entity
+public class HomePhone extends Phone {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
-	private Integer id;
-
-	private String phoneNo;
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Person person;
 
 	/**
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Phone() {
+	public HomePhone() {
 		super();
 	}
 
 	/**
+	 * @param person
+	 *            the person
 	 * @param phone
-	 *            the phone number
+	 *            the phone
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Phone(String phone) {
-		super();
+	public HomePhone(Person person, String phone) {
+		super(phone);
 
-		this.phoneNo = phone;
+		this.person = person;
+
+		this.person.getPhones().add(this);
 	}
 
 	/**
-	 * Returns the id.
+	 * Returns the person.
 	 * 
-	 * @return the id
+	 * @return the person
 	 * @since $version
 	 */
-	public Integer getId() {
-		return this.id;
+	public Person getPerson() {
+		return this.person;
 	}
 
 	/**
-	 * Returns the phoneNo.
+	 * Sets the person.
 	 * 
-	 * @return the phoneNo
+	 * @param person
+	 *            the person to set
 	 * @since $version
 	 */
-	public String getPhoneNo() {
-		return this.phoneNo;
+	public void setPerson(Person person) {
+		this.person = person;
 	}
 
-	/**
-	 * Sets the phoneNo.
-	 * 
-	 * @param phoneNo
-	 *            the phoneNo to set
-	 * @since $version
-	 */
-	public void setPhoneNo(String phoneNo) {
-		this.phoneNo = phoneNo;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String toString() {
-		return "Phone [phoneNo=" + this.phoneNo + "]";
-	}
 }

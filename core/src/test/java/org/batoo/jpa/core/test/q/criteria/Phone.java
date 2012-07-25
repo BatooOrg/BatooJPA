@@ -16,79 +16,77 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.criteria;
+package org.batoo.jpa.core.test.q.criteria;
 
-import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
 
 /**
  * 
  * @author hceylan
  * @since $version
  */
-@Entity
-public class Country {
+@MappedSuperclass
+public class Phone {
 
 	@Id
-	private String code;
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	private Integer id;
 
-	private String name;
+	private String phoneNo;
 
 	/**
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Country() {
+	public Phone() {
 		super();
 	}
 
 	/**
-	 * @param code
-	 *            the id
-	 * @param name
-	 *            the name
+	 * @param phone
+	 *            the phone number
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Country(String code, String name) {
+	public Phone(String phone) {
 		super();
 
-		this.code = code;
-		this.name = name;
+		this.phoneNo = phone;
 	}
 
 	/**
-	 * Returns the code of the Country.
+	 * Returns the id.
 	 * 
-	 * @return the code of the Country
-	 * 
+	 * @return the id
 	 * @since $version
-	 * @author hceylan
 	 */
-	public String getCode() {
-		return this.code;
+	public Integer getId() {
+		return this.id;
 	}
 
 	/**
-	 * Returns the name.
+	 * Returns the phoneNo.
 	 * 
-	 * @return the name
+	 * @return the phoneNo
 	 * @since $version
 	 */
-	public String getName() {
-		return this.name;
+	public String getPhoneNo() {
+		return this.phoneNo;
 	}
 
 	/**
-	 * Sets the name.
+	 * Sets the phoneNo.
 	 * 
-	 * @param name
-	 *            the name to set
+	 * @param phoneNo
+	 *            the phoneNo to set
 	 * @since $version
 	 */
-	public void setName(String name) {
-		this.name = name;
+	public void setPhoneNo(String phoneNo) {
+		this.phoneNo = phoneNo;
 	}
 
 	/**
@@ -97,6 +95,6 @@ public class Country {
 	 */
 	@Override
 	public String toString() {
-		return "Country [name=" + this.name + "]";
+		return "Phone [phoneNo=" + this.phoneNo + "]";
 	}
 }

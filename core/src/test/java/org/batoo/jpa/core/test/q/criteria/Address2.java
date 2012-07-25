@@ -16,34 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.criteria;
+package org.batoo.jpa.core.test.q.criteria;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
-import javax.persistence.Embedded;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 
 /**
- * 
  * 
  * @author hceylan
  * @since $version
  */
 @Embeddable
-public class Contact {
+public class Address2 {
 
-	@Embedded
-	private Address2 address;
+	private String city;
 
-	@OneToOne(cascade = CascadeType.ALL)
-	private WorkPhone phone;
+	@ManyToOne
+	private Country country;
 
 	/**
-	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Contact() {
+	public Address2() {
 		super();
 	}
 
@@ -52,67 +47,57 @@ public class Contact {
 	 *            the city
 	 * @param country
 	 *            the country
-	 * @param phone
-	 *            the phone
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Contact(String city, Country country, String phone) {
+	public Address2(String city, Country country) {
 		super();
 
-		this.address = new Address2(city, country);
-		this.phone = new WorkPhone(phone);
+		this.city = city;
+		this.country = country;
 	}
 
 	/**
-	 * Returns the address of the Contact.
+	 * Returns the city.
 	 * 
-	 * @return the address of the Contact
-	 * 
+	 * @return the city
 	 * @since $version
-	 * @author hceylan
 	 */
-	protected Address2 getAddress() {
-		return this.address;
+	public String getCity() {
+		return this.city;
 	}
 
 	/**
-	 * Returns the phone of the Contact.
+	 * Returns the country.
 	 * 
-	 * @return the phone of the Contact
-	 * 
+	 * @return the country
 	 * @since $version
-	 * @author hceylan
 	 */
-	protected Phone getPhone() {
-		return this.phone;
+	public Country getCountry() {
+		return this.country;
 	}
 
 	/**
-	 * Sets the address of the Contact.
+	 * Sets the city.
 	 * 
-	 * @param address
-	 *            the address to set for Contact
-	 * 
+	 * @param city
+	 *            the city to set
 	 * @since $version
-	 * @author hceylan
 	 */
-	protected void setAddress(Address2 address) {
-		this.address = address;
+	public void setCity(String city) {
+		this.city = city;
 	}
 
 	/**
-	 * Sets the phone of the Contact.
+	 * Sets the country.
 	 * 
-	 * @param phone
-	 *            the phone to set for Contact
-	 * 
+	 * @param country
+	 *            the country to set
 	 * @since $version
-	 * @author hceylan
 	 */
-	protected void setPhone(WorkPhone phone) {
-		this.phone = phone;
+	public void setCountry(Country country) {
+		this.country = country;
 	}
 
 	/**
@@ -121,6 +106,6 @@ public class Contact {
 	 */
 	@Override
 	public String toString() {
-		return "Contact [address=" + this.address + ", phone=" + this.phone + "]";
+		return "Address2 [country=" + this.country + ", city=" + this.city + "]";
 	}
 }

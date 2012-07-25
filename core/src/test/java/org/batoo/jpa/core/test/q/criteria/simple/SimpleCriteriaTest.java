@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.criteria.simple;
+package org.batoo.jpa.core.test.q.criteria.simple;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,11 +34,12 @@ import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 import org.batoo.jpa.core.test.BaseCoreTest;
-import org.batoo.jpa.core.test.criteria.Address;
-import org.batoo.jpa.core.test.criteria.Country;
-import org.batoo.jpa.core.test.criteria.HomePhone;
-import org.batoo.jpa.core.test.criteria.Person;
-import org.batoo.jpa.core.test.criteria.WorkPhone;
+import org.batoo.jpa.core.test.q.criteria.Address;
+import org.batoo.jpa.core.test.q.criteria.Country;
+import org.batoo.jpa.core.test.q.criteria.HomePhone;
+import org.batoo.jpa.core.test.q.criteria.Person;
+import org.batoo.jpa.core.test.q.criteria.SimpleCity;
+import org.batoo.jpa.core.test.q.criteria.WorkPhone;
 import org.junit.Before;
 import org.junit.Test;
 

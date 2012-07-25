@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.criteria.embedded;
+package org.batoo.jpa.core.test.q.criteria.embedded;
 
 import java.util.List;
 
@@ -28,10 +28,10 @@ import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.test.BaseCoreTest;
-import org.batoo.jpa.core.test.criteria.Address2;
-import org.batoo.jpa.core.test.criteria.Contact;
-import org.batoo.jpa.core.test.criteria.Country;
-import org.batoo.jpa.core.test.criteria.Person2;
+import org.batoo.jpa.core.test.q.criteria.Address2;
+import org.batoo.jpa.core.test.q.criteria.Contact;
+import org.batoo.jpa.core.test.q.criteria.Country;
+import org.batoo.jpa.core.test.q.criteria.Person2;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -16,19 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.criteria;
+package org.batoo.jpa.core.test.q.criteria;
 
-import java.util.List;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-
-import com.google.common.collect.Lists;
+import javax.persistence.ManyToOne;
 
 /**
  * 
@@ -36,52 +31,67 @@ import com.google.common.collect.Lists;
  * @since $version
  */
 @Entity
-public class Person {
+public class Address {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Integer id;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "person")
-	private final List<Address> addresses = Lists.newArrayList();
+	@ManyToOne
+	private Person person;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "person", fetch = FetchType.EAGER)
-	private final List<HomePhone> phones = Lists.newArrayList();
+	private String city;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-	private final List<WorkPhone> workPhones = Lists.newArrayList();
-
-	private String name;
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Country country;
 
 	/**
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Person() {
+	public Address() {
 		super();
 	}
 
 	/**
-	 * @param name
-	 *            the name
+	 * @param person
+	 *            the person
+	 * @param city
+	 *            the city
+	 * @param country
+	 *            the country
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Person(String name) {
+	public Address(Person person, String city, Country country) {
 		super();
 
-		this.name = name;
+		this.person = person;
+		this.city = city;
+		this.country = country;
+
+		this.person.getAddresses().add(this);
 	}
 
 	/**
-	 * Returns the addresses.
+	 * Returns the city.
 	 * 
-	 * @return the addresses
+	 * @return the city
 	 * @since $version
 	 */
-	public List<Address> getAddresses() {
-		return this.addresses;
+	public String getCity() {
+		return this.city;
+	}
+
+	/**
+	 * Returns the country.
+	 * 
+	 * @return the country
+	 * @since $version
+	 */
+	public Country getCountry() {
+		return this.country;
 	}
 
 	/**
@@ -95,43 +105,45 @@ public class Person {
 	}
 
 	/**
-	 * Returns the name.
+	 * Returns the person.
 	 * 
-	 * @return the name
+	 * @return the person
 	 * @since $version
 	 */
-	public String getName() {
-		return this.name;
+	public Person getPerson() {
+		return this.person;
 	}
 
 	/**
-	 * Returns the phones.
+	 * Sets the city.
 	 * 
-	 * @return the phones
+	 * @param city
+	 *            the city to set
 	 * @since $version
 	 */
-	public List<HomePhone> getPhones() {
-		return this.phones;
+	public void setCity(String city) {
+		this.city = city;
 	}
 
 	/**
-	 * Returns the workPhones.
+	 * Sets the country.
 	 * 
-	 * @return the workPhones
+	 * @param country
+	 *            the country to set
 	 * @since $version
 	 */
-	public List<WorkPhone> getWorkPhones() {
-		return this.workPhones;
+	public void setCountry(Country country) {
+		this.country = country;
 	}
 
 	/**
-	 * Sets the name.
+	 * Sets the person.
 	 * 
-	 * @param name
-	 *            the name to set
+	 * @param person
+	 *            the person to set
 	 * @since $version
 	 */
-	public void setName(String name) {
-		this.name = name;
+	public void setPerson(Person person) {
+		this.person = person;
 	}
 }

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.criteria.elementcollection;
+package org.batoo.jpa.core.test.q.criteria.elementcollection;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -33,7 +33,7 @@ import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl;
 import org.batoo.jpa.core.test.BaseCoreTest;
-import org.batoo.jpa.core.test.criteria.ElementCollectionParent;
+import org.batoo.jpa.core.test.q.criteria.ElementCollectionParent;
 import org.junit.Test;
 
 /**
