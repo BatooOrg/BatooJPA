@@ -392,7 +392,8 @@ comparison_operator :
     | Greater_Or_Equals_Operator
     | Less_Than_Operator
     | Less_Or_Equals_Operator
-    | Not_Equals_Operator;
+    | Not_Equals_Operator
+    | LIKE;
 
 //arithmetic_expression
 //  :

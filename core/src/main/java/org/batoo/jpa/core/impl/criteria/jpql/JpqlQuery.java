@@ -271,7 +271,8 @@ public class JpqlQuery {
 			|| (predictionDef.getType() == JpqlParser.Greater_Than_Operator) //
 			|| (predictionDef.getType() == JpqlParser.Greater_Or_Equals_Operator) //
 			|| (predictionDef.getType() == JpqlParser.Less_Than_Operator) //
-			|| (predictionDef.getType() == JpqlParser.Less_Or_Equals_Operator)) {
+			|| (predictionDef.getType() == JpqlParser.Less_Or_Equals_Operator) //
+			|| (predictionDef.getType() == JpqlParser.LIKE)) {
 
 			final AbstractExpression<X> left = this.<X> getExpression(cb, predictionDef.getChild(0), null);
 			final AbstractExpression<? extends X> right = this.getExpression(cb, predictionDef.getChild(1), left.getJavaType());
@@ -314,6 +315,8 @@ public class JpqlQuery {
 					else {
 						return cb.le((Expression<? extends Number>) left, (Expression<? extends Number>) right);
 					}
+				case JpqlParser.LIKE:
+					return cb.like((Expression<String>) left, (Expression<String>) right);
 			}
 		}
 

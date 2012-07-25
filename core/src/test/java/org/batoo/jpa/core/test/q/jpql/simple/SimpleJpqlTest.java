@@ -341,5 +341,12 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		q = this.cq("select p from Person p where p.name > :name", Person.class).setParameter("name", "Ceylan");
 		Assert.assertEquals(0, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.name like :name", Person.class).setParameter("name", "Ce%");
+		Assert.assertEquals(2, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.name like :name", Person.class).setParameter("name", "De%");
+		Assert.assertEquals(0, q.getResultList().size());
+
 	}
 }
