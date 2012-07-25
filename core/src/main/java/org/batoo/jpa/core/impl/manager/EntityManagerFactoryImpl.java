@@ -21,7 +21,6 @@ package org.batoo.jpa.core.impl.manager;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import javax.persistence.Cache;
 import javax.persistence.EntityManager;
@@ -246,7 +245,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		try {
 			return this.graphs.get(qlString);
 		}
-		catch (final ExecutionException e) {
+		catch (final Exception e) {
 			if (e.getCause() instanceof PersistenceException) {
 				throw (PersistenceException) e.getCause();
 			}

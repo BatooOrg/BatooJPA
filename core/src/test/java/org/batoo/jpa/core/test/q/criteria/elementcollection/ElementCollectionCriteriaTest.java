@@ -33,7 +33,7 @@ import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl;
 import org.batoo.jpa.core.test.BaseCoreTest;
-import org.batoo.jpa.core.test.q.criteria.ElementCollectionParent;
+import org.batoo.jpa.core.test.q.ElementCollectionParent;
 import org.junit.Test;
 
 /**

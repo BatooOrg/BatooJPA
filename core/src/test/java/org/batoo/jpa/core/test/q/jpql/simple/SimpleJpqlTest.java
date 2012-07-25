@@ -21,17 +21,18 @@ package org.batoo.jpa.core.test.q.jpql.simple;
 import java.util.Collections;
 import java.util.List;
 
+import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
 
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
-import org.batoo.jpa.core.test.q.criteria.Address;
-import org.batoo.jpa.core.test.q.criteria.Country;
-import org.batoo.jpa.core.test.q.criteria.HomePhone;
-import org.batoo.jpa.core.test.q.criteria.Person;
-import org.batoo.jpa.core.test.q.criteria.SimpleCity;
-import org.batoo.jpa.core.test.q.criteria.WorkPhone;
+import org.batoo.jpa.core.test.q.Address;
+import org.batoo.jpa.core.test.q.Country;
+import org.batoo.jpa.core.test.q.HomePhone;
+import org.batoo.jpa.core.test.q.Person;
+import org.batoo.jpa.core.test.q.SimpleCity;
+import org.batoo.jpa.core.test.q.WorkPhone;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -62,9 +63,9 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	private Person person() {
 		final Person person = new Person("Ceylan");
 
-		new Address(person, SimpleJpqlTest.CITY_ISTANBUL, SimpleJpqlTest.TR);
-		new Address(person, SimpleJpqlTest.CITY_NEW_YORK, SimpleJpqlTest.USA);
-		new Address(person, SimpleJpqlTest.CITY_LONDON, SimpleJpqlTest.UK);
+		new Address(person, SimpleJpqlTest.CITY_ISTANBUL, SimpleJpqlTest.TR, true);
+		new Address(person, SimpleJpqlTest.CITY_NEW_YORK, SimpleJpqlTest.USA, false);
+		new Address(person, SimpleJpqlTest.CITY_LONDON, SimpleJpqlTest.UK, false);
 
 		new HomePhone(person, "111 1111111");
 		new HomePhone(person, "222 2222222");
@@ -89,6 +90,17 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		this.persist(SimpleJpqlTest.UK);
 
 		this.commit();
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test(expected = PersistenceException.class)
+	public void testAliasNotBound() {
+		final TypedQuery<Country> q = this.em().createQuery("select d from Country c", Country.class);
+		q.getResultList();
 	}
 
 	/**
@@ -137,6 +149,30 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	}
 
 	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testBooleanExpression() {
+		this.persist(this.person());
+		this.persist(this.person());
+		this.commit();
+
+		this.close();
+
+		final TypedQuery<Address> q = this.em().createQuery(//
+			"select a from Person p\n" + //
+				"    left join p.addresses a\n" + //
+				"    where a.primary", //
+			Address.class);
+
+		final List<Address> resultList = q.getResultList();
+
+		Assert.assertEquals(2, resultList.size());
+	}
+
+	/**
 	 * @since $version
 	 * @author hceylan
 	 */
@@ -146,8 +182,8 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		this.commit();
 		this.close();
 
-		final TypedQuery<SimpleCity> q = this.em().createQuery(
-			"select new org.batoo.jpa.core.test.q.criteria.SimpleCity(a.city, a.country.name) from Address a", SimpleCity.class);
+		final TypedQuery<SimpleCity> q = this.em().createQuery("select new org.batoo.jpa.core.test.q.SimpleCity(a.city, a.country.name) from Address a",
+			SimpleCity.class);
 
 		final List<SimpleCity> resultList = q.getResultList();
 		Collections.sort(resultList);

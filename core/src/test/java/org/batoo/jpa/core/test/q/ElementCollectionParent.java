@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.q.criteria;
+package org.batoo.jpa.core.test.q;
 
 import java.util.List;
 import java.util.Map;

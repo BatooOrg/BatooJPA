@@ -6,7 +6,7 @@
 	<persistence-unit name="default">
 		<provider>org.batoo.jpa.core.PersistenceProvider</provider>
 		
-		<class>org.batoo.jpa.core.test.q.criteria.ElementCollectionParent</class>
+		<class>org.batoo.jpa.core.test.q.ElementCollectionParent</class>
 		
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.Driver40" />

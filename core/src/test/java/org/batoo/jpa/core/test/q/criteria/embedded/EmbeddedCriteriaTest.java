@@ -28,10 +28,10 @@ import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.test.BaseCoreTest;
-import org.batoo.jpa.core.test.q.criteria.Address2;
-import org.batoo.jpa.core.test.q.criteria.Contact;
-import org.batoo.jpa.core.test.q.criteria.Country;
-import org.batoo.jpa.core.test.q.criteria.Person2;
+import org.batoo.jpa.core.test.q.Address2;
+import org.batoo.jpa.core.test.q.Contact;
+import org.batoo.jpa.core.test.q.Country;
+import org.batoo.jpa.core.test.q.Person2;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -16,10 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.q.criteria;
+package org.batoo.jpa.core.test.q;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 /**
@@ -28,35 +31,80 @@ import javax.persistence.ManyToOne;
  * @since $version
  */
 @Entity
-public class HomePhone extends Phone {
+public class Address {
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	private Integer id;
+
+	@ManyToOne
 	private Person person;
 
+	private String city;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Country country;
+
+	private boolean primary;
+
 	/**
-	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public HomePhone() {
+	public Address() {
 		super();
 	}
 
 	/**
 	 * @param person
 	 *            the person
-	 * @param phone
-	 *            the phone
+	 * @param city
+	 *            the city
+	 * @param country
+	 *            the country
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public HomePhone(Person person, String phone) {
-		super(phone);
+	public Address(Person person, String city, Country country, boolean primary) {
+		super();
 
 		this.person = person;
+		this.city = city;
+		this.country = country;
+		this.primary = primary;
 
-		this.person.getPhones().add(this);
+		this.person.getAddresses().add(this);
+	}
+
+	/**
+	 * Returns the city.
+	 * 
+	 * @return the city
+	 * @since $version
+	 */
+	public String getCity() {
+		return this.city;
+	}
+
+	/**
+	 * Returns the country.
+	 * 
+	 * @return the country
+	 * @since $version
+	 */
+	public Country getCountry() {
+		return this.country;
+	}
+
+	/**
+	 * Returns the id.
+	 * 
+	 * @return the id
+	 * @since $version
+	 */
+	public Integer getId() {
+		return this.id;
 	}
 
 	/**
@@ -70,6 +118,28 @@ public class HomePhone extends Phone {
 	}
 
 	/**
+	 * Sets the city.
+	 * 
+	 * @param city
+	 *            the city to set
+	 * @since $version
+	 */
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	/**
+	 * Sets the country.
+	 * 
+	 * @param country
+	 *            the country to set
+	 * @since $version
+	 */
+	public void setCountry(Country country) {
+		this.country = country;
+	}
+
+	/**
 	 * Sets the person.
 	 * 
 	 * @param person
@@ -79,5 +149,4 @@ public class HomePhone extends Phone {
 	public void setPerson(Person person) {
 		this.person = person;
 	}
-
 }

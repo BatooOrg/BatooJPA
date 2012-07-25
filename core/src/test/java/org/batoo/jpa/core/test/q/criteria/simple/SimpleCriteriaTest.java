@@ -32,14 +32,15 @@ import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.criteria.join.AbstractJoin;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 import org.batoo.jpa.core.test.BaseCoreTest;
-import org.batoo.jpa.core.test.q.criteria.Address;
-import org.batoo.jpa.core.test.q.criteria.Country;
-import org.batoo.jpa.core.test.q.criteria.HomePhone;
-import org.batoo.jpa.core.test.q.criteria.Person;
-import org.batoo.jpa.core.test.q.criteria.SimpleCity;
-import org.batoo.jpa.core.test.q.criteria.WorkPhone;
+import org.batoo.jpa.core.test.q.Address;
+import org.batoo.jpa.core.test.q.Country;
+import org.batoo.jpa.core.test.q.HomePhone;
+import org.batoo.jpa.core.test.q.Person;
+import org.batoo.jpa.core.test.q.SimpleCity;
+import org.batoo.jpa.core.test.q.WorkPhone;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -69,9 +70,9 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 	private Person person() {
 		final Person person = new Person("Ceylan");
 
-		new Address(person, SimpleCriteriaTest.CITY_ISTANBUL, SimpleCriteriaTest.TR);
-		new Address(person, SimpleCriteriaTest.CITY_NEW_YORK, SimpleCriteriaTest.USA);
-		new Address(person, SimpleCriteriaTest.CITY_LONDON, SimpleCriteriaTest.UK);
+		new Address(person, SimpleCriteriaTest.CITY_ISTANBUL, SimpleCriteriaTest.TR, true);
+		new Address(person, SimpleCriteriaTest.CITY_NEW_YORK, SimpleCriteriaTest.USA, false);
+		new Address(person, SimpleCriteriaTest.CITY_LONDON, SimpleCriteriaTest.UK, false);
 
 		new HomePhone(person, "111 1111111");
 		new HomePhone(person, "222 2222222");
@@ -143,6 +144,32 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 
 		final List<Address> resultList = this.em().createQuery(q).getResultList();
 		Assert.assertEquals(6, resultList.size());
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testBooleanExpression() {
+		this.persist(this.person());
+		this.persist(this.person());
+		this.commit();
+
+		this.close();
+
+		final CriteriaBuilderImpl cb = this.em().getCriteriaBuilder();
+		final CriteriaQueryImpl<Address> q = cb.createQuery(Address.class);
+		final RootImpl<Person> r = q.from(Person.class);
+		final AbstractJoin<Person, Address> a = r.join("addresses");
+		q.select(a);
+
+		final AbstractPath<Boolean> p = a.<Boolean> get("primary");
+		q.where(p);
+
+		final List<Address> resultList = this.em().createQuery(q).getResultList();
+		Assert.assertEquals(2, resultList.size());
 	}
 
 	/**

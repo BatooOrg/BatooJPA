@@ -16,9 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.q.criteria;
+package org.batoo.jpa.core.test.q;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
 
 /**
  * 
@@ -26,14 +28,17 @@ import javax.persistence.Entity;
  * @since $version
  */
 @Entity
-public class WorkPhone extends Phone {
+public class HomePhone extends Phone {
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Person person;
 
 	/**
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public WorkPhone() {
+	public HomePhone() {
 		super();
 	}
 
@@ -46,20 +51,33 @@ public class WorkPhone extends Phone {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public WorkPhone(Person person, String phone) {
+	public HomePhone(Person person, String phone) {
 		super(phone);
 
-		person.getWorkPhones().add(this);
+		this.person = person;
+
+		this.person.getPhones().add(this);
 	}
 
 	/**
-	 * @param phone
-	 *            the phone
+	 * Returns the person.
 	 * 
+	 * @return the person
 	 * @since $version
-	 * @author hceylan
 	 */
-	public WorkPhone(String phone) {
-		super(phone);
+	public Person getPerson() {
+		return this.person;
 	}
+
+	/**
+	 * Sets the person.
+	 * 
+	 * @param person
+	 *            the person to set
+	 * @since $version
+	 */
+	public void setPerson(Person person) {
+		this.person = person;
+	}
+
 }

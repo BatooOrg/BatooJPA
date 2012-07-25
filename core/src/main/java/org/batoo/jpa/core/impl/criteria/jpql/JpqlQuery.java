@@ -196,7 +196,7 @@ public class JpqlQuery {
 			else {
 				final Aliased aliased = new Aliased(this.aliasMap, join.getChild(2), false);
 
-				AbstractFrom<?, ?> parent = this.aliasMap.get(join.getChild(1).getText());
+				AbstractFrom<?, ?> parent = this.getAliased(join.getChild(1).getText());
 
 				for (final String segment : aliased.getQualified().getSegments()) {
 					if (joinType == JpqlParser.LEFT) {
@@ -261,9 +261,17 @@ public class JpqlQuery {
 	 * @since $version
 	 * @author hceylan
 	 */
+	@SuppressWarnings("unchecked")
 	private <X> Expression<Boolean> constructPredicate(CriteriaBuilderImpl cb, Tree predictionDef) {
-		if (predictionDef.getChildCount() == 1) {
-			return this.<Boolean> getExpression(cb, predictionDef.getChild(0), Boolean.class);
+		if (predictionDef.getType() == JpqlParser.ST_BOOLEAN) {
+			AbstractPath<?> expr = this.getAliased(predictionDef.getChild(0).getText());
+
+			final Qualified qualified = new Qualified(predictionDef.getChild(1));
+			for (final String segment : qualified.getSegments()) {
+				expr = expr.get(segment);
+			}
+
+			return (Expression<Boolean>) expr;
 		}
 
 		final AbstractExpression<X> left = this.<X> getExpression(cb, predictionDef.getChild(0), null);
@@ -310,13 +318,19 @@ public class JpqlQuery {
 					throw new PersistenceException("Cannot load class: " + className);
 				}
 			}
+			else if (selectDef.getType() == JpqlParser.OBJECT) {
+				final String alias = selectDef.getChild(0).getText();
+				final AbstractFrom<?, ?> from = this.getAliased(alias);
+
+				selection = (AbstractSelection<?>) from.type();
+			}
 			// entity or path selection
 			else {
 
 				final Aliased aliased = new Aliased(this.selectMap, selectDef.getChild(0), true);
 
-				selection = this.aliasMap.get(aliased.getParent());
-
+				final String id = aliased.getParent();
+				selection = this.getAliased(id);
 				if (aliased.getQualified() != null) {
 					// is it a path selection
 
@@ -338,6 +352,7 @@ public class JpqlQuery {
 					selection.alias(aliased.getAlias());
 				}
 			}
+
 			selections.add(selection);
 		}
 
@@ -363,6 +378,15 @@ public class JpqlQuery {
 		return new TypedQueryImpl<T>((CriteriaQueryImpl<T>) this.criteriaQuery, entityManager);
 	}
 
+	private AbstractFrom<?, ?> getAliased(String alias) {
+		final AbstractFrom<?, ?> from = this.aliasMap.get(alias);
+		if (from == null) {
+			throw new PersistenceException("Alias is not bound: " + alias);
+		}
+
+		return from;
+	}
+
 	/**
 	 * Constructs and returns the expression.
 	 * 
@@ -384,12 +408,12 @@ public class JpqlQuery {
 			return cb.parameter(javaType, exprDef.getText().substring(1));
 		}
 		else if (exprDef.getType() == JpqlParser.ID) {
-			return (AbstractExpression<X>) this.aliasMap.get(exprDef.getText());
+			return (AbstractExpression<X>) this.getAliased(exprDef.getText());
 		}
 
 		// fall back to path expression
 		final Qualified qualified = new Qualified(exprDef, true);
-		AbstractPath<?> expression = this.aliasMap.get(qualified.getId());
+		AbstractPath<?> expression = this.getAliased(qualified.getId());
 
 		final Iterator<String> i = qualified.getSegments().iterator();
 		while (i.hasNext()) {

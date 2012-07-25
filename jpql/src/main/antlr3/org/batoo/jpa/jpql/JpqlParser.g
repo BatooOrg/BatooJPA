@@ -24,6 +24,7 @@ tokens {
     ST_JOIN;
     ST_ID_AS;
     ST_SELECT;
+    ST_BOOLEAN;
 }
 
 @header {
@@ -277,7 +278,8 @@ conditional_primary :
     | Left_Paren conditional_expression Right_Paren;
 
 simple_cond_expression :
-    comparison_expression
+    boolean_expression
+    | comparison_expression
 //  | between_expression
     //  | like_expression
     //  | in_expression
@@ -490,7 +492,7 @@ boolean_expression :
 
 boolean_primary :
     ID
-    | ID Period qid
+    | ((ID Period qid) -> ^(ST_BOOLEAN ID qid))
     //  | boolean_literal
     | input_parameter;
 

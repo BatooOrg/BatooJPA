@@ -16,69 +16,85 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.q.criteria;
+package org.batoo.jpa.core.test.q;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
 
 /**
- * 
  * 
  * @author hceylan
  * @since $version
  */
-@Entity
-@DiscriminatorValue("FOO_TYPE_1")
-public class FooType1 extends BaseFoo {
+@MappedSuperclass
+public class Phone {
 
-	private String valueType1;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	private Integer id;
+
+	private String phoneNo;
 
 	/**
-	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public FooType1() {
+	public Phone() {
 		super();
 	}
 
 	/**
-	 * @param bar
-	 *            the bar
-	 * @param valueType1
-	 *            the value type 1
+	 * @param phone
+	 *            the phone number
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public FooType1(Bar bar, String valueType1) {
-		super(bar);
+	public Phone(String phone) {
+		super();
 
-		this.valueType1 = valueType1;
+		this.phoneNo = phone;
 	}
 
 	/**
-	 * Returns the valueType1 of the FooType1.
+	 * Returns the id.
 	 * 
-	 * @return the valueType1 of the FooType1
-	 * 
+	 * @return the id
 	 * @since $version
-	 * @author hceylan
 	 */
-	public String getValueType1() {
-		return this.valueType1;
+	public Integer getId() {
+		return this.id;
 	}
 
 	/**
-	 * Sets the valueType1 of the FooType1.
+	 * Returns the phoneNo.
 	 * 
-	 * @param valueType1
-	 *            the valueType1 to set for FooType1
-	 * 
+	 * @return the phoneNo
 	 * @since $version
-	 * @author hceylan
 	 */
-	public void setValueType1(String valueType1) {
-		this.valueType1 = valueType1;
+	public String getPhoneNo() {
+		return this.phoneNo;
+	}
+
+	/**
+	 * Sets the phoneNo.
+	 * 
+	 * @param phoneNo
+	 *            the phoneNo to set
+	 * @since $version
+	 */
+	public void setPhoneNo(String phoneNo) {
+		this.phoneNo = phoneNo;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "Phone [phoneNo=" + this.phoneNo + "]";
 	}
 }

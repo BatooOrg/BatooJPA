@@ -6,12 +6,12 @@
 	<persistence-unit name="default">
 		<provider>org.batoo.jpa.core.PersistenceProvider</provider>
 		
-		<class>org.batoo.jpa.core.test.q.criteria.Address</class>
-		<class>org.batoo.jpa.core.test.q.criteria.Country</class>
-		<class>org.batoo.jpa.core.test.q.criteria.HomePhone</class>
-		<class>org.batoo.jpa.core.test.q.criteria.Person</class>
-		<class>org.batoo.jpa.core.test.q.criteria.Phone</class>
-		<class>org.batoo.jpa.core.test.q.criteria.WorkPhone</class>
+		<class>org.batoo.jpa.core.test.q.Address</class>
+		<class>org.batoo.jpa.core.test.q.Country</class>
+		<class>org.batoo.jpa.core.test.q.HomePhone</class>
+		<class>org.batoo.jpa.core.test.q.Person</class>
+		<class>org.batoo.jpa.core.test.q.Phone</class>
+		<class>org.batoo.jpa.core.test.q.WorkPhone</class>
 		
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.Driver40" />

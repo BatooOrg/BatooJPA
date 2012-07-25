@@ -16,69 +16,64 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.q.criteria;
+package org.batoo.jpa.core.test.q;
 
-import javax.persistence.DiscriminatorValue;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+
+import com.google.common.collect.Sets;
 
 /**
- * 
  * 
  * @author hceylan
  * @since $version
  */
 @Entity
-@DiscriminatorValue("FOO_TYPE_2")
-public class FooType2 extends BaseFoo {
+public class Bar {
 
-	private int valueType2;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	private Integer id;
+
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "bar")
+	private final Set<BaseFoo> foos = Sets.newHashSet();
 
 	/**
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public FooType2() {
+	public Bar() {
 		super();
 	}
 
 	/**
-	 * @param bar
-	 *            the bar
-	 * @param valueType2
-	 *            the value type 2
+	 * Returns the foos of the Bar.
+	 * 
+	 * @return the foos of the Bar
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public FooType2(Bar bar, int valueType2) {
-		super(bar);
-
-		this.valueType2 = valueType2;
+	public Set<BaseFoo> getFoos() {
+		return this.foos;
 	}
 
 	/**
-	 * Returns the valueType2 of the FooType2.
+	 * Returns the id of the Bar.
 	 * 
-	 * @return the valueType2 of the FooType2
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	protected int getValueType2() {
-		return this.valueType2;
-	}
-
-	/**
-	 * Sets the valueType2 of the FooType2.
-	 * 
-	 * @param valueType2
-	 *            the valueType2 to set for FooType2
+	 * @return the id of the Bar
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected void setValueType2(int valueType2) {
-		this.valueType2 = valueType2;
+	public Integer getId() {
+		return this.id;
 	}
 }

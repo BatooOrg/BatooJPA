@@ -71,7 +71,7 @@ public class BooleanExpression extends AbstractExpression<Boolean> {
 	}
 
 	/**
-	 * {@inheritDoc} // TODO Auto-generated method stub return null;
+	 * {@inheritDoc}
 	 */
 	@Override
 	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
@@ -89,7 +89,7 @@ public class BooleanExpression extends AbstractExpression<Boolean> {
 	 * @author hceylan
 	 */
 	public String generateSqlRestriction(final CriteriaQueryImpl<?> query) {
-		throw new UnsupportedOperationException();
+		return this.inner.getSqlRestrictionFragments(query)[0];
 	}
 
 	/**

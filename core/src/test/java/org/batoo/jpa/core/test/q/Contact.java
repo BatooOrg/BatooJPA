@@ -16,42 +16,38 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.q.criteria;
+package org.batoo.jpa.core.test.q;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
 /**
+ * 
  * 
  * @author hceylan
  * @since $version
  */
-@Entity
-public class Person2 {
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
-	private Integer id;
+@Embeddable
+public class Contact {
 
 	@Embedded
-	private Contact contact;
+	private Address2 address;
 
-	private String name;
+	@OneToOne(cascade = CascadeType.ALL)
+	private WorkPhone phone;
 
 	/**
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Person2() {
+	public Contact() {
 		super();
 	}
 
 	/**
-	 * @param name
-	 *            the name
 	 * @param city
 	 *            the city
 	 * @param country
@@ -62,67 +58,61 @@ public class Person2 {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Person2(String name, String city, Country country, String phone) {
+	public Contact(String city, Country country, String phone) {
 		super();
 
-		this.name = name;
-		this.contact = new Contact(city, country, phone);
+		this.address = new Address2(city, country);
+		this.phone = new WorkPhone(phone);
 	}
 
 	/**
-	 * Returns the contact of the Person2.
+	 * Returns the address of the Contact.
 	 * 
-	 * @return the contact of the Person2
+	 * @return the address of the Contact
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected Contact getContact() {
-		return this.contact;
+	protected Address2 getAddress() {
+		return this.address;
 	}
 
 	/**
-	 * Returns the id.
+	 * Returns the phone of the Contact.
 	 * 
-	 * @return the id
-	 * @since $version
-	 */
-	public Integer getId() {
-		return this.id;
-	}
-
-	/**
-	 * Returns the name.
-	 * 
-	 * @return the name
-	 * @since $version
-	 */
-	public String getName() {
-		return this.name;
-	}
-
-	/**
-	 * Sets the contact of the Person2.
-	 * 
-	 * @param contact
-	 *            the contact to set for Person2
+	 * @return the phone of the Contact
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected void setContact(Contact contact) {
-		this.contact = contact;
+	protected Phone getPhone() {
+		return this.phone;
 	}
 
 	/**
-	 * Sets the name.
+	 * Sets the address of the Contact.
 	 * 
-	 * @param name
-	 *            the name to set
+	 * @param address
+	 *            the address to set for Contact
+	 * 
 	 * @since $version
+	 * @author hceylan
 	 */
-	public void setName(String name) {
-		this.name = name;
+	protected void setAddress(Address2 address) {
+		this.address = address;
+	}
+
+	/**
+	 * Sets the phone of the Contact.
+	 * 
+	 * @param phone
+	 *            the phone to set for Contact
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected void setPhone(WorkPhone phone) {
+		this.phone = phone;
 	}
 
 	/**
@@ -131,6 +121,6 @@ public class Person2 {
 	 */
 	@Override
 	public String toString() {
-		return "[name=" + this.name + ", contact=" + this.contact + "]";
+		return "Contact [address=" + this.address + ", phone=" + this.phone + "]";
 	}
 }

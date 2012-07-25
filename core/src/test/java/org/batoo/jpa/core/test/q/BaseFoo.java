@@ -16,13 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.q.criteria;
+package org.batoo.jpa.core.test.q;
 
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
 import javax.persistence.ManyToOne;
 
 /**
@@ -31,119 +33,76 @@ import javax.persistence.ManyToOne;
  * @since $version
  */
 @Entity
-public class Address {
+@Inheritance
+@DiscriminatorColumn(name = "FOO_TYPE")
+@DiscriminatorValue("BASE_FOO")
+public class BaseFoo {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Integer id;
 
 	@ManyToOne
-	private Person person;
-
-	private String city;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	private Country country;
+	private Bar bar;
 
 	/**
-	 * @since $version
-	 * @author hceylan
-	 */
-	public Address() {
-		super();
-	}
-
-	/**
-	 * @param person
-	 *            the person
-	 * @param city
-	 *            the city
-	 * @param country
-	 *            the country
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Address(Person person, String city, Country country) {
+	public BaseFoo() {
+		super();
+	}
+
+	/**
+	 * @param bar
+	 *            the bar
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public BaseFoo(Bar bar) {
 		super();
 
-		this.person = person;
-		this.city = city;
-		this.country = country;
+		this.bar = bar;
 
-		this.person.getAddresses().add(this);
+		this.bar.getFoos().add(this);
 	}
 
 	/**
-	 * Returns the city.
+	 * Returns the bar of the BaseFoo.
 	 * 
-	 * @return the city
+	 * @return the bar of the BaseFoo
+	 * 
 	 * @since $version
+	 * @author hceylan
 	 */
-	public String getCity() {
-		return this.city;
+	public Bar getBar() {
+		return this.bar;
 	}
 
 	/**
-	 * Returns the country.
+	 * Returns the id of the BasepublicFoo.
 	 * 
-	 * @return the country
-	 * @since $version
-	 */
-	public Country getCountry() {
-		return this.country;
-	}
-
-	/**
-	 * Returns the id.
+	 * @return the id of the BaseFoo
 	 * 
-	 * @return the id
 	 * @since $version
+	 * @author hceylan
 	 */
 	public Integer getId() {
 		return this.id;
 	}
 
 	/**
-	 * Returns the person.
+	 * Sets the bar of the BaseFoo.
 	 * 
-	 * @return the person
-	 * @since $version
-	 */
-	public Person getPerson() {
-		return this.person;
-	}
-
-	/**
-	 * Sets the city.
+	 * @param bar
+	 *            the bar to set for BaseFoo
 	 * 
-	 * @param city
-	 *            the city to set
 	 * @since $version
+	 * @author hceylan
 	 */
-	public void setCity(String city) {
-		this.city = city;
-	}
-
-	/**
-	 * Sets the country.
-	 * 
-	 * @param country
-	 *            the country to set
-	 * @since $version
-	 */
-	public void setCountry(Country country) {
-		this.country = country;
-	}
-
-	/**
-	 * Sets the person.
-	 * 
-	 * @param person
-	 *            the person to set
-	 * @since $version
-	 */
-	public void setPerson(Person person) {
-		this.person = person;
+	public void setBar(Bar bar) {
+		this.bar = bar;
 	}
 }

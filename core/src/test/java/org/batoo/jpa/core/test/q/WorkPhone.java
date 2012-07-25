@@ -16,10 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.q.criteria;
+package org.batoo.jpa.core.test.q;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 
 /**
  * 
@@ -27,76 +26,40 @@ import javax.persistence.Id;
  * @since $version
  */
 @Entity
-public class Country {
-
-	@Id
-	private String code;
-
-	private String name;
+public class WorkPhone extends Phone {
 
 	/**
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Country() {
+	public WorkPhone() {
 		super();
 	}
 
 	/**
-	 * @param code
-	 *            the id
-	 * @param name
-	 *            the name
+	 * @param person
+	 *            the person
+	 * @param phone
+	 *            the phone
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Country(String code, String name) {
-		super();
+	public WorkPhone(Person person, String phone) {
+		super(phone);
 
-		this.code = code;
-		this.name = name;
+		person.getWorkPhones().add(this);
 	}
 
 	/**
-	 * Returns the code of the Country.
-	 * 
-	 * @return the code of the Country
+	 * @param phone
+	 *            the phone
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String getCode() {
-		return this.code;
-	}
-
-	/**
-	 * Returns the name.
-	 * 
-	 * @return the name
-	 * @since $version
-	 */
-	public String getName() {
-		return this.name;
-	}
-
-	/**
-	 * Sets the name.
-	 * 
-	 * @param name
-	 *            the name to set
-	 * @since $version
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String toString() {
-		return "Country [name=" + this.name + "]";
+	public WorkPhone(String phone) {
+		super(phone);
 	}
 }

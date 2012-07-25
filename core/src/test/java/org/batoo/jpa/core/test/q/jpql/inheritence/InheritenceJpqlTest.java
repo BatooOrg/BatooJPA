@@ -16,22 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.q.criteria.inheritence;
+package org.batoo.jpa.core.test.q.jpql.inheritence;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.Expression;
 
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
-import org.batoo.jpa.core.impl.criteria.join.SetJoinImpl;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 import org.batoo.jpa.core.test.BaseCoreTest;
 import org.batoo.jpa.core.test.q.Bar;
-import org.batoo.jpa.core.test.q.BaseFoo;
 import org.batoo.jpa.core.test.q.FooType1;
 import org.batoo.jpa.core.test.q.FooType2;
 import org.junit.Assert;
@@ -42,7 +41,7 @@ import org.junit.Test;
  * 
  * @since $version
  */
-public class InheritenceCriteriaTest extends BaseCoreTest {
+public class InheritenceJpqlTest extends BaseCoreTest {
 
 	private Object bar() {
 		final Bar bar = new Bar();
@@ -64,16 +63,9 @@ public class InheritenceCriteriaTest extends BaseCoreTest {
 		this.commit();
 		this.close();
 
-		final CriteriaBuilderImpl cb = this.em().getCriteriaBuilder();
+		final TypedQuery<Class> q = this.em().createQuery("select object(f) from Bar b inner join b.foos f", Class.class);
 
-		final CriteriaQueryImpl<Class> q = cb.createQuery(Class.class);
-		final RootImpl<Bar> r = q.from(Bar.class);
-		final SetJoinImpl<Bar, BaseFoo> b = r.joinSet("foos");
-
-		final Expression<Class<? extends BaseFoo>> type = b.type();
-		q.select(type);
-
-		final List<Class> resultList = this.em().createQuery(q).getResultList();
+		final List<Class> resultList = q.getResultList();
 
 		Collections.sort(resultList, new Comparator<Class>() {
 

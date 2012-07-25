@@ -282,7 +282,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @author hceylan
 	 */
 	protected String getColumnType(AbstractColumn cd, int sqlType) {
-		switch (cd.getSqlType()) {
+		switch (sqlType) {
 			case Types.BLOB:
 				return "BLOB(" + cd.getLength() + ")";
 			case Types.CLOB:
@@ -297,8 +297,9 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 				return "TIMESTAMP";
 			case Types.CHAR:
 				return "CHAR";
-			case Types.TINYINT:
 			case Types.BOOLEAN:
+				return "BOOLEAN";
+			case Types.TINYINT:
 			case Types.SMALLINT:
 				return "SMALLINT";
 			case Types.INTEGER:

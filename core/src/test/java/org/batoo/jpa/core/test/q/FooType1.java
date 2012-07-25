@@ -16,93 +16,69 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.test.q.criteria;
+package org.batoo.jpa.core.test.q;
 
-import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.ManyToOne;
 
 /**
+ * 
  * 
  * @author hceylan
  * @since $version
  */
 @Entity
-@Inheritance
-@DiscriminatorColumn(name = "FOO_TYPE")
-@DiscriminatorValue("BASE_FOO")
-public class BaseFoo {
+@DiscriminatorValue("FOO_TYPE_1")
+public class FooType1 extends BaseFoo {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
-	private Integer id;
-
-	@ManyToOne
-	private Bar bar;
+	private String valueType1;
 
 	/**
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public BaseFoo() {
+	public FooType1() {
 		super();
 	}
 
 	/**
 	 * @param bar
 	 *            the bar
+	 * @param valueType1
+	 *            the value type 1
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public BaseFoo(Bar bar) {
-		super();
+	public FooType1(Bar bar, String valueType1) {
+		super(bar);
 
-		this.bar = bar;
-
-		this.bar.getFoos().add(this);
+		this.valueType1 = valueType1;
 	}
 
 	/**
-	 * Returns the bar of the BaseFoo.
+	 * Returns the valueType1 of the FooType1.
 	 * 
-	 * @return the bar of the BaseFoo
+	 * @return the valueType1 of the FooType1
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Bar getBar() {
-		return this.bar;
+	public String getValueType1() {
+		return this.valueType1;
 	}
 
 	/**
-	 * Returns the id of the BasepublicFoo.
+	 * Sets the valueType1 of the FooType1.
 	 * 
-	 * @return the id of the BaseFoo
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public Integer getId() {
-		return this.id;
-	}
-
-	/**
-	 * Sets the bar of the BaseFoo.
-	 * 
-	 * @param bar
-	 *            the bar to set for BaseFoo
+	 * @param valueType1
+	 *            the valueType1 to set for FooType1
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void setBar(Bar bar) {
-		this.bar = bar;
+	public void setValueType1(String valueType1) {
+		this.valueType1 = valueType1;
 	}
 }
