@@ -112,7 +112,16 @@ public class JpqlQuery {
 			}
 
 			this.constructFrom(cb, q, tree.getChild(1));
-			this.constructSelect(cb, q, tree.getChild(0).getChild(0));
+
+			final List<Selection<?>> selections = this.constructSelect(cb, q, tree.getChild(0).getChild(0));
+
+			if (selections.size() == 1) {
+				q.select(selections.get(0));
+			}
+			else {
+				q.multiselect(selections);
+			}
+
 			if (tree.getChildCount() > 2) {
 				final Tree child = tree.getChild(2);
 				if (child.getType() == JpqlParser.WHERE) {
@@ -279,8 +288,9 @@ public class JpqlQuery {
 	 * 
 	 * @since $version
 	 * @author hceylan
+	 * @return
 	 */
-	private void constructSelect(CriteriaBuilderImpl cb, CriteriaQueryImpl<Object> q, Tree selects) {
+	private List<Selection<?>> constructSelect(CriteriaBuilderImpl cb, CriteriaQueryImpl<Object> q, Tree selects) {
 		final List<Selection<?>> selections = Lists.newArrayList();
 
 		for (int i = 0; i < selects.getChildCount(); i++) {
@@ -288,31 +298,50 @@ public class JpqlQuery {
 
 			AbstractSelection<?> selection = null;
 
-			final Aliased aliased = new Aliased(this.selectMap, selectDef.getChild(0), true);
-
-			final AbstractSelection<?> parent = this.aliasMap.get(aliased.getParent());
-			if (aliased.getQualified() != null) {
-				if (parent instanceof AbstractFrom) {
-					final AbstractFrom<?, ?> from = (AbstractFrom<?, ?>) parent;
-					selection = from.get(aliased.getQualified().toString());
-					if (aliased.getAlias() != null) {
-						selection.alias(aliased.getAlias());
-					}
+			// constructor select
+			if (selectDef.getType() == JpqlParser.NEW) {
+				final String className = new Qualified(selectDef.getChild(0)).toString();
+				final List<Selection<?>> childSelections = this.constructSelect(cb, q, selectDef.getChild(1));
+				try {
+					selection = cb.construct(Class.forName(className.toString()), //
+						childSelections.toArray(new Selection[childSelections.size()]));
+				}
+				catch (final ClassNotFoundException e) {
+					throw new PersistenceException("Cannot load class: " + className);
 				}
 			}
+			// entity or path selection
 			else {
-				selection = parent;
-			}
 
+				final Aliased aliased = new Aliased(this.selectMap, selectDef.getChild(0), true);
+
+				selection = this.aliasMap.get(aliased.getParent());
+
+				if (aliased.getQualified() != null) {
+					// is it a path selection
+
+					for (final String segment : aliased.getQualified().getSegments()) {
+
+						if (selection instanceof AbstractFrom) {
+							selection = ((AbstractFrom<?, ?>) selection).get(segment);
+						}
+						else if (selection instanceof AbstractPath) {
+							selection = ((AbstractPath<?>) selection).get(segment);
+						}
+						else {
+							throw new IllegalArgumentException("Cannot dereference: " + segment);
+						}
+					}
+				}
+
+				if (aliased.getAlias() != null) {
+					selection.alias(aliased.getAlias());
+				}
+			}
 			selections.add(selection);
 		}
 
-		if (selections.size() == 1) {
-			q.select(selections.get(0));
-		}
-		else {
-			q.multiselect(selections);
-		}
+		return selections;
 	}
 
 	/**

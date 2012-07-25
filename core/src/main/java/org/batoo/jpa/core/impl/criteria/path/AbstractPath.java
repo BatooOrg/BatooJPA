@@ -71,13 +71,15 @@ public abstract class AbstractPath<X> extends AbstractExpression<X> implements P
 	/**
 	 * returns cannot dereference exception.
 	 * 
+	 * @param name
+	 *            the attribute name
 	 * @return the exception
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected IllegalArgumentException cannotDereference() {
-		return new IllegalArgumentException("Cannot dereference");
+	protected IllegalArgumentException cannotDereference(String name) {
+		return new IllegalArgumentException("Cannot dereference: " + name);
 	}
 
 	/**
@@ -122,7 +124,7 @@ public abstract class AbstractPath<X> extends AbstractExpression<X> implements P
 		}
 
 		if (!(this instanceof ParentPath)) {
-			throw this.cannotDereference();
+			throw this.cannotDereference(name);
 		}
 
 		Mapping<? super X, ?, Y> mapping = null;
@@ -139,7 +141,7 @@ public abstract class AbstractPath<X> extends AbstractExpression<X> implements P
 		}
 
 		if (mapping == null) {
-			throw this.cannotDereference();
+			throw this.cannotDereference(name);
 		}
 
 		// generate and return

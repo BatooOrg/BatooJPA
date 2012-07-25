@@ -88,7 +88,7 @@ left_join :
 inner_join :
     ( ( INNER)? JOIN ID Period qid AS? ID)
         -> ^( 
-                ST_JOIN JOIN ID 
+                ST_JOIN JOIN ID
                 ^( ST_ID_AS qid ID  )
               );
 
@@ -130,6 +130,12 @@ select_expressions :
                 LSELECT select_expression ( select_expression)*
               );
 
+simple_select_expressions :
+    select_expression ( Comma select_expression)*
+        -> ^( 
+                LSELECT select_expression ( select_expression)*
+              );
+
 select_expression :
     (
     ID ( AS? ID)?
@@ -141,22 +147,27 @@ select_expression :
     | ( aliased_fqid
         -> ^( ST_SELECT aliased_fqid  )
 )
+    //  | aggregate_expression
+    //  | 'OBJECT' Left_Paren ID Right_Paren
+    | constructor_expression;
+
+simple_select_expression :
+    ( ID
+        -> ^( 
+                ST_SELECT
+                ^( ST_ID_AS ID NULL  )
+              )
+)
+    | ( fake_aliased_fqid
+        -> ^( ST_SELECT fake_aliased_fqid  )
+)
 //  | aggregate_expression
-//  | 'OBJECT' Left_Paren ID Right_Paren
-//  | constructor_expression
 ;
 
-//constructor_expression
-//  :
-//  'NEW' constructor_name Left_Paren constructor_item (Comma constructor_item)* Right_Paren
-//  ;
-//
-//constructor_item
-//  :
-//  single_valued_path_expression
-//  | aggregate_expression
-//  ;
-//
+constructor_expression :
+    NEW qid Left_Paren simple_select_expressions Right_Paren
+        -> ^( NEW qid simple_select_expressions  );
+
 //aggregate_expression
 //  :
 //  (
@@ -343,7 +354,7 @@ comparison_expression :
     //  (
     //    string_expression
     //    | all_or_any_expression
-    //  ) |
+    //  ) |( ( AS)? ID)?
     boolean_expression
     (
     Equals_Operator^
@@ -603,11 +614,19 @@ aliased_qid :
                 ST_ID_AS qid ( ID)?
               );
 
+fake_aliased_qid :
+    qid
+        -> ^( ST_ID_AS qid NULL  );
+
 aliased_fqid :
     fqid ( ( AS)? ID)?
         -> ^( 
                 ST_ID_AS fqid ( ID)?
               );
+
+fake_aliased_fqid :
+    fqid
+        -> ^( ST_ID_AS fqid NULL  );
 
 qid :
     ID ( Period ID)*

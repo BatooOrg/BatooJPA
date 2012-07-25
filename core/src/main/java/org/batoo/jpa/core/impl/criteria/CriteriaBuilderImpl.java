@@ -253,7 +253,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public <Y> CompoundSelection<Y> construct(Class<Y> resultClass, Selection<?>... selections) {
+	public <Y> CompoundSelectionImpl<Y> construct(Class<Y> resultClass, Selection<?>... selections) {
 		return new CompoundSelectionImpl<Y>(resultClass, selections);
 	}
 

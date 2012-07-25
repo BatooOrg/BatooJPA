@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.test.q.jpql.simple;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.TypedQuery;
@@ -29,6 +30,7 @@ import org.batoo.jpa.core.test.q.criteria.Address;
 import org.batoo.jpa.core.test.q.criteria.Country;
 import org.batoo.jpa.core.test.q.criteria.HomePhone;
 import org.batoo.jpa.core.test.q.criteria.Person;
+import org.batoo.jpa.core.test.q.criteria.SimpleCity;
 import org.batoo.jpa.core.test.q.criteria.WorkPhone;
 import org.junit.Before;
 import org.junit.Test;
@@ -132,6 +134,26 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		final List<Address> resultList = q.getResultList();
 		Assert.assertEquals(3, resultList.size());
+	}
+
+	/**
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testConstructor() {
+		this.persist(this.person());
+		this.commit();
+		this.close();
+
+		final TypedQuery<SimpleCity> q = this.em().createQuery(
+			"select new org.batoo.jpa.core.test.q.criteria.SimpleCity(a.city, a.country.name) from Address a", SimpleCity.class);
+
+		final List<SimpleCity> resultList = q.getResultList();
+		Collections.sort(resultList);
+		Assert.assertEquals(
+			"[SimpleCity [city=Istanbul, country=Turkey], SimpleCity [city=London, country=United Kingdom], SimpleCity [city=New York, country=United States of America]]",
+			resultList.toString());
 	}
 
 	/**
