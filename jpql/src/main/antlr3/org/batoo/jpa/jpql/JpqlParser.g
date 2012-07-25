@@ -148,7 +148,8 @@ select_expression :
         -> ^( ST_SELECT aliased_fqid  )
 )
     //  | aggregate_expression
-    //  | 'OBJECT' Left_Paren ID Right_Paren
+    | ( OBJECT Left_Paren ID Right_Paren)
+        -> ^( OBJECT ID  )
     | constructor_expression;
 
 simple_select_expression :

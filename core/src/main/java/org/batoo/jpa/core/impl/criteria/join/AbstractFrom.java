@@ -25,16 +25,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.persistence.criteria.CollectionJoin;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.From;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.ListJoin;
-import javax.persistence.criteria.MapJoin;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.SetJoin;
 import javax.persistence.metamodel.CollectionAttribute;
 import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.MapAttribute;
@@ -46,6 +41,7 @@ import javax.persistence.metamodel.Type.PersistenceType;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.expression.EntityTypeExpression;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl.MapSelectType;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 import org.batoo.jpa.core.impl.criteria.path.ParentPath;
@@ -429,69 +425,9 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 * 
 	 */
 	@Override
-	public Predicate in(Collection<?> values) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Predicate in(Expression<?>... values) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Predicate in(Expression<Collection<?>> values) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Predicate in(Object... values) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public boolean isCorrelated() {
 		// TODO Auto-generated method stub
 		return false;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Predicate isNotNull() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Predicate isNull() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/**
@@ -537,7 +473,7 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 * 
 	 */
 	@Override
-	public <K, V> MapJoin<X, K, V> join(MapAttribute<? super X, K, V> map) {
+	public <K, V> MapJoinImpl<X, K, V> join(MapAttribute<? super X, K, V> map) {
 		return this.join(map, JoinType.INNER);
 	}
 
@@ -547,8 +483,8 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public <K, V> MapJoin<X, K, V> join(MapAttribute<? super X, K, V> map, JoinType jt) {
-		return (MapJoin<X, K, V>) this.join(map.getName(), jt);
+	public <K, V> MapJoinImpl<X, K, V> join(MapAttribute<? super X, K, V> map, JoinType jt) {
+		return (MapJoinImpl<X, K, V>) this.join(map.getName(), jt);
 	}
 
 	/**
@@ -651,7 +587,7 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 * 
 	 */
 	@Override
-	public <Y> CollectionJoin<X, Y> joinCollection(String attributeName) {
+	public <Y> CollectionJoinImpl<X, Y> joinCollection(String attributeName) {
 		return this.joinCollection(attributeName, JoinType.INNER);
 	}
 
@@ -661,8 +597,8 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public <Y> CollectionJoin<X, Y> joinCollection(String attributeName, JoinType jt) {
-		return (CollectionJoin<X, Y>) this.join(attributeName, jt);
+	public <Y> CollectionJoinImpl<X, Y> joinCollection(String attributeName, JoinType jt) {
+		return (CollectionJoinImpl<X, Y>) this.join(attributeName, jt);
 	}
 
 	/**
@@ -670,7 +606,7 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 * 
 	 */
 	@Override
-	public <Y> ListJoin<X, Y> joinList(String attributeName) {
+	public <Y> ListJoinImpl<X, Y> joinList(String attributeName) {
 		return this.joinList(attributeName, JoinType.INNER);
 	}
 
@@ -680,8 +616,8 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public <Y> ListJoin<X, Y> joinList(String attributeName, JoinType jt) {
-		return (ListJoin<X, Y>) this.join(attributeName, jt);
+	public <Y> ListJoinImpl<X, Y> joinList(String attributeName, JoinType jt) {
+		return (ListJoinImpl<X, Y>) this.join(attributeName, jt);
 	}
 
 	/**
@@ -689,7 +625,7 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 * 
 	 */
 	@Override
-	public <K, V> MapJoin<X, K, V> joinMap(String attributeName) {
+	public <K, V> MapJoinImpl<X, K, V> joinMap(String attributeName) {
 		return this.joinMap(attributeName, JoinType.INNER);
 	}
 
@@ -699,8 +635,8 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public <K, V> MapJoin<X, K, V> joinMap(String attributeName, JoinType jt) {
-		return (MapJoin<X, K, V>) this.join(attributeName, jt);
+	public <K, V> MapJoinImpl<X, K, V> joinMap(String attributeName, JoinType jt) {
+		return (MapJoinImpl<X, K, V>) this.join(attributeName, jt);
 	}
 
 	/**
@@ -708,7 +644,7 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 * 
 	 */
 	@Override
-	public <Y> SetJoin<X, Y> joinSet(String attributeName) {
+	public <Y> SetJoinImpl<X, Y> joinSet(String attributeName) {
 		return this.joinSet(attributeName, JoinType.INNER);
 	}
 
@@ -718,8 +654,8 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public <Y> SetJoin<X, Y> joinSet(String attributeName, JoinType jt) {
-		return (SetJoin<X, Y>) this.join(attributeName, jt);
+	public <Y> SetJoinImpl<X, Y> joinSet(String attributeName, JoinType jt) {
+		return (SetJoinImpl<X, Y>) this.join(attributeName, jt);
 	}
 
 	/**
@@ -733,5 +669,14 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 */
 	public void select(boolean selected) {
 		this.selected |= selected;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Expression<Class<? extends X>> type() {
+		return new EntityTypeExpression<Class<? extends X>>(this);
 	}
 }

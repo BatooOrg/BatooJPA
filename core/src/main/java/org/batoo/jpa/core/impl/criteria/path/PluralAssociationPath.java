@@ -27,8 +27,10 @@ import javax.persistence.criteria.Path;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.expression.EntityTypeExpression;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
 import org.batoo.jpa.core.impl.criteria.join.FetchImpl;
+import org.batoo.jpa.core.impl.criteria.join.FetchParentImpl;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl.MapSelectType;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
@@ -47,7 +49,7 @@ import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
  * @author hceylan
  * @since $version
  */
-public class PluralAssociationPath<Z, X> extends AbstractPath<X> implements Joinable {
+public class PluralAssociationPath<Z, X> extends AbstractPath<X> implements Joinable, ParentPath<Z, X> {
 
 	private final PluralAssociationMapping<Z, ?, X> mapping;
 	private final FetchImpl<Z, X> fetchRoot;
@@ -120,6 +122,15 @@ public class PluralAssociationPath<Z, X> extends AbstractPath<X> implements Join
 	 * 
 	 */
 	@Override
+	public FetchParentImpl<?, X> getFetchRoot() {
+		return this.fetchRoot;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public PluralAssociationMapping<?, ?, X> getMapping() {
 		return this.mapping;
 	}
@@ -158,5 +169,14 @@ public class PluralAssociationPath<Z, X> extends AbstractPath<X> implements Join
 	@Override
 	public X handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		return this.fetchRoot.handle(session, row);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public EntityTypeExpression<Class<? extends X>> type() {
+		return new EntityTypeExpression<Class<? extends X>>(this);
 	}
 }

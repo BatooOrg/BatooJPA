@@ -198,14 +198,4 @@ public abstract class AbstractPath<X> extends AbstractExpression<X> implements P
 
 		return (Joinable) root;
 	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public AbstractPath<Class<? extends X>> type() {
-		return (AbstractPath<Class<? extends X>>) this;
-	}
 }

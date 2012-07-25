@@ -97,13 +97,17 @@ public class LinkManager extends DeploymentManager<EntityTypeImpl<?>> {
 		switch (this.phase) {
 			case LINK_ASSOCIATIONS:
 				for (final AssociationMapping<?, ?, ?> mapping : entity.getAssociations()) {
-					mapping.link();
+					if (mapping.getRoot().getType() == entity) {
+						mapping.link();
+					}
 				}
 				break;
 			case LINK_ELEMENT_COLLECTIONS:
 				for (final PluralMapping<?, ?, ?> mapping : entity.getMappingsPlural()) {
-					if (mapping instanceof ElementCollectionMapping) {
-						((ElementCollectionMapping<?, ?, ?>) mapping).link();
+					if (mapping.getRoot().getType() == entity) {
+						if (mapping instanceof ElementCollectionMapping) {
+							((ElementCollectionMapping<?, ?, ?>) mapping).link();
+						}
 					}
 				}
 				break;

@@ -21,6 +21,8 @@ package org.batoo.jpa.core.impl.criteria.path;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.persistence.criteria.Expression;
+
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl;
@@ -120,5 +122,14 @@ public class MapKeyPath<X> extends AbstractPath<X> {
 	@SuppressWarnings("unchecked")
 	public X handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		return (X) this.mapJoin.handle(session, row, MapSelectType.KEY);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Expression<Class<? extends X>> type() {
+		return this.mapJoin.type(MapSelectType.KEY);
 	}
 }

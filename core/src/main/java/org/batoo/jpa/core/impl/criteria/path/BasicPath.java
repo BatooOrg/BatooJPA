@@ -21,11 +21,13 @@ package org.batoo.jpa.core.impl.criteria.path;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.expression.PathTypeExpression;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -149,5 +151,14 @@ public class BasicPath<X> extends AbstractPath<X> {
 	@SuppressWarnings("unchecked")
 	public X handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		return (X) this.mapping.getColumn().convertValue(row.getObject(this.fieldAlias));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Expression<Class<? extends X>> type() {
+		return new PathTypeExpression<Class<? extends X>>(this);
 	}
 }

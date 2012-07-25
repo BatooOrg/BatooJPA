@@ -228,6 +228,18 @@ public class MapJoinImpl<Z, K, V> extends AbstractJoin<Z, V> implements MapJoin<
 	}
 
 	/**
+	 * @param key
+	 * @return
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Expression<Class<? extends K>> type(MapSelectType key) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */

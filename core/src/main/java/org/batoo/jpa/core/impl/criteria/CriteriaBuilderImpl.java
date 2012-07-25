@@ -134,8 +134,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public CompoundSelection<Object[]> array(Selection<?>... selections) {
-		// TODO Auto-generated method stub
-		return null;
+		return new CompoundSelectionImpl<Object[]>(Object[].class, selections);
 	}
 
 	/**

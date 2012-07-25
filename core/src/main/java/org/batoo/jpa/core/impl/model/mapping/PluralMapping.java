@@ -155,10 +155,20 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * 
 	 * @return the order by of the association
 	 * 
-	 * @since $version
+	 * @since $versionpublic RootMapping<?> getRoot()
 	 * @author hceylan
 	 */
 	String getOrderBy();
+
+	/**
+	 * Returns the root mapping.
+	 * 
+	 * @return the root mapping
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	RootMapping<?> getRoot();
 
 	/**
 	 * Loads the collection eagerly.
