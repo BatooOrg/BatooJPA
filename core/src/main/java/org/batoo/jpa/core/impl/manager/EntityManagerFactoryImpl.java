@@ -250,6 +250,10 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 				throw (PersistenceException) e.getCause();
 			}
 
+			if (e.getCause() instanceof IllegalArgumentException) {
+				throw (IllegalArgumentException) e.getCause();
+			}
+
 			throw new PersistenceException("Cannot parse query: " + e.getMessage(), e);
 		}
 	}

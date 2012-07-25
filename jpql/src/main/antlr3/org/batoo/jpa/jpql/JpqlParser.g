@@ -358,12 +358,7 @@ comparison_expression :
     //    string_expression
     //    | all_or_any_expression
     //  ) |( ( AS)? ID)?
-    boolean_expression
-    (
-    Equals_Operator^
-    | Not_Equals_Operator^
-    )
-    ( boolean_expression
+    boolean_expression comparison_operator^ ( boolean_expression
 //    | all_or_any_expression
     )
 //  | enum_expression
@@ -396,16 +391,14 @@ comparison_expression :
     //  )
     ;
 
-//comparison_operator
-//  :
-//  Equals_Operator
-//  | '>'
-//  | '>='
-//  | '<'
-//  | '<='
-//  | Not_Equals_Operator
-//  ;
-//
+comparison_operator :
+    Equals_Operator
+    | Greater_Than_Operator
+    | Greater_Or_Equals_Operator
+    | Less_Than_Operator
+    | Less_Or_Equals_Operator
+    | Not_Equals_Operator;
+
 //arithmetic_expression
 //  :
 //  simple_arithmetic_expression
@@ -492,7 +485,11 @@ boolean_expression :
 
 boolean_primary :
     ID
-    | ((ID Period qid) -> ^(ST_BOOLEAN ID qid))
+    |
+    (
+    ( ID Period qid)
+        -> ^( ST_BOOLEAN ID qid  )
+    )
     //  | boolean_literal
     | input_parameter;
 

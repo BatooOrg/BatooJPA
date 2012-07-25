@@ -51,6 +51,8 @@ public class Person {
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	private final List<WorkPhone> workPhones = Lists.newArrayList();
 
+	private int age;
+
 	private String name;
 
 	/**
@@ -68,10 +70,11 @@ public class Person {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Person(String name) {
+	public Person(String name, int age) {
 		super();
 
 		this.name = name;
+		this.age = age;
 	}
 
 	/**

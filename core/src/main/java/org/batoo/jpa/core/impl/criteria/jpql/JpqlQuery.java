@@ -74,7 +74,7 @@ public class JpqlQuery {
 
 	/**
 	 * @param entityManagerFactory
-	 *            the entity manager factorey
+	 *            the entity manager factory
 	 * @param qlString
 	 *            the query string
 	 * 
@@ -261,24 +261,60 @@ public class JpqlQuery {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private <X> Expression<Boolean> constructPredicate(CriteriaBuilderImpl cb, Tree predictionDef) {
 		if (predictionDef.getType() == JpqlParser.ST_BOOLEAN) {
-			AbstractPath<?> expr = this.getAliased(predictionDef.getChild(0).getText());
-
-			final Qualified qualified = new Qualified(predictionDef.getChild(1));
-			for (final String segment : qualified.getSegments()) {
-				expr = expr.get(segment);
-			}
-
-			return (Expression<Boolean>) expr;
+			return this.getBooleanExpression(predictionDef);
 		}
+		else if ((predictionDef.getType() == JpqlParser.Equals_Operator) //
+			|| (predictionDef.getType() == JpqlParser.Not_Equals_Operator) //
+			|| (predictionDef.getType() == JpqlParser.Greater_Than_Operator) //
+			|| (predictionDef.getType() == JpqlParser.Greater_Or_Equals_Operator) //
+			|| (predictionDef.getType() == JpqlParser.Less_Than_Operator) //
+			|| (predictionDef.getType() == JpqlParser.Less_Or_Equals_Operator)) {
 
-		final AbstractExpression<X> left = this.<X> getExpression(cb, predictionDef.getChild(0), null);
-		final AbstractExpression<? extends X> right = this.getExpression(cb, predictionDef.getChild(1), left.getJavaType());
+			final AbstractExpression<X> left = this.<X> getExpression(cb, predictionDef.getChild(0), null);
+			final AbstractExpression<? extends X> right = this.getExpression(cb, predictionDef.getChild(1), left.getJavaType());
 
-		if (predictionDef.getType() == JpqlParser.Equals_Operator) {
-			return cb.equal(left, right);
+			switch (predictionDef.getType()) {
+				case JpqlParser.Equals_Operator:
+					return cb.equal(left, right);
+
+				case JpqlParser.Not_Equals_Operator:
+					return cb.notEqual(left, right);
+
+				case JpqlParser.Greater_Than_Operator:
+					if (Comparable.class.isAssignableFrom(left.getJavaType())) {
+						return cb.greaterThan((Expression<Comparable>) left, (Expression<Comparable>) right);
+					}
+					else {
+						return cb.gt((Expression<? extends Number>) left, (Expression<? extends Number>) right);
+					}
+
+				case JpqlParser.Greater_Or_Equals_Operator:
+					if (Comparable.class.isAssignableFrom(left.getJavaType())) {
+						return cb.greaterThanOrEqualTo((Expression<Comparable>) left, (Expression<Comparable>) right);
+					}
+					else {
+						return cb.ge((Expression<? extends Number>) left, (Expression<? extends Number>) right);
+					}
+
+				case JpqlParser.Less_Than_Operator:
+					if (Comparable.class.isAssignableFrom(left.getJavaType())) {
+						return cb.lessThan((Expression<Comparable>) left, (Expression<Comparable>) right);
+					}
+					else {
+						return cb.lt((Expression<? extends Number>) left, (Expression<? extends Number>) right);
+					}
+
+				case JpqlParser.Less_Or_Equals_Operator:
+					if (Comparable.class.isAssignableFrom(left.getJavaType())) {
+						return cb.lessThanOrEqualTo((Expression<Comparable>) left, (Expression<Comparable>) right);
+					}
+					else {
+						return cb.le((Expression<? extends Number>) left, (Expression<? extends Number>) right);
+					}
+			}
 		}
 
 		return null;
@@ -387,6 +423,18 @@ public class JpqlQuery {
 		return from;
 	}
 
+	@SuppressWarnings("unchecked")
+	private Expression<Boolean> getBooleanExpression(Tree predictionDef) {
+		AbstractPath<?> expr = this.getAliased(predictionDef.getChild(0).getText());
+
+		final Qualified qualified = new Qualified(predictionDef.getChild(1));
+		for (final String segment : qualified.getSegments()) {
+			expr = expr.get(segment);
+		}
+
+		return (Expression<Boolean>) expr;
+	}
+
 	/**
 	 * Constructs and returns the expression.
 	 * 
@@ -401,7 +449,10 @@ public class JpqlQuery {
 	 */
 	@SuppressWarnings("unchecked")
 	private <X> AbstractExpression<X> getExpression(CriteriaBuilderImpl cb, Tree exprDef, Class<X> javaType) {
-		if (exprDef.getType() == JpqlParser.Ordinal_Parameter) {
+		if (exprDef.getType() == JpqlParser.ST_BOOLEAN) {
+			return (AbstractExpression<X>) this.getBooleanExpression(exprDef);
+		}
+		else if (exprDef.getType() == JpqlParser.Ordinal_Parameter) {
 			return null;
 		}
 		else if (exprDef.getType() == JpqlParser.Named_Parameter) {

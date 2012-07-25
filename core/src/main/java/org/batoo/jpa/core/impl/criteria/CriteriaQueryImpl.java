@@ -103,17 +103,17 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	private String generateJpql() {
 		final StringBuilder builder = new StringBuilder();
 
-		if (this.selection != null) {
-			builder.append("select ");
+		this.ensureSelection();
 
-			// append distinct if necessary * @param selected
+		builder.append("select ");
 
-			if (this.distinct) {
-				builder.append("distinct ");
-			}
+		// append distinct if necessary * @param selected
 
-			builder.append(this.selection.generateJpqlSelect(this, true));
+		if (this.distinct) {
+			builder.append("distinct ");
 		}
+
+		builder.append(this.selection.generateJpqlSelect(this, true));
 
 		final Collection<String> roots = Collections2.transform(this.getRoots(), new Function<Root<?>, String>() {
 
@@ -153,6 +153,8 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 * @author hceylan
 	 */
 	private String generateSql() {
+		this.ensureSelection();
+
 		CriteriaQueryImpl.LOG.debug("Preparing SQL for {0}", CriteriaQueryImpl.LOG.lazyBoxed(this));
 
 		final Map<Joinable, String> joins = Maps.newLinkedHashMap();

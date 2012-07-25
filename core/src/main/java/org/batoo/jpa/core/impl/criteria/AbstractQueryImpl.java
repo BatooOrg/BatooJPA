@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.criteria;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.PersistenceException;
 import javax.persistence.criteria.AbstractQuery;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
@@ -51,6 +52,7 @@ import com.google.common.collect.Sets;
  * @author hceylan
  * @since $version
  */
+@SuppressWarnings("unchecked")
 public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 
 	private final MetamodelImpl metamodel;
@@ -89,6 +91,27 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 
 		this.metamodel = metamodel;
 		this.resultType = resultType;
+	}
+
+	/**
+	 * Ensures that there is a valid selection.
+	 * 
+	 * @return the selection
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected AbstractSelection<T> ensureSelection() {
+		if (this.selection == null) {
+			if (this.getRoots().size() == 1) {
+				return this.selection = (AbstractSelection<T>) this.getRoots().iterator().next();
+			}
+			else {
+				throw new PersistenceException("Selection is not specified");
+			}
+		}
+
+		return this.selection;
 	}
 
 	/**
@@ -192,7 +215,7 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	 */
 	@Override
 	public AbstractSelection<T> getSelection() {
-		return this.selection;
+		return this.ensureSelection();
 	}
 
 	/**
@@ -282,4 +305,5 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 }

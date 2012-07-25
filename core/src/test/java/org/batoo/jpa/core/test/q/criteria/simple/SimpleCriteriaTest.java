@@ -68,7 +68,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 	private static Country UK = new Country(SimpleCriteriaTest.COUNTRY_CODE_UK, SimpleCriteriaTest.COUNTRY_UK);
 
 	private Person person() {
-		final Person person = new Person("Ceylan");
+		final Person person = new Person("Ceylan", 38);
 
 		new Address(person, SimpleCriteriaTest.CITY_ISTANBUL, SimpleCriteriaTest.TR, true);
 		new Address(person, SimpleCriteriaTest.CITY_NEW_YORK, SimpleCriteriaTest.USA, false);
@@ -97,6 +97,60 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 		this.persist(SimpleCriteriaTest.UK);
 
 		this.commit();
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testArithmeticExpression1() {
+		this.persist(this.person());
+		this.commit();
+
+		this.close();
+
+		final CriteriaBuilderImpl cb = this.em().getCriteriaBuilder();
+		final CriteriaQueryImpl<Person> cq = cb.createQuery(Person.class);
+
+		final RootImpl<Person> r = cq.from(Person.class);
+		final AbstractPath<Integer> age = r.<Integer> get("age");
+
+		final ParameterExpressionImpl<Integer> p = cb.parameter(Integer.class);
+		cq.where(cb.lessThan(age, p));
+
+		final TypedQueryImpl<Person> q = this.em().createQuery(cq);
+		q.setParameter(p, 40);
+
+		Assert.assertEquals(1, q.getResultList().size());
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testArithmeticExpression2() {
+		this.persist(this.person());
+		this.commit();
+
+		this.close();
+
+		final CriteriaBuilderImpl cb = this.em().getCriteriaBuilder();
+		final CriteriaQueryImpl<Person> cq = cb.createQuery(Person.class);
+
+		final RootImpl<Person> r = cq.from(Person.class);
+		final AbstractPath<Integer> age = r.<Integer> get("age");
+
+		final ParameterExpressionImpl<Integer> p = cb.parameter(Integer.class);
+		cq.where(cb.greaterThan(age, p));
+
+		final TypedQueryImpl<Person> q = this.em().createQuery(cq);
+		q.setParameter(p, 40);
+
+		Assert.assertEquals(0, q.getResultList().size());
 	}
 
 	/**

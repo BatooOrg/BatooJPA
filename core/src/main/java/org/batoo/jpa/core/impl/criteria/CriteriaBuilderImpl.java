@@ -450,8 +450,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Predicate ge(Expression<? extends Number> x, Expression<? extends Number> y) {
-		// TODO Auto-generated method stub
-		return null;
+		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER_OR_EQUAL, x, y));
 	}
 
 	/**
@@ -460,8 +459,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Predicate ge(Expression<? extends Number> x, Number y) {
-		// TODO Auto-generated method stub
-		return null;
+		final TypeImpl<?> type = this.metamodel.type(y.getClass());
+
+		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER_OR_EQUAL, x, new ConstantExpression(type, y)));
 	}
 
 	/**
@@ -479,9 +479,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public <Y extends Comparable<? super Y>> Predicate greaterThan(Expression<? extends Y> x, Expression<? extends Y> y) {
-		// TODO Auto-generated method stub
-		return null;
+	public <Y extends Comparable<? super Y>> PredicateImpl greaterThan(Expression<? extends Y> x, Expression<? extends Y> y) {
+		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER, x, y));
 	}
 
 	/**
@@ -489,9 +488,10 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public <Y extends Comparable<? super Y>> Predicate greaterThan(Expression<? extends Y> x, Y y) {
-		// TODO Auto-generated method stub
-		return null;
+	public <Y extends Comparable<? super Y>> PredicateImpl greaterThan(Expression<? extends Y> x, Y y) {
+		final TypeImpl<?> type = this.metamodel.type(y.getClass());
+
+		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER, x, new ConstantExpression(type, y)));
 	}
 
 	/**
@@ -499,9 +499,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public <Y extends Comparable<? super Y>> Predicate greaterThanOrEqualTo(Expression<? extends Y> x, Expression<? extends Y> y) {
-		// TODO Auto-generated method stub
-		return null;
+	public <Y extends Comparable<? super Y>> PredicateImpl greaterThanOrEqualTo(Expression<? extends Y> x, Expression<? extends Y> y) {
+		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER_OR_EQUAL, x, y));
 	}
 
 	/**
@@ -509,9 +508,10 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public <Y extends Comparable<? super Y>> Predicate greaterThanOrEqualTo(Expression<? extends Y> x, Y y) {
-		// TODO Auto-generated method stub
-		return null;
+	public <Y extends Comparable<? super Y>> PredicateImpl greaterThanOrEqualTo(Expression<? extends Y> x, Y y) {
+		final TypeImpl<?> type = this.metamodel.type(y.getClass());
+
+		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER_OR_EQUAL, x, new ConstantExpression(type, y)));
 	}
 
 	/**
@@ -529,9 +529,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate gt(Expression<? extends Number> x, Expression<? extends Number> y) {
-		// TODO Auto-generated method stub
-		return null;
+	public PredicateImpl gt(Expression<? extends Number> x, Expression<? extends Number> y) {
+		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER, x, y));
 	}
 
 	/**
@@ -539,9 +538,10 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate gt(Expression<? extends Number> x, Number y) {
-		// TODO Auto-generated method stub
-		return null;
+	public PredicateImpl gt(Expression<? extends Number> x, Number y) {
+		final TypeImpl<?> type = this.metamodel.type(y.getClass());
+
+		return new PredicateImpl(new ComparisonExpression(Comparison.LESS, x, new ConstantExpression(type, y)));
 	}
 
 	/**
@@ -669,9 +669,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate le(Expression<? extends Number> x, Expression<? extends Number> y) {
-		// TODO Auto-generated method stub
-		return null;
+	public PredicateImpl le(Expression<? extends Number> x, Expression<? extends Number> y) {
+		return new PredicateImpl(new ComparisonExpression(Comparison.LESS_OR_EQUAL, x, y));
 	}
 
 	/**
@@ -679,9 +678,10 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate le(Expression<? extends Number> x, Number y) {
-		// TODO Auto-generated method stub
-		return null;
+	public PredicateImpl le(Expression<? extends Number> x, Number y) {
+		final TypeImpl<?> type = this.metamodel.type(y.getClass());
+
+		return new PredicateImpl(new ComparisonExpression(Comparison.LESS_OR_EQUAL, x, new ConstantExpression(type, y)));
 	}
 
 	/**
@@ -709,9 +709,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public <Y extends Comparable<? super Y>> Predicate lessThan(Expression<? extends Y> x, Expression<? extends Y> y) {
-		// TODO Auto-generated method stub
-		return null;
+	public <Y extends Comparable<? super Y>> PredicateImpl lessThan(Expression<? extends Y> x, Expression<? extends Y> y) {
+		return new PredicateImpl(new ComparisonExpression(Comparison.LESS, x, y));
 	}
 
 	/**
@@ -719,9 +718,10 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public <Y extends Comparable<? super Y>> Predicate lessThan(Expression<? extends Y> x, Y y) {
-		// TODO Auto-generated method stub
-		return null;
+	public <Y extends Comparable<? super Y>> PredicateImpl lessThan(Expression<? extends Y> x, Y y) {
+		final TypeImpl<?> type = this.metamodel.type(y.getClass());
+
+		return new PredicateImpl(new ComparisonExpression(Comparison.LESS, x, new ConstantExpression(type, y)));
 	}
 
 	/**
@@ -729,9 +729,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public <Y extends Comparable<? super Y>> Predicate lessThanOrEqualTo(Expression<? extends Y> x, Expression<? extends Y> y) {
-		// TODO Auto-generated method stub
-		return null;
+	public <Y extends Comparable<? super Y>> PredicateImpl lessThanOrEqualTo(Expression<? extends Y> x, Expression<? extends Y> y) {
+		return new PredicateImpl(new ComparisonExpression(Comparison.LESS_OR_EQUAL, x, y));
 	}
 
 	/**
@@ -740,8 +739,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <Y extends Comparable<? super Y>> Predicate lessThanOrEqualTo(Expression<? extends Y> x, Y y) {
-		// TODO Auto-generated method stub
-		return null;
+		final TypeImpl<?> type = this.metamodel.type(y.getClass());
+
+		return new PredicateImpl(new ComparisonExpression(Comparison.LESS_OR_EQUAL, x, new ConstantExpression(type, y)));
 	}
 
 	/**
@@ -750,8 +750,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Predicate like(Expression<String> x, Expression<String> pattern) {
-		// TODO Auto-generated method stub
-		return null;
+		return new PredicateImpl(new ComparisonExpression(Comparison.LIKE, x, pattern));
 	}
 
 	/**
@@ -780,8 +779,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Predicate like(Expression<String> x, String pattern) {
-		// TODO Auto-generated method stub
-		return null;
+		final TypeImpl<?> type = this.metamodel.type(pattern.getClass());
+
+		return new PredicateImpl(new ComparisonExpression(Comparison.LIKE, x, new ConstantExpression(type, pattern)));
 	}
 
 	/**
@@ -870,8 +870,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Predicate lt(Expression<? extends Number> x, Expression<? extends Number> y) {
-		// TODO Auto-generated method stub
-		return null;
+		return new PredicateImpl(new ComparisonExpression(Comparison.LESS, x, y));
 	}
 
 	/**
@@ -880,8 +879,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Predicate lt(Expression<? extends Number> x, Number y) {
-		// TODO Auto-generated method stub
-		return null;
+		final TypeImpl<?> type = this.metamodel.type(y.getClass());
+
+		return new PredicateImpl(new ComparisonExpression(Comparison.LESS, x, new ConstantExpression(type, y)));
 	}
 
 	/**
@@ -960,8 +960,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Predicate notEqual(Expression<?> x, Expression<?> y) {
-		// TODO Auto-generated method stub
-		return null;
+		return new PredicateImpl(new ComparisonExpression(Comparison.NOT_EQUAL, x, y));
 	}
 
 	/**
@@ -970,8 +969,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Predicate notEqual(Expression<?> x, Object y) {
-		// TODO Auto-generated method stub
-		return null;
+		final TypeImpl<?> type = this.metamodel.type(y.getClass());
+
+		return new PredicateImpl(new ComparisonExpression(Comparison.NOT_EQUAL, x, new ConstantExpression(type, y)));
 	}
 
 	/**
@@ -980,8 +980,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Predicate notLike(Expression<String> x, Expression<String> pattern) {
-		// TODO Auto-generated method stub
-		return null;
+		return new PredicateImpl(new ComparisonExpression(Comparison.LIKE, x, pattern)).not();
 	}
 
 	/**
@@ -1010,8 +1009,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Predicate notLike(Expression<String> x, String pattern) {
-		// TODO Auto-generated method stub
-		return null;
+		final TypeImpl<?> type = this.metamodel.type(pattern.getClass());
+
+		return new PredicateImpl(new ComparisonExpression(Comparison.LIKE, x, new ConstantExpression(type, pattern))).not();
 	}
 
 	/**

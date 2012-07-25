@@ -61,7 +61,11 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	private static Country UK = new Country(SimpleJpqlTest.COUNTRY_CODE_UK, SimpleJpqlTest.COUNTRY_UK);
 
 	private Person person() {
-		final Person person = new Person("Ceylan");
+		return this.person(35);
+	}
+
+	private Person person(int age) {
+		final Person person = new Person("Ceylan", age);
 
 		new Address(person, SimpleJpqlTest.CITY_ISTANBUL, SimpleJpqlTest.TR, true);
 		new Address(person, SimpleJpqlTest.CITY_NEW_YORK, SimpleJpqlTest.USA, false);
@@ -99,8 +103,40 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	 */
 	@Test(expected = PersistenceException.class)
 	public void testAliasNotBound() {
-		final TypedQuery<Country> q = this.em().createQuery("select d from Country c", Country.class);
+		final TypedQuery<Country> q = this.cq("select d from Country c", Country.class);
 		q.getResultList();
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testArithmeticExpression() {
+		this.persist(this.person(40));
+		this.persist(this.person(35));
+		this.commit();
+
+		this.close();
+
+		TypedQuery<Person> q = this.cq("select p from Person p where p.age > :age", Person.class).setParameter("age", 40);
+		Assert.assertEquals(0, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.age < :age", Person.class).setParameter("age", 40);
+		Assert.assertEquals(1, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.age >= :age", Person.class).setParameter("age", 40);
+		Assert.assertEquals(1, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.age <= :age", Person.class).setParameter("age", 40);
+		Assert.assertEquals(2, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.name <= :name", Person.class).setParameter("name", "Ceylan");
+		Assert.assertEquals(2, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.name > :name", Person.class).setParameter("name", "Ceylan");
+		Assert.assertEquals(0, q.getResultList().size());
 	}
 
 	/**
@@ -116,10 +152,9 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		this.close();
 
-		final TypedQuery<Address> q = this.em().createQuery("select a from Person p inner join p.addresses a", Address.class);
+		final TypedQuery<Address> q = this.cq("select a from Person p inner join p.addresses a", Address.class);
 
-		final List<Address> resultList = q.getResultList();
-		Assert.assertEquals(6, resultList.size());
+		Assert.assertEquals(6, q.getResultList().size());
 	}
 
 	/**
@@ -136,7 +171,7 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		this.close();
 
-		final TypedQuery<Address> q = this.em().createQuery(//
+		final TypedQuery<Address> q = this.cq(//
 			"select a from Person p\n" + //
 				"left join p.addresses as a \n" + //
 				"join fetch a.country \n" + //
@@ -144,8 +179,7 @@ public class SimpleJpqlTest extends BaseCoreTest {
 				"where p = :person", Address.class);
 		q.setParameter("person", person);
 
-		final List<Address> resultList = q.getResultList();
-		Assert.assertEquals(3, resultList.size());
+		Assert.assertEquals(3, q.getResultList().size());
 	}
 
 	/**
@@ -161,15 +195,13 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		this.close();
 
-		final TypedQuery<Address> q = this.em().createQuery(//
+		final TypedQuery<Address> q = this.cq(//
 			"select a from Person p\n" + //
 				"    left join p.addresses a\n" + //
 				"    where a.primary", //
 			Address.class);
 
-		final List<Address> resultList = q.getResultList();
-
-		Assert.assertEquals(2, resultList.size());
+		Assert.assertEquals(2, q.getResultList().size());
 	}
 
 	/**
@@ -182,11 +214,11 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		this.commit();
 		this.close();
 
-		final TypedQuery<SimpleCity> q = this.em().createQuery("select new org.batoo.jpa.core.test.q.SimpleCity(a.city, a.country.name) from Address a",
-			SimpleCity.class);
+		final TypedQuery<SimpleCity> q = this.cq("select new org.batoo.jpa.core.test.q.SimpleCity(a.city, a.country.name) from Address a", SimpleCity.class);
 
 		final List<SimpleCity> resultList = q.getResultList();
 		Collections.sort(resultList);
+
 		Assert.assertEquals(
 			"[SimpleCity [city=Istanbul, country=Turkey], SimpleCity [city=London, country=United Kingdom], SimpleCity [city=New York, country=United States of America]]",
 			resultList.toString());
@@ -205,7 +237,7 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		this.close();
 
-		final TypedQuery<Person> q = this.em().createQuery(//
+		final TypedQuery<Person> q = this.cq(//
 			"select p from Person p\n" + //
 				"    join fetch p.addresses\n" + //
 				"    join fetch p.addresses.country\n" + //
@@ -225,9 +257,8 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testSimple0() {
-		final TypedQuery<Country> q = this.em().createQuery("select c from Country c", Country.class);
-		final List<Country> resultList = q.getResultList();
-		Assert.assertEquals("[Country [name=Turkey], Country [name=United States of America], Country [name=United Kingdom]]", resultList.toString());
+		final TypedQuery<Country> q = this.cq("select c from Country c", Country.class);
+		Assert.assertEquals("[Country [name=Turkey], Country [name=United States of America], Country [name=United Kingdom]]", q.getResultList().toString());
 	}
 
 	/**
@@ -236,12 +267,10 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testSimple1() {
-		final TypedQuery<Country> q = this.em().createQuery("select c from Country c where c = :country", Country.class);
+		final TypedQuery<Country> q = this.cq("select c from Country c where c = :country", Country.class);
 
 		q.setParameter("country", SimpleJpqlTest.TR);
 
-		final List<Country> resultList = q.getResultList();
-
-		Assert.assertEquals(1, resultList.size());
+		Assert.assertEquals(1, q.getResultList().size());
 	}
 }

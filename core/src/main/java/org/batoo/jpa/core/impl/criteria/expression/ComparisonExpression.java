@@ -59,7 +59,6 @@ public class ComparisonExpression extends BooleanExpression {
 		this.comparison = comparison;
 		this.x = (AbstractExpression<?>) x;
 		this.y = (AbstractExpression<?>) y;
-
 	}
 
 	/**

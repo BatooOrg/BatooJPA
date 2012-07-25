@@ -24,12 +24,22 @@ package org.batoo.jpa.core.impl.criteria.expression;
  * @author hceylan
  * @since $version
  */
+@SuppressWarnings("javadoc")
 public enum Comparison {
 
-	/**
-	 * Equal comparison
-	 */
-	EQUAL(" = ");
+	EQUAL(" = "),
+
+	NOT_EQUAL(" <> "),
+
+	LESS(" < "),
+
+	LESS_OR_EQUAL(" <= "),
+
+	GREATER(" > "),
+
+	GREATER_OR_EQUAL(" >= "),
+
+	LIKE(" LIKE ");
 
 	private final String fragment;
 

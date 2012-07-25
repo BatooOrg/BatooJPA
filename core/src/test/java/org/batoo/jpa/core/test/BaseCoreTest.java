@@ -26,6 +26,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.LockModeType;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 
 import junit.framework.Assert;
 
@@ -150,6 +151,24 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 */
 	protected boolean contains(Object entity) {
 		return this.em().contains(entity);
+	}
+
+	/**
+	 * Creates and returns a JPQL query.
+	 * 
+	 * @param qlString
+	 *            the query string
+	 * @param resultClass
+	 *            the result class
+	 * @param <T>
+	 *            the result ype
+	 * @return the query
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected <T> TypedQuery<T> cq(String qlString, Class<T> resultClass) {
+		return this.em().createQuery(qlString, resultClass);
 	}
 
 	/**
