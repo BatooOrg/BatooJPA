@@ -18,10 +18,14 @@
  */
 package org.batoo.jpa.core.test.q.jpql.simple;
 
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.persistence.PersistenceException;
+import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 
 import junit.framework.Assert;
@@ -61,11 +65,25 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	private static Country UK = new Country(SimpleJpqlTest.COUNTRY_CODE_UK, SimpleJpqlTest.COUNTRY_UK);
 
 	private Person person() {
-		return this.person(35);
+		final GregorianCalendar start = new GregorianCalendar();
+		start.set(Calendar.YEAR, 2000);
+		start.set(Calendar.MONTH, 12);
+		start.set(Calendar.DAY_OF_MONTH, 31);
+
+		return this.person(35, start.getTime());
 	}
 
 	private Person person(int age) {
-		final Person person = new Person("Ceylan", age);
+		final GregorianCalendar start = new GregorianCalendar();
+		start.set(Calendar.YEAR, 2000);
+		start.set(Calendar.MONTH, 12);
+		start.set(Calendar.DAY_OF_MONTH, 31);
+
+		return this.person(age, start.getTime());
+	}
+
+	private Person person(int age, Date start) {
+		final Person person = new Person("Ceylan", age, start);
 
 		new Address(person, SimpleJpqlTest.CITY_ISTANBUL, SimpleJpqlTest.TR, true);
 		new Address(person, SimpleJpqlTest.CITY_NEW_YORK, SimpleJpqlTest.USA, false);
@@ -131,12 +149,6 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		q = this.cq("select p from Person p where p.age <= :age", Person.class).setParameter("age", 40);
 		Assert.assertEquals(2, q.getResultList().size());
-
-		q = this.cq("select p from Person p where p.name <= :name", Person.class).setParameter("name", "Ceylan");
-		Assert.assertEquals(2, q.getResultList().size());
-
-		q = this.cq("select p from Person p where p.name > :name", Person.class).setParameter("name", "Ceylan");
-		Assert.assertEquals(0, q.getResultList().size());
 	}
 
 	/**
@@ -230,6 +242,43 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
+	public void testDateExpression() {
+		final GregorianCalendar start1 = new GregorianCalendar();
+		start1.set(Calendar.YEAR, 2000);
+		start1.set(Calendar.MONTH, 12);
+		start1.set(Calendar.DAY_OF_MONTH, 31);
+
+		final GregorianCalendar start2 = new GregorianCalendar();
+		start2.set(Calendar.YEAR, 2001);
+		start2.set(Calendar.MONTH, 12);
+		start2.set(Calendar.DAY_OF_MONTH, 31);
+
+		this.persist(this.person(40, start1.getTime()));
+		this.persist(this.person(35, start2.getTime()));
+		this.commit();
+
+		this.close();
+
+		TypedQuery<Person> q = this.cq("select p from Person p where p.startDate > :start", Person.class).setParameter("start", start1.getTime(),
+			TemporalType.DATE);
+		Assert.assertEquals(1, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.startDate < :start", Person.class).setParameter("start", start2.getTime(), TemporalType.DATE);
+		Assert.assertEquals(1, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.startDate >= :start", Person.class).setParameter("start", start1.getTime(), TemporalType.DATE);
+		Assert.assertEquals(2, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.startDate <= :start", Person.class).setParameter("start", start1.getTime(), TemporalType.DATE);
+		Assert.assertEquals(1, q.getResultList().size());
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
 	public void testRootJoin() {
 		this.persist(this.person());
 		this.persist(this.person());
@@ -272,5 +321,25 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		q.setParameter("country", SimpleJpqlTest.TR);
 
 		Assert.assertEquals(1, q.getResultList().size());
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testStringExpression() {
+		this.persist(this.person(40));
+		this.persist(this.person(35));
+		this.commit();
+
+		this.close();
+
+		TypedQuery<Person> q = this.cq("select p from Person p where p.name <= :name", Person.class).setParameter("name", "Ceylan");
+		Assert.assertEquals(2, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.name > :name", Person.class).setParameter("name", "Ceylan");
+		Assert.assertEquals(0, q.getResultList().size());
 	}
 }

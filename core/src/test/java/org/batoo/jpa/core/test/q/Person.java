@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.test.q;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -27,6 +28,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import com.google.common.collect.Lists;
 
@@ -55,6 +58,9 @@ public class Person {
 
 	private String name;
 
+	@Temporal(TemporalType.DATE)
+	private Date startDate;
+
 	/**
 	 * @since $version
 	 * @author hceylan
@@ -66,15 +72,20 @@ public class Person {
 	/**
 	 * @param name
 	 *            the name
+	 * @param age
+	 *            the age
+	 * @param startDate
+	 *            the start date
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Person(String name, int age) {
+	public Person(String name, int age, Date startDate) {
 		super();
 
 		this.name = name;
 		this.age = age;
+		this.startDate = startDate;
 	}
 
 	/**
@@ -85,6 +96,18 @@ public class Person {
 	 */
 	public List<Address> getAddresses() {
 		return this.addresses;
+	}
+
+	/**
+	 * Returns the age of the Person.
+	 * 
+	 * @return the age of the Person
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public int getAge() {
+		return this.age;
 	}
 
 	/**
@@ -118,6 +141,18 @@ public class Person {
 	}
 
 	/**
+	 * Returns the startDate of the Person.
+	 * 
+	 * @return the startDate of the Person
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Date getStartDate() {
+		return this.startDate;
+	}
+
+	/**
 	 * Returns the workPhones.
 	 * 
 	 * @return the workPhones
@@ -125,6 +160,19 @@ public class Person {
 	 */
 	public List<WorkPhone> getWorkPhones() {
 		return this.workPhones;
+	}
+
+	/**
+	 * Sets the age of the Person.
+	 * 
+	 * @param age
+	 *            the age to set for Person
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setAge(int age) {
+		this.age = age;
 	}
 
 	/**
@@ -136,5 +184,18 @@ public class Person {
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	/**
+	 * Sets the startDate of the Person.
+	 * 
+	 * @param startDate
+	 *            the startDate to set for Person
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
 	}
 }

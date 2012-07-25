@@ -19,6 +19,8 @@
 package org.batoo.jpa.core.impl.model.attribute;
 
 import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Date;
 
 import javax.persistence.EnumType;
 import javax.persistence.PersistenceException;
@@ -120,7 +122,7 @@ public final class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 		this.type = this.getDeclaringType().getMetamodel().createBasicType(this.getJavaType());
 		this.optional = metadata.isOptional();
 
-		if (this.getJavaType() == Timestamp.class) {
+		if (Date.class.isAssignableFrom(this.getJavaType()) || Calendar.class.isAssignableFrom(this.getJavaType())) {
 			if (metadata.getTemporalType() == null) {
 				this.temporalType = TemporalType.TIMESTAMP;
 			}

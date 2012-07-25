@@ -384,11 +384,6 @@ comparison_expression :
     //    entity_expression
     //    | all_or_any_expression
     //  )
-    //  | arithmetic_expression comparison_operator
-    //  (
-    //    arithmetic_expression
-    //    | all_or_any_expression
-    //  )
     ;
 
 comparison_operator :

@@ -27,19 +27,19 @@ package org.batoo.jpa.core.impl.criteria.expression;
 @SuppressWarnings("javadoc")
 public enum Comparison {
 
-	EQUAL(" = "),
+	EQUAL("{0} = {1}"),
 
-	NOT_EQUAL(" <> "),
+	NOT_EQUAL("{0} <> {1}"),
 
-	LESS(" < "),
+	LESS("{0} < {1}"),
 
-	LESS_OR_EQUAL(" <= "),
+	LESS_OR_EQUAL("{0} <= {1}"),
 
-	GREATER(" > "),
+	GREATER("{0} > {1}"),
 
-	GREATER_OR_EQUAL(" >= "),
+	GREATER_OR_EQUAL("{0} >= {1}"),
 
-	LIKE(" LIKE ");
+	LIKE("{0} LIKE {1}");
 
 	private final String fragment;
 

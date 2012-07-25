@@ -19,8 +19,11 @@
 package org.batoo.jpa.core.impl.jdbc;
 
 import java.lang.reflect.Method;
+import java.util.Calendar;
+import java.util.Date;
 
 import javax.persistence.EnumType;
+import javax.persistence.TemporalType;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
@@ -56,6 +59,7 @@ public class BasicColumn extends AbstractColumn {
 	private final EnumType enumType;
 	private final Enum<?>[] values;
 	private final Method method;
+	private final TemporalType temporalType;
 
 	/**
 	 * @param jdbcAdaptor
@@ -91,6 +95,8 @@ public class BasicColumn extends AbstractColumn {
 		this.nullable = metadata != null ? metadata.isNullable() : true;
 		this.unique = metadata != null ? metadata.isUnique() : false;
 		this.updatable = metadata != null ? metadata.isUpdatable() : true;
+
+		this.temporalType = mapping.getAttribute().getTemporalType();
 
 		this.enumType = mapping.getAttribute().getEnumType();
 		if (this.enumType != null) {
@@ -129,6 +135,41 @@ public class BasicColumn extends AbstractColumn {
 	public Object convertValue(final Object value) {
 		if (value == null) {
 			return null;
+		}
+
+		if (this.temporalType != null) {
+			switch (this.temporalType) {
+				case DATE:
+					if (value instanceof java.sql.Date) {
+						return value;
+					}
+
+					if (value instanceof Date) {
+						return new java.sql.Date(((Date) value).getTime());
+					}
+
+					return new java.sql.Date(((Calendar) value).getTimeInMillis());
+				case TIME:
+					if (value instanceof java.sql.Time) {
+						return value;
+					}
+
+					if (value instanceof Date) {
+						return new java.sql.Time(((Date) value).getTime());
+					}
+
+					return new java.sql.Time(((Calendar) value).getTimeInMillis());
+				case TIMESTAMP:
+					if (value instanceof java.sql.Timestamp) {
+						return value;
+					}
+
+					if (value instanceof Date) {
+						return new java.sql.Timestamp(((Date) value).getTime());
+					}
+
+					return new java.sql.Timestamp(((Calendar) value).getTimeInMillis());
+			}
 		}
 
 		if (this.enumType == null) {
@@ -252,6 +293,7 @@ public class BasicColumn extends AbstractColumn {
 	 */
 	@Override
 	public Object getValue(Object instance) {
+
 		final Object value = this.mapping.get(instance);
 
 		return this.convertValue(value);

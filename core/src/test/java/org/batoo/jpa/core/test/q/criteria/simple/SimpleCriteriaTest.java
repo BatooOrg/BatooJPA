@@ -18,7 +18,9 @@
  */
 package org.batoo.jpa.core.test.q.criteria.simple;
 
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.persistence.TypedQuery;
@@ -68,7 +70,12 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 	private static Country UK = new Country(SimpleCriteriaTest.COUNTRY_CODE_UK, SimpleCriteriaTest.COUNTRY_UK);
 
 	private Person person() {
-		final Person person = new Person("Ceylan", 38);
+		final GregorianCalendar start = new GregorianCalendar();
+		start.set(Calendar.YEAR, 2000);
+		start.set(Calendar.MONTH, 12);
+		start.set(Calendar.DAY_OF_MONTH, 31);
+
+		final Person person = new Person("Ceylan", 38, start.getTime());
 
 		new Address(person, SimpleCriteriaTest.CITY_ISTANBUL, SimpleCriteriaTest.TR, true);
 		new Address(person, SimpleCriteriaTest.CITY_NEW_YORK, SimpleCriteriaTest.USA, false);

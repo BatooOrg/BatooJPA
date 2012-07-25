@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.impl.criteria.expression;
 
 import java.sql.ResultSet;
+import java.text.MessageFormat;
 import java.util.List;
 
 import javax.persistence.criteria.Expression;
@@ -67,7 +68,7 @@ public class ComparisonExpression extends BooleanExpression {
 	 */
 	@Override
 	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
-		return this.x.generateJpqlRestriction(query) + this.comparison.getFragment() + this.y.generateJpqlRestriction(query);
+		return MessageFormat.format(this.comparison.getFragment(), this.x.generateJpqlRestriction(query), this.y.generateJpqlRestriction(query));
 	}
 
 	/**
@@ -76,7 +77,7 @@ public class ComparisonExpression extends BooleanExpression {
 	 */
 	@Override
 	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
-		return this.x.generateJpqlSelect(null, selected) + this.comparison.getFragment() + this.y.generateJpqlSelect(null, selected);
+		return MessageFormat.format(this.comparison.getFragment(), this.x.generateJpqlSelect(null, selected), this.y.generateJpqlSelect(null, selected));
 	}
 
 	/**
@@ -91,7 +92,7 @@ public class ComparisonExpression extends BooleanExpression {
 		final List<String> restrictions = Lists.newArrayList();
 
 		for (int i = 0; i < left.length; i++) {
-			restrictions.add(left[i] + this.comparison.getFragment() + right[i]);
+			restrictions.add(MessageFormat.format(this.comparison.getFragment(), left[i], right[i]));
 		}
 
 		return Joiner.on(" AND ").join(restrictions);
