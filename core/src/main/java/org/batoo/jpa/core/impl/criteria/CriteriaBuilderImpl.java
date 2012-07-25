@@ -47,9 +47,12 @@ import javax.persistence.criteria.Selection;
 import javax.persistence.criteria.SetJoin;
 import javax.persistence.criteria.Subquery;
 
+import org.batoo.jpa.core.impl.criteria.expression.ArithmeticExression;
+import org.batoo.jpa.core.impl.criteria.expression.ArithmeticExression.ArithmeticOperation;
 import org.batoo.jpa.core.impl.criteria.expression.Comparison;
 import org.batoo.jpa.core.impl.criteria.expression.ComparisonExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ConstantExpression;
+import org.batoo.jpa.core.impl.criteria.expression.NegationExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
@@ -171,10 +174,11 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <Y extends Comparable<? super Y>> Predicate between(Expression<? extends Y> v, Y x, Y y) {
-		final TypeImpl<?> type = this.metamodel.type(y.getClass());
+		final TypeImpl<Y> type = (TypeImpl<Y>) this.metamodel.type(y.getClass());
 
-		return new PredicateImpl(new ComparisonExpression(Comparison.BETWEEN, v, new ConstantExpression(type, x), new ConstantExpression(type, y)));
+		return new PredicateImpl(new ComparisonExpression(Comparison.BETWEEN, v, new ConstantExpression<Y>(type, x), new ConstantExpression<Y>(type, y)));
 	}
 
 	/**
@@ -370,8 +374,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <N extends Number> Expression<N> diff(Expression<? extends N> x, Expression<? extends N> y) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArithmeticExression<N>(ArithmeticOperation.SUBTRACT, x, y);
 	}
 
 	/**
@@ -379,9 +382,11 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <N extends Number> Expression<N> diff(Expression<? extends N> x, N y) {
-		// TODO Auto-generated method stub
-		return null;
+		final TypeImpl<N> type = (TypeImpl<N>) this.metamodel.type(y.getClass());
+
+		return new ArithmeticExression<N>(ArithmeticOperation.SUBTRACT, x, new ConstantExpression<N>(type, y));
 	}
 
 	/**
@@ -389,9 +394,11 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <N extends Number> Expression<N> diff(N x, Expression<? extends N> y) {
-		// TODO Auto-generated method stub
-		return null;
+		final TypeImpl<N> type = (TypeImpl<N>) this.metamodel.type(x.getClass());
+
+		return new ArithmeticExression<N>(ArithmeticOperation.SUBTRACT, new ConstantExpression<N>(type, x), y);
 	}
 
 	/**
@@ -418,6 +425,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Predicate equal(Expression<?> x, Object y) {
 		final TypeImpl<?> type = this.metamodel.type(y.getClass());
 
@@ -458,10 +466,11 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public Predicate ge(Expression<? extends Number> x, Number y) {
-		final TypeImpl<?> type = this.metamodel.type(y.getClass());
+		final TypeImpl<Number> type = (TypeImpl<Number>) this.metamodel.type(y.getClass());
 
-		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER_OR_EQUAL, x, new ConstantExpression(type, y)));
+		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER_OR_EQUAL, x, new ConstantExpression<Number>(type, y)));
 	}
 
 	/**
@@ -488,10 +497,11 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <Y extends Comparable<? super Y>> PredicateImpl greaterThan(Expression<? extends Y> x, Y y) {
-		final TypeImpl<?> type = this.metamodel.type(y.getClass());
+		final TypeImpl<Y> type = (TypeImpl<Y>) this.metamodel.type(y.getClass());
 
-		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER, x, new ConstantExpression(type, y)));
+		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER, x, new ConstantExpression<Y>(type, y)));
 	}
 
 	/**
@@ -508,10 +518,11 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <Y extends Comparable<? super Y>> PredicateImpl greaterThanOrEqualTo(Expression<? extends Y> x, Y y) {
-		final TypeImpl<?> type = this.metamodel.type(y.getClass());
+		final TypeImpl<Y> type = (TypeImpl<Y>) this.metamodel.type(y.getClass());
 
-		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER_OR_EQUAL, x, new ConstantExpression(type, y)));
+		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER_OR_EQUAL, x, new ConstantExpression<Y>(type, y)));
 	}
 
 	/**
@@ -538,10 +549,11 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public PredicateImpl gt(Expression<? extends Number> x, Number y) {
-		final TypeImpl<?> type = this.metamodel.type(y.getClass());
+		final TypeImpl<Number> type = (TypeImpl<Number>) this.metamodel.type(y.getClass());
 
-		return new PredicateImpl(new ComparisonExpression(Comparison.LESS, x, new ConstantExpression(type, y)));
+		return new PredicateImpl(new ComparisonExpression(Comparison.LESS, x, new ConstantExpression<Number>(type, y)));
 	}
 
 	/**
@@ -678,10 +690,11 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public PredicateImpl le(Expression<? extends Number> x, Number y) {
-		final TypeImpl<?> type = this.metamodel.type(y.getClass());
+		final TypeImpl<Number> type = (TypeImpl<Number>) this.metamodel.type(y.getClass());
 
-		return new PredicateImpl(new ComparisonExpression(Comparison.LESS_OR_EQUAL, x, new ConstantExpression(type, y)));
+		return new PredicateImpl(new ComparisonExpression(Comparison.LESS_OR_EQUAL, x, new ConstantExpression<Number>(type, y)));
 	}
 
 	/**
@@ -718,10 +731,11 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <Y extends Comparable<? super Y>> PredicateImpl lessThan(Expression<? extends Y> x, Y y) {
-		final TypeImpl<?> type = this.metamodel.type(y.getClass());
+		final TypeImpl<Y> type = (TypeImpl<Y>) this.metamodel.type(y.getClass());
 
-		return new PredicateImpl(new ComparisonExpression(Comparison.LESS, x, new ConstantExpression(type, y)));
+		return new PredicateImpl(new ComparisonExpression(Comparison.LESS, x, new ConstantExpression<Y>(type, y)));
 	}
 
 	/**
@@ -738,10 +752,11 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <Y extends Comparable<? super Y>> Predicate lessThanOrEqualTo(Expression<? extends Y> x, Y y) {
-		final TypeImpl<?> type = this.metamodel.type(y.getClass());
+		final TypeImpl<Y> type = (TypeImpl<Y>) this.metamodel.type(y.getClass());
 
-		return new PredicateImpl(new ComparisonExpression(Comparison.LESS_OR_EQUAL, x, new ConstantExpression(type, y)));
+		return new PredicateImpl(new ComparisonExpression(Comparison.LESS_OR_EQUAL, x, new ConstantExpression<Y>(type, y)));
 	}
 
 	/**
@@ -778,10 +793,11 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public Predicate like(Expression<String> x, String pattern) {
-		final TypeImpl<?> type = this.metamodel.type(pattern.getClass());
+		final TypeImpl<String> type = (TypeImpl<String>) this.metamodel.type(pattern.getClass());
 
-		return new PredicateImpl(new ComparisonExpression(Comparison.LIKE, x, new ConstantExpression(type, pattern)));
+		return new PredicateImpl(new ComparisonExpression(Comparison.LIKE, x, new ConstantExpression<String>(type, pattern)));
 	}
 
 	/**
@@ -878,10 +894,11 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public Predicate lt(Expression<? extends Number> x, Number y) {
-		final TypeImpl<?> type = this.metamodel.type(y.getClass());
+		final TypeImpl<Number> type = (TypeImpl<Number>) this.metamodel.type(y.getClass());
 
-		return new PredicateImpl(new ComparisonExpression(Comparison.LESS, x, new ConstantExpression(type, y)));
+		return new PredicateImpl(new ComparisonExpression(Comparison.LESS, x, new ConstantExpression<Number>(type, y)));
 	}
 
 	/**
@@ -940,8 +957,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <N extends Number> Expression<N> neg(Expression<N> x) {
-		// TODO Auto-generated method stub
-		return null;
+		return new NegationExpression<N>(x);
 	}
 
 	/**
@@ -949,9 +965,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate not(Expression<Boolean> restriction) {
-		// TODO Auto-generated method stub
-		return null;
+	@SuppressWarnings("unchecked")
+	public PredicateImpl not(Expression<Boolean> restriction) {
+		return new PredicateImpl(true, BooleanOperator.AND, restriction);
 	}
 
 	/**
@@ -959,7 +975,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate notEqual(Expression<?> x, Expression<?> y) {
+	public PredicateImpl notEqual(Expression<?> x, Expression<?> y) {
 		return new PredicateImpl(new ComparisonExpression(Comparison.NOT_EQUAL, x, y));
 	}
 
@@ -968,10 +984,11 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate notEqual(Expression<?> x, Object y) {
-		final TypeImpl<?> type = this.metamodel.type(y.getClass());
+	@SuppressWarnings("unchecked")
+	public PredicateImpl notEqual(Expression<?> x, Object y) {
+		final TypeImpl<Object> type = (TypeImpl<Object>) this.metamodel.type(y.getClass());
 
-		return new PredicateImpl(new ComparisonExpression(Comparison.NOT_EQUAL, x, new ConstantExpression(type, y)));
+		return new PredicateImpl(new ComparisonExpression(Comparison.NOT_EQUAL, x, new ConstantExpression<Object>(type, y)));
 	}
 
 	/**
@@ -979,7 +996,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate notLike(Expression<String> x, Expression<String> pattern) {
+	public PredicateImpl notLike(Expression<String> x, Expression<String> pattern) {
 		return new PredicateImpl(new ComparisonExpression(Comparison.LIKE, x, pattern)).not();
 	}
 
@@ -1008,10 +1025,11 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate notLike(Expression<String> x, String pattern) {
-		final TypeImpl<?> type = this.metamodel.type(pattern.getClass());
+	@SuppressWarnings("unchecked")
+	public PredicateImpl notLike(Expression<String> x, String pattern) {
+		final TypeImpl<String> type = (TypeImpl<String>) this.metamodel.type(pattern.getClass());
 
-		return new PredicateImpl(new ComparisonExpression(Comparison.LIKE, x, new ConstantExpression(type, pattern))).not();
+		return new PredicateImpl(new ComparisonExpression(Comparison.LIKE, x, new ConstantExpression<String>(type, pattern))).not();
 	}
 
 	/**
@@ -1107,8 +1125,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <N extends Number> Expression<N> prod(Expression<? extends N> x, Expression<? extends N> y) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArithmeticExression<N>(ArithmeticOperation.MULTIPLY, x, y);
 	}
 
 	/**
@@ -1116,9 +1133,11 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <N extends Number> Expression<N> prod(Expression<? extends N> x, N y) {
-		// TODO Auto-generated method stub
-		return null;
+		final TypeImpl<N> type = (TypeImpl<N>) this.metamodel.type(y.getClass());
+
+		return new ArithmeticExression<N>(ArithmeticOperation.MULTIPLY, x, new ConstantExpression<N>(type, y));
 	}
 
 	/**
@@ -1126,9 +1145,11 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <N extends Number> Expression<N> prod(N x, Expression<? extends N> y) {
-		// TODO Auto-generated method stub
-		return null;
+		final TypeImpl<N> type = (TypeImpl<N>) this.metamodel.type(x.getClass());
+
+		return new ArithmeticExression<N>(ArithmeticOperation.MULTIPLY, new ConstantExpression<N>(type, x), y);
 	}
 
 	/**
@@ -1137,8 +1158,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<Number> quot(Expression<? extends Number> x, Expression<? extends Number> y) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArithmeticExression<Number>(ArithmeticOperation.DIVIDE, x, y);
 	}
 
 	/**
@@ -1146,9 +1166,11 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public Expression<Number> quot(Expression<? extends Number> x, Number y) {
-		// TODO Auto-generated method stub
-		return null;
+		final TypeImpl<Number> type = (TypeImpl<Number>) this.metamodel.type(y.getClass());
+
+		return new ArithmeticExression<Number>(ArithmeticOperation.SUBTRACT, x, new ConstantExpression<Number>(type, y));
 	}
 
 	/**
@@ -1267,8 +1289,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <N extends Number> Expression<N> sum(Expression<? extends N> x, Expression<? extends N> y) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArithmeticExression<N>(ArithmeticOperation.ADD, x, y);
 	}
 
 	/**
@@ -1276,9 +1297,11 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <N extends Number> Expression<N> sum(Expression<? extends N> x, N y) {
-		// TODO Auto-generated method stub
-		return null;
+		final TypeImpl<N> type = (TypeImpl<N>) this.metamodel.type(y.getClass());
+
+		return new ArithmeticExression<N>(ArithmeticOperation.ADD, x, new ConstantExpression<N>(type, y));
 	}
 
 	/**
@@ -1296,9 +1319,11 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <N extends Number> Expression<N> sum(N x, Expression<? extends N> y) {
-		// TODO Auto-generated method stub
-		return null;
+		final TypeImpl<N> type = (TypeImpl<N>) this.metamodel.type(x.getClass());
+
+		return new ArithmeticExression<N>(ArithmeticOperation.ADD, new ConstantExpression<N>(type, x), y);
 	}
 
 	/**

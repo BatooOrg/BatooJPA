@@ -62,6 +62,8 @@ public class Address {
 	 *            the city
 	 * @param country
 	 *            the country
+	 * @param primary
+	 *            if the address is primary
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -118,6 +120,18 @@ public class Address {
 	}
 
 	/**
+	 * Returns the primary of the Address.
+	 * 
+	 * @return the primary of the Address
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected boolean isPrimary() {
+		return this.primary;
+	}
+
+	/**
 	 * Sets the city.
 	 * 
 	 * @param city
@@ -148,5 +162,18 @@ public class Address {
 	 */
 	public void setPerson(Person person) {
 		this.person = person;
+	}
+
+	/**
+	 * Sets the primary of the Address.
+	 * 
+	 * @param primary
+	 *            the primary to set for Address
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected void setPrimary(boolean primary) {
+		this.primary = primary;
 	}
 }

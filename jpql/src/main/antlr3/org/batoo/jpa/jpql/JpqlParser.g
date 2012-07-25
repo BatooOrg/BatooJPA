@@ -20,40 +20,35 @@ tokens {
     //imaginary AS token
     ST_UPDATE;
     ST_FROM;
+    ST_PARENTED;
     ST_COLL;
     ST_JOIN;
     ST_ID_AS;
     ST_SELECT;
     ST_BOOLEAN;
+    ST_ARITH_FACT;
 }
 
 @header {
-package org.batoo.jpa.jpql;
+	package org.batoo.jpa.jpql;
 }
 
 ql_statement :
-    (
-    select_statement
-    | update_statement
-    | delete_statement
-    )
-    EOF;
+    (select_statement | update_statement | delete_statement) EOF;
 
 select_statement :
-    select_clause from_clause ( where_clause)? //(groupby_clause)? (having_clause)? (orderby_clause)?
+    select_clause from_clause (where_clause)? //(groupby_clause)? (having_clause)? (orderby_clause)?
     ;
 
 update_statement :
-    UPDATE^ update_clause ( where_clause)?;
+    UPDATE^ update_clause (where_clause)?;
 
 delete_statement :
-    DELETE^ aliased_qid ( where_clause)?;
+    DELETE^ aliased_qid (where_clause)?;
 
 from_clause :
-    FROM from_declaration ( Comma from_declaration_or_collection_member_declaration)*
-        -> ^( 
-                LFROM from_declaration ( from_declaration_or_collection_member_declaration)*
-              );
+    FROM from_declaration (Comma from_declaration_or_collection_member_declaration)*
+        -> ^(LFROM from_declaration (from_declaration_or_collection_member_declaration)*);
 
 from_declaration_or_collection_member_declaration :
     from_declaration
@@ -61,56 +56,38 @@ from_declaration_or_collection_member_declaration :
 
 from_declaration :
     faliased_qid ( join)*
-        -> ^( 
-                ST_FROM faliased_qid
-                ^( 
-                    LJOINS ( join)*
-                  )
-              );
-
+        -> ^(ST_FROM faliased_qid ^(LJOINS (join)*));
 join :
     fetch_join
     | left_join
     | inner_join;
 
 fetch_join :
-    (
-    ( LEFT)? ( OUTER)? JOIN FETCH ID Period qid
-    )
-        -> ^( ST_JOIN FETCH ID qid  );
+    (LEFT)? (OUTER)? JOIN FETCH ID Period qid
+        -> ^(ST_JOIN FETCH ID qid  );
 
 left_join :
-    ( LEFT ( OUTER)? JOIN ID Period qid AS? ID)
-        -> ^( 
-                ST_JOIN LEFT ID
-                ^( ST_ID_AS qid ID  )
-              );
+    LEFT (OUTER)? JOIN ID Period qid AS? ID
+        -> ^(ST_JOIN LEFT ID ^(ST_ID_AS qid ID));
 
 inner_join :
-    ( ( INNER)? JOIN ID Period qid AS? ID)
-        -> ^( 
-                ST_JOIN JOIN ID
-                ^( ST_ID_AS qid ID  )
-              );
+    (INNER)? JOIN ID Period qid AS? ID
+        -> ^(ST_JOIN JOIN ID ^(ST_ID_AS qid ID));
 
 collection_member_declaration :
-    IN Left_Paren ID Period qid Right_Paren ( ( AS)? ID)?
-        -> ^( 
-                ST_COLL ID qid ( ID)?
-              );
+    IN Left_Paren ID Period qid Right_Paren (AS? ID)?
+        -> ^(ST_COLL ID qid (ID)?);
 
 update_clause :
     aliased_qid SET update_items
-        -> ^( ST_UPDATE aliased_qid update_items  );
+        -> ^(ST_UPDATE aliased_qid update_items);
 
 update_items :
-    ( update_item)*
-        -> ^( 
-                LUPDATE ( update_item)*
-              );
+    (update_item)*
+        -> ^(LUPDATE (update_item)*);
 
 update_item :
-    fqid Equals_Operator new_value;
+    state_field_path_expression Equals_Operator new_value;
 
 new_value :
     //    simple_arithmetic_expression
@@ -122,53 +99,69 @@ new_value :
     //    | simple_entity_expression
     | NULL;
 
+where_clause :
+    WHERE^ conditional_expression;
+
 select_clause :
-    SELECT^ ( DISTINCT)? select_expressions;
+    SELECT^ (DISTINCT)? select_items;
+
+select_items :
+    select_item ( Comma select_item)*
+        -> ^(LSELECT select_item (select_item)*);
+
+select_item :
+    select_expression (AS? ID)?
+        -> ^(ST_ID_AS select_expression (ID)?);
 
 select_expressions :
     select_expression ( Comma select_expression)*
-        -> ^( 
-                LSELECT select_expression ( select_expression)*
-              );
-
-simple_select_expressions :
-    select_expression ( Comma select_expression)*
-        -> ^( 
-                LSELECT select_expression ( select_expression)*
-              );
+        -> ^(LSELECT select_expression ( select_expression)*);
 
 select_expression :
-    (
-    ID ( AS? ID)?
-        -> ^( 
-                ST_SELECT
-                ^( ST_ID_AS ID ID  )
-              )
-    )
-    | ( aliased_fqid
-        -> ^( ST_SELECT aliased_fqid  )
-)
-    //  | aggregate_expression
-    | ( OBJECT Left_Paren ID Right_Paren)
-        -> ^( OBJECT ID  )
+    state_field_path_expression
+    | scalar_expression
+    // | aggregate_expression
+    | ID
+    | OBJECT^ Left_Paren! ID Right_Paren!
     | constructor_expression;
 
-simple_select_expression :
-    ( ID
-        -> ^( 
-                ST_SELECT
-                ^( ST_ID_AS ID NULL  )
-              )
-)
-    | ( fake_aliased_fqid
-        -> ^( ST_SELECT fake_aliased_fqid  )
-)
-//  | aggregate_expression
-;
+state_field_path_expression :
+    ID Period qid
+        -> ^(ST_PARENTED ID qid  );
 
 constructor_expression :
-    NEW qid Left_Paren simple_select_expressions Right_Paren
-        -> ^( NEW qid simple_select_expressions  );
+    NEW qid Left_Paren select_expressions Right_Paren
+        -> ^(NEW qid select_expressions);
+        
+scalar_expression :
+    simple_arithmetic_expression
+    //    | string_primary
+    //    | enum_primary
+    //    | datetime_primary
+    //    | boolean_primary
+    //    | case_expression
+    //    | entity_type_expression
+    ;
+
+simple_arithmetic_expression :
+    arithmetic_term ((Plus_Sign | Minus_Sign)^ arithmetic_term)?;
+
+arithmetic_term :
+    arithmetic_factor ((Multiplication_Sign | Division_Sign)^ arithmetic_factor)?;
+
+arithmetic_factor :
+    (Plus_Sign | Minus_Sign)? arithmetic_primary 
+    	-> ^(ST_ARITH_FACT (Plus_Sign)? (Minus_Sign)? arithmetic_primary); 
+
+arithmetic_primary :
+	state_field_path_expression
+//	| numeric_literal
+	| (Left_Paren! simple_arithmetic_expression Right_Paren!)
+//	| input_parameter
+//	| functions_returning_numerics
+//	| aggregate_expression
+//	| case_expression
+	;
 
 //aggregate_expression
 //  :
@@ -189,93 +182,20 @@ constructor_expression :
 //  ;
 //
 
-where_clause :
-    WHERE^ conditional_expression;
-
-//groupby_clause
-//  :
-//  'GROUP' 'BY' groupby_item (Comma groupby_item)*
-//  ;
-//
-//groupby_item
-//  :
-//  single_valued_path_expression
-//  | ID
-//  ;
-//
-//having_clause
-//  :
-//  'HAVING' conditional_expression
-//  ;
-//
-//orderby_clause
-//  :
-//  'ORDER' 'BY' orderby_item (Comma orderby_item)*
-//  ;
-//
-//orderby_item
-//  :
-//  state_field_path_expression
-//  (
-//    'ASC'
-//    | 'DESC'
-//  )?
-//  ;
-//
-//subquery
-//  :
-//  simple_select_clause subquery_from_clause (where_clause)? (groupby_clause)? (having_clause)?
-//  ;
-//
-//subquery_from_clause
-//  :
-//  FROM subselect_ID_declaration (Comma subselect_ID_declaration)*
-//  ;
-//
-//subselect_ID_declaration
-//  :
-//  ID_declaration
-//  | association_path_expression (AS)? ID
-//  | collection_member_declaration
-//  ;
-//
-//association_path_expression
-//  :
-//  collection_valued_path_expression
-//  | single_valued_association_path_expression
-//  ;
-//
-//simple_select_clause
-//  :
-//  SELECT (DISTINCT)? simple_select_expression
-//  ;
-//
-//simple_select_expression
-//  :
-//  single_valued_path_expression
-//  | aggregate_expression
-//  | ID
-//  ;
-//
-
 conditional_expression :
-    conditional_term ( OR conditional_term)*
-        -> ^( 
-                LOR conditional_term ( conditional_term)*
-              );
+    conditional_term (OR conditional_term)*
+        -> ^(LOR conditional_term ( conditional_term)*);
 
 conditional_term :
-    conditional_factor ( AND conditional_factor)*
-        -> ^( 
-                LAND conditional_factor ( conditional_factor)*
-              );
+    conditional_factor (AND conditional_factor)*
+        -> ^(LAND conditional_factor ( conditional_factor)*);
 
 conditional_factor :
-    ( NOT)? conditional_primary;
+    (NOT)? conditional_primary;
 
 conditional_primary :
     simple_cond_expression
-    | Left_Paren conditional_expression Right_Paren;
+    | Left_Paren! conditional_expression Right_Paren!;
 
 simple_cond_expression :
     boolean_expression
@@ -290,63 +210,12 @@ simple_cond_expression :
     ;
 
 between_expression :
-    boolean_expression ( NOT)? BETWEEN boolean_expression AND boolean_expression
-        -> ^( BETWEEN boolean_expression boolean_expression boolean_expression (NOT)?  );
+    boolean_expression (NOT)? BETWEEN boolean_expression AND boolean_expression
+        -> ^(BETWEEN boolean_expression boolean_expression boolean_expression (NOT)?);
 
 like_expression :
-    boolean_expression ( NOT)? LIKE boolean_expression
-        -> ^( LIKE boolean_expression boolean_expression (NOT)?  );
-
-//in_expression
-//  :
-//  state_field_path_expression (NOT)? 'IN' Left_Paren
-//  (
-//    in_item (Comma in_item)*
-//    | subquery
-//  )
-//  Right_Paren
-//  ;
-//
-//in_item
-//  :
-//  literal
-//  | input_parameter
-//  ;
-//
-//null_comparison_expression
-//  :
-//  (
-//    single_valued_path_expression
-//    | input_parameter
-//  )
-//  'IS' (NOT)? 'NULL'
-//  ;
-//
-//empty_collection_comparison_expression
-//  :
-//  collection_valued_path_expression 'IS' (NOT)? 'EMPTY'
-//  ;
-//
-//collection_member_expression
-//  :
-//  entity_expression (NOT)? 'MEMBER' ('OF')? collection_valued_path_expression
-//  ;
-//
-//exists_expression
-//  :
-//  (NOT)? 'EXISTS' Left_Paren subquery Right_Paren
-//  ;
-//
-//all_or_any_expression
-//  :
-//  (
-//    'ALL'
-//    | 'ANY'
-//    | 'SOME'
-//  )
-//  Left_Paren subquery Right_Paren
-//  ;
-//
+    boolean_expression (NOT)? LIKE boolean_expression
+        -> ^(LIKE boolean_expression boolean_expression (NOT)?);
 
 comparison_expression :
     //  string_expression comparison_operator
@@ -389,49 +258,6 @@ comparison_operator :
 //  :
 //  simple_arithmetic_expression
 //  | Left_Paren subquery Right_Paren
-//  ;
-//
-//simple_arithmetic_expression
-//  :
-//  (arithmetic_term)
-//  (
-//    (
-//      '+'
-//      | '-'
-//    )
-//    arithmetic_term
-//  )*
-//  ;
-//
-//arithmetic_term
-//  :
-//  (arithmetic_factor)
-//  (
-//    (
-//      '*'
-//      | '/'
-//    )
-//    arithmetic_factor
-//  )*
-//  ;
-//
-//arithmetic_factor
-//  :
-//  (
-//    '+'
-//    | '-'
-//  )?
-//  arithmetic_primary
-//  ;
-//
-//arithmetic_primary
-//  :
-//  state_field_path_expression
-//  | numeric_literal
-//  | Left_Paren simple_arithmetic_expression Right_Paren
-//  | input_parameter
-//  | functions_returning_numerics
-//  | aggregate_expression
 //  ;
 //
 //string_expression
@@ -560,9 +386,137 @@ input_parameter :
     Ordinal_Parameter
     | Named_Parameter;
 
-//literal: ;
+faliased_qid :
+    qid (AS)? ID
+        -> ^(ST_ID_AS qid (ID)?);
+
+aliased_qid :
+    qid ((AS)? ID)?
+        -> ^(ST_ID_AS qid (ID)?);
+
+qid :
+    ID ( Period ID)*
+        -> ^(LQUALIFIED ID (ID)*);
+        
+        
+//in_expression
+//  :
+//  state_field_path_expression (NOT)? 'IN' Left_Paren
+//  (
+//    in_item (Comma in_item)*
+//    | subquery
+//  )
+//  Right_Paren
+//  ;
 //
-//constructor_name: ;
+//in_item
+//  :
+//  literal
+//  | input_parameter
+//  ;
+//
+//null_comparison_expression
+//  :
+//  (
+//    single_valued_path_expression
+//    | input_parameter
+//  )
+//  'IS' (NOT)? 'NULL'
+//  ;
+//
+//empty_collection_comparison_expression
+//  :
+//  collection_valued_path_expression 'IS' (NOT)? 'EMPTY'
+//  ;
+//
+//collection_member_expression
+//  :
+//  entity_expression (NOT)? 'MEMBER' ('OF')? collection_valued_path_expression
+//  ;
+//
+//exists_expression
+//  :
+//  (NOT)? 'EXISTS' Left_Paren subquery Right_Paren
+//  ;
+//
+//all_or_any_expression
+//  :
+//  (
+//    'ALL'
+//    | 'ANY'
+//    | 'SOME'
+//  )
+//  Left_Paren subquery Right_Paren
+//  ;
+//
+
+//groupby_clause
+//  :
+//  'GROUP' 'BY' groupby_item (Comma groupby_item)*
+//  ;
+//
+//groupby_item
+//  :
+//  single_valued_path_expression
+//  | ID
+//  ;
+//
+//having_clause
+//  :
+//  'HAVING' conditional_expression
+//  ;
+//
+//orderby_clause
+//  :
+//  'ORDER' 'BY' orderby_item (Comma orderby_item)*
+//  ;
+//
+//orderby_item
+//  :
+//  state_field_path_expression
+//  (
+//    'ASC'
+//    | 'DESC'
+//  )?
+//  ;
+//
+//subquery
+//  :
+//  simple_select_clause subquery_from_clause (where_clause)? (groupby_clause)? (having_clause)?
+//  ;
+//
+//subquery_from_clause
+//  :
+//  FROM subselect_ID_declaration (Comma subselect_ID_declaration)*
+//  ;
+//
+//subselect_ID_declaration
+//  :
+//  ID_declaration
+//  | association_path_expression (AS)? ID
+//  | collection_member_declaration
+//  ;
+//
+//association_path_expression
+//  :
+//  collection_valued_path_expression
+//  | single_valued_association_path_expression
+//  ;
+//
+//simple_select_clause
+//  :
+//  SELECT (DISTINCT)? simple_select_expression
+//  ;
+//
+//simple_select_expression
+//  :
+//  single_valued_path_expression
+//  | aggregate_expression
+//  | ID
+//  ;
+//
+
+//literal: ;
 //
 //enum_literal: ;
 //
@@ -587,41 +541,3 @@ input_parameter :
 //  )
 //  ;
 //
-
-faliased_qid :
-    qid ( AS)? ID
-        -> ^( 
-                ST_ID_AS qid ( ID)?
-              );
-
-aliased_qid :
-    qid ( ( AS)? ID)?
-        -> ^( 
-                ST_ID_AS qid ( ID)?
-              );
-
-fake_aliased_qid :
-    qid
-        -> ^( ST_ID_AS qid NULL  );
-
-aliased_fqid :
-    fqid ( ( AS)? ID)?
-        -> ^( 
-                ST_ID_AS fqid ( ID)?
-              );
-
-fake_aliased_fqid :
-    fqid
-        -> ^( ST_ID_AS fqid NULL  );
-
-qid :
-    ID ( Period ID)*
-        -> ^( 
-                LQUALIFIED ID ( ID)*
-              );
-
-fqid :
-    ID Period ID ( Period ID)*
-        -> ^( 
-                LQUALIFIED ID ID ( ID)*
-              );

@@ -234,7 +234,7 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public Predicate not() {
+	public PredicateImpl not() {
 		return new PredicateImpl(true, this.operator, this.expressions.toArray(new Expression[this.expressions.size()]));
 	}
 }

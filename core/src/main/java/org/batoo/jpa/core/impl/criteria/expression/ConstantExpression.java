@@ -27,14 +27,17 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
 
 /**
- * Expressipons for constants.
+ * Expression for constants.
+ * 
+ * @param <T>
+ *            the type of the constant expression
  * 
  * @author hceylan
  * @since $version
  */
-public class ConstantExpression extends ParameterExpressionImpl<Object> {
+public class ConstantExpression<T> extends ParameterExpressionImpl<T> {
 
-	private final Object value;
+	private final T value;
 
 	/**
 	 * @param type
@@ -45,8 +48,8 @@ public class ConstantExpression extends ParameterExpressionImpl<Object> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ConstantExpression(TypeImpl<?> type, Object value) {
-		super(type, Object.class, null);
+	public ConstantExpression(TypeImpl<T> type, T value) {
+		super(type, type.getJavaType(), null);
 
 		this.value = value;
 	}
@@ -74,7 +77,7 @@ public class ConstantExpression extends ParameterExpressionImpl<Object> {
 	 * 
 	 */
 	@Override
-	public Object handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+	public T handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		return this.value;
 	}
 }

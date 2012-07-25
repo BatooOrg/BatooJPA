@@ -59,7 +59,7 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ParameterExpressionImpl(TypeImpl<?> type, Class<T> paramClass, String name) {
+	public ParameterExpressionImpl(TypeImpl<T> type, Class<T> paramClass, String name) {
 		super(paramClass);
 
 		this.type = type;

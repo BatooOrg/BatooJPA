@@ -70,7 +70,6 @@ public class JpqlQuery {
 
 	private final CriteriaQueryImpl<?> criteriaQuery;
 	private final Map<String, AbstractFrom<?, ?>> aliasMap = Maps.newHashMap();
-	private final Map<String, AbstractSelection<?>> selectMap = Maps.newHashMap();
 
 	/**
 	 * @param entityManagerFactory
@@ -157,10 +156,7 @@ public class JpqlQuery {
 
 			this.aliasMap.put(fromDef.getAlias(), r);
 
-			if (from.getChildCount() == 2) {
-				this.constructJoins(cb, q, r, from.getChild(1));
-			}
-
+			this.constructJoins(cb, q, r, from.getChild(1));
 		}
 	}
 
@@ -359,59 +355,111 @@ public class JpqlQuery {
 		for (int i = 0; i < selects.getChildCount(); i++) {
 			final Tree selectDef = selects.getChild(i);
 
-			AbstractSelection<?> selection = null;
+			final AbstractSelection<?> selection = this.constructSingleSelect(cb, q, selectDef.getChild(0));
 
-			// constructor select
-			if (selectDef.getType() == JpqlParser.NEW) {
-				final String className = new Qualified(selectDef.getChild(0)).toString();
-				final List<Selection<?>> childSelections = this.constructSelect(cb, q, selectDef.getChild(1));
-				try {
-					selection = cb.construct(Class.forName(className.toString()), //
-						childSelections.toArray(new Selection[childSelections.size()]));
-				}
-				catch (final ClassNotFoundException e) {
-					throw new PersistenceException("Cannot load class: " + className);
-				}
-			}
-			else if (selectDef.getType() == JpqlParser.OBJECT) {
-				final String alias = selectDef.getChild(0).getText();
-				final AbstractFrom<?, ?> from = this.getAliased(alias);
-
-				selection = (AbstractSelection<?>) from.type();
-			}
-			// entity or path selection
-			else {
-
-				final Aliased aliased = new Aliased(this.selectMap, selectDef.getChild(0), true);
-
-				final String id = aliased.getParent();
-				selection = this.getAliased(id);
-				if (aliased.getQualified() != null) {
-					// is it a path selection
-
-					for (final String segment : aliased.getQualified().getSegments()) {
-
-						if (selection instanceof AbstractFrom) {
-							selection = ((AbstractFrom<?, ?>) selection).get(segment);
-						}
-						else if (selection instanceof AbstractPath) {
-							selection = ((AbstractPath<?>) selection).get(segment);
-						}
-						else {
-							throw new IllegalArgumentException("Cannot dereference: " + segment);
-						}
-					}
-				}
-
-				if (aliased.getAlias() != null) {
-					selection.alias(aliased.getAlias());
-				}
+			if (selectDef.getChildCount() == 2) {
+				selection.alias(selectDef.getChild(1).getText());
 			}
 
 			selections.add(selection);
 		}
 
 		return selections;
+	}
+
+	/**
+	 * Creates a single select item.
+	 * 
+	 * @param cb
+	 *            the criteria builder
+	 * @param q
+	 *            the query
+	 * @param selectDef
+	 *            the select definition
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	private AbstractSelection<?> constructSingleSelect(CriteriaBuilderImpl cb, CriteriaQueryImpl<Object> q, Tree selectDef) {
+		// Identification variable
+		if (selectDef.getType() == JpqlParser.ID) {
+			return this.getAliased(selectDef.getText());
+		}
+
+		// constructor select
+		if (selectDef.getType() == JpqlParser.NEW) {
+			final String className = new Qualified(selectDef.getChild(0)).toString();
+
+			final List<Selection<?>> childSelections = Lists.newArrayList();
+			final Tree arguments = selectDef.getChild(1);
+			for (int i = 0; i < arguments.getChildCount(); i++) {
+				final Tree argumentDef = arguments.getChild(i);
+
+				childSelections.add(this.constructSingleSelect(cb, q, argumentDef));
+			}
+
+			try {
+				return cb.construct(Class.forName(className.toString()), //
+					childSelections.toArray(new Selection[childSelections.size()]));
+			}
+			catch (final ClassNotFoundException e) {
+				throw new PersistenceException("Cannot load class: " + className);
+			}
+		}
+
+		// object type
+		if (selectDef.getType() == JpqlParser.OBJECT) {
+			final String alias = selectDef.getChild(0).getText();
+			final AbstractFrom<?, ?> from = this.getAliased(alias);
+
+			return (AbstractSelection<?>) from.type();
+		}
+
+		// single valued state field expression
+		if (selectDef.getType() == JpqlParser.ST_PARENTED) {
+
+			// entity or path selection
+			AbstractSelection<?> selection = this.getAliased(selectDef.getChild(0).getText());
+
+			final Qualified qualified = new Qualified(selectDef.getChild(1));
+			for (final String segment : qualified.getSegments()) {
+				if (selection instanceof AbstractFrom) {
+					selection = ((AbstractFrom<?, ?>) selection).get(segment);
+				}
+				else if (selection instanceof AbstractPath) {
+					selection = ((AbstractPath<?>) selection).get(segment);
+				}
+				else {
+					throw new IllegalArgumentException("Cannot dereference: " + segment);
+				}
+
+			}
+
+			return selection;
+		}
+
+		if (selectDef.getType() == JpqlParser.ST_ARITH_FACT) {
+			if (selectDef.getChild(0).getType() == JpqlParser.Minus_Sign) {
+				return (AbstractSelection<?>) cb.neg((Expression<Number>) this.constructSingleSelect(cb, q, selectDef.getChild(1)));
+			}
+
+			return this.constructSingleSelect(cb, q, selectDef.getChild(1));
+		}
+		// if (selectDef.getType() == JpqlParser.LUNARY) {
+		// AbstractSelection<?> previous = null;
+		// final Tree childrenDef = selectDef.getChild(1);
+		// for (int i = 0; i < childrenDef.getChildCount(); i++) {
+		// if (previous == null) {
+		// previous = this.constructSingleSelect(cb, q, childrenDef.getChild(i));
+		// }
+		// else {
+		//
+		// }
+		// }
+		// }
+
+		throw new PersistenceException("unhandled select item: " + selectDef.toStringTree());
 	}
 
 	/**

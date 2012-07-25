@@ -5,175 +5,72 @@ options {
 }
 
 @header {
-package org.batoo.jpa.jpql;
+	package org.batoo.jpa.jpql;
 }
 
-fragment Start_Comment :
-    '/*';
+fragment Start_Comment : '/*';
 
-fragment End_Comment :
-    '*/';
+fragment End_Comment : '*/';
 
-fragment Line_Comment :
-    '//';
+fragment Line_Comment : '//';
 
 COMMENT :
-    ( Start_Comment (options {greedy=false;}: .)* End_Comment)+ 
-                                                               {
-                                                                $channel = HIDDEN;
-                                                               };
+    ( Start_Comment (options {greedy=false;}: .)* End_Comment)+ { $channel = HIDDEN; };
 
 LINE_COMMENT :
-    (
-    (
-    Line_Comment
-    | '--'
-    )
-    ~(
-    '\n'
-    | '\r'
-     )*
-    '\r'? '\n'
-    )+
-    
-    {
-     $channel = HIDDEN;
-    };
+    ((Line_Comment | '--') ~('\n' | '\r')* '\r'? '\n')+ { $channel = HIDDEN; };
 
-fragment A :
-    'A'
-    | 'a';
+fragment A : 'A' | 'a';
 
-fragment B :
-    'B'
-    | 'b';
+fragment B : 'B' | 'b';
 
-fragment C :
-    'C'
-    | 'c';
+fragment C : 'C' | 'c';
 
-fragment D :
-    'D'
-    | 'd';
+fragment D : 'D' | 'd';
 
-fragment E :
-    'E'
-    | 'e';
+fragment E : 'E' | 'e';
 
-fragment F :
-    'F'
-    | 'f';
+fragment F : 'F' | 'f';
 
-fragment G :
-    'G'
-    | 'g';
+fragment G : 'G' | 'g';
 
-fragment H :
-    'H'
-    | 'h';
+fragment H : 'H' | 'h';
 
-fragment I :
-    'I'
-    | 'i';
+fragment I : 'I' | 'i';
 
-fragment J :
-    'J'
-    | 'j';
+fragment J : 'J' | 'j';
 
-fragment K :
-    'K'
-    | 'k';
+fragment K : 'K' | 'k';
 
-fragment L :
-    'L'
-    | 'l';
+fragment L : 'L' | 'l';
 
-fragment M :
-    'M'
-    | 'm';
+fragment M : 'M' | 'm';
 
-fragment N :
-    'N'
-    | 'n';
+fragment N : 'N' | 'n';
 
-fragment O :
-    'O'
-    | 'o';
+fragment O : 'O' | 'o';
 
-fragment P :
-    'P'
-    | 'p';
+fragment P : 'P' | 'p';
 
-fragment Q :
-    'Q'
-    | 'q';
+fragment Q : 'Q' | 'q';
 
-fragment R :
-    'R'
-    | 'r';
+fragment R : 'R' | 'r';
 
-fragment S :
-    'S'
-    | 's';
+fragment S : 'S' | 's';
 
-fragment T :
-    'T'
-    | 't';
+fragment T : 'T' | 't';
 
-fragment U :
-    'U'
-    | 'u';
+fragment U : 'U' | 'u';
 
-fragment V :
-    'V'
-    | 'v';
+fragment V : 'V' | 'v';
 
-fragment W :
-    'W'
-    | 'w';
+fragment W : 'W' | 'w';
 
-fragment X :
-    'X'
-    | 'x';
+fragment X : 'X' | 'x';
 
-fragment Y :
-    'Y'
-    | 'y';
+fragment Y : 'Y' | 'y';
 
-fragment Z :
-    'Z'
-    | 'z';
-
-fragment Digit :
-    '0'
-    | '1'
-    | '2'
-    | '3'
-    | '4'
-    | '5'
-    | '6'
-    | '7'
-    | '8'
-    | '9';
-
-fragment OctalDigit :
-    '0'
-    | '1'
-    | '2'
-    | '3'
-    | '4'
-    | '5'
-    | '6'
-    | '7';
-
-fragment Hexit :
-    Digit
-    | A
-    | B
-    | C
-    | D
-    | E
-    | F;
+fragment Z : 'Z' | 'z';
 
 fragment Underscore :
     '_';
@@ -448,6 +345,12 @@ Plus_Sign :
 Minus_Sign :
     '-';
 
+Star_Sign:
+	'*';
+
+Division_Sign:
+	'/';
+	
 Comma :
     ',';
 
@@ -461,16 +364,7 @@ Question_Sign :
     '?';
 
 WS :
-    (
-    ' '
-    | '\t'
-    | '\r'
-    | '\n'
-    )+
-    
-    {
-     $channel = HIDDEN;
-    };
+    (' ' | '\t' | '\r' | '\n')+ { $channel = HIDDEN; };
 
 Ordinal_Parameter :
     Question_Sign INT;
@@ -479,17 +373,7 @@ Named_Parameter :
     Column ID;
 
 ID :
-    (
-    'a'..'z'
-    | 'A'..'Z'
-    | '_'
-    )
-    (
-    'a'..'z'
-    | 'A'..'Z'
-    | '0'..'9'
-    | '_'
-    )*;
+    ('a'..'z' | 'A'..'Z' | '_') ('a'..'z' | 'A'..'Z' | '0'..'9' | '_')*;
 
 INT :
-    ( '0'..'9')+;
+    ('0'..'9')+;
