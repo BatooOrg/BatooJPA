@@ -36,6 +36,8 @@ import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
  */
 public abstract class AbstractExpression<T> extends AbstractSelection<T> implements Expression<T> {
 
+	private ExpressionConverter<?> converter;
+
 	/**
 	 * @param javaType
 	 *            the java type
@@ -68,6 +70,18 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 * @author hceylan
 	 */
 	public abstract String generateJpqlRestriction(CriteriaQueryImpl<?> query);
+
+	/**
+	 * Returns the converter of the expression.
+	 * 
+	 * @return the converter of the expression
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ExpressionConverter<?> getConverter() {
+		return this.converter;
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -127,5 +141,24 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	public Predicate isNull() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	/**
+	 * Sets the numeric converter of the expression
+	 * 
+	 * @param converter
+	 *            the numeric converter instance
+	 * @param <N>
+	 *            the type of the conversion
+	 * @return the same expression
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	public <N> Expression<N> setConverter(ExpressionConverter<N> converter) {
+		this.converter = converter;
+
+		return (Expression<N>) this;
 	}
 }

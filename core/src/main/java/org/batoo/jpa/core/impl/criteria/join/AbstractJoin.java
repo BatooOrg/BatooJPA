@@ -129,8 +129,7 @@ public abstract class AbstractJoin<Z, X> extends AbstractFrom<Z, X> implements J
 	 */
 	@Override
 	public Predicate getOn() {
-		// TODO Auto-generated method stub
-		return null;
+		throw this.notSupported();
 	}
 
 	/**
@@ -140,5 +139,17 @@ public abstract class AbstractJoin<Z, X> extends AbstractFrom<Z, X> implements J
 	@Override
 	public AbstractFrom<?, Z> getParent() {
 		return this.parent;
+	}
+
+	/**
+	 * Returns a new {@link UnsupportedOperationException}.
+	 * 
+	 * @return the exception
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected UnsupportedOperationException notSupported() {
+		return new UnsupportedOperationException("On operations not supported");
 	}
 }

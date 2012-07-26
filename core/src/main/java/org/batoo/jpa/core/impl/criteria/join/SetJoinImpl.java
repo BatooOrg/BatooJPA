@@ -72,8 +72,7 @@ public class SetJoinImpl<Z, E> extends AbstractJoin<Z, E> implements SetJoin<Z, 
 	 */
 	@Override
 	public SetJoin<Z, E> on(Expression<Boolean> restriction) {
-		// TODO Auto-generated method stub
-		return null;
+		throw this.notSupported();
 	}
 
 	/**
@@ -82,7 +81,6 @@ public class SetJoinImpl<Z, E> extends AbstractJoin<Z, E> implements SetJoin<Z, 
 	 */
 	@Override
 	public SetJoin<Z, E> on(Predicate... restrictions) {
-		// TODO Auto-generated method stub
-		return null;
+		throw this.notSupported();
 	}
 }

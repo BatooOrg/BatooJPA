@@ -90,8 +90,8 @@ update_item :
     state_field_path_expression Equals_Operator new_value;
 
 new_value :
-    //    simple_arithmetic_expression
-    //    | string_primary
+    simple_arithmetic_expression
+    | string_primary
     //    | datetime_primary
     //    |
     boolean_primary
@@ -118,10 +118,10 @@ select_expressions :
         -> ^(LSELECT select_expression ( select_expression)*);
 
 select_expression :
-    state_field_path_expression
+    ID
+    | aggregate_expression
+    | state_field_path_expression
     | scalar_expression
-    // | aggregate_expression
-    | ID
     | OBJECT^ Left_Paren! ID Right_Paren!
     | constructor_expression;
 
@@ -135,19 +135,19 @@ constructor_expression :
         
 scalar_expression :
     simple_arithmetic_expression
-    //    | string_primary
-    //    | enum_primary
-    //    | datetime_primary
-    //    | boolean_primary
+    | string_primary
+    | enum_primary
+    | datetime_primary
+    | boolean_primary
     //    | case_expression
     //    | entity_type_expression
     ;
 
 simple_arithmetic_expression :
-    arithmetic_term ((Plus_Sign | Minus_Sign)^ arithmetic_term)?;
+    arithmetic_term (Plus_Sign | Minus_Sign)^ arithmetic_term;
 
 arithmetic_term :
-    arithmetic_factor ((Multiplication_Sign | Division_Sign)^ arithmetic_factor)?;
+    arithmetic_factor (Multiplication_Sign | Division_Sign)^ arithmetic_factor;
 
 arithmetic_factor :
     (Plus_Sign | Minus_Sign)? arithmetic_primary 
@@ -155,32 +155,43 @@ arithmetic_factor :
 
 arithmetic_primary :
 	state_field_path_expression
-//	| numeric_literal
+	| NUMERIC_LITERAL
 	| (Left_Paren! simple_arithmetic_expression Right_Paren!)
-//	| input_parameter
-//	| functions_returning_numerics
-//	| aggregate_expression
+	| input_parameter
+	| functions_returning_numerics
+	| aggregate_expression
 //	| case_expression
 	;
 
-//aggregate_expression
-//  :
-//  (
-//    'AVG'
-//    | 'MAX'
-//    | 'MIN'
-//    | 'SUM'
-//  )
-//  Left_Paren (DISTINCT)? state_field_path_expression Right_Paren
-//  | 'COUNT' Left_Paren (DISTINCT)?
-//  (
-//    ID
-//    | state_field_path_expression
-//    | single_valued_association_path_expression
-//  )
-//  Right_Paren
-//  ;
-//
+aggregate_expression :
+	(AVG | MAX | MIN | SUM)^ Left_Paren! (DISTINCT)? state_field_path_expression Right_Paren!
+	| COUNT^ Left_Paren! (DISTINCT)? (ID | state_field_path_expression) Right_Paren!;
+
+functions_returning_numerics :
+  LENGTH^ Left_Paren! string_primary Right_Paren!
+  | LOCATE^ Left_Paren! string_primary Comma! string_primary (Comma! simple_arithmetic_expression)? Right_Paren!
+  | ABS^ Left_Paren! simple_arithmetic_expression Right_Paren!
+  | SQRT^ Left_Paren! simple_arithmetic_expression Right_Paren!
+  | MOD^ Left_Paren! simple_arithmetic_expression Comma! simple_arithmetic_expression Right_Paren!
+//  | SIZE^ Left_Paren collection_valued_path_expression Right_Paren
+  ;
+
+string_primary :
+	state_field_path_expression
+	| STRING_LITERAL
+	| input_parameter
+	| functions_returning_strings
+	| aggregate_expression
+//	| case_expression
+	;
+	
+functions_returning_strings :
+  CONCAT^ Left_Paren! string_primary Comma! string_primary Right_Paren!
+  | SUBSTRING^ Left_Paren! string_primary Comma! simple_arithmetic_expression Comma! simple_arithmetic_expression Right_Paren!
+  | TRIM^ Left_Paren! ((LEADING | TRAILING | BOTH)? (TRIM_CHARACTER)? FROM)? string_primary Right_Paren!
+  | LOWER^ Left_Paren! string_primary Right_Paren!
+  | UPPER^ Left_Paren! string_primary Right_Paren!
+  ;
 
 conditional_expression :
     conditional_term (OR conditional_term)*
@@ -193,57 +204,43 @@ conditional_term :
 conditional_factor :
     (NOT)? conditional_primary;
 
-conditional_primary :
+conditional_primary options { backtrack=true; } :
     simple_cond_expression
-    | Left_Paren! conditional_expression Right_Paren!;
+    | Left_Paren! conditional_expression Right_Paren!
+    ;
 
-simple_cond_expression :
+simple_cond_expression options { backtrack=true; } :
     boolean_expression
     | comparison_expression
     | between_expression
     | like_expression
 //  | in_expression
-    //  | null_comparison_expression
-    //  | empty_collection_comparison_expression
-    //  | collection_member_expression
-    //  | exists_expression
+//  | null_comparison_expression
+//  | empty_collection_comparison_expression
+//  | collection_member_expression
+//  | exists_expression
     ;
 
 between_expression :
-    boolean_expression (NOT)? BETWEEN boolean_expression AND boolean_expression
-        -> ^(BETWEEN boolean_expression boolean_expression boolean_expression (NOT)?);
-
+    arithmetic_expression (NOT)? BETWEEN arithmetic_expression AND arithmetic_expression
+        -> ^(BETWEEN arithmetic_expression arithmetic_expression arithmetic_expression (NOT)?)
+    | string_expression (NOT)? BETWEEN string_expression AND string_expression
+        -> ^(BETWEEN string_expression string_expression string_expression (NOT)?)
+    | datetime_expression (NOT)? BETWEEN datetime_expression AND datetime_expression
+        -> ^(BETWEEN datetime_expression datetime_expression datetime_expression (NOT)?)
+    ;
+    
 like_expression :
-    boolean_expression (NOT)? LIKE boolean_expression
-        -> ^(LIKE boolean_expression boolean_expression (NOT)?);
+    string_expression (NOT)? LIKE string_expression
+        -> ^(LIKE string_expression string_expression (NOT)?);
 
 comparison_expression :
-    //  string_expression comparison_operator
-    //  (
-    //    string_expression
-    //    | all_or_any_expression
-    //  ) |( ( AS)? ID)?
-    boolean_expression comparison_operator^ ( boolean_expression
-//    | all_or_any_expression
-    )
-//  | enum_expression
-    //  (
-    //    Equals_Operator
-    //    | Not_Equals_Operator
-    //  )
-    //  (
-    //    enum_expression
-    //    | all_or_any_expression
-    //  )
-    //  | entity_expression
-    //  (
-    //    Equals_Operator
-    //    | Not_Equals_Operator
-    //  )
-    //  (
-    //    entity_expression
-    //    | all_or_any_expression
-    //  )
+    string_expression comparison_operator^ (string_expression /*| all_or_any_expression*/) 
+    | boolean_expression comparison_operator^ (boolean_expression /*| all_or_any_expression*/)
+    | enum_expression (Equals_Operator | Not_Equals_Operator)^ (enum_expression /*| all_or_any_expression*/)
+    | datetime_expression comparison_operator^ (datetime_expression /*| all_or_any_expression*/)
+    | arithmetic_expression comparison_operator^ (arithmetic_expression /*| all_or_any_expression*/)
+//  | entity_expression (Equals_Operator | Not_Equals_Operator) ( entity_expression | all_or_any_expression )
     ;
 
 comparison_operator :
@@ -254,41 +251,33 @@ comparison_operator :
     | Less_Or_Equals_Operator
     | Not_Equals_Operator;
 
-//arithmetic_expression
-//  :
-//  simple_arithmetic_expression
+arithmetic_expression :
+ 	simple_arithmetic_expression
 //  | Left_Paren subquery Right_Paren
-//  ;
-//
-//string_expression
-//  :
-//  string_primary
+  ;
+
+string_expression :
+  	string_primary
 //  | Left_Paren subquery Right_Paren
-//  ;
-//
-//string_primary
-//  :
-//  state_field_path_expression
-//  | STRINGLITERAL
-//  | input_parameter
-//  | functions_returning_strings
-//  | aggregate_expression
-//  ;
-//
-//datetime_expression
-//  :
-//  datetime_primary
+  ;
+
+datetime_expression :
+  	datetime_primary
 //  | Left_Paren subquery Right_Paren
-//  ;
-//
-//datetime_primary
-//  :
-//  state_field_path_expression
-//  | input_parameter
-//  | functions_returning_datetime
-//  | aggregate_expression
-//  ;
-//
+  ;
+
+datetime_primary :
+	state_field_path_expression
+	| input_parameter
+	| functions_returning_datetime
+	| aggregate_expression
+  ;
+
+functions_returning_datetime :
+  	CURRENT_DATE
+  	| CURRENT_TIME
+  	| CURRENT_TIMESTAMP
+  ;
 
 boolean_expression :
     boolean_primary
@@ -296,32 +285,31 @@ boolean_expression :
     ;
 
 boolean_primary :
-    ID
-    |
-    (
-    ( ID Period qid)
-        -> ^( ST_BOOLEAN ID qid  )
-    )
-    //  | boolean_literal
-    | input_parameter;
+	state_field_path_expression
+	| boolean_literal
+	| input_parameter
+//	| case_expression
+	;
 
-//enum_expression
-//  :
-//  enum_primary
+boolean_literal : TRUE | FALSE;
+
+enum_expression :
+  enum_primary
 //  | Left_Paren subquery Right_Paren
-//  ;
-//
-//enum_primary
-//  :
-//  state_field_path_expression
-//  | enum_literal
-//  | input_parameter
-//  ;
-//
+  ;
+
+enum_primary :
+  state_field_path_expression
+  | enum_literal
+  | input_parameter
+  ;
+
+enum_literal: ID;
+
 //entity_expression
 //  :
 //  single_valued_association_path_expression
-//  | simple_entity_expressioni
+//  | simple_entity_expression
 //  ;
 //
 //simple_entity_expression
@@ -330,53 +318,9 @@ boolean_primary :
 //  | input_parameter
 //  ;
 //
-//functions_returning_numerics
-//  :
-//  'LENGTH' Left_Paren string_primary Right_Paren
-//  | 'LOCATE' Left_Paren string_primary Comma string_primary (Comma simple_arithmetic_expression)? Right_Paren
-//  | 'ABS' Left_Paren simple_arithmetic_expression Right_Paren
-//  | 'SQRT' Left_Paren simple_arithmetic_expression Right_Paren
-//  | 'MOD' Left_Paren simple_arithmetic_expression Comma simple_arithmetic_expression Right_Paren
-//  | 'SIZE' Left_Paren collection_valued_path_expression Right_Paren
-//  ;
-//
-//functions_returning_datetime
-//  :
-//  'CURRENT_DATE'
-//  | 'CURRENT_TIME'
-//  | 'CURRENT_TIMESTAMP'
-//  ;
-//
-//functions_returning_strings
-//  :
-//  'CONCAT' Left_Paren string_primary Comma string_primary Right_Paren
-//  | 'SUBSTRING' Left_Paren string_primary Comma simple_arithmetic_expression Comma simple_arithmetic_expression Right_Paren
-//  | 'TRIM' Left_Paren
-//  (
-//    (trim_specification)? (TRIM_CHARACTER)? FROM
-//  )?
-//  string_primary Right_Paren
-//  | 'LOWER' Left_Paren string_primary Right_Paren
-//  | 'UPPER' Left_Paren string_primary Right_Paren
-//  ;
-//
-//trim_specification
-//  :
-//  'LEADING'
-//  | 'TRAILING'
-//  | 'BOTH'
-//  ;
-//
 //TRIM_CHARACTER
 //  :
 //  ' '
-//  ;
-//
-//numeric_literal: ;
-//
-//ESCAPE_CHARACTER
-//  :
-//  CHARACTER
 //  ;
 //
 //pattern_value: ;
@@ -513,31 +457,5 @@ qid :
 //  single_valued_path_expression
 //  | aggregate_expression
 //  | ID
-//  ;
-//
-
-//literal: ;
-//
-//enum_literal: ;
-//
-//boolean_literal
-//  :
-//  'true'
-//  | 'false'
-//  ;
-//
-
-//STRINGLITERAL
-//  :
-//  (
-//    '\''
-//    (
-//      ~(
-//        '\\'
-//        | '"'
-//       )
-//    )*
-//    '\''
-//  )
 //  ;
 //

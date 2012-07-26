@@ -150,7 +150,9 @@ public class BasicPath<X> extends AbstractPath<X> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public X handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
-		return (X) this.mapping.getColumn().convertValue(row.getObject(this.fieldAlias));
+		final X value = (X) this.mapping.getColumn().convertValue(row.getObject(this.fieldAlias));
+
+		return (X) (this.getConverter() != null ? this.getConverter().convert((Number) value) : value);
 	}
 
 	/**

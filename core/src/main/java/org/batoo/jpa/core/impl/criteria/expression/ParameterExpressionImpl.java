@@ -179,8 +179,11 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public T handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
-		return query.getParameterValue(this);
+		final T value = query.getParameterValue(this);
+
+		return (T) (this.getConverter() != null ? this.getConverter().convert((Number) value) : value);
 	}
 
 	/**

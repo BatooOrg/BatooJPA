@@ -377,3 +377,7 @@ ID :
 
 INT :
     ('0'..'9')+;
+
+STRING_LITERAL : ('\'' ( ~('\\' | '"' ) )* '\'' );
+
+NUMERIC_LITERAL : INT (Period INT)?;

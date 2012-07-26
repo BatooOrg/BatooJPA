@@ -121,7 +121,9 @@ public class MapKeyPath<X> extends AbstractPath<X> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public X handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
-		return (X) this.mapJoin.handle(session, row, MapSelectType.KEY);
+		final X value = (X) this.mapJoin.handle(session, row, MapSelectType.KEY);
+
+		return (X) (this.getConverter() != null ? this.getConverter().convert((Number) value) : value);
 	}
 
 	/**

@@ -82,8 +82,7 @@ public class ListJoinImpl<Z, E> extends AbstractJoin<Z, E> implements ListJoin<Z
 	 */
 	@Override
 	public ListJoin<Z, E> on(Expression<Boolean> restriction) {
-		// TODO Auto-generated method stub
-		return null;
+		throw this.notSupported();
 	}
 
 	/**
@@ -92,7 +91,6 @@ public class ListJoinImpl<Z, E> extends AbstractJoin<Z, E> implements ListJoin<Z
 	 */
 	@Override
 	public ListJoin<Z, E> on(Predicate... restrictions) {
-		// TODO Auto-generated method stub
-		return null;
+		throw this.notSupported();
 	}
 }

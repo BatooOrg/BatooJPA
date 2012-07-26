@@ -109,6 +109,8 @@ public class NegationExpression<N extends Number> extends AbstractExpression<N> 
 	@Override
 	@SuppressWarnings("unchecked")
 	public N handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
-		return (N) row.getObject(this.alias);
+		final N value = (N) row.getObject(this.alias);
+
+		return (N) (this.getConverter() != null ? this.getConverter().convert(value) : value);
 	}
 }

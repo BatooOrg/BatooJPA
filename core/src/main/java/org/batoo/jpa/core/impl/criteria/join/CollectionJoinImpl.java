@@ -72,8 +72,7 @@ public class CollectionJoinImpl<Z, E> extends AbstractJoin<Z, E> implements Coll
 	 */
 	@Override
 	public CollectionJoin<Z, E> on(Expression<Boolean> restriction) {
-		// TODO Auto-generated method stub
-		return null;
+		throw this.notSupported();
 	}
 
 	/**
@@ -82,7 +81,6 @@ public class CollectionJoinImpl<Z, E> extends AbstractJoin<Z, E> implements Coll
 	 */
 	@Override
 	public CollectionJoin<Z, E> on(Predicate... restrictions) {
-		// TODO Auto-generated method stub
-		return null;
+		throw this.notSupported();
 	}
 }

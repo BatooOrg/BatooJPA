@@ -167,8 +167,11 @@ public class PluralAssociationPath<Z, X> extends AbstractPath<X> implements Join
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public X handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
-		return this.fetchRoot.handle(session, row);
+		final X value = this.fetchRoot.handle(session, row);
+
+		return (X) (this.getConverter() != null ? this.getConverter().convert((Number) value) : value);
 	}
 
 	/**

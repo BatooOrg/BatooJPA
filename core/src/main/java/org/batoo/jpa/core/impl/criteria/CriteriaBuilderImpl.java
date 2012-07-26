@@ -47,11 +47,13 @@ import javax.persistence.criteria.Selection;
 import javax.persistence.criteria.SetJoin;
 import javax.persistence.criteria.Subquery;
 
+import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ArithmeticExression;
 import org.batoo.jpa.core.impl.criteria.expression.ArithmeticExression.ArithmeticOperation;
 import org.batoo.jpa.core.impl.criteria.expression.Comparison;
 import org.batoo.jpa.core.impl.criteria.expression.ComparisonExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ConstantExpression;
+import org.batoo.jpa.core.impl.criteria.expression.ExpressionConverter;
 import org.batoo.jpa.core.impl.criteria.expression.NegationExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
@@ -1352,8 +1354,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<BigDecimal> toBigDecimal(Expression<? extends Number> number) {
-		// TODO Auto-generated method stub
-		return null;
+		return ((AbstractExpression<? extends Number>) number).setConverter(ExpressionConverter.BIG_DECIMAL);
 	}
 
 	/**
@@ -1362,8 +1363,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<BigInteger> toBigInteger(Expression<? extends Number> number) {
-		// TODO Auto-generated method stub
-		return null;
+		return ((AbstractExpression<? extends Number>) number).setConverter(ExpressionConverter.BIG_INTEGER);
 	}
 
 	/**
@@ -1372,8 +1372,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<Double> toDouble(Expression<? extends Number> number) {
-		// TODO Auto-generated method stub
-		return null;
+		return ((AbstractExpression<? extends Number>) number).setConverter(ExpressionConverter.DOUBLE);
 	}
 
 	/**
@@ -1382,8 +1381,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<Float> toFloat(Expression<? extends Number> number) {
-		// TODO Auto-generated method stub
-		return null;
+		return ((AbstractExpression<? extends Number>) number).setConverter(ExpressionConverter.FLOAT);
 	}
 
 	/**
@@ -1392,8 +1390,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<Integer> toInteger(Expression<? extends Number> number) {
-		// TODO Auto-generated method stub
-		return null;
+		return ((AbstractExpression<? extends Number>) number).setConverter(ExpressionConverter.INTEGER);
 	}
 
 	/**
@@ -1402,8 +1399,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<Long> toLong(Expression<? extends Number> number) {
-		// TODO Auto-generated method stub
-		return null;
+		return ((AbstractExpression<? extends Number>) number).setConverter(ExpressionConverter.LONG);
 	}
 
 	/**
@@ -1412,8 +1408,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<String> toString(Expression<Character> character) {
-		// TODO Auto-generated method stub
-		return null;
+		return ((AbstractExpression<Character>) character).setConverter(ExpressionConverter.STRING);
 	}
 
 	/**
@@ -1575,5 +1570,4 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }

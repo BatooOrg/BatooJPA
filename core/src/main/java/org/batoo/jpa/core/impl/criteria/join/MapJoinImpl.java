@@ -213,8 +213,7 @@ public class MapJoinImpl<Z, K, V> extends AbstractJoin<Z, V> implements MapJoin<
 	 */
 	@Override
 	public MapJoin<Z, K, V> on(Expression<Boolean> restriction) {
-		// TODO Auto-generated method stub
-		return null;
+		throw this.notSupported();
 	}
 
 	/**
@@ -223,18 +222,20 @@ public class MapJoinImpl<Z, K, V> extends AbstractJoin<Z, V> implements MapJoin<
 	 */
 	@Override
 	public MapJoin<Z, K, V> on(Predicate... restrictions) {
-		// TODO Auto-generated method stub
-		return null;
+		throw this.notSupported();
 	}
 
 	/**
-	 * @param key
-	 * @return
+	 * Create an expression corresponding to the type of the path.
+	 * 
+	 * @param selectType
+	 *            the select type
+	 * @return expression corresponding to the type of the path
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Expression<Class<? extends K>> type(MapSelectType key) {
+	public Expression<Class<? extends K>> type(MapSelectType selectType) {
 		// TODO Auto-generated method stub
 		return null;
 	}

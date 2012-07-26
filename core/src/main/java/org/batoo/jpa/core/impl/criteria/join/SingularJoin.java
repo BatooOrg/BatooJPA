@@ -70,8 +70,7 @@ public class SingularJoin<Z, X> extends AbstractJoin<Z, X> {
 	 */
 	@Override
 	public Join<Z, X> on(Expression<Boolean> restriction) {
-		// TODO Auto-generated method stub
-		return null;
+		throw this.notSupported();
 	}
 
 	/**
@@ -80,7 +79,6 @@ public class SingularJoin<Z, X> extends AbstractJoin<Z, X> {
 	 */
 	@Override
 	public Join<Z, X> on(Predicate... restrictions) {
-		// TODO Auto-generated method stub
-		return null;
+		throw this.notSupported();
 	}
 }
