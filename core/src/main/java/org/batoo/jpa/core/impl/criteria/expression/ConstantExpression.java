@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.criteria.expression;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -60,6 +61,8 @@ public class ConstantExpression<T> extends ParameterExpressionImpl<T> {
 	 */
 	@Override
 	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
+		this.ensureAlias(query);
+
 		return this.value.toString();
 	}
 
@@ -69,6 +72,8 @@ public class ConstantExpression<T> extends ParameterExpressionImpl<T> {
 	 */
 	@Override
 	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+		this.ensureAlias(query);
+
 		return this.value.toString();
 	}
 
@@ -79,5 +84,23 @@ public class ConstantExpression<T> extends ParameterExpressionImpl<T> {
 	@Override
 	public T handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		return this.value;
+	}
+
+	/**
+	 * Sets the parameters expanding if necessary.
+	 * 
+	 * @param parameters
+	 *            the SQL parameters
+	 * @param sqlIndex
+	 *            the index corresponding to expanded SQL parameter
+	 * @param value
+	 *            the value to set to the parameter
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Override
+	public void setParameter(Object[] parameters, MutableInt sqlIndex, Object value) {
+		super.setParameter(parameters, sqlIndex, this.value);
 	}
 }

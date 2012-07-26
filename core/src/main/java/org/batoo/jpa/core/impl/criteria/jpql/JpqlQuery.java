@@ -18,7 +18,6 @@
  */
 package org.batoo.jpa.core.impl.criteria.jpql;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +41,7 @@ import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
+import org.batoo.jpa.core.impl.criteria.expression.ConstantExpression;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
@@ -52,6 +52,7 @@ import org.batoo.jpa.jpql.JpqlLexer;
 import org.batoo.jpa.jpql.JpqlParser;
 import org.batoo.jpa.jpql.JpqlParser.ql_statement_return;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -238,7 +239,7 @@ public class JpqlQuery {
 			return predictions.get(0);
 		}
 
-		if (junctionDef.getType() == JpqlParser.OR) {
+		if (junctionDef.getType() == JpqlParser.LOR) {
 			return cb.or(predictions.toArray(new Predicate[predictions.size()]));
 		}
 
@@ -259,10 +260,7 @@ public class JpqlQuery {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private <X> Expression<Boolean> constructPredicate(CriteriaBuilderImpl cb, Tree predictionDef) {
-		if (predictionDef.getType() == JpqlParser.ST_BOOLEAN) {
-			return this.getBooleanExpression(predictionDef);
-		}
-		else if ((predictionDef.getType() == JpqlParser.Equals_Operator) //
+		if ((predictionDef.getType() == JpqlParser.Equals_Operator) //
 			|| (predictionDef.getType() == JpqlParser.Not_Equals_Operator) //
 			|| (predictionDef.getType() == JpqlParser.Greater_Than_Operator) //
 			|| (predictionDef.getType() == JpqlParser.Greater_Or_Equals_Operator) //
@@ -332,7 +330,7 @@ public class JpqlQuery {
 			}
 		}
 
-		return null;
+		return this.getBooleanExpression(predictionDef);
 	}
 
 	/**
@@ -355,7 +353,7 @@ public class JpqlQuery {
 		for (int i = 0; i < selects.getChildCount(); i++) {
 			final Tree selectDef = selects.getChild(i);
 
-			final AbstractSelection<?> selection = this.constructSingleSelect(cb, q, selectDef.getChild(0));
+			final AbstractSelection<?> selection = this.constructSingleSelect(cb, selectDef.getChild(0));
 
 			if (selectDef.getChildCount() == 2) {
 				selection.alias(selectDef.getChild(1).getText());
@@ -380,13 +378,7 @@ public class JpqlQuery {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
-	private AbstractSelection<?> constructSingleSelect(CriteriaBuilderImpl cb, CriteriaQueryImpl<Object> q, Tree selectDef) {
-		// Identification variable
-		if (selectDef.getType() == JpqlParser.ID) {
-			return this.getAliased(selectDef.getText());
-		}
-
+	private AbstractSelection<?> constructSingleSelect(CriteriaBuilderImpl cb, Tree selectDef) {
 		// constructor select
 		if (selectDef.getType() == JpqlParser.NEW) {
 			final String className = new Qualified(selectDef.getChild(0)).toString();
@@ -396,7 +388,7 @@ public class JpqlQuery {
 			for (int i = 0; i < arguments.getChildCount(); i++) {
 				final Tree argumentDef = arguments.getChild(i);
 
-				childSelections.add(this.constructSingleSelect(cb, q, argumentDef));
+				childSelections.add(this.getExpression(cb, argumentDef, null));
 			}
 
 			try {
@@ -416,50 +408,7 @@ public class JpqlQuery {
 			return (AbstractSelection<?>) from.type();
 		}
 
-		// single valued state field expression
-		if (selectDef.getType() == JpqlParser.ST_PARENTED) {
-
-			// entity or path selection
-			AbstractSelection<?> selection = this.getAliased(selectDef.getChild(0).getText());
-
-			final Qualified qualified = new Qualified(selectDef.getChild(1));
-			for (final String segment : qualified.getSegments()) {
-				if (selection instanceof AbstractFrom) {
-					selection = ((AbstractFrom<?, ?>) selection).get(segment);
-				}
-				else if (selection instanceof AbstractPath) {
-					selection = ((AbstractPath<?>) selection).get(segment);
-				}
-				else {
-					throw new IllegalArgumentException("Cannot dereference: " + segment);
-				}
-
-			}
-
-			return selection;
-		}
-
-		if (selectDef.getType() == JpqlParser.ST_ARITH_FACT) {
-			if (selectDef.getChild(0).getType() == JpqlParser.Minus_Sign) {
-				return (AbstractSelection<?>) cb.neg((Expression<Number>) this.constructSingleSelect(cb, q, selectDef.getChild(1)));
-			}
-
-			return this.constructSingleSelect(cb, q, selectDef.getChild(1));
-		}
-		// if (selectDef.getType() == JpqlParser.LUNARY) {
-		// AbstractSelection<?> previous = null;
-		// final Tree childrenDef = selectDef.getChild(1);
-		// for (int i = 0; i < childrenDef.getChildCount(); i++) {
-		// if (previous == null) {
-		// previous = this.constructSingleSelect(cb, q, childrenDef.getChild(i));
-		// }
-		// else {
-		//
-		// }
-		// }
-		// }
-
-		throw new PersistenceException("unhandled select item: " + selectDef.toStringTree());
+		return this.getExpression(cb, selectDef, null);
 	}
 
 	/**
@@ -516,36 +465,79 @@ public class JpqlQuery {
 	 */
 	@SuppressWarnings("unchecked")
 	private <X> AbstractExpression<X> getExpression(CriteriaBuilderImpl cb, Tree exprDef, Class<X> javaType) {
-		if (exprDef.getType() == JpqlParser.ST_BOOLEAN) {
-			return (AbstractExpression<X>) this.getBooleanExpression(exprDef);
-		}
-		else if (exprDef.getType() == JpqlParser.Ordinal_Parameter) {
-			return null;
-		}
-		else if (exprDef.getType() == JpqlParser.Named_Parameter) {
-			return cb.parameter(javaType, exprDef.getText().substring(1));
-		}
-		else if (exprDef.getType() == JpqlParser.ID) {
+		// identification variable
+		if (exprDef.getType() == JpqlParser.ID) {
 			return (AbstractExpression<X>) this.getAliased(exprDef.getText());
 		}
 
-		// fall back to path expression
-		final Qualified qualified = new Qualified(exprDef, true);
-		AbstractPath<?> expression = this.getAliased(qualified.getId());
+		// single valued state field expression
+		if (exprDef.getType() == JpqlParser.ST_PARENTED) {
+			AbstractSelection<?> selection = this.getAliased(exprDef.getChild(0).getText());
 
-		final Iterator<String> i = qualified.getSegments().iterator();
-		while (i.hasNext()) {
-			final String segment = i.next();
-			if (i.hasNext()) {
-				expression = expression.get(segment);
+			final Qualified qualified = new Qualified(exprDef.getChild(1));
+			for (final String segment : qualified.getSegments()) {
+				if (selection instanceof AbstractFrom) {
+					selection = ((AbstractFrom<?, ?>) selection).get(segment);
+				}
+				else if (selection instanceof AbstractPath) {
+					selection = ((AbstractPath<?>) selection).get(segment);
+				}
+				else {
+					throw new IllegalArgumentException("Cannot dereference: " + segment);
+				}
+
 			}
-			else {
-				expression = expression.get(segment);
-				break;
+
+			return (AbstractExpression<X>) selection;
+		}
+
+		// negation
+		if (exprDef.getType() == JpqlParser.ST_NEGATION) {
+			return (AbstractExpression<X>) cb.neg(this.<Number> getExpression(cb, exprDef.getChild(0), null));
+		}
+
+		if (exprDef.getType() == JpqlParser.Named_Parameter) {
+			return cb.parameter(javaType, exprDef.getText().substring(1));
+		}
+
+		// arithmetic operation
+		if ((exprDef.getType() == JpqlParser.Plus_Sign) //
+			|| (exprDef.getType() == JpqlParser.Minus_Sign) //
+			|| (exprDef.getType() == JpqlParser.Multiplication_Sign) //
+			|| (exprDef.getType() == JpqlParser.Division_Sign)) {
+
+			final AbstractExpression<Number> left = this.getExpression(cb, exprDef.getChild(0), null);
+			final AbstractExpression<? extends Number> right = this.getExpression(cb, exprDef.getChild(1), left.getJavaType());
+
+			switch (exprDef.getType()) {
+				case JpqlParser.Plus_Sign:
+					return (AbstractExpression<X>) cb.sum(left, right);
+
+				case JpqlParser.Minus_Sign:
+					return (AbstractExpression<X>) cb.diff(left, right);
+
+				case JpqlParser.Multiplication_Sign:
+					return (AbstractExpression<X>) cb.prod(left, right);
+
+				case JpqlParser.Division_Sign:
+					return (AbstractExpression<X>) cb.quot(left, right);
 			}
 		}
 
-		return (AbstractExpression<X>) expression;
+		if (exprDef.getType() == JpqlParser.ST_BOOLEAN) {
+			return (AbstractExpression<X>) this.getBooleanExpression(exprDef);
+		}
+
+		if (exprDef.getType() == JpqlParser.Ordinal_Parameter) {
+			// TODO Handle
+			return null;
+		}
+
+		if (exprDef.getType() == JpqlParser.NUMERIC_LITERAL) {
+			return (AbstractExpression<X>) new ConstantExpression<Long>(this.metamodel.createBasicType(Long.class), Long.valueOf(exprDef.getText()));
+		}
+
+		throw new PersistenceException("unhandled select item: " + exprDef.toStringTree());
 	}
 
 	/**
@@ -559,7 +551,8 @@ public class JpqlQuery {
 	private CriteriaQueryImpl<?> parse() {
 		final CommonTree tree = this.parse(this.qlString);
 
-		JpqlQuery.LOG.debug("Parsed query successfully {0}", JpqlQuery.LOG.lazyBoxed(this.qlString, new Object[] { tree.toStringTree() }));
+		JpqlQuery.LOG.debug("Parsed query successfully {0}", //
+			JpqlQuery.LOG.lazyBoxed(this.qlString, new Object[] { tree.toStringTree() }));
 
 		return this.construct(tree);
 	}
@@ -571,8 +564,20 @@ public class JpqlQuery {
 			final JpqlParser parser = new JpqlParser(tokenStream);
 
 			final ql_statement_return ql_statement = parser.ql_statement();
+			final CommonTree tree = (CommonTree) ql_statement.getTree();
 
-			return (CommonTree) ql_statement.getTree();
+			final List<String> errors = parser.getErrors();
+			if (errors.size() > 0) {
+				final String errorMsg = Joiner.on("\n\t").join(errors);
+
+				JpqlQuery.LOG.error("Cannot parse query: {0}", //
+					JpqlQuery.LOG.boxed(query, //
+						new Object[] { errorMsg, "\n\n" + tree.toStringTree() }));
+
+				throw new PersistenceException("cannot parse the query:\n " + errorMsg);
+			}
+
+			return tree;
 		}
 		catch (final Exception e) {
 			throw new PersistenceException("Cannot parse qpql: " + e.getMessage(), e);

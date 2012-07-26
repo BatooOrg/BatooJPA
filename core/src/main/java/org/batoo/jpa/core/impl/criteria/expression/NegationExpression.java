@@ -26,6 +26,7 @@ import javax.persistence.criteria.Expression;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.path.BasicPath;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
@@ -71,9 +72,13 @@ public class NegationExpression<N extends Number> extends AbstractExpression<N> 
 	 */
 	@Override
 	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
-		final StringBuilder builder = new StringBuilder("-(");
-		builder.append(this.inner.generateJpqlRestriction(query));
-		builder.append(")");
+		final StringBuilder builder = new StringBuilder("-");
+		if (!(this.inner instanceof BasicPath)) {
+			builder.append("(").append(this.inner.generateJpqlRestriction(query)).append(")");
+		}
+		else {
+			builder.append(this.inner.generateJpqlRestriction(query));
+		}
 
 		if (StringUtils.isNotBlank(this.getAlias())) {
 			builder.append(" as ").append(this.getAlias());
@@ -89,6 +94,10 @@ public class NegationExpression<N extends Number> extends AbstractExpression<N> 
 	@Override
 	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
 		this.alias = query.getAlias(this);
+
+		if (this.inner instanceof BasicPath) {
+			return "-" + this.inner.getSqlRestrictionFragments(query)[0] + " AS " + this.alias;
+		}
 
 		return "-(" + this.inner.getSqlRestrictionFragments(query)[0] + ") AS " + this.alias;
 	}

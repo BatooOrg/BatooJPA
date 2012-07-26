@@ -138,50 +138,70 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		this.close();
 
-		// TypedQuery<Person> q;
 		TypedQuery<Integer> q2;
+		int total;
 
-		// q = this.cq("select p from Person p where p.age > :age", Person.class).setParameter("age", 40);
-		// Assert.assertEquals(0, q.getResultList().size());
-		//
-		// q = this.cq("select p from Person p where p.age < :age", Person.class).setParameter("age", 40);
-		// Assert.assertEquals(1, q.getResultList().size());
-		//
-		// q = this.cq("select p from Person p where p.age >= :age", Person.class).setParameter("age", 40);
-		// Assert.assertEquals(1, q.getResultList().size());
-		//
-		// q = this.cq("select p from Person p where p.age <= :age", Person.class).setParameter("age", 40);
-		// Assert.assertEquals(2, q.getResultList().size());
-		//
-		// q = this.cq("select p from Person p where p.age between :age1 and :age2", Person.class).setParameter("age1",
-		// 38).setParameter("age2", 41);
-		// Assert.assertEquals(1, q.getResultList().size());
-		//
-		// q = this.cq("select p from Person p where p.age between :age1 and :age2", Person.class).setParameter("age1",
-		// 30).setParameter("age2", 50);
-		// Assert.assertEquals(2, q.getResultList().size());
-		//
-		// q = this.cq("select p from Person p where p.age between :age1 and :age2", Person.class).setParameter("age1",
-		// 10).setParameter("age2", 20);
-		// Assert.assertEquals(0, q.getResultList().size());
-		//
-		// q = this.cq("select p from Person p where p.age not between :age1 and :age2", Person.class).setParameter("age1",
-		// 10).setParameter("age2", 20);
-		// Assert.assertEquals(2, q.getResultList().size());
-		//
-		// q2 = this.cq("select -p.age from Person p", Integer.class);
-		int total = 0;
-		// for (final Integer i : q2.getResultList()) {
-		// total += i;
-		// }
-		// Assert.assertEquals(-75, total);
+		TypedQuery<Person> q = this.cq("select p from Person p where p.age > :age", Person.class).setParameter("age", 40);
+		Assert.assertEquals(0, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.age < :age", Person.class).setParameter("age", 40);
+		Assert.assertEquals(1, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.age >= :age", Person.class).setParameter("age", 40);
+		Assert.assertEquals(1, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.age >= :age1 or p.age < :age2", Person.class).setParameter("age1", 40).setParameter("age2", 50);
+		Assert.assertEquals(2, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.age <= :age", Person.class).setParameter("age", 40);
+		Assert.assertEquals(2, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.age between :age1 and :age2", Person.class).setParameter("age1", 38).setParameter("age2", 41);
+		Assert.assertEquals(1, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.age between :age1 and :age2", Person.class).setParameter("age1", 30).setParameter("age2", 50);
+		Assert.assertEquals(2, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.age between :age1 and :age2", Person.class).setParameter("age1", 10).setParameter("age2", 20);
+		Assert.assertEquals(0, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.age not between :age1 and :age2", Person.class).setParameter("age1", 10).setParameter("age2", 20);
+		Assert.assertEquals(2, q.getResultList().size());
+
+		q2 = this.cq("select -p.age from Person p", Integer.class);
+		total = 0;
+		for (final Integer i : q2.getResultList()) {
+			total += i;
+		}
+		Assert.assertEquals(-75, total);
 
 		q2 = this.cq("select p.age + p.age from Person p", Integer.class);
 		total = 0;
 		for (final Integer i : q2.getResultList()) {
 			total += i;
 		}
+		Assert.assertEquals(150, total);
+
+		q2 = this.cq("select -p.age + -p.age from Person p", Integer.class);
+		total = 0;
+		for (final Integer i : q2.getResultList()) {
+			total += i;
+		}
 		Assert.assertEquals(-150, total);
+
+		q2 = this.cq("select 22 + p.age from Person p", Integer.class);
+		total = 0;
+		for (final Integer i : q2.getResultList()) {
+			total += i;
+		}
+		Assert.assertEquals(119, total);
+
+		q2 = this.cq("select p.age * 2 from Person p", Integer.class);
+		total = 0;
+		for (final Integer i : q2.getResultList()) {
+			total += i;
+		}
+		Assert.assertEquals(150, total);
 	}
 
 	/**
@@ -333,24 +353,15 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	}
 
 	/**
-	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	@Test
-	public void testSimple0() {
-		final TypedQuery<Country> q = this.cq("select c from Country c", Country.class);
+	public void testSimple() {
+		TypedQuery<Country> q = this.cq("select c from Country c", Country.class);
 		Assert.assertEquals("[Country [name=Turkey], Country [name=United States of America], Country [name=United Kingdom]]", q.getResultList().toString());
-	}
 
-	/**
-	 * @since $version
-	 * @author hceylan
-	 */
-	@Test
-	public void testSimple1() {
-		final TypedQuery<Country> q = this.cq("select c from Country c where c = :country", Country.class);
-
+		q = this.cq("select c from Country c where c = :country", Country.class);
 		q.setParameter("country", SimpleJpqlTest.TR);
 
 		Assert.assertEquals(1, q.getResultList().size());
@@ -371,7 +382,7 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		TypedQuery<Person> q;
 
-		q = this.cq("select p from Person p where p.name <= :name", Person.class).setParameter("name", "Ceylan");
+		q = this.cq("select p.name from Person p where p.name <= :name", Person.class).setParameter("name", "Ceylan");
 		Assert.assertEquals(2, q.getResultList().size());
 
 		q = this.cq("select p from Person p where p.name > :name", Person.class).setParameter("name", "Ceylan");

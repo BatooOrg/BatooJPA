@@ -68,7 +68,16 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 		}
 	}
 
-	private void ensureAlias(CriteriaQueryImpl<?> query) {
+	/**
+	 * Ensures the alias has been created.
+	 * 
+	 * @param query
+	 *            the query
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected void ensureAlias(CriteriaQueryImpl<?> query) {
 		if (this.position == null) {
 			this.position = query.getAlias(this);
 			if (StringUtils.isBlank(this.getAlias())) {
@@ -96,6 +105,8 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 */
 	@Override
 	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+		this.ensureAlias(query);
+
 		return this.generateJpqlRestriction(query);
 	}
 
@@ -105,6 +116,8 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 */
 	@Override
 	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+		this.ensureAlias(query);
+
 		return null;
 	}
 
@@ -183,7 +196,7 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	public T handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		final T value = query.getParameterValue(this);
 
-		return (T) (this.getConverter() != null ? this.getConverter().convert((Number) value) : value);
+		return (T) (this.getConverter() != null ? this.getConverter().convert(value) : value);
 	}
 
 	/**

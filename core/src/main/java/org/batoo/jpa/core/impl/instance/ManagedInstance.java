@@ -484,7 +484,7 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void flush(ConnectionImpl connection) throws SQLException {
-		ManagedInstance.LOG.debug("Flushing instance {0}", this);
+		ManagedInstance.LOG.debug("Flushing instance as {0}: {1}", this.status, this);
 
 		switch (this.status) {
 			case NEW:
@@ -884,7 +884,7 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void reset() {
-		ManagedInstance.LOG.debug("Reset instance {0}", this);
+		ManagedInstance.LOG.trace("Reset instance {0}", this);
 
 		this.collectionsChanged.clear();
 
@@ -903,7 +903,7 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void setChanged(PluralMapping<?, ?, ?> association) {
-		ManagedInstance.LOG.debug("Association changed for instance: {0}", this, association);
+		ManagedInstance.LOG.trace("Association changed for instance: {0}", this, association);
 
 		if ((this.collectionsChanged.size() == 0) && !this.changed) {
 			this.session.setChanged(this);
@@ -987,7 +987,7 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	private void snapshot() {
-		ManagedInstance.LOG.debug("Snapshot generated for instance {0}", this);
+		ManagedInstance.LOG.trace("Snapshot generated for instance {0}", this);
 
 		for (final Mapping<?, ?, ?> mapping : this.type.getMappingsSingular()) {
 			this.snapshot.put(mapping, mapping.get(this.instance));

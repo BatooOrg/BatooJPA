@@ -26,11 +26,27 @@ tokens {
     ST_ID_AS;
     ST_SELECT;
     ST_BOOLEAN;
-    ST_ARITH_FACT;
+    ST_NEGATION;
 }
 
 @header {
 	package org.batoo.jpa.jpql;
+}
+
+
+@members {
+    private List<String> errors = new ArrayList<String>();
+
+    public void displayRecognitionError(String[] tokenNames,
+                                        RecognitionException e) {
+        String hdr = getErrorHeader(e);
+        String msg = getErrorMessage(e, tokenNames);
+        errors.add(hdr + " " + msg);
+    }
+
+    public List<String> getErrors() {
+        return errors;
+    }
 }
 
 ql_statement :
@@ -91,12 +107,7 @@ update_item :
 
 new_value :
     simple_arithmetic_expression
-    | string_primary
-    //    | datetime_primary
-    //    |
-    boolean_primary
-    //    | enum_primary
-    //    | simple_entity_expression
+//    | simple_entity_expression
     | NULL;
 
 where_clause :
@@ -118,40 +129,49 @@ select_expressions :
         -> ^(LSELECT select_expression ( select_expression)*);
 
 select_expression :
-    ID
-    | aggregate_expression
-    | state_field_path_expression
-    | scalar_expression
+    scalar_expression
     | OBJECT^ Left_Paren! ID Right_Paren!
     | constructor_expression;
 
+single_valued_path_expression :
+	qualified_identification_variable
+	| state_field_path_expression
+	;
+
+qualified_identification_variable:
+	KEY (ID)
+	| VALUE (ID)
+	| ENTRY (ID)
+	;
+
 state_field_path_expression :
     ID Period qid
-        -> ^(ST_PARENTED ID qid  );
+        -> ^(ST_PARENTED ID qid);
 
 constructor_expression :
     NEW qid Left_Paren select_expressions Right_Paren
         -> ^(NEW qid select_expressions);
         
-scalar_expression :
+scalar_expression options { backtrack=true; } :
     simple_arithmetic_expression
     | string_primary
     | enum_primary
     | datetime_primary
     | boolean_primary
     //    | case_expression
-    //    | entity_type_expression
+//    | entity_type_expression
     ;
 
 simple_arithmetic_expression :
-    arithmetic_term (Plus_Sign | Minus_Sign)^ arithmetic_term;
+    arithmetic_term ((Plus_Sign | Minus_Sign)^ arithmetic_term)?;
 
 arithmetic_term :
-    arithmetic_factor (Multiplication_Sign | Division_Sign)^ arithmetic_factor;
+    arithmetic_factor ((Multiplication_Sign | Division_Sign)^ arithmetic_factor)?;
 
 arithmetic_factor :
-    (Plus_Sign | Minus_Sign)? arithmetic_primary 
-    	-> ^(ST_ARITH_FACT (Plus_Sign)? (Minus_Sign)? arithmetic_primary); 
+	(Plus_Sign)? arithmetic_primary
+    | Minus_Sign arithmetic_primary 
+    	-> ^(ST_NEGATION arithmetic_primary); 
 
 arithmetic_primary :
 	state_field_path_expression
@@ -210,10 +230,10 @@ conditional_primary options { backtrack=true; } :
     ;
 
 simple_cond_expression options { backtrack=true; } :
-    boolean_expression
-    | comparison_expression
+    comparison_expression
     | between_expression
     | like_expression
+    | boolean_expression
 //  | in_expression
 //  | null_comparison_expression
 //  | empty_collection_comparison_expression
@@ -224,10 +244,6 @@ simple_cond_expression options { backtrack=true; } :
 between_expression :
     arithmetic_expression (NOT)? BETWEEN arithmetic_expression AND arithmetic_expression
         -> ^(BETWEEN arithmetic_expression arithmetic_expression arithmetic_expression (NOT)?)
-    | string_expression (NOT)? BETWEEN string_expression AND string_expression
-        -> ^(BETWEEN string_expression string_expression string_expression (NOT)?)
-    | datetime_expression (NOT)? BETWEEN datetime_expression AND datetime_expression
-        -> ^(BETWEEN datetime_expression datetime_expression datetime_expression (NOT)?)
     ;
     
 like_expression :
@@ -249,35 +265,36 @@ comparison_operator :
     | Greater_Or_Equals_Operator
     | Less_Than_Operator
     | Less_Or_Equals_Operator
-    | Not_Equals_Operator;
+    | Not_Equals_Operator
+    ;
 
 arithmetic_expression :
  	simple_arithmetic_expression
 //  | Left_Paren subquery Right_Paren
-  ;
+	;
 
 string_expression :
   	string_primary
 //  | Left_Paren subquery Right_Paren
-  ;
+	;
 
 datetime_expression :
   	datetime_primary
 //  | Left_Paren subquery Right_Paren
-  ;
+	;
 
 datetime_primary :
 	state_field_path_expression
 	| input_parameter
 	| functions_returning_datetime
 	| aggregate_expression
-  ;
+	;
 
 functions_returning_datetime :
   	CURRENT_DATE
   	| CURRENT_TIME
   	| CURRENT_TIMESTAMP
-  ;
+  	;
 
 boolean_expression :
     boolean_primary

@@ -345,9 +345,9 @@ Plus_Sign :
 Minus_Sign :
     '-';
 
-Star_Sign:
+Multiplication_Sign:
 	'*';
-
+	
 Division_Sign:
 	'/';
 	
@@ -367,7 +367,7 @@ WS :
     (' ' | '\t' | '\r' | '\n')+ { $channel = HIDDEN; };
 
 Ordinal_Parameter :
-    Question_Sign INT;
+    Question_Sign ('0'..'9')+;
 
 Named_Parameter :
     Column ID;
@@ -375,9 +375,6 @@ Named_Parameter :
 ID :
     ('a'..'z' | 'A'..'Z' | '_') ('a'..'z' | 'A'..'Z' | '0'..'9' | '_')*;
 
-INT :
-    ('0'..'9')+;
+NUMERIC_LITERAL : ('0'..'9')+ (Period ('0'..'9')+)?;
 
 STRING_LITERAL : ('\'' ( ~('\\' | '"' ) )* '\'' );
-
-NUMERIC_LITERAL : INT (Period INT)?;
