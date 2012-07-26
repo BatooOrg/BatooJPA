@@ -645,8 +645,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Predicate isNotNull(Expression<?> x) {
-		// TODO Auto-generated method stub
-		return null;
+		return x.isNotNull();
 	}
 
 	/**
@@ -655,8 +654,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Predicate isNull(Expression<?> x) {
-		// TODO Auto-generated method stub
-		return null;
+		return x.isNull();
 	}
 
 	/**

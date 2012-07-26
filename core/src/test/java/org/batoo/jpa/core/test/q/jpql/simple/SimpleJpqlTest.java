@@ -55,6 +55,7 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	private static final String COUNTRY_CODE_UK = "UK";
 	private static final String COUNTRY_CODE_USA = "USA";
 	private static final String COUNTRY_CODE_TR = "TR";
+	private static final String COUNTRY_CODE_BR = "BR";
 
 	private static final String CITY_LONDON = "London";
 	private static final String CITY_NEW_YORK = "New York";
@@ -63,6 +64,7 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	private static Country TR = new Country(SimpleJpqlTest.COUNTRY_CODE_TR, SimpleJpqlTest.COUNTRY_TR);
 	private static Country USA = new Country(SimpleJpqlTest.COUNTRY_CODE_USA, SimpleJpqlTest.COUNTRY_USA);
 	private static Country UK = new Country(SimpleJpqlTest.COUNTRY_CODE_UK, SimpleJpqlTest.COUNTRY_UK);
+	private static Country BROKEN = new Country(SimpleJpqlTest.COUNTRY_CODE_BR, null);
 
 	private Person person() {
 		final GregorianCalendar start = new GregorianCalendar();
@@ -110,6 +112,7 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		this.persist(SimpleJpqlTest.TR);
 		this.persist(SimpleJpqlTest.USA);
 		this.persist(SimpleJpqlTest.UK);
+		this.persist(SimpleJpqlTest.BROKEN);
 
 		this.commit();
 	}
@@ -366,12 +369,13 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testSimple() {
-		TypedQuery<Country> q = this.cq("select c from Country c", Country.class);
+		TypedQuery<Country> q = this.cq("select c from Country c where c = :country", Country.class).setParameter("country", SimpleJpqlTest.TR);
+		Assert.assertEquals(1, q.getResultList().size());
+
+		q = this.cq("select c from Country c where c.name is not null", Country.class);
 		Assert.assertEquals("[Country [name=Turkey], Country [name=United States of America], Country [name=United Kingdom]]", q.getResultList().toString());
 
-		q = this.cq("select c from Country c where c = :country", Country.class);
-		q.setParameter("country", SimpleJpqlTest.TR);
-
+		q = this.cq("select c from Country as c where c.name is null", Country.class);
 		Assert.assertEquals(1, q.getResultList().size());
 	}
 

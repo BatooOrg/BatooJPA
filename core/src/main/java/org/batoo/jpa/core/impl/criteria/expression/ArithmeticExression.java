@@ -128,7 +128,7 @@ public class ArithmeticExression<N extends Number> extends AbstractExpression<N>
 	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
 		this.alias = query.getAlias(this);
 
-		return this.x.getSqlRestrictionFragments(query)[0] + this.operation.getFragment() + this.y.getSqlRestrictionFragments(query)[0] + " AS " + this.alias;
+		return this.getSqlRestrictionFragments(query) + " AS " + this.alias;
 	}
 
 	/**

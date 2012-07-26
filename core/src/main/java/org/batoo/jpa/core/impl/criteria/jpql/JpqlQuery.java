@@ -344,6 +344,16 @@ public class JpqlQuery {
 			return left.in(expressions);
 		}
 
+		if (predictionDef.getType() == JpqlParser.ST_NULL) {
+			final AbstractExpression<Object> expr = this.getExpression(cb, predictionDef.getChild(0), null);
+
+			if (predictionDef.getChildCount() == 2) {
+				return cb.isNotNull(expr);
+			}
+
+			return cb.isNull(expr);
+		}
+
 		return this.getBooleanExpression(predictionDef);
 	}
 

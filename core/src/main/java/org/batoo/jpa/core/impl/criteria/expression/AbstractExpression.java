@@ -128,8 +128,7 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 */
 	@Override
 	public Predicate isNotNull() {
-		// TODO Auto-generated method stub
-		return null;
+		return new PredicateImpl(new IsNullExpression(true, this));
 	}
 
 	/**
@@ -138,8 +137,7 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 */
 	@Override
 	public Predicate isNull() {
-		// TODO Auto-generated method stub
-		return null;
+		return new PredicateImpl(new IsNullExpression(false, this));
 	}
 
 	/**

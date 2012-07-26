@@ -344,7 +344,7 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public <T> TypedQuery<T> createQuery(String qlString, Class<T> resultClass) {
-		final JpqlQuery jpqlQuery = this.emf.getpqlQuery(qlString);
+		final JpqlQuery jpqlQuery = this.emf.getJpqlQuery(qlString);
 		return jpqlQuery.createTypedQuery(this, resultClass);
 	}
 

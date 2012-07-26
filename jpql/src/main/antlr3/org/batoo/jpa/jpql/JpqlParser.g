@@ -29,6 +29,7 @@ tokens {
     ST_BOOLEAN;
     ST_NEGATION;
     ST_IN;
+    ST_NULL;
 }
 
 @header {
@@ -233,11 +234,11 @@ conditional_primary options { backtrack=true; } :
 
 simple_cond_expression options { backtrack=true; } :
     in_expression
+    | null_comparison_expression
     | comparison_expression
     | between_expression
     | like_expression
     | boolean_expression
-//  | null_comparison_expression
 //  | empty_collection_comparison_expression
 //  | collection_member_expression
 //  | exists_expression
@@ -327,11 +328,11 @@ enum_literal: ID;
 
 in_expression :
   	state_field_path_expression (NOT)? IN Left_Paren (in_items /*| subquery*/) Right_Paren
-  		->^(ST_IN state_field_path_expression (NOT)? in_items);
+  		-> ^(ST_IN state_field_path_expression (NOT)? in_items);
 
 in_items :
 	in_item (Comma in_item)*
-		->^(LIN in_item (in_item)*);
+		-> ^(LIN in_item (in_item)*);
 
 in_item :
 	STRING_LITERAL | NUMERIC_LITERAL | input_parameter;
@@ -372,15 +373,12 @@ qid :
     ID ( Period ID)*
         -> ^(LQUALIFIED ID (ID)*);
         
-//null_comparison_expression
-//  :
-//  (
-//    single_valued_path_expression
-//    | input_parameter
-//  )
-//  'IS' (NOT)? 'NULL'
-//  ;
-//
+null_comparison_expression :
+  	single_valued_path_expression IS (NOT)? NULL
+  		-> ^(ST_NULL single_valued_path_expression (NOT)?)
+  	| input_parameter IS (NOT)? NULL
+  		-> ^(ST_NULL input_parameter (NOT)?);
+
 //empty_collection_comparison_expression
 //  :
 //  collection_valued_path_expression 'IS' (NOT)? 'EMPTY'

@@ -241,7 +241,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public JpqlQuery getpqlQuery(String qlString) {
+	public JpqlQuery getJpqlQuery(String qlString) {
 		try {
 			return this.graphs.get(qlString);
 		}
