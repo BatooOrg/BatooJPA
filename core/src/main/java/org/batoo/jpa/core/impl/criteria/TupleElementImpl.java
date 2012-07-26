@@ -45,6 +45,10 @@ public abstract class TupleElementImpl<X> implements TupleElement<X> {
 	public TupleElementImpl(Class<X> javaType) {
 		super();
 
+		if (javaType == null) {
+			throw new NullPointerException();
+		}
+
 		this.javaType = javaType;
 	}
 

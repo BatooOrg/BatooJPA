@@ -319,6 +319,7 @@ public class JpqlQuery {
 					}
 
 					return between;
+
 				case JpqlParser.LIKE:
 					final Predicate like = cb.like((Expression<String>) left, (Expression<String>) right);
 
@@ -328,6 +329,19 @@ public class JpqlQuery {
 
 					return like;
 			}
+		}
+
+		if (predictionDef.getType() == JpqlParser.ST_IN) {
+			final AbstractExpression<?> left = this.<X> getExpression(cb, predictionDef.getChild(0), null);
+
+			final List<AbstractExpression<?>> expressions = Lists.newArrayList();
+
+			final Tree inDefs = predictionDef.getChild(1);
+			for (int i = 0; i < inDefs.getChildCount(); i++) {
+				expressions.add(this.getExpression(cb, inDefs.getChild(i), left.getJavaType()));
+			}
+
+			return left.in(expressions);
 		}
 
 		return this.getBooleanExpression(predictionDef);
@@ -537,7 +551,7 @@ public class JpqlQuery {
 			return (AbstractExpression<X>) new ConstantExpression<Long>(this.metamodel.createBasicType(Long.class), Long.valueOf(exprDef.getText()));
 		}
 
-		throw new PersistenceException("unhandled select item: " + exprDef.toStringTree());
+		throw new PersistenceException("Unhandled expression: " + exprDef.toStringTree());
 	}
 
 	/**

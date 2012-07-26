@@ -132,8 +132,10 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testArithmeticExpression() {
-		this.persist(this.person(40));
-		this.persist(this.person(35));
+		Person p1, p2;
+
+		this.persist(p1 = this.person(40));
+		this.persist(p2 = this.person(35));
 		this.commit();
 
 		this.close();
@@ -202,6 +204,12 @@ public class SimpleJpqlTest extends BaseCoreTest {
 			total += i;
 		}
 		Assert.assertEquals(150, total);
+
+		q = this.cq("select p from Person p where p.age in (:age1, :age2)", Person.class).setParameter("age1", 35).setParameter("age2", 40);
+		Assert.assertEquals(2, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p in (:p1, :p2)", Person.class).setParameter("p1", p1).setParameter("p2", p2);
+		Assert.assertEquals(2, q.getResultList().size());
 	}
 
 	/**

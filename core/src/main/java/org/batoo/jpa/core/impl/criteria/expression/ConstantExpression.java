@@ -25,6 +25,7 @@ import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
 
 /**
@@ -49,8 +50,9 @@ public class ConstantExpression<T> extends ParameterExpressionImpl<T> {
 	 * @since $version
 	 * @author hceylan
 	 */
+	@SuppressWarnings("unchecked")
 	public ConstantExpression(TypeImpl<T> type, T value) {
-		super(type, type.getJavaType(), null);
+		super(type, (Class<T>) value.getClass(), null);
 
 		this.value = value;
 	}
@@ -87,20 +89,11 @@ public class ConstantExpression<T> extends ParameterExpressionImpl<T> {
 	}
 
 	/**
-	 * Sets the parameters expanding if necessary.
+	 * {@inheritDoc}
 	 * 
-	 * @param parameters
-	 *            the SQL parameters
-	 * @param sqlIndex
-	 *            the index corresponding to expanded SQL parameter
-	 * @param value
-	 *            the value to set to the parameter
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
 	@Override
-	public void setParameter(Object[] parameters, MutableInt sqlIndex, Object value) {
-		super.setParameter(parameters, sqlIndex, this.value);
+	public void setParameter(MetamodelImpl metamodelImpls, Object[] parameters, MutableInt sqlIndex, Object value) {
+		super.setParameter(metamodelImpls, parameters, sqlIndex, this.value);
 	}
 }

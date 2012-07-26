@@ -26,6 +26,8 @@ import javax.persistence.criteria.Predicate;
 import org.batoo.jpa.core.impl.criteria.AbstractSelection;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 
+import com.google.common.collect.Lists;
+
 /**
  * Type for query expressions.
  * 
@@ -89,8 +91,7 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 */
 	@Override
 	public Predicate in(Collection<?> values) {
-		// TODO Auto-generated method stub
-		return null;
+		return new PredicateImpl(new InExpression(this, values));
 	}
 
 	/**
@@ -99,8 +100,7 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 */
 	@Override
 	public Predicate in(Expression<?>... values) {
-		// TODO Auto-generated method stub
-		return null;
+		return new PredicateImpl(new InExpression(this, values));
 	}
 
 	/**
@@ -119,8 +119,7 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 */
 	@Override
 	public Predicate in(Object... values) {
-		// TODO Auto-generated method stub
-		return null;
+		return new PredicateImpl(new InExpression(this, Lists.newArrayList(values)));
 	}
 
 	/**

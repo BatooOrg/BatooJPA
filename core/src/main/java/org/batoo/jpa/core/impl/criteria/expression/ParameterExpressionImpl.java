@@ -30,6 +30,7 @@ import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
@@ -45,7 +46,7 @@ import org.batoo.jpa.core.impl.model.type.TypeImpl;
  */
 public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements ParameterExpression<T> {
 
-	private final TypeImpl<?> type;
+	private TypeImpl<?> type;
 	private Integer position;
 
 	/**
@@ -83,6 +84,12 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 			if (StringUtils.isBlank(this.getAlias())) {
 				this.alias("param" + this.position);
 			}
+		}
+	}
+
+	private void ensureTypeResolved(MetamodelImpl metamodelImpl) {
+		if (this.type == null) {
+			this.type = metamodelImpl.type(this.getJavaType());
 		}
 	}
 
@@ -124,12 +131,16 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	/**
 	 * Returns the number of SQL parameters when expanded.
 	 * 
+	 * @param metamodelImpl
+	 *            the metamodel
 	 * @return the number of SQL parameters when expanded
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public int getExpandedCount() {
+	public int getExpandedCount(MetamodelImpl metamodelImpl) {
+		this.ensureTypeResolved(metamodelImpl);
+
 		if (this.type.getPersistenceType() == PersistenceType.BASIC) {
 			return 1;
 		}
@@ -178,7 +189,7 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 
 		query.setNextSqlParam(this);
 
-		final String[] restrictions = new String[this.getExpandedCount()];
+		final String[] restrictions = new String[this.getExpandedCount(query.getMetamodel())];
 
 		for (int i = 0; i < restrictions.length; i++) {
 			restrictions[i] = "?";
@@ -202,6 +213,8 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	/**
 	 * Sets the parameters expanding if necessary.
 	 * 
+	 * @param metamodel
+	 *            the metamodel
 	 * @param parameters
 	 *            the SQL parameters
 	 * @param sqlIndex
@@ -212,7 +225,9 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void setParameter(Object[] parameters, MutableInt sqlIndex, Object value) {
+	public void setParameter(MetamodelImpl metamodel, Object[] parameters, MutableInt sqlIndex, Object value) {
+		this.ensureTypeResolved(metamodel);
+
 		if (this.type.getPersistenceType() == PersistenceType.BASIC) {
 			parameters[sqlIndex.intValue()] = value;
 

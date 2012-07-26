@@ -16,6 +16,7 @@ tokens {
     LJOINS;
     LAND;
     LOR;
+    LIN;
 
     //imaginary AS token
     ST_UPDATE;
@@ -27,6 +28,7 @@ tokens {
     ST_SELECT;
     ST_BOOLEAN;
     ST_NEGATION;
+    ST_IN;
 }
 
 @header {
@@ -230,11 +232,11 @@ conditional_primary options { backtrack=true; } :
     ;
 
 simple_cond_expression options { backtrack=true; } :
-    comparison_expression
+    in_expression
+    | comparison_expression
     | between_expression
     | like_expression
     | boolean_expression
-//  | in_expression
 //  | null_comparison_expression
 //  | empty_collection_comparison_expression
 //  | collection_member_expression
@@ -323,6 +325,17 @@ enum_primary :
 
 enum_literal: ID;
 
+in_expression :
+  	state_field_path_expression (NOT)? IN Left_Paren (in_items /*| subquery*/) Right_Paren
+  		->^(ST_IN state_field_path_expression (NOT)? in_items);
+
+in_items :
+	in_item (Comma in_item)*
+		->^(LIN in_item (in_item)*);
+
+in_item :
+	STRING_LITERAL | NUMERIC_LITERAL | input_parameter;
+
 //entity_expression
 //  :
 //  single_valued_association_path_expression
@@ -359,23 +372,6 @@ qid :
     ID ( Period ID)*
         -> ^(LQUALIFIED ID (ID)*);
         
-        
-//in_expression
-//  :
-//  state_field_path_expression (NOT)? 'IN' Left_Paren
-//  (
-//    in_item (Comma in_item)*
-//    | subquery
-//  )
-//  Right_Paren
-//  ;
-//
-//in_item
-//  :
-//  literal
-//  | input_parameter
-//  ;
-//
 //null_comparison_expression
 //  :
 //  (

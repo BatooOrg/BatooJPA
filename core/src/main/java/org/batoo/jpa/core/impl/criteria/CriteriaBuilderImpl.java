@@ -56,6 +56,7 @@ import org.batoo.jpa.core.impl.criteria.expression.ConstantExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ExpressionConverter;
 import org.batoo.jpa.core.impl.criteria.expression.NegationExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
 
@@ -827,9 +828,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public <T> Expression<T> literal(T value) {
-		// TODO Auto-generated method stub
-		return null;
+	@SuppressWarnings("unchecked")
+	public <T> ConstantExpression<T> literal(T value) {
+		return new ConstantExpression<T>((TypeImpl<T>) this.metamodel.createBasicType(value.getClass()), value);
 	}
 
 	/**
@@ -1080,8 +1081,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <T> Expression<T> nullLiteral(Class<T> resultClass) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ConstantExpression<T>(this.metamodel.type(resultClass), null);
 	}
 
 	/**

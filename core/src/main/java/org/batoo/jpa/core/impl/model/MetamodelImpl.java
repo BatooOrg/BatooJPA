@@ -273,6 +273,7 @@ public class MetamodelImpl implements Metamodel {
 	 */
 	public synchronized void addTableGenerator(TableGeneratorMetadata metadata) {
 		final TableGenerator tableGenerator = new TableGenerator(metadata);
+
 		this.tableGenerators.put(tableGenerator.getName(), tableGenerator);
 	}
 

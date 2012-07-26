@@ -20,8 +20,8 @@ package org.batoo.jpa.core.impl.criteria.expression;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.MessageFormat;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.persistence.criteria.Expression;
 
@@ -30,58 +30,61 @@ import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 /**
  * 
+ * 
  * @author hceylan
  * @since $version
  */
-public class ComparisonExpression extends BooleanExpression {
+public class InExpression extends BooleanExpression {
 
-	private final Comparison comparison;
-	private final AbstractExpression<?> x;
-	private final AbstractExpression<?> y;
-	private final AbstractExpression<?> z;
+	private final AbstractExpression<?> inner;
+	private final ArrayList<AbstractExpression<?>> values = Lists.newArrayList();
 	private String alias;
 
 	/**
-	 * @param comparison
-	 *            the comparison
-	 * @param x
-	 *            the left side expression
-	 * @param y
-	 *            the right side expression
+	 * @param inner
+	 *            the inner expression
+	 * @param values
+	 *            the values
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ComparisonExpression(Comparison comparison, Expression<?> x, Expression<?> y) {
-		this(comparison, x, y, null);
+	public InExpression(AbstractExpression<?> inner, Expression<?>[] values) {
+		super();
+
+		this.inner = inner;
+		for (final Expression<?> expression : values) {
+			this.values.add((AbstractExpression<?>) expression);
+		}
 	}
 
 	/**
-	 * @param comparison
-	 *            the comparison
-	 * @param x
-	 *            the left side expression
-	 * @param y
-	 *            the first right side expression
-	 * @param z
-	 *            the second right side expression
+	 * @param inner
+	 *            the inner expression
+	 * @param values
+	 *            the values
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ComparisonExpression(Comparison comparison, Expression<?> x, Expression<?> y, Expression<?> z) {
+	public InExpression(Expression<?> inner, Collection<?> values) {
 		super();
 
-		this.comparison = comparison;
-
-		this.x = (AbstractExpression<?>) x;
-		this.y = (AbstractExpression<?>) y;
-		this.z = (AbstractExpression<?>) z;
+		this.inner = (AbstractExpression<?>) inner;
+		for (final Object value : values) {
+			if (value instanceof AbstractExpression) {
+				this.values.add((AbstractExpression<?>) value);
+			}
+			else {
+				this.values.add(new ConstantExpression<Object>(null, value));
+			}
+		}
 	}
 
 	/**
@@ -89,17 +92,16 @@ public class ComparisonExpression extends BooleanExpression {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
-		if (this.z != null) {
-			return MessageFormat.format(this.comparison.getFragment(), //
-				this.x.generateJpqlRestriction(query), //
-				this.y.generateJpqlRestriction(query), //
-				this.z.generateJpqlRestriction(query));
-		}
+	public String generateJpqlRestriction(final CriteriaQueryImpl<?> query) {
+		final String values = Joiner.on(", ").join(Lists.transform(this.values, new Function<AbstractExpression<?>, String>() {
 
-		return MessageFormat.format(this.comparison.getFragment(), //
-			this.x.generateJpqlRestriction(query), //
-			this.y.generateJpqlRestriction(query));
+			@Override
+			public String apply(AbstractExpression<?> input) {
+				return input.generateJpqlRestriction(query);
+			}
+		}));
+
+		return this.inner.generateJpqlRestriction(query) + " in (" + values + ")";
 	}
 
 	/**
@@ -120,23 +122,18 @@ public class ComparisonExpression extends BooleanExpression {
 	 * 
 	 */
 	@Override
-	public String generateSqlRestriction(CriteriaQueryImpl<?> query) {
-		final String[] left = this.x.getSqlRestrictionFragments(query);
-		final String[] right1 = this.y.getSqlRestrictionFragments(query);
-		final String[] right2 = this.z != null ? this.z.getSqlRestrictionFragments(query) : null;
+	public String generateSqlRestriction(final CriteriaQueryImpl<?> query) {
+		final String inner = this.inner.getSqlRestrictionFragments(query)[0];
 
-		final List<String> restrictions = Lists.newArrayList();
+		final String values = Joiner.on(", ").join(Lists.transform(this.values, new Function<AbstractExpression<?>, String>() {
 
-		for (int i = 0; i < left.length; i++) {
-			if (this.z != null) {
-				restrictions.add(MessageFormat.format(this.comparison.getFragment(), left[i], right1[i], right2[i]));
+			@Override
+			public String apply(AbstractExpression<?> input) {
+				return input.getSqlRestrictionFragments(query)[0];
 			}
-			else {
-				restrictions.add(MessageFormat.format(this.comparison.getFragment(), left[i], right1[i]));
-			}
-		}
+		}));
 
-		return Joiner.on(" AND ").join(restrictions);
+		return inner + " IN (" + values + ")";
 	}
 
 	/**

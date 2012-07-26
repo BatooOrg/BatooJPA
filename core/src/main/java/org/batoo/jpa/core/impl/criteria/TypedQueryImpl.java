@@ -50,6 +50,7 @@ import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.model.MetamodelImpl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -347,17 +348,19 @@ public class TypedQueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X
 				this.sql = this.em.getJdbcAdaptor().applyLock(this.sql, lockMode);
 			}
 
+			final MetamodelImpl metamodel = this.em.getMetamodel();
+
 			final List<ParameterExpressionImpl<?>> sqlParameters = this.cq.getSqlParameters();
 
 			for (final ParameterExpressionImpl<?> parameter : sqlParameters) {
-				paramCount += parameter.getExpandedCount();
+				paramCount += parameter.getExpandedCount(metamodel);
 			}
 
 			final MutableInt sqlIndex = new MutableInt(0);
 			final Object[] parameters = new Object[paramCount];
 
 			for (final ParameterExpressionImpl<?> parameter : sqlParameters) {
-				parameter.setParameter(parameters, sqlIndex, this.parameters.get(parameter));
+				parameter.setParameter(metamodel, parameters, sqlIndex, this.parameters.get(parameter));
 			}
 
 			try {
