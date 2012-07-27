@@ -21,11 +21,9 @@ package org.batoo.jpa.core.impl.criteria.expression;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
 
 /**
@@ -37,7 +35,7 @@ import org.batoo.jpa.core.impl.model.type.TypeImpl;
  * @author hceylan
  * @since $version
  */
-public class ConstantExpression<T> extends ParameterExpressionImpl<T> {
+public class ConstantExpression<T> extends AbstractExpression<T> {
 
 	private final T value;
 
@@ -52,7 +50,7 @@ public class ConstantExpression<T> extends ParameterExpressionImpl<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	public ConstantExpression(TypeImpl<T> type, T value) {
-		super(type, (Class<T>) value.getClass(), null);
+		super((Class<T>) value.getClass());
 
 		this.value = value;
 	}
@@ -63,9 +61,12 @@ public class ConstantExpression<T> extends ParameterExpressionImpl<T> {
 	 */
 	@Override
 	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
-		this.ensureAlias(query);
-
-		return this.value.toString();
+		if (Number.class.isAssignableFrom(this.getJavaType())) {
+			return this.value.toString();
+		}
+		else {
+			return "'" + this.value.toString() + "'";
+		}
 	}
 
 	/**
@@ -74,9 +75,30 @@ public class ConstantExpression<T> extends ParameterExpressionImpl<T> {
 	 */
 	@Override
 	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
-		this.ensureAlias(query);
+		return this.generateJpqlRestriction(query);
+	}
 
-		return this.value.toString();
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+		return this.getSqlRestrictionFragments(query)[0];
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query) {
+		if (Number.class.isAssignableFrom(this.getJavaType())) {
+			return new String[] { this.value.toString() };
+		}
+		else {
+			return new String[] { "'" + this.value.toString() + "'" };
+		}
 	}
 
 	/**
@@ -86,14 +108,5 @@ public class ConstantExpression<T> extends ParameterExpressionImpl<T> {
 	@Override
 	public T handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		return this.value;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public void setParameter(MetamodelImpl metamodelImpls, Object[] parameters, MutableInt sqlIndex, Object value) {
-		super.setParameter(metamodelImpls, parameters, sqlIndex, this.value);
 	}
 }

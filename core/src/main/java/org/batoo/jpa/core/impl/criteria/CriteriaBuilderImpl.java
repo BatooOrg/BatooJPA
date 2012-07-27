@@ -50,6 +50,8 @@ import javax.persistence.criteria.Subquery;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ArithmeticExression;
 import org.batoo.jpa.core.impl.criteria.expression.ArithmeticExression.ArithmeticOperation;
+import org.batoo.jpa.core.impl.criteria.expression.CaseTransformationExpression;
+import org.batoo.jpa.core.impl.criteria.expression.CaseTransformationExpression.CaseTransformationType;
 import org.batoo.jpa.core.impl.criteria.expression.ComparisonExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ComparisonExpression.Comparison;
 import org.batoo.jpa.core.impl.criteria.expression.ConstantExpression;
@@ -57,8 +59,8 @@ import org.batoo.jpa.core.impl.criteria.expression.ExpressionConverter;
 import org.batoo.jpa.core.impl.criteria.expression.NegationExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
-import org.batoo.jpa.core.impl.criteria.expression.CaseTransformationExpression;
-import org.batoo.jpa.core.impl.criteria.expression.CaseTransformationExpression.CaseTransformationType;
+import org.batoo.jpa.core.impl.criteria.expression.SubstringExpression;
+import org.batoo.jpa.core.impl.criteria.expression.TrimExpression;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
 
@@ -1250,8 +1252,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<String> substring(Expression<String> x, Expression<Integer> from) {
-		// TODO Auto-generated method stub
-		return null;
+		return new SubstringExpression(x, from, null);
 	}
 
 	/**
@@ -1260,8 +1261,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<String> substring(Expression<String> x, Expression<Integer> from, Expression<Integer> len) {
-		// TODO Auto-generated method stub
-		return null;
+		return new SubstringExpression(x, from, len);
 	}
 
 	/**
@@ -1270,8 +1270,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<String> substring(Expression<String> x, int from) {
-		// TODO Auto-generated method stub
-		return null;
+		return new SubstringExpression(x, new ConstantExpression<Integer>(this.metamodel.type(Integer.class), from), null);
 	}
 
 	/**
@@ -1280,8 +1279,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<String> substring(Expression<String> x, int from, int len) {
-		// TODO Auto-generated method stub
-		return null;
+		return new SubstringExpression(x, //
+			new ConstantExpression<Integer>(this.metamodel.type(Integer.class), from), //
+			new ConstantExpression<Integer>(this.metamodel.type(Integer.class), len));
 	}
 
 	/**
@@ -1486,8 +1486,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<String> trim(char t, Expression<String> x) {
-		// TODO Auto-generated method stub
-		return null;
+		return new TrimExpression(null, new ConstantExpression<Character>(this.metamodel.type(Character.class), t), x);
 	}
 
 	/**
@@ -1496,8 +1495,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<String> trim(Expression<Character> t, Expression<String> x) {
-		// TODO Auto-generated method stub
-		return null;
+		return new TrimExpression(null, t, x);
 	}
 
 	/**
@@ -1506,8 +1504,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<String> trim(Expression<String> x) {
-		// TODO Auto-generated method stub
-		return null;
+		return new TrimExpression(Trimspec.BOTH, null, x);
 	}
 
 	/**
@@ -1516,8 +1513,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<String> trim(Trimspec ts, char t, Expression<String> x) {
-		// TODO Auto-generated method stub
-		return null;
+		return new TrimExpression(ts, new ConstantExpression<Character>(this.metamodel.type(Character.class), t), x);
 	}
 
 	/**
@@ -1526,8 +1522,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<String> trim(Trimspec ts, Expression<Character> t, Expression<String> x) {
-		// TODO Auto-generated method stub
-		return null;
+		return new TrimExpression(ts, t, x);
 	}
 
 	/**
@@ -1536,8 +1531,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<String> trim(Trimspec ts, Expression<String> x) {
-		// TODO Auto-generated method stub
-		return null;
+		return new TrimExpression(ts, null, x);
 	}
 
 	/**

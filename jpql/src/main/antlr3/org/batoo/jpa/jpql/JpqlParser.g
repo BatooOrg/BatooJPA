@@ -200,17 +200,17 @@ functions_returning_numerics :
   ;
 
 string_primary :
-	state_field_path_expression
+	functions_returning_strings
+	| state_field_path_expression
 	| STRING_LITERAL
 	| input_parameter
-	| functions_returning_strings
 	| aggregate_expression
 //	| case_expression
 	;
 	
 functions_returning_strings :
   CONCAT^ Left_Paren! string_primary (Comma! string_primary )+ Right_Paren!
-  | TRIM^ Left_Paren! ((LEADING | TRAILING | BOTH)? (TRIM_CHARACTER)? FROM)? string_primary Right_Paren!
+  | TRIM^ Left_Paren! ((LEADING | TRAILING | BOTH)? (CHAR_LITERAL)? FROM!)? string_primary Right_Paren!
   | LOWER^ Left_Paren! string_primary Right_Paren!
   | UPPER^ Left_Paren! string_primary Right_Paren!
   ;
@@ -346,11 +346,6 @@ in_item :
 //  :
 //  ID
 //  | input_parameter
-//  ;
-//
-//TRIM_CHARACTER
-//  :
-//  ' '
 //  ;
 //
 //pattern_value: ;

@@ -377,4 +377,6 @@ ID :
 
 NUMERIC_LITERAL : ('0'..'9')+ (Period ('0'..'9')+)?;
 
-STRING_LITERAL : '\'' ~( '\'' | '\\' | '\r' | '\n' ) '\'' ;
+STRING_LITERAL : '\'' ~( '\'' | '\\' | '\r' | '\n' )+ '\'';
+
+CHAR_LITERAL : '\'' ~( '\'' | '\\' | '\r' | '\n' ) '\'';

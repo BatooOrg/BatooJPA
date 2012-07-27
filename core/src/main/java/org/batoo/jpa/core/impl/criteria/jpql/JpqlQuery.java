@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.PersistenceException;
+import javax.persistence.criteria.CriteriaBuilder.Trimspec;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.FetchParent;
@@ -44,6 +45,7 @@ import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ConcatExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ConstantExpression;
 import org.batoo.jpa.core.impl.criteria.expression.SubstringExpression;
+import org.batoo.jpa.core.impl.criteria.expression.TrimExpression;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
@@ -563,6 +565,18 @@ public class JpqlQuery {
 			return (AbstractExpression<X>) new ConstantExpression<Long>(this.metamodel.createBasicType(Long.class), Long.valueOf(exprDef.getText()));
 		}
 
+		// string literal
+		if (exprDef.getType() == JpqlParser.STRING_LITERAL) {
+			return (AbstractExpression<X>) new ConstantExpression<String>(this.metamodel.type(String.class), //
+				exprDef.getText().substring(1, exprDef.getText().length() - 1));
+		}
+
+		// char literal
+		if (exprDef.getType() == JpqlParser.CHAR_LITERAL) {
+			return (AbstractExpression<X>) new ConstantExpression<Character>(this.metamodel.type(Character.class), //
+				exprDef.getText().substring(1, 2).toCharArray()[0]);
+		}
+
 		// functions returning string
 		if ((exprDef.getType() == JpqlParser.UPPER) //
 			|| (exprDef.getType() == JpqlParser.LOWER) //
@@ -578,13 +592,14 @@ public class JpqlQuery {
 					return (AbstractExpression<X>) cb.lower(argument);
 
 				case JpqlParser.SUBSTRING:
-					final AbstractExpression<Number> start = this.getExpression(cb, exprDef.getChild(1), Number.class);
-					final AbstractExpression<Number> end = exprDef.getChildCount() == 3 ? this.getExpression(cb, exprDef.getChild(2), Number.class) : null;
+					final AbstractExpression<Integer> start = this.getExpression(cb, exprDef.getChild(1), Integer.class);
+					final AbstractExpression<Integer> end = exprDef.getChildCount() == 3 ? this.getExpression(cb, exprDef.getChild(2), Integer.class) : null;
 
 					return (AbstractExpression<X>) new SubstringExpression(argument, start, end);
 			}
 		}
 
+		// concat function
 		if (exprDef.getType() == JpqlParser.CONCAT) {
 			final List<Expression<String>> arguments = Lists.newArrayList();
 			for (int i = 0; i < exprDef.getChildCount(); i++) {
@@ -594,9 +609,39 @@ public class JpqlQuery {
 			return (AbstractExpression<X>) new ConcatExpression(arguments.toArray(new Expression[arguments.size()]));
 		}
 
-		if (exprDef.getType() == JpqlParser.STRING_LITERAL) {
-			return (AbstractExpression<X>) new ConstantExpression<String>(this.metamodel.type(String.class), //
-				exprDef.getText().substring(1, exprDef.getText().length() - 1));
+		// trim function
+		if (exprDef.getType() == JpqlParser.TRIM) {
+			Trimspec trimspec = null;
+			Expression<Character> trimChar = null;
+			Expression<String> inner = null;
+
+			int i = 0;
+			int type = exprDef.getChild(i).getType();
+
+			// trim spec
+			if (type == JpqlParser.BOTH) {
+				trimspec = Trimspec.BOTH;
+				i++;
+			}
+			else if (type == JpqlParser.LEADING) {
+				trimspec = Trimspec.LEADING;
+				i++;
+			}
+			else if (type == JpqlParser.TRAILING) {
+				trimspec = Trimspec.TRAILING;
+				i++;
+			}
+
+			// trim char
+			type = exprDef.getChild(i).getType();
+			if (type == JpqlParser.CHAR_LITERAL) {
+				trimChar = this.getExpression(cb, exprDef.getChild(i), Character.class);
+				i++;
+			}
+
+			inner = this.getExpression(cb, exprDef.getChild(i), String.class);
+
+			return (AbstractExpression<X>) new TrimExpression(trimspec, trimChar, inner);
 		}
 
 		throw new PersistenceException("Unhandled expression: " + exprDef.toStringTree());
@@ -642,7 +687,7 @@ public class JpqlQuery {
 			return tree;
 		}
 		catch (final Exception e) {
-			throw new PersistenceException("Cannot parse qpql: " + e.getMessage(), e);
+			throw new PersistenceException("Cannot parse jpql: " + e.getMessage(), e);
 		}
 	}
 }

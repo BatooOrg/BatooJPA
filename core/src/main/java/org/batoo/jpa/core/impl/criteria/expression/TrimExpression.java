@@ -20,7 +20,9 @@ package org.batoo.jpa.core.impl.criteria.expression;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Locale;
 
+import javax.persistence.criteria.CriteriaBuilder.Trimspec;
 import javax.persistence.criteria.Expression;
 
 import org.apache.commons.lang.StringUtils;
@@ -29,35 +31,36 @@ import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
- * Expression for substring function.
+ * Expression for trim function.
  * 
  * @author hceylan
  * @since $version
  */
-public class SubstringExpression extends AbstractExpression<String> {
+public class TrimExpression extends AbstractExpression<String> {
+
+	private final Trimspec trimspec;
+	private final AbstractExpression<Character> trimChar;
+	private final AbstractExpression<String> inner;
 
 	private String alias;
-	private final AbstractExpression<String> inner;
-	private final AbstractExpression<Integer> start;
-	private final AbstractExpression<Integer> end;
 
 	/**
+	 * @param trimspec
+	 *            the trim spec expression
+	 * @param trimChar
+	 *            the trim chararacter expression
 	 * @param inner
 	 *            the inner expression
-	 * @param start
-	 *            the start expression
-	 * @param end
-	 *            the end expression
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SubstringExpression(Expression<String> inner, Expression<Integer> start, Expression<Integer> end) {
+	public TrimExpression(Trimspec trimspec, Expression<Character> trimChar, Expression<String> inner) {
 		super(String.class);
 
+		this.trimspec = trimspec;
+		this.trimChar = (AbstractExpression<Character>) trimChar;
 		this.inner = (AbstractExpression<String>) inner;
-		this.start = (AbstractExpression<Integer>) start;
-		this.end = (AbstractExpression<Integer>) end;
 	}
 
 	/**
@@ -66,14 +69,23 @@ public class SubstringExpression extends AbstractExpression<String> {
 	 */
 	@Override
 	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
-		if (this.end != null) {
-			return "substring(" + this.inner.generateJpqlRestriction(query) + "," //
-				+ this.start.generateJpqlRestriction(query) + ")";
+		final StringBuilder builder = new StringBuilder("trim(");
+
+		if (this.trimspec != null) {
+			builder.append(this.trimspec.toString().toLowerCase(Locale.ENGLISH)).append(" ");
 		}
 
-		return "substring(" + this.inner.generateJpqlRestriction(query) + "," //
-			+ this.start.generateJpqlRestriction(query) + "," //
-			+ this.end.generateJpqlRestriction(query) + ")";
+		if (this.trimChar != null) {
+			builder.append(this.trimChar.generateJpqlRestriction(query)).append(" ");
+		}
+
+		if ((this.trimspec != null) || (this.trimChar != null)) {
+			builder.append("from ");
+		}
+
+		return builder//
+		.append(this.inner.generateJpqlRestriction(query))//
+		.append(")").toString();
 	}
 
 	/**
@@ -106,14 +118,23 @@ public class SubstringExpression extends AbstractExpression<String> {
 	 */
 	@Override
 	public String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query) {
-		if (this.end == null) {
-			return new String[] { "SUBSTR(" + this.inner.getSqlRestrictionFragments(query)[0] + //
-				"," + this.start.getSqlRestrictionFragments(query)[0] + ")" };
+		final StringBuilder builder = new StringBuilder("TRIM(");
+
+		if (this.trimspec != null) {
+			builder.append(this.trimspec.toString()).append(" ");
 		}
 
-		return new String[] { "SUBSTR(" + this.inner.getSqlRestrictionFragments(query)[0] + "," //
-			+ this.start.getSqlRestrictionFragments(query)[0] + "," //
-			+ this.end.getSqlRestrictionFragments(query)[0] + ")" };
+		if (this.trimChar != null) {
+			builder.append(this.trimChar.getSqlRestrictionFragments(query)[0]).append(" ");
+		}
+
+		if ((this.trimspec != null) || (this.trimChar != null)) {
+			builder.append("FROM ");
+		}
+
+		return new String[] { builder//
+		.append(this.inner.getSqlRestrictionFragments(query)[0])//
+		.append(")").toString() };
 	}
 
 	/**

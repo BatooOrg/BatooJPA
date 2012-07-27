@@ -134,44 +134,15 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
-	public void testArithmeticExpression() {
-		Person p1, p2;
-
-		this.persist(p1 = this.person(40));
-		this.persist(p2 = this.person(35));
+	public void testArtimeticOperands() {
+		this.persist(this.person(40));
+		this.persist(this.person(35));
 		this.commit();
 
 		this.close();
 
 		TypedQuery<Integer> q2;
 		int total;
-
-		TypedQuery<Person> q = this.cq("select p from Person p where p.age > :age", Person.class).setParameter("age", 40);
-		Assert.assertEquals(0, q.getResultList().size());
-
-		q = this.cq("select p from Person p where p.age < :age", Person.class).setParameter("age", 40);
-		Assert.assertEquals(1, q.getResultList().size());
-
-		q = this.cq("select p from Person p where p.age >= :age", Person.class).setParameter("age", 40);
-		Assert.assertEquals(1, q.getResultList().size());
-
-		q = this.cq("select p from Person p where p.age >= :age1 or p.age < :age2", Person.class).setParameter("age1", 40).setParameter("age2", 50);
-		Assert.assertEquals(2, q.getResultList().size());
-
-		q = this.cq("select p from Person p where p.age <= :age", Person.class).setParameter("age", 40);
-		Assert.assertEquals(2, q.getResultList().size());
-
-		q = this.cq("select p from Person p where p.age between :age1 and :age2", Person.class).setParameter("age1", 38).setParameter("age2", 41);
-		Assert.assertEquals(1, q.getResultList().size());
-
-		q = this.cq("select p from Person p where p.age between :age1 and :age2", Person.class).setParameter("age1", 30).setParameter("age2", 50);
-		Assert.assertEquals(2, q.getResultList().size());
-
-		q = this.cq("select p from Person p where p.age between :age1 and :age2", Person.class).setParameter("age1", 10).setParameter("age2", 20);
-		Assert.assertEquals(0, q.getResultList().size());
-
-		q = this.cq("select p from Person p where p.age not between :age1 and :age2", Person.class).setParameter("age1", 10).setParameter("age2", 20);
-		Assert.assertEquals(2, q.getResultList().size());
 
 		q2 = this.cq("select -p.age from Person p", Integer.class);
 		total = 0;
@@ -207,12 +178,6 @@ public class SimpleJpqlTest extends BaseCoreTest {
 			total += i;
 		}
 		Assert.assertEquals(150, total);
-
-		q = this.cq("select p from Person p where p.age in (:age1, :age2)", Person.class).setParameter("age1", 35).setParameter("age2", 40);
-		Assert.assertEquals(2, q.getResultList().size());
-
-		q = this.cq("select p from Person p where p in (:p1, :p2)", Person.class).setParameter("p1", p1).setParameter("p2", p2);
-		Assert.assertEquals(2, q.getResultList().size());
 	}
 
 	/**
@@ -278,6 +243,53 @@ public class SimpleJpqlTest extends BaseCoreTest {
 			Address.class);
 
 		Assert.assertEquals(2, q.getResultList().size());
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testComparisonOperands() {
+		this.persist(this.person(40));
+		this.persist(this.person(35));
+		this.commit();
+
+		this.close();
+
+		TypedQuery<Person> q = this.cq("select p from Person p where p.age > :age", Person.class).setParameter("age", 40);
+		Assert.assertEquals(0, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.age < :age", Person.class).setParameter("age", 40);
+		Assert.assertEquals(1, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.age >= :age", Person.class).setParameter("age", 40);
+		Assert.assertEquals(1, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.age >= :age1 or p.age < :age2", Person.class).setParameter("age1", 40).setParameter("age2", 50);
+		Assert.assertEquals(2, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.age <= :age", Person.class).setParameter("age", 40);
+		Assert.assertEquals(2, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.age between :age1 and :age2", Person.class).setParameter("age1", 38).setParameter("age2", 41);
+		Assert.assertEquals(1, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.age between :age1 and :age2", Person.class).setParameter("age1", 30).setParameter("age2", 50);
+		Assert.assertEquals(2, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.age between :age1 and :age2", Person.class).setParameter("age1", 10).setParameter("age2", 20);
+		Assert.assertEquals(0, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.age not between :age1 and :age2", Person.class).setParameter("age1", 10).setParameter("age2", 20);
+		Assert.assertEquals(2, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.age in (:age1, :age2)", Person.class).setParameter("age1", 35).setParameter("age2", 40);
+		Assert.assertEquals(2, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.age in (:p1, :p2)", Person.class).setParameter("p1", 35).setParameter("p2", 45);
+		Assert.assertEquals(1, q.getResultList().size());
 	}
 
 	/**
@@ -426,5 +438,22 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		q2 = this.cq("select substring(c.name, 2, 3) from Country c", String.class);
 		Assert.assertEquals("[urk, nit, nit, null]", q2.getResultList().toString());
+
+		q2 = this.cq("select trim(' a ') from Country c where c = :country", String.class).setParameter("country", SimpleJpqlTest.TR);
+		Assert.assertEquals("a", q2.getSingleResult());
+
+		q2 = this.cq("select trim(leading from ' a ') from Country c where c = :country", String.class).setParameter("country", SimpleJpqlTest.TR);
+		Assert.assertEquals("a ", q2.getSingleResult());
+
+		q2 = this.cq("select trim(trailing from ' a ') from Country c where c = :country", String.class).setParameter("country", SimpleJpqlTest.TR);
+		Assert.assertEquals(" a", q2.getSingleResult());
+
+		q2 = this.cq("select trim(both from ' a ') from Country c where c = :country", String.class).setParameter("country", SimpleJpqlTest.TR);
+		Assert.assertEquals("a", q2.getSingleResult());
+
+		// TODO char literals don't work
+		// q2 = this.cq("select trim(both 'c' from 'cac') from Country c where c = :country", String.class).setParameter("country",
+		// SimpleJpqlTest.TR);
+		// Assert.assertEquals("a", q2.getSingleResult());
 	}
 }
