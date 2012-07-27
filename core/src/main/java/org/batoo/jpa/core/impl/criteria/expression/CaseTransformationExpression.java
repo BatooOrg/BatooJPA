@@ -21,7 +21,6 @@ package org.batoo.jpa.core.impl.criteria.expression;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
-import java.util.List;
 
 import javax.persistence.criteria.Expression;
 
@@ -30,37 +29,32 @@ import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
-import com.google.common.collect.Lists;
-
 /**
- * Expression for string functions.
+ * Expression for string <code>upper</code> and <code>lower</code> functions.
  * 
  * @author hceylan
  * @since $version
  */
-public class StringOperationExpression extends AbstractExpression<String> {
+public class CaseTransformationExpression extends AbstractExpression<String> {
 
 	@SuppressWarnings("javadoc")
-	public enum StringFunction {
-		UPPER(false, "UPPER({0})", "upper({0})"),
+	public enum CaseTransformationType {
+		UPPER("UPPER({0})", "upper({0})"),
 
-		LOWER(false, "LOWER({0})", "lower{0}");
+		LOWER("LOWER({0})", "lower{0}");
 
-		private final boolean takesArguments;
 		private final String sqlFragment;
 		private final String jpqlFragment;
 
-		private StringFunction(boolean takesArguments, String sqlfragment, String jpqlFragment) {
-			this.takesArguments = takesArguments;
+		private CaseTransformationType(String sqlfragment, String jpqlFragment) {
 			this.sqlFragment = sqlfragment;
 			this.jpqlFragment = jpqlFragment;
 		}
 	}
 
 	private final AbstractExpression<?> inner;
-	private final Object[] parameters;
 	private String alias;
-	private final StringFunction function;
+	private final CaseTransformationType function;
 
 	/**
 	 * @param inner
@@ -71,31 +65,11 @@ public class StringOperationExpression extends AbstractExpression<String> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public StringOperationExpression(Expression<String> inner, StringFunction function) {
+	public CaseTransformationExpression(Expression<String> inner, CaseTransformationType function) {
 		super(String.class);
 
 		this.inner = (AbstractExpression<?>) inner;
 		this.function = function;
-		this.parameters = null;
-	}
-
-	/**
-	 * @param inner
-	 *            the inner expression
-	 * @param function
-	 *            the string function
-	 * @param parameters
-	 *            the parameters to the function
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public StringOperationExpression(Expression<String> inner, StringFunction function, Object... parameters) {
-		super(String.class);
-
-		this.inner = (AbstractExpression<?>) inner;
-		this.function = function;
-		this.parameters = parameters;
 	}
 
 	/**
@@ -104,16 +78,6 @@ public class StringOperationExpression extends AbstractExpression<String> {
 	 */
 	@Override
 	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
-		if (this.function.takesArguments) {
-			final List<Object> arguments = Lists.newArrayList();
-			arguments.add(this.inner.generateJpqlRestriction(query));
-			for (final Object parameter : this.parameters) {
-				arguments.add(parameter);
-			}
-
-			return MessageFormat.format(this.function.jpqlFragment, arguments.toArray());
-		}
-
 		return MessageFormat.format(this.function.jpqlFragment, this.inner.generateJpqlRestriction(query));
 	}
 
@@ -131,16 +95,6 @@ public class StringOperationExpression extends AbstractExpression<String> {
 	}
 
 	private String generateSqlRestriction(CriteriaQueryImpl<?> query) {
-		if (this.function.takesArguments) {
-			final List<Object> arguments = Lists.newArrayList();
-			arguments.add(this.inner.getSqlRestrictionFragments(query)[0]);
-			for (final Object parameter : this.parameters) {
-				arguments.add(parameter);
-			}
-
-			return MessageFormat.format(this.function.sqlFragment, arguments.toArray());
-		}
-
 		return MessageFormat.format(this.function.sqlFragment, this.inner.getSqlRestrictionFragments(query)[0]);
 	}
 

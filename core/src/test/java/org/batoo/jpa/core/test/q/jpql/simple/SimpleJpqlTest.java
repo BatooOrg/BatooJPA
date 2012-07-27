@@ -417,5 +417,8 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		q2 = this.cq("select upper(c.name) from Country c where lower(c.name) = :name", String.class).setParameter("name",
 			SimpleJpqlTest.COUNTRY_TR.toLowerCase());
 		Assert.assertEquals("TURKEY", q2.getResultList().get(0));
+
+		q2 = this.cq("select concat(c.code, '_', c.name) from Country c", String.class);
+		Assert.assertEquals("[TR'_'Turkey, USA'_'United States of America, UK'_'United Kingdom, null]", q2.getResultList().toString());
 	}
 }

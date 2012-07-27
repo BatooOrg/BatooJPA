@@ -57,8 +57,8 @@ import org.batoo.jpa.core.impl.criteria.expression.ExpressionConverter;
 import org.batoo.jpa.core.impl.criteria.expression.NegationExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
-import org.batoo.jpa.core.impl.criteria.expression.StringOperationExpression;
-import org.batoo.jpa.core.impl.criteria.expression.StringOperationExpression.StringFunction;
+import org.batoo.jpa.core.impl.criteria.expression.CaseTransformationExpression;
+import org.batoo.jpa.core.impl.criteria.expression.CaseTransformationExpression.CaseTransformationType;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
 
@@ -879,7 +879,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<String> lower(Expression<String> x) {
-		return new StringOperationExpression(x, StringFunction.LOWER);
+		return new CaseTransformationExpression(x, CaseTransformationType.LOWER);
 	}
 
 	/**
@@ -1556,7 +1556,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<String> upper(Expression<String> x) {
-		return new StringOperationExpression(x, StringFunction.UPPER);
+		return new CaseTransformationExpression(x, CaseTransformationType.UPPER);
 	}
 
 	/**

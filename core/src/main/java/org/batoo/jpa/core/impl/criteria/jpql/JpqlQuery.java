@@ -41,6 +41,7 @@ import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
+import org.batoo.jpa.core.impl.criteria.expression.ConcatExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ConstantExpression;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
@@ -565,7 +566,6 @@ public class JpqlQuery {
 		if ((exprDef.getType() == JpqlParser.UPPER) //
 			|| (exprDef.getType() == JpqlParser.LOWER) //
 			|| (exprDef.getType() == JpqlParser.CONCAT) //
-			|| (exprDef.getType() == JpqlParser.SUBSTRING) //
 			|| (exprDef.getType() == JpqlParser.SUBSTRING)) {
 
 			final AbstractExpression<String> argument = this.getExpression(cb, exprDef.getChild(0), null);
@@ -575,8 +575,20 @@ public class JpqlQuery {
 					return (AbstractExpression<X>) cb.upper(argument);
 				case JpqlParser.LOWER:
 					return (AbstractExpression<X>) cb.lower(argument);
-					// TODO implement other functions
 			}
+		}
+
+		if (exprDef.getType() == JpqlParser.CONCAT) {
+			final List<Expression<String>> arguments = Lists.newArrayList();
+			for (int i = 0; i < exprDef.getChildCount(); i++) {
+				arguments.add(this.getExpression(cb, exprDef.getChild(i), String.class));
+			}
+
+			return (AbstractExpression<X>) new ConcatExpression(arguments.toArray(new Expression[arguments.size()]));
+		}
+
+		if (exprDef.getType() == JpqlParser.STRING_LITERAL) {
+			return (AbstractExpression<X>) new ConstantExpression<String>(this.metamodel.type(String.class), exprDef.getText());
 		}
 
 		throw new PersistenceException("Unhandled expression: " + exprDef.toStringTree());
