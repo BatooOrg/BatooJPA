@@ -419,6 +419,12 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		Assert.assertEquals("TURKEY", q2.getResultList().get(0));
 
 		q2 = this.cq("select concat(c.code, '_', c.name) from Country c", String.class);
-		Assert.assertEquals("[TR'_'Turkey, USA'_'United States of America, UK'_'United Kingdom, null]", q2.getResultList().toString());
+		Assert.assertEquals("[TR_Turkey, USA_United States of America, UK_United Kingdom, null]", q2.getResultList().toString());
+
+		q2 = this.cq("select substring(c.name, 2) from Country c", String.class);
+		Assert.assertEquals("[urkey, nited States of America, nited Kingdom, null]", q2.getResultList().toString());
+
+		q2 = this.cq("select substring(c.name, 2, 3) from Country c", String.class);
+		Assert.assertEquals("[urk, nit, nit, null]", q2.getResultList().toString());
 	}
 }
