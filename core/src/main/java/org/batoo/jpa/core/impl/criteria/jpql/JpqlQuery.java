@@ -561,6 +561,24 @@ public class JpqlQuery {
 			return (AbstractExpression<X>) new ConstantExpression<Long>(this.metamodel.createBasicType(Long.class), Long.valueOf(exprDef.getText()));
 		}
 
+		// functions returning string
+		if ((exprDef.getType() == JpqlParser.UPPER) //
+			|| (exprDef.getType() == JpqlParser.LOWER) //
+			|| (exprDef.getType() == JpqlParser.CONCAT) //
+			|| (exprDef.getType() == JpqlParser.SUBSTRING) //
+			|| (exprDef.getType() == JpqlParser.SUBSTRING)) {
+
+			final AbstractExpression<String> argument = this.getExpression(cb, exprDef.getChild(0), null);
+
+			switch (exprDef.getType()) {
+				case JpqlParser.UPPER:
+					return (AbstractExpression<X>) cb.upper(argument);
+				case JpqlParser.LOWER:
+					return (AbstractExpression<X>) cb.lower(argument);
+					// TODO implement other functions
+			}
+		}
+
 		throw new PersistenceException("Unhandled expression: " + exprDef.toStringTree());
 	}
 

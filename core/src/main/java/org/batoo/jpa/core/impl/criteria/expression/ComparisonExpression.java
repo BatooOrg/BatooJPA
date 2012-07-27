@@ -34,11 +34,44 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 /**
+ * Expression for comparisons.
  * 
  * @author hceylan
  * @since $version
  */
 public class ComparisonExpression extends BooleanExpression {
+
+	/**
+	 * The comparison types
+	 * 
+	 * @author hceylan
+	 * @since $version
+	 */
+	@SuppressWarnings("javadoc")
+	public enum Comparison {
+
+		EQUAL("{0} = {1}"),
+
+		NOT_EQUAL("{0} <> {1}"),
+
+		LESS("{0} < {1}"),
+
+		LESS_OR_EQUAL("{0} <= {1}"),
+
+		GREATER("{0} > {1}"),
+
+		GREATER_OR_EQUAL("{0} >= {1}"),
+
+		LIKE("{0} LIKE {1}"),
+
+		BETWEEN("{0} BETWEEN {1} AND {2}");
+
+		private final String fragment;
+
+		Comparison(String fragment) {
+			this.fragment = fragment;
+		}
+	}
 
 	private final Comparison comparison;
 	private final AbstractExpression<?> x;
@@ -91,13 +124,13 @@ public class ComparisonExpression extends BooleanExpression {
 	@Override
 	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
 		if (this.z != null) {
-			return MessageFormat.format(this.comparison.getFragment(), //
+			return MessageFormat.format(this.comparison.fragment, //
 				this.x.generateJpqlRestriction(query), //
 				this.y.generateJpqlRestriction(query), //
 				this.z.generateJpqlRestriction(query));
 		}
 
-		return MessageFormat.format(this.comparison.getFragment(), //
+		return MessageFormat.format(this.comparison.fragment, //
 			this.x.generateJpqlRestriction(query), //
 			this.y.generateJpqlRestriction(query));
 	}
@@ -129,10 +162,10 @@ public class ComparisonExpression extends BooleanExpression {
 
 		for (int i = 0; i < left.length; i++) {
 			if (this.z != null) {
-				restrictions.add(MessageFormat.format(this.comparison.getFragment(), left[i], right1[i], right2[i]));
+				restrictions.add(MessageFormat.format(this.comparison.fragment, left[i], right1[i], right2[i]));
 			}
 			else {
-				restrictions.add(MessageFormat.format(this.comparison.getFragment(), left[i], right1[i]));
+				restrictions.add(MessageFormat.format(this.comparison.fragment, left[i], right1[i]));
 			}
 		}
 

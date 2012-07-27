@@ -27,7 +27,7 @@ import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
- * 
+ * Expression for null checks.
  * 
  * @author hceylan
  * @since $version

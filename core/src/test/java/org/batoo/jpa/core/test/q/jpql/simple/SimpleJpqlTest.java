@@ -393,6 +393,7 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		this.close();
 
 		TypedQuery<Person> q;
+		TypedQuery<String> q2;
 
 		q = this.cq("select p.name from Person p where p.name <= :name", Person.class).setParameter("name", "Ceylan");
 		Assert.assertEquals(2, q.getResultList().size());
@@ -409,7 +410,12 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		q = this.cq("select p from Person p where p.name not like :name", Person.class).setParameter("name", "De%");
 		Assert.assertEquals(2, q.getResultList().size());
 
-		// q = this.cq("select length(p.name) from Person p", Person.class);
-		// Assert.assertEquals(2, q.getResultList().size());
+		q2 = this.cq("select lower(c.name) from Country c where upper(c.name) = :name", String.class).setParameter("name",
+			SimpleJpqlTest.COUNTRY_TR.toUpperCase());
+		Assert.assertEquals("turkey", q2.getResultList().get(0));
+
+		q2 = this.cq("select upper(c.name) from Country c where lower(c.name) = :name", String.class).setParameter("name",
+			SimpleJpqlTest.COUNTRY_TR.toLowerCase());
+		Assert.assertEquals("TURKEY", q2.getResultList().get(0));
 	}
 }
