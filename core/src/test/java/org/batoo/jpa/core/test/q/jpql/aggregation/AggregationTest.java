@@ -22,8 +22,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import javax.persistence.TypedQuery;
-
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
@@ -59,15 +57,6 @@ public class AggregationTest extends BaseCoreTest {
 	private static Country USA = new Country(AggregationTest.COUNTRY_CODE_USA, AggregationTest.COUNTRY_USA);
 	private static Country UK = new Country(AggregationTest.COUNTRY_CODE_UK, AggregationTest.COUNTRY_UK);
 	private static Country BROKEN = new Country(AggregationTest.COUNTRY_CODE_BR, null);
-
-	private Person person() {
-		final GregorianCalendar start = new GregorianCalendar();
-		start.set(Calendar.YEAR, 2000);
-		start.set(Calendar.MONTH, 12);
-		start.set(Calendar.DAY_OF_MONTH, 31);
-
-		return this.person(35, start.getTime());
-	}
 
 	private Person person(int age) {
 		final GregorianCalendar start = new GregorianCalendar();
@@ -124,9 +113,12 @@ public class AggregationTest extends BaseCoreTest {
 
 		this.close();
 
-		TypedQuery<Integer> q;
+		Assert.assertEquals(37, this.cq("select avg(p.age) from Person p", Double.class).getSingleResult());
 
-		q = this.cq("select avg(p.age) from Person p where p.name <= :name", Integer.class).setParameter("name", "Ceylan");
-		Assert.assertEquals(2, q.getResultList().size());
+		Assert.assertEquals((Integer) 75, this.cq("select sum(p.age) from Person p", Integer.class).getSingleResult());
+
+		Assert.assertEquals((Integer) 40, this.cq("select max(p.age) from Person p", Integer.class).getSingleResult());
+
+		Assert.assertEquals((Integer) 35, this.cq("select min(p.age) from Person p", Integer.class).getSingleResult());
 	}
 }

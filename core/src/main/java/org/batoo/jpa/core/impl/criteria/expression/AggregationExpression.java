@@ -30,7 +30,7 @@ import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
- * The expression for numeric functions
+ * The expression for aggregate functions
  * 
  * @param <N>
  *            the type of the expression
@@ -38,30 +38,29 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  * @author hceylan
  * @since $version
  */
-public class NumericFunctionExpression<N extends Number> extends AbstractExpression<N> {
+public class AggregationExpression<N extends Number> extends AbstractExpression<N> {
 
 	@SuppressWarnings("javadoc")
-	public enum NumericFunctionType {
-		MOD("MOD({0}, {1})", "mod({0}, {1})"),
+	public enum AggregationFunctionType {
+		AVG("AVG({0})", "avg({0})"),
 
-		ABS("ABS({0})", "abs({0})"),
+		SUM("SUM({0})", "sum({0})"),
 
-		SQRT("SQRT({0})", "sqrt({0})"),
+		MIN("MIN({0})", "min({0})"),
 
-		LENGTH("LENGTH({0})", "length({0})");
+		MAX("MAX({0})", "max({0})");
 
 		private final String sqlFragment;
 		private final String jpqlFragment;
 
-		private NumericFunctionType(String sqlfragment, String jpqlFragment) {
+		private AggregationFunctionType(String sqlfragment, String jpqlFragment) {
 			this.sqlFragment = sqlfragment;
 			this.jpqlFragment = jpqlFragment;
 		}
 	}
 
-	private final NumericFunctionType type;
+	private final AggregationFunctionType type;
 	private final AbstractExpression<?> x;
-	private final AbstractExpression<Integer> y;
 	private String alias;
 
 	/**
@@ -69,19 +68,16 @@ public class NumericFunctionExpression<N extends Number> extends AbstractExpress
 	 *            the type of the function
 	 * @param x
 	 *            the first parameter
-	 * @param y
-	 *            the optional second parameter
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public NumericFunctionExpression(NumericFunctionType type, Expression<?> x, Expression<Integer> y) {
+	public AggregationExpression(AggregationFunctionType type, Expression<?> x) {
 		super((Class<N>) x.getJavaType());
 
 		this.type = type;
 		this.x = (AbstractExpression<?>) x;
-		this.y = (AbstractExpression<Integer>) y;
 	}
 
 	/**
@@ -90,10 +86,7 @@ public class NumericFunctionExpression<N extends Number> extends AbstractExpress
 	 */
 	@Override
 	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
-		final String xExpr = this.x.generateJpqlRestriction(query);
-		final String yExpr = this.y != null ? this.y.generateJpqlRestriction(query) : null;
-
-		return MessageFormat.format(this.type.jpqlFragment, xExpr, yExpr);
+		return MessageFormat.format(this.type.jpqlFragment, this.x.generateJpqlRestriction(query));
 	}
 
 	/**
@@ -126,10 +119,7 @@ public class NumericFunctionExpression<N extends Number> extends AbstractExpress
 	 */
 	@Override
 	public String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query) {
-		final String xExpr = this.x.getSqlRestrictionFragments(query)[0];
-		final String yExpr = this.y != null ? this.y.getSqlRestrictionFragments(query)[0] : null;
-
-		return new String[] { MessageFormat.format(this.type.sqlFragment, xExpr, yExpr) };
+		return new String[] { MessageFormat.format(this.type.sqlFragment, this.x.getSqlRestrictionFragments(query)[0]) };
 
 	}
 

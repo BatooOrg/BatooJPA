@@ -707,9 +707,11 @@ public class JpqlQuery {
 			case JpqlParser.AVG:
 				return (AbstractExpression<X>) cb.avg(this.getExpression(cb, exprDef.getChild(0), Number.class));
 			case JpqlParser.SUM:
-				return (AbstractExpression<X>) cb.avg(this.getExpression(cb, exprDef.getChild(0), Number.class));
-			default:
-				break;
+				return (AbstractExpression<X>) cb.sum(this.getExpression(cb, exprDef.getChild(0), Number.class));
+			case JpqlParser.MAX:
+				return (AbstractExpression<X>) cb.max(this.getExpression(cb, exprDef.getChild(0), Number.class));
+			case JpqlParser.MIN:
+				return (AbstractExpression<X>) cb.min(this.getExpression(cb, exprDef.getChild(0), Number.class));
 		}
 
 		throw new PersistenceException("Unhandled expression: " + exprDef.toStringTree());

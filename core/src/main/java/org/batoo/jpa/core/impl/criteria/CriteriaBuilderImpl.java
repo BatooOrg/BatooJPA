@@ -49,6 +49,8 @@ import javax.persistence.criteria.SetJoin;
 import javax.persistence.criteria.Subquery;
 
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
+import org.batoo.jpa.core.impl.criteria.expression.AggregationExpression;
+import org.batoo.jpa.core.impl.criteria.expression.AggregationExpression.AggregationFunctionType;
 import org.batoo.jpa.core.impl.criteria.expression.ArithmeticExression;
 import org.batoo.jpa.core.impl.criteria.expression.ArithmeticExression.ArithmeticOperation;
 import org.batoo.jpa.core.impl.criteria.expression.CaseTransformationExpression;
@@ -167,8 +169,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <N extends Number> Expression<Double> avg(Expression<N> x) {
-		// TODO Auto-generated method stub
-		return null;
+		return new AggregationExpression<Double>(AggregationFunctionType.AVG, x);
 	}
 
 	/**
@@ -906,8 +907,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <N extends Number> Expression<N> max(Expression<N> x) {
-		// TODO Auto-generated method stub
-		return null;
+		return new AggregationExpression<N>(AggregationFunctionType.MAX, x);
 	}
 
 	/**
@@ -916,8 +916,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <N extends Number> Expression<N> min(Expression<N> x) {
-		// TODO Auto-generated method stub
-		return null;
+		return new AggregationExpression<N>(AggregationFunctionType.MIN, x);
 	}
 
 	/**
@@ -1302,8 +1301,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <N extends Number> Expression<N> sum(Expression<N> x) {
-		// TODO Auto-generated method stub
-		return null;
+		return new AggregationExpression<N>(AggregationFunctionType.SUM, x);
 	}
 
 	/**
