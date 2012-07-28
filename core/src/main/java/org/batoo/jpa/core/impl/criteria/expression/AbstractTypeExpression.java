@@ -53,8 +53,21 @@ public abstract class AbstractTypeExpression<T> extends AbstractExpression<T> {
 	 * 
 	 */
 	@Override
+	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
+		return "type(" + this.getPath().generateJpqlRestriction(query) + ")";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
-		return "object(" + this.path.generateJpqlRestriction(query) + ")";
+		if (this.getAlias() != null) {
+			return this.generateJpqlRestriction(query) + " as " + this.getAlias();
+		}
+
+		return this.generateJpqlRestriction(query);
 	}
 
 	/**

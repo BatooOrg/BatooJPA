@@ -120,7 +120,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private Mapping<?, ?, ?>[] singularMappings;
 	private PluralMapping<?, ?, ?>[] mappingsPluralSorted;
 	private PluralMapping<?, ?, ?>[] mappingsPlural;
-	private JoinedMapping<?, ?, ?>[] mappingsEager;
 	private JoinedMapping<?, ?, ?>[] mappingsJoined;
 	private AssociationMapping<?, ?, ?>[] associations;
 	private AssociationMapping<?, ?, ?>[] associationsDetachable;

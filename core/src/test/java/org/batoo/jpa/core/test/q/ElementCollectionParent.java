@@ -31,8 +31,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-import org.batoo.jpa.core.test.enums.Foo.FooType;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -46,7 +44,7 @@ import com.google.common.collect.Sets;
 public class ElementCollectionParent {
 
 	@SuppressWarnings("javadoc")
-	public enum FooTypes {
+	public enum FooType {
 		TYPE1,
 		TYPE2,
 		TYPE3

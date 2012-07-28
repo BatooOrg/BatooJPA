@@ -139,6 +139,10 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * @author hceylan
 	 */
 	public int getExpandedCount(MetamodelImpl metamodelImpl) {
+		if (this.getJavaType() == Class.class) {
+			return 1;
+		}
+
 		this.ensureTypeResolved(metamodelImpl);
 
 		if (this.type.getPersistenceType() == PersistenceType.BASIC) {
@@ -226,22 +230,40 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * @author hceylan
 	 */
 	public void setParameter(MetamodelImpl metamodel, Object[] parameters, MutableInt sqlIndex, Object value) {
-		this.ensureTypeResolved(metamodel);
+		// type parameter
+		if (this.getJavaType() == Class.class) {
+			final EntityTypeImpl<?> entity = metamodel.entity((Class<?>) value);
 
-		if (this.type.getPersistenceType() == PersistenceType.BASIC) {
-			parameters[sqlIndex.intValue()] = value;
+			if (entity == null) {
+				throw new IllegalArgumentException("Type is not managed: " + value);
+			}
 
+			if (entity.getRootType().getInheritanceType() == null) {
+				throw new IllegalArgumentException("Entity does not have inheritence: " + entity.getName());
+			}
+
+			parameters[sqlIndex.intValue()] = entity.getDiscriminatorValue();
 			sqlIndex.increment();
 		}
-		else if (this.type.getPersistenceType() == PersistenceType.ENTITY) {
-			final EntityTypeImpl<?> type = (EntityTypeImpl<?>) this.type;
-
-			this.setParameter(parameters, sqlIndex, value, type);
-		}
 		else {
-			final EmbeddableTypeImpl<?> type = (EmbeddableTypeImpl<?>) this.type;
 
-			this.setParameter(parameters, sqlIndex, value, type);
+			this.ensureTypeResolved(metamodel);
+
+			if (this.type.getPersistenceType() == PersistenceType.BASIC) {
+				parameters[sqlIndex.intValue()] = value;
+
+				sqlIndex.increment();
+			}
+			else if (this.type.getPersistenceType() == PersistenceType.ENTITY) {
+				final EntityTypeImpl<?> type = (EntityTypeImpl<?>) this.type;
+
+				this.setParameter(parameters, sqlIndex, value, type);
+			}
+			else {
+				final EmbeddableTypeImpl<?> type = (EmbeddableTypeImpl<?>) this.type;
+
+				this.setParameter(parameters, sqlIndex, value, type);
+			}
 		}
 	}
 

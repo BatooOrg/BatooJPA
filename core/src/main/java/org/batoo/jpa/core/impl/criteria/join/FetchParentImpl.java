@@ -225,7 +225,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @author hceylan
 	 */
 	public String generateDiscrimination() {
-		if (this.entity.getRootType().getInheritanceType() == null) {
+		if ((this.entity.getRootType().getInheritanceType() == null) || (this.entity == this.entity.getRootType())) {
 			return null;
 		}
 

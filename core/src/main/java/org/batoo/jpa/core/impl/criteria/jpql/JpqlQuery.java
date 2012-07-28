@@ -155,7 +155,8 @@ public class JpqlQuery {
 			final Tree from = froms.getChild(i);
 			final Aliased fromDef = new Aliased(this.aliasMap, from.getChild(0), false);
 
-			final EntityTypeImpl<Object> entity = this.metamodel.entity(fromDef.getQualified().toString());
+			final EntityTypeImpl<Object> entity = this.getEntity(fromDef.getQualified().toString());
+
 			final RootImpl<Object> r = q.from(entity);
 			r.alias(fromDef.getAlias());
 
@@ -358,7 +359,7 @@ public class JpqlQuery {
 			return cb.isNull(expr);
 		}
 
-		return this.getBooleanExpression(predictionDef);
+		return this.getExpression(cb, predictionDef, Boolean.class);
 	}
 
 	/**
@@ -431,9 +432,7 @@ public class JpqlQuery {
 		// object type
 		if (selectDef.getType() == JpqlParser.OBJECT) {
 			final String alias = selectDef.getChild(0).getText();
-			final AbstractFrom<?, ?> from = this.getAliased(alias);
-
-			return (AbstractSelection<?>) from.type();
+			return this.getAliased(alias);
 		}
 
 		return this.getExpression(cb, selectDef, null);
@@ -467,16 +466,12 @@ public class JpqlQuery {
 		return from;
 	}
 
-	@SuppressWarnings("unchecked")
-	private Expression<Boolean> getBooleanExpression(Tree predictionDef) {
-		AbstractPath<?> expr = this.getAliased(predictionDef.getChild(0).getText());
-
-		final Qualified qualified = new Qualified(predictionDef.getChild(1));
-		for (final String segment : qualified.getSegments()) {
-			expr = expr.get(segment);
+	private EntityTypeImpl<Object> getEntity(String entityName) {
+		final EntityTypeImpl<Object> entity = this.metamodel.entity(entityName);
+		if (entity == null) {
+			throw new IllegalArgumentException("Type is not managed: " + entityName);
 		}
-
-		return (Expression<Boolean>) expr;
+		return entity;
 	}
 
 	/**
@@ -553,7 +548,7 @@ public class JpqlQuery {
 		}
 
 		if (exprDef.getType() == JpqlParser.ST_BOOLEAN) {
-			return (AbstractExpression<X>) this.getBooleanExpression(exprDef);
+			return (AbstractExpression<X>) this.getExpression(cb, exprDef, Boolean.class);
 		}
 
 		if (exprDef.getType() == JpqlParser.Ordinal_Parameter) {
@@ -642,6 +637,21 @@ public class JpqlQuery {
 			inner = this.getExpression(cb, exprDef.getChild(i), String.class);
 
 			return (AbstractExpression<X>) new TrimExpression(trimspec, trimChar, inner);
+		}
+
+		// type function
+		if (exprDef.getType() == JpqlParser.TYPE) {
+			final AbstractExpression<?> inner = this.getExpression(cb, exprDef.getChild(0), null);
+			return (AbstractExpression<X>) ((AbstractPath<?>) inner).type();
+		}
+
+		if (exprDef.getType() == JpqlParser.ST_ENTITY_TYPE) {
+			final EntityTypeImpl<?> entity = this.getEntity(exprDef.getChild(0).getText());
+			if (entity.getRootType().getInheritanceType() == null) {
+				throw new IllegalArgumentException("Entity does not have inheritence: " + entity.getName());
+			}
+
+			return (AbstractExpression<X>) new ConstantExpression<String>(null, entity.getDiscriminatorValue());
 		}
 
 		throw new PersistenceException("Unhandled expression: " + exprDef.toStringTree());

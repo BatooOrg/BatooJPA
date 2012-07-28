@@ -10,6 +10,10 @@
 		<class>org.batoo.jpa.core.test.q.FooType1</class>
 		<class>org.batoo.jpa.core.test.q.FooType2</class>
 		<class>org.batoo.jpa.core.test.q.Bar</class>
+
+		<class>org.batoo.jpa.core.test.q.Employee</class>
+		<class>org.batoo.jpa.core.test.q.Exempt</class>
+		<class>org.batoo.jpa.core.test.q.Contractor</class>
 		
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.Driver40" />
@@ -21,5 +25,4 @@
 		</properties>
 
 	</persistence-unit>
-
 </persistence>

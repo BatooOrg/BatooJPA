@@ -29,6 +29,7 @@ tokens {
     ST_BOOLEAN;
     ST_NEGATION;
     ST_IN;
+    ST_ENTITY_TYPE;
     ST_NULL;
 }
 
@@ -162,7 +163,7 @@ scalar_expression options { backtrack=true; } :
     | datetime_primary
     | boolean_primary
     //    | case_expression
-//    | entity_type_expression
+    | entity_type_expression
     ;
 
 simple_arithmetic_expression :
@@ -258,7 +259,7 @@ comparison_expression :
     | enum_expression (Equals_Operator | Not_Equals_Operator)^ (enum_expression /*| all_or_any_expression*/)
     | datetime_expression comparison_operator^ (datetime_expression /*| all_or_any_expression*/)
     | arithmetic_expression comparison_operator^ (arithmetic_expression /*| all_or_any_expression*/)
-//  | entity_expression (Equals_Operator | Not_Equals_Operator) ( entity_expression | all_or_any_expression )
+    | entity_type_expression (Equals_Operator | Not_Equals_Operator)^ entity_type_expression
     ;
 
 comparison_operator :
@@ -311,6 +312,15 @@ boolean_primary :
 	;
 
 boolean_literal : TRUE | FALSE;
+
+entity_type_expression :
+	type_discriminator
+	| ID -> ^(ST_ENTITY_TYPE ID)
+	| input_parameter
+	;
+
+type_discriminator :
+	TYPE^ Left_Paren! (ID | state_field_path_expression | input_parameter ) Right_Paren!;
 
 enum_expression :
   enum_primary

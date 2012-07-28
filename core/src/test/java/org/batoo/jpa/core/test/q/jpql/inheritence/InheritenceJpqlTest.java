@@ -18,21 +18,12 @@
  */
 package org.batoo.jpa.core.test.q.jpql.inheritence;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.Expression;
 
-import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
-import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.RootImpl;
-import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 import org.batoo.jpa.core.test.BaseCoreTest;
-import org.batoo.jpa.core.test.q.Bar;
-import org.batoo.jpa.core.test.q.FooType1;
-import org.batoo.jpa.core.test.q.FooType2;
+import org.batoo.jpa.core.test.q.Contractor;
+import org.batoo.jpa.core.test.q.Employee;
+import org.batoo.jpa.core.test.q.Exempt;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -43,63 +34,33 @@ import org.junit.Test;
  */
 public class InheritenceJpqlTest extends BaseCoreTest {
 
-	private Object bar() {
-		final Bar bar = new Bar();
-
-		new FooType1(bar, "Value1");
-		new FooType2(bar, 2);
-
-		return bar;
-	}
-
 	/**
 	 * @since $version
 	 * @author hceylan
 	 */
 	@Test
 	@SuppressWarnings("rawtypes")
-	public void testType1() {
-		this.persist(this.bar());
+	public void testType() {
+		this.persist(new Employee());
+		this.persist(new Exempt());
+		this.persist(new Exempt());
+		this.persist(new Contractor());
 		this.commit();
 		this.close();
 
-		final TypedQuery<Class> q = this.em().createQuery("select object(f) from Bar b inner join b.foos f", Class.class);
+		TypedQuery<Employee> q;
+		TypedQuery<Class> q2;
 
-		final List<Class> resultList = q.getResultList();
+		q = this.cq("select e from Employee e where type(e) = Exempt", Employee.class);
+		Assert.assertEquals(2, q.getResultList().size());
 
-		Collections.sort(resultList, new Comparator<Class>() {
+		q = this.cq("select e from Employee e where type(e) = :p", Employee.class).setParameter("p", Exempt.class);
+		Assert.assertEquals(2, q.getResultList().size());
 
-			@Override
-			public int compare(Class o1, Class o2) {
-				return o1.getName().compareTo(o2.getName());
-			}
-		});
+		q2 = this.cq("select type(e) from Employee e where type(e) = :p", Class.class).setParameter("p", Exempt.class);
+		Assert.assertEquals(Exempt.class, q2.getResultList().get(0));
 
-		Assert.assertEquals("[class org.batoo.jpa.core.test.q.FooType1, class org.batoo.jpa.core.test.q.FooType2]", resultList.toString());
-	}
-
-	/**
-	 * @since $version
-	 * @author hceylan
-	 */
-	@Test
-	@SuppressWarnings("rawtypes")
-	public void testType2() {
-		this.persist(this.bar());
-		this.commit();
-		this.close();
-
-		final CriteriaBuilderImpl cb = this.em().getCriteriaBuilder();
-
-		final CriteriaQueryImpl<Class> q = cb.createQuery(Class.class);
-		final RootImpl<Bar> r = q.from(Bar.class);
-		final AbstractPath<Integer> path = r.get("foos").<Integer> get("id");
-		final Expression<Class<? extends Integer>> type = path.type();
-
-		q.select(type);
-
-		final List<Class> resultList = this.em().createQuery(q).getResultList();
-
-		Assert.assertEquals("[class java.lang.Integer, class java.lang.Integer]", resultList.toString());
+		q2 = this.cq("select type(e.id) from Employee e where type(e) = :p", Class.class).setParameter("p", Exempt.class);
+		Assert.assertEquals(Integer.class, q2.getResultList().get(0));
 	}
 }

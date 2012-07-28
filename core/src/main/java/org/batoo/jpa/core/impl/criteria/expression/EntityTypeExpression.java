@@ -21,11 +21,16 @@ package org.batoo.jpa.core.impl.criteria.expression;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
+import org.batoo.jpa.core.impl.criteria.path.PluralAssociationPath;
+import org.batoo.jpa.core.impl.criteria.path.SingularAssociationPath;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 /**
  * The type expression for entities.
@@ -55,8 +60,20 @@ public class EntityTypeExpression<T> extends AbstractTypeExpression<T> {
 	 */
 	@Override
 	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
-		// TODO Auto-generated method stub
-		return null;
+		return "type(" + this.getPath().generateJpqlRestriction(query) + ")";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+		if (StringUtils.isNotBlank(this.getAlias())) {
+			return this.generateJpqlRestriction(query) + " as " + this.getAlias();
+		}
+
+		return this.generateJpqlRestriction(query);
 	}
 
 	/**
@@ -65,8 +82,20 @@ public class EntityTypeExpression<T> extends AbstractTypeExpression<T> {
 	 */
 	@Override
 	public String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query) {
-		// TODO Auto-generated method stub
-		return null;
+		final AbstractPath<?> path = this.getPath();
+
+		EntityTypeImpl<?> entity = null;
+		if (path instanceof AbstractFrom) {
+			entity = ((AbstractFrom<?, ?>) path).getEntity();
+		}
+		else if (path instanceof SingularAssociationPath) {
+			entity = ((SingularAssociationPath<?, ?>) path).getMapping().getType();
+		}
+		else {
+			entity = ((PluralAssociationPath<?, ?>) path).getMapping().getType();
+		}
+
+		return new String[] { entity.getRootType().getDiscriminatorColumn().getName() };
 	}
 
 	/**
