@@ -54,7 +54,7 @@ public class InheritenceJpqlTest extends BaseCoreTest {
 		q = this.cq("select e from Employee e where type(e) = Exempt", Employee.class);
 		Assert.assertEquals(2, q.getResultList().size());
 
-		q = this.cq("select e from Employee e where type(e) = :p", Employee.class).setParameter("p", Exempt.class);
+		q = this.cq("select object(e) from Employee e where type(e) = :p", Employee.class).setParameter("p", Exempt.class);
 		Assert.assertEquals(2, q.getResultList().size());
 
 		q2 = this.cq("select type(e) from Employee e where type(e) = :p", Class.class).setParameter("p", Exempt.class);

@@ -639,19 +639,77 @@ public class JpqlQuery {
 			return (AbstractExpression<X>) new TrimExpression(trimspec, trimChar, inner);
 		}
 
-		// type function
-		if (exprDef.getType() == JpqlParser.TYPE) {
-			final AbstractExpression<?> inner = this.getExpression(cb, exprDef.getChild(0), null);
-			return (AbstractExpression<X>) ((AbstractPath<?>) inner).type();
+		// type functions
+		if ((exprDef.getType() == JpqlParser.TYPE) || (exprDef.getType() == JpqlParser.ST_ENTITY_TYPE)) {
+			switch (exprDef.getType()) {
+				case JpqlParser.TYPE:
+					final AbstractExpression<?> inner = this.getExpression(cb, exprDef.getChild(0), null);
+
+					return (AbstractExpression<X>) ((AbstractPath<?>) inner).type();
+
+				case JpqlParser.ST_ENTITY_TYPE:
+					final EntityTypeImpl<?> entity = this.getEntity(exprDef.getChild(0).getText());
+					if (entity.getRootType().getInheritanceType() == null) {
+						throw new IllegalArgumentException("Entity does not have inheritence: " + entity.getName());
+					}
+
+					return (AbstractExpression<X>) new ConstantExpression<String>(null, entity.getDiscriminatorValue());
+			}
 		}
 
-		if (exprDef.getType() == JpqlParser.ST_ENTITY_TYPE) {
-			final EntityTypeImpl<?> entity = this.getEntity(exprDef.getChild(0).getText());
-			if (entity.getRootType().getInheritanceType() == null) {
-				throw new IllegalArgumentException("Entity does not have inheritence: " + entity.getName());
-			}
+		// date time functions
+		switch (exprDef.getType()) {
+			case JpqlParser.CURRENT_DATE:
+				return (AbstractExpression<X>) cb.currentDate();
 
-			return (AbstractExpression<X>) new ConstantExpression<String>(null, entity.getDiscriminatorValue());
+			case JpqlParser.CURRENT_TIME:
+				return (AbstractExpression<X>) cb.currentTime();
+
+			case JpqlParser.CURRENT_TIMESTAMP:
+				return (AbstractExpression<X>) cb.currentTimestamp();
+		}
+
+		// arithmetic functions
+		switch (exprDef.getType()) {
+			case JpqlParser.ABS:
+				return (AbstractExpression<X>) cb.abs(this.getExpression(cb, exprDef.getChild(0), Number.class));
+
+			case JpqlParser.SQRT:
+				return (AbstractExpression<X>) cb.sqrt(this.getExpression(cb, exprDef.getChild(0), Number.class));
+
+			case JpqlParser.MOD:
+				return (AbstractExpression<X>) cb.mod(//
+					this.getExpression(cb, exprDef.getChild(0), Integer.class), //
+					this.getExpression(cb, exprDef.getChild(1), Integer.class));
+
+			case JpqlParser.LOCATE:
+				if (exprDef.getChildCount() == 3) {
+					return (AbstractExpression<X>) cb.locate(//
+						this.getExpression(cb, exprDef.getChild(0), String.class), //
+						this.getExpression(cb, exprDef.getChild(1), String.class), //
+						this.getExpression(cb, exprDef, Integer.class));
+				}
+
+				return (AbstractExpression<X>) cb.locate(//
+					this.getExpression(cb, exprDef.getChild(0), String.class), //
+					this.getExpression(cb, exprDef.getChild(1), String.class));
+
+			case JpqlParser.LENGTH:
+				return (AbstractExpression<X>) cb.length(this.getExpression(cb, exprDef.getChild(0), String.class));
+
+			case JpqlParser.SIZE:
+			case JpqlParser.INDEX:
+				// TODO
+		}
+
+		// aggregate functions
+		switch (exprDef.getType()) {
+			case JpqlParser.AVG:
+				return (AbstractExpression<X>) cb.avg(this.getExpression(cb, exprDef.getChild(0), Number.class));
+			case JpqlParser.SUM:
+				return (AbstractExpression<X>) cb.avg(this.getExpression(cb, exprDef.getChild(0), Number.class));
+			default:
+				break;
 		}
 
 		throw new PersistenceException("Unhandled expression: " + exprDef.toStringTree());

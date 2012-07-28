@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.TemporalType;
 import javax.persistence.Tuple;
 import javax.persistence.criteria.CollectionJoin;
 import javax.persistence.criteria.CompoundSelection;
@@ -55,8 +56,12 @@ import org.batoo.jpa.core.impl.criteria.expression.CaseTransformationExpression.
 import org.batoo.jpa.core.impl.criteria.expression.ComparisonExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ComparisonExpression.Comparison;
 import org.batoo.jpa.core.impl.criteria.expression.ConstantExpression;
+import org.batoo.jpa.core.impl.criteria.expression.CurrentTemporalExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ExpressionConverter;
+import org.batoo.jpa.core.impl.criteria.expression.LocateExpression;
 import org.batoo.jpa.core.impl.criteria.expression.NegationExpression;
+import org.batoo.jpa.core.impl.criteria.expression.NumericFunctionExpression;
+import org.batoo.jpa.core.impl.criteria.expression.NumericFunctionExpression.NumericFunctionType;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
 import org.batoo.jpa.core.impl.criteria.expression.SubstringExpression;
@@ -95,8 +100,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <N extends Number> Expression<N> abs(Expression<N> x) {
-		// TODO Auto-generated method stub
-		return null;
+		return new NumericFunctionExpression<N>(NumericFunctionType.ABS, x, null);
 	}
 
 	/**
@@ -340,9 +344,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Expression<Date> currentDate() {
-		// TODO Auto-generated method stub
-		return null;
+	public CurrentTemporalExpression<Date> currentDate() {
+		return new CurrentTemporalExpression<Date>(TemporalType.DATE, Date.class);
 	}
 
 	/**
@@ -351,8 +354,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<Time> currentTime() {
-		// TODO Auto-generated method stub
-		return null;
+		return new CurrentTemporalExpression<Time>(TemporalType.TIME, Time.class);
 	}
 
 	/**
@@ -361,8 +363,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<Timestamp> currentTimestamp() {
-		// TODO Auto-generated method stub
-		return null;
+		return new CurrentTemporalExpression<Timestamp>(TemporalType.TIMESTAMP, Timestamp.class);
 	}
 
 	/**
@@ -718,8 +719,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<Integer> length(Expression<String> x) {
-		// TODO Auto-generated method stub
-		return null;
+		return new NumericFunctionExpression<Integer>(NumericFunctionType.LENGTH, x, null);
 	}
 
 	/**
@@ -811,7 +811,6 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Predicate like(Expression<String> x, String pattern, char escapeChar) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -841,8 +840,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<Integer> locate(Expression<String> x, Expression<String> pattern) {
-		// TODO Auto-generated method stub
-		return null;
+		return new LocateExpression(x, pattern, null);
 	}
 
 	/**
@@ -851,8 +849,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<Integer> locate(Expression<String> x, Expression<String> pattern, Expression<Integer> from) {
-		// TODO Auto-generated method stub
-		return null;
+		return new LocateExpression(x, pattern, from);
 	}
 
 	/**
@@ -861,8 +858,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<Integer> locate(Expression<String> x, String pattern) {
-		// TODO Auto-generated method stub
-		return null;
+		return new LocateExpression(x, new ConstantExpression<String>(null, pattern), null);
 	}
 
 	/**
@@ -871,8 +867,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<Integer> locate(Expression<String> x, String pattern, int from) {
-		// TODO Auto-generated method stub
-		return null;
+		return new LocateExpression(x, new ConstantExpression<String>(null, pattern), new ConstantExpression<Integer>(null, from));
 	}
 
 	/**
@@ -931,8 +926,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<Integer> mod(Expression<Integer> x, Expression<Integer> y) {
-		// TODO Auto-generated method stub
-		return null;
+		return new NumericFunctionExpression<Integer>(NumericFunctionType.MOD, x, y);
 	}
 
 	/**
@@ -941,8 +935,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<Integer> mod(Expression<Integer> x, Integer y) {
-		// TODO Auto-generated method stub
-		return null;
+		return new NumericFunctionExpression<Integer>(NumericFunctionType.MOD, x, new ConstantExpression<Integer>(null, y));
 	}
 
 	/**
@@ -951,8 +944,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<Integer> mod(Integer x, Expression<Integer> y) {
-		// TODO Auto-generated method stub
-		return null;
+		return new NumericFunctionExpression<Integer>(NumericFunctionType.MOD, new ConstantExpression<Integer>(null, x), y);
 	}
 
 	/**
@@ -1242,8 +1234,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<Double> sqrt(Expression<? extends Number> x) {
-		// TODO Auto-generated method stub
-		return null;
+		return new NumericFunctionExpression<Double>(NumericFunctionType.SQRT, x, null);
 	}
 
 	/**

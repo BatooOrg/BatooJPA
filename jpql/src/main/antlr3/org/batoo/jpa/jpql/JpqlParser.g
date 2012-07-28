@@ -193,11 +193,12 @@ aggregate_expression :
 
 functions_returning_numerics :
   LENGTH^ Left_Paren! string_primary Right_Paren!
-  | SUBSTRING^ Left_Paren! string_primary Comma! simple_arithmetic_expression (Comma! simple_arithmetic_expression)? Right_Paren!
   | LOCATE^ Left_Paren! string_primary Comma! string_primary (Comma! simple_arithmetic_expression)? Right_Paren!
   | ABS^ Left_Paren! simple_arithmetic_expression Right_Paren!
   | SQRT^ Left_Paren! simple_arithmetic_expression Right_Paren!
   | MOD^ Left_Paren! simple_arithmetic_expression Comma! simple_arithmetic_expression Right_Paren!
+//  | SIZE^ Left_Paren! simple_arithmetic_expression Right_Paren!
+//  | INDEX^ Left_Paren! simple_arithmetic_expression Right_Paren!
   ;
 
 string_primary :

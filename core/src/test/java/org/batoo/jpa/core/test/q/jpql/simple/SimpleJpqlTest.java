@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.core.test.q.jpql.simple;
 
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -335,8 +337,9 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		this.close();
 
-		TypedQuery<Person> q = this.cq("select p from Person p where p.startDate > :start", Person.class).setParameter("start", start1.getTime(),
-			TemporalType.DATE);
+		TypedQuery<Person> q;
+
+		q = this.cq("select p from Person p where p.startDate > :start", Person.class).setParameter("start", start1.getTime(), TemporalType.DATE);
 		Assert.assertEquals(1, q.getResultList().size());
 
 		q = this.cq("select p from Person p where p.startDate < :start", Person.class).setParameter("start", start2.getTime(), TemporalType.DATE);
@@ -347,6 +350,46 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		q = this.cq("select p from Person p where p.startDate <= :start", Person.class).setParameter("start", start1.getTime(), TemporalType.DATE);
 		Assert.assertEquals(1, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.startDate <= current_date", Person.class);
+		Assert.assertEquals(2, q.getResultList().size());
+
+		final TypedQuery<java.sql.Date> q2 = this.cq("select current_date from Person p", java.sql.Date.class);
+		Assert.assertEquals(2, q2.getResultList().size());
+
+		final TypedQuery<Time> q3 = this.cq("select current_time from Person p", Time.class);
+		Assert.assertEquals(2, q3.getResultList().size());
+
+		final TypedQuery<Timestamp> q4 = this.cq("select current_timestamp from Person p", Timestamp.class);
+		Assert.assertEquals(2, q4.getResultList().size());
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testNumericFunctions() {
+		this.persist(this.person(-49));
+		this.commit();
+
+		this.close();
+
+		TypedQuery<Integer> q;
+		TypedQuery<Double> q2;
+
+		q = this.cq("select abs(p.age) from Person p where p.id = 1", Integer.class);
+		Assert.assertEquals((Integer) 49, q.getSingleResult());
+
+		q2 = this.cq("select sqrt(abs(p.age)) from Person p where p.id = 1", Double.class);
+		Assert.assertEquals(7.0, q2.getSingleResult());
+
+		q = this.cq("select mod(abs(p.age), 10) from Person p where p.id = 1", Integer.class);
+		Assert.assertEquals((Integer) 9, q.getSingleResult());
+
+		q = this.cq("select length(p.name) from Person p where p.id = 1", Integer.class);
+		Assert.assertEquals((Integer) 6, q.getSingleResult());
 	}
 
 	/**
