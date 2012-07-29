@@ -139,4 +139,24 @@ public class AggregationTest extends BaseCoreTest {
 
 		Assert.assertEquals(70, this.cq("select p.age, sum(p.age) from Person p group by p.age", Object[].class).getResultList().get(0)[1]);
 	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testCount() {
+		this.persist(this.person(40));
+		this.persist(this.person(40));
+		this.persist(this.person(35));
+		this.persist(this.person(35));
+		this.commit();
+
+		this.close();
+
+		Assert.assertEquals((Long) 4l, this.cq("select count(p.age) from Person p", Long.class).getSingleResult());
+
+		Assert.assertEquals((Long) 2l, this.cq("select count(distinct p.age) from Person p", Long.class).getSingleResult());
+	}
 }

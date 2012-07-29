@@ -44,6 +44,7 @@ import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ConcatExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ConstantExpression;
+import org.batoo.jpa.core.impl.criteria.expression.CountExpression;
 import org.batoo.jpa.core.impl.criteria.expression.SubstringExpression;
 import org.batoo.jpa.core.impl.criteria.expression.TrimExpression;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
@@ -756,6 +757,15 @@ public class JpqlQuery {
 				return (AbstractExpression<X>) cb.max(this.getExpression(cb, exprDef.getChild(0), Number.class));
 			case JpqlParser.MIN:
 				return (AbstractExpression<X>) cb.min(this.getExpression(cb, exprDef.getChild(0), Number.class));
+		}
+
+		// count function
+		if (exprDef.getType() == JpqlParser.COUNT) {
+			if (exprDef.getChildCount() == 2) {
+				return (AbstractExpression<X>) new CountExpression(this.getExpression(cb, exprDef.getChild(1), null), true);
+			}
+
+			return (AbstractExpression<X>) new CountExpression(this.getExpression(cb, exprDef.getChild(0), null), false);
 		}
 
 		throw new PersistenceException("Unhandled expression: " + exprDef.toStringTree());

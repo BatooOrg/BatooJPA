@@ -20,7 +20,6 @@ package org.batoo.jpa.core.impl.criteria.expression;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.MessageFormat;
 
 import javax.persistence.criteria.Expression;
 
@@ -30,54 +29,32 @@ import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
- * The expression for aggregate functions
- * 
- * @param <T>
- *            the type of the expression
+ * The expression for count function.
  * 
  * @author hceylan
  * @since $version
  */
-public class AggregationExpression<T> extends AbstractExpression<T> {
+public class CountExpression extends AbstractExpression<Long> {
 
-	@SuppressWarnings("javadoc")
-	public enum AggregationFunctionType {
-		AVG("AVG({0})", "avg({0})"),
+	private final AbstractExpression<?> inner;
+	private final boolean distinct;
 
-		SUM("SUM({0})", "sum({0})"),
-
-		MIN("MIN({0})", "min({0})"),
-
-		MAX("MAX({0})", "max({0})");
-
-		private final String sqlFragment;
-		private final String jpqlFragment;
-
-		private AggregationFunctionType(String sqlfragment, String jpqlFragment) {
-			this.sqlFragment = sqlfragment;
-			this.jpqlFragment = jpqlFragment;
-		}
-	}
-
-	private final AggregationFunctionType type;
-	private final AbstractExpression<?> x;
 	private String alias;
 
 	/**
-	 * @param type
-	 *            the type of the function
-	 * @param x
-	 *            the first parameter
+	 * @param inner
+	 *            the inner expression
+	 * @param distinct
+	 *            if the count is distinct
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
-	public AggregationExpression(AggregationFunctionType type, Expression<?> x) {
-		super((Class<T>) x.getJavaType());
+	public CountExpression(Expression<?> inner, boolean distinct) {
+		super(Long.class);
 
-		this.type = type;
-		this.x = (AbstractExpression<?>) x;
+		this.inner = (AbstractExpression<?>) inner;
+		this.distinct = distinct;
 	}
 
 	/**
@@ -86,7 +63,16 @@ public class AggregationExpression<T> extends AbstractExpression<T> {
 	 */
 	@Override
 	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
-		return MessageFormat.format(this.type.jpqlFragment, this.x.generateJpqlRestriction(query));
+		final StringBuilder builder = new StringBuilder("count(");
+
+		if (this.distinct) {
+			builder.append("distinct ");
+		}
+
+		builder.append(this.inner.generateJpqlRestriction(query));
+		builder.append(")");
+
+		return builder.toString();
 	}
 
 	/**
@@ -123,8 +109,16 @@ public class AggregationExpression<T> extends AbstractExpression<T> {
 	 */
 	@Override
 	public String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query) {
-		return new String[] { MessageFormat.format(this.type.sqlFragment, this.x.getSqlRestrictionFragments(query)[0]) };
+		final StringBuilder builder = new StringBuilder("COUNT(");
 
+		if (this.distinct) {
+			builder.append("DISTINCT ");
+		}
+
+		builder.append(this.inner.getSqlRestrictionFragments(query)[0]);
+		builder.append(")");
+
+		return new String[] { builder.toString() };
 	}
 
 	/**
@@ -132,16 +126,7 @@ public class AggregationExpression<T> extends AbstractExpression<T> {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
-	public T handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
-		if (this.getJavaType() == Long.class) {
-			return (T) (Long) row.getLong(this.alias);
-		}
-
-		if (this.getJavaType() == Double.class) {
-			return (T) (Double) row.getDouble(this.alias);
-		}
-
-		return (T) row.getObject(this.alias);
+	public Long handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+		return row.getLong(this.alias);
 	}
 }
