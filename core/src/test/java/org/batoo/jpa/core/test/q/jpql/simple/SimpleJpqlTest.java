@@ -398,6 +398,18 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
+	public void testOrderBy() {
+		Assert.assertEquals(null, this.cq("select c.name from Country c order by c.name desc", String.class).setMaxResults(1).getSingleResult());
+
+		Assert.assertEquals("Turkey", this.cq("select c.name from Country c order by c.name asc", String.class).setMaxResults(1).getSingleResult());
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
 	public void testPagination() {
 		Assert.assertEquals(2l, this.cq("select c from Country c", Country.class).setFirstResult(2).getResultList().size());
 

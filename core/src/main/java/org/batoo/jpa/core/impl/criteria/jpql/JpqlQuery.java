@@ -27,6 +27,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.FetchParent;
 import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Selection;
 
@@ -152,6 +153,11 @@ public class JpqlQuery {
 				// having fragment
 				if (child.getType() == JpqlParser.HAVING) {
 					q.having(this.constructJunction(cb, child.getChild(0)));
+				}
+
+				// order by fragment
+				if (child.getType() == JpqlParser.LORDER) {
+					this.constructOrder(cb, q, child);
 				}
 
 				i++;
@@ -298,6 +304,34 @@ public class JpqlQuery {
 		}
 
 		return cb.and(predictions.toArray(new Predicate[predictions.size()]));
+	}
+
+	/**
+	 * Constructs the order by fragment of the query.
+	 * 
+	 * @param cb
+	 *            the criteria builder
+	 * @param q
+	 *            the query
+	 * @param orderBy
+	 *            the order by definitions
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void constructOrder(CriteriaBuilderImpl cb, CriteriaQueryImpl<?> q, Tree orderBy) {
+		final List<Order> orders = Lists.newArrayList();
+
+		for (int i = 0; i < orderBy.getChildCount(); i++) {
+			final Tree orderByItem = orderBy.getChild(i);
+			final Order order = orderByItem.getChildCount() == 2 ? //
+				cb.desc(this.getExpression(cb, orderByItem.getChild(0), null)) : //
+				cb.asc(this.getExpression(cb, orderByItem.getChild(0), null));
+
+			orders.add(order);
+		}
+
+		q.orderBy(orders);
 	}
 
 	/**

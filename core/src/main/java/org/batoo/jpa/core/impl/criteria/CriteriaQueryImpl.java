@@ -18,7 +18,9 @@
  */
 package org.batoo.jpa.core.impl.criteria;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -63,10 +65,11 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(CriteriaQueryImpl.class);
 
-	private final Map<String, List<AbstractColumn>> fields = Maps.newHashMap();
-	private final Map<Selection<?>, String> selections = Maps.newHashMap();
+	private final HashMap<String, List<AbstractColumn>> fields = Maps.newHashMap();
+	private final HashMap<Selection<?>, String> selections = Maps.newHashMap();
 	private final HashBiMap<ParameterExpressionImpl<?>, Integer> parameters = HashBiMap.create();
 	private final List<ParameterExpressionImpl<?>> parameterOrder = Lists.newArrayList();
+	private final ArrayList<OrderImpl> orderList = Lists.newArrayList();;
 	private boolean internal;
 
 	private int nextSelection;
@@ -147,11 +150,25 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 				}
 			}));
 
-			builder.append("\ngroup by ").append(groupBy);
+			builder.append("\ngroup by\n\t").append(groupBy);
 		}
 
 		if (this.getGroupRestriction() != null) {
 			builder.append("\nhaving\n\t").append(this.getGroupRestriction().generateJpqlRestriction(this));
+		}
+
+		if (this.orderList.size() > 0) {
+			final String orderBy = Joiner.on(", ").join(Lists.transform(this.orderList, new Function<OrderImpl, String>() {
+
+				@Override
+				public String apply(OrderImpl input) {
+					return input.isAscending() ? //
+						input.getExpression().generateJpqlRestriction(CriteriaQueryImpl.this) + " asc" : //
+						input.getExpression().generateJpqlRestriction(CriteriaQueryImpl.this) + " desc";
+				}
+			}));
+
+			builder.append("\norder by\n\t").append(orderBy);
 		}
 
 		return builder.toString();
@@ -204,15 +221,27 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 
 		final String having = this.getGroupRestriction() != null ? this.getGroupRestriction().generateSqlRestriction(this) : null;
 
+		final String orderBy = this.orderList.size() == 0 ? null : Joiner.on(", ").join(Lists.transform(this.orderList, new Function<OrderImpl, String>() {
+
+			@Override
+			public String apply(OrderImpl input) {
+				return input.isAscending() ? //
+					input.getExpression().generateSqlSelect(CriteriaQueryImpl.this, false) + " asc" : //
+					input.getExpression().generateSqlSelect(CriteriaQueryImpl.this, false) + " desc";
+			}
+		}));
+
 		final String from = "FROM " + Joiner.on(",").join(froms);
 		final String join = Joiner.on("\n").skipNulls().join(joins.values());
 
-		return Joiner.on("\n").skipNulls().join(select, //
+		return Joiner.on("\n").skipNulls().join(//
+			select, //
 			from, //
 			StringUtils.isBlank(join) ? null : BatooUtils.indent(join), //
-			where, //
-			StringUtils.isBlank(groupBy) ? null : "GROUP BY " + groupBy, //
-			StringUtils.isBlank(having) ? null : "HAVING " + having);
+			StringUtils.isBlank(where) ? null : "WHERE\n\t" + where, //
+			StringUtils.isBlank(groupBy) ? null : "GROUP BY\n\t" + groupBy, //
+			StringUtils.isBlank(having) ? null : "HAVING\n\t" + having, //
+			StringUtils.isBlank(orderBy) ? null : "ORDER BY\n\t" + orderBy);
 	}
 
 	/**
@@ -238,9 +267,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 
 		}
 
-		final String restriction = Joiner.on(" AND ").skipNulls().join(restrictions);
-
-		return StringUtils.isNotBlank(restriction) ? "WHERE " + restriction : null;
+		return Joiner.on(" AND ").skipNulls().join(restrictions);
 	}
 
 	/**
@@ -337,8 +364,10 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 */
 	@Override
 	public List<Order> getOrderList() {
-		// TODO Auto-generated method stub
-		return null;
+		final List<Order> orderList = Lists.newArrayList();
+		orderList.addAll(this.orderList);
+
+		return orderList;
 	}
 
 	/**
@@ -468,8 +497,13 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 */
 	@Override
 	public CriteriaQuery<T> orderBy(List<Order> o) {
-		// TODO Auto-generated method stub
-		return null;
+		this.orderList.clear();
+
+		for (final Order order : o) {
+			this.orderList.add((OrderImpl) order);
+		}
+
+		return this;
 	}
 
 	/**
@@ -478,8 +512,13 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 */
 	@Override
 	public CriteriaQuery<T> orderBy(Order... o) {
-		// TODO Auto-generated method stub
-		return null;
+		this.orderList.clear();
+
+		for (final Order order : o) {
+			this.orderList.add((OrderImpl) order);
+		}
+
+		return this;
 	}
 
 	/**

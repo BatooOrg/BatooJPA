@@ -39,7 +39,6 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.ListJoin;
 import javax.persistence.criteria.MapJoin;
-import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Predicate.BooleanOperator;
@@ -161,9 +160,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Order asc(Expression<?> x) {
-		// TODO Auto-generated method stub
-		return null;
+	public OrderImpl asc(Expression<?> x) {
+		return new OrderImpl(x, false);
 	}
 
 	/**
@@ -370,9 +368,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Order desc(Expression<?> x) {
-		// TODO Auto-generated method stub
-		return null;
+	public OrderImpl desc(Expression<?> x) {
+		return new OrderImpl(x, true);
 	}
 
 	/**

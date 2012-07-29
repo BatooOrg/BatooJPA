@@ -14,6 +14,7 @@ tokens {
     LQUALIFIED;
     LFROM;
     LGROUP_BY;
+    LORDER;
     LJOINS;
     LAND;
     LOR;
@@ -22,6 +23,7 @@ tokens {
     //imaginary AS token
     ST_UPDATE;
     ST_FROM;
+    ST_ORDER;
     ST_PARENTED;
     ST_COLL;
     ST_JOIN;
@@ -58,8 +60,7 @@ ql_statement :
     (select_statement | update_statement | delete_statement) EOF;
 
 select_statement :
-    select_clause from_clause (where_clause)? (groupby_clause)? (having_clause)? //(orderby_clause)?
-    ;
+    select_clause from_clause (where_clause)? (groupby_clause)? (having_clause)? (orderby_clause)?;
 
 update_statement :
     UPDATE^ update_clause (where_clause)?;
@@ -115,20 +116,28 @@ new_value :
 //    | simple_entity_expression
     | NULL;
 
-having_clause :
-  	HAVING^ conditional_expression;
+orderby_clause :
+  	ORDER BY orderby_item (Comma orderby_item)*
+  		-> ^(LORDER orderby_item (orderby_item)*);
+
+orderby_item :
+  	state_field_path_expression (ASC | DESC)?
+  		-> ^(ST_ORDER state_field_path_expression (DESC)?);
 
 where_clause :
     WHERE^ conditional_expression;
 
 groupby_clause :
-  GROUP BY groupby_item (Comma groupby_item)* 
-  	-> ^(LGROUP_BY groupby_item (groupby_item) *);
+  	GROUP BY groupby_item (Comma groupby_item)* 
+  		-> ^(LGROUP_BY groupby_item (groupby_item) *);
 
 groupby_item :
   single_valued_path_expression
   | ID
   ;
+
+having_clause :
+  	HAVING^ conditional_expression;
 
 select_clause :
     SELECT^ (DISTINCT)? select_items;
@@ -421,20 +430,6 @@ null_comparison_expression :
 //    | 'SOME'
 //  )
 //  Left_Paren subquery Right_Paren
-//  ;
-//
-//orderby_clause
-//  :
-//  'ORDER' 'BY' orderby_item (Comma orderby_item)*
-//  ;
-//
-//orderby_item
-//  :
-//  state_field_path_expression
-//  (
-//    'ASC'
-//    | 'DESC'
-//  )?
 //  ;
 //
 //subquery
