@@ -18,8 +18,11 @@
  */
 package org.batoo.jpa.core.impl.criteria.expression;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Collection;
 
+import javax.persistence.PersistenceException;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 
@@ -56,9 +59,35 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <X> Expression<X> as(Class<X> type) {
-		// TODO Auto-generated method stub
-		return null;
+		if (this.getJavaType() == type) {
+			return (Expression<X>) this;
+		}
+
+		if (type == BigDecimal.class) {
+			this.setConverter(ExpressionConverter.BIG_DECIMAL);
+		}
+		else if (type == BigInteger.class) {
+			this.setConverter(ExpressionConverter.BIG_INTEGER);
+		}
+		else if (type == Double.class) {
+			this.setConverter(ExpressionConverter.DOUBLE);
+		}
+		else if (type == Float.class) {
+			this.setConverter(ExpressionConverter.FLOAT);
+		}
+		else if (type == Integer.class) {
+			this.setConverter(ExpressionConverter.INTEGER);
+		}
+		else if (type == Long.class) {
+			this.setConverter(ExpressionConverter.LONG);
+		}
+		else if (type == String.class) {
+			this.setConverter(ExpressionConverter.STRING);
+		}
+
+		throw new PersistenceException("Cannot cast to :" + type);
 	}
 
 	/**
