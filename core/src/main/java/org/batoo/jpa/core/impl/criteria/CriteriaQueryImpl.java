@@ -142,6 +142,18 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 			builder.append("\nwhere\n\t").append(this.getRestriction().generateJpqlRestriction(this));
 		}
 
+		if (this.groupList.size() > 0) {
+			final String groupBy = Joiner.on(", ").join(Lists.transform(this.groupList, new Function<AbstractExpression<?>, String>() {
+
+				@Override
+				public String apply(AbstractExpression<?> input) {
+					return input.generateJpqlRestriction(CriteriaQueryImpl.this);
+				}
+			}));
+
+			builder.append("\ngroup by ").append(groupBy);
+		}
+
 		return builder.toString();
 	}
 
@@ -180,8 +192,16 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 			((RootImpl<?>) root).generateSqlJoins(this, joins);
 		}
 
-		final String restriction = this.generateSqlRestriction();
-		final String where = StringUtils.isNotBlank(restriction) ? "WHERE " + restriction : null;
+		final String where = this.generateSqlRestriction();
+
+		final String groupBy = this.groupList.size() == 0 ? null : Joiner.on(", ").join(
+			Lists.transform(this.groupList, new Function<AbstractExpression<?>, String>() {
+
+				@Override
+				public String apply(AbstractExpression<?> input) {
+					return input.generateSqlSelect(CriteriaQueryImpl.this, false);
+				}
+			}));
 
 		final String from = "FROM " + Joiner.on(",").join(froms);
 		final String join = Joiner.on("\n").skipNulls().join(joins.values());
@@ -189,7 +209,8 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 		return Joiner.on("\n").skipNulls().join(select, //
 			from, //
 			StringUtils.isBlank(join) ? null : BatooUtils.indent(join), //
-			StringUtils.isBlank(where) ? null : where);
+			where, //
+			StringUtils.isBlank(groupBy) ? null : "GROUP BY " + groupBy);
 	}
 
 	/**
@@ -215,7 +236,9 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 
 		}
 
-		return Joiner.on(" AND ").skipNulls().join(restrictions);
+		final String restriction = Joiner.on(" AND ").skipNulls().join(restrictions);
+
+		return StringUtils.isNotBlank(restriction) ? "WHERE " + restriction : null;
 	}
 
 	/**

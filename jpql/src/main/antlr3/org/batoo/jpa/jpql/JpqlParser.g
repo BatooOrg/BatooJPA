@@ -13,6 +13,7 @@ tokens {
     LUPDATE;
     LQUALIFIED;
     LFROM;
+    LGROUP_BY;
     LJOINS;
     LAND;
     LOR;
@@ -57,7 +58,7 @@ ql_statement :
     (select_statement | update_statement | delete_statement) EOF;
 
 select_statement :
-    select_clause from_clause (where_clause)? //(groupby_clause)? (having_clause)? (orderby_clause)?
+    select_clause from_clause (where_clause)? (groupby_clause)? //(having_clause)? (orderby_clause)?
     ;
 
 update_statement :
@@ -116,6 +117,15 @@ new_value :
 
 where_clause :
     WHERE^ conditional_expression;
+
+groupby_clause :
+  GROUP BY groupby_item (Comma groupby_item)* 
+  	-> ^(LGROUP_BY groupby_item (groupby_item) *);
+
+groupby_item :
+  single_valued_path_expression
+  | ID
+  ;
 
 select_clause :
     SELECT^ (DISTINCT)? select_items;
@@ -211,11 +221,12 @@ string_primary :
 	;
 	
 functions_returning_strings :
-  CONCAT^ Left_Paren! string_primary (Comma! string_primary )+ Right_Paren!
-  | TRIM^ Left_Paren! ((LEADING | TRAILING | BOTH)? (CHAR_LITERAL)? FROM!)? string_primary Right_Paren!
-  | LOWER^ Left_Paren! string_primary Right_Paren!
-  | UPPER^ Left_Paren! string_primary Right_Paren!
-  ;
+	SUBSTRING^ Left_Paren! string_primary Comma! simple_arithmetic_expression (Comma! simple_arithmetic_expression)? Right_Paren!
+	| CONCAT^ Left_Paren! string_primary (Comma! string_primary )+ Right_Paren!
+	| TRIM^ Left_Paren! ((LEADING | TRAILING | BOTH)? (CHAR_LITERAL)? FROM!)? string_primary Right_Paren!
+	| LOWER^ Left_Paren! string_primary Right_Paren!
+	| UPPER^ Left_Paren! string_primary Right_Paren!
+	;
 
 conditional_expression :
     conditional_term (OR conditional_term)*
@@ -407,18 +418,6 @@ null_comparison_expression :
 //    | 'SOME'
 //  )
 //  Left_Paren subquery Right_Paren
-//  ;
-//
-
-//groupby_clause
-//  :
-//  'GROUP' 'BY' groupby_item (Comma groupby_item)*
-//  ;
-//
-//groupby_item
-//  :
-//  single_valued_path_expression
-//  | ID
 //  ;
 //
 //having_clause

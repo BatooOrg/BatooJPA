@@ -42,6 +42,7 @@ import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
+import org.batoo.jpa.core.util.Pair;
 import org.batoo.jpa.parser.PersistenceParser;
 
 import com.google.common.cache.CacheBuilder;
@@ -63,12 +64,13 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	private boolean open;
 	private final CriteriaBuilderImpl criteriaBuilder;
 
-	LoadingCache<String, JpqlQuery> graphs = CacheBuilder.newBuilder().maximumSize(1000).build(new CacheLoader<String, JpqlQuery>() {
-		@Override
-		public JpqlQuery load(String jpql) {
-			return new JpqlQuery(EntityManagerFactoryImpl.this, jpql);
-		}
-	});
+	LoadingCache<Pair<String, Class<?>>, JpqlQuery> graphs = CacheBuilder.newBuilder().maximumSize(1000).build(
+		new CacheLoader<Pair<String, Class<?>>, JpqlQuery>() {
+			@Override
+			public JpqlQuery load(Pair<String, Class<?>> jpql) {
+				return new JpqlQuery(EntityManagerFactoryImpl.this, jpql.getFirst(), jpql.getSecond());
+			}
+		});
 
 	/**
 	 * @param name
@@ -213,6 +215,35 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	}
 
 	/**
+	 * Returns a lazy created {@link JpqlQuery} for the query.
+	 * 
+	 * @param qlString
+	 *            the JPQL query string
+	 * @param resultClass
+	 *            the result class
+	 * @return the Jpql Query object
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public JpqlQuery getJpqlQuery(String qlString, Class<?> resultClass) {
+		try {
+			return this.graphs.get(new Pair<String, Class<?>>(qlString, resultClass));
+		}
+		catch (final Exception e) {
+			if (e.getCause() instanceof PersistenceException) {
+				throw (PersistenceException) e.getCause();
+			}
+
+			if (e.getCause() instanceof IllegalArgumentException) {
+				throw (IllegalArgumentException) e.getCause();
+			}
+
+			throw new PersistenceException("Cannot parse query: " + e.getMessage(), e);
+		}
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -229,33 +260,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	public PersistenceUnitUtil getPersistenceUnitUtil() {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	/**
-	 * Returns a lazy created {@link JpqlQuery} for the query.
-	 * 
-	 * @param qlString
-	 *            the JPQL query string
-	 * @return the Jpql Query object
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public JpqlQuery getJpqlQuery(String qlString) {
-		try {
-			return this.graphs.get(qlString);
-		}
-		catch (final Exception e) {
-			if (e.getCause() instanceof PersistenceException) {
-				throw (PersistenceException) e.getCause();
-			}
-
-			if (e.getCause() instanceof IllegalArgumentException) {
-				throw (IllegalArgumentException) e.getCause();
-			}
-
-			throw new PersistenceException("Cannot parse query: " + e.getMessage(), e);
-		}
 	}
 
 	/**

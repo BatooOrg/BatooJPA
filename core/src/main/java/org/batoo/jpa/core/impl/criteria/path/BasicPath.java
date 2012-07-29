@@ -109,7 +109,12 @@ public class BasicPath<X> extends AbstractPath<X> {
 
 		this.fieldAlias = tableAlias + "_F" + query.getFieldAlias(tableAlias, column);
 
-		return tableAlias + "." + column.getName() + " AS " + this.fieldAlias;
+		if (selected) {
+			return tableAlias + "." + column.getName() + " AS " + this.fieldAlias;
+		}
+		else {
+			return tableAlias + "." + column.getName();
+		}
 	}
 
 	/**
@@ -152,7 +157,7 @@ public class BasicPath<X> extends AbstractPath<X> {
 	public X handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		final X value = (X) this.mapping.getColumn().convertValue(row.getObject(this.fieldAlias));
 
-		return (X) (this.getConverter() != null ? this.getConverter().convert((Number) value) : value);
+		return (X) (this.getConverter() != null ? this.getConverter().convert(value) : value);
 	}
 
 	/**

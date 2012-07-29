@@ -114,7 +114,7 @@ public class SingularAssociationPath<Z, X> extends AbstractPath<X> implements Jo
 	 */
 	@Override
 	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
-		return this.fetchRoot.generateSqlSelect(query, false);
+		return this.fetchRoot.generateSqlSelect(query, selected, false);
 	}
 
 	/**

@@ -144,7 +144,11 @@ public class InExpression extends BooleanExpression {
 	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
 		this.alias = query.getAlias(this);
 
-		return this.generateSqlRestriction(query) + " AS " + this.alias;
+		if (selected) {
+			return this.generateSqlRestriction(query) + " AS " + this.alias;
+		}
+
+		return this.generateSqlRestriction(query);
 	}
 
 	/**

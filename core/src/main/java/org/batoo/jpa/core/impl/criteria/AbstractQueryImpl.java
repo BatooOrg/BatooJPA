@@ -29,6 +29,7 @@ import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 import javax.persistence.metamodel.EntityType;
 
+import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
@@ -77,6 +78,11 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	 * If the query is distinc
 	 */
 	protected boolean distinct;
+
+	/**
+	 * The group list of the query
+	 */
+	protected final List<AbstractExpression<?>> groupList = Lists.newArrayList();
 
 	/**
 	 * @param metamodel
@@ -159,8 +165,10 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	 */
 	@Override
 	public List<Expression<?>> getGroupList() {
-		// TODO Auto-generated method stub
-		return null;
+		final List<Expression<?>> groupList = Lists.newArrayList();
+		groupList.addAll(this.groupList);
+
+		return groupList;
 	}
 
 	/**
@@ -237,8 +245,13 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	 */
 	@Override
 	public AbstractQuery<T> groupBy(Expression<?>... grouping) {
-		// TODO Auto-generated method stub
-		return null;
+		this.groupList.clear();
+
+		for (final Expression<?> expression : grouping) {
+			this.groupList.add((AbstractExpression<?>) expression);
+		}
+
+		return this;
 	}
 
 	/**
@@ -247,8 +260,13 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	 */
 	@Override
 	public AbstractQuery<T> groupBy(List<Expression<?>> grouping) {
-		// TODO Auto-generated method stub
-		return null;
+		this.groupList.clear();
+
+		for (final Expression<?> expression : grouping) {
+			this.groupList.add((AbstractExpression<?>) expression);
+		}
+
+		return this;
 	}
 
 	/**

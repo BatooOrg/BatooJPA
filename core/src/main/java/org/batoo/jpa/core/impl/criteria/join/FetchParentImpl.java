@@ -326,6 +326,8 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * 
 	 * @param query
 	 *            the query
+	 * @param selected
+	 *            if the item is selected
 	 * @param root
 	 *            if the generation is at root
 	 * @return the generated SQL fragment
@@ -333,8 +335,8 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean root) {
-		return this.generateSqlSelect(query, root, MapSelectType.VALUE);
+	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected, boolean root) {
+		return this.generateSqlSelect(query, selected, root, MapSelectType.VALUE);
 	}
 
 	/**
@@ -342,6 +344,8 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * 
 	 * @param query
 	 *            the query
+	 * @param selected
+	 *            if the item is selected
 	 * @param root
 	 *            if the generation is at root
 	 * @param selectType
@@ -351,16 +355,16 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean root, MapSelectType selectType) {
+	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected, boolean root, MapSelectType selectType) {
 		final List<String> selects = Lists.newArrayList();
 
 		// skip the embeddable mappings
 		if (!(this.getMapping() instanceof EmbeddedMapping)) {
-			selects.add(this.generateSqlSelectImpl(query, root, selectType));
+			selects.add(this.generateSqlSelectImpl(query, selected, root, selectType));
 		}
 
 		for (final FetchImpl<X, ?> fetch : this.fetches.values()) {
-			final String select = fetch.generateSqlSelect(query, false);
+			final String select = fetch.generateSqlSelect(query, selected, false);
 			if (StringUtils.isNotBlank(select)) {
 				selects.add(select);
 			}
@@ -369,8 +373,8 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		return Joiner.on(",\n").join(selects);
 	}
 
-	private void generateSqlSelectForElementCollection(CriteriaQueryImpl<?> query, List<String> selects, Map<AbstractColumn, String> fieldMap,
-		MapSelectType selectType) {
+	private void generateSqlSelectForElementCollection(CriteriaQueryImpl<?> query, boolean selected, List<String> selects,
+		Map<AbstractColumn, String> fieldMap, MapSelectType selectType) {
 
 		final List<String> fields1 = Lists.newArrayList();
 
@@ -396,7 +400,12 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			final String fieldAlias = tableAlias + "_F" + query.getFieldAlias(tableAlias, column);
 			final String field = Joiner.on(".").skipNulls().join(tableAlias, column.getName());
 
-			fields1.add(field + " AS " + fieldAlias);
+			if (selected) {
+				fields1.add(field + " AS " + fieldAlias);
+			}
+			else {
+				fields1.add(field);
+			}
 
 			// seperate out the key column from the rest
 			if (column == table.getKeyColumn()) {
@@ -410,7 +419,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		selects.add(Joiner.on(", ").join(fields1));
 	}
 
-	private void generateSqlSelectForEntityTable(CriteriaQueryImpl<?> query, boolean root, final List<String> selects,
+	private void generateSqlSelectForEntityTable(CriteriaQueryImpl<?> query, boolean selected, boolean root, final List<String> selects,
 		final Map<AbstractColumn, String> fieldMap, final EntityTable table) {
 
 		final List<String> fields1 = Lists.newArrayList();
@@ -454,23 +463,28 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 				fieldMap.put(column, fieldAlias);
 			}
 
-			fields1.add(field + " AS " + fieldAlias);
+			if (selected) {
+				fields1.add(field + " AS " + fieldAlias);
+			}
+			else {
+				fields1.add(field);
+			}
 		}
 
 		selects.add(Joiner.on(", ").join(fields1));
 	}
 
-	private String generateSqlSelectImpl(CriteriaQueryImpl<?> query, boolean root, MapSelectType selectType) {
+	private String generateSqlSelectImpl(CriteriaQueryImpl<?> query, boolean selected, boolean root, MapSelectType selectType) {
 		final List<String> selects = Lists.newArrayList();
 		final Map<AbstractColumn, String> fieldMap = Maps.newHashMap();
 
 		if (this.entity != null) {
 			for (final EntityTable table : this.entity.getAllTables()) {
-				this.generateSqlSelectForEntityTable(query, root, selects, fieldMap, table);
+				this.generateSqlSelectForEntityTable(query, selected, root, selects, fieldMap, table);
 			}
 		}
 		else {
-			this.generateSqlSelectForElementCollection(query, selects, fieldMap, selectType);
+			this.generateSqlSelectForElementCollection(query, selected, selects, fieldMap, selectType);
 		}
 
 		this.columns = new AbstractColumn[fieldMap.size()];

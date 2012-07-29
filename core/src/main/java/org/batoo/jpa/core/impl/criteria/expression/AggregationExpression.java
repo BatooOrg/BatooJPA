@@ -110,7 +110,11 @@ public class AggregationExpression<N extends Number> extends AbstractExpression<
 	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
 		this.alias = query.getAlias(this);
 
-		return this.getSqlRestrictionFragments(query)[0] + " AS " + this.alias;
+		if (selected) {
+			return this.getSqlRestrictionFragments(query)[0] + " AS " + this.alias;
+		}
+
+		return this.getSqlRestrictionFragments(query)[0];
 	}
 
 	/**
@@ -130,6 +134,14 @@ public class AggregationExpression<N extends Number> extends AbstractExpression<
 	@Override
 	@SuppressWarnings("unchecked")
 	public N handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+		if (this.getJavaType() == Long.class) {
+			return (N) (Long) row.getLong(this.alias);
+		}
+
+		if (this.getJavaType() == Double.class) {
+			return (N) (Double) row.getDouble(this.alias);
+		}
+
 		return (N) row.getObject(this.alias);
 	}
 }

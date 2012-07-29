@@ -96,10 +96,18 @@ public class NegationExpression<N extends Number> extends AbstractExpression<N> 
 		this.alias = query.getAlias(this);
 
 		if (this.inner instanceof BasicPath) {
+			if (selected) {
+				return "-" + this.inner.getSqlRestrictionFragments(query)[0] + " AS " + this.alias;
+			}
+
+			return "-" + this.inner.getSqlRestrictionFragments(query)[0];
+		}
+
+		if (selected) {
 			return "-" + this.inner.getSqlRestrictionFragments(query)[0] + " AS " + this.alias;
 		}
 
-		return "-(" + this.inner.getSqlRestrictionFragments(query)[0] + ") AS " + this.alias;
+		return "-" + this.inner.getSqlRestrictionFragments(query)[0];
 	}
 
 	/**

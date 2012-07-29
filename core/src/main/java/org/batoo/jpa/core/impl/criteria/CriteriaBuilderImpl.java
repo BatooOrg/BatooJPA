@@ -1322,8 +1322,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<Double> sumAsDouble(Expression<Float> x) {
-		// TODO Auto-generated method stub
-		return null;
+		return new AggregationExpression<Double>(AggregationFunctionType.SUM, x);
 	}
 
 	/**
@@ -1332,8 +1331,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<Long> sumAsLong(Expression<Integer> x) {
-		// TODO Auto-generated method stub
-		return null;
+		return new AggregationExpression<Long>(AggregationFunctionType.SUM, x);
 	}
 
 	/**

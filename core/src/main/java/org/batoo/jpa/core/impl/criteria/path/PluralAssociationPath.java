@@ -114,7 +114,7 @@ public class PluralAssociationPath<Z, X> extends AbstractPath<X> implements Join
 	 */
 	@Override
 	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
-		return this.fetchRoot.generateSqlSelect(query, false);
+		return this.fetchRoot.generateSqlSelect(query, selected, false);
 	}
 
 	/**
@@ -171,7 +171,7 @@ public class PluralAssociationPath<Z, X> extends AbstractPath<X> implements Join
 	public X handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		final X value = this.fetchRoot.handle(session, row);
 
-		return (X) (this.getConverter() != null ? this.getConverter().convert((Number) value) : value);
+		return (X) (this.getConverter() != null ? this.getConverter().convert(value) : value);
 	}
 
 	/**

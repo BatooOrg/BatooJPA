@@ -287,7 +287,7 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
 		this.select(selected);
 
-		return this.fetchRoot.generateSqlSelect(query, this.getParentPath() == null);
+		return this.fetchRoot.generateSqlSelect(query, selected, this.getParentPath() == null);
 	}
 
 	/**

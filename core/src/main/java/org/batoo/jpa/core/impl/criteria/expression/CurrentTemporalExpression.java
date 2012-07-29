@@ -92,9 +92,9 @@ public class CurrentTemporalExpression<T> extends AbstractExpression<T> {
 	 */
 	@Override
 	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
-		if (selected) {
-			this.alias = query.getAlias(this);
+		this.alias = query.getAlias(this);
 
+		if (selected) {
 			return this.getSqlRestrictionFragments(query)[0] + " AS " + this.alias;
 		}
 

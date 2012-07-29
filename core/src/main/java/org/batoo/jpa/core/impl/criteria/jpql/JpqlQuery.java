@@ -72,6 +72,7 @@ public class JpqlQuery {
 
 	private final MetamodelImpl metamodel;
 	private final String qlString;
+	private final Class<?> resultClass;
 
 	private final CriteriaQueryImpl<?> criteriaQuery;
 	private final Map<String, AbstractFrom<?, ?>> aliasMap = Maps.newHashMap();
@@ -81,15 +82,18 @@ public class JpqlQuery {
 	 *            the entity manager factory
 	 * @param qlString
 	 *            the query string
+	 * @param resultClass
+	 *            the result class
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public JpqlQuery(EntityManagerFactoryImpl entityManagerFactory, String qlString) {
+	public JpqlQuery(EntityManagerFactoryImpl entityManagerFactory, String qlString, Class<?> resultClass) {
 		super();
 
 		this.metamodel = entityManagerFactory.getMetamodel();
 		this.qlString = qlString;
+		this.resultClass = resultClass;
 
 		this.criteriaQuery = this.parse();
 	}
@@ -103,18 +107,13 @@ public class JpqlQuery {
 	 * @author hceylan
 	 * @return
 	 */
-	private CriteriaQueryImpl<Object> construct(CommonTree tree) {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private CriteriaQueryImpl<?> construct(CommonTree tree) {
 		final CriteriaBuilderImpl cb = this.metamodel.getEntityManagerFactory().getCriteriaBuilder();
-		final CriteriaQueryImpl<Object> q = cb.createQuery(Object.class);
+		final CriteriaQueryImpl q = cb.createQuery(this.resultClass);
 
 		final Tree type = tree.getChild(0);
 		if (type.getType() == JpqlParser.SELECT) {
-			JpqlQuery.LOG.debug("This is a select query");
-
-			if (tree.getChild(1).getType() == JpqlParser.DISTINCT) {
-				JpqlQuery.LOG.debug("Distinct is set");
-			}
-
 			this.constructFrom(cb, q, tree.getChild(1));
 
 			final List<Selection<?>> selections = this.constructSelect(cb, q, tree.getChild(0).getChild(0));
@@ -126,11 +125,32 @@ public class JpqlQuery {
 				q.multiselect(selections);
 			}
 
-			if (tree.getChildCount() > 2) {
-				final Tree child = tree.getChild(2);
-				if (child.getType() == JpqlParser.WHERE) {
-					q.where(this.constructJunction(cb, tree.getChild(2).getChild(0)));
+			if (tree.getChild(1).getType() == JpqlParser.DISTINCT) {
+				this.criteriaQuery.distinct(true);
+			}
+
+			int i = 2;
+			while (true) {
+				final Tree child = tree.getChild(i);
+
+				// end of query
+				if (child.getType() == JpqlParser.EOF) {
+					break;
 				}
+
+				// where fragment
+				if (child.getType() == JpqlParser.WHERE) {
+					q.where(this.constructJunction(cb, child.getChild(0)));
+
+				}
+
+				// group by fragment
+				if (child.getType() == JpqlParser.LGROUP_BY) {
+					q.groupBy(this.constructGroupBy(cb, q, child));
+				}
+
+				i++;
+				continue;
 			}
 		}
 
@@ -164,6 +184,30 @@ public class JpqlQuery {
 
 			this.constructJoins(cb, q, r, from.getChild(1));
 		}
+	}
+
+	/**
+	 * Creates the group by fragment of the query.
+	 * 
+	 * @param cb
+	 *            the criteria builder
+	 * @param q
+	 *            the query
+	 * @param from
+	 *            the from metadata
+	 * @return the list of group by expressions
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private List<Expression<?>> constructGroupBy(CriteriaBuilderImpl cb, CriteriaQueryImpl<?> q, Tree groupByDef) {
+		final List<Expression<?>> groupBy = Lists.newArrayList();
+
+		for (int i = 0; i < groupByDef.getChildCount(); i++) {
+			groupBy.add(this.getExpression(cb, groupByDef.getChild(i), null));
+		}
+
+		return groupBy;
 	}
 
 	/**
@@ -363,7 +407,7 @@ public class JpqlQuery {
 	}
 
 	/**
-	 * Creates the select fragment of the query
+	 * Creates the select fragment of the query.
 	 * 
 	 * @param cb
 	 *            the criteria builder
@@ -376,7 +420,7 @@ public class JpqlQuery {
 	 * @author hceylan
 	 * @return
 	 */
-	private List<Selection<?>> constructSelect(CriteriaBuilderImpl cb, CriteriaQueryImpl<Object> q, Tree selects) {
+	private List<Selection<?>> constructSelect(CriteriaBuilderImpl cb, CriteriaQueryImpl<?> q, Tree selects) {
 		final List<Selection<?>> selections = Lists.newArrayList();
 
 		for (int i = 0; i < selects.getChildCount(); i++) {

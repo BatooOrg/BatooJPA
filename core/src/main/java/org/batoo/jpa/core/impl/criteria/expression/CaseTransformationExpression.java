@@ -106,7 +106,11 @@ public class CaseTransformationExpression extends AbstractExpression<String> {
 	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
 		this.alias = query.getAlias(this);
 
-		return this.generateSqlRestriction(query) + " AS " + this.alias;
+		if (selected) {
+			return this.generateSqlRestriction(query) + " AS " + this.alias;
+		}
+
+		return this.generateSqlRestriction(query);
 	}
 
 	/**

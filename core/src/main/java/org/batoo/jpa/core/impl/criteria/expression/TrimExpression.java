@@ -109,7 +109,11 @@ public class TrimExpression extends AbstractExpression<String> {
 	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
 		this.alias = query.getAlias(this);
 
-		return this.getSqlRestrictionFragments(query)[0] + " AS " + this.alias;
+		if (selected) {
+			return this.getSqlRestrictionFragments(query)[0] + " AS " + this.alias;
+		}
+
+		return this.getSqlRestrictionFragments(query)[0];
 	}
 
 	/**

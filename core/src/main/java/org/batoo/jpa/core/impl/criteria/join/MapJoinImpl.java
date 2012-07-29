@@ -130,7 +130,7 @@ public class MapJoinImpl<Z, K, V> extends AbstractJoin<Z, V> implements MapJoin<
 	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected, MapSelectType selectType) {
 		this.select(selected);
 
-		return this.getFetchRoot().generateSqlSelect(query, this.getParentPath() == null, selectType);
+		return this.getFetchRoot().generateSqlSelect(query, selected, this.getParentPath() == null, selectType);
 	}
 
 	/**

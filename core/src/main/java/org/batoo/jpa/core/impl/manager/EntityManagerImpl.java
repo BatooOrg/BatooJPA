@@ -46,7 +46,6 @@ import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
-import org.batoo.jpa.core.impl.criteria.jpql.JpqlQuery;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
@@ -344,8 +343,7 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public <T> TypedQuery<T> createQuery(String qlString, Class<T> resultClass) {
-		final JpqlQuery jpqlQuery = this.emf.getJpqlQuery(qlString);
-		return jpqlQuery.createTypedQuery(this, resultClass);
+		return this.emf.getJpqlQuery(qlString, resultClass).createTypedQuery(this, resultClass);
 	}
 
 	/**
