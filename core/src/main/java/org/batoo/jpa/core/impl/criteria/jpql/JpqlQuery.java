@@ -142,12 +142,16 @@ public class JpqlQuery {
 				// where fragment
 				if (child.getType() == JpqlParser.WHERE) {
 					q.where(this.constructJunction(cb, child.getChild(0)));
-
 				}
 
 				// group by fragment
 				if (child.getType() == JpqlParser.LGROUP_BY) {
 					q.groupBy(this.constructGroupBy(cb, q, child));
+				}
+
+				// having fragment
+				if (child.getType() == JpqlParser.HAVING) {
+					q.having(this.constructJunction(cb, child.getChild(0)));
 				}
 
 				i++;

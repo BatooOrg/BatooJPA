@@ -25,6 +25,7 @@ import javax.persistence.PersistenceException;
 import javax.persistence.criteria.AbstractQuery;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Predicate.BooleanOperator;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 import javax.persistence.metamodel.EntityType;
@@ -69,20 +70,10 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	 */
 	protected AbstractSelection<T> selection;
 
-	/**
-	 * The restriction
-	 */
-	protected PredicateImpl restriction;
-
-	/**
-	 * If the query is distinc
-	 */
-	protected boolean distinct;
-
-	/**
-	 * The group list of the query
-	 */
-	protected final List<AbstractExpression<?>> groupList = Lists.newArrayList();
+	private PredicateImpl restriction;
+	private PredicateImpl groupRestriction;
+	private boolean distinct;
+	private final List<AbstractExpression<?>> groupList = Lists.newArrayList();
 
 	/**
 	 * @param metamodel
@@ -98,6 +89,17 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 
 		this.metamodel = metamodel;
 		this.resultType = resultType;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public AbstractQuery<T> distinct(boolean distinct) {
+		this.distinct = distinct;
+
+		return this;
 	}
 
 	/**
@@ -176,9 +178,8 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	 * 
 	 */
 	@Override
-	public Predicate getGroupRestriction() {
-		// TODO Auto-generated method stub
-		return null;
+	public PredicateImpl getGroupRestriction() {
+		return this.groupRestriction;
 	}
 
 	/**
@@ -275,8 +276,14 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	 */
 	@Override
 	public AbstractQuery<T> having(Expression<Boolean> restriction) {
-		// TODO Auto-generated method stub
-		return null;
+		if (restriction instanceof PredicateImpl) {
+			this.groupRestriction = (PredicateImpl) restriction;
+		}
+		else {
+			this.groupRestriction = new PredicateImpl((AbstractExpression<Boolean>) restriction);
+		}
+
+		return this;
 	}
 
 	/**
@@ -285,8 +292,9 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	 */
 	@Override
 	public AbstractQuery<T> having(Predicate... restrictions) {
-		// TODO Auto-generated method stub
-		return null;
+		this.groupRestriction = new PredicateImpl(false, BooleanOperator.AND, restrictions);
+
+		return this;
 	}
 
 	/**
@@ -295,8 +303,7 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	 */
 	@Override
 	public boolean isDistinct() {
-		// TODO Auto-generated method stub
-		return false;
+		return this.distinct;
 	}
 
 	/**
@@ -325,4 +332,30 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public AbstractQuery<T> where(Expression<Boolean> restriction) {
+		if (restriction instanceof PredicateImpl) {
+			this.restriction = (PredicateImpl) restriction;
+		}
+		else {
+			this.restriction = new PredicateImpl((AbstractExpression<Boolean>) restriction);
+		}
+
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public AbstractQuery<T> where(Predicate... restrictions) {
+		this.restriction = new PredicateImpl(false, BooleanOperator.AND, restrictions);
+
+		return this;
+	}
 }

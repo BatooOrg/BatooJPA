@@ -58,7 +58,7 @@ ql_statement :
     (select_statement | update_statement | delete_statement) EOF;
 
 select_statement :
-    select_clause from_clause (where_clause)? (groupby_clause)? //(having_clause)? (orderby_clause)?
+    select_clause from_clause (where_clause)? (groupby_clause)? (having_clause)? //(orderby_clause)?
     ;
 
 update_statement :
@@ -114,6 +114,9 @@ new_value :
     simple_arithmetic_expression
 //    | simple_entity_expression
     | NULL;
+
+having_clause :
+  	HAVING^ conditional_expression;
 
 where_clause :
     WHERE^ conditional_expression;
@@ -418,11 +421,6 @@ null_comparison_expression :
 //    | 'SOME'
 //  )
 //  Left_Paren subquery Right_Paren
-//  ;
-//
-//having_clause
-//  :
-//  'HAVING' conditional_expression
 //  ;
 //
 //orderby_clause

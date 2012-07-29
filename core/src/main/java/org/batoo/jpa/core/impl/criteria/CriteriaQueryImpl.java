@@ -29,7 +29,6 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Predicate.BooleanOperator;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Selection;
 
@@ -38,7 +37,6 @@ import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
-import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
@@ -96,9 +94,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 */
 	@Override
 	public CriteriaQueryImpl<T> distinct(boolean distinct) {
-		this.distinct = distinct;
-
-		return this;
+		return (CriteriaQueryImpl<T>) super.distinct(distinct);
 	}
 
 	private String generateJpql() {
@@ -110,7 +106,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 
 		// append distinct if necessary * @param selected
 
-		if (this.distinct) {
+		if (this.isDistinct()) {
 			builder.append("distinct ");
 		}
 
@@ -142,16 +138,20 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 			builder.append("\nwhere\n\t").append(this.getRestriction().generateJpqlRestriction(this));
 		}
 
-		if (this.groupList.size() > 0) {
-			final String groupBy = Joiner.on(", ").join(Lists.transform(this.groupList, new Function<AbstractExpression<?>, String>() {
+		if (this.getGroupList().size() > 0) {
+			final String groupBy = Joiner.on(", ").join(Lists.transform(this.getGroupList(), new Function<Expression<?>, String>() {
 
 				@Override
-				public String apply(AbstractExpression<?> input) {
-					return input.generateJpqlRestriction(CriteriaQueryImpl.this);
+				public String apply(Expression<?> input) {
+					return ((AbstractExpression<?>) input).generateJpqlRestriction(CriteriaQueryImpl.this);
 				}
 			}));
 
 			builder.append("\ngroup by ").append(groupBy);
+		}
+
+		if (this.getGroupRestriction() != null) {
+			builder.append("\nhaving\n\t").append(this.getGroupRestriction().generateJpqlRestriction(this));
 		}
 
 		return builder.toString();
@@ -175,7 +175,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 		// generate the select chunk
 		final StringBuilder select = new StringBuilder();
 		select.append("SELECT");
-		if (this.distinct && !this.internal) {
+		if (this.isDistinct() && !this.internal) {
 			select.append(" DISTINCT");
 		}
 		select.append("\n");
@@ -193,15 +193,16 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 		}
 
 		final String where = this.generateSqlRestriction();
-
-		final String groupBy = this.groupList.size() == 0 ? null : Joiner.on(", ").join(
-			Lists.transform(this.groupList, new Function<AbstractExpression<?>, String>() {
+		final String groupBy = this.getGroupList().size() == 0 ? null : Joiner.on(", ").join(
+			Lists.transform(this.getGroupList(), new Function<Expression<?>, String>() {
 
 				@Override
-				public String apply(AbstractExpression<?> input) {
-					return input.generateSqlSelect(CriteriaQueryImpl.this, false);
+				public String apply(Expression<?> input) {
+					return ((AbstractExpression<?>) input).generateSqlSelect(CriteriaQueryImpl.this, false);
 				}
 			}));
+
+		final String having = this.getGroupRestriction().generateSqlRestriction(this);
 
 		final String from = "FROM " + Joiner.on(",").join(froms);
 		final String join = Joiner.on("\n").skipNulls().join(joins.values());
@@ -210,7 +211,8 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 			from, //
 			StringUtils.isBlank(join) ? null : BatooUtils.indent(join), //
 			where, //
-			StringUtils.isBlank(groupBy) ? null : "GROUP BY " + groupBy);
+			StringUtils.isBlank(groupBy) ? null : "GROUP BY " + groupBy, //
+			StringUtils.isBlank(having) ? null : "HAVING " + having);
 	}
 
 	/**
@@ -224,8 +226,8 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	private String generateSqlRestriction() {
 		final String[] restrictions = new String[this.getRoots().size() + 1];
 
-		if (this.restriction != null) {
-			restrictions[0] = this.restriction.generateSqlRestriction(this);
+		if (this.getRestriction() != null) {
+			restrictions[0] = this.getRestriction().generateSqlRestriction(this);
 		}
 
 		int i = 0;
@@ -433,18 +435,9 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 */
 	public CriteriaQueryImpl<T> internal() {
 		this.internal = true;
-		this.distinct = true;
+		this.distinct(true);
 
 		return this;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public boolean isDistinct() {
-		return this.distinct;
 	}
 
 	/**
@@ -529,14 +522,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 */
 	@Override
 	public CriteriaQueryImpl<T> where(Expression<Boolean> restriction) {
-		if (restriction instanceof PredicateImpl) {
-			this.restriction = (PredicateImpl) restriction;
-		}
-		else {
-			this.restriction = new PredicateImpl((AbstractExpression<Boolean>) restriction);
-		}
-
-		return this;
+		return (CriteriaQueryImpl<T>) super.where(restriction);
 	}
 
 	/**
@@ -544,9 +530,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 	 * 
 	 */
 	@Override
-	public CriteriaQueryImpl<T> where(Predicate... predicates) {
-		this.restriction = new PredicateImpl(false, BooleanOperator.AND, predicates);
-
-		return this;
+	public CriteriaQueryImpl<T> where(Predicate... restrictions) {
+		return (CriteriaQueryImpl<T>) super.where(restrictions);
 	}
 }
