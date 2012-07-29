@@ -35,7 +35,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 /**
- * 
+ * Expression for in predicates.
  * 
  * @author hceylan
  * @since $version
@@ -85,6 +85,19 @@ public class InExpression extends BooleanExpression {
 				this.values.add(new ConstantExpression<Object>(null, value));
 			}
 		}
+	}
+
+	/**
+	 * Adds the expression to the list of values.
+	 * 
+	 * @param expression
+	 *            the expression to add
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void add(AbstractExpression<?> expression) {
+		this.values.add(expression);
 	}
 
 	/**

@@ -62,6 +62,7 @@ import org.batoo.jpa.core.impl.criteria.expression.ConstantExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CountExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CurrentTemporalExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ExpressionConverter;
+import org.batoo.jpa.core.impl.criteria.expression.IsEmptyExpression;
 import org.batoo.jpa.core.impl.criteria.expression.LocateExpression;
 import org.batoo.jpa.core.impl.criteria.expression.NegationExpression;
 import org.batoo.jpa.core.impl.criteria.expression.NumericFunctionExpression;
@@ -547,8 +548,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <T> In<T> in(Expression<? extends T> expression) {
-		// TODO Auto-generated method stub
-		return null;
+		return new InPredicate<T>(expression);
 	}
 
 	/**
@@ -557,8 +557,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <C extends Collection<?>> Predicate isEmpty(Expression<C> collection) {
-		// TODO Auto-generated method stub
-		return null;
+		return new PredicateImpl(new IsEmptyExpression(collection));
 	}
 
 	/**
@@ -567,8 +566,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Predicate isFalse(Expression<Boolean> x) {
-		// TODO Auto-generated method stub
-		return null;
+		return new PredicateImpl((AbstractExpression<Boolean>) x).not();
 	}
 
 	/**
