@@ -84,6 +84,22 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	public abstract String applyLock(String sql, LockModeType lockMode);
 
 	/**
+	 * Applies the pagination to SQL string.
+	 * 
+	 * @param sql
+	 *            the SQL to apply
+	 * @param startPosition
+	 *            the start position
+	 * @param maxResult
+	 *            the max number of results
+	 * @return the modified SQL
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract String applyPagination(String sql, int startPosition, int maxResult);
+
+	/**
 	 * Creates the BasicColumn Definition DDL For the column.
 	 * 
 	 * @param columnDefinition

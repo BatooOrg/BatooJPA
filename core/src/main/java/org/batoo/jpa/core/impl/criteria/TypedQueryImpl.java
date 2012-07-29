@@ -75,6 +75,8 @@ public class TypedQueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X
 	private String sql;
 	private final AbstractSelection<X> selection;
 	private final Map<String, Object> hints = Maps.newHashMap();
+	private int startPosition = 0;
+	private int maxResult = Integer.MAX_VALUE;
 
 	private final Map<ParameterExpressionImpl<?>, Object> parameters = Maps.newHashMap();
 	private final List<X> results = Lists.newArrayList();
@@ -188,8 +190,7 @@ public class TypedQueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X
 	 */
 	@Override
 	public int getFirstResult() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.startPosition;
 	}
 
 	/**
@@ -226,8 +227,7 @@ public class TypedQueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X
 	 */
 	@Override
 	public int getMaxResults() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.maxResult;
 	}
 
 	/**
@@ -346,6 +346,12 @@ public class TypedQueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X
 			if ((lockMode == LockModeType.PESSIMISTIC_READ) || (lockMode == LockModeType.PESSIMISTIC_WRITE)
 				|| (lockMode == LockModeType.PESSIMISTIC_FORCE_INCREMENT)) {
 				this.sql = this.em.getJdbcAdaptor().applyLock(this.sql, lockMode);
+			}
+
+			if ((this.startPosition != 0) || (this.maxResult != Integer.MAX_VALUE)) {
+				TypedQueryImpl.LOG.debug("Rows restricted to {0} / {1}", this.startPosition, this.maxResult);
+
+				this.sql = this.cq.getMetamodel().getJdbcAdaptor().applyPagination(this.sql, this.startPosition, this.maxResult);
 			}
 
 			final MetamodelImpl metamodel = this.em.getMetamodel();
@@ -478,8 +484,9 @@ public class TypedQueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X
 	 */
 	@Override
 	public TypedQuery<X> setFirstResult(int startPosition) {
-		// TODO Auto-generated method stub
-		return null;
+		this.startPosition = startPosition;
+
+		return this;
 	}
 
 	/**
@@ -520,8 +527,8 @@ public class TypedQueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X
 	 */
 	@Override
 	public TypedQuery<X> setMaxResults(int maxResult) {
-		// TODO Auto-generated method stub
-		return null;
+		this.maxResult = maxResult;
+		return this;
 	}
 
 	/**

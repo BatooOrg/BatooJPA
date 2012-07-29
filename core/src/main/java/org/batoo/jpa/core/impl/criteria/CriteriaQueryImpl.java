@@ -202,7 +202,7 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 				}
 			}));
 
-		final String having = this.getGroupRestriction().generateSqlRestriction(this);
+		final String having = this.getGroupRestriction() != null ? this.getGroupRestriction().generateSqlRestriction(this) : null;
 
 		final String from = "FROM " + Joiner.on(",").join(froms);
 		final String join = Joiner.on("\n").skipNulls().join(joins.values());

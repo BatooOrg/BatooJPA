@@ -82,6 +82,23 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
+	public String applyPagination(String sql, int startPosition, int maxResult) {
+		if (startPosition != 0) {
+			sql = sql + "\nOFFSET " + startPosition + " ROWS";
+		}
+
+		if (maxResult != Integer.MAX_VALUE) {
+			sql = sql + "\nFETCH FIRST  " + maxResult + " ROWS ONLY";
+		}
+
+		return sql;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public String createColumnDDL(AbstractColumn column) {
 		final boolean identity = (column instanceof PkColumn) && (((PkColumn) column).getIdType() == IdType.IDENTITY);
 
