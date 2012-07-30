@@ -23,7 +23,7 @@ import java.sql.SQLException;
 
 import javax.persistence.criteria.Expression;
 
-import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
@@ -55,7 +55,7 @@ public class IsEmptyExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -65,7 +65,7 @@ public class IsEmptyExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -75,7 +75,7 @@ public class IsEmptyExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -85,7 +85,7 @@ public class IsEmptyExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
 		// TODO Auto-generated method stub
 		return null;
 	}

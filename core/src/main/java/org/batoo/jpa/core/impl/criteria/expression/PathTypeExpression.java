@@ -21,7 +21,7 @@ package org.batoo.jpa.core.impl.criteria.expression;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -57,7 +57,7 @@ public class PathTypeExpression<T> extends AbstractTypeExpression<T> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
 		throw new IllegalArgumentException();
 	}
 
@@ -66,7 +66,7 @@ public class PathTypeExpression<T> extends AbstractTypeExpression<T> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
 		throw new IllegalArgumentException();
 	}
 

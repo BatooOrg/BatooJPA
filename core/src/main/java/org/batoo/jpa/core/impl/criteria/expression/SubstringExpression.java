@@ -24,7 +24,7 @@ import java.sql.SQLException;
 import javax.persistence.criteria.Expression;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
@@ -65,7 +65,7 @@ public class SubstringExpression extends AbstractExpression<String> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
 		if (this.end != null) {
 			return "substring(" + this.inner.generateJpqlRestriction(query) + "," //
 				+ this.start.generateJpqlRestriction(query) + ")";
@@ -81,7 +81,7 @@ public class SubstringExpression extends AbstractExpression<String> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
 		if (selected && StringUtils.isBlank(this.getAlias())) {
 			return this.generateJpqlRestriction(query) + " as " + this.getAlias();
 		}
@@ -94,7 +94,7 @@ public class SubstringExpression extends AbstractExpression<String> {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
 		this.alias = query.getAlias(this);
 
 		if (selected) {
@@ -109,7 +109,7 @@ public class SubstringExpression extends AbstractExpression<String> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
 		if (this.end == null) {
 			return new String[] { "SUBSTR(" + this.inner.getSqlRestrictionFragments(query)[0] + //
 				"," + this.start.getSqlRestrictionFragments(query)[0] + ")" };

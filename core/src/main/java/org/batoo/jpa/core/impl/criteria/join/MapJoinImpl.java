@@ -30,7 +30,7 @@ import javax.persistence.criteria.MapJoin;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 
-import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.MapEntryExpression;
@@ -109,7 +109,7 @@ public class MapJoinImpl<Z, K, V> extends AbstractJoin<Z, V> implements MapJoin<
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
 		return this.generateSqlSelect(query, selected, MapSelectType.VALUE);
 	}
 
@@ -127,7 +127,7 @@ public class MapJoinImpl<Z, K, V> extends AbstractJoin<Z, V> implements MapJoin<
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected, MapSelectType selectType) {
+	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected, MapSelectType selectType) {
 		this.select(selected);
 
 		return this.getFetchRoot().generateSqlSelect(query, selected, this.getParentPath() == null, selectType);
@@ -141,6 +141,16 @@ public class MapJoinImpl<Z, K, V> extends AbstractJoin<Z, V> implements MapJoin<
 	@SuppressWarnings("unchecked")
 	public MapAttributeImpl<? super Z, K, V> getModel() {
 		return (MapAttributeImpl<? super Z, K, V>) this.getAttribute();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public V handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+		return (V) this.handle(session, row, MapSelectType.VALUE);
 	}
 
 	/**
@@ -186,16 +196,6 @@ public class MapJoinImpl<Z, K, V> extends AbstractJoin<Z, V> implements MapJoin<
 			default:
 				return result;
 		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public V handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
-		return (V) this.handle(session, row, MapSelectType.VALUE);
 	}
 
 	/**

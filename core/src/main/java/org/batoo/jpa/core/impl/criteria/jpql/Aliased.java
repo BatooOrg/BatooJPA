@@ -18,12 +18,7 @@
  */
 package org.batoo.jpa.core.impl.criteria.jpql;
 
-import java.util.Map;
-
-import javax.persistence.PersistenceException;
-
 import org.antlr.runtime.tree.Tree;
-import org.batoo.jpa.core.impl.criteria.AbstractSelection;
 import org.batoo.jpa.jpql.JpqlParser;
 
 /**
@@ -39,8 +34,6 @@ public class Aliased {
 	private final String parent;
 
 	/**
-	 * @param aliasMap
-	 *            the alias map
 	 * @param aliased
 	 *            aliased tree
 	 * @param parented
@@ -49,7 +42,7 @@ public class Aliased {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Aliased(Map<String, ? extends AbstractSelection<?>> aliasMap, Tree aliased, boolean parented) {
+	public Aliased(Tree aliased, boolean parented) {
 		super();
 
 		final Tree id = aliased.getChild(0);
@@ -64,10 +57,6 @@ public class Aliased {
 
 		if (aliased.getChildCount() > 1) {
 			this.alias = aliased.getChild(1).getText();
-
-			if (aliasMap.containsKey(this.alias)) {
-				throw new PersistenceException("Alias already exists: " + this.alias + ", " + aliased.getChild(1).getTokenStartIndex());
-			}
 		}
 		else {
 			this.alias = null;

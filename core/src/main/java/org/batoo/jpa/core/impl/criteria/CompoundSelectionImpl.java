@@ -102,7 +102,7 @@ public class CompoundSelectionImpl<X> extends AbstractSelection<X> implements Co
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(CriteriaQueryImpl<?> query, final boolean selected) {
+	public String generateJpqlSelect(AbstractQueryImpl<?> query, final boolean selected) {
 		return Joiner.on(", ").join(Lists.transform(this.selections, new Function<AbstractSelection<?>, String>() {
 
 			@Override
@@ -117,7 +117,7 @@ public class CompoundSelectionImpl<X> extends AbstractSelection<X> implements Co
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(final CriteriaQueryImpl<?> query, final boolean selected) {
+	public String generateSqlSelect(final AbstractQueryImpl<?> query, final boolean selected) {
 		return Joiner.on(",\n").join(Lists.transform(this.selections, new Function<AbstractSelection<?>, String>() {
 
 			@Override
@@ -132,7 +132,7 @@ public class CompoundSelectionImpl<X> extends AbstractSelection<X> implements Co
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
 		throw new UnsupportedOperationException();
 	}
 

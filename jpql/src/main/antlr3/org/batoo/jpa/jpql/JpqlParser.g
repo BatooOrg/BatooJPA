@@ -23,6 +23,7 @@ tokens {
     //imaginary AS token
     ST_UPDATE;
     ST_FROM;
+    ST_SUBQUERY;
     ST_ORDER;
     ST_PARENTED;
     ST_COLL;
@@ -222,21 +223,11 @@ functions_returning_numerics :
 //  | SIZE^ Left_Paren! simple_arithmetic_expression Right_Paren!
 //  | INDEX^ Left_Paren! simple_arithmetic_expression Right_Paren!
   ;
-
-string_primary :
-	functions_returning_strings
-	| state_field_path_expression
-	| STRING_LITERAL
-	| input_parameter
-	| aggregate_expression
-//	| case_expression
-	;
 	
 functions_returning_strings :
 	SUBSTRING^ Left_Paren! string_primary Comma! simple_arithmetic_expression (Comma! simple_arithmetic_expression)? Right_Paren!
 	| CONCAT^ Left_Paren! string_primary (Comma! string_primary )+ Right_Paren!
-	| TRIM Left_Paren ((LEADING | TRAILING | BOTH)? (STRING_LITERAL)? FROM!)? string_primary Right_Paren!
-	 	-> ^(TRIM (LEADING | TRAILING | BOTH)? (STRING_LITERAL)?)? string_primary)
+	| TRIM^ Left_Paren! ((LEADING | TRAILING | BOTH)? (STRING_LITERAL)? FROM!)? string_primary Right_Paren!
 	| LOWER^ Left_Paren! string_primary Right_Paren!
 	| UPPER^ Left_Paren! string_primary Right_Paren!
 	;
@@ -271,14 +262,13 @@ simple_cond_expression options { backtrack=true; } :
 
 between_expression :
     arithmetic_expression (NOT)? BETWEEN arithmetic_expression AND arithmetic_expression
-        -> ^(BETWEEN arithmetic_expression arithmetic_expression arithmetic_expression (NOT)?)
-    ;
+        -> ^(BETWEEN arithmetic_expression arithmetic_expression arithmetic_expression (NOT)?);
     
 like_expression :
     string_expression (NOT)? LIKE string_expression (ESCAPE STRING_LITERAL)?
         -> ^(LIKE string_expression string_expression (STRING_LITERAL)? (NOT)?);
 
-comparison_expression :
+comparison_expression options { backtrack=true; }:
     string_expression comparison_operator^ (string_expression /*| all_or_any_expression*/) 
     | boolean_expression comparison_operator^ (boolean_expression /*| all_or_any_expression*/)
     | enum_expression (Equals_Operator | Not_Equals_Operator)^ (enum_expression /*| all_or_any_expression*/)
@@ -298,17 +288,26 @@ comparison_operator :
 
 arithmetic_expression :
  	simple_arithmetic_expression
-//  | Left_Paren subquery Right_Paren
+ 	| Left_Paren subquery Right_Paren
 	;
 
 string_expression :
   	string_primary
-//  | Left_Paren subquery Right_Paren
+  	| Left_Paren! subquery Right_Paren!
 	;
 
+string_primary :
+	functions_returning_strings
+	| state_field_path_expression
+	| STRING_LITERAL
+	| input_parameter
+	| aggregate_expression
+//	| case_expression
+	;
+	
 datetime_expression :
   	datetime_primary
-//  | Left_Paren subquery Right_Paren
+  	| Left_Paren! subquery Right_Paren!
 	;
 
 datetime_primary :
@@ -326,7 +325,7 @@ functions_returning_datetime :
 
 boolean_expression :
     boolean_primary
-//  | Left_Paren subquery Right_Paren
+    | Left_Paren! subquery Right_Paren!
     ;
 
 boolean_primary :
@@ -348,9 +347,9 @@ type_discriminator :
 	TYPE^ Left_Paren! (ID | state_field_path_expression | input_parameter ) Right_Paren!;
 
 enum_expression :
-  enum_primary
-//  | Left_Paren subquery Right_Paren
-  ;
+  	enum_primary
+  	| Left_Paren! subquery Right_Paren!
+  	;
 
 enum_primary :
   state_field_path_expression
@@ -361,7 +360,7 @@ enum_primary :
 enum_literal: ID;
 
 in_expression :
-  	state_field_path_expression (NOT)? IN Left_Paren (in_items /*| subquery*/) Right_Paren
+  	state_field_path_expression (NOT)? IN Left_Paren (in_items | subquery) Right_Paren
   		-> ^(ST_IN state_field_path_expression (NOT)? in_items);
 
 in_items :
@@ -433,38 +432,19 @@ null_comparison_expression :
 //  Left_Paren subquery Right_Paren
 //  ;
 //
-//subquery
-//  :
-//  simple_select_clause subquery_from_clause (where_clause)? (groupby_clause)? (having_clause)?
-//  ;
-//
-//subquery_from_clause
-//  :
-//  FROM subselect_ID_declaration (Comma subselect_ID_declaration)*
-//  ;
-//
-//subselect_ID_declaration
-//  :
-//  ID_declaration
-//  | association_path_expression (AS)? ID
-//  | collection_member_declaration
-//  ;
-//
-//association_path_expression
-//  :
-//  collection_valued_path_expression
-//  | single_valued_association_path_expression
-//  ;
-//
-//simple_select_clause
-//  :
-//  SELECT (DISTINCT)? simple_select_expression
-//  ;
-//
-//simple_select_expression
-//  :
-//  single_valued_path_expression
-//  | aggregate_expression
-//  | ID
-//  ;
-//
+subquery :
+  	simple_select_clause subquery_from_clause (where_clause)? (groupby_clause)? (having_clause)?
+  		-> ^(ST_SUBQUERY simple_select_clause subquery_from_clause (where_clause)? (groupby_clause)? (having_clause)?);
+
+simple_select_clause :
+  	SELECT^ (DISTINCT)? scalar_expression;
+
+subquery_from_clause :
+    FROM subselect_ID_declaration (Comma subselect_ID_declaration)*
+        -> ^(LFROM subselect_ID_declaration (subselect_ID_declaration)*);  
+
+subselect_ID_declaration :
+  ID_declaration
+  | faliased_qid
+  | collection_member_declaration
+  ;

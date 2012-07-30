@@ -25,6 +25,7 @@ import java.util.Map.Entry;
 
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceException;
+import javax.persistence.criteria.AbstractQuery;
 import javax.persistence.criteria.CriteriaBuilder.Trimspec;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
@@ -33,6 +34,7 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Selection;
+import javax.persistence.criteria.Subquery;
 
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
@@ -45,6 +47,7 @@ import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
+import org.batoo.jpa.core.impl.criteria.SubQueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ConcatExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ConstantExpression;
@@ -80,7 +83,7 @@ public class JpqlQuery {
 	private final String qlString;
 
 	private final CriteriaQueryImpl<?> criteriaQuery;
-	private final Map<String, AbstractFrom<?, ?>> aliasMap = Maps.newHashMap();
+	private final Map<AbstractQuery<?>, Map<String, AbstractFrom<?, ?>>> aliasMap = Maps.newHashMap();
 
 	private HashMap<String, Object> hints;
 	private LockModeType lockMode;
@@ -169,7 +172,7 @@ public class JpqlQuery {
 			}
 
 			if (tree.getChild(1).getType() == JpqlParser.DISTINCT) {
-				this.criteriaQuery.distinct(true);
+				q.distinct(true);
 			}
 
 			int i = 2;
@@ -183,7 +186,7 @@ public class JpqlQuery {
 
 				// where fragment
 				if (child.getType() == JpqlParser.WHERE) {
-					q.where(this.constructJunction(cb, child.getChild(0)));
+					q.where(this.constructJunction(cb, q, child.getChild(0)));
 				}
 
 				// group by fragment
@@ -193,7 +196,7 @@ public class JpqlQuery {
 
 				// having fragment
 				if (child.getType() == JpqlParser.HAVING) {
-					q.having(this.constructJunction(cb, child.getChild(0)));
+					q.having(this.constructJunction(cb, q, child.getChild(0)));
 				}
 
 				// order by fragment
@@ -222,19 +225,33 @@ public class JpqlQuery {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private void constructFrom(CriteriaBuilderImpl cb, CriteriaQueryImpl<?> q, Tree froms) {
+	private void constructFrom(CriteriaBuilderImpl cb, AbstractQuery<?> q, Tree froms) {
 		for (int i = 0; i < froms.getChildCount(); i++) {
 			final Tree from = froms.getChild(i);
-			final Aliased fromDef = new Aliased(this.aliasMap, from.getChild(0), false);
+			// root query from
+			if (from.getType() == JpqlParser.ST_FROM) {
+				final Aliased fromDef = new Aliased(from.getChild(0), false);
 
-			final EntityTypeImpl<Object> entity = this.getEntity(fromDef.getQualified().toString());
+				final EntityTypeImpl<Object> entity = this.getEntity(fromDef.getQualified().toString());
 
-			final RootImpl<Object> r = q.from(entity);
-			r.alias(fromDef.getAlias());
+				final RootImpl<Object> r = (RootImpl<Object>) q.from(entity);
+				r.alias(fromDef.getAlias());
 
-			this.aliasMap.put(fromDef.getAlias(), r);
+				this.putAlias(q, from, fromDef, r);
 
-			this.constructJoins(cb, q, r, from.getChild(1));
+				this.constructJoins(cb, q, r, from.getChild(1));
+
+			}
+			// sub query from
+			else {
+				final Aliased fromDef = new Aliased(from, false);
+				final EntityTypeImpl<Object> entity = this.getEntity(fromDef.getQualified().toString());
+
+				final RootImpl<Object> r = (RootImpl<Object>) q.from(entity);
+				r.alias(fromDef.getAlias());
+
+				this.putAlias(q, from, fromDef, r);
+			}
 		}
 	}
 
@@ -252,11 +269,11 @@ public class JpqlQuery {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private List<Expression<?>> constructGroupBy(CriteriaBuilderImpl cb, CriteriaQueryImpl<?> q, Tree groupByDef) {
+	private List<Expression<?>> constructGroupBy(CriteriaBuilderImpl cb, AbstractQuery<?> q, Tree groupByDef) {
 		final List<Expression<?>> groupBy = Lists.newArrayList();
 
 		for (int i = 0; i < groupByDef.getChildCount(); i++) {
-			groupBy.add(this.getExpression(cb, groupByDef.getChild(i), null));
+			groupBy.add(this.getExpression(cb, q, groupByDef.getChild(i), null));
 		}
 
 		return groupBy;
@@ -277,13 +294,13 @@ public class JpqlQuery {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private void constructJoins(CriteriaBuilderImpl cb, CriteriaQueryImpl<?> q, RootImpl<Object> r, Tree joins) {
+	private void constructJoins(CriteriaBuilderImpl cb, AbstractQuery<?> q, RootImpl<Object> r, Tree joins) {
 		for (int i = 0; i < joins.getChildCount(); i++) {
 			final Tree join = joins.getChild(i);
 
 			final int joinType = join.getChild(0).getType();
 			if (joinType == JpqlParser.FETCH) {
-				FetchParent<?, ?> parent = this.aliasMap.get(join.getChild(1).getText());
+				FetchParent<?, ?> parent = this.getAliased(q, join.getChild(1).getText());
 
 				final Qualified qualified = new Qualified(join.getChild(2), false);
 
@@ -292,9 +309,9 @@ public class JpqlQuery {
 				}
 			}
 			else {
-				final Aliased aliased = new Aliased(this.aliasMap, join.getChild(2), false);
+				final Aliased aliased = new Aliased(join.getChild(2), false);
 
-				AbstractFrom<?, ?> parent = this.getAliased(join.getChild(1).getText());
+				AbstractFrom<?, ?> parent = this.getAliased(q, join.getChild(1).getText());
 
 				for (final String segment : aliased.getQualified().getSegments()) {
 					if (joinType == JpqlParser.LEFT) {
@@ -307,7 +324,7 @@ public class JpqlQuery {
 
 				parent.alias(aliased.getAlias());
 
-				this.aliasMap.put(aliased.getAlias(), parent);
+				this.putAlias(q, join.getChild(1), aliased, parent);
 			}
 		}
 	}
@@ -323,16 +340,16 @@ public class JpqlQuery {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private Expression<Boolean> constructJunction(CriteriaBuilderImpl cb, Tree junctionDef) {
+	private Expression<Boolean> constructJunction(CriteriaBuilderImpl cb, AbstractQuery<?> q, Tree junctionDef) {
 		final List<Expression<Boolean>> predictions = Lists.newArrayList();
 
 		for (int i = 0; i < junctionDef.getChildCount(); i++) {
 			final Tree childDef = junctionDef.getChild(i);
 			if ((childDef.getType() == JpqlParser.LOR) || (childDef.getType() == JpqlParser.LAND)) {
-				predictions.add(this.constructJunction(cb, childDef));
+				predictions.add(this.constructJunction(cb, q, childDef));
 			}
 			else {
-				predictions.add(this.constructPredicate(cb, childDef));
+				predictions.add(this.constructPredicate(cb, q, childDef));
 			}
 		}
 
@@ -366,8 +383,8 @@ public class JpqlQuery {
 		for (int i = 0; i < orderBy.getChildCount(); i++) {
 			final Tree orderByItem = orderBy.getChild(i);
 			final Order order = orderByItem.getChildCount() == 2 ? //
-				cb.desc(this.getExpression(cb, orderByItem.getChild(0), null)) : //
-				cb.asc(this.getExpression(cb, orderByItem.getChild(0), null));
+				cb.desc(this.getExpression(cb, q, orderByItem.getChild(0), null)) : //
+				cb.asc(this.getExpression(cb, q, orderByItem.getChild(0), null));
 
 			orders.add(order);
 		}
@@ -388,7 +405,7 @@ public class JpqlQuery {
 	 * @author hceylan
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private <X> Expression<Boolean> constructPredicate(CriteriaBuilderImpl cb, Tree predictionDef) {
+	private <X> Expression<Boolean> constructPredicate(CriteriaBuilderImpl cb, AbstractQuery<?> q, Tree predictionDef) {
 		if ((predictionDef.getType() == JpqlParser.Equals_Operator) //
 			|| (predictionDef.getType() == JpqlParser.Not_Equals_Operator) //
 			|| (predictionDef.getType() == JpqlParser.Greater_Than_Operator) //
@@ -397,8 +414,29 @@ public class JpqlQuery {
 			|| (predictionDef.getType() == JpqlParser.Less_Or_Equals_Operator) //
 			|| (predictionDef.getType() == JpqlParser.BETWEEN)) {
 
-			final AbstractExpression<X> left = this.<X> getExpression(cb, predictionDef.getChild(0), null);
-			final AbstractExpression<? extends X> right = this.getExpression(cb, predictionDef.getChild(1), left.getJavaType());
+			final AbstractExpression<X> left;
+			final AbstractExpression<X> right;
+
+			if ((predictionDef.getChild(0).getType() == JpqlParser.ST_SUBQUERY) || (predictionDef.getChild(1).getType() == JpqlParser.ST_SUBQUERY)) {
+				// left side is sub query
+				if (predictionDef.getChild(0).getType() == JpqlParser.ST_SUBQUERY) {
+					right = this.getExpression(cb, q, predictionDef.getChild(1), null);
+					left = (AbstractExpression<X>) this.constructSubquery(cb, q, predictionDef.getChild(0), right.getJavaType());
+
+					// right side is sub query
+				}
+				else if (predictionDef.getChild(1).getType() == JpqlParser.ST_SUBQUERY) {
+					left = this.getExpression(cb, q, predictionDef.getChild(0), null);
+					right = (AbstractExpression<X>) this.constructSubquery(cb, q, predictionDef.getChild(1), left.getJavaType());
+				}
+				else {
+					throw new PersistenceException("Both sides of the comparison cannot be sub query");
+				}
+			}
+			else {
+				left = this.<X> getExpression(cb, q, predictionDef.getChild(0), null);
+				right = (AbstractExpression<X>) this.getExpression(cb, q, predictionDef.getChild(1), left.getJavaType());
+			}
 
 			switch (predictionDef.getType()) {
 				case JpqlParser.Equals_Operator:
@@ -439,7 +477,7 @@ public class JpqlQuery {
 						return cb.le((Expression<? extends Number>) left, (Expression<? extends Number>) right);
 					}
 				case JpqlParser.BETWEEN:
-					final AbstractExpression<?> right2 = this.getExpression(cb, predictionDef.getChild(2), left.getJavaType());
+					final AbstractExpression<?> right2 = this.getExpression(cb, q, predictionDef.getChild(2), left.getJavaType());
 
 					final Predicate between = cb.between((AbstractExpression) left, (AbstractExpression) right, (AbstractExpression) right2);
 					if (predictionDef.getChildCount() == 4) {
@@ -451,11 +489,11 @@ public class JpqlQuery {
 		}
 
 		if (predictionDef.getType() == JpqlParser.LIKE) {
-			final AbstractExpression<String> inner = this.getExpression(cb, predictionDef.getChild(0), String.class);
-			final AbstractExpression<String> pattern = this.getExpression(cb, predictionDef.getChild(1), String.class);
+			final AbstractExpression<String> inner = this.getExpression(cb, q, predictionDef.getChild(0), String.class);
+			final AbstractExpression<String> pattern = this.getExpression(cb, q, predictionDef.getChild(1), String.class);
 
 			if ((predictionDef.getChildCount() > 2) && (predictionDef.getChild(2).getType() == JpqlParser.STRING_LITERAL)) {
-				final Expression<Character> escape = this.getExpression(cb, predictionDef.getChild(2), Character.class);
+				final Expression<Character> escape = this.getExpression(cb, q, predictionDef.getChild(2), Character.class);
 
 				if (predictionDef.getChild(predictionDef.getChildCount() - 1).getType() == JpqlParser.NOT) {
 					return cb.notLike(inner, pattern, escape);
@@ -475,20 +513,20 @@ public class JpqlQuery {
 		}
 
 		if (predictionDef.getType() == JpqlParser.ST_IN) {
-			final AbstractExpression<?> left = this.<X> getExpression(cb, predictionDef.getChild(0), null);
+			final AbstractExpression<?> left = this.<X> getExpression(cb, q, predictionDef.getChild(0), null);
 
 			final List<AbstractExpression<?>> expressions = Lists.newArrayList();
 
 			final Tree inDefs = predictionDef.getChild(1);
 			for (int i = 0; i < inDefs.getChildCount(); i++) {
-				expressions.add(this.getExpression(cb, inDefs.getChild(i), left.getJavaType()));
+				expressions.add(this.getExpression(cb, q, inDefs.getChild(i), left.getJavaType()));
 			}
 
 			return left.in(expressions);
 		}
 
 		if (predictionDef.getType() == JpqlParser.ST_NULL) {
-			final AbstractExpression<Object> expr = this.getExpression(cb, predictionDef.getChild(0), null);
+			final AbstractExpression<Object> expr = this.getExpression(cb, q, predictionDef.getChild(0), null);
 
 			if (predictionDef.getChildCount() == 2) {
 				return cb.isNotNull(expr);
@@ -497,7 +535,7 @@ public class JpqlQuery {
 			return cb.isNull(expr);
 		}
 
-		return this.getExpression(cb, predictionDef, Boolean.class);
+		return this.getExpression(cb, q, predictionDef, Boolean.class);
 	}
 
 	/**
@@ -520,7 +558,7 @@ public class JpqlQuery {
 		for (int i = 0; i < selects.getChildCount(); i++) {
 			final Tree selectDef = selects.getChild(i);
 
-			final AbstractSelection<?> selection = this.constructSingleSelect(cb, selectDef.getChild(0));
+			final AbstractSelection<?> selection = this.constructSingleSelect(cb, q, selectDef.getChild(0));
 
 			if (selectDef.getChildCount() == 2) {
 				selection.alias(selectDef.getChild(1).getText());
@@ -547,7 +585,7 @@ public class JpqlQuery {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private AbstractSelection<?> constructSingleSelect(CriteriaBuilderImpl cb, Tree selectDef) {
+	private AbstractSelection<?> constructSingleSelect(CriteriaBuilderImpl cb, CriteriaQueryImpl<?> q, Tree selectDef) {
 		// constructor select
 		if (selectDef.getType() == JpqlParser.NEW) {
 			final String className = new Qualified(selectDef.getChild(0)).toString();
@@ -557,7 +595,7 @@ public class JpqlQuery {
 			for (int i = 0; i < arguments.getChildCount(); i++) {
 				final Tree argumentDef = arguments.getChild(i);
 
-				childSelections.add(this.getExpression(cb, argumentDef, null));
+				childSelections.add(this.getExpression(cb, q, argumentDef, null));
 			}
 
 			try {
@@ -572,10 +610,69 @@ public class JpqlQuery {
 		// object type
 		if (selectDef.getType() == JpqlParser.OBJECT) {
 			final String alias = selectDef.getChild(0).getText();
-			return this.getAliased(alias);
+			return this.getAliased(q, alias);
 		}
 
-		return this.getExpression(cb, selectDef, null);
+		return this.getExpression(cb, q, selectDef, null);
+	}
+
+	/**
+	 * @param cb
+	 *            the crtieria builder
+	 * @param q
+	 *            the critieria query
+	 * @param subQueryDef
+	 *            the sub query definition
+	 * @return the sub query
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private <T> SubQueryImpl<T> constructSubquery(CriteriaBuilderImpl cb, AbstractQuery<?> q, Tree subQueryDef, Class<T> javaType) {
+		final SubQueryImpl<T> s = (SubQueryImpl<T>) q.subquery(javaType);
+
+		final Tree type = subQueryDef.getChild(0);
+		if (type.getType() == JpqlParser.SELECT) {
+			this.constructFrom(cb, s, subQueryDef.getChild(1));
+
+			final Tree selectDef = subQueryDef.getChild(0).getChild(0);
+
+			s.select(this.getExpression(cb, s, selectDef, javaType));
+
+			if (subQueryDef.getChild(1).getType() == JpqlParser.DISTINCT) {
+				s.distinct(true);
+			}
+
+			int i = 2;
+			while (true) {
+				final Tree child = subQueryDef.getChild(i);
+
+				// en of sub query
+				if (child == null) {
+					break;
+				}
+
+				// where fragment
+				if (child.getType() == JpqlParser.WHERE) {
+					s.where(this.constructJunction(cb, s, child.getChild(0)));
+				}
+
+				// group by fragment
+				if (child.getType() == JpqlParser.LGROUP_BY) {
+					s.groupBy(this.constructGroupBy(cb, s, child));
+				}
+
+				// having fragment
+				if (child.getType() == JpqlParser.HAVING) {
+					s.having(this.constructJunction(cb, s, child.getChild(0)));
+				}
+
+				i++;
+				continue;
+			}
+		}
+
+		return s;
 	}
 
 	/**
@@ -607,20 +704,38 @@ public class JpqlQuery {
 		return typedQuery;
 	}
 
-	private AbstractFrom<?, ?> getAliased(String alias) {
-		final AbstractFrom<?, ?> from = this.aliasMap.get(alias);
-		if (from == null) {
-			throw new PersistenceException("Alias is not bound: " + alias);
+	private AbstractFrom<?, ?> getAliased(AbstractQuery<?> q, String alias) {
+		final Map<String, AbstractFrom<?, ?>> aliasMap = this.aliasMap.get(q);
+
+		if (aliasMap != null) {
+			final AbstractFrom<?, ?> from = aliasMap.get(alias);
+
+			if (from != null) {
+				return from;
+			}
 		}
 
-		return from;
+		if (q instanceof Subquery) {
+			final SubQueryImpl<?> s = (SubQueryImpl<?>) q;
+			final AbstractFrom<?, ?> aliased = this.getAliased(s.getParent(), alias);
+
+			if (aliased instanceof RootImpl) {
+				s.correlate((RootImpl<?>) aliased);
+			}
+
+			return aliased;
+		}
+
+		throw new PersistenceException("Alias is not bound: " + alias);
 	}
 
 	private EntityTypeImpl<Object> getEntity(String entityName) {
 		final EntityTypeImpl<Object> entity = this.metamodel.entity(entityName);
+
 		if (entity == null) {
 			throw new IllegalArgumentException("Type is not managed: " + entityName);
 		}
+
 		return entity;
 	}
 
@@ -637,23 +752,23 @@ public class JpqlQuery {
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	private <X> AbstractExpression<X> getExpression(CriteriaBuilderImpl cb, Tree exprDef, Class<X> javaType) {
+	private <X> AbstractExpression<X> getExpression(CriteriaBuilderImpl cb, AbstractQuery<?> q, Tree exprDef, Class<X> javaType) {
 		// identification variable
 		if (exprDef.getType() == JpqlParser.ID) {
-			return (AbstractExpression<X>) this.getAliased(exprDef.getText());
+			return (AbstractExpression<X>) this.getAliased(q, exprDef.getText());
 		}
 
 		// single valued state field expression
 		if (exprDef.getType() == JpqlParser.ST_PARENTED) {
-			AbstractSelection<?> selection = this.getAliased(exprDef.getChild(0).getText());
+			AbstractSelection<?> expression = this.getAliased(q, exprDef.getChild(0).getText());
 
 			final Qualified qualified = new Qualified(exprDef.getChild(1));
 			for (final String segment : qualified.getSegments()) {
-				if (selection instanceof AbstractFrom) {
-					selection = ((AbstractFrom<?, ?>) selection).get(segment);
+				if (expression instanceof AbstractFrom) {
+					expression = ((AbstractFrom<?, ?>) expression).get(segment);
 				}
-				else if (selection instanceof AbstractPath) {
-					selection = ((AbstractPath<?>) selection).get(segment);
+				else if (expression instanceof AbstractPath) {
+					expression = ((AbstractPath<?>) expression).get(segment);
 				}
 				else {
 					throw new IllegalArgumentException("Cannot dereference: " + segment);
@@ -661,12 +776,12 @@ public class JpqlQuery {
 
 			}
 
-			return (AbstractExpression<X>) selection;
+			return (AbstractExpression<X>) expression;
 		}
 
 		// negation
 		if (exprDef.getType() == JpqlParser.ST_NEGATION) {
-			return (AbstractExpression<X>) cb.neg(this.<Number> getExpression(cb, exprDef.getChild(0), null));
+			return (AbstractExpression<X>) cb.neg(this.<Number> getExpression(cb, q, exprDef.getChild(0), null));
 		}
 
 		if (exprDef.getType() == JpqlParser.Named_Parameter) {
@@ -679,8 +794,8 @@ public class JpqlQuery {
 			|| (exprDef.getType() == JpqlParser.Multiplication_Sign) //
 			|| (exprDef.getType() == JpqlParser.Division_Sign)) {
 
-			final AbstractExpression<Number> left = this.getExpression(cb, exprDef.getChild(0), null);
-			final AbstractExpression<? extends Number> right = this.getExpression(cb, exprDef.getChild(1), left.getJavaType());
+			final AbstractExpression<Number> left = this.getExpression(cb, q, exprDef.getChild(0), null);
+			final AbstractExpression<? extends Number> right = this.getExpression(cb, q, exprDef.getChild(1), left.getJavaType());
 
 			switch (exprDef.getType()) {
 				case JpqlParser.Plus_Sign:
@@ -698,7 +813,7 @@ public class JpqlQuery {
 		}
 
 		if (exprDef.getType() == JpqlParser.ST_BOOLEAN) {
-			return (AbstractExpression<X>) this.getExpression(cb, exprDef, Boolean.class);
+			return (AbstractExpression<X>) this.getExpression(cb, q, exprDef, Boolean.class);
 		}
 
 		if (exprDef.getType() == JpqlParser.Ordinal_Parameter) {
@@ -726,7 +841,7 @@ public class JpqlQuery {
 			|| (exprDef.getType() == JpqlParser.LOWER) //
 			|| (exprDef.getType() == JpqlParser.SUBSTRING)) {
 
-			final AbstractExpression<String> argument = this.getExpression(cb, exprDef.getChild(0), null);
+			final AbstractExpression<String> argument = this.getExpression(cb, q, exprDef.getChild(0), null);
 
 			switch (exprDef.getType()) {
 				case JpqlParser.UPPER:
@@ -736,8 +851,9 @@ public class JpqlQuery {
 					return (AbstractExpression<X>) cb.lower(argument);
 
 				case JpqlParser.SUBSTRING:
-					final AbstractExpression<Integer> start = this.getExpression(cb, exprDef.getChild(1), Integer.class);
-					final AbstractExpression<Integer> end = exprDef.getChildCount() == 3 ? this.getExpression(cb, exprDef.getChild(2), Integer.class) : null;
+					final AbstractExpression<Integer> start = this.getExpression(cb, q, exprDef.getChild(1), Integer.class);
+					final AbstractExpression<Integer> end = exprDef.getChildCount() == 3 ? //
+						this.getExpression(cb, q, exprDef.getChild(2), Integer.class) : null;
 
 					return (AbstractExpression<X>) new SubstringExpression(argument, start, end);
 			}
@@ -747,7 +863,7 @@ public class JpqlQuery {
 		if (exprDef.getType() == JpqlParser.CONCAT) {
 			final List<Expression<String>> arguments = Lists.newArrayList();
 			for (int i = 0; i < exprDef.getChildCount(); i++) {
-				arguments.add(this.getExpression(cb, exprDef.getChild(i), String.class));
+				arguments.add(this.getExpression(cb, q, exprDef.getChild(i), String.class));
 			}
 
 			return (AbstractExpression<X>) new ConcatExpression(arguments.toArray(new Expression[arguments.size()]));
@@ -777,11 +893,11 @@ public class JpqlQuery {
 			}
 
 			if (exprDef.getChildCount() > (i + 1)) {
-				trimChar = this.getExpression(cb, exprDef.getChild(i), Character.class);
-				inner = this.getExpression(cb, exprDef.getChild(i + 1), String.class);
+				trimChar = this.getExpression(cb, q, exprDef.getChild(i), Character.class);
+				inner = this.getExpression(cb, q, exprDef.getChild(i + 1), String.class);
 			}
 			else {
-				inner = this.getExpression(cb, exprDef.getChild(i), String.class);
+				inner = this.getExpression(cb, q, exprDef.getChild(i), String.class);
 			}
 
 			return (AbstractExpression<X>) new TrimExpression(trimspec, trimChar, inner);
@@ -791,7 +907,7 @@ public class JpqlQuery {
 		if ((exprDef.getType() == JpqlParser.TYPE) || (exprDef.getType() == JpqlParser.ST_ENTITY_TYPE)) {
 			switch (exprDef.getType()) {
 				case JpqlParser.TYPE:
-					final AbstractExpression<?> inner = this.getExpression(cb, exprDef.getChild(0), null);
+					final AbstractExpression<?> inner = this.getExpression(cb, q, exprDef.getChild(0), null);
 
 					return (AbstractExpression<X>) ((AbstractPath<?>) inner).type();
 
@@ -820,30 +936,30 @@ public class JpqlQuery {
 		// arithmetic functions
 		switch (exprDef.getType()) {
 			case JpqlParser.ABS:
-				return (AbstractExpression<X>) cb.abs(this.getExpression(cb, exprDef.getChild(0), Number.class));
+				return (AbstractExpression<X>) cb.abs(this.getExpression(cb, q, exprDef.getChild(0), Number.class));
 
 			case JpqlParser.SQRT:
-				return (AbstractExpression<X>) cb.sqrt(this.getExpression(cb, exprDef.getChild(0), Number.class));
+				return (AbstractExpression<X>) cb.sqrt(this.getExpression(cb, q, exprDef.getChild(0), Number.class));
 
 			case JpqlParser.MOD:
 				return (AbstractExpression<X>) cb.mod(//
-					this.getExpression(cb, exprDef.getChild(0), Integer.class), //
-					this.getExpression(cb, exprDef.getChild(1), Integer.class));
+					this.getExpression(cb, q, exprDef.getChild(0), Integer.class), //
+					this.getExpression(cb, q, exprDef.getChild(1), Integer.class));
 
 			case JpqlParser.LOCATE:
 				if (exprDef.getChildCount() == 3) {
 					return (AbstractExpression<X>) cb.locate(//
-						this.getExpression(cb, exprDef.getChild(0), String.class), //
-						this.getExpression(cb, exprDef.getChild(1), String.class), //
-						this.getExpression(cb, exprDef, Integer.class));
+						this.getExpression(cb, q, exprDef.getChild(0), String.class), //
+						this.getExpression(cb, q, exprDef.getChild(1), String.class), //
+						this.getExpression(cb, q, exprDef, Integer.class));
 				}
 
 				return (AbstractExpression<X>) cb.locate(//
-					this.getExpression(cb, exprDef.getChild(0), String.class), //
-					this.getExpression(cb, exprDef.getChild(1), String.class));
+					this.getExpression(cb, q, exprDef.getChild(0), String.class), //
+					this.getExpression(cb, q, exprDef.getChild(1), String.class));
 
 			case JpqlParser.LENGTH:
-				return (AbstractExpression<X>) cb.length(this.getExpression(cb, exprDef.getChild(0), String.class));
+				return (AbstractExpression<X>) cb.length(this.getExpression(cb, q, exprDef.getChild(0), String.class));
 
 			case JpqlParser.SIZE:
 			case JpqlParser.INDEX:
@@ -853,22 +969,22 @@ public class JpqlQuery {
 		// aggregate functions
 		switch (exprDef.getType()) {
 			case JpqlParser.AVG:
-				return (AbstractExpression<X>) cb.avg(this.getExpression(cb, exprDef.getChild(0), Number.class));
+				return (AbstractExpression<X>) cb.avg(this.getExpression(cb, q, exprDef.getChild(0), Number.class));
 			case JpqlParser.SUM:
-				return (AbstractExpression<X>) cb.sum(this.getExpression(cb, exprDef.getChild(0), Number.class));
+				return (AbstractExpression<X>) cb.sum(this.getExpression(cb, q, exprDef.getChild(0), Number.class));
 			case JpqlParser.MAX:
-				return (AbstractExpression<X>) cb.max(this.getExpression(cb, exprDef.getChild(0), Number.class));
+				return (AbstractExpression<X>) cb.max(this.getExpression(cb, q, exprDef.getChild(0), Number.class));
 			case JpqlParser.MIN:
-				return (AbstractExpression<X>) cb.min(this.getExpression(cb, exprDef.getChild(0), Number.class));
+				return (AbstractExpression<X>) cb.min(this.getExpression(cb, q, exprDef.getChild(0), Number.class));
 		}
 
 		// count function
 		if (exprDef.getType() == JpqlParser.COUNT) {
 			if (exprDef.getChildCount() == 2) {
-				return (AbstractExpression<X>) new CountExpression(this.getExpression(cb, exprDef.getChild(1), null), true);
+				return (AbstractExpression<X>) new CountExpression(this.getExpression(cb, q, exprDef.getChild(1), null), true);
 			}
 
-			return (AbstractExpression<X>) new CountExpression(this.getExpression(cb, exprDef.getChild(0), null), false);
+			return (AbstractExpression<X>) new CountExpression(this.getExpression(cb, q, exprDef.getChild(0), null), false);
 		}
 
 		throw new PersistenceException("Unhandled expression: " + exprDef.toStringTree());
@@ -918,5 +1034,20 @@ public class JpqlQuery {
 		catch (final Exception e) {
 			throw new PersistenceException("Cannot parse jpql: " + e.getMessage(), e);
 		}
+	}
+
+	private void putAlias(AbstractQuery<?> q, Tree aliasedDef, final Aliased aliased, final AbstractFrom<?, ?> r) {
+		Map<String, AbstractFrom<?, ?>> aliasMap = this.aliasMap.get(q);
+		if (aliasMap == null) {
+			aliasMap = Maps.newHashMap();
+			this.aliasMap.put(q, aliasMap);
+		}
+
+		final String alias = aliased.getAlias();
+		if (aliasMap.containsKey(alias)) {
+			throw new PersistenceException("Alias already exists: " + alias + ", " + aliasedDef.getChild(1).getTokenStartIndex());
+		}
+
+		aliasMap.put(aliased.getAlias(), r);
 	}
 }

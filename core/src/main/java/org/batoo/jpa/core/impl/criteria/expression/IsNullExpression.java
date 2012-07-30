@@ -22,7 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
@@ -59,7 +59,7 @@ public class IsNullExpression extends BooleanExpression {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
 		if (this.not) {
 			return this.inner.generateJpqlRestriction(query) + " is not null";
 		}
@@ -72,7 +72,7 @@ public class IsNullExpression extends BooleanExpression {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
 		if (selected && StringUtils.isBlank(this.getAlias())) {
 			return this.generateJpqlRestriction(query) + " as " + this.getAlias();
 		}
@@ -85,7 +85,7 @@ public class IsNullExpression extends BooleanExpression {
 	 * 
 	 */
 	@Override
-	public String generateSqlRestriction(CriteriaQueryImpl<?> query) {
+	public String generateSqlRestriction(AbstractQueryImpl<?> query) {
 		if (this.not) {
 			return this.inner.getSqlRestrictionFragments(query)[0] + " IS NOT NULL";
 		}
@@ -98,7 +98,7 @@ public class IsNullExpression extends BooleanExpression {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
 		this.alias = query.getAlias(this);
 
 		if (selected) {

@@ -23,6 +23,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
+import javax.persistence.ManyToOne;
 
 /**
  * 
@@ -38,6 +39,16 @@ public class Employee {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Integer id;
 
+	private double salary;
+
+	private String name;
+
+	@ManyToOne
+	private Department department;
+
+	@ManyToOne
+	private Manager manager;
+
 	/**
 	 * 
 	 * @since $version
@@ -45,6 +56,40 @@ public class Employee {
 	 */
 	public Employee() {
 		super();
+	}
+
+	/**
+	 * @param name
+	 *            the name
+	 * @param manager
+	 *            the manager
+	 * @param department
+	 *            the department
+	 * @param salary
+	 *            the salary
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Employee(String name, Manager manager, Department department, double salary) {
+		super();
+
+		this.name = name;
+		this.manager = manager;
+		this.department = department;
+		this.salary = salary;
+	}
+
+	/**
+	 * Returns the department of the Employee.
+	 * 
+	 * @return the department of the Employee
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Department getDepartment() {
+		return this.department;
 	}
 
 	/**
@@ -57,6 +102,94 @@ public class Employee {
 	 */
 	public Integer getId() {
 		return this.id;
+	}
+
+	/**
+	 * Returns the manager of the Employee.
+	 * 
+	 * @return the manager of the Employee
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Manager getManager() {
+		return this.manager;
+	}
+
+	/**
+	 * Returns the name of the Employee.
+	 * 
+	 * @return the name of the Employee
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getName() {
+		return this.name;
+	}
+
+	/**
+	 * Returns the salary of the Employee.
+	 * 
+	 * @return the salary of the Employee
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public double getSalary() {
+		return this.salary;
+	}
+
+	/**
+	 * Sets the department of the Employee.
+	 * 
+	 * @param department
+	 *            the department to set for Employee
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setDepartment(Department department) {
+		this.department = department;
+	}
+
+	/**
+	 * Sets the manager of the Employee.
+	 * 
+	 * @param manager
+	 *            the manager to set for Employee
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setManager(Manager manager) {
+		this.manager = manager;
+	}
+
+	/**
+	 * Sets the name of the Employee.
+	 * 
+	 * @param name
+	 *            the name to set for Employee
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * Sets the salary of the Employee.
+	 * 
+	 * @param salary
+	 *            the salary to set for Employee
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setSalary(double salary) {
+		this.salary = salary;
 	}
 
 }

@@ -56,7 +56,7 @@ public class RootImpl<X> extends AbstractFrom<X, X> implements Root<X> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
 		super.generateJpqlSelect(query, selected);
 
 		if (StringUtils.isNotBlank(this.getAlias())) {
@@ -76,7 +76,7 @@ public class RootImpl<X> extends AbstractFrom<X, X> implements Root<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String generateSqlFrom(CriteriaQueryImpl<?> query) {
+	public String generateSqlFrom(AbstractQueryImpl<?> query) {
 		final EntityTable primaryTable = this.entity.getRootType().getPrimaryTable();
 
 		return primaryTable.getName() + " AS " + this.getFetchRoot().getTableAlias(query, primaryTable);

@@ -16,32 +16,42 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.criteria.join;
+package org.batoo.jpa.core.test.q;
 
-import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
-import org.batoo.jpa.core.impl.jdbc.AbstractTable;
+import javax.persistence.Entity;
 
 /**
- * Interface for joinable types.
+ * 
  * 
  * @author hceylan
  * @since $version
  */
-public interface Joinable {
+@Entity
+public class Manager extends Employee {
 
 	/**
-	 * Returns the alias for the table.
-	 * <p>
-	 * if table does not have an alias, it is generated.
-	 * 
-	 * @param query
-	 *            the query
-	 * @param table
-	 *            the table
-	 * @return the alias for the table
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	String getTableAlias(AbstractQueryImpl<?> query, AbstractTable table);
+	public Manager() {
+		super();
+	}
+
+	/**
+	 * @param name
+	 *            the name
+	 * @param manager
+	 *            the manager
+	 * @param department
+	 *            the department
+	 * @param salary
+	 *            the salary
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Manager(String name, Manager manager, Department department, double salary) {
+		super(name, manager, department, salary);
+	}
 }

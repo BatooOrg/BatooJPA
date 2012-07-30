@@ -23,7 +23,7 @@ import java.sql.SQLException;
 
 import javax.persistence.criteria.Expression;
 
-import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
@@ -66,7 +66,7 @@ public class BooleanExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
 		return this.inner.generateJpqlRestriction(query);
 	}
 
@@ -74,7 +74,7 @@ public class BooleanExpression extends AbstractExpression<Boolean> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
 		return this.inner.generateJpqlSelect(null, selected);
 	}
 
@@ -88,7 +88,7 @@ public class BooleanExpression extends AbstractExpression<Boolean> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String generateSqlRestriction(final CriteriaQueryImpl<?> query) {
+	public String generateSqlRestriction(final AbstractQueryImpl<?> query) {
 		return this.inner.getSqlRestrictionFragments(query)[0];
 	}
 
@@ -97,7 +97,7 @@ public class BooleanExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
 		return this.inner.generateSqlSelect(query, selected);
 	}
 
@@ -106,7 +106,7 @@ public class BooleanExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public final String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query) {
+	public final String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
 		return this.inner.getSqlRestrictionFragments(query);
 	}
 

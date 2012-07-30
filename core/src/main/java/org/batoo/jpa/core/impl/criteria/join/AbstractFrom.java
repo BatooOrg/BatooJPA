@@ -39,7 +39,7 @@ import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.Type.PersistenceType;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.EntityTypeExpression;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl.MapSelectType;
@@ -138,7 +138,7 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected void ensureAlias(CriteriaQueryImpl<?> query) {
+	protected void ensureAlias(AbstractQueryImpl<?> query) {
 		if (StringUtils.isBlank(this.getAlias())) {
 			this.alias(query.getAlias(this));
 		}
@@ -220,7 +220,7 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String generateJpqlJoins(CriteriaQueryImpl<?> criteriaQuery) {
+	public String generateJpqlJoins(AbstractQueryImpl<?> criteriaQuery) {
 		this.ensureAlias(criteriaQuery);
 
 		final List<String> joins = Lists.newArrayList();
@@ -243,7 +243,7 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
 		this.ensureAlias(query);
 
 		return this.getAlias();
@@ -254,7 +254,7 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
 		this.selected |= selected;
 
 		return null;
@@ -271,7 +271,7 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void generateSqlJoins(CriteriaQueryImpl<?> query, Map<Joinable, String> joins) {
+	public void generateSqlJoins(AbstractQueryImpl<?> query, Map<Joinable, String> joins) {
 		this.fetchRoot.generateSqlJoins(query, joins, this.selected);
 
 		for (final AbstractJoin<X, ?> join : this.joins) {
@@ -284,7 +284,7 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
 		this.select(selected);
 
 		return this.fetchRoot.generateSqlSelect(query, selected, this.getParentPath() == null);
@@ -368,7 +368,7 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
 		return this.fetchRoot.getSqlRestrictionFragments(query, MapSelectType.VALUE);
 	}
 
@@ -384,7 +384,7 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query, MapSelectType selectType) {
+	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query, MapSelectType selectType) {
 		return this.fetchRoot.getSqlRestrictionFragments(query, selectType);
 	}
 
@@ -403,7 +403,7 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 * @author hceylan
 	 */
 	@Override
-	public String getTableAlias(CriteriaQueryImpl<?> query, AbstractTable table) {
+	public String getTableAlias(AbstractQueryImpl<?> query, AbstractTable table) {
 		return this.getFetchRoot().getTableAlias(query, table);
 	}
 

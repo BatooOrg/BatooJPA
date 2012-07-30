@@ -25,7 +25,7 @@ import java.util.List;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 
-import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
@@ -123,7 +123,7 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(final CriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(final AbstractQueryImpl<?> query) {
 		final StringBuilder builder = new StringBuilder();
 
 		if (this.negated) {
@@ -152,7 +152,7 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
 		return this.generateJpqlRestriction(query);
 	}
 
@@ -161,7 +161,7 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	 * 
 	 */
 	@Override
-	public String generateSqlRestriction(final CriteriaQueryImpl<?> query) {
+	public String generateSqlRestriction(final AbstractQueryImpl<?> query) {
 
 		final List<String> converted = Lists.transform(this.expressions, new Function<BooleanExpression, String>() {
 
@@ -183,7 +183,7 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
 		this.alias = query.getAlias(this);
 
 		if (selected) {

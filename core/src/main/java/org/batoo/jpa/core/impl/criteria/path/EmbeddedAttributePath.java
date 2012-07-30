@@ -28,7 +28,7 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.PathTypeExpression;
 import org.batoo.jpa.core.impl.criteria.join.FetchParentImpl;
@@ -82,7 +82,7 @@ public class EmbeddedAttributePath<Z, X> extends AbstractPath<X> implements Pare
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
 		final StringBuilder builder = new StringBuilder();
 
 		builder.append(this.getParentPath().generateJpqlRestriction(query));
@@ -97,7 +97,7 @@ public class EmbeddedAttributePath<Z, X> extends AbstractPath<X> implements Pare
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
 		final StringBuilder builder = new StringBuilder();
 
 		builder.append(this.getParentPath().generateJpqlSelect(query, false));
@@ -115,7 +115,7 @@ public class EmbeddedAttributePath<Z, X> extends AbstractPath<X> implements Pare
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
 		final List<String> fragments = Lists.newArrayList();
 
 		this.generateSqlSelect(query, fragments, this.mapping.getSingularMappings());
@@ -123,7 +123,7 @@ public class EmbeddedAttributePath<Z, X> extends AbstractPath<X> implements Pare
 		return Joiner.on(", ").join(fragments);
 	}
 
-	private void generateSqlSelect(CriteriaQueryImpl<?> query, final List<String> fragments, Mapping<?, ?, ?>[] mappings) {
+	private void generateSqlSelect(AbstractQueryImpl<?> query, final List<String> fragments, Mapping<?, ?, ?>[] mappings) {
 		for (final Mapping<?, ?, ?> mapping : mappings) {
 			if (mapping instanceof BasicMapping) {
 				final BasicColumn column = ((BasicMapping<?, ?>) mapping).getColumn();
@@ -179,7 +179,7 @@ public class EmbeddedAttributePath<Z, X> extends AbstractPath<X> implements Pare
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
 		final List<String> restrictions = Lists.newArrayList();
 
 		final Joinable rootPath = this.getRootPath();

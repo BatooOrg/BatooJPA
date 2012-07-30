@@ -25,7 +25,7 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Path;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.EntityTypeExpression;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
@@ -75,7 +75,7 @@ public class SingularAssociationPath<Z, X> extends AbstractPath<X> implements Jo
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
 		final StringBuilder builder = new StringBuilder();
 
 		builder.append(this.getParentPath().generateJpqlRestriction(query));
@@ -90,7 +90,7 @@ public class SingularAssociationPath<Z, X> extends AbstractPath<X> implements Jo
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
 		final StringBuilder builder = new StringBuilder();
 
 		if ((this.getParentPath() instanceof AbstractFrom) && StringUtils.isNotBlank(this.getParentPath().getAlias())) {
@@ -113,7 +113,7 @@ public class SingularAssociationPath<Z, X> extends AbstractPath<X> implements Jo
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
 		return this.fetchRoot.generateSqlSelect(query, selected, false);
 	}
 
@@ -149,7 +149,7 @@ public class SingularAssociationPath<Z, X> extends AbstractPath<X> implements Jo
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
 		return this.fetchRoot.getSqlRestrictionFragments(query, MapSelectType.VALUE);
 	}
 
@@ -158,7 +158,7 @@ public class SingularAssociationPath<Z, X> extends AbstractPath<X> implements Jo
 	 * 
 	 */
 	@Override
-	public String getTableAlias(CriteriaQueryImpl<?> query, AbstractTable table) {
+	public String getTableAlias(AbstractQueryImpl<?> query, AbstractTable table) {
 		return this.getFetchRoot().getTableAlias(query, table);
 	}
 

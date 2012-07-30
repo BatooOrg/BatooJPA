@@ -39,7 +39,7 @@ import javax.persistence.metamodel.Type.PersistenceType;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
-import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl.MapSelectType;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
@@ -275,7 +275,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void generateSqlJoins(CriteriaQueryImpl<?> query, final List<String> selfJoins) {
+	public void generateSqlJoins(AbstractQueryImpl<?> query, final List<String> selfJoins) {
 		for (final Entry<SecondaryTable, String> e : this.tableAliases.entrySet()) {
 			final String alias = e.getValue();
 			final SecondaryTable table = e.getKey();
@@ -297,7 +297,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void generateSqlJoins(CriteriaQueryImpl<?> query, Map<Joinable, String> joins, boolean recurse) {
+	public void generateSqlJoins(AbstractQueryImpl<?> query, Map<Joinable, String> joins, boolean recurse) {
 		final List<String> selfJoins = Lists.newArrayList();
 
 		this.generateSqlJoins(query, selfJoins);
@@ -335,7 +335,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected, boolean root) {
+	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected, boolean root) {
 		return this.generateSqlSelect(query, selected, root, MapSelectType.VALUE);
 	}
 
@@ -355,7 +355,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected, boolean root, MapSelectType selectType) {
+	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected, boolean root, MapSelectType selectType) {
 		final List<String> selects = Lists.newArrayList();
 
 		// skip the embeddable mappings
@@ -373,7 +373,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		return Joiner.on(",\n").join(selects);
 	}
 
-	private void generateSqlSelectForElementCollection(CriteriaQueryImpl<?> query, boolean selected, List<String> selects,
+	private void generateSqlSelectForElementCollection(AbstractQueryImpl<?> query, boolean selected, List<String> selects,
 		Map<AbstractColumn, String> fieldMap, MapSelectType selectType) {
 
 		final List<String> fields1 = Lists.newArrayList();
@@ -419,7 +419,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		selects.add(Joiner.on(", ").join(fields1));
 	}
 
-	private void generateSqlSelectForEntityTable(CriteriaQueryImpl<?> query, boolean selected, boolean root, final List<String> selects,
+	private void generateSqlSelectForEntityTable(AbstractQueryImpl<?> query, boolean selected, boolean root, final List<String> selects,
 		final Map<AbstractColumn, String> fieldMap, final EntityTable table) {
 
 		final List<String> fields1 = Lists.newArrayList();
@@ -474,7 +474,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		selects.add(Joiner.on(", ").join(fields1));
 	}
 
-	private String generateSqlSelectImpl(CriteriaQueryImpl<?> query, boolean selected, boolean root, MapSelectType selectType) {
+	private String generateSqlSelectImpl(AbstractQueryImpl<?> query, boolean selected, boolean root, MapSelectType selectType) {
 		final List<String> selects = Lists.newArrayList();
 		final Map<AbstractColumn, String> fieldMap = Maps.newHashMap();
 
@@ -510,7 +510,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private String getAlias(CriteriaQueryImpl<?> query) {
+	private String getAlias(AbstractQueryImpl<?> query) {
 		if (this.alias == null) {
 			this.alias = query.generateTableAlias(this.entity != null);
 		}
@@ -736,7 +736,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String getPrimaryTableAlias(CriteriaQueryImpl<?> query) {
+	public String getPrimaryTableAlias(AbstractQueryImpl<?> query) {
 		if (this.primaryTableAlias == null) {
 			this.primaryTableAlias = this.getAlias(query) + "_P";
 		}
@@ -756,7 +756,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query, MapSelectType selectType) {
+	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query, MapSelectType selectType) {
 		final List<String> restrictions = Lists.newArrayList();
 
 		if (this.entity != null) {
@@ -784,7 +784,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @author hceylan
 	 */
 	@Override
-	public String getTableAlias(CriteriaQueryImpl<?> query, AbstractTable table) {
+	public String getTableAlias(AbstractQueryImpl<?> query, AbstractTable table) {
 		if (table instanceof SecondaryTable) {
 			String alias = this.tableAliases.get(table);
 			if (alias == null) {

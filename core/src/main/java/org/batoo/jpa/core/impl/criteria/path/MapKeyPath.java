@@ -23,7 +23,7 @@ import java.sql.SQLException;
 
 import javax.persistence.criteria.Expression;
 
-import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl.MapSelectType;
@@ -64,7 +64,7 @@ public class MapKeyPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(CriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
 		return this.mapJoin.generateJpqlRestriction(query) + ".key";
 	}
 
@@ -73,7 +73,7 @@ public class MapKeyPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
 		return this.mapJoin.generateJpqlSelect(null, selected) + ".key";
 	}
 
@@ -82,7 +82,7 @@ public class MapKeyPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(CriteriaQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
 		return this.mapJoin.generateSqlSelect(query, selected, MapSelectType.KEY);
 	}
 
@@ -110,7 +110,7 @@ public class MapKeyPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(CriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
 		return this.mapJoin.getSqlRestrictionFragments(query, MapSelectType.KEY);
 	}
 
@@ -123,7 +123,7 @@ public class MapKeyPath<X> extends AbstractPath<X> {
 	public X handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		final X value = (X) this.mapJoin.handle(session, row, MapSelectType.KEY);
 
-		return (X) (this.getConverter() != null ? this.getConverter().convert((Number) value) : value);
+		return (X) (this.getConverter() != null ? this.getConverter().convert(value) : value);
 	}
 
 	/**

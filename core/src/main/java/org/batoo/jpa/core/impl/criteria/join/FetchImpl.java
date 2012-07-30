@@ -27,7 +27,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.metamodel.Type.PersistenceType;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
 
@@ -98,7 +98,7 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	 * 
 	 */
 	@Override
-	public void generateSqlJoins(CriteriaQueryImpl<?> query, List<String> selfJoins) {
+	public void generateSqlJoins(AbstractQueryImpl<?> query, List<String> selfJoins) {
 		final String parentAlias = this.getParent().getPrimaryTableAlias(query);
 		final String alias = this.getPrimaryTableAlias(query);
 
@@ -158,7 +158,7 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	 * 
 	 */
 	@Override
-	public String getPrimaryTableAlias(CriteriaQueryImpl<?> query) {
+	public String getPrimaryTableAlias(AbstractQueryImpl<?> query) {
 		if (this.mapping.getType().getPersistenceType() == PersistenceType.EMBEDDABLE) {
 			return this.parent.getPrimaryTableAlias(query);
 		}
