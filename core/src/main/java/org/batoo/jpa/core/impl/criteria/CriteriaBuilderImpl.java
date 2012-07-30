@@ -62,6 +62,7 @@ import org.batoo.jpa.core.impl.criteria.expression.CountExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CurrentTemporalExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ExpressionConverter;
 import org.batoo.jpa.core.impl.criteria.expression.IsEmptyExpression;
+import org.batoo.jpa.core.impl.criteria.expression.LikeExpression;
 import org.batoo.jpa.core.impl.criteria.expression.LocateExpression;
 import org.batoo.jpa.core.impl.criteria.expression.NegationExpression;
 import org.batoo.jpa.core.impl.criteria.expression.NumericFunctionExpression;
@@ -123,7 +124,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public Predicate and(Expression<Boolean> x, Expression<Boolean> y) {
+	public PredicateImpl and(Expression<Boolean> x, Expression<Boolean> y) {
 		return new PredicateImpl(false, BooleanOperator.AND, x, y);
 	}
 
@@ -132,7 +133,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate and(Predicate... restrictions) {
+	public PredicateImpl and(Predicate... restrictions) {
 		return new PredicateImpl(false, BooleanOperator.AND, restrictions);
 	}
 
@@ -256,7 +257,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate conjunction() {
+	public PredicateImpl conjunction() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -404,7 +405,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate disjunction() {
+	public PredicateImpl disjunction() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -424,7 +425,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Predicate equal(Expression<?> x, Object y) {
+	public PredicateImpl equal(Expression<?> x, Object y) {
 		return new PredicateImpl(new ComparisonExpression(Comparison.EQUAL, x, new ConstantExpression(null, y)));
 	}
 
@@ -433,7 +434,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate exists(Subquery<?> subquery) {
+	public PredicateImpl exists(Subquery<?> subquery) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -453,7 +454,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate ge(Expression<? extends Number> x, Expression<? extends Number> y) {
+	public PredicateImpl ge(Expression<? extends Number> x, Expression<? extends Number> y) {
 		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER_OR_EQUAL, x, y));
 	}
 
@@ -462,7 +463,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate ge(Expression<? extends Number> x, Number y) {
+	public PredicateImpl ge(Expression<? extends Number> x, Number y) {
 		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER_OR_EQUAL, x, new ConstantExpression<Number>(null, y)));
 	}
 
@@ -562,7 +563,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate isFalse(Expression<Boolean> x) {
+	public PredicateImpl isFalse(Expression<Boolean> x) {
 		return new PredicateImpl((AbstractExpression<Boolean>) x).not();
 	}
 
@@ -621,8 +622,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate isNotNull(Expression<?> x) {
-		return x.isNotNull();
+	public PredicateImpl isNotNull(Expression<?> x) {
+		return ((AbstractExpression<?>) x).isNotNull();
 	}
 
 	/**
@@ -630,8 +631,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate isNull(Expression<?> x) {
-		return x.isNull();
+	public PredicateImpl isNull(Expression<?> x) {
+		return ((AbstractExpression<?>) x).isNull();
 	}
 
 	/**
@@ -639,7 +640,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate isTrue(Expression<Boolean> x) {
+	public PredicateImpl isTrue(Expression<Boolean> x) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -731,8 +732,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate like(Expression<String> x, Expression<String> pattern) {
-		return new PredicateImpl(new ComparisonExpression(Comparison.LIKE, x, pattern));
+	public PredicateImpl like(Expression<String> x, Expression<String> pattern) {
+		return new PredicateImpl(new LikeExpression(x, pattern, null, false));
 	}
 
 	/**
@@ -740,9 +741,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate like(Expression<String> x, Expression<String> pattern, char escapeChar) {
-		// TODO Auto-generated method stub
-		return null;
+	public PredicateImpl like(Expression<String> x, Expression<String> pattern, char escapeChar) {
+		return new PredicateImpl(new LikeExpression(x, pattern, new ConstantExpression<Character>(null, escapeChar), false));
 	}
 
 	/**
@@ -750,9 +750,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate like(Expression<String> x, Expression<String> pattern, Expression<Character> escapeChar) {
-		// TODO Auto-generated method stub
-		return null;
+	public PredicateImpl like(Expression<String> x, Expression<String> pattern, Expression<Character> escapeChar) {
+		return new PredicateImpl(new LikeExpression(x, pattern, escapeChar, false));
 	}
 
 	/**
@@ -760,8 +759,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate like(Expression<String> x, String pattern) {
-		return new PredicateImpl(new ComparisonExpression(Comparison.LIKE, x, new ConstantExpression<String>(null, pattern)));
+	public PredicateImpl like(Expression<String> x, String pattern) {
+		return new PredicateImpl(new LikeExpression(x, new ConstantExpression<String>(null, pattern), null, false));
 	}
 
 	/**
@@ -769,8 +768,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate like(Expression<String> x, String pattern, char escapeChar) {
-		return null;
+	public PredicateImpl like(Expression<String> x, String pattern, char escapeChar) {
+		return new PredicateImpl(new LikeExpression(x, new ConstantExpression<String>(null, pattern), new ConstantExpression<Character>(null, escapeChar),
+			false));
 	}
 
 	/**
@@ -778,9 +778,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate like(Expression<String> x, String pattern, Expression<Character> escapeChar) {
-		// TODO Auto-generated method stub
-		return null;
+	public PredicateImpl like(Expression<String> x, String pattern, Expression<Character> escapeChar) {
+		return new PredicateImpl(new LikeExpression(x, new ConstantExpression<String>(null, pattern), escapeChar, false));
 	}
 
 	/**
@@ -843,7 +842,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate lt(Expression<? extends Number> x, Expression<? extends Number> y) {
+	public PredicateImpl lt(Expression<? extends Number> x, Expression<? extends Number> y) {
 		return new PredicateImpl(new ComparisonExpression(Comparison.LESS, x, y));
 	}
 
@@ -852,7 +851,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate lt(Expression<? extends Number> x, Number y) {
+	public PredicateImpl lt(Expression<? extends Number> x, Number y) {
 		return new PredicateImpl(new ComparisonExpression(Comparison.LESS, x, new ConstantExpression<Number>(null, y)));
 	}
 
@@ -944,7 +943,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public PredicateImpl notLike(Expression<String> x, Expression<String> pattern) {
-		return new PredicateImpl(new ComparisonExpression(Comparison.LIKE, x, pattern)).not();
+		return new PredicateImpl(new LikeExpression(x, pattern, null, true));
 	}
 
 	/**
@@ -952,9 +951,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate notLike(Expression<String> x, Expression<String> pattern, char escapeChar) {
-		// TODO Auto-generated method stub
-		return null;
+	public PredicateImpl notLike(Expression<String> x, Expression<String> pattern, char escapeChar) {
+		return new PredicateImpl(new LikeExpression(x, pattern, new ConstantExpression<Character>(null, escapeChar), true));
 	}
 
 	/**
@@ -962,9 +960,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate notLike(Expression<String> x, Expression<String> pattern, Expression<Character> escapeChar) {
-		// TODO Auto-generated method stub
-		return null;
+	public PredicateImpl notLike(Expression<String> x, Expression<String> pattern, Expression<Character> escapeChar) {
+		return new PredicateImpl(new LikeExpression(x, pattern, escapeChar, true));
 	}
 
 	/**
@@ -973,7 +970,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public PredicateImpl notLike(Expression<String> x, String pattern) {
-		return new PredicateImpl(new ComparisonExpression(Comparison.LIKE, x, new ConstantExpression<String>(null, pattern))).not();
+		return new PredicateImpl(new LikeExpression(x, new ConstantExpression<String>(null, pattern), null, true));
 	}
 
 	/**
@@ -981,9 +978,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate notLike(Expression<String> x, String pattern, char escapeChar) {
-		// TODO Auto-generated method stub
-		return null;
+	public PredicateImpl notLike(Expression<String> x, String pattern, char escapeChar) {
+		return new PredicateImpl(
+			new LikeExpression(x, new ConstantExpression<String>(null, pattern), new ConstantExpression<Character>(null, escapeChar), true));
 	}
 
 	/**
@@ -991,9 +988,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate notLike(Expression<String> x, String pattern, Expression<Character> escapeChar) {
-		// TODO Auto-generated method stub
-		return null;
+	public PredicateImpl notLike(Expression<String> x, String pattern, Expression<Character> escapeChar) {
+		return new PredicateImpl(new LikeExpression(x, new ConstantExpression<String>(null, pattern), escapeChar, true));
 	}
 
 	/**
@@ -1031,7 +1027,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public Predicate or(Expression<Boolean> x, Expression<Boolean> y) {
+	public PredicateImpl or(Expression<Boolean> x, Expression<Boolean> y) {
 		return new PredicateImpl(false, BooleanOperator.OR, x, y);
 	}
 
@@ -1040,7 +1036,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public Predicate or(Predicate... restrictions) {
+	public PredicateImpl or(Predicate... restrictions) {
 		return new PredicateImpl(false, BooleanOperator.OR, restrictions);
 	}
 

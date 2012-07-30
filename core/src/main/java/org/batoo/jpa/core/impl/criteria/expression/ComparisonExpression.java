@@ -62,8 +62,6 @@ public class ComparisonExpression extends BooleanExpression {
 
 		GREATER_OR_EQUAL("{0} >= {1}"),
 
-		LIKE("{0} LIKE {1}"),
-
 		BETWEEN("{0} BETWEEN {1} AND {2}");
 
 		private final String fragment;

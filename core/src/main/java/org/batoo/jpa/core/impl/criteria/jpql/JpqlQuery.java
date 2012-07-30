@@ -395,8 +395,7 @@ public class JpqlQuery {
 			|| (predictionDef.getType() == JpqlParser.Greater_Or_Equals_Operator) //
 			|| (predictionDef.getType() == JpqlParser.Less_Than_Operator) //
 			|| (predictionDef.getType() == JpqlParser.Less_Or_Equals_Operator) //
-			|| (predictionDef.getType() == JpqlParser.BETWEEN) //
-			|| (predictionDef.getType() == JpqlParser.LIKE)) {
+			|| (predictionDef.getType() == JpqlParser.BETWEEN)) {
 
 			final AbstractExpression<X> left = this.<X> getExpression(cb, predictionDef.getChild(0), null);
 			final AbstractExpression<? extends X> right = this.getExpression(cb, predictionDef.getChild(1), left.getJavaType());
@@ -448,15 +447,30 @@ public class JpqlQuery {
 					}
 
 					return between;
+			}
+		}
 
-				case JpqlParser.LIKE:
-					final Predicate like = cb.like((Expression<String>) left, (Expression<String>) right);
+		if (predictionDef.getType() == JpqlParser.LIKE) {
+			final AbstractExpression<String> inner = this.getExpression(cb, predictionDef.getChild(0), String.class);
+			final AbstractExpression<String> pattern = this.getExpression(cb, predictionDef.getChild(1), String.class);
 
-					if (predictionDef.getChildCount() == 3) {
-						return like.not();
-					}
+			if ((predictionDef.getChildCount() > 2) && (predictionDef.getChild(2).getType() == JpqlParser.STRING_LITERAL)) {
+				final Expression<Character> escape = this.getExpression(cb, predictionDef.getChild(2), Character.class);
 
-					return like;
+				if (predictionDef.getChild(predictionDef.getChildCount() - 1).getType() == JpqlParser.NOT) {
+					return cb.notLike(inner, pattern, escape);
+				}
+				else {
+					return cb.like(inner, pattern, escape);
+				}
+			}
+			else {
+				if (predictionDef.getChild(predictionDef.getChildCount() - 1).getType() == JpqlParser.NOT) {
+					return cb.notLike(inner, pattern);
+				}
+				else {
+					return cb.like(inner, pattern);
+				}
 			}
 		}
 
@@ -698,14 +712,13 @@ public class JpqlQuery {
 
 		// string literal
 		if (exprDef.getType() == JpqlParser.STRING_LITERAL) {
+			if (javaType == Character.class) {
+				return (AbstractExpression<X>) new ConstantExpression<Character>(this.metamodel.type(Character.class), //
+					exprDef.getText().substring(1, 2).toCharArray()[0]);
+			}
+
 			return (AbstractExpression<X>) new ConstantExpression<String>(this.metamodel.type(String.class), //
 				exprDef.getText().substring(1, exprDef.getText().length() - 1));
-		}
-
-		// char literal
-		if (exprDef.getType() == JpqlParser.CHAR_LITERAL) {
-			return (AbstractExpression<X>) new ConstantExpression<Character>(this.metamodel.type(Character.class), //
-				exprDef.getText().substring(1, 2).toCharArray()[0]);
 		}
 
 		// functions returning string
@@ -747,7 +760,7 @@ public class JpqlQuery {
 			Expression<String> inner = null;
 
 			int i = 0;
-			int type = exprDef.getChild(i).getType();
+			final int type = exprDef.getChild(i).getType();
 
 			// trim spec
 			if (type == JpqlParser.BOTH) {
@@ -763,14 +776,13 @@ public class JpqlQuery {
 				i++;
 			}
 
-			// trim char
-			type = exprDef.getChild(i).getType();
-			if (type == JpqlParser.CHAR_LITERAL) {
+			if (exprDef.getChildCount() > (i + 1)) {
 				trimChar = this.getExpression(cb, exprDef.getChild(i), Character.class);
-				i++;
+				inner = this.getExpression(cb, exprDef.getChild(i + 1), String.class);
 			}
-
-			inner = this.getExpression(cb, exprDef.getChild(i), String.class);
+			else {
+				inner = this.getExpression(cb, exprDef.getChild(i), String.class);
+			}
 
 			return (AbstractExpression<X>) new TrimExpression(trimspec, trimChar, inner);
 		}

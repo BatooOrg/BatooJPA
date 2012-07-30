@@ -370,6 +370,32 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
+	public void testLike() {
+		final Person person = this.person(40);
+		person.setName("%Ceylan");
+		this.persist(person);
+		this.persist(this.person(35));
+		this.commit();
+
+		this.close();
+
+		TypedQuery<Person> q;
+		q = this.cq("select p from Person p where p.name like :name", Person.class).setParameter("name", "Ce%");
+		Assert.assertEquals(1, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.name like :name", Person.class).setParameter("name", "De%");
+		Assert.assertEquals(0, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.name not like :name escape '\\'", Person.class).setParameter("name", "\\%Ce%");
+		Assert.assertEquals(2, q.getResultList().size());
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
 	public void testNamedQuery() {
 		this.persist(this.person(40));
 		this.persist(this.person(35));
@@ -496,15 +522,6 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		q = this.cq("select p from Person p where p.name > :name", Person.class).setParameter("name", "Ceylan");
 		Assert.assertEquals(0, q.getResultList().size());
 
-		q = this.cq("select p from Person p where p.name like :name", Person.class).setParameter("name", "Ce%");
-		Assert.assertEquals(2, q.getResultList().size());
-
-		q = this.cq("select p from Person p where p.name like :name", Person.class).setParameter("name", "De%");
-		Assert.assertEquals(0, q.getResultList().size());
-
-		q = this.cq("select p from Person p where p.name not like :name", Person.class).setParameter("name", "De%");
-		Assert.assertEquals(2, q.getResultList().size());
-
 		q2 = this.cq("select lower(c.name) from Country c where upper(c.name) = :name", String.class).setParameter("name",
 			SimpleJpqlTest.COUNTRY_TR.toUpperCase());
 		Assert.assertEquals("turkey", q2.getResultList().get(0));
@@ -534,9 +551,7 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		q2 = this.cq("select trim(both from ' a ') from Country c where c = :country", String.class).setParameter("country", SimpleJpqlTest.TR);
 		Assert.assertEquals("a", q2.getSingleResult());
 
-		// TODO char literals don't work
-		// q2 = this.cq("select trim(both 'c' from 'cac') from Country c where c = :country", String.class).setParameter("country",
-		// SimpleJpqlTest.TR);
-		// Assert.assertEquals("a", q2.getSingleResult());
+		q2 = this.cq("select trim(both 'c' from 'cac') from Country c where c = :country", String.class).setParameter("country", SimpleJpqlTest.TR);
+		Assert.assertEquals("a", q2.getSingleResult());
 	}
 }

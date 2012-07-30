@@ -128,7 +128,7 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 * 
 	 */
 	@Override
-	public Predicate in(Expression<?>... values) {
+	public PredicateImpl in(Expression<?>... values) {
 		return new PredicateImpl(new InExpression(this, values));
 	}
 
@@ -137,7 +137,7 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 * 
 	 */
 	@Override
-	public Predicate in(Expression<Collection<?>> values) {
+	public PredicateImpl in(Expression<Collection<?>> values) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -147,7 +147,7 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 * 
 	 */
 	@Override
-	public Predicate in(Object... values) {
+	public PredicateImpl in(Object... values) {
 		return new PredicateImpl(new InExpression(this, Lists.newArrayList(values)));
 	}
 
@@ -156,7 +156,7 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 * 
 	 */
 	@Override
-	public Predicate isNotNull() {
+	public PredicateImpl isNotNull() {
 		return new PredicateImpl(new IsNullExpression(true, this));
 	}
 
@@ -165,7 +165,7 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 * 
 	 */
 	@Override
-	public Predicate isNull() {
+	public PredicateImpl isNull() {
 		return new PredicateImpl(new IsNullExpression(false, this));
 	}
 

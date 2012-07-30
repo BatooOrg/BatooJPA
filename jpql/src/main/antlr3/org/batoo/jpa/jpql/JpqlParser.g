@@ -235,7 +235,8 @@ string_primary :
 functions_returning_strings :
 	SUBSTRING^ Left_Paren! string_primary Comma! simple_arithmetic_expression (Comma! simple_arithmetic_expression)? Right_Paren!
 	| CONCAT^ Left_Paren! string_primary (Comma! string_primary )+ Right_Paren!
-	| TRIM^ Left_Paren! ((LEADING | TRAILING | BOTH)? (CHAR_LITERAL)? FROM!)? string_primary Right_Paren!
+	| TRIM Left_Paren ((LEADING | TRAILING | BOTH)? (STRING_LITERAL)? FROM!)? string_primary Right_Paren!
+	 	-> ^(TRIM (LEADING | TRAILING | BOTH)? (STRING_LITERAL)?)? string_primary)
 	| LOWER^ Left_Paren! string_primary Right_Paren!
 	| UPPER^ Left_Paren! string_primary Right_Paren!
 	;
@@ -274,8 +275,8 @@ between_expression :
     ;
     
 like_expression :
-    string_expression (NOT)? LIKE string_expression
-        -> ^(LIKE string_expression string_expression (NOT)?);
+    string_expression (NOT)? LIKE string_expression (ESCAPE STRING_LITERAL)?
+        -> ^(LIKE string_expression string_expression (STRING_LITERAL)? (NOT)?);
 
 comparison_expression :
     string_expression comparison_operator^ (string_expression /*| all_or_any_expression*/) 
