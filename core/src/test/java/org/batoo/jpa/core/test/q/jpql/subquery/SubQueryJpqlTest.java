@@ -39,14 +39,58 @@ public class SubQueryJpqlTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
+	public void testAllAnySome() {
+		final Department qa = new Department("QA");
+		final Department rnd = new Department("RND");
+		this.persist(qa);
+		this.persist(rnd);
+
+		final Manager qaManager = new Manager("Manager1", qa, 100000);
+		final Manager rndManager = new Manager("Manager2", rnd, 100000);
+		final Manager qaManager2 = new Manager("Manager3", qa, 80000);
+		this.persist(rndManager);
+		this.persist(qaManager);
+		this.persist(qaManager2);
+
+		final Employee employee1 = new Employee("Employee1", rndManager, rnd, 90000);
+		final Employee employee2 = new Employee("Employee2", rndManager, rnd, 100000);
+		this.persist(employee1);
+		this.persist(employee2);
+
+		final Employee employee3 = new Employee("Employee1", qaManager, qa, 90000);
+		final Employee employee4 = new Employee("Employee2", qaManager, qa, 110000);
+		final Employee employee5 = new Employee("Employee1", qaManager, qa, 90000);
+		final Employee employee6 = new Employee("Employee2", qaManager, qa, 90000);
+		this.persist(employee3);
+		this.persist(employee4);
+		this.persist(employee5);
+		this.persist(employee6);
+
+		this.commit();
+
+		final TypedQuery<Integer> q;
+		final TypedQuery<String> q2;
+
+		q = this.cq("select e.id from Employee e where e.salary > all (select m.salary from Manager m where m.department = e.department)", Integer.class);
+		Assert.assertEquals(employee4.getId(), q.getSingleResult());
+
+		q2 = this.cq("select e.name from Employee e where e.salary > any (select m.salary from Manager m where m.department = e.department)", String.class);
+		Assert.assertEquals(4, q2.getResultList().size());
+	}
+
+	/**
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
 	public void testSubQuery() {
 		final Department qa = new Department("QA");
 		final Department rnd = new Department("RND");
 		this.persist(qa);
 		this.persist(rnd);
 
-		final Manager qaManager = new Manager("Manager1", null, qa, 100000);
-		final Manager rndManager = new Manager("Manager2", null, rnd, 100000);
+		final Manager qaManager = new Manager("Manager1", qa, 100000);
+		final Manager rndManager = new Manager("Manager2", rnd, 100000);
 		this.persist(rndManager);
 		this.persist(qaManager);
 
@@ -66,9 +110,9 @@ public class SubQueryJpqlTest extends BaseCoreTest {
 
 		this.commit();
 
-		final TypedQuery<Integer> q = this.cq(//
-			"select e.id from Employee e where e.salary > ( select m.salary from Manager m where m.department = e.department)", //
-			Integer.class);
+		TypedQuery<Integer> q;
+
+		q = this.cq("select e.id from Employee e where e.salary > (select m.salary from Manager m where m.department = e.department)", Integer.class);
 		Assert.assertEquals(employee4.getId(), q.getSingleResult());
 	}
 }

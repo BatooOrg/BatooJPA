@@ -43,11 +43,12 @@ import org.antlr.runtime.tree.Tree;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.AbstractSelection;
+import org.batoo.jpa.core.impl.criteria.AllAnyExpression;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
-import org.batoo.jpa.core.impl.criteria.SubQueryImpl;
+import org.batoo.jpa.core.impl.criteria.SubqueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ConcatExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ConstantExpression;
@@ -628,8 +629,8 @@ public class JpqlQuery {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private <T> SubQueryImpl<T> constructSubquery(CriteriaBuilderImpl cb, AbstractQuery<?> q, Tree subQueryDef, Class<T> javaType) {
-		final SubQueryImpl<T> s = (SubQueryImpl<T>) q.subquery(javaType);
+	private <T> SubqueryImpl<T> constructSubquery(CriteriaBuilderImpl cb, AbstractQuery<?> q, Tree subQueryDef, Class<T> javaType) {
+		final SubqueryImpl<T> s = (SubqueryImpl<T>) q.subquery(javaType);
 
 		final Tree type = subQueryDef.getChild(0);
 		if (type.getType() == JpqlParser.SELECT) {
@@ -716,7 +717,7 @@ public class JpqlQuery {
 		}
 
 		if (q instanceof Subquery) {
-			final SubQueryImpl<?> s = (SubQueryImpl<?>) q;
+			final SubqueryImpl<?> s = (SubqueryImpl<?>) q;
 			final AbstractFrom<?, ?> aliased = this.getAliased(s.getParent(), alias);
 
 			if (aliased instanceof RootImpl) {
@@ -985,6 +986,18 @@ public class JpqlQuery {
 			}
 
 			return (AbstractExpression<X>) new CountExpression(this.getExpression(cb, q, exprDef.getChild(0), null), false);
+		}
+
+		if (exprDef.getType() == JpqlParser.ST_ALL_OR_ANY) {
+			// all, any, some expressions
+			switch (exprDef.getChild(0).getType()) {
+				case JpqlParser.ALL:
+					return new AllAnyExpression<X>(true, this.constructSubquery(cb, q, exprDef.getChild(1), javaType));
+
+				case JpqlParser.ANY:
+				case JpqlParser.SOME:
+					return new AllAnyExpression<X>(false, this.constructSubquery(cb, q, exprDef.getChild(1), javaType));
+			}
 		}
 
 		throw new PersistenceException("Unhandled expression: " + exprDef.toStringTree());

@@ -35,6 +35,7 @@ tokens {
     ST_IN;
     ST_ENTITY_TYPE;
     ST_NULL;
+    ST_ALL_OR_ANY;
 }
 
 @header {
@@ -185,7 +186,7 @@ scalar_expression options { backtrack=true; } :
     | enum_primary
     | datetime_primary
     | boolean_primary
-    //    | case_expression
+//    | case_expression
     | entity_type_expression
     ;
 
@@ -269,11 +270,11 @@ like_expression :
         -> ^(LIKE string_expression string_expression (STRING_LITERAL)? (NOT)?);
 
 comparison_expression options { backtrack=true; }:
-    string_expression comparison_operator^ (string_expression /*| all_or_any_expression*/) 
-    | boolean_expression comparison_operator^ (boolean_expression /*| all_or_any_expression*/)
-    | enum_expression (Equals_Operator | Not_Equals_Operator)^ (enum_expression /*| all_or_any_expression*/)
-    | datetime_expression comparison_operator^ (datetime_expression /*| all_or_any_expression*/)
-    | arithmetic_expression comparison_operator^ (arithmetic_expression /*| all_or_any_expression*/)
+    string_expression comparison_operator^ (string_expression | all_or_any_expression) 
+    | boolean_expression comparison_operator^ (boolean_expression | all_or_any_expression)
+    | enum_expression (Equals_Operator | Not_Equals_Operator)^ (enum_expression | all_or_any_expression)
+    | datetime_expression comparison_operator^ (datetime_expression | all_or_any_expression)
+    | arithmetic_expression comparison_operator^ (arithmetic_expression | all_or_any_expression)
     | entity_type_expression (Equals_Operator | Not_Equals_Operator)^ entity_type_expression
     ;
 
@@ -422,16 +423,10 @@ null_comparison_expression :
 //  (NOT)? 'EXISTS' Left_Paren subquery Right_Paren
 //  ;
 //
-//all_or_any_expression
-//  :
-//  (
-//    'ALL'
-//    | 'ANY'
-//    | 'SOME'
-//  )
-//  Left_Paren subquery Right_Paren
-//  ;
-//
+all_or_any_expression :
+  (ALL | ANY | SOME ) Left_Paren subquery Right_Paren
+  	-> ^(ST_ALL_OR_ANY (ALL)? (ANY)? (SOME)? subquery);
+
 subquery :
   	simple_select_clause subquery_from_clause (where_clause)? (groupby_clause)? (having_clause)?
   		-> ^(ST_SUBQUERY simple_select_clause subquery_from_clause (where_clause)? (groupby_clause)? (having_clause)?);

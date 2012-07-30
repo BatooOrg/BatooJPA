@@ -52,7 +52,7 @@ import com.google.common.collect.Sets;
  * @author hceylan
  * @since $version
  */
-public class SubQueryImpl<T> extends AbstractExpression<T> implements Subquery<T> {
+public class SubqueryImpl<T> extends AbstractExpression<T> implements Subquery<T> {
 
 	private final SubQueryStub<T> query;
 	private final AbstractQueryImpl<?> parent;
@@ -69,7 +69,7 @@ public class SubQueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SubQueryImpl(MetamodelImpl metamodel, AbstractQueryImpl<?> parent, Class<T> javaType) {
+	public SubqueryImpl(MetamodelImpl metamodel, AbstractQueryImpl<?> parent, Class<T> javaType) {
 		super(javaType);
 
 		this.parent = parent;
@@ -159,8 +159,8 @@ public class SubQueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 	 * 
 	 */
 	@Override
-	public SubQueryImpl<T> distinct(boolean distinct) {
-		return (SubQueryImpl<T>) this.query.distinct(distinct);
+	public SubqueryImpl<T> distinct(boolean distinct) {
+		return (SubqueryImpl<T>) this.query.distinct(distinct);
 	}
 
 	/**
@@ -295,8 +295,8 @@ public class SubQueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 	 * 
 	 */
 	@Override
-	public SubQueryImpl<T> groupBy(Expression<?>... grouping) {
-		return (SubQueryImpl<T>) this.query.groupBy(grouping);
+	public SubqueryImpl<T> groupBy(Expression<?>... grouping) {
+		return (SubqueryImpl<T>) this.query.groupBy(grouping);
 	}
 
 	/**
@@ -304,8 +304,8 @@ public class SubQueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 	 * 
 	 */
 	@Override
-	public SubQueryImpl<T> groupBy(List<Expression<?>> grouping) {
-		return (SubQueryImpl<T>) this.query.groupBy(grouping);
+	public SubqueryImpl<T> groupBy(List<Expression<?>> grouping) {
+		return (SubqueryImpl<T>) this.query.groupBy(grouping);
 	}
 
 	/**
@@ -322,8 +322,8 @@ public class SubQueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 	 * 
 	 */
 	@Override
-	public SubQueryImpl<T> having(Expression<Boolean> restriction) {
-		return (SubQueryImpl<T>) this.query.having(restriction);
+	public SubqueryImpl<T> having(Expression<Boolean> restriction) {
+		return (SubqueryImpl<T>) this.query.having(restriction);
 	}
 
 	/**
@@ -331,8 +331,8 @@ public class SubQueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 	 * 
 	 */
 	@Override
-	public SubQueryImpl<T> having(Predicate... restrictions) {
-		return (SubQueryImpl<T>) this.query.having(restrictions);
+	public SubqueryImpl<T> having(Predicate... restrictions) {
+		return (SubqueryImpl<T>) this.query.having(restrictions);
 	}
 
 	/**
@@ -360,7 +360,7 @@ public class SubQueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 	 * 
 	 */
 	@Override
-	public <U> SubQueryImpl<U> subquery(Class<U> type) {
+	public <U> SubqueryImpl<U> subquery(Class<U> type) {
 		return this.query.subquery(type);
 	}
 

@@ -687,8 +687,8 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	 * 
 	 */
 	@Override
-	public <U> SubQueryImpl<U> subquery(Class<U> type) {
-		return new SubQueryImpl<U>(this.metamodel, this, type);
+	public <U> SubqueryImpl<U> subquery(Class<U> type) {
+		return new SubqueryImpl<U>(this.metamodel, this, type);
 	}
 
 	/**

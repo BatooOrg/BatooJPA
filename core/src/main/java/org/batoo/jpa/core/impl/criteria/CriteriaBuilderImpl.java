@@ -114,8 +114,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <Y> Expression<Y> all(Subquery<Y> subquery) {
-		// TODO Auto-generated method stub
-		return null;
+		return new AllAnyExpression<Y>(true, subquery);
 	}
 
 	/**
@@ -143,8 +142,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <Y> Expression<Y> any(Subquery<Y> subquery) {
-		// TODO Auto-generated method stub
-		return null;
+		return new AllAnyExpression<Y>(false, subquery);
 	}
 
 	/**
@@ -1159,8 +1157,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <Y> Expression<Y> some(Subquery<Y> subquery) {
-		// TODO Auto-generated method stub
-		return null;
+		return new AllAnyExpression<Y>(false, subquery);
 	}
 
 	/**
