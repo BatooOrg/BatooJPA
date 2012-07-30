@@ -20,10 +20,12 @@ package org.batoo.jpa.core.impl.deployment;
 
 import java.util.concurrent.Callable;
 
+import javax.persistence.metamodel.ManagedType;
+
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.IdentifiableTypeImpl;
-import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.core.impl.model.type.MappedSuperclassTypeImpl;
+import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 
 /**
  * Implementation for deployment unit tasks.
@@ -35,7 +37,7 @@ import org.batoo.jpa.core.impl.model.type.MappedSuperclassTypeImpl;
  */
 public final class DeploymentUnitTask implements Callable<Void>, Comparable<DeploymentUnitTask> {
 
-	private final ManagedTypeImpl<?> type;
+	private final Object unit;
 
 	@SuppressWarnings("rawtypes")
 	private final DeploymentManager manager;
@@ -43,17 +45,17 @@ public final class DeploymentUnitTask implements Callable<Void>, Comparable<Depl
 	/**
 	 * @param manager
 	 *            the deployment unit manager
-	 * @param type
+	 * @param unit
 	 *            the type of this task
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public DeploymentUnitTask(@SuppressWarnings("rawtypes") DeploymentManager manager, ManagedTypeImpl<?> type) {
+	public DeploymentUnitTask(@SuppressWarnings("rawtypes") DeploymentManager manager, Object unit) {
 		super();
 
 		this.manager = manager;
-		this.type = type;
+		this.unit = unit;
 	}
 
 	/**
@@ -63,7 +65,7 @@ public final class DeploymentUnitTask implements Callable<Void>, Comparable<Depl
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public final Void call() throws Exception {
-		final IdentifiableTypeImpl<?> parent = this.type instanceof IdentifiableTypeImpl ? ((IdentifiableTypeImpl) this.type).getSupertype() : null;
+		final IdentifiableTypeImpl<?> parent = this.unit instanceof IdentifiableTypeImpl ? ((IdentifiableTypeImpl) this.unit).getSupertype() : null;
 
 		// if the super type hasn't performed yet, then wait for to finish
 		while (!this.manager.hasPerformed(parent)) {
@@ -76,10 +78,10 @@ public final class DeploymentUnitTask implements Callable<Void>, Comparable<Depl
 		}
 
 		try {
-			return this.manager.perform(this.type);
+			return this.manager.perform(this.unit);
 		}
 		finally {
-			this.manager.performed(this.type);
+			this.manager.performed(this.unit);
 		}
 	}
 
@@ -89,31 +91,39 @@ public final class DeploymentUnitTask implements Callable<Void>, Comparable<Depl
 	 */
 	@Override
 	public int compareTo(DeploymentUnitTask o) {
+		// named queries has no precedence
+		if (this.unit instanceof NamedQueryMetadata) {
+			return 0;
+		}
+
+		final ManagedType<?> thisUnit = (ManagedType<?>) this.unit;
+		final ManagedType<?> otherUnit = (ManagedType<?>) o.unit;
+
 		// if this type is Embeddable and the other type is not then perform this earlier
-		if ((this.type instanceof EmbeddableTypeImpl) && (!(o.type instanceof EmbeddableTypeImpl))) {
+		if ((thisUnit instanceof EmbeddableTypeImpl) && (!(otherUnit instanceof EmbeddableTypeImpl))) {
 			return -1;
 		}
 
 		// if the other type is Embeddable and this type is not then perform the other earlier
-		if ((o.type instanceof EmbeddableTypeImpl) && (!(this.type instanceof EmbeddableTypeImpl))) {
+		if ((otherUnit instanceof EmbeddableTypeImpl) && (!(thisUnit instanceof EmbeddableTypeImpl))) {
 			return 1;
 		}
 
 		// if this type is a MappedSuperClass and the other type is not then perform this earlier
-		if ((this.type instanceof MappedSuperclassTypeImpl) && (!(o.type instanceof MappedSuperclassTypeImpl))) {
+		if ((thisUnit instanceof MappedSuperclassTypeImpl) && (!(otherUnit instanceof MappedSuperclassTypeImpl))) {
 			return -1;
 		}
 
 		// if the other type is a MappedSuperClass and this type is not then perform this later
-		if ((o.type instanceof MappedSuperclassTypeImpl) && (!(this.type instanceof MappedSuperclassTypeImpl))) {
+		if ((otherUnit instanceof MappedSuperclassTypeImpl) && (!(thisUnit instanceof MappedSuperclassTypeImpl))) {
 			return 1;
 		}
 
 		// if the other type is super type of this type then perform other earlier
-		Class<?> javaType = this.type.getJavaType();
+		Class<?> javaType = thisUnit.getJavaType();
 		while (javaType.getSuperclass() != null) {
 			javaType = javaType.getSuperclass();
-			if (javaType == o.type.getJavaType()) {
+			if (javaType == otherUnit.getJavaType()) {
 				return 1;
 			}
 		}

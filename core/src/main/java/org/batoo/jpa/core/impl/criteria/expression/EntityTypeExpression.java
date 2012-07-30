@@ -23,7 +23,7 @@ import java.sql.SQLException;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 import org.batoo.jpa.core.impl.criteria.path.PluralAssociationPath;
@@ -104,7 +104,7 @@ public class EntityTypeExpression<T> extends AbstractTypeExpression<T> {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public T handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+	public T handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		final Object object = this.getPath().handle(query, session, row);
 
 		if (object == null) {

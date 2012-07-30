@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.model;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -67,6 +68,7 @@ import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.metadata.MetadataImpl;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
+import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.type.EmbeddableMetadata;
@@ -117,6 +119,7 @@ public class MetamodelImpl implements Metamodel {
 	private final Map<Class<?>, EmbeddableType<?>> embeddables = Maps.newHashMap();
 	private final Map<Class<?>, EntityTypeImpl<?>> entities = Maps.newHashMap();
 	private final Map<String, EntityTypeImpl<?>> entitiesByName = Maps.newHashMap();
+	private final Map<String, NamedQueryMetadata> namedQueries = Maps.newHashMap();
 
 	private final CallbackManager callbackManager;
 
@@ -246,6 +249,30 @@ public class MetamodelImpl implements Metamodel {
 		}
 
 		this.callbackManager = new CallbackManager(metadata.getEntityListeners());
+
+		this.addNamedQueries(metadata.getNamedQueries());
+		for (final ManagedTypeMetadata entity : entities) {
+			if (entity instanceof EntityMetadata) {
+				this.addNamedQueries(((EntityMetadata) entity).getNamedQueries());
+			}
+		}
+	}
+
+	/**
+	 * Adds the named queries to the metamodel.
+	 * 
+	 * @param namedQueries
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void addNamedQueries(List<NamedQueryMetadata> namedQueries) {
+		for (final NamedQueryMetadata namedQuery : namedQueries) {
+			final NamedQueryMetadata existing = this.namedQueries.put(namedQuery.getName(), namedQuery);
+			if (existing != null) {
+				throw new MappingException("Duplicate named query with the name: " + namedQuery.getName(), existing.getLocator(), namedQuery.getLocator());
+			}
+		}
 	}
 
 	/**
@@ -466,6 +493,18 @@ public class MetamodelImpl implements Metamodel {
 		managedTypes.addAll(this.entities.values());
 
 		return managedTypes;
+	}
+
+	/**
+	 * Returns the set of named queries.
+	 * 
+	 * @return the set of named queries
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Collection<NamedQueryMetadata> getNamedQueries() {
+		return this.namedQueries.values();
 	}
 
 	/**

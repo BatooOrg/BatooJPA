@@ -64,11 +64,11 @@ import com.google.common.collect.Sets;
  * @author hceylan
  * @since $version
  */
-public class TypedQueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>> {
+public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>> {
 
 	private static final int MAX_COL_LENGTH = 30;
 
-	private static final BLogger LOG = BLoggerFactory.getLogger(TypedQueryImpl.class);
+	private static final BLogger LOG = BLoggerFactory.getLogger(QueryImpl.class);
 
 	private final EntityManagerImpl em;
 	private final CriteriaQueryImpl<X> cq;
@@ -96,7 +96,7 @@ public class TypedQueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X
 	 * @since $version
 	 * @author hceylan
 	 */
-	public TypedQueryImpl(CriteriaQueryImpl<X> criteriaQuery, EntityManagerImpl entityManager) {
+	public QueryImpl(CriteriaQueryImpl<X> criteriaQuery, EntityManagerImpl entityManager) {
 		super();
 
 		this.cq = criteriaQuery;
@@ -171,7 +171,7 @@ public class TypedQueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X
 		dump.append("\n");
 		dump.append(StringUtils.repeat("-", length));
 
-		TypedQueryImpl.LOG.debug(dump.toString(), this.data.size());
+		QueryImpl.LOG.debug(dump.toString(), this.data.size());
 	}
 
 	/**
@@ -182,6 +182,18 @@ public class TypedQueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X
 	public int executeUpdate() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	/**
+	 * Returns the criteria query of the typed query.
+	 * 
+	 * @return the criteria query of the typed query
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public CriteriaQueryImpl<X> getCriteriaQuery() {
+		return this.cq;
 	}
 
 	/**
@@ -349,7 +361,7 @@ public class TypedQueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X
 			}
 
 			if ((this.startPosition != 0) || (this.maxResult != Integer.MAX_VALUE)) {
-				TypedQueryImpl.LOG.debug("Rows restricted to {0} / {1}", this.startPosition, this.maxResult);
+				QueryImpl.LOG.debug("Rows restricted to {0} / {1}", this.startPosition, this.maxResult);
 
 				this.sql = this.cq.getMetamodel().getJdbcAdaptor().applyPagination(this.sql, this.startPosition, this.maxResult);
 			}
@@ -373,7 +385,7 @@ public class TypedQueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X
 				return new QueryRunner().query(this.em.getConnection(), this.sql, this, parameters);
 			}
 			catch (final SQLException e) {
-				TypedQueryImpl.LOG.error(e, "Query failed" + TypedQueryImpl.LOG.lazyBoxed(this.sql, parameters));
+				QueryImpl.LOG.error(e, "Query failed" + QueryImpl.LOG.lazyBoxed(this.sql, parameters));
 
 				final EntityTransaction transaction = this.em.getTransaction();
 				if (transaction != null) {
@@ -415,7 +427,7 @@ public class TypedQueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X
 	public List<X> handle(ResultSet rs) throws SQLException {
 		this.md = rs.getMetaData();
 
-		final boolean debug = TypedQueryImpl.LOG.isDebugEnabled();
+		final boolean debug = QueryImpl.LOG.isDebugEnabled();
 		if (debug) {
 			this.prepareLabels(this.md);
 		}
@@ -458,7 +470,7 @@ public class TypedQueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X
 	}
 
 	private int max(int length1, int length2) {
-		return Math.min(TypedQueryImpl.MAX_COL_LENGTH, Math.max(length1, length2));
+		return Math.min(QueryImpl.MAX_COL_LENGTH, Math.max(length1, length2));
 	}
 
 	private void prepareLabels(final ResultSetMetaData md) throws SQLException {
@@ -466,13 +478,13 @@ public class TypedQueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X
 
 		for (int i = 0; i < this.labels.length; i++) {
 			String label = md.getColumnName(i + 1) + " (" + md.getColumnTypeName(i + 1) + ")";
-			label = StringUtils.abbreviate(label, TypedQueryImpl.MAX_COL_LENGTH);
+			label = StringUtils.abbreviate(label, QueryImpl.MAX_COL_LENGTH);
 
 			this.labels[i] = label;
 		}
 	}
 
-	private TypedQueryImpl<X> putParam(Parameter<?> param, Object value) {
+	private QueryImpl<X> putParam(Parameter<?> param, Object value) {
 		this.parameters.put((ParameterExpressionImpl<?>) param, value);
 
 		return this;
@@ -554,7 +566,7 @@ public class TypedQueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X
 	 * 
 	 */
 	@Override
-	public TypedQueryImpl<X> setParameter(int position, Object value) {
+	public QueryImpl<X> setParameter(int position, Object value) {
 		return this.putParam(this.getParameter(position), value);
 	}
 

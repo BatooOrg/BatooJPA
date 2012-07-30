@@ -45,6 +45,7 @@ import org.batoo.jpa.parser.metadata.CallbackMetadata;
 import org.batoo.jpa.parser.metadata.DiscriminatorColumnMetadata;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata;
 import org.batoo.jpa.parser.metadata.InheritanceMetadata;
+import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
@@ -81,6 +82,7 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 	private boolean excludeSuperclassListeners;
 	private final List<EntityListenerMetadata> listeners = Lists.newArrayList();
 	private final List<CallbackMetadata> callbacks = Lists.newArrayList();
+	private final List<NamedQueryMetadata> namedQueries = Lists.newArrayList();
 
 	/**
 	 * Constructor for ORM File parsing
@@ -115,7 +117,8 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 			ElementConstants.ELEMENT_POST_REMOVE, //
 			ElementConstants.ELEMENT_POST_UPDATE, //
 			ElementConstants.ELEMENT_EXCLUDE_DEFAULT_LISTENERS, //
-			ElementConstants.ELEMENT_EXCLUDE_SUPERCLASS_LISTENERS);
+			ElementConstants.ELEMENT_EXCLUDE_SUPERCLASS_LISTENERS, //
+			ElementConstants.ELEMENT_NAMED_QUERY);
 	}
 
 	/**
@@ -271,6 +274,15 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 	 * 
 	 */
 	@Override
+	public List<NamedQueryMetadata> getNamedQueries() {
+		return this.namedQueries;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public List<SecondaryTableMetadata> getSecondaryTables() {
 		return this.secondaryTables;
 	}
@@ -366,6 +378,10 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 
 		if (child instanceof ExcludeSuperclassListenersElement) {
 			this.excludeSuperclassListeners = true;
+		}
+
+		if (child instanceof NamedQueryMetadata) {
+			this.namedQueries.add((NamedQueryMetadata) child);
 		}
 	}
 

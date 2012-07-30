@@ -25,7 +25,7 @@ import javax.persistence.criteria.Expression;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
@@ -129,7 +129,7 @@ public class LocateExpression extends AbstractExpression<Integer> {
 	 * 
 	 */
 	@Override
-	public Integer handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+	public Integer handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		return (Integer) row.getObject(this.alias);
 	}
 }

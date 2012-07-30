@@ -27,6 +27,7 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Predicate.BooleanOperator;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Selection;
 import javax.persistence.criteria.Subquery;
 import javax.persistence.metamodel.EntityType;
 
@@ -59,7 +60,7 @@ import com.google.common.collect.Sets;
 public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 
 	private final MetamodelImpl metamodel;
-	private final Class<T> resultType;
+	private Class<T> resultType;
 
 	private final Set<RootImpl<?>> roots = Sets.newHashSet();
 	private int nextEntityAlias;
@@ -330,6 +331,23 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	public <U> Subquery<U> subquery(Class<U> type) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	/**
+	 * @param selections
+	 *            the selections
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void updateResultClass(List<Selection<?>> selections) {
+		if (selections.size() == 1) {
+			final Selection<?> selection = selections.get(0);
+			this.resultType = (Class<T>) selection.getJavaType();
+		}
+		else {
+			this.resultType = (Class<T>) Object[].class;
+		}
 	}
 
 	/**

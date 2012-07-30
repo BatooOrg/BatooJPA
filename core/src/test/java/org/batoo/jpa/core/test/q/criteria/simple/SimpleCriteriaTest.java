@@ -32,7 +32,7 @@ import junit.framework.Assert;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.join.AbstractJoin;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
@@ -127,7 +127,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 		final ParameterExpressionImpl<Integer> p = cb.parameter(Integer.class);
 		cq.where(cb.lessThan(age, p));
 
-		final TypedQueryImpl<Person> q = this.em().createQuery(cq);
+		final QueryImpl<Person> q = this.em().createQuery(cq);
 		q.setParameter(p, 40);
 
 		Assert.assertEquals(1, q.getResultList().size());
@@ -154,7 +154,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 		final ParameterExpressionImpl<Integer> p = cb.parameter(Integer.class);
 		cq.where(cb.greaterThan(age, p));
 
-		final TypedQueryImpl<Person> q = this.em().createQuery(cq);
+		final QueryImpl<Person> q = this.em().createQuery(cq);
 		q.setParameter(p, 40);
 
 		Assert.assertEquals(0, q.getResultList().size());
@@ -402,7 +402,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 		final ParameterExpressionImpl<Country> p = cb.parameter(Country.class);
 		q.where(cb.equal(r, p));
 
-		final TypedQueryImpl<Country> tq = this.em().createQuery(q);
+		final QueryImpl<Country> tq = this.em().createQuery(q);
 		tq.setParameter(p, SimpleCriteriaTest.TR);
 
 		final List<Country> resultList = tq.getResultList();

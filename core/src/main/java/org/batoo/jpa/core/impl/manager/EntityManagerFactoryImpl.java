@@ -25,6 +25,7 @@ import java.util.Map;
 import javax.persistence.Cache;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.LockModeType;
 import javax.persistence.PersistenceException;
 import javax.persistence.PersistenceUnitUtil;
 import javax.persistence.Query;
@@ -34,20 +35,24 @@ import org.batoo.jpa.common.BatooException;
 import org.batoo.jpa.core.BJPASettings;
 import org.batoo.jpa.core.JPASettings;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.jpql.JpqlQuery;
 import org.batoo.jpa.core.impl.deployment.DdlManager;
 import org.batoo.jpa.core.impl.deployment.LinkManager;
+import org.batoo.jpa.core.impl.deployment.NamedQueriesManager;
 import org.batoo.jpa.core.impl.jdbc.AbstractJdbcAdaptor;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
-import org.batoo.jpa.core.util.Pair;
 import org.batoo.jpa.parser.PersistenceParser;
+import org.batoo.jpa.parser.impl.AbstractLocator;
+import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Maps;
 
 /**
  * Implementation of {@link EntityManagerFactory}.
@@ -61,16 +66,17 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	private final DataSourceImpl datasource;
 	private final JdbcAdaptor jdbcAdaptor;
 	private final Map<String, Object> properties;
-	private boolean open;
+	private final Map<String, JpqlQuery> namedQueries = Maps.newHashMap();
 	private final CriteriaBuilderImpl criteriaBuilder;
 
-	LoadingCache<Pair<String, Class<?>>, JpqlQuery> graphs = CacheBuilder.newBuilder().maximumSize(1000).build(
-		new CacheLoader<Pair<String, Class<?>>, JpqlQuery>() {
-			@Override
-			public JpqlQuery load(Pair<String, Class<?>> jpql) {
-				return new JpqlQuery(EntityManagerFactoryImpl.this, jpql.getFirst(), jpql.getSecond());
-			}
-		});
+	LoadingCache<String, JpqlQuery> graphs = CacheBuilder.newBuilder().maximumSize(1000).build(new CacheLoader<String, JpqlQuery>() {
+		@Override
+		public JpqlQuery load(String jpql) {
+			return new JpqlQuery(EntityManagerFactoryImpl.this, jpql);
+		}
+	});
+
+	private boolean open;
 
 	/**
 	 * @param name
@@ -98,7 +104,28 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		this.metamodel.preFillGenerators(this.datasource);
 		this.criteriaBuilder = new CriteriaBuilderImpl(this.metamodel);
 
+		NamedQueriesManager.perform(this.metamodel, this.criteriaBuilder);
+
 		this.open = true;
+	}
+
+	/**
+	 * Adds the named query to the entity manager factory.
+	 * 
+	 * @param name
+	 *            the name of the query
+	 * @param jpqlQuery
+	 *            the compiled query
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void addNamedQuery(String name, JpqlQuery jpqlQuery) {
+		if (this.namedQueries.containsKey(name)) {
+			throw new IllegalArgumentException("A named query with the same name already exists: " + name);
+		}
+
+		this.namedQueries.put(name, jpqlQuery);
 	}
 
 	/**
@@ -106,9 +133,37 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * 
 	 */
 	@Override
-	public void addNamedQuery(String name, Query query) {
-		// TODO Auto-generated method stub
+	public void addNamedQuery(final String name, Query query) {
+		final QueryImpl<?> typedQuery = (QueryImpl<?>) query;
+		final String jpql = typedQuery.getCriteriaQuery().getJpql();
 
+		new JpqlQuery(this, this.criteriaBuilder, new NamedQueryMetadata() {
+
+			@Override
+			public Map<String, Object> getHints() {
+				return typedQuery.getHints();
+			}
+
+			@Override
+			public AbstractLocator getLocator() {
+				return null;
+			}
+
+			@Override
+			public LockModeType getLockMode() {
+				return typedQuery.getLockMode();
+			}
+
+			@Override
+			public String getName() {
+				return name;
+			}
+
+			@Override
+			public String getQuery() {
+				return jpql;
+			}
+		});
 	}
 
 	private void assertOpen() {
@@ -228,7 +283,8 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 */
 	public JpqlQuery getJpqlQuery(String qlString, Class<?> resultClass) {
 		try {
-			return this.graphs.get(new Pair<String, Class<?>>(qlString, resultClass));
+			// TODO Check result class compatibility
+			return this.graphs.get(qlString);
 		}
 		catch (final Exception e) {
 			if (e.getCause() instanceof PersistenceException) {
@@ -250,6 +306,20 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	@Override
 	public MetamodelImpl getMetamodel() {
 		return this.metamodel;
+	}
+
+	/**
+	 * Returns the named query with the name <code>name</code>.
+	 * 
+	 * @param name
+	 *            the name of the query
+	 * @return the named query
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public JpqlQuery getNamedQuery(String name) {
+		return this.namedQueries.get(name);
 	}
 
 	/**

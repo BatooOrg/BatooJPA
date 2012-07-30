@@ -25,7 +25,7 @@ import javax.persistence.criteria.Expression;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
@@ -126,7 +126,7 @@ public class CountExpression extends AbstractExpression<Long> {
 	 * 
 	 */
 	@Override
-	public Long handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+	public Long handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		return row.getLong(this.alias);
 	}
 }

@@ -25,7 +25,7 @@ import javax.persistence.criteria.Expression;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
@@ -125,7 +125,7 @@ public class SubstringExpression extends AbstractExpression<String> {
 	 * 
 	 */
 	@Override
-	public String handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+	public String handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		return (String) row.getObject(this.alias);
 	}
 }

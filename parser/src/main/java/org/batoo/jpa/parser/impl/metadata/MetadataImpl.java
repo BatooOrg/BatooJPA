@@ -33,6 +33,7 @@ import org.batoo.jpa.parser.impl.metadata.type.EntityMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.type.MappedSuperclassMetadataImpl;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata;
 import org.batoo.jpa.parser.metadata.Metadata;
+import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.type.EmbeddableMetadata;
@@ -59,6 +60,7 @@ public class MetadataImpl implements Metadata {
 	private final List<SequenceGeneratorMetadata> sequenceGenerators = Lists.newArrayList();
 	private final List<TableGeneratorMetadata> tableGenerators = Lists.newArrayList();
 
+	private final List<NamedQueryMetadata> namedQueries = Lists.newArrayList();
 	private final List<EntityListenerMetadata> entityListeners = Lists.newArrayList();
 	private final Map<String, ManagedTypeMetadata> entityMap = Maps.newHashMap();
 	private boolean cascadePersist;
@@ -128,6 +130,15 @@ public class MetadataImpl implements Metadata {
 	 * 
 	 */
 	@Override
+	public List<NamedQueryMetadata> getNamedQueries() {
+		return this.namedQueries;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public String getSchema() {
 		return this.schema;
 	}
@@ -180,6 +191,7 @@ public class MetadataImpl implements Metadata {
 		this.tableGenerators.addAll(metadata.getTableGenerators());
 
 		this.entityListeners.addAll(metadata.getEntityListeners());
+		this.namedQueries.addAll(metadata.getNamedQueries());
 
 		for (final ManagedTypeMetadata managedType : metadata.getEntityMappings()) {
 			final ManagedTypeMetadata existing = this.entityMap.put(managedType.getClassName(), managedType);
@@ -209,7 +221,10 @@ public class MetadataImpl implements Metadata {
 				final Class<?> clazz = Class.forName(className);
 				if (metadata == null) {
 					if (clazz.getAnnotation(Entity.class) != null) {
-						this.entityMap.put(className, new EntityMetadataImpl(clazz, (EntityMetadata) metadata));
+						final EntityMetadataImpl entityMetadata = new EntityMetadataImpl(clazz, (EntityMetadata) metadata);
+						this.entityMap.put(className, entityMetadata);
+
+						this.namedQueries.addAll(entityMetadata.getNamedQueries());
 					}
 					else if (clazz.getAnnotation(MappedSuperclass.class) != null) {
 						this.entityMap.put(className, new MappedSuperclassMetadataImpl(clazz, (MappedSuperclassMetadata) metadata));
@@ -224,6 +239,8 @@ public class MetadataImpl implements Metadata {
 				else {
 					if (metadata instanceof EntityMetadata) {
 						this.entityMap.put(className, new EntityMetadataImpl(clazz, (EntityMetadata) metadata));
+
+						this.namedQueries.addAll(((EntityMetadata) metadata).getNamedQueries());
 					}
 					else if (metadata instanceof MappedSuperclassMetadata) {
 						this.entityMap.put(className, new MappedSuperclassMetadataImpl(clazz, (MappedSuperclassMetadata) metadata));

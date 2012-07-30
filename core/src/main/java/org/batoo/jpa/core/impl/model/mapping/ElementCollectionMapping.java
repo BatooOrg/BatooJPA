@@ -41,7 +41,7 @@ import org.batoo.jpa.core.impl.collections.ManagedList;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
 import org.batoo.jpa.core.impl.criteria.join.AbstractJoin;
@@ -564,7 +564,7 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	@Override
 	public Collection<? extends E> loadCollection(ManagedInstance<?> instance) {
 		final EntityManagerImpl em = instance.getSession().getEntityManager();
-		final TypedQueryImpl<E> q = em.createQuery(this.getSelectCriteria());
+		final QueryImpl<E> q = em.createQuery(this.getSelectCriteria());
 
 		final EntityTypeImpl<?> rootType = instance.getType();
 
@@ -592,7 +592,7 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	@SuppressWarnings("unchecked")
 	public <K> Map<? extends K, ? extends E> loadMap(ManagedInstance<?> instance) {
 		final EntityManagerImpl em = instance.getSession().getEntityManager();
-		final TypedQueryImpl<Object[]> q = em.createQuery(this.getSelectMapCriteria());
+		final QueryImpl<Object[]> q = em.createQuery(this.getSelectMapCriteria());
 
 		final EntityTypeImpl<?> rootType = instance.getType();
 

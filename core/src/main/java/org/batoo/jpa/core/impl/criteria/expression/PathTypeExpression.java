@@ -22,7 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
@@ -76,7 +76,7 @@ public class PathTypeExpression<T> extends AbstractTypeExpression<T> {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public T handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+	public T handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		return (T) this.path.getMapping().getJavaType();
 	}
 }

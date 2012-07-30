@@ -43,7 +43,7 @@ import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
@@ -1454,7 +1454,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	public void performRefresh(ConnectionImpl connection, ManagedInstance<X> instance, LockModeType lockMode) {
 		final SessionImpl session = instance.getSession();
 
-		final TypedQueryImpl<X> q = session.getEntityManager().createQuery(this.getCriteriaRefresh());
+		final QueryImpl<X> q = session.getEntityManager().createQuery(this.getCriteriaRefresh());
 		q.setLockMode(lockMode);
 
 		final Object id = instance.getId().getId();
@@ -1507,7 +1507,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public X performSelect(EntityManagerImpl entityManager, Object id, LockModeType lockMode) {
-		final TypedQueryImpl<X> q = entityManager.createQuery(this.getCriteriaSelect());
+		final QueryImpl<X> q = entityManager.createQuery(this.getCriteriaSelect());
 
 		q.setLockMode(lockMode);
 

@@ -45,7 +45,8 @@ import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
+import org.batoo.jpa.core.impl.criteria.jpql.JpqlQuery;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
@@ -244,8 +245,7 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public Query createNamedQuery(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.createNamedQuery(name, Object.class);
 	}
 
 	/**
@@ -254,8 +254,13 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public <T> TypedQuery<T> createNamedQuery(String name, Class<T> resultClass) {
-		// TODO Auto-generated method stub
-		return null;
+		final JpqlQuery query = this.emf.getNamedQuery(name);
+
+		if (query == null) {
+			throw new IllegalArgumentException("No named query found with the name: " + name);
+		}
+
+		return query.createTypedQuery(this);
 	}
 
 	/**
@@ -313,8 +318,8 @@ public class EntityManagerImpl implements EntityManager {
 	 * 
 	 */
 	@Override
-	public <T> TypedQueryImpl<T> createQuery(CriteriaQuery<T> criteriaQuery) {
-		return new TypedQueryImpl<T>((CriteriaQueryImpl<T>) criteriaQuery, this);
+	public <T> QueryImpl<T> createQuery(CriteriaQuery<T> criteriaQuery) {
+		return new QueryImpl<T>((CriteriaQueryImpl<T>) criteriaQuery, this);
 	}
 
 	/**
@@ -343,7 +348,10 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public <T> TypedQuery<T> createQuery(String qlString, Class<T> resultClass) {
-		return this.emf.getJpqlQuery(qlString, resultClass).createTypedQuery(this, resultClass);
+		final QueryImpl<T> typedQuery = this.emf.getJpqlQuery(qlString, resultClass).createTypedQuery(this);
+
+		// TODO check result class compatibility
+		return typedQuery;
 	}
 
 	/**

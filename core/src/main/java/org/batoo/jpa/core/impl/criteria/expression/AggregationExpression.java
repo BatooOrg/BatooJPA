@@ -26,7 +26,7 @@ import javax.persistence.criteria.Expression;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
@@ -133,7 +133,7 @@ public class AggregationExpression<T> extends AbstractExpression<T> {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public T handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+	public T handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		if (this.getJavaType() == Long.class) {
 			return (T) (Long) row.getLong(this.alias);
 		}

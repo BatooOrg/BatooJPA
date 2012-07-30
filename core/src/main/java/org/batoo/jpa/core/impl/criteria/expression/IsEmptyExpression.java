@@ -24,7 +24,7 @@ import java.sql.SQLException;
 import javax.persistence.criteria.Expression;
 
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
@@ -95,7 +95,7 @@ public class IsEmptyExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public Boolean handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+	public Boolean handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
 	}

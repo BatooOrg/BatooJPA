@@ -27,7 +27,7 @@ import javax.persistence.metamodel.Type.PersistenceType;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
@@ -208,7 +208,7 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public T handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+	public T handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		final T value = query.getParameterValue(this);
 
 		return (T) (this.getConverter() != null ? this.getConverter().convert(value) : value);

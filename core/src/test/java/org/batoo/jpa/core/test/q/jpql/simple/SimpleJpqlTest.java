@@ -370,6 +370,20 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
+	public void testNamedQuery() {
+		this.persist(this.person(40));
+		this.persist(this.person(35));
+		this.commit();
+
+		Assert.assertEquals(40, this.em().createNamedQuery("theOldestGuys", Person.class).setMaxResults(1).getSingleResult().getAge());
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
 	public void testNumericFunctions() {
 		this.persist(this.person(-49));
 		this.commit();

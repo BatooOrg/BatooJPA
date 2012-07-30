@@ -3,13 +3,19 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd" version="2.0">
 	<access>PROPERTY</access>
 
+	<named-query name="aaa"><query>aaaa</query><hint name="" value=""></hint><lock-mode></lock-mode></named-query>
+	
 	<mapped-superclass class=""></mapped-superclass>
 
 	<entity name="Entity" class="org.batoo.jpa.parser.test.Entity">
 		<inheritance strategy="SINGLE_TABLE" />
 		<discriminator-column />
+		<named-query name="a"><query>select p from Person p</query></named-query>
 		<attributes>
-			<one-to-many name=""><order-by></order-by><map-key name=""/></one-to-many>
+			<one-to-many name="">
+				<order-by></order-by>
+				<map-key name="" />
+			</one-to-many>
 		</attributes>
 	</entity>
 	<embeddable class=""></embeddable>

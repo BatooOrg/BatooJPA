@@ -22,7 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
 
@@ -106,7 +106,7 @@ public class ConstantExpression<T> extends AbstractExpression<T> {
 	 * 
 	 */
 	@Override
-	public T handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+	public T handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		return this.value;
 	}
 }

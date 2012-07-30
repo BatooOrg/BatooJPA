@@ -29,7 +29,7 @@ import javax.persistence.criteria.Path;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.PathTypeExpression;
 import org.batoo.jpa.core.impl.criteria.join.FetchParentImpl;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
@@ -213,7 +213,7 @@ public class EmbeddedAttributePath<Z, X> extends AbstractPath<X> implements Pare
 	 * 
 	 */
 	@Override
-	public X handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+	public X handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		final Object instance = this.getParentPath().handle(query, session, row);
 
 		return this.getMapping().get(instance);

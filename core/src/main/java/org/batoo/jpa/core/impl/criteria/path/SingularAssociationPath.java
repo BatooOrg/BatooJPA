@@ -26,7 +26,7 @@ import javax.persistence.criteria.Path;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.EntityTypeExpression;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
 import org.batoo.jpa.core.impl.criteria.join.FetchImpl;
@@ -167,7 +167,7 @@ public class SingularAssociationPath<Z, X> extends AbstractPath<X> implements Jo
 	 * 
 	 */
 	@Override
-	public X handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+	public X handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		return this.fetchRoot.handle(session, row);
 	}
 

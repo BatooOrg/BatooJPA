@@ -26,6 +26,7 @@ import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.BindableMetadata;
 import org.batoo.jpa.parser.metadata.DiscriminatorColumnMetadata;
+import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
@@ -98,6 +99,16 @@ public interface EntityMetadata extends IdentifiableTypeMetadata, BindableMetada
 	 * @author hceylan
 	 */
 	InheritanceType getInheritanceType();
+
+	/**
+	 * Returns the list of named queries.
+	 * 
+	 * @return the list of named queries
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	List<NamedQueryMetadata> getNamedQueries();
 
 	/**
 	 * Returns the list secondary tables of the entity.

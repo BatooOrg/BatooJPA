@@ -18,9 +18,12 @@
  */
 package org.batoo.jpa.core.impl.criteria.jpql;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import javax.persistence.LockModeType;
 import javax.persistence.PersistenceException;
 import javax.persistence.criteria.CriteriaBuilder.Trimspec;
 import javax.persistence.criteria.CriteriaQuery;
@@ -40,8 +43,8 @@ import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.AbstractSelection;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ConcatExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ConstantExpression;
@@ -57,6 +60,7 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.jpql.JpqlLexer;
 import org.batoo.jpa.jpql.JpqlParser;
 import org.batoo.jpa.jpql.JpqlParser.ql_statement_return;
+import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -74,45 +78,82 @@ public class JpqlQuery {
 
 	private final MetamodelImpl metamodel;
 	private final String qlString;
-	private final Class<?> resultClass;
 
 	private final CriteriaQueryImpl<?> criteriaQuery;
 	private final Map<String, AbstractFrom<?, ?>> aliasMap = Maps.newHashMap();
+
+	private HashMap<String, Object> hints;
+	private LockModeType lockMode;
+
+	/**
+	 * Constructor for named queries.
+	 * 
+	 * @param entityManagerFactory
+	 *            the entity manager factory
+	 * @param cb
+	 *            the criteria builder
+	 * @param metadata
+	 *            the named query metadata
+	 * @since $version
+	 * @author hceylan
+	 */
+	public JpqlQuery(EntityManagerFactoryImpl entityManagerFactory, CriteriaBuilderImpl cb, NamedQueryMetadata metadata) {
+		this(entityManagerFactory, metadata.getQuery(), cb);
+
+		// force sql compilation
+		this.criteriaQuery.getSql();
+
+		this.lockMode = metadata.getLockMode();
+		if (metadata.getHints().size() > 0) {
+			this.hints = Maps.newHashMap();
+			this.hints.putAll(metadata.getHints());
+		}
+
+		entityManagerFactory.addNamedQuery(metadata.getName(), this);
+	}
 
 	/**
 	 * @param entityManagerFactory
 	 *            the entity manager factory
 	 * @param qlString
 	 *            the query string
-	 * @param resultClass
-	 *            the result class
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public JpqlQuery(EntityManagerFactoryImpl entityManagerFactory, String qlString, Class<?> resultClass) {
+	public JpqlQuery(EntityManagerFactoryImpl entityManagerFactory, String qlString) {
+		this(entityManagerFactory, qlString, null);
+	}
+
+	private JpqlQuery(EntityManagerFactoryImpl entityManagerFactory, String qlString, CriteriaBuilderImpl cb) {
 		super();
 
 		this.metamodel = entityManagerFactory.getMetamodel();
 		this.qlString = qlString;
-		this.resultClass = resultClass;
 
-		this.criteriaQuery = this.parse();
+		if (cb == null) {
+			cb = entityManagerFactory.getCriteriaBuilder();
+		}
+
+		this.criteriaQuery = this.parse(cb);
 	}
 
 	/**
-	 * Constructs the query object
+	 * Constructs the query object.
 	 * 
+	 * @param cb
+	 *            the criteria builder
 	 * @param tree
+	 *            the query tree
+	 * 
+	 * @return the constructed criteria query
 	 * 
 	 * @since $version
 	 * @author hceylan
-	 * @return
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private CriteriaQueryImpl<?> construct(CommonTree tree) {
-		final CriteriaBuilderImpl cb = this.metamodel.getEntityManagerFactory().getCriteriaBuilder();
-		final CriteriaQueryImpl q = cb.createQuery(this.resultClass);
+	private CriteriaQueryImpl<?> construct(CriteriaBuilderImpl cb, CommonTree tree) {
+		final CriteriaQueryImpl q = new CriteriaQueryImpl(this.metamodel);
 
 		final Tree type = tree.getChild(0);
 		if (type.getType() == JpqlParser.SELECT) {
@@ -474,6 +515,8 @@ public class JpqlQuery {
 			selections.add(selection);
 		}
 
+		q.updateResultClass(selections);
+
 		return selections;
 	}
 
@@ -526,8 +569,6 @@ public class JpqlQuery {
 	 * 
 	 * @param entityManager
 	 *            the entity manager
-	 * @param resutClass
-	 *            the result class
 	 * @param <T>
 	 *            the result type
 	 * @return the typed query
@@ -536,8 +577,20 @@ public class JpqlQuery {
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> TypedQueryImpl<T> createTypedQuery(EntityManagerImpl entityManager, Class<T> resutClass) {
-		return new TypedQueryImpl<T>((CriteriaQueryImpl<T>) this.criteriaQuery, entityManager);
+	public <T> QueryImpl<T> createTypedQuery(EntityManagerImpl entityManager) {
+		final QueryImpl<T> typedQuery = new QueryImpl<T>((CriteriaQueryImpl<T>) this.criteriaQuery, entityManager);
+
+		if (this.lockMode != null) {
+			typedQuery.setLockMode(this.lockMode);
+		}
+
+		if (this.hints != null) {
+			for (final Entry<String, Object> entry : this.hints.entrySet()) {
+				typedQuery.setHint(entry.getKey(), entry.getValue());
+			}
+		}
+
+		return typedQuery;
 	}
 
 	private AbstractFrom<?, ?> getAliased(String alias) {
@@ -812,18 +865,20 @@ public class JpqlQuery {
 	/**
 	 * Parses the JPQL.
 	 * 
-	 * @return
+	 * @param cb
+	 *            the criteria builder
+	 * @return the criteria constructed
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	private CriteriaQueryImpl<?> parse() {
+	private CriteriaQueryImpl<?> parse(CriteriaBuilderImpl cb) {
 		final CommonTree tree = this.parse(this.qlString);
 
 		JpqlQuery.LOG.debug("Parsed query successfully {0}", //
 			JpqlQuery.LOG.lazyBoxed(this.qlString, new Object[] { tree.toStringTree() }));
 
-		return this.construct(tree);
+		return this.construct(cb, tree);
 	}
 
 	private CommonTree parse(String query) {

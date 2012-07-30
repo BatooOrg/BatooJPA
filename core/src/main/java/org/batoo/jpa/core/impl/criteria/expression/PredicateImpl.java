@@ -26,7 +26,7 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 import com.google.common.base.Function;
@@ -219,7 +219,7 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	 * 
 	 */
 	@Override
-	public Boolean handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+	public Boolean handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		return row.getBoolean(this.alias);
 	}
 

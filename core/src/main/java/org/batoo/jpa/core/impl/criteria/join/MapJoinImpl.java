@@ -32,7 +32,7 @@ import javax.persistence.criteria.Predicate;
 
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.MapEntryExpression;
 import org.batoo.jpa.core.impl.criteria.path.MapKeyPath;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
@@ -194,7 +194,7 @@ public class MapJoinImpl<Z, K, V> extends AbstractJoin<Z, V> implements MapJoin<
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public V handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+	public V handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		return (V) this.handle(session, row, MapSelectType.VALUE);
 	}
 

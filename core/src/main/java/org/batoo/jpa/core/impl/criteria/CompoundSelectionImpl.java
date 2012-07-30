@@ -142,7 +142,7 @@ public class CompoundSelectionImpl<X> extends AbstractSelection<X> implements Co
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public X handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+	public X handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		final Object[] values = new Object[this.selections.size()];
 
 		for (int i = 0; i < this.selections.size(); i++) {

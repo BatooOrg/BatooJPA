@@ -80,6 +80,17 @@ public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements Criter
 
 	/**
 	 * @param metamodel
+	 *            the metamodel;
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public CriteriaQueryImpl(MetamodelImpl metamodel) {
+		super(metamodel, null);
+	}
+
+	/**
+	 * @param metamodel
 	 *            the metamodel
 	 * @param resultType
 	 *            the result type

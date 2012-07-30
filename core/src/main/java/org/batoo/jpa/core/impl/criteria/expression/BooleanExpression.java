@@ -24,7 +24,7 @@ import java.sql.SQLException;
 import javax.persistence.criteria.Expression;
 
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
@@ -115,7 +115,7 @@ public class BooleanExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public Boolean handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+	public Boolean handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		return this.inner.handle(query, session, row);
 	}
 }

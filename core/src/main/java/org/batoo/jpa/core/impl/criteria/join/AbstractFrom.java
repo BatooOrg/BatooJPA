@@ -40,7 +40,7 @@ import javax.persistence.metamodel.Type.PersistenceType;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.EntityTypeExpression;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl.MapSelectType;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
@@ -412,7 +412,7 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 * 
 	 */
 	@Override
-	public X handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+	public X handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		if (this.entity != null) {
 			return this.fetchRoot.handle(session, row);
 		}

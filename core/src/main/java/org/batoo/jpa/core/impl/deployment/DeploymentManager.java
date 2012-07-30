@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.deployment;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -30,9 +31,9 @@ import javax.persistence.metamodel.ManagedType;
 import org.batoo.jpa.common.BatooException;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
-import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
 import org.batoo.jpa.core.util.IncrementalNamingThreadFactory;
+import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -48,7 +49,7 @@ import com.google.common.collect.Sets;
  * @author hceylan
  * @since $version
  */
-public abstract class DeploymentManager<X extends ManagedTypeImpl<?>> {
+public abstract class DeploymentManager<X> {
 
 	/**
 	 * The context for the operation
@@ -70,15 +71,22 @@ public abstract class DeploymentManager<X extends ManagedTypeImpl<?>> {
 		/**
 		 * Perform for entities only
 		 */
-		ENTITIES
+		ENTITIES,
+
+		/**
+		 * Perform for named queries
+		 */
+		NAMED_QUERIES
 	}
 
 	private final BLogger log;
 	private final MetamodelImpl metamodel;
 	private final List<ManagedType<?>> types = Lists.newArrayList();
+	private final Collection<NamedQueryMetadata> namedQueries = Lists.newArrayList();
 
 	private final Set<TypeImpl<?>> performed = Sets.newHashSet();
 	private final ThreadPoolExecutor executer;
+	private final Context context;
 
 	/**
 	 * @param log
@@ -98,6 +106,7 @@ public abstract class DeploymentManager<X extends ManagedTypeImpl<?>> {
 
 		this.log = log;
 		this.metamodel = metamodel;
+		this.context = context;
 
 		switch (context) {
 			case MANAGED_TYPES:
@@ -106,8 +115,11 @@ public abstract class DeploymentManager<X extends ManagedTypeImpl<?>> {
 			case IDENTIFIABLE_TYPES:
 				this.types.addAll(this.metamodel.getIdentifiables());
 				break;
-			default:
+			case ENTITIES:
 				this.types.addAll(this.metamodel.getEntities());
+				break;
+			case NAMED_QUERIES:
+				this.namedQueries.addAll(this.metamodel.getNamedQueries());
 		}
 
 		final int nThreads = Runtime.getRuntime().availableProcessors() * 2;
@@ -183,8 +195,16 @@ public abstract class DeploymentManager<X extends ManagedTypeImpl<?>> {
 
 		// Submit the tasks
 		final List<Future<?>> futures = Lists.newArrayList();
-		for (final ManagedType<?> type : this.types) {
-			futures.add(this.executer.submit(new DeploymentUnitTask(this, (ManagedTypeImpl<?>) type)));
+
+		if (this.context == Context.NAMED_QUERIES) {
+			for (final NamedQueryMetadata query : this.namedQueries) {
+				futures.add(this.executer.submit(new DeploymentUnitTask(this, query)));
+			}
+		}
+		else {
+			for (final ManagedType<?> type : this.types) {
+				futures.add(this.executer.submit(new DeploymentUnitTask(this, type)));
+			}
 		}
 
 		// wait until tasks finish or one bails out with an exception
@@ -226,8 +246,9 @@ public abstract class DeploymentManager<X extends ManagedTypeImpl<?>> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performed(TypeImpl<?> type) {
-		this.performed.add(type);
+	public void performed(X type) {
+		if (!(type instanceof NamedQueryMetadata)) {
+			this.performed.add((TypeImpl<?>) type);
+		}
 	}
-
 }

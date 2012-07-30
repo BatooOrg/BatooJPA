@@ -24,7 +24,7 @@ import java.sql.SQLException;
 import javax.persistence.criteria.Expression;
 
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl.MapSelectType;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -120,7 +120,7 @@ public class MapKeyPath<X> extends AbstractPath<X> {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public X handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+	public X handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		final X value = (X) this.mapJoin.handle(session, row, MapSelectType.KEY);
 
 		return (X) (this.getConverter() != null ? this.getConverter().convert((Number) value) : value);

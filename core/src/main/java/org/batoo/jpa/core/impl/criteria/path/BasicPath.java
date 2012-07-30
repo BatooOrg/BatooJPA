@@ -26,7 +26,7 @@ import javax.persistence.criteria.Path;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.PathTypeExpression;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
@@ -154,7 +154,7 @@ public class BasicPath<X> extends AbstractPath<X> {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public X handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+	public X handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		final X value = (X) this.mapping.getColumn().convertValue(row.getObject(this.fieldAlias));
 
 		return (X) (this.getConverter() != null ? this.getConverter().convert(value) : value);

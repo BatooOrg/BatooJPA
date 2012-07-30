@@ -27,7 +27,7 @@ import javax.persistence.criteria.Expression;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 import com.google.common.base.Joiner;
@@ -192,7 +192,7 @@ public class ComparisonExpression extends BooleanExpression {
 	 * 
 	 */
 	@Override
-	public Boolean handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+	public Boolean handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		return (Boolean) row.getObject(this.alias);
 	}
 }

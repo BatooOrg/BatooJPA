@@ -25,7 +25,7 @@ import javax.persistence.TemporalType;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
@@ -123,7 +123,7 @@ public class CurrentTemporalExpression<T> extends AbstractExpression<T> {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public T handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+	public T handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		return (T) row.getObject(this.alias);
 	}
 }

@@ -24,7 +24,7 @@ import java.util.Map.Entry;
 
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl.MapSelectType;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -101,7 +101,7 @@ public class MapEntryExpression<K, V> extends AbstractExpression<Entry<K, V>> {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public EntryImpl<K, V> handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+	public EntryImpl<K, V> handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		return (EntryImpl<K, V>) this.mapJoin.handle(session, row, MapSelectType.ENTRY);
 	}
 }

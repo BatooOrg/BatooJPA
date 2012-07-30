@@ -139,7 +139,7 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract X handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException;
+	public abstract X handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException;
 
 	/**
 	 * {@inheritDoc}

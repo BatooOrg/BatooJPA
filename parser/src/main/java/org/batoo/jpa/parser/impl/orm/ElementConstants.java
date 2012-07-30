@@ -33,8 +33,6 @@ public class ElementConstants {
 	protected static final String FALSE = null;
 	protected static final String EMPTY = "";
 
-	protected static final String ATTR_NAME = "name";
-
 	/**
 	 * Elements
 	 */
@@ -66,6 +64,7 @@ public class ElementConstants {
 	protected static final String ELEMENT_ENTITY = "entity";
 	protected static final String ELEMENT_ENUMERATED = "enumerated";
 	protected static final String ELEMENT_GENERATED_VALUE = "generated-value";
+	protected static final String ELEMENT_HINT = "hint";
 	protected static final String ELEMENT_ID = "id";
 	protected static final String ELEMENT_ID_CLASS = "id-class";
 	protected static final String ELEMENT_INVERSE_JOIN_COLUMN = "inverse-join-column";
@@ -73,6 +72,7 @@ public class ElementConstants {
 	protected static final String ELEMENT_COLLECTION_TABLE = "collection-table";
 	protected static final String ELEMENT_JOIN_TABLE = "join-table";
 	protected static final String ELEMENT_LOB = "lob";
+	protected static final String ELEMENT_LOCK_MODE = "lock-mode";
 	protected static final String ELEMENT_ELEMENT_COLLECTION = "element-collection";
 	protected static final String ELEMENT_MANY_TO_MANY = "many-to-many";
 	protected static final String ELEMENT_MANY_TO_ONE = "many-to-one";
@@ -83,6 +83,8 @@ public class ElementConstants {
 	protected static final String ELEMENT_MAP_KEY_CLASS = "map-key-class";
 	protected static final String ELEMENT_MAP_KEY_ENUMERATED = "map-key-enumerated";
 	protected static final String ELEMENT_MAP_KEY_TEMPORAL = "map-key-temporal";
+	protected static final String ELEMENT_NAMED_QUERY = "named-query";
+	protected static final String ELEMENT_QUERY = "query";
 	protected static final String ELEMENT_ORDER_BY = "order-by";
 	protected static final String ELEMENT_ORDER_COLUMN = "order-column";
 	protected static final String ELEMENT_PRIMARY_KEY_JOIN_COLUMN = "primary-key-join-column";
@@ -108,6 +110,12 @@ public class ElementConstants {
 	protected static final String ELEMENT_PRE_PERSIST = "pre-persist";
 	protected static final String ELEMENT_PRE_REMOVE = "pre-remove";
 	protected static final String ELEMENT_PRE_UPDATE = "pre-update";
+
+	/**
+	 * Atrributes
+	 */
+	protected static final String ATTR_NAME = "name";
+	protected static final String ATTR_VALUE = "value";
 
 	/**
 	 * Column Attribute names.

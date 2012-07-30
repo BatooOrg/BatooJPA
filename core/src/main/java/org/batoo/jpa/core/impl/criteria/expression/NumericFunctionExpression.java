@@ -26,7 +26,7 @@ import javax.persistence.criteria.Expression;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
@@ -143,7 +143,7 @@ public class NumericFunctionExpression<N extends Number> extends AbstractExpress
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public N handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+	public N handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		return (N) row.getObject(this.alias);
 	}
 }

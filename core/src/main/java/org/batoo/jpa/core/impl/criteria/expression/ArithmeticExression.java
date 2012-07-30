@@ -25,7 +25,7 @@ import javax.persistence.criteria.Expression;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.TypedQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
@@ -152,7 +152,7 @@ public class ArithmeticExression<N extends Number> extends AbstractExpression<N>
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public N handle(TypedQueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+	public N handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		final N value = (N) row.getObject(this.alias);
 
 		return (N) (this.getConverter() != null ? this.getConverter().convert(value) : value);

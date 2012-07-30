@@ -27,7 +27,10 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.QueryHint;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -39,6 +42,10 @@ import com.google.common.collect.Lists;
  * @since $version
  */
 @Entity
+@NamedQueries(@NamedQuery(name = "theOldestGuys", //
+	query = "select p from Person p order by p.age desc",
+	hints = { //
+	@QueryHint(name = "hint1", value = "value1"), @QueryHint(name = "hint2", value = "value2") }))
 public class Person {
 
 	@Id
