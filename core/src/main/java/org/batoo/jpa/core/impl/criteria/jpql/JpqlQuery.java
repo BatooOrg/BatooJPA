@@ -33,6 +33,7 @@ import javax.persistence.criteria.FetchParent;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Predicate.BooleanOperator;
 import javax.persistence.criteria.Selection;
 import javax.persistence.criteria.Subquery;
 
@@ -43,16 +44,18 @@ import org.antlr.runtime.tree.Tree;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.AbstractSelection;
-import org.batoo.jpa.core.impl.criteria.AllAnyExpression;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.SubqueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
+import org.batoo.jpa.core.impl.criteria.expression.AllAnyExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ConcatExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ConstantExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CountExpression;
+import org.batoo.jpa.core.impl.criteria.expression.ExistsExpression;
+import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
 import org.batoo.jpa.core.impl.criteria.expression.SubstringExpression;
 import org.batoo.jpa.core.impl.criteria.expression.TrimExpression;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
@@ -998,6 +1001,14 @@ public class JpqlQuery {
 				case JpqlParser.SOME:
 					return new AllAnyExpression<X>(false, this.constructSubquery(cb, q, exprDef.getChild(1), javaType));
 			}
+		}
+
+		if (exprDef.getType() == JpqlParser.EXISTS) {
+			return (AbstractExpression<X>) new ExistsExpression(this.constructSubquery(cb, q, exprDef.getChild(0), javaType));
+		}
+
+		if (exprDef.getType() == JpqlParser.NOT) {
+			return (AbstractExpression<X>) new PredicateImpl(true, BooleanOperator.AND, this.getExpression(cb, q, exprDef.getChild(0), Boolean.class));
 		}
 
 		throw new PersistenceException("Unhandled expression: " + exprDef.toStringTree());

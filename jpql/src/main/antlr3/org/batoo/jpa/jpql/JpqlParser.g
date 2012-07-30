@@ -242,7 +242,8 @@ conditional_term :
         -> ^(LAND conditional_factor ( conditional_factor)*);
 
 conditional_factor :
-    (NOT)? conditional_primary;
+    NOT^ conditional_primary 
+    | conditional_primary;
 
 conditional_primary options { backtrack=true; } :
     simple_cond_expression
@@ -250,7 +251,8 @@ conditional_primary options { backtrack=true; } :
     ;
 
 simple_cond_expression options { backtrack=true; } :
-    in_expression
+  	exists_expression
+    | in_expression
     | null_comparison_expression
     | comparison_expression
     | between_expression
@@ -258,7 +260,6 @@ simple_cond_expression options { backtrack=true; } :
     | boolean_expression
 //  | empty_collection_comparison_expression
 //  | collection_member_expression
-//  | exists_expression
     ;
 
 between_expression :
@@ -418,14 +419,12 @@ null_comparison_expression :
 //  entity_expression (NOT)? 'MEMBER' ('OF')? collection_valued_path_expression
 //  ;
 //
-//exists_expression
-//  :
-//  (NOT)? 'EXISTS' Left_Paren subquery Right_Paren
-//  ;
-//
+exists_expression :
+  	EXISTS^ Left_Paren! subquery Right_Paren!;
+
 all_or_any_expression :
-  (ALL | ANY | SOME ) Left_Paren subquery Right_Paren
-  	-> ^(ST_ALL_OR_ANY (ALL)? (ANY)? (SOME)? subquery);
+  	(ALL | ANY | SOME ) Left_Paren subquery Right_Paren
+  		-> ^(ST_ALL_OR_ANY (ALL)? (ANY)? (SOME)? subquery);
 
 subquery :
   	simple_select_clause subquery_from_clause (where_clause)? (groupby_clause)? (having_clause)?

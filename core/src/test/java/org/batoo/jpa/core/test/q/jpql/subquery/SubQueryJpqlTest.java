@@ -83,6 +83,47 @@ public class SubQueryJpqlTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
+	public void testExists() {
+		final Employee employee1 = new Employee();
+		employee1.setName("Employee1");
+		final Employee employee2 = new Employee();
+		employee2.setName("Employee2");
+		final Employee employee3 = new Employee();
+		employee3.setName("Employee3");
+		final Employee employee4 = new Employee();
+		employee4.setName("Employee4");
+
+		final Manager manager1 = new Manager();
+		employee3.setName("Manager1");
+		final Manager manager2 = new Manager();
+		employee3.setName("Manager2");
+
+		employee1.setManager(manager1);
+		employee2.setManager(manager1);
+		employee4.setManager(manager2);
+
+		this.persist(employee1);
+		this.persist(employee2);
+		this.persist(employee3);
+		this.persist(employee4);
+		this.persist(manager1);
+		this.persist(manager2);
+
+		this.commit();
+
+		TypedQuery<Integer> q;
+		q = this.cq("select e.id from Employee e where exists (select m.id from Manager m where e.manager = m)", Integer.class);
+		Assert.assertEquals("[1, 2, 4]", q.getResultList().toString());
+
+		q = this.cq("select e.id from Employee e where not exists (select m.id from Manager m where e.manager = m)", Integer.class);
+		Assert.assertEquals("[3]", q.getResultList().toString());
+	}
+
+	/**
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
 	public void testSubQuery() {
 		final Department qa = new Department("QA");
 		final Department rnd = new Department("RND");

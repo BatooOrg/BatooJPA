@@ -16,14 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.core.impl.criteria;
+package org.batoo.jpa.core.impl.criteria.expression;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.persistence.criteria.Subquery;
 
-import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
+import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
+import org.batoo.jpa.core.impl.criteria.SubqueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
@@ -38,7 +40,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
 public class AllAnyExpression<T> extends AbstractExpression<T> {
 
 	private final boolean all;
-	private final SubqueryImpl<?> subQuery;
+	private final SubqueryImpl<T> subQuery;
 
 	/**
 	 * @param all
@@ -54,7 +56,7 @@ public class AllAnyExpression<T> extends AbstractExpression<T> {
 		super(((Class<T>) subquery.getJavaType()));
 
 		this.all = all;
-		this.subQuery = (SubqueryImpl<?>) subquery;
+		this.subQuery = (SubqueryImpl<T>) subquery;
 	}
 
 	/**

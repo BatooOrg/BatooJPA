@@ -50,6 +50,7 @@ import javax.persistence.criteria.Subquery;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.AggregationExpression;
 import org.batoo.jpa.core.impl.criteria.expression.AggregationExpression.AggregationFunctionType;
+import org.batoo.jpa.core.impl.criteria.expression.AllAnyExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ArithmeticExression;
 import org.batoo.jpa.core.impl.criteria.expression.ArithmeticExression.ArithmeticOperation;
 import org.batoo.jpa.core.impl.criteria.expression.CaseTransformationExpression;
@@ -60,6 +61,7 @@ import org.batoo.jpa.core.impl.criteria.expression.ConcatExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ConstantExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CountExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CurrentTemporalExpression;
+import org.batoo.jpa.core.impl.criteria.expression.ExistsExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ExpressionConverter;
 import org.batoo.jpa.core.impl.criteria.expression.IsEmptyExpression;
 import org.batoo.jpa.core.impl.criteria.expression.LikeExpression;
@@ -433,8 +435,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public PredicateImpl exists(Subquery<?> subquery) {
-		// TODO Auto-generated method stub
-		return null;
+		return new PredicateImpl(new ExistsExpression(subquery));
 	}
 
 	/**
