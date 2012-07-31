@@ -1,2 +1,0 @@
---<ScriptOptions statementTerminator=";"/>
-
