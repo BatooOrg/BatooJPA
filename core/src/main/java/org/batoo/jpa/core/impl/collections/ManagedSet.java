@@ -26,11 +26,11 @@ import java.util.Set;
 
 import javax.persistence.PersistenceException;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
+import org.batoo.jpa.core.util.BatooUtils;
 
 import com.google.common.collect.Sets;
 
@@ -210,7 +210,6 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public void flush(ConnectionImpl connection, boolean removals, boolean force) throws SQLException {
 		if (this.removed(connection, removals)) {
 			return;
@@ -234,14 +233,14 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 
 		if (removals) {
 			// delete the removals
-			final Collection<E> childrenRemoved = CollectionUtils.subtract(this.snapshot, this.delegate);
+			final Collection<E> childrenRemoved = BatooUtils.subtract(this.snapshot, this.delegate);
 			for (final E child : childrenRemoved) {
 				mapping.detach(connection, managedInstance, null, child);
 			}
 		}
 		else {
 			// create the additions
-			final Collection<E> childrenAdded = CollectionUtils.subtract(this.delegate, this.snapshot);
+			final Collection<E> childrenAdded = BatooUtils.subtract(this.delegate, this.snapshot);
 			for (final E child : childrenAdded) {
 				mapping.attach(connection, managedInstance, null, child, -1);
 			}

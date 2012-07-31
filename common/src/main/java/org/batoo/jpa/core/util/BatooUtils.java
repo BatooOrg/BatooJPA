@@ -18,7 +18,12 @@
  */
 package org.batoo.jpa.core.util;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
+
+import com.google.common.collect.Lists;
 
 /**
  * 
@@ -69,6 +74,28 @@ public class BatooUtils {
 		}
 
 		return "\t" + str.replaceAll("\n", "\n\t");
+	}
+
+	/**
+	 * @param a
+	 *            the collection a
+	 * @param b
+	 *            the collection b
+	 * @return the subtracted collection
+	 * @param <X>
+	 *            the type of the collecions
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public static <X> Collection<X> subtract(final Collection<X> a, final Collection<X> b) {
+		final List<X> list = Lists.newArrayList(a);
+
+		for (final Object element : b) {
+			list.remove(element);
+		}
+
+		return list;
 	}
 
 	/**

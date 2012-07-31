@@ -26,11 +26,11 @@ import java.util.Set;
 
 import javax.persistence.PersistenceException;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
+import org.batoo.jpa.core.util.BatooUtils;
 
 import com.google.common.collect.Maps;
 
@@ -182,7 +182,6 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public void flush(ConnectionImpl connection, boolean removals, boolean force) throws SQLException {
 		if (this.removed(connection, removals)) {
 			return;
@@ -206,14 +205,14 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 
 		if (removals) {
 			// delete the removals
-			final Collection<K> childrenRemoved = CollectionUtils.subtract(this.snapshot.keySet(), this.delegate.keySet());
+			final Collection<K> childrenRemoved = BatooUtils.subtract(this.snapshot.keySet(), this.delegate.keySet());
 			for (final K key : childrenRemoved) {
 				mapping.detach(connection, managedInstance, key, this.snapshot.get(key));
 			}
 		}
 		else {
 			// create the additions
-			final Collection<K> childrenAdded = CollectionUtils.subtract(this.delegate.keySet(), this.snapshot.keySet());
+			final Collection<K> childrenAdded = BatooUtils.subtract(this.delegate.keySet(), this.snapshot.keySet());
 			for (final K key : childrenAdded) {
 				mapping.attach(connection, managedInstance, key, this.delegate.get(key), -1);
 			}

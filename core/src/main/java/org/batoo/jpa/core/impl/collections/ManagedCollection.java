@@ -22,7 +22,6 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.IdentityHashMap;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
@@ -33,6 +32,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
+import org.batoo.jpa.core.util.BatooUtils;
 
 import com.google.common.collect.Lists;
 
@@ -255,9 +255,8 @@ public abstract class ManagedCollection<E> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
 	public void persistAdditions(EntityManagerImpl entityManager) {
-		final Collection<E> added = CollectionUtils.subtract(this.getDelegate(), this.getSnapshot());
+		final Collection<E> added = BatooUtils.subtract(this.getDelegate(), this.getSnapshot());
 		for (final E e : added) {
 			entityManager.persistImpl(e, Lists.newArrayList());
 		}
@@ -314,9 +313,8 @@ public abstract class ManagedCollection<E> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
 	public void removeOrphans(EntityManagerImpl entityManager) {
-		final Collection<E> removed = CollectionUtils.subtract(this.getSnapshot(), this.getDelegate());
+		final Collection<E> removed = BatooUtils.subtract(this.getSnapshot(), this.getDelegate());
 		for (final E e : removed) {
 			entityManager.remove(e);
 		}

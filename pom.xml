@@ -175,11 +175,6 @@
 				<version>1.8.3</version>
 			</dependency>
 			<dependency>
-				<groupId>commons-collections</groupId>
-				<artifactId>commons-collections</artifactId>
-				<version>3.2.1</version>
-			</dependency>
-			<dependency>
 				<groupId>commons-dbutils</groupId>
 				<artifactId>commons-dbutils</artifactId>
 				<version>1.4</version>

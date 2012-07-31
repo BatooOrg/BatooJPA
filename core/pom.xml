@@ -120,18 +120,14 @@
 			<artifactId>reflections</artifactId>
 			<exclusions>
 				<exclusion>
-					<artifactId>javassist</artifactId>
-					<groupId>javassist</groupId>
+					<artifactId>dom4j</artifactId>
+					<groupId>dom4j</groupId>
 				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-collections</groupId>
-			<artifactId>commons-collections</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>commons-dbutils</groupId>
