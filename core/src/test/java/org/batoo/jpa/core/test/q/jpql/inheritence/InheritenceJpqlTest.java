@@ -39,6 +39,28 @@ public class InheritenceJpqlTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
+	public void testCaseType() {
+		this.persist(new Employee());
+		this.persist(new Exempt());
+		this.persist(new Exempt());
+		this.persist(new Contractor());
+		this.commit();
+		this.close();
+
+		Assert.assertEquals("[Employee, Exempt, Exempt, Contractor]", //
+			this.cq("select case type(e) \n" + //
+				"    when Exempt then 'Exempt'\n" + //
+				"    when Contractor then 'Contractor'\n" + //
+				"    else 'Employee'\n" + //
+				"  end\n" + //
+				"from Employee e order by type(e)", String.class).getResultList().toString());
+	}
+
+	/**
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
 	@SuppressWarnings("rawtypes")
 	public void testType() {
 		this.persist(new Employee());

@@ -53,8 +53,10 @@ import org.batoo.jpa.core.impl.criteria.expression.AggregationExpression.Aggrega
 import org.batoo.jpa.core.impl.criteria.expression.AllAnyExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ArithmeticExression;
 import org.batoo.jpa.core.impl.criteria.expression.ArithmeticExression.ArithmeticOperation;
+import org.batoo.jpa.core.impl.criteria.expression.CaseImpl;
 import org.batoo.jpa.core.impl.criteria.expression.CaseTransformationExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CaseTransformationExpression.CaseTransformationType;
+import org.batoo.jpa.core.impl.criteria.expression.CoalesceExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ComparisonExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ComparisonExpression.Comparison;
 import org.batoo.jpa.core.impl.criteria.expression.ConcatExpression;
@@ -71,6 +73,7 @@ import org.batoo.jpa.core.impl.criteria.expression.NumericFunctionExpression;
 import org.batoo.jpa.core.impl.criteria.expression.NumericFunctionExpression.NumericFunctionType;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
+import org.batoo.jpa.core.impl.criteria.expression.SimpleCaseImpl;
 import org.batoo.jpa.core.impl.criteria.expression.SubstringExpression;
 import org.batoo.jpa.core.impl.criteria.expression.TrimExpression;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
@@ -197,9 +200,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public <T> Coalesce<T> coalesce() {
-		// TODO Auto-generated method stub
-		return null;
+	public <T> CoalesceExpression<T> coalesce() {
+		return new CoalesceExpression<T>();
 	}
 
 	/**
@@ -207,9 +209,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public <Y> Expression<Y> coalesce(Expression<? extends Y> x, Expression<? extends Y> y) {
-		// TODO Auto-generated method stub
-		return null;
+	public <Y> CoalesceExpression<Y> coalesce(Expression<? extends Y> x, Expression<? extends Y> y) {
+		return new CoalesceExpression<Y>(x, y);
 	}
 
 	/**
@@ -217,9 +218,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public <Y> Expression<Y> coalesce(Expression<? extends Y> x, Y y) {
-		// TODO Auto-generated method stub
-		return null;
+	public <Y> CoalesceExpression<Y> coalesce(Expression<? extends Y> x, Y y) {
+		return new CoalesceExpression<Y>(x, new ConstantExpression<Y>(null, y));
 	}
 
 	/**
@@ -640,8 +640,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public PredicateImpl isTrue(Expression<Boolean> x) {
-		// TODO Auto-generated method stub
-		return null;
+		return new PredicateImpl((AbstractExpression<Boolean>) x);
 	}
 
 	/**
@@ -1117,9 +1116,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public <R> Case<R> selectCase() {
-		// TODO Auto-generated method stub
-		return null;
+	public <R> CaseImpl<R> selectCase() {
+		return new CaseImpl<R>();
 	}
 
 	/**
@@ -1127,9 +1125,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public <C, R> SimpleCase<C, R> selectCase(Expression<? extends C> expression) {
-		// TODO Auto-generated method stub
-		return null;
+	public <C, R> SimpleCaseImpl<C, R> selectCase(Expression<? extends C> expression) {
+		return new SimpleCaseImpl<C, R>(expression);
 	}
 
 	/**
@@ -1138,8 +1135,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <C extends Collection<?>> Expression<Integer> size(C collection) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ConstantExpression<Integer>(null, collection != null ? collection.size() : 0);
 	}
 
 	/**
@@ -1337,8 +1333,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <X, T, E extends T> CollectionJoin<X, E> treat(CollectionJoin<X, T> join, Class<E> type) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("treat() not yet supported");
 	}
 
 	/**
@@ -1347,8 +1342,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <X, T, V extends T> Join<X, V> treat(Join<X, T> join, Class<V> type) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("treat() not yet supported");
 	}
 
 	/**
@@ -1357,8 +1351,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <X, T, E extends T> ListJoin<X, E> treat(ListJoin<X, T> join, Class<E> type) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("treat() not yet supported");
 	}
 
 	/**
@@ -1367,8 +1360,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <X, K, T, V extends T> MapJoin<X, K, V> treat(MapJoin<X, K, T> join, Class<V> type) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("treat() not yet supported");
 	}
 
 	/**
@@ -1377,8 +1369,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <X, T extends X> Path<T> treat(Path<X> path, Class<T> type) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("treat() not yet supported");
 	}
 
 	/**
@@ -1387,8 +1378,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <X, T extends X> Root<T> treat(Root<X> root, Class<T> type) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("treat() not yet supported");
 	}
 
 	/**
@@ -1397,8 +1387,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <X, T, E extends T> SetJoin<X, E> treat(SetJoin<X, T> join, Class<E> type) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("treat() not yet supported");
 	}
 
 	/**

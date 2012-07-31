@@ -81,7 +81,7 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	 * @author hceylan
 	 */
 	public PredicateImpl(boolean negated, BooleanOperator operator, Expression<Boolean>... expressions) {
-		super();
+		super(null);
 
 		this.negated = negated;
 		this.operator = operator;
@@ -108,7 +108,7 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	 * @author hceylan
 	 */
 	public PredicateImpl(boolean negated, BooleanOperator operator, Predicate... predicates) {
-		super();
+		super(null);
 
 		this.negated = negated;
 		this.operator = operator;

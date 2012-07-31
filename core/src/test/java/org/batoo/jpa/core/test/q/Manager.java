@@ -18,11 +18,16 @@
  */
 package org.batoo.jpa.core.test.q;
 
+import java.util.Set;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
+import com.google.common.collect.Sets;
 
 /**
  * 
@@ -43,6 +48,9 @@ public class Manager {
 
 	@ManyToOne
 	private Department department;
+
+	@OneToMany(mappedBy = "manager")
+	private final Set<Employee> employees = Sets.newHashSet();
 
 	/**
 	 * 
@@ -82,6 +90,18 @@ public class Manager {
 	 */
 	public Department getDepartment() {
 		return this.department;
+	}
+
+	/**
+	 * Returns the employees of the Manager.
+	 * 
+	 * @return the employees of the Manager
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Set<Employee> getEmployees() {
+		return this.employees;
 	}
 
 	/**

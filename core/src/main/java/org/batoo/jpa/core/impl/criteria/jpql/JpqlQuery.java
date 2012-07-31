@@ -51,11 +51,14 @@ import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.SubqueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.AllAnyExpression;
+import org.batoo.jpa.core.impl.criteria.expression.CaseImpl;
+import org.batoo.jpa.core.impl.criteria.expression.CoalesceExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ConcatExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ConstantExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CountExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ExistsExpression;
 import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
+import org.batoo.jpa.core.impl.criteria.expression.SimpleCaseImpl;
 import org.batoo.jpa.core.impl.criteria.expression.SubstringExpression;
 import org.batoo.jpa.core.impl.criteria.expression.TrimExpression;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
@@ -792,6 +795,10 @@ public class JpqlQuery {
 			return cb.parameter(javaType, exprDef.getText().substring(1));
 		}
 
+		if (exprDef.getType() == JpqlParser.Ordinal_Parameter) {
+			return cb.parameter(javaType, exprDef.getText().substring(1));
+		}
+
 		// arithmetic operation
 		if ((exprDef.getType() == JpqlParser.Plus_Sign) //
 			|| (exprDef.getType() == JpqlParser.Minus_Sign) //
@@ -818,11 +825,6 @@ public class JpqlQuery {
 
 		if (exprDef.getType() == JpqlParser.ST_BOOLEAN) {
 			return (AbstractExpression<X>) this.getExpression(cb, q, exprDef, Boolean.class);
-		}
-
-		if (exprDef.getType() == JpqlParser.Ordinal_Parameter) {
-			// TODO Handle
-			return null;
 		}
 
 		if (exprDef.getType() == JpqlParser.NUMERIC_LITERAL) {
@@ -1009,6 +1011,70 @@ public class JpqlQuery {
 
 		if (exprDef.getType() == JpqlParser.NOT) {
 			return (AbstractExpression<X>) new PredicateImpl(true, BooleanOperator.AND, this.getExpression(cb, q, exprDef.getChild(0), Boolean.class));
+		}
+
+		// general case
+		if (exprDef.getType() == JpqlParser.ST_GENERAL_CASE) {
+			final CaseImpl<Object> caseExpr = cb.selectCase();
+
+			for (int i = 0; i < exprDef.getChildCount(); i++) {
+				final Tree caseDef = exprDef.getChild(i);
+
+				if (caseDef.getType() == JpqlParser.WHEN) {
+					caseExpr.when(this.constructJunction(cb, q, caseDef.getChild(0)), this.getExpression(cb, q, caseDef.getChild(1), null));
+				}
+				else {
+					caseExpr.otherwise(this.getExpression(cb, q, caseDef, null));
+				}
+			}
+
+			return (AbstractExpression<X>) caseExpr;
+		}
+
+		// simple case
+		if (exprDef.getType() == JpqlParser.CASE) {
+			final AbstractExpression<X> expression = this.getExpression(cb, q, exprDef.getChild(0), null);
+			final SimpleCaseImpl<X, Object> caseExpr = cb.selectCase(expression);
+
+			for (int i = 1; i < exprDef.getChildCount(); i++) {
+				final Tree caseDef = exprDef.getChild(i);
+
+				if (caseDef.getType() == JpqlParser.WHEN) {
+					final AbstractExpression<Object> result = this.getExpression(cb, q, caseDef.getChild(1), null);
+
+					final AbstractExpression<X> condition;
+
+					if (exprDef.getChild(0).getType() == JpqlParser.TYPE) {
+						final EntityTypeImpl<Object> entity = this.getEntity(caseDef.getChild(0).getText());
+
+						if (entity.getRootType().getInheritanceType() == null) {
+							throw new IllegalArgumentException("Entity does not have inheritence: " + entity.getName());
+						}
+
+						condition = (AbstractExpression<X>) new ConstantExpression<String>(null, entity.getDiscriminatorValue());
+					}
+					else {
+						condition = this.getExpression(cb, q, caseDef.getChild(0), null);
+					}
+
+					caseExpr.when(condition, result);
+				}
+				else {
+					caseExpr.otherwise(this.getExpression(cb, q, caseDef, null));
+				}
+			}
+
+			return (AbstractExpression<X>) caseExpr;
+		}
+
+		// coalesce function
+		if (exprDef.getType() == JpqlParser.ST_COALESCE) {
+			final CoalesceExpression<X> coalesce = cb.coalesce();
+			for (int i = 0; i < exprDef.getChildCount(); i++) {
+				coalesce.value(this.getExpression(cb, q, exprDef.getChild(i), javaType));
+			}
+
+			return coalesce;
 		}
 
 		throw new PersistenceException("Unhandled expression: " + exprDef.toStringTree());

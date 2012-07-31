@@ -28,7 +28,7 @@ import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
- * 
+ * Wrapper expression for boolean expressions.
  * 
  * @author hceylan
  * @since $version
@@ -36,17 +36,6 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
 public class BooleanExpression extends AbstractExpression<Boolean> {
 
 	private final AbstractExpression<Boolean> inner;
-
-	/**
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public BooleanExpression() {
-		super(Boolean.class);
-
-		this.inner = null;
-	}
 
 	/**
 	 * @param inner
@@ -106,8 +95,12 @@ public class BooleanExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public final String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
-		return this.inner.getSqlRestrictionFragments(query);
+	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
+		if (this.inner != null) {
+			return this.inner.getSqlRestrictionFragments(query);
+		}
+
+		return new String[] { this.generateSqlRestriction(query) };
 	}
 
 	/**

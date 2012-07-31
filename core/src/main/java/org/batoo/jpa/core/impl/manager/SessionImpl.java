@@ -298,6 +298,9 @@ public class SessionImpl {
 
 		for (final ManagedInstance<?> instance : sortedUpdates) {
 			instance.flush(connection);
+		}
+
+		for (final ManagedInstance<?> instance : sortedUpdates) {
 			instance.checkTransients();
 		}
 

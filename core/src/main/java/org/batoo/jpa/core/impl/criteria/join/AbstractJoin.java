@@ -150,6 +150,6 @@ public abstract class AbstractJoin<Z, X> extends AbstractFrom<Z, X> implements J
 	 * @author hceylan
 	 */
 	protected UnsupportedOperationException notSupported() {
-		return new UnsupportedOperationException("On operations not supported");
+		return new UnsupportedOperationException("on() operations not supported");
 	}
 }

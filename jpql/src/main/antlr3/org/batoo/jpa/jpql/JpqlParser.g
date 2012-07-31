@@ -36,6 +36,9 @@ tokens {
     ST_ENTITY_TYPE;
     ST_NULL;
     ST_ALL_OR_ANY;
+    ST_GENERAL_CASE;
+    ST_SIMPLE_WHEN;
+    ST_COALESCE;
 }
 
 @header {
@@ -123,8 +126,8 @@ orderby_clause :
   		-> ^(LORDER orderby_item (orderby_item)*);
 
 orderby_item :
-  	state_field_path_expression (ASC | DESC)?
-  		-> ^(ST_ORDER state_field_path_expression (DESC)?);
+  	(state_field_path_expression | entity_type_expression) (ASC | DESC)?
+  		-> ^(ST_ORDER (state_field_path_expression)? (entity_type_expression)? (DESC)?);
 
 where_clause :
     WHERE^ conditional_expression;
@@ -152,10 +155,6 @@ select_item :
     select_expression (AS? ID)?
         -> ^(ST_ID_AS select_expression (ID)?);
 
-select_expressions :
-    select_expression ( Comma select_expression)*
-        -> ^(LSELECT select_expression ( select_expression)*);
-
 select_expression :
     scalar_expression
     | OBJECT^ Left_Paren! ID Right_Paren!
@@ -179,14 +178,48 @@ state_field_path_expression :
 constructor_expression :
     NEW qid Left_Paren select_expressions Right_Paren
         -> ^(NEW qid select_expressions);
+
+select_expressions :
+    select_expression ( Comma select_expression)*
+        -> ^(LSELECT select_expression ( select_expression)*);
         
-scalar_expression options { backtrack=true; } :
-    simple_arithmetic_expression
+case_expression :
+	general_case_expression
+	| simple_case_expression
+	| coalesce_expression 
+	| nullif_expression
+	;
+
+general_case_expression :
+	CASE (when_clause)+ ELSE scalar_expression END
+		-> ^(ST_GENERAL_CASE (when_clause)+ scalar_expression);
+		
+when_clause :
+	WHEN^ conditional_expression THEN! scalar_expression;
+	
+simple_case_expression :
+	CASE^ case_operand (simple_when_clause)+ ELSE! scalar_expression END!;
+	
+case_operand :
+	state_field_path_expression | type_discriminator;
+	
+simple_when_clause :
+	WHEN^ scalar_expression THEN! scalar_expression;
+
+coalesce_expression :
+	COALESCE Left_Paren scalar_expression (Comma scalar_expression)+ Right_Paren
+		-> ^(ST_COALESCE scalar_expression (scalar_expression)+);
+
+nullif_expression :
+	NULLIF^ Left_Paren! scalar_expression Comma! scalar_expression Right_Paren!;
+
+scalar_expression options { backtrack=true; }:
+	case_expression
+    | simple_arithmetic_expression
     | string_primary
     | enum_primary
     | datetime_primary
     | boolean_primary
-//    | case_expression
     | entity_type_expression
     ;
 
@@ -208,11 +241,11 @@ arithmetic_primary :
 	| input_parameter
 	| functions_returning_numerics
 	| aggregate_expression
-//	| case_expression
+	| case_expression
 	;
 
 aggregate_expression :
-	(AVG | MAX | MIN | SUM)^ Left_Paren! (DISTINCT)? state_field_path_expression Right_Paren!
+	(AVG | MAX | MIN | SUM)^ Left_Paren! (DISTINCT)? scalar_expression Right_Paren!
 	| COUNT^ Left_Paren! (DISTINCT)? (ID | state_field_path_expression) Right_Paren!;
 
 functions_returning_numerics :
@@ -300,11 +333,11 @@ string_expression :
 
 string_primary :
 	functions_returning_strings
+	| case_expression
 	| state_field_path_expression
 	| STRING_LITERAL
 	| input_parameter
 	| aggregate_expression
-//	| case_expression
 	;
 	
 datetime_expression :
@@ -332,9 +365,9 @@ boolean_expression :
 
 boolean_primary :
 	state_field_path_expression
+	| case_expression
 	| boolean_literal
 	| input_parameter
-//	| case_expression
 	;
 
 boolean_literal : TRUE | FALSE;
@@ -355,6 +388,7 @@ enum_expression :
 
 enum_primary :
   state_field_path_expression
+  | case_expression
   | enum_literal
   | input_parameter
   ;
@@ -383,8 +417,6 @@ in_item :
 //  ID
 //  | input_parameter
 //  ;
-//
-//pattern_value: ;
 //
 
 input_parameter :

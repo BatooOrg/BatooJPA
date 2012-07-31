@@ -39,7 +39,7 @@ import com.google.common.collect.Lists;
  * @author hceylan
  * @since $version
  */
-public class ComparisonExpression extends BooleanExpression {
+public class ComparisonExpression extends AbstractExpression<Boolean> {
 
 	/**
 	 * The comparison types
@@ -106,7 +106,7 @@ public class ComparisonExpression extends BooleanExpression {
 	 * @author hceylan
 	 */
 	public ComparisonExpression(Comparison comparison, Expression<?> x, Expression<?> y, Expression<?> z) {
-		super();
+		super(Boolean.class);
 
 		this.comparison = comparison;
 
@@ -151,7 +151,22 @@ public class ComparisonExpression extends BooleanExpression {
 	 * 
 	 */
 	@Override
-	public String generateSqlRestriction(AbstractQueryImpl<?> query) {
+	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+		this.alias = query.getAlias(this);
+
+		if (selected) {
+			return this.getSqlRestrictionFragments(query)[0] + " AS " + this.alias;
+		}
+
+		return this.getSqlRestrictionFragments(query)[0];
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
 		final String[] left = this.x.getSqlRestrictionFragments(query);
 		final String[] right1 = this.y.getSqlRestrictionFragments(query);
 		final String[] right2 = this.z != null ? this.z.getSqlRestrictionFragments(query) : null;
@@ -167,22 +182,7 @@ public class ComparisonExpression extends BooleanExpression {
 			}
 		}
 
-		return Joiner.on(" AND ").join(restrictions);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
-		this.alias = query.getAlias(this);
-
-		if (selected) {
-			return this.generateSqlRestriction(query) + " AS " + this.alias;
-		}
-
-		return this.generateSqlRestriction(query);
+		return new String[] { Joiner.on(" AND ").join(restrictions) };
 	}
 
 	/**

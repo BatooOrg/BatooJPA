@@ -75,9 +75,10 @@ public class Employee {
 		super();
 
 		this.name = name;
-		this.manager = manager;
 		this.department = department;
 		this.salary = salary;
+
+		this.setManager(manager);
 	}
 
 	/**
@@ -163,7 +164,15 @@ public class Employee {
 	 * @author hceylan
 	 */
 	public void setManager(Manager manager) {
+		if (this.manager != null) {
+			this.manager.getEmployees().remove(this);
+		}
+
 		this.manager = manager;
+
+		if (this.manager != null) {
+			this.manager.getEmployees().add(this);
+		}
 	}
 
 	/**
@@ -191,5 +200,4 @@ public class Employee {
 	public void setSalary(double salary) {
 		this.salary = salary;
 	}
-
 }

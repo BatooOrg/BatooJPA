@@ -6,11 +6,7 @@
 	<persistence-unit name="default">
 		<provider>org.batoo.jpa.core.PersistenceProvider</provider>
 		
-		<class>org.batoo.jpa.core.test.q.Employee</class>
-		<class>org.batoo.jpa.core.test.q.Manager</class>
-		<class>org.batoo.jpa.core.test.q.Department</class>
-		<class>org.batoo.jpa.core.test.q.Exempt</class>
-		<class>org.batoo.jpa.core.test.q.Contractor</class>
+		<class>org.batoo.jpa.core.test.q.Foo</class>
 		
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.Driver40" />
@@ -20,5 +16,6 @@
 
 			<property name="org.batoo.jpa.ddl" value="DROP" />
 		</properties>
+
 	</persistence-unit>
 </persistence>

@@ -20,9 +20,9 @@ package org.batoo.jpa.core.impl.criteria.expression;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
+import javax.persistence.criteria.CriteriaBuilder.Coalesce;
 import javax.persistence.criteria.Expression;
 
 import org.apache.commons.lang.StringUtils;
@@ -35,69 +35,43 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 /**
- * Expression for in predicates.
+ * Expression for colesce function.
+ * 
+ * @param <T>
+ *            the type of the expression
  * 
  * @author hceylan
  * @since $version
  */
-public class InExpression extends AbstractExpression<Boolean> {
+public class CoalesceExpression<T> extends AbstractExpression<T> implements Coalesce<T> {
 
-	private final AbstractExpression<?> inner;
-	private final ArrayList<AbstractExpression<?>> values = Lists.newArrayList();
+	private final List<Expression<? extends T>> values = Lists.newArrayList();
 	private String alias;
 
 	/**
-	 * @param inner
-	 *            the inner expression
-	 * @param values
-	 *            the values
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public InExpression(AbstractExpression<?> inner, Expression<?>[] values) {
-		super(Boolean.class);
-
-		this.inner = inner;
-		for (final Expression<?> expression : values) {
-			this.values.add((AbstractExpression<?>) expression);
-		}
+	@SuppressWarnings("unchecked")
+	public CoalesceExpression() {
+		super((Class<T>) Object.class);
 	}
 
 	/**
-	 * @param inner
-	 *            the inner expression
-	 * @param values
-	 *            the values
+	 * @param x
+	 *            the x expression
+	 * @param y
+	 *            the y expression
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public InExpression(Expression<?> inner, Collection<?> values) {
-		super(Boolean.class);
+	public CoalesceExpression(Expression<? extends T> x, Expression<? extends T> y) {
+		this();
 
-		this.inner = (AbstractExpression<?>) inner;
-		for (final Object value : values) {
-			if (value instanceof AbstractExpression) {
-				this.values.add((AbstractExpression<?>) value);
-			}
-			else {
-				this.values.add(new ConstantExpression<Object>(null, value));
-			}
-		}
-	}
-
-	/**
-	 * Adds the expression to the list of values.
-	 * 
-	 * @param expression
-	 *            the expression to add
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void add(AbstractExpression<?> expression) {
-		this.values.add(expression);
+		this.value(x);
+		this.value(y);
 	}
 
 	/**
@@ -106,15 +80,13 @@ public class InExpression extends AbstractExpression<Boolean> {
 	 */
 	@Override
 	public String generateJpqlRestriction(final AbstractQueryImpl<?> query) {
-		final String values = Joiner.on(", ").join(Lists.transform(this.values, new Function<AbstractExpression<?>, String>() {
+		return "coalesce(" + Joiner.on(", ").join(Lists.transform(this.values, new Function<Expression<? extends T>, String>() {
 
 			@Override
-			public String apply(AbstractExpression<?> input) {
-				return input.generateJpqlRestriction(query);
+			public String apply(Expression<? extends T> input) {
+				return ((AbstractExpression<? extends T>) input).generateJpqlRestriction(query);
 			}
-		}));
-
-		return this.inner.generateJpqlRestriction(query) + " in (" + values + ")";
+		})) + ")";
 	}
 
 	/**
@@ -123,7 +95,7 @@ public class InExpression extends AbstractExpression<Boolean> {
 	 */
 	@Override
 	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
-		if (selected && StringUtils.isBlank(this.getAlias())) {
+		if (StringUtils.isNotBlank(this.getAlias())) {
 			return this.generateJpqlRestriction(query) + " as " + this.getAlias();
 		}
 
@@ -151,17 +123,13 @@ public class InExpression extends AbstractExpression<Boolean> {
 	 */
 	@Override
 	public String[] getSqlRestrictionFragments(final AbstractQueryImpl<?> query) {
-		final String inner = this.inner.getSqlRestrictionFragments(query)[0];
-
-		final String values = Joiner.on(", ").join(Lists.transform(this.values, new Function<AbstractExpression<?>, String>() {
+		return new String[] { "COALESCE(" + Joiner.on(", ").join(Lists.transform(this.values, new Function<Expression<? extends T>, String>() {
 
 			@Override
-			public String apply(AbstractExpression<?> input) {
-				return input.getSqlRestrictionFragments(query)[0];
+			public String apply(Expression<? extends T> input) {
+				return ((AbstractExpression<? extends T>) input).getSqlRestrictionFragments(query)[0];
 			}
-		}));
-
-		return new String[] { inner + " IN (" + values + ")" };
+		})) + ")" };
 	}
 
 	/**
@@ -169,7 +137,28 @@ public class InExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public Boolean handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
-		return (Boolean) row.getObject(this.alias);
+	@SuppressWarnings("unchecked")
+	public T handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+		return (T) row.getObject(this.alias);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public CoalesceExpression<T> value(Expression<? extends T> value) {
+		this.values.add(value);
+
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public CoalesceExpression<T> value(T value) {
+		return this.value(new ConstantExpression<T>(null, value));
 	}
 }

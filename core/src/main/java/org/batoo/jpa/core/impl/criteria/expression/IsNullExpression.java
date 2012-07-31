@@ -32,7 +32,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  * @author hceylan
  * @since $version
  */
-public class IsNullExpression extends BooleanExpression {
+public class IsNullExpression extends AbstractExpression<Boolean> {
 
 	private final AbstractExpression<?> inner;
 	private final boolean not;
@@ -48,7 +48,7 @@ public class IsNullExpression extends BooleanExpression {
 	 * @author hceylan
 	 */
 	public IsNullExpression(boolean not, AbstractExpression<?> inner) {
-		super();
+		super(Boolean.class);
 
 		this.not = not;
 		this.inner = inner;
@@ -85,12 +85,14 @@ public class IsNullExpression extends BooleanExpression {
 	 * 
 	 */
 	@Override
-	public String generateSqlRestriction(AbstractQueryImpl<?> query) {
-		if (this.not) {
-			return this.inner.getSqlRestrictionFragments(query)[0] + " IS NOT NULL";
+	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+		this.alias = query.getAlias(this);
+
+		if (selected) {
+			return this.getSqlRestrictionFragments(query)[0] + " AS " + this.alias;
 		}
 
-		return this.inner.getSqlRestrictionFragments(query)[0] + " IS NULL";
+		return this.getSqlRestrictionFragments(query)[0];
 	}
 
 	/**
@@ -98,14 +100,12 @@ public class IsNullExpression extends BooleanExpression {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
-		this.alias = query.getAlias(this);
-
-		if (selected) {
-			return this.generateSqlRestriction(query) + " AS " + this.alias;
+	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
+		if (this.not) {
+			return new String[] { this.inner.getSqlRestrictionFragments(query)[0] + " IS NOT NULL" };
 		}
 
-		return this.generateSqlRestriction(query);
+		return new String[] { this.inner.getSqlRestrictionFragments(query)[0] + " IS NULL" };
 	}
 
 	/**

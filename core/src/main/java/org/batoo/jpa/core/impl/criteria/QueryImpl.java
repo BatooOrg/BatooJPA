@@ -254,7 +254,7 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>> {
 			}
 		}
 
-		return null;
+		return this.getParameter(Integer.toString(position));
 	}
 
 	/**
@@ -279,7 +279,7 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>> {
 			}
 		}
 
-		return null;
+		throw new IllegalArgumentException("Parameter with the name " + name + " does not exist");
 	}
 
 	/**
