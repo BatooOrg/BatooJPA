@@ -257,9 +257,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public PredicateImpl conjunction() {
-		// TODO Auto-generated method stub
-		return null;
+		return new PredicateImpl();
 	}
 
 	/**
@@ -406,8 +406,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public PredicateImpl disjunction() {
-		// TODO Auto-generated method stub
-		return null;
+		return new PredicateImpl(true, BooleanOperator.AND);
 	}
 
 	/**

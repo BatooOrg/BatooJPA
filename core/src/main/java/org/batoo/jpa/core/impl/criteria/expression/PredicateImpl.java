@@ -25,6 +25,7 @@ import java.util.List;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 
+import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -124,27 +125,24 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	 */
 	@Override
 	public String generateJpqlRestriction(final AbstractQueryImpl<?> query) {
-		final StringBuilder builder = new StringBuilder();
+		String predicates = Joiner.on(" " + this.operator.name() + " ").join(
+			Lists.transform(this.expressions, new Function<AbstractExpression<Boolean>, String>() {
 
-		if (this.negated) {
-			builder.append("not (");
+				@Override
+				public String apply(AbstractExpression<Boolean> input) {
+					return input.generateJpqlRestriction(query);
+				}
+			}));
+
+		if (StringUtils.isBlank(predicates)) {
+			predicates = "true";
 		}
 
-		final List<String> expressions = Lists.transform(this.expressions, new Function<AbstractExpression<Boolean>, String>() {
-
-			@Override
-			public String apply(AbstractExpression<Boolean> input) {
-				return input.generateJpqlRestriction(query);
-			}
-		});
-
-		builder.append(Joiner.on(" " + this.operator.name() + " ").join(expressions));
-
 		if (this.negated) {
-			builder.append(")");
+			return "not (" + predicates + ")";
 		}
 
-		return builder.toString();
+		return predicates;
 	}
 
 	/**
@@ -153,6 +151,10 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	 */
 	@Override
 	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+		if (StringUtils.isNotBlank(this.getAlias())) {
+			return this.generateJpqlRestriction(query) + " AS " + this.alias;
+		}
+
 		return this.generateJpqlRestriction(query);
 	}
 
@@ -162,20 +164,23 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	 */
 	@Override
 	public String generateSqlRestriction(final AbstractQueryImpl<?> query) {
-
-		final List<String> converted = Lists.transform(this.expressions, new Function<BooleanExpression, String>() {
+		String predicates = Joiner.on(" " + this.operator.name() + " ").join(Lists.transform(this.expressions, new Function<BooleanExpression, String>() {
 
 			@Override
 			public String apply(BooleanExpression input) {
 				return input.generateSqlRestriction(query);
 			}
-		});
+		}));
 
-		if (this.negated) {
-			return "NOT (" + Joiner.on(" " + this.operator.name() + " ").join(converted) + ")";
+		if (StringUtils.isBlank(predicates)) {
+			predicates = "TRUE";
 		}
 
-		return Joiner.on(" " + this.operator.name() + " ").join(converted);
+		if (this.negated) {
+			return "NOT (" + predicates + ")";
+		}
+
+		return predicates;
 	}
 
 	/**
