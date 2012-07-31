@@ -213,8 +213,12 @@ coalesce_expression :
 nullif_expression :
 	NULLIF^ Left_Paren! scalar_expression Comma! scalar_expression Right_Paren!;
 
+function_expression:
+	FUNC^ Left_Paren! ID (Comma! scalar_expression)* Right_Paren!;
+
 scalar_expression options { backtrack=true; }:
 	case_expression
+	| function_expression
     | simple_arithmetic_expression
     | string_primary
     | enum_primary
@@ -235,7 +239,8 @@ arithmetic_factor :
     	-> ^(ST_NEGATION arithmetic_primary); 
 
 arithmetic_primary :
-	state_field_path_expression
+	function_expression
+	| state_field_path_expression
 	| NUMERIC_LITERAL
 	| (Left_Paren! simple_arithmetic_expression Right_Paren!)
 	| input_parameter
@@ -332,7 +337,8 @@ string_expression :
 	;
 
 string_primary :
-	functions_returning_strings
+	function_expression
+	| functions_returning_strings
 	| case_expression
 	| state_field_path_expression
 	| STRING_LITERAL
@@ -346,7 +352,8 @@ datetime_expression :
 	;
 
 datetime_primary :
-	state_field_path_expression
+	function_expression
+	| state_field_path_expression
 	| input_parameter
 	| functions_returning_datetime
 	| aggregate_expression
@@ -364,7 +371,8 @@ boolean_expression :
     ;
 
 boolean_primary :
-	state_field_path_expression
+	function_expression
+	| state_field_path_expression
 	| case_expression
 	| boolean_literal
 	| input_parameter
@@ -387,11 +395,12 @@ enum_expression :
   	;
 
 enum_primary :
-  state_field_path_expression
-  | case_expression
-  | enum_literal
-  | input_parameter
-  ;
+  	function_expression
+  	| state_field_path_expression
+  	| case_expression
+  	| enum_literal
+  	| input_parameter
+  	;
 
 enum_literal: ID;
 

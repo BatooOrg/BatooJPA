@@ -370,6 +370,20 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
+	public void testFunction() {
+		this.persist(this.person(100));
+
+		this.commit();
+
+		Assert.assertEquals(2.4971498726941337, this.cq("select func(log10, pp.age * func(pi)) from Person pp", Double.class).getSingleResult());
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
 	public void testLike() {
 		final Person person = this.person(40);
 		person.setName("%Ceylan");

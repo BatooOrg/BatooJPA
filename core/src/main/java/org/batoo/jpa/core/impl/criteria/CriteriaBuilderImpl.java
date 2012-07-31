@@ -65,6 +65,7 @@ import org.batoo.jpa.core.impl.criteria.expression.CountExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CurrentTemporalExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ExistsExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ExpressionConverter;
+import org.batoo.jpa.core.impl.criteria.expression.FunctionExpression;
 import org.batoo.jpa.core.impl.criteria.expression.IsEmptyExpression;
 import org.batoo.jpa.core.impl.criteria.expression.LikeExpression;
 import org.batoo.jpa.core.impl.criteria.expression.LocateExpression;
@@ -442,9 +443,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public <T> Expression<T> function(String name, Class<T> type, Expression<?>... args) {
-		// TODO Auto-generated method stub
-		return null;
+	public <T> FunctionExpression<T> function(String name, Class<T> type, Expression<?>... args) {
+		return new FunctionExpression<T>(type, name, args);
 	}
 
 	/**

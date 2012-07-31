@@ -57,6 +57,7 @@ import org.batoo.jpa.core.impl.criteria.expression.ConcatExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ConstantExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CountExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ExistsExpression;
+import org.batoo.jpa.core.impl.criteria.expression.FunctionExpression;
 import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
 import org.batoo.jpa.core.impl.criteria.expression.SimpleCaseImpl;
 import org.batoo.jpa.core.impl.criteria.expression.SubstringExpression;
@@ -1077,6 +1078,19 @@ public class JpqlQuery {
 			return coalesce;
 		}
 
+		// db func
+		if (exprDef.getType() == JpqlParser.FUNC) {
+			final List<AbstractExpression<?>> arguments = Lists.newArrayList();
+			final String function = exprDef.getChild(0).getText();
+
+			for (int i = 1; i < exprDef.getChildCount(); i++) {
+				arguments.add(this.getExpression(cb, q, exprDef.getChild(i), null));
+			}
+
+			return new FunctionExpression<X>((Class<X>) (javaType != null ? javaType : Object.class), //
+				function, arguments.toArray(new Expression<?>[arguments.size()]));
+		}
+
 		throw new PersistenceException("Unhandled expression: " + exprDef.toStringTree());
 	}
 
@@ -1114,7 +1128,7 @@ public class JpqlQuery {
 
 				JpqlQuery.LOG.error("Cannot parse query: {0}", //
 					JpqlQuery.LOG.boxed(query, //
-						new Object[] { errorMsg, "\n\n" + tree.toStringTree() }));
+						new Object[] { "\n\t" + errorMsg, "\n\n" + tree.toStringTree() + "\n" }));
 
 				throw new PersistenceException("cannot parse the query:\n " + errorMsg);
 			}

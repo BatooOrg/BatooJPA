@@ -21,7 +21,5 @@
 
 			<property name="org.batoo.jpa.ddl" value="DROP" />
 		</properties>
-
 	</persistence-unit>
-
 </persistence>

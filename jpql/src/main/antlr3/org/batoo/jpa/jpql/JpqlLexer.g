@@ -171,6 +171,8 @@ FALSE :
 FETCH :
     F E T C H;
 
+FUNC : F U N C;
+
 FROM :
     F R O M;
 
