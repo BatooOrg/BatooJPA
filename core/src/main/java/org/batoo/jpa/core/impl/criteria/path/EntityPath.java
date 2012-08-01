@@ -25,7 +25,7 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Path;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractTypeExpression;
 import org.batoo.jpa.core.impl.criteria.expression.EntityTypeExpression;
@@ -82,7 +82,7 @@ public class EntityPath<Z, X> extends ParentPath<Z, X> implements Joinable {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
+	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
 		final StringBuilder builder = new StringBuilder();
 
 		builder.append(this.getParentPath().generateJpqlRestriction(query));
@@ -97,7 +97,7 @@ public class EntityPath<Z, X> extends ParentPath<Z, X> implements Joinable {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		final StringBuilder builder = new StringBuilder();
 
 		if ((this.getParentPath() instanceof AbstractFrom) && StringUtils.isNotBlank(this.getParentPath().getAlias())) {
@@ -120,7 +120,7 @@ public class EntityPath<Z, X> extends ParentPath<Z, X> implements Joinable {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		return this.fetchRoot.generateSqlSelect(query, selected, false);
 	}
 
@@ -172,7 +172,7 @@ public class EntityPath<Z, X> extends ParentPath<Z, X> implements Joinable {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
 		return this.fetchRoot.getSqlRestrictionFragments(query, MapSelectType.VALUE);
 	}
 
@@ -181,7 +181,7 @@ public class EntityPath<Z, X> extends ParentPath<Z, X> implements Joinable {
 	 * 
 	 */
 	@Override
-	public String getTableAlias(AbstractQueryImpl<?> query, AbstractTable table) {
+	public String getTableAlias(AbstractCriteriaQueryImpl<?> query, AbstractTable table) {
 		return this.getFetchRoot().getTableAlias(query, table);
 	}
 

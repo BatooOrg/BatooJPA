@@ -24,7 +24,7 @@ import java.sql.SQLException;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Root;
 
-import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.SubqueryImpl;
@@ -63,7 +63,7 @@ public class IsEmptyExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
+	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
 		return this.inner.generateJpqlRestriction(query) + (this.not ? " is not empty" : " is empty");
 	}
 
@@ -72,7 +72,7 @@ public class IsEmptyExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		throw new IllegalArgumentException("Collection expressions cannot be selected");
 	}
 
@@ -81,7 +81,7 @@ public class IsEmptyExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		throw new IllegalArgumentException("Collection expressions cannot be selected");
 	}
 
@@ -90,7 +90,7 @@ public class IsEmptyExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
 		final CriteriaBuilderImpl cb = query.getMetamodel().getEntityManagerFactory().getCriteriaBuilder();
 		final Joinable rp = this.inner.getParentPath().getRootPath();
 

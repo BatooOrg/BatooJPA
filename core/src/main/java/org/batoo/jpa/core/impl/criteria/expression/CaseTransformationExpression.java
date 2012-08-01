@@ -25,7 +25,7 @@ import java.text.MessageFormat;
 import javax.persistence.criteria.Expression;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
@@ -77,7 +77,7 @@ public class CaseTransformationExpression extends AbstractExpression<String> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
+	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
 		return MessageFormat.format(this.function.jpqlFragment, this.inner.generateJpqlRestriction(query));
 	}
 
@@ -86,7 +86,7 @@ public class CaseTransformationExpression extends AbstractExpression<String> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		if (selected && StringUtils.isBlank(this.getAlias())) {
 			return this.generateJpqlRestriction(query) + " as " + this.getAlias();
 		}
@@ -94,7 +94,7 @@ public class CaseTransformationExpression extends AbstractExpression<String> {
 		return this.generateJpqlRestriction(query);
 	}
 
-	private String generateSqlRestriction(AbstractQueryImpl<?> query) {
+	private String generateSqlRestriction(AbstractCriteriaQueryImpl<?> query) {
 		return MessageFormat.format(this.function.sqlFragment, this.inner.getSqlRestrictionFragments(query)[0]);
 	}
 
@@ -103,7 +103,7 @@ public class CaseTransformationExpression extends AbstractExpression<String> {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		this.alias = query.getAlias(this);
 
 		if (selected) {
@@ -118,7 +118,7 @@ public class CaseTransformationExpression extends AbstractExpression<String> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
 		return new String[] { this.generateSqlRestriction(query) };
 	}
 

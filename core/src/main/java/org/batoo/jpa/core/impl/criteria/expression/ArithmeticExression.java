@@ -24,7 +24,7 @@ import java.sql.SQLException;
 import javax.persistence.criteria.Expression;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
@@ -97,7 +97,7 @@ public class ArithmeticExression<N extends Number> extends AbstractExpression<N>
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
+	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
 		return this.x.generateJpqlRestriction(query) + this.operation.getFragment() + this.y.generateJpqlRestriction(query);
 	}
 
@@ -106,7 +106,7 @@ public class ArithmeticExression<N extends Number> extends AbstractExpression<N>
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		final StringBuilder builder = new StringBuilder();
 
 		builder.append(this.x.generateJpqlRestriction(query));
@@ -125,7 +125,7 @@ public class ArithmeticExression<N extends Number> extends AbstractExpression<N>
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		this.alias = query.getAlias(this);
 
 		if (selected) {
@@ -140,7 +140,7 @@ public class ArithmeticExression<N extends Number> extends AbstractExpression<N>
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
 		return new String[] { this.x.getSqlRestrictionFragments(query)[0] //
 			+ this.operation.getFragment() //
 			+ this.y.getSqlRestrictionFragments(query)[0] };

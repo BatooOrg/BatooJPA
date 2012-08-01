@@ -23,7 +23,7 @@ import java.sql.SQLException;
 
 import javax.persistence.criteria.Subquery;
 
-import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.SubqueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -56,7 +56,7 @@ public class ExistsExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
+	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
 		return "exists" + this.subQuery.generateJpqlRestriction(query);
 	}
 
@@ -65,7 +65,7 @@ public class ExistsExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		return null; // N/A
 	}
 
@@ -74,7 +74,7 @@ public class ExistsExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		return null; // N/A
 	}
 
@@ -83,7 +83,7 @@ public class ExistsExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
 		return new String[] { "EXISTS" + this.subQuery.getSqlRestrictionFragments(query)[0] };
 	}
 

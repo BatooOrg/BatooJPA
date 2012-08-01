@@ -113,9 +113,9 @@ public class AggregationTest extends BaseCoreTest {
 
 		this.close();
 
-		Assert.assertEquals(37, this.cq("select avg(p.age) from Person p", Double.class).getSingleResult());
+		Assert.assertEquals(37.5d, this.cq("select avg(func(cast, '(', p.age, ' as double)')) from Person p", Double.class).getSingleResult());
 
-		Assert.assertEquals((Integer) 75, this.cq("select sum(p.age) from Person p", Long.class).getSingleResult());
+		Assert.assertEquals((Integer) 75, this.cq("select sum(p.age) from Person p", Integer.class).getSingleResult());
 
 		Assert.assertEquals((Integer) 40, this.cq("select max(p.age) from Person p", Integer.class).getSingleResult());
 

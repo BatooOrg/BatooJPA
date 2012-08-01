@@ -22,7 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 
-import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.path.ParentPath;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -65,7 +65,7 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
+	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
 		return this.parentPath.generateJpqlRestriction(query) + "." + this.mapping.getAttribute().getName();
 	}
 
@@ -74,7 +74,7 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		throw new IllegalArgumentException("Collection paths cannot be selected");
 	}
 
@@ -83,7 +83,7 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		throw new IllegalArgumentException("Collection paths cannot be selected");
 	}
 
@@ -116,7 +116,7 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
 		throw new IllegalArgumentException("Collection paths cannot be restricted");
 	}
 

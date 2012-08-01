@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import javax.persistence.criteria.Expression;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
@@ -62,7 +62,7 @@ public class ConcatExpression extends AbstractExpression<String> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(final AbstractQueryImpl<?> query) {
+	public String generateJpqlRestriction(final AbstractCriteriaQueryImpl<?> query) {
 		final String expressions = Joiner.on(", ").join(Lists.transform(this.arguments, new Function<Expression<String>, String>() {
 
 			@Override
@@ -79,7 +79,7 @@ public class ConcatExpression extends AbstractExpression<String> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		if (selected && StringUtils.isBlank(this.getAlias())) {
 			return this.generateJpqlRestriction(query) + " as " + this.getAlias();
 		}
@@ -87,7 +87,7 @@ public class ConcatExpression extends AbstractExpression<String> {
 		return this.generateJpqlRestriction(query);
 	}
 
-	private String generateSqlRestriction(final AbstractQueryImpl<?> query) {
+	private String generateSqlRestriction(final AbstractCriteriaQueryImpl<?> query) {
 		return Joiner.on(" || ").join(Lists.transform(this.arguments, new Function<Expression<String>, String>() {
 
 			@Override
@@ -102,7 +102,7 @@ public class ConcatExpression extends AbstractExpression<String> {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		this.alias = query.getAlias(this);
 
 		if (selected) {
@@ -117,7 +117,7 @@ public class ConcatExpression extends AbstractExpression<String> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
 		return new String[] { this.generateSqlRestriction(query) };
 	}
 

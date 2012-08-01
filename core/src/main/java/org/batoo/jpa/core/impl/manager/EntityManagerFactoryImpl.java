@@ -274,14 +274,12 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * 
 	 * @param qlString
 	 *            the JPQL query string
-	 * @param resultClass
-	 *            the result class
 	 * @return the Jpql Query object
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public JpqlQuery getJpqlQuery(String qlString, Class<?> resultClass) {
+	public JpqlQuery getJpqlQuery(String qlString) {
 		try {
 			// TODO Check result class compatibility
 			return this.graphs.get(qlString);

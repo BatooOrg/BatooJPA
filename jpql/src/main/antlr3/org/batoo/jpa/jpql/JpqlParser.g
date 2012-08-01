@@ -108,19 +108,17 @@ collection_member_declaration :
         -> ^(ST_COLL ID ^(ST_ID_AS qid ID));
 
 update_clause :
-    aliased_qid SET update_items
-        -> ^(ST_UPDATE aliased_qid update_items);
-
-update_items :
-    (update_item)*
-        -> ^(LUPDATE (update_item)*);
+    aliased_qid SET update_item (Comma update_item)*
+        -> ^(ST_UPDATE update_item update_item*);
 
 update_item :
     state_field_path_expression Equals_Operator new_value;
 
-new_value :
+new_value options { backtrack=true; }:
     simple_arithmetic_expression
-//    | simple_entity_expression
+    | simple_entity_expression
+    | STRING_LITERAL
+    | NUMERIC_LITERAL
     | NULL;
 
 orderby_clause :
@@ -439,10 +437,6 @@ faliased_qid :
 aliased_qid :
     qid ((AS)? ID)?
         -> ^(ST_ID_AS qid (ID)?);
-
-fqid :
-    ID ( Period ID)+
-        -> ^(LQUALIFIED ID (ID)*);
 
 qid :
     ID ( Period ID)*

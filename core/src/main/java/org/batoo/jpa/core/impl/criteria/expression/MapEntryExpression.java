@@ -22,7 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map.Entry;
 
-import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl;
@@ -64,7 +64,7 @@ public class MapEntryExpression<K, V> extends AbstractExpression<Entry<K, V>> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
+	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
 		return this.mapJoin.generateJpqlRestriction(query) + ".entry";
 	}
 
@@ -73,7 +73,7 @@ public class MapEntryExpression<K, V> extends AbstractExpression<Entry<K, V>> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		return this.mapJoin.generateJpqlSelect(null, selected) + ".entry";
 	}
 
@@ -82,7 +82,7 @@ public class MapEntryExpression<K, V> extends AbstractExpression<Entry<K, V>> {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		return this.mapJoin.generateSqlSelect(query, selected, MapSelectType.ENTRY);
 	}
 
@@ -91,7 +91,7 @@ public class MapEntryExpression<K, V> extends AbstractExpression<Entry<K, V>> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
 		return this.mapJoin.getSqlRestrictionFragments(query, MapSelectType.ENTRY);
 	}
 

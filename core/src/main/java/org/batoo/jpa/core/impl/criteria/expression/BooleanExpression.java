@@ -23,7 +23,7 @@ import java.sql.SQLException;
 
 import javax.persistence.criteria.Expression;
 
-import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
@@ -55,7 +55,7 @@ public class BooleanExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
+	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
 		return this.inner.generateJpqlRestriction(query);
 	}
 
@@ -63,7 +63,7 @@ public class BooleanExpression extends AbstractExpression<Boolean> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		return this.inner.generateJpqlSelect(null, selected);
 	}
 
@@ -77,7 +77,7 @@ public class BooleanExpression extends AbstractExpression<Boolean> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String generateSqlRestriction(final AbstractQueryImpl<?> query) {
+	public String generateSqlRestriction(final AbstractCriteriaQueryImpl<?> query) {
 		return this.inner.getSqlRestrictionFragments(query)[0];
 	}
 
@@ -86,7 +86,7 @@ public class BooleanExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		return this.inner.generateSqlSelect(query, selected);
 	}
 
@@ -95,7 +95,7 @@ public class BooleanExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
 		if (this.inner != null) {
 			return this.inner.getSqlRestrictionFragments(query);
 		}

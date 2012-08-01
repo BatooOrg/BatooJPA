@@ -18,7 +18,7 @@
  */
 package org.batoo.jpa.core.impl.criteria.join;
 
-import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
@@ -54,5 +54,5 @@ public interface Joinable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	String getTableAlias(AbstractQueryImpl<?> query, AbstractTable table);
+	String getTableAlias(AbstractCriteriaQueryImpl<?> query, AbstractTable table);
 }

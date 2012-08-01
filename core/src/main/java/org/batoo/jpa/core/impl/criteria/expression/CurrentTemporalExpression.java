@@ -24,7 +24,7 @@ import java.sql.SQLException;
 import javax.persistence.TemporalType;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
@@ -62,7 +62,7 @@ public class CurrentTemporalExpression<T> extends AbstractExpression<T> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
+	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
 		switch (this.temporalType) {
 			case DATE:
 				return "current_date";
@@ -78,7 +78,7 @@ public class CurrentTemporalExpression<T> extends AbstractExpression<T> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		if (StringUtils.isNotBlank(this.getAlias())) {
 			return this.generateJpqlRestriction(query) + " as " + this.getAlias();
 		}
@@ -91,7 +91,7 @@ public class CurrentTemporalExpression<T> extends AbstractExpression<T> {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		this.alias = query.getAlias(this);
 
 		if (selected) {
@@ -106,7 +106,7 @@ public class CurrentTemporalExpression<T> extends AbstractExpression<T> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
 		switch (this.temporalType) {
 			case DATE:
 				return new String[] { "CURRENT_DATE" };

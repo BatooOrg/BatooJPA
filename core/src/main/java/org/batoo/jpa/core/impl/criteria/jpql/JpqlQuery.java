@@ -46,6 +46,7 @@ import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.AbstractSelection;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
@@ -99,7 +100,7 @@ public class JpqlQuery {
 	private final MetamodelImpl metamodel;
 	private final String qlString;
 
-	private final CriteriaQueryImpl<?> criteriaQuery;
+	private final AbstractCriteriaQueryImpl<?> criteria;
 	private final Map<AbstractQuery<?>, Map<String, AbstractFrom<?, ?>>> aliasMap = Maps.newHashMap();
 
 	private HashMap<String, Object> hints;
@@ -121,7 +122,7 @@ public class JpqlQuery {
 		this(entityManagerFactory, metadata.getQuery(), cb);
 
 		// force sql compilation
-		this.criteriaQuery.getSql();
+		this.criteria.getSql();
 
 		this.lockMode = metadata.getLockMode();
 		if (metadata.getHints().size() > 0) {
@@ -155,7 +156,7 @@ public class JpqlQuery {
 			cb = entityManagerFactory.getCriteriaBuilder();
 		}
 
-		this.criteriaQuery = this.parse(cb);
+		this.criteria = this.parse(cb);
 	}
 
 	/**
@@ -171,62 +172,14 @@ public class JpqlQuery {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private CriteriaQueryImpl<?> construct(CriteriaBuilderImpl cb, CommonTree tree) {
-		final CriteriaQueryImpl q = new CriteriaQueryImpl(this.metamodel);
-
+	private AbstractCriteriaQueryImpl<?> construct(CriteriaBuilderImpl cb, CommonTree tree) {
 		final Tree type = tree.getChild(0);
 		if (type.getType() == JpqlParser.SELECT) {
-			this.constructFrom(cb, q, tree.getChild(1));
-
-			final List<Selection<?>> selections = this.constructSelect(cb, q, tree.getChild(0).getChild(0));
-
-			if (selections.size() == 1) {
-				q.select(selections.get(0));
-			}
-			else {
-				q.multiselect(selections);
-			}
-
-			if (tree.getChild(1).getType() == JpqlParser.DISTINCT) {
-				q.distinct(true);
-			}
-
-			int i = 2;
-			while (true) {
-				final Tree child = tree.getChild(i);
-
-				// end of query
-				if (child.getType() == JpqlParser.EOF) {
-					break;
-				}
-
-				// where fragment
-				if (child.getType() == JpqlParser.WHERE) {
-					q.where(this.constructJunction(cb, q, child.getChild(0)));
-				}
-
-				// group by fragment
-				if (child.getType() == JpqlParser.LGROUP_BY) {
-					q.groupBy(this.constructGroupBy(cb, q, child));
-				}
-
-				// having fragment
-				if (child.getType() == JpqlParser.HAVING) {
-					q.having(this.constructJunction(cb, q, child.getChild(0)));
-				}
-
-				// order by fragment
-				if (child.getType() == JpqlParser.LORDER) {
-					this.constructOrder(cb, q, child);
-				}
-
-				i++;
-				continue;
-			}
+			return this.constructSelectQuery(cb, tree);
 		}
-
-		return q;
+		else {
+			return this.constructUpdateQuery(cb, tree);
+		}
 	}
 
 	/**
@@ -631,6 +584,73 @@ public class JpqlQuery {
 	}
 
 	/**
+	 * Constructs an select query.
+	 * 
+	 * @param cb
+	 *            the criteria builder
+	 * @param tree
+	 *            the tree
+	 * @return the constructed query
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private CriteriaQueryImpl constructSelectQuery(CriteriaBuilderImpl cb, CommonTree tree) {
+		final CriteriaQueryImpl q = new CriteriaQueryImpl(this.metamodel);
+
+		this.constructFrom(cb, q, tree.getChild(1));
+
+		final List<Selection<?>> selections = this.constructSelect(cb, q, tree.getChild(0).getChild(0));
+
+		if (selections.size() == 1) {
+			q.select(selections.get(0));
+		}
+		else {
+			q.multiselect(selections);
+		}
+
+		if (tree.getChild(1).getType() == JpqlParser.DISTINCT) {
+			q.distinct(true);
+		}
+
+		int i = 2;
+		while (true) {
+			final Tree child = tree.getChild(i);
+
+			// end of query
+			if (child.getType() == JpqlParser.EOF) {
+				break;
+			}
+
+			// where fragment
+			if (child.getType() == JpqlParser.WHERE) {
+				q.where(this.constructJunction(cb, q, child.getChild(0)));
+			}
+
+			// group by fragment
+			if (child.getType() == JpqlParser.LGROUP_BY) {
+				q.groupBy(this.constructGroupBy(cb, q, child));
+			}
+
+			// having fragment
+			if (child.getType() == JpqlParser.HAVING) {
+				q.having(this.constructJunction(cb, q, child.getChild(0)));
+			}
+
+			// order by fragment
+			if (child.getType() == JpqlParser.LORDER) {
+				this.constructOrder(cb, q, child);
+			}
+
+			i++;
+			continue;
+		}
+
+		return q;
+	}
+
+	/**
 	 * Creates a single select item.
 	 * 
 	 * @param cb
@@ -734,6 +754,22 @@ public class JpqlQuery {
 	}
 
 	/**
+	 * Constructs an update query.
+	 * 
+	 * @param cb
+	 *            the criteria builder
+	 * @param tree
+	 *            the tree
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 * @return
+	 */
+	private CriteriaUpdateImpl<?> constructUpdateQuery(CriteriaBuilderImpl cb, CommonTree tree) {
+
+	}
+
+	/**
 	 * Creates a typed query for the JPQL.
 	 * 
 	 * @param entityManager
@@ -747,7 +783,7 @@ public class JpqlQuery {
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> QueryImpl<T> createTypedQuery(EntityManagerImpl entityManager) {
-		final QueryImpl<T> typedQuery = new QueryImpl<T>((CriteriaQueryImpl<T>) this.criteriaQuery, entityManager);
+		final QueryImpl<T> typedQuery = new QueryImpl<T>((CriteriaQueryImpl<T>) this.criteria, entityManager);
 
 		if (this.lockMode != null) {
 			typedQuery.setLockMode(this.lockMode);
@@ -1029,7 +1065,7 @@ public class JpqlQuery {
 			case JpqlParser.AVG:
 				return (AbstractExpression<X>) cb.avg(this.getExpression(cb, q, exprDef.getChild(0), Number.class));
 			case JpqlParser.SUM:
-				return (AbstractExpression<X>) cb.sum(this.getExpression(cb, q, exprDef.getChild(0), Number.class));
+				return (AbstractExpression<X>) cb.sum(this.getExpression(cb, q, exprDef.getChild(0), Long.class));
 			case JpqlParser.MAX:
 				return (AbstractExpression<X>) cb.max(this.getExpression(cb, q, exprDef.getChild(0), Number.class));
 			case JpqlParser.MIN:
@@ -1233,7 +1269,7 @@ public class JpqlQuery {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private CriteriaQueryImpl<?> parse(CriteriaBuilderImpl cb) {
+	private AbstractCriteriaQueryImpl<?> parse(CriteriaBuilderImpl cb) {
 		final CommonTree tree = this.parse(this.qlString);
 
 		JpqlQuery.LOG.debug("Parsed query successfully {0}", //

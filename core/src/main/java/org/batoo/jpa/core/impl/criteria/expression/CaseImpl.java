@@ -26,7 +26,7 @@ import javax.persistence.criteria.CriteriaBuilder.Case;
 import javax.persistence.criteria.Expression;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.util.Pair;
@@ -65,7 +65,7 @@ public class CaseImpl<T> extends AbstractExpression<T> implements Case<T> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(final AbstractQueryImpl<?> query) {
+	public String generateJpqlRestriction(final AbstractCriteriaQueryImpl<?> query) {
 		final String whens = Joiner.on("\n\t").join(Lists.transform(this.conditions, //
 			new Function<Pair<Expression<Boolean>, Expression<? extends T>>, String>() {
 
@@ -88,7 +88,7 @@ public class CaseImpl<T> extends AbstractExpression<T> implements Case<T> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		if (StringUtils.isNotBlank(this.getAlias())) {
 			return this.generateJpqlRestriction(query) + " as " + this.getAlias();
 		}
@@ -101,7 +101,7 @@ public class CaseImpl<T> extends AbstractExpression<T> implements Case<T> {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		this.alias = query.getAlias(this);
 
 		if (selected) {
@@ -116,7 +116,7 @@ public class CaseImpl<T> extends AbstractExpression<T> implements Case<T> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(final AbstractQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(final AbstractCriteriaQueryImpl<?> query) {
 		final String whens = Joiner.on("\n\t").join(Lists.transform(this.conditions, //
 			new Function<Pair<Expression<Boolean>, Expression<? extends T>>, String>() {
 

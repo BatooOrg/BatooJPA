@@ -26,7 +26,7 @@ import javax.persistence.metamodel.Type.PersistenceType;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
-import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -78,7 +78,7 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected void ensureAlias(AbstractQueryImpl<?> query) {
+	protected void ensureAlias(AbstractCriteriaQueryImpl<?> query) {
 		if (this.position == null) {
 			this.position = query.getAlias(this);
 			if (StringUtils.isBlank(this.getAlias())) {
@@ -98,7 +98,7 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
+	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
 		final StringBuilder builder = new StringBuilder();
 
 		this.ensureAlias(query);
@@ -111,7 +111,7 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		this.ensureAlias(query);
 
 		return this.generateJpqlRestriction(query);
@@ -122,7 +122,7 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		this.ensureAlias(query);
 
 		return null;
@@ -188,7 +188,7 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
 		this.ensureAlias(query);
 
 		query.setNextSqlParam(this);

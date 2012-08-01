@@ -25,7 +25,7 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.metamodel.Type.PersistenceType;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.StaticTypeExpression;
 import org.batoo.jpa.core.impl.criteria.join.FetchParentImpl;
@@ -76,7 +76,7 @@ public class MapKeyPath<Z, X> extends ParentPath<Z, X> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
+	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
 		return "key(" + this.mapJoin.generateJpqlRestriction(query) + ")";
 	}
 
@@ -85,7 +85,7 @@ public class MapKeyPath<Z, X> extends ParentPath<Z, X> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		if (StringUtils.isNotBlank(this.getAlias())) {
 			return this.generateJpqlRestriction(query) + " as " + this.getAlias();
 		}
@@ -98,7 +98,7 @@ public class MapKeyPath<Z, X> extends ParentPath<Z, X> {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		return this.mapJoin.generateSqlSelect(query, selected, MapSelectType.KEY);
 	}
 
@@ -144,7 +144,7 @@ public class MapKeyPath<Z, X> extends ParentPath<Z, X> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
 		return this.mapJoin.getSqlRestrictionFragments(query, MapSelectType.KEY);
 	}
 

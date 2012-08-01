@@ -30,9 +30,9 @@ import org.batoo.jpa.core.impl.model.MetamodelImpl;
  * @author hceylan
  * @since $version
  */
-public class SubQueryStub<T> extends AbstractQueryImpl<T> {
+public class SubQueryStub<T> extends AbstractCriteriaQueryImpl<T> {
 
-	private final AbstractQueryImpl<?> parent;
+	private final BaseQuery<?> parent;
 
 	/**
 	 * @param parent
@@ -45,7 +45,7 @@ public class SubQueryStub<T> extends AbstractQueryImpl<T> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SubQueryStub(AbstractQueryImpl<?> parent, MetamodelImpl metamodel, Class<T> resultType) {
+	public SubQueryStub(BaseQuery<?> parent, MetamodelImpl metamodel, Class<T> resultType) {
 		super(metamodel, resultType);
 
 		this.parent = parent;

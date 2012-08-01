@@ -143,40 +143,40 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		this.close();
 
-		TypedQuery<Integer> q2;
+		TypedQuery<Integer> q1;
 		int total;
 
-		q2 = this.cq("select -p.age from Person p", Integer.class);
+		q1 = this.cq("select -p.age from Person p", Integer.class);
 		total = 0;
-		for (final Integer i : q2.getResultList()) {
+		for (final Integer i : q1.getResultList()) {
 			total += i;
 		}
 		Assert.assertEquals(-75, total);
 
-		q2 = this.cq("select p.age + p.age from Person p", Integer.class);
+		q1 = this.cq("select p.age + p.age from Person p", Integer.class);
 		total = 0;
-		for (final Integer i : q2.getResultList()) {
+		for (final Integer i : q1.getResultList()) {
 			total += i;
 		}
 		Assert.assertEquals(150, total);
 
-		q2 = this.cq("select -p.age + -p.age from Person p", Integer.class);
+		q1 = this.cq("select -p.age + -p.age from Person p", Integer.class);
 		total = 0;
-		for (final Integer i : q2.getResultList()) {
+		for (final Integer i : q1.getResultList()) {
 			total += i;
 		}
 		Assert.assertEquals(-150, total);
 
-		q2 = this.cq("select 22 + p.age from Person p", Integer.class);
+		q1 = this.cq("select 22 + p.age from Person p", Integer.class);
 		total = 0;
-		for (final Integer i : q2.getResultList()) {
+		for (final Integer i : q1.getResultList()) {
 			total += i;
 		}
 		Assert.assertEquals(119, total);
 
-		q2 = this.cq("select p.age * 2 from Person p", Integer.class);
+		q1 = this.cq("select p.age * 2 from Person p", Integer.class);
 		total = 0;
-		for (final Integer i : q2.getResultList()) {
+		for (final Integer i : q1.getResultList()) {
 			total += i;
 		}
 		Assert.assertEquals(150, total);
@@ -375,7 +375,7 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		this.commit();
 
-		Assert.assertEquals(2.4971498726941337, this.cq("select func(log10, pp.age * func(pi)) from Person pp", Double.class).getSingleResult());
+		Assert.assertEquals(2.4971498726941337, this.cq("select func(log10, '(', pp.age * func(pi, '()'), ')') from Person pp", Double.class).getSingleResult());
 	}
 
 	/**
@@ -490,6 +490,22 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		Assert.assertEquals(2l, this.cq("select c from Country c", Country.class).setMaxResults(2).getResultList().size());
 
 		Assert.assertEquals(1l, this.cq("select c from Country c", Country.class).setFirstResult(3).setMaxResults(2).getResultList().size());
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testQuery() {
+		this.persist(this.person(40));
+		this.persist(this.person(35));
+
+		this.commit();
+		this.close();
+
+		Assert.assertEquals(75, this.cq("select sum(p.age) from Person p").getSingleResult());
 	}
 
 	/**

@@ -25,7 +25,7 @@ import java.util.List;
 import javax.persistence.criteria.Expression;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
@@ -74,7 +74,7 @@ public class FunctionExpression<T> extends AbstractExpression<T> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(final AbstractQueryImpl<?> query) {
+	public String generateJpqlRestriction(final AbstractCriteriaQueryImpl<?> query) {
 		return this.function + "(" + Joiner.on(", ").join(Lists.transform(this.arguments, new Function<Expression<?>, String>() {
 
 			@Override
@@ -89,7 +89,7 @@ public class FunctionExpression<T> extends AbstractExpression<T> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		if (StringUtils.isNotBlank(this.getAlias())) {
 			return this.generateJpqlRestriction(query) + " as " + this.getAlias();
 		}
@@ -102,7 +102,7 @@ public class FunctionExpression<T> extends AbstractExpression<T> {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		this.alias = query.getAlias(this);
 
 		if (selected) {
@@ -117,14 +117,23 @@ public class FunctionExpression<T> extends AbstractExpression<T> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(final AbstractQueryImpl<?> query) {
-		return new String[] { this.function + "(" + Joiner.on(", ").join(Lists.transform(this.arguments, new Function<Expression<?>, String>() {
+	public String[] getSqlRestrictionFragments(final AbstractCriteriaQueryImpl<?> query) {
+		return new String[] { this.function + Joiner.on("").join(Lists.transform(this.arguments, new Function<Expression<?>, String>() {
 
 			@Override
 			public String apply(Expression<?> input) {
+				if (input instanceof ConstantExpression) {
+					final String result = ((AbstractExpression<?>) input).getSqlRestrictionFragments(query)[0];
+					if (result.startsWith("'")) {
+						return result.substring(1, result.length() - 1);
+					}
+
+					return result;
+				}
+
 				return ((AbstractExpression<?>) input).getSqlRestrictionFragments(query)[0];
 			}
-		})) + ")" };
+		})) };
 	}
 
 	/**

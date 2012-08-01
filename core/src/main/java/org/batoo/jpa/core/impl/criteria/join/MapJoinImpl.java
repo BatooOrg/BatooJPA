@@ -30,7 +30,7 @@ import javax.persistence.criteria.MapJoin;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 
-import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.MapEntryExpression;
@@ -109,7 +109,7 @@ public class MapJoinImpl<Z, K, V> extends AbstractPluralJoin<Z, Map<K, V>, V> im
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		return this.generateSqlSelect(query, selected, MapSelectType.VALUE);
 	}
 
@@ -127,7 +127,7 @@ public class MapJoinImpl<Z, K, V> extends AbstractPluralJoin<Z, Map<K, V>, V> im
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected, MapSelectType selectType) {
+	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected, MapSelectType selectType) {
 		this.select(selected);
 
 		return this.getFetchRoot().generateSqlSelect(query, selected, this.getParentPath() == null, selectType);

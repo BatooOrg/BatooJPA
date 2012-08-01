@@ -26,7 +26,7 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
@@ -124,7 +124,7 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(final AbstractQueryImpl<?> query) {
+	public String generateJpqlRestriction(final AbstractCriteriaQueryImpl<?> query) {
 		String predicates = Joiner.on(" " + this.operator.name() + " ").join(
 			Lists.transform(this.expressions, new Function<AbstractExpression<Boolean>, String>() {
 
@@ -150,7 +150,7 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		if (StringUtils.isNotBlank(this.getAlias())) {
 			return this.generateJpqlRestriction(query) + " AS " + this.alias;
 		}
@@ -163,7 +163,7 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	 * 
 	 */
 	@Override
-	public String generateSqlRestriction(final AbstractQueryImpl<?> query) {
+	public String generateSqlRestriction(final AbstractCriteriaQueryImpl<?> query) {
 		String predicates = Joiner.on(" " + this.operator.name() + " ").join(Lists.transform(this.expressions, new Function<BooleanExpression, String>() {
 
 			@Override
@@ -188,7 +188,7 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		this.alias = query.getAlias(this);
 
 		if (selected) {

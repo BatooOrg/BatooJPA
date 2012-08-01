@@ -18,7 +18,7 @@
  */
 package org.batoo.jpa.core.impl.criteria.expression;
 
-import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 
 /**
@@ -52,7 +52,7 @@ public abstract class AbstractTypeExpression<T> extends AbstractExpression<Class
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
+	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
 		return "type(" + this.getPath().generateJpqlRestriction(query) + ")";
 	}
 
@@ -61,7 +61,7 @@ public abstract class AbstractTypeExpression<T> extends AbstractExpression<Class
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		if (this.getAlias() != null) {
 			return this.generateJpqlRestriction(query) + " as " + this.getAlias();
 		}
@@ -74,7 +74,7 @@ public abstract class AbstractTypeExpression<T> extends AbstractExpression<Class
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		return this.path.generateSqlSelect(query, selected);
 	}
 

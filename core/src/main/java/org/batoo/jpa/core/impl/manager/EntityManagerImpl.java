@@ -338,8 +338,7 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public Query createQuery(String qlString) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.emf.getJpqlQuery(qlString).createTypedQuery(this);
 	}
 
 	/**
@@ -348,10 +347,7 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public <T> TypedQuery<T> createQuery(String qlString, Class<T> resultClass) {
-		final QueryImpl<T> typedQuery = this.emf.getJpqlQuery(qlString, resultClass).createTypedQuery(this);
-
-		// TODO check result class compatibility
-		return typedQuery;
+		return this.emf.getJpqlQuery(qlString).<T> createTypedQuery(this);
 	}
 
 	/**

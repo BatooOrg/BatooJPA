@@ -24,7 +24,7 @@ import java.sql.SQLException;
 import javax.persistence.criteria.Expression;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.path.BasicPath;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -62,7 +62,7 @@ public class NegationExpression<N extends Number> extends AbstractExpression<N> 
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
+	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
 		return "-(" + this.inner.generateJpqlRestriction(query) + ")";
 	}
 
@@ -71,7 +71,7 @@ public class NegationExpression<N extends Number> extends AbstractExpression<N> 
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		final StringBuilder builder = new StringBuilder("-");
 		if (!(this.inner instanceof BasicPath)) {
 			builder.append("(").append(this.inner.generateJpqlRestriction(query)).append(")");
@@ -92,7 +92,7 @@ public class NegationExpression<N extends Number> extends AbstractExpression<N> 
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		this.alias = query.getAlias(this);
 
 		if (this.inner instanceof BasicPath) {
@@ -115,7 +115,7 @@ public class NegationExpression<N extends Number> extends AbstractExpression<N> 
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
 		return new String[] { "-(" + this.inner.getSqlRestrictionFragments(query)[0] + ")" };
 	}
 

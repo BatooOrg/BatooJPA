@@ -77,7 +77,7 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected);
+	public abstract String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected);
 
 	/**
 	 * Returns the SQL select fragment.
@@ -91,7 +91,7 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected);
+	public abstract String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected);
 
 	/**
 	 * {@inheritDoc}
@@ -121,7 +121,7 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query);
+	public abstract String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query);
 
 	/**
 	 * Handles the row.

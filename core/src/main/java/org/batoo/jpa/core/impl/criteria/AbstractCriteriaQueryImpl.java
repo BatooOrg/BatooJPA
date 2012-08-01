@@ -19,7 +19,6 @@
 package org.batoo.jpa.core.impl.criteria;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +27,6 @@ import java.util.Set;
 import javax.persistence.PersistenceException;
 import javax.persistence.criteria.AbstractQuery;
 import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Predicate.BooleanOperator;
 import javax.persistence.criteria.Root;
@@ -42,7 +40,6 @@ import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
-import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.util.BatooUtils;
@@ -50,7 +47,6 @@ import org.batoo.jpa.core.util.BatooUtils;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -72,18 +68,15 @@ import com.google.common.collect.Sets;
  * @since $version
  */
 @SuppressWarnings("unchecked")
-public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
+public abstract class AbstractCriteriaQueryImpl<T> extends BaseQuery<T> implements AbstractQuery<T> {
 
-	private static final BLogger LOG = BLoggerFactory.getLogger(AbstractQueryImpl.class);
+	private static final BLogger LOG = BLoggerFactory.getLogger(AbstractCriteriaQueryImpl.class);
 
 	private final MetamodelImpl metamodel;
 	private Class<T> resultType;
 	private boolean internal;
-	private final HashMap<String, List<AbstractColumn>> fields = Maps.newHashMap();
 	private final Set<RootImpl<?>> roots = Sets.newHashSet();
-	private int nextEntityAlias;
 	private final List<ParameterExpressionImpl<?>> sqlParameters = Lists.newArrayList();
-	private final HashMap<Selection<?>, String> selections = Maps.newHashMap();
 	private AbstractSelection<T> selection;
 	private PredicateImpl restriction;
 	private PredicateImpl groupRestriction;
@@ -91,10 +84,7 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	private final List<AbstractExpression<?>> groupList = Lists.newArrayList();
 	private String sql;
 	private String jpql;
-	private int nextSelection;
 
-	private int nextparam;
-	private final HashBiMap<ParameterExpressionImpl<?>, Integer> parameters = HashBiMap.create();
 	private final List<ParameterExpressionImpl<?>> parameterOrder = Lists.newArrayList();
 
 	/**
@@ -106,7 +96,7 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AbstractQueryImpl(MetamodelImpl metamodel, Class<T> resultType) {
+	public AbstractCriteriaQueryImpl(MetamodelImpl metamodel, Class<T> resultType) {
 		super();
 
 		this.metamodel = metamodel;
@@ -184,8 +174,7 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 
 		builder.append("select ");
 
-		// append distinct if necessary * @param selected
-
+		// append distinct if necessary
 		if (this.isDistinct()) {
 			builder.append("distinct ");
 		}
@@ -204,7 +193,7 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 					builder.append(" as ").append(input.getAlias());
 				}
 
-				final String joins = root.generateJpqlJoins(AbstractQueryImpl.this);
+				final String joins = root.generateJpqlJoins(AbstractCriteriaQueryImpl.this);
 
 				if (StringUtils.isNotBlank(joins)) {
 					builder.append("\n").append(BatooUtils.indent(joins));
@@ -223,7 +212,7 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 
 				@Override
 				public String apply(Expression<?> input) {
-					return ((AbstractExpression<?>) input).generateJpqlRestriction(AbstractQueryImpl.this);
+					return ((AbstractExpression<?>) input).generateJpqlRestriction(AbstractCriteriaQueryImpl.this);
 				}
 			}));
 
@@ -248,7 +237,7 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	protected String generateSql() {
 		this.ensureSelection();
 
-		AbstractQueryImpl.LOG.debug("Preparing SQL for {0}", AbstractQueryImpl.LOG.lazyBoxed(this));
+		AbstractCriteriaQueryImpl.LOG.debug("Preparing SQL for {0}", AbstractCriteriaQueryImpl.LOG.lazyBoxed(this));
 
 		final Map<Joinable, String> joins = Maps.newLinkedHashMap();
 
@@ -278,7 +267,7 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 
 				@Override
 				public String apply(Expression<?> input) {
-					return ((AbstractExpression<?>) input).generateSqlSelect(AbstractQueryImpl.this, false);
+					return ((AbstractExpression<?>) input).generateSqlSelect(AbstractCriteriaQueryImpl.this, false);
 				}
 			}));
 
@@ -320,86 +309,6 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 		}
 
 		return Joiner.on(" AND ").skipNulls().join(restrictions);
-	}
-
-	/**
-	 * Returns the generated entity alias.
-	 * 
-	 * @param entity
-	 *            true if the table is an entity table, false for element collections
-	 * @return the generated entity alias
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String generateTableAlias(boolean entity) {
-		return "E" + (!entity ? "C" : "") + this.nextEntityAlias++;
-	}
-
-	/**
-	 * Returns the generated alias for the selection.
-	 * 
-	 * @param selection
-	 *            the selection
-	 * @return the alias
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String getAlias(AbstractSelection<?> selection) {
-		String alias = this.selections.get(selection);
-		if (alias == null) {
-			alias = "S" + this.nextSelection++;
-			this.selections.put(selection, alias);
-		}
-
-		return alias;
-	}
-
-	/**
-	 * Returns the generated alias for the parameter.
-	 * 
-	 * @param parameter
-	 *            the parameter
-	 * @return the alias
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public Integer getAlias(ParameterExpressionImpl<?> parameter) {
-		Integer alias = this.parameters.get(parameter);
-		if (alias == null) {
-			alias = this.nextparam++;
-			this.parameters.put(parameter, alias);
-		}
-
-		return alias;
-	}
-
-	/**
-	 * @param tableAlias
-	 *            the alias of the table
-	 * @param column
-	 *            the column
-	 * @return the field alias
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String getFieldAlias(String tableAlias, AbstractColumn column) {
-		List<AbstractColumn> fields = this.fields.get(tableAlias);
-		if (fields == null) {
-			fields = Lists.newArrayList();
-			this.fields.put(tableAlias, fields);
-		}
-
-		final int i = fields.indexOf(column);
-		if (i >= 0) {
-			return Integer.toString(i);
-		}
-
-		fields.add(column);
-		return Integer.toString(fields.size() - 1);
 	}
 
 	/**
@@ -453,37 +362,6 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	 */
 	public MetamodelImpl getMetamodel() {
 		return this.metamodel;
-	}
-
-	/**
-	 * Returns the parameter at position.
-	 * 
-	 * @param position
-	 *            the position
-	 * @return the parameter at position
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public ParameterExpressionImpl<?> getParameter(int position) {
-		return this.parameters.inverse().get(position);
-	}
-
-	/**
-	 * Returns the parameters of the query. Returns empty set if there are no parameters.
-	 * <p>
-	 * Modifications to the set do not affect the query.
-	 * 
-	 * @return the query parameters
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public Set<ParameterExpression<?>> getParameters() {
-		final Set<ParameterExpression<?>> parameters = Sets.newHashSet();
-		parameters.addAll(this.parameters.keySet());
-
-		return parameters;
 	}
 
 	/**
@@ -621,7 +499,7 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AbstractQueryImpl<T> internal() {
+	public AbstractCriteriaQueryImpl<T> internal() {
 		this.internal = true;
 		this.distinct(true);
 
@@ -660,7 +538,7 @@ public abstract class AbstractQueryImpl<T> implements AbstractQuery<T> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected AbstractQueryImpl<T> select(Selection<? extends T> selection) {
+	protected AbstractCriteriaQueryImpl<T> select(Selection<? extends T> selection) {
 		this.selection = (AbstractSelection<T>) selection;
 
 		return this;

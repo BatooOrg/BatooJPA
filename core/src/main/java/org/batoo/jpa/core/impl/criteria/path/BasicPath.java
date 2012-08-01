@@ -25,7 +25,7 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.StaticTypeExpression;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
@@ -68,7 +68,7 @@ public class BasicPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
+	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
 		final StringBuilder builder = new StringBuilder();
 
 		builder.append(this.getParentPath().generateJpqlRestriction(query));
@@ -83,7 +83,7 @@ public class BasicPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean seleselectedcted) {
+	public String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean seleselectedcted) {
 		final StringBuilder builder = new StringBuilder();
 
 		builder.append(this.getParentPath().generateJpqlSelect(query, false));
@@ -101,7 +101,7 @@ public class BasicPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		final BasicColumn column = this.mapping.getColumn();
 
 		final Joinable rootPath = this.getRootPath();
@@ -131,7 +131,7 @@ public class BasicPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
 		final BasicColumn column = this.mapping.getColumn();
 
 		final String tableAlias = this.getRootPath().getTableAlias(query, column.getTable());

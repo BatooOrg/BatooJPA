@@ -23,7 +23,7 @@ import java.sql.SQLException;
 
 import javax.persistence.criteria.Subquery;
 
-import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
+import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.SubqueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -64,7 +64,7 @@ public class AllAnyExpression<T> extends AbstractExpression<T> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
+	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
 		return (this.all ? "all " : "any ") + this.subQuery.generateJpqlRestriction(query);
 	}
 
@@ -73,7 +73,7 @@ public class AllAnyExpression<T> extends AbstractExpression<T> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		return null; // N/A
 	}
 
@@ -82,7 +82,7 @@ public class AllAnyExpression<T> extends AbstractExpression<T> {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		return null; // N/A
 	}
 
@@ -91,7 +91,7 @@ public class AllAnyExpression<T> extends AbstractExpression<T> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
 		return new String[] { (this.all ? "ALL " : "ANY ") + this.subQuery.getSqlRestrictionFragments(query)[0] };
 	}
 

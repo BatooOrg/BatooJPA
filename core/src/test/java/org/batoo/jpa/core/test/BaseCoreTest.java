@@ -26,6 +26,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.LockModeType;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import junit.framework.Assert;
@@ -160,6 +161,22 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 *            the query string
 	 * @param resultClass
 	 *            the result class
+	 * @return the query
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected Query cq(String qlString) {
+		return this.em().createQuery(qlString);
+	}
+
+	/**
+	 * Creates and returns a JPQL query.
+	 * 
+	 * @param qlString
+	 *            the query string
+	 * @param resultClass
+	 *            the result class
 	 * @param <T>
 	 *            the result ype
 	 * @return the query
@@ -169,6 +186,20 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 */
 	protected <T> TypedQuery<T> cq(String qlString, Class<T> resultClass) {
 		return this.em().createQuery(qlString, resultClass);
+	}
+
+	/**
+	 * Creates and returns a JPQL update query.
+	 * 
+	 * @param qlString
+	 *            the query string
+	 * @return the query
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected Query cu(String qlString) {
+		return this.em().createQuery(qlString);
 	}
 
 	/**

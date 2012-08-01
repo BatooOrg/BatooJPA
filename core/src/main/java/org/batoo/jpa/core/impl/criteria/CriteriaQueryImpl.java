@@ -42,7 +42,7 @@ import com.google.common.collect.Lists;
  * @author hceylan
  * @since $version
  */
-public class CriteriaQueryImpl<T> extends AbstractQueryImpl<T> implements CriteriaQuery<T> {
+public class CriteriaQueryImpl<T> extends AbstractCriteriaQueryImpl<T> implements CriteriaQuery<T> {
 
 	private final ArrayList<OrderImpl> orderList = Lists.newArrayList();;
 
