@@ -75,6 +75,7 @@ import org.batoo.jpa.core.impl.criteria.path.ParentPath;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.jpql.JpqlLexer;
 import org.batoo.jpa.jpql.JpqlParser;
@@ -268,7 +269,7 @@ public class JpqlQuery {
 				int depth = 0;
 				for (final String segment : aliased.getQualified().getSegments()) {
 					if ((depth > 0) && (parent instanceof PluralJoin)) {
-						throw new PersistenceException("Cannot qualify only embeddable joins along the path, " + "line " + from.getLine() + ":"
+						throw new PersistenceException("Cannot qualify, only embeddable joins within the path allowed, " + "line " + from.getLine() + ":"
 							+ from.getCharPositionInLine());
 					}
 
@@ -356,7 +357,7 @@ public class JpqlQuery {
 				int depth = 0;
 				for (final String segment : aliased.getQualified().getSegments()) {
 					if ((depth > 0) && (parent instanceof PluralJoin)) {
-						throw new PersistenceException("Cannot qualify only embeddable joins along the path, " + "line " + join.getLine() + ":"
+						throw new PersistenceException("Cannot qualify, only embeddable joins within the path allowed, " + "line " + join.getLine() + ":"
 							+ join.getCharPositionInLine());
 					}
 
@@ -483,7 +484,7 @@ public class JpqlQuery {
 				}
 			}
 			else {
-				left = this.<X> getExpression(cb, q, predictionDef.getChild(0), null);
+				left = this.getExpression(cb, q, predictionDef.getChild(0), null);
 				right = (AbstractExpression<X>) this.getExpression(cb, q, predictionDef.getChild(1), left.getJavaType());
 			}
 
@@ -562,13 +563,21 @@ public class JpqlQuery {
 		}
 
 		if (predictionDef.getType() == JpqlParser.ST_IN) {
-			final AbstractExpression<?> left = this.<X> getExpression(cb, q, predictionDef.getChild(0), null);
+			AbstractExpression<X> left = null;
 
-			final List<AbstractExpression<?>> expressions = Lists.newArrayList();
+			if ((predictionDef.getChild(0).getType() != JpqlParser.Named_Parameter) && (predictionDef.getChild(0).getType() != JpqlParser.Ordinal_Parameter)) {
+				left = this.getExpression(cb, q, predictionDef.getChild(0), null);
+			}
+
+			final List<AbstractExpression<X>> expressions = Lists.newArrayList();
 
 			final Tree inDefs = predictionDef.getChild(1);
 			for (int i = 0; i < inDefs.getChildCount(); i++) {
-				expressions.add(this.getExpression(cb, q, inDefs.getChild(i), left.getJavaType()));
+				expressions.add((AbstractExpression<X>) this.getExpression(cb, q, inDefs.getChild(i), left != null ? left.getJavaType() : null));
+			}
+
+			if (left == null) {
+				left = (AbstractExpression<X>) this.getExpression(cb, q, predictionDef.getChild(0), expressions.get(0).getJavaType());
 			}
 
 			return left.in(expressions);
@@ -801,7 +810,7 @@ public class JpqlQuery {
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	private <X> AbstractExpression<X> getExpression(CriteriaBuilderImpl cb, AbstractQuery<?> q, Tree exprDef, Class<X> javaType) {
+	private <X, C extends Collection<E>, E> AbstractExpression<X> getExpression(CriteriaBuilderImpl cb, AbstractQuery<?> q, Tree exprDef, Class<X> javaType) {
 		// identification variable
 		if (exprDef.getType() == JpqlParser.ID) {
 			return (AbstractExpression<X>) this.getAliased(q, exprDef.getText());
@@ -830,7 +839,7 @@ public class JpqlQuery {
 
 		// negation
 		if (exprDef.getType() == JpqlParser.ST_NEGATION) {
-			return (AbstractExpression<X>) cb.neg(this.<Number> getExpression(cb, q, exprDef.getChild(0), null));
+			return (AbstractExpression<X>) cb.neg(this.<Number, Collection<Object>, Object> getExpression(cb, q, exprDef.getChild(0), null));
 		}
 
 		if (exprDef.getType() == JpqlParser.Named_Parameter) {
@@ -1173,6 +1182,27 @@ public class JpqlQuery {
 			}
 			else {
 				return (AbstractExpression<X>) cb.isEmpty((Expression<Collection<?>>) expression);
+			}
+		}
+
+		// member of operation
+		if (exprDef.getType() == JpqlParser.ST_MEMBER) {
+			final AbstractExpression<?> expression = this.getExpression(cb, q, exprDef.getChild(1), null);
+			if (!(expression instanceof CollectionExpression)) {
+				throw new PersistenceException("Member of expression must evaluate to a collection expression, " + exprDef.getLine() + ":"
+					+ exprDef.getCharPositionInLine());
+			}
+
+			final CollectionExpression<C, E> collection = (CollectionExpression<C, E>) expression;
+			final PluralAttributeImpl<?, C, E> attribute = (PluralAttributeImpl<?, C, E>) collection.getMapping().getAttribute();
+
+			final AbstractExpression<E> elem = this.getExpression(cb, q, exprDef.getChild(0), attribute.getElementType().getJavaType());
+
+			if (exprDef.getChildCount() == 3) {
+				return (AbstractExpression<X>) cb.isNotMember(elem, collection);
+			}
+			else {
+				return (AbstractExpression<X>) cb.isMember(elem, collection);
 			}
 		}
 

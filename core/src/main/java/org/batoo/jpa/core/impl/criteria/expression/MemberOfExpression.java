@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.criteria.expression;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Root;
@@ -28,34 +29,46 @@ import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.SubqueryImpl;
+import org.batoo.jpa.core.impl.criteria.join.AbstractPluralJoin;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 /**
  * Expression for empty
  * 
+ * @param <C>
+ *            the type of the collection
+ * @param <E>
+ *            the type of the elemenet
+ * 
  * @author hceylan
  * @since $version
  */
-public class IsEmptyExpression extends AbstractExpression<Boolean> {
+public class MemberOfExpression<C extends Collection<E>, E> extends AbstractExpression<Boolean> {
 
-	private final CollectionExpression<?, ?> inner;
 	private final boolean not;
+	private final CollectionExpression<?, ?> values;
+	private final AbstractExpression<?> value;
 
 	/**
-	 * @param inner
-	 *            the inner expression
 	 * @param not
 	 *            if not empty
+	 * @param value
+	 *            the value expression
+	 * @param values
+	 *            the values expression
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public IsEmptyExpression(Expression<?> inner, boolean not) {
+	public MemberOfExpression(boolean not, Expression<E> value, Expression<C> values) {
 		super(Boolean.class);
 
-		this.inner = (CollectionExpression<?, ?>) inner;
 		this.not = not;
+		this.values = (CollectionExpression<?, ?>) values;
+		this.value = (AbstractExpression<?>) value;
 	}
 
 	/**
@@ -64,7 +77,7 @@ public class IsEmptyExpression extends AbstractExpression<Boolean> {
 	 */
 	@Override
 	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
-		return this.inner.generateJpqlRestriction(query) + (this.not ? " is not empty" : " is empty");
+		return this.value.generateJpqlRestriction(query) + (this.not ? " not member of " : " member of ") + this.values.generateJpqlRestriction(query);
 	}
 
 	/**
@@ -90,21 +103,24 @@ public class IsEmptyExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
 		final CriteriaBuilderImpl cb = query.getMetamodel().getEntityManagerFactory().getCriteriaBuilder();
-		final Joinable rp = this.inner.getParentPath().getRootPath();
+		final Joinable rp = this.values.getParentPath().getRootPath();
 
-		final SubqueryImpl<Integer> s = query.subquery(Integer.class);
+		final SubqueryImpl<Object> s = query.subquery(Object.class);
 
 		final Root<?> r = s.from(rp.getEntity());
-		r.join(this.inner.getMapping().getAttribute().getName());
+		final PluralAttributeImpl<?, C, E> attribute = (PluralAttributeImpl<?, C, E>) this.values.getMapping().getAttribute();
+		final AbstractPluralJoin<?, C, E> j = (AbstractPluralJoin<?, C, E>) r.join(attribute.getName());
 
-		final PredicateImpl p = this.not ? cb.exists(s).not() : cb.exists(s);
+		final EntityTypeImpl<E> entity = (EntityTypeImpl<E>) attribute.getElementType();
+		final String idName = entity.getIdMapping().getAttribute().getName();
+		s.select(j.get(idName));
+
 		s.where(cb.equal(r, (AbstractExpression<?>) rp));
 
-		s.select(cb.literal(1));
-
-		return p.getSqlRestrictionFragments(query);
+		return new String[] { this.value.getSqlRestrictionFragments(query)[0] + " IN " + s.getSqlRestrictionFragments(query)[0] };
 	}
 
 	/**

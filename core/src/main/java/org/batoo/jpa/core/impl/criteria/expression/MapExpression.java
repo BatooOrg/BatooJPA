@@ -106,5 +106,4 @@ public class MapExpression<M extends Map<K, V>, K, V> extends AbstractExpression
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }

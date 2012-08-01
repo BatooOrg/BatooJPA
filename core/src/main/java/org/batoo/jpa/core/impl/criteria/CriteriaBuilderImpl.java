@@ -69,6 +69,7 @@ import org.batoo.jpa.core.impl.criteria.expression.FunctionExpression;
 import org.batoo.jpa.core.impl.criteria.expression.IsEmptyExpression;
 import org.batoo.jpa.core.impl.criteria.expression.LikeExpression;
 import org.batoo.jpa.core.impl.criteria.expression.LocateExpression;
+import org.batoo.jpa.core.impl.criteria.expression.MemberOfExpression;
 import org.batoo.jpa.core.impl.criteria.expression.NegationExpression;
 import org.batoo.jpa.core.impl.criteria.expression.NullIfExpression;
 import org.batoo.jpa.core.impl.criteria.expression.NumericFunctionExpression;
@@ -572,8 +573,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <E, C extends Collection<E>> Predicate isMember(E elem, Expression<C> collection) {
-		// TODO Auto-generated method stub
-		return null;
+		return new PredicateImpl(new MemberOfExpression<C, E>(false, new ConstantExpression<E>(null, elem), collection));
 	}
 
 	/**
@@ -582,8 +582,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <E, C extends Collection<E>> Predicate isMember(Expression<E> elem, Expression<C> collection) {
-		// TODO Auto-generated method stub
-		return null;
+		return new PredicateImpl(new MemberOfExpression<C, E>(false, elem, collection));
 	}
 
 	/**
@@ -601,8 +600,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <E, C extends Collection<E>> Predicate isNotMember(E elem, Expression<C> collection) {
-		// TODO Auto-generated method stub
-		return null;
+		return new PredicateImpl(new MemberOfExpression<C, E>(true, new ConstantExpression<E>(null, elem), collection));
 	}
 
 	/**
@@ -611,8 +609,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <E, C extends Collection<E>> Predicate isNotMember(Expression<E> elem, Expression<C> collection) {
-		// TODO Auto-generated method stub
-		return null;
+		return new PredicateImpl(new MemberOfExpression<C, E>(true, elem, collection));
 	}
 
 	/**

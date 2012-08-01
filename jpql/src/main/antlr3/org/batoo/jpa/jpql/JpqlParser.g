@@ -261,7 +261,7 @@ functions_returning_numerics :
   	| ABS^ Left_Paren! simple_arithmetic_expression Right_Paren!
   	| SQRT^ Left_Paren! simple_arithmetic_expression Right_Paren!
   	| MOD^ Left_Paren! simple_arithmetic_expression Comma! simple_arithmetic_expression Right_Paren!
-//  | SIZE^ Left_Paren! simple_arithmetic_expression Right_Paren!
+  	| SIZE^ Left_Paren! fqid Right_Paren!
   	| INDEX^ Left_Paren! ID Right_Paren!
   ;
 	
@@ -291,7 +291,8 @@ conditional_primary options { backtrack=true; } :
     ;
 
 simple_cond_expression options { backtrack=true; } :
-  	exists_expression
+    collection_member_expression
+  	| exists_expression
     | in_expression
     | empty_collection_comparison_expression
     | null_comparison_expression
@@ -299,7 +300,6 @@ simple_cond_expression options { backtrack=true; } :
     | between_expression
     | like_expression
     | boolean_expression
-    | collection_member_expression
     ;
 
 between_expression :
@@ -407,8 +407,8 @@ enum_primary :
 enum_literal: ID;
 
 in_expression :
-  	state_field_path_expression (NOT)? IN Left_Paren (in_items | subquery) Right_Paren
-  		-> ^(ST_IN state_field_path_expression (NOT)? in_items);
+  	(state_field_path_expression | input_parameter) (NOT)? IN Left_Paren (subquery | in_items) Right_Paren
+  		-> ^(ST_IN state_field_path_expression? input_parameter? (NOT)? in_items? subquery?);
 
 in_items :
 	in_item (Comma in_item)*
@@ -460,8 +460,20 @@ empty_collection_comparison_expression :
   		-> ^(ST_EMPTY state_field_path_expression (NOT)?);
 
 collection_member_expression :
-  	entity_expression (NOT)? MEMBER (OF)? state_field_path_expression
-  		-> ^(ST_MEMBER state_field_path_expression (NOT)?);
+  	entity_or_value_expression (NOT)? MEMBER (OF)? state_field_path_expression
+  		-> ^(ST_MEMBER entity_or_value_expression state_field_path_expression (NOT)?);
+
+entity_or_value_expression :
+	simple_entity_or_value_expression
+	| state_field_path_expression
+	;
+
+simple_entity_or_value_expression :
+	input_parameter
+	| ID
+	| STRING_LITERAL
+	| NUMERIC_LITERAL
+	;
 
 exists_expression :
   	EXISTS^ Left_Paren! subquery Right_Paren!;
