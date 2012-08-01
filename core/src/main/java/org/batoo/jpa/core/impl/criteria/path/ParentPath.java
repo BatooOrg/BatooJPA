@@ -24,6 +24,7 @@ import java.util.Map;
 import javax.persistence.criteria.Path;
 import javax.persistence.metamodel.MapAttribute;
 import javax.persistence.metamodel.PluralAttribute;
+import javax.persistence.metamodel.PluralAttribute.CollectionType;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
@@ -31,6 +32,9 @@ import org.batoo.jpa.core.impl.criteria.expression.CollectionExpression;
 import org.batoo.jpa.core.impl.criteria.expression.MapExpression;
 import org.batoo.jpa.core.impl.criteria.join.FetchParentImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
+import org.batoo.jpa.core.impl.model.attribute.MapAttributeImpl;
+import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
+import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
@@ -81,7 +85,7 @@ public abstract class ParentPath<Z, X> extends AbstractPath<X> implements Path<X
 	 */
 	@Override
 	public final <E, C extends Collection<E>> CollectionExpression<C, E> get(PluralAttribute<? super X, C, E> collection) {
-		return new CollectionExpression<C, E>(this.<Collection<E>, E> getMapping(collection.getName()));
+		return new CollectionExpression<C, E>(this, this.<Collection<E>, E> getMapping(collection.getName()));
 	}
 
 	/**
@@ -124,6 +128,35 @@ public abstract class ParentPath<Z, X> extends AbstractPath<X> implements Path<X
 		}
 
 		return this.get((SingularAttribute<? super X, Y>) attribute);
+	}
+
+	/**
+	 * Returns the expression corresponding to the attribute name.
+	 * 
+	 * @param attributeName
+	 *            the name of the attribute
+	 * @return the expression
+	 * @param <Y>
+	 *            the type of the path
+	 * @param <C>
+	 *            the element type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings("unchecked")
+	public <Y, C extends Collection<Y>> AbstractExpression<Y> getExpression(String attributeName) {
+		final AttributeImpl<? super X, Y> attribute = (AttributeImpl<? super X, Y>) this.getMapping(attributeName).getAttribute();
+
+		if (!attribute.isCollection()) {
+			return this.get((SingularAttributeImpl<? super X, Y>) attribute);
+		}
+
+		if (((PluralAttributeImpl<? super X, Y, ?>) attribute).getCollectionType() == CollectionType.MAP) {
+			return (AbstractExpression<Y>) this.get((MapAttributeImpl<? super X, Y, ?>) attribute);
+		}
+
+		return (AbstractExpression<Y>) this.get((PluralAttribute<? super X, C, Y>) attribute);
 	}
 
 	/**

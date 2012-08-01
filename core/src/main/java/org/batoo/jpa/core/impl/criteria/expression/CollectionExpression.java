@@ -24,18 +24,28 @@ import java.util.Collection;
 
 import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
+import org.batoo.jpa.core.impl.criteria.path.ParentPath;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
 
 /**
  * 
+ * @param <C>
+ *            the type of the collection
+ * @param <E>
+ *            the type of the element
  * 
  * @author hceylan
  * @since $version
  */
 public class CollectionExpression<C extends Collection<E>, E> extends AbstractExpression<C> {
 
+	private final ParentPath<?, ?> parentPath;
+	private final Mapping<?, Collection<E>, E> mapping;
+
 	/**
+	 * @param parentPath
+	 *            the parent path
 	 * @param mapping
 	 *            the mapping
 	 * 
@@ -43,8 +53,11 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public CollectionExpression(Mapping<?, Collection<E>, E> mapping) {
+	public CollectionExpression(ParentPath<?, ?> parentPath, Mapping<?, Collection<E>, E> mapping) {
 		super((Class<C>) mapping.getJavaType());
+
+		this.parentPath = parentPath;
+		this.mapping = mapping;
 	}
 
 	/**
@@ -53,8 +66,7 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	 */
 	@Override
 	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
-		// TODO Auto-generated method stub
-		return null;
+		return this.parentPath.generateJpqlRestriction(query) + "." + this.mapping.getAttribute().getName();
 	}
 
 	/**
@@ -63,8 +75,7 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	 */
 	@Override
 	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IllegalArgumentException("Collection paths cannot be selected");
 	}
 
 	/**
@@ -73,8 +84,31 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	 */
 	@Override
 	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IllegalArgumentException("Collection paths cannot be selected");
+	}
+
+	/**
+	 * Returns the mapping of the CollectionExpression.
+	 * 
+	 * @return the mapping of the CollectionExpression
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Mapping<?, Collection<E>, E> getMapping() {
+		return this.mapping;
+	}
+
+	/**
+	 * Returns the parentPath of the CollectionExpression.
+	 * 
+	 * @return the parentPath of the CollectionExpression
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ParentPath<?, ?> getParentPath() {
+		return this.parentPath;
 	}
 
 	/**
@@ -83,8 +117,7 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	 */
 	@Override
 	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new IllegalArgumentException("Collection paths cannot be restricted");
 	}
 
 	/**
@@ -93,8 +126,15 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	 */
 	@Override
 	public C handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		return null; // N/A
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "CollectionExpression [parentPath=" + this.parentPath + ", mapping=" + this.mapping + "]";
+	}
 }

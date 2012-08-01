@@ -129,6 +129,15 @@ public class EntityPath<Z, X> extends ParentPath<Z, X> implements Joinable {
 	 * 
 	 */
 	@Override
+	public EntityTypeImpl<?> getEntity() {
+		return this.entity;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public FetchParentImpl<?, X> getFetchRoot() {
 		return this.fetchRoot;
 	}

@@ -88,7 +88,9 @@ public class SubQueryJpqlTest extends BaseCoreTest {
 		this.persist(qa);
 
 		final Manager qaManager = new Manager("Manager1", qa, 100000);
+		final Manager qaManager2 = new Manager("Manager2", qa, 100000);
 		this.persist(qaManager);
+		this.persist(qaManager2);
 
 		final Employee employee1 = new Employee("Employee1", qaManager, qa, 90000);
 		final Employee employee2 = new Employee("Employee2", qaManager, qa, 100000);
@@ -100,8 +102,11 @@ public class SubQueryJpqlTest extends BaseCoreTest {
 
 		TypedQuery<Integer> q;
 
-		q = this.cq("select m.id from Manager m where m.employees is not empty", Integer.class);
+		q = this.cq("select m.id from Manager m where m.employees is empty", Integer.class);
 		Assert.assertEquals(qaManager.getId(), q.getSingleResult());
+
+		q = this.cq("select m.id from Manager m where m.employees is not empty", Integer.class);
+		Assert.assertEquals(qaManager2.getId(), q.getSingleResult());
 	}
 
 	/**

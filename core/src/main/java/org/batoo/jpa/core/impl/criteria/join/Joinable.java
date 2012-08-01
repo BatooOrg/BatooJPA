@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.criteria.join;
 
 import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 /**
  * Interface for joinable types.
@@ -28,6 +29,16 @@ import org.batoo.jpa.core.impl.jdbc.AbstractTable;
  * @since $version
  */
 public interface Joinable {
+
+	/**
+	 * Returns the entity of the joinable.
+	 * 
+	 * @return the entity of the joinable
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	EntityTypeImpl<?> getEntity();
 
 	/**
 	 * Returns the alias for the table.

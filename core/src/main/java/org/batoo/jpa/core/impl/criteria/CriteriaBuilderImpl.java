@@ -553,13 +553,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <C extends Collection<?>> Predicate isEmpty(Expression<C> collection) {
-		// if (!(collection instanceof PluralAssociationPath)) {
-		// throw new IllegalArgumentException("Not a collection");
-		// }
-
-		// TODO handle constant collections
-
-		return new PredicateImpl(new IsEmptyExpression(collection));
+		return new PredicateImpl(new IsEmptyExpression(collection, false));
 	}
 
 	/**
@@ -597,8 +591,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <C extends Collection<?>> Predicate isNotEmpty(Expression<C> collection) {
-		// TODO Auto-generated method stub
-		return null;
+		return new PredicateImpl(new IsEmptyExpression(collection, true));
 	}
 
 	/**
@@ -1112,8 +1105,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public Expression<Number> quot(Number x, Expression<? extends Number> y) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArithmeticExression<Number>(ArithmeticOperation.SUBTRACT, new ConstantExpression<Number>(null, x), y);
 	}
 
 	/**

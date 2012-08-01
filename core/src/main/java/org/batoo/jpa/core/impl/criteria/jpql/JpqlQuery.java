@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.criteria.jpql;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -810,12 +811,12 @@ public class JpqlQuery {
 			AbstractSelection<?> expression = this.getAliased(q, exprDef.getChild(0).getText());
 
 			final Qualified qualified = new Qualified(exprDef.getChild(1));
-			for (final String segment : qualified.getSegments()) {
-				if (expression instanceof AbstractFrom) {
-					expression = ((AbstractFrom<?, ?>) expression).get(segment);
-				}
-				else if (expression instanceof ParentPath) {
-					expression = ((ParentPath<?, ?>) expression).get(segment);
+			final Iterator<String> i = qualified.getSegments().iterator();
+			while (i.hasNext()) {
+				final String segment = i.next();
+
+				if (expression instanceof ParentPath) {
+					expression = ((ParentPath<?, ?>) expression).getExpression(segment);
 				}
 				else {
 					throw new PersistenceException("Cannot dereference: " + segment + ", line " + exprDef.getLine() + ":" + exprDef.getCharPositionInLine());
@@ -1034,6 +1035,7 @@ public class JpqlQuery {
 			return (AbstractExpression<X>) new CountExpression(this.getExpression(cb, q, exprDef.getChild(0), null), false);
 		}
 
+		// all or any operator
 		if (exprDef.getType() == JpqlParser.ST_ALL_OR_ANY) {
 			// all, any, some expressions
 			switch (exprDef.getChild(0).getType()) {
@@ -1046,10 +1048,12 @@ public class JpqlQuery {
 			}
 		}
 
+		// exists operator
 		if (exprDef.getType() == JpqlParser.EXISTS) {
 			return (AbstractExpression<X>) new ExistsExpression(this.constructSubquery(cb, q, exprDef.getChild(0), javaType));
 		}
 
+		// not operator
 		if (exprDef.getType() == JpqlParser.NOT) {
 			return (AbstractExpression<X>) new PredicateImpl(true, BooleanOperator.AND, this.getExpression(cb, q, exprDef.getChild(0), Boolean.class));
 		}
@@ -1143,7 +1147,7 @@ public class JpqlQuery {
 			throw new PersistenceException("Reference is not a list join, line " + exprDef.getLine() + ":" + exprDef.getCharPositionInLine());
 		}
 
-		// empty
+		// empty operation
 		if (exprDef.getType() == JpqlParser.ST_EMPTY) {
 			AbstractExpression<?> expression = this.getExpression(cb, q, exprDef.getChild(0), null);
 
@@ -1156,7 +1160,7 @@ public class JpqlQuery {
 			}
 
 			if (exprDef.getChildCount() == 2) {
-				return (AbstractExpression<X>) cb.isEmpty((Expression<Collection<?>>) expression).not();
+				return (AbstractExpression<X>) cb.isNotEmpty((Expression<Collection<?>>) expression);
 			}
 			else {
 				return (AbstractExpression<X>) cb.isEmpty((Expression<Collection<?>>) expression);

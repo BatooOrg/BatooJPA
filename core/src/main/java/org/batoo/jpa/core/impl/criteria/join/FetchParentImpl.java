@@ -523,6 +523,15 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * 
 	 */
 	@Override
+	public EntityTypeImpl<?> getEntity() {
+		return this.entity;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public final Set<Fetch<X, ?>> getFetches() {
 		final Set<Fetch<X, ?>> fetches = Sets.newHashSet();
 		fetches.addAll(this.fetches.values());
