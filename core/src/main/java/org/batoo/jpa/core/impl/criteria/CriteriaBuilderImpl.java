@@ -70,6 +70,7 @@ import org.batoo.jpa.core.impl.criteria.expression.IsEmptyExpression;
 import org.batoo.jpa.core.impl.criteria.expression.LikeExpression;
 import org.batoo.jpa.core.impl.criteria.expression.LocateExpression;
 import org.batoo.jpa.core.impl.criteria.expression.NegationExpression;
+import org.batoo.jpa.core.impl.criteria.expression.NullIfExpression;
 import org.batoo.jpa.core.impl.criteria.expression.NumericFunctionExpression;
 import org.batoo.jpa.core.impl.criteria.expression.NumericFunctionExpression.NumericFunctionType;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
@@ -994,8 +995,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <Y> Expression<Y> nullif(Expression<Y> x, Expression<?> y) {
-		// TODO Auto-generated method stub
-		return null;
+		return new NullIfExpression<Y>(x, y);
 	}
 
 	/**
@@ -1004,8 +1004,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <Y> Expression<Y> nullif(Expression<Y> x, Y y) {
-		// TODO Auto-generated method stub
-		return null;
+		return new NullIfExpression<Y>(x, new ConstantExpression<Y>(null, y));
 	}
 
 	/**

@@ -80,4 +80,27 @@ public class CaseJpqlTest extends BaseCoreTest {
 
 		Assert.assertEquals((Integer) 11, this.cq("select sum(coalesce(f.number2, f.number)) from Foo f", Integer.class).getSingleResult());
 	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testNullif() {
+		this.persist(new Foo(2, 1));
+		this.persist(new Foo(5, 7));
+		this.persist(new Foo(null, 2));
+
+		this.commit();
+		this.close();
+
+		Assert.assertEquals((Integer) 5, this.cq("select sum(nullif(f.number, 2)) from Foo f", Integer.class).getSingleResult());
+
+		Assert.assertEquals((Integer) 8, this.cq("select sum(nullif(coalesce(f.number2, f.number), 2)) from Foo f", Integer.class).getSingleResult());
+
+		Assert.assertEquals((Integer) 10, this.cq("select sum(nullif(coalesce(f.number2, f.number), 5)) from Foo f", Integer.class).getSingleResult());
+
+		Assert.assertEquals((Integer) 10, this.cq("select sum(nullif(coalesce(f.number2, f.number), 99)) from Foo f", Integer.class).getSingleResult());
+	}
 }

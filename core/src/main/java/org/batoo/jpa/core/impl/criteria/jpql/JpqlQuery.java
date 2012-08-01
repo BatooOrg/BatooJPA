@@ -63,6 +63,7 @@ import org.batoo.jpa.core.impl.criteria.expression.CountExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ExistsExpression;
 import org.batoo.jpa.core.impl.criteria.expression.FunctionExpression;
 import org.batoo.jpa.core.impl.criteria.expression.MapExpression;
+import org.batoo.jpa.core.impl.criteria.expression.NullIfExpression;
 import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
 import org.batoo.jpa.core.impl.criteria.expression.SimpleCaseImpl;
 import org.batoo.jpa.core.impl.criteria.expression.SubstringExpression;
@@ -1111,6 +1112,14 @@ public class JpqlQuery {
 			}
 
 			return (AbstractExpression<X>) caseExpr;
+		}
+
+		// nullif function
+		if (exprDef.getType() == JpqlParser.NULLIF) {
+			final AbstractExpression<X> left = this.getExpression(cb, q, exprDef.getChild(0), null);
+			final AbstractExpression<?> right = this.getExpression(cb, q, exprDef.getChild(1), null);
+
+			return new NullIfExpression<X>(left, right);
 		}
 
 		// coalesce function
