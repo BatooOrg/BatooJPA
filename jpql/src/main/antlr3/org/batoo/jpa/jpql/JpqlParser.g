@@ -84,7 +84,7 @@ from_declaration_or_collection_member_declaration :
     | collection_member_declaration;
 
 from_declaration :
-    faliased_qid ( join)*
+    faliased_qid (join)*
         -> ^(ST_FROM faliased_qid ^(LJOINS (join)*));
 join :
     fetch_join
@@ -104,8 +104,8 @@ inner_join :
         -> ^(ST_JOIN JOIN ID ^(ST_ID_AS qid ID));
 
 collection_member_declaration :
-    IN Left_Paren ID Period qid Right_Paren (AS? ID)?
-        -> ^(ST_COLL ID qid (ID)?);
+    IN Left_Paren ID Period qid Right_Paren AS? ID?
+        -> ^(ST_COLL ID ^(ST_ID_AS qid ID));
 
 update_clause :
     aliased_qid SET update_items
@@ -439,6 +439,10 @@ faliased_qid :
 aliased_qid :
     qid ((AS)? ID)?
         -> ^(ST_ID_AS qid (ID)?);
+
+fqid :
+    ID ( Period ID)+
+        -> ^(LQUALIFIED ID (ID)*);
 
 qid :
     ID ( Period ID)*

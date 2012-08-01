@@ -19,7 +19,6 @@
 package org.batoo.jpa.core.impl.criteria.jpql;
 
 import org.antlr.runtime.tree.Tree;
-import org.batoo.jpa.jpql.JpqlParser;
 
 /**
  * 
@@ -31,29 +30,18 @@ public class Aliased {
 
 	private final Qualified qualified;
 	private final String alias;
-	private final String parent;
 
 	/**
 	 * @param aliased
 	 *            aliased tree
-	 * @param parented
-	 *            if the aliased is parented
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Aliased(Tree aliased, boolean parented) {
+	public Aliased(Tree aliased) {
 		super();
 
-		final Tree id = aliased.getChild(0);
-		if (id.getType() == JpqlParser.ID) {
-			this.parent = id.getText();
-			this.qualified = null;
-		}
-		else {
-			this.qualified = new Qualified(id, parented);
-			this.parent = this.qualified.getId();
-		}
+		this.qualified = new Qualified(aliased.getChild(0));
 
 		if (aliased.getChildCount() > 1) {
 			this.alias = aliased.getChild(1).getText();
@@ -73,18 +61,6 @@ public class Aliased {
 	 */
 	protected String getAlias() {
 		return this.alias;
-	}
-
-	/**
-	 * Returns the parent of the Aliased.
-	 * 
-	 * @return the parent of the Aliased
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String getParent() {
-		return this.parent;
 	}
 
 	/**

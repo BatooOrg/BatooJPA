@@ -33,6 +33,7 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.FetchParent;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
+import javax.persistence.criteria.PluralJoin;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Predicate.BooleanOperator;
 import javax.persistence.criteria.Selection;
@@ -243,7 +244,7 @@ public class JpqlQuery {
 			final Tree from = froms.getChild(i);
 			// root query from
 			if (from.getType() == JpqlParser.ST_FROM) {
-				final Aliased fromDef = new Aliased(from.getChild(0), false);
+				final Aliased fromDef = new Aliased(from.getChild(0));
 
 				final EntityTypeImpl<Object> entity = this.getEntity(fromDef.getQualified().toString());
 
@@ -255,9 +256,33 @@ public class JpqlQuery {
 				this.constructJoins(cb, q, r, from.getChild(1));
 
 			}
+
+			// in collection form
+			else if (from.getType() == JpqlParser.ST_COLL) {
+				final Aliased aliased = new Aliased(from.getChild(1));
+
+				AbstractFrom<?, ?> parent = this.getAliased(q, from.getChild(0).getText());
+
+				int depth = 0;
+				for (final String segment : aliased.getQualified().getSegments()) {
+					if ((depth > 0) && (parent instanceof PluralJoin)) {
+						throw new PersistenceException("Cannot qualify only embeddable joins along the path, " + "line " + from.getLine() + ":"
+							+ from.getCharPositionInLine());
+					}
+
+					parent = parent.join(segment, JoinType.LEFT);
+
+					depth++;
+				}
+
+				parent.alias(aliased.getAlias());
+
+				this.putAlias(q, from.getChild(1), aliased, parent);
+			}
+
 			// sub query from
 			else {
-				final Aliased fromDef = new Aliased(from, false);
+				final Aliased fromDef = new Aliased(from);
 				final EntityTypeImpl<Object> entity = this.getEntity(fromDef.getQualified().toString());
 
 				final RootImpl<Object> r = (RootImpl<Object>) q.from(entity);
@@ -315,24 +340,32 @@ public class JpqlQuery {
 			if (joinType == JpqlParser.FETCH) {
 				FetchParent<?, ?> parent = this.getAliased(q, join.getChild(1).getText());
 
-				final Qualified qualified = new Qualified(join.getChild(2), false);
+				final Qualified qualified = new Qualified(join.getChild(2));
 
 				for (final String segment : qualified.getSegments()) {
 					parent = parent.fetch(segment);
 				}
 			}
 			else {
-				final Aliased aliased = new Aliased(join.getChild(2), false);
+				final Aliased aliased = new Aliased(join.getChild(2));
 
 				AbstractFrom<?, ?> parent = this.getAliased(q, join.getChild(1).getText());
 
+				int depth = 0;
 				for (final String segment : aliased.getQualified().getSegments()) {
+					if ((depth > 0) && (parent instanceof PluralJoin)) {
+						throw new PersistenceException("Cannot qualify only embeddable joins along the path, " + "line " + join.getLine() + ":"
+							+ join.getCharPositionInLine());
+					}
+
 					if (joinType == JpqlParser.LEFT) {
 						parent = parent.join(segment, JoinType.LEFT);
 					}
 					else {
 						parent = parent.join(segment, JoinType.INNER);
 					}
+
+					depth++;
 				}
 
 				parent.alias(aliased.getAlias());

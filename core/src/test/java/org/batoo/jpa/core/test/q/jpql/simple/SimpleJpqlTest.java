@@ -195,9 +195,9 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		this.close();
 
-		final TypedQuery<Address> q = this.cq("select a from Person p inner join p.addresses a", Address.class);
+		Assert.assertEquals(6, this.cq("select a from Person p inner join p.addresses a", Address.class).getResultList().size());
 
-		Assert.assertEquals(6, q.getResultList().size());
+		Assert.assertEquals(6, this.cq("select a from Person p, IN(p.addresses) a", Address.class).getResultList().size());
 	}
 
 	/**

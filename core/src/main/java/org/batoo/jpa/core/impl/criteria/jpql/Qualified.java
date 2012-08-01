@@ -34,7 +34,6 @@ import com.google.common.collect.Lists;
 public class Qualified {
 
 	private final LinkedList<String> segments = Lists.newLinkedList();
-	private final String id;
 
 	/**
 	 * @param tree
@@ -44,47 +43,14 @@ public class Qualified {
 	 * @author hceylan
 	 */
 	public Qualified(Tree tree) {
-		this(tree, false);
-	}
-
-	/**
-	 * @param tree
-	 *            the tree
-	 * @param parented
-	 *            if the qualified is parented
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public Qualified(Tree tree, boolean parented) {
 		super();
 
 		int i = 0;
-		if (parented) {
-			this.id = tree.getChild(0).getText();
-
-			i = 1;
-		}
-		else {
-			this.id = null;
-		}
 
 		for (; i < tree.getChildCount(); i++) {
 			final Tree child = tree.getChild(i);
 			this.getSegments().add(child.getText());
 		}
-	}
-
-	/**
-	 * Returns the id of the Qualified.
-	 * 
-	 * @return the id of the Qualified
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String getId() {
-		return this.id;
 	}
 
 	/**
