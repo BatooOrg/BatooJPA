@@ -42,8 +42,8 @@ import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.EntityTypeExpression;
+import org.batoo.jpa.core.impl.criteria.expression.StaticTypeExpression;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl.MapSelectType;
-import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 import org.batoo.jpa.core.impl.criteria.path.ParentPath;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -74,7 +74,7 @@ import com.google.common.collect.Sets;
  * @author hceylan
  * @since $version
  */
-public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From<Z, X>, Joinable, ParentPath<Z, X> {
+public abstract class AbstractFrom<Z, X> extends ParentPath<Z, X> implements From<Z, X>, Joinable {
 
 	private final FetchParentImpl<Z, X> fetchRoot;
 	private final EntityTypeImpl<X> entity;
@@ -346,24 +346,6 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	}
 
 	/**
-	 * Returns the mapping of the path.
-	 * 
-	 * @return the mapping of the path
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public Mapping<?, ?, X> getMapping() {
-		if (this.entity != null) {
-			return this.entity.getRootMapping();
-		}
-
-		return (Mapping<?, ?, X>) this.mapping;
-	}
-
-	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -549,10 +531,6 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 			// TODO handle embeddable element collections
 		}
 
-		if (!(mapping instanceof JoinedMapping)) {
-			throw new IllegalArgumentException("Cannot dereference attribute " + attributeName);
-		}
-
 		AbstractJoin<X, Y> join = null;
 
 		final JoinedMapping<X, ?, Y> joinedMapping = (JoinedMapping<X, ?, Y>) mapping;
@@ -677,6 +655,14 @@ public abstract class AbstractFrom<Z, X> extends AbstractPath<X> implements From
 	 */
 	@Override
 	public Expression<Class<? extends X>> type() {
-		return new EntityTypeExpression<Class<? extends X>>(this);
+		if ((this.entity != null) && (this.entity.getRootType().getInheritanceType() != null)) {
+			return new EntityTypeExpression<X>(this, this.entity.getRootType().getDiscriminatorColumn());
+		}
+
+		if (this.entity != null) {
+			return new StaticTypeExpression<X>(this, this.entity.getJavaType());
+		}
+
+		return new StaticTypeExpression<X>(this, this.getModel().getBindableJavaType());
 	}
 }

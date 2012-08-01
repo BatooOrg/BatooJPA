@@ -83,6 +83,32 @@ public class SubQueryJpqlTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
+	public void testEmpty() {
+		final Department qa = new Department("QA");
+		this.persist(qa);
+
+		final Manager qaManager = new Manager("Manager1", qa, 100000);
+		this.persist(qaManager);
+
+		final Employee employee1 = new Employee("Employee1", qaManager, qa, 90000);
+		final Employee employee2 = new Employee("Employee2", qaManager, qa, 100000);
+		this.persist(employee1);
+		this.persist(employee2);
+
+		this.commit();
+		this.close();
+
+		TypedQuery<Integer> q;
+
+		q = this.cq("select m.id from Manager m where m.employees is not empty", Integer.class);
+		Assert.assertEquals(qaManager.getId(), q.getSingleResult());
+	}
+
+	/**
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
 	public void testExists() {
 		final Employee employee1 = new Employee();
 		employee1.setName("Employee1");

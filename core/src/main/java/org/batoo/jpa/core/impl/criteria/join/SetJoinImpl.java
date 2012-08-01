@@ -39,7 +39,7 @@ import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
  * @author hceylan
  * @since $version
  */
-public class SetJoinImpl<Z, E> extends AbstractJoin<Z, E> implements SetJoin<Z, E> {
+public class SetJoinImpl<Z, E> extends AbstractPluralJoin<Z, Set<E>, E> implements SetJoin<Z, E> {
 
 	/**
 	 * @param parent

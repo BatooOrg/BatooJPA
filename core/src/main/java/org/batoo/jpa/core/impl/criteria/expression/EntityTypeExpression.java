@@ -21,14 +21,12 @@ package org.batoo.jpa.core.impl.criteria.expression;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
-import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
-import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
-import org.batoo.jpa.core.impl.criteria.path.PluralAssociationPath;
-import org.batoo.jpa.core.impl.criteria.path.SingularAssociationPath;
+import org.batoo.jpa.core.impl.criteria.path.ParentPath;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
+import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.jdbc.DiscriminatorColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
@@ -43,37 +41,21 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
  */
 public class EntityTypeExpression<T> extends AbstractTypeExpression<T> {
 
+	private final DiscriminatorColumn discriminatorColumn;
+
 	/**
-	 * @param from
+	 * @param path
 	 *            the from
+	 * @param discriminatorColumn
+	 *            the discriminator column
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EntityTypeExpression(AbstractPath<?> from) {
-		super(from);
-	}
+	public EntityTypeExpression(ParentPath<?, T> path, DiscriminatorColumn discriminatorColumn) {
+		super(path);
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
-		return "type(" + this.getPath().generateJpqlRestriction(query) + ")";
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
-		if (StringUtils.isNotBlank(this.getAlias())) {
-			return this.generateJpqlRestriction(query) + " as " + this.getAlias();
-		}
-
-		return this.generateJpqlRestriction(query);
+		this.discriminatorColumn = discriminatorColumn;
 	}
 
 	/**
@@ -82,20 +64,8 @@ public class EntityTypeExpression<T> extends AbstractTypeExpression<T> {
 	 */
 	@Override
 	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
-		final AbstractPath<?> path = this.getPath();
-
-		EntityTypeImpl<?> entity = null;
-		if (path instanceof AbstractFrom) {
-			entity = ((AbstractFrom<?, ?>) path).getEntity();
-		}
-		else if (path instanceof SingularAssociationPath) {
-			entity = ((SingularAssociationPath<?, ?>) path).getMapping().getType();
-		}
-		else {
-			entity = ((PluralAssociationPath<?, ?>) path).getMapping().getType();
-		}
-
-		return new String[] { entity.getRootType().getDiscriminatorColumn().getName() };
+		final String tableAlias = this.getPath().getRootPath().getTableAlias(query, this.discriminatorColumn.getTable());
+		return new String[] { tableAlias + "." + this.discriminatorColumn.getName() };
 	}
 
 	/**
@@ -104,7 +74,7 @@ public class EntityTypeExpression<T> extends AbstractTypeExpression<T> {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public T handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+	public Class<? extends T> handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		final Object object = this.getPath().handle(query, session, row);
 
 		if (object == null) {
@@ -112,9 +82,12 @@ public class EntityTypeExpression<T> extends AbstractTypeExpression<T> {
 		}
 
 		if (object instanceof EnhancedInstance) {
-			return (T) ((EnhancedInstance) object).__enhanced__$$__getManagedInstance().getType().getJavaType();
+			final ManagedInstance<?> managedInstance = ((EnhancedInstance) object).__enhanced__$$__getManagedInstance();
+			final EntityTypeImpl<? extends T> type = (EntityTypeImpl<? extends T>) managedInstance.getType();
+
+			return type.getJavaType();
 		}
 
-		return (T) object.getClass();
+		return (Class<? extends T>) object.getClass();
 	}
 }

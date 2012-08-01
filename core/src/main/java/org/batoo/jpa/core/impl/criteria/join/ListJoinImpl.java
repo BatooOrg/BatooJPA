@@ -41,7 +41,7 @@ import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
  * @author hceylan
  * @since $version
  */
-public class ListJoinImpl<Z, E> extends AbstractJoin<Z, E> implements ListJoin<Z, E> {
+public class ListJoinImpl<Z, E> extends AbstractPluralJoin<Z, List<E>, E> implements ListJoin<Z, E> {
 
 	private final PluralMapping<? super Z, List<E>, E> mapping;
 

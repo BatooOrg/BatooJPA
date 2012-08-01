@@ -27,7 +27,7 @@ import javax.persistence.criteria.Path;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
-import org.batoo.jpa.core.impl.criteria.expression.PathTypeExpression;
+import org.batoo.jpa.core.impl.criteria.expression.StaticTypeExpression;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -122,15 +122,6 @@ public class BasicPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public BasicMapping<?, X> getMapping() {
-		return this.mapping;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public BasicAttribute<?, X> getModel() {
 		return this.mapping.getAttribute();
 	}
@@ -166,6 +157,6 @@ public class BasicPath<X> extends AbstractPath<X> {
 	 */
 	@Override
 	public Expression<Class<? extends X>> type() {
-		return new PathTypeExpression<Class<? extends X>>(this);
+		return new StaticTypeExpression<X>(this, this.mapping.getJavaType());
 	}
 }

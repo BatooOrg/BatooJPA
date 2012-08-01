@@ -27,7 +27,9 @@ import javax.persistence.criteria.Path;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
+import org.batoo.jpa.core.impl.criteria.expression.AbstractTypeExpression;
 import org.batoo.jpa.core.impl.criteria.expression.EntityTypeExpression;
+import org.batoo.jpa.core.impl.criteria.expression.StaticTypeExpression;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
 import org.batoo.jpa.core.impl.criteria.join.FetchImpl;
 import org.batoo.jpa.core.impl.criteria.join.FetchParentImpl;
@@ -35,11 +37,11 @@ import org.batoo.jpa.core.impl.criteria.join.Joinable;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl.MapSelectType;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
-import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.Mapping;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 /**
- * Physical Attribute implementation of {@link Path}.
+ * Entity type attribute implementation of {@link Path}.
  * 
  * @param <Z>
  *            the source type
@@ -49,25 +51,30 @@ import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
  * @author hceylan
  * @since $version
  */
-public class PluralAssociationPath<Z, X> extends AbstractPath<X> implements Joinable, ParentPath<Z, X> {
+public class EntityPath<Z, X> extends ParentPath<Z, X> implements Joinable {
 
-	private final PluralAssociationMapping<Z, ?, X> mapping;
 	private final FetchImpl<Z, X> fetchRoot;
+	private final String pathName;
+	private final EntityTypeImpl<X> entity;
 
 	/**
 	 * @param parent
 	 *            the parent path
-	 * @param mapping
-	 *            the physical mapping
+	 * @param pathName
+	 *            the path name
+	 * @param entity
+	 *            the entity
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PluralAssociationPath(ParentPath<?, Z> parent, PluralAssociationMapping<Z, ?, X> mapping) {
-		super(parent, mapping.getType().getJavaType());
+	public EntityPath(ParentPath<?, Z> parent, String pathName, EntityTypeImpl<X> entity) {
+		super(parent, entity.getJavaType());
 
-		this.mapping = mapping;
-		this.fetchRoot = parent.getFetchRoot().join(mapping.getAttribute().getName(), JoinType.LEFT);
+		this.pathName = pathName;
+		this.entity = entity;
+
+		this.fetchRoot = parent.getFetchRoot().join(pathName, JoinType.LEFT);
 	}
 
 	/**
@@ -80,7 +87,7 @@ public class PluralAssociationPath<Z, X> extends AbstractPath<X> implements Join
 
 		builder.append(this.getParentPath().generateJpqlRestriction(query));
 
-		builder.append(".").append(this.mapping.getAttribute().getName());
+		builder.append(".").append(this.pathName);
 
 		return builder.toString();
 	}
@@ -100,8 +107,8 @@ public class PluralAssociationPath<Z, X> extends AbstractPath<X> implements Join
 			builder.append(this.getParentPath().generateJpqlSelect(null, false));
 		}
 
-		builder.append(".").append(this.mapping.getAttribute().getName());
-		if (StringUtils.isNotBlank(this.getAlias())) {
+		builder.append(".").append(this.pathName);
+		if (selected && StringUtils.isNotBlank(this.getAlias())) {
 			builder.append(" as ").append(this.getAlias());
 		}
 
@@ -131,8 +138,15 @@ public class PluralAssociationPath<Z, X> extends AbstractPath<X> implements Join
 	 * 
 	 */
 	@Override
-	public PluralAssociationMapping<?, ?, X> getMapping() {
-		return this.mapping;
+	@SuppressWarnings("unchecked")
+	protected <C, Y> Mapping<? super X, C, Y> getMapping(String name) {
+		final Mapping<? super X, C, Y> mapping = (Mapping<? super X, C, Y>) this.entity.getRootMapping().getChild(name);
+
+		if (mapping == null) {
+			throw this.cannotDereference(name);
+		}
+
+		return mapping;
 	}
 
 	/**
@@ -140,8 +154,8 @@ public class PluralAssociationPath<Z, X> extends AbstractPath<X> implements Join
 	 * 
 	 */
 	@Override
-	public PluralAttributeImpl<? super Z, ?, X> getModel() {
-		return this.mapping.getAttribute();
+	public EntityTypeImpl<X> getModel() {
+		return this.entity;
 	}
 
 	/**
@@ -159,7 +173,7 @@ public class PluralAssociationPath<Z, X> extends AbstractPath<X> implements Join
 	 */
 	@Override
 	public String getTableAlias(AbstractQueryImpl<?> query, AbstractTable table) {
-		return this.fetchRoot.getTableAlias(query, table);
+		return this.getFetchRoot().getTableAlias(query, table);
 	}
 
 	/**
@@ -167,11 +181,8 @@ public class PluralAssociationPath<Z, X> extends AbstractPath<X> implements Join
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public X handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
-		final X value = this.fetchRoot.handle(session, row);
-
-		return (X) (this.getConverter() != null ? this.getConverter().convert(value) : value);
+		return this.fetchRoot.handle(session, row);
 	}
 
 	/**
@@ -179,7 +190,11 @@ public class PluralAssociationPath<Z, X> extends AbstractPath<X> implements Join
 	 * 
 	 */
 	@Override
-	public EntityTypeExpression<Class<? extends X>> type() {
-		return new EntityTypeExpression<Class<? extends X>>(this);
+	public AbstractTypeExpression<X> type() {
+		if (this.entity.getRootType().getInheritanceType() != null) {
+			return new EntityTypeExpression<X>(this, this.entity.getRootType().getDiscriminatorColumn());
+		}
+
+		return new StaticTypeExpression<X>(this, this.getModel().getBindableJavaType());
 	}
 }

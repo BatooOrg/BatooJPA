@@ -40,9 +40,9 @@ import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
  */
 public abstract class AbstractJoin<Z, X> extends AbstractFrom<Z, X> implements Join<Z, X> {
 
-	private final AbstractFrom<?, Z> parent;
 	private final JoinedMapping<? super Z, ?, X> mapping;
 	private final JoinType joinType;
+	private final AbstractFrom<?, Z> parent;
 
 	/**
 	 * @param parent
@@ -75,7 +75,7 @@ public abstract class AbstractJoin<Z, X> extends AbstractFrom<Z, X> implements J
 
 		builder.append(this.joinType == JoinType.LEFT ? "left" : "inner");
 		builder.append(" join ") //
-		.append(this.parent.getAlias()).append(".").append(this.mapping.getAttribute().getName()) //
+		.append(this.getParent().getAlias()).append(".").append(this.mapping.getAttribute().getName()) //
 		.append(" as ").append(this.getAlias());
 
 		final String joins = super.generateJpqlJoins(criteriaQuery);
@@ -121,6 +121,18 @@ public abstract class AbstractJoin<Z, X> extends AbstractFrom<Z, X> implements J
 	@Override
 	public JoinType getJoinType() {
 		return this.joinType;
+	}
+
+	/**
+	 * Returns the mapping.
+	 * 
+	 * @return the mapping
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected JoinedMapping<? super Z, ?, X> getMapping() {
+		return this.mapping;
 	}
 
 	/**

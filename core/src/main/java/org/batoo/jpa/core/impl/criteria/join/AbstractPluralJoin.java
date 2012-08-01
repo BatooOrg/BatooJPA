@@ -21,28 +21,31 @@ package org.batoo.jpa.core.impl.criteria.join;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.PluralJoin;
 import javax.persistence.criteria.Predicate;
-import javax.persistence.metamodel.SingularAttribute;
+import javax.persistence.metamodel.PluralAttribute;
+import javax.persistence.metamodel.Type.PersistenceType;
 
-import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
-import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
+import org.batoo.jpa.core.impl.model.mapping.ElementCollectionMapping;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping.MappingType;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
-import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 
 /**
- * Joins for singular attributes.
+ * The implementation of {@link PluralJoin}.
  * 
  * @param <Z>
  *            the source type
- * @param <X>
- *            the target type
+ * @param <C>
+ *            the collection type
+ * @param <E>
+ *            the element type of the collection
  * 
  * @author hceylan
  * @since $version
  */
-public class SingularJoin<Z, X> extends AbstractJoin<Z, X> {
+public class AbstractPluralJoin<Z, C, E> extends AbstractJoin<Z, E> implements PluralJoin<Z, C, E> {
 
 	/**
 	 * @param parent
@@ -55,7 +58,7 @@ public class SingularJoin<Z, X> extends AbstractJoin<Z, X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SingularJoin(AbstractFrom<?, Z> parent, JoinedMapping<? super Z, ?, X> mapping, JoinType jointType) {
+	public AbstractPluralJoin(AbstractFrom<?, Z> parent, JoinedMapping<? super Z, ?, E> mapping, JoinType jointType) {
 		super(parent, mapping, jointType);
 	}
 
@@ -65,21 +68,24 @@ public class SingularJoin<Z, X> extends AbstractJoin<Z, X> {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	protected <C, Y> Mapping<? super X, C, Y> getMapping(String name) {
-		Mapping<? super X, ?, ?> child = null;
+	protected <CC, Y> Mapping<? super E, CC, Y> getMapping(String name) {
+		Mapping<? super E, ?, ?> child = null;
 
-		if (this.getMapping().getMappingType() == MappingType.EMBEDDABLE) {
-			child = ((EmbeddedMapping<? super Z, X>) this.getMapping()).getChild(name);
+		if (this.getMapping().getMappingType() == MappingType.ELEMENT_COLLECTION) {
+			final ElementCollectionMapping<? super Z, C, E> elementCollectionMapping = (ElementCollectionMapping<? super Z, C, E>) this.getMapping();
+			if (elementCollectionMapping.getType().getPersistenceType() == PersistenceType.EMBEDDABLE) {
+				child = (Mapping<? super E, ?, ?>) elementCollectionMapping.getMapping(name);
+			}
 		}
 		else {
-			child = ((SingularAssociationMapping<? super Z, X>) this.getMapping()).getType().getRootMapping().getChild(name);
+			child = ((PluralAssociationMapping<? super Z, C, E>) this.getMapping()).getType().getRootMapping().getChild(name);
 		}
 
 		if (child == null) {
 			throw this.cannotDereference(name);
 		}
 
-		return (Mapping<? super X, C, Y>) child;
+		return (Mapping<? super E, CC, Y>) child;
 	}
 
 	/**
@@ -87,9 +93,9 @@ public class SingularJoin<Z, X> extends AbstractJoin<Z, X> {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
-	public SingularAttribute<? super Z, X> getModel() {
-		return (SingularAttributeImpl<? super Z, X>) super.getAttribute();
+	public PluralAttribute<? super Z, C, E> getModel() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -97,8 +103,9 @@ public class SingularJoin<Z, X> extends AbstractJoin<Z, X> {
 	 * 
 	 */
 	@Override
-	public Join<Z, X> on(Expression<Boolean> restriction) {
-		throw this.notSupported();
+	public Join<Z, E> on(Expression<Boolean> restriction) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -106,7 +113,9 @@ public class SingularJoin<Z, X> extends AbstractJoin<Z, X> {
 	 * 
 	 */
 	@Override
-	public Join<Z, X> on(Predicate... restrictions) {
-		throw this.notSupported();
+	public Join<Z, E> on(Predicate... restrictions) {
+		// TODO Auto-generated method stub
+		return null;
 	}
+
 }

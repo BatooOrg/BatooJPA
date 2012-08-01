@@ -31,8 +31,8 @@ import junit.framework.Assert;
 
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
+import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.join.AbstractJoin;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
@@ -176,7 +176,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 		final CriteriaBuilderImpl cb = this.em().getCriteriaBuilder();
 		final CriteriaQueryImpl<Address> q = cb.createQuery(Address.class);
 		final RootImpl<Person> r = q.from(Person.class);
-		q.select(r.<Address> get("addresses"));
+		q.select(r.<Address> join("addresses"));
 
 		final List<Address> resultList = this.em().createQuery(q).getResultList();
 		Assert.assertEquals(6, resultList.size());

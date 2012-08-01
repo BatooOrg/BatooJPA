@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.criteria.jpql;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,11 +54,13 @@ import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.AllAnyExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CaseImpl;
 import org.batoo.jpa.core.impl.criteria.expression.CoalesceExpression;
+import org.batoo.jpa.core.impl.criteria.expression.CollectionExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ConcatExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ConstantExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CountExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ExistsExpression;
 import org.batoo.jpa.core.impl.criteria.expression.FunctionExpression;
+import org.batoo.jpa.core.impl.criteria.expression.MapExpression;
 import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
 import org.batoo.jpa.core.impl.criteria.expression.SimpleCaseImpl;
 import org.batoo.jpa.core.impl.criteria.expression.SubstringExpression;
@@ -65,6 +68,7 @@ import org.batoo.jpa.core.impl.criteria.expression.TrimExpression;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
 import org.batoo.jpa.core.impl.criteria.join.ListJoinImpl;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
+import org.batoo.jpa.core.impl.criteria.path.ParentPath;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
@@ -439,7 +443,8 @@ public class JpqlQuery {
 					right = (AbstractExpression<X>) this.constructSubquery(cb, q, predictionDef.getChild(1), left.getJavaType());
 				}
 				else {
-					throw new PersistenceException("Both sides of the comparison cannot be sub query");
+					throw new PersistenceException("Both sides of the comparison cannot be sub query, line " + predictionDef.getLine() + ":"
+						+ predictionDef.getCharPositionInLine());
 				}
 			}
 			else {
@@ -612,7 +617,7 @@ public class JpqlQuery {
 					childSelections.toArray(new Selection[childSelections.size()]));
 			}
 			catch (final ClassNotFoundException e) {
-				throw new PersistenceException("Cannot load class: " + className);
+				throw new PersistenceException("Cannot load class: " + className + ", line " + selectDef.getLine() + ":" + selectDef.getCharPositionInLine());
 			}
 		}
 
@@ -742,7 +747,7 @@ public class JpqlQuery {
 		final EntityTypeImpl<Object> entity = this.metamodel.entity(entityName);
 
 		if (entity == null) {
-			throw new IllegalArgumentException("Type is not managed: " + entityName);
+			throw new PersistenceException("Type is not managed: " + entityName);
 		}
 
 		return entity;
@@ -776,11 +781,11 @@ public class JpqlQuery {
 				if (expression instanceof AbstractFrom) {
 					expression = ((AbstractFrom<?, ?>) expression).get(segment);
 				}
-				else if (expression instanceof AbstractPath) {
-					expression = ((AbstractPath<?>) expression).get(segment);
+				else if (expression instanceof ParentPath) {
+					expression = ((ParentPath<?, ?>) expression).get(segment);
 				}
 				else {
-					throw new IllegalArgumentException("Cannot dereference: " + segment);
+					throw new PersistenceException("Cannot dereference: " + segment + ", line " + exprDef.getLine() + ":" + exprDef.getCharPositionInLine());
 				}
 
 			}
@@ -922,7 +927,8 @@ public class JpqlQuery {
 				case JpqlParser.ST_ENTITY_TYPE:
 					final EntityTypeImpl<?> entity = this.getEntity(exprDef.getChild(0).getText());
 					if (entity.getRootType().getInheritanceType() == null) {
-						throw new IllegalArgumentException("Entity does not have inheritence: " + entity.getName());
+						throw new PersistenceException("Entity does not have inheritence: " + entity.getName() + ", line " + exprDef.getLine() + ":"
+							+ exprDef.getCharPositionInLine());
 					}
 
 					return (AbstractExpression<X>) new ConstantExpression<String>(null, entity.getDiscriminatorValue());
@@ -1050,7 +1056,8 @@ public class JpqlQuery {
 						final EntityTypeImpl<Object> entity = this.getEntity(caseDef.getChild(0).getText());
 
 						if (entity.getRootType().getInheritanceType() == null) {
-							throw new IllegalArgumentException("Entity does not have inheritence: " + entity.getName());
+							throw new PersistenceException("Entity does not have inheritence: " + entity.getName() + ", line " + exprDef.getLine() + ":"
+								+ exprDef.getCharPositionInLine());
 						}
 
 						condition = (AbstractExpression<X>) new ConstantExpression<String>(null, entity.getDiscriminatorValue());
@@ -1100,10 +1107,31 @@ public class JpqlQuery {
 				return (AbstractExpression<X>) ((ListJoinImpl<?, ?>) expression).index();
 			}
 
-			throw new IllegalArgumentException("Reference is not a list join: " + exprDef.getChild(0).getText());
+			throw new PersistenceException("Reference is not a list join, line " + exprDef.getLine() + ":" + exprDef.getCharPositionInLine());
 		}
 
-		throw new PersistenceException("Unhandled expression: " + exprDef.toStringTree());
+		// empty
+		if (exprDef.getType() == JpqlParser.ST_EMPTY) {
+			AbstractExpression<?> expression = this.getExpression(cb, q, exprDef.getChild(0), null);
+
+			if (expression instanceof MapExpression) {
+				expression = ((MapExpression<Map<?, ?>, ?, ?>) expression).values();
+			}
+
+			if (!(expression instanceof CollectionExpression<?, ?>)) {
+				throw new PersistenceException("Reference is not a collection, line " + exprDef.getLine() + ":" + exprDef.getCharPositionInLine());
+			}
+
+			if (exprDef.getChildCount() == 2) {
+				return (AbstractExpression<X>) cb.isEmpty((Expression<Collection<?>>) expression).not();
+			}
+			else {
+				return (AbstractExpression<X>) cb.isEmpty((Expression<Collection<?>>) expression);
+			}
+		}
+
+		throw new PersistenceException("Unhandled expression: " + exprDef.toStringTree() + ", line " + exprDef.getLine() + ":"
+			+ exprDef.getCharPositionInLine());
 	}
 
 	/**

@@ -553,6 +553,12 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <C extends Collection<?>> Predicate isEmpty(Expression<C> collection) {
+		// if (!(collection instanceof PluralAssociationPath)) {
+		// throw new IllegalArgumentException("Not a collection");
+		// }
+
+		// TODO handle constant collections
+
 		return new PredicateImpl(new IsEmptyExpression(collection));
 	}
 

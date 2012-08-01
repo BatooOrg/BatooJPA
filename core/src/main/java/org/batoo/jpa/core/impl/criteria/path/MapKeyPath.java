@@ -22,27 +22,36 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.persistence.criteria.Expression;
+import javax.persistence.metamodel.Type.PersistenceType;
 
+import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
+import org.batoo.jpa.core.impl.criteria.expression.StaticTypeExpression;
+import org.batoo.jpa.core.impl.criteria.join.FetchParentImpl;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl.MapSelectType;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.MapAttributeImpl;
+import org.batoo.jpa.core.impl.model.mapping.ElementMapping;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
+import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 
 /**
  * Path for Map join keys.
  * 
+ * @param <Z>
+ *            the type of the parent path
  * @param <X>
  *            the type of the key
  * 
  * @author hceylan
  * @since $version
  */
-public class MapKeyPath<X> extends AbstractPath<X> {
+public class MapKeyPath<Z, X> extends ParentPath<Z, X> {
 
 	private final MapJoinImpl<?, X, ?> mapJoin;
+	private ElementMapping<X> elementMapping;
 
 	/**
 	 * @param mapJoin
@@ -53,10 +62,13 @@ public class MapKeyPath<X> extends AbstractPath<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public MapKeyPath(MapJoinImpl<?, X, ?> mapJoin, Class<X> javaType) {
-		super(mapJoin, javaType);
+	public MapKeyPath(MapJoinImpl<Z, X, ?> mapJoin, Class<X> javaType) {
+		super(mapJoin.getParent(), javaType);
 
 		this.mapJoin = mapJoin;
+		if (this.mapJoin.getModel().getKeyType().getPersistenceType() == PersistenceType.EMBEDDABLE) {
+			this.elementMapping = new ElementMapping<X>(null, (EmbeddableTypeImpl<X>) this.mapJoin.getModel().getKeyType());
+		}
 	}
 
 	/**
@@ -65,7 +77,7 @@ public class MapKeyPath<X> extends AbstractPath<X> {
 	 */
 	@Override
 	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
-		return this.mapJoin.generateJpqlRestriction(query) + ".key";
+		return "key(" + this.mapJoin.generateJpqlRestriction(query) + ")";
 	}
 
 	/**
@@ -74,7 +86,11 @@ public class MapKeyPath<X> extends AbstractPath<X> {
 	 */
 	@Override
 	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
-		return this.mapJoin.generateJpqlSelect(null, selected) + ".key";
+		if (StringUtils.isNotBlank(this.getAlias())) {
+			return this.generateJpqlRestriction(query) + " as " + this.getAlias();
+		}
+
+		return this.generateJpqlRestriction(query);
 	}
 
 	/**
@@ -91,8 +107,26 @@ public class MapKeyPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public Mapping<?, ?, X> getMapping() {
+	public FetchParentImpl<?, X> getFetchRoot() {
 		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	protected <C, Y> Mapping<? super X, C, Y> getMapping(String name) {
+		if (this.mapJoin.getModel().getKeyType() instanceof EmbeddableTypeImpl) {
+			final Mapping<? super X, ?, ?> child = this.elementMapping.getChild(name);
+
+			if (child != null) {
+				return (Mapping<? super X, C, Y>) child;
+			}
+		}
+
+		throw this.cannotDereference(name);
 	}
 
 	/**
@@ -132,6 +166,6 @@ public class MapKeyPath<X> extends AbstractPath<X> {
 	 */
 	@Override
 	public Expression<Class<? extends X>> type() {
-		return this.mapJoin.type(MapSelectType.KEY);
+		return new StaticTypeExpression<X>(this, this.mapJoin.getModel().getKeyJavaType());
 	}
 }

@@ -54,7 +54,7 @@ import org.batoo.jpa.core.util.Pair;
  * @author hceylan
  * @since $version
  */
-public class MapJoinImpl<Z, K, V> extends AbstractJoin<Z, V> implements MapJoin<Z, K, V> {
+public class MapJoinImpl<Z, K, V> extends AbstractPluralJoin<Z, Map<K, V>, V> implements MapJoin<Z, K, V> {
 
 	/**
 	 * The select type for the map join
@@ -204,7 +204,7 @@ public class MapJoinImpl<Z, K, V> extends AbstractJoin<Z, V> implements MapJoin<
 	 */
 	@Override
 	public Path<K> key() {
-		return new MapKeyPath<K>(this, this.getModel().getKeyJavaType());
+		return new MapKeyPath<Z, K>(this, this.getModel().getKeyJavaType());
 	}
 
 	/**
@@ -235,7 +235,7 @@ public class MapJoinImpl<Z, K, V> extends AbstractJoin<Z, V> implements MapJoin<
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Expression<Class<? extends K>> type(MapSelectType selectType) {
+	public Expression<Class<?>> type(MapSelectType selectType) {
 		// TODO Auto-generated method stub
 		return null;
 	}

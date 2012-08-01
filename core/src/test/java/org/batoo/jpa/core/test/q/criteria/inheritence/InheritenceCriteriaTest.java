@@ -23,12 +23,12 @@ import java.util.Comparator;
 import java.util.List;
 
 import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Path;
 
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.join.SetJoinImpl;
-import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 import org.batoo.jpa.core.test.BaseCoreTest;
 import org.batoo.jpa.core.test.q.Bar;
 import org.batoo.jpa.core.test.q.BaseFoo;
@@ -101,7 +101,7 @@ public class InheritenceCriteriaTest extends BaseCoreTest {
 
 		final CriteriaQueryImpl<Class> q = cb.createQuery(Class.class);
 		final RootImpl<Bar> r = q.from(Bar.class);
-		final AbstractPath<Integer> path = r.get("foos").<Integer> get("id");
+		final Path<Integer> path = r.join("foos").<Integer> get("id");
 		final Expression<Class<? extends Integer>> type = path.type();
 
 		q.select(type);

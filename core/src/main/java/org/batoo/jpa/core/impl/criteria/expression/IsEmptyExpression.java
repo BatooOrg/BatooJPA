@@ -18,33 +18,36 @@
  */
 package org.batoo.jpa.core.impl.criteria.expression;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import javax.persistence.criteria.Expression;
+
 import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
-import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
- * Type for query expressions.
- * 
- * @param <T>
- *            the type of the expression
+ * Expression for empty
  * 
  * @author hceylan
  * @since $version
  */
-public abstract class AbstractTypeExpression<T> extends AbstractExpression<Class<? extends T>> {
+public class IsEmptyExpression extends AbstractExpression<Boolean> {
 
-	private final AbstractPath<?> path;
+	private final Expression<?> inner;
 
 	/**
-	 * @param path
-	 *            the path
+	 * @param inner
+	 *            the inner expression
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
-	public AbstractTypeExpression(AbstractPath<T> path) {
-		super((Class<Class<? extends T>>) path.getJavaType().getClass());
-		this.path = path;
+	public IsEmptyExpression(Expression<?> inner) {
+		super(Boolean.class);
+
+		this.inner = inner;
 	}
 
 	/**
@@ -53,7 +56,8 @@ public abstract class AbstractTypeExpression<T> extends AbstractExpression<Class
 	 */
 	@Override
 	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
-		return "type(" + this.getPath().generateJpqlRestriction(query) + ")";
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -62,11 +66,8 @@ public abstract class AbstractTypeExpression<T> extends AbstractExpression<Class
 	 */
 	@Override
 	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
-		if (this.getAlias() != null) {
-			return this.generateJpqlRestriction(query) + " as " + this.getAlias();
-		}
-
-		return this.generateJpqlRestriction(query);
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -75,18 +76,27 @@ public abstract class AbstractTypeExpression<T> extends AbstractExpression<Class
 	 */
 	@Override
 	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
-		return this.path.generateSqlSelect(query, selected);
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
-	 * Returns the path of the type expression.
+	 * {@inheritDoc}
 	 * 
-	 * @return the path of the type expression
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	public AbstractPath<?> getPath() {
-		return this.path;
+	@Override
+	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Boolean handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

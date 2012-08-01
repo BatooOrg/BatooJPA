@@ -20,36 +20,30 @@ package org.batoo.jpa.core.impl.criteria.expression;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
+import java.util.Map;
 
 import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
-import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.model.mapping.Mapping;
 
 /**
- * Type expression for simple paths.
  * 
- * @param <T>
- *            the type of the expression
  * 
  * @author hceylan
  * @since $version
  */
-public class PathTypeExpression<T> extends AbstractTypeExpression<T> {
-
-	final AbstractPath<?> path;
+public class MapExpression<M extends Map<K, V>, K, V> extends AbstractExpression<M> {
 
 	/**
-	 * @param path
-	 *            the owner path
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PathTypeExpression(AbstractPath<?> path) {
-		super(path);
-
-		this.path = path;
+	@SuppressWarnings("unchecked")
+	public MapExpression(Mapping<?, Map<K, V>, V> mapping) {
+		super((Class<M>) mapping.getJavaType());
 	}
 
 	/**
@@ -58,7 +52,28 @@ public class PathTypeExpression<T> extends AbstractTypeExpression<T> {
 	 */
 	@Override
 	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
-		throw new IllegalArgumentException();
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -67,7 +82,8 @@ public class PathTypeExpression<T> extends AbstractTypeExpression<T> {
 	 */
 	@Override
 	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
-		throw new IllegalArgumentException();
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -75,8 +91,20 @@ public class PathTypeExpression<T> extends AbstractTypeExpression<T> {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
-	public T handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
-		return (T) this.path.getMapping().getJavaType();
+	public M handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
 	}
+
+	/**
+	 * @return
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public CollectionExpression<Collection<V>, V> values() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

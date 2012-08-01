@@ -18,11 +18,16 @@
  */
 package org.batoo.jpa.core.impl.criteria.expression;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
- * Type for query expressions.
+ * Type expression for simple paths.
  * 
  * @param <T>
  *            the type of the expression
@@ -30,21 +35,23 @@ import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
  * @author hceylan
  * @since $version
  */
-public abstract class AbstractTypeExpression<T> extends AbstractExpression<Class<? extends T>> {
+public class StaticTypeExpression<T> extends AbstractTypeExpression<T> {
 
-	private final AbstractPath<?> path;
+	private final Class<T> javaType;
 
 	/**
 	 * @param path
-	 *            the path
+	 *            the owner path
+	 * @param javaType
+	 *            the java type
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
-	public AbstractTypeExpression(AbstractPath<T> path) {
-		super((Class<Class<? extends T>>) path.getJavaType().getClass());
-		this.path = path;
+	public StaticTypeExpression(AbstractPath<T> path, Class<T> javaType) {
+		super(path);
+
+		this.javaType = javaType;
 	}
 
 	/**
@@ -52,8 +59,8 @@ public abstract class AbstractTypeExpression<T> extends AbstractExpression<Class
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
-		return "type(" + this.getPath().generateJpqlRestriction(query) + ")";
+	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
+		return new String[] { this.javaType.getName() };
 	}
 
 	/**
@@ -61,32 +68,7 @@ public abstract class AbstractTypeExpression<T> extends AbstractExpression<Class
 	 * 
 	 */
 	@Override
-	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
-		if (this.getAlias() != null) {
-			return this.generateJpqlRestriction(query) + " as " + this.getAlias();
-		}
-
-		return this.generateJpqlRestriction(query);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
-		return this.path.generateSqlSelect(query, selected);
-	}
-
-	/**
-	 * Returns the path of the type expression.
-	 * 
-	 * @return the path of the type expression
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public AbstractPath<?> getPath() {
-		return this.path;
+	public Class<? extends T> handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+		return this.javaType;
 	}
 }

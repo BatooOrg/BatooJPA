@@ -24,13 +24,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
-import org.batoo.jpa.core.impl.criteria.expression.PathTypeExpression;
+import org.batoo.jpa.core.impl.criteria.expression.StaticTypeExpression;
 import org.batoo.jpa.core.impl.criteria.join.FetchParentImpl;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
@@ -56,7 +55,7 @@ import com.google.common.collect.Lists;
  * @author hceylan
  * @since $version
  */
-public class EmbeddedAttributePath<Z, X> extends AbstractPath<X> implements ParentPath<Z, X> {
+public class EmbeddedAttributePath<Z, X> extends ParentPath<Z, X> {
 
 	private final EmbeddedMapping<? super Z, X> mapping;
 	private final FetchParentImpl<Z, X> fetchRoot;
@@ -103,7 +102,7 @@ public class EmbeddedAttributePath<Z, X> extends AbstractPath<X> implements Pare
 		builder.append(this.getParentPath().generateJpqlSelect(query, false));
 
 		builder.append(".").append(this.mapping.getAttribute().getName());
-		if (StringUtils.isNotBlank(this.getAlias())) {
+		if (selected && StringUtils.isNotBlank(this.getAlias())) {
 			builder.append(" as ").append(this.getAlias());
 		}
 
@@ -161,8 +160,15 @@ public class EmbeddedAttributePath<Z, X> extends AbstractPath<X> implements Pare
 	 * 
 	 */
 	@Override
-	public EmbeddedMapping<?, X> getMapping() {
-		return this.mapping;
+	@SuppressWarnings("unchecked")
+	protected <C, Y> Mapping<? super X, C, Y> getMapping(String name) {
+		final Mapping<? super X, ?, ?> child = this.mapping.getChild(name);
+
+		if (child == null) {
+			throw this.cannotDereference(name);
+		}
+
+		return (Mapping<? super X, C, Y>) child;
 	}
 
 	/**
@@ -216,7 +222,7 @@ public class EmbeddedAttributePath<Z, X> extends AbstractPath<X> implements Pare
 	public X handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		final Object instance = this.getParentPath().handle(query, session, row);
 
-		return this.getMapping().get(instance);
+		return this.mapping.get(instance);
 	}
 
 	/**
@@ -224,7 +230,7 @@ public class EmbeddedAttributePath<Z, X> extends AbstractPath<X> implements Pare
 	 * 
 	 */
 	@Override
-	public Expression<Class<? extends X>> type() {
-		return new PathTypeExpression<Class<? extends X>>(this);
+	public StaticTypeExpression<X> type() {
+		return new StaticTypeExpression<X>(this, this.getModel().getJavaType());
 	}
 }
