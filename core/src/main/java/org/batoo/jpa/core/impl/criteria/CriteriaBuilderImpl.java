@@ -77,6 +77,7 @@ import org.batoo.jpa.core.impl.criteria.expression.NumericFunctionExpression.Num
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
 import org.batoo.jpa.core.impl.criteria.expression.SimpleCaseImpl;
+import org.batoo.jpa.core.impl.criteria.expression.SizeExpression;
 import org.batoo.jpa.core.impl.criteria.expression.SubstringExpression;
 import org.batoo.jpa.core.impl.criteria.expression.TrimExpression;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
@@ -1137,8 +1138,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <C extends Collection<?>> Expression<Integer> size(Expression<C> collection) {
-		// TODO Auto-generated method stub
-		return null;
+		return new SizeExpression<C>(collection);
 	}
 
 	/**

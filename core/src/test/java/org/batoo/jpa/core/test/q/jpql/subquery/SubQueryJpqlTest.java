@@ -125,9 +125,9 @@ public class SubQueryJpqlTest extends BaseCoreTest {
 		employee4.setName("Employee4");
 
 		final Manager manager1 = new Manager();
-		employee3.setName("Manager1");
+		manager1.setName("Manager1");
 		final Manager manager2 = new Manager();
-		employee3.setName("Manager2");
+		manager2.setName("Manager2");
 
 		employee1.setManager(manager1);
 		employee2.setManager(manager1);
@@ -186,6 +186,42 @@ public class SubQueryJpqlTest extends BaseCoreTest {
 
 		q = this.cq("select m.id from Manager m where :p member of m.employees", Integer.class).setParameter("p", employee1);
 		Assert.assertEquals((Integer) 3, q.getSingleResult());
+	}
+
+	/**
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testSize() {
+		final Employee employee1 = new Employee();
+		employee1.setName("Employee1");
+		final Employee employee2 = new Employee();
+		employee2.setName("Employee2");
+		final Employee employee3 = new Employee();
+		employee3.setName("Employee3");
+		final Employee employee4 = new Employee();
+		employee4.setName("Employee4");
+
+		final Manager manager1 = new Manager();
+		manager1.setName("Manager1");
+		final Manager manager2 = new Manager();
+		manager2.setName("Manager2");
+
+		employee1.setManager(manager1);
+		employee2.setManager(manager1);
+		employee4.setManager(manager2);
+
+		this.persist(employee1);
+		this.persist(employee2);
+		this.persist(employee3);
+		this.persist(employee4);
+		this.persist(manager1);
+		this.persist(manager2);
+
+		this.commit();
+
+		Assert.assertEquals((Integer) 2, this.cq("select size(m.employees) from Manager m where size(m.employees) = 2", Integer.class).getSingleResult());
 	}
 
 	/**

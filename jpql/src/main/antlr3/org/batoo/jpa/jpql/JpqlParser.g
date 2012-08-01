@@ -261,7 +261,7 @@ functions_returning_numerics :
   	| ABS^ Left_Paren! simple_arithmetic_expression Right_Paren!
   	| SQRT^ Left_Paren! simple_arithmetic_expression Right_Paren!
   	| MOD^ Left_Paren! simple_arithmetic_expression Comma! simple_arithmetic_expression Right_Paren!
-  	| SIZE^ Left_Paren! fqid Right_Paren!
+  	| SIZE^ Left_Paren! state_field_path_expression Right_Paren!
   	| INDEX^ Left_Paren! ID Right_Paren!
   ;
 	

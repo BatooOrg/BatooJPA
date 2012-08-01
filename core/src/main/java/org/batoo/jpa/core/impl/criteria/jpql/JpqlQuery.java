@@ -1206,6 +1206,19 @@ public class JpqlQuery {
 			}
 		}
 
+		// size operation
+		if (exprDef.getType() == JpqlParser.SIZE) {
+			final AbstractExpression<?> expression = this.getExpression(cb, q, exprDef.getChild(0), null);
+			if (!(expression instanceof CollectionExpression)) {
+				throw new PersistenceException("Member of expression must evaluate to a collection expression, " + exprDef.getLine() + ":"
+					+ exprDef.getCharPositionInLine());
+			}
+
+			final CollectionExpression<C, E> collection = (CollectionExpression<C, E>) expression;
+
+			return (AbstractExpression<X>) cb.size(collection);
+		}
+
 		throw new PersistenceException("Unhandled expression: " + exprDef.toStringTree() + ", line " + exprDef.getLine() + ":"
 			+ exprDef.getCharPositionInLine());
 	}
