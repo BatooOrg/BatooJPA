@@ -30,6 +30,7 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
 import javax.persistence.QueryHint;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -58,6 +59,7 @@ public class Person {
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "person", fetch = FetchType.EAGER)
 	private final List<HomePhone> phones = Lists.newArrayList();
 
+	@OrderColumn
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	private final List<WorkPhone> workPhones = Lists.newArrayList();
 

@@ -384,6 +384,26 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
+	public void testIndex() {
+		this.persist(this.person());
+		this.commit();
+
+		this.close();
+
+		final TypedQuery<Integer> q = this.cq(//
+			"select index(wp) from Person p\n" + //
+				"    left join p.workPhones wp\n" + //
+				"    order by wp.id", Integer.class);
+
+		Assert.assertEquals("[0, 1]", q.getResultList().toString());
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
 	public void testLike() {
 		final Person person = this.person(40);
 		person.setName("%Ceylan");

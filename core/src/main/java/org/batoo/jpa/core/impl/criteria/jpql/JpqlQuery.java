@@ -63,6 +63,7 @@ import org.batoo.jpa.core.impl.criteria.expression.SimpleCaseImpl;
 import org.batoo.jpa.core.impl.criteria.expression.SubstringExpression;
 import org.batoo.jpa.core.impl.criteria.expression.TrimExpression;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
+import org.batoo.jpa.core.impl.criteria.join.ListJoinImpl;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
@@ -1091,6 +1092,17 @@ public class JpqlQuery {
 				function, arguments.toArray(new Expression<?>[arguments.size()]));
 		}
 
+		// index expression
+		if (exprDef.getType() == JpqlParser.INDEX) {
+			final AbstractExpression<Object> expression = this.getExpression(cb, q, exprDef.getChild(0), null);
+
+			if (expression instanceof ListJoinImpl) {
+				return (AbstractExpression<X>) ((ListJoinImpl<?, ?>) expression).index();
+			}
+
+			throw new IllegalArgumentException("Reference is not a list join: " + exprDef.getChild(0).getText());
+		}
+
 		throw new PersistenceException("Unhandled expression: " + exprDef.toStringTree());
 	}
 
@@ -1149,7 +1161,7 @@ public class JpqlQuery {
 
 		final String alias = aliased.getAlias();
 		if (aliasMap.containsKey(alias)) {
-			throw new PersistenceException("Alias already exists: " + alias + ", " + aliasedDef.getChild(1).getTokenStartIndex());
+			throw new PersistenceException("Alias already exists: " + alias + ", line " + aliasedDef.getLine() + ":" + aliasedDef.getCharPositionInLine());
 		}
 
 		aliasMap.put(aliased.getAlias(), r);

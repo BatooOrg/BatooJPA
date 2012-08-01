@@ -51,6 +51,7 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 	private OrderColumn orderColumn;
 
 	private String removeSql;
+
 	private String removeAllSql;
 	private JoinColumn[] sourceRemoveColumns;
 	private JoinColumn[] destinationRemoveColumns;
@@ -129,6 +130,18 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 	 */
 	public EntityTypeImpl<?> getEntity() {
 		return this.entity;
+	}
+
+	/**
+	 * Returns the order column.
+	 * 
+	 * @return the order column
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public OrderColumn getOrderColumn() {
+		return this.orderColumn;
 	}
 
 	private String getRemoveAllSql() {

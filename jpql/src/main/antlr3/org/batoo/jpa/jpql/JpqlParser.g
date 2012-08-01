@@ -39,6 +39,8 @@ tokens {
     ST_GENERAL_CASE;
     ST_SIMPLE_WHEN;
     ST_COALESCE;
+    ST_EMPTY;
+    ST_MEMBER;
 }
 
 @header {
@@ -254,13 +256,13 @@ aggregate_expression :
 	| COUNT^ Left_Paren! (DISTINCT)? (ID | state_field_path_expression) Right_Paren!;
 
 functions_returning_numerics :
-  LENGTH^ Left_Paren! string_primary Right_Paren!
-  | LOCATE^ Left_Paren! string_primary Comma! string_primary (Comma! simple_arithmetic_expression)? Right_Paren!
-  | ABS^ Left_Paren! simple_arithmetic_expression Right_Paren!
-  | SQRT^ Left_Paren! simple_arithmetic_expression Right_Paren!
-  | MOD^ Left_Paren! simple_arithmetic_expression Comma! simple_arithmetic_expression Right_Paren!
+  	LENGTH^ Left_Paren! string_primary Right_Paren!
+  	| LOCATE^ Left_Paren! string_primary Comma! string_primary (Comma! simple_arithmetic_expression)? Right_Paren!
+  	| ABS^ Left_Paren! simple_arithmetic_expression Right_Paren!
+  	| SQRT^ Left_Paren! simple_arithmetic_expression Right_Paren!
+  	| MOD^ Left_Paren! simple_arithmetic_expression Comma! simple_arithmetic_expression Right_Paren!
 //  | SIZE^ Left_Paren! simple_arithmetic_expression Right_Paren!
-//  | INDEX^ Left_Paren! simple_arithmetic_expression Right_Paren!
+  	| INDEX^ Left_Paren! ID Right_Paren!
   ;
 	
 functions_returning_strings :
@@ -291,13 +293,13 @@ conditional_primary options { backtrack=true; } :
 simple_cond_expression options { backtrack=true; } :
   	exists_expression
     | in_expression
+    | empty_collection_comparison_expression
     | null_comparison_expression
     | comparison_expression
     | between_expression
     | like_expression
     | boolean_expression
-//  | empty_collection_comparison_expression
-//  | collection_member_expression
+    | collection_member_expression
     ;
 
 between_expression :
@@ -415,22 +417,20 @@ in_items :
 in_item :
 	STRING_LITERAL | NUMERIC_LITERAL | input_parameter;
 
-//entity_expression
-//  :
-//  single_valued_association_path_expression
-//  | simple_entity_expression
-//  ;
-//
-//simple_entity_expression
-//  :
-//  ID
-//  | input_parameter
-//  ;
-//
+entity_expression :
+  	state_field_path_expression
+  	| simple_entity_expression
+  	;
+
+simple_entity_expression : 
+	ID 
+	| input_parameter
+	;
 
 input_parameter :
     Ordinal_Parameter
-    | Named_Parameter;
+    | Named_Parameter
+    ;
 
 faliased_qid :
     qid (AS)? ID
@@ -448,18 +448,17 @@ null_comparison_expression :
   	single_valued_path_expression IS (NOT)? NULL
   		-> ^(ST_NULL single_valued_path_expression (NOT)?)
   	| input_parameter IS (NOT)? NULL
-  		-> ^(ST_NULL input_parameter (NOT)?);
+  		-> ^(ST_NULL input_parameter (NOT)?)
+  	;
 
-//empty_collection_comparison_expression
-//  :
-//  collection_valued_path_expression 'IS' (NOT)? 'EMPTY'
-//  ;
-//
-//collection_member_expression
-//  :
-//  entity_expression (NOT)? 'MEMBER' ('OF')? collection_valued_path_expression
-//  ;
-//
+empty_collection_comparison_expression :
+  	state_field_path_expression IS (NOT)? EMPTY
+  		-> ^(ST_EMPTY state_field_path_expression (NOT)?);
+
+collection_member_expression :
+  	entity_expression (NOT)? MEMBER (OF)? state_field_path_expression
+  		-> ^(ST_MEMBER state_field_path_expression (NOT)?);
+
 exists_expression :
   	EXISTS^ Left_Paren! subquery Right_Paren!;
 

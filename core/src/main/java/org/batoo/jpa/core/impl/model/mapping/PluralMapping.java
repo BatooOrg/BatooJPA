@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
+import org.batoo.jpa.core.impl.jdbc.OrderColumn;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
 
 /**
@@ -159,6 +160,16 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @author hceylan
 	 */
 	String getOrderBy();
+
+	/**
+	 * Returns the order column.
+	 * 
+	 * @return the order column
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	OrderColumn getOrderColumn();
 
 	/**
 	 * Returns the root mapping.

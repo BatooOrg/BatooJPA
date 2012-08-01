@@ -61,10 +61,11 @@ public class ForeignKey {
 	private OrderColumn orderColumn;
 
 	private String singleChildSql;
+
 	private PkColumn[] singleChildRestrictions;
 	private AbstractColumn[] singleChildUpdates;
-
 	private String allChildrenSql;
+
 	private JoinColumn[] allChildrenRestrictions;
 	private final JdbcAdaptor jdbcAdaptor;
 
@@ -355,6 +356,18 @@ public class ForeignKey {
 	 */
 	public List<JoinColumn> getJoinColumns() {
 		return this.joinColumns;
+	}
+
+	/**
+	 * Returns the order column.
+	 * 
+	 * @return the order column
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public OrderColumn getOrderColumn() {
+		return this.orderColumn;
 	}
 
 	/**

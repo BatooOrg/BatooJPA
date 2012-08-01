@@ -40,8 +40,8 @@ import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.collections.ManagedList;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
+import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
 import org.batoo.jpa.core.impl.criteria.join.AbstractJoin;
@@ -50,6 +50,7 @@ import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.CollectionTable;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.JoinableTable;
+import org.batoo.jpa.core.impl.jdbc.OrderColumn;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
@@ -92,18 +93,18 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	private final String orderBy;
 
 	private final ColumnMetadata orderColumn;
-
 	private final ColumnMetadata mapKeyColumn;
+
 	private final String mapKey;
 	private final EnumType mapKeyEnumType;
 	private final TemporalType mapKeyTemporalType;
 	private TypeImpl<E> type;
-
 	private SingularMapping<? super E, ?> keyMapping;
+
 	private ElementMapping<E> rootMapping;
 	private Comparator<E> comparator;
-
 	private CriteriaQueryImpl<E> selectCriteria;
+
 	private CriteriaQueryImpl<Object[]> selectMapCriteria;
 
 	/**
@@ -317,6 +318,19 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	@Override
 	public String getOrderBy() {
 		return this.orderBy;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public OrderColumn getOrderColumn() {
+		if (this.collectionTable != null) {
+			return this.collectionTable.getOrderColumn();
+		}
+
+		return null;
 	}
 
 	private CriteriaQueryImpl<E> getSelectCriteria() {

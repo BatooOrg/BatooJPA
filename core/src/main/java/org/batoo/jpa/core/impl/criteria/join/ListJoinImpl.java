@@ -26,6 +26,8 @@ import javax.persistence.criteria.ListJoin;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.metamodel.ListAttribute;
 
+import org.batoo.jpa.core.impl.criteria.expression.IndexExpression;
+import org.batoo.jpa.core.impl.jdbc.OrderColumn;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 
 /**
@@ -41,6 +43,8 @@ import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
  */
 public class ListJoinImpl<Z, E> extends AbstractJoin<Z, E> implements ListJoin<Z, E> {
 
+	private final PluralMapping<? super Z, List<E>, E> mapping;
+
 	/**
 	 * @param parent
 	 *            the parent
@@ -54,6 +58,8 @@ public class ListJoinImpl<Z, E> extends AbstractJoin<Z, E> implements ListJoin<Z
 	 */
 	public ListJoinImpl(AbstractFrom<?, Z> parent, PluralMapping<? super Z, List<E>, E> mapping, JoinType jointType) {
 		super(parent, mapping, jointType);
+
+		this.mapping = mapping;
 	}
 
 	/**
@@ -72,8 +78,13 @@ public class ListJoinImpl<Z, E> extends AbstractJoin<Z, E> implements ListJoin<Z
 	 */
 	@Override
 	public Expression<Integer> index() {
-		// TODO Auto-generated method stub
-		return null;
+		final OrderColumn orderColumn = this.mapping.getOrderColumn();
+
+		if (orderColumn == null) {
+			throw new IllegalArgumentException("List join does not have an order column");
+		}
+
+		return new IndexExpression(this, orderColumn);
 	}
 
 	/**

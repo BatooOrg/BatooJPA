@@ -53,6 +53,7 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	private ElementColumn elementColumn;
 
 	private String removeSql;
+
 	private String removeAllSql;
 	private AbstractColumn[] removeColumns;
 	private JoinColumn[] removeAllColumns;
@@ -98,6 +99,18 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	 */
 	public MapKeyColumn getKeyColumn() {
 		return this.keyColumn;
+	}
+
+	/**
+	 * Returns the order column.
+	 * 
+	 * @return the order column
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public OrderColumn getOrderColumn() {
+		return this.orderColumn;
 	}
 
 	private String getRemoveAllSql() {

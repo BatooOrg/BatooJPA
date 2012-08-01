@@ -21,33 +21,40 @@ package org.batoo.jpa.core.impl.criteria.expression;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import javax.persistence.criteria.Expression;
-
+import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
+import org.batoo.jpa.core.impl.criteria.join.ListJoinImpl;
+import org.batoo.jpa.core.impl.jdbc.JoinTable;
+import org.batoo.jpa.core.impl.jdbc.OrderColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
- * Expression for empty
+ * Expression for list join indices.
  * 
  * @author hceylan
  * @since $version
  */
-public class IsEmptyExpression extends AbstractExpression<Boolean> {
+public class IndexExpression extends AbstractExpression<Integer> {
 
-	private final Expression<?> inner;
+	private final ListJoinImpl<?, ?> listJoin;
+	private final OrderColumn orderColumn;
+	private String alias;
 
 	/**
-	 * @param inner
-	 *            the inner expression
+	 * @param listJoin
+	 *            the list join
+	 * @param orderColumn
+	 *            the order column
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public IsEmptyExpression(Expression<?> inner) {
-		super(Boolean.class);
+	public IndexExpression(ListJoinImpl<?, ?> listJoin, OrderColumn orderColumn) {
+		super(Integer.class);
 
-		this.inner = inner;
+		this.listJoin = listJoin;
+		this.orderColumn = orderColumn;
 	}
 
 	/**
@@ -56,8 +63,7 @@ public class IsEmptyExpression extends AbstractExpression<Boolean> {
 	 */
 	@Override
 	public String generateJpqlRestriction(AbstractQueryImpl<?> query) {
-		// TODO Auto-generated method stub
-		return null;
+		return "index(" + this.listJoin.getAlias() + ")";
 	}
 
 	/**
@@ -66,8 +72,11 @@ public class IsEmptyExpression extends AbstractExpression<Boolean> {
 	 */
 	@Override
 	public String generateJpqlSelect(AbstractQueryImpl<?> query, boolean selected) {
-		// TODO Auto-generated method stub
-		return null;
+		if (StringUtils.isNotBlank(this.getAlias())) {
+			return this.generateJpqlRestriction(query) + " as " + this.getAlias();
+		}
+
+		return this.generateJpqlRestriction(query);
 	}
 
 	/**
@@ -76,8 +85,13 @@ public class IsEmptyExpression extends AbstractExpression<Boolean> {
 	 */
 	@Override
 	public String generateSqlSelect(AbstractQueryImpl<?> query, boolean selected) {
-		// TODO Auto-generated method stub
-		return null;
+		this.alias = query.getAlias(this);
+
+		if (selected) {
+			return this.getSqlRestrictionFragments(query)[0] + " AS " + this.alias;
+		}
+
+		return this.getSqlRestrictionFragments(query)[0];
 	}
 
 	/**
@@ -86,8 +100,12 @@ public class IsEmptyExpression extends AbstractExpression<Boolean> {
 	 */
 	@Override
 	public String[] getSqlRestrictionFragments(AbstractQueryImpl<?> query) {
-		// TODO Auto-generated method stub
-		return null;
+		String tableAlias = this.listJoin.getTableAlias(query, this.orderColumn.getTable());
+		if (this.orderColumn.getTable() instanceof JoinTable) {
+			tableAlias += "_J";
+		}
+
+		return new String[] { tableAlias + "." + this.orderColumn.getName() };
 	}
 
 	/**
@@ -95,8 +113,7 @@ public class IsEmptyExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public Boolean handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+	public Integer handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+		return (Integer) row.getObject(this.alias);
 	}
 }

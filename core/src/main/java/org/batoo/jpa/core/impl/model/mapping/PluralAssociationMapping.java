@@ -39,8 +39,8 @@ import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.collections.ManagedList;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
+import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
 import org.batoo.jpa.core.impl.criteria.join.AbstractJoin;
@@ -48,6 +48,7 @@ import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
+import org.batoo.jpa.core.impl.jdbc.OrderColumn;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
@@ -368,6 +369,23 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	@Override
 	public String getOrderBy() {
 		return this.orderBy;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public OrderColumn getOrderColumn() {
+		if (this.joinTable != null) {
+			return this.joinTable.getOrderColumn();
+		}
+
+		if (this.foreignKey != null) {
+			return this.foreignKey.getOrderColumn();
+		}
+
+		return null;
 	}
 
 	private CriteriaQueryImpl<E> getSelectCriteria() {
