@@ -26,6 +26,7 @@ import javax.persistence.criteria.Expression;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
@@ -62,7 +63,7 @@ public class ConcatExpression extends AbstractExpression<String> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(final AbstractCriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(final BaseQueryImpl<?> query) {
 		final String expressions = Joiner.on(", ").join(Lists.transform(this.arguments, new Function<Expression<String>, String>() {
 
 			@Override
@@ -87,7 +88,7 @@ public class ConcatExpression extends AbstractExpression<String> {
 		return this.generateJpqlRestriction(query);
 	}
 
-	private String generateSqlRestriction(final AbstractCriteriaQueryImpl<?> query) {
+	private String generateSqlRestriction(final BaseQueryImpl<?> query) {
 		return Joiner.on(" || ").join(Lists.transform(this.arguments, new Function<Expression<String>, String>() {
 
 			@Override
@@ -117,7 +118,7 @@ public class ConcatExpression extends AbstractExpression<String> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
 		return new String[] { this.generateSqlRestriction(query) };
 	}
 

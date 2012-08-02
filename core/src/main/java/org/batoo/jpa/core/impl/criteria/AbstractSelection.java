@@ -121,7 +121,7 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query);
+	public abstract String[] getSqlRestrictionFragments(BaseQueryImpl<?> query);
 
 	/**
 	 * Handles the row.

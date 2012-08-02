@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.util.Map.Entry;
 
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl;
@@ -64,7 +65,7 @@ public class MapEntryExpression<K, V> extends AbstractExpression<Entry<K, V>> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(BaseQueryImpl<?> query) {
 		return this.mapJoin.generateJpqlRestriction(query) + ".entry";
 	}
 
@@ -91,7 +92,7 @@ public class MapEntryExpression<K, V> extends AbstractExpression<Entry<K, V>> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
 		return this.mapJoin.getSqlRestrictionFragments(query, MapSelectType.ENTRY);
 	}
 

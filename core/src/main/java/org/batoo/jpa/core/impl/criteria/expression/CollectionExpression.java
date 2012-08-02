@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.path.ParentPath;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -65,7 +66,7 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(BaseQueryImpl<?> query) {
 		return this.parentPath.generateJpqlRestriction(query) + "." + this.mapping.getAttribute().getName();
 	}
 
@@ -116,7 +117,7 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
 		throw new IllegalArgumentException("Collection paths cannot be restricted");
 	}
 

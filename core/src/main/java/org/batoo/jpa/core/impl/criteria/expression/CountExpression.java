@@ -25,6 +25,7 @@ import javax.persistence.criteria.Expression;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
@@ -62,7 +63,7 @@ public class CountExpression extends AbstractExpression<Long> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(BaseQueryImpl<?> query) {
 		final StringBuilder builder = new StringBuilder("count(");
 
 		if (this.distinct) {
@@ -108,7 +109,7 @@ public class CountExpression extends AbstractExpression<Long> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
 		final StringBuilder builder = new StringBuilder("COUNT(");
 
 		if (this.distinct) {

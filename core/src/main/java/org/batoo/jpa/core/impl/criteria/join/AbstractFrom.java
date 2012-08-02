@@ -40,6 +40,7 @@ import javax.persistence.metamodel.Type.PersistenceType;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.EntityTypeExpression;
 import org.batoo.jpa.core.impl.criteria.expression.StaticTypeExpression;
@@ -138,7 +139,7 @@ public abstract class AbstractFrom<Z, X> extends ParentPath<Z, X> implements Fro
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected void ensureAlias(AbstractCriteriaQueryImpl<?> query) {
+	protected void ensureAlias(BaseQueryImpl<?> query) {
 		if (StringUtils.isBlank(this.getAlias())) {
 			this.alias(query.getAlias(this));
 		}
@@ -243,7 +244,7 @@ public abstract class AbstractFrom<Z, X> extends ParentPath<Z, X> implements Fro
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(BaseQueryImpl<?> query) {
 		this.ensureAlias(query);
 
 		return this.getAlias();
@@ -308,6 +309,7 @@ public abstract class AbstractFrom<Z, X> extends ParentPath<Z, X> implements Fro
 	 * @since $version
 	 * @author hceylan
 	 */
+	@Override
 	public EntityTypeImpl<X> getEntity() {
 		return this.entity;
 	}
@@ -350,7 +352,7 @@ public abstract class AbstractFrom<Z, X> extends ParentPath<Z, X> implements Fro
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
 		return this.fetchRoot.getSqlRestrictionFragments(query, MapSelectType.VALUE);
 	}
 
@@ -366,7 +368,7 @@ public abstract class AbstractFrom<Z, X> extends ParentPath<Z, X> implements Fro
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query, MapSelectType selectType) {
+	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query, MapSelectType selectType) {
 		return this.fetchRoot.getSqlRestrictionFragments(query, selectType);
 	}
 
@@ -385,7 +387,7 @@ public abstract class AbstractFrom<Z, X> extends ParentPath<Z, X> implements Fro
 	 * @author hceylan
 	 */
 	@Override
-	public String getTableAlias(AbstractCriteriaQueryImpl<?> query, AbstractTable table) {
+	public String getTableAlias(BaseQueryImpl<?> query, AbstractTable table) {
 		return this.getFetchRoot().getTableAlias(query, table);
 	}
 

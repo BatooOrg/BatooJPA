@@ -21,7 +21,7 @@ package org.batoo.jpa.core.impl.criteria.expression;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -59,7 +59,7 @@ public class StaticTypeExpression<T> extends AbstractTypeExpression<T> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
 		return new String[] { this.javaType.getName() };
 	}
 

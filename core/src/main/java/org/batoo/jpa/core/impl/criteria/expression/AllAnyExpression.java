@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import javax.persistence.criteria.Subquery;
 
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.SubqueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -64,7 +65,7 @@ public class AllAnyExpression<T> extends AbstractExpression<T> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(BaseQueryImpl<?> query) {
 		return (this.all ? "all " : "any ") + this.subQuery.generateJpqlRestriction(query);
 	}
 
@@ -91,7 +92,7 @@ public class AllAnyExpression<T> extends AbstractExpression<T> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
 		return new String[] { (this.all ? "ALL " : "ANY ") + this.subQuery.getSqlRestrictionFragments(query)[0] };
 	}
 

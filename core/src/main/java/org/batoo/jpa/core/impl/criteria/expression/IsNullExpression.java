@@ -23,6 +23,7 @@ import java.sql.SQLException;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
@@ -59,7 +60,7 @@ public class IsNullExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(BaseQueryImpl<?> query) {
 		if (this.not) {
 			return this.inner.generateJpqlRestriction(query) + " is not null";
 		}
@@ -100,7 +101,7 @@ public class IsNullExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
 		if (this.not) {
 			return new String[] { this.inner.getSqlRestrictionFragments(query)[0] + " IS NOT NULL" };
 		}

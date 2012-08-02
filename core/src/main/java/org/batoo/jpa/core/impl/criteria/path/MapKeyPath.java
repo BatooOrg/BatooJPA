@@ -26,6 +26,7 @@ import javax.persistence.metamodel.Type.PersistenceType;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.StaticTypeExpression;
 import org.batoo.jpa.core.impl.criteria.join.FetchParentImpl;
@@ -76,7 +77,7 @@ public class MapKeyPath<Z, X> extends ParentPath<Z, X> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(BaseQueryImpl<?> query) {
 		return "key(" + this.mapJoin.generateJpqlRestriction(query) + ")";
 	}
 
@@ -144,7 +145,7 @@ public class MapKeyPath<Z, X> extends ParentPath<Z, X> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
 		return this.mapJoin.getSqlRestrictionFragments(query, MapSelectType.KEY);
 	}
 

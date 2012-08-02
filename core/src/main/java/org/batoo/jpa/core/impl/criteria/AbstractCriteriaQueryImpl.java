@@ -68,22 +68,19 @@ import com.google.common.collect.Sets;
  * @since $version
  */
 @SuppressWarnings("unchecked")
-public abstract class AbstractCriteriaQueryImpl<T> extends BaseQuery<T> implements AbstractQuery<T> {
+public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> implements AbstractQuery<T> {
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(AbstractCriteriaQueryImpl.class);
 
-	private final MetamodelImpl metamodel;
 	private Class<T> resultType;
 	private boolean internal;
 	private final Set<RootImpl<?>> roots = Sets.newHashSet();
-	private final List<ParameterExpressionImpl<?>> sqlParameters = Lists.newArrayList();
+
 	private AbstractSelection<T> selection;
 	private PredicateImpl restriction;
 	private PredicateImpl groupRestriction;
 	private boolean distinct;
 	private final List<AbstractExpression<?>> groupList = Lists.newArrayList();
-	private String sql;
-	private String jpql;
 
 	private final List<ParameterExpressionImpl<?>> parameterOrder = Lists.newArrayList();
 
@@ -97,9 +94,8 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQuery<T> implemen
 	 * @author hceylan
 	 */
 	public AbstractCriteriaQueryImpl(MetamodelImpl metamodel, Class<T> resultType) {
-		super();
+		super(metamodel);
 
-		this.metamodel = metamodel;
 		this.resultType = resultType;
 	}
 
@@ -160,14 +156,11 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQuery<T> implemen
 	}
 
 	/**
-	 * Generates the JPQL for the query.
+	 * {@inheritDoc}
 	 * 
-	 * @return the generated JPQL
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	protected String generateJpql() {
+	@Override
+	public String generateJpql() {
 		final StringBuilder builder = new StringBuilder();
 
 		this.ensureSelection();
@@ -227,14 +220,11 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQuery<T> implemen
 	}
 
 	/**
-	 * Returns the generated SQL.
+	 * {@inheritDoc}
 	 * 
-	 * @return the generated SQL
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	protected String generateSql() {
+	@Override
+	public String generateSql() {
 		this.ensureSelection();
 
 		AbstractCriteriaQueryImpl.LOG.debug("Preparing SQL for {0}", AbstractCriteriaQueryImpl.LOG.lazyBoxed(this));
@@ -308,7 +298,12 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQuery<T> implemen
 
 		}
 
-		return Joiner.on(" AND ").skipNulls().join(restrictions);
+		final String restriction = Joiner.on(") AND (").skipNulls().join(restrictions);
+		if (StringUtils.isBlank(restriction)) {
+			return null;
+		}
+
+		return "(" + restriction + ")";
 	}
 
 	/**
@@ -330,38 +325,6 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQuery<T> implemen
 	@Override
 	public PredicateImpl getGroupRestriction() {
 		return this.groupRestriction;
-	}
-
-	/**
-	 * Returns the JPQL for the query.
-	 * 
-	 * @return the the JPQL
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String getJpql() {
-		if (this.jpql != null) {
-			return this.jpql;
-		}
-
-		synchronized (this) {
-			if (this.jpql != null) {
-				return this.jpql;
-			}
-
-			return this.jpql = this.generateJpql();
-		}
-	}
-
-	/**
-	 * Returns the metamodel.
-	 * 
-	 * @return the metamodel
-	 * @since $version
-	 */
-	public MetamodelImpl getMetamodel() {
-		return this.metamodel;
 	}
 
 	/**
@@ -398,40 +361,6 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQuery<T> implemen
 	@Override
 	public AbstractSelection<T> getSelection() {
 		return this.ensureSelection();
-	}
-
-	/**
-	 * Returns the SQL for the query.
-	 * 
-	 * @return the the SQL
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String getSql() {
-		if (this.sql != null) {
-			return this.sql;
-		}
-
-		synchronized (this) {
-			if (this.sql != null) {
-				return this.sql;
-			}
-
-			return this.sql = this.generateSql();
-		}
-	}
-
-	/**
-	 * Returns the SQL parameters of the query.
-	 * 
-	 * @return the SQL Parameters of the query
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public List<ParameterExpressionImpl<?>> getSqlParameters() {
-		return this.sqlParameters;
 	}
 
 	/**
@@ -545,28 +474,12 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQuery<T> implemen
 	}
 
 	/**
-	 * Adds the parameter to the SQL parameters queue.
-	 * 
-	 * @param parameter
-	 *            the parameter to add
-	 * @return the positional number of the parameter
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public int setNextSqlParam(ParameterExpressionImpl<?> parameter) {
-		this.sqlParameters.add(parameter);
-
-		return this.sqlParameters.size() - 1;
-	}
-
-	/**
 	 * {@inheritDoc}
 	 * 
 	 */
 	@Override
 	public <U> SubqueryImpl<U> subquery(Class<U> type) {
-		return new SubqueryImpl<U>(this.metamodel, this, type);
+		return new SubqueryImpl<U>(this.getMetamodel(), this, type);
 	}
 
 	/**

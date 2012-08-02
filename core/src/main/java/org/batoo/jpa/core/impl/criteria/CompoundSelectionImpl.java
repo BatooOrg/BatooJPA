@@ -132,7 +132,7 @@ public class CompoundSelectionImpl<X> extends AbstractSelection<X> implements Co
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
 		throw new UnsupportedOperationException();
 	}
 

@@ -23,6 +23,7 @@ import java.sql.SQLException;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.join.ListJoinImpl;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
@@ -62,7 +63,7 @@ public class IndexExpression extends AbstractExpression<Integer> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(BaseQueryImpl<?> query) {
 		return "index(" + this.listJoin.getAlias() + ")";
 	}
 
@@ -99,7 +100,7 @@ public class IndexExpression extends AbstractExpression<Integer> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
 		String tableAlias = this.listJoin.getTableAlias(query, this.orderColumn.getTable());
 		if (this.orderColumn.getTable() instanceof JoinTable) {
 			tableAlias += "_J";

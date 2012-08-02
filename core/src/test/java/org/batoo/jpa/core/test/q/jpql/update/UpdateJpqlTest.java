@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.core.test.q.jpql.update;
 
+import junit.framework.Assert;
+
 import org.batoo.jpa.core.test.BaseCoreTest;
 import org.batoo.jpa.core.test.q.Country;
 import org.junit.Before;
@@ -69,6 +71,10 @@ public class UpdateJpqlTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testUpdate() {
-		this.cu("update Country c set c.name = 'Republic of Turkey'");
+		Assert.assertEquals((Long) 4l, this.cq("select count(c) from Country c", Long.class).getSingleResult());
+
+		this.cu("delete Country c where c = :code").setParameter("code", UpdateJpqlTest.TR).executeUpdate();
+
+		Assert.assertEquals((Long) 3l, this.cq("select count(c) from Country c", Long.class).getSingleResult());
 	}
 }

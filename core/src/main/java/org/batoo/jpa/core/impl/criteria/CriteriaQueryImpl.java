@@ -84,7 +84,7 @@ public class CriteriaQueryImpl<T> extends AbstractCriteriaQueryImpl<T> implement
 	 * 
 	 */
 	@Override
-	protected String generateJpql() {
+	public String generateJpql() {
 		if (this.orderList.size() > 0) {
 			final String orderBy = Joiner.on(", ").join(Lists.transform(this.orderList, new Function<OrderImpl, String>() {
 
@@ -107,7 +107,7 @@ public class CriteriaQueryImpl<T> extends AbstractCriteriaQueryImpl<T> implement
 	 * 
 	 */
 	@Override
-	protected String generateSql() {
+	public String generateSql() {
 		if (this.orderList.size() > 0) {
 			final String orderBy = Joiner.on(", ").join(Lists.transform(this.orderList, new Function<OrderImpl, String>() {
 

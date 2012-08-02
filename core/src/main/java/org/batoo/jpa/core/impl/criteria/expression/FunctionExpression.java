@@ -26,6 +26,7 @@ import javax.persistence.criteria.Expression;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
@@ -74,7 +75,7 @@ public class FunctionExpression<T> extends AbstractExpression<T> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(final AbstractCriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(final BaseQueryImpl<?> query) {
 		return this.function + "(" + Joiner.on(", ").join(Lists.transform(this.arguments, new Function<Expression<?>, String>() {
 
 			@Override
@@ -117,7 +118,7 @@ public class FunctionExpression<T> extends AbstractExpression<T> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(final AbstractCriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(final BaseQueryImpl<?> query) {
 		return new String[] { this.function + Joiner.on("").join(Lists.transform(this.arguments, new Function<Expression<?>, String>() {
 
 			@Override

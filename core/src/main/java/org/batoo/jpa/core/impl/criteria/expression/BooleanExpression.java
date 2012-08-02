@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import javax.persistence.criteria.Expression;
 
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
@@ -55,7 +56,7 @@ public class BooleanExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(BaseQueryImpl<?> query) {
 		return this.inner.generateJpqlRestriction(query);
 	}
 
@@ -77,7 +78,7 @@ public class BooleanExpression extends AbstractExpression<Boolean> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String generateSqlRestriction(final AbstractCriteriaQueryImpl<?> query) {
+	public String generateSqlRestriction(final BaseQueryImpl<?> query) {
 		return this.inner.getSqlRestrictionFragments(query)[0];
 	}
 
@@ -95,7 +96,7 @@ public class BooleanExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
 		if (this.inner != null) {
 			return this.inner.getSqlRestrictionFragments(query);
 		}

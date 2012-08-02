@@ -18,25 +18,23 @@
  */
 package org.batoo.jpa.core.impl.criteria;
 
-import javax.persistence.criteria.CriteriaUpdate;
+import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
-import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 
 /**
- * Implementation of {@link CriteriaUpdate}.
+ * Implementation of {@link CriteriaDelete}.
  * 
  * @param <T>
- *            the entity type that is the target of the update
+ *            the entity type that is the target of the delete
  * 
  * @author hceylan
  * @since $version
  */
-public class CriteriaUpdateImpl<T> extends CriteriaModify<T> implements CriteriaUpdate<T> {
+public class CriteriaDeleteImpl<T> extends CriteriaModify<T> implements CriteriaDelete<T> {
 
 	/**
 	 * @param metamodel
@@ -45,7 +43,7 @@ public class CriteriaUpdateImpl<T> extends CriteriaModify<T> implements Criteria
 	 * @since $version
 	 * @author hceylan
 	 */
-	public CriteriaUpdateImpl(MetamodelImpl metamodel) {
+	public CriteriaDeleteImpl(MetamodelImpl metamodel) {
 		super(metamodel);
 	}
 
@@ -55,15 +53,18 @@ public class CriteriaUpdateImpl<T> extends CriteriaModify<T> implements Criteria
 	 */
 	@Override
 	public String generateJpql() {
-		final StringBuilder builder = new StringBuilder();
+		final RootImpl<T> root = this.getRoot();
 
-		builder.append("update " + this.getRoot().getEntity().getName());
-
-		if (this.getRestriction() != null) {
-			builder.append("\nwhere\n\t").append(this.getRestriction().generateJpqlRestriction(this));
+		if (StringUtils.isBlank(root.getAlias())) {
+			this.getRoot().alias("r");
 		}
 
-		return builder.toString();
+		String restriction = "";
+		if (this.getRestriction() != null) {
+			restriction = "\n" + this.getRestriction().generateJpqlRestriction(this);
+		}
+
+		return "delete " + this.getRoot().generateJpqlRestriction(this) + " as " + root.getAlias() + restriction;
 	}
 
 	/**
@@ -73,10 +74,8 @@ public class CriteriaUpdateImpl<T> extends CriteriaModify<T> implements Criteria
 	@Override
 	public String generateSql() {
 		final String sqlRestriction = this.generateSqlRestriction();
-		final String updates = "";
 
-		return "UPDATE " + this.getRoot().generateSqlFrom(this) + "\nSET " + updates
-			+ (StringUtils.isNotBlank(sqlRestriction) ? "\nWHERE " + sqlRestriction : "");
+		return "DELETE FROM " + this.getRoot().generateSqlFrom(this) + (StringUtils.isNotBlank(sqlRestriction) ? "\nWHERE " + sqlRestriction : "");
 	}
 
 	/**
@@ -106,9 +105,8 @@ public class CriteriaUpdateImpl<T> extends CriteriaModify<T> implements Criteria
 	 * 
 	 */
 	@Override
-	public <Y> CriteriaUpdate<T> set(Path<Y> attribute, Expression<? extends Y> value) {
-		// TODO Auto-generated method stub
-		return null;
+	public CriteriaDeleteImpl<T> where(Expression<Boolean> restriction) {
+		return (CriteriaDeleteImpl<T>) super.where(restriction);
 	}
 
 	/**
@@ -116,56 +114,7 @@ public class CriteriaUpdateImpl<T> extends CriteriaModify<T> implements Criteria
 	 * 
 	 */
 	@Override
-	public <Y, X extends Y> CriteriaUpdate<T> set(Path<Y> attribute, X value) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public <Y> CriteriaUpdate<T> set(SingularAttribute<? super T, Y> attribute, Expression<? extends Y> value) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public <Y, X extends Y> CriteriaUpdate<T> set(SingularAttribute<? super T, Y> attribute, X value) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public CriteriaUpdate<T> set(String attributeName, Object value) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public CriteriaUpdateImpl<T> where(Expression<Boolean> restriction) {
-		return (CriteriaUpdateImpl<T>) super.where(restriction);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public CriteriaUpdateImpl<T> where(Predicate... restrictions) {
-		return (CriteriaUpdateImpl<T>) super.where(restrictions);
+	public CriteriaDeleteImpl<T> where(Predicate... restrictions) {
+		return (CriteriaDeleteImpl<T>) super.where(restrictions);
 	}
 }

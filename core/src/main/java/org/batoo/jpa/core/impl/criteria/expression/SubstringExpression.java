@@ -25,6 +25,7 @@ import javax.persistence.criteria.Expression;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
@@ -65,7 +66,7 @@ public class SubstringExpression extends AbstractExpression<String> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(BaseQueryImpl<?> query) {
 		if (this.end != null) {
 			return "substring(" + this.inner.generateJpqlRestriction(query) + "," //
 				+ this.start.generateJpqlRestriction(query) + ")";
@@ -109,7 +110,7 @@ public class SubstringExpression extends AbstractExpression<String> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
 		if (this.end == null) {
 			return new String[] { "SUBSTR(" + this.inner.getSqlRestrictionFragments(query)[0] + //
 				"," + this.start.getSqlRestrictionFragments(query)[0] + ")" };

@@ -77,7 +77,7 @@ public class RootImpl<X> extends AbstractFrom<X, X> implements Root<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String generateSqlFrom(AbstractCriteriaQueryImpl<?> query) {
+	public String generateSqlFrom(BaseQueryImpl<?> query) {
 		final EntityTable primaryTable = this.entity.getRootType().getPrimaryTable();
 
 		return primaryTable.getName() + " AS " + this.getFetchRoot().getTableAlias(query, primaryTable);

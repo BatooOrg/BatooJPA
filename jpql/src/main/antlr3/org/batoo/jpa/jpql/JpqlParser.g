@@ -66,14 +66,32 @@ tokens {
 ql_statement :
     (select_statement | update_statement | delete_statement) EOF;
 
-select_statement :
-    select_clause from_clause (where_clause)? (groupby_clause)? (having_clause)? (orderby_clause)?;
-
 update_statement :
     UPDATE^ update_clause (where_clause)?;
 
+update_clause :
+    aliased_qid SET update_item (Comma update_item)*
+        -> ^(ST_UPDATE update_item update_item*);
+
+update_item :
+    state_field_path_expression Equals_Operator^ new_value;
+
+new_value options { backtrack=true; }:
+    simple_arithmetic_expression
+    | simple_entity_expression
+    | STRING_LITERAL
+    | NUMERIC_LITERAL
+    | NULL;
+
+orderby_clause :
+  	ORDER BY orderby_item (Comma orderby_item)*
+  		-> ^(LORDER orderby_item (orderby_item)*);
+
 delete_statement :
     DELETE^ aliased_qid (where_clause)?;
+
+select_statement :
+    select_clause from_clause (where_clause)? (groupby_clause)? (having_clause)? (orderby_clause)?;
 
 from_clause :
     FROM from_declaration (Comma from_declaration_or_collection_member_declaration)*
@@ -106,24 +124,6 @@ inner_join :
 collection_member_declaration :
     IN Left_Paren ID Period qid Right_Paren AS? ID?
         -> ^(ST_COLL ID ^(ST_ID_AS qid ID));
-
-update_clause :
-    aliased_qid SET update_item (Comma update_item)*
-        -> ^(ST_UPDATE update_item update_item*);
-
-update_item :
-    state_field_path_expression Equals_Operator new_value;
-
-new_value options { backtrack=true; }:
-    simple_arithmetic_expression
-    | simple_entity_expression
-    | STRING_LITERAL
-    | NUMERIC_LITERAL
-    | NULL;
-
-orderby_clause :
-  	ORDER BY orderby_item (Comma orderby_item)*
-  		-> ^(LORDER orderby_item (orderby_item)*);
 
 orderby_item :
   	(state_field_path_expression | entity_type_expression) (ASC | DESC)?

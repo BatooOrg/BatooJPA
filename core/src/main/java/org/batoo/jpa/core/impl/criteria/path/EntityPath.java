@@ -26,6 +26,7 @@ import javax.persistence.criteria.Path;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractTypeExpression;
 import org.batoo.jpa.core.impl.criteria.expression.EntityTypeExpression;
@@ -82,7 +83,7 @@ public class EntityPath<Z, X> extends ParentPath<Z, X> implements Joinable {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(BaseQueryImpl<?> query) {
 		final StringBuilder builder = new StringBuilder();
 
 		builder.append(this.getParentPath().generateJpqlRestriction(query));
@@ -172,7 +173,7 @@ public class EntityPath<Z, X> extends ParentPath<Z, X> implements Joinable {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
 		return this.fetchRoot.getSqlRestrictionFragments(query, MapSelectType.VALUE);
 	}
 
@@ -181,7 +182,7 @@ public class EntityPath<Z, X> extends ParentPath<Z, X> implements Joinable {
 	 * 
 	 */
 	@Override
-	public String getTableAlias(AbstractCriteriaQueryImpl<?> query, AbstractTable table) {
+	public String getTableAlias(BaseQueryImpl<?> query, AbstractTable table) {
 		return this.getFetchRoot().getTableAlias(query, table);
 	}
 

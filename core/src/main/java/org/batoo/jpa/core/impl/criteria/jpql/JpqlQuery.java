@@ -48,8 +48,12 @@ import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.AbstractSelection;
+import org.batoo.jpa.core.impl.criteria.BaseQuery;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
+import org.batoo.jpa.core.impl.criteria.CriteriaDeleteImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.CriteriaUpdateImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.SubqueryImpl;
@@ -100,8 +104,8 @@ public class JpqlQuery {
 	private final MetamodelImpl metamodel;
 	private final String qlString;
 
-	private final AbstractCriteriaQueryImpl<?> criteria;
-	private final Map<AbstractQuery<?>, Map<String, AbstractFrom<?, ?>>> aliasMap = Maps.newHashMap();
+	private final BaseQuery<?> q;
+	private final Map<BaseQuery<?>, Map<String, AbstractFrom<?, ?>>> aliasMap = Maps.newHashMap();
 
 	private HashMap<String, Object> hints;
 	private LockModeType lockMode;
@@ -122,7 +126,7 @@ public class JpqlQuery {
 		this(entityManagerFactory, metadata.getQuery(), cb);
 
 		// force sql compilation
-		this.criteria.getSql();
+		this.q.getSql();
 
 		this.lockMode = metadata.getLockMode();
 		if (metadata.getHints().size() > 0) {
@@ -156,7 +160,7 @@ public class JpqlQuery {
 			cb = entityManagerFactory.getCriteriaBuilder();
 		}
 
-		this.criteria = this.parse(cb);
+		this.q = this.parse(cb);
 	}
 
 	/**
@@ -172,14 +176,54 @@ public class JpqlQuery {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private AbstractCriteriaQueryImpl<?> construct(CriteriaBuilderImpl cb, CommonTree tree) {
+	private BaseQueryImpl<?> construct(CriteriaBuilderImpl cb, CommonTree tree) {
 		final Tree type = tree.getChild(0);
 		if (type.getType() == JpqlParser.SELECT) {
 			return this.constructSelectQuery(cb, tree);
 		}
+		else if (type.getType() == JpqlParser.DELETE) {
+			return this.constructDeleteQuery(cb, tree);
+		}
 		else {
 			return this.constructUpdateQuery(cb, tree);
 		}
+	}
+
+	/**
+	 * Constructs an update query.
+	 * 
+	 * @param cb
+	 *            the criteria builder
+	 * @param tree
+	 *            the tree
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 * @return
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private CriteriaDeleteImpl constructDeleteQuery(CriteriaBuilderImpl cb, CommonTree tree) {
+		final CriteriaDeleteImpl q = new CriteriaDeleteImpl(this.metamodel);
+
+		final Tree deleteDef = tree.getChild(0);
+
+		final Tree aliasedDef = deleteDef.getChild(0);
+		final Aliased aliased = new Aliased(aliasedDef);
+
+		final EntityTypeImpl entity = this.getEntity(aliased.getQualified().toString());
+		final RootImpl<?> r = (RootImpl<?>) q.from(entity);
+		this.putAlias(q, aliasedDef, aliased, r);
+
+		if (tree.getChildCount() == 2) {
+			q.where(this.constructJunction(cb, q, deleteDef.getChild(1)));
+		}
+		final Tree setDefs = tree.getChild(1);
+		for (int i = 0; i < setDefs.getChildCount(); i++) {
+			final Tree setDef = setDefs.getChild(i);
+			this.getExpression(cb, q, setDef.getChild(0), null);
+		}
+
+		return q;
 	}
 
 	/**
@@ -207,9 +251,9 @@ public class JpqlQuery {
 				final RootImpl<Object> r = (RootImpl<Object>) q.from(entity);
 				r.alias(fromDef.getAlias());
 
-				this.putAlias(q, from, fromDef, r);
+				this.putAlias((BaseQueryImpl<?>) q, from, fromDef, r);
 
-				this.constructJoins(cb, q, r, from.getChild(1));
+				this.constructJoins(cb, (AbstractCriteriaQueryImpl<?>) q, r, from.getChild(1));
 
 			}
 
@@ -233,7 +277,7 @@ public class JpqlQuery {
 
 				parent.alias(aliased.getAlias());
 
-				this.putAlias(q, from.getChild(1), aliased, parent);
+				this.putAlias((BaseQueryImpl<?>) q, from.getChild(1), aliased, parent);
 			}
 
 			// sub query from
@@ -244,7 +288,7 @@ public class JpqlQuery {
 				final RootImpl<Object> r = (RootImpl<Object>) q.from(entity);
 				r.alias(fromDef.getAlias());
 
-				this.putAlias(q, from, fromDef, r);
+				this.putAlias((BaseQuery<?>) q, from, fromDef, r);
 			}
 		}
 	}
@@ -288,7 +332,7 @@ public class JpqlQuery {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private void constructJoins(CriteriaBuilderImpl cb, AbstractQuery<?> q, RootImpl<Object> r, Tree joins) {
+	private void constructJoins(CriteriaBuilderImpl cb, AbstractCriteriaQueryImpl<?> q, RootImpl<Object> r, Tree joins) {
 		for (int i = 0; i < joins.getChildCount(); i++) {
 			final Tree join = joins.getChild(i);
 
@@ -342,7 +386,7 @@ public class JpqlQuery {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private Expression<Boolean> constructJunction(CriteriaBuilderImpl cb, AbstractQuery<?> q, Tree junctionDef) {
+	private Expression<Boolean> constructJunction(CriteriaBuilderImpl cb, Object q, Tree junctionDef) {
 		final List<Expression<Boolean>> predictions = Lists.newArrayList();
 
 		for (int i = 0; i < junctionDef.getChildCount(); i++) {
@@ -407,7 +451,7 @@ public class JpqlQuery {
 	 * @author hceylan
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private <X> Expression<Boolean> constructPredicate(CriteriaBuilderImpl cb, AbstractQuery<?> q, Tree predictionDef) {
+	private <X> Expression<Boolean> constructPredicate(CriteriaBuilderImpl cb, Object q, Tree predictionDef) {
 		if ((predictionDef.getType() == JpqlParser.Equals_Operator) //
 			|| (predictionDef.getType() == JpqlParser.Not_Equals_Operator) //
 			|| (predictionDef.getType() == JpqlParser.Greater_Than_Operator) //
@@ -706,8 +750,18 @@ public class JpqlQuery {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private <T> SubqueryImpl<T> constructSubquery(CriteriaBuilderImpl cb, AbstractQuery<?> q, Tree subQueryDef, Class<T> javaType) {
-		final SubqueryImpl<T> s = (SubqueryImpl<T>) q.subquery(javaType);
+	private <T> SubqueryImpl<T> constructSubquery(CriteriaBuilderImpl cb, Object q, Tree subQueryDef, Class<T> javaType) {
+		final SubqueryImpl<T> s;
+
+		if (q instanceof CriteriaQueryImpl) {
+			s = ((CriteriaQueryImpl<?>) q).subquery(javaType);
+		}
+		else if (q instanceof CriteriaUpdateImpl) {
+			s = ((CriteriaUpdateImpl<?>) q).subquery(javaType);
+		}
+		else {
+			s = ((CriteriaDeleteImpl<?>) q).subquery(javaType);
+		}
 
 		final Tree type = subQueryDef.getChild(0);
 		if (type.getType() == JpqlParser.SELECT) {
@@ -765,8 +819,26 @@ public class JpqlQuery {
 	 * @author hceylan
 	 * @return
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private CriteriaUpdateImpl<?> constructUpdateQuery(CriteriaBuilderImpl cb, CommonTree tree) {
+		final CriteriaUpdateImpl<?> q = new CriteriaUpdateImpl(this.metamodel);
 
+		final Tree deleteDef = tree.getChild(0);
+
+		final Tree aliasedDef = deleteDef.getChild(0);
+		final Aliased aliased = new Aliased(aliasedDef);
+
+		final EntityTypeImpl entity = this.getEntity(aliased.getQualified().toString());
+		final RootImpl<?> r = (RootImpl<?>) q.from(entity);
+		this.putAlias(q, aliasedDef, aliased, r);
+
+		final Tree setDefs = tree.getChild(1);
+		for (int i = 0; i < setDefs.getChildCount(); i++) {
+			final Tree setDef = setDefs.getChild(i);
+			this.getExpression(cb, q, setDef.getChild(0), null);
+		}
+
+		return q;
 	}
 
 	/**
@@ -783,7 +855,7 @@ public class JpqlQuery {
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> QueryImpl<T> createTypedQuery(EntityManagerImpl entityManager) {
-		final QueryImpl<T> typedQuery = new QueryImpl<T>((CriteriaQueryImpl<T>) this.criteria, entityManager);
+		final QueryImpl<T> typedQuery = new QueryImpl<T>((BaseQuery<T>) this.q, entityManager);
 
 		if (this.lockMode != null) {
 			typedQuery.setLockMode(this.lockMode);
@@ -798,7 +870,7 @@ public class JpqlQuery {
 		return typedQuery;
 	}
 
-	private AbstractFrom<?, ?> getAliased(AbstractQuery<?> q, String alias) {
+	private AbstractFrom<?, ?> getAliased(Object q, String alias) {
 		final Map<String, AbstractFrom<?, ?>> aliasMap = this.aliasMap.get(q);
 
 		if (aliasMap != null) {
@@ -846,7 +918,7 @@ public class JpqlQuery {
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	private <X, C extends Collection<E>, E> AbstractExpression<X> getExpression(CriteriaBuilderImpl cb, AbstractQuery<?> q, Tree exprDef, Class<X> javaType) {
+	private <X, C extends Collection<E>, E> AbstractExpression<X> getExpression(CriteriaBuilderImpl cb, Object q, Tree exprDef, Class<X> javaType) {
 		// identification variable
 		if (exprDef.getType() == JpqlParser.ID) {
 			return (AbstractExpression<X>) this.getAliased(q, exprDef.getText());
@@ -1054,10 +1126,6 @@ public class JpqlQuery {
 
 			case JpqlParser.LENGTH:
 				return (AbstractExpression<X>) cb.length(this.getExpression(cb, q, exprDef.getChild(0), String.class));
-
-			case JpqlParser.SIZE:
-			case JpqlParser.INDEX:
-				// TODO
 		}
 
 		// aggregate functions
@@ -1269,7 +1337,7 @@ public class JpqlQuery {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private AbstractCriteriaQueryImpl<?> parse(CriteriaBuilderImpl cb) {
+	private BaseQueryImpl<?> parse(CriteriaBuilderImpl cb) {
 		final CommonTree tree = this.parse(this.qlString);
 
 		JpqlQuery.LOG.debug("Parsed query successfully {0}", //
@@ -1305,7 +1373,7 @@ public class JpqlQuery {
 		}
 	}
 
-	private void putAlias(AbstractQuery<?> q, Tree aliasedDef, final Aliased aliased, final AbstractFrom<?, ?> r) {
+	private void putAlias(BaseQuery<?> q, Tree aliasedDef, final Aliased aliased, final AbstractFrom<?, ?> r) {
 		Map<String, AbstractFrom<?, ?>> aliasMap = this.aliasMap.get(q);
 		if (aliasMap == null) {
 			aliasMap = Maps.newHashMap();

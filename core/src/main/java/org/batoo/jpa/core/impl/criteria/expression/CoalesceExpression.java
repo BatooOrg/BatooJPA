@@ -27,6 +27,7 @@ import javax.persistence.criteria.Expression;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
@@ -79,7 +80,7 @@ public class CoalesceExpression<T> extends AbstractExpression<T> implements Coal
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(final AbstractCriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(final BaseQueryImpl<?> query) {
 		return "coalesce(" + Joiner.on(", ").join(Lists.transform(this.values, new Function<Expression<? extends T>, String>() {
 
 			@Override
@@ -122,7 +123,7 @@ public class CoalesceExpression<T> extends AbstractExpression<T> implements Coal
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(final AbstractCriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(final BaseQueryImpl<?> query) {
 		return new String[] { "COALESCE(" + Joiner.on(", ").join(Lists.transform(this.values, new Function<Expression<? extends T>, String>() {
 
 			@Override

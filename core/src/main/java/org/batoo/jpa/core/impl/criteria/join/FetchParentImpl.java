@@ -40,6 +40,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl.MapSelectType;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
@@ -510,7 +511,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private String getAlias(AbstractCriteriaQueryImpl<?> query) {
+	private String getAlias(BaseQueryImpl<?> query) {
 		if (this.alias == null) {
 			this.alias = query.generateTableAlias(this.entity != null);
 		}
@@ -745,7 +746,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String getPrimaryTableAlias(AbstractCriteriaQueryImpl<?> query) {
+	public String getPrimaryTableAlias(BaseQueryImpl<?> query) {
 		if (this.primaryTableAlias == null) {
 			this.primaryTableAlias = this.getAlias(query) + "_P";
 		}
@@ -765,7 +766,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query, MapSelectType selectType) {
+	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query, MapSelectType selectType) {
 		final List<String> restrictions = Lists.newArrayList();
 
 		if (this.entity != null) {
@@ -793,7 +794,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @author hceylan
 	 */
 	@Override
-	public String getTableAlias(AbstractCriteriaQueryImpl<?> query, AbstractTable table) {
+	public String getTableAlias(BaseQueryImpl<?> query, AbstractTable table) {
 		if (table instanceof SecondaryTable) {
 			String alias = this.tableAliases.get(table);
 			if (alias == null) {

@@ -25,6 +25,7 @@ import javax.persistence.criteria.Expression;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
@@ -69,7 +70,7 @@ public class LikeExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(BaseQueryImpl<?> query) {
 		final StringBuilder builder = new StringBuilder();
 
 		builder.append(this.inner.generateJpqlRestriction(query));
@@ -121,7 +122,7 @@ public class LikeExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
 		final StringBuilder builder = new StringBuilder();
 
 		builder.append(this.inner.getSqlRestrictionFragments(query)[0]);

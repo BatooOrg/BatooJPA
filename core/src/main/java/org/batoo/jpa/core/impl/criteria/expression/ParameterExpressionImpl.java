@@ -27,6 +27,7 @@ import javax.persistence.metamodel.Type.PersistenceType;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -78,7 +79,7 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected void ensureAlias(AbstractCriteriaQueryImpl<?> query) {
+	protected void ensureAlias(BaseQueryImpl<?> query) {
 		if (this.position == null) {
 			this.position = query.getAlias(this);
 			if (StringUtils.isBlank(this.getAlias())) {
@@ -98,12 +99,10 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
-		final StringBuilder builder = new StringBuilder();
-
+	public String generateJpqlRestriction(BaseQueryImpl<?> query) {
 		this.ensureAlias(query);
 
-		return builder.append(":").append(this.getAlias()).toString();
+		return ":" + this.getAlias();
 	}
 
 	/**
@@ -112,8 +111,6 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 */
 	@Override
 	public String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
-		this.ensureAlias(query);
-
 		return this.generateJpqlRestriction(query);
 	}
 
@@ -188,7 +185,7 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
 		this.ensureAlias(query);
 
 		query.setNextSqlParam(this);

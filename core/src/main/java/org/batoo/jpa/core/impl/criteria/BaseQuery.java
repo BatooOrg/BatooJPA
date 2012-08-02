@@ -18,39 +18,44 @@
  */
 package org.batoo.jpa.core.impl.criteria;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
 import javax.persistence.criteria.ParameterExpression;
-import javax.persistence.criteria.Selection;
 
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
-
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import org.batoo.jpa.core.impl.model.MetamodelImpl;
 
 /**
- * Commons super class for criteria queries.
  * 
  * @param <T>
- *            the type of the query
+ *            type of the query
  * 
  * @author hceylan
  * @since $version
  */
-public abstract class BaseQuery<T> {
+public interface BaseQuery<T> {
 
-	private int nextEntityAlias;
-	private int nextSelection;
-	private int nextparam;
+	/**
+	 * Generates the JPQL for the query.
+	 * 
+	 * @return the generated JPQL
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	String generateJpql();
 
-	private final HashMap<Selection<?>, String> selections = Maps.newHashMap();
-	private final HashBiMap<ParameterExpressionImpl<?>, Integer> parameters = HashBiMap.create();
-	private final HashMap<String, List<AbstractColumn>> fields = Maps.newHashMap();
+	/**
+	 * Returns the generated SQL.
+	 * 
+	 * @return the generated SQL
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	String generateSql();
 
 	/**
 	 * Returns the generated entity alias.
@@ -62,9 +67,7 @@ public abstract class BaseQuery<T> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String generateTableAlias(boolean entity) {
-		return "E" + (!entity ? "C" : "") + this.nextEntityAlias++;
-	}
+	String generateTableAlias(boolean entity);
 
 	/**
 	 * Returns the generated alias for the selection.
@@ -76,15 +79,7 @@ public abstract class BaseQuery<T> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String getAlias(AbstractSelection<?> selection) {
-		String alias = this.selections.get(selection);
-		if (alias == null) {
-			alias = "S" + this.nextSelection++;
-			this.selections.put(selection, alias);
-		}
-
-		return alias;
-	}
+	String getAlias(AbstractSelection<?> selection);
 
 	/**
 	 * Returns the generated alias for the parameter.
@@ -96,15 +91,7 @@ public abstract class BaseQuery<T> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Integer getAlias(ParameterExpressionImpl<?> parameter) {
-		Integer alias = this.parameters.get(parameter);
-		if (alias == null) {
-			alias = this.nextparam++;
-			this.parameters.put(parameter, alias);
-		}
-
-		return alias;
-	}
+	Integer getAlias(ParameterExpressionImpl<?> parameter);
 
 	/**
 	 * @param tableAlias
@@ -116,21 +103,25 @@ public abstract class BaseQuery<T> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String getFieldAlias(String tableAlias, AbstractColumn column) {
-		List<AbstractColumn> fields = this.fields.get(tableAlias);
-		if (fields == null) {
-			fields = Lists.newArrayList();
-			this.fields.put(tableAlias, fields);
-		}
+	String getFieldAlias(String tableAlias, AbstractColumn column);
 
-		final int i = fields.indexOf(column);
-		if (i >= 0) {
-			return Integer.toString(i);
-		}
+	/**
+	 * Returns the JPQL for the query.
+	 * 
+	 * @return the the JPQL
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	String getJpql();
 
-		fields.add(column);
-		return Integer.toString(fields.size() - 1);
-	}
+	/**
+	 * Returns the metamodel.
+	 * 
+	 * @return the metamodel
+	 * @since $version
+	 */
+	MetamodelImpl getMetamodel();
 
 	/**
 	 * Returns the parameter at position.
@@ -142,9 +133,7 @@ public abstract class BaseQuery<T> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ParameterExpressionImpl<?> getParameter(int position) {
-		return this.parameters.inverse().get(position);
-	}
+	ParameterExpressionImpl<?> getParameter(int position);
 
 	/**
 	 * Returns the parameters of the query. Returns empty set if there are no parameters.
@@ -156,10 +145,52 @@ public abstract class BaseQuery<T> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Set<ParameterExpression<?>> getParameters() {
-		final Set<ParameterExpression<?>> parameters = Sets.newHashSet();
-		parameters.addAll(this.parameters.keySet());
+	Set<ParameterExpression<?>> getParameters();
 
-		return parameters;
-	}
+	/**
+	 * Returns the SQL for the query.
+	 * 
+	 * @return the the SQL
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	String getSql();
+
+	/**
+	 * Returns the SQL parameters of the query.
+	 * 
+	 * @return the SQL Parameters of the query
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	List<ParameterExpressionImpl<?>> getSqlParameters();
+
+	/**
+	 * Adds the parameter to the SQL parameters queue.
+	 * 
+	 * @param parameter
+	 *            the parameter to add
+	 * @return the positional number of the parameter
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	int setNextSqlParam(ParameterExpressionImpl<?> parameter);
+
+	/**
+	 * Create a subquery of the query.
+	 * 
+	 * @param type
+	 *            the subquery result type
+	 * @param <U>
+	 *            The type of the represented object
+	 * @return subquery
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	<U> SubqueryImpl<U> subquery(Class<U> type);
+
 }

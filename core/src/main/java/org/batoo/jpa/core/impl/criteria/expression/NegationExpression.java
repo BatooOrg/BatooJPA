@@ -25,6 +25,7 @@ import javax.persistence.criteria.Expression;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.path.BasicPath;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -62,7 +63,7 @@ public class NegationExpression<N extends Number> extends AbstractExpression<N> 
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(BaseQueryImpl<?> query) {
 		return "-(" + this.inner.generateJpqlRestriction(query) + ")";
 	}
 
@@ -115,7 +116,7 @@ public class NegationExpression<N extends Number> extends AbstractExpression<N> 
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
 		return new String[] { "-(" + this.inner.getSqlRestrictionFragments(query)[0] + ")" };
 	}
 

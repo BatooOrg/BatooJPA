@@ -26,8 +26,8 @@ import javax.persistence.PersistenceException;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 
-import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.AbstractSelection;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 
 import com.google.common.collect.Lists;
 
@@ -100,7 +100,7 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query);
+	public abstract String generateJpqlRestriction(BaseQueryImpl<?> query);
 
 	/**
 	 * Returns the converter of the expression.

@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
@@ -60,7 +61,7 @@ public class ConstantExpression<T> extends AbstractExpression<T> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(BaseQueryImpl<?> query) {
 		if (Number.class.isAssignableFrom(this.getJavaType())) {
 			return this.value.toString();
 		}
@@ -92,7 +93,7 @@ public class ConstantExpression<T> extends AbstractExpression<T> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
 		if (Number.class.isAssignableFrom(this.getJavaType())) {
 			return new String[] { this.value.toString() };
 		}

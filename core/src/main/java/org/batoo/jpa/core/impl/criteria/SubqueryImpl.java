@@ -23,11 +23,13 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.criteria.AbstractQuery;
 import javax.persistence.criteria.CollectionJoin;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.ListJoin;
 import javax.persistence.criteria.MapJoin;
+import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.SetJoin;
@@ -35,7 +37,9 @@ import javax.persistence.criteria.Subquery;
 import javax.persistence.metamodel.EntityType;
 
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
+import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
+import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.util.BatooUtils;
@@ -51,10 +55,10 @@ import com.google.common.collect.Sets;
  * @author hceylan
  * @since $version
  */
-public class SubqueryImpl<T> extends AbstractExpression<T> implements Subquery<T> {
+public class SubqueryImpl<T> extends AbstractExpression<T> implements Subquery<T>, BaseQuery<T> {
 
 	private final SubQueryStub<T> query;
-	private final BaseQuery<?> parent;
+	private final BaseQueryImpl<?> parent;
 	private final Set<AbstractFrom<?, ?>> correlatedJoins = Sets.newHashSet();
 
 	/**
@@ -68,7 +72,7 @@ public class SubqueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SubqueryImpl(MetamodelImpl metamodel, BaseQuery<?> parent, Class<T> javaType) {
+	public SubqueryImpl(MetamodelImpl metamodel, BaseQueryImpl<?> parent, Class<T> javaType) {
 		super(javaType);
 
 		this.parent = parent;
@@ -185,7 +189,16 @@ public class SubqueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
+	public String generateJpql() {
+		return this.query.generateJpql();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String generateJpqlRestriction(BaseQueryImpl<?> query) {
 		return "(\n" + BatooUtils.indent(BatooUtils.indent(this.query.generateJpql())) + ")";
 	}
 
@@ -203,6 +216,15 @@ public class SubqueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 	 * 
 	 */
 	@Override
+	public String generateSql() {
+		return this.query.generateSql();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		return null; // N/A;
 	}
@@ -212,8 +234,44 @@ public class SubqueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 	 * 
 	 */
 	@Override
+	public String generateTableAlias(boolean entity) {
+		return this.query.generateTableAlias(entity);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getAlias(AbstractSelection<?> selection) {
+		return this.query.getAlias(selection);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Integer getAlias(ParameterExpressionImpl<?> parameter) {
+		return this.query.getAlias(parameter);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public Set<Join<?, ?>> getCorrelatedJoins() {
 		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getFieldAlias(String tableAlias, AbstractColumn column) {
+		return this.query.getFieldAlias(tableAlias, column);
 	}
 
 	/**
@@ -239,8 +297,44 @@ public class SubqueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 	 * 
 	 */
 	@Override
-	public BaseQuery<?> getParent() {
-		return this.parent;
+	public String getJpql() {
+		return this.query.getJpql();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public MetamodelImpl getMetamodel() {
+		return this.query.getMetamodel();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public ParameterExpressionImpl<?> getParameter(int position) {
+		return this.query.getParameter(position);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Set<ParameterExpression<?>> getParameters() {
+		return this.query.getParameters();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public AbstractQuery<?> getParent() {
+		return (AbstractQuery<?>) this.parent;
 	}
 
 	/**
@@ -285,7 +379,25 @@ public class SubqueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
+	public String getSql() {
+		return this.query.getSql();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<ParameterExpressionImpl<?>> getSqlParameters() {
+		return this.query.getSqlParameters();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
 		return new String[] { "(\n" + BatooUtils.indent(BatooUtils.indent(this.query.getSql())) + ")" };
 	}
 
@@ -352,6 +464,15 @@ public class SubqueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 		this.query.select(expression);
 
 		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int setNextSqlParam(ParameterExpressionImpl<?> parameter) {
+		return this.query.setNextSqlParam(parameter);
 	}
 
 	/**

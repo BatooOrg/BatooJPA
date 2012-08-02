@@ -26,6 +26,7 @@ import javax.persistence.criteria.Path;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.StaticTypeExpression;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
@@ -68,7 +69,7 @@ public class BasicPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(BaseQueryImpl<?> query) {
 		final StringBuilder builder = new StringBuilder();
 
 		builder.append(this.getParentPath().generateJpqlRestriction(query));
@@ -131,7 +132,7 @@ public class BasicPath<X> extends AbstractPath<X> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
 		final BasicColumn column = this.mapping.getColumn();
 
 		final String tableAlias = this.getRootPath().getTableAlias(query, column.getTable());

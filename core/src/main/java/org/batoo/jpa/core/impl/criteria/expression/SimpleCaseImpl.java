@@ -27,6 +27,7 @@ import javax.persistence.criteria.Expression;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.util.Pair;
@@ -72,7 +73,7 @@ public class SimpleCaseImpl<C, R> extends AbstractExpression<R> implements Simpl
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(final AbstractCriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(final BaseQueryImpl<?> query) {
 		final String whens = Joiner.on("\n\t").join(Lists.transform(this.conditions, //
 			new Function<Pair<Expression<C>, Expression<? extends R>>, String>() {
 
@@ -133,7 +134,7 @@ public class SimpleCaseImpl<C, R> extends AbstractExpression<R> implements Simpl
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(final AbstractCriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(final BaseQueryImpl<?> query) {
 		final String innerFragment = ((AbstractExpression<? extends C>) this.inner).getSqlRestrictionFragments(query)[0];
 
 		final String whens = Joiner.on("\n\t").join(Lists.transform(this.conditions, //

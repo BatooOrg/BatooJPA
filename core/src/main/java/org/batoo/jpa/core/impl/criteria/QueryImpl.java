@@ -36,6 +36,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.Parameter;
 import javax.persistence.PersistenceException;
+import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.ParameterExpression;
@@ -64,16 +65,15 @@ import com.google.common.collect.Sets;
  * @author hceylan
  * @since $version
  */
-public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>> {
+public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>>, Query {
 
 	private static final int MAX_COL_LENGTH = 30;
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(QueryImpl.class);
 
 	private final EntityManagerImpl em;
-	private final CriteriaQueryImpl<X> cq;
+	private final BaseQuery<X> q;
 	private String sql;
-	private final AbstractSelection<X> selection;
 	private final Map<String, Object> hints = Maps.newHashMap();
 	private int startPosition = 0;
 	private int maxResult = Integer.MAX_VALUE;
@@ -87,8 +87,10 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>> {
 	private ResultSetMetaData md;
 	private String[] labels;
 
+	private FlushModeType flushMode = FlushModeType.AUTO;
+
 	/**
-	 * @param criteriaQuery
+	 * @param q
 	 *            the criteria query
 	 * @param entityManager
 	 *            the entity manager
@@ -96,17 +98,41 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public QueryImpl(CriteriaQueryImpl<X> criteriaQuery, EntityManagerImpl entityManager) {
+	public QueryImpl(BaseQuery<X> q, EntityManagerImpl entityManager) {
 		super();
 
-		this.cq = criteriaQuery;
+		this.q = q;
 		this.em = entityManager;
-		this.selection = this.cq.getSelection();
-		this.sql = this.cq.getSql();
+		this.sql = this.q.getSql();
 
-		for (final ParameterExpression<?> p : this.cq.getParameters()) {
+		for (final ParameterExpression<?> p : this.q.getParameters()) {
 			this.parameters.put((ParameterExpressionImpl<?>) p, null);
 		}
+	}
+
+	private Object[] applyParameters() {
+		int paramCount = 0;
+		if ((this.startPosition != 0) || (this.maxResult != Integer.MAX_VALUE)) {
+			QueryImpl.LOG.debug("Rows restricted to {0} / {1}", this.startPosition, this.maxResult);
+
+			this.sql = this.q.getMetamodel().getJdbcAdaptor().applyPagination(this.sql, this.startPosition, this.maxResult);
+		}
+
+		final MetamodelImpl metamodel = this.em.getMetamodel();
+
+		final List<ParameterExpressionImpl<?>> sqlParameters = this.q.getSqlParameters();
+
+		for (final ParameterExpressionImpl<?> parameter : sqlParameters) {
+			paramCount += parameter.getExpandedCount(metamodel);
+		}
+
+		final MutableInt sqlIndex = new MutableInt(0);
+		final Object[] parameters = new Object[paramCount];
+
+		for (final ParameterExpressionImpl<?> parameter : sqlParameters) {
+			parameter.setParameter(metamodel, parameters, sqlIndex, this.parameters.get(parameter));
+		}
+		return parameters;
 	}
 
 	private void dumpResultSet() throws SQLException {
@@ -180,8 +206,21 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>> {
 	 */
 	@Override
 	public int executeUpdate() {
-		// TODO Auto-generated method stub
-		return 0;
+		final Object[] parameters = this.applyParameters();
+
+		try {
+			return new QueryRunner().update(this.em.getConnection(), this.sql, parameters);
+		}
+		catch (final SQLException e) {
+			QueryImpl.LOG.error(e, "Query failed" + QueryImpl.LOG.lazyBoxed(this.sql, parameters));
+
+			final EntityTransaction transaction = this.em.getTransaction();
+			if (transaction != null) {
+				transaction.setRollbackOnly();
+			}
+
+			throw new PersistenceException("Query failed", e);
+		}
 	}
 
 	/**
@@ -192,8 +231,8 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public CriteriaQueryImpl<X> getCriteriaQuery() {
-		return this.cq;
+	public BaseQuery<X> getCriteriaQuery() {
+		return this.q;
 	}
 
 	/**
@@ -211,8 +250,7 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>> {
 	 */
 	@Override
 	public FlushModeType getFlushMode() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.flushMode;
 	}
 
 	/**
@@ -300,7 +338,7 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>> {
 	public Set<Parameter<?>> getParameters() {
 		final Set<Parameter<?>> parameters = Sets.newHashSet();
 
-		parameters.addAll(this.cq.getParameters());
+		parameters.addAll(this.q.getParameters());
 
 		return parameters;
 	}
@@ -352,7 +390,6 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>> {
 
 	private List<X> getResultListImpl() {
 		try {
-			int paramCount = 0;
 
 			final LockModeType lockMode = this.getLockMode();
 			if ((lockMode == LockModeType.PESSIMISTIC_READ) || (lockMode == LockModeType.PESSIMISTIC_WRITE)
@@ -360,26 +397,7 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>> {
 				this.sql = this.em.getJdbcAdaptor().applyLock(this.sql, lockMode);
 			}
 
-			if ((this.startPosition != 0) || (this.maxResult != Integer.MAX_VALUE)) {
-				QueryImpl.LOG.debug("Rows restricted to {0} / {1}", this.startPosition, this.maxResult);
-
-				this.sql = this.cq.getMetamodel().getJdbcAdaptor().applyPagination(this.sql, this.startPosition, this.maxResult);
-			}
-
-			final MetamodelImpl metamodel = this.em.getMetamodel();
-
-			final List<ParameterExpressionImpl<?>> sqlParameters = this.cq.getSqlParameters();
-
-			for (final ParameterExpressionImpl<?> parameter : sqlParameters) {
-				paramCount += parameter.getExpandedCount(metamodel);
-			}
-
-			final MutableInt sqlIndex = new MutableInt(0);
-			final Object[] parameters = new Object[paramCount];
-
-			for (final ParameterExpressionImpl<?> parameter : sqlParameters) {
-				parameter.setParameter(metamodel, parameters, sqlIndex, this.parameters.get(parameter));
-			}
+			final Object[] parameters = this.applyParameters();
 
 			try {
 				return new QueryRunner().query(this.em.getConnection(), this.sql, this, parameters);
@@ -427,6 +445,8 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>> {
 	public List<X> handle(ResultSet rs) throws SQLException {
 		this.md = rs.getMetaData();
 
+		final CriteriaQueryImpl<X> cq = (CriteriaQueryImpl<X>) this.q;
+		final AbstractSelection<X> selection = cq.getSelection();
 		final boolean debug = QueryImpl.LOG.isDebugEnabled();
 		if (debug) {
 			this.prepareLabels(this.md);
@@ -436,8 +456,9 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>> {
 
 		// process the resultset
 		while (rs.next()) {
-			final X instance = this.selection.handle(this, session, rs);
-			if (!this.cq.isDistinct() || !this.results.contains(instance)) {
+
+			final X instance = selection.handle(this, session, rs);
+			if (!cq.isDistinct() || !this.results.contains(instance)) {
 				this.results.add(instance);
 			}
 
@@ -506,9 +527,10 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>> {
 	 * 
 	 */
 	@Override
-	public TypedQuery<X> setFlushMode(FlushModeType flushMode) {
-		// TODO Auto-generated method stub
-		return null;
+	public QueryImpl<X> setFlushMode(FlushModeType flushMode) {
+		this.flushMode = flushMode;;
+
+		return this;
 	}
 
 	/**

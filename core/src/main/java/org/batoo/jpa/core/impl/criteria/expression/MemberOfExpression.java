@@ -26,6 +26,7 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Root;
 
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.SubqueryImpl;
@@ -76,7 +77,7 @@ public class MemberOfExpression<C extends Collection<E>, E> extends AbstractExpr
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(BaseQueryImpl<?> query) {
 		return this.value.generateJpqlRestriction(query) + (this.not ? " not member of " : " member of ") + this.values.generateJpqlRestriction(query);
 	}
 
@@ -104,7 +105,7 @@ public class MemberOfExpression<C extends Collection<E>, E> extends AbstractExpr
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
 		final CriteriaBuilderImpl cb = query.getMetamodel().getEntityManagerFactory().getCriteriaBuilder();
 		final Joinable rp = this.values.getParentPath().getRootPath();
 

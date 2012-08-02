@@ -27,6 +27,7 @@ import javax.persistence.criteria.Predicate;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
@@ -124,7 +125,7 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(final AbstractCriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(final BaseQueryImpl<?> query) {
 		String predicates = Joiner.on(" " + this.operator.name() + " ").join(
 			Lists.transform(this.expressions, new Function<AbstractExpression<Boolean>, String>() {
 
@@ -163,7 +164,7 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	 * 
 	 */
 	@Override
-	public String generateSqlRestriction(final AbstractCriteriaQueryImpl<?> query) {
+	public String generateSqlRestriction(final BaseQueryImpl<?> query) {
 		String predicates = Joiner.on(" " + this.operator.name() + " ").join(Lists.transform(this.expressions, new Function<BooleanExpression, String>() {
 
 			@Override

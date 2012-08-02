@@ -44,7 +44,9 @@ import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
+import org.batoo.jpa.core.impl.criteria.CriteriaDeleteImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.CriteriaUpdateImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.jpql.JpqlQuery;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
@@ -308,9 +310,9 @@ public class EntityManagerImpl implements EntityManager {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Query createQuery(CriteriaDelete<?> deleteQuery) {
-		// TODO Auto-generated method stub
-		return null;
+		return new QueryImpl((CriteriaDeleteImpl<?>) deleteQuery, this);
 	}
 
 	/**
@@ -327,9 +329,9 @@ public class EntityManagerImpl implements EntityManager {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Query createQuery(CriteriaUpdate<?> updateQuery) {
-		// TODO Auto-generated method stub
-		return null;
+		return new QueryImpl((CriteriaUpdateImpl<?>) updateQuery, this);
 	}
 
 	/**

@@ -25,6 +25,7 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Root;
 
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.SubqueryImpl;
@@ -63,7 +64,7 @@ public class IsEmptyExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String generateJpqlRestriction(AbstractCriteriaQueryImpl<?> query) {
+	public String generateJpqlRestriction(BaseQueryImpl<?> query) {
 		return this.inner.generateJpqlRestriction(query) + (this.not ? " is not empty" : " is empty");
 	}
 
@@ -90,7 +91,7 @@ public class IsEmptyExpression extends AbstractExpression<Boolean> {
 	 * 
 	 */
 	@Override
-	public String[] getSqlRestrictionFragments(AbstractCriteriaQueryImpl<?> query) {
+	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
 		final CriteriaBuilderImpl cb = query.getMetamodel().getEntityManagerFactory().getCriteriaBuilder();
 		final Joinable rp = this.inner.getParentPath().getRootPath();
 
