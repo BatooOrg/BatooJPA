@@ -33,6 +33,7 @@ import org.batoo.jpa.parser.impl.metadata.type.EntityMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.type.MappedSuperclassMetadataImpl;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata;
 import org.batoo.jpa.parser.metadata.Metadata;
+import org.batoo.jpa.parser.metadata.NamedNativeQueryMetadata;
 import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
@@ -61,6 +62,7 @@ public class MetadataImpl implements Metadata {
 	private final List<TableGeneratorMetadata> tableGenerators = Lists.newArrayList();
 
 	private final List<NamedQueryMetadata> namedQueries = Lists.newArrayList();
+	private final List<NamedNativeQueryMetadata> namedNativeQueries = Lists.newArrayList();
 	private final List<EntityListenerMetadata> entityListeners = Lists.newArrayList();
 	private final Map<String, ManagedTypeMetadata> entityMap = Maps.newHashMap();
 	private boolean cascadePersist;
@@ -130,6 +132,15 @@ public class MetadataImpl implements Metadata {
 	 * 
 	 */
 	@Override
+	public List<NamedNativeQueryMetadata> getNamedNativeQueries() {
+		return this.namedNativeQueries;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public List<NamedQueryMetadata> getNamedQueries() {
 		return this.namedQueries;
 	}
@@ -192,6 +203,7 @@ public class MetadataImpl implements Metadata {
 
 		this.entityListeners.addAll(metadata.getEntityListeners());
 		this.namedQueries.addAll(metadata.getNamedQueries());
+		this.namedNativeQueries.addAll(metadata.getNamedNativeQueries());
 
 		for (final ManagedTypeMetadata managedType : metadata.getEntityMappings()) {
 			final ManagedTypeMetadata existing = this.entityMap.put(managedType.getClassName(), managedType);
@@ -211,8 +223,6 @@ public class MetadataImpl implements Metadata {
 	 * @author hceylan
 	 */
 	public void parse() {
-		this.parseDefaultListeners();
-
 		for (final Entry<String, ManagedTypeMetadata> entry : this.entityMap.entrySet()) {
 			final String className = entry.getKey();
 			final ManagedTypeMetadata metadata = entry.getValue();
@@ -251,16 +261,5 @@ public class MetadataImpl implements Metadata {
 				throw new MappingException("Class " + className + " cound not be found.", metadata.getLocator());
 			}
 		}
-	}
-
-	/**
-	 * 
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	private void parseDefaultListeners() {
-		// TODO Auto-generated method stub
-
 	}
 }

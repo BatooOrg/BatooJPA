@@ -32,6 +32,8 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.SecondaryTable;
@@ -44,6 +46,7 @@ import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.parser.impl.metadata.AssociationOverrideMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.AttributeOverrideMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.DiscriminatorColumnMetadataImpl;
+import org.batoo.jpa.parser.impl.metadata.NamedNativeQueryMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.NamedQueryMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.SecondaryTableMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.SequenceGeneratorMetadataImpl;
@@ -52,6 +55,7 @@ import org.batoo.jpa.parser.impl.metadata.TableMetadataImpl;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.DiscriminatorColumnMetadata;
+import org.batoo.jpa.parser.metadata.NamedNativeQueryMetadata;
 import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
@@ -79,6 +83,7 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	private final List<AssociationMetadata> associationOverrides = Lists.newArrayList();
 	private final List<AttributeOverrideMetadata> attributeOverrides = Lists.newArrayList();
 	private final List<NamedQueryMetadata> namedQueries = Lists.newArrayList();
+	private final List<NamedNativeQueryMetadata> namedNativeQueries = Lists.newArrayList();
 	private InheritanceType inheritanceType;
 	private DiscriminatorColumnMetadata discriminatorColumn;
 	private String discriminatorValue;
@@ -120,6 +125,7 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 
 		// handle named queries
 		this.handleNamedQuery(metadata, parsed);
+		this.handleNamedNativeQuery(metadata, parsed);
 	}
 
 	/**
@@ -183,6 +189,16 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	@Override
 	public String getName() {
 		return this.name;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<NamedNativeQueryMetadata> getNamedNativeQueries() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**
@@ -422,6 +438,41 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 		}
 
 		return this.getClazz().getSimpleName();
+	}
+
+	/**
+	 * Handles the named native query definitions of the entity.
+	 * 
+	 * @param metadata
+	 *            the metadata
+	 * @param parsed
+	 *            the set of annotations parsed
+	 * 
+	 * @since $version
+	 * @author
+	 * @param parsed
+	 */
+	private void handleNamedNativeQuery(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
+		if ((metadata != null) && (metadata.getNamedNativeQueries().size() > 0)) {
+			this.namedNativeQueries.addAll(metadata.getNamedNativeQueries());
+		}
+
+		final NamedNativeQueries namedQueries = this.getClazz().getAnnotation(NamedNativeQueries.class);
+		if ((namedQueries != null) && (namedQueries.value().length > 0)) {
+			parsed.add(NamedNativeQueries.class);
+
+			for (final NamedNativeQuery namedQuery : namedQueries.value()) {
+				this.namedNativeQueries.add(new NamedNativeQueryMetadataImpl(this.getLocator(), namedQuery));
+			}
+		}
+		else {
+			final NamedNativeQuery namedQuery = this.getClazz().getAnnotation(NamedNativeQuery.class);
+			parsed.add(NamedNativeQuery.class);
+
+			if (namedQuery != null) {
+				this.namedNativeQueries.add(new NamedNativeQueryMetadataImpl(this.getLocator(), namedQuery));
+			}
+		}
 	}
 
 	/**

@@ -4,7 +4,7 @@
 	<access>PROPERTY</access>
 
 	<named-query name="aaa"><query>aaaa</query><hint name="" value=""></hint><lock-mode></lock-mode></named-query>
-	
+	<named-native-query name=""></named-native-query>
 	<mapped-superclass class=""></mapped-superclass>
 
 	<entity name="Entity" class="org.batoo.jpa.parser.test.Entity">

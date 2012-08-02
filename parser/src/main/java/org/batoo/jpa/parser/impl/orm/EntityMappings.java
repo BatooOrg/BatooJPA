@@ -25,6 +25,7 @@ import javax.persistence.AccessType;
 
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata;
 import org.batoo.jpa.parser.metadata.Metadata;
+import org.batoo.jpa.parser.metadata.NamedNativeQueryMetadata;
 import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
@@ -52,6 +53,7 @@ public class EntityMappings extends ParentElement implements Metadata {
 	private final List<TableGeneratorMetadata> tableGenerators = Lists.newArrayList();
 
 	private final List<NamedQueryMetadata> namedQueries = Lists.newArrayList();
+	private final List<NamedNativeQueryMetadata> namedNativeQueries = Lists.newArrayList();
 	private final List<EntityListenerMetadata> entityListeners = Lists.newArrayList();
 	private final List<ManagedTypeMetadata> entities = Lists.newArrayList();
 	private boolean cascadePersist;
@@ -74,7 +76,8 @@ public class EntityMappings extends ParentElement implements Metadata {
 			ElementConstants.ELEMENT_ENTITY, //
 			ElementConstants.ELEMENT_MAPPED_SUPERCLASS, //
 			ElementConstants.ELEMENT_EMBEDDABLE, //
-			ElementConstants.ELEMENT_NAMED_QUERY);
+			ElementConstants.ELEMENT_NAMED_QUERY, //
+			ElementConstants.ELEMENT_NAMED_NATIVE_QUERY);
 	}
 
 	/**
@@ -120,6 +123,15 @@ public class EntityMappings extends ParentElement implements Metadata {
 	@Override
 	public List<ManagedTypeMetadata> getEntityMappings() {
 		return this.entities;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<NamedNativeQueryMetadata> getNamedNativeQueries() {
+		return this.namedNativeQueries;
 	}
 
 	/**
@@ -216,6 +228,10 @@ public class EntityMappings extends ParentElement implements Metadata {
 
 		if (child instanceof NamedQueryMetadata) {
 			this.namedQueries.add((NamedQueryMetadata) child);
+		}
+
+		if (child instanceof NamedNativeQueryMetadata) {
+			this.namedNativeQueries.add((NamedNativeQueryMetadata) child);
 		}
 	}
 

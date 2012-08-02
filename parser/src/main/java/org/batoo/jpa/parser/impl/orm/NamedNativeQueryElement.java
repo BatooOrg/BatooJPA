@@ -20,24 +20,23 @@ package org.batoo.jpa.parser.impl.orm;
 
 import java.util.Map;
 
-import javax.persistence.LockModeType;
-
-import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
+import org.batoo.jpa.parser.metadata.NamedNativeQueryMetadata;
 
 import com.google.common.collect.Maps;
 
 /**
- * Element for <code>named-native-query</code> elements.
+ * Element for <code>named-query</code> elements.
  * 
  * @author hceylan
  * @since $version
  */
-public class NamedQueryElement extends ParentElement implements NamedQueryMetadata {
+public class NamedNativeQueryElement extends ParentElement implements NamedNativeQueryMetadata {
 
 	private String name;
 	private String query;
-	private LockModeType lockMode;
 	private final Map<String, Object> hints = Maps.newHashMap();
+	private String resultClass;
+	private String resultSetMapping;
 
 	/**
 	 * @param parent
@@ -48,11 +47,10 @@ public class NamedQueryElement extends ParentElement implements NamedQueryMetada
 	 * @since $version
 	 * @author hceylan
 	 */
-	public NamedQueryElement(ParentElement parent, Map<String, String> attributes) {
+	public NamedNativeQueryElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, //
 			ElementConstants.ELEMENT_QUERY, //
-			ElementConstants.ELEMENT_HINT, //
-			ElementConstants.ELEMENT_LOCK_MODE);
+			ElementConstants.ELEMENT_HINT);
 	}
 
 	/**
@@ -62,6 +60,8 @@ public class NamedQueryElement extends ParentElement implements NamedQueryMetada
 	@Override
 	protected void generate() {
 		this.name = this.getAttribute(ElementConstants.ATTR_NAME, ElementConstants.EMPTY);
+		this.resultClass = this.getAttribute(ElementConstants.ATTR_RESULT_CLASS, ElementConstants.EMPTY);
+		this.resultSetMapping = this.getAttribute(ElementConstants.ATTR_RESULT_SET_MAPPING, ElementConstants.EMPTY);
 	}
 
 	/**
@@ -71,15 +71,6 @@ public class NamedQueryElement extends ParentElement implements NamedQueryMetada
 	@Override
 	public Map<String, Object> getHints() {
 		return this.hints;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public LockModeType getLockMode() {
-		return this.lockMode;
 	}
 
 	/**
@@ -105,6 +96,24 @@ public class NamedQueryElement extends ParentElement implements NamedQueryMetada
 	 * 
 	 */
 	@Override
+	public String getResultClass() {
+		return this.resultClass;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getResultSetMapping() {
+		return this.resultSetMapping;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	protected void handleChild(Element child) {
 		if (child instanceof HintElement) {
 			this.hints.put(((HintElement) child).getName(), ((HintElement) child).getValue());
@@ -112,10 +121,6 @@ public class NamedQueryElement extends ParentElement implements NamedQueryMetada
 
 		if (child instanceof QueryElement) {
 			this.query = ((QueryElement) child).getQuery();
-		}
-
-		if (child instanceof LockModeElement) {
-			this.lockMode = ((LockModeElement) child).getLockMode();
 		}
 	}
 }

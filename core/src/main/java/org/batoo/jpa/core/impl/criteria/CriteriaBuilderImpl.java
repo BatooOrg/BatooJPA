@@ -336,9 +336,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public CriteriaQuery<Tuple> createTupleQuery() {
-		// TODO Auto-generated method stub
-		return null;
+	public CriteriaQueryImpl<Tuple> createTupleQuery() {
+		return new CriteriaQueryImpl<Tuple>(this.metamodel, Tuple.class);
 	}
 
 	/**

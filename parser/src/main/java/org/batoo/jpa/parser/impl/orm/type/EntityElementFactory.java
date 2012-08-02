@@ -45,6 +45,7 @@ import org.batoo.jpa.parser.metadata.CallbackMetadata;
 import org.batoo.jpa.parser.metadata.DiscriminatorColumnMetadata;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata;
 import org.batoo.jpa.parser.metadata.InheritanceMetadata;
+import org.batoo.jpa.parser.metadata.NamedNativeQueryMetadata;
 import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
@@ -83,6 +84,7 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 	private final List<EntityListenerMetadata> listeners = Lists.newArrayList();
 	private final List<CallbackMetadata> callbacks = Lists.newArrayList();
 	private final List<NamedQueryMetadata> namedQueries = Lists.newArrayList();
+	private final List<NamedNativeQueryMetadata> namedNativeQueries = Lists.newArrayList();
 
 	/**
 	 * Constructor for ORM File parsing
@@ -118,7 +120,8 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 			ElementConstants.ELEMENT_POST_UPDATE, //
 			ElementConstants.ELEMENT_EXCLUDE_DEFAULT_LISTENERS, //
 			ElementConstants.ELEMENT_EXCLUDE_SUPERCLASS_LISTENERS, //
-			ElementConstants.ELEMENT_NAMED_QUERY);
+			ElementConstants.ELEMENT_NAMED_QUERY, //
+			ElementConstants.ELEMENT_NAMED_NATIVE_QUERY);
 	}
 
 	/**
@@ -274,6 +277,15 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 	 * 
 	 */
 	@Override
+	public List<NamedNativeQueryMetadata> getNamedNativeQueries() {
+		return this.namedNativeQueries;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public List<NamedQueryMetadata> getNamedQueries() {
 		return this.namedQueries;
 	}
@@ -382,6 +394,10 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 
 		if (child instanceof NamedQueryMetadata) {
 			this.namedQueries.add((NamedQueryMetadata) child);
+		}
+
+		if (child instanceof NamedNativeQueryMetadata) {
+			this.namedNativeQueries.add((NamedNativeQueryMetadata) child);
 		}
 	}
 

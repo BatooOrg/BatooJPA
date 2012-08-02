@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import javax.persistence.PersistenceException;
+import javax.persistence.Tuple;
 import javax.persistence.criteria.CompoundSelection;
 import javax.persistence.criteria.Selection;
 
@@ -50,6 +51,7 @@ public class CompoundSelectionImpl<X> extends AbstractSelection<X> implements Co
 
 	private final List<AbstractSelection<?>> selections = Lists.newArrayList();
 	private ConstructorAccessor constructor;
+	private List<String> aliases;
 
 	/**
 	 * @param javaType
@@ -67,7 +69,7 @@ public class CompoundSelectionImpl<X> extends AbstractSelection<X> implements Co
 			this.selections.add((AbstractSelection<?>) selection);
 		}
 
-		if (javaType != Object[].class) {
+		if ((javaType != Object[].class) && (javaType != Tuple.class)) {
 			try {
 				final Class<?>[] parameters = new Class[this.selections.size()];
 				for (int i = 0; i < this.selections.size(); i++) {
@@ -128,6 +130,25 @@ public class CompoundSelectionImpl<X> extends AbstractSelection<X> implements Co
 	}
 
 	/**
+	 * @return
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private List<String> getAliases() {
+		if (this.aliases != null) {
+			return this.aliases;
+		}
+
+		this.aliases = Lists.newArrayList();
+		for (final AbstractSelection<?> selection : this.selections) {
+			this.aliases.add(selection.getAlias());
+		}
+
+		return this.aliases;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -147,6 +168,10 @@ public class CompoundSelectionImpl<X> extends AbstractSelection<X> implements Co
 
 		for (int i = 0; i < this.selections.size(); i++) {
 			values[i] = this.selections.get(i).handle(query, session, row);
+		}
+
+		if (this.getJavaType() == Tuple.class) {
+			return (X) new TupleImpl(this.getAliases(), this.selections, values);
 		}
 
 		try {

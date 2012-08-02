@@ -281,7 +281,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 */
 	public JpqlQuery getJpqlQuery(String qlString) {
 		try {
-			// TODO Check result class compatibility
 			return this.graphs.get(qlString);
 		}
 		catch (final Exception e) {

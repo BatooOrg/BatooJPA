@@ -83,6 +83,16 @@ public interface Metadata {
 	List<ManagedTypeMetadata> getEntityMappings();
 
 	/**
+	 * Returns the list of named native queries.
+	 * 
+	 * @return the list of named native queries
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	List<NamedNativeQueryMetadata> getNamedNativeQueries();
+
+	/**
 	 * Returns the list of named queries.
 	 * 
 	 * @return the list of named queries

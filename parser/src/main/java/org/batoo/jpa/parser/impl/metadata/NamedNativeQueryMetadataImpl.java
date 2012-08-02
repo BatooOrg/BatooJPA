@@ -16,52 +16,55 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.batoo.jpa.parser.impl.orm;
+package org.batoo.jpa.parser.impl.metadata;
 
 import java.util.Map;
 
-import javax.persistence.LockModeType;
+import javax.persistence.NamedNativeQuery;
+import javax.persistence.QueryHint;
 
+import org.batoo.jpa.parser.impl.AbstractLocator;
+import org.batoo.jpa.parser.metadata.NamedNativeQueryMetadata;
 import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 
 import com.google.common.collect.Maps;
 
 /**
- * Element for <code>named-native-query</code> elements.
+ * Implementation of {@link NamedQueryMetadata}.
  * 
  * @author hceylan
  * @since $version
  */
-public class NamedQueryElement extends ParentElement implements NamedQueryMetadata {
+public class NamedNativeQueryMetadataImpl implements NamedNativeQueryMetadata {
 
-	private String name;
-	private String query;
-	private LockModeType lockMode;
+	private final AbstractLocator locator;
+	private final String query;
+	private final String name;
 	private final Map<String, Object> hints = Maps.newHashMap();
+	private final String resultClass;
+	private final String resultSetMapping;
 
 	/**
-	 * @param parent
-	 *            the parent element factory
-	 * @param attributes
-	 *            the attributes
+	 * @param locator
+	 *            the locator
+	 * @param annotation
+	 *            the annotation
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public NamedQueryElement(ParentElement parent, Map<String, String> attributes) {
-		super(parent, attributes, //
-			ElementConstants.ELEMENT_QUERY, //
-			ElementConstants.ELEMENT_HINT, //
-			ElementConstants.ELEMENT_LOCK_MODE);
-	}
+	public NamedNativeQueryMetadataImpl(AbstractLocator locator, NamedNativeQuery annotation) {
+		super();
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	protected void generate() {
-		this.name = this.getAttribute(ElementConstants.ATTR_NAME, ElementConstants.EMPTY);
+		this.locator = locator;
+		this.name = annotation.name();
+		this.query = annotation.query();
+		this.resultClass = annotation.resultClass().getName();
+		this.resultSetMapping = annotation.resultSetMapping();
+
+		for (final QueryHint hint : annotation.hints()) {
+			this.hints.put(hint.name(), hint.value());
+		}
 	}
 
 	/**
@@ -78,8 +81,8 @@ public class NamedQueryElement extends ParentElement implements NamedQueryMetada
 	 * 
 	 */
 	@Override
-	public LockModeType getLockMode() {
-		return this.lockMode;
+	public AbstractLocator getLocator() {
+		return this.locator;
 	}
 
 	/**
@@ -105,17 +108,16 @@ public class NamedQueryElement extends ParentElement implements NamedQueryMetada
 	 * 
 	 */
 	@Override
-	protected void handleChild(Element child) {
-		if (child instanceof HintElement) {
-			this.hints.put(((HintElement) child).getName(), ((HintElement) child).getValue());
-		}
+	public String getResultClass() {
+		return this.resultClass;
+	}
 
-		if (child instanceof QueryElement) {
-			this.query = ((QueryElement) child).getQuery();
-		}
-
-		if (child instanceof LockModeElement) {
-			this.lockMode = ((LockModeElement) child).getLockMode();
-		}
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getResultSetMapping() {
+		return this.resultSetMapping;
 	}
 }

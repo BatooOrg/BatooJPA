@@ -84,6 +84,7 @@ public class ElementConstants {
 	protected static final String ELEMENT_MAP_KEY_ENUMERATED = "map-key-enumerated";
 	protected static final String ELEMENT_MAP_KEY_TEMPORAL = "map-key-temporal";
 	protected static final String ELEMENT_NAMED_QUERY = "named-query";
+	protected static final String ELEMENT_NAMED_NATIVE_QUERY = "named-native-query";
 	protected static final String ELEMENT_QUERY = "query";
 	protected static final String ELEMENT_ORDER_BY = "order-by";
 	protected static final String ELEMENT_ORDER_COLUMN = "order-column";
@@ -116,6 +117,8 @@ public class ElementConstants {
 	 */
 	protected static final String ATTR_NAME = "name";
 	protected static final String ATTR_VALUE = "value";
+	protected static final String ATTR_RESULT_CLASS = "result-class";
+	protected static final String ATTR_RESULT_SET_MAPPING = "result-set-mapping";
 
 	/**
 	 * Column Attribute names.
