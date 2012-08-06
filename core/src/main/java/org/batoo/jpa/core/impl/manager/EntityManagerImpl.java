@@ -1035,7 +1035,7 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public void setProperty(String propertyName, Object value) {
-		// TODO Auto-generated method stub
+		this.properties.put(propertyName, value);
 	}
 
 	/**

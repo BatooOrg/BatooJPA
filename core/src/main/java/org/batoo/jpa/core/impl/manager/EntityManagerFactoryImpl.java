@@ -68,6 +68,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	private final Map<String, Object> properties;
 	private final Map<String, JpqlQuery> namedQueries = Maps.newHashMap();
 	private final CriteriaBuilderImpl criteriaBuilder;
+	private final PersistenceUnitUtilImpl persistenceUtil;
 
 	LoadingCache<String, JpqlQuery> graphs = CacheBuilder.newBuilder().maximumSize(1000).build(new CacheLoader<String, JpqlQuery>() {
 		@Override
@@ -105,6 +106,8 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		this.criteriaBuilder = new CriteriaBuilderImpl(this.metamodel);
 
 		NamedQueriesManager.perform(this.metamodel, this.criteriaBuilder);
+
+		this.persistenceUtil = new PersistenceUnitUtilImpl(this);
 
 		this.open = true;
 	}
@@ -325,8 +328,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 */
 	@Override
 	public PersistenceUnitUtil getPersistenceUnitUtil() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.persistenceUtil;
 	}
 
 	/**

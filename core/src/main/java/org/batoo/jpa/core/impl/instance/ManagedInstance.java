@@ -767,6 +767,22 @@ public class ManagedInstance<X> {
 	}
 
 	/**
+	 * Returns if attribute name <code>attributeNaöe</code> has been loaded.
+	 * 
+	 * @param attributeName
+	 *            the name of the attribute
+	 * @return true if join is loaded, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isJoinLoaded(String attributeName) {
+		final Mapping<?, ?, ?> mapping = this.type.getRootMapping().getMapping(attributeName);
+
+		return this.joinsLoaded.contains(mapping);
+	}
+
+	/**
 	 * Returns if the instance is loading.
 	 * 
 	 * @return true if the instance is loading, false otherwise
