@@ -52,10 +52,6 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 	private static final String COUNTRY_CODE_USA = "USA";
 	private static final String COUNTRY_CODE_TR = "TR";
 
-	private static final String CITY_LONDON = "London";
-	private static final String CITY_NEW_YORK = "New York";
-	private static final String CITY_ISTANBUL = "Istanbul";
-
 	private static Country TR = new Country(SimpleCriteriaTest.COUNTRY_CODE_TR, SimpleCriteriaTest.COUNTRY_TR);
 	private static Country USA = new Country(SimpleCriteriaTest.COUNTRY_CODE_USA, SimpleCriteriaTest.COUNTRY_USA);
 	private static Country UK = new Country(SimpleCriteriaTest.COUNTRY_CODE_UK, SimpleCriteriaTest.COUNTRY_UK);
