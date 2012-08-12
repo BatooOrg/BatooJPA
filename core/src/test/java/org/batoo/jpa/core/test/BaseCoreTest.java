@@ -31,6 +31,7 @@ import javax.persistence.TypedQuery;
 
 import junit.framework.Assert;
 
+import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.BJPASettings;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
@@ -434,11 +435,14 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	/**
 	 * Builds the session factory.
 	 * 
+	 * @throws SQLException
+	 *             th
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	@Before
-	public void setup() {
+	public void setup() throws SQLException {
 		if (!this.lazySetup()) {
 			this.setupEmf();
 		}
@@ -460,14 +464,30 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	/**
 	 * Cleans up the test
 	 * 
+	 * @throws SQLException
+	 *             thrown if the tear down fails
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	@After
-	public void teardown() {
+	public void teardown() throws SQLException {
+		final String testMode = System.getProperty("testMode");
+
 		this.cleanupTx();
 
 		this.cleanUpEm();
+
+		final QueryRunner qr = new QueryRunner();
+
+		if ("mysql".equals(testMode) && (this.emf != null)) {
+			final EntityManagerImpl em = this.emf.createEntityManager();
+
+			qr.update(em.getConnection(), "drop database test");
+			qr.update(em.getConnection(), "create database test");
+
+			em.close();
+		}
 
 		if ((this.emf != null) && this.emf.isOpen()) {
 			try {
@@ -477,10 +497,12 @@ public abstract class BaseCoreTest { // extends BaseTest {
 			this.emf = null;
 		}
 
-		try {
-			DriverManager.getConnection("jdbc:derby:memory:test;drop=true");
+		if (StringUtils.isBlank(testMode) || "derby".equals(testMode)) {
+			try {
+				DriverManager.getConnection("jdbc:derby:memory:test;drop=true");
+			}
+			catch (final Exception e) {}
 		}
-		catch (final SQLException e) {}
 
 		Thread.currentThread().setContextClassLoader(this.oldContextClassLoader);
 		this.oldContextClassLoader = null;

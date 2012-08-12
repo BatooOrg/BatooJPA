@@ -134,9 +134,7 @@ public class LikeExpression extends AbstractExpression<Boolean> {
 
 		builder.append(this.pattern.getSqlRestrictionFragments(query)[0]);
 		if (this.escape != null) {
-			builder.append(" {ESCAPE ");
-			builder.append(this.escape.getSqlRestrictionFragments(query)[0]);
-			builder.append("}");
+			builder.append(query.getJdbcAdaptor().applyLikeEscape(this.escape.getSqlRestrictionFragments(query)[0]));
 		}
 
 		return new String[] { builder.toString() };

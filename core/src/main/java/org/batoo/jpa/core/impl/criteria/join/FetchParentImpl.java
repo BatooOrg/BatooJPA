@@ -220,12 +220,14 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	/**
 	 * Returns the restriction based on discrimination.
 	 * 
+	 * @param noQualification
+	 *            if the fields should not be quelified
 	 * @return the restriction based on discrimination, <code>null</code>
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String generateDiscrimination() {
+	public String generateDiscrimination(boolean noQualification) {
 		if ((this.entity.getRootType().getInheritanceType() == null) || (this.entity == this.entity.getRootType())) {
 			return null;
 		}
@@ -237,6 +239,10 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 				return "'" + input + "'";
 			}
 		});
+
+		if (noQualification) {
+			return this.entity.getRootType().getDiscriminatorColumn().getName() + " IN (" + Joiner.on(",").join(discriminators) + ")";
+		}
 
 		return this.primaryTableAlias + "." + this.entity.getRootType().getDiscriminatorColumn().getName() + " IN (" + Joiner.on(",").join(discriminators)
 			+ ")";
@@ -771,10 +777,14 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 
 		if (this.entity != null) {
 			for (final PkColumn column : this.entity.getPrimaryTable().getPkColumns()) {
-				restrictions.add(this.getPrimaryTableAlias(query) + "." + column.getName());
+				if (query.isQuery()) {
+					restrictions.add(this.getPrimaryTableAlias(query) + "." + column.getName());
+				}
+				else {
+					restrictions.add(column.getName());
+				}
 			}
 		}
-		else {}
 
 		return restrictions.toArray(new String[restrictions.size()]);
 	}

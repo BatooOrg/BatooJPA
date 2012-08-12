@@ -75,7 +75,7 @@ public class SimpleTest extends BaseCoreTest {
 		Assert.assertEquals(1, entities.size());
 
 		final DataSource dataSource = this.em().unwrap(DataSource.class);
-		new QueryRunner(dataSource).query("SELECT * FROM FOO", new NullResultSetHandler());
+		new QueryRunner(dataSource).query("SELECT * FROM Foo", new NullResultSetHandler());
 	}
 
 	/**
@@ -114,8 +114,8 @@ public class SimpleTest extends BaseCoreTest {
 
 		this.commit();
 
-		final Integer count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM FOO", new SingleValueHandler<Integer>());
-		Assert.assertEquals(new Integer(0), count);
+		Assert.assertEquals(0,
+			new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM Foo", new SingleValueHandler<Number>()).intValue());
 	}
 
 	/**
@@ -157,8 +157,8 @@ public class SimpleTest extends BaseCoreTest {
 
 		this.commit();
 
-		final Integer count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM FOO", new SingleValueHandler<Integer>());
-		Assert.assertEquals(new Integer(1), count);
+		Assert.assertEquals(1,
+			new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM Foo", new SingleValueHandler<Number>()).intValue());
 	}
 
 	/**
@@ -176,7 +176,7 @@ public class SimpleTest extends BaseCoreTest {
 
 		this.commit();
 
-		final Integer count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM FOO", new SingleValueHandler<Integer>());
-		Assert.assertEquals(new Integer(1), count);
+		Assert.assertEquals(1,
+			new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM Foo", new SingleValueHandler<Number>()).intValue());
 	}
 }

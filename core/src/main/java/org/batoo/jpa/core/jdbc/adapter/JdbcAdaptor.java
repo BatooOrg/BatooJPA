@@ -70,6 +70,30 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	}
 
 	/**
+	 * Applies the concat operation to the arguments.
+	 * 
+	 * @param arguments
+	 *            the arguments
+	 * @return the concat SQL fragment
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract String applyConcat(List<String> arguments);
+
+	/**
+	 * Appends the escape pattern.
+	 * 
+	 * @param escapePattern
+	 *            the escape pattern
+	 * @return the sql fragment to escape
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract String applyLikeEscape(String escapePattern);
+
+	/**
 	 * Applies the lock to SQL string.
 	 * 
 	 * @param sql
@@ -152,7 +176,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@Override
 	public String createCreateTableStatement(AbstractTable table, List<String> ddlColumns, List<String> pkColumns) {
 		final String columns = Joiner.on(",\n\t").join(ddlColumns);
 		final String keys = Joiner.on(", ").join(pkColumns);

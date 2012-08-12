@@ -24,13 +24,13 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
-import javax.persistence.metamodel.Type.PersistenceType;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
+import org.batoo.jpa.core.impl.model.mapping.JoinedMapping.MappingType;
 
 /**
  * Implementation of {@link Fetch}.
@@ -160,7 +160,7 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	 */
 	@Override
 	public String getPrimaryTableAlias(BaseQueryImpl<?> query) {
-		if (this.mapping.getType().getPersistenceType() == PersistenceType.EMBEDDABLE) {
+		if (this.mapping.getMappingType() == MappingType.EMBEDDABLE) {
 			return this.parent.getPrimaryTableAlias(query);
 		}
 

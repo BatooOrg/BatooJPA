@@ -22,6 +22,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -143,41 +144,41 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		this.close();
 
-		TypedQuery<Integer> q1;
+		TypedQuery<Number> q1;
 		int total;
 
-		q1 = this.cq("select -p.age from Person p", Integer.class);
+		q1 = this.cq("select -p.age from Person p", Number.class);
 		total = 0;
-		for (final Integer i : q1.getResultList()) {
-			total += i;
+		for (final Number i : q1.getResultList()) {
+			total += i.intValue();
 		}
 		Assert.assertEquals(-75, total);
 
-		q1 = this.cq("select p.age + p.age from Person p", Integer.class);
+		q1 = this.cq("select p.age + p.age from Person p", Number.class);
 		total = 0;
-		for (final Integer i : q1.getResultList()) {
-			total += i;
+		for (final Number i : q1.getResultList()) {
+			total += i.intValue();
 		}
 		Assert.assertEquals(150, total);
 
-		q1 = this.cq("select -p.age + -p.age from Person p", Integer.class);
+		q1 = this.cq("select -p.age + -p.age from Person p", Number.class);
 		total = 0;
-		for (final Integer i : q1.getResultList()) {
-			total += i;
+		for (final Number i : q1.getResultList()) {
+			total += i.intValue();
 		}
 		Assert.assertEquals(-150, total);
 
-		q1 = this.cq("select 22 + p.age from Person p", Integer.class);
+		q1 = this.cq("select 22 + p.age from Person p", Number.class);
 		total = 0;
-		for (final Integer i : q1.getResultList()) {
-			total += i;
+		for (final Number i : q1.getResultList()) {
+			total += i.intValue();
 		}
 		Assert.assertEquals(119, total);
 
-		q1 = this.cq("select p.age * 2 from Person p", Integer.class);
+		q1 = this.cq("select p.age * 2 from Person p", Number.class);
 		total = 0;
-		for (final Integer i : q1.getResultList()) {
-			total += i;
+		for (final Number i : q1.getResultList()) {
+			total += i.intValue();
 		}
 		Assert.assertEquals(150, total);
 	}
@@ -390,10 +391,10 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		this.close();
 
-		final TypedQuery<Integer> q = this.cq(//
+		final TypedQuery<Number> q = this.cq(//
 			"select index(wp) from Person p\n" + //
 				"    left join p.workPhones wp\n" + //
-				"    order by wp.id", Integer.class);
+				"    order by wp.id", Number.class);
 
 		Assert.assertEquals("[0, 1]", q.getResultList().toString());
 	}
@@ -450,20 +451,19 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		this.close();
 
-		TypedQuery<Integer> q;
-		TypedQuery<Double> q2;
+		TypedQuery<Number> q;
 
-		q = this.cq("select abs(p.age) from Person p where p.id = 1", Integer.class);
-		Assert.assertEquals((Integer) 49, q.getSingleResult());
+		q = this.cq("select abs(p.age) from Person p where p.id = 1", Number.class);
+		Assert.assertEquals(49, q.getSingleResult().intValue());
 
-		q2 = this.cq("select sqrt(abs(p.age)) from Person p where p.id = 1", Double.class);
-		Assert.assertEquals(7.0, q2.getSingleResult());
+		q = this.cq("select sqrt(abs(p.age)) from Person p where p.id = 1", Number.class);
+		Assert.assertEquals(7.0, q.getSingleResult().doubleValue());
 
-		q = this.cq("select mod(abs(p.age), 10) from Person p where p.id = 1", Integer.class);
-		Assert.assertEquals((Integer) 9, q.getSingleResult());
+		q = this.cq("select mod(abs(p.age), 10) from Person p where p.id = 1", Number.class);
+		Assert.assertEquals(9, q.getSingleResult().intValue());
 
-		q = this.cq("select length(p.name) from Person p where p.id = 1", Integer.class);
-		Assert.assertEquals((Integer) 6, q.getSingleResult());
+		q = this.cq("select length(p.name) from Person p where p.id = 1", Number.class);
+		Assert.assertEquals(6, q.getSingleResult().intValue());
 	}
 
 	/**
@@ -473,9 +473,21 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testOrderBy() {
-		Assert.assertEquals(null, this.cq("select c.name from Country c order by c.name desc", String.class).setMaxResults(1).getSingleResult());
+		final String testMode = System.getProperty("testMode");
+		String expected = null;
 
-		Assert.assertEquals("Turkey", this.cq("select c.name from Country c order by c.name asc", String.class).setMaxResults(1).getSingleResult());
+		if ("mysql".equals(testMode)) {
+			expected = SimpleJpqlTest.COUNTRY_USA;
+		}
+
+		Assert.assertEquals(expected, this.cq("select c.name from Country c order by c.name desc", String.class).setMaxResults(1).getSingleResult());
+
+		expected = SimpleJpqlTest.COUNTRY_TR;
+		if ("mysql".equals(testMode)) {
+			expected = null;
+		}
+
+		Assert.assertEquals(expected, this.cq("select c.name from Country c order by c.name asc", String.class).setMaxResults(1).getSingleResult());
 	}
 
 	/**
@@ -505,7 +517,7 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		this.commit();
 		this.close();
 
-		Assert.assertEquals(75, this.cq("select sum(p.age) from Person p").getSingleResult());
+		Assert.assertEquals(75, ((Number) this.cq("select sum(p.age) from Person p").getSingleResult()).intValue());
 	}
 
 	/**
@@ -544,7 +556,16 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		Assert.assertEquals(1, q.getResultList().size());
 
 		q = this.cq("select c from Country c where c.name is not null", Country.class);
-		Assert.assertEquals("[Country [name=Turkey], Country [name=United States of America], Country [name=United Kingdom]]", q.getResultList().toString());
+		final List<Country> rs = q.getResultList();
+		Collections.sort(rs, new Comparator<Country>() {
+
+			@Override
+			public int compare(Country o1, Country o2) {
+				return o1.getName().compareTo(o2.getName());
+			}
+		});
+
+		Assert.assertEquals("[Country [name=Turkey], Country [name=United Kingdom], Country [name=United States of America]]", rs.toString());
 
 		q = this.cq("select c from Country as c where c.name is null", Country.class);
 		Assert.assertEquals(1, q.getResultList().size());
@@ -566,6 +587,8 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		TypedQuery<Person> q;
 		TypedQuery<String> q2;
 
+		System.getProperty("testMode");
+
 		q = this.cq("select p.name from Person p where p.name <= :name", Person.class).setParameter("name", "Ceylan");
 		Assert.assertEquals(2, q.getResultList().size());
 
@@ -580,14 +603,14 @@ public class SimpleJpqlTest extends BaseCoreTest {
 			SimpleJpqlTest.COUNTRY_TR.toLowerCase());
 		Assert.assertEquals("TURKEY", q2.getResultList().get(0));
 
-		q2 = this.cq("select concat(c.code, '_', c.name) from Country c", String.class);
-		Assert.assertEquals("[TR_Turkey, USA_United States of America, UK_United Kingdom, null]", q2.getResultList().toString());
+		q2 = this.cq("select concat(c.code, '_', c.name) from Country c order by c.code", String.class);
+		Assert.assertEquals("[null, TR_Turkey, UK_United Kingdom, USA_United States of America]", q2.getResultList().toString());
 
-		q2 = this.cq("select substring(c.name, 2) from Country c", String.class);
-		Assert.assertEquals("[urkey, nited States of America, nited Kingdom, null]", q2.getResultList().toString());
+		q2 = this.cq("select substring(c.name, 2) from Country c order by c.code", String.class);
+		Assert.assertEquals("[null, urkey, nited Kingdom, nited States of America]", q2.getResultList().toString());
 
-		q2 = this.cq("select substring(c.name, 2, 3) from Country c", String.class);
-		Assert.assertEquals("[urk, nit, nit, null]", q2.getResultList().toString());
+		q2 = this.cq("select substring(c.name, 2, 3) from Country c order by c.code", String.class);
+		Assert.assertEquals("[null, urk, nit, nit]", q2.getResultList().toString());
 
 		q2 = this.cq("select trim(' a ') from Country c where c = :country", String.class).setParameter("country", SimpleJpqlTest.TR);
 		Assert.assertEquals("a", q2.getSingleResult());

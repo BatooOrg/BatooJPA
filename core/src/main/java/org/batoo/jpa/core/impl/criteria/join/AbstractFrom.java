@@ -202,13 +202,15 @@ public abstract class AbstractFrom<Z, X> extends ParentPath<Z, X> implements Fro
 	/**
 	 * Returns the restriction based on discrimination.
 	 * 
+	 * @param noQualification
+	 *            if the fields should not be qualified
 	 * @return the restriction based on discrimination, <code>null</code>
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String generateDiscrimination() {
-		return this.fetchRoot.generateDiscrimination();
+	public String generateDiscrimination(boolean noQualification) {
+		return this.fetchRoot.generateDiscrimination(noQualification);
 	}
 
 	/**

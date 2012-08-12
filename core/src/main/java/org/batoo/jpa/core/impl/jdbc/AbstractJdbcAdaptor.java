@@ -21,22 +21,17 @@ package org.batoo.jpa.core.impl.jdbc;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.common.reflect.ReflectHelper;
-import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
@@ -140,73 +135,10 @@ public abstract class AbstractJdbcAdaptor {
 	public abstract String createColumnDDL(AbstractColumn column);
 
 	/**
-	 * Returns the SQL to create the table.
-	 * 
-	 * @param jdbcAdapter
-	 *            the JDBC Adapter to use
-	 * @return the SQL to create the table
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 * @param tableDefinition
-	 */
-	private String createCreateTableStatement(AbstractTable table) {
-		final List<String> ddlColumns = Lists.newArrayList();
-		final List<String> pkColumns = Lists.newArrayList();
-
-		for (final AbstractColumn column : table.getColumns()) {
-			ddlColumns.add(this.createColumnDDL(column));
-
-			if (column instanceof PkColumn) {
-				pkColumns.add(column.getName());
-			}
-		}
-
-		return this.createCreateTableStatement(table, ddlColumns, pkColumns);
-	}
-
-	/**
-	 * Composes the SQL to create the table.
-	 * 
-	 * @param table
-	 *            the table
-	 * @param ddlColumns
-	 *            the column DDL fragments
-	 * @param pkColumns
-	 *            the list of primary key columns
-	 * @return the SQL to create the table
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	protected abstract String createCreateTableStatement(AbstractTable table, List<String> ddlColumns, List<String> pkColumns);
-
-	/**
 	 * @return the JDBC Driver this adapter works with
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	protected abstract String[] getJdbcDriverClassNames();
-
-	/**
-	 * Performs the DDL operation for the table.
-	 * 
-	 * @param schemas
-	 *            the set of schemas created
-	 * @param datasource
-	 *            the datasource
-	 * @param ddlMode
-	 *            the DDL Mode
-	 * @param table
-	 *            the table
-	 * @throws SQLException
-	 *             thrown in case of an SQL error
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public final void performTableDdl(Set<String> schemas, DataSourceImpl datasource, DDLMode ddlMode, AbstractTable table) throws SQLException {
-		new QueryRunner(datasource).update(this.createCreateTableStatement(table));
-	}
 }

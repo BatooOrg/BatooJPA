@@ -178,6 +178,15 @@ public class CriteriaQueryImpl<T> extends AbstractCriteriaQueryImpl<T> implement
 	 * 
 	 */
 	@Override
+	public boolean isQuery() {
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public CriteriaQuery<T> multiselect(List<Selection<?>> selectionList) {
 		return this.select(new CompoundSelectionImpl<T>(this.getResultType(), selectionList));
 	}

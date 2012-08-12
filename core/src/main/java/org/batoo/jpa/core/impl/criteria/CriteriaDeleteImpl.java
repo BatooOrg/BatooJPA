@@ -97,7 +97,16 @@ public class CriteriaDeleteImpl<T> extends CriteriaModify<T> implements Criteria
 			return sqlRestriction;
 		}
 
-		return "(" + sqlRestriction + ") AND (" + this.getRoot().generateDiscrimination() + ")";
+		return "(" + sqlRestriction + ") AND (" + this.getRoot().generateDiscrimination(true) + ")";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isQuery() {
+		return false;
 	}
 
 	/**

@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.jdbc.adapter;
 
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
 
 import javax.persistence.GenerationType;
@@ -41,21 +42,21 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 /**
- * JDBC Adapter for Derby.
+ * JDBC Adapter for MySQL.
  * 
  * @author hceylan
  * @since $version
  */
-public class DerbyAdaptor extends JdbcAdaptor {
+public class MySqlAdaptor extends JdbcAdaptor {
 
-	private static final String[] DRIVER_CLASSES = new String[] { "org.apache.derby.jdbc.Driver40", "org.apache.derby.jdbc.EmbeddedDriver" };
+	private static final String[] DRIVER_CLASSES = new String[] { "com.mysql.jdbc.Driver" };
 
 	/**
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public DerbyAdaptor() {
+	public MySqlAdaptor() {
 		super();
 	}
 
@@ -65,7 +66,7 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	 */
 	@Override
 	public String applyConcat(List<String> arguments) {
-		return Joiner.on(" || ").join(arguments);
+		return "CONCAT(" + Joiner.on(", ").join(arguments) + ")";
 	}
 
 	/**
@@ -74,8 +75,7 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	 */
 	@Override
 	public String applyLikeEscape(String escapePattern) {
-		return " {ESCAPE " + escapePattern + "}";
-
+		return " ESCAPE " + escapePattern;
 	}
 
 	/**
@@ -101,12 +101,12 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	 */
 	@Override
 	public String applyPagination(String sql, int startPosition, int maxResult) {
-		if (startPosition != 0) {
-			sql = sql + "\nOFFSET " + startPosition + " ROWS";
-		}
+		if ((startPosition != 0) || (maxResult != Integer.MAX_VALUE)) {
+			sql = sql + "\nLIMIT " + startPosition;
 
-		if (maxResult != Integer.MAX_VALUE) {
-			sql = sql + "\nFETCH FIRST  " + maxResult + " ROWS ONLY";
+			if (maxResult != Integer.MAX_VALUE) {
+				sql = sql + ", " + maxResult;
+			}
 		}
 
 		return sql;
@@ -124,7 +124,7 @@ public class DerbyAdaptor extends JdbcAdaptor {
 			+ this.getColumnType(column, column.getSqlType()) // data type part
 			+ (!column.isNullable() ? " NOT NULL" : "") // not null part
 			+ (column.isUnique() ? " UNIQUE" : "") // not null part
-			+ (identity ? " GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1)" : ""); // auto increment part
+			+ (identity ? " AUTO_INCREMENT" : ""); // auto increment part
 	}
 
 	/**
@@ -176,19 +176,21 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	 */
 	@Override
 	public void createSequenceIfNecessary(DataSource datasource, SequenceGenerator sequence) throws SQLException {
-		final String schema = this.schemaOf(datasource, sequence.getSchema());
+		throw new UnsupportedOperationException("Mysql does not support sequences");
+	}
 
-		final boolean exists = new QueryRunner(datasource) //
-		.query("SELECT SEQUENCENAME FROM SYS.SYSSCHEMAS S\n" + //
-			"\tINNER JOIN SYS.SYSSEQUENCES Q ON S.SCHEMAID = Q.SCHEMAID\n" + //
-			"WHERE SCHEMANAME = ? AND SEQUENCENAME = ?", //
-			new SingleValueHandler<String>(), schema, sequence.getSequenceName()) != null;
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void createTableGeneratorIfNecessary(DataSource datasource, TableGenerator table) throws SQLException {
+		if (new QueryRunner(datasource).query("SHOW TABLES LIKE '" + table.getName() + "';", new SingleValueHandler<String>()) == null) {
 
-		if (!exists) {
-			final String sql = "CREATE SEQUENCE " //
-				+ schema + "." + sequence.getSequenceName() // ;
-				+ " START WITH " + sequence.getInitialValue() //
-				+ " INCREMENT BY " + sequence.getAllocationSize();
+			final String sql = "CREATE TABLE `" + table.getName() + "` ("//
+				+ "\n\t" + table.getPkColumnName() + " VARCHAR(255)," //
+				+ "\n\t" + table.getValueColumnName() + " INT," //
+				+ "\nPRIMARY KEY(" + table.getPkColumnName() + "))";
 
 			new QueryRunner(datasource).update(sql);
 		}
@@ -199,20 +201,39 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
-	public void createTableGeneratorIfNecessary(DataSource datasource, TableGenerator table) throws SQLException {
-		final String schema = this.schemaOf(datasource, table.getSchema());
-
-		if (new QueryRunner(datasource).query("SELECT TABLENAME FROM SYS.SYSSCHEMAS S\n" + //
-			"\tINNER JOIN SYS.SYSTABLES T ON S.SCHEMAID = T.SCHEMAID\n" + //
-			"WHERE SCHEMANAME = ?", new SingleValueHandler<String>(), schema) == null) {
-
-			final String sql = "CREATE TABLE " + schema + "." + table.getTable() + " ("//
-				+ "\n\t" + table.getPkColumnName() + " VARCHAR(255)," //
-				+ "\n\t" + table.getValueColumnName() + " INT," //
-				+ "\nPRIMARY KEY(" + table.getPkColumnName() + "))";
-
-			new QueryRunner(datasource).update(sql);
+	protected String getColumnType(AbstractColumn cd, int sqlType) {
+		switch (sqlType) {
+			case Types.BLOB:
+			case Types.CLOB:
+				return "BLOB(" + cd.getLength() + ")";
+			case Types.VARCHAR:
+				return "VARCHAR(" + cd.getLength() + ")";
+			case Types.TIME:
+				return "TIME";
+			case Types.DATE:
+				return "DATE";
+			case Types.TIMESTAMP:
+				return "TIMESTAMP";
+			case Types.CHAR:
+				return "CHAR";
+			case Types.BOOLEAN:
+				return "BOOLEAN";
+			case Types.TINYINT:
+			case Types.SMALLINT:
+				return "SMALLINT";
+			case Types.INTEGER:
+				return "INTEGER";
+			case Types.BIGINT:
+				return "BIGINT";
+			case Types.FLOAT:
+				return "FLOAT" + (cd.getPrecision() > 0 ? "(" + cd.getPrecision() + ")" : "");
+			case Types.DOUBLE:
+				return "DOUBLE" + (cd.getPrecision() > 0 ? "(" + cd.getPrecision() + ")" : "");
+			case Types.DECIMAL:
+				return "DECIMAL" + (cd.getPrecision() > 0 ? "(" + cd.getPrecision() + (cd.getScale() > 0 ? "," + cd.getScale() : "") + ")" : "");
 		}
+
+		throw new IllegalArgumentException("Unhandled sql type: " + sqlType);
 	}
 
 	/**
@@ -230,7 +251,7 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	 */
 	@Override
 	protected String[] getJdbcDriverClassNames() {
-		return DerbyAdaptor.DRIVER_CLASSES;
+		return MySqlAdaptor.DRIVER_CLASSES;
 	}
 
 	/**
@@ -239,8 +260,7 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	 */
 	@Override
 	public Integer getNextSequence(DataSourceImpl datasource, String sequenceName) throws SQLException {
-		return new QueryRunner(datasource) //
-		.query("VALUES (NEXT VALUE FOR " + sequenceName + ")", new SingleValueHandler<Integer>());
+		throw new UnsupportedOperationException("Mysql does not support sequences");
 	}
 
 	/**
@@ -249,7 +269,7 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	 */
 	@Override
 	public String getSelectLastIdentitySql() {
-		return "VALUES IDENTITY_VAL_LOCAL()";
+		return "SELECT LAST_INSERT_ID()";
 	}
 
 	private boolean schemaExists(DataSource datasource, String schema) throws SQLException {
@@ -264,19 +284,10 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	 */
 	@Override
 	public IdType supports(GenerationType type) {
-		if (type == null) {
-			return IdType.SEQUENCE;
+		if (type == GenerationType.IDENTITY) {
+			return IdType.IDENTITY;
 		}
 
-		switch (type) {
-			case IDENTITY:
-				return IdType.IDENTITY;
-			case SEQUENCE:
-				return IdType.SEQUENCE;
-			case TABLE:
-				return IdType.TABLE;
-			default:
-				return IdType.SEQUENCE;
-		}
+		return IdType.TABLE;
 	}
 }

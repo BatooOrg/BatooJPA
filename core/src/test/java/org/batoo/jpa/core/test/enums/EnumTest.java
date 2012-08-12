@@ -93,8 +93,8 @@ public class EnumTest extends BaseCoreTest {
 
 		this.commit();
 
-		Assert.assertNull(new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT FOOTYPE FROM FOO", new SingleValueHandler<String>()));
-		Assert.assertNull(new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT FOOTYPE2 FROM FOO", new SingleValueHandler<Integer>()));
+		Assert.assertNull(new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT FOOTYPE FROM Foo", new SingleValueHandler<String>()));
+		Assert.assertNull(new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT FOOTYPE2 FROM Foo", new SingleValueHandler<Integer>()));
 	}
 
 	/**
@@ -115,9 +115,9 @@ public class EnumTest extends BaseCoreTest {
 		this.commit();
 
 		Assert.assertEquals(FooType.TYPE1.name(),
-			new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT FOOTYPE FROM FOO", new SingleValueHandler<String>()));
+			new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT FOOTYPE FROM Foo", new SingleValueHandler<String>()));
 		Assert.assertEquals(new Integer(1),
-			new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT FOOTYPE2 FROM FOO", new SingleValueHandler<Integer>()));
+			new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT FOOTYPE2 FROM Foo", new SingleValueHandler<Integer>()));
 	}
 
 	/**

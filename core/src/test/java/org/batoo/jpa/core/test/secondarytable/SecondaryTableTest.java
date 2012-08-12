@@ -67,12 +67,12 @@ public class SecondaryTableTest extends BaseCoreTest {
 		Assert.assertEquals(4, entities.size());
 
 		final DataSource dataSource = this.em().unwrap(DataSource.class);
-		new QueryRunner(dataSource).query("SELECT * FROM FOO", new NullResultSetHandler());
-		new QueryRunner(dataSource).query("SELECT * FROM FOOEXTRA", new NullResultSetHandler());
-		new QueryRunner(dataSource).query("SELECT * FROM PERSON", new NullResultSetHandler());
-		new QueryRunner(dataSource).query("SELECT * FROM PERSONEXTRA", new NullResultSetHandler());
-		new QueryRunner(dataSource).query("SELECT * FROM ADDRESS", new NullResultSetHandler());
-		new QueryRunner(dataSource).query("SELECT * FROM ADDRESSEXTRA", new NullResultSetHandler());
+		new QueryRunner(dataSource).query("SELECT * FROM Foo", new NullResultSetHandler());
+		new QueryRunner(dataSource).query("SELECT * FROM FooExtra", new NullResultSetHandler());
+		new QueryRunner(dataSource).query("SELECT * FROM Person", new NullResultSetHandler());
+		new QueryRunner(dataSource).query("SELECT * FROM PersonExtra", new NullResultSetHandler());
+		new QueryRunner(dataSource).query("SELECT * FROM Address", new NullResultSetHandler());
+		new QueryRunner(dataSource).query("SELECT * FROM AddressExtra", new NullResultSetHandler());
 	}
 
 	/**
@@ -163,12 +163,11 @@ public class SecondaryTableTest extends BaseCoreTest {
 
 		this.commit();
 
-		Integer count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM FOO", new SingleValueHandler<Integer>());
-		Assert.assertEquals(new Integer(1), count);
+		Assert.assertEquals(1,
+			new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM Foo", new SingleValueHandler<Number>()).intValue());
 
-		count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM FOOEXTRA", new SingleValueHandler<Integer>());
-
-		Assert.assertEquals(new Integer(1), count);
+		Assert.assertEquals(1,
+			new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM FooExtra", new SingleValueHandler<Number>()).intValue());
 	}
 
 	/**
@@ -187,18 +186,16 @@ public class SecondaryTableTest extends BaseCoreTest {
 
 		this.commit();
 
-		Integer count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM PERSON", new SingleValueHandler<Integer>());
-		Assert.assertEquals(new Integer(1), count);
+		Assert.assertEquals(1,
+			new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM Person", new SingleValueHandler<Number>()).intValue());
 
-		count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM PERSONEXTRA", new SingleValueHandler<Integer>());
+		Assert.assertEquals(1,
+			new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM PersonExtra", new SingleValueHandler<Number>()).intValue());
 
-		Assert.assertEquals(new Integer(1), count);
+		Assert.assertEquals(3,
+			new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM Address", new SingleValueHandler<Number>()).intValue());
 
-		count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM ADDRESS", new SingleValueHandler<Integer>());
-		Assert.assertEquals(new Integer(3), count);
-
-		count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM ADDRESSEXTRA", new SingleValueHandler<Integer>());
-
-		Assert.assertEquals(new Integer(3), count);
+		Assert.assertEquals(3,
+			new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM AddressExtra", new SingleValueHandler<Number>()).intValue());
 	}
 }

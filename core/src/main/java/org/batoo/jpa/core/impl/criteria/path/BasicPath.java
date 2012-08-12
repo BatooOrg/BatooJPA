@@ -137,7 +137,11 @@ public class BasicPath<X> extends AbstractPath<X> {
 
 		final String tableAlias = this.getRootPath().getTableAlias(query, column.getTable());
 
-		return new String[] { tableAlias + "." + column.getName() };
+		if (query.isQuery()) {
+			return new String[] { tableAlias + "." + column.getName() };
+		}
+
+		return new String[] { column.getName() };
 	}
 
 	/**

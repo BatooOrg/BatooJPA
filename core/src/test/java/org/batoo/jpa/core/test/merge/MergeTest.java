@@ -100,8 +100,8 @@ public class MergeTest extends BaseCoreTest {
 
 		try {
 			for (int i = 0; i < 2; i++) {
-				counts[i] = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM FOO" + (i + 1), //
-					new SingleValueHandler<Integer>());
+				counts[i] = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM Foo" + (i + 1), //
+					new SingleValueHandler<Number>()).intValue();
 			}
 
 			MergeTest.LOG.debug("Foos are: {0}, {1}", counts[0], counts[1]);
@@ -126,8 +126,8 @@ public class MergeTest extends BaseCoreTest {
 
 		try {
 			for (int i = 0; i < 4; i++) {
-				counts[i] = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM CHILD" + (i + 1), //
-					new SingleValueHandler<Integer>());
+				counts[i] = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM Child" + (i + 1), //
+					new SingleValueHandler<Number>()).intValue();
 			}
 
 			MergeTest.LOG.debug("Remaining children are: {0}, {1}, {2}, {3}", counts[0], counts[1], counts[2], counts[3]);

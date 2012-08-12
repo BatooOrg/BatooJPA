@@ -54,7 +54,7 @@ public class DataSourceImpl implements DataSource {
 	private PrintWriter printer;
 	private int loginTimeout;
 
-	private final boolean open;
+	private boolean open;
 
 	/**
 	 * @param jdbcUrl
@@ -90,7 +90,7 @@ public class DataSourceImpl implements DataSource {
 	 * @author hceylan
 	 */
 	public void close() {
-		if (!this.open) {
+		if (this.open) {
 			DataSourceImpl.LOG.info("Datasource closed: {0}", this.jdbcUrl);
 
 			try {
@@ -100,6 +100,8 @@ public class DataSourceImpl implements DataSource {
 				DataSourceImpl.LOG.warn(e, "Error while closing connection cache");
 			}
 		}
+
+		this.open = false;
 	}
 
 	/**

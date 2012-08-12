@@ -45,21 +45,21 @@ public class CaseJpqlTest extends BaseCoreTest {
 		this.commit();
 		this.close();
 
-		Assert.assertEquals((Integer) 14, //
+		Assert.assertEquals(14, //
 			this.cq("select sum(case\n" + //
 				"    when f.number = 1 then 1 * f.number\n" + //
 				"    when f.number = 2 then 2 * f.number\n" + //
 				"    else 3 * f.number\n" + //
 				"  end)\n" + //
-				"from Foo f", Integer.class).getSingleResult());
+				"from Foo f", Number.class).getSingleResult().intValue());
 
-		Assert.assertEquals((Integer) 14, //
+		Assert.assertEquals(14, //
 			this.cq("select sum(case f.number\n" + //
 				"    when 1 then 1 * f.number\n" + //
 				"    when 2 then 2 * f.number\n" + //
 				"    else 3 * f.number\n" + //
 				"  end)\n" + //
-				"from Foo f", Integer.class).getSingleResult());
+				"from Foo f", Number.class).getSingleResult().intValue());
 	}
 
 	/**
@@ -76,9 +76,9 @@ public class CaseJpqlTest extends BaseCoreTest {
 		this.commit();
 		this.close();
 
-		Assert.assertEquals((Integer) 9, this.cq("select sum(coalesce(f.number, f.number2)) from Foo f", Integer.class).getSingleResult());
+		Assert.assertEquals(9, this.cq("select sum(coalesce(f.number, f.number2)) from Foo f", Number.class).getSingleResult().intValue());
 
-		Assert.assertEquals((Integer) 11, this.cq("select sum(coalesce(f.number2, f.number)) from Foo f", Integer.class).getSingleResult());
+		Assert.assertEquals(11, this.cq("select sum(coalesce(f.number2, f.number)) from Foo f", Number.class).getSingleResult().intValue());
 	}
 
 	/**
@@ -95,12 +95,12 @@ public class CaseJpqlTest extends BaseCoreTest {
 		this.commit();
 		this.close();
 
-		Assert.assertEquals((Integer) 5, this.cq("select sum(nullif(f.number, 2)) from Foo f", Integer.class).getSingleResult());
+		Assert.assertEquals(5, this.cq("select sum(nullif(f.number, 2)) from Foo f", Number.class).getSingleResult().intValue());
 
-		Assert.assertEquals((Integer) 8, this.cq("select sum(nullif(coalesce(f.number2, f.number), 2)) from Foo f", Integer.class).getSingleResult());
+		Assert.assertEquals(8, this.cq("select sum(nullif(coalesce(f.number2, f.number), 2)) from Foo f", Number.class).getSingleResult().intValue());
 
-		Assert.assertEquals((Integer) 10, this.cq("select sum(nullif(coalesce(f.number2, f.number), 5)) from Foo f", Integer.class).getSingleResult());
+		Assert.assertEquals(10, this.cq("select sum(nullif(coalesce(f.number2, f.number), 5)) from Foo f", Number.class).getSingleResult().intValue());
 
-		Assert.assertEquals((Integer) 10, this.cq("select sum(nullif(coalesce(f.number2, f.number), 99)) from Foo f", Integer.class).getSingleResult());
+		Assert.assertEquals(10, this.cq("select sum(nullif(coalesce(f.number2, f.number), 99)) from Foo f", Number.class).getSingleResult().intValue());
 	}
 }

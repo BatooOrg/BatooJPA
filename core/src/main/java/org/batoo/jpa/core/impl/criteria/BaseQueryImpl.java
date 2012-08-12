@@ -28,6 +28,7 @@ import javax.persistence.criteria.Selection;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
@@ -132,6 +133,18 @@ public abstract class BaseQueryImpl<T> implements BaseQuery<T> {
 	}
 
 	/**
+	 * Returns the jdbc adaptor.
+	 * 
+	 * @return the jdbc adaptor
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public JdbcAdaptor getJdbcAdaptor() {
+		return this.metamodel.getJdbcAdaptor();
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -207,6 +220,16 @@ public abstract class BaseQueryImpl<T> implements BaseQuery<T> {
 	public List<ParameterExpressionImpl<?>> getSqlParameters() {
 		return this.sqlParameters;
 	}
+
+	/**
+	 * Returns if the query is a select query.
+	 * 
+	 * @return true if the query is a select query, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract boolean isQuery();
 
 	/**
 	 * {@inheritDoc}

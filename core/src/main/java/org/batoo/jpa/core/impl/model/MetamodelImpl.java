@@ -699,7 +699,7 @@ public class MetamodelImpl implements Metamodel {
 				this.jdbcAdaptor.createTableGeneratorIfNecessary(datasource, tableGenerator);
 			}
 			catch (final SQLException e) {
-				throw new MappingException("DDL operation failed on table generator" + tableGenerator.getName(), e);
+				throw new MappingException("DDL operation failed on table generator " + tableGenerator.getName(), e);
 			}
 		}
 	}

@@ -89,7 +89,7 @@ public class ConcatExpression extends AbstractExpression<String> {
 	}
 
 	private String generateSqlRestriction(final BaseQueryImpl<?> query) {
-		return Joiner.on(" || ").join(Lists.transform(this.arguments, new Function<Expression<String>, String>() {
+		return query.getJdbcAdaptor().applyConcat(Lists.transform(this.arguments, new Function<Expression<String>, String>() {
 
 			@Override
 			public String apply(Expression<String> input) {

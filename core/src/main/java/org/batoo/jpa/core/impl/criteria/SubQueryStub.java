@@ -92,6 +92,15 @@ public class SubQueryStub<T> extends AbstractCriteriaQueryImpl<T> {
 	 * 
 	 */
 	@Override
+	public boolean isQuery() {
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public String toString() {
 		return this.getJpql();
 	}

@@ -294,7 +294,7 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 		final Iterator<Root<?>> j = this.getRoots().iterator();
 		while (j.hasNext()) {
 			final Root<?> root = j.next();
-			restrictions[++i] = ((RootImpl<?>) root).generateDiscrimination();
+			restrictions[++i] = ((RootImpl<?>) root).generateDiscrimination(false);
 
 		}
 

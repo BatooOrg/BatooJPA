@@ -155,12 +155,10 @@ public class ManyToOneToManyTest extends BaseCoreTest {
 
 		this.commit();
 
-		Integer count;
+		Assert.assertEquals(1,
+			new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM Person", new SingleValueHandler<Number>()).intValue());
 
-		count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM PERSON", new SingleValueHandler<Integer>());
-		Assert.assertEquals(new Integer(1), count);
-
-		count = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM ADDRESS", new SingleValueHandler<Integer>());
-		Assert.assertEquals(new Integer(3), count);
+		Assert.assertEquals(3,
+			new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM Address", new SingleValueHandler<Number>()).intValue());
 	}
 }
