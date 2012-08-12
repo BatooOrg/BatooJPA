@@ -249,21 +249,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	public abstract void createTableGeneratorIfNecessary(DataSource datasource, TableGenerator table) throws SQLException;
 
 	/**
-	 * Drops the schema if exists
-	 * 
-	 * @param datasource
-	 *            the datasource to use
-	 * @param schema
-	 *            the name of the schema
-	 * @throws SQLException
-	 *             thrown in case of an SQL error
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public abstract void dropSchema(DataSource datasource, String schema) throws SQLException;
-
-	/**
 	 * Escapes an SQL name
 	 * 
 	 * @param name

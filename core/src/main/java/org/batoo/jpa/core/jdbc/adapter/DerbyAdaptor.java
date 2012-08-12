@@ -19,14 +19,12 @@
 package org.batoo.jpa.core.jdbc.adapter;
 
 import java.sql.SQLException;
-import java.util.List;
 
 import javax.persistence.GenerationType;
 import javax.persistence.LockModeType;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.QueryRunner;
-import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
@@ -194,48 +192,6 @@ public class DerbyAdaptor extends JdbcAdaptor {
 				+ "\nPRIMARY KEY(" + table.getPkColumnName() + "))";
 
 			new QueryRunner(datasource).update(sql);
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public void dropSchema(DataSource datasource, String schema) throws SQLException {
-		if (this.schemaExists(datasource, schema)) {
-			final QueryRunner runner = new QueryRunner(datasource);
-
-			// Derby requires all the objects deleted from the schema before it can be dropped
-			// Drop Constraints
-			final List<Object[]> foreignKeys = runner.query("SELECT T.TABLENAME, C.CONSTRAINTNAME FROM SYS.SYSSCHEMAS S\n" + //
-				"\tINNER JOIN SYS.SYSTABLES T ON T.SCHEMAID = S.SCHEMAID\n" + //
-				"\tINNER JOIN SYS.SYSCONSTRAINTS C ON C.TABLEID = T.TABLEID\n" + //
-				"WHERE S.SCHEMANAME = ? AND C.TYPE = 'F'", new ArrayListHandler(), schema);
-
-			for (final Object[] foreignKey : foreignKeys) {
-				runner.update("ALTER TABLE " + schema + "." + foreignKey[0] + " DROP FOREIGN KEY " + foreignKey[1]);
-			}
-
-			// Drop tables
-			final List<Object[]> tables = runner.query("SELECT TABLENAME FROM SYS.SYSSCHEMAS S\n" + //
-				"\tINNER JOIN SYS.SYSTABLES T ON S.SCHEMAID = T.SCHEMAID\n" + //
-				"WHERE SCHEMANAME = ?", new ArrayListHandler(), schema);
-
-			for (final Object[] table : tables) {
-				runner.update("DROP TABLE " + schema + "." + table[0]);
-			}
-
-			// Drop sequences
-			final List<Object[]> sequences = runner.query("SELECT SEQUENCENAME FROM SYS.SYSSCHEMAS S\n" + //
-				"\tINNER JOIN SYS.SYSSEQUENCES Q ON S.SCHEMAID = Q.SCHEMAID\n" + //
-				"WHERE SCHEMANAME = ?", new ArrayListHandler(), schema);
-
-			for (final Object[] sequence : sequences) {
-				runner.update("DROP SEQUENCE " + schema + "." + sequence[0] + " RESTRICT");
-			}
-
-			runner.update("DROP SCHEMA " + schema + " RESTRICT");
 		}
 	}
 

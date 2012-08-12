@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.manager;
 
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Map;
 
 import javax.persistence.Cache;
@@ -65,7 +66,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	private final MetamodelImpl metamodel;
 	private final DataSourceImpl datasource;
 	private final JdbcAdaptor jdbcAdaptor;
-	private final Map<String, Object> properties;
+	private final Map<String, Object> properties = Maps.newHashMap();
 	private final Map<String, JpqlQuery> namedQueries = Maps.newHashMap();
 	private final CriteriaBuilderImpl criteriaBuilder;
 	private final PersistenceUnitUtilImpl persistenceUtil;
@@ -91,10 +92,11 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	public EntityManagerFactoryImpl(String name, PersistenceParser parser) {
 		super();
 
+		this.prepareProperties(parser);
+
 		this.jdbcAdaptor = this.createJdbcAdaptor(parser);
 		this.datasource = this.createDatasource(parser);
 		this.metamodel = new MetamodelImpl(this, this.jdbcAdaptor, parser.getMetadata());
-		this.properties = parser.getProperties();
 
 		this.metamodel.performSequencesDdl(this.datasource, DDLMode.DROP);
 		this.metamodel.performTableGeneratorsDdl(this.datasource, DDLMode.DROP);
@@ -190,9 +192,9 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	}
 
 	private DataSourceImpl createDatasource(PersistenceParser parser) {
-		final String jdbcUrl = (String) parser.getProperty(JPASettings.JDBC_URL);
-		final String jdbcUser = (String) parser.getProperty(JPASettings.JDBC_USER);
-		final String jdbcPassword = (String) parser.getProperty(JPASettings.JDBC_PASSWORD);
+		final String jdbcUrl = (String) this.getProperty(JPASettings.JDBC_URL);
+		final String jdbcUser = (String) this.getProperty(JPASettings.JDBC_USER);
+		final String jdbcPassword = (String) this.getProperty(JPASettings.JDBC_PASSWORD);
 
 		try {
 			return new DataSourceImpl(jdbcUrl, jdbcUser, jdbcPassword);
@@ -245,8 +247,8 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * @author hceylan
 	 */
 	private JdbcAdaptor createJdbcAdaptor(PersistenceParser parser) {
-		final boolean scanExternal = Boolean.valueOf((String) parser.getProperty(BJPASettings.SCAN_EXTERNAL_JDBC_DRIVERS));
-		final String jdbcDriver = (String) parser.getProperty(JPASettings.JDBC_DRIVER);
+		final boolean scanExternal = Boolean.valueOf((String) this.getProperty(BJPASettings.SCAN_EXTERNAL_JDBC_DRIVERS));
+		final String jdbcDriver = (String) this.getProperty(JPASettings.JDBC_DRIVER);
 
 		return AbstractJdbcAdaptor.getAdapter(scanExternal, jdbcDriver);
 	}
@@ -341,12 +343,39 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	}
 
 	/**
+	 * Returns the persistence property.
+	 * 
+	 * @param key
+	 *            the key for the property
+	 * @return the value of the property or null
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Object getProperty(String key) {
+		return this.properties.get(key);
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
 	@Override
 	public boolean isOpen() {
 		return this.open;
+	}
+
+	private void prepareProperties(PersistenceParser parser) {
+		final Enumeration<?> e = System.getProperties().propertyNames();
+
+		while (e.hasMoreElements()) {
+			final Object key = e.nextElement();
+			if (key instanceof String) {
+				this.properties.put((String) key, System.getProperties().get(key));
+			}
+		}
+
+		this.properties.putAll(parser.getProperties());
 	}
 
 	/**

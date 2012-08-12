@@ -108,20 +108,6 @@ public class PersistenceParser {
 	}
 
 	/**
-	 * Returns the persistence property.
-	 * 
-	 * @param key
-	 *            the key for the property
-	 * @return the value of the property or null
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public Object getProperty(String key) {
-		return this.properties.get(key);
-	}
-
-	/**
 	 * Initializes the persistence unit by parsing the Persistence XML File.
 	 * 
 	 * @since $version
