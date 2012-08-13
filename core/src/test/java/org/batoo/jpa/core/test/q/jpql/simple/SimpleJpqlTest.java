@@ -376,7 +376,7 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		this.commit();
 
-		Assert.assertEquals(2.4971498726941337, this.cq("select func(log10, '(', pp.age * func(pi, '()'), ')') from Person pp", Double.class).getSingleResult());
+		Assert.assertEquals(314.1592653589793, this.cq("select pp.age * func(pi, '()') from Person pp", Double.class).getSingleResult());
 	}
 
 	/**

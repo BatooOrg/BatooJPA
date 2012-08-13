@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.test.order;
 
 import java.util.Arrays;
+import java.util.Comparator;
 
 import junit.framework.Assert;
 
@@ -93,6 +94,14 @@ public class OrderTest extends BaseCoreTest {
 		person = this.find(Person.class, person.getId());
 
 		final Object[] addresses2 = person.getAddresses().toArray();
+
+		Arrays.sort(addresses1, new Comparator<Object>() {
+
+			@Override
+			public int compare(Object o1, Object o2) {
+				return ((Address) o1).getId().compareTo(((Address) o2).getId());
+			}
+		});
 
 		Assert.assertEquals(Arrays.toString(addresses1), Arrays.toString(addresses2));
 	}

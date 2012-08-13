@@ -23,7 +23,6 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceException;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -60,16 +59,22 @@ public class OptimisticLockTest extends BaseCoreTest {
 		this.commit();
 
 		final EntityManager em2 = this.emf().createEntityManager();
-		final Foo foo2 = em2.find(Foo.class, foo.getId());
+		try {
+			final Foo foo2 = em2.find(Foo.class, foo.getId());
 
-		final EntityTransaction tx2 = em2.getTransaction();
-		tx2.begin();
-		em2.remove(foo2);
-		tx2.commit();
+			final EntityTransaction tx2 = em2.getTransaction();
 
-		this.begin();
-		foo.setValue("test3");
-		this.commit();
+			tx2.begin();
+			em2.remove(foo2);
+			tx2.commit();
+
+			this.begin();
+			foo.setValue("test3");
+			this.commit();
+		}
+		finally {
+			em2.close();
+		}
 	}
 
 	/**
@@ -78,11 +83,8 @@ public class OptimisticLockTest extends BaseCoreTest {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@Test(expected = PersistenceException.class)
-	@Ignore
-	// Derby taking too long to rollback
-		public
-		void testOptimisticLockRollback() {
+	@Test
+	public void testOptimisticLockRollback() {
 		Foo foo = this.newFoo(false);
 
 		this.persist(foo);
@@ -95,14 +97,17 @@ public class OptimisticLockTest extends BaseCoreTest {
 		this.flush();
 
 		final EntityManager em2 = this.emf().createEntityManager();
-		final EntityTransaction tx2 = em2.getTransaction();
-		tx2.begin();
-
-		tx2.begin();
-		final Foo foo2 = em2.find(Foo.class, foo.getId());
-		foo2.setValue("NewValue2");
-		this.rollback();
-		tx2.commit();
+		try {
+			final EntityTransaction tx2 = em2.getTransaction();
+			tx2.begin();
+			final Foo foo2 = em2.find(Foo.class, foo.getId());
+			foo2.setValue("NewValue2");
+			this.rollback();
+			tx2.commit();
+		}
+		finally {
+			em2.close();
+		}
 	}
 
 	/**
@@ -119,16 +124,21 @@ public class OptimisticLockTest extends BaseCoreTest {
 		this.commit();
 
 		final EntityManager em2 = this.emf().createEntityManager();
-		final Foo foo2 = em2.find(Foo.class, foo.getId());
+		try {
+			final Foo foo2 = em2.find(Foo.class, foo.getId());
 
-		final EntityTransaction tx2 = em2.getTransaction();
-		tx2.begin();
-		foo2.setValue("test2");
-		tx2.commit();
+			final EntityTransaction tx2 = em2.getTransaction();
+			tx2.begin();
+			foo2.setValue("test2");
+			tx2.commit();
 
-		this.begin();
-		foo.setValue("test3");
-		this.commit();
+			this.begin();
+			foo.setValue("test3");
+			this.commit();
+		}
+		finally {
+			em2.close();
+		}
 	}
 
 	/**
@@ -145,16 +155,21 @@ public class OptimisticLockTest extends BaseCoreTest {
 		this.commit();
 
 		final EntityManager em2 = this.emf().createEntityManager();
-		final Foo foo2 = em2.find(Foo.class, foo.getId());
+		try {
+			final Foo foo2 = em2.find(Foo.class, foo.getId());
 
-		final EntityTransaction tx2 = em2.getTransaction();
-		tx2.begin();
-		foo2.getBars().get(0).setValue("barChangedValue");
-		tx2.commit();
+			final EntityTransaction tx2 = em2.getTransaction();
+			tx2.begin();
+			foo2.getBars().get(0).setValue("barChangedValue");
+			tx2.commit();
 
-		this.begin();
-		foo.getBars().get(0).setValue("barChangedValue2");
-		this.commit();
+			this.begin();
+			foo.getBars().get(0).setValue("barChangedValue2");
+			this.commit();
+		}
+		finally {
+			em2.close();
+		}
 	}
 
 	/**
@@ -172,16 +187,22 @@ public class OptimisticLockTest extends BaseCoreTest {
 
 		this.begin();
 		final EntityManager em2 = this.emf().createEntityManager();
-		final EntityTransaction tx2 = em2.getTransaction();
-		tx2.begin();
+		try {
+			final EntityTransaction tx2 = em2.getTransaction();
+			tx2.begin();
 
-		final Foo foo2 = em2.find(Foo.class, foo.getId());
+			final Foo foo2 = em2.find(Foo.class, foo.getId());
 
-		new Bar(foo2, "barValue3");
-		tx2.commit();
+			new Bar(foo2, "barValue3");
+			tx2.commit();
 
-		this.begin();
-		new Bar(foo, "barValue3");
-		this.commit();
+			this.begin();
+			new Bar(foo, "barValue3");
+			this.commit();
+		}
+		finally {
+			em2.close();
+		}
+
 	}
 }

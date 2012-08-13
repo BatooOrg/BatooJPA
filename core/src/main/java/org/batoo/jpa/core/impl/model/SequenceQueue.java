@@ -65,7 +65,7 @@ public class SequenceQueue extends IdQueue {
 	 * 
 	 */
 	@Override
-	protected Integer getNextId() throws SQLException {
+	protected Long getNextId() throws SQLException {
 		return this.jdbcAdaptor.getNextSequence(this.datasource, this.sequenceName);
 	}
 }

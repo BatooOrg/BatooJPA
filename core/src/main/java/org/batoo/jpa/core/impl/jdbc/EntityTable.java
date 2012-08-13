@@ -186,7 +186,7 @@ public class EntityTable extends AbstractTable {
 
 		// if there is an identity column, extract the identity and set it back to the instance
 		if (this.identityColumn != null) {
-			final String selectLastIdSql = this.jdbcAdaptor.getSelectLastIdentitySql();
+			final String selectLastIdSql = this.jdbcAdaptor.getSelectLastIdentitySql(this.identityColumn);
 			final Number id = runner.query(connection, selectLastIdSql, new SingleValueHandler<Number>());
 
 			this.identityColumn.setValue(managedInstance.getInstance(), id);

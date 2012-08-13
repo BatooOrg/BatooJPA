@@ -57,16 +57,21 @@ public class OptimisticLockIncrementTest extends BaseCoreTest {
 		this.commit();
 
 		final EntityManager em2 = this.emf().createEntityManager();
-		final Foo foo2 = em2.find(Foo.class, foo.getId());
+		try {
+			final Foo foo2 = em2.find(Foo.class, foo.getId());
 
-		final EntityTransaction tx2 = em2.getTransaction();
-		tx2.begin();
-		em2.remove(foo2);
-		tx2.commit();
+			final EntityTransaction tx2 = em2.getTransaction();
+			tx2.begin();
+			em2.remove(foo2);
+			tx2.commit();
 
-		this.begin();
-		foo.setValue("test3");
-		this.commit();
+			this.begin();
+			foo.setValue("test3");
+			this.commit();
+		}
+		finally {
+			em2.close();
+		}
 	}
 
 	/**
@@ -83,16 +88,21 @@ public class OptimisticLockIncrementTest extends BaseCoreTest {
 		this.commit();
 
 		final EntityManager em2 = this.emf().createEntityManager();
-		final Foo foo2 = em2.find(Foo.class, foo.getId());
+		try {
+			final Foo foo2 = em2.find(Foo.class, foo.getId());
 
-		final EntityTransaction tx2 = em2.getTransaction();
-		tx2.begin();
-		foo2.setValue("test2");
-		tx2.commit();
+			final EntityTransaction tx2 = em2.getTransaction();
+			tx2.begin();
+			foo2.setValue("test2");
+			tx2.commit();
 
-		this.begin();
-		foo.setValue("test3");
-		this.commit();
+			this.begin();
+			foo.setValue("test3");
+			this.commit();
+		}
+		finally {
+			em2.close();
+		}
 	}
 
 	/**
@@ -109,16 +119,21 @@ public class OptimisticLockIncrementTest extends BaseCoreTest {
 		this.commit();
 
 		final EntityManager em2 = this.emf().createEntityManager();
-		final Foo foo2 = em2.find(Foo.class, foo.getId());
+		try {
+			final Foo foo2 = em2.find(Foo.class, foo.getId());
 
-		final EntityTransaction tx2 = em2.getTransaction();
-		tx2.begin();
-		foo2.getBars().get(0).setValue("barChangedValue");
-		tx2.commit();
+			final EntityTransaction tx2 = em2.getTransaction();
+			tx2.begin();
+			foo2.getBars().get(0).setValue("barChangedValue");
+			tx2.commit();
 
-		this.begin();
-		foo.getBars().get(0).setValue("barChangedValue2");
-		this.commit();
+			this.begin();
+			foo.getBars().get(0).setValue("barChangedValue2");
+			this.commit();
+		}
+		finally {
+			em2.close();
+		}
 	}
 
 	/**
@@ -135,15 +150,20 @@ public class OptimisticLockIncrementTest extends BaseCoreTest {
 		this.commit();
 
 		final EntityManager em2 = this.emf().createEntityManager();
-		final Foo foo2 = em2.find(Foo.class, foo.getId());
+		try {
+			final Foo foo2 = em2.find(Foo.class, foo.getId());
 
-		final EntityTransaction tx2 = em2.getTransaction();
-		tx2.begin();
-		new Bar(foo2, "barValue3");
-		tx2.commit();
+			final EntityTransaction tx2 = em2.getTransaction();
+			tx2.begin();
+			new Bar(foo2, "barValue3");
+			tx2.commit();
 
-		this.begin();
-		new Bar(foo, "barValue3");
-		this.commit();
+			this.begin();
+			new Bar(foo, "barValue3");
+			this.commit();
+		}
+		finally {
+			em2.close();
+		}
 	}
 }

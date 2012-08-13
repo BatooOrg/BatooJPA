@@ -30,7 +30,7 @@ import org.batoo.jpa.common.log.BLoggerFactory;
  * @author hceylan
  * @since $version
  */
-public abstract class IdQueue extends LinkedBlockingQueue<Integer> {
+public abstract class IdQueue extends LinkedBlockingQueue<Long> {
 
 	/**
 	 * 
@@ -91,7 +91,7 @@ public abstract class IdQueue extends LinkedBlockingQueue<Integer> {
 				IdQueue.LOG.debug("Ids will be fetched for {0} from the database...", this.name);
 
 				try {
-					final int nextSequence = this.getNextId();
+					final long nextSequence = this.getNextId();
 					for (int i = 0; i < this.allocationSize; i++) {
 						this.put(nextSequence + i);
 					}
@@ -126,6 +126,6 @@ public abstract class IdQueue extends LinkedBlockingQueue<Integer> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected abstract Integer getNextId() throws SQLException;
+	protected abstract Long getNextId() throws SQLException;
 
 }

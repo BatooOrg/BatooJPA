@@ -33,6 +33,9 @@ import junit.framework.Assert;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.lf5.util.StreamUtils;
+import org.batoo.jpa.common.log.BLogger;
+import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.BJPASettings;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
@@ -50,6 +53,8 @@ import com.google.common.collect.Maps;
  * @since $version
  */
 public abstract class BaseCoreTest { // extends BaseTest {
+
+	private static final BLogger LOG = BLoggerFactory.getLogger(BaseCoreTest.class);
 
 	private static final String DEFAULT = "default";
 
@@ -252,6 +257,21 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	private void ensureTx() {
 		if ((this.tx == null) || !this.tx.isActive()) {
 			this.begin();
+		}
+	}
+
+	private void exec(String cmd) {
+		try {
+			final Process process = Runtime.getRuntime().exec(cmd);
+			if (process.waitFor() != 0) {
+				BaseCoreTest.LOG.error("Command failed: " + process.exitValue());
+				StreamUtils.copy(process.getErrorStream(), System.err);
+			}
+
+			StreamUtils.copy(process.getInputStream(), System.out);
+		}
+		catch (final Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -476,18 +496,19 @@ public abstract class BaseCoreTest { // extends BaseTest {
 
 		this.cleanupTx();
 
-		this.cleanUpEm();
-
 		final QueryRunner qr = new QueryRunner();
 
-		if ("mysql".equals(testMode) && (this.emf != null)) {
-			final EntityManagerImpl em = this.emf.createEntityManager();
+		if (this.emf != null) {
+			if ("mysql".equals(testMode)) {
+				final EntityManagerImpl em = this.em();
 
-			qr.update(em.getConnection(), "drop database test");
-			qr.update(em.getConnection(), "create database test");
+				qr.update(em.getConnection(), "drop database test");
+				qr.update(em.getConnection(), "create database test");
 
-			em.close();
+			}
 		}
+
+		this.cleanUpEm();
 
 		if ((this.emf != null) && this.emf.isOpen()) {
 			try {
@@ -502,6 +523,10 @@ public abstract class BaseCoreTest { // extends BaseTest {
 				DriverManager.getConnection("jdbc:derby:memory:test;drop=true");
 			}
 			catch (final Exception e) {}
+		}
+		else if ("pgsql".equals(testMode)) {
+			this.exec("/usr/bin/dropdb test -U postgres -h localhost");
+			this.exec("/usr/bin/createdb test -U postgres -h localhost");
 		}
 
 		Thread.currentThread().setContextClassLoader(this.oldContextClassLoader);

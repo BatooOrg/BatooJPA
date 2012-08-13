@@ -103,7 +103,7 @@ public class FieldAccessor extends AbstractAccessor {
 			case LONG:
 				return Long.valueOf(ReflectHelper.unsafe.getLong(instance, this.fieldOffset));
 			case SHORT:
-				return Boolean.valueOf(ReflectHelper.unsafe.getBoolean(instance, this.fieldOffset));
+				return Short.valueOf(ReflectHelper.unsafe.getShort(instance, this.fieldOffset));
 			case BYTE:
 				return Byte.valueOf(ReflectHelper.unsafe.getByte(instance, this.fieldOffset));
 			default: // CHAR

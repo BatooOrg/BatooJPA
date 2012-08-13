@@ -517,7 +517,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Integer getNextSequence(String generator) {
+	public Long getNextSequence(String generator) {
 		try {
 			return this.sequenceQueues.get(generator).poll(MetamodelImpl.POLL_TIMEOUT, TimeUnit.SECONDS);
 		}
@@ -675,7 +675,7 @@ public class MetamodelImpl implements Metamodel {
 				this.jdbcAdaptor.createSequenceIfNecessary(datasource, sequenceGenerator);
 			}
 			catch (final SQLException e) {
-				throw new MappingException("DDL operation failed on table generator" + sequenceGenerator.getName(), e);
+				throw new MappingException("DDL operation failed on table generator " + sequenceGenerator.getName(), e);
 			}
 		}
 	}

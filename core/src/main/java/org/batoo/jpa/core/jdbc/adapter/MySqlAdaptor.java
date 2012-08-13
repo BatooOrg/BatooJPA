@@ -164,17 +164,6 @@ public class MySqlAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
-	public void createSchemaIfNecessary(DataSource datasource, String schema) throws SQLException {
-		if (!this.schemaExists(datasource, schema)) {
-			new QueryRunner(datasource).update("CREATE SCHEMA " + schema);
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public void createSequenceIfNecessary(DataSource datasource, SequenceGenerator sequence) throws SQLException {
 		throw new UnsupportedOperationException("Mysql does not support sequences");
 	}
@@ -242,7 +231,7 @@ public class MySqlAdaptor extends JdbcAdaptor {
 	 */
 	@Override
 	protected String getDatabaseName() {
-		return "Derby";
+		return "MySql";
 	}
 
 	/**
@@ -259,7 +248,7 @@ public class MySqlAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
-	public Integer getNextSequence(DataSourceImpl datasource, String sequenceName) throws SQLException {
+	public long getNextSequence(DataSourceImpl datasource, String sequenceName) throws SQLException {
 		throw new UnsupportedOperationException("Mysql does not support sequences");
 	}
 
@@ -268,14 +257,8 @@ public class MySqlAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
-	public String getSelectLastIdentitySql() {
+	public String getSelectLastIdentitySql(PkColumn identityColumn) {
 		return "SELECT LAST_INSERT_ID()";
-	}
-
-	private boolean schemaExists(DataSource datasource, String schema) throws SQLException {
-		return new QueryRunner(datasource) //
-		.query("SELECT SCHEMANAME FROM SYS.SYSSCHEMAS WHERE SCHEMANAME = ?", //
-			new SingleValueHandler<String>(), schema) != null;
 	}
 
 	/**

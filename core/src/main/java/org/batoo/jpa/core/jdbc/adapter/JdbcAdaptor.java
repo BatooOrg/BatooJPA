@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -151,7 +154,9 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 
 		final List<String> pkColumns = Lists.newArrayList();
 
-		for (final AbstractColumn column : table.getColumns()) {
+		final Collection<AbstractColumn> columns = this.getColumns(table);
+
+		for (final AbstractColumn column : columns) {
 			ddlColumns.add(this.createColumnDDL(column));
 
 			if (column instanceof PkColumn) {
@@ -208,21 +213,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @author hceylan
 	 */
 	public abstract void createForeignKey(DataSource datasource, ForeignKey foreignKey) throws SQLException;
-
-	/**
-	 * Creates the schema if necessary. The adapter should check if schema exists and create the schema if it does not exist.
-	 * 
-	 * @param datasource
-	 *            the datasource to use
-	 * @param schema
-	 *            the name of the schema
-	 * @throws SQLException
-	 *             thrown in case of an SQL error
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public abstract void createSchemaIfNecessary(DataSource datasource, String schema) throws SQLException;
 
 	/**
 	 * Creates the sequence if not exists.
@@ -291,6 +281,38 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 		}
 
 		return name;
+	}
+
+	/**
+	 * Returns the sorted columns.
+	 * 
+	 * @param table
+	 *            the table
+	 * @return the sorted columns
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected Collection<AbstractColumn> getColumns(AbstractTable table) {
+		final List<AbstractColumn> columns = Lists.newArrayList(table.getColumns());
+
+		Collections.sort(columns, new Comparator<AbstractColumn>() {
+
+			@Override
+			public int compare(AbstractColumn o1, AbstractColumn o2) {
+				if ((o1 instanceof PkColumn) && !(o2 instanceof PkColumn)) {
+					return -1;
+				}
+
+				if ((o2 instanceof PkColumn) && !(o1 instanceof PkColumn)) {
+					return 1;
+				}
+
+				return o1.getName().compareTo(o2.getName());
+			}
+		});
+
+		return columns;
 	}
 
 	/**
@@ -385,7 +407,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract Integer getNextSequence(DataSourceImpl datasource, String sequenceName) throws SQLException;
+	public abstract long getNextSequence(DataSourceImpl datasource, String sequenceName) throws SQLException;
 
 	/**
 	 * Returns the qualified name for the table.
@@ -420,12 +442,14 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	/**
 	 * Returns the SQL to select the last identity generated.
 	 * 
+	 * @param identityColumn
+	 *            the identity column
 	 * @return the SQL to select the last identity generated
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract String getSelectLastIdentitySql();
+	public abstract String getSelectLastIdentitySql(PkColumn identityColumn);
 
 	private void loadReservedWords() throws MappingException {
 		final String packageName = this.getClass().getPackage().getName().replaceAll("\\.", "/");

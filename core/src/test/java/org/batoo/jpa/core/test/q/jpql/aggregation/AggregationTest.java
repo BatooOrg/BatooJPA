@@ -116,7 +116,7 @@ public class AggregationTest extends BaseCoreTest {
 		final String testMode = System.getProperty("testMode");
 
 		String qlString = "select avg(func(cast, '(', p.age, ' as double)')) from Person p";
-		if ("mysql".equals(testMode)) {
+		if ("mysql".equals(testMode) || "pgsql".equals(testMode)) {
 			qlString = "select avg(p.age) from Person p";
 		}
 
@@ -145,7 +145,7 @@ public class AggregationTest extends BaseCoreTest {
 		this.close();
 
 		Assert.assertEquals(70,
-			((Number) this.cq("select p.age, sum(p.age) from Person p group by p.age", Object[].class).getResultList().get(0)[1]).intValue());
+			((Number) this.cq("select p.age, sum(p.age) from Person p group by p.age order by p.age", Object[].class).getResultList().get(0)[1]).intValue());
 	}
 
 	/**

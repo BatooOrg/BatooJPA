@@ -293,7 +293,6 @@ public class BasicColumn extends AbstractColumn {
 	 */
 	@Override
 	public Object getValue(Object instance) {
-
 		final Object value = this.mapping.get(instance);
 
 		return this.convertValue(value);

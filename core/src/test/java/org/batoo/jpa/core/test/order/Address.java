@@ -63,6 +63,31 @@ public class Address {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		final Address other = (Address) obj;
+		if (this.id == null) {
+			return false;
+		}
+		else if (!this.id.equals(other.id)) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
 	 * Returns the city.
 	 * 
 	 * @return the city
@@ -80,6 +105,18 @@ public class Address {
 	 */
 	public Integer getId() {
 		return this.id;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = (prime * result) + ((this.id == null) ? 0 : this.id.hashCode());
+		return result;
 	}
 
 	/**

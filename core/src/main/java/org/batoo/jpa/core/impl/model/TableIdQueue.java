@@ -42,7 +42,7 @@ public class TableIdQueue extends IdQueue {
 	private String insertSql;
 	private String updateSql;
 
-	private Integer nextId;
+	private Long nextId;
 
 	private final DataSourceImpl datasource;
 
@@ -79,13 +79,13 @@ public class TableIdQueue extends IdQueue {
 	 * 
 	 */
 	@Override
-	protected Integer getNextId() throws SQLException {
+	protected Long getNextId() throws SQLException {
 		final QueryRunner runner = new QueryRunner(this.datasource);
 
-		this.nextId = runner.query(this.getSelectSql(), new SingleValueHandler<Integer>(), this.generator.getPkColumnValue());
+		this.nextId = runner.query(this.getSelectSql(), new SingleValueHandler<Long>(), this.generator.getPkColumnValue());
 		if (this.nextId == null) {
 			runner.update(this.getInsertSql(), this.generator.getPkColumnValue(), this.generator.getInitialValue() + 1);
-			this.nextId = 1;
+			this.nextId = 1l;
 		}
 		else {
 			this.nextId += this.generator.getAllocationSize();

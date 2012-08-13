@@ -65,17 +65,22 @@ public class PessimisticLockTest extends BaseCoreTest {
 		foo = this.find(Foo2.class, foo.getId(), LockModeType.PESSIMISTIC_WRITE);
 
 		final EntityManager em2 = this.emf().createEntityManager();
-		final Foo2 foo2 = em2.find(Foo2.class, foo.getId(), LockModeType.PESSIMISTIC_WRITE);
+		try {
+			final Foo2 foo2 = em2.find(Foo2.class, foo.getId(), LockModeType.PESSIMISTIC_WRITE);
 
-		final EntityTransaction tx2 = em2.getTransaction();
-		tx2.begin();
-		em2.remove(foo2);
+			final EntityTransaction tx2 = em2.getTransaction();
+			tx2.begin();
+			em2.remove(foo2);
 
-		this.begin();
-		foo.setValue("test3");
+			this.begin();
+			foo.setValue("test3");
 
-		tx2.commit();
-		this.commit();
+			tx2.commit();
+			this.commit();
+		}
+		finally {
+			em2.close();
+		}
 	}
 
 	/**
@@ -92,16 +97,21 @@ public class PessimisticLockTest extends BaseCoreTest {
 		this.commit();
 
 		final EntityManager em2 = this.emf().createEntityManager();
-		final Foo2 foo2 = em2.find(Foo2.class, foo.getId());
+		try {
+			final Foo2 foo2 = em2.find(Foo2.class, foo.getId());
 
-		final EntityTransaction tx2 = em2.getTransaction();
-		tx2.begin();
-		foo2.setValue("test2");
-		tx2.commit();
+			final EntityTransaction tx2 = em2.getTransaction();
+			tx2.begin();
+			foo2.setValue("test2");
+			tx2.commit();
 
-		this.begin();
-		foo.setValue("test3");
-		this.commit();
+			this.begin();
+			foo.setValue("test3");
+			this.commit();
+		}
+		finally {
+			em2.close();
+		}
 	}
 
 	/**
@@ -118,16 +128,21 @@ public class PessimisticLockTest extends BaseCoreTest {
 		this.commit();
 
 		final EntityManager em2 = this.emf().createEntityManager();
-		final Foo2 foo2 = em2.find(Foo2.class, foo.getId());
+		try {
+			final Foo2 foo2 = em2.find(Foo2.class, foo.getId());
 
-		final EntityTransaction tx2 = em2.getTransaction();
-		tx2.begin();
-		foo2.getBars().get(0).setValue("barChangedValue");
-		tx2.commit();
+			final EntityTransaction tx2 = em2.getTransaction();
+			tx2.begin();
+			foo2.getBars().get(0).setValue("barChangedValue");
+			tx2.commit();
 
-		this.begin();
-		foo.getBars().get(0).setValue("barChangedValue2");
-		this.commit();
+			this.begin();
+			foo.getBars().get(0).setValue("barChangedValue2");
+			this.commit();
+		}
+		finally {
+			em2.close();
+		}
 	}
 
 	/**
@@ -144,15 +159,20 @@ public class PessimisticLockTest extends BaseCoreTest {
 		this.commit();
 
 		final EntityManager em2 = this.emf().createEntityManager();
-		final Foo2 foo2 = em2.find(Foo2.class, foo.getId());
+		try {
+			final Foo2 foo2 = em2.find(Foo2.class, foo.getId());
 
-		final EntityTransaction tx2 = em2.getTransaction();
-		tx2.begin();
-		new Bar2(foo2, "barValue3");
-		tx2.commit();
+			final EntityTransaction tx2 = em2.getTransaction();
+			tx2.begin();
+			new Bar2(foo2, "barValue3");
+			tx2.commit();
 
-		this.begin();
-		new Bar2(foo, "barValue3");
-		this.commit();
+			this.begin();
+			new Bar2(foo, "barValue3");
+			this.commit();
+		}
+		finally {
+			em2.close();
+		}
 	}
 }
