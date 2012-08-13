@@ -35,7 +35,7 @@
 		<!-- Internal Dependencies -->
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
-			<artifactId>core</artifactId>
+			<artifactId>batoo-jpa</artifactId>
 			<type>bundle</type>
 			<scope>test</scope>
 		</dependency>

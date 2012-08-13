@@ -108,7 +108,7 @@
 			</dependency>
 			<dependency>
 				<groupId>org.batoo.jpa</groupId>
-				<artifactId>core</artifactId>
+				<artifactId>batoo-jpa</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 				<type>bundle</type>
 			</dependency>
@@ -323,8 +323,8 @@
 		<module>persistence-api</module>
 		<module>common</module>
 		<module>parser</module>
-		<module>core</module>
 		<module>test</module>
 		<module>jpql</module>
+		<module>batoo-jpa</module>
 	</modules>
 </project>

@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.jdt.junit.launchconfig">
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/org.batoo.jpa.core"/>
+<listEntry value="/org.batoo.jpa.batoo-jpa"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="4"/>
 </listAttribute>
-<stringAttribute key="org.eclipse.jdt.junit.CONTAINER" value="=org.batoo.jpa.core"/>
+<stringAttribute key="org.eclipse.jdt.junit.CONTAINER" value="=org.batoo.jpa.batoo-jpa"/>
 <booleanAttribute key="org.eclipse.jdt.junit.KEEPRUNNING_ATTR" value="false"/>
 <stringAttribute key="org.eclipse.jdt.junit.TESTNAME" value=""/>
 <stringAttribute key="org.eclipse.jdt.junit.TEST_KIND" value="org.eclipse.jdt.junit.loader.junit4"/>
 <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.m2e.launchconfig.classpathProvider"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value=""/>
-<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="org.batoo.jpa.core"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="org.batoo.jpa.batoo-jpa"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djavax.persistence.jdbc.driver=org.postgresql.Driver -Djavax.persistence.jdbc.url=jdbc:postgresql://localhost/test -Djavax.persistence.jdbc.user=postgres -Djavax.persistence.jdbc.password=toor -DtestMode=pgsql"/>
 </launchConfiguration>

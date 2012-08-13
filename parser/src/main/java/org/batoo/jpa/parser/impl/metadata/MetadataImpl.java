@@ -219,16 +219,20 @@ public class MetadataImpl implements Metadata {
 	/**
 	 * Parses the types in the metamodel.
 	 * 
+	 * @param classloader
+	 *            the class loader
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void parse() {
+	public void parse(ClassLoader classloader) {
 		for (final Entry<String, ManagedTypeMetadata> entry : this.entityMap.entrySet()) {
 			final String className = entry.getKey();
 			final ManagedTypeMetadata metadata = entry.getValue();
 
 			try {
-				final Class<?> clazz = Class.forName(className);
+				final Class<?> clazz = classloader.loadClass(className);
+
 				if (metadata == null) {
 					if (clazz.getAnnotation(Entity.class) != null) {
 						final EntityMetadataImpl entityMetadata = new EntityMetadataImpl(clazz, (EntityMetadata) metadata);

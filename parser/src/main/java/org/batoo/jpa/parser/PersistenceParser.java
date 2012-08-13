@@ -19,10 +19,11 @@
 package org.batoo.jpa.parser;
 
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Map;
 
+import javax.persistence.spi.PersistenceUnitInfo;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.batoo.jpa.common.BatooException;
@@ -57,9 +58,47 @@ public class PersistenceParser {
 	private static final BLogger LOG = BLoggerFactory.getLogger(PersistenceParser.class);
 
 	private final String puName;
+	private final PersistenceUnitInfo persistenceUnitInfo;
+
+	private final ClassLoader classloader;
+
 	private final MetadataImpl metadata;
+
 	private PersistenceUnit persistenceUnit;
 	private final Map<String, Object> properties = Maps.newHashMap();
+
+	/**
+	 * @param persistenceUnitName
+	 *            the name of the persistence unit
+	 * @param persistenceUnitInfo
+	 *            the persistence unit info
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public PersistenceParser(PersistenceUnitInfo persistenceUnitInfo, String persistenceUnitName) {
+		super();
+
+		this.persistenceUnitInfo = persistenceUnitInfo;
+
+		if (this.persistenceUnitInfo != null) {
+			this.puName = this.persistenceUnitInfo.getPersistenceUnitName();
+			this.classloader = this.persistenceUnitInfo.getClassLoader();
+		}
+		else {
+			this.puName = persistenceUnitName;
+			this.classloader = Thread.currentThread().getContextClassLoader();
+		}
+
+		// initialize the persistence unit
+		this.init();
+		this.readProperties();
+
+		this.metadata = new MetadataImpl(this.persistenceUnit.getClazzs());
+
+		this.parseOrmXmls();
+		this.metadata.parse(this.classloader);
+	}
 
 	/**
 	 * @param persistenceUnitName
@@ -69,18 +108,31 @@ public class PersistenceParser {
 	 * @author hceylan
 	 */
 	public PersistenceParser(String persistenceUnitName) {
-		super();
+		this(null, persistenceUnitName);
+	}
 
-		this.puName = persistenceUnitName;
+	/**
+	 * Returns the classloader of the PersistenceParser.
+	 * 
+	 * @return the classloader of the PersistenceParser
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ClassLoader getClassloader() {
+		return this.classloader;
+	}
 
-		// initialize the persistence unit
-		this.init();
-		this.readProperties();
-
-		this.metadata = new MetadataImpl(this.persistenceUnit.getClazzs());
-
-		this.parseOrmXmls();
-		this.metadata.parse();
+	/**
+	 * Returns the JTA datasource JNDI name.
+	 * 
+	 * @return the JTA datasource JNDI name
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getJtaDatasource() {
+		return this.persistenceUnit.getJtaDataSource();
 	}
 
 	/**
@@ -93,6 +145,18 @@ public class PersistenceParser {
 	 */
 	public MetadataImpl getMetadata() {
 		return this.metadata;
+	}
+
+	/**
+	 * Returns the non-JTA datasource JNDI name.
+	 * 
+	 * @return the non-JTA datasource JNDI name
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getNonJtaDatasource() {
+		return this.persistenceUnit.getNonJtaDataSource();
 	}
 
 	/**
@@ -117,16 +181,13 @@ public class PersistenceParser {
 		try {
 			PersistenceParser.LOG.info("Loading persistence.xml");
 
-			InputStream is;
+			if (this.persistenceUnitInfo != null) {
+				new URL(this.persistenceUnitInfo.getPersistenceUnitRootUrl().toExternalForm() + "/" + PersistenceParser.PERSISTENCE_XML);
 
-			// Try to load the Persistence XML from the thread's class loader
-			is = Thread.currentThread().getContextClassLoader().getResourceAsStream(PersistenceParser.PERSISTENCE_XML);
-
-			if (is == null) {
-				// Fall back to load the Persistence XML from the class's class loader
-				is = this.getClass().getClassLoader().getResourceAsStream(PersistenceParser.PERSISTENCE_XML);
 			}
 
+			// Try to load the Persistence XML
+			final InputStream is = this.classloader.getResourceAsStream(PersistenceParser.PERSISTENCE_XML);
 			if (is == null) {
 				throw new BatooException("persistence.xml not found in the classpath");
 			}
@@ -145,7 +206,7 @@ public class PersistenceParser {
 
 			throw new BatooException("Persistence unit " + this.puName + " not found in the persistence.xml");
 		}
-		catch (final JAXBException e) {
+		catch (final Exception e) {
 			throw new BatooException("Unable to create JAXBContext", e);
 		}
 	}
