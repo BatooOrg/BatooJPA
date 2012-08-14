@@ -35,9 +35,7 @@ import javax.persistence.Query;
 import javax.persistence.StoredProcedureQuery;
 import javax.persistence.TransactionRequiredException;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.metamodel.PluralAttribute.CollectionType;
 import javax.sql.DataSource;
 
@@ -45,9 +43,7 @@ import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
-import org.batoo.jpa.core.impl.criteria.CriteriaDeleteImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.CriteriaUpdateImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.jpql.JpqlQuery;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
@@ -311,16 +307,6 @@ public class EntityManagerImpl implements EntityManager {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Query createQuery(CriteriaDelete<?> deleteQuery) {
-		return new QueryImpl((CriteriaDeleteImpl<?>) deleteQuery, this);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public <T> QueryImpl<T> createQuery(CriteriaQuery<T> criteriaQuery) {
 		return new QueryImpl<T>((CriteriaQueryImpl<T>) criteriaQuery, this);
 	}
@@ -331,8 +317,18 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Query createQuery(CriteriaUpdate<?> updateQuery) {
-		return new QueryImpl((CriteriaUpdateImpl<?>) updateQuery, this);
+	public Query createQuery(javax.persistence.criteria.CriteriaDelete<?> deleteQuery) {
+		return new QueryImpl((org.batoo.jpa.core.impl.criteria.CriteriaDeleteImpl<?>) deleteQuery, this);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public Query createQuery(javax.persistence.criteria.CriteriaUpdate<?> updateQuery) {
+		return new QueryImpl((org.batoo.jpa.core.impl.criteria.CriteriaUpdateImpl<?>) updateQuery, this);
 	}
 
 	/**

@@ -20,6 +20,8 @@ package org.batoo.jpa.parser;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.spi.PersistenceUnitInfo;
@@ -59,12 +61,9 @@ public class PersistenceParser {
 
 	private final String puName;
 	private final PersistenceUnitInfo persistenceUnitInfo;
-
 	private final ClassLoader classloader;
-
 	private final MetadataImpl metadata;
-
-	private PersistenceUnit persistenceUnit;
+	private final PersistenceUnit persistenceUnit;
 	private final Map<String, Object> properties = Maps.newHashMap();
 
 	/**
@@ -91,13 +90,23 @@ public class PersistenceParser {
 		}
 
 		// initialize the persistence unit
-		this.init();
+		this.persistenceUnit = this.createPersistenceUnit();
 		this.readProperties();
 
 		this.metadata = new MetadataImpl(this.persistenceUnit.getClazzs());
 
 		this.parseOrmXmls();
-		this.metadata.parse(this.classloader);
+		if (this.persistenceUnitInfo != null) {
+			List<URL> jarFiles = this.persistenceUnitInfo.getJarFileUrls();
+			if (jarFiles == null) {
+				jarFiles = Collections.emptyList();
+			}
+
+			this.metadata.parse(jarFiles, this.classloader);
+		}
+		else {
+			this.metadata.parse(this.classloader);
+		}
 	}
 
 	/**
@@ -109,6 +118,45 @@ public class PersistenceParser {
 	 */
 	public PersistenceParser(String persistenceUnitName) {
 		this(null, persistenceUnitName);
+	}
+
+	/**
+	 * Initializes the persistence unit by parsing the Persistence XML File.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 * @return
+	 */
+	private PersistenceUnit createPersistenceUnit() {
+		try {
+			PersistenceParser.LOG.info("Loading persistence.xml");
+
+			if (this.persistenceUnitInfo != null) {
+				new URL(this.persistenceUnitInfo.getPersistenceUnitRootUrl().toExternalForm() + "/" + PersistenceParser.PERSISTENCE_XML);
+
+			}
+
+			// Try to load the Persistence XML
+			final InputStream is = this.classloader.getResourceAsStream(PersistenceParser.PERSISTENCE_XML);
+			if (is == null) {
+				throw new BatooException("persistence.xml not found in the classpath");
+			}
+
+			final JAXBContext context = JAXBContext.newInstance(Persistence.class);
+			final Unmarshaller unmarshaller = context.createUnmarshaller();
+
+			final Persistence persistence = (Persistence) unmarshaller.unmarshal(is);
+			for (final PersistenceUnit persistenceUnit : persistence.getPersistenceUnits()) {
+				if (this.puName.equals(persistenceUnit.getName())) {
+					return persistenceUnit;
+				}
+			}
+
+			throw new BatooException("Persistence unit " + this.puName + " not found in the persistence.xml");
+		}
+		catch (final Exception e) {
+			throw new BatooException("Unable to create JAXBContext", e);
+		}
 	}
 
 	/**
@@ -169,46 +217,6 @@ public class PersistenceParser {
 	 */
 	public Map<String, Object> getProperties() {
 		return this.properties;
-	}
-
-	/**
-	 * Initializes the persistence unit by parsing the Persistence XML File.
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	private void init() {
-		try {
-			PersistenceParser.LOG.info("Loading persistence.xml");
-
-			if (this.persistenceUnitInfo != null) {
-				new URL(this.persistenceUnitInfo.getPersistenceUnitRootUrl().toExternalForm() + "/" + PersistenceParser.PERSISTENCE_XML);
-
-			}
-
-			// Try to load the Persistence XML
-			final InputStream is = this.classloader.getResourceAsStream(PersistenceParser.PERSISTENCE_XML);
-			if (is == null) {
-				throw new BatooException("persistence.xml not found in the classpath");
-			}
-
-			final JAXBContext context = JAXBContext.newInstance(Persistence.class);
-			final Unmarshaller unmarshaller = context.createUnmarshaller();
-
-			final Persistence persistence = (Persistence) unmarshaller.unmarshal(is);
-			for (final PersistenceUnit persistenceUnit : persistence.getPersistenceUnits()) {
-				if (this.puName.equals(persistenceUnit.getName())) {
-					this.persistenceUnit = persistenceUnit;
-
-					return;
-				}
-			}
-
-			throw new BatooException("Persistence unit " + this.puName + " not found in the persistence.xml");
-		}
-		catch (final Exception e) {
-			throw new BatooException("Unable to create JAXBContext", e);
-		}
 	}
 
 	/**

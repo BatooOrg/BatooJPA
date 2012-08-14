@@ -32,9 +32,7 @@ import javax.persistence.Tuple;
 import javax.persistence.criteria.CollectionJoin;
 import javax.persistence.criteria.CompoundSelection;
 import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.ListJoin;
@@ -298,7 +296,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public <T> CriteriaDelete<T> createCriteriaDelete(Class<T> targetEntity) {
+	public <T> javax.persistence.criteria.CriteriaDelete<T> createCriteriaDelete(Class<T> targetEntity) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -308,7 +306,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public <T> CriteriaUpdate<T> createCriteriaUpdate(Class<T> targetEntity) {
+	public <T> javax.persistence.criteria.CriteriaUpdate<T> createCriteriaUpdate(Class<T> targetEntity) {
 		// TODO Auto-generated method stub
 		return null;
 	}

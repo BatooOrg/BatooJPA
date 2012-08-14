@@ -41,10 +41,11 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 	 * 
 	 */
 	@Override
-	public EntityManagerFactoryImpl createContainerEntityManagerFactory(PersistenceUnitInfo info, @SuppressWarnings("rawtypes") Map map) {
+	@SuppressWarnings("rawtypes")
+	public EntityManagerFactoryImpl createContainerEntityManagerFactory(PersistenceUnitInfo info, Map map) {
 		final PersistenceParser parser = new PersistenceParser(info, null);
 
-		return new EntityManagerFactoryImpl(info.getPersistenceUnitName(), parser);
+		return new EntityManagerFactoryImpl(true, info.getPersistenceUnitName(), parser);
 	}
 
 	/**
@@ -52,12 +53,13 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 	 * 
 	 */
 	@Override
-	public EntityManagerFactory createEntityManagerFactory(String emName, @SuppressWarnings("rawtypes") Map map) {
+	@SuppressWarnings("rawtypes")
+	public EntityManagerFactory createEntityManagerFactory(String emName, Map map) {
 		// create the persistence parser
 		final PersistenceParser parser = new PersistenceParser(emName);
 
 		// finally, create the entity manager factory
-		return new EntityManagerFactoryImpl(emName, parser);
+		return new EntityManagerFactoryImpl(false, emName, parser);
 	}
 
 	/**

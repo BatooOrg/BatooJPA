@@ -1,9 +1,23 @@
-<!-- Copyright (c) 2012 - Batoo Software ve Consultancy Ltd. This copyrighted material is made available to anyone wishing to use, modify, copy, 
-	or redistribute it subject to the terms and conditions of the GNU Lesser General Public License, as published by the Free Software Foundation. 
-	This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
-	or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details. You should have received a copy of the GNU Lesser 
-	General Public License along with this distribution; if not, write to: Free Software Foundation, Inc. 51 Franklin Street, Fifth Floor Boston, 
-	MA 02110-1301 USA -->
+<!-- 
+
+	Copyright (c) 2012 - Batoo Software ve Consultancy Ltd.
+ 
+	This copyrighted material is made available to anyone wishing to use, modify,
+	copy, or redistribute it subject to the terms and conditions of the GNU
+	Lesser General Public License, as published by the Free Software Foundation.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+	or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+	for more details.
+
+	You should have received a copy of the GNU Lesser General Public License
+	along with this distribution; if not, write to:
+	Free Software Foundation, Inc.
+	51 Franklin Street, Fifth Floor
+	Boston, MA  02110-1301  USA
+
+ -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
@@ -43,7 +57,7 @@
 					</instructions>
 				</configuration>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
@@ -57,8 +71,8 @@
 					</execution>
 				</executions>
 			</plugin>
-			
-			<plugin>
+
+ 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
 				<version>1.7.1</version>
@@ -69,9 +83,16 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
-							<minimizeJar>true</minimizeJar>
 							<createSourcesJar>true</createSourcesJar>
-							<relocations>
+							<artifactSet>
+								<includes>
+									<include>org.batoo.jpa:*</include>
+								</includes>
+								<excludes>
+									<exclude>*:persistence-api</exclude>
+								</excludes>
+							</artifactSet>
+<!-- 							<relocations>
 								<relocation>
 									<pattern>org.antlr</pattern>
 									<shadedPattern>org.batoo.jpa.external.antlr</shadedPattern>
@@ -92,19 +113,11 @@
 									<pattern>com.google</pattern>
 									<shadedPattern>org.batoo.jpa.external.google</shadedPattern>
 								</relocation>
-								<relocation>
-									<pattern>javassist</pattern>
-									<shadedPattern>org.batoo.jpa.external.javassist</shadedPattern>
-								</relocation>
-								<relocation>
-									<pattern>org.reflections</pattern>
-									<shadedPattern>org.batoo.jpa.external.reflections</shadedPattern>
-								</relocation>
 							</relocations>
-						</configuration>
+ -->						</configuration>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin> 
 
 		</plugins>
 	</build>
@@ -139,6 +152,16 @@
 		<dependency>
 			<groupId>org.antlr</groupId>
 			<artifactId>antlr-runtime</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>stringtemplate</artifactId>
+					<groupId>org.antlr</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>antlr</artifactId>
+					<groupId>antlr</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- ASM -->
@@ -175,7 +198,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
+
 		<!-- Utils -->
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -187,16 +210,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
-			<groupId>org.reflections</groupId>
-			<artifactId>reflections</artifactId>
-			<exclusions>
-				<exclusion>
-					<artifactId>dom4j</artifactId>
-					<groupId>dom4j</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+	
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
@@ -219,6 +233,12 @@
 		</dependency>
 
 		<!-- Test -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>

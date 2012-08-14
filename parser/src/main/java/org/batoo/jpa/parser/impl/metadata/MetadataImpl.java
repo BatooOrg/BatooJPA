@@ -18,15 +18,24 @@
  */
 package org.batoo.jpa.parser.impl.metadata;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.persistence.AccessType;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.PersistenceException;
 
+import org.batoo.jpa.common.log.BLogger;
+import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.metadata.type.EmbeddableMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.type.EntityMetadataImpl;
@@ -44,6 +53,7 @@ import org.batoo.jpa.parser.metadata.type.MappedSuperclassMetadata;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Implementation of {@link Metadata}.
@@ -52,6 +62,8 @@ import com.google.common.collect.Maps;
  * @since $version
  */
 public class MetadataImpl implements Metadata {
+
+	private static final BLogger LOG = BLoggerFactory.getLogger(MetadataImpl.class);
 
 	private AccessType accessType;
 	private boolean xmlMappingMetadataComplete;
@@ -89,6 +101,53 @@ public class MetadataImpl implements Metadata {
 	@Override
 	public boolean cascadePersists() {
 		return this.cascadePersist;
+	}
+
+	private void findClasses(Set<Class<?>> classes, URLClassLoader classPath) {
+		try {
+			final Enumeration<URL> resources = classPath.getResources("");
+			while (resources.hasMoreElements()) {
+				String root = resources.nextElement().getFile();
+				if (root.endsWith("WEB-INF/")) {
+					root = root + "classes/";
+				}
+
+				if (!root.endsWith("/")) {
+					root = root + "/";
+				}
+
+				this.findClasses(classPath, classes, root.length(), new File(root));
+			}
+		}
+		catch (final Exception e) {
+			throw new PersistenceException("Cannot scan the classpath", e);
+		}
+	}
+
+	private void findClasses(URLClassLoader classPath, Set<Class<?>> classes, int rootLength, File file) throws IOException {
+		if (file.isDirectory()) {
+			for (final String child : file.list()) {
+				this.findClasses(classPath, classes, rootLength, new File(file.getCanonicalPath() + "/" + child));
+			}
+		}
+		else {
+			String path = file.getPath();
+
+			if (path.endsWith(".class")) {
+				path = path.substring(rootLength, path.length() - 6).replace("/", ".");
+				try {
+					final Class<?> clazz = classPath.loadClass(path);
+					if ((clazz.getAnnotation(Embeddable.class) != null) || //
+						(clazz.getAnnotation(MappedSuperclass.class) != null) || //
+						(clazz.getAnnotation(Entity.class) != null)) {
+						classes.add(clazz);
+					}
+				}
+				catch (final Exception e) {
+					MetadataImpl.LOG.warn("Cannot load class {0} in {1}", path, file.getPath());
+				}
+			}
+		}
 	}
 
 	/**
@@ -265,5 +324,32 @@ public class MetadataImpl implements Metadata {
 				throw new MappingException("Class " + className + " cound not be found.", metadata.getLocator());
 			}
 		}
+	}
+
+	/**
+	 * Parses the types in the metamodel and in the jar files.
+	 * 
+	 * @param jarFiles
+	 *            the optional jar files
+	 * @param classloader
+	 *            the class loader
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void parse(List<URL> jarFiles, ClassLoader classloader) {
+		final URLClassLoader classPath = new URLClassLoader(jarFiles.toArray(new URL[jarFiles.size()]), classloader);
+
+		final Set<Class<?>> classes = Sets.newHashSet();
+
+		this.findClasses(classes, classPath);
+
+		for (final Class<?> clazz : classes) {
+			if (!this.entityMap.containsKey(clazz.getName()) && !this.entityMap.containsKey(clazz.getSimpleName())) {
+				this.entityMap.put(clazz.getName(), null);
+			}
+		}
+
+		this.parse(classloader);
 	}
 }

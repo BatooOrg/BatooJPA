@@ -29,6 +29,7 @@ import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.core.impl.model.type.MappedSuperclassTypeImpl;
 
@@ -220,6 +221,28 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 		mapping.createMappings();
 	}
 
+	@SuppressWarnings("unchecked")
+	private void createMapping(final Attribute<? super X, ?> attribute) {
+		switch (attribute.getPersistentAttributeType()) {
+			case BASIC:
+				this.createBasicMapping((BasicAttribute<? super X, ?>) attribute);
+				break;
+			case ELEMENT_COLLECTION:
+				this.createElementCollectionMapping((PluralAttributeImpl<? super X, ?, ?>) attribute);
+				break;
+			case ONE_TO_ONE:
+			case MANY_TO_ONE:
+				this.createSingularAssociationMapping((AssociatedSingularAttribute<? super X, ?>) attribute);
+				break;
+			case MANY_TO_MANY:
+			case ONE_TO_MANY:
+				this.createPluralAssociationMapping((PluralAttributeImpl<? super X, ?, ?>) attribute);
+				break;
+			case EMBEDDED:
+				this.createEmbeddedMapping((EmbeddedAttribute<? super X, ?>) attribute);
+		}
+	}
+
 	/**
 	 * Creates the mappings.
 	 * 
@@ -229,32 +252,23 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	@SuppressWarnings("unchecked")
 	public void createMappings() {
 		for (final Attribute<? super X, ?> attribute : this.getType().getAttributes()) {
-			// should we process the attribute
-			final boolean process = (attribute.getDeclaringType() == this.getType()) //
-				|| (attribute.getDeclaringType() instanceof MappedSuperclassTypeImpl);
 
-			if (!process) {
-				continue;
+			// if the declaring type is not this mapping's type then inspect
+			if (attribute.getDeclaringType() != this.getType()) {
+
+				// if the declaring type is mapped super type then inspect
+				if (attribute.getDeclaringType() instanceof MappedSuperclassTypeImpl) {
+					final EntityTypeImpl<X> type = (EntityTypeImpl<X>) this.getType();
+					if (type.getRootType() != type) {
+						continue;
+					}
+				}
+				else if (attribute.getDeclaringType() instanceof EntityTypeImpl) {
+					continue;
+				}
 			}
 
-			switch (attribute.getPersistentAttributeType()) {
-				case BASIC:
-					this.createBasicMapping((BasicAttribute<? super X, ?>) attribute);
-					break;
-				case ELEMENT_COLLECTION:
-					this.createElementCollectionMapping((PluralAttributeImpl<? super X, ?, ?>) attribute);
-					break;
-				case ONE_TO_ONE:
-				case MANY_TO_ONE:
-					this.createSingularAssociationMapping((AssociatedSingularAttribute<? super X, ?>) attribute);
-					break;
-				case MANY_TO_MANY:
-				case ONE_TO_MANY:
-					this.createPluralAssociationMapping((PluralAttributeImpl<? super X, ?, ?>) attribute);
-					break;
-				case EMBEDDED:
-					this.createEmbeddedMapping((EmbeddedAttribute<? super X, ?>) attribute);
-			}
+			this.createMapping(attribute);
 		}
 	}
 

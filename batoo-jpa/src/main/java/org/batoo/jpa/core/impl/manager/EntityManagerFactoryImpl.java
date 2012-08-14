@@ -82,8 +82,11 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 
 	private boolean open;
 	private final ClassLoader classloader;
+	private final boolean containerManaged;
 
 	/**
+	 * @param containerManaged
+	 *            if the persistence managed by a container
 	 * @param name
 	 *            the name of the entity manager factory
 	 * @param parser
@@ -92,9 +95,10 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EntityManagerFactoryImpl(String name, PersistenceParser parser) {
+	public EntityManagerFactoryImpl(boolean containerManaged, String name, PersistenceParser parser) {
 		super();
 
+		this.containerManaged = containerManaged;
 		this.classloader = parser.getClassloader();
 		this.prepareProperties(parser);
 
