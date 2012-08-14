@@ -22,26 +22,4 @@ public interface SetJoin<Z, E> extends PluralJoin<Z, Set<E>, E> {
 	 */
 	@Override
 	SetAttribute<? super Z, E> getModel();
-
-	/**
-	 * Modify the join to restrict the result according to the specified ON condition. Replaces the previous ON condition, if any. Return
-	 * the join object
-	 * 
-	 * @param restriction
-	 *            a simple or compound boolean expression
-	 * @return the modified join object
-	 */
-	@Override
-	SetJoin<Z, E> on(Expression<Boolean> restriction);
-
-	/**
-	 * Modify the join to restrict the result according to the specified ON condition. Replaces the previous ON condition, if any. Return
-	 * the join object
-	 * 
-	 * @param restrictions
-	 *            zero or more restriction predicates
-	 * @return the modified join object
-	 */
-	@Override
-	SetJoin<Z, E> on(Predicate... restrictions);
 }

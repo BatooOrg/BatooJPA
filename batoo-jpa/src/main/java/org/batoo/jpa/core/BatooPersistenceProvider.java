@@ -45,7 +45,7 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 	public EntityManagerFactoryImpl createContainerEntityManagerFactory(PersistenceUnitInfo info, Map map) {
 		final PersistenceParser parser = new PersistenceParser(info, null);
 
-		return new EntityManagerFactoryImpl(true, info.getPersistenceUnitName(), parser);
+		return new EntityManagerFactoryImpl(info.getPersistenceUnitName(), parser);
 	}
 
 	/**
@@ -59,7 +59,7 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 		final PersistenceParser parser = new PersistenceParser(emName);
 
 		// finally, create the entity manager factory
-		return new EntityManagerFactoryImpl(false, emName, parser);
+		return new EntityManagerFactoryImpl(emName, parser);
 	}
 
 	/**

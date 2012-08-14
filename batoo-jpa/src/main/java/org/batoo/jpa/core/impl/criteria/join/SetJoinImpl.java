@@ -20,9 +20,7 @@ package org.batoo.jpa.core.impl.criteria.join;
 
 import java.util.Set;
 
-import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.SetJoin;
 import javax.persistence.metamodel.SetAttribute;
 
@@ -64,23 +62,5 @@ public class SetJoinImpl<Z, E> extends AbstractPluralJoin<Z, Set<E>, E> implemen
 	@SuppressWarnings("unchecked")
 	public SetAttribute<? super Z, E> getModel() {
 		return (SetAttribute<? super Z, E>) this.getAttribute();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public SetJoin<Z, E> on(Expression<Boolean> restriction) {
-		throw this.notSupported();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public SetJoin<Z, E> on(Predicate... restrictions) {
-		throw this.notSupported();
 	}
 }

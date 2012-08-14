@@ -20,10 +20,8 @@ package org.batoo.jpa.core.impl.criteria.join;
 
 import java.util.List;
 
-import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Predicate;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
@@ -140,16 +138,6 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	 * 
 	 */
 	@Override
-	public Predicate getOn() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public FetchParentImpl<?, Z> getParent() {
 		return this.parent;
 	}
@@ -165,25 +153,5 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 		}
 
 		return super.getPrimaryTableAlias(query);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Fetch<Z, X> on(Expression<Boolean> restriction) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Fetch<Z, X> on(Predicate... restrictions) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

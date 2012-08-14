@@ -29,8 +29,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import junit.framework.Assert;
-
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -244,7 +242,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 */
 	public EntityManagerFactoryImpl emf() {
 		if (this.emf == null) {
-			this.setupEmf();
+			this.emf = this.setupEmf();
 		}
 
 		return this.emf;
@@ -464,11 +462,19 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	@Before
 	public void setup() throws SQLException {
 		if (!this.lazySetup()) {
-			this.setupEmf();
+			this.emf = this.setupEmf();
 		}
 	}
 
-	private void setupEmf() {
+	/**
+	 * Sets up the entity manager factory
+	 * 
+	 * @return the entity manager factory
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected EntityManagerFactoryImpl setupEmf() {
 		final Thread currentThread = Thread.currentThread();
 		this.oldContextClassLoader = currentThread.getContextClassLoader();
 
@@ -476,9 +482,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 		currentThread.setContextClassLoader(cl);
 		cl.setRoot(this.getRootPackage());
 
-		this.emf = (EntityManagerFactoryImpl) Persistence.createEntityManagerFactory(this.persistenceUnitName);
-
-		Assert.assertNotNull("EntityManagerFactory is null", this.emf);
+		return (EntityManagerFactoryImpl) Persistence.createEntityManagerFactory(this.persistenceUnitName);
 	}
 
 	/**

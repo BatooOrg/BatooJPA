@@ -645,7 +645,8 @@ public class JpqlQuery {
 
 		this.constructFrom(cb, q, tree.getChild(1));
 
-		final List<Selection<?>> selections = this.constructSelect(cb, q, tree.getChild(0).getChild(0));
+		final Tree select = tree.getChild(0);
+		final List<Selection<?>> selections = this.constructSelect(cb, q, select.getChild(select.getChildCount() - 1));
 
 		if (selections.size() == 1) {
 			q.select(selections.get(0));
@@ -654,7 +655,7 @@ public class JpqlQuery {
 			q.multiselect(selections);
 		}
 
-		if (tree.getChild(1).getType() == JpqlParser.DISTINCT) {
+		if (tree.getChild(0).getType() == JpqlParser.DISTINCT) {
 			q.distinct(true);
 		}
 

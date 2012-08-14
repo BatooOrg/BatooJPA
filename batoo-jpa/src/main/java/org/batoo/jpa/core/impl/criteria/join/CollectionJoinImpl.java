@@ -21,9 +21,7 @@ package org.batoo.jpa.core.impl.criteria.join;
 import java.util.Collection;
 
 import javax.persistence.criteria.CollectionJoin;
-import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Predicate;
 import javax.persistence.metamodel.CollectionAttribute;
 
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
@@ -64,23 +62,5 @@ public class CollectionJoinImpl<Z, E> extends AbstractPluralJoin<Z, Collection<E
 	@SuppressWarnings("unchecked")
 	public CollectionAttribute<? super Z, E> getModel() {
 		return (CollectionAttribute<? super Z, E>) this.getAttribute();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public CollectionJoin<Z, E> on(Expression<Boolean> restriction) {
-		throw this.notSupported();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public CollectionJoin<Z, E> on(Predicate... restrictions) {
-		throw this.notSupported();
 	}
 }

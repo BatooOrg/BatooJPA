@@ -31,7 +31,6 @@ import javax.persistence.LockModeType;
 import javax.persistence.PersistenceException;
 import javax.persistence.PersistenceUnitUtil;
 import javax.persistence.Query;
-import javax.persistence.SynchronizationType;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.BatooException;
@@ -82,11 +81,8 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 
 	private boolean open;
 	private final ClassLoader classloader;
-	private final boolean containerManaged;
 
 	/**
-	 * @param containerManaged
-	 *            if the persistence managed by a container
 	 * @param name
 	 *            the name of the entity manager factory
 	 * @param parser
@@ -95,10 +91,9 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EntityManagerFactoryImpl(boolean containerManaged, String name, PersistenceParser parser) {
+	public EntityManagerFactoryImpl(String name, PersistenceParser parser) {
 		super();
 
-		this.containerManaged = containerManaged;
 		this.classloader = parser.getClassloader();
 		this.prepareProperties(parser);
 
@@ -109,6 +104,9 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		this.metamodel.performTableGeneratorsDdl(this.datasource, DDLMode.DROP);
 
 		LinkManager.perform(this.metamodel);
+
+		this.metamodel.dropAllTables(this.datasource);
+
 		DdlManager.perform(this.datasource, this.metamodel, DDLMode.DROP);
 
 		this.metamodel.preFillGenerators(this.datasource);
@@ -141,10 +139,16 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Adds the query to the named queries.
 	 * 
+	 * @param name
+	 *            the name fo the query
+	 * @param query
+	 *            the query
+	 * 
+	 * @since $version
+	 * @author hceylan
 	 */
-	@Override
 	public void addNamedQuery(final String name, Query query) {
 		final QueryImpl<?> typedQuery = (QueryImpl<?>) query;
 		final String jpql = typedQuery.getCriteriaQuery().getJpql();
@@ -244,16 +248,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		this.assertOpen();
 
 		return new EntityManagerImpl(this, this.metamodel, this.datasource, map, this.jdbcAdaptor);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public EntityManager createEntityManager(SynchronizationType synchronizationType, Map<String, Object> map) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/**

@@ -18,7 +18,6 @@
  */
 package org.batoo.jpa.core.impl.criteria;
 
-import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 
@@ -26,7 +25,7 @@ import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 
 /**
- * Implementation of {@link CriteriaDelete}.
+ * Implementation of CriteriaDelete.
  * 
  * @param <T>
  *            the entity type that is the target of the delete
@@ -34,7 +33,7 @@ import org.batoo.jpa.core.impl.model.MetamodelImpl;
  * @author hceylan
  * @since $version
  */
-public class CriteriaDeleteImpl<T> extends CriteriaModify<T> implements CriteriaDelete<T> {
+public class CriteriaDeleteImpl<T> extends CriteriaModify<T> {
 
 	/**
 	 * @param metamodel

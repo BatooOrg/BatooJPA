@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -292,6 +293,21 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @author hceylan
 	 */
 	public abstract void createTableGeneratorIfNecessary(DataSource datasource, TableGenerator table) throws SQLException;
+
+	/**
+	 * Drops the tables in the database
+	 * 
+	 * @param dataSource
+	 *            the datasource
+	 * @param tables
+	 *            the set of tables to drop
+	 * @throws SQLException
+	 *             thrown if the SQL fails
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract void dropTables(DataSource dataSource, Set<AbstractTable> tables) throws SQLException;
 
 	/**
 	 * Escapes an SQL name

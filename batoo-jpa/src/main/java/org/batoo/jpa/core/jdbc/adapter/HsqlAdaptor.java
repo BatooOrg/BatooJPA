@@ -21,6 +21,7 @@ package org.batoo.jpa.core.jdbc.adapter;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.GenerationType;
 import javax.persistence.LockModeType;
@@ -29,6 +30,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
+import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinColumn;
@@ -221,6 +223,22 @@ public class HsqlAdaptor extends JdbcAdaptor {
 				+ "\nPRIMARY KEY(" + table.getPkColumnName() + "))";
 
 			new QueryRunner(datasource).update(sql);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void dropTables(DataSource datasource, Set<AbstractTable> tables) throws SQLException {
+
+		final QueryRunner runner = new QueryRunner(datasource);
+
+		for (final AbstractTable table : tables) {
+			final String schema = this.schemaOf(datasource, table.getSchema());
+
+			runner.update("DROP TABLE " + schema + "." + table.getName() + " IF EXISTS CASCADE");
 		}
 	}
 

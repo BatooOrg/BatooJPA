@@ -328,6 +328,58 @@ public class MetamodelImpl implements Metamodel {
 	}
 
 	/**
+	 * Drops all the tables in the database.
+	 * 
+	 * @param datasource
+	 *            the datasource
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void dropAllTables(DataSourceImpl datasource) {
+		final Set<AbstractTable> tables = Sets.newHashSet();
+
+		for (final EntityTypeImpl<?> entity : this.entities.values()) {
+
+			// collect the entity tables
+			for (final EntityTable table : entity.getTables()) {
+				// if table belongs to parent then skip
+				if (table.getEntity() != entity) {
+					continue;
+				}
+
+				tables.add(table);
+			}
+
+			// collect the join tables
+			for (final AssociationMapping<?, ?, ?> mapping : entity.getAssociations()) {
+				final JoinTable table = mapping.getTable();
+
+				// skip not applicable tables
+				if ((table == null) || (table.getEntity() != entity)) {
+					continue;
+				}
+
+				tables.add(table);
+			}
+
+			// collect the join tables
+			for (final PluralMapping<?, ?, ?> mapping : entity.getMappingsPlural()) {
+				if (!mapping.isAssociation()) {
+					tables.add((AbstractTable) mapping.getTable());
+				}
+			}
+		}
+
+		try {
+			this.jdbcAdaptor.dropTables(datasource, tables);
+		}
+		catch (final SQLException e) {
+			throw new PersistenceException("Cannot drop tables", e);
+		}
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */

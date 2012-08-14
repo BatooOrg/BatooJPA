@@ -16,22 +16,28 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package javax.persistence;
+package org.batoo.jpa.core.test.inheritence.complex;
+
+import org.batoo.jpa.core.test.BaseCoreTest;
+import org.junit.Test;
 
 /**
- * Types for the synchronization.
- * 
- * @since 2.1
+ * @author hceylan
+ * @since $version
  */
-public enum SynchronizationType {
+public class ComplexInheritanceTest extends BaseCoreTest {
 
 	/**
-	 * Synchronized.
+	 * Tests the complex select
+	 * 
+	 * @since $version
+	 * @author hceylan
 	 */
-	SYNCHRONIZED,
+	@Test
+	public void testComplex1() {
+		this.em();
+		this.setupEmf();
 
-	/**
-	 * Unsynchronized.
-	 */
-	UNSYNCHRONIZED
+		this.em().find(Student.class, 1);
+	}
 }

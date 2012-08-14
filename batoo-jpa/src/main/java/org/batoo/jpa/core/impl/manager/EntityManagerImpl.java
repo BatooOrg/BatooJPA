@@ -32,7 +32,6 @@ import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
-import javax.persistence.StoredProcedureQuery;
 import javax.persistence.TransactionRequiredException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaQuery;
@@ -43,7 +42,9 @@ import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
+import org.batoo.jpa.core.impl.criteria.CriteriaDeleteImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
+import org.batoo.jpa.core.impl.criteria.CriteriaUpdateImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.jpql.JpqlQuery;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
@@ -267,16 +268,6 @@ public class EntityManagerImpl implements EntityManager {
 	 * 
 	 */
 	@Override
-	public StoredProcedureQuery createNamedStoredProcedureQuery(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public Query createNativeQuery(String sqlString) {
 		// TODO Auto-generated method stub
 		return null;
@@ -306,6 +297,15 @@ public class EntityManagerImpl implements EntityManager {
 	 * {@inheritDoc}
 	 * 
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public Query createQuery(CriteriaDeleteImpl<?> deleteQuery) {
+		return new QueryImpl(deleteQuery, this);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
 	@Override
 	public <T> QueryImpl<T> createQuery(CriteriaQuery<T> criteriaQuery) {
 		return new QueryImpl<T>((CriteriaQueryImpl<T>) criteriaQuery, this);
@@ -315,20 +315,9 @@ public class EntityManagerImpl implements EntityManager {
 	 * {@inheritDoc}
 	 * 
 	 */
-	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Query createQuery(javax.persistence.criteria.CriteriaDelete<?> deleteQuery) {
-		return new QueryImpl((org.batoo.jpa.core.impl.criteria.CriteriaDeleteImpl<?>) deleteQuery, this);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Query createQuery(javax.persistence.criteria.CriteriaUpdate<?> updateQuery) {
-		return new QueryImpl((org.batoo.jpa.core.impl.criteria.CriteriaUpdateImpl<?>) updateQuery, this);
+	public Query createQuery(CriteriaUpdateImpl<?> updateQuery) {
+		return new QueryImpl(updateQuery, this);
 	}
 
 	/**
@@ -347,36 +336,6 @@ public class EntityManagerImpl implements EntityManager {
 	@Override
 	public <T> TypedQuery<T> createQuery(String qlString, Class<T> resultClass) {
 		return this.emf.getJpqlQuery(qlString).<T> createTypedQuery(this);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public StoredProcedureQuery createStoredProcedureQuery(String procedureName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public StoredProcedureQuery createStoredProcedureQuery(String procedureName, Class<?>... resultClasses) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public StoredProcedureQuery createStoredProcedureQuery(String procedureName, String... resultSetMappings) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/**

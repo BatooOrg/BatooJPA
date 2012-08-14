@@ -18,10 +18,7 @@
  */
 package org.batoo.jpa.core.impl.criteria.join;
 
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Predicate;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
@@ -90,23 +87,5 @@ public class SingularJoin<Z, X> extends AbstractJoin<Z, X> {
 	@SuppressWarnings("unchecked")
 	public SingularAttribute<? super Z, X> getModel() {
 		return (SingularAttributeImpl<? super Z, X>) super.getAttribute();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Join<Z, X> on(Expression<Boolean> restriction) {
-		throw this.notSupported();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Join<Z, X> on(Predicate... restrictions) {
-		throw this.notSupported();
 	}
 }

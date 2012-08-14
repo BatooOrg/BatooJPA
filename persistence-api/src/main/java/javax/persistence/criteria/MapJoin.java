@@ -40,28 +40,6 @@ public interface MapJoin<Z, K, V> extends PluralJoin<Z, Map<K, V>, V> {
 	Path<K> key();
 
 	/**
-	 * Modify the join to restrict the result according to the specified ON condition. Replaces the previous ON condition, if any. Return
-	 * the join object
-	 * 
-	 * @param restriction
-	 *            a simple or compound boolean expression
-	 * @return the modified join object
-	 */
-	@Override
-	MapJoin<Z, K, V> on(Expression<Boolean> restriction);
-
-	/**
-	 * Modify the join to restrict the result according to the specified ON condition. Replaces the previous ON condition, if any. Return
-	 * the join object
-	 * 
-	 * @param restrictions
-	 *            zero or more restriction predicates
-	 * @return the modified join object
-	 */
-	@Override
-	MapJoin<Z, K, V> on(Predicate... restrictions);
-
-	/**
 	 * Create a path expression that corresponds to the map value. This method is for stylistic use only: it just returns this.
 	 * 
 	 * @return path corresponding to the map value

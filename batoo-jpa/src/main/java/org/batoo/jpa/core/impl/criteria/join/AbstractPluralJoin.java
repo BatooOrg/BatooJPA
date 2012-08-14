@@ -18,12 +18,8 @@
  */
 package org.batoo.jpa.core.impl.criteria.join;
 
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.PluralJoin;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.Type.PersistenceType;
 
 import org.batoo.jpa.core.impl.model.mapping.ElementCollectionMapping;
@@ -45,7 +41,7 @@ import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
  * @author hceylan
  * @since $version
  */
-public class AbstractPluralJoin<Z, C, E> extends AbstractJoin<Z, E> implements PluralJoin<Z, C, E> {
+public abstract class AbstractPluralJoin<Z, C, E> extends AbstractJoin<Z, E> implements PluralJoin<Z, C, E> {
 
 	/**
 	 * @param parent
@@ -87,35 +83,4 @@ public class AbstractPluralJoin<Z, C, E> extends AbstractJoin<Z, E> implements P
 
 		return (Mapping<? super E, CC, Y>) child;
 	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public PluralAttribute<? super Z, C, E> getModel() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Join<Z, E> on(Expression<Boolean> restriction) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Join<Z, E> on(Predicate... restrictions) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

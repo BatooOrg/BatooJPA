@@ -28,7 +28,6 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.ListJoin;
 import javax.persistence.criteria.MapJoin;
 import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
 
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
@@ -205,24 +204,6 @@ public class MapJoinImpl<Z, K, V> extends AbstractPluralJoin<Z, Map<K, V>, V> im
 	@Override
 	public Path<K> key() {
 		return new MapKeyPath<Z, K>(this, this.getModel().getKeyJavaType());
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public MapJoin<Z, K, V> on(Expression<Boolean> restriction) {
-		throw this.notSupported();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public MapJoin<Z, K, V> on(Predicate... restrictions) {
-		throw this.notSupported();
 	}
 
 	/**

@@ -3,9 +3,7 @@ package javax.persistence;
 import java.util.Map;
 
 import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.metamodel.Metamodel;
 
 /**
@@ -69,17 +67,6 @@ public interface EntityManager {
 	public <T> TypedQuery<T> createNamedQuery(String name, Class<T> resultClass);
 
 	/**
-	 * Create an instance of StoredProcedureQuery for executing a stored procedure in the database.
-	 * 
-	 * @param name
-	 *            name assigned to the stored procedure query in metadata
-	 * @return the new stored procedure query instance
-	 * @throws IllegalArgumentException
-	 *             if a query has not been defined with the given name
-	 */
-	public StoredProcedureQuery createNamedStoredProcedureQuery(String name);
-
-	/**
 	 * Create an instance of Query for executing a native SQL statement, e.g., for update or delete. If the query is not an update or delete
 	 * query, query execution will result in each row of the SQL result being returned as a result of type Object[] (or a result of type
 	 * Object if there is only one column in the select list.) Column values are returned in the order of their appearance in the select
@@ -114,17 +101,6 @@ public interface EntityManager {
 	public Query createNativeQuery(String sqlString, String resultSetMapping);
 
 	/**
-	 * Create an instance of Query for executing a criteria delete query.
-	 * 
-	 * @param deleteQuery
-	 *            a criteria delete query object
-	 * @return the new query instance
-	 * @throws IllegalArgumentException
-	 *             if the delete query is found to be invalid
-	 */
-	public Query createQuery(CriteriaDelete<?> deleteQuery);
-
-	/**
 	 * Create an instance of TypedQuery for executing a criteria query.
 	 * 
 	 * @param criteriaQuery
@@ -136,17 +112,6 @@ public interface EntityManager {
 	 *             if the criteria query is found to be invalid
 	 */
 	public <T> TypedQuery<T> createQuery(CriteriaQuery<T> criteriaQuery);
-
-	/**
-	 * Create an instance of Query for executing a criteria update query.
-	 * 
-	 * @param updateQuery
-	 *            a criteria update query object
-	 * @return the new query instance
-	 * @throws IllegalArgumentException
-	 *             if the update query is found to be invalid
-	 */
-	public Query createQuery(CriteriaUpdate<?> updateQuery);
 
 	/**
 	 * Create an instance of Query for executing a Java Persistence query language statement.
@@ -174,49 +139,6 @@ public interface EntityManager {
 	 *             if the query string is found to be invalid or if the query result is found to not be assignable to the specified type
 	 */
 	public <T> TypedQuery<T> createQuery(String qlString, Class<T> resultClass);
-
-	/**
-	 * Create an instance of StoredProcedureQuery for executing a stored procedure in the database. Parameters must be registered before the
-	 * stored procedure can be executed. If the stored procedure returns one or more result sets, any result set will be returned as a list
-	 * of type Object[].
-	 * 
-	 * @param procedureName
-	 *            name of the stored procedure in the database
-	 * @return the new stored procedure query instance
-	 * @throws IllegalArgumentException
-	 *             if a stored procedure of the given name does not exist (or the query execution will fail)
-	 */
-	public StoredProcedureQuery createStoredProcedureQuery(String procedureName);
-
-	/**
-	 * Create an instance of StoredProcedureQuery for executing a stored procedure in the database. Parameters must be registered before the
-	 * stored procedure can be executed. The resultClass arguments must be specified in the order in which the result sets will be returned
-	 * by the stored procedure invocation.
-	 * 
-	 * @param procedureName
-	 *            name of the stored procedure in the database
-	 * @param resultClasses
-	 *            classes to which the result sets produced by the stored procedure are to be mapped
-	 * @return the new stored procedure query instance
-	 * @throws IllegalArgumentException
-	 *             if a stored procedure of the given name does not exist (or the query execution will fail)
-	 */
-	public StoredProcedureQuery createStoredProcedureQuery(String procedureName, Class<?>... resultClasses);
-
-	/**
-	 * Create an instance of StoredProcedureQuery for executing a stored procedure in the database. Parameters must be registered before the
-	 * stored procedure can be executed. The resultSetMapping arguments must be specified in the order in which the result sets will be
-	 * returned by the stored procedure invocation.
-	 * 
-	 * @param procedureName
-	 *            name of the stored procedure in the database
-	 * @param resultSetMappings
-	 *            the names of the result set mappings to be used in mapping result sets returned by the stored procedure
-	 * @return the new stored procedure query instance
-	 * @throws IllegalArgumentException
-	 *             if a stored procedure or result set mapping of the given name does not exist (or the query execution will fail)
-	 */
-	public StoredProcedureQuery createStoredProcedureQuery(String procedureName, String... resultSetMappings);
 
 	/**
 	 * Remove the given entity from the persistence context, causing a managed entity to become detached. Unflushed changes made to the

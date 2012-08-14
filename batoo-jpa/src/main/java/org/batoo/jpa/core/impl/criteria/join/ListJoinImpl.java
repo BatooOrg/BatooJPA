@@ -23,7 +23,6 @@ import java.util.List;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.ListJoin;
-import javax.persistence.criteria.Predicate;
 import javax.persistence.metamodel.ListAttribute;
 
 import org.batoo.jpa.core.impl.criteria.expression.IndexExpression;
@@ -85,23 +84,5 @@ public class ListJoinImpl<Z, E> extends AbstractPluralJoin<Z, List<E>, E> implem
 		}
 
 		return new IndexExpression(this, orderColumn);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public ListJoin<Z, E> on(Expression<Boolean> restriction) {
-		throw this.notSupported();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public ListJoin<Z, E> on(Predicate... restrictions) {
-		throw this.notSupported();
 	}
 }

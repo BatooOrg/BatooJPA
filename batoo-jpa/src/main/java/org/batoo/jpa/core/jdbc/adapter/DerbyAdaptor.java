@@ -20,6 +20,7 @@ package org.batoo.jpa.core.jdbc.adapter;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.GenerationType;
 import javax.persistence.LockModeType;
@@ -27,6 +28,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
+import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinColumn;
@@ -203,6 +205,16 @@ public class DerbyAdaptor extends JdbcAdaptor {
 
 			new QueryRunner(datasource).update(sql);
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void dropTables(DataSource dataSource, Set<AbstractTable> tables) throws SQLException {
+		// TODO Auto-generated method stub
+
 	}
 
 	/**

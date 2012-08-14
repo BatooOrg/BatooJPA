@@ -20,7 +20,6 @@ package org.batoo.jpa.core.impl.criteria.join;
 
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Predicate;
 import javax.persistence.metamodel.Attribute;
 
 import org.apache.commons.lang.StringUtils;
@@ -133,15 +132,6 @@ public abstract class AbstractJoin<Z, X> extends AbstractFrom<Z, X> implements J
 	 */
 	protected JoinedMapping<? super Z, ?, X> getMapping() {
 		return this.mapping;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Predicate getOn() {
-		throw this.notSupported();
 	}
 
 	/**
