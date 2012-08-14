@@ -169,7 +169,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@Override
 	public abstract String createColumnDDL(AbstractColumn columnDefinition);
 
 	/**

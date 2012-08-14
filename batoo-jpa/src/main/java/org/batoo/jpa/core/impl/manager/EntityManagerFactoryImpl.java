@@ -35,7 +35,6 @@ import javax.persistence.SynchronizationType;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.BatooException;
-import org.batoo.jpa.core.BJPASettings;
 import org.batoo.jpa.core.JPASettings;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
@@ -262,13 +261,10 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * @author hceylan
 	 */
 	private JdbcAdaptor createJdbcAdaptor() {
-		final boolean scanExternal = Boolean.valueOf((String) this.getProperty(BJPASettings.SCAN_EXTERNAL_JDBC_DRIVERS));
 		try {
 			final Connection connection = this.datasource.getConnection();
 			try {
-				final String databaseProductName = connection.getMetaData().getDatabaseProductName();
-
-				return AbstractJdbcAdaptor.getAdapter(this.classloader, scanExternal, databaseProductName);
+				return AbstractJdbcAdaptor.getAdapter(this.classloader, connection.getMetaData().getDatabaseProductName());
 			}
 			finally {
 				connection.close();

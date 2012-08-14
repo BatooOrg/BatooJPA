@@ -41,11 +41,6 @@ public interface BJPASettings {
 	String ROOT_PACKAGE = "org.batoo.jpa.root_url";
 
 	/**
-	 * If JDBC drivers on the classpath should be scanned, default false
-	 */
-	String SCAN_EXTERNAL_JDBC_DRIVERS = "org.batoo.jpa.root_url";
-
-	/**
 	 * DDL operations, DROP | CREATE (*) | UPDATE | VERIFY | NONE
 	 */
 	String DDL = "org.batoo.jpa.ddl";

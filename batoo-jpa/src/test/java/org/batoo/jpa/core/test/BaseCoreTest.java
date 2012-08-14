@@ -32,8 +32,8 @@ import javax.persistence.TypedQuery;
 import junit.framework.Assert;
 
 import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.lf5.util.StreamUtils;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.BJPASettings;
@@ -265,10 +265,10 @@ public abstract class BaseCoreTest { // extends BaseTest {
 			final Process process = Runtime.getRuntime().exec(cmd);
 			if (process.waitFor() != 0) {
 				BaseCoreTest.LOG.error("Command failed: " + process.exitValue());
-				StreamUtils.copy(process.getErrorStream(), System.err);
+				IOUtils.copy(process.getErrorStream(), System.err);
 			}
 
-			StreamUtils.copy(process.getInputStream(), System.out);
+			IOUtils.copy(process.getErrorStream(), System.out);
 		}
 		catch (final Exception e) {
 			throw new RuntimeException(e);
