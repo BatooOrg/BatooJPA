@@ -851,7 +851,12 @@ public class EntityManagerImpl implements EntityManager {
 		// try to locate the instance in the session
 		ManagedInstance<T> instance = this.session.get(entity);
 
-		final EntityTypeImpl<T> type = (EntityTypeImpl<T>) this.metamodel.entity(entity.getClass());
+		Class<?> clazz = entity.getClass();
+		if (entity instanceof EnhancedInstance) {
+			clazz = clazz.getSuperclass();
+		}
+
+		final EntityTypeImpl<T> type = (EntityTypeImpl<T>) this.metamodel.entity(clazz);
 
 		// if it is in the session then test its status
 		if (instance != null) {
@@ -880,7 +885,7 @@ public class EntityManagerImpl implements EntityManager {
 
 		// if it has an id try to locate instance in the database
 		if (id != null) {
-			final T existingEntity = this.find((Class<T>) entity.getClass(), id);
+			final T existingEntity = this.find((Class<T>) clazz, id);
 
 			// if it is found in the database then merge and return
 			if (existingEntity != null) {
