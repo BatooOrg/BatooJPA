@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,8 +43,8 @@ import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
-import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
+import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
@@ -105,6 +106,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private EntityTable primaryTable;
 	private final Map<String, EntityTable> tableMap = Maps.newHashMap();
 	private EntityTable[] tables;
+	private EntityTable[] updateTables;
 	private EntityTable[] allTables;
 	private final HashMap<String, AssociatedSingularAttribute<? super X, ?>> idMap = Maps.newHashMap();
 
@@ -1557,8 +1559,29 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public void performUpdate(ConnectionImpl connection, ManagedInstance<X> instance) throws SQLException {
-		for (final EntityTable table : this.getTables()) {
-			table.performUpdate(connection, instance);
+		if (this.updateTables != null) {
+			for (final EntityTable table : this.updateTables) {
+				table.performUpdate(connection, instance);
+			}
+		}
+		else {
+			synchronized (this) {
+				if (this.updateTables != null) {
+					for (final EntityTable table : this.updateTables) {
+						table.performUpdate(connection, instance);
+					}
+				}
+				else {
+					final List<EntityTable> updateTables = Lists.newArrayList(this.getTables());
+					for (final Iterator<EntityTable> i = updateTables.iterator(); i.hasNext();) {
+						if (!i.next().performUpdateWithUpdatability(connection, instance)) {
+							i.remove();
+						}
+					}
+
+					this.updateTables = updateTables.toArray(new EntityTable[updateTables.size()]);
+				}
+			}
 		}
 	}
 

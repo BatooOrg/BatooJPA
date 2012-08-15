@@ -342,6 +342,12 @@ public class ManagedInstance<X> {
 			return;
 		}
 
+		if (this.checkUpdatedImpl()) {
+			this.changed();
+		}
+	}
+
+	private boolean checkUpdatedImpl() {
 		// iterate over old values
 		for (final Mapping<?, ?, ?> mapping : this.type.getMappingsSingular()) {
 			final Object newValue = mapping.get(this.instance);
@@ -349,11 +355,11 @@ public class ManagedInstance<X> {
 
 			// if it is changed then mark as changed and bail out
 			if (oldValue != newValue) {
-				this.changed();
-
-				return;
+				return true;
 			}
 		}
+
+		return false;
 	}
 
 	/**
@@ -493,9 +499,7 @@ public class ManagedInstance<X> {
 				this.status = Status.MANAGED;
 				break;
 			case MANAGED:
-				if (this.changed) {
-					this.type.performUpdate(connection, this);
-				}
+				this.type.performUpdate(connection, this);
 				break;
 			case REMOVED:
 				this.type.performRemove(connection, this);
@@ -679,6 +683,26 @@ public class ManagedInstance<X> {
 	 */
 	public boolean hasInitialId() {
 		return this.hasInitialId;
+	}
+
+	/**
+	 * Returns if the instance has self update.
+	 * 
+	 * @return true if the instance has self update, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean hasSelfUpdate() {
+		if (!this.changed && (this.snapshot.size() == 0)) {
+			return false;
+		}
+
+		if (this.collectionsChanged.size() > 0) {
+			return true;
+		}
+
+		return this.checkUpdatedImpl();
 	}
 
 	/**
@@ -909,6 +933,7 @@ public class ManagedInstance<X> {
 
 		this.changed = false;
 
+		this.snapshot.clear();
 		this.snapshot();
 	}
 
@@ -1006,8 +1031,10 @@ public class ManagedInstance<X> {
 	private void snapshot() {
 		ManagedInstance.LOG.trace("Snapshot generated for instance {0}", this);
 
-		for (final Mapping<?, ?, ?> mapping : this.type.getMappingsSingular()) {
-			this.snapshot.put(mapping, mapping.get(this.instance));
+		if (this.snapshot.size() == 0) {
+			for (final Mapping<?, ?, ?> mapping : this.type.getMappingsSingular()) {
+				this.snapshot.put(mapping, mapping.get(this.instance));
+			}
 		}
 	}
 

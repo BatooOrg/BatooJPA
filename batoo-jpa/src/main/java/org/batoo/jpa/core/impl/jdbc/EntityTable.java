@@ -288,6 +288,48 @@ public class EntityTable extends AbstractTable {
 	}
 
 	/**
+	 * Performs update to the table for the managed instance or joins. In addition checks if the table participate in update.
+	 * 
+	 * @param connection
+	 *            the connection to use
+	 * @param managedInstance
+	 *            the managed instance to perform update for
+	 * @return returns true if the table is updatable
+	 * @throws SQLException
+	 *             thrown in case of underlying SQLException
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean performUpdateWithUpdatability(ConnectionImpl connection, final ManagedInstance<?> managedInstance) throws SQLException {
+		final EntityTypeImpl<?> entityType = managedInstance.getType();
+		final Object instance = managedInstance.getInstance();
+
+		// Do not inline, generation of the update SQL will initialize the insertColumns!
+		final String updateSql = this.getUpdateSql(entityType, this.pkColumns);
+		final AbstractColumn[] updateColumns = this.getUpdateColumns(entityType);
+
+		// prepare the parameters
+		final Object[] params = new Object[updateColumns.length];
+		for (int i = 0; i < updateColumns.length; i++) {
+			final AbstractColumn column = updateColumns[i];
+
+			// if the first column is primary key then the table is not updatable
+			if ((i == 0) && (column instanceof PkColumn)) {
+				return false;
+			}
+
+			params[i] = column.getValue(instance);
+		}
+
+		// execute the insert
+		final QueryRunner runner = new QueryRunner();
+		runner.update(connection, updateSql, params);
+
+		return true;
+	}
+
+	/**
 	 * Performs version update to the table.
 	 * 
 	 * @param connection

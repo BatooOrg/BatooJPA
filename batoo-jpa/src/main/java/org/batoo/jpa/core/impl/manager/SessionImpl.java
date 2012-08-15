@@ -257,13 +257,19 @@ public class SessionImpl {
 	public void flush(ConnectionImpl connection) throws SQLException {
 		SessionImpl.LOG.debug("Flushing session {0}", this.sessionId);
 
-		Sets.newHashSet(this.newEntities);
-
 		final ArrayList<ManagedInstance<?>> updates = Lists.newArrayList(this.newEntities);
 		final ArrayList<ManagedInstance<?>> removals = Lists.newArrayListWithCapacity(this.changedEntities.size());
 
 		for (final ManagedInstance<?> instance : this.changedEntities) {
-			(instance.getStatus() == Status.REMOVED ? removals : updates).add(instance);
+			if (instance.getStatus() == Status.REMOVED) {
+				removals.add(instance);
+			}
+			else if (instance.getStatus() == Status.NEW) {
+				updates.add(instance);
+			}
+			else if (instance.hasSelfUpdate()) {
+				updates.add(instance);
+			}
 		}
 
 		final ManagedInstance<?>[] sortedUpdates = new ManagedInstance[updates.size()];
@@ -359,14 +365,22 @@ public class SessionImpl {
 	 */
 	@SuppressWarnings("unchecked")
 	public <X> ManagedInstance<X> get(X entity) {
+		Class<? extends Object> clazz = null;
+
 		if (entity instanceof EnhancedInstance) {
 			final ManagedInstance<?> instance = ((EnhancedInstance) entity).__enhanced__$$__getManagedInstance();
 			if (instance.getSession() == this) {
 				return (ManagedInstance<X>) instance;
 			}
+
+			clazz = entity.getClass().getSuperclass();
 		}
 
-		final EntityTypeImpl<X> type = (EntityTypeImpl<X>) this.metamodel.entity(entity.getClass());
+		if (clazz == null) {
+			clazz = entity.getClass();
+		}
+
+		final EntityTypeImpl<X> type = (EntityTypeImpl<X>) this.metamodel.entity(clazz);
 		final ManagedId<X> id = new ManagedId<X>(type, entity);
 
 		return (ManagedInstance<X>) this.repository.get(id);
