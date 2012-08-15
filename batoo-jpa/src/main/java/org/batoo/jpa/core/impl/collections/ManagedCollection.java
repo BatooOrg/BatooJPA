@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.collections;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.IdentityHashMap;
+import java.util.Map;
 
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
@@ -172,6 +173,16 @@ public abstract class ManagedCollection<E> {
 	protected abstract Collection<E> getSnapshot();
 
 	/**
+	 * Returns if the list is initialized.
+	 * 
+	 * @return true if the list is initialized, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract boolean isInitialized();
+
+	/**
 	 * Merges the collection with the entity
 	 * 
 	 * @param entityManager
@@ -192,18 +203,17 @@ public abstract class ManagedCollection<E> {
 
 		final Object children = this.mapping.get(instance);
 
-		// if it is a collection, handle like collection
+		final Collection<E> collection;
 		if (children instanceof Collection) {
-			final Collection<E> collection = (Collection<E>) children;
-
-			// merge all the new children
-			for (final E child : collection) {
-				mergedChildren.add(entityManager.mergeImpl(child, requiresFlush, processed, this.mapping.cascadesMerge()));
-			}
+			collection = (Collection<E>) children;
 		}
-		// handle like a map
 		else {
-			// TODO Map implementation
+			collection = ((Map<?, E>) children).values();
+		}
+
+		// merge all the new children
+		for (final E child : collection) {
+			mergedChildren.add(entityManager.mergeImpl(child, requiresFlush, processed, this.mapping.cascadesMerge()));
 		}
 
 		// make a snapshot

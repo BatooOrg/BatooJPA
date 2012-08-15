@@ -634,8 +634,10 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 		// get the managed collection
 		final ManagedCollection<E> collection = (ManagedCollection<E>) this.get(instance.getInstance());
 
-		// merge with the new entities
-		collection.mergeWith(entityManager, entity, requiresFlush, processed);
+		// if initialized then merge with the new entities
+		if (collection.isInitialized()) {
+			collection.mergeWith(entityManager, entity, requiresFlush, processed);
+		}
 	}
 
 	/**

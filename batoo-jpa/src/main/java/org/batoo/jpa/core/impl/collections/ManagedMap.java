@@ -281,6 +281,15 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	 * 
 	 */
 	@Override
+	public boolean isInitialized() {
+		return this.initialized;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public Set<K> keySet() {
 		this.initialize();
 

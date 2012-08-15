@@ -309,6 +309,15 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 * 
 	 */
 	@Override
+	public boolean isInitialized() {
+		return this.initialized;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public Iterator<E> iterator() {
 		this.initialize();
 
