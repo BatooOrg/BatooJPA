@@ -37,6 +37,8 @@ import javax.transaction.TransactionManager;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.BatooException;
+import org.batoo.jpa.common.log.BLogger;
+import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.JPASettings;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
@@ -66,6 +68,8 @@ import com.google.common.collect.Maps;
  */
 public class EntityManagerFactoryImpl implements EntityManagerFactory {
 
+	private static final BLogger LOG = BLoggerFactory.getLogger(EntityManagerFactoryImpl.class);
+
 	private final MetamodelImpl metamodel;
 	private final DataSourceImpl datasource;
 	private final TransactionManager transactionManager;
@@ -76,6 +80,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	private final Map<String, JpqlQuery> namedQueries = Maps.newHashMap();
 	private final CriteriaBuilderImpl criteriaBuilder;
 	private final PersistenceUnitUtilImpl persistenceUtil;
+
 	LoadingCache<String, JpqlQuery> graphs = CacheBuilder.newBuilder().maximumSize(1000).build(new CacheLoader<String, JpqlQuery>() {
 		@Override
 		public JpqlQuery load(String jpql) {
@@ -312,6 +317,8 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 */
 	public JpqlQuery getJpqlQuery(String qlString) {
 		try {
+			EntityManagerFactoryImpl.LOG.debug("JPQL: {0}", qlString);
+
 			return this.graphs.get(qlString);
 		}
 		catch (final Exception e) {
