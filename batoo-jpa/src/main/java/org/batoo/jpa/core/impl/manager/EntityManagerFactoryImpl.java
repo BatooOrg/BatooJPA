@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Map;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.persistence.Cache;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -31,6 +33,7 @@ import javax.persistence.LockModeType;
 import javax.persistence.PersistenceException;
 import javax.persistence.PersistenceUnitUtil;
 import javax.persistence.Query;
+import javax.transaction.TransactionManager;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.BatooException;
@@ -65,13 +68,14 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 
 	private final MetamodelImpl metamodel;
 	private final DataSourceImpl datasource;
-	private boolean jta;
+	private final TransactionManager transactionManager;
+	private final boolean jta;
+
 	private final JdbcAdaptor jdbcAdaptor;
 	private final Map<String, Object> properties = Maps.newHashMap();
 	private final Map<String, JpqlQuery> namedQueries = Maps.newHashMap();
 	private final CriteriaBuilderImpl criteriaBuilder;
 	private final PersistenceUnitUtilImpl persistenceUtil;
-
 	LoadingCache<String, JpqlQuery> graphs = CacheBuilder.newBuilder().maximumSize(1000).build(new CacheLoader<String, JpqlQuery>() {
 		@Override
 		public JpqlQuery load(String jpql) {
@@ -80,6 +84,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	});
 
 	private boolean open;
+
 	private final ClassLoader classloader;
 
 	/**
@@ -97,7 +102,10 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		this.classloader = parser.getClassloader();
 		this.prepareProperties(parser);
 
+		this.jta = StringUtils.isNotBlank(parser.getJtaDatasource());
 		this.datasource = this.createDatasource(parser);
+		this.transactionManager = this.lookupTransactionManager();
+
 		this.jdbcAdaptor = this.createJdbcAdaptor();
 		this.metamodel = new MetamodelImpl(this, this.jdbcAdaptor, parser.getMetadata());
 		this.metamodel.performSequencesDdl(this.datasource, DDLMode.DROP);
@@ -204,8 +212,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 
 	private DataSourceImpl createDatasource(PersistenceParser parser) {
 		if (StringUtils.isNotBlank(parser.getJtaDatasource())) {
-			this.jta = true;
-
 			return new DataSourceImpl(parser.getJtaDatasource());
 		}
 
@@ -377,6 +383,18 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	}
 
 	/**
+	 * Returns the transaction manager.
+	 * 
+	 * @return the transaction manager
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public TransactionManager getTransactionManager() {
+		return this.transactionManager;
+	}
+
+	/**
 	 * Returns the jta of the EntityManagerFactoryImpl.
 	 * 
 	 * @return the jta of the EntityManagerFactoryImpl
@@ -395,6 +413,19 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	@Override
 	public boolean isOpen() {
 		return this.open;
+	}
+
+	private TransactionManager lookupTransactionManager() {
+		if (!this.jta) {
+			return null;
+		}
+
+		try {
+			return (TransactionManager) new InitialContext().lookup("java:/TransactionManager");
+		}
+		catch (final NamingException e) {
+			throw new PersistenceException("Unable to locate the transaction manager");
+		}
 	}
 
 	private void prepareProperties(PersistenceParser parser) {

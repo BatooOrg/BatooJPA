@@ -81,7 +81,7 @@ public class DataSourceImpl implements DataSource {
 		this.jdbcUser = null;
 		this.jdbcPassword = null;
 
-		this.pool = new GenericPool<ConnectionImpl>(new ConnectionFactory(this));
+		this.pool = null;
 
 		DataSourceImpl.LOG.info("Datasource active: {0}", datasource);
 

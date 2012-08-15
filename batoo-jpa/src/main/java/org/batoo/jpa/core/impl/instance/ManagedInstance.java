@@ -370,9 +370,10 @@ public class ManagedInstance<X> {
 	public void checkVersion(ConnectionImpl connection) throws SQLException {
 		// no optimistic lock, nothing to check
 		if (!this.optimisticLock) {
-			ManagedInstance.LOG.debug("No optimistic lock support on {0}", this);
 			return;
 		}
+
+		ManagedInstance.LOG.debug("Optimistic lock on {0}", this);
 
 		final EntityTypeImpl<? super X> rootType = this.type.getRootType();
 		final Object currentVersion = rootType.getVersionAttribute().get(this.instance);
@@ -518,10 +519,12 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void flushAssociations(ConnectionImpl connection, boolean removals, boolean force) throws SQLException {
-		ManagedInstance.LOG.debug("Flushing associations for instance {0}", this);
+		if (!removals || (this.status != Status.NEW)) {
+			ManagedInstance.LOG.debug("Flushing associations for instance {0}", this);
 
-		for (final JoinedMapping<?, ?, ?> collection : this.type.getMappingsJoined()) {
-			collection.flush(connection, this, removals, force);
+			for (final JoinedMapping<?, ?, ?> collection : this.type.getMappingsJoined()) {
+				collection.flush(connection, this, removals, force);
+			}
 		}
 	}
 
@@ -919,8 +922,6 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void setChanged(PluralMapping<?, ?, ?> association) {
-		ManagedInstance.LOG.trace("Association changed for instance: {0}", this, association);
-
 		if ((this.collectionsChanged.size() == 0) && !this.changed) {
 			this.session.setChanged(this);
 		}
@@ -1031,8 +1032,6 @@ public class ManagedInstance<X> {
 		return "ManagedInstance [session=" + this.session.getSessionId() //
 			+ ", type=" + this.type.getName() //
 			+ ", status=" + this.status //
-			+ ", id=" + (this.id != null ? this.id.getId() : null) //
-			+ ", instance=" //
-			+ this.instance + "]";
+			+ ", id=" + (this.id != null ? this.id.getId() : null) + "]";
 	}
 }

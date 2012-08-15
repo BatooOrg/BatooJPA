@@ -111,8 +111,6 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public void checkTransient(Object instance) {
-		SessionImpl.LOG.debug("Transients are being checked on instance {0}", instance);
-
 		if (instance instanceof EnhancedInstance) {
 			final ManagedInstance<?> associate = ((EnhancedInstance) instance).__enhanced__$$__getManagedInstance();
 			if ((associate.getStatus() != Status.MANAGED) && (associate.getSession() == this)) {
@@ -514,8 +512,7 @@ public class SessionImpl {
 
 			for (final ManagedInstance<?> instance : entitiesLoaded) {
 				// check if the transaction is marked as rollback
-				final EntityTransactionImpl transaction = this.em.getTransaction();
-				if (transaction.getRollbackOnly()) {
+				if (this.em.hasTransactionMarkedForRollback()) {
 					return;
 				}
 
@@ -569,8 +566,6 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public void setChanged(ManagedInstance<?> instance) {
-		SessionImpl.LOG.debug("Instance changed {0}", instance);
-
 		this.changedEntities.add(instance);
 
 		if (instance.getStatus() == Status.REMOVED) {

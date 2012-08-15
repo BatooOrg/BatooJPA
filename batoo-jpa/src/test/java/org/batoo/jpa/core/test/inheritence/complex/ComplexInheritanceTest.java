@@ -37,7 +37,5 @@ public class ComplexInheritanceTest extends BaseCoreTest {
 	public void testComplex1() {
 		this.em();
 		this.setupEmf();
-
-		this.em().find(Student.class, 1);
 	}
 }

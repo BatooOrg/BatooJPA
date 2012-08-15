@@ -153,7 +153,6 @@ public class EntityTransactionImpl implements EntityTransaction {
 		catch (final SQLException e) {
 			throw new PersistenceException("Unable to rollback transaction", e);
 		}
-
 	}
 
 	/**
@@ -164,5 +163,4 @@ public class EntityTransactionImpl implements EntityTransaction {
 	public void setRollbackOnly() {
 		this.rollbackOnly = true;
 	}
-
 }

@@ -49,6 +49,7 @@ import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
@@ -209,6 +210,8 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>>, Q
 		final Object[] parameters = this.applyParameters();
 
 		try {
+			this.em.assertTransaction();
+
 			return new QueryRunner().update(this.em.getConnection(), this.sql, parameters);
 		}
 		catch (final SQLException e) {
@@ -390,7 +393,6 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>>, Q
 
 	private List<X> getResultListImpl() {
 		try {
-
 			final LockModeType lockMode = this.getLockMode();
 			if ((lockMode == LockModeType.PESSIMISTIC_READ) || (lockMode == LockModeType.PESSIMISTIC_WRITE)
 				|| (lockMode == LockModeType.PESSIMISTIC_FORCE_INCREMENT)) {
@@ -400,7 +402,13 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>>, Q
 			final Object[] parameters = this.applyParameters();
 
 			try {
-				return new QueryRunner().query(this.em.getConnection(), this.sql, this, parameters);
+				final ConnectionImpl connection = this.em.getConnection();
+				try {
+					return new QueryRunner().query(connection, this.sql, this, parameters);
+				}
+				finally {
+					this.em.closeConnectionIfNecessary();
+				}
 			}
 			catch (final SQLException e) {
 				QueryImpl.LOG.error(e, "Query failed" + QueryImpl.LOG.lazyBoxed(this.sql, parameters));
@@ -456,7 +464,6 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>>, Q
 
 		// process the resultset
 		while (rs.next()) {
-
 			final X instance = selection.handle(this, session, rs);
 			if (!cq.isDistinct() || !this.results.contains(instance)) {
 				this.results.add(instance);

@@ -301,8 +301,8 @@ public class AbstractTable {
 
 				@Override
 				public boolean apply(AbstractColumn input) {
-					if (input instanceof PkColumn) {
-						return true;
+					if ((input instanceof PkColumn) || (input instanceof DiscriminatorColumn)) {
+						return false;
 					}
 
 					final EntityTypeImpl<?> root;

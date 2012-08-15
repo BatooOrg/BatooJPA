@@ -73,7 +73,11 @@ public class UpdateJpqlTest extends BaseCoreTest {
 	public void testUpdate() {
 		Assert.assertEquals((Long) 4l, this.cq("select count(c) from Country c", Long.class).getSingleResult());
 
+		this.begin();
+
 		this.cu("delete Country c where c = :code").setParameter("code", UpdateJpqlTest.TR).executeUpdate();
+
+		this.commit();
 
 		Assert.assertEquals((Long) 3l, this.cq("select count(c) from Country c", Long.class).getSingleResult());
 	}

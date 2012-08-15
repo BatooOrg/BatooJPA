@@ -655,7 +655,7 @@ public class JpqlQuery {
 			q.multiselect(selections);
 		}
 
-		if (tree.getChild(0).getType() == JpqlParser.DISTINCT) {
+		if (select.getChild(0).getType() == JpqlParser.DISTINCT) {
 			q.distinct(true);
 		}
 
