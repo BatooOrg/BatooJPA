@@ -87,13 +87,18 @@ public final class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 		this.enumType = null;
 
 		this.type = this.getDeclaringType().getMetamodel().createBasicType(this.getJavaType());
+
 		if (this.getJavaType() == Timestamp.class) {
-			if (metadata.getTemporalType() == null) {
-				this.temporalType = TemporalType.TIMESTAMP;
-			}
-			else {
-				this.temporalType = metadata.getTemporalType();
-			}
+			this.temporalType = TemporalType.TIMESTAMP;
+		}
+		else if (this.getJavaType() == java.sql.Date.class) {
+			this.temporalType = TemporalType.DATE;
+		}
+		else if (this.getJavaType() == java.sql.Time.class) {
+			this.temporalType = TemporalType.TIME;
+		}
+		else if ((this.getJavaType() == Date.class) || (this.getJavaType() == Calendar.class)) {
+			this.temporalType = metadata.getTemporalType() != null ? metadata.getTemporalType() : TemporalType.TIMESTAMP;
 		}
 		else {
 			this.temporalType = null;
