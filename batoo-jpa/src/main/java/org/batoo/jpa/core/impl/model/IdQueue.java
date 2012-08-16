@@ -52,6 +52,8 @@ public abstract class IdQueue extends LinkedBlockingQueue<Long> {
 	private final String name;
 	private final int allocationSize;
 
+	private final ExecutorService idExecuter;
+
 	/**
 	 * @param idExecuter
 	 *            the executor service to submit refill tasks
@@ -66,10 +68,11 @@ public abstract class IdQueue extends LinkedBlockingQueue<Long> {
 	public IdQueue(ExecutorService idExecuter, String name, int allocationSize) {
 		super();
 
+		this.idExecuter = idExecuter;
 		this.name = name;
 		this.allocationSize = allocationSize;
 
-		idExecuter.execute(new TopUpTask());
+		this.idExecuter.execute(new TopUpTask());
 	}
 
 	/**
@@ -83,7 +86,7 @@ public abstract class IdQueue extends LinkedBlockingQueue<Long> {
 	 */
 	protected void doTopUp(Runnable runnable) {
 		while (true) {
-			if (Thread.currentThread().isInterrupted()) {
+			if (this.idExecuter.isShutdown()) {
 				return;
 			}
 
@@ -100,7 +103,13 @@ public abstract class IdQueue extends LinkedBlockingQueue<Long> {
 					return;
 				}
 				catch (final Throwable e) {
-					if (Thread.currentThread().isInterrupted()) {
+					try {
+						Thread.currentThread();
+						Thread.sleep(1000);
+					}
+					catch (final InterruptedException e1) {}
+
+					if (this.idExecuter.isShutdown()) {
 						return;
 					}
 

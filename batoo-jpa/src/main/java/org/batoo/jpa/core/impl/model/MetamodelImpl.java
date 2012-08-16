@@ -859,6 +859,10 @@ public class MetamodelImpl implements Metamodel {
 	 */
 	public void stopIdGenerators() {
 		this.idGeneratorExecuter.shutdownNow();
+		try {
+			this.idGeneratorExecuter.awaitTermination(5, TimeUnit.SECONDS);
+		}
+		catch (final Exception e) {}
 	}
 
 	/**
