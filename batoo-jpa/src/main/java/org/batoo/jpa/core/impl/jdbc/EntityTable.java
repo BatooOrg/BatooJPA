@@ -321,7 +321,7 @@ public class EntityTable extends AbstractTable {
 			final AbstractColumn column = updateColumns[i];
 
 			// if the first column is primary key then the table is not updatable
-			if ((i == 0) && (column instanceof PkColumn)) {
+			if ((i == 0) && column.isPrimaryKey()) {
 				return false;
 			}
 
