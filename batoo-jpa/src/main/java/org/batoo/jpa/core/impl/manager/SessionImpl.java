@@ -273,6 +273,10 @@ public class SessionImpl {
 			}
 		}
 
+		if ((updates.size() == 0) && (removals.size() == 0)) {
+			return;
+		}
+
 		final ManagedInstance<?>[] sortedUpdates = new ManagedInstance[updates.size()];
 		final ManagedInstance<?>[] sortedRemovals = new ManagedInstance[removals.size()];
 
