@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -184,7 +183,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 */
 	private String createCreateTableStatement(AbstractTable table) {
 		final List<String> ddlColumns = Lists.newArrayList();
-
 		final List<String> pkColumns = Lists.newArrayList();
 
 		final Collection<AbstractColumn> columns = this.getColumns(table);
@@ -192,7 +190,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 		for (final AbstractColumn column : columns) {
 			ddlColumns.add(this.createColumnDDL(column));
 
-			if (column instanceof PkColumn) {
+			if (column.isPrimaryKey()) {
 				pkColumns.add(column.getName());
 			}
 		}
@@ -295,6 +293,19 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	public abstract void createTableGeneratorIfNecessary(DataSource datasource, TableGenerator table) throws SQLException;
 
 	/**
+	 * @param datasource
+	 *            the datasource
+	 * @param sequences
+	 *            the sequences
+	 * @throws SQLException
+	 *             thrown if the SQL fails
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract void dropAllSequences(DataSourceImpl datasource, Collection<SequenceGenerator> sequences) throws SQLException;
+
+	/**
 	 * Drops the tables in the database
 	 * 
 	 * @param dataSource
@@ -307,7 +318,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract void dropTables(DataSource dataSource, Set<AbstractTable> tables) throws SQLException;
+	public abstract void dropTables(DataSource dataSource, Collection<AbstractTable> tables) throws SQLException;
 
 	/**
 	 * Escapes an SQL name
@@ -348,11 +359,11 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 
 			@Override
 			public int compare(AbstractColumn o1, AbstractColumn o2) {
-				if ((o1 instanceof PkColumn) && !(o2 instanceof PkColumn)) {
+				if (o1.isPrimaryKey() && !o2.isPrimaryKey()) {
 					return -1;
 				}
 
-				if ((o2 instanceof PkColumn) && !(o1 instanceof PkColumn)) {
+				if (o2.isPrimaryKey() && !o1.isPrimaryKey()) {
 					return 1;
 				}
 

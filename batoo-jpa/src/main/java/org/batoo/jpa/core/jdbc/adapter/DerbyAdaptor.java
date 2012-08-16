@@ -19,8 +19,8 @@
 package org.batoo.jpa.core.jdbc.adapter;
 
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.GenerationType;
 import javax.persistence.LockModeType;
@@ -212,7 +212,17 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
-	public void dropTables(DataSource dataSource, Set<AbstractTable> tables) throws SQLException {
+	public void dropAllSequences(DataSourceImpl datasource, Collection<SequenceGenerator> sequences) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void dropTables(DataSource dataSource, Collection<AbstractTable> tables) throws SQLException {
 		// TODO Auto-generated method stub
 
 	}

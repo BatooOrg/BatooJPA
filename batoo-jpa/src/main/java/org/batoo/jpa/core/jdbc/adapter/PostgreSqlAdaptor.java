@@ -20,8 +20,8 @@ package org.batoo.jpa.core.jdbc.adapter;
 
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.GenerationType;
 import javax.persistence.LockModeType;
@@ -198,7 +198,16 @@ public class PostgreSqlAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
-	public void dropTables(DataSource dataSource, Set<AbstractTable> tables) throws SQLException {
+	public void dropAllSequences(DataSourceImpl datasource, Collection<SequenceGenerator> sequences) throws SQLException {
+		// TODO Auto-generated method stub
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void dropTables(DataSource dataSource, Collection<AbstractTable> tables) throws SQLException {
 		// TODO Auto-generated method stub
 
 	}

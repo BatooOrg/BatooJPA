@@ -373,6 +373,7 @@ public class MetamodelImpl implements Metamodel {
 
 		try {
 			this.jdbcAdaptor.dropTables(datasource, tables);
+			this.jdbcAdaptor.dropAllSequences(datasource, this.sequenceGenerators.values());
 		}
 		catch (final SQLException e) {
 			throw new PersistenceException("Cannot drop tables", e);

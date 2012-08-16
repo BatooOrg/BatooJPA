@@ -20,8 +20,8 @@ package org.batoo.jpa.core.jdbc.adapter;
 
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.GenerationType;
 import javax.persistence.LockModeType;
@@ -231,8 +231,22 @@ public class HsqlAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
-	public void dropTables(DataSource datasource, Set<AbstractTable> tables) throws SQLException {
+	public void dropAllSequences(DataSourceImpl datasource, Collection<SequenceGenerator> sequences) throws SQLException {
+		final QueryRunner runner = new QueryRunner(datasource);
 
+		for (final SequenceGenerator sequence : sequences) {
+			final String schema = this.schemaOf(datasource, sequence.getSchema());
+
+			runner.update("DROP SEQUENCE " + schema + "." + sequence.getName() + " IF EXISTS CASCADE");
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void dropTables(DataSource datasource, Collection<AbstractTable> tables) throws SQLException {
 		final QueryRunner runner = new QueryRunner(datasource);
 
 		for (final AbstractTable table : tables) {
