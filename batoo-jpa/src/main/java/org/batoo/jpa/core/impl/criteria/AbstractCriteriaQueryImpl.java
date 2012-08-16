@@ -168,7 +168,7 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 		builder.append("select ");
 
 		// append distinct if necessary
-		if (this.isDistinct()) {
+		if (this.distinct) {
 			builder.append("distinct ");
 		}
 
@@ -234,7 +234,7 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 		// generate the select chunk
 		final StringBuilder select = new StringBuilder();
 		select.append("SELECT");
-		if (this.isDistinct() && !this.internal) {
+		if (this.distinct && !this.internal) {
 			select.append(" DISTINCT");
 		}
 		select.append("\n");
