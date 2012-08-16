@@ -262,7 +262,7 @@ public class SessionImpl {
 
 		for (final ManagedInstance<?> instance : this.changedEntities) {
 			if (instance.getStatus() == Status.NEW) {
-				//should be already in the list the instance is a new instance
+				// should be already in the list the instance is a new instance
 				continue;
 			}
 			else if (instance.getStatus() == Status.REMOVED) {

@@ -904,12 +904,13 @@ public class EntityManagerImpl implements EntityManager {
 		instance = type.getManagedInstanceById(this.session, managedId, false);
 
 		instance.setStatus(Status.NEW);
+
 		instance.enhanceCollections();
-		this.session.put(instance);
 		if (type.getRootType().hasVersionAttribute()) {
 			instance.setOptimisticLock();
 		}
 
+		this.session.putExternal(instance);
 		processed.put(entity, instance.getInstance());
 
 		instance.mergeWith(this, entity, requiresFlush, processed);
@@ -978,6 +979,7 @@ public class EntityManagerImpl implements EntityManager {
 
 		final EntityTypeImpl<T> type = (EntityTypeImpl<T>) this.metamodel.entity(entity.getClass());
 		final ManagedInstance<T> instance = type.getManagedInstance(this.session, entity);
+
 		instance.setStatus(Status.NEW);
 
 		instance.enhanceCollections();
