@@ -113,14 +113,14 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 
 		this.jdbcAdaptor = this.createJdbcAdaptor();
 		this.metamodel = new MetamodelImpl(this, this.jdbcAdaptor, parser.getMetadata());
-		this.metamodel.performSequencesDdl(this.datasource, DDLMode.DROP);
-		this.metamodel.performTableGeneratorsDdl(this.datasource, DDLMode.DROP);
 
 		LinkManager.perform(this.metamodel);
 
 		this.metamodel.dropAllTables(this.datasource);
-
 		DdlManager.perform(this.datasource, this.metamodel, DDLMode.DROP);
+
+		this.metamodel.performSequencesDdl(this.datasource, DDLMode.DROP);
+		this.metamodel.performTableGeneratorsDdl(this.datasource, DDLMode.DROP);
 
 		this.metamodel.preFillGenerators(this.datasource);
 		this.criteriaBuilder = new CriteriaBuilderImpl(this.metamodel);
