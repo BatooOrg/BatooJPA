@@ -261,11 +261,12 @@ public class SessionImpl {
 		final ArrayList<ManagedInstance<?>> removals = Lists.newArrayListWithCapacity(this.changedEntities.size());
 
 		for (final ManagedInstance<?> instance : this.changedEntities) {
-			if (instance.getStatus() == Status.REMOVED) {
-				removals.add(instance);
+			if (instance.getStatus() == Status.NEW) {
+				//should be already in the list the instance is a new instance
+				continue;
 			}
-			else if (instance.getStatus() == Status.NEW) {
-				updates.add(instance);
+			else if (instance.getStatus() == Status.REMOVED) {
+				removals.add(instance);
 			}
 			else if (instance.hasSelfUpdate()) {
 				updates.add(instance);

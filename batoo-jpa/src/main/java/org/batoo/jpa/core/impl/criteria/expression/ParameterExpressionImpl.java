@@ -29,7 +29,7 @@ import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
-import org.batoo.jpa.core.impl.jdbc.PkColumn;
+import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
@@ -284,7 +284,7 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	}
 
 	private void setParameter(Object[] parameters, MutableInt sqlIndex, Object value, final EntityTypeImpl<?> type) {
-		for (final PkColumn column : type.getPrimaryTable().getPkColumns()) {
+		for (final AbstractColumn column : type.getPrimaryTable().getPkColumns()) {
 			parameters[sqlIndex.intValue()] = column.getMapping().get(value);
 
 			sqlIndex.increment();

@@ -62,7 +62,7 @@ public class ForeignKey {
 
 	private String singleChildSql;
 
-	private PkColumn[] singleChildRestrictions;
+	private AbstractColumn[] singleChildRestrictions;
 	private AbstractColumn[] singleChildUpdates;
 	private String allChildrenSql;
 
@@ -400,7 +400,7 @@ public class ForeignKey {
 				return this.singleChildSql;
 			}
 
-			final List<PkColumn> singleChildRestrictions = Lists.newArrayList();
+			final List<AbstractColumn> singleChildRestrictions = Lists.newArrayList();
 			final List<AbstractColumn> singleChildUpdates = Lists.newArrayList();
 
 			final String updates = Joiner.on(", ").join(Lists.transform(this.joinColumns, new Function<JoinColumn, String>() {
@@ -424,17 +424,17 @@ public class ForeignKey {
 			}
 
 			final EntityTable table = (EntityTable) this.table;
-			final String restrictions = Joiner.on(", ").join(Collections2.transform(table.getPkColumns(), new Function<PkColumn, String>() {
+			final String restrictions = Joiner.on(" AND ").join(Collections2.transform(table.getPkColumns(), new Function<AbstractColumn, String>() {
 
 				@Override
-				public String apply(PkColumn input) {
+				public String apply(AbstractColumn input) {
 					singleChildRestrictions.add(input);
 
 					return input.getName() + " = ?";
 				}
 			}));
 
-			this.singleChildRestrictions = singleChildRestrictions.toArray(new PkColumn[singleChildRestrictions.size()]);
+			this.singleChildRestrictions = singleChildRestrictions.toArray(new AbstractColumn[singleChildRestrictions.size()]);
 			this.singleChildUpdates = singleChildUpdates.toArray(new AbstractColumn[singleChildUpdates.size()]);
 
 			return this.singleChildSql = "UPDATE " + this.table.getQName() + "\nSET " + updates + order + "\nWHERE " + restrictions;
@@ -573,7 +573,7 @@ public class ForeignKey {
 			}
 		}
 
-		for (final PkColumn column : this.singleChildRestrictions) {
+		for (final AbstractColumn column : this.singleChildRestrictions) {
 			parameters[i++] = column.getValue(child);
 		}
 
@@ -636,7 +636,7 @@ public class ForeignKey {
 			}
 		}
 
-		for (final PkColumn column : this.singleChildRestrictions) {
+		for (final AbstractColumn column : this.singleChildRestrictions) {
 			parameters[i++] = column.getValue(child);
 		}
 

@@ -43,12 +43,12 @@ import com.google.common.collect.Maps;
 public class EntityTable extends AbstractTable {
 
 	private final EntityTypeImpl<?> entity;
-	private final Map<String, PkColumn> pkColumns = Maps.newHashMap();
+	private final Map<String, AbstractColumn> pkColumns = Maps.newHashMap();
 
 	private final JdbcAdaptor jdbcAdaptor;
 	private PkColumn identityColumn;
 	private String removeSql;
-	private PkColumn[] removeColumns;
+	private AbstractColumn[] removeColumns;
 
 	/**
 	 * @param entity
@@ -82,6 +82,12 @@ public class EntityTable extends AbstractTable {
 
 			if (pkColumn.getIdType() == IdType.IDENTITY) {
 				this.identityColumn = (PkColumn) column;
+			}
+		}
+		else if (column instanceof JoinColumn) {
+			final JoinColumn joinColumn = (JoinColumn) column;
+			if (joinColumn.isPrimaryKey()) {
+				this.pkColumns.put(column.getMappingName(), joinColumn);
 			}
 		}
 	}
@@ -118,7 +124,7 @@ public class EntityTable extends AbstractTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Collection<PkColumn> getPkColumns() {
+	public Collection<AbstractColumn> getPkColumns() {
 		return this.pkColumns.values();
 	}
 
@@ -132,13 +138,13 @@ public class EntityTable extends AbstractTable {
 				return this.removeSql;
 			}
 
-			this.removeColumns = new PkColumn[this.pkColumns.size()];
+			this.removeColumns = new AbstractColumn[this.pkColumns.size()];
 			this.pkColumns.values().toArray(this.removeColumns);
 
-			final Collection<String> restrictions = Collections2.transform(this.pkColumns.values(), new Function<PkColumn, String>() {
+			final Collection<String> restrictions = Collections2.transform(this.pkColumns.values(), new Function<AbstractColumn, String>() {
 
 				@Override
-				public String apply(PkColumn input) {
+				public String apply(AbstractColumn input) {
 					return input.getName() + " = ?";
 				}
 			});
@@ -212,7 +218,7 @@ public class EntityTable extends AbstractTable {
 		// prepare the parameters
 		final Object[] params = new Object[this.removeColumns.length];
 		for (int i = 0; i < this.removeColumns.length; i++) {
-			final PkColumn column = this.removeColumns[i];
+			final AbstractColumn column = this.removeColumns[i];
 			params[i] = column.getValue(managedInstance.getInstance());
 		}
 

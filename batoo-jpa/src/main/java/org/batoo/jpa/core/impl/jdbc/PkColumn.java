@@ -63,4 +63,13 @@ public class PkColumn extends BasicColumn {
 	public IdType getIdType() {
 		return this.idType;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isPrimaryKey() {
+		return true;
+	}
 }

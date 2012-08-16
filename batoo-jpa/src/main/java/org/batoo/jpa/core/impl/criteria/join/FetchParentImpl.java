@@ -437,7 +437,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			final String fieldAlias;
 			final String field;
 
-			if (column instanceof PkColumn) {
+			if (column.isPrimaryKey() && column instanceof PkColumn) {
 				fieldAlias = tableAlias + "_F" + query.getFieldAlias(tableAlias, column);
 				field = Joiner.on(".").skipNulls().join(tableAlias, column.getName());
 
@@ -776,7 +776,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		final List<String> restrictions = Lists.newArrayList();
 
 		if (this.entity != null) {
-			for (final PkColumn column : this.entity.getPrimaryTable().getPkColumns()) {
+			for (final AbstractColumn column : this.entity.getPrimaryTable().getPkColumns()) {
 				if (query.isQuery()) {
 					restrictions.add(this.getPrimaryTableAlias(query) + "." + column.getName());
 				}

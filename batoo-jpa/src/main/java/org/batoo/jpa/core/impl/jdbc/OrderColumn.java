@@ -226,5 +226,4 @@ public class OrderColumn extends AbstractColumn {
 	public void setValue(Object instance, Object value) {
 		// noop
 	}
-
 }

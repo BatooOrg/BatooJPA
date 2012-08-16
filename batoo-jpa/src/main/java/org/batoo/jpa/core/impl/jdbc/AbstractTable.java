@@ -66,7 +66,7 @@ public class AbstractTable {
 	private AbstractColumn[] insertColumns;
 	private AbstractColumn[] updateColumns;
 	private AbstractColumn[] versionUpdateColumns;
-	private PkColumn[] selectVersionColumns;
+	private AbstractColumn[] selectVersionColumns;
 	private final Map<EntityTypeImpl<?>, AbstractColumn[]> insertColumnsMap = Maps.newHashMap();
 
 	private final Map<EntityTypeImpl<?>, AbstractColumn[]> updateColumnsMap = Maps.newHashMap();
@@ -239,7 +239,7 @@ public class AbstractTable {
 	 * @author hceylan
 	 * @param pkColumns
 	 */
-	private synchronized void generateSelectVersionSql(Map<String, PkColumn> pkColumns) {
+	private synchronized void generateSelectVersionSql(Map<String, AbstractColumn> pkColumns) {
 		if (this.versionSelectSql != null) {
 			return;
 		}
@@ -256,12 +256,12 @@ public class AbstractTable {
 			}
 		}
 
-		final List<PkColumn> selectVersionColumns = Lists.newArrayList();
+		final List<AbstractColumn> selectVersionColumns = Lists.newArrayList();
 
-		final Collection<String> restrictions = Collections2.transform(pkColumns.values(), new Function<PkColumn, String>() {
+		final Collection<String> restrictions = Collections2.transform(pkColumns.values(), new Function<AbstractColumn, String>() {
 
 			@Override
-			public String apply(PkColumn input) {
+			public String apply(AbstractColumn input) {
 				selectVersionColumns.add(input);
 
 				return input.getName() + " = ?";
@@ -275,7 +275,7 @@ public class AbstractTable {
 		this.versionSelectSql = "SELECT " + versionColumn.getName() + " FROM " + this.getQName() //
 			+ "\nWHERE " + restrictionStr;
 
-		this.selectVersionColumns = selectVersionColumns.toArray(new PkColumn[selectVersionColumns.size()]);
+		this.selectVersionColumns = selectVersionColumns.toArray(new AbstractColumn[selectVersionColumns.size()]);
 	}
 
 	/**
@@ -288,7 +288,7 @@ public class AbstractTable {
 	 * @author hceylan
 	 * @param pkColumns
 	 */
-	private synchronized void generateUpdateSql(final EntityTypeImpl<?> type, Map<String, PkColumn> pkColumns) {
+	private synchronized void generateUpdateSql(final EntityTypeImpl<?> type, Map<String, AbstractColumn> pkColumns) {
 		String sql = type != null ? this.updateSqlMap.get(type) : this.insertSql;
 		if (sql != null) { // other thread finished the job for us
 			return;
@@ -301,7 +301,7 @@ public class AbstractTable {
 
 				@Override
 				public boolean apply(AbstractColumn input) {
-					if ((input instanceof PkColumn) || (input instanceof DiscriminatorColumn)) {
+					if ((input.isPrimaryKey()) || (input instanceof DiscriminatorColumn)) {
 						return false;
 					}
 
@@ -326,7 +326,7 @@ public class AbstractTable {
 
 			@Override
 			public String apply(AbstractColumn input) {
-				if (!(input instanceof PkColumn)) {
+				if (!input.isPrimaryKey()) {
 					updateColumns.add(input);
 
 					return input.getName() + " = ?";
@@ -336,10 +336,10 @@ public class AbstractTable {
 			}
 		});
 
-		final Collection<String> restrictions = Collections2.transform(pkColumns.values(), new Function<PkColumn, String>() {
+		final Collection<String> restrictions = Collections2.transform(pkColumns.values(), new Function<AbstractColumn, String>() {
 
 			@Override
-			public String apply(PkColumn input) {
+			public String apply(AbstractColumn input) {
 				updateColumns.add(input);
 
 				return input.getName() + " = ?";
@@ -373,7 +373,7 @@ public class AbstractTable {
 	 * @author hceylan
 	 * @param pkColumns
 	 */
-	private synchronized void generateVersionUpdateSql(Map<String, PkColumn> pkColumns) {
+	private synchronized void generateVersionUpdateSql(Map<String, AbstractColumn> pkColumns) {
 		if (this.versionUpdateSql != null) {
 			return;
 		}
@@ -390,10 +390,10 @@ public class AbstractTable {
 			}
 		}
 
-		final Collection<String> restrictions = Collections2.transform(pkColumns.values(), new Function<PkColumn, String>() {
+		final Collection<String> restrictions = Collections2.transform(pkColumns.values(), new Function<AbstractColumn, String>() {
 
 			@Override
-			public String apply(PkColumn input) {
+			public String apply(AbstractColumn input) {
 				versionUpdateColumns.add(input);
 
 				return input.getName() + " = ?";
@@ -552,7 +552,7 @@ public class AbstractTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PkColumn[] getSelectVersionColumns() {
+	public AbstractColumn[] getSelectVersionColumns() {
 		return this.selectVersionColumns;
 	}
 
@@ -566,7 +566,7 @@ public class AbstractTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected String getSelectVersionSql(Map<String, PkColumn> pkColumns) {
+	protected String getSelectVersionSql(Map<String, AbstractColumn> pkColumns) {
 		if (this.versionSelectSql == null) {
 			this.generateSelectVersionSql(pkColumns);
 		}
@@ -616,7 +616,7 @@ public class AbstractTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected String getUpdateSql(EntityTypeImpl<?> entity, Map<String, PkColumn> pkColumns) {
+	protected String getUpdateSql(EntityTypeImpl<?> entity, Map<String, AbstractColumn> pkColumns) {
 		if (entity == null) {
 			if (this.updateSql == null) {
 				this.generateUpdateSql(null, pkColumns);
@@ -657,7 +657,7 @@ public class AbstractTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected String getVersionUpdateSql(Map<String, PkColumn> pkColumns) {
+	protected String getVersionUpdateSql(Map<String, AbstractColumn> pkColumns) {
 		if (this.updateSql == null) {
 			this.generateVersionUpdateSql(pkColumns);
 		}

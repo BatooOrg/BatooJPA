@@ -39,6 +39,7 @@ public class JoinColumn extends AbstractColumn {
 	private final AbstractLocator locator;
 	private AbstractTable table;
 
+	private final boolean primaryKey;
 	private String mappingName;
 	private String name;
 	private String referencedColumnName;
@@ -77,6 +78,7 @@ public class JoinColumn extends AbstractColumn {
 		this.jdbcAdaptor = jdbcAdaptor;
 		this.mapping = mapping;
 		this.locator = null;
+		this.primaryKey = false;
 
 		this.columnDefinition = "";
 		this.tableName = "";
@@ -107,6 +109,8 @@ public class JoinColumn extends AbstractColumn {
 		this.jdbcAdaptor = jdbcAdaptor;
 		this.locator = null;
 		this.referencedMapping = idMapping;
+		this.primaryKey = false;
+
 		final PkColumn referencedColumn = (PkColumn) idMapping.getColumn();
 
 		this.referencedColumnName = referencedColumn.getName();
@@ -139,6 +143,7 @@ public class JoinColumn extends AbstractColumn {
 
 		this.jdbcAdaptor = jdbcAdaptor;
 		this.locator = metadata.getLocator();
+		this.primaryKey = false;
 
 		this.referencedColumnName = metadata.getReferencedColumnName();
 		this.columnDefinition = metadata.getColumnDefinition();
@@ -170,6 +175,7 @@ public class JoinColumn extends AbstractColumn {
 		this.jdbcAdaptor = jdbcAdaptor;
 		this.locator = metadata.getLocator();
 		this.tableName = table.getName();
+		this.primaryKey = false;
 
 		this.referencedColumnName = metadata.getReferencedColumnName();
 		this.columnDefinition = metadata.getColumnDefinition();
@@ -182,6 +188,44 @@ public class JoinColumn extends AbstractColumn {
 
 		this.setColumnProperties(idMapping);
 		this.setTable(table);
+	}
+
+	/**
+	 * Constructor for inheritance and secondary table joins.
+	 * 
+	 * @param jdbcAdaptor
+	 *            the JDBC Adaptor
+	 * @param table
+	 *            the table
+	 * @param idMapping
+	 *            the referenced id mapping
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public JoinColumn(JdbcAdaptor jdbcAdaptor, SecondaryTable table, BasicMapping<?, ?> idMapping) {
+		super();
+
+		this.jdbcAdaptor = jdbcAdaptor;
+		this.locator = null;
+		this.referencedMapping = idMapping;
+		this.primaryKey = true;
+
+		final PkColumn referencedColumn = (PkColumn) idMapping.getColumn();
+
+		this.referencedColumnName = referencedColumn.getName();
+		this.columnDefinition = referencedColumn.getColumnDefinition();
+		this.tableName = table.getName();
+		this.mappingName = referencedColumn.getMappingName();
+		this.name = referencedColumn.getName();
+		this.insertable = referencedColumn.isInsertable();
+		this.nullable = referencedColumn.isNullable();
+		this.unique = referencedColumn.isUnique();
+		this.updatable = referencedColumn.isUnique();
+
+		this.setColumnProperties(idMapping);
+		this.setTable(table);
+
 	}
 
 	/**
@@ -368,6 +412,15 @@ public class JoinColumn extends AbstractColumn {
 	@Override
 	public boolean isNullable() {
 		return this.nullable;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isPrimaryKey() {
+		return this.primaryKey;
 	}
 
 	/**

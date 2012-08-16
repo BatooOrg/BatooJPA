@@ -173,6 +173,18 @@ public abstract class AbstractColumn {
 	public abstract boolean isNullable();
 
 	/**
+	 * Returns if the column is a primary key column.
+	 * 
+	 * @return true if the column is a primary key column false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isPrimaryKey(){
+		return false;
+	}
+
+	/**
 	 * Returns the unique of the column.
 	 * 
 	 * @return the unique of the column
