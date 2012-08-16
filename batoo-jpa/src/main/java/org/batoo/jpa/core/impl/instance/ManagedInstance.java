@@ -29,6 +29,7 @@ import java.util.Map;
 
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceException;
+import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 import javax.persistence.metamodel.PluralAttribute.CollectionType;
 
 import org.apache.commons.lang.ObjectUtils;
@@ -354,6 +355,20 @@ public class ManagedInstance<X> {
 			final Object oldValue = this.snapshot.get(mapping);
 
 			// if it is changed then mark as changed and bail out
+			if (mapping.getAttribute().getPersistentAttributeType() == PersistentAttributeType.BASIC) {
+				if (oldValue != newValue) {
+					if ((oldValue == null) || (newValue == null)) {
+						return true;
+					}
+
+					if (!ObjectUtils.equals(oldValue, newValue)) {
+						return true;
+					}
+				}
+
+				continue;
+			}
+
 			if (oldValue != newValue) {
 				return true;
 			}
