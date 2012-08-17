@@ -38,6 +38,10 @@ import javax.persistence.criteria.Path;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.SingularAttribute;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.reflect.ReflectHelper;
@@ -56,6 +60,7 @@ import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.DiscriminatorColumn;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.SecondaryTable;
+import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
@@ -1691,6 +1696,46 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 				type.prepareEagerJoins(r2, depth + 1, association);
 			}
+		}
+	}
+
+	/**
+	 * Runs the validators for the instance
+	 * 
+	 * @param entityManagerFactory
+	 *            the entity manager factory
+	 * @param instance
+	 *            the instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void runValidators(EntityManagerFactoryImpl entityManagerFactory, ManagedInstance<?> instance) {
+		final ValidatorFactory factory = entityManagerFactory.getValidationFactory();
+
+		final Validator validator = factory.usingContext().getValidator();
+
+		Class<?>[] groups;
+
+		switch (instance.getStatus()) {
+			case NEW:
+				groups = entityManagerFactory.getPersistValidators();
+				break;
+			case MANAGED:
+				groups = entityManagerFactory.getUpdateValidators();
+				break;
+			default:
+				groups = entityManagerFactory.getRemoveValidators();
+				break;
+		}
+
+		final Set<?> result = validator.validate(instance.getInstance(), groups);
+		if ((result != null) && (result.size() > 0)) {
+			final Set<ConstraintViolation<?>> violations = Sets.newHashSet();
+			for (final Object violation : result) {
+				violations.add((ConstraintViolation<?>) violation);
+			}
+			throw new ConstraintViolationException(violations);
 		}
 	}
 

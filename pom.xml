@@ -124,6 +124,14 @@
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
 
+			<!-- Validation -->
+			<dependency>
+				<groupId>javax.validation</groupId>
+				<artifactId>validation-api</artifactId>
+				<version>1.0.0.GA</version>
+			</dependency>
+
+			<!-- JAXB -->
 			<dependency>
 				<groupId>javax.xml.bind</groupId>
 				<artifactId>jaxb-api</artifactId>
@@ -235,7 +243,21 @@
 				<artifactId>mockito-core</artifactId>
 				<version>1.9.0</version>
 			</dependency>
-
+			<dependency>
+				<groupId>org.apache.bval</groupId>
+				<artifactId>bval-jsr303</artifactId>
+				<version>0.4</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.bval</groupId>
+				<artifactId>bval-core</artifactId>
+				<version>0.4</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>3.1</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

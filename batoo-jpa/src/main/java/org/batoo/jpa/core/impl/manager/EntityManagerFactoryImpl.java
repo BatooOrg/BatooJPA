@@ -22,7 +22,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -34,6 +36,9 @@ import javax.persistence.PersistenceException;
 import javax.persistence.PersistenceUnitUtil;
 import javax.persistence.Query;
 import javax.transaction.TransactionManager;
+import javax.validation.Validation;
+import javax.validation.ValidatorFactory;
+import javax.validation.groups.Default;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.BatooException;
@@ -55,10 +60,12 @@ import org.batoo.jpa.parser.PersistenceParser;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 
+import com.google.common.base.Splitter;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Implementation of {@link EntityManagerFactory}.
@@ -88,9 +95,14 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		}
 	});
 
-	private boolean open;
-
 	private final ClassLoader classloader;
+
+	private final ValidatorFactory validationFactory;
+	private final Class<?>[] persistValidators;
+	private final Class<?>[] updateValidators;
+	private final Class<?>[] removeValidators;
+
+	private boolean open;
 
 	/**
 	 * @param name
@@ -106,6 +118,21 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 
 		this.classloader = parser.getClassloader();
 		this.prepareProperties(parser);
+
+		final boolean hasValidators = parser.hasValidators();
+		if (hasValidators) {
+			this.validationFactory = Validation.buildDefaultValidatorFactory();
+
+			this.persistValidators = this.getValidatorsFor(parser, JPASettings.PERSIST_VALIDATION_GROUP);
+			this.updateValidators = this.getValidatorsFor(parser, JPASettings.UPDATE_VALIDATION_GROUP);
+			this.removeValidators = this.getValidatorsFor(parser, JPASettings.REMOVE_VALIDATION_GROUP);
+		}
+		else {
+			this.validationFactory = null;
+			this.persistValidators = null;
+			this.updateValidators = null;
+			this.removeValidators = null;
+		}
 
 		this.jta = StringUtils.isNotBlank(parser.getJtaDatasource());
 		this.datasource = this.createDatasource(parser);
@@ -367,6 +394,18 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	}
 
 	/**
+	 * Returns the set of persist validators.
+	 * 
+	 * @return the set of persist validators.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Class<?>[] getPersistValidators() {
+		return this.persistValidators;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -390,6 +429,18 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	}
 
 	/**
+	 * Returns the set of remove validators.
+	 * 
+	 * @return the set of remove validators.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Class<?>[] getRemoveValidators() {
+		return this.removeValidators;
+	}
+
+	/**
 	 * Returns the transaction manager.
 	 * 
 	 * @return the transaction manager
@@ -399,6 +450,64 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 */
 	public TransactionManager getTransactionManager() {
 		return this.transactionManager;
+	}
+
+	/**
+	 * Returns the set of update validators.
+	 * 
+	 * @return the set of update validators.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Class<?>[] getUpdateValidators() {
+		return this.updateValidators;
+	}
+
+	/**
+	 * Returns the validation factory.
+	 * 
+	 * @return the validation factory.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ValidatorFactory getValidationFactory() {
+		return this.validationFactory;
+	}
+
+	private Class<?>[] getValidatorsFor(PersistenceParser parser, String group) {
+
+		final String groups = (String) parser.getProperties().get(group);
+		if (StringUtils.isBlank(groups)) {
+			return new Class[] { Default.class };
+		}
+
+		final Set<Class<?>> validationGroups = Sets.newHashSet();
+		final Iterator<String> i = Splitter.on(",").trimResults().split(groups).iterator();
+		while (i.hasNext()) {
+			final String className = i.next();
+			try {
+				validationGroups.add(this.classloader.loadClass(className));
+			}
+			catch (final ClassNotFoundException e) {
+				throw new PersistenceException("Cannot load class for validation group: " + className);
+			}
+		}
+
+		return validationGroups.toArray(new Class[validationGroups.size()]);
+	}
+
+	/**
+	 * Returns if the persistence unit has validators
+	 * 
+	 * @return true if the persistence unit has validators, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean hasValidators() {
+		return this.validationFactory != null;
 	}
 
 	/**

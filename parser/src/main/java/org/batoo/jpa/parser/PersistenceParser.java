@@ -36,6 +36,7 @@ import org.batoo.jpa.parser.impl.metadata.MetadataImpl;
 import org.batoo.jpa.parser.persistence.Persistence;
 import org.batoo.jpa.parser.persistence.Persistence.PersistenceUnit;
 import org.batoo.jpa.parser.persistence.Persistence.PersistenceUnit.Properties.Property;
+import org.batoo.jpa.parser.persistence.PersistenceUnitValidationModeType;
 
 import com.google.common.collect.Maps;
 
@@ -66,6 +67,8 @@ public class PersistenceParser {
 	private final PersistenceUnit persistenceUnit;
 	private final Map<String, Object> properties = Maps.newHashMap();
 
+	private final boolean hasValidators;
+
 	/**
 	 * @param persistenceUnitName
 	 *            the name of the persistence unit
@@ -92,6 +95,9 @@ public class PersistenceParser {
 		// initialize the persistence unit
 		this.persistenceUnit = this.createPersistenceUnit();
 		this.readProperties();
+
+		this.hasValidators = (this.persistenceUnit.getValidationMode() == PersistenceUnitValidationModeType.AUTO)
+			|| (this.persistenceUnit.getValidationMode() == PersistenceUnitValidationModeType.CALLBACK);
 
 		this.metadata = new MetadataImpl(this.persistenceUnit.getClazzs());
 
@@ -217,6 +223,18 @@ public class PersistenceParser {
 	 */
 	public Map<String, Object> getProperties() {
 		return this.properties;
+	}
+
+	/**
+	 * Returns if the persistence unit has validators
+	 * 
+	 * @return true if the persistence unit has validators, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean hasValidators() {
+		return this.hasValidators;
 	}
 
 	/**

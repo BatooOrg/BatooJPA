@@ -26,6 +26,7 @@ import javax.persistence.spi.PersistenceUnitInfo;
 import javax.persistence.spi.ProviderUtil;
 
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
+import org.batoo.jpa.core.impl.manager.PersistenceUtilImpl;
 import org.batoo.jpa.parser.PersistenceParser;
 
 /**
@@ -35,6 +36,19 @@ import org.batoo.jpa.parser.PersistenceParser;
  * @since $version
  */
 public class BatooPersistenceProvider implements PersistenceProvider {
+
+	private final ProviderUtil providerUtil;
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public BatooPersistenceProvider() {
+		super();
+
+		this.providerUtil = new PersistenceUtilImpl();
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -68,7 +82,6 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 	 */
 	@Override
 	public ProviderUtil getProviderUtil() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.providerUtil;
 	}
 }

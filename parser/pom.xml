@@ -128,7 +128,7 @@
 			<artifactId>guava</artifactId>
 		</dependency>
 		
-		<!-- test -->
+		<!-- Test -->
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>test</artifactId>

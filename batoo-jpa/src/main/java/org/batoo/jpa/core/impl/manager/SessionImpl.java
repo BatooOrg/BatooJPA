@@ -286,6 +286,18 @@ public class SessionImpl {
 
 		SessionImpl.LOG.debug("Flushing session {0}: updates {1}, removals {2}", this.sessionId, sortedUpdates.length, sortedRemovals.length);
 
+		// validations
+		final EntityManagerFactoryImpl entityManagerFactory = this.em.getEntityManagerFactory();
+		if (entityManagerFactory.hasValidators()) {
+			for (final ManagedInstance<?> instance : sortedUpdates) {
+				instance.getType().runValidators(entityManagerFactory, instance);
+			}
+
+			for (final ManagedInstance<?> instance : sortedRemovals) {
+				instance.getType().runValidators(entityManagerFactory, instance);
+			}
+		}
+
 		// fire callbacks
 		this.firePreCallbacks(sortedUpdates, sortedRemovals, callbackAvailability);
 

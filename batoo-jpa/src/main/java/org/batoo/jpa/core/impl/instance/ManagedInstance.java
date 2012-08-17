@@ -42,6 +42,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
+import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
@@ -820,6 +821,10 @@ public class ManagedInstance<X> {
 	 */
 	public boolean isJoinLoaded(String attributeName) {
 		final Mapping<?, ?, ?> mapping = this.type.getRootMapping().getMapping(attributeName);
+
+		if ((mapping instanceof BasicMapping) || (mapping instanceof EmbeddedMapping)) {
+			return true;
+		}
 
 		return this.joinsLoaded.contains(mapping);
 	}
