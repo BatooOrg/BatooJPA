@@ -14,5 +14,4 @@
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value=""/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="org.batoo.jpa.batoo-jpa"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djavax.persistence.jdbc.driver=org.hsqldb.jdbcDriver -Djavax.persistence.jdbc.url=jdbc:hsqldb:mem:test -Djavax.persistence.jdbc.user=sa -Djavax.persistence.jdbc.password= -DtestMode=hsql"/>
 </launchConfiguration>

@@ -461,6 +461,14 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 */
 	@Before
 	public void setup() throws SQLException {
+		if (System.getProperty("testMode") == null) {
+			System.setProperty("testMode", "hsql");
+			System.setProperty("javax.persistence.jdbc.driver", "org.hsqldb.jdbcDriver");
+			System.setProperty("javax.persistence.jdbc.url", "jdbc:hsqldb:mem:test");
+			System.setProperty("javax.persistence.jdbc.user", "sa");
+			System.setProperty("javax.persistence.jdbc.password", "");
+		}
+
 		if (!this.lazySetup()) {
 			this.emf = this.setupEmf();
 		}
