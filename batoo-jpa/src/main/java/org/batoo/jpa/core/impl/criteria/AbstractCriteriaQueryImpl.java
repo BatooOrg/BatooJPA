@@ -42,7 +42,7 @@ import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
-import org.batoo.jpa.core.util.BatooUtils;
+import org.batoo.jpa.util.BatooUtils;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;

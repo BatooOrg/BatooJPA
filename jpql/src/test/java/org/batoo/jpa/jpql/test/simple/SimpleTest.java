@@ -25,10 +25,10 @@ import java.util.List;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.tree.CommonTree;
-import org.batoo.jpa.core.util.BatooUtils;
 import org.batoo.jpa.jpql.JpqlLexer;
 import org.batoo.jpa.jpql.JpqlParser;
 import org.batoo.jpa.jpql.JpqlParser.ql_statement_return;
+import org.batoo.jpa.util.BatooUtils;
 import org.junit.Test;
 
 import com.google.common.base.Function;

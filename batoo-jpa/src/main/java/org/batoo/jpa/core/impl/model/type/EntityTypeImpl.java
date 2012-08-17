@@ -78,7 +78,6 @@ import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
-import org.batoo.jpa.core.util.BatooUtils;
 import org.batoo.jpa.core.util.Pair;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
@@ -87,6 +86,7 @@ import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
+import org.batoo.jpa.util.BatooUtils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

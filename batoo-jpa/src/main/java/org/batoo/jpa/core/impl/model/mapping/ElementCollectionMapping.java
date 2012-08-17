@@ -59,11 +59,11 @@ import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
-import org.batoo.jpa.core.util.BatooUtils;
 import org.batoo.jpa.core.util.Pair;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.ElementCollectionAttributeMetadata;
+import org.batoo.jpa.util.BatooUtils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
