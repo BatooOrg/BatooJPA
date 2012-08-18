@@ -273,7 +273,7 @@ public class Playground {
 	}
 
 	private void doCriteria(final EntityManagerFactory emf, final Person person, CriteriaQuery<Address> cq, ParameterExpression<Person> p) {
-		for (int i = 1; i < 5; i++) {
+		for (int i = 1; i < 25; i++) {
 			final EntityManager em = emf.createEntityManager();
 
 			final TypedQuery<Address> q = em.createQuery(cq);
@@ -305,16 +305,12 @@ public class Playground {
 	}
 
 	private void doJpql(final EntityManagerFactory emf, final Person person) {
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 25; i++) {
 			final EntityManager em = emf.createEntityManager();
 
 			emf.getCriteriaBuilder();
-			final TypedQuery<Address> q = em.createQuery(//
-				"select a from Person p\n" + //
-					"left join p.addresses a\n" + //
-					"join fetch a.country\n" + //
-					"join fetch a.person\n" + //
-					"where p = :person", Address.class);
+			final TypedQuery<Address> q = em.createQuery(
+				"select a from Person p left join p.addresses a join fetch a.country join fetch a.person where p = :person", Address.class);
 
 			q.setParameter("person", person);
 			q.getResultList();
@@ -392,7 +388,7 @@ public class Playground {
 
 			final EntityTransaction tx = em.getTransaction();
 			tx.begin();
-			person2.setName("Ceylan");
+			person2.setName("Ceylan" + i);
 			tx.commit();
 
 			em.close();
