@@ -582,7 +582,7 @@ public class SessionImpl {
 			SessionImpl.LOG.debug("Load tracker is released on session {0}", this.sessionId);
 
 			// swap the set
-			final List<ManagedInstance<?>> entitiesLoaded = this.entitiesLoading;
+			final ManagedInstance<?>[] entitiesLoaded = this.entitiesLoading.toArray(new ManagedInstance[this.entitiesLoading.size()]);
 			this.entitiesLoading = Lists.newArrayList();
 			this.idsNotCached = Sets.newHashSet();
 
@@ -599,9 +599,12 @@ public class SessionImpl {
 				instance.processJoinedMappings();
 				instance.sortLists();
 
-				if (cache.getCacheStoreMode(instance.getType()) != CacheStoreMode.BYPASS) {
+				if (!instance.isLoadingFromCache() && (cache.getCacheStoreMode(instance.getType()) != CacheStoreMode.BYPASS)) {
 					cache.put(instance);
 				}
+
+				// mark as loaded
+				instance.setLoadingFromCache(false);
 			}
 
 			for (final ManagedInstance<?> instance : entitiesLoaded) {

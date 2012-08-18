@@ -88,8 +88,10 @@ public class ManagedInstance<X> {
 	private final HashSet<PluralMapping<?, ?, ?>> collectionsChanged;
 
 	private boolean loading;
+	private boolean loadingFromCache;
 	private boolean refreshing;
 	private boolean changed;
+	private CacheInstance cacheInstance;
 
 	private boolean hasInitialId;
 	private ManagedId<? super X> id;
@@ -99,8 +101,6 @@ public class ManagedInstance<X> {
 	 * The current lock mode context.
 	 */
 	public static ThreadLocal<LockModeType> LOCK_CONTEXT = new ThreadLocal<LockModeType>();
-
-	private CacheInstance cacheInstance;
 
 	/**
 	 * @param type
@@ -847,6 +847,18 @@ public class ManagedInstance<X> {
 	}
 
 	/**
+	 * Returns if the instance is loading from the cache.
+	 * 
+	 * @return true if the instance is loading from the cache, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isLoadingFromCache() {
+		return this.loadingFromCache;
+	}
+
+	/**
 	 * Returns if the instance is refreshing.
 	 * 
 	 * @return true if the instance is refreshing, false otherwise
@@ -973,6 +985,9 @@ public class ManagedInstance<X> {
 	 */
 	public void setCache(CacheInstance cacheInstance) {
 		this.cacheInstance = cacheInstance;
+
+		this.loading = true;
+		this.loadingFromCache = true;
 	}
 
 	/**
@@ -1016,6 +1031,19 @@ public class ManagedInstance<X> {
 	 */
 	public void setLoading(boolean loading) {
 		this.loading = loading;
+	}
+
+	/**
+	 * Marks the instance as loading loading from the cahce.
+	 * 
+	 * @param loadingFromCache
+	 *            loading to set
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setLoadingFromCache(boolean loadingFromCache) {
+		this.loadingFromCache = loadingFromCache;
 	}
 
 	/**

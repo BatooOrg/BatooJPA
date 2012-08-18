@@ -61,8 +61,8 @@ public class ManyToManyToManyTest extends BaseCoreTest {
 		final Customer customer1_2 = this.find(Customer.class, customer1.getId());
 		final Customer customer2_2 = this.find(Customer.class, customer2.getId());
 
-		Assert.assertTrue(customer2_2.getPhoneNumbers().size() == 2);
-		Assert.assertTrue(customer2_2.getPhoneNumbers().size() == 2);
+		Assert.assertEquals(2, customer2_2.getPhoneNumbers().size());
+		Assert.assertEquals(2, customer2_2.getPhoneNumbers().size());
 
 		Assert.assertEquals(customer1_2.getPhoneNumbers(), customer2_2.getPhoneNumbers());
 	}

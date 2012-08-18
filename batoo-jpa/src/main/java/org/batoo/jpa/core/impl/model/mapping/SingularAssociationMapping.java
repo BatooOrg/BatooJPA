@@ -21,10 +21,12 @@ package org.batoo.jpa.core.impl.model.mapping;
 import java.sql.SQLException;
 import java.util.IdentityHashMap;
 
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 
 import org.apache.commons.lang.mutable.MutableBoolean;
+import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
@@ -32,7 +34,9 @@ import org.batoo.jpa.core.impl.jdbc.JoinTable;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
+import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.util.Pair;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 
@@ -184,8 +188,37 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 	 * 
 	 */
 	@Override
-	public void initialize(ManagedInstance<?> instance) {
-		// noop
+	public void initialize(ManagedInstance<?> managedInstance) {
+		final EntityManagerImpl em = managedInstance.getSession().getEntityManager();
+		final QueryImpl<X> q = em.createQuery(this.getSelectCriteria());
+
+		final EntityTypeImpl<?> rootType = managedInstance.getType();
+
+		final Object id = managedInstance.getId().getId();
+
+		// if has single id then pass it on
+		if (rootType.hasSingleIdAttribute()) {
+			q.setParameter(0, id);
+		}
+		else {
+			int i = 0;
+			for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
+				q.setParameter(i++, pair.getSecond().get(id));
+			}
+		}
+
+		try {
+			final X child = q.getSingleResult();
+
+			final Object instance = managedInstance.getInstance();
+			if (this.getInverse() != null) {
+				final Object newParent = this.getInverse().get(child);
+				if ((newParent == null) && (newParent != this)) {
+					this.getInverse().set(child, instance);
+				}
+			}
+		}
+		catch (final NoResultException e) {}
 	}
 
 	/**

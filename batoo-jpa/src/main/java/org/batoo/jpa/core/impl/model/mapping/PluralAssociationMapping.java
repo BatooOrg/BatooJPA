@@ -24,12 +24,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.IdentityHashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EnumType;
 import javax.persistence.TemporalType;
-import javax.persistence.criteria.Path;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 import javax.persistence.metamodel.PluralAttribute.CollectionType;
 
@@ -37,13 +37,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.collections.ManagedList;
-import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
-import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
-import org.batoo.jpa.core.impl.criteria.RootImpl;
-import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
-import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
-import org.batoo.jpa.core.impl.criteria.join.AbstractJoin;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
@@ -51,7 +45,6 @@ import org.batoo.jpa.core.impl.jdbc.JoinTable;
 import org.batoo.jpa.core.impl.jdbc.OrderColumn;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.attribute.MapAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
@@ -64,9 +57,6 @@ import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.PluralAttributeMetadata;
-import org.batoo.jpa.util.BatooUtils;
-
-import com.google.common.collect.Lists;
 
 /**
  * 
@@ -87,7 +77,6 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	private final ForeignKey foreignKey;
 	private EntityTypeImpl<E> type;
 	private AssociationMapping<?, ?, ?> inverse;
-	private CriteriaQueryImpl<E> selectCriteria;
 
 	private SingularMapping<? super E, ?> mapKeyMapping;
 	private Pair<BasicMapping<? super E, ?>, BasicAttribute<?, ?>>[] mapKeyMappings;
@@ -388,59 +377,6 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 		return null;
 	}
 
-	private CriteriaQueryImpl<E> getSelectCriteria() {
-		if (this.selectCriteria != null) {
-			return this.selectCriteria;
-		}
-
-		synchronized (this) {
-			// other thread prepared before this one
-			if (this.selectCriteria != null) {
-				return this.selectCriteria;
-			}
-
-			final MetamodelImpl metamodel = this.getRoot().getType().getMetamodel();
-			final CriteriaBuilderImpl cb = metamodel.getEntityManagerFactory().getCriteriaBuilder();
-
-			final EntityTypeImpl<E> entity = metamodel.entity(this.attribute.getBindableJavaType());
-
-			CriteriaQueryImpl<E> q = cb.createQuery(this.attribute.getBindableJavaType());
-			q.internal();
-			final EntityTypeImpl<?> type = (EntityTypeImpl<?>) this.getRoot().getType();
-			final RootImpl<?> r = q.from(type);
-			r.alias(BatooUtils.acronym(type.getName()).toLowerCase());
-			// TODO handle embeddables along the path
-			final AbstractJoin<?, E> join = r.<E> join(this.attribute.getName());
-			join.alias(BatooUtils.acronym(entity.getName()).toLowerCase());
-			q = q.select(join);
-
-			entity.prepareEagerJoins(join, 0, this);
-
-			// has single id mapping
-			if (type.hasSingleIdAttribute()) {
-				final SingularMapping<?, ?> idMapping = type.getIdMapping();
-				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
-				final Path<?> path = r.get(idMapping.getAttribute().getName());
-				final PredicateImpl predicate = cb.equal(path, pe);
-
-				return this.selectCriteria = q.where(predicate);
-			}
-
-			// has multiple id mappings
-			final List<PredicateImpl> predicates = Lists.newArrayList();
-			for (final Pair<?, BasicAttribute<?, ?>> pair : type.getIdMappings()) {
-				final BasicMapping<?, ?> idMapping = (BasicMapping<?, ?>) pair.getFirst();
-				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
-				final Path<?> path = r.get(idMapping.getAttribute().getName());
-				final PredicateImpl predicate = cb.equal(path, pe);
-
-				predicates.add(predicate);
-			}
-
-			return this.selectCriteria = q.where(predicates.toArray(new PredicateImpl[predicates.size()]));
-		}
-	}
-
 	/**
 	 * {@inheritDoc}
 	 * 
@@ -586,13 +522,13 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * 
 	 */
 	@Override
-	public Collection<? extends E> loadCollection(ManagedInstance<?> instance) {
-		final EntityManagerImpl em = instance.getSession().getEntityManager();
+	public Collection<? extends E> loadCollection(ManagedInstance<?> managedInstance) {
+		final EntityManagerImpl em = managedInstance.getSession().getEntityManager();
 		final QueryImpl<E> q = em.createQuery(this.getSelectCriteria());
 
-		final EntityTypeImpl<?> rootType = instance.getType();
+		final EntityTypeImpl<?> rootType = managedInstance.getType();
 
-		final Object id = instance.getId().getId();
+		final Object id = managedInstance.getId().getId();
 
 		// if has single id then pass it on
 		if (rootType.hasSingleIdAttribute()) {
@@ -605,7 +541,23 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 			}
 		}
 
-		return q.getResultList();
+		final List<E> children = q.getResultList();
+
+		final Object instance = managedInstance.getInstance();
+		if ((this.getInverse() != null) && (this.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_MANY)) {
+			for (final Iterator<E> i = children.iterator(); i.hasNext();) {
+				final E child = i.next();
+				final Object newParent = this.getInverse().get(child);
+				if ((newParent != null) && (newParent != managedInstance.getInstance())) {
+					i.remove();
+				}
+				else {
+					this.getInverse().set(child, instance);
+				}
+			}
+		}
+
+		return children;
 	}
 
 	/**

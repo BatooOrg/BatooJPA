@@ -131,6 +131,7 @@ public class CacheTest extends BaseCoreTest {
 		foo = this.find(Foo.class, foo.getId());
 		Assert.assertEquals("Global | puts:4 evicts:0 hits:1, misses:3", this.emf().getCache().getStats().toString());
 
+		foo.getBars().size();
 		foo.getBars2().size();
 		Assert.assertEquals("Global | puts:4 evicts:0 hits:3, misses:3", this.emf().getCache().getStats().toString());
 	}

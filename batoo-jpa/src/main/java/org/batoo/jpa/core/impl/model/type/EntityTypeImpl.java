@@ -138,6 +138,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private AssociationMapping<?, ?, ?>[] associationsPersistable;
 	private AssociationMapping<?, ?, ?>[] associationsRemovable;
 	private PluralAssociationMapping<?, ?, ?>[] associationsPlural;
+	private SingularAssociationMapping<?, ?>[] associationsSingular;
 	private SingularAssociationMapping<?, ?>[] associationsSingularLazy;
 	private final Map<Method, Method> idMethods = Maps.newHashMap();
 
@@ -537,9 +538,9 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
-	 * Returns the associated attributes that are removable by the type.
+	 * Returns the associated mappings that are removable by the type.
 	 * 
-	 * @return the associated attributes that are removable by the type
+	 * @return the associated mappings that are removable by the type
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -566,6 +567,39 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			associationsRemovable.toArray(associationsRemovable0);
 
 			return this.associationsRemovable = associationsRemovable0;
+		}
+	}
+
+	/**
+	 * Returns the singular associated mappings.
+	 * 
+	 * @return the singular associated mappings
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public SingularAssociationMapping<?, ?>[] getAssociationsSingular() {
+		if (this.associationsSingular != null) {
+			return this.associationsSingular;
+		}
+
+		synchronized (this) {
+			if (this.associationsSingular != null) {
+				return this.associationsSingular;
+			}
+
+			final List<SingularAssociationMapping<?, ?>> associationsSingular = Lists.newArrayList();
+
+			for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
+				if (association instanceof SingularAssociationMapping) {
+					associationsSingular.add((SingularAssociationMapping<?, ?>) association);
+				}
+			}
+
+			final SingularAssociationMapping<?, ?>[] associationsSingular0 = new SingularAssociationMapping[associationsSingular.size()];
+			associationsSingular.toArray(associationsSingular0);
+
+			return this.associationsSingular = associationsSingular0;
 		}
 	}
 
@@ -1810,7 +1844,13 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 			instance.copyTo(cache, managedInstance);
 
-			session.put(managedInstance);
+			session.setLoadTracker();
+			try {
+				session.put(managedInstance);
+			}
+			finally {
+				session.releaseLoadTracker();
+			}
 
 			return managedInstance;
 		}

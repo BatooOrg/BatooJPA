@@ -23,14 +23,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.CacheRetrieveMode;
 import javax.persistence.CacheStoreMode;
 
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
+import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
@@ -47,8 +49,9 @@ public class CacheInstance implements Serializable {
 
 	public static final CacheInstance REMOVED = new CacheInstance();
 
-	private final Map<String, Object> basicMappings;
-	private final Map<String, List<CacheReference>> pluralMappings;
+	private final Map<String, Object> basicMappings = Maps.newHashMap();
+	private final Map<String, List<CacheReference>> pluralMappings = Maps.newHashMap();
+	private final Map<String, CacheReference> singularMappings = Maps.newHashMap();
 
 	private String clazz;
 
@@ -61,9 +64,6 @@ public class CacheInstance implements Serializable {
 	 */
 	private CacheInstance() {
 		super();
-
-		this.basicMappings = null;
-		this.pluralMappings = null;
 	}
 
 	/**
@@ -85,14 +85,31 @@ public class CacheInstance implements Serializable {
 		final Object instance = managedInstance.getInstance();
 		final MetamodelImpl metamodel = managedInstance.getSession().getEntityManager().getMetamodel();
 
-		this.basicMappings = Maps.newHashMap();
 		for (final BasicMapping<?, ?> mapping : type.getBasicMappings()) {
 			this.basicMappings.put(mapping.getPath(), mapping.get(instance));
 		}
 
-		this.pluralMappings = Maps.newHashMap();
-		for (final PluralMapping<?, ?, ?> mapping : type.getMappingsPlural()) {
-			this.updateCollection(metamodel, cache, mapping, instance);
+		for (final AssociationMapping<?, ?, ?> mapping : type.getAssociations()) {
+			if (mapping instanceof PluralAssociationMapping) {
+				this.updateCollection(metamodel, cache, (PluralMapping<?, ?, ?>) mapping, instance);
+			}
+			else {
+				final Object value = mapping.get(instance);
+				if (value == null) {
+					this.singularMappings.put(mapping.getPath(), null);
+				}
+				else {
+					if (value instanceof EnhancedInstance) {
+						final EnhancedInstance enhancedInstance = (EnhancedInstance) value;
+						if (enhancedInstance.__enhanced__$$__isInitialized()) {
+							this.singularMappings.put(mapping.getPath(), new CacheReference(metamodel, value));
+						}
+					}
+					else {
+						this.singularMappings.put(mapping.getPath(), new CacheReference(metamodel, value));
+					}
+				}
+			}
 		}
 
 		managedInstance.setCache(this);
@@ -109,48 +126,12 @@ public class CacheInstance implements Serializable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void copyTo(CacheImpl cache, ManagedInstance<?> managedInstance) {
 		final EntityTypeImpl<?> type = managedInstance.getType();
 		final Object instance = managedInstance.getInstance();
 
 		for (final BasicMapping<?, ?> mapping : type.getBasicMappings()) {
 			mapping.set(instance, this.basicMappings.get(mapping.getPath()));
-		}
-
-		final EntityManagerImpl em = managedInstance.getSession().getEntityManager();
-		final MetamodelImpl metamodel = em.getMetamodel();
-
-		for (final PluralMapping<?, ?, ?> mapping : type.getMappingsPlural()) {
-			// if the mapping is lazy then set lazy and skip
-			if (!mapping.isEager()) {
-				mapping.setLazy(managedInstance);
-				continue;
-			}
-
-			// if this is not a cachable type then skip
-			if (mapping.getType() instanceof EntityTypeImpl) {
-				final EntityTypeImpl<?> childType = (EntityTypeImpl<?>) mapping.getType();
-
-				if (cache.getCacheRetrieveMode(childType.getRootType()) == CacheRetrieveMode.BYPASS) {
-					continue;
-				}
-			}
-
-			final List<CacheReference> children = this.pluralMappings.get(mapping.getPath());
-
-			// if not null then fetch the references
-			if (children == null) {
-				mapping.setLazy(managedInstance);
-			}
-
-			final Collection childEntities = Lists.newArrayList();
-			for (final CacheReference child : children) {
-				final EntityTypeImpl<?> childType = metamodel.entity(child.getType());
-				childEntities.add(em.find(childType.getJavaType(), child.getId()));
-			}
-
-			mapping.setCollection(managedInstance, childEntities);
 		}
 
 		managedInstance.setCache(this);

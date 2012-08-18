@@ -437,7 +437,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			final String fieldAlias;
 			final String field;
 
-			if (column.isPrimaryKey() && column instanceof PkColumn) {
+			if (column.isPrimaryKey() && (column instanceof PkColumn)) {
 				fieldAlias = tableAlias + "_F" + query.getFieldAlias(tableAlias, column);
 				field = Joiner.on(".").skipNulls().join(tableAlias, column.getName());
 
@@ -1076,7 +1076,9 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 
 		for (final FetchImpl<X, ?> fetch : this.fetches.values()) {
 			final JoinedMapping<? super X, ?, ?> mapping = fetch.getMapping();
-			mapping.initialize(managedInstance);
+			if (!(mapping instanceof SingularAssociationMapping)) {
+				mapping.initialize(managedInstance);
+			}
 
 			managedInstance.setJoinLoaded(mapping);
 		}
