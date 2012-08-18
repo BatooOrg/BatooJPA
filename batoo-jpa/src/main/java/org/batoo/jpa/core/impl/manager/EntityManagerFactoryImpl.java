@@ -20,8 +20,11 @@ package org.batoo.jpa.core.impl.manager;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -61,9 +64,7 @@ import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 
 import com.google.common.base.Splitter;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -77,6 +78,9 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(EntityManagerFactoryImpl.class);
 
+	private static final int NO_QUERIES_MAX = 1000;
+	private static final int NO_QUERIES_TRIM = 100;
+
 	private final MetamodelImpl metamodel;
 	private final DataSourceImpl datasource;
 	private final TransactionManager transactionManager;
@@ -89,13 +93,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	private final CriteriaBuilderImpl criteriaBuilder;
 	private final PersistenceUnitUtilImpl persistenceUtil;
 
-	LoadingCache<String, JpqlQuery> graphs = CacheBuilder.newBuilder().maximumSize(1000).build(new CacheLoader<String, JpqlQuery>() {
-		@Override
-		public JpqlQuery load(String jpql) {
-			return new JpqlQuery(EntityManagerFactoryImpl.this, jpql);
-		}
-	});
-
+	private final HashMap<String, JpqlQuery> jpqlCache = Maps.newHashMap();
 	private final ClassLoader classloader;
 
 	private final ValidatorFactory validationFactory;
@@ -347,7 +345,37 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		try {
 			EntityManagerFactoryImpl.LOG.debug("JPQL: {0}", qlString);
 
-			return this.graphs.get(qlString);
+			JpqlQuery jpqlQuery = this.jpqlCache.get(qlString);
+			if (jpqlQuery == null) {
+				jpqlQuery = new JpqlQuery(EntityManagerFactoryImpl.this, qlString);
+
+				// clean up job
+				if (this.jpqlCache.size() == EntityManagerFactoryImpl.NO_QUERIES_MAX) {
+					synchronized (this) {
+						if (this.jpqlCache.size() == EntityManagerFactoryImpl.NO_QUERIES_MAX) {
+							final JpqlQuery[] queries = Lists.newArrayList(this.jpqlCache.values()).toArray(new JpqlQuery[this.jpqlCache.size()]);
+							Arrays.sort(queries, new Comparator<JpqlQuery>() {
+
+								@Override
+								public int compare(JpqlQuery o1, JpqlQuery o2) {
+									if (o1.getLastUsed() > o2.getLastUsed()) {
+										return 1;
+									}
+
+									return -1;
+								}
+							});
+
+							for (int i = 0; i < EntityManagerFactoryImpl.NO_QUERIES_TRIM; i++) {
+								this.jpqlCache.remove(queries[i].getQueryString());
+							}
+						}
+					}
+				}
+
+				this.jpqlCache.put(qlString, jpqlQuery);
+			}
+			return jpqlQuery;
 		}
 		catch (final Exception e) {
 			if (e.getCause() instanceof PersistenceException) {

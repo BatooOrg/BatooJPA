@@ -103,12 +103,13 @@ public class JpqlQuery {
 
 	private final MetamodelImpl metamodel;
 	private final String qlString;
-
 	private final BaseQuery<?> q;
-	private final Map<BaseQuery<?>, Map<String, AbstractFrom<?, ?>>> aliasMap = Maps.newHashMap();
 
+	private final Map<BaseQuery<?>, Map<String, AbstractFrom<?, ?>>> aliasMap = Maps.newHashMap();
 	private HashMap<String, Object> hints;
+
 	private LockModeType lockMode;
+	private long lastUsed;
 
 	/**
 	 * Constructor for named queries.
@@ -124,6 +125,8 @@ public class JpqlQuery {
 	 */
 	public JpqlQuery(EntityManagerFactoryImpl entityManagerFactory, CriteriaBuilderImpl cb, NamedQueryMetadata metadata) {
 		this(entityManagerFactory, metadata.getQuery(), cb);
+
+		this.lastUsed = Long.MAX_VALUE;
 
 		// force sql compilation
 		this.q.getSql();
@@ -155,6 +158,8 @@ public class JpqlQuery {
 
 		this.metamodel = entityManagerFactory.getMetamodel();
 		this.qlString = qlString;
+
+		this.lastUsed = System.currentTimeMillis();
 
 		if (cb == null) {
 			cb = entityManagerFactory.getCriteriaBuilder();
@@ -856,6 +861,10 @@ public class JpqlQuery {
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> QueryImpl<T> createTypedQuery(EntityManagerImpl entityManager) {
+		if (this.lastUsed != Long.MAX_VALUE) {
+			this.lastUsed = System.currentTimeMillis();
+		}
+
 		final QueryImpl<T> typedQuery = new QueryImpl<T>((BaseQuery<T>) this.q, entityManager);
 
 		if (this.lockMode != null) {
@@ -1326,6 +1335,30 @@ public class JpqlQuery {
 
 		throw new PersistenceException("Unhandled expression: " + exprDef.toStringTree() + ", line " + exprDef.getLine() + ":"
 			+ exprDef.getCharPositionInLine());
+	}
+
+	/**
+	 * Returns the time query last used.
+	 * 
+	 * @return the the time query last used
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public long getLastUsed() {
+		return this.lastUsed;
+	}
+
+	/**
+	 * Returns the query.
+	 * 
+	 * @return the query
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getQueryString() {
+		return this.qlString;
 	}
 
 	/**
