@@ -445,13 +445,21 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 */
 	private void initialize() {
 		if (!this.initialized) {
-			if (this.getManagedInstance() == null) {
+			final ManagedInstance<?> managedInstance = this.getManagedInstance();
+
+			if (managedInstance == null) {
 				throw new PersistenceException("No session to initialize the collection");
 			}
 
-			this.delegate.addAll(this.getMapping().loadCollection(this.getManagedInstance()));
+			final PluralMapping<?, ?, E> mapping = this.getMapping();
 
-			this.getMapping().sortList(this.getManagedInstance().getInstance());
+			if (!managedInstance.tryLoadFromCache(mapping)) {
+				this.delegate.addAll(mapping.loadCollection(managedInstance));
+				mapping.sortList(managedInstance.getInstance());
+
+				this.initialized = true;
+				managedInstance.updateCollectionCache(mapping);
+			}
 
 			this.initialized = true;
 		}
@@ -476,6 +484,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 * @since $version
 	 * @author hceylan
 	 */
+	@Override
 	public boolean isInitialized() {
 		return this.initialized;
 	}

@@ -45,6 +45,8 @@ import javax.validation.ValidatorFactory;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.reflect.ReflectHelper;
+import org.batoo.jpa.core.impl.cache.CacheImpl;
+import org.batoo.jpa.core.impl.cache.CacheInstance;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
@@ -114,16 +116,17 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private EntityTable[] updateTables;
 	private EntityTable[] allTables;
 	private final HashMap<String, AssociatedSingularAttribute<? super X, ?>> idMap = Maps.newHashMap();
+	private final boolean cachable;
 
 	private sun.reflect.ConstructorAccessor constructor;
 
 	private CriteriaQueryImpl<X> selectCriteria;
 	private CriteriaQueryImpl<X> refreshCriteria;
-
 	private int dependencyCount;
-	private final HashMap<EntityTypeImpl<?>, AssociationMapping<?, ?, ?>[]> dependencyMap = Maps.newHashMap();
 
+	private final HashMap<EntityTypeImpl<?>, AssociationMapping<?, ?, ?>[]> dependencyMap = Maps.newHashMap();
 	private BasicMapping<?, ?>[] basicMappings;
+
 	private Mapping<?, ?, ?>[] singularMappings;
 	private PluralMapping<?, ?, ?>[] mappingsPluralSorted;
 	private PluralMapping<?, ?, ?>[] mappingsPlural;
@@ -136,13 +139,13 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private AssociationMapping<?, ?, ?>[] associationsRemovable;
 	private PluralAssociationMapping<?, ?, ?>[] associationsPlural;
 	private SingularAssociationMapping<?, ?>[] associationsSingularLazy;
-
 	private final Map<Method, Method> idMethods = Maps.newHashMap();
 
 	private SingularMapping<? super X, ?> idMapping;
-	private Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>[] idMappings;
 
+	private Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>[] idMappings;
 	private final InheritanceType inheritanceType;
+
 	private final Map<String, EntityTypeImpl<? extends X>> children = Maps.newHashMap();
 	private final String discriminatorValue;
 	private DiscriminatorColumn discriminatorColumn;
@@ -174,6 +177,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		this.initTables(metadata);
 		this.entityMapping = new EntityMapping<X>(this);
 		this.linkMappings();
+
+		this.cachable = this.getCachable(metamodel.getEntityManagerFactory(), metadata);
 	}
 
 	/**
@@ -664,6 +669,28 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	@Override
 	public BindableType getBindableType() {
 		return BindableType.ENTITY_TYPE;
+	}
+
+	private boolean getCachable(EntityManagerFactoryImpl emf, EntityMetadata metadata) {
+		switch (emf.getCache().getCacheMode()) {
+			case ALL:
+				return true;
+			case DISABLE_SELECTIVE:
+				if ((metadata.getCacheable() != null) && !metadata.getCacheable().booleanValue()) {
+					return false;
+				}
+
+				return true;
+			case UNSPECIFIED:
+			case ENABLE_SELECTIVE:
+				if ((metadata.getCacheable() != null) && metadata.getCacheable().booleanValue()) {
+					return true;
+				}
+
+				return false;
+			default:
+				return false;
+		}
 	}
 
 	/**
@@ -1353,6 +1380,18 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
+	 * Returns if the entity is cachable.
+	 * 
+	 * @return true if the entity is cachable, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isCachable() {
+		return this.cachable;
+	}
+
+	/**
 	 * Returns if the method is an id method.
 	 * 
 	 * @param method
@@ -1746,5 +1785,36 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	@Override
 	public String toString() {
 		return "EntityTypeImpl [name=" + this.name + "]";
+	}
+
+	/**
+	 * Tries to locate the instance in the cache and returns the instance from the cache.
+	 * 
+	 * @param cache
+	 *            the cache
+	 * @param session
+	 *            the session
+	 * @param primaryKey
+	 *            the primary key
+	 * @return the managed instance or null
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ManagedInstance<X> tryGetFromCache(CacheImpl cache, SessionImpl session, Object primaryKey) {
+		final CacheInstance instance = cache.get(this.getRootMapping().getJavaType(), primaryKey);
+
+		if (instance != null) {
+			final ManagedId<X> managedId = new ManagedId<X>(primaryKey, this);
+			final ManagedInstance<X> managedInstance = this.getManagedInstanceById(session, managedId, false);
+
+			instance.copyTo(cache, managedInstance);
+
+			session.put(managedInstance);
+
+			return managedInstance;
+		}
+
+		return null;
 	}
 }

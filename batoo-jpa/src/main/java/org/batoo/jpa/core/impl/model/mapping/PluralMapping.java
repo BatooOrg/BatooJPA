@@ -172,6 +172,16 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	OrderColumn getOrderColumn();
 
 	/**
+	 * Returns the path of the mapping.
+	 * 
+	 * @return the path of the mapping
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	String getPath();
+
+	/**
 	 * Returns the root mapping.
 	 * 
 	 * @return the root mapping
@@ -216,6 +226,19 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @author hceylan
 	 */
 	<K> Map<? extends K, ? extends E> loadMap(ManagedInstance<?> instance);
+
+	/**
+	 * Sets the collection manually for the mapping.
+	 * 
+	 * @param instance
+	 *            the managed instance
+	 * @param children
+	 *            the collection of children
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setCollection(ManagedInstance<?> instance, Collection<? extends E> children);
 
 	/**
 	 * Sets the lazy instance for the collection

@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.SharedCacheMode;
 import javax.persistence.spi.PersistenceUnitInfo;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
@@ -36,6 +37,7 @@ import org.batoo.jpa.parser.impl.metadata.MetadataImpl;
 import org.batoo.jpa.parser.persistence.Persistence;
 import org.batoo.jpa.parser.persistence.Persistence.PersistenceUnit;
 import org.batoo.jpa.parser.persistence.Persistence.PersistenceUnit.Properties.Property;
+import org.batoo.jpa.parser.persistence.PersistenceUnitCachingType;
 import org.batoo.jpa.parser.persistence.PersistenceUnitValidationModeType;
 
 import com.google.common.collect.Maps;
@@ -223,6 +225,20 @@ public class PersistenceParser {
 	 */
 	public Map<String, Object> getProperties() {
 		return this.properties;
+	}
+
+	/**
+	 * Returns the specification of how the provider must use a second-level cache for the persistence unit.
+	 * 
+	 * @return the second-level cache mode that must be used by the provider for the persistence unit
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public SharedCacheMode getSharedCacheMode() {
+		final PersistenceUnitCachingType cacheMode = this.persistenceUnit.getSharedCacheMode();
+
+		return cacheMode == null ? SharedCacheMode.NONE : SharedCacheMode.valueOf(cacheMode.name());
 	}
 
 	/**

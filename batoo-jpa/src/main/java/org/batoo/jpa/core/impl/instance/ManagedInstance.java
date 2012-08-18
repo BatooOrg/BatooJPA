@@ -36,7 +36,10 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.jpa.core.impl.cache.CacheImpl;
+import org.batoo.jpa.core.impl.cache.CacheInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
+import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
@@ -96,6 +99,8 @@ public class ManagedInstance<X> {
 	 * The current lock mode context.
 	 */
 	public static ThreadLocal<LockModeType> LOCK_CONTEXT = new ThreadLocal<LockModeType>();
+
+	private CacheInstance cacheInstance;
 
 	/**
 	 * @param type
@@ -958,6 +963,19 @@ public class ManagedInstance<X> {
 	}
 
 	/**
+	 * Sets the cache instance
+	 * 
+	 * @param cacheInstance
+	 *            the cache instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setCache(CacheInstance cacheInstance) {
+		this.cacheInstance = cacheInstance;
+	}
+
+	/**
 	 * Marks the plural association as changed.
 	 * 
 	 * @param association
@@ -1080,5 +1098,49 @@ public class ManagedInstance<X> {
 			+ ", type=" + this.type.getName() //
 			+ ", status=" + this.status //
 			+ ", id=" + (this.id != null ? this.id.getId() : null) + "]";
+	}
+
+	/**
+	 * Tries to load the collection from the cache.
+	 * 
+	 * @param mapping
+	 *            the mapping of the collection
+	 * @return true if the collection was found in the cache, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public boolean tryLoadFromCache(PluralMapping<?, ?, ?> mapping) {
+		if (this.cacheInstance != null) {
+			final Collection children = this.cacheInstance.getCollection(this.getSession().getEntityManager(), mapping);
+			if (children != null) {
+				mapping.setCollection(this, children);
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Updates the collection cache of the managed instance for the mapping
+	 * 
+	 * @param mapping
+	 *            the mapping to update
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void updateCollectionCache(PluralMapping<?, ?, ?> mapping) {
+		if (this.cacheInstance != null) {
+			final EntityManagerFactoryImpl emf = this.session.getEntityManager().getEntityManagerFactory();
+			final CacheImpl cache = emf.getCache();
+
+			if (this.cacheInstance.updateCollection(emf.getMetamodel(), cache, mapping, this.instance)) {
+				cache.put(this);
+			}
+		}
 	}
 }

@@ -33,9 +33,9 @@ public class ManagedId<X> {
 
 	private final EntityTypeImpl<? super X> type;
 	private Object id;
+	private final X instance;
 
 	private int h;
-	private final X instance;
 
 	/**
 	 * Constructor for the instances.
@@ -114,6 +114,18 @@ public class ManagedId<X> {
 			return this.id = this.type.getInstanceId(this.instance);
 		}
 		return this.id;
+	}
+
+	/**
+	 * Returns the type of the managed id.
+	 * 
+	 * @return the type of the managed id
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public EntityTypeImpl<? super X> getType() {
+		return this.type;
 	}
 
 	/**

@@ -25,6 +25,8 @@ import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
+import javax.persistence.CacheRetrieveMode;
+import javax.persistence.CacheStoreMode;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
@@ -43,6 +45,7 @@ import javax.transaction.Transaction;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.jpa.core.JPASettings;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaDeleteImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
@@ -426,25 +429,7 @@ public class EntityManagerImpl implements EntityManager {
 			lockMode = LockModeType.OPTIMISTIC;
 		}
 
-		final ManagedInstance<? extends T> instance = this.session.get(new ManagedId<T>(primaryKey, type));
-		if (instance != null) {
-			if (instance.getInstance() instanceof EnhancedInstance) {
-				final EnhancedInstance enhanced = (EnhancedInstance) instance.getInstance();
-				if (enhanced.__enhanced__$$__isInitialized()) {
-
-					this.lock(instance, lockMode, properties);
-
-					return instance.getInstance();
-				}
-			}
-			else {
-				this.lock(instance, lockMode, properties);
-
-				return instance.getInstance();
-			}
-		}
-
-		return type.performSelect(this, primaryKey, lockMode);
+		return this.findImpl(primaryKey, lockMode, properties, type);
 	}
 
 	/**
@@ -454,6 +439,55 @@ public class EntityManagerImpl implements EntityManager {
 	@Override
 	public <T> T find(Class<T> entityClass, Object primaryKey, Map<String, Object> properties) {
 		return this.find(entityClass, primaryKey, null, properties);
+	}
+
+	private <T> T findImpl(Object primaryKey, LockModeType lockMode, Map<String, Object> properties, final EntityTypeImpl<T> type) {
+		CacheRetrieveMode cacheRetrieveMode = null;
+		if (properties != null) {
+			cacheRetrieveMode = (CacheRetrieveMode) properties.get(JPASettings.SHARED_CACHE_RETRIEVE_MODE);
+			if (cacheRetrieveMode != null) {
+				this.emf.getCache().setCacheRetrieveMode(cacheRetrieveMode);
+			}
+		}
+
+		CacheStoreMode cacheStoreMode = null;
+		if (properties != null) {
+			cacheStoreMode = (CacheStoreMode) properties.get(JPASettings.SHARED_CACHE_RETRIEVE_MODE);
+			if (cacheStoreMode != null) {
+				this.emf.getCache().setCacheStoreMode(cacheStoreMode);
+			}
+		}
+
+		try {
+			final ManagedInstance<? extends T> instance = this.session.get(new ManagedId<T>(primaryKey, type));
+			if (instance != null) {
+				if (instance.getInstance() instanceof EnhancedInstance) {
+					final EnhancedInstance enhanced = (EnhancedInstance) instance.getInstance();
+					if (enhanced.__enhanced__$$__isInitialized()) {
+
+						this.lock(instance, lockMode, properties);
+
+						return instance.getInstance();
+					}
+				}
+				else {
+					this.lock(instance, lockMode, properties);
+
+					return instance.getInstance();
+				}
+			}
+
+			return type.performSelect(this, primaryKey, lockMode);
+		}
+		finally {
+			if (cacheRetrieveMode != null) {
+				this.emf.getCache().setCacheRetrieveMode(null);
+			}
+
+			if (cacheStoreMode != null) {
+				this.emf.getCache().setCacheStoreMode(null);
+			}
+		}
 	}
 
 	/**

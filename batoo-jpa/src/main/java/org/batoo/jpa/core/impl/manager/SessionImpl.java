@@ -23,11 +23,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import javax.persistence.CacheRetrieveMode;
+import javax.persistence.CacheStoreMode;
 import javax.persistence.PersistenceException;
 
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.jpa.core.impl.cache.CacheImpl;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
@@ -64,6 +68,7 @@ public class SessionImpl {
 	private final HashSet<ManagedInstance<?>> changedEntities = Sets.newHashSet();
 
 	private List<ManagedInstance<?>> entitiesLoading = Lists.newArrayList();
+	private Set<ManagedId<?>> idsNotCached = Sets.newHashSet();
 
 	private int loadTracker = 0;
 
@@ -336,6 +341,8 @@ public class SessionImpl {
 
 		SessionImpl.LOG.debug("Flush successful for session {0}", this.sessionId);
 
+		this.putInstancesToCache(this.em.getEntityManagerFactory().getCache(), sortedUpdates, sortedRemovals);
+
 		// move new entities to external entities
 		this.externalEntities.addAll(this.newEntities);
 
@@ -365,7 +372,26 @@ public class SessionImpl {
 	 */
 	@SuppressWarnings("unchecked")
 	public <Y, X> ManagedInstance<Y> get(ManagedId<X> id) {
-		return (ManagedInstance<Y>) this.repository.get(id);
+		ManagedInstance<Y> instance = (ManagedInstance<Y>) this.repository.get(id);
+
+		if (instance != null) {
+			return instance;
+		}
+
+		final CacheImpl cache = this.em.getEntityManagerFactory().getCache();
+		if (cache.getCacheRetrieveMode(id.getType()) == CacheRetrieveMode.USE) {
+			if (this.idsNotCached.contains(id)) {
+				return null;
+			}
+
+			instance = (ManagedInstance<Y>) id.getType().tryGetFromCache(cache, this, id.getId());
+
+			if (instance == null) {
+				this.idsNotCached.add(id);
+			}
+		}
+
+		return instance;
 	}
 
 	/**
@@ -498,7 +524,7 @@ public class SessionImpl {
 	public <X> void put(ManagedInstance<X> instance) {
 		this.repository.put(instance.getId(), instance);
 
-		if (this.loadTracker > 0) {
+		if ((this.loadTracker > 0) && instance.isLoading()) {
 			this.entitiesLoading.add(instance);
 		}
 	}
@@ -524,6 +550,22 @@ public class SessionImpl {
 		this.newEntities.add(instance);
 	}
 
+	private void putInstancesToCache(CacheImpl cache, ManagedInstance<?>[] sortedUpdates, ManagedInstance<?>[] sortedRemovals) {
+		if (!cache.isOn()) {
+			return;
+		}
+
+		for (final ManagedInstance<?> instance : sortedRemovals) {
+			cache.put(instance);
+		}
+
+		for (final ManagedInstance<?> instance : sortedUpdates) {
+			if (cache.getCacheStoreMode(instance.getType()) == CacheStoreMode.USE) {
+				cache.put(instance);
+			}
+		}
+	}
+
 	/**
 	 * Releases the load tracker, so that the entities loaded are processed for associations and <code>PostLoad</code> listeners are
 	 * invoked.
@@ -535,11 +577,14 @@ public class SessionImpl {
 		this.loadTracker--;
 
 		if (this.loadTracker == 0) {
+			final CacheImpl cache = this.getEntityManager().getEntityManagerFactory().getCache();
+
 			SessionImpl.LOG.debug("Load tracker is released on session {0}", this.sessionId);
 
 			// swap the set
 			final List<ManagedInstance<?>> entitiesLoaded = this.entitiesLoading;
 			this.entitiesLoading = Lists.newArrayList();
+			this.idsNotCached = Sets.newHashSet();
 
 			for (final ManagedInstance<?> instance : entitiesLoaded) {
 				// check if the transaction is marked as rollback
@@ -553,6 +598,10 @@ public class SessionImpl {
 				// process the associations
 				instance.processJoinedMappings();
 				instance.sortLists();
+
+				if (cache.getCacheStoreMode(instance.getType()) != CacheStoreMode.BYPASS) {
+					cache.put(instance);
+				}
 			}
 
 			for (final ManagedInstance<?> instance : entitiesLoaded) {

@@ -577,13 +577,8 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public void load(ManagedInstance<?> instance) {
-		final ManagedCollection<E> collection = (ManagedCollection<E>) this.attribute.newCollection(this, instance, false);
-
-		collection.getDelegate().addAll(this.loadCollection(instance));
-
-		this.set(instance.getInstance(), collection);
+		this.setCollection(instance, this.loadCollection(instance));
 	}
 
 	/**
@@ -719,6 +714,20 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 			final ManagedCollection<E> collection = (ManagedCollection<E>) this.get(instance.getInstance());
 			collection.removeOrphans(entityManager);
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public void setCollection(ManagedInstance<?> instance, Collection<? extends E> children) {
+		final ManagedCollection<E> collection = (ManagedCollection<E>) this.attribute.newCollection(this, instance, false);
+
+		collection.getDelegate().addAll(children);
+
+		this.set(instance.getInstance(), collection);
 	}
 
 	/**

@@ -28,7 +28,6 @@ import java.util.Set;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.persistence.Cache;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.LockModeType;
@@ -45,6 +44,7 @@ import org.batoo.jpa.common.BatooException;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.JPASettings;
+import org.batoo.jpa.core.impl.cache.CacheImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.jpql.JpqlQuery;
@@ -80,6 +80,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	private final MetamodelImpl metamodel;
 	private final DataSourceImpl datasource;
 	private final TransactionManager transactionManager;
+	private final CacheImpl cache;
 	private final boolean jta;
 
 	private final JdbcAdaptor jdbcAdaptor;
@@ -137,6 +138,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		this.jta = StringUtils.isNotBlank(parser.getJtaDatasource());
 		this.datasource = this.createDatasource(parser);
 		this.transactionManager = this.lookupTransactionManager();
+		this.cache = new CacheImpl(this.metamodel, parser.getSharedCacheMode());
 
 		this.jdbcAdaptor = this.createJdbcAdaptor();
 		this.metamodel = new MetamodelImpl(this, this.jdbcAdaptor, parser.getMetadata());
@@ -316,9 +318,8 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * 
 	 */
 	@Override
-	public Cache getCache() {
-		// TODO Auto-generated method stub
-		return null;
+	public CacheImpl getCache() {
+		return this.cache;
 	}
 
 	/**
