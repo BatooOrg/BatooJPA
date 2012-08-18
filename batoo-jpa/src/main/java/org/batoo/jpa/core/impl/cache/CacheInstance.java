@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.CacheStoreMode;
+import javax.persistence.NoResultException;
+import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
@@ -48,24 +50,13 @@ import com.google.common.collect.Maps;
  */
 public class CacheInstance implements Serializable {
 
-	public static final CacheInstance REMOVED = new CacheInstance();
-
 	private final Map<String, Object> basicMappings = Maps.newHashMap();
 	private final Map<String, List<CacheReference>> pluralMappings = Maps.newHashMap();
 	private final Map<String, CacheReference> singularMappings = Maps.newHashMap();
 
-	private String clazz;
+	private final String clazz;
 
-	private Object id;
-
-	/**
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	private CacheInstance() {
-		super();
-	}
+	private final Object id;
 
 	/**
 	 * @param cache
@@ -150,8 +141,8 @@ public class CacheInstance implements Serializable {
 	}
 
 	/**
-	 * @param entityManager
-	 *            the entity manager
+	 * @param managedInstance
+	 *            the managed instance
 	 * @param mapping
 	 *            the mapping
 	 * @return the collection of children or null
@@ -160,7 +151,7 @@ public class CacheInstance implements Serializable {
 	 * @author hceylan
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Collection<?> getCollection(EntityManagerImpl entityManager, PluralMapping<?, ?, ?> mapping) {
+	public Collection<?> getCollection(ManagedInstance<?> managedInstance, PluralAssociationMapping<?, ?, ?> mapping) {
 		final List<CacheReference> children = this.pluralMappings.get(mapping.getPath());
 
 		// if not null then fetch the references
@@ -168,15 +159,54 @@ public class CacheInstance implements Serializable {
 			return null;
 		}
 
+		final EntityManagerImpl entityManager = managedInstance.getSession().getEntityManager();
 		final MetamodelImpl metamodel = entityManager.getMetamodel();
+		final CacheImpl cache = entityManager.getEntityManagerFactory().getCache();
+		final Object instance = managedInstance.getInstance();
 
-		final Collection childEntities = Lists.newArrayList();
-		for (final CacheReference child : children) {
-			final EntityTypeImpl<?> childType = metamodel.entity(child.getType());
-			childEntities.add(entityManager.find(childType.getJavaType(), child.getId()));
+		AssociationMapping<?, ?, ?> inverse = null;
+		if ((mapping.getInverse() != null) && (mapping.getInverse().getAttribute().getPersistentAttributeType() == PersistentAttributeType.MANY_TO_ONE)) {
+			inverse = mapping.getInverse();
 		}
 
-		return childEntities;
+		try {
+			final Collection childEntities = Lists.newArrayList();
+			for (final CacheReference childReference : children) {
+				final EntityTypeImpl<?> childType = metamodel.entity(childReference.getType());
+				final Object child = entityManager.find(childType.getJavaType(), childReference.getId());
+
+				// if the child is null then it is removed
+				if ((inverse != null) && (inverse.get(child) != instance)) {
+					return this.handleStale(cache, mapping, managedInstance);
+				}
+				childEntities.add(child);
+
+			}
+
+			return childEntities;
+		}
+		catch (final NoResultException e) {}
+
+		return this.handleStale(cache, mapping, managedInstance);
+	}
+
+	/**
+	 * @param cache
+	 *            the cache
+	 * @param mapping
+	 *            the mapping
+	 * @param managedInstance
+	 *            the managed instance
+	 * @return the null collection
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private Collection<?> handleStale(CacheImpl cache, PluralMapping<?, ?, ?> mapping, ManagedInstance<?> managedInstance) {
+		this.pluralMappings.remove(mapping.getPath());
+		cache.put(managedInstance);
+
+		return null;
 	}
 
 	/**

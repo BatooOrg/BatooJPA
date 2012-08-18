@@ -305,7 +305,7 @@ public class CacheImpl implements Cache {
 		final Object key = instance.getId().getId();
 
 		if (instance.getStatus() == Status.REMOVED) {
-			this.getEntityMap(clazz).put(key, CacheInstance.REMOVED);
+			this.getEntityMap(clazz).remove(key);
 
 			this.stats.evict(key);
 			this.getStats(clazz).evict(key);

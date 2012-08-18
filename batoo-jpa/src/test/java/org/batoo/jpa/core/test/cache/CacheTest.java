@@ -136,6 +136,33 @@ public class CacheTest extends BaseCoreTest {
 	}
 
 	/**
+	 * Tests the one to many cachables
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testRemoval() {
+		Foo foo = new Foo("value");
+		Bar2 bar1 = new Bar2(foo, 1);
+		new Bar2(foo, 2);
+
+		this.persist(foo);
+		this.commit();
+		this.close();
+
+		bar1 = this.find(Bar2.class, bar1.getId());
+		Assert.assertEquals("Global | puts:3 evicts:0 hits:2, misses:0", this.emf().getCache().getStats().toString());
+		this.remove(bar1);
+		this.commit();
+		this.close();
+
+		foo = this.find(Foo.class, foo.getId());
+		Assert.assertEquals(1, foo.getBars2().size());
+		Assert.assertEquals("Global | puts:5 evicts:1 hits:4, misses:1", this.emf().getCache().getStats().toString());
+	}
+
+	/**
 	 * Tests the simple cache put
 	 * 
 	 * @since $version

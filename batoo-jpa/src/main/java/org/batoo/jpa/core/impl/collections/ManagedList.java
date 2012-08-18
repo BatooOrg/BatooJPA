@@ -31,6 +31,7 @@ import org.apache.commons.lang.ObjectUtils;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
+import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 
 import com.google.common.collect.Lists;
@@ -453,7 +454,8 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 
 			final PluralMapping<?, ?, E> mapping = this.getMapping();
 
-			if (!managedInstance.tryLoadFromCache(mapping)) {
+			if (!(mapping instanceof PluralAssociationMapping) //
+				|| !managedInstance.tryLoadFromCache((PluralAssociationMapping<?, ?, ?>) mapping)) {
 				this.delegate.addAll(mapping.loadCollection(managedInstance));
 				mapping.sortList(managedInstance.getInstance());
 

@@ -1139,9 +1139,9 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public boolean tryLoadFromCache(PluralMapping<?, ?, ?> mapping) {
+	public boolean tryLoadFromCache(PluralAssociationMapping<?, ?, ?> mapping) {
 		if (this.cacheInstance != null) {
-			final Collection children = this.cacheInstance.getCollection(this.getSession().getEntityManager(), mapping);
+			final Collection children = this.cacheInstance.getCollection(this, mapping);
 			if (children != null) {
 				mapping.setCollection(this, children);
 
