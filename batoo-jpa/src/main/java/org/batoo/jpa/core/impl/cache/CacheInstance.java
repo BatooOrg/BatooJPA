@@ -34,6 +34,7 @@ import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
+import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 import com.google.common.collect.Lists;
@@ -130,8 +131,19 @@ public class CacheInstance implements Serializable {
 		final EntityTypeImpl<?> type = managedInstance.getType();
 		final Object instance = managedInstance.getInstance();
 
+		final EntityManagerImpl em = managedInstance.getSession().getEntityManager();
+		final MetamodelImpl metamodel = em.getMetamodel();
+
 		for (final BasicMapping<?, ?> mapping : type.getBasicMappings()) {
 			mapping.set(instance, this.basicMappings.get(mapping.getPath()));
+		}
+
+		for (final SingularAssociationMapping<?, ?> mapping : type.getAssociationsSingular()) {
+			final CacheReference reference = this.singularMappings.get(mapping.getPath());
+			if (reference != null) {
+				final EntityTypeImpl<?> entity = metamodel.entity(reference.getType());
+				mapping.set(managedInstance.getInstance(), em.find(entity.getJavaType(), reference.getId()));
+			}
 		}
 
 		managedInstance.setCache(this);

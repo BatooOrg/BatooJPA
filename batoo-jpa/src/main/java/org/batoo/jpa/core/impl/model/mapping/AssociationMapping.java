@@ -274,6 +274,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * @since $version
 	 * @author hceylan
 	 */
+	@SuppressWarnings("unchecked")
 	protected CriteriaQueryImpl<Y> getSelectCriteria() {
 		if (this.selectCriteria != null) {
 			return this.selectCriteria;
@@ -298,8 +299,10 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 			final EntityTypeImpl<?> type = (EntityTypeImpl<?>) this.getRoot().getType();
 			final RootImpl<?> r = q.from(type);
 			r.alias(BatooUtils.acronym(type.getName()).toLowerCase());
-			// TODO handle embeddables along the path
 			final AbstractJoin<?, Y> join = r.<Y> join(attribute.getName());
+			if (this.getInverse() != null) {
+				join.fetch(this.getInverse().getAttribute().getName());
+			}
 			join.alias(BatooUtils.acronym(entity.getName()).toLowerCase());
 			q = q.select(join);
 

@@ -458,6 +458,8 @@ public class EntityManagerImpl implements EntityManager {
 			}
 		}
 
+		this.session.setLoadTracker();
+
 		try {
 			final ManagedInstance<? extends T> instance = this.session.get(new ManagedId<T>(primaryKey, type));
 			if (instance != null) {
@@ -480,6 +482,8 @@ public class EntityManagerImpl implements EntityManager {
 			return type.performSelect(this, primaryKey, lockMode);
 		}
 		finally {
+			this.session.releaseLoadTracker();
+
 			if (cacheRetrieveMode != null) {
 				this.emf.getCache().setCacheRetrieveMode(null);
 			}

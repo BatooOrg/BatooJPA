@@ -71,7 +71,7 @@ public class CacheTest extends BaseCoreTest {
 		bar1 = this.find(Bar2.class, bar1.getId());
 		bar2 = this.find(Bar2.class, bar2.getId());
 
-		Assert.assertEquals("Global | puts:3 evicts:0 hits:2, misses:0", this.emf().getCache().getStats().toString());
+		Assert.assertEquals("Global | puts:3 evicts:0 hits:3, misses:0", this.emf().getCache().getStats().toString());
 	}
 
 	/**
@@ -100,7 +100,7 @@ public class CacheTest extends BaseCoreTest {
 		bar1 = this.find(Bar2.class, bar1.getId());
 		bar2 = this.find(Bar2.class, bar2.getId());
 
-		Assert.assertEquals("Global | puts:3 evicts:0 hits:2, misses:3", this.emf().getCache().getStats().toString());
+		Assert.assertEquals("Global | puts:3 evicts:0 hits:3, misses:3", this.emf().getCache().getStats().toString());
 	}
 
 	/**
@@ -131,7 +131,6 @@ public class CacheTest extends BaseCoreTest {
 		foo = this.find(Foo.class, foo.getId());
 		Assert.assertEquals("Global | puts:4 evicts:0 hits:1, misses:3", this.emf().getCache().getStats().toString());
 
-		foo.getBars().size();
 		foo.getBars2().size();
 		Assert.assertEquals("Global | puts:4 evicts:0 hits:3, misses:3", this.emf().getCache().getStats().toString());
 	}
