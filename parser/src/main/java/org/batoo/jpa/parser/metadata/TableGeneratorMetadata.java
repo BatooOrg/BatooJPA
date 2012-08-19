@@ -77,5 +77,4 @@ public interface TableGeneratorMetadata extends GeneratorMetadata {
 	 * @author hceylan
 	 */
 	String getValueColumnName();
-
 }

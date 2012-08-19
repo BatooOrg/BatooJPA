@@ -60,7 +60,7 @@ public class TableIdQueue extends IdQueue {
 	 * @author hceylan
 	 */
 	public TableIdQueue(JdbcAdaptor jdbcAdaptor, DataSourceImpl datasource, ExecutorService idExecuter, TableGenerator generator) {
-		super(idExecuter, generator.getPkColumnValue(), generator.getAllocationSize());
+		super(idExecuter, generator.getName(), generator.getAllocationSize());
 
 		this.datasource = datasource;
 		this.generator = generator;
@@ -68,7 +68,7 @@ public class TableIdQueue extends IdQueue {
 
 	private String getInsertSql() {
 		if (this.insertSql == null) {
-			this.insertSql = "INSERT INTO " + this.generator.getQName() + "\nVALUES (?, ?)";
+			this.insertSql = "INSERT INTO " + this.generator.getTable() + "\nVALUES (?, ?)";
 		}
 
 		return this.insertSql;
@@ -79,12 +79,12 @@ public class TableIdQueue extends IdQueue {
 	 * 
 	 */
 	@Override
-	protected Long getNextId() throws SQLException {
+	protected synchronized Long getNextId() throws SQLException {
 		final QueryRunner runner = new QueryRunner(this.datasource);
 
 		final Number nextId = runner.query(this.getSelectSql(), new SingleValueHandler<Number>(), this.generator.getPkColumnValue());
 		if (nextId == null) {
-			runner.update(this.getInsertSql(), this.generator.getPkColumnValue(), this.generator.getInitialValue() + 1);
+			runner.update(this.getInsertSql(), this.generator.getPkColumnValue(), this.generator.getAllocationSize() + 1);
 			this.nextId = 1l;
 		}
 		else {
@@ -99,7 +99,7 @@ public class TableIdQueue extends IdQueue {
 	private String getSelectSql() {
 		if (this.selectSql == null) {
 			this.selectSql = "SELECT " + this.generator.getValueColumnName() + //
-				"\nFROM " + this.generator.getQName() + //
+				"\nFROM " + this.generator.getTable() + //
 				"\nWHERE " + this.generator.getPkColumnName() + " = ?";
 		}
 
@@ -114,7 +114,7 @@ public class TableIdQueue extends IdQueue {
 	 */
 	private String getUpdateSql() {
 		if (this.updateSql == null) {
-			this.updateSql = "UPDATE " + this.generator.getQName() + //
+			this.updateSql = "UPDATE " + this.generator.getTable() + //
 				"\nSET " + this.generator.getValueColumnName() + " = ?" + //
 				"\nWHERE " + this.generator.getPkColumnName() + " = ?";
 		}

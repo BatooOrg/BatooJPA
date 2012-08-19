@@ -27,6 +27,8 @@ import javax.persistence.LockModeType;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.QueryRunner;
+import org.batoo.jpa.common.log.BLogger;
+import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
@@ -49,6 +51,8 @@ import com.google.common.collect.Lists;
  * @since $version
  */
 public class DerbyAdaptor extends JdbcAdaptor {
+
+	private static final BLogger LOG = BLoggerFactory.getLogger(DerbyAdaptor.class);
 
 	private static final String[] PRODUCT_NAMES = new String[] { "Apache Derby" };
 
@@ -158,7 +162,12 @@ public class DerbyAdaptor extends JdbcAdaptor {
 			+ "\n\tADD FOREIGN KEY (" + keyColumns + ")" //
 			+ "\n\tREFERENCES " + referenceTableName + "(" + foreignKeyColumns + ")";
 
-		new QueryRunner(datasource).update(sql);
+		try {
+			new QueryRunner(datasource).update(sql);
+		}
+		catch (final SQLException e) {
+			DerbyAdaptor.LOG.warn(e, "Cannot create foreign key");
+		}
 	}
 
 	/**
@@ -176,12 +185,17 @@ public class DerbyAdaptor extends JdbcAdaptor {
 			new SingleValueHandler<String>(), schema, sequence.getSequenceName()) != null;
 
 		if (!exists) {
-			final String sql = "CREATE SEQUENCE " //
-				+ schema + "." + sequence.getSequenceName() // ;
-				+ " START WITH " + sequence.getInitialValue() //
-				+ " INCREMENT BY " + sequence.getAllocationSize();
+			try {
+				final String sql = "CREATE SEQUENCE " //
+					+ schema + "." + sequence.getSequenceName() // ;
+					+ " START WITH " + sequence.getInitialValue() //
+					+ " INCREMENT BY " + sequence.getAllocationSize();
 
-			new QueryRunner(datasource).update(sql);
+				new QueryRunner(datasource).update(sql);
+			}
+			catch (final SQLException e) {
+				DerbyAdaptor.LOG.warn(e, "Cannot create sequence");
+			}
 		}
 	}
 
@@ -196,14 +210,19 @@ public class DerbyAdaptor extends JdbcAdaptor {
 		if (new QueryRunner(datasource).query("SELECT TABLENAME FROM SYS.SYSSCHEMAS S\n" + //
 			"\tINNER JOIN SYS.SYSTABLES T ON S.SCHEMAID = T.SCHEMAID\n" + //
 			"WHERE SCHEMANAME = ? AND TABLENAME = ?", //
-			new SingleValueHandler<String>(), schema, table.getName()) == null) {
+			new SingleValueHandler<String>(), schema, table.getTable()) == null) {
 
-			final String sql = "CREATE TABLE " + schema + "." + table.getTable() + " ("//
-				+ "\n\t" + table.getPkColumnName() + " VARCHAR(255)," //
-				+ "\n\t" + table.getValueColumnName() + " INT," //
-				+ "\nPRIMARY KEY(" + table.getPkColumnName() + "))";
+			try {
+				final String sql = "CREATE TABLE " + schema + "." + table.getTable() + " ("//
+					+ "\n\t" + table.getPkColumnName() + " VARCHAR(255)," //
+					+ "\n\t" + table.getValueColumnName() + " INT," //
+					+ "\nPRIMARY KEY(" + table.getPkColumnName() + "))";
 
-			new QueryRunner(datasource).update(sql);
+				new QueryRunner(datasource).update(sql);
+			}
+			catch (final SQLException e) {
+				DerbyAdaptor.LOG.warn(e, "Cannot create table generator");
+			}
 		}
 	}
 

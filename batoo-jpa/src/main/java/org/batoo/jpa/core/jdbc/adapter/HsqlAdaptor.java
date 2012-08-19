@@ -215,7 +215,7 @@ public class HsqlAdaptor extends JdbcAdaptor {
 
 		if (new QueryRunner(datasource).query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.SYSTEM_TABLES\n" + //
 			"WHERE TABLE_SCHEM = ? AND TABLE_NAME = ?", //
-			new SingleValueHandler<String>(), schema, table.getName()) == null) {
+			new SingleValueHandler<String>(), schema, table.getTable()) == null) {
 
 			final String sql = "CREATE TABLE " + schema + "." + table.getTable() + " ("//
 				+ "\n\t" + table.getPkColumnName() + " VARCHAR(255)," //

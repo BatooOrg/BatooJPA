@@ -176,9 +176,9 @@ public class MySqlAdaptor extends JdbcAdaptor {
 	 */
 	@Override
 	public void createTableGeneratorIfNecessary(DataSource datasource, TableGenerator table) throws SQLException {
-		if (new QueryRunner(datasource).query("SHOW TABLES LIKE '" + table.getName() + "';", new SingleValueHandler<String>()) == null) {
+		if (new QueryRunner(datasource).query("SHOW TABLES LIKE '" + table.getTable() + "';", new SingleValueHandler<String>()) == null) {
 
-			final String sql = "CREATE TABLE `" + table.getName() + "` ("//
+			final String sql = "CREATE TABLE `" + table.getTable() + "` ("//
 				+ "\n\t" + table.getPkColumnName() + " VARCHAR(255)," //
 				+ "\n\t" + table.getValueColumnName() + " INT," //
 				+ "\nPRIMARY KEY(" + table.getPkColumnName() + "))";

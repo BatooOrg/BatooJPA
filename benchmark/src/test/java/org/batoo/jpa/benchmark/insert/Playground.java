@@ -39,6 +39,7 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Root;
 
@@ -310,7 +311,7 @@ public class Playground {
 
 			emf.getCriteriaBuilder();
 			final TypedQuery<Address> q = em.createQuery(
-				"select a from Person p left join p.addresses a join fetch a.country join fetch a.person where p = :person", Address.class);
+				"select a from Person p inner join p.addresses a left join fetch a.country left join fetch a.person where p = :person", Address.class);
 
 			q.setParameter("person", person);
 			q.getResultList();
@@ -415,8 +416,8 @@ public class Playground {
 
 		final Root<Person> r = cq.from(Person.class);
 		final Join<Person, Address> a = r.join("addresses");
-		a.fetch("country");
-		a.fetch("person");
+		a.fetch("country", JoinType.LEFT);
+		a.fetch("person", JoinType.LEFT);
 		cq.select(a);
 
 		final ParameterExpression<Person> p = cb.parameter(Person.class);

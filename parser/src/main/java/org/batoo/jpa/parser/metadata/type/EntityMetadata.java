@@ -26,6 +26,7 @@ import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.BindableMetadata;
 import org.batoo.jpa.parser.metadata.DiscriminatorColumnMetadata;
+import org.batoo.jpa.parser.metadata.IndexMetadata;
 import org.batoo.jpa.parser.metadata.NamedNativeQueryMetadata;
 import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
@@ -90,6 +91,16 @@ public interface EntityMetadata extends IdentifiableTypeMetadata, BindableMetada
 	 * @author hceylan
 	 */
 	String getDiscriminatorValue();
+
+	/**
+	 * Returns the list of indexes of the entity.
+	 * 
+	 * @return the list of indexes of the entity
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	List<IndexMetadata> getIndexes();
 
 	/**
 	 * Returns the inheritance type of the entity.

@@ -834,7 +834,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 			final String name = field.getName();
 
 			// if the field is transient then skip it
-			if (Modifier.isTransient(field.getModifiers())) {
+			if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) {
 				continue;
 			}
 

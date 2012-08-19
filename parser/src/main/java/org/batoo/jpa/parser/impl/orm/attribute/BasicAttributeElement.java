@@ -28,6 +28,7 @@ import org.batoo.jpa.parser.impl.orm.ElementConstants;
 import org.batoo.jpa.parser.impl.orm.EnumeratedElement;
 import org.batoo.jpa.parser.impl.orm.LobElement;
 import org.batoo.jpa.parser.impl.orm.ParentElement;
+import org.batoo.jpa.parser.metadata.IndexMetadata;
 import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
 
 /**
@@ -95,6 +96,15 @@ public class BasicAttributeElement extends PhysicalAttributeElement implements B
 	 * 
 	 */
 	@Override
+	public IndexMetadata getIndex() {
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	protected void handleChild(Element child) {
 		super.handleChild(child);
 
@@ -124,5 +134,4 @@ public class BasicAttributeElement extends PhysicalAttributeElement implements B
 	public boolean isOptional() {
 		return this.optional;
 	}
-
 }

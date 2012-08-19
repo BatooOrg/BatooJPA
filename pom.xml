@@ -97,6 +97,12 @@
 			</dependency>
 			<dependency>
 				<groupId>org.batoo.jpa</groupId>
+				<artifactId>batoo-annotations</artifactId>
+				<version>${project.version}</version>
+				<type>bundle</type>
+			</dependency>
+			<dependency>
+				<groupId>org.batoo.jpa</groupId>
 				<artifactId>persistence-api</artifactId>
 				<version>2.0</version>
 			</dependency>
@@ -338,5 +344,6 @@
 		<module>test</module>
 		<module>jpql</module>
 		<module>batoo-jpa</module>
+		<module>batoo-annotations</module>
 	</modules>
 </project>

@@ -43,9 +43,12 @@ import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.annotations.Index;
+import org.batoo.jpa.annotations.Indexes;
 import org.batoo.jpa.parser.impl.metadata.AssociationOverrideMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.AttributeOverrideMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.DiscriminatorColumnMetadataImpl;
+import org.batoo.jpa.parser.impl.metadata.IndexMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.NamedNativeQueryMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.NamedQueryMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.SecondaryTableMetadataImpl;
@@ -55,6 +58,7 @@ import org.batoo.jpa.parser.impl.metadata.TableMetadataImpl;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.DiscriminatorColumnMetadata;
+import org.batoo.jpa.parser.metadata.IndexMetadata;
 import org.batoo.jpa.parser.metadata.NamedNativeQueryMetadata;
 import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
@@ -84,6 +88,7 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	private final List<AttributeOverrideMetadata> attributeOverrides = Lists.newArrayList();
 	private final List<NamedQueryMetadata> namedQueries = Lists.newArrayList();
 	private final List<NamedNativeQueryMetadata> namedNativeQueries = Lists.newArrayList();
+	private final List<IndexMetadata> indexes = Lists.newArrayList();
 	private InheritanceType inheritanceType;
 	private DiscriminatorColumnMetadata discriminatorColumn;
 	private String discriminatorValue;
@@ -126,6 +131,7 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 		// handle named queries
 		this.handleNamedQuery(metadata, parsed);
 		this.handleNamedNativeQuery(metadata, parsed);
+		this.handleIndexes(metadata, parsed);
 	}
 
 	/**
@@ -178,6 +184,15 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 * 
 	 */
 	@Override
+	public List<IndexMetadata> getIndexes() {
+		return this.indexes;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public InheritanceType getInheritanceType() {
 		return this.inheritanceType;
 	}
@@ -197,8 +212,7 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 */
 	@Override
 	public List<NamedNativeQueryMetadata> getNamedNativeQueries() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.getNamedNativeQueries();
 	}
 
 	/**
@@ -362,6 +376,36 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	}
 
 	/**
+	 * Handles the index definitions of the entity.
+	 * 
+	 * @param metadata
+	 *            the metadata
+	 * @param parsed
+	 *            the set of annotations parsed
+	 * 
+	 * @since $version
+	 * @author
+	 */
+	private void handleIndexes(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
+		final Indexes indexes = this.getClazz().getAnnotation(Indexes.class);
+		if ((indexes != null) && (indexes.value().length > 0)) {
+			parsed.add(Indexes.class);
+
+			for (final Index index : indexes.value()) {
+				this.indexes.add(new IndexMetadataImpl(this.getLocator(), index));
+			}
+		}
+		else {
+			final Index index = this.getClazz().getAnnotation(Index.class);
+			parsed.add(Index.class);
+
+			if (index != null) {
+				this.indexes.add(new IndexMetadataImpl(this.getLocator(), index));
+			}
+		}
+	}
+
+	/**
 	 * Handles the inheritance definition of the entity.
 	 * 
 	 * @param metadata
@@ -485,7 +529,6 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 * 
 	 * @since $version
 	 * @author
-	 * @param parsed
 	 */
 	private void handleNamedQuery(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
 		if ((metadata != null) && (metadata.getNamedQueries().size() > 0)) {

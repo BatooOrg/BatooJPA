@@ -27,6 +27,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -38,10 +40,14 @@ import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.common.log.BLogger;
+import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.AbstractJdbcAdaptor;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
+import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
+import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.model.SequenceGenerator;
@@ -60,6 +66,8 @@ import com.google.common.collect.Lists;
  * @since $version
  */
 public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
+
+	private static final BLogger LOG = BLoggerFactory.getLogger(JdbcAdaptor.class);
 
 	private List<String> words;
 
@@ -246,6 +254,37 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	public abstract void createForeignKey(DataSource datasource, ForeignKey foreignKey) throws SQLException;
 
 	/**
+	 * Creates the index for the table.
+	 * 
+	 * @param datasource
+	 *            the datasource
+	 * @param table
+	 *            the table
+	 * @param indexName
+	 *            the name of the index
+	 * @param columns
+	 *            the columns
+	 * @throws SQLException
+	 *             throw in case index creation fails
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected void createIndex(DataSourceImpl datasource, EntityTable table, String indexName, BasicColumn[] columns) throws SQLException {
+		final String schema = this.schemaOf(datasource, table.getSchema());
+
+		final String columnNames = Joiner.on(", ").join(Lists.transform(Lists.newArrayList(columns), new Function<BasicColumn, String>() {
+
+			@Override
+			public String apply(BasicColumn input) {
+				return input.getName();
+			}
+		}));
+
+		new QueryRunner(datasource).update("CREATE INDEX " + indexName + " ON " + schema + "." + table.getName() + "(" + columnNames + ")");
+	}
+
+	/**
 	 * Creates the sequence if not exists.
 	 * 
 	 * @param datasource
@@ -272,9 +311,24 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @author hceylan
 	 */
 	public void createTable(AbstractTable table, DataSourceImpl datasource) throws SQLException {
-		final String ddlSql = this.createCreateTableStatement(table);
+		try {
+			new QueryRunner(datasource).update(this.createCreateTableStatement(table));
+		}
+		catch (final SQLException e) {
+			JdbcAdaptor.LOG.warn(e, "Cannot create table");
+		}
 
-		new QueryRunner(datasource).update(ddlSql);
+		if (table instanceof EntityTable) {
+			final Map<String, BasicColumn[]> indexes = ((EntityTable) table).getIndexes();
+			for (final Entry<String, BasicColumn[]> entry : indexes.entrySet()) {
+				try {
+					this.createIndex(datasource, (EntityTable) table, entry.getKey(), entry.getValue());
+				}
+				catch (final SQLException e) {
+					JdbcAdaptor.LOG.warn(e, "Cannot create index {0}", entry.getKey());
+				}
+			}
+		}
 	}
 
 	/**

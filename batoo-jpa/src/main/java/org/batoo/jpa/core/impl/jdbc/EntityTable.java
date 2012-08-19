@@ -49,6 +49,7 @@ public class EntityTable extends AbstractTable {
 	private PkColumn identityColumn;
 	private String removeSql;
 	private AbstractColumn[] removeColumns;
+	private final Map<String, BasicColumn[]> indexes = Maps.newHashMap();
 
 	/**
 	 * @param entity
@@ -93,6 +94,28 @@ public class EntityTable extends AbstractTable {
 	}
 
 	/**
+	 * Adds the index to table.
+	 * 
+	 * @param name
+	 *            the name of the index
+	 * @param columns
+	 *            the columns
+	 * @return true if an index with the <code>name</code> already existed, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean addIndex(String name, BasicColumn... columns) {
+		if (this.indexes.containsKey(name)) {
+			return true;
+		}
+
+		this.indexes.put(name, columns);
+
+		return false;
+	}
+
+	/**
 	 * Returns the entity of the EntityTable.
 	 * 
 	 * @return the entity of the EntityTable
@@ -102,6 +125,18 @@ public class EntityTable extends AbstractTable {
 	 */
 	public EntityTypeImpl<?> getEntity() {
 		return this.entity;
+	}
+
+	/**
+	 * Returns the indexes of the table.
+	 * 
+	 * @return the indexes of the table
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Map<String, BasicColumn[]> getIndexes() {
+		return this.indexes;
 	}
 
 	/**

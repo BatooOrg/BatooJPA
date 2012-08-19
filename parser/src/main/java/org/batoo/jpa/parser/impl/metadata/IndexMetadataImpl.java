@@ -18,22 +18,22 @@
  */
 package org.batoo.jpa.parser.impl.metadata;
 
-import javax.persistence.UniqueConstraint;
-
+import org.batoo.jpa.annotations.Index;
 import org.batoo.jpa.parser.impl.AbstractLocator;
-import org.batoo.jpa.parser.metadata.UniqueConstraintMetadata;
+import org.batoo.jpa.parser.metadata.IndexMetadata;
 
 /**
- * Implementation of {@link UniqueConstraintMetadata}.
+ * Implementation of {@link IndexMetadata}.
  * 
  * @author hceylan
  * @since $version
  */
-public class UniqueConstraintMetadataImpl implements UniqueConstraintMetadata {
+public class IndexMetadataImpl implements IndexMetadata {
 
 	private final AbstractLocator locator;
 	private final String[] columnNames;
 	private final String name;
+	private final String table;
 
 	/**
 	 * @param locator
@@ -44,12 +44,33 @@ public class UniqueConstraintMetadataImpl implements UniqueConstraintMetadata {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public UniqueConstraintMetadataImpl(AbstractLocator locator, UniqueConstraint annotation) {
+	public IndexMetadataImpl(AbstractLocator locator, Index annotation) {
 		super();
 
 		this.locator = locator;
 		this.name = annotation.name();
-		this.columnNames = annotation.columnNames();
+		this.columnNames = annotation.columns();
+		this.table = annotation.table();
+	}
+
+	/**
+	 * @param locator
+	 *            the java locator
+	 * @param annotation
+	 *            the annotation
+	 * @param name
+	 *            field column name
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public IndexMetadataImpl(AbstractLocator locator, Index annotation, String name) {
+		super();
+
+		this.locator = locator;
+		this.name = annotation.name();
+		this.columnNames = new String[] { name };
+		this.table = annotation.table();
 	}
 
 	/**
@@ -77,5 +98,14 @@ public class UniqueConstraintMetadataImpl implements UniqueConstraintMetadata {
 	@Override
 	public String getName() {
 		return this.name;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getTable() {
+		return this.table;
 	}
 }

@@ -16,68 +16,53 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.parser.metadata.attribute;
+package org.batoo.jpa.annotations;
 
-import javax.persistence.EnumType;
-import javax.persistence.FetchType;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import org.batoo.jpa.parser.metadata.IndexMetadata;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
- * Metadata for basic attributes.
+ * Defines an index on one or more columns.
  * 
- * @author hceylan
  * @since $version
+ * @author hceylan
  */
-public interface BasicAttributeMetadata extends PhysicalAttributeMetadata {
+@Target({ TYPE, FIELD, METHOD })
+@Retention(RUNTIME)
+public @interface Index {
 
 	/**
-	 * Returns the enumType of the basic attribute.
+	 * Returns the names of the columns.
 	 * 
-	 * @return the enumType of the basic attribute
+	 * @return the names of the columns
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	EnumType getEnumType();
+	String[] columns() default {};
 
 	/**
-	 * Returns the fetch type of the attribute.
+	 * Returns the name of the index.
 	 * 
-	 * @return the fetch type of the attribute
+	 * @return the name of the index
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	FetchType getFetchType();
+	String name();
 
 	/**
-	 * Returns the index definition.
+	 * Returns the name of the table
 	 * 
-	 * @return the index definition
+	 * @return the name of the table
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	IndexMetadata getIndex();
-
-	/**
-	 * Returns if the basic attribute is lob.
-	 * 
-	 * @return true if the basic attribute is lob
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	boolean isLob();
-
-	/**
-	 * Returns if the basic attribute is optional.
-	 * 
-	 * @return true if the basic attribute is optional, false otherwise
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	boolean isOptional();
+	String table() default "";
 }

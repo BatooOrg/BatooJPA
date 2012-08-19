@@ -29,10 +29,9 @@ import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
  */
 public class TableGenerator extends AbstractGenerator {
 
-	private static final String DEFAULT_PK_COLUMN_NAME = "name";
-	private static final String DEFAULT_PK_COLUMN_VALUE = "default";
-	private static final String DEFAULT_TABLE_NAME = "batoo_id";
-	private static final String DEFAULT_VALUE_COLUMN_NAME = "next_id";
+	private static final String DEFAULT_PK_COLUMN_NAME = "NAME";
+	private static final String DEFAULT_TABLE_NAME = "BATOO_ID";
+	private static final String DEFAULT_VALUE_COLUMN_NAME = "NEXT_ID";
 
 	private final String pkColumnName;
 	private final String pkColumnValue;
@@ -54,11 +53,23 @@ public class TableGenerator extends AbstractGenerator {
 		this.pkColumnName = (metadata != null) && StringUtils.isNotBlank(metadata.getPkColumnName()) ? metadata.getPkColumnName()
 			: TableGenerator.DEFAULT_PK_COLUMN_NAME;
 
-		this.pkColumnValue = (metadata != null) && StringUtils.isNotBlank(metadata.getPkColumnValue()) ? metadata.getPkColumnValue()
-			: TableGenerator.DEFAULT_PK_COLUMN_VALUE;
-
 		this.valueColumnName = (metadata != null) && StringUtils.isNotBlank(metadata.getValueColumnName()) ? metadata.getValueColumnName()
 			: TableGenerator.DEFAULT_VALUE_COLUMN_NAME;
+
+		if (metadata != null) {
+			if (StringUtils.isNotBlank(metadata.getPkColumnValue())) {
+				this.pkColumnValue = metadata.getPkColumnValue();
+			}
+			else if (StringUtils.isNotBlank(metadata.getName())) {
+				this.pkColumnValue = metadata.getName();
+			}
+			else {
+				this.pkColumnValue = TableGenerator.DEFAULT_TABLE_NAME;
+			}
+		}
+		else {
+			this.pkColumnValue = TableGenerator.DEFAULT_TABLE_NAME;
+		}
 	}
 
 	/**

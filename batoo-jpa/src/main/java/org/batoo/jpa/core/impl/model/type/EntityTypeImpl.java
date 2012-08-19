@@ -58,6 +58,7 @@ import org.batoo.jpa.core.impl.instance.Enhancer;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
+import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.DiscriminatorColumn;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
@@ -86,9 +87,12 @@ import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
+import org.batoo.jpa.parser.metadata.IndexMetadata;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 import org.batoo.jpa.util.BatooUtils;
+
+import sun.reflect.ConstructorAccessor;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -118,7 +122,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private final HashMap<String, AssociatedSingularAttribute<? super X, ?>> idMap = Maps.newHashMap();
 	private final boolean cachable;
 
-	private sun.reflect.ConstructorAccessor constructor;
+	private final sun.reflect.ConstructorAccessor constructor;
 
 	private CriteriaQueryImpl<X> selectCriteria;
 	private CriteriaQueryImpl<X> refreshCriteria;
@@ -153,6 +157,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private EntityTypeImpl<? super X> rootType;
 	private final EntityMapping<X> entityMapping;
 
+	private final List<IndexMetadata> indexes;
+
 	/**
 	 * @param metamodel
 	 *            the metamodel
@@ -171,6 +177,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 		this.name = metadata.getName();
 		this.metadata = metadata;
+		this.indexes = metadata.getIndexes();
 		this.inheritanceType = metadata.getInheritanceType();
 		this.discriminatorValue = StringUtils.isNotBlank(metadata.getDiscriminatorValue()) ? metadata.getDiscriminatorValue() : this.name;
 
@@ -178,8 +185,19 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		this.initTables(metadata);
 		this.entityMapping = new EntityMapping<X>(this);
 		this.linkMappings();
+		this.initIndexes();
 
 		this.cachable = this.getCachable(metamodel.getEntityManagerFactory(), metadata);
+
+		if (metadata.getTableGenerator() != null) {
+			metamodel.addTableGenerator(metadata.getTableGenerator());
+		}
+
+		if (metadata.getSequenceGenerator() != null) {
+			metamodel.addSequenceGenerator(metadata.getSequenceGenerator());
+		}
+
+		this.constructor = this.enhance();
 	}
 
 	/**
@@ -199,31 +217,18 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		}
 	}
 
-	private void enhanceIfNeccessary() {
-		if (this.constructor != null) {
-			return;
+	private ConstructorAccessor enhance() {
+		try {
+			final Class<X> enhancedClass = Enhancer.enhance(this);
+			final Constructor<X> constructor = enhancedClass.getConstructor(Class.class, // type
+				SessionImpl.class, // session
+				Object.class, // id
+				Boolean.TYPE); // initialized
+
+			return ReflectHelper.createConstructor(constructor);
 		}
-
-		synchronized (this) {
-			// other thread got it before us?
-			if (this.constructor != null) {
-				return;
-			}
-
-			if (this.constructor == null) {
-				try {
-					final Class<X> enhancedClass = Enhancer.enhance(this);
-					final Constructor<X> constructor = enhancedClass.getConstructor(Class.class, // type
-						SessionImpl.class, // session
-						Object.class, // id
-						Boolean.TYPE); // initialized
-
-					this.constructor = ReflectHelper.createConstructor(constructor);
-				}
-				catch (final Exception e) {
-					throw new RuntimeException("Cannot enhance class: " + this.getJavaType(), e);
-				}
-			}
+		catch (final Exception e) {
+			throw new RuntimeException("Cannot enhance class: " + this.getJavaType(), e);
 		}
 	}
 
@@ -1046,8 +1051,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 */
 	@SuppressWarnings({ "unchecked" })
 	public ManagedInstance<X> getManagedInstanceById(SessionImpl session, ManagedId<X> id, boolean lazy) {
-		this.enhanceIfNeccessary();
-
 		try {
 			final X instance = (X) this.constructor.newInstance(new Object[] { this.getJavaType(), session, id.getId(), !lazy });
 
@@ -1352,6 +1355,47 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			});
 
 			return this.tables = tables;
+		}
+	}
+
+	/**
+	 * Initializes the indexes
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void initIndexes() {
+		for (final BasicMapping<?, ?> basicMapping : this.getBasicMappings()) {
+			final IndexMetadata index = basicMapping.getAttribute().getIndex();
+			if (index != null) {
+				final EntityTable table = StringUtils.isNotBlank(index.getTable()) ? this.tableMap.get(index.getTable()) : this.primaryTable;
+				if (table == null) {
+					throw new MappingException("Cannot locate table for index " + index.getName(), index.getLocator());
+				}
+
+				if (table.addIndex(index.getName(), basicMapping.getColumn())) {
+					throw new MappingException("Duplicate index with the same name " + index.getName(), index.getLocator());
+				}
+			}
+		}
+
+		for (final IndexMetadata index : this.indexes) {
+			final EntityTable table = StringUtils.isNotBlank(index.getTable()) ? this.tableMap.get(index.getTable()) : this.primaryTable;
+			if (table == null) {
+				throw new MappingException("Cannot locate table for index " + index.getName(), index.getLocator());
+			}
+
+			final List<BasicColumn> columns = Lists.newArrayList();
+			for (final String path : index.getColumnNames()) {
+				final Mapping<?, ?, ?> mapping = this.getRootMapping().getMapping(path);
+				if (!(mapping instanceof BasicMapping)) {
+					throw new MappingException("Cannot locate the basic path " + path + " for index " + index.getName(), index.getLocator());
+				}
+
+				columns.add(((BasicMapping<?, ?>) mapping).getColumn());
+			}
+
+			table.addIndex(index.getName(), columns.toArray(new BasicColumn[columns.size()]));
 		}
 	}
 

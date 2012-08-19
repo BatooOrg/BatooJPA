@@ -129,7 +129,11 @@
 			<artifactId>persistence-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>org.batoo.jpa</groupId>
+			<artifactId>batoo-annotations</artifactId>
+			<type>bundle</type>
+		</dependency>
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>common</artifactId>

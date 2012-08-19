@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.model;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
@@ -85,44 +86,42 @@ public abstract class IdQueue extends LinkedBlockingQueue<Long> {
 	 * @author hceylan
 	 */
 	protected void doTopUp(Runnable runnable) {
-		while (true) {
-			if (this.idExecuter.isShutdown()) {
-				return;
-			}
+		if (this.idExecuter.isShutdown()) {
+			return;
+		}
 
-			if (this.size() <= (this.allocationSize)) {
-				IdQueue.LOG.debug("Ids will be fetched for {0} from the database...", this.name);
-
-				try {
-					final long nextSequence = this.getNextId();
-					for (int i = 0; i < this.allocationSize; i++) {
-						this.put(nextSequence + i);
-					}
-				}
-				catch (final InterruptedException e) {
-					return;
-				}
-				catch (final Throwable e) {
-					try {
-						Thread.currentThread();
-						Thread.sleep(1000);
-					}
-					catch (final InterruptedException e1) {}
-
-					if (this.idExecuter.isShutdown()) {
-						return;
-					}
-
-					IdQueue.LOG.fatal(e, "Cannot get next id from the database!");
-				}
-			}
+		if (this.size() <= (this.allocationSize)) {
+			IdQueue.LOG.debug("Ids will be fetched for {0} from the database...", this.name);
 
 			try {
-				Thread.sleep(1);
+				final long nextSequence = this.getNextId();
+				for (int i = 0; i < this.allocationSize; i++) {
+					this.put(nextSequence + i);
+				}
 			}
 			catch (final InterruptedException e) {
 				return;
 			}
+			catch (final Throwable e) {
+				try {
+					Thread.currentThread();
+					Thread.sleep(1000);
+				}
+				catch (final InterruptedException e1) {}
+
+				if (this.idExecuter.isShutdown()) {
+					return;
+				}
+
+				IdQueue.LOG.fatal(e, "Cannot get next id from the database!");
+			}
+		}
+
+		try {
+			Thread.sleep(1);
+		}
+		catch (final InterruptedException e) {
+			return;
 		}
 	}
 
@@ -137,4 +136,16 @@ public abstract class IdQueue extends LinkedBlockingQueue<Long> {
 	 */
 	protected abstract Long getNextId() throws SQLException;
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Long poll(long timeout, TimeUnit unit) throws InterruptedException {
+		if (this.size() < (this.allocationSize * 2)) {
+			this.idExecuter.execute(new TopUpTask());
+		}
+
+		return super.poll(timeout, unit);
+	}
 }

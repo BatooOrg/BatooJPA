@@ -12,7 +12,7 @@
 		<class>org.batoo.jpa.benchmark.insert.Phone</class>
 	
 		<properties>
-			<property name="hibernate.dialect" value="org.hibernate.dialect.DerbyTenSevenDialect" />
+<!-- 			<property name="hibernate.dialect" value="org.hibernate.dialect.DerbyTenSevenDialect" /> -->
 			<property name="hibernate.hbm2ddl.auto" value="update" />
 <!-- 			<property name="hibernate.show_sql" value="true" /> -->
 			<property name="hibernate.connection.driver_class" value="org.apache.derby.jdbc.Driver40" />

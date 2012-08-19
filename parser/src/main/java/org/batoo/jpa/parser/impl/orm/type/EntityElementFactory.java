@@ -44,6 +44,7 @@ import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.CallbackMetadata;
 import org.batoo.jpa.parser.metadata.DiscriminatorColumnMetadata;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata;
+import org.batoo.jpa.parser.metadata.IndexMetadata;
 import org.batoo.jpa.parser.metadata.InheritanceMetadata;
 import org.batoo.jpa.parser.metadata.NamedNativeQueryMetadata;
 import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
@@ -243,6 +244,15 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 	@Override
 	public String getIdClass() {
 		return this.idClass;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<IndexMetadata> getIndexes() {
+		return Lists.newArrayList();
 	}
 
 	/**
