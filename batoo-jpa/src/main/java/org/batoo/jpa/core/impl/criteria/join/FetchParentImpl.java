@@ -776,7 +776,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		final List<String> restrictions = Lists.newArrayList();
 
 		if (this.entity != null) {
-			for (final AbstractColumn column : this.entity.getPrimaryTable().getPkColumns()) {
+			for (final AbstractColumn column : this.entity.getRootType().getPrimaryTable().getPkColumns()) {
 				if (query.isQuery()) {
 					restrictions.add(this.getPrimaryTableAlias(query) + "." + column.getName());
 				}
