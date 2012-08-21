@@ -25,6 +25,8 @@ import javax.persistence.spi.PersistenceProvider;
 import javax.persistence.spi.PersistenceUnitInfo;
 import javax.persistence.spi.ProviderUtil;
 
+import org.batoo.jpa.common.log.BLogger;
+import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.PersistenceUtilImpl;
 import org.batoo.jpa.parser.PersistenceParser;
@@ -36,6 +38,8 @@ import org.batoo.jpa.parser.PersistenceParser;
  * @since $version
  */
 public class BatooPersistenceProvider implements PersistenceProvider {
+
+	private static final BLogger LOG = BLoggerFactory.getLogger(BatooPersistenceProvider.class);
 
 	private final ProviderUtil providerUtil;
 
@@ -57,9 +61,16 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 	@Override
 	@SuppressWarnings("rawtypes")
 	public EntityManagerFactoryImpl createContainerEntityManagerFactory(PersistenceUnitInfo info, Map map) {
-		final PersistenceParser parser = new PersistenceParser(info, null);
+		try {
+			final PersistenceParser parser = new PersistenceParser(info, null);
 
-		return new EntityManagerFactoryImpl(info.getPersistenceUnitName(), parser);
+			return new EntityManagerFactoryImpl(info.getPersistenceUnitName(), parser);
+		}
+		catch (final Throwable e) {
+			BatooPersistenceProvider.LOG.info(e, "Unable to find Batoo JPA persistence unit: " + info.getPersistenceUnitName());
+
+			return null;
+		}
 	}
 
 	/**
@@ -69,11 +80,18 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 	@Override
 	@SuppressWarnings("rawtypes")
 	public EntityManagerFactory createEntityManagerFactory(String emName, Map map) {
-		// create the persistence parser
-		final PersistenceParser parser = new PersistenceParser(emName);
+		try {
+			// create the persistence parser
+			final PersistenceParser parser = new PersistenceParser(emName);
 
-		// finally, create the entity manager factory
-		return new EntityManagerFactoryImpl(emName, parser);
+			// finally, create the entity manager factory
+			return new EntityManagerFactoryImpl(emName, parser);
+		}
+		catch (final Throwable e) {
+			BatooPersistenceProvider.LOG.info(e, "Unable to find Batoo JPA persistence unit: " + emName);
+
+			return null;
+		}
 	}
 
 	/**
