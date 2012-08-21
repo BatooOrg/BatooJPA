@@ -378,7 +378,7 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		double expected = 314.159265;
 		final String testMode = System.getProperty("testMode");
-		if ("hsql".equals(testMode)) {
+		if ("hsql".equals(testMode) || "derby".equals(testMode)) {
 			expected = 314.1592653589793;
 		}
 

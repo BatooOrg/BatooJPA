@@ -240,7 +240,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 * @return the Entity Manager Factory
 	 * @since $version
 	 */
-	public EntityManagerFactoryImpl emf() {
+	protected EntityManagerFactoryImpl emf() {
 		if (this.emf == null) {
 			this.emf = this.setupEmf();
 		}
