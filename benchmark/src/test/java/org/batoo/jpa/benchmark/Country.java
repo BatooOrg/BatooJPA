@@ -16,12 +16,13 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.benchmark.insert;
+package org.batoo.jpa.benchmark;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 
 /**
  * 
@@ -29,10 +30,11 @@ import javax.persistence.Id;
  * @since $version
  */
 @Entity
+@SequenceGenerator(name = "country_id", allocationSize = 1000)
 public class Country {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(generator = "country_id", strategy = GenerationType.SEQUENCE)
 	private Integer id;
 
 	private String name;

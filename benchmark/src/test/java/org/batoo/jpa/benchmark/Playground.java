@@ -16,7 +16,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.benchmark.insert;
+package org.batoo.jpa.benchmark;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
@@ -43,7 +43,6 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Root;
 
-import org.batoo.jpa.benchmark.insert.BenchmarkClassLoader.Type;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -58,8 +57,6 @@ import com.google.common.collect.Maps;
  * @since $version
  */
 public class Playground {
-
-	private static final String PU_NAME = "insert";
 
 	/**
 	 * 
@@ -259,18 +256,14 @@ public class Playground {
 		return persons;
 	}
 
-	private void dobatoo() {
-		this.doTest(Type.BATOO);
-	}
-
 	/**
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	@Test
-	public void doBatoo() {
-		this.dobatoo();
+	public void dobatoo() {
+		this.doTest(Type.BATOO);
 	}
 
 	private void doCriteria(final EntityManagerFactory emf, final Person person, CriteriaQuery<Address> cq, ParameterExpression<Person> p) {
@@ -283,6 +276,16 @@ public class Playground {
 
 			em.close();
 		}
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void doeclipselink() {
+		this.doTest(Type.ECLIPSELINK);
 	}
 
 	private void doFind(final EntityManagerFactory emf, final Person person) {
@@ -354,31 +357,30 @@ public class Playground {
 	}
 
 	private void doTest(Type type) {
-		final ClassLoader old = Thread.currentThread().getContextClassLoader();
-		try {
-			Thread.currentThread().setContextClassLoader(new BenchmarkClassLoader(old, type, Playground.PU_NAME));
-			System.currentTimeMillis();
+		// final ClassLoader old = Thread.currentThread().getContextClassLoader();
+		// try {
+		// Thread.currentThread().setContextClassLoader(new BenchmarkClassLoader(old, type));
+		// System.currentTimeMillis();;
 
-			final EntityManagerFactory emf = Persistence.createEntityManagerFactory(Playground.PU_NAME);
+		final EntityManagerFactory emf = Persistence.createEntityManagerFactory(type.name().toLowerCase());
 
-			final EntityManager em = emf.createEntityManager();
-			this.country = new Country();
+		final EntityManager em = emf.createEntityManager();
+		this.country = new Country();
 
-			this.country.setName("Turkey");
-			em.getTransaction().begin();
-			em.persist(this.country);
-			em.getTransaction().commit();
+		this.country.setName("Turkey");
+		em.getTransaction().begin();
+		em.persist(this.country);
+		em.getTransaction().commit();
 
-			em.close();
+		em.close();
 
-			System.currentTimeMillis();
+		// System.currentTimeMillis();
 
-			this.test(type, emf);
+		this.test(type, emf);
 
-		}
-		finally {
-			Thread.currentThread().setContextClassLoader(old);
-		}
+		// finally {
+		// Thread.currentThread().setContextClassLoader(old);
+		// }
 	}
 
 	private void doUpdate(final EntityManagerFactory emf, final Person person) {

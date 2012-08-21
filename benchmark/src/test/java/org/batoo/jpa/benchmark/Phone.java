@@ -16,20 +16,14 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.benchmark.insert;
+package org.batoo.jpa.benchmark;
 
-import java.util.List;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Version;
-
-import com.google.common.collect.Lists;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 
 /**
  * 
@@ -37,22 +31,17 @@ import com.google.common.collect.Lists;
  * @since $version
  */
 @Entity
-public class Person {
+@SequenceGenerator(name = "phone_id", allocationSize = 1000)
+public class Phone {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(generator = "phone_id", strategy = GenerationType.SEQUENCE)
 	private Integer id;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "person")
-	private final List<Address> addresses = Lists.newArrayList();
+	@ManyToOne
+	private Person person;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "person")
-	private final List<Phone> phones = Lists.newArrayList();
-
-	@Version
-	private Integer version;
-
-	private String name;
+	private String phoneNo;
 
 	/**
 	 * {@inheritDoc}
@@ -69,7 +58,7 @@ public class Person {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		final Person other = (Person) obj;
+		final Phone other = (Phone) obj;
 		if (this.id == null) {
 			return false;
 		}
@@ -77,16 +66,6 @@ public class Person {
 			return false;
 		}
 		return true;
-	}
-
-	/**
-	 * Returns the addresses.
-	 * 
-	 * @return the addresses
-	 * @since $version
-	 */
-	public List<Address> getAddresses() {
-		return this.addresses;
 	}
 
 	/**
@@ -100,35 +79,23 @@ public class Person {
 	}
 
 	/**
-	 * Returns the name.
+	 * Returns the person.
 	 * 
-	 * @return the name
+	 * @return the person
 	 * @since $version
 	 */
-	public String getName() {
-		return this.name;
+	public Person getPerson() {
+		return this.person;
 	}
 
 	/**
-	 * Returns the phones.
+	 * Returns the phoneNo.
 	 * 
-	 * @return the phones
+	 * @return the phoneNo
 	 * @since $version
 	 */
-	public List<Phone> getPhones() {
-		return this.phones;
-	}
-
-	/**
-	 * Returns the version of the Person.
-	 * 
-	 * @return the version of the Person
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public Integer getVersion() {
-		return this.version;
+	public String getPhoneNo() {
+		return this.phoneNo;
 	}
 
 	/**
@@ -144,13 +111,36 @@ public class Person {
 	}
 
 	/**
-	 * Sets the name.
+	 * Sets the id.
 	 * 
-	 * @param name
-	 *            the name to set
+	 * @param id
+	 *            the id to set
 	 * @since $version
 	 */
-	public void setName(String name) {
-		this.name = name;
+	public void setId(Integer id) {
+		this.id = id;
 	}
+
+	/**
+	 * Sets the person.
+	 * 
+	 * @param person
+	 *            the person to set
+	 * @since $version
+	 */
+	public void setPerson(Person person) {
+		this.person = person;
+	}
+
+	/**
+	 * Sets the phoneNo.
+	 * 
+	 * @param phoneNo
+	 *            the phoneNo to set
+	 * @since $version
+	 */
+	public void setPhoneNo(String phoneNo) {
+		this.phoneNo = phoneNo;
+	}
+
 }

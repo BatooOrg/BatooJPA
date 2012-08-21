@@ -16,7 +16,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.benchmark.insert;
+package org.batoo.jpa.benchmark;
 
 import java.util.Collections;
 import java.util.HashMap;

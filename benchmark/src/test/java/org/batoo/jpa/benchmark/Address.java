@@ -16,13 +16,14 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.benchmark.insert;
+package org.batoo.jpa.benchmark;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 
 /**
  * 
@@ -30,16 +31,20 @@ import javax.persistence.ManyToOne;
  * @since $version
  */
 @Entity
-public class Phone {
+@SequenceGenerator(name = "address_id", allocationSize = 1000)
+public class Address {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(generator = "address_id", strategy = GenerationType.SEQUENCE)
 	private Integer id;
 
 	@ManyToOne
 	private Person person;
 
-	private String phoneNo;
+	@ManyToOne
+	private Country country;
+
+	private String city;
 
 	/**
 	 * {@inheritDoc}
@@ -56,7 +61,7 @@ public class Phone {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		final Phone other = (Phone) obj;
+		final Address other = (Address) obj;
 		if (this.id == null) {
 			return false;
 		}
@@ -64,6 +69,26 @@ public class Phone {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Returns the city.
+	 * 
+	 * @return the city
+	 * @since $version
+	 */
+	public String getCity() {
+		return this.city;
+	}
+
+	/**
+	 * Returns the country.
+	 * 
+	 * @return the country
+	 * @since $version
+	 */
+	public Country getCountry() {
+		return this.country;
 	}
 
 	/**
@@ -87,16 +112,6 @@ public class Phone {
 	}
 
 	/**
-	 * Returns the phoneNo.
-	 * 
-	 * @return the phoneNo
-	 * @since $version
-	 */
-	public String getPhoneNo() {
-		return this.phoneNo;
-	}
-
-	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -109,14 +124,25 @@ public class Phone {
 	}
 
 	/**
-	 * Sets the id.
+	 * Sets the city.
 	 * 
-	 * @param id
-	 *            the id to set
+	 * @param city
+	 *            the city to set
 	 * @since $version
 	 */
-	public void setId(Integer id) {
-		this.id = id;
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	/**
+	 * Sets the country.
+	 * 
+	 * @param country
+	 *            the country to set
+	 * @since $version
+	 */
+	public void setCountry(Country country) {
+		this.country = country;
 	}
 
 	/**
@@ -129,16 +155,4 @@ public class Phone {
 	public void setPerson(Person person) {
 		this.person = person;
 	}
-
-	/**
-	 * Sets the phoneNo.
-	 * 
-	 * @param phoneNo
-	 *            the phoneNo to set
-	 * @since $version
-	 */
-	public void setPhoneNo(String phoneNo) {
-		this.phoneNo = phoneNo;
-	}
-
 }

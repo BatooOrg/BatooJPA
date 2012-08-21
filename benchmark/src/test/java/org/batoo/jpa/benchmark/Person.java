@@ -16,13 +16,21 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.benchmark.insert;
+package org.batoo.jpa.benchmark;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Version;
+
+import com.google.common.collect.Lists;
 
 /**
  * 
@@ -30,19 +38,23 @@ import javax.persistence.ManyToOne;
  * @since $version
  */
 @Entity
-public class Address {
+@SequenceGenerator(name = "person_id", allocationSize = 1000)
+public class Person {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(generator = "person_id", strategy = GenerationType.SEQUENCE)
 	private Integer id;
 
-	@ManyToOne
-	private Person person;
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "person")
+	private final List<Address> addresses = Lists.newArrayList();
 
-	@ManyToOne
-	private Country country;
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "person")
+	private final List<Phone> phones = Lists.newArrayList();
 
-	private String city;
+	@Version
+	private Integer version;
+
+	private String name;
 
 	/**
 	 * {@inheritDoc}
@@ -59,7 +71,7 @@ public class Address {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		final Address other = (Address) obj;
+		final Person other = (Person) obj;
 		if (this.id == null) {
 			return false;
 		}
@@ -70,23 +82,13 @@ public class Address {
 	}
 
 	/**
-	 * Returns the city.
+	 * Returns the addresses.
 	 * 
-	 * @return the city
+	 * @return the addresses
 	 * @since $version
 	 */
-	public String getCity() {
-		return this.city;
-	}
-
-	/**
-	 * Returns the country.
-	 * 
-	 * @return the country
-	 * @since $version
-	 */
-	public Country getCountry() {
-		return this.country;
+	public List<Address> getAddresses() {
+		return this.addresses;
 	}
 
 	/**
@@ -100,13 +102,35 @@ public class Address {
 	}
 
 	/**
-	 * Returns the person.
+	 * Returns the name.
 	 * 
-	 * @return the person
+	 * @return the name
 	 * @since $version
 	 */
-	public Person getPerson() {
-		return this.person;
+	public String getName() {
+		return this.name;
+	}
+
+	/**
+	 * Returns the phones.
+	 * 
+	 * @return the phones
+	 * @since $version
+	 */
+	public List<Phone> getPhones() {
+		return this.phones;
+	}
+
+	/**
+	 * Returns the version of the Person.
+	 * 
+	 * @return the version of the Person
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Integer getVersion() {
+		return this.version;
 	}
 
 	/**
@@ -122,35 +146,13 @@ public class Address {
 	}
 
 	/**
-	 * Sets the city.
+	 * Sets the name.
 	 * 
-	 * @param city
-	 *            the city to set
+	 * @param name
+	 *            the name to set
 	 * @since $version
 	 */
-	public void setCity(String city) {
-		this.city = city;
-	}
-
-	/**
-	 * Sets the country.
-	 * 
-	 * @param country
-	 *            the country to set
-	 * @since $version
-	 */
-	public void setCountry(Country country) {
-		this.country = country;
-	}
-
-	/**
-	 * Sets the person.
-	 * 
-	 * @param person
-	 *            the person to set
-	 * @since $version
-	 */
-	public void setPerson(Person person) {
-		this.person = person;
+	public void setName(String name) {
+		this.name = name;
 	}
 }
