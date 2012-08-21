@@ -795,5 +795,4 @@ public class ConnectionImpl implements Connection {
 		this.throwNotImplemented();
 		return null;
 	}
-
 }
