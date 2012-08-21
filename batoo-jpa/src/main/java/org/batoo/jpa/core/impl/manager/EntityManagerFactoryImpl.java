@@ -251,19 +251,17 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 			return new DataSourceImpl(parser.getNonJtaDatasource());
 		}
 
-		final String jdbcDriver = (String) this.getProperty(JPASettings.JDBC_DRIVER);
 		final String jdbcUrl = (String) this.getProperty(JPASettings.JDBC_URL);
 		final String jdbcUser = (String) this.getProperty(JPASettings.JDBC_USER);
 		final String jdbcPassword = (String) this.getProperty(JPASettings.JDBC_PASSWORD);
 
 		try {
-			this.classloader.loadClass(jdbcDriver).newInstance();
-
 			return new DataSourceImpl(jdbcUrl, jdbcUser, jdbcPassword);
 		}
 		catch (final Exception e) {
 			throw new BatooException("Datasource cannot be created", e);
 		}
+
 	}
 
 	/**
