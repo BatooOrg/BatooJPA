@@ -140,14 +140,9 @@ public class PersistenceParser {
 		try {
 			PersistenceParser.LOG.info("Loading persistence.xml");
 
-			if (this.persistenceUnitInfo != null) {
-				new URL(this.persistenceUnitInfo.getPersistenceUnitRootUrl().toExternalForm() + "/" + PersistenceParser.PERSISTENCE_XML);
-			}
-
-			final Enumeration<URL> xmls = Thread.currentThread().getContextClassLoader().getResources("META-INF/persistence.xml");
-
-			final InputStream is = this.classloader.getResourceAsStream(PersistenceParser.PERSISTENCE_XML);
+			final Enumeration<URL> xmls = this.classloader.getResources(PersistenceParser.PERSISTENCE_XML);
 			while (xmls.hasMoreElements()) {
+				final InputStream is = this.classloader.getResourceAsStream(PersistenceParser.PERSISTENCE_XML);
 				// Try to load the Persistence XML
 				if (is == null) {
 					throw new BatooException("persistence.xml not found in the classpath");

@@ -18,7 +18,10 @@
  */
 package org.batoo.jpa.core.test;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.Enumeration;
 
 /**
  * A test class loader to map test persistence.xml's
@@ -28,6 +31,9 @@ import java.io.InputStream;
  * @since $version
  */
 public class TestClassLoader extends ClassLoader {
+
+	private static final String PERSISTENCE_XML = "persistence.xml";
+	private static final String FULL_PERSISTENCE_XML = "META-INF/" + TestClassLoader.PERSISTENCE_XML;
 
 	private String root;
 
@@ -58,12 +64,26 @@ public class TestClassLoader extends ClassLoader {
 	 */
 	@Override
 	public InputStream getResourceAsStream(String name) {
-		if (name.startsWith("META-INF")) {
-			name = this.root + name.substring(8);
+		if (name.equals(TestClassLoader.FULL_PERSISTENCE_XML)) {
+			name = this.root + "/" + TestClassLoader.PERSISTENCE_XML;
 			return super.getResourceAsStream(name);
 		}
 
 		return super.getResourceAsStream(name);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Enumeration<URL> getResources(String name) throws IOException {
+		if (name.equals(TestClassLoader.FULL_PERSISTENCE_XML)) {
+			name = this.root + "/" + TestClassLoader.PERSISTENCE_XML;
+			return super.getResources(name);
+		}
+
+		return super.getResources(name);
 	}
 
 	/**

@@ -21,14 +21,17 @@ package org.batoo.jpa.core;
 import java.util.Map;
 
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceException;
 import javax.persistence.spi.PersistenceProvider;
 import javax.persistence.spi.PersistenceUnitInfo;
 import javax.persistence.spi.ProviderUtil;
 
+import org.batoo.jpa.common.BatooException;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.PersistenceUtilImpl;
+import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.PersistenceParser;
 
 /**
@@ -67,6 +70,10 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 			return new EntityManagerFactoryImpl(info.getPersistenceUnitName(), parser);
 		}
 		catch (final Throwable e) {
+			if ((e instanceof PersistenceException) || (e instanceof MappingException) || (e instanceof BatooException)) {
+				throw (RuntimeException) e;
+			}
+
 			BatooPersistenceProvider.LOG.info(e, "Unable to find Batoo JPA persistence unit: " + info.getPersistenceUnitName());
 
 			return null;
@@ -88,6 +95,10 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 			return new EntityManagerFactoryImpl(emName, parser);
 		}
 		catch (final Throwable e) {
+			if ((e instanceof PersistenceException) || (e instanceof MappingException) || (e instanceof BatooException)) {
+				throw (RuntimeException) e;
+			}
+
 			BatooPersistenceProvider.LOG.info(e, "Unable to find Batoo JPA persistence unit: " + emName);
 
 			return null;

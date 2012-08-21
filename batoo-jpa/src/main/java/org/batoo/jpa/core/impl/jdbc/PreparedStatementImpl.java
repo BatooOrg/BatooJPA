@@ -278,7 +278,7 @@ public class PreparedStatementImpl implements PreparedStatement {
 	 */
 	@Override
 	public ResultSet executeQuery() throws SQLException {
-		if (!PreparedStatementImpl.LOG.isDebugEnabled()) {
+		if (!this.debug) {
 			return this.statement.executeQuery();
 		}
 
