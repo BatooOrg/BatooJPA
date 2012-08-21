@@ -267,9 +267,10 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * @author hceylan
 	 */
 	private void consolidateAttributes() {
-		AttributesMetadataImpl.LOG.debug("Consolidating ORM Attributes of entity {0}", this.parent.getClassName());
 
 		if (this.metadata != null) {
+			AttributesMetadataImpl.LOG.debug("Consolidating ORM Attributes of entity {0}", this.parent.getClassName());
+
 			this.consolidateAttributes(this.metadata.getBasics());
 			this.consolidateAttributes(this.metadata.getEmbeddedIds());
 			this.consolidateAttributes(this.metadata.getEmbeddeds());
@@ -280,9 +281,9 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 			this.consolidateAttributes(this.metadata.getOneToOnes());
 			this.consolidateAttributes(this.metadata.getTransients());
 			this.consolidateAttributes(this.metadata.getVersions());
-		}
 
-		AttributesMetadataImpl.LOG.debug("{0} ORM Attribute(s) obtained for entity {1}", this.ormAttributeMap.size(), this.parent.getClassName());
+			AttributesMetadataImpl.LOG.debug("{0} ORM Attribute(s) obtained for entity {1}", this.ormAttributeMap.size(), this.parent.getClassName());
+		}
 	}
 
 	/**
