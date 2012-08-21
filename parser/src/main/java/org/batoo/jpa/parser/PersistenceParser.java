@@ -21,6 +21,7 @@ package org.batoo.jpa.parser;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
@@ -141,30 +142,33 @@ public class PersistenceParser {
 
 			if (this.persistenceUnitInfo != null) {
 				new URL(this.persistenceUnitInfo.getPersistenceUnitRootUrl().toExternalForm() + "/" + PersistenceParser.PERSISTENCE_XML);
-
 			}
 
-			// Try to load the Persistence XML
+			final Enumeration<URL> xmls = Thread.currentThread().getContextClassLoader().getResources("META-INF/persistence.xml");
+
 			final InputStream is = this.classloader.getResourceAsStream(PersistenceParser.PERSISTENCE_XML);
-			if (is == null) {
-				throw new BatooException("persistence.xml not found in the classpath");
-			}
+			while (xmls.hasMoreElements()) {
+				// Try to load the Persistence XML
+				if (is == null) {
+					throw new BatooException("persistence.xml not found in the classpath");
+				}
 
-			final JAXBContext context = JAXBContext.newInstance(Persistence.class);
-			final Unmarshaller unmarshaller = context.createUnmarshaller();
+				final JAXBContext context = JAXBContext.newInstance(Persistence.class);
+				final Unmarshaller unmarshaller = context.createUnmarshaller();
 
-			final Persistence persistence = (Persistence) unmarshaller.unmarshal(is);
-			for (final PersistenceUnit persistenceUnit : persistence.getPersistenceUnits()) {
-				if (this.puName.equals(persistenceUnit.getName())) {
-					return persistenceUnit;
+				final Persistence persistence = (Persistence) unmarshaller.unmarshal(is);
+				for (final PersistenceUnit persistenceUnit : persistence.getPersistenceUnits()) {
+					if (this.puName.equals(persistenceUnit.getName())) {
+						return persistenceUnit;
+					}
 				}
 			}
-
-			throw new BatooException("Persistence unit " + this.puName + " not found in the persistence.xml");
 		}
 		catch (final Exception e) {
-			throw new BatooException("Unable to create JAXBContext", e);
+			throw new BatooException("Unable to parse persistence.xml", e);
 		}
+
+		throw new BatooException("Persistence unit " + this.puName + " not found.");
 	}
 
 	/**
