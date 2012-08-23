@@ -174,7 +174,7 @@ public class MetamodelImpl implements Metamodel {
 			while (entities.size() > 0) {
 				for (final Iterator<ManagedTypeMetadata> i = entities.iterator(); i.hasNext();) {
 					final ManagedTypeMetadata entity = i.next();
-					final Class<?> c1 = Class.forName(entity.getClassName());
+					final Class<?> c1 = this.emf.getClassloader().loadClass(entity.getClassName());
 
 					boolean independent = true;
 					for (final ManagedTypeMetadata entity2 : entities) {
@@ -182,7 +182,7 @@ public class MetamodelImpl implements Metamodel {
 							continue;
 						}
 
-						final Class<?> c2 = Class.forName(entity2.getClassName());
+						final Class<?> c2 = this.emf.getClassloader().loadClass(entity2.getClassName());
 
 						if (c2.isAssignableFrom(c1)) {
 							independent = false;
@@ -201,7 +201,7 @@ public class MetamodelImpl implements Metamodel {
 
 		for (final ManagedTypeMetadata type : sortedEntities) {
 			try {
-				final Class<?> clazz = Class.forName(type.getClassName());
+				final Class<?> clazz = this.emf.getClassloader().loadClass(type.getClassName());
 
 				ManagedTypeImpl<?> parent = null;
 

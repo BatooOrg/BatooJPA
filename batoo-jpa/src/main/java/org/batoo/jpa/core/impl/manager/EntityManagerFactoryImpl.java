@@ -321,6 +321,18 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	}
 
 	/**
+	 * Returns the classloader of the entity manager factory.
+	 * 
+	 * @return the classloader of the entity manager factory
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ClassLoader getClassloader() {
+		return this.classloader;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
