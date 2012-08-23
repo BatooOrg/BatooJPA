@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.model;
 
+import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.GeneratorMetadata;
 
@@ -54,7 +55,7 @@ public abstract class AbstractGenerator {
 		this.locator = metadata != null ? metadata.getLocator() : null;
 		this.catalog = metadata != null ? metadata.getCatalog() : null;
 		this.name = metadata != null ? metadata.getName() : AbstractGenerator.DEFAULT_NAME;
-		this.schema = metadata != null ? metadata.getSchema() : null;
+		this.schema = (metadata != null) && StringUtils.isNotBlank(metadata.getSchema()) ? metadata.getSchema() : null;
 		this.initialValue = metadata != null ? metadata.getInitialValue() : 1;
 		this.allocationSize = metadata != null ? metadata.getAllocationSize() : 50;
 	}
