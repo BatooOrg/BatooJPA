@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.jdbc;
 import java.util.Map;
 
 import org.batoo.jpa.core.jdbc.adapter.DerbyAdaptor;
+import org.batoo.jpa.core.jdbc.adapter.H2Adaptor;
 import org.batoo.jpa.core.jdbc.adapter.HsqlAdaptor;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.core.jdbc.adapter.MySqlAdaptor;
@@ -59,6 +60,7 @@ public abstract class AbstractJdbcAdaptor {
 		AbstractJdbcAdaptor.putAdaptor(adaptors, new MySqlAdaptor());
 		AbstractJdbcAdaptor.putAdaptor(adaptors, new HsqlAdaptor());
 		AbstractJdbcAdaptor.putAdaptor(adaptors, new PostgreSqlAdaptor());
+		AbstractJdbcAdaptor.putAdaptor(adaptors, new H2Adaptor());
 
 		return adaptors;
 	}

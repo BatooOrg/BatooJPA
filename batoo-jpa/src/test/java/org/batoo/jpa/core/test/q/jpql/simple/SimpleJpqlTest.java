@@ -378,7 +378,7 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		double expected = 314.159265;
 		final String testMode = System.getProperty("testMode");
-		if ("hsql".equals(testMode) || "derby".equals(testMode)) {
+		if ("hsql".equals(testMode) || "derby".equals(testMode) || "h2".equals(testMode)) {
 			expected = 314.1592653589793;
 		}
 
@@ -482,14 +482,14 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		final String testMode = System.getProperty("testMode");
 		String expected = null;
 
-		if ("mysql".equals(testMode) || "hsql".equals(testMode)) {
+		if ("mysql".equals(testMode) || "hsql".equals(testMode) || "h2".equals(testMode)) {
 			expected = SimpleJpqlTest.COUNTRY_USA;
 		}
 
 		Assert.assertEquals(expected, this.cq("select c.name from Country c order by c.name desc", String.class).setMaxResults(1).getSingleResult());
 
 		expected = SimpleJpqlTest.COUNTRY_TR;
-		if ("mysql".equals(testMode) || "hsql".equals(testMode)) {
+		if ("mysql".equals(testMode) || "hsql".equals(testMode) || "h2".equals(testMode)) {
 			expected = null;
 		}
 
