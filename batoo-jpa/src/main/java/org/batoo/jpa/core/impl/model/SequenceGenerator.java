@@ -21,6 +21,8 @@ package org.batoo.jpa.core.impl.model;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
 
+import com.google.common.base.Joiner;
+
 /**
  * Sequence based generator.
  * 
@@ -44,6 +46,15 @@ public class SequenceGenerator extends AbstractGenerator {
 		super(metadata);
 
 		this.sequenceName = (metadata != null) && StringUtils.isNotBlank(metadata.getName()) ? metadata.getName() : SequenceGenerator.DEFAULT_SEQUENCE_NAME;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getQName() {
+		return Joiner.on(".").skipNulls().join(this.getSchema(), this.sequenceName);
 	}
 
 	/**

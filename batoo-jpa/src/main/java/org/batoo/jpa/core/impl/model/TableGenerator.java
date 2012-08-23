@@ -21,6 +21,8 @@ package org.batoo.jpa.core.impl.model;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
 
+import com.google.common.base.Joiner;
+
 /**
  * Table based generator.
  * 
@@ -94,6 +96,15 @@ public class TableGenerator extends AbstractGenerator {
 	 */
 	public String getPkColumnValue() {
 		return this.pkColumnValue;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getQName() {
+		return Joiner.on(".").skipNulls().join(this.getSchema(), this.table);
 	}
 
 	/**

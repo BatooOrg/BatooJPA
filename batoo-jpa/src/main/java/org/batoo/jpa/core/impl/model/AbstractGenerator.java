@@ -21,15 +21,13 @@ package org.batoo.jpa.core.impl.model;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.GeneratorMetadata;
 
-import com.google.common.base.Joiner;
-
 /**
  * Abstract base implementation of Sequence and Table generators.
  * 
  * @author hceylan
  * @since $version
  */
-public class AbstractGenerator {
+public abstract class AbstractGenerator {
 
 	/**
 	 * The default name for the generators
@@ -122,16 +120,14 @@ public class AbstractGenerator {
 	}
 
 	/**
-	 * Returns the qualified name of the table.
+	 * Returns the qualified name of the table or sequence.
 	 * 
-	 * @return the qualified name of the table
+	 * @return the qualified name of the table or sequence
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String getQName() {
-		return Joiner.on(".").skipNulls().join(this.schema, this.name);
-	}
+	public abstract String getQName();
 
 	/**
 	 * Returns the schema of the generator.

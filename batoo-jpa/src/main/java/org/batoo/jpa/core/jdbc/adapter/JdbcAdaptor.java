@@ -19,7 +19,6 @@
 package org.batoo.jpa.core.jdbc.adapter;
 
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Collection;
@@ -29,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -36,7 +36,6 @@ import javax.persistence.LockModeType;
 import javax.persistence.criteria.CriteriaBuilder.Trimspec;
 import javax.sql.DataSource;
 
-import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -49,6 +48,7 @@ import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
+import org.batoo.jpa.core.impl.jdbc.JoinColumn;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.model.SequenceGenerator;
 import org.batoo.jpa.core.impl.model.TableGenerator;
@@ -245,13 +245,41 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 *            the datasource
 	 * @param foreignKey
 	 *            the foreign key
-	 * @throws SQLException
-	 *             thrown in case of an SQL error
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract void createForeignKey(DataSource datasource, ForeignKey foreignKey) throws SQLException;
+	public synchronized void createForeignKey(DataSource datasource, ForeignKey foreignKey) {
+		final String referenceTableName = foreignKey.getReferencedTableName();
+		final String tableName = foreignKey.getTable().getName();
+
+		final String foreignKeyColumns = Joiner.on(", ").join(Lists.transform(foreignKey.getJoinColumns(), new Function<JoinColumn, String>() {
+
+			@Override
+			public String apply(JoinColumn input) {
+				return input.getReferencedColumnName();
+			}
+		}));
+
+		final String keyColumns = Joiner.on(", ").join(Lists.transform(foreignKey.getJoinColumns(), new Function<JoinColumn, String>() {
+
+			@Override
+			public String apply(JoinColumn input) {
+				return input.getName();
+			}
+		}));
+
+		final String sql = "ALTER TABLE " + tableName //
+			+ "\n\tADD CONSTRAINT " + foreignKey.getName() + " FOREIGN KEY (" + keyColumns + ")" //
+			+ "\n\tREFERENCES " + referenceTableName + "(" + foreignKeyColumns + ")";
+
+		try {
+			new QueryRunner(datasource).update(sql);
+		}
+		catch (final SQLException e) {
+			this.logRelaxed(e, "Cannot create foreign key.");
+		}
+	}
 
 	/**
 	 * Creates the index for the table.
@@ -271,8 +299,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @author hceylan
 	 */
 	protected void createIndex(DataSourceImpl datasource, EntityTable table, String indexName, BasicColumn[] columns) throws SQLException {
-		final String schema = this.schemaOf(datasource, table.getSchema());
-
 		final String columnNames = Joiner.on(", ").join(Lists.transform(Lists.newArrayList(columns), new Function<BasicColumn, String>() {
 
 			@Override
@@ -281,7 +307,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 			}
 		}));
 
-		new QueryRunner(datasource).update("CREATE INDEX " + indexName + " ON " + schema + "." + table.getName() + "(" + columnNames + ")");
+		new QueryRunner(datasource).update("CREATE INDEX " + indexName + " ON " + table.getQName() + "(" + columnNames + ")");
 	}
 
 	/**
@@ -291,31 +317,27 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 *            the datasource to use
 	 * @param sequence
 	 *            the sequence to create
-	 * @throws SQLException
-	 *             thrown in case of an SQL error
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract void createSequenceIfNecessary(DataSource datasource, SequenceGenerator sequence) throws SQLException;
+	public abstract void createSequenceIfNecessary(DataSource datasource, SequenceGenerator sequence);
 
 	/**
 	 * @param table
 	 *            the
 	 * @param datasource
 	 *            the datasource
-	 * @throws SQLException
-	 *             thrown if DDL table creation fails
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void createTable(AbstractTable table, DataSourceImpl datasource) throws SQLException {
+	public void createTable(AbstractTable table, DataSourceImpl datasource) {
 		try {
 			new QueryRunner(datasource).update(this.createCreateTableStatement(table));
 		}
 		catch (final SQLException e) {
-			JdbcAdaptor.LOG.warn(e, "Cannot create table");
+			this.logRelaxed(e, "Cannot create table " + table.getName());
 		}
 
 		if (table instanceof EntityTable) {
@@ -338,13 +360,38 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 *            the datasource to use
 	 * @param table
 	 *            the table generator
-	 * @throws SQLException
-	 *             thrown in case of an SQL error
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract void createTableGeneratorIfNecessary(DataSource datasource, TableGenerator table) throws SQLException;
+	public final void createTableGeneratorIfNecessary(DataSource datasource, TableGenerator table) {
+		final String sql = "CREATE TABLE " + table.getQName() + " ("//
+			+ "\n\t" + table.getPkColumnName() + " VARCHAR(255)," //
+			+ "\n\t" + table.getValueColumnName() + " INT," //
+			+ "\nPRIMARY KEY(" + table.getPkColumnName() + "))";
+
+		try {
+			new QueryRunner(datasource).update(sql);
+		}
+		catch (final SQLException e) {
+			this.logRelaxed(e, "Cannot create tabe generator " + table.getTable());
+		}
+	}
+
+	/**
+	 * @param datasource
+	 *            the datasource
+	 * @param foreignKeys
+	 *            the foreign keys
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void dropAllForeignKeys(DataSourceImpl datasource, Set<ForeignKey> foreignKeys) {
+		for (final ForeignKey key : foreignKeys) {
+			this.dropForeignKey(datasource, key);
+		}
+	}
 
 	/**
 	 * @param datasource
@@ -357,12 +404,23 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract void dropAllSequences(DataSourceImpl datasource, Collection<SequenceGenerator> sequences) throws SQLException;
+	public void dropAllSequences(DataSourceImpl datasource, Collection<SequenceGenerator> sequences) throws SQLException {
+		final QueryRunner runner = new QueryRunner(datasource);
+
+		for (final SequenceGenerator sequence : sequences) {
+			try {
+				this.dropSequence(runner, sequence);
+			}
+			catch (final SQLException e) {
+				this.logRelaxed(e, "Cannot drop sequence.");
+			}
+		}
+	}
 
 	/**
 	 * Drops the tables in the database
 	 * 
-	 * @param dataSource
+	 * @param datasource
 	 *            the datasource
 	 * @param tables
 	 *            the set of tables to drop
@@ -372,7 +430,53 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract void dropTables(DataSource dataSource, Collection<AbstractTable> tables) throws SQLException;
+	public void dropAllTables(DataSource datasource, Collection<AbstractTable> tables) throws SQLException {
+		final QueryRunner runner = new QueryRunner(datasource);
+
+		for (final AbstractTable table : tables) {
+			try {
+				runner.update("DROP TABLE " + table.getQName());
+			}
+			catch (final SQLException e) {
+				this.logRelaxed(e, "Cannot drop table " + table.getName());
+			}
+		}
+	}
+
+	/**
+	 * @param datasource
+	 *            the datasource
+	 * @param foreignKey
+	 *            the foreign key
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected void dropForeignKey(DataSourceImpl datasource, ForeignKey foreignKey) {
+		try {
+			new QueryRunner(datasource).update("ALTER TABLE " + foreignKey.getTable().getQName() + " DROP FOREIGN KEY " + foreignKey.getName());
+		}
+		catch (final SQLException e) {
+			this.logRelaxed(e, "Cannot drop foreign key " + foreignKey.getName());
+		}
+	}
+
+	/**
+	 * Drops the sequence.
+	 * 
+	 * @param runner
+	 *            the runner
+	 * @param sequence
+	 *            the sequence
+	 * @throws SQLException
+	 *             thrown if SQL fails
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected void dropSequence(final QueryRunner runner, final SequenceGenerator sequence) throws SQLException {
+		runner.update("DROP SEQUENCE " + sequence.getQName());
+	}
 
 	/**
 	 * Escapes an SQL name
@@ -485,28 +589,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	protected abstract String getDatabaseName();
 
 	/**
-	 * Returns the name of the default schema.
-	 * 
-	 * @param dataSource
-	 *            the datasource to use
-	 * @return the name of the default schema or null if database does not support schemas
-	 * @throws SQLException
-	 *             thrown in case of an SQL error
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String getDefaultSchema(DataSource dataSource) throws SQLException {
-		final Connection connection = dataSource.getConnection();
-		try {
-			return connection.getSchema();
-		}
-		finally {
-			DbUtils.closeQuietly(connection);
-		}
-	}
-
-	/**
 	 * Returns next sequence number from the database.
 	 * 
 	 * @param datasource
@@ -521,36 +603,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @author hceylan
 	 */
 	public abstract long getNextSequence(DataSourceImpl datasource, String sequenceName) throws SQLException;
-
-	/**
-	 * Returns the qualified name for the table.
-	 * 
-	 * @param catalog
-	 *            the catalog of the table, maybe null or blank
-	 * @param schema
-	 *            the schema the table, maybe null or blank
-	 * @param name
-	 *            the name of the table, must be provided
-	 * @return the qualified name of the table
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String getQualifiedName(String catalog, String schema, String name) {
-		final List<String> segments = Lists.newArrayList();
-
-		if (StringUtils.isNotBlank(catalog)) {
-			segments.add(this.escape(catalog));
-		}
-
-		if (StringUtils.isNotBlank(schema)) {
-			segments.add(this.escape(schema));
-		}
-
-		segments.add(this.escape(name));
-
-		return Joiner.on(".").skipNulls().join(segments);
-	}
 
 	/**
 	 * Returns the SQL to select the last identity generated.
@@ -585,12 +637,28 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	}
 
 	/**
+	 * Logs the message as info and with exception as debug.
+	 * 
+	 * @param e
+	 *            the sql exception
+	 * @param message
+	 *            the message
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected void logRelaxed(SQLException e, String message) {
+		JdbcAdaptor.LOG.warn(message + " Check debug log for details: " + e.getMessage());
+		JdbcAdaptor.LOG.debug(e, message);
+	}
+
+	/**
 	 * Returns the schema if it is set otherwise falls back to the default schema.
 	 * 
-	 * @param datasource
-	 *            the datasource to use
 	 * @param schema
 	 *            the schema name
+	 * @param jdbcClassName
+	 *            the name of the table or sequence
 	 * @return the proper schema name
 	 * @throws SQLException
 	 *             thrown in case of an SQL error
@@ -598,12 +666,12 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected String schemaOf(DataSource datasource, String schema) throws SQLException {
+	protected String qualified(String schema, String jdbcClassName) {
 		if (StringUtils.isBlank(schema)) {
-			schema = this.getDefaultSchema(datasource);
+			return jdbcClassName;
 		}
 
-		return schema;
+		return schema + "." + jdbcClassName;
 	}
 
 	/**

@@ -19,6 +19,8 @@
 package org.batoo.jpa.core.impl.jdbc;
 
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.persistence.criteria.JoinType;
@@ -61,10 +63,9 @@ public class ForeignKey {
 	private OrderColumn orderColumn;
 
 	private String singleChildSql;
-
 	private AbstractColumn[] singleChildRestrictions;
-	private AbstractColumn[] singleChildUpdates;
 	private String allChildrenSql;
+	private AbstractColumn[] singleChildUpdates;
 
 	private JoinColumn[] allChildrenRestrictions;
 	private final JdbcAdaptor jdbcAdaptor;
@@ -356,6 +357,35 @@ public class ForeignKey {
 	 */
 	public List<JoinColumn> getJoinColumns() {
 		return this.joinColumns;
+	}
+
+	/**
+	 * Returns a generated name for the foreign key.
+	 * 
+	 * @return the name of the foreign key
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getName() {
+		final List<JoinColumn> columns = Lists.newArrayList(this.joinColumns);
+
+		// sort the column names for consistent order
+		Collections.sort(columns, new Comparator<JoinColumn>() {
+			@Override
+			public int compare(JoinColumn o1, JoinColumn o2) {
+				return o1.getName().compareTo(o2.getName());
+			}
+		});
+
+		final int prime = 31;
+		int id = 31 * columns.get(0).getReferencedTable().getQName().hashCode();
+
+		for (final JoinColumn joinColumn : columns) {
+			id = (prime * id) + joinColumn.getName().hashCode();
+		}
+
+		return "FK_" + Integer.toHexString(id).toUpperCase();
 	}
 
 	/**

@@ -20,7 +20,6 @@ package org.batoo.jpa.core.jdbc.adapter;
 
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.GenerationType;
@@ -29,19 +28,14 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
-import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
-import org.batoo.jpa.core.impl.jdbc.JoinColumn;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.jdbc.SingleValueHandler;
 import org.batoo.jpa.core.impl.model.SequenceGenerator;
-import org.batoo.jpa.core.impl.model.TableGenerator;
 import org.batoo.jpa.core.jdbc.IdType;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 
 /**
  * JDBC Adapter for PostgreSQL.
@@ -132,84 +126,37 @@ public class PostgreSqlAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
-	public synchronized void createForeignKey(DataSource datasource, ForeignKey foreignKey) throws SQLException {
-		final String referenceTableName = foreignKey.getReferencedTableName();
-		final String tableName = foreignKey.getTable().getName();
+	public void createSequenceIfNecessary(DataSource datasource, SequenceGenerator sequence) {
+		final String sql = "CREATE SEQUENCE " //
+			+ sequence.getSequenceName() // ;
+			+ " START WITH " + sequence.getInitialValue() //
+			+ " INCREMENT BY " + sequence.getAllocationSize();
 
-		final String foreignKeyColumns = Joiner.on(", ").join(Lists.transform(foreignKey.getJoinColumns(), new Function<JoinColumn, String>() {
-
-			@Override
-			public String apply(JoinColumn input) {
-				return input.getReferencedColumnName();
-			}
-		}));
-
-		final String keyColumns = Joiner.on(", ").join(Lists.transform(foreignKey.getJoinColumns(), new Function<JoinColumn, String>() {
-
-			@Override
-			public String apply(JoinColumn input) {
-				return input.getName();
-			}
-		}));
-
-		final String sql = "ALTER TABLE " + tableName //
-			+ "\n\tADD FOREIGN KEY (" + keyColumns + ")" //
-			+ "\n\tREFERENCES " + referenceTableName + "(" + foreignKeyColumns + ")";
-
-		new QueryRunner(datasource).update(sql);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public void createSequenceIfNecessary(DataSource datasource, SequenceGenerator sequence) throws SQLException {
-		final boolean exists = new QueryRunner(datasource) //
-		.query("SELECT RELNAME FROM PG_CLASS WHERE RELNAME= ?",//
-			new SingleValueHandler<String>(), sequence.getSequenceName()) != null;
-
-		if (!exists) {
-			final String sql = "CREATE SEQUENCE " //
-				+ sequence.getSequenceName() // ;
-				+ " START WITH " + sequence.getInitialValue() //
-				+ " INCREMENT BY " + sequence.getAllocationSize();
-
+		try {
 			new QueryRunner(datasource).update(sql);
+		}
+		catch (final SQLException e) {
+			this.logRelaxed(e, "Cannot create sequence " + sequence.getName());
 		}
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * @param datasource
+	 *            the datasource
+	 * @param foreignKey
+	 *            the foreign key
 	 * 
+	 * @since $version
+	 * @author hceylan
 	 */
 	@Override
-	public void createTableGeneratorIfNecessary(DataSource datasource, TableGenerator table) throws SQLException {
-		final String sql = "CREATE TABLE " + table.getTable() + " ("//
-			+ "\n\t" + table.getPkColumnName() + " VARCHAR(255)," //
-			+ "\n\t" + table.getValueColumnName() + " INT," //
-			+ "\nPRIMARY KEY(" + table.getPkColumnName() + "))";
-
-		new QueryRunner(datasource).update(sql);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public void dropAllSequences(DataSourceImpl datasource, Collection<SequenceGenerator> sequences) throws SQLException {
-		// TODO Auto-generated method stub
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public void dropTables(DataSource dataSource, Collection<AbstractTable> tables) throws SQLException {
-		// TODO Auto-generated method stub
-
+	protected void dropForeignKey(DataSourceImpl datasource, ForeignKey foreignKey) {
+		try {
+			new QueryRunner(datasource).update("ALTER TABLE " + foreignKey.getTable().getQName() + " DROP CONSTRAINT " + foreignKey.getName());
+		}
+		catch (final SQLException e) {
+			this.logRelaxed(e, "Cannot drop foreign key " + foreignKey.getName());
+		}
 	}
 
 	/**

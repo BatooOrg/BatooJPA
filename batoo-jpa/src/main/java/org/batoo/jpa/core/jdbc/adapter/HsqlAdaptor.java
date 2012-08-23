@@ -20,7 +20,6 @@ package org.batoo.jpa.core.jdbc.adapter;
 
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.GenerationType;
@@ -30,19 +29,14 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
-import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
-import org.batoo.jpa.core.impl.jdbc.JoinColumn;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.jdbc.SingleValueHandler;
 import org.batoo.jpa.core.impl.model.SequenceGenerator;
-import org.batoo.jpa.core.impl.model.TableGenerator;
 import org.batoo.jpa.core.jdbc.IdType;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 
 /**
  * JDBC Adapter for HSQLDB.
@@ -155,104 +149,36 @@ public class HsqlAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
-	public synchronized void createForeignKey(DataSource datasource, ForeignKey foreignKey) throws SQLException {
-		final String referenceTableName = foreignKey.getReferencedTableName();
-		final String tableName = foreignKey.getTable().getName();
+	public void createSequenceIfNecessary(DataSource datasource, SequenceGenerator sequence) {
+		final String sql = "CREATE SEQUENCE " //
+			+ sequence.getQName() + " AS BIGINT"// ;
+			+ " START WITH " + sequence.getInitialValue() //
+			+ " INCREMENT BY " + sequence.getAllocationSize();
 
-		final String foreignKeyColumns = Joiner.on(", ").join(Lists.transform(foreignKey.getJoinColumns(), new Function<JoinColumn, String>() {
-
-			@Override
-			public String apply(JoinColumn input) {
-				return input.getReferencedColumnName();
-			}
-		}));
-
-		final String keyColumns = Joiner.on(", ").join(Lists.transform(foreignKey.getJoinColumns(), new Function<JoinColumn, String>() {
-
-			@Override
-			public String apply(JoinColumn input) {
-				return input.getName();
-			}
-		}));
-
-		final String sql = "ALTER TABLE " + tableName //
-			+ "\n\tADD FOREIGN KEY (" + keyColumns + ")" //
-			+ "\n\tREFERENCES " + referenceTableName + "(" + foreignKeyColumns + ")";
-
-		new QueryRunner(datasource).update(sql);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public void createSequenceIfNecessary(DataSource datasource, SequenceGenerator sequence) throws SQLException {
-		final String schema = this.schemaOf(datasource, sequence.getSchema());
-
-		final boolean exists = new QueryRunner(datasource) //
-		.query("SELECT SEQUENCE_NAME FROM INFORMATION_SCHEMA.SYSTEM_SEQUENCES\n" + //
-			"WHERE SEQUENCE_SCHEMA = ? AND SEQUENCE_NAME = ?", //
-			new SingleValueHandler<String>(), schema, sequence.getSequenceName()) != null;
-
-		if (!exists) {
-			final String sql = "CREATE SEQUENCE " //
-				+ schema + "." + sequence.getSequenceName() + " AS BIGINT "// ;
-				+ " START WITH " + sequence.getInitialValue() //
-				+ " INCREMENT BY " + sequence.getAllocationSize();
-
+		try {
 			new QueryRunner(datasource).update(sql);
 		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public void createTableGeneratorIfNecessary(DataSource datasource, TableGenerator table) throws SQLException {
-		final String schema = this.schemaOf(datasource, table.getSchema());
-
-		if (new QueryRunner(datasource).query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.SYSTEM_TABLES\n" + //
-			"WHERE TABLE_SCHEM = ? AND TABLE_NAME = ?", //
-			new SingleValueHandler<String>(), schema, table.getTable()) == null) {
-
-			final String sql = "CREATE TABLE " + schema + "." + table.getTable() + " ("//
-				+ "\n\t" + table.getPkColumnName() + " VARCHAR(255)," //
-				+ "\n\t" + table.getValueColumnName() + " INT," //
-				+ "\nPRIMARY KEY(" + table.getPkColumnName() + "))";
-
-			new QueryRunner(datasource).update(sql);
+		catch (final SQLException e) {
+			this.logRelaxed(e, "Cannot create sequence " + sequence.getName());
 		}
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * @param datasource
+	 *            the datasource
+	 * @param foreignKey
+	 *            the foreign key
 	 * 
+	 * @since $version
+	 * @author hceylan
 	 */
 	@Override
-	public void dropAllSequences(DataSourceImpl datasource, Collection<SequenceGenerator> sequences) throws SQLException {
-		final QueryRunner runner = new QueryRunner(datasource);
-
-		for (final SequenceGenerator sequence : sequences) {
-			final String schema = this.schemaOf(datasource, sequence.getSchema());
-
-			runner.update("DROP SEQUENCE " + schema + "." + sequence.getName() + " IF EXISTS CASCADE");
+	protected void dropForeignKey(DataSourceImpl datasource, ForeignKey foreignKey) {
+		try {
+			new QueryRunner(datasource).update("ALTER TABLE " + foreignKey.getTable().getQName() + " DROP CONSTRAINT " + foreignKey.getName());
 		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public void dropTables(DataSource datasource, Collection<AbstractTable> tables) throws SQLException {
-		final QueryRunner runner = new QueryRunner(datasource);
-
-		for (final AbstractTable table : tables) {
-			final String schema = this.schemaOf(datasource, table.getSchema());
-
-			runner.update("DROP TABLE " + schema + "." + table.getName() + " IF EXISTS CASCADE");
+		catch (final SQLException e) {
+			this.logRelaxed(e, "Cannot drop foreign key " + foreignKey.getName());
 		}
 	}
 
@@ -303,15 +229,6 @@ public class HsqlAdaptor extends JdbcAdaptor {
 	@Override
 	protected String getDatabaseName() {
 		return "HSqlDb";
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String getDefaultSchema(DataSource dataSource) throws SQLException {
-		return new QueryRunner(dataSource).query("SELECT SCHEMA FROM INFORMATION_SCHEMA.SYSTEM_SESSIONS", new SingleValueHandler<String>());
 	}
 
 	/**

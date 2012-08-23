@@ -338,6 +338,7 @@ public class MetamodelImpl implements Metamodel {
 	 */
 	public void dropAllTables(DataSourceImpl datasource) {
 		final Set<AbstractTable> tables = Sets.newHashSet();
+		final Set<ForeignKey> foreignKeys = Sets.newHashSet();
 
 		for (final EntityTypeImpl<?> entity : this.entities.values()) {
 
@@ -349,6 +350,10 @@ public class MetamodelImpl implements Metamodel {
 				}
 
 				tables.add(table);
+
+				for (final ForeignKey key : table.getForeignKeys()) {
+					foreignKeys.add(key);
+				}
 			}
 
 			// collect the join tables
@@ -361,18 +366,30 @@ public class MetamodelImpl implements Metamodel {
 				}
 
 				tables.add(table);
+
+				for (final ForeignKey key : table.getForeignKeys()) {
+					foreignKeys.add(key);
+				}
 			}
 
 			// collect the join tables
 			for (final PluralMapping<?, ?, ?> mapping : entity.getMappingsPlural()) {
 				if (!mapping.isAssociation()) {
-					tables.add((AbstractTable) mapping.getTable());
+					final AbstractTable table = (AbstractTable) mapping.getTable();
+					if (table != null) {
+						tables.add(table);
+
+						for (final ForeignKey key : table.getForeignKeys()) {
+							foreignKeys.add(key);
+						}
+					}
 				}
 			}
 		}
 
 		try {
-			this.jdbcAdaptor.dropTables(datasource, tables);
+			this.jdbcAdaptor.dropAllForeignKeys(datasource, foreignKeys);
+			this.jdbcAdaptor.dropAllTables(datasource, tables);
 			this.jdbcAdaptor.dropAllSequences(datasource, this.sequenceGenerators.values());
 		}
 		catch (final SQLException e) {
@@ -661,15 +678,10 @@ public class MetamodelImpl implements Metamodel {
 			if (table.getEntity() != entity) {
 				continue;
 			}
-			try {
-				MetamodelImpl.LOG.info("Performing foreign key DDL operations for table {0}, mode {1}", table.getName(), ddlMode);
+			MetamodelImpl.LOG.info("Performing foreign key DDL operations for table {0}, mode {1}", table.getName(), ddlMode);
 
-				for (final ForeignKey foreignKey : table.getForeignKeys()) {
-					this.jdbcAdaptor.createForeignKey(datasource, foreignKey);
-				}
-			}
-			catch (final SQLException e) {
-				throw new MappingException("DDL operation failed on table " + table.getName(), e);
+			for (final ForeignKey foreignKey : table.getForeignKeys()) {
+				this.jdbcAdaptor.createForeignKey(datasource, foreignKey);
 			}
 		}
 
@@ -683,12 +695,7 @@ public class MetamodelImpl implements Metamodel {
 			MetamodelImpl.LOG.info("Performing foreign key DDL operations for join table {0}, mode {1}", table.getName(), ddlMode);
 
 			for (final ForeignKey foreignKey : table.getForeignKeys()) {
-				try {
-					this.jdbcAdaptor.createForeignKey(datasource, foreignKey);
-				}
-				catch (final SQLException e) {
-					throw new MappingException("DDL operation failed on table " + table.getName(), e);
-				}
+				this.jdbcAdaptor.createForeignKey(datasource, foreignKey);
 			}
 		}
 
@@ -698,12 +705,7 @@ public class MetamodelImpl implements Metamodel {
 				MetamodelImpl.LOG.info("Performing foreign key DDL operations for join table {0}, mode {1}", table.getName(), ddlMode);
 
 				for (final ForeignKey foreignKey : table.getForeignKeys()) {
-					try {
-						this.jdbcAdaptor.createForeignKey(datasource, foreignKey);
-					}
-					catch (final SQLException e) {
-						throw new MappingException("DDL operation failed on table " + table.getName(), e);
-					}
+					this.jdbcAdaptor.createForeignKey(datasource, foreignKey);
 				}
 			}
 		}
@@ -722,14 +724,9 @@ public class MetamodelImpl implements Metamodel {
 	 */
 	public void performSequencesDdl(DataSourceImpl datasource, DDLMode ddlMode) {
 		for (final SequenceGenerator sequenceGenerator : this.sequenceGenerators.values()) {
-			try {
-				MetamodelImpl.LOG.info("Performing DDL operations for sequence generators for {0}, mode {1}", sequenceGenerator.getName(), ddlMode);
+			MetamodelImpl.LOG.info("Performing DDL operations for sequence generators for {0}, mode {1}", sequenceGenerator.getName(), ddlMode);
 
-				this.jdbcAdaptor.createSequenceIfNecessary(datasource, sequenceGenerator);
-			}
-			catch (final SQLException e) {
-				throw new MappingException("DDL operation failed on table generator " + sequenceGenerator.getName(), e);
-			}
+			this.jdbcAdaptor.createSequenceIfNecessary(datasource, sequenceGenerator);
 		}
 	}
 
@@ -746,14 +743,9 @@ public class MetamodelImpl implements Metamodel {
 	 */
 	public void performTableGeneratorsDdl(DataSourceImpl datasource, DDLMode ddlMode) {
 		for (final TableGenerator tableGenerator : this.tableGenerators.values()) {
-			try {
-				MetamodelImpl.LOG.info("Performing DDL operations for sequence generators for mode table {1}, mode {0}", tableGenerator.getName(), ddlMode);
+			MetamodelImpl.LOG.info("Performing DDL operations for sequence generators for mode table {1}, mode {0}", tableGenerator.getName(), ddlMode);
 
-				this.jdbcAdaptor.createTableGeneratorIfNecessary(datasource, tableGenerator);
-			}
-			catch (final SQLException e) {
-				throw new MappingException("DDL operation failed on table generator " + tableGenerator.getName(), e);
-			}
+			this.jdbcAdaptor.createTableGeneratorIfNecessary(datasource, tableGenerator);
 		}
 	}
 
@@ -782,14 +774,9 @@ public class MetamodelImpl implements Metamodel {
 				continue;
 			}
 
-			try {
-				MetamodelImpl.LOG.info("Performing DDL operations for {0}, mode {1}", table.getName(), ddlMode);
+			MetamodelImpl.LOG.info("Performing DDL operations for {0}, mode {1}", table.getName(), ddlMode);
 
-				this.jdbcAdaptor.createTable(table, datasource);
-			}
-			catch (final SQLException e) {
-				throw new MappingException("DDL operation failed on table " + table.getName(), e);
-			}
+			this.jdbcAdaptor.createTable(table, datasource);
 		}
 
 		// create the join tables
@@ -801,12 +788,7 @@ public class MetamodelImpl implements Metamodel {
 				continue;
 			}
 
-			try {
-				this.jdbcAdaptor.createTable(mapping.getTable(), datasource);
-			}
-			catch (final SQLException e) {
-				throw new MappingException("DDL operation failed on table " + table.getName(), e);
-			}
+			this.jdbcAdaptor.createTable(mapping.getTable(), datasource);
 		}
 
 		// create the join tables
@@ -814,12 +796,7 @@ public class MetamodelImpl implements Metamodel {
 			if (!mapping.isAssociation()) {
 				final AbstractTable table = (AbstractTable) mapping.getTable();
 
-				try {
-					this.jdbcAdaptor.createTable(table, datasource);
-				}
-				catch (final SQLException e) {
-					throw new MappingException("DDL operation failed on table " + table.getName(), e);
-				}
+				this.jdbcAdaptor.createTable(table, datasource);
 			}
 		}
 	}
