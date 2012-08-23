@@ -19,6 +19,10 @@
 package org.batoo.jpa.common.reflect;
 
 import java.lang.reflect.Field;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+
+import javax.persistence.PersistenceException;
 
 /**
  * Accessor implementation of {@link AbstractAccessor} for the members of {@link Field}s.
@@ -72,8 +76,18 @@ public class FieldAccessor extends AbstractAccessor {
 		super();
 
 		this.field = field;
+		AccessController.doPrivileged(new PrivilegedAction<Void>() {
+
+			@Override
+			public Void run() {
+				FieldAccessor.this.field.setAccessible(true);
+
+				return null;
+			}
+		});
+
 		this.primitiveType = this.getPrimitiveType();
-		this.fieldOffset = ReflectHelper.unsafe.objectFieldOffset(field);
+		this.fieldOffset = ReflectHelper.unsafe != null ? ReflectHelper.unsafe.objectFieldOffset(field) : -1;
 
 		if (Number.class.isAssignableFrom(this.field.getType())) {
 			this.numberType = this.field.getType();
@@ -87,27 +101,37 @@ public class FieldAccessor extends AbstractAccessor {
 	@Override
 	@SuppressWarnings({ "restriction" })
 	public Object get(Object instance) {
-		if (this.primitiveType == null) {
-			return ReflectHelper.unsafe.getObject(instance, this.fieldOffset);
+		if (this.fieldOffset != -1) {
+
+			if (this.primitiveType == null) {
+				return ReflectHelper.unsafe.getObject(instance, this.fieldOffset);
+			}
+
+			switch (this.primitiveType) {
+				case BOOLEAN:
+					return Boolean.valueOf(ReflectHelper.unsafe.getBoolean(instance, this.fieldOffset));
+				case INTEGER:
+					return Integer.valueOf(ReflectHelper.unsafe.getInt(instance, this.fieldOffset));
+				case FLOAT:
+					return Float.valueOf(ReflectHelper.unsafe.getFloat(instance, this.fieldOffset));
+				case DOUBLE:
+					return Double.valueOf(ReflectHelper.unsafe.getDouble(instance, this.fieldOffset));
+				case LONG:
+					return Long.valueOf(ReflectHelper.unsafe.getLong(instance, this.fieldOffset));
+				case SHORT:
+					return Short.valueOf(ReflectHelper.unsafe.getShort(instance, this.fieldOffset));
+				case BYTE:
+					return Byte.valueOf(ReflectHelper.unsafe.getByte(instance, this.fieldOffset));
+				default: // CHAR
+					return Character.valueOf(ReflectHelper.unsafe.getChar(instance, this.fieldOffset));
+			}
 		}
 
-		switch (this.primitiveType) {
-			case BOOLEAN:
-				return Boolean.valueOf(ReflectHelper.unsafe.getBoolean(instance, this.fieldOffset));
-			case INTEGER:
-				return Integer.valueOf(ReflectHelper.unsafe.getInt(instance, this.fieldOffset));
-			case FLOAT:
-				return Float.valueOf(ReflectHelper.unsafe.getFloat(instance, this.fieldOffset));
-			case DOUBLE:
-				return Double.valueOf(ReflectHelper.unsafe.getDouble(instance, this.fieldOffset));
-			case LONG:
-				return Long.valueOf(ReflectHelper.unsafe.getLong(instance, this.fieldOffset));
-			case SHORT:
-				return Short.valueOf(ReflectHelper.unsafe.getShort(instance, this.fieldOffset));
-			case BYTE:
-				return Byte.valueOf(ReflectHelper.unsafe.getByte(instance, this.fieldOffset));
-			default: // CHAR
-				return Character.valueOf(ReflectHelper.unsafe.getChar(instance, this.fieldOffset));
+		try {
+			return this.field.get(instance);
+		}
+		catch (final Exception e) {
+			throw new PersistenceException("Cannot get field value: " + this.field, e);
 		}
 	}
 
@@ -141,67 +165,83 @@ public class FieldAccessor extends AbstractAccessor {
 			throw new NullPointerException();
 		}
 
-		if (this.primitiveType == null) {
-			if ((this.numberType != null) && (value != null) && (this.numberType != value.getClass())) {
-				final Number number = ReflectHelper.convertNumber((Number) value, this.numberType);
+		if (this.fieldOffset != -1) {
+			if (this.primitiveType == null) {
+				if ((this.numberType != null) && (value != null) && (this.numberType != value.getClass())) {
+					final Number number = ReflectHelper.convertNumber((Number) value, this.numberType);
 
-				ReflectHelper.unsafe.putObject(instance, this.fieldOffset, number);
+					ReflectHelper.unsafe.putObject(instance, this.fieldOffset, number);
+				}
+				else {
+					ReflectHelper.unsafe.putObject(instance, this.fieldOffset, value);
+				}
 			}
 			else {
-				ReflectHelper.unsafe.putObject(instance, this.fieldOffset, value);
+				switch (this.primitiveType) {
+					case BOOLEAN:
+						if (value instanceof Integer) {
+							ReflectHelper.unsafe.putBoolean(instance, this.fieldOffset, value.equals(FieldAccessor.INT_0) ? false : true);
+						}
+						else {
+							ReflectHelper.unsafe.putBoolean(instance, this.fieldOffset, (Boolean) value);
+						}
+						break;
+					case INTEGER:
+						ReflectHelper.unsafe.putInt(instance, this.fieldOffset, (Integer) value);
+						break;
+					case FLOAT:
+						if (value instanceof Double) {
+							ReflectHelper.unsafe.putFloat(instance, this.fieldOffset, ((Double) value).floatValue());
+						}
+						else {
+							ReflectHelper.unsafe.putFloat(instance, this.fieldOffset, (Float) value);
+						}
+						break;
+					case DOUBLE:
+						ReflectHelper.unsafe.putDouble(instance, this.fieldOffset, (Double) value);
+						break;
+					case LONG:
+						ReflectHelper.unsafe.putLong(instance, this.fieldOffset, (Long) value);
+						break;
+					case SHORT:
+						if (value instanceof Integer) {
+							ReflectHelper.unsafe.putShort(instance, this.fieldOffset, ((Integer) value).shortValue());
+						}
+						else {
+							ReflectHelper.unsafe.putShort(instance, this.fieldOffset, (Short) value);
+						}
+						break;
+					case BYTE:
+						if (value instanceof Integer) {
+							ReflectHelper.unsafe.putByte(instance, this.fieldOffset, ((Integer) value).byteValue());
+						}
+						else {
+							ReflectHelper.unsafe.putByte(instance, this.fieldOffset, (Byte) value);
+						}
+						break;
+					default: // CHAR
+						if (value == null) {
+							ReflectHelper.unsafe.putChar(instance, this.fieldOffset, '\u0000');
+						}
+						else {
+							ReflectHelper.unsafe.putChar(instance, this.fieldOffset, (Character) value);
+						}
+						break;
+				}
 			}
 		}
 		else {
-			switch (this.primitiveType) {
-				case BOOLEAN:
-					if (value instanceof Integer) {
-						ReflectHelper.unsafe.putBoolean(instance, this.fieldOffset, value.equals(FieldAccessor.INT_0) ? false : true);
-					}
-					else {
-						ReflectHelper.unsafe.putBoolean(instance, this.fieldOffset, (Boolean) value);
-					}
-					break;
-				case INTEGER:
-					ReflectHelper.unsafe.putInt(instance, this.fieldOffset, (Integer) value);
-					break;
-				case FLOAT:
-					if (value instanceof Double) {
-						ReflectHelper.unsafe.putFloat(instance, this.fieldOffset, ((Double) value).floatValue());
-					}
-					else {
-						ReflectHelper.unsafe.putFloat(instance, this.fieldOffset, (Float) value);
-					}
-					break;
-				case DOUBLE:
-					ReflectHelper.unsafe.putDouble(instance, this.fieldOffset, (Double) value);
-					break;
-				case LONG:
-					ReflectHelper.unsafe.putLong(instance, this.fieldOffset, (Long) value);
-					break;
-				case SHORT:
-					if (value instanceof Integer) {
-						ReflectHelper.unsafe.putShort(instance, this.fieldOffset, ((Integer) value).shortValue());
-					}
-					else {
-						ReflectHelper.unsafe.putShort(instance, this.fieldOffset, (Short) value);
-					}
-					break;
-				case BYTE:
-					if (value instanceof Integer) {
-						ReflectHelper.unsafe.putByte(instance, this.fieldOffset, ((Integer) value).byteValue());
-					}
-					else {
-						ReflectHelper.unsafe.putByte(instance, this.fieldOffset, (Byte) value);
-					}
-					break;
-				default: // CHAR
-					if (value == null) {
-						ReflectHelper.unsafe.putChar(instance, this.fieldOffset, '\u0000');
-					}
-					else {
-						ReflectHelper.unsafe.putChar(instance, this.fieldOffset, (Character) value);
-					}
-					break;
+			try {
+				if ((this.numberType != null) && (value != null) && (this.numberType != value.getClass())) {
+					final Number number = ReflectHelper.convertNumber((Number) value, this.numberType);
+					this.field.set(instance, number);
+				}
+				else {
+					this.field.set(instance, value);
+				}
+			}
+			catch (final Exception e) {
+				throw new PersistenceException("Cannot set field value: " + this.field, e);
 			}
 		}
 	}

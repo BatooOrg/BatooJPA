@@ -43,7 +43,6 @@ import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.reflections.util.ClasspathHelper;
 
-import sun.misc.Unsafe;
 import sun.reflect.ConstructorAccessor;
 
 import com.google.common.base.Joiner;
@@ -60,20 +59,23 @@ public class ReflectHelper {
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(ReflectHelper.class);
 
-	static final Unsafe unsafe;
+	private static boolean hasUnsafe;
+	static final sun.misc.Unsafe unsafe;
 
 	static {
+		ReflectHelper.hasUnsafe = true;
 		try {
-			ReflectHelper.LOG.debug("Loading direct access library....");
-
-			final Field field = Unsafe.class.getDeclaredField("theUnsafe");
-			field.setAccessible(true);
-			unsafe = (Unsafe) field.get(null);
-
-			ReflectHelper.LOG.debug("Direct access library loaded successfully");
+			Class.forName("sun.misc.Unsafe");
 		}
 		catch (final Exception e) {
-			throw new RuntimeException("Direct access library cannot be loaded", e);
+			ReflectHelper.hasUnsafe = false;
+		}
+
+		if (ReflectHelper.hasUnsafe) {
+			unsafe = ReflectHelper.getUnSafe();
+		}
+		else {
+			unsafe = null;
 		}
 	}
 
@@ -307,6 +309,26 @@ public class ReflectHelper {
 		}
 
 		return ((Method) member).getReturnType();
+	}
+
+	private static sun.misc.Unsafe getUnSafe() {
+		try {
+			ReflectHelper.LOG.debug("Loading direct access library....");
+
+			final Field field = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
+			field.setAccessible(true);
+			try {
+				return (sun.misc.Unsafe) field.get(null);
+			}
+			finally {
+				ReflectHelper.LOG.debug("Direct access library loaded successfully");
+			}
+		}
+		catch (final Exception e) {
+			ReflectHelper.LOG.warn(e, "Direct access library cannot be loaded");
+		}
+
+		return null;
 	}
 
 	/**
