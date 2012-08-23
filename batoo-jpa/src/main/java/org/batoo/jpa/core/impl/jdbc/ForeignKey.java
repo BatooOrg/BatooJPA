@@ -380,6 +380,7 @@ public class ForeignKey {
 
 		final int prime = 31;
 		int id = 31 * columns.get(0).getReferencedTable().getQName().hashCode();
+		id = 31 * columns.get(0).getTable().getQName().hashCode();
 
 		for (final JoinColumn joinColumn : columns) {
 			id = (prime * id) + joinColumn.getName().hashCode();
