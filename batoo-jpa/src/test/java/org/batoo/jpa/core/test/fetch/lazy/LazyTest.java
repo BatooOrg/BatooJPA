@@ -101,6 +101,24 @@ public class LazyTest extends BaseCoreTest {
 	}
 
 	/**
+	 * Tests to {@link EntityManager#persist(Object)} load address then person as lazy.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testFindAddress() {
+		final Person person = this.person();
+		this.persist(person);
+
+		this.commit();
+		this.close();
+
+		final Address address = this.find(Address.class, person.getAddresses().get(0).getId());
+		Assert.assertEquals("Ceylan", address.getPerson().getName());
+	}
+
+	/**
 	 * Tests to {@link EntityManager#find(Class, Object)} person.
 	 * 
 	 * @since $version

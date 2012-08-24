@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.core.test.fetch.lazy;
 
+import java.io.Serializable;
+
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -31,13 +33,13 @@ import javax.persistence.ManyToOne;
  * @since $version
  */
 @Entity
-public class Address {
+public class Address implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Integer id;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Person person;
 
 	private String city;
