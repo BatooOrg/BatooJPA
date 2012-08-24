@@ -365,7 +365,7 @@ public class BasicColumn extends AbstractColumn {
 	public void setValue(Object instance, Object value) {
 		if ((value != null) && (this.enumType != null)) {
 			if (this.enumType == EnumType.ORDINAL) {
-				value = this.values[(Integer) value];
+				value = this.values[((Number) value).shortValue()];
 			}
 			else {
 				try {

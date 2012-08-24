@@ -974,7 +974,7 @@ public class PreparedStatementImpl implements PreparedStatement {
 	 */
 	@Override
 	public void setNull(int parameterIndex, int sqlType) throws SQLException {
-		if (this.debug) {
+		if (this.debug && (this.parameters != null)) {
 			this.parameters[parameterIndex - 1] = null;
 		}
 
@@ -996,7 +996,7 @@ public class PreparedStatementImpl implements PreparedStatement {
 	 */
 	@Override
 	public void setObject(int parameterIndex, Object x) throws SQLException {
-		if (this.debug) {
+		if (this.debug && (this.parameters != null)) {
 			this.parameters[parameterIndex - 1] = x;
 		}
 

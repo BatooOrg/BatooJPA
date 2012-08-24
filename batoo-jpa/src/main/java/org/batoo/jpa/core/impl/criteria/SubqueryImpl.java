@@ -42,6 +42,7 @@ import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.util.BatooUtils;
 
 import com.google.common.collect.Sets;
@@ -290,6 +291,11 @@ public class SubqueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 	@Override
 	public Predicate getGroupRestriction() {
 		return this.query.getGroupRestriction();
+	}
+
+	@Override
+	public JdbcAdaptor getJdbcAdaptor() {
+		return this.parent.getJdbcAdaptor();
 	}
 
 	/**

@@ -222,7 +222,7 @@ public class EntityTable extends AbstractTable {
 		}
 
 		// execute the insert
-		final QueryRunner runner = new QueryRunner();
+		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor.isPmdBroken());
 		runner.update(connection, insertSql, params);
 
 		// if there is an identity column, extract the identity and set it back to the instance
@@ -257,7 +257,7 @@ public class EntityTable extends AbstractTable {
 			params[i] = column.getValue(managedInstance.getInstance());
 		}
 
-		final QueryRunner runner = new QueryRunner();
+		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor.isPmdBroken());
 		runner.update(connection, removeSql, params);
 	}
 
@@ -290,7 +290,7 @@ public class EntityTable extends AbstractTable {
 		}
 
 		// execute the insert
-		final QueryRunner runner = new QueryRunner();
+		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor.isPmdBroken());
 
 		return runner.query(connection, updateSql, new SingleValueHandler<Object>(), params);
 	}
@@ -324,7 +324,7 @@ public class EntityTable extends AbstractTable {
 		}
 
 		// execute the insert
-		final QueryRunner runner = new QueryRunner();
+		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor.isPmdBroken());
 		runner.update(connection, updateSql, params);
 	}
 
@@ -364,7 +364,7 @@ public class EntityTable extends AbstractTable {
 		}
 
 		// execute the insert
-		final QueryRunner runner = new QueryRunner();
+		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor.isPmdBroken());
 		runner.update(connection, updateSql, params);
 
 		return true;
@@ -398,7 +398,7 @@ public class EntityTable extends AbstractTable {
 		}
 
 		// execute the insert
-		final QueryRunner runner = new QueryRunner();
+		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor.isPmdBroken());
 		runner.update(connection, updateSql, params);
 	}
 

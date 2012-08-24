@@ -20,10 +20,13 @@ package org.batoo.jpa.core.impl.jdbc;
 
 import java.util.Map;
 
+import javax.persistence.PersistenceException;
+
 import org.batoo.jpa.core.jdbc.adapter.DerbyAdaptor;
 import org.batoo.jpa.core.jdbc.adapter.H2Adaptor;
 import org.batoo.jpa.core.jdbc.adapter.HsqlAdaptor;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
+import org.batoo.jpa.core.jdbc.adapter.MsSqlAdaptor;
 import org.batoo.jpa.core.jdbc.adapter.MySqlAdaptor;
 import org.batoo.jpa.core.jdbc.adapter.PostgreSqlAdaptor;
 
@@ -50,7 +53,13 @@ public abstract class AbstractJdbcAdaptor {
 	 * @since $version
 	 */
 	public static JdbcAdaptor getAdapter(ClassLoader classloader, String databaseProductName) {
-		return AbstractJdbcAdaptor.ADAPTERS.get(databaseProductName);
+		JdbcAdaptor jdbcAdaptor = AbstractJdbcAdaptor.ADAPTERS.get(databaseProductName);
+		
+		if (jdbcAdaptor == null){
+			throw new PersistenceException("Cannot locate JDBC Adaptor for " + databaseProductName);
+		}
+		
+		return jdbcAdaptor;
 	}
 
 	private static Map<String, JdbcAdaptor> prepareAdaptors() {
@@ -58,9 +67,10 @@ public abstract class AbstractJdbcAdaptor {
 
 		AbstractJdbcAdaptor.putAdaptor(adaptors, new DerbyAdaptor());
 		AbstractJdbcAdaptor.putAdaptor(adaptors, new MySqlAdaptor());
+		AbstractJdbcAdaptor.putAdaptor(adaptors, new MsSqlAdaptor());
+		AbstractJdbcAdaptor.putAdaptor(adaptors, new H2Adaptor());
 		AbstractJdbcAdaptor.putAdaptor(adaptors, new HsqlAdaptor());
 		AbstractJdbcAdaptor.putAdaptor(adaptors, new PostgreSqlAdaptor());
-		AbstractJdbcAdaptor.putAdaptor(adaptors, new H2Adaptor());
 
 		return adaptors;
 	}

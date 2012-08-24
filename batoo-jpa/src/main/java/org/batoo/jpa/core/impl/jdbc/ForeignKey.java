@@ -608,7 +608,7 @@ public class ForeignKey {
 			parameters[i++] = column.getValue(child);
 		}
 
-		new QueryRunner().update(connection, sql, parameters);
+		new QueryRunner(this.jdbcAdaptor.isPmdBroken()).update(connection, sql, parameters);
 	}
 
 	/**
@@ -634,7 +634,7 @@ public class ForeignKey {
 			parameters[i++] = column.getValue(instance.getInstance());
 		}
 
-		new QueryRunner().update(connection, sql, parameters);
+		new QueryRunner(this.jdbcAdaptor.isPmdBroken()).update(connection, sql, parameters);
 	}
 
 	/**
@@ -671,7 +671,7 @@ public class ForeignKey {
 			parameters[i++] = column.getValue(child);
 		}
 
-		new QueryRunner().update(connection, sql, parameters);
+		new QueryRunner(this.jdbcAdaptor.isPmdBroken()).update(connection, sql, parameters);
 	}
 
 	/**
