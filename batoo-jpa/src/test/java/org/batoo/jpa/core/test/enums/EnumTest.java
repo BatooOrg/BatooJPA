@@ -116,8 +116,8 @@ public class EnumTest extends BaseCoreTest {
 
 		Assert.assertEquals(FooType.TYPE1.name(),
 			new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT FOOTYPE FROM Foo", new SingleValueHandler<String>()));
-		Assert.assertEquals(new Integer(1),
-			new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT FOOTYPE2 FROM Foo", new SingleValueHandler<Integer>()));
+		Assert.assertEquals(1,
+			new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT FOOTYPE2 FROM Foo", new SingleValueHandler<Number>()).intValue());
 	}
 
 	/**

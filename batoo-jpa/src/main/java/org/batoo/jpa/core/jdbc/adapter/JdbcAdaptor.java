@@ -41,6 +41,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.jpa.core.impl.criteria.expression.NumericFunctionExpression.NumericFunctionType;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.AbstractJdbcAdaptor;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
@@ -136,6 +137,24 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	public abstract String applyPagination(String sql, int startPosition, int maxResult);
 
 	/**
+	 * Returns the sub string function.
+	 * 
+	 * @param innerFragment
+	 *            the inner fragment
+	 * @param startFragment
+	 *            the start fragment
+	 * @param endFragment
+	 *            the end fragment
+	 * @return the sub string function
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String applySubStr(String innerFragment, String startFragment, String endFragment) {
+		return "SUBSTR(" + Joiner.on(", ").skipNulls().join(new Object[] { innerFragment, startFragment, endFragment }) + ")";
+	}
+
+	/**
 	 * Applies the trim to argument
 	 * 
 	 * @param trimspec
@@ -165,6 +184,17 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 		}
 
 		return builder.append(argument).append(")").toString();
+	}
+
+	/**
+	 * Casts the expression to boolean if necessary.
+	 * 
+	 * @param sqlFragment
+	 *            the SQL Fragment
+	 * @return the cast SQL fragment
+	 */
+	public String castBoolean(String sqlFragment) {
+		return sqlFragment;
 	}
 
 	/**
@@ -274,7 +304,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 			+ "\n\tREFERENCES " + referenceTableName + "(" + foreignKeyColumns + ")";
 
 		try {
-			new QueryRunner(datasource).update(sql);
+			new QueryRunner(datasource, this.isPmdBroken()).update(sql);
 		}
 		catch (final SQLException e) {
 			this.logRelaxed(e, "Cannot create foreign key.");
@@ -307,7 +337,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 			}
 		}));
 
-		new QueryRunner(datasource).update("CREATE INDEX " + indexName + " ON " + table.getQName() + "(" + columnNames + ")");
+		new QueryRunner(datasource, this.isPmdBroken()).update("CREATE INDEX " + indexName + " ON " + table.getQName() + "(" + columnNames + ")");
 	}
 
 	/**
@@ -334,7 +364,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 */
 	public void createTable(AbstractTable table, DataSourceImpl datasource) {
 		try {
-			new QueryRunner(datasource).update(this.createCreateTableStatement(table));
+			new QueryRunner(datasource, this.isPmdBroken()).update(this.createCreateTableStatement(table));
 		}
 		catch (final SQLException e) {
 			this.logRelaxed(e, "Cannot create table " + table.getName());
@@ -371,7 +401,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 			+ "\nPRIMARY KEY(" + table.getPkColumnName() + "))";
 
 		try {
-			new QueryRunner(datasource).update(sql);
+			new QueryRunner(datasource, this.isPmdBroken()).update(sql);
 		}
 		catch (final SQLException e) {
 			this.logRelaxed(e, "Cannot create tabe generator " + table.getTable());
@@ -405,7 +435,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @author hceylan
 	 */
 	public void dropAllSequences(DataSourceImpl datasource, Collection<SequenceGenerator> sequences) throws SQLException {
-		final QueryRunner runner = new QueryRunner(datasource);
+		final QueryRunner runner = new QueryRunner(datasource, this.isPmdBroken());
 
 		for (final SequenceGenerator sequence : sequences) {
 			try {
@@ -431,7 +461,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @author hceylan
 	 */
 	public void dropAllTables(DataSource datasource, Collection<AbstractTable> tables) throws SQLException {
-		final QueryRunner runner = new QueryRunner(datasource);
+		final QueryRunner runner = new QueryRunner(datasource, this.isPmdBroken());
 
 		for (final AbstractTable table : tables) {
 			try {
@@ -454,7 +484,8 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 */
 	protected void dropForeignKey(DataSourceImpl datasource, ForeignKey foreignKey) {
 		try {
-			new QueryRunner(datasource).update("ALTER TABLE " + foreignKey.getTable().getQName() + " DROP FOREIGN KEY " + foreignKey.getName());
+			new QueryRunner(datasource, this.isPmdBroken()).update("ALTER TABLE " + foreignKey.getTable().getQName() + " DROP FOREIGN KEY "
+				+ foreignKey.getName());
 		}
 		catch (final SQLException e) {
 			this.logRelaxed(e, "Cannot drop foreign key " + foreignKey.getName());
@@ -581,6 +612,39 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	}
 
 	/**
+	 * Returns the current date literal
+	 * 
+	 * @return the current date literal.
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getCurrentDate() {
+		return "CURRENT_DATE";
+	}
+
+	/**
+	 * Returns the current time literal
+	 * 
+	 * @return the current time literal.
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getCurrentTime() {
+		return "CURRENT_TIME";
+	}
+
+	/**
+	 * Returns the current time stamp literal
+	 * 
+	 * @return the current time stamp literal.
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getCurrentTimeStamp() {
+		return "CURRENT_TIMESTAMP";
+	}
+
+	/**
 	 * @return
 	 * 
 	 * @since $version
@@ -605,6 +669,29 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	public abstract long getNextSequence(DataSourceImpl datasource, String sequenceName) throws SQLException;
 
 	/**
+	 * Returns the numeric function template.
+	 * 
+	 * @param type
+	 *            the id type
+	 * @return the {@link IdType} selected, the {@link Id} passed or null
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getNumericFunctionTemplate(NumericFunctionType type) {
+		switch (type) {
+			case ABS:
+				return "ABS({0})";
+			case LENGTH:
+				return "LENGTH({0})";
+			case MOD:
+				return "MOD({0}, {1})";
+			default:
+				return "SQRT({0})";
+		}
+	}
+
+	/**
 	 * Returns the SQL to select the last identity generated.
 	 * 
 	 * @param identityColumn
@@ -615,6 +702,17 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @author hceylan
 	 */
 	public abstract String getSelectLastIdentitySql(PkColumn identityColumn);
+
+	/**
+	 * Returns if the PMD is Broken for the adaptor.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 * @return
+	 */
+	public boolean isPmdBroken() {
+		return false;
+	}
 
 	private void loadReservedWords() throws MappingException {
 		final String packageName = this.getClass().getPackage().getName().replaceAll("\\.", "/");
@@ -637,7 +735,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	}
 
 	/**
-	 * Logs the message as info and with exception as debug.
+	 * Logs the message as warning and with exception as debug.
 	 * 
 	 * @param e
 	 *            the sql exception
@@ -690,4 +788,16 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @author hceylan
 	 */
 	public abstract IdType supports(GenerationType type);
+
+	/**
+	 * Returns if the adaptor supports the start position.
+	 * 
+	 * @return true if the adaptor supports the start position, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean supportsStartPosition() {
+		return true;
+	}
 }

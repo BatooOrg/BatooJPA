@@ -46,6 +46,8 @@ public class TableIdQueue extends IdQueue {
 
 	private final DataSourceImpl datasource;
 
+	private final JdbcAdaptor jdbcAdaptor;
+
 	/**
 	 * @param jdbcAdaptor
 	 *            the JDBC adaptor
@@ -62,6 +64,7 @@ public class TableIdQueue extends IdQueue {
 	public TableIdQueue(JdbcAdaptor jdbcAdaptor, DataSourceImpl datasource, ExecutorService idExecuter, TableGenerator generator) {
 		super(idExecuter, generator.getName(), generator.getAllocationSize());
 
+		this.jdbcAdaptor = jdbcAdaptor;
 		this.datasource = datasource;
 		this.generator = generator;
 	}
@@ -80,7 +83,7 @@ public class TableIdQueue extends IdQueue {
 	 */
 	@Override
 	protected synchronized Long getNextId() throws SQLException {
-		final QueryRunner runner = new QueryRunner(this.datasource);
+		final QueryRunner runner = new QueryRunner(this.datasource, this.jdbcAdaptor.isPmdBroken());
 
 		final Number nextId = runner.query(this.getSelectSql(), new SingleValueHandler<Number>(), this.generator.getPkColumnValue());
 		if (nextId == null) {

@@ -31,6 +31,7 @@ import org.batoo.jpa.core.impl.model.mapping.ElementMapping;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
+import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.metadata.CollectionTableMetadata;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
@@ -46,6 +47,7 @@ import com.google.common.collect.Lists;
  */
 public class CollectionTable extends AbstractTable implements JoinableTable {
 
+	private final JdbcAdaptor jdbcAdaptor;
 	private final EntityTypeImpl<?> entity;
 	private final ForeignKey key;
 
@@ -72,7 +74,7 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 		super(metadata);
 
 		this.entity = entity;
-
+		this.jdbcAdaptor = entity.getMetamodel().getJdbcAdaptor();
 		this.key = new ForeignKey(entity.getMetamodel().getJdbcAdaptor(), //
 			metadata != null ? metadata.getJoinColumns() : Collections.<JoinColumnMetadata> emptyList());
 	}
@@ -249,7 +251,7 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 			}
 		}
 
-		new QueryRunner().update(connection, insertSql, params);
+		new QueryRunner(this.jdbcAdaptor.isPmdBroken()).update(connection, insertSql, params);
 	}
 
 	/**
@@ -278,7 +280,7 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 			}
 		}
 
-		new QueryRunner().update(connection, removeSql, params);
+		new QueryRunner(this.jdbcAdaptor.isPmdBroken()).update(connection, removeSql, params);
 	}
 
 	/**
@@ -296,7 +298,7 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 			params[i++] = sourceRemoveColumn.getValue(source);
 		}
 
-		new QueryRunner().update(connection, removeAllSql, params);
+		new QueryRunner(this.jdbcAdaptor.isPmdBroken()).update(connection, removeAllSql, params);
 	}
 
 	/**

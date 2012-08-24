@@ -56,6 +56,7 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 	private JoinColumn[] sourceRemoveColumns;
 	private JoinColumn[] destinationRemoveColumns;
 	private JoinColumn[] removeAllColumns;
+	private final JdbcAdaptor jdbcAdaptor;
 
 	/**
 	 * @param entity
@@ -71,10 +72,11 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 
 		this.entity = entity;
 
-		final JdbcAdaptor jdbcAdaptor = this.entity.getMetamodel().getJdbcAdaptor();
+		this.jdbcAdaptor = this.entity.getMetamodel().getJdbcAdaptor();
 
-		this.sourceKey = new ForeignKey(jdbcAdaptor, metadata != null ? metadata.getJoinColumns() : Collections.<JoinColumnMetadata> emptyList());
-		this.destinationKey = new ForeignKey(jdbcAdaptor, metadata != null ? metadata.getInverseJoinColumns() : Collections.<JoinColumnMetadata> emptyList());
+		this.sourceKey = new ForeignKey(this.jdbcAdaptor, metadata != null ? metadata.getJoinColumns() : Collections.<JoinColumnMetadata> emptyList());
+		this.destinationKey = new ForeignKey(this.jdbcAdaptor, metadata != null ? metadata.getInverseJoinColumns()
+			: Collections.<JoinColumnMetadata> emptyList());
 	}
 
 	/**
@@ -253,7 +255,7 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 			}
 		}
 
-		new QueryRunner().update(connection, insertSql, params);
+		new QueryRunner(this.jdbcAdaptor.isPmdBroken()).update(connection, insertSql, params);
 	}
 
 	/**
@@ -275,7 +277,7 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 			params[i++] = destinationRemoveColumn.getValue(destination);
 		}
 
-		new QueryRunner().update(connection, removeSql, params);
+		new QueryRunner(this.jdbcAdaptor.isPmdBroken()).update(connection, removeSql, params);
 	}
 
 	/**
@@ -293,7 +295,7 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 			params[i++] = sourceRemoveColumn.getValue(source);
 		}
 
-		new QueryRunner().update(connection, removeAllSql, params);
+		new QueryRunner(this.jdbcAdaptor.isPmdBroken()).update(connection, removeAllSql, params);
 	}
 
 	/**

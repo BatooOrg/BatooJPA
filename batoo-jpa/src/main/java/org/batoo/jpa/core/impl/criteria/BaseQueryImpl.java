@@ -132,14 +132,7 @@ public abstract class BaseQueryImpl<T> implements BaseQuery<T> {
 		return Integer.toString(fields.size() - 1);
 	}
 
-	/**
-	 * Returns the jdbc adaptor.
-	 * 
-	 * @return the jdbc adaptor
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
+	@Override
 	public JdbcAdaptor getJdbcAdaptor() {
 		return this.metamodel.getJdbcAdaptor();
 	}

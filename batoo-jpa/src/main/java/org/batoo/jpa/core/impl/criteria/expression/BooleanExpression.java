@@ -26,6 +26,7 @@ import javax.persistence.criteria.Expression;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
+import org.batoo.jpa.core.impl.criteria.path.BasicPath;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
@@ -79,6 +80,10 @@ public class BooleanExpression extends AbstractExpression<Boolean> {
 	 * @author hceylan
 	 */
 	public String generateSqlRestriction(final BaseQueryImpl<?> query) {
+		if (this.inner instanceof BasicPath) {
+			return query.getJdbcAdaptor().castBoolean(this.inner.getSqlRestrictionFragments(query)[0]);
+		}
+
 		return this.inner.getSqlRestrictionFragments(query)[0];
 	}
 

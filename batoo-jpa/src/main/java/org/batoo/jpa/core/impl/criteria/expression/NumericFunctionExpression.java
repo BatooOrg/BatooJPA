@@ -43,19 +43,17 @@ public class NumericFunctionExpression<N extends Number> extends AbstractExpress
 
 	@SuppressWarnings("javadoc")
 	public enum NumericFunctionType {
-		MOD("MOD({0}, {1})", "mod({0}, {1})"),
+		MOD("mod({0}, {1})"),
 
-		ABS("ABS({0})", "abs({0})"),
+		ABS("abs({0})"),
 
-		SQRT("SQRT({0})", "sqrt({0})"),
+		SQRT("sqrt({0})"),
 
-		LENGTH("LENGTH({0})", "length({0})");
+		LENGTH("length({0})");
 
-		private final String sqlFragment;
 		private final String jpqlFragment;
 
-		private NumericFunctionType(String sqlfragment, String jpqlFragment) {
-			this.sqlFragment = sqlfragment;
+		private NumericFunctionType(String jpqlFragment) {
 			this.jpqlFragment = jpqlFragment;
 		}
 	}
@@ -134,7 +132,7 @@ public class NumericFunctionExpression<N extends Number> extends AbstractExpress
 		final String xExpr = this.x.getSqlRestrictionFragments(query)[0];
 		final String yExpr = this.y != null ? this.y.getSqlRestrictionFragments(query)[0] : null;
 
-		return new String[] { MessageFormat.format(this.type.sqlFragment, xExpr, yExpr) };
+		return new String[] { MessageFormat.format(query.getJdbcAdaptor().getNumericFunctionTemplate(this.type), xExpr, yExpr) };
 
 	}
 

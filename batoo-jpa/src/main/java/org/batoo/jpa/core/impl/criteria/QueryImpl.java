@@ -212,7 +212,7 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>>, Q
 		try {
 			this.em.assertTransaction();
 
-			return new QueryRunner().update(this.em.getConnection(), this.sql, parameters);
+			return new QueryRunner(this.em.getJdbcAdaptor().isPmdBroken()).update(this.em.getConnection(), this.sql, parameters);
 		}
 		catch (final SQLException e) {
 			QueryImpl.LOG.error(e, "Query failed" + QueryImpl.LOG.lazyBoxed(this.sql, parameters));
@@ -404,7 +404,7 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>>, Q
 			try {
 				final ConnectionImpl connection = this.em.getConnection();
 				try {
-					return new QueryRunner().query(connection, this.sql, this, parameters);
+					return new QueryRunner(this.em.getMetamodel().getJdbcAdaptor().isPmdBroken()).query(connection, this.sql, this, parameters);
 				}
 				finally {
 					this.em.closeConnectionIfNecessary();

@@ -111,14 +111,11 @@ public class SubstringExpression extends AbstractExpression<String> {
 	 */
 	@Override
 	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
-		if (this.end == null) {
-			return new String[] { "SUBSTR(" + this.inner.getSqlRestrictionFragments(query)[0] + //
-				"," + this.start.getSqlRestrictionFragments(query)[0] + ")" };
-		}
+		String innerFragment = this.inner.getSqlRestrictionFragments(query)[0];
+		String startFragment = this.start.getSqlRestrictionFragments(query)[0];
+		String endFragment = this.end != null ? this.end.getSqlRestrictionFragments(query)[0] : null;
 
-		return new String[] { "SUBSTR(" + this.inner.getSqlRestrictionFragments(query)[0] + "," //
-			+ this.start.getSqlRestrictionFragments(query)[0] + "," //
-			+ this.end.getSqlRestrictionFragments(query)[0] + ")" };
+		return new String[] { query.getJdbcAdaptor().applySubStr(innerFragment, startFragment, endFragment) };
 	}
 
 	/**

@@ -26,6 +26,7 @@ import javax.persistence.criteria.ParameterExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 
 /**
  * 
@@ -104,6 +105,16 @@ public interface BaseQuery<T> {
 	 * @author hceylan
 	 */
 	String getFieldAlias(String tableAlias, AbstractColumn column);
+
+	/**
+	 * Returns the JDBC Adaptor.
+	 * 
+	 * @return the JDBC Adaptor
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	JdbcAdaptor getJdbcAdaptor();
 
 	/**
 	 * Returns the JPQL for the query.

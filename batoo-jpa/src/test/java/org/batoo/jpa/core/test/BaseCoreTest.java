@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.test;
 
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -469,6 +470,23 @@ public abstract class BaseCoreTest { // extends BaseTest {
 			System.setProperty("javax.persistence.jdbc.password", "");
 		}
 
+		final String testMode = System.getProperty("testMode");
+
+		if ("mssql".equals(testMode)) {
+			String username = System.getProperty("javax.persistence.jdbc.user");
+			String password = System.getProperty("javax.persistence.jdbc.password");
+			Connection connection = DriverManager.getConnection(System.getProperty("javax.persistence.jdbc.url"), username, password);
+			try {
+				QueryRunner qr = new QueryRunner(true);
+				qr.update(connection, "use master");
+				qr.update(connection, "drop database test");
+				qr.update(connection, "create database test");
+			}
+			finally {
+				connection.close();
+			}
+		}
+
 		if (!this.lazySetup()) {
 			this.emf = this.setupEmf();
 		}
@@ -508,7 +526,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 
 		this.cleanupTx();
 
-		final QueryRunner qr = new QueryRunner();
+		final QueryRunner qr = "mssql".equals(testMode) ? new QueryRunner(true) : new QueryRunner();
 
 		if (this.emf != null) {
 			if ("mysql".equals(testMode)) {
@@ -532,6 +550,20 @@ public abstract class BaseCoreTest { // extends BaseTest {
 			}
 			catch (final Exception e) {}
 			this.emf = null;
+		}
+
+		if ("mssql".equals(testMode)) {
+			String username = System.getProperty("javax.persistence.jdbc.user");
+			String password = System.getProperty("javax.persistence.jdbc.password");
+			Connection connection = DriverManager.getConnection(System.getProperty("javax.persistence.jdbc.url"), username, password);
+			try {
+				qr.update(connection, "use master");
+				qr.update(connection, "drop database test");
+				qr.update(connection, "create database test");
+			}
+			finally {
+				connection.close();
+			}
 		}
 
 		if (StringUtils.isBlank(testMode) || "derby".equals(testMode)) {

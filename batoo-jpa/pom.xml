@@ -280,7 +280,14 @@
 			<version>1.8.0.10</version>
 			<scope>test</scope>
 		</dependency>
-			<dependency>
+		<dependency>
+		<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>sqljdbc4</artifactId>
+			<version>3.0</version>
+			<scope>test</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.derby</groupId>
 			<artifactId>derby</artifactId>
 			<scope>test</scope>

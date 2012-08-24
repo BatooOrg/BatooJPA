@@ -110,11 +110,11 @@ public class CurrentTemporalExpression<T> extends AbstractExpression<T> {
 	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
 		switch (this.temporalType) {
 			case DATE:
-				return new String[] { "CURRENT_DATE" };
+				return new String[] { query.getJdbcAdaptor().getCurrentDate() };
 			case TIME:
-				return new String[] { "CURRENT_TIME" };
+				return new String[] { query.getJdbcAdaptor().getCurrentTime() };
 			default:
-				return new String[] { "CURRENT_TIMESTAMP" };
+				return new String[] { query.getJdbcAdaptor().getCurrentTimeStamp() };
 		}
 	}
 
