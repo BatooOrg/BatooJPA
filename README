@@ -1,0 +1,97 @@
+Welcome to Batoo JPA
+
+Batoo JPA is the fastest JPA Implementation by far.
+
+It is 10 ~ 20 times faster then the leading JPA providers.
+
+
+L I C E N S E
+
+Copyright (c) 2012 - Batoo Software ve Consultancy Ltd.
+
+This copyrighted material is made available to anyone wishing to use, modify,
+copy, or redistribute it subject to the terms and conditions of the GNU
+Lesser General Public License, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this distribution; if not, write to:
+Free Software Foundation, Inc.
+51 Franklin Street, Fifth Floor
+Boston, MA  02110-1301  USA
+
+
+
+F E A T U R E S
+- Full implementation of JPA 2.0 Spec (except for the L2 Cache for now)
+- Minimum deviation from the specification
+- Full JTA Support
+- Built in connection pool for Java SE
+- Prepared Statement cache support for Java SE
+
+
+
+C O M P A T I B I L I T Y 
+
+Bato JPA has been tested with the following databases:
+- Derby
+- HypersonicDB
+- H2
+- MySql
+- PostgreSQL
+
+Bato JPA has been tested with the following platforms:
+- Java SE 1.6
+- Java SE 1.7
+- Jboss AS 6.1.0.Final
+- Jboss AS 7.1.1.Final
+
+
+
+B U I L D I N G
+
+1) Install Maven 3.0.X if you haven't installed it previously.
+
+2) Install JDK 1.7 if you haven't installed it previously.
+
+3) check the project using
+	$ git clone git://github.com/BatooOrg/BatooJPA.git
+	$ cd BaooJPA
+	$ mvn install
+	
+Not: The initial build may take a long time.
+
+
+
+D E V E L O P M E N T
+
+Current development platform is Eclipse 3.7.2
+The Eclipse Dependencies
+- EGit / JGit
+- M2Eclipse
+
+Environment configs are in etc/ide/eclipse/run_configs
+cleanup.xml -> Code cleanup profile
+codetemplates.xml - Code templates profile
+dictionary.txt - The custom spell checker dictionary
+formatter.xml - The source formatter
+templates.xml - The custom java templates
+
+There are 4 lunch shortcuts to benchmark Batoo JPA
+Benchmark - Batoo.launch
+Benchmark - EclipseLink.launch
+Benchmark - Hibernate.launch
+Benchmark.launch
+
+There are 5 unit tests lunch shortcuts to test Batoo JPA
+test-derby.launch
+test-h2.launch
+test-hsql.launch
+test-mysql.launch
+test-pgsql.launch
+
+->>> Please be kind an send pull requests for public benefit
