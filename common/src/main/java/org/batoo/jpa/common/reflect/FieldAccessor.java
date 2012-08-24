@@ -192,37 +192,22 @@ public class FieldAccessor extends AbstractAccessor {
 						}
 						break;
 					case INTEGER:
-						ReflectHelper.unsafe.putInt(instance, this.fieldOffset, (Integer) value);
+						ReflectHelper.unsafe.putInt(instance, this.fieldOffset, ((Number) value).intValue());
 						break;
 					case FLOAT:
-						if (value instanceof Double) {
-							ReflectHelper.unsafe.putFloat(instance, this.fieldOffset, ((Double) value).floatValue());
-						}
-						else {
-							ReflectHelper.unsafe.putFloat(instance, this.fieldOffset, (Float) value);
-						}
+						ReflectHelper.unsafe.putFloat(instance, this.fieldOffset, ((Number) value).floatValue());
 						break;
 					case DOUBLE:
-						ReflectHelper.unsafe.putDouble(instance, this.fieldOffset, (Double) value);
+						ReflectHelper.unsafe.putDouble(instance, this.fieldOffset, ((Number) value).doubleValue());
 						break;
 					case LONG:
-						ReflectHelper.unsafe.putLong(instance, this.fieldOffset, (Long) value);
+						ReflectHelper.unsafe.putLong(instance, this.fieldOffset, ((Number) value).longValue());
 						break;
 					case SHORT:
-						if (value instanceof Integer) {
-							ReflectHelper.unsafe.putShort(instance, this.fieldOffset, ((Integer) value).shortValue());
-						}
-						else {
-							ReflectHelper.unsafe.putShort(instance, this.fieldOffset, (Short) value);
-						}
+						ReflectHelper.unsafe.putShort(instance, this.fieldOffset, ((Number) value).shortValue());
 						break;
 					case BYTE:
-						if (value instanceof Integer) {
-							ReflectHelper.unsafe.putByte(instance, this.fieldOffset, ((Integer) value).byteValue());
-						}
-						else {
-							ReflectHelper.unsafe.putByte(instance, this.fieldOffset, (Byte) value);
-						}
+						ReflectHelper.unsafe.putByte(instance, this.fieldOffset, ((Number) value).byteValue());
 						break;
 					default: // CHAR
 						if (value == null) {
