@@ -104,14 +104,14 @@ public class MsSqlAdaptor extends JdbcAdaptor {
 
 		sql = BatooUtils.indent(sql);
 
-		StringBuffer sqlStr = new StringBuffer(sql);
-		int orderIndex = sqlStr.indexOf("ORDER BY");
-		CharSequence orderby = orderIndex > -1 ? sqlStr.subSequence(orderIndex, sqlStr.length()) : "ORDER BY CURRENT_TIMESTAMP";
+		final StringBuffer sqlStr = new StringBuffer(sql);
+		final int orderIndex = sqlStr.indexOf("ORDER BY");
+		final CharSequence orderby = orderIndex > -1 ? sqlStr.subSequence(orderIndex, sqlStr.length()) : "ORDER BY CURRENT_TIMESTAMP";
 		if (orderIndex > -1) {
 			sqlStr.delete(orderIndex, sqlStr.length());
 		}
 
-		int fromIndex = sqlStr.indexOf("FROM");
+		final int fromIndex = sqlStr.indexOf("FROM");
 		sqlStr.insert(fromIndex, "\t, ROW_NUMBER() OVER (" + orderby + ") AS ROW_NUM__INTERNAL ");
 
 		if (maxResult == Integer.MAX_VALUE) {
@@ -122,6 +122,10 @@ public class MsSqlAdaptor extends JdbcAdaptor {
 			+ (startPosition + maxResult) + " ORDER BY ROW_NUM__INTERNAL";
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
 	@Override
 	public String applySubStr(String innerFragment, String startFragment, String endFragment) {
 		if (endFragment != null) {
@@ -131,6 +135,10 @@ public class MsSqlAdaptor extends JdbcAdaptor {
 		return "SUBSTRING(" + Joiner.on(", ").skipNulls().join(new Object[] { innerFragment, startFragment, Integer.toString(Integer.MAX_VALUE) }) + ")";
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
 	@Override
 	public String applyTrim(Trimspec trimspec, String trimChar, String argument) {
 		if (trimChar != null) {
@@ -151,6 +159,10 @@ public class MsSqlAdaptor extends JdbcAdaptor {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
 	@Override
 	public String castBoolean(String sqlFragment) {
 		return super.castBoolean(sqlFragment) + " = 1";
@@ -219,16 +231,28 @@ public class MsSqlAdaptor extends JdbcAdaptor {
 		throw new IllegalArgumentException("Unhandled sql type: " + sqlType);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
 	@Override
 	public String getCurrentDate() {
 		return "GETDATE()";
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
 	@Override
 	public String getCurrentTime() {
 		return "GETDATE()";
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
 	@Override
 	public String getCurrentTimeStamp() {
 		return "CURRENT_TIMESTAMP";
@@ -252,6 +276,10 @@ public class MsSqlAdaptor extends JdbcAdaptor {
 		throw new UnsupportedOperationException("MSSQL does not support sequences");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
 	@Override
 	public String getNumericFunctionTemplate(NumericFunctionType type) {
 		if (type == NumericFunctionType.MOD) {
@@ -283,6 +311,10 @@ public class MsSqlAdaptor extends JdbcAdaptor {
 		return "SELECT @@IDENTITY";
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
 	@Override
 	public boolean isPmdBroken() {
 		return true;
@@ -299,10 +331,5 @@ public class MsSqlAdaptor extends JdbcAdaptor {
 		}
 
 		return IdType.TABLE;
-	}
-
-	@Override
-	public boolean supportsStartPosition() {
-		return false;
 	}
 }

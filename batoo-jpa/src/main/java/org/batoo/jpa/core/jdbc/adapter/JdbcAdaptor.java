@@ -706,9 +706,10 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	/**
 	 * Returns if the PMD is Broken for the adaptor.
 	 * 
+	 * @return true if the PMD is Broken for the adaptor, false otherwise
+	 * 
 	 * @since $version
 	 * @author hceylan
-	 * @return
 	 */
 	public boolean isPmdBroken() {
 		return false;
@@ -788,16 +789,4 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @author hceylan
 	 */
 	public abstract IdType supports(GenerationType type);
-
-	/**
-	 * Returns if the adaptor supports the start position.
-	 * 
-	 * @return true if the adaptor supports the start position, false otherwise
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public boolean supportsStartPosition() {
-		return true;
-	}
 }
