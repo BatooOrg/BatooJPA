@@ -469,7 +469,7 @@ public class ManagedInstance<X> {
 		}
 		else {
 			for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> mapping : this.idMappings) {
-				if (!mapping.getSecond().fillValue(this.type.getRootType(), this, this.instance)) {
+				if (!mapping.getFirst().fillValue(this.type.getRootType(), this, this.instance)) {
 					return false;
 				}
 			}
