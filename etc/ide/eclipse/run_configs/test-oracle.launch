@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.jdt.junit.launchconfig">
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/org.batoo.jpa.batoo-jpa"/>
+<listEntry value="/org.batoo.jpa.batoo-jpa/src/test/java"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
-<listEntry value="4"/>
+<listEntry value="2"/>
 </listAttribute>
-<stringAttribute key="org.eclipse.jdt.junit.CONTAINER" value="=org.batoo.jpa.batoo-jpa"/>
+<stringAttribute key="org.eclipse.jdt.junit.CONTAINER" value="=org.batoo.jpa.batoo-jpa/src\/test\/java"/>
 <booleanAttribute key="org.eclipse.jdt.junit.KEEPRUNNING_ATTR" value="false"/>
 <stringAttribute key="org.eclipse.jdt.junit.TESTNAME" value=""/>
 <stringAttribute key="org.eclipse.jdt.junit.TEST_KIND" value="org.eclipse.jdt.junit.loader.junit4"/>
@@ -14,5 +14,5 @@
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value=""/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="org.batoo.jpa.batoo-jpa"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djavax.persistence.jdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver -Djavax.persistence.jdbc.url=jdbc:sqlserver://localhost;databaseName=test;instanceName=SQLExpress -Djavax.persistence.jdbc.user=sa -Djavax.persistence.jdbc.password=sa01 -DtestMode=mssql"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djavax.persistence.jdbc.driver=oracle.jdbc.OracleDriver -Djavax.persistence.jdbc.url=jdbc:oracle:thin:@//test.cxk7oll1whtw.eu-west-1.rds.amazonaws.com:1521/TEST -Djavax.persistence.jdbc.user=test -Djavax.persistence.jdbc.password=testtest -DtestMode=oracle"/>
 </launchConfiguration>

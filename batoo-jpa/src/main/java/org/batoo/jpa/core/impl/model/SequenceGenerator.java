@@ -31,7 +31,7 @@ import com.google.common.base.Joiner;
  */
 public class SequenceGenerator extends AbstractGenerator {
 
-	private static final String DEFAULT_SEQUENCE_NAME = "BATOO_ID";
+	private static final String DEFAULT_SEQUENCE_NAME = "BATOO_SEQ";
 
 	private final String sequenceName;
 

@@ -26,6 +26,7 @@ import javax.persistence.EnumType;
 import javax.persistence.TemporalType;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.MappingException;
@@ -60,6 +61,7 @@ public class BasicColumn extends AbstractColumn {
 	private final Enum<?>[] values;
 	private final Method method;
 	private final TemporalType temporalType;
+	private final Class<?> numberType;
 
 	/**
 	 * @param jdbcAdaptor
@@ -96,8 +98,8 @@ public class BasicColumn extends AbstractColumn {
 		this.unique = metadata != null ? metadata.isUnique() : false;
 		this.updatable = metadata != null ? metadata.isUpdatable() : true;
 
+		this.numberType = Number.class.isAssignableFrom(mapping.getAttribute().getJavaType()) ? mapping.getAttribute().getJavaType() : null;
 		this.temporalType = mapping.getAttribute().getTemporalType();
-
 		this.enumType = mapping.getAttribute().getEnumType();
 		if (this.enumType != null) {
 			Class<Enum<?>> enumJavaType;
@@ -170,6 +172,10 @@ public class BasicColumn extends AbstractColumn {
 
 					return new java.sql.Timestamp(((Calendar) value).getTimeInMillis());
 			}
+		}
+
+		if (this.numberType != null) {
+			return ReflectHelper.convertNumber((Number) value, this.numberType);
 		}
 
 		if (this.enumType == null) {

@@ -22,6 +22,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.persistence.EntityTransaction;
 import javax.persistence.LockModeType;
@@ -31,6 +32,7 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.log.BLogger;
@@ -473,11 +475,12 @@ public abstract class BaseCoreTest { // extends BaseTest {
 		final String testMode = System.getProperty("testMode");
 
 		if ("mssql".equals(testMode)) {
-			String username = System.getProperty("javax.persistence.jdbc.user");
-			String password = System.getProperty("javax.persistence.jdbc.password");
-			Connection connection = DriverManager.getConnection(System.getProperty("javax.persistence.jdbc.url"), username, password);
+			final String username = System.getProperty("javax.persistence.jdbc.user");
+			final String password = System.getProperty("javax.persistence.jdbc.password");
+			final Connection connection = DriverManager.getConnection(System.getProperty("javax.persistence.jdbc.url"), username, password);
+
 			try {
-				QueryRunner qr = new QueryRunner(true);
+				final QueryRunner qr = new QueryRunner(true);
 				qr.update(connection, "use master");
 				qr.update(connection, "drop database test");
 				qr.update(connection, "create database test");
@@ -485,6 +488,27 @@ public abstract class BaseCoreTest { // extends BaseTest {
 			finally {
 				connection.close();
 			}
+		}
+
+		if ("oracle".equals(testMode)) {
+			final String username = System.getProperty("javax.persistence.jdbc.user");
+			final String password = System.getProperty("javax.persistence.jdbc.password");
+			final Connection connection = DriverManager.getConnection(System.getProperty("javax.persistence.jdbc.url"), username, password);
+
+			try {
+				final QueryRunner qr = new QueryRunner(true);
+				final List<Object[]> tables = qr.query(connection, "select TABLE_NAME from user_tables", new ArrayListHandler());
+				for (final Object[] table : tables) {
+					try {
+						qr.update(connection, "DROP TABLE " + table[0] + " CASCADE CONSTRAINTS");
+					}
+					catch (final Exception e) {}
+				}
+			}
+			finally {
+				connection.close();
+			}
+
 		}
 
 		if (!this.lazySetup()) {
@@ -553,9 +577,9 @@ public abstract class BaseCoreTest { // extends BaseTest {
 		}
 
 		if ("mssql".equals(testMode)) {
-			String username = System.getProperty("javax.persistence.jdbc.user");
-			String password = System.getProperty("javax.persistence.jdbc.password");
-			Connection connection = DriverManager.getConnection(System.getProperty("javax.persistence.jdbc.url"), username, password);
+			final String username = System.getProperty("javax.persistence.jdbc.user");
+			final String password = System.getProperty("javax.persistence.jdbc.password");
+			final Connection connection = DriverManager.getConnection(System.getProperty("javax.persistence.jdbc.url"), username, password);
 			try {
 				qr.update(connection, "use master");
 				qr.update(connection, "drop database test");

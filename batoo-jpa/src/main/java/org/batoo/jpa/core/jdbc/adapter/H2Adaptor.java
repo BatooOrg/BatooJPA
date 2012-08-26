@@ -100,10 +100,10 @@ public class H2Adaptor extends JdbcAdaptor {
 	@Override
 	public String applyPagination(String sql, int startPosition, int maxResult) {
 		if ((startPosition != 0) || (maxResult != Integer.MAX_VALUE)) {
-			sql = sql + "\nLIMIT " + maxResult;
+			sql = sql + "\nLIMIT ?";
 
 			if (startPosition != 0) {
-				sql = sql + "OFFSET " + startPosition;
+				sql = sql + "OFFSET ?";
 			}
 		}
 
@@ -252,6 +252,15 @@ public class H2Adaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
+	public PaginationParamsOrder getPaginationParamsOrder() {
+		return PaginationParamsOrder.SQL_MAX_START;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	protected String[] getProductNames() {
 		return H2Adaptor.PRODUCT_NAMES;
 	}
@@ -263,6 +272,24 @@ public class H2Adaptor extends JdbcAdaptor {
 	@Override
 	public String getSelectLastIdentitySql(PkColumn identityColumn) {
 		return "CALL IDENTITY()";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean paginationNeedsMaxResultsAlways() {
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean paginationNeedsStartAlways() {
+		return false;
 	}
 
 	/**

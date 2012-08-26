@@ -68,6 +68,49 @@ import com.google.common.collect.Lists;
  */
 public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 
+	/**
+	 * The order of pagination paramaters embedded into the SQL.
+	 * 
+	 * @author hceylan
+	 * @since $version
+	 */
+	@SuppressWarnings("javadoc")
+	public enum PaginationParamsOrder {
+		SQL_START_MAX(true),
+
+		SQL_MAX_START(true),
+
+		SQL_START_END(true),
+
+		SQL_END_START(true),
+
+		MAX_START_SQL(false),
+
+		START_MAX_SQL(false);
+
+		private final boolean afterMainSql;
+
+		/**
+		 * @since $version
+		 * @author hceylan
+		 */
+		private PaginationParamsOrder(boolean afterMainSql) {
+			this.afterMainSql = afterMainSql;
+		}
+
+		/**
+		 * Returns if the pagination params come after the main SQL.
+		 * 
+		 * @return the if if the pagination params come after the main SQL, false otherwise
+		 * 
+		 * @since $version
+		 * @author hceylan
+		 */
+		public boolean isAfterMainSql() {
+			return this.afterMainSql;
+		}
+	}
+
 	private static final BLogger LOG = BLoggerFactory.getLogger(JdbcAdaptor.class);
 
 	private List<String> words;
@@ -692,6 +735,16 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	}
 
 	/**
+	 * Returns the pagination params order for the adaptor.
+	 * 
+	 * @return the pagination params order for the adaptor
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract PaginationParamsOrder getPaginationParamsOrder();
+
+	/**
 	 * Returns the SQL to select the last identity generated.
 	 * 
 	 * @param identityColumn
@@ -750,6 +803,26 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 		JdbcAdaptor.LOG.warn(message + " Check debug log for details: " + e.getMessage());
 		JdbcAdaptor.LOG.debug(e, message);
 	}
+
+	/**
+	 * Returns if pagination always needs the max results paramater.
+	 * 
+	 * @return true if pagination always needs the max results paramater, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract boolean paginationNeedsMaxResultsAlways();
+
+	/**
+	 * Returns if pagination always needs the start paramater.
+	 * 
+	 * @return true if pagination always needs the start paramater, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract boolean paginationNeedsStartAlways();
 
 	/**
 	 * Returns the schema if it is set otherwise falls back to the default schema.

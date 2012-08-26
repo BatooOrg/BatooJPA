@@ -108,6 +108,7 @@ public class EntityTransactionImpl implements EntityTransaction {
 		try {
 			this.em.flush();
 
+			this.connection.commit();
 			this.connection.setAutoCommit(true);
 
 			this.em.clearTransaction();

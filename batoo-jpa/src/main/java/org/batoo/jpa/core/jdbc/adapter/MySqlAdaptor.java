@@ -95,10 +95,10 @@ public class MySqlAdaptor extends JdbcAdaptor {
 	@Override
 	public String applyPagination(String sql, int startPosition, int maxResult) {
 		if ((startPosition != 0) || (maxResult != Integer.MAX_VALUE)) {
-			sql = sql + "\nLIMIT " + startPosition;
+			sql = sql + "\nLIMIT ?";
 
 			if (maxResult != Integer.MAX_VALUE) {
-				sql = sql + ", " + maxResult;
+				sql = sql + ", ?";
 			}
 		}
 
@@ -192,6 +192,15 @@ public class MySqlAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
+	public PaginationParamsOrder getPaginationParamsOrder() {
+		return PaginationParamsOrder.SQL_START_MAX;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	protected String[] getProductNames() {
 		return MySqlAdaptor.PRODUCT_NAMES;
 	}
@@ -203,6 +212,24 @@ public class MySqlAdaptor extends JdbcAdaptor {
 	@Override
 	public String getSelectLastIdentitySql(PkColumn identityColumn) {
 		return "SELECT LAST_INSERT_ID()";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean paginationNeedsMaxResultsAlways() {
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean paginationNeedsStartAlways() {
+		return true;
 	}
 
 	/**

@@ -115,6 +115,6 @@ public class IndexExpression extends AbstractExpression<Integer> {
 	 */
 	@Override
 	public Integer handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
-		return (Integer) row.getObject(this.alias);
+		return ((Number) row.getObject(this.alias)).intValue();
 	}
 }

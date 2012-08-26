@@ -99,11 +99,11 @@ public class PostgreSqlAdaptor extends JdbcAdaptor {
 	@Override
 	public String applyPagination(String sql, int startPosition, int maxResult) {
 		if (startPosition != 0) {
-			sql = sql + "\nOFFSET " + startPosition + " ROWS";
+			sql = sql + "\nOFFSET ? ROWS";
 		}
 
 		if (maxResult != Integer.MAX_VALUE) {
-			sql = sql + "\nFETCH FIRST  " + maxResult + " ROWS ONLY";
+			sql = sql + "\nFETCH FIRST ? ROWS ONLY";
 		}
 
 		return sql;
@@ -235,6 +235,15 @@ public class PostgreSqlAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
+	public PaginationParamsOrder getPaginationParamsOrder() {
+		return PaginationParamsOrder.SQL_START_MAX;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	protected String[] getProductNames() {
 		return PostgreSqlAdaptor.PRODUCT_NAMES;
 	}
@@ -246,6 +255,24 @@ public class PostgreSqlAdaptor extends JdbcAdaptor {
 	@Override
 	public String getSelectLastIdentitySql(PkColumn identityColumn) {
 		return "SELECT CURRVAL('" + identityColumn.getTable().getName() + "_" + identityColumn.getName() + "_seq')";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean paginationNeedsMaxResultsAlways() {
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean paginationNeedsStartAlways() {
+		return false;
 	}
 
 	/**

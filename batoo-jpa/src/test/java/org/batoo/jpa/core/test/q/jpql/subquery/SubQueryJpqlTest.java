@@ -256,9 +256,9 @@ public class SubQueryJpqlTest extends BaseCoreTest {
 
 		this.commit();
 
-		TypedQuery<Integer> q;
+		TypedQuery<Number> q;
 
-		q = this.cq("select e.id from Employee e where e.salary > (select m.salary from Manager m where m.department = e.department)", Integer.class);
+		q = this.cq("select e.id from Employee e where e.salary > (select m.salary from Manager m where m.department = e.department)", Number.class);
 		Assert.assertEquals(employee4.getId(), q.getSingleResult());
 	}
 }

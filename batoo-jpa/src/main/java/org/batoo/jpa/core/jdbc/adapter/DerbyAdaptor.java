@@ -97,11 +97,11 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	@Override
 	public String applyPagination(String sql, int startPosition, int maxResult) {
 		if (startPosition != 0) {
-			sql = sql + "\nOFFSET " + startPosition + " ROWS";
+			sql = sql + "\nOFFSET ? ROWS";
 		}
 
 		if (maxResult != Integer.MAX_VALUE) {
-			sql = sql + "\nFETCH FIRST  " + maxResult + " ROWS ONLY";
+			sql = sql + "\nFETCH FIRST ? ROWS ONLY";
 		}
 
 		return sql;
@@ -173,6 +173,15 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
+	public PaginationParamsOrder getPaginationParamsOrder() {
+		return PaginationParamsOrder.SQL_START_MAX;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	protected String[] getProductNames() {
 		return DerbyAdaptor.PRODUCT_NAMES;
 	}
@@ -184,6 +193,24 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	@Override
 	public String getSelectLastIdentitySql(PkColumn identityColumn) {
 		return "VALUES IDENTITY_VAL_LOCAL()";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean paginationNeedsMaxResultsAlways() {
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean paginationNeedsStartAlways() {
+		return false;
 	}
 
 	/**

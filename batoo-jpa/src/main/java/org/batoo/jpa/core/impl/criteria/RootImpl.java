@@ -81,7 +81,7 @@ public class RootImpl<X> extends AbstractFrom<X, X> implements Root<X> {
 		final EntityTable primaryTable = this.entity.getRootType().getPrimaryTable();
 
 		if (query.isQuery()) {
-			return primaryTable.getName() + " AS " + this.getFetchRoot().getTableAlias(query, primaryTable);
+			return primaryTable.getName() + " " + this.getFetchRoot().getTableAlias(query, primaryTable);
 		}
 
 		return primaryTable.getName();

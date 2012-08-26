@@ -153,7 +153,7 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	@Override
 	public String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		if (StringUtils.isNotBlank(this.getAlias())) {
-			return this.generateJpqlRestriction(query) + " AS " + this.alias;
+			return this.generateJpqlRestriction(query) + " as " + this.alias;
 		}
 
 		return this.generateJpqlRestriction(query);

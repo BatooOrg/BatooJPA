@@ -122,6 +122,9 @@ public class AggregationTest extends BaseCoreTest {
 		else if ("mssql".equals(testMode)) {
 			qlString = "select avg(func(cast, '(', p.age, ' as float)')) from Person p";
 		}
+		else if ("oracle".equals(testMode)) {
+			qlString = "select avg(func(cast, '(', p.age, ' as double precision)')) from Person p";
+		}
 
 		Assert.assertEquals(37.5d, this.cq(qlString, Number.class).getSingleResult().doubleValue());
 

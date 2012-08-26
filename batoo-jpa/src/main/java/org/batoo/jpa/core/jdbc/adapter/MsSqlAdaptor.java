@@ -99,7 +99,7 @@ public class MsSqlAdaptor extends JdbcAdaptor {
 	@Override
 	public String applyPagination(String sql, int startPosition, int maxResult) {
 		if (startPosition == 0) {
-			return sql.replaceFirst("SELECT", "SELECT TOP " + startPosition + maxResult);
+			return sql.replaceFirst("SELECT", "SELECT TOP " + maxResult);
 		}
 
 		sql = BatooUtils.indent(sql);
@@ -115,11 +115,10 @@ public class MsSqlAdaptor extends JdbcAdaptor {
 		sqlStr.insert(fromIndex, "\t, ROW_NUMBER() OVER (" + orderby + ") AS ROW_NUM__INTERNAL ");
 
 		if (maxResult == Integer.MAX_VALUE) {
-			return "SELECT * FROM (\n" + sqlStr + "\n) AS PAGINATED_RESULT WHERE ROW_NUM__INTERNAL > " + startPosition + " ORDER BY ROW_NUM__INTERNAL";
+			return "SELECT * FROM (\n" + sqlStr + "\n) AS PAGINATED_RESULT WHERE ROW_NUM__INTERNAL > ? ORDER BY ROW_NUM__INTERNAL";
 		}
 
-		return "SELECT * FROM (\n" + sqlStr + ")\nAS PAGINATED_RESULT WHERE ROW_NUM__INTERNAL > " + startPosition + " AND ROW_NUM__INTERNAL < "
-			+ (startPosition + maxResult) + " ORDER BY ROW_NUM__INTERNAL";
+		return "SELECT * FROM (\n" + sqlStr + ")\nAS PAGINATED_RESULT WHERE ROW_NUM__INTERNAL > ? AND ROW_NUM__INTERNAL < ? ORDER BY ROW_NUM__INTERNAL";
 	}
 
 	/**
@@ -298,6 +297,15 @@ public class MsSqlAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
+	public PaginationParamsOrder getPaginationParamsOrder() {
+		return PaginationParamsOrder.SQL_START_END;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	protected String[] getProductNames() {
 		return MsSqlAdaptor.PRODUCT_NAMES;
 	}
@@ -318,6 +326,24 @@ public class MsSqlAdaptor extends JdbcAdaptor {
 	@Override
 	public boolean isPmdBroken() {
 		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean paginationNeedsMaxResultsAlways() {
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean paginationNeedsStartAlways() {
+		return false;
 	}
 
 	/**

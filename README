@@ -43,6 +43,8 @@ Bato JPA has been tested with the following databases:
 - H2
 - MySql
 - PostgreSQL
+- MsSQL
+- Oracle
 
 Bato JPA has been tested with the following platforms:
 - Java SE 1.6

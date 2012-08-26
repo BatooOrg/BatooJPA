@@ -53,6 +53,7 @@ import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor.PaginationParamsOrder;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -112,7 +113,6 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>>, Q
 	}
 
 	private Object[] applyParameters() {
-		int paramCount = 0;
 		if ((this.startPosition != 0) || (this.maxResult != Integer.MAX_VALUE)) {
 			QueryImpl.LOG.debug("Rows restricted to {0} / {1}", this.startPosition, this.maxResult);
 
@@ -123,16 +123,110 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>>, Q
 
 		final List<ParameterExpressionImpl<?>> sqlParameters = this.q.getSqlParameters();
 
+		int paramCount = 0;
 		for (final ParameterExpressionImpl<?> parameter : sqlParameters) {
 			paramCount += parameter.getExpandedCount(metamodel);
 		}
 
+		// determine if we need to expand param count for pagination
+		if ((this.maxResult != Integer.MAX_VALUE) || (this.startPosition != 0)) {
+			final PaginationParamsOrder paginationParamsOrder = this.q.getJdbcAdaptor().getPaginationParamsOrder();
+
+			final boolean paginationHasStart = (this.startPosition != 0) || this.q.getJdbcAdaptor().paginationNeedsStartAlways();
+			final boolean paginationHasMaxResults = (this.maxResult != Integer.MAX_VALUE) || this.q.getJdbcAdaptor().paginationNeedsMaxResultsAlways();
+
+			paramCount = paramCount + (paginationHasMaxResults && paginationHasStart ? 2 : 1);
+
+			final MutableInt sqlIndex = new MutableInt(0);
+			final Object[] parameters = new Object[paramCount];
+
+			if (!paginationParamsOrder.isAfterMainSql()) {
+				if (paginationParamsOrder == PaginationParamsOrder.MAX_START_SQL) {
+					if (paginationHasStart) {
+						parameters[sqlIndex.intValue()] = this.startPosition;
+						sqlIndex.increment();
+					}
+
+					if (paginationHasMaxResults) {
+						parameters[sqlIndex.intValue()] = this.maxResult;
+						sqlIndex.increment();
+					}
+				}
+				else {
+					if (paginationHasMaxResults) {
+						parameters[sqlIndex.intValue()] = this.maxResult;
+						sqlIndex.increment();
+					}
+
+					if (paginationHasStart) {
+						parameters[sqlIndex.intValue()] = this.startPosition;
+						sqlIndex.increment();
+					}
+				}
+			}
+
+			for (final ParameterExpressionImpl<?> parameter : sqlParameters) {
+				parameter.setParameter(metamodel, parameters, sqlIndex, this.parameters.get(parameter));
+			}
+
+			if (paginationParamsOrder.isAfterMainSql()) {
+				if (paginationParamsOrder == PaginationParamsOrder.SQL_START_MAX) {
+					if (paginationHasStart) {
+						parameters[sqlIndex.intValue()] = this.startPosition;
+						sqlIndex.increment();
+					}
+
+					if (paginationHasMaxResults) {
+						parameters[sqlIndex.intValue()] = this.maxResult;
+						sqlIndex.increment();
+					}
+				}
+				else if (paginationParamsOrder == PaginationParamsOrder.SQL_START_END) {
+					if (paginationHasStart) {
+						parameters[sqlIndex.intValue()] = this.startPosition;
+						sqlIndex.increment();
+					}
+
+					if (paginationHasMaxResults) {
+						parameters[sqlIndex.intValue()] = (long) this.startPosition + (long) this.maxResult;
+						sqlIndex.increment();
+					}
+				}
+				else if (paginationParamsOrder == PaginationParamsOrder.SQL_END_START) {
+					if (paginationHasMaxResults) {
+						parameters[sqlIndex.intValue()] = (long) this.startPosition + (long) this.maxResult;
+						sqlIndex.increment();
+					}
+
+					if (paginationHasStart) {
+						parameters[sqlIndex.intValue()] = this.startPosition;
+						sqlIndex.increment();
+					}
+				}
+				else {
+					if (paginationHasMaxResults) {
+						parameters[sqlIndex.intValue()] = this.maxResult;
+						sqlIndex.increment();
+					}
+
+					if (paginationHasStart) {
+						parameters[sqlIndex.intValue()] = this.startPosition;
+						sqlIndex.increment();
+					}
+				}
+			}
+
+			return parameters;
+		}
+
+		// no pagination parameter
 		final MutableInt sqlIndex = new MutableInt(0);
 		final Object[] parameters = new Object[paramCount];
 
 		for (final ParameterExpressionImpl<?> parameter : sqlParameters) {
 			parameter.setParameter(metamodel, parameters, sqlIndex, this.parameters.get(parameter));
 		}
+
 		return parameters;
 	}
 
