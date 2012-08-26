@@ -56,8 +56,6 @@ public class FieldAccessor extends AbstractAccessor {
 		}
 	}
 
-	private static final Object INT_0 = new Integer(0);
-
 	private final Field field;
 	private final long fieldOffset;
 	private final PrimitiveType primitiveType;
@@ -184,8 +182,8 @@ public class FieldAccessor extends AbstractAccessor {
 			else {
 				switch (this.primitiveType) {
 					case BOOLEAN:
-						if (value instanceof Integer) {
-							ReflectHelper.unsafe.putBoolean(instance, this.fieldOffset, value.equals(FieldAccessor.INT_0) ? false : true);
+						if (value instanceof Number) {
+							ReflectHelper.unsafe.putBoolean(instance, this.fieldOffset, ((Number) value).byteValue() == 0 ? false : true);
 						}
 						else {
 							ReflectHelper.unsafe.putBoolean(instance, this.fieldOffset, (Boolean) value);
@@ -234,8 +232,8 @@ public class FieldAccessor extends AbstractAccessor {
 				else {
 					switch (this.primitiveType) {
 						case BOOLEAN:
-							if (value instanceof Integer) {
-								this.field.set(instance, value.equals(FieldAccessor.INT_0) ? false : true);
+							if (value instanceof Number) {
+								this.field.set(instance, ((Number) value).byteValue() == 0 ? false : true);
 							}
 							else {
 								this.field.set(instance, value);
@@ -245,12 +243,7 @@ public class FieldAccessor extends AbstractAccessor {
 							this.field.set(instance, value);
 							break;
 						case FLOAT:
-							if (value instanceof Double) {
-								this.field.set(instance, ((Double) value).floatValue());
-							}
-							else {
-								this.field.set(instance, value);
-							}
+							this.field.set(instance, ((Number) value).floatValue());
 							break;
 						case DOUBLE:
 							this.field.set(instance, value);
@@ -259,20 +252,10 @@ public class FieldAccessor extends AbstractAccessor {
 							this.field.set(instance, value);
 							break;
 						case SHORT:
-							if (value instanceof Integer) {
-								this.field.set(instance, ((Integer) value).shortValue());
-							}
-							else {
-								this.field.set(instance, value);
-							}
+							this.field.set(instance, ((Number) value).shortValue());
 							break;
 						case BYTE:
-							if (value instanceof Integer) {
-								this.field.set(instance, ((Integer) value).byteValue());
-							}
-							else {
-								this.field.set(instance, value);
-							}
+							this.field.set(instance, ((Number) value).byteValue());
 							break;
 						default: // CHAR
 							if (value == null) {
