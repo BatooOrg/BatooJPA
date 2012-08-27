@@ -447,7 +447,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 			new QueryRunner(datasource, this.isPmdBroken()).update(sql);
 		}
 		catch (final SQLException e) {
-			this.logRelaxed(e, "Cannot create tabe generator " + table.getTable());
+			this.logRelaxed(e, "Cannot create table generator " + table.getTable());
 		}
 	}
 

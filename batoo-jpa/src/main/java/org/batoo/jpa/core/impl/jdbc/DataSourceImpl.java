@@ -128,7 +128,9 @@ public class DataSourceImpl implements DataSource {
 			DataSourceImpl.LOG.info("Datasource closed: {0}", this.jdbcUrl);
 
 			try {
-				this.pool.close();
+				if (this.pool != null) {
+					this.pool.close();
+				}
 			}
 			catch (final Exception e) {
 				DataSourceImpl.LOG.warn(e, "Error while closing connection cache");

@@ -78,6 +78,10 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(EntityManagerFactoryImpl.class);
 
+	private static final String[] TRANSACTION_MANAGERS = new String[] { //
+	"java:appserver/TransactionManager", //
+		"java:/TransactionManager" };
+
 	private static final int NO_QUERIES_MAX = 1000;
 	private static final int NO_QUERIES_TRIM = 100;
 
@@ -577,12 +581,26 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 			return null;
 		}
 
+		for (final String jndiName : EntityManagerFactoryImpl.TRANSACTION_MANAGERS) {
+			final TransactionManager manager = this.lookupTransactionManager(jndiName);
+			if (manager != null) {
+				EntityManagerFactoryImpl.LOG.info("Using JTA Transaction manager: {0}", jndiName);
+				return manager;
+			}
+		}
+
+		throw new PersistenceException("Unable to locate the transa ction manager");
+	}
+
+	private TransactionManager lookupTransactionManager(String jndiName) {
 		try {
-			return (TransactionManager) new InitialContext().lookup("java:/TransactionManager");
+			EntityManagerFactoryImpl.LOG.debug("Trying JTA Transaction Manager: {0}", jndiName);
+
+			return (TransactionManager) new InitialContext().lookup(jndiName);
 		}
-		catch (final NamingException e) {
-			throw new PersistenceException("Unable to locate the transaction manager");
-		}
+		catch (final NamingException e) {}
+
+		return null;
 	}
 
 	private void prepareProperties(PersistenceParser parser) {

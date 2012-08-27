@@ -51,7 +51,7 @@ Bato JPA has been tested with the following platforms:
 - Java SE 1.7
 - Jboss AS 6.1.0.Final
 - Jboss AS 7.1.1.Final
-
+- Glassfish 3.1.2.1
 
 
 B U I L D I N G
