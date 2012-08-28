@@ -209,6 +209,15 @@ public class PreparedStatementImpl implements PreparedStatement {
 	 * 
 	 */
 	@Override
+	public void closeOnCompletion() throws SQLException {
+		this.throwNotImplemented();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public boolean execute() throws SQLException {
 		return false;
 	}
@@ -569,6 +578,16 @@ public class PreparedStatementImpl implements PreparedStatement {
 	 */
 	@Override
 	public boolean isClosed() throws SQLException {
+		this.throwNotImplemented();
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isCloseOnCompletion() throws SQLException {
 		this.throwNotImplemented();
 		return false;
 	}

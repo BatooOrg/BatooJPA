@@ -35,6 +35,7 @@ import java.sql.Statement;
 import java.sql.Struct;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang.NotImplementedException;
@@ -89,6 +90,15 @@ public class ConnectionImpl implements Connection {
 		this.connNo = ConnectionImpl.no.incrementAndGet();
 		this.opened = System.currentTimeMillis();
 		this.preparedStatementPool = new GenericKeyedPool<String, PreparedStatementImpl>(new PreparedStatementFactory(this));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void abort(Executor executor) throws SQLException {
+		this.throwNotImplemented();
 	}
 
 	/**
@@ -332,6 +342,24 @@ public class ConnectionImpl implements Connection {
 	@Override
 	public DatabaseMetaData getMetaData() throws SQLException {
 		return this.connection.getMetaData();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int getNetworkTimeout() throws SQLException {
+		return this.connection.getNetworkTimeout();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getSchema() throws SQLException {
+		return this.connection.getSchema();
 	}
 
 	/**
@@ -686,6 +714,15 @@ public class ConnectionImpl implements Connection {
 	 * 
 	 */
 	@Override
+	public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
+		this.connection.setNetworkTimeout(executor, milliseconds);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public void setReadOnly(boolean readOnly) throws SQLException {
 		this.connection.setReadOnly(readOnly);
 	}
@@ -706,6 +743,15 @@ public class ConnectionImpl implements Connection {
 	@Override
 	public Savepoint setSavepoint(String name) throws SQLException {
 		return this.connection.setSavepoint(name);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void setSchema(String schema) throws SQLException {
+		this.connection.setSchema(schema);
 	}
 
 	/**
