@@ -102,12 +102,5 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 		</dependency>
-
-		<!-- Test -->
-		<dependency>
-			<groupId>org.batoo.jpa</groupId>
-			<artifactId>test</artifactId>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 </project>
