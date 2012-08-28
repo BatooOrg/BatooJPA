@@ -22,8 +22,6 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.SQLFeatureNotSupportedException;
-import java.util.logging.Logger;
 
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
@@ -223,15 +221,6 @@ public class DataSourceImpl implements DataSource {
 	@Override
 	public PrintWriter getLogWriter() throws SQLException {
 		return this.printer;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-		return null;
 	}
 
 	/**
