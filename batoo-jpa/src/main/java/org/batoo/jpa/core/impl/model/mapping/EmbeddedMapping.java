@@ -234,6 +234,10 @@ public class EmbeddedMapping<Z, X> extends ParentMapping<Z, X> implements Singul
 						}
 
 						singularMappings.add(mapping);
+					case ONE_TO_MANY:
+					case MANY_TO_MANY:
+					case ELEMENT_COLLECTION:
+						// N/A
 				}
 			}
 

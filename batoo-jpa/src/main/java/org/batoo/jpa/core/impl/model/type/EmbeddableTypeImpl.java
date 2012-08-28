@@ -105,6 +105,10 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 					case MANY_TO_ONE:
 					case ONE_TO_ONE:
 						attributeCount += ((EntityTypeImpl<?>) attribute.getType()).getPrimaryTable().getPkColumns().size();
+					case ELEMENT_COLLECTION:
+					case MANY_TO_MANY:
+					case ONE_TO_MANY:
+						break;
 				}
 			}
 
@@ -154,6 +158,10 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 						}
 
 						singularMappings.add((SingularAttributeImpl<? super X, ?>) attribute);
+					case ELEMENT_COLLECTION:
+					case MANY_TO_MANY:
+					case ONE_TO_MANY:
+						// N/A
 				}
 			}
 

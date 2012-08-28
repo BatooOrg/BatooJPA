@@ -339,7 +339,7 @@ public class EntityManagerImpl implements EntityManager {
 	 * {@inheritDoc}
 	 * 
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked", "rawtypes", "javadoc" })
 	public Query createQuery(CriteriaDeleteImpl<?> deleteQuery) {
 		return new QueryImpl(deleteQuery, this);
 	}
@@ -357,7 +357,7 @@ public class EntityManagerImpl implements EntityManager {
 	 * {@inheritDoc}
 	 * 
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked", "rawtypes", "javadoc" })
 	public Query createQuery(CriteriaUpdateImpl<?> updateQuery) {
 		return new QueryImpl(updateQuery, this);
 	}
@@ -1012,6 +1012,8 @@ public class EntityManagerImpl implements EntityManager {
 				case NEW:
 				case MANAGED:
 					return existing.cascadePersist(this, processed);
+				case DETACHED:
+					// noop
 			}
 		}
 

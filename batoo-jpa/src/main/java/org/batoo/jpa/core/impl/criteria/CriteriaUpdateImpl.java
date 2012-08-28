@@ -19,9 +19,7 @@
 package org.batoo.jpa.core.impl.criteria;
 
 import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
-import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
@@ -107,51 +105,6 @@ public class CriteriaUpdateImpl<T> extends CriteriaModify<T> {
 	@Override
 	public boolean isQuery() {
 		return false;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	public <Y> CriteriaUpdateImpl<T> set(Path<Y> attribute, Expression<? extends Y> value) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	public <Y, X extends Y> CriteriaUpdateImpl<T> set(Path<Y> attribute, X value) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	public <Y> CriteriaUpdateImpl<T> set(SingularAttribute<? super T, Y> attribute, Expression<? extends Y> value) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	public <Y, X extends Y> CriteriaUpdateImpl<T> set(SingularAttribute<? super T, Y> attribute, X value) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	public CriteriaUpdateImpl<T> set(String attributeName, Object value) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/**

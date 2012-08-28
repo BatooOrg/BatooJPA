@@ -88,6 +88,8 @@ public class HsqlAdaptor extends JdbcAdaptor {
 				return sql + "\nFOR READ ONLY";
 			case PESSIMISTIC_WRITE:
 				return sql + "\nFOR UPDATE";
+			default:
+				break;
 		}
 
 		return sql;

@@ -279,6 +279,10 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 					break;
 				case EMBEDDED:
 					this.setParameter(parameters, sqlIndex, attribute.get(value), (EmbeddableTypeImpl<?>) this.type);
+				case ELEMENT_COLLECTION:
+				case MANY_TO_MANY:
+				case ONE_TO_MANY:
+					// N/A
 			}
 		}
 	}

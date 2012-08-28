@@ -678,6 +678,7 @@ public class MetamodelImpl implements Metamodel {
 			if (table.getEntity() != entity) {
 				continue;
 			}
+
 			MetamodelImpl.LOG.info("Performing foreign key DDL operations for table {0}, mode {1}", table.getName(), ddlMode);
 
 			for (final ForeignKey foreignKey : table.getForeignKeys()) {

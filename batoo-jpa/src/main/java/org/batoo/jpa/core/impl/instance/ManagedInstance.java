@@ -525,6 +525,8 @@ public class ManagedInstance<X> {
 			case REMOVED:
 				this.type.performRemove(connection, this);
 				break;
+			case DETACHED:
+				// N/A
 		}
 	}
 

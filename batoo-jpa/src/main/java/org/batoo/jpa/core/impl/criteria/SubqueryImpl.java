@@ -293,6 +293,10 @@ public class SubqueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 		return this.query.getGroupRestriction();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
 	@Override
 	public JdbcAdaptor getJdbcAdaptor() {
 		return this.parent.getJdbcAdaptor();
