@@ -29,13 +29,11 @@
 
 	<artifactId>jpql</artifactId>
 	<name>Batoo Persistence JPQL Parser Generator</name>
-	<packaging>bundle</packaging>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>common</artifactId>
-			<type>bundle</type>
 		</dependency>
 
 		<dependency>
@@ -87,20 +85,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<extensions>true</extensions>
-				<configuration>
-					<instructions>
-						<Implementation-Title>${project.name}</Implementation-Title>
-						<Implementation-Version>${project.version}</Implementation-Version>
-						<Bundle-DocURL>${project.url}</Bundle-DocURL>
-					</instructions>
-				</configuration>
-			</plugin>
-
 			<plugin>
 				<groupId>org.antlr</groupId>
 				<artifactId>antlr3-maven-plugin</artifactId>

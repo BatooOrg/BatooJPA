@@ -29,7 +29,6 @@
 
 	<artifactId>batoo-jpa</artifactId>
 	<name>Batoo Persistence Core</name>
-	<packaging>bundle</packaging>
 
 	<build>
 		<testResources>
@@ -45,19 +44,6 @@
 		</testResources>
 
 		<plugins>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<extensions>true</extensions>
-				<configuration>
-					<instructions>
-						<Implementation-Title>${project.name}</Implementation-Title>
-						<Implementation-Version>${project.version}</Implementation-Version>
-						<Bundle-DocURL>${project.url}</Bundle-DocURL>
-					</instructions>
-				</configuration>
-			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
@@ -132,24 +118,20 @@
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>batoo-annotations</artifactId>
-			<type>bundle</type>
 		</dependency>
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>common</artifactId>
-			<type>bundle</type>
 		</dependency>
 
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>parser</artifactId>
-			<type>bundle</type>
 		</dependency>
 
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>jpql</artifactId>
-			<type>bundle</type>
 		</dependency>
 
 		<dependency>

@@ -15,7 +15,6 @@
 
 	<artifactId>parser</artifactId>
 	<name>Batoo Persistence Parser</name>
-	<packaging>bundle</packaging>
 
 	<build>
 		<testResources>
@@ -63,19 +62,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<extensions>true</extensions>
-				<configuration>
-					<instructions>
-						<Implementation-Title>${project.name}</Implementation-Title>
-						<Implementation-Version>${project.version}</Implementation-Version>
-						<Bundle-DocURL>${project.url}</Bundle-DocURL>
-					</instructions>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
 
@@ -89,13 +75,11 @@
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>batoo-annotations</artifactId>
-			<type>bundle</type>
 		</dependency>
 
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>common</artifactId>
-			<type>bundle</type>
 		</dependency>
 
 		<!-- JAXB -->

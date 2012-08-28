@@ -29,7 +29,6 @@
 
 	<artifactId>benchmark</artifactId>
 	<name>Batoo Persistence Benchmark</name>
-	<packaging>bundle</packaging>
 
 	<dependencies>
 		<!-- Hibernate -->
@@ -48,31 +47,26 @@
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>batoo-jpa</artifactId>
-			<type>bundle</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>batoo-annotations</artifactId>
-			<type>bundle</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>parser</artifactId>
-			<type>bundle</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>jpql</artifactId>
-			<type>bundle</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>common</artifactId>
-			<type>bundle</type>
 			<scope>test</scope>
 		</dependency>
 
