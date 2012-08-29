@@ -77,6 +77,20 @@ public class BatooUtils {
 	}
 
 	/**
+	 * Converts the string to lower case.
+	 * 
+	 * @param string
+	 *            the string to convert
+	 * @return the converted string
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public static String lower(String string) {
+		return string != null ? string.toLowerCase() : null;
+	}
+
+	/**
 	 * @param a
 	 *            the collection a
 	 * @param b
@@ -114,5 +128,19 @@ public class BatooUtils {
 		}
 
 		return "|-->" + str.replaceAll("\n", "\n|   ");
+	}
+
+	/**
+	 * Converts the string to upper case.
+	 * 
+	 * @param string
+	 *            the string to convert
+	 * @return the converted string
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public static String upper(String string) {
+		return string != null ? string.toUpperCase() : null;
 	}
 }
