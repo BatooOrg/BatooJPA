@@ -16,49 +16,72 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.core.test.ddl;
+package org.batoo.jpa.core.test.ddl.update2;
 
-import org.batoo.jpa.core.test.BaseCoreTest;
-import org.junit.Test;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 /**
- * @author hceylan
  * 
+ * 
+ * @author hceylan
  * @since $version
  */
-public class DdlTest extends BaseCoreTest {
+@Entity
+public class Country {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Integer id;
+
+	private String name;
 
 	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	protected boolean lazySetup() {
-		return true;
-	}
-
-	/**
-	 * Tests the ddl drop mode.
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	@Test
-	public void testDdlDrop() {
-		this.setupEmf().close();
-		this.setupEmf().close();
+	public Country() {
+		super();
 	}
 
 	/**
-	 * Tests the ddl drop mode.
+	 * Returns the id of the Country.
+	 * 
+	 * @return the id of the Country
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	@Test
-	public void testDdlUpdate() {
-		this.setupEmf("update1").close();
-		this.setupEmf("update2").close();
+	public Integer getId() {
+		return this.id;
+	}
+
+	/**
+	 * Returns the name of the Country.
+	 * 
+	 * @return the name of the Country
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getName() {
+		return this.name;
+	}
+
+	/**
+	 * Sets the name of the Country.
+	 * 
+	 * @param name
+	 *            the name to set for Country
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }

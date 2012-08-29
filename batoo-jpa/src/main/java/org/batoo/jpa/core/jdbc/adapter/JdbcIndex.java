@@ -16,49 +16,59 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.core.test.ddl;
+package org.batoo.jpa.core.jdbc.adapter;
 
-import org.batoo.jpa.core.test.BaseCoreTest;
-import org.junit.Test;
+import java.util.List;
+
+import com.google.common.collect.Lists;
 
 /**
- * @author hceylan
+ * The metadata for an index of an existing table.
  * 
+ * @author hceylan
  * @since $version
  */
-public class DdlTest extends BaseCoreTest {
+public class JdbcIndex {
+
+	private final String name;
+	private final List<String> columns = Lists.newArrayList();
 
 	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	protected boolean lazySetup() {
-		return true;
-	}
-
-	/**
-	 * Tests the ddl drop mode.
+	 * @param name
+	 *            the name of the index
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	@Test
-	public void testDdlDrop() {
-		this.setupEmf().close();
-		this.setupEmf().close();
+	public JdbcIndex(String name) {
+		super();
+
+		this.name = name;
 	}
 
 	/**
-	 * Tests the ddl drop mode.
+	 * Adds a column to the index.
+	 * 
+	 * @param columnName
+	 *            the name of the column
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	@Test
-	public void testDdlUpdate() {
-		this.setupEmf("update1").close();
-		this.setupEmf("update2").close();
+	public void addColumn(String columnName) {
+		this.columns.add(columnName);
+	}
+
+	/**
+	 * Returns the name of the index.
+	 * 
+	 * @return the name of the index
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getName() {
+		return this.name;
 	}
 
 }

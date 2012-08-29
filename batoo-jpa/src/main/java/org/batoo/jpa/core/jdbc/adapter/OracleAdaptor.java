@@ -31,7 +31,6 @@ import javax.sql.DataSource;
 import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
-import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.jdbc.SingleValueHandler;
 import org.batoo.jpa.core.impl.model.SequenceGenerator;
@@ -179,25 +178,6 @@ public class OracleAdaptor extends JdbcAdaptor {
 	}
 
 	/**
-	 * @param datasource
-	 *            the datasource
-	 * @param foreignKey
-	 *            the foreign key
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@Override
-	protected void dropForeignKey(DataSourceImpl datasource, ForeignKey foreignKey) {
-		try {
-			new QueryRunner(datasource).update("ALTER TABLE " + foreignKey.getTable().getQName() + " DROP CONSTRAINT " + foreignKey.getName());
-		}
-		catch (final SQLException e) {
-			this.logRelaxed(e, "Cannot drop foreign key " + foreignKey.getName());
-		}
-	}
-
-	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -252,6 +232,17 @@ public class OracleAdaptor extends JdbcAdaptor {
 	@Override
 	protected String getDatabaseName() {
 		return "Oracle";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	protected String getDropForeignKeySql(String schema, String table, String foreignKey) {
+		final String qualifiedName = Joiner.on(".").skipNulls().join(schema, table);
+
+		return "ALTER TABLE " + qualifiedName + " DROP CONSTRAINT " + foreignKey;
 	}
 
 	/**

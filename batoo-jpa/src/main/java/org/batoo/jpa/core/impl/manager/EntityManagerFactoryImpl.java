@@ -46,6 +46,7 @@ import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.BatooException;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.jpa.core.BJPASettings;
 import org.batoo.jpa.core.JPASettings;
 import org.batoo.jpa.core.impl.cache.CacheImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
@@ -90,6 +91,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	private final TransactionManager transactionManager;
 	private final CacheImpl cache;
 	private final boolean jta;
+	private final DDLMode ddlMode;
 
 	private final JdbcAdaptor jdbcAdaptor;
 	private final Map<String, Object> properties = Maps.newHashMap();
@@ -142,16 +144,22 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		this.transactionManager = this.lookupTransactionManager();
 		this.cache = new CacheImpl(this.metamodel, parser.getSharedCacheMode());
 
+		this.ddlMode = this.readDdlMode();
+
 		this.jdbcAdaptor = this.createJdbcAdaptor();
 		this.metamodel = new MetamodelImpl(this, this.jdbcAdaptor, parser.getMetadata());
 
 		LinkManager.perform(this.metamodel);
 
-		this.metamodel.dropAllTables(this.datasource);
-		DdlManager.perform(this.datasource, this.metamodel, DDLMode.DROP);
+		// drop all tables if ddl mode is drop
+		if (this.ddlMode == DDLMode.DROP) {
+			this.metamodel.dropAllTables(this.datasource);
+		}
 
-		this.metamodel.performSequencesDdl(this.datasource, DDLMode.DROP);
-		this.metamodel.performTableGeneratorsDdl(this.datasource, DDLMode.DROP);
+		DdlManager.perform(this.datasource, this.metamodel, this.ddlMode);
+
+		this.metamodel.performSequencesDdl(this.datasource, this.ddlMode);
+		this.metamodel.performTableGeneratorsDdl(this.datasource, this.ddlMode);
 
 		this.metamodel.preFillGenerators(this.datasource);
 		this.criteriaBuilder = new CriteriaBuilderImpl(this.metamodel);
@@ -261,7 +269,10 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		final String jdbcPassword = (String) this.getProperty(JPASettings.JDBC_PASSWORD);
 
 		try {
-			this.classloader.loadClass(jdbcDriver).newInstance();
+			try {
+				this.classloader.loadClass(jdbcDriver).newInstance();
+			}
+			catch (final Exception e) {}
 
 			return new DataSourceImpl(jdbcUrl, jdbcUser, jdbcPassword);
 		}
@@ -614,6 +625,16 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		}
 
 		this.properties.putAll(parser.getProperties());
+	}
+
+	private DDLMode readDdlMode() {
+		final String ddlMode = (String) this.getProperty(BJPASettings.DDL);
+
+		if (ddlMode == null) {
+			return DDLMode.NONE;
+		}
+
+		return DDLMode.valueOf(ddlMode.toUpperCase());
 	}
 
 	/**

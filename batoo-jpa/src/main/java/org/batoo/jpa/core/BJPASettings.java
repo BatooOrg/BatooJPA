@@ -31,18 +31,7 @@ public interface BJPASettings {
 	final long WARN_TIME = 2500;
 
 	/**
-	 * Class loader to use during deployment, default null
-	 */
-	String CLASS_LOADER_CLASS = "org.batoo.jpa.class_loader_class";
-
-	/**
-	 * The root package for the persistence unit to scan for entities, default null
-	 */
-	String ROOT_PACKAGE = "org.batoo.jpa.root_url";
-
-	/**
 	 * DDL operations, DROP | CREATE (*) | UPDATE | VERIFY | NONE
 	 */
 	String DDL = "org.batoo.jpa.ddl";
-
 }

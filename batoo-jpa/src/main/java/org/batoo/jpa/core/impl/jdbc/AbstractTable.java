@@ -19,8 +19,10 @@
 package org.batoo.jpa.core.impl.jdbc;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
@@ -45,7 +47,7 @@ import com.google.common.collect.Maps;
  * @author hceylan
  * @since $version
  */
-public class AbstractTable {
+public abstract class AbstractTable {
 
 	private final AbstractLocator locator;
 
@@ -426,6 +428,18 @@ public class AbstractTable {
 	}
 
 	/**
+	 * Returns the set of column names.
+	 * 
+	 * @return the set of column names
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Set<String> getColumnNames() {
+		return this.columns.keySet();
+	}
+
+	/**
 	 * Returns the collection of basicColumns of the table.
 	 * 
 	 * @return the collection of basicColumns of the table
@@ -518,6 +532,18 @@ public class AbstractTable {
 	 */
 	public String getName() {
 		return this.name;
+	}
+
+	/**
+	 * Returns the set of primary key column names.
+	 * 
+	 * @return the set of primary column names
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Set<String> getPkColumnNames() {
+		return Collections.emptySet();
 	}
 
 	/**

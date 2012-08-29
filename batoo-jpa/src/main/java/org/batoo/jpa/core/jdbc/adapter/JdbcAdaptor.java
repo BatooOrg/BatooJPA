@@ -19,6 +19,8 @@
 package org.batoo.jpa.core.jdbc.adapter;
 
 import java.io.IOException;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Collection;
@@ -36,6 +38,7 @@ import javax.persistence.LockModeType;
 import javax.persistence.criteria.CriteriaBuilder.Trimspec;
 import javax.sql.DataSource;
 
+import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -46,6 +49,7 @@ import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.AbstractJdbcAdaptor;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
+import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
@@ -53,12 +57,16 @@ import org.batoo.jpa.core.impl.jdbc.JoinColumn;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.model.SequenceGenerator;
 import org.batoo.jpa.core.impl.model.TableGenerator;
+import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.parser.MappingException;
+import org.batoo.jpa.util.BatooUtils;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Base class for JDBC Adapters.
@@ -111,9 +119,14 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 		}
 	}
 
+	private static final String[] TABLE_OR_VIEW = new String[] { "TABLE", "VIEW" };
+	private static final String TABLE_NAME = "TABLE_NAME";
+
 	private static final BLogger LOG = BLoggerFactory.getLogger(JdbcAdaptor.class);
 
 	private List<String> words;
+
+	private final Map<AbstractTable, JdbcTable> tables = Maps.newHashMap();
 
 	/**
 	 * @since $version
@@ -241,6 +254,32 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	}
 
 	/**
+	 * Returns the SQL to alter the table.
+	 * 
+	 * @param table
+	 *            the table
+	 * @param columnsToAdd
+	 *            the list of columns to add
+	 * @return the SQL to alter the table
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private String createAlterTableStatement(AbstractTable table, List<AbstractColumn> columnsToAdd) {
+		final List<String> ddlColumns = Lists.newArrayList();
+
+		for (final AbstractColumn column : columnsToAdd) {
+			ddlColumns.add("ADD COLUMN " + this.createColumnDDL(column));
+		}
+
+		final StringBuilder statement = new StringBuilder();
+		statement.append("ALTER TABLE ").append(table.getQName()).append("\n\t"); // table part
+		statement.append(Joiner.on("\n\t").join(ddlColumns)); // columns part
+
+		return statement.toString();
+	}
+
+	/**
 	 * Creates the BasicColumn Definition DDL For the column.
 	 * 
 	 * @param columnDefinition
@@ -322,35 +361,54 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public synchronized void createForeignKey(DataSource datasource, ForeignKey foreignKey) {
-		final String referenceTableName = foreignKey.getReferencedTableName();
-		final String tableName = foreignKey.getTable().getName();
-
-		final String foreignKeyColumns = Joiner.on(", ").join(Lists.transform(foreignKey.getJoinColumns(), new Function<JoinColumn, String>() {
-
-			@Override
-			public String apply(JoinColumn input) {
-				return input.getReferencedColumnName();
-			}
-		}));
-
-		final String keyColumns = Joiner.on(", ").join(Lists.transform(foreignKey.getJoinColumns(), new Function<JoinColumn, String>() {
-
-			@Override
-			public String apply(JoinColumn input) {
-				return input.getName();
-			}
-		}));
-
-		final String sql = "ALTER TABLE " + tableName //
-			+ "\n\tADD CONSTRAINT " + foreignKey.getName() + " FOREIGN KEY (" + keyColumns + ")" //
-			+ "\n\tREFERENCES " + referenceTableName + "(" + foreignKeyColumns + ")";
+	public synchronized void createForeignKey(DataSourceImpl datasource, ForeignKey foreignKey) {
+		final QueryRunner runner = new QueryRunner(datasource, this.isPmdBroken());
 
 		try {
-			new QueryRunner(datasource, this.isPmdBroken()).update(sql);
+			// locate the foreign key metada
+			final JdbcTable tableMetadata = this.getTableMetadata(datasource, foreignKey.getTable());
+			final JdbcForeignKey foreignKeyMetadata = tableMetadata.getForeignKey(foreignKey.getName());
+
+			// if it exists, then if there is no change then bail out, otherwise drop and continue with the creation
+			if (foreignKeyMetadata != null) {
+				if (!foreignKeyMetadata.matches(foreignKey)) {
+					final String sql = this.getDropForeignKeySql(tableMetadata.getSchema(), tableMetadata.getName(), foreignKey.getName());
+
+					runner.update(sql);
+				}
+				else {
+					return;
+				}
+			}
+
+			// create the foreign key
+			final String referenceTableName = foreignKey.getReferencedTableName();
+			final String tableName = foreignKey.getTable().getName();
+
+			final String foreignKeyColumns = Joiner.on(", ").join(Lists.transform(foreignKey.getJoinColumns(), new Function<JoinColumn, String>() {
+
+				@Override
+				public String apply(JoinColumn input) {
+					return input.getReferencedColumnName();
+				}
+			}));
+
+			final String keyColumns = Joiner.on(", ").join(Lists.transform(foreignKey.getJoinColumns(), new Function<JoinColumn, String>() {
+
+				@Override
+				public String apply(JoinColumn input) {
+					return input.getName();
+				}
+			}));
+
+			final String sql = "ALTER TABLE " + tableName //
+				+ "\n\tADD CONSTRAINT " + foreignKey.getName() + " FOREIGN KEY (" + keyColumns + ")" //
+				+ "\n\tREFERENCES " + referenceTableName + "(" + foreignKeyColumns + ")";
+
+			runner.update(sql);
 		}
 		catch (final SQLException e) {
-			this.logRelaxed(e, "Cannot create foreign key.");
+			this.logRelaxed(e, "Cannot (re)create foreign key.");
 		}
 	}
 
@@ -383,36 +441,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 		new QueryRunner(datasource, this.isPmdBroken()).update("CREATE INDEX " + indexName + " ON " + table.getQName() + "(" + columnNames + ")");
 	}
 
-	/**
-	 * Creates the sequence if not exists.
-	 * 
-	 * @param datasource
-	 *            the datasource to use
-	 * @param sequence
-	 *            the sequence to create
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public abstract void createSequenceIfNecessary(DataSource datasource, SequenceGenerator sequence);
-
-	/**
-	 * @param table
-	 *            the
-	 * @param datasource
-	 *            the datasource
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void createTable(AbstractTable table, DataSourceImpl datasource) {
-		try {
-			new QueryRunner(datasource, this.isPmdBroken()).update(this.createCreateTableStatement(table));
-		}
-		catch (final SQLException e) {
-			this.logRelaxed(e, "Cannot create table " + table.getName());
-		}
-
+	private void createIndexes(DataSourceImpl datasource, AbstractTable table) {
 		if (table instanceof EntityTable) {
 			final Map<String, BasicColumn[]> indexes = ((EntityTable) table).getIndexes();
 			for (final Entry<String, BasicColumn[]> entry : indexes.entrySet()) {
@@ -427,6 +456,66 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	}
 
 	/**
+	 * Creates or update the table.
+	 * 
+	 * @param table
+	 *            the table
+	 * @param datasource
+	 *            the datasource
+	 * @param ddlMode
+	 *            the ddl mode
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void createOrUpdateTable(AbstractTable table, DataSourceImpl datasource, DDLMode ddlMode) {
+		try {
+			if ((ddlMode == DDLMode.DROP) || (ddlMode == DDLMode.CREATE)) {
+				final JdbcTable tableMetadata = this.getTableMetadata(datasource, table);
+				if (tableMetadata == null) {
+					this.createTable(datasource, table);
+				}
+			}
+			else if (ddlMode == DDLMode.UPDATE) {
+				final JdbcTable tableMetadata = this.getTableMetadata(datasource, table);
+				if (tableMetadata == null) {
+					this.createTable(datasource, table);
+				}
+				else {
+					this.updateTable(datasource, table);
+				}
+			}
+		}
+		catch (final SQLException e) {
+			this.logRelaxed(e, "Table DDL Failed for table " + table.getName());
+		}
+	}
+
+	/**
+	 * Creates the sequence if not exists.
+	 * 
+	 * @param datasource
+	 *            the datasource to use
+	 * @param sequence
+	 *            the sequence to create
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract void createSequenceIfNecessary(DataSource datasource, SequenceGenerator sequence);
+
+	private void createTable(DataSourceImpl datasource, AbstractTable table) {
+		try {
+			new QueryRunner(datasource, this.isPmdBroken()).update(this.createCreateTableStatement(table));
+		}
+		catch (final SQLException e) {
+			this.logRelaxed(e, "Cannot create table " + table.getName());
+		}
+
+		this.createIndexes(datasource, table);
+	}
+
+	/**
 	 * Creates the table generator if not exists.
 	 * 
 	 * @param datasource
@@ -437,14 +526,17 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public final void createTableGeneratorIfNecessary(DataSource datasource, TableGenerator table) {
-		final String sql = "CREATE TABLE " + table.getQName() + " ("//
-			+ "\n\t" + table.getPkColumnName() + " VARCHAR(255)," //
-			+ "\n\t" + table.getValueColumnName() + " INT," //
-			+ "\nPRIMARY KEY(" + table.getPkColumnName() + "))";
-
+	public final void createTableGeneratorIfNecessary(DataSourceImpl datasource, TableGenerator table) {
 		try {
-			new QueryRunner(datasource, this.isPmdBroken()).update(sql);
+			if (this.getTableMetadata(datasource, table.getCatalog(), table.getSchema(), table.getTable()) == null) {
+
+				final String sql = "CREATE TABLE " + table.getQName() + " ("//
+					+ "\n\t" + table.getPkColumnName() + " VARCHAR(255)," //
+					+ "\n\t" + table.getValueColumnName() + " INT," //
+					+ "\nPRIMARY KEY(" + table.getPkColumnName() + "))";
+
+				new QueryRunner(datasource, this.isPmdBroken()).update(sql);
+			}
 		}
 		catch (final SQLException e) {
 			this.logRelaxed(e, "Cannot create table generator " + table.getTable());
@@ -454,15 +546,33 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	/**
 	 * @param datasource
 	 *            the datasource
-	 * @param foreignKeys
+	 * @param tables
 	 *            the foreign keys
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void dropAllForeignKeys(DataSourceImpl datasource, Set<ForeignKey> foreignKeys) {
-		for (final ForeignKey key : foreignKeys) {
-			this.dropForeignKey(datasource, key);
+	public void dropAllForeignKeys(DataSourceImpl datasource, Set<AbstractTable> tables) {
+		for (final AbstractTable table : tables) {
+			JdbcTable tableMetadata = null;
+			try {
+				tableMetadata = this.getTableMetadata(datasource, table);
+			}
+			catch (final SQLException e) {
+				this.logRelaxed(e, "Cannot drop foreign keys for table " + table.getName());
+			}
+
+			if (tableMetadata != null) {
+				for (final JdbcForeignKey foreignKey : tableMetadata.getForeignKeys()) {
+					try {
+						new QueryRunner(datasource, this.isPmdBroken()).update(this.getDropForeignKeySql(table.getSchema(), table.getName(),
+							foreignKey.getName()));
+					}
+					catch (final SQLException e) {
+						this.logRelaxed(e, "Cannot drop foreign key " + foreignKey.getName());
+					}
+				}
+			}
 		}
 	}
 
@@ -503,35 +613,21 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void dropAllTables(DataSource datasource, Collection<AbstractTable> tables) throws SQLException {
+	public void dropAllTables(DataSourceImpl datasource, Collection<AbstractTable> tables) throws SQLException {
 		final QueryRunner runner = new QueryRunner(datasource, this.isPmdBroken());
 
 		for (final AbstractTable table : tables) {
 			try {
-				runner.update("DROP TABLE " + table.getQName());
+				final JdbcTable tableMetadata = this.getTableMetadata(datasource, table);
+				this.tables.remove(table);
+
+				if (tableMetadata != null) {
+					runner.update("DROP TABLE " + table.getQName());
+				}
 			}
 			catch (final SQLException e) {
 				this.logRelaxed(e, "Cannot drop table " + table.getName());
 			}
-		}
-	}
-
-	/**
-	 * @param datasource
-	 *            the datasource
-	 * @param foreignKey
-	 *            the foreign key
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	protected void dropForeignKey(DataSourceImpl datasource, ForeignKey foreignKey) {
-		try {
-			new QueryRunner(datasource, this.isPmdBroken()).update("ALTER TABLE " + foreignKey.getTable().getQName() + " DROP FOREIGN KEY "
-				+ foreignKey.getName());
-		}
-		catch (final SQLException e) {
-			this.logRelaxed(e, "Cannot drop foreign key " + foreignKey.getName());
 		}
 	}
 
@@ -696,6 +792,26 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	protected abstract String getDatabaseName();
 
 	/**
+	 * Returns the SQL to drop the foreign key.
+	 * 
+	 * @param schema
+	 *            the name of the schema
+	 * @param table
+	 *            the name of the table
+	 * @param foreignKey
+	 *            the name of the foreign key
+	 * @return the SQL to drop the foreign key
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected String getDropForeignKeySql(String schema, String table, String foreignKey) {
+		final String qualifiedName = Joiner.on(".").skipNulls().join(schema, table);
+
+		return "ALTER TABLE " + qualifiedName + " DROP FOREIGN KEY " + foreignKey;
+	}
+
+	/**
 	 * Returns next sequence number from the database.
 	 * 
 	 * @param datasource
@@ -745,6 +861,46 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	public abstract PaginationParamsOrder getPaginationParamsOrder();
 
 	/**
+	 * Returns the priary key drop SQL.
+	 * 
+	 * @param schema
+	 *            the name of the schema
+	 * @param table
+	 *            the name of the table
+	 * @param pkColumns
+	 *            the set of the primary key column names
+	 * @return the priary key drop SQL
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected String getPkCreateSql(String schema, String table, Set<String> pkColumns) {
+		final String qualifiedName = Joiner.on(".").skipNulls().join(new String[] { schema, table });
+
+		return "ALTER TABLE " + qualifiedName + " ADD PRIMARY KEY (" + Joiner.on(", ").join(pkColumns) + ")";
+	}
+
+	/**
+	 * Returns the priary key drop SQL.
+	 * 
+	 * @param schema
+	 *            the name of the schema
+	 * @param table
+	 *            the name of the table
+	 * @param pkName
+	 *            the name of the primary key
+	 * @return the priary key drop SQL
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected String getPkDropSql(String schema, String table, String pkName) {
+		final String qualifiedName = Joiner.on(".").skipNulls().join(new String[] { schema, table });
+
+		return "ALTER TABLE " + qualifiedName + " DROP PRIMARY KEY";
+	}
+
+	/**
 	 * Returns the SQL to select the last identity generated.
 	 * 
 	 * @param identityColumn
@@ -755,6 +911,62 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @author hceylan
 	 */
 	public abstract String getSelectLastIdentitySql(PkColumn identityColumn);
+
+	private synchronized JdbcTable getTableMetadata(DataSourceImpl datasource, AbstractTable table) throws SQLException {
+		JdbcTable tableMetadata = this.tables.get(table);
+		if (tableMetadata != null) {
+			return tableMetadata;
+		}
+
+		tableMetadata = this.getTableMetadata(datasource, table.getCatalog(), table.getSchema(), table.getName());
+		if (tableMetadata != null) {
+			this.tables.put(table, tableMetadata);
+		}
+
+		return tableMetadata;
+	}
+
+	private JdbcTable getTableMetadata(DataSourceImpl datasource, String catalog, String schema, String table) throws SQLException {
+		final ConnectionImpl connection = datasource.getConnection();
+
+		ResultSet tables = null;
+		try {
+			final DatabaseMetaData dbMetadata = connection.getMetaData();
+			catalog = StringUtils.isNotBlank(catalog) ? catalog : null;
+			schema = StringUtils.isNotBlank(schema) ? schema : null;
+
+			if (dbMetadata.storesUpperCaseIdentifiers()) {
+				tables = dbMetadata.getTables(//
+					BatooUtils.upper(catalog), //
+					BatooUtils.upper(schema), //
+					BatooUtils.upper(table),//
+					JdbcAdaptor.TABLE_OR_VIEW);
+			}
+			else if (dbMetadata.storesLowerCaseIdentifiers()) {
+				tables = dbMetadata.getTables(//
+					BatooUtils.lower(catalog), //
+					BatooUtils.lower(schema), //
+					BatooUtils.lower(table),//
+					JdbcAdaptor.TABLE_OR_VIEW);
+			}
+			else {
+				tables = dbMetadata.getTables(catalog, schema, table, JdbcAdaptor.TABLE_OR_VIEW);
+			}
+
+			if (tables.next()) {
+				final String tableName = tables.getString(JdbcAdaptor.TABLE_NAME);
+				if (table.equalsIgnoreCase(tableName)) {
+					return new JdbcTable(dbMetadata, tables);
+				}
+			}
+		}
+		finally {
+			DbUtils.closeQuietly(connection);
+			DbUtils.closeQuietly(tables);
+		}
+
+		return null;
+	}
 
 	/**
 	 * Returns if the PMD is Broken for the adaptor.
@@ -862,4 +1074,59 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @author hceylan
 	 */
 	public abstract IdType supports(GenerationType type);
+
+	private void updateTable(DataSourceImpl datasource, AbstractTable table) {
+		final QueryRunner runner = new QueryRunner(datasource, this.isPmdBroken());
+
+		try {
+			// locate the existing table metadata
+			final JdbcTable tableMetadata = this.getTableMetadata(datasource, table);
+
+			final Set<String> columnsFound = Sets.newHashSet();
+			final List<AbstractColumn> columnsToAdd = Lists.newArrayList();
+
+			// iterate over columns to find out the columns to add
+			for (final AbstractColumn column : table.getColumns()) {
+				final JdbcColumn columnMetadata = tableMetadata.getColumn(column.getName());
+				if (columnMetadata == null) {
+					columnsToAdd.add(column);
+				}
+				else {
+					columnsFound.add(column.getName());
+				}
+			}
+
+			// log warning for the non null columns that are not in the persistence unit
+			tableMetadata.logNotNullExtraColumns(table.getColumnNames());
+
+			boolean pkDropped = false;
+
+			// if primary key has changed then drop the primary key
+			if (tableMetadata.requiresPkDrop(table.getPkColumnNames())) {
+				try {
+					runner.update(this.getPkDropSql(tableMetadata.getSchema(), table.getName(), tableMetadata.getPkName()));
+					pkDropped = true;
+				}
+				catch (final SQLException e) {
+					JdbcAdaptor.LOG.error(e, "Cannot drop the primary key for table {0}. Primary key changes will not be reflected!", table.getName());
+				}
+			}
+
+			// add the new columns
+			if (columnsToAdd.size() > 0) {
+				runner.update(this.createAlterTableStatement(table, columnsToAdd));
+			}
+
+			// create the missing indexes
+			this.createIndexes(datasource, table);
+
+			// if primary key is dropped then recreate the primary key if necessary
+			if (pkDropped) {
+				runner.update(this.getPkCreateSql(tableMetadata.getSchema(), table.getName(), table.getPkColumnNames()));
+			}
+		}
+		catch (final SQLException e) {
+			JdbcAdaptor.LOG.error(e, "Unable to update table {0}", table.getName());
+		}
+	}
 }

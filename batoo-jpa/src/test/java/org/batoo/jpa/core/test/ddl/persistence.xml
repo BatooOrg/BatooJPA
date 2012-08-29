@@ -38,4 +38,29 @@
 		</properties>
 
 	</persistence-unit>
+
+	<persistence-unit name="update1">
+		<provider>org.batoo.jpa.core.BatooPersistenceProvider</provider>
+		
+		<class>org.batoo.jpa.core.test.ddl.update1.Customer</class>
+		<class>org.batoo.jpa.core.test.ddl.update1.Address</class>
+		
+		<properties>
+			<property name="org.batoo.jpa.ddl" value="DROP" />
+		</properties>
+
+	</persistence-unit>
+
+	<persistence-unit name="update2">
+		<provider>org.batoo.jpa.core.BatooPersistenceProvider</provider>
+		
+		<class>org.batoo.jpa.core.test.ddl.update2.Customer</class>
+		<class>org.batoo.jpa.core.test.ddl.update2.Address</class>
+		<class>org.batoo.jpa.core.test.ddl.update2.Country</class>
+		
+		<properties>
+			<property name="org.batoo.jpa.ddl" value="UPDATE" />
+		</properties>
+
+	</persistence-unit>
 </persistence>

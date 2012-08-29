@@ -60,7 +60,12 @@ public abstract class AbstractJdbcAdaptor {
 			throw new PersistenceException("Cannot locate JDBC Adaptor for '" + databaseProductName + "'");
 		}
 
-		return jdbcAdaptor;
+		try {
+			return jdbcAdaptor.getClass().newInstance();
+		}
+		catch (final Exception e) {}
+
+		return null;
 	}
 
 	private static Map<String, JdbcAdaptor> prepareAdaptors() {

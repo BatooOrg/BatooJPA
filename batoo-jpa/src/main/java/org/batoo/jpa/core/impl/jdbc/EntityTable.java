@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.jdbc;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
@@ -149,6 +150,15 @@ public class EntityTable extends AbstractTable {
 	 */
 	protected JdbcAdaptor getJdbcAdaptor() {
 		return this.jdbcAdaptor;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public Set<String> getPkColumnNames() {
+		return this.pkColumns.keySet();
 	}
 
 	/**

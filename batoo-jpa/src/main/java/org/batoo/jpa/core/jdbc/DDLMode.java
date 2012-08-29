@@ -41,11 +41,6 @@ public enum DDLMode {
 	UPDATE,
 
 	/**
-	 * Only verify the tables
-	 */
-	VERIFY,
-
-	/**
 	 * None
 	 */
 	NONE;

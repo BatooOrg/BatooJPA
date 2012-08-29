@@ -21,7 +21,6 @@ package org.batoo.jpa.core.test;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.persistence.EntityTransaction;
@@ -37,7 +36,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
-import org.batoo.jpa.core.BJPASettings;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.junit.After;
@@ -45,8 +43,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
-
-import com.google.common.collect.Maps;
 
 /**
  * @author hceylan
@@ -333,21 +329,6 @@ public abstract class BaseCoreTest { // extends BaseTest {
 		return this.getRootPackage();
 	}
 
-	/**
-	 * @return the persistence unit properties override
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	protected HashMap<Object, Object> getProperties() {
-		final HashMap<Object, Object> properties = Maps.newHashMap();
-
-		properties.put(BJPASettings.ROOT_PACKAGE, this.getRootPackage());
-		properties.put(BJPASettings.CLASS_LOADER_CLASS, TestClassLoader.class.getCanonicalName());
-
-		return properties;
-	}
-
 	private String getRootPackage() {
 		return this.getClass().getPackage().getName();
 	}
@@ -517,7 +498,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	}
 
 	/**
-	 * Sets up the entity manager factory
+	 * Sets up the entity manager factory.
 	 * 
 	 * @return the entity manager factory
 	 * 
@@ -525,14 +506,33 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 * @author hceylan
 	 */
 	protected EntityManagerFactoryImpl setupEmf() {
+		return this.setupEmf(this.persistenceUnitName);
+	}
+
+	/**
+	 * Sets up the entity manager factory.
+	 * 
+	 * @param puName
+	 *            the persistence unit name
+	 * @return the entity manager factory
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected EntityManagerFactoryImpl setupEmf(String puName) {
 		final Thread currentThread = Thread.currentThread();
+
+		if (this.oldContextClassLoader != null) {
+			currentThread.setContextClassLoader(this.oldContextClassLoader);
+		}
+
 		this.oldContextClassLoader = currentThread.getContextClassLoader();
 
 		final TestClassLoader cl = new TestClassLoader(this.oldContextClassLoader);
 		currentThread.setContextClassLoader(cl);
 		cl.setRoot(this.getRootPackage());
 
-		return (EntityManagerFactoryImpl) Persistence.createEntityManagerFactory(this.persistenceUnitName);
+		return (EntityManagerFactoryImpl) Persistence.createEntityManagerFactory(puName);
 	}
 
 	/**

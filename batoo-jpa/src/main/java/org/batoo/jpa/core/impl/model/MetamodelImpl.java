@@ -338,7 +338,6 @@ public class MetamodelImpl implements Metamodel {
 	 */
 	public void dropAllTables(DataSourceImpl datasource) {
 		final Set<AbstractTable> tables = Sets.newHashSet();
-		final Set<ForeignKey> foreignKeys = Sets.newHashSet();
 
 		for (final EntityTypeImpl<?> entity : this.entities.values()) {
 
@@ -350,10 +349,6 @@ public class MetamodelImpl implements Metamodel {
 				}
 
 				tables.add(table);
-
-				for (final ForeignKey key : table.getForeignKeys()) {
-					foreignKeys.add(key);
-				}
 			}
 
 			// collect the join tables
@@ -366,10 +361,6 @@ public class MetamodelImpl implements Metamodel {
 				}
 
 				tables.add(table);
-
-				for (final ForeignKey key : table.getForeignKeys()) {
-					foreignKeys.add(key);
-				}
 			}
 
 			// collect the join tables
@@ -378,17 +369,13 @@ public class MetamodelImpl implements Metamodel {
 					final AbstractTable table = (AbstractTable) mapping.getTable();
 					if (table != null) {
 						tables.add(table);
-
-						for (final ForeignKey key : table.getForeignKeys()) {
-							foreignKeys.add(key);
-						}
 					}
 				}
 			}
 		}
 
 		try {
-			this.jdbcAdaptor.dropAllForeignKeys(datasource, foreignKeys);
+			this.jdbcAdaptor.dropAllForeignKeys(datasource, tables);
 			this.jdbcAdaptor.dropAllTables(datasource, tables);
 			this.jdbcAdaptor.dropAllSequences(datasource, this.sequenceGenerators.values());
 		}
@@ -777,7 +764,7 @@ public class MetamodelImpl implements Metamodel {
 
 			MetamodelImpl.LOG.info("Performing DDL operations for {0}, mode {1}", table.getName(), ddlMode);
 
-			this.jdbcAdaptor.createTable(table, datasource);
+			this.jdbcAdaptor.createOrUpdateTable(table, datasource, ddlMode);
 		}
 
 		// create the join tables
@@ -789,7 +776,7 @@ public class MetamodelImpl implements Metamodel {
 				continue;
 			}
 
-			this.jdbcAdaptor.createTable(mapping.getTable(), datasource);
+			this.jdbcAdaptor.createOrUpdateTable(mapping.getTable(), datasource, ddlMode);
 		}
 
 		// create the join tables
@@ -797,7 +784,7 @@ public class MetamodelImpl implements Metamodel {
 			if (!mapping.isAssociation()) {
 				final AbstractTable table = (AbstractTable) mapping.getTable();
 
-				this.jdbcAdaptor.createTable(table, datasource);
+				this.jdbcAdaptor.createOrUpdateTable(table, datasource, ddlMode);
 			}
 		}
 	}
