@@ -421,6 +421,15 @@ public abstract class AbstractFrom<Z, X> extends ParentPath<Z, X> implements Fro
 	 * 
 	 */
 	@Override
+	public boolean isEntityList() {
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public <Y> CollectionJoinImpl<X, Y> join(CollectionAttribute<? super X, Y> collection) {
 		return this.join(collection, JoinType.INNER);
 	}

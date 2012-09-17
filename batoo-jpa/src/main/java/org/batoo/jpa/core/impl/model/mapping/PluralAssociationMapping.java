@@ -35,6 +35,7 @@ import javax.persistence.metamodel.PluralAttribute.CollectionType;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableBoolean;
+import org.batoo.jpa.core.impl.cache.CacheInstance;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.collections.ManagedList;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
@@ -57,6 +58,8 @@ import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.PluralAttributeMetadata;
+
+import com.google.common.collect.Lists;
 
 /**
  * 
@@ -522,26 +525,47 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public Collection<? extends E> loadCollection(ManagedInstance<?> managedInstance) {
 		final EntityManagerImpl em = managedInstance.getSession().getEntityManager();
-		final QueryImpl<E> q = em.createQuery(this.getSelectCriteria());
 
-		final EntityTypeImpl<?> rootType = managedInstance.getType();
+		List<E> children = null;
 
-		final Object id = managedInstance.getId().getId();
+		// try to load from the cache
+		if (this.type.isCachable()) {
 
-		// if has single id then pass it on
-		if (rootType.hasSingleIdAttribute()) {
-			q.setParameter(0, id);
-		}
-		else {
-			int i = 0;
-			for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
-				q.setParameter(i++, pair.getSecond().get(id));
+			final CacheInstance cacheInstance = em.getEntityManagerFactory().getCache().get(managedInstance.getId());
+
+			final Collection<E> collection = (Collection<E>) cacheInstance.getCollection(managedInstance, this);
+			if (collection != null) {
+				children = Lists.newArrayList(collection);
 			}
 		}
 
-		final List<E> children = q.getResultList();
+		// load from the database
+		if (children == null) {
+			final QueryImpl<E> q = em.createQuery(this.getSelectCriteria());
+
+			final EntityTypeImpl<?> rootType = managedInstance.getType();
+
+			final Object id = managedInstance.getId().getId();
+
+			// if has single id then pass it on
+			if (rootType.hasSingleIdAttribute()) {
+				q.setParameter(0, id);
+			}
+			else {
+				int i = 0;
+				for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
+					q.setParameter(i++, pair.getSecond().get(id));
+				}
+			}
+
+			children = q.getResultList();
+			if (this.type.isCachable()) {
+
+			}
+		}
 
 		final Object instance = managedInstance.getInstance();
 		if ((this.getInverse() != null) && (this.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_MANY)) {

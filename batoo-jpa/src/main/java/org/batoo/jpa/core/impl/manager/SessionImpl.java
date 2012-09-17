@@ -32,6 +32,7 @@ import javax.persistence.PersistenceException;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.cache.CacheImpl;
+import org.batoo.jpa.core.impl.cache.CacheInstance;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
@@ -384,7 +385,24 @@ public class SessionImpl {
 				return null;
 			}
 
-			instance = (ManagedInstance<Y>) id.getType().tryGetFromCache(cache, this, id.getId());
+			final CacheInstance cacheInstance = cache.get(id);
+			if (cacheInstance != null) {
+				final EntityTypeImpl<X> type = this.metamodel.entity((cacheInstance.getEntityName()));
+				instance = (ManagedInstance<Y>) type.getManagedInstanceById(this, id, false);
+
+				cacheInstance.copyTo(cache, instance);
+				instance.enhanceCollections();
+
+				this.setLoadTracker();
+				try {
+					this.put(instance);
+				}
+				finally {
+					this.releaseLoadTracker();
+				}
+
+				return instance;
+			}
 
 			if (instance == null) {
 				this.idsNotCached.add(id);

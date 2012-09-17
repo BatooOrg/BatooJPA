@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.impl.cache;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Cache;
@@ -28,11 +29,14 @@ import javax.persistence.SharedCacheMode;
 
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.Status;
+import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
@@ -48,27 +52,28 @@ public class CacheImpl implements Cache {
 	private static final ThreadLocal<CacheRetrieveMode> cacheRetrieveMode = new ThreadLocal<CacheRetrieveMode>();
 	private static final ThreadLocal<CacheStoreMode> cacheStoreMode = new ThreadLocal<CacheStoreMode>();
 
-	private final MetamodelImpl metamodel;
+	private final EntityManagerFactoryImpl emf;
 	private final SharedCacheMode cacheMode;
 	private final boolean on;
 
 	private final HashMap<Class<?>, Map<Object, CacheInstance>> cacheDelegate = Maps.newHashMap();
+	private final HashMap<ResultListReference, List<CacheReference[]>> queryCacheDelegate = Maps.newHashMap();
 	private final HashMap<Class<?>, CacheStats> statsDelegate = Maps.newHashMap();
 
 	private CacheStats stats;
 
 	/**
-	 * @param metamodel
-	 *            the metamodel
+	 * @param emf
+	 *            the entity manager factory
 	 * @param cacheMode
 	 *            the cache mode
 	 * @since $version
 	 * @author hceylan
 	 */
-	public CacheImpl(MetamodelImpl metamodel, SharedCacheMode cacheMode) {
+	public CacheImpl(EntityManagerFactoryImpl emf, SharedCacheMode cacheMode) {
 		super();
 
-		this.metamodel = metamodel;
+		this.emf = emf;
 		this.cacheMode = cacheMode;
 
 		switch (this.cacheMode) {
@@ -90,7 +95,7 @@ public class CacheImpl implements Cache {
 	 */
 	@Override
 	public boolean contains(Class<?> cls, Object primaryKey) {
-		final EntityTypeImpl<?> entity = this.metamodel.getEntity(cls);
+		final EntityTypeImpl<?> entity = this.emf.getMetamodel().getEntity(cls);
 
 		return this.cacheDelegate.containsKey(entity + "_" + primaryKey);
 	}
@@ -131,30 +136,55 @@ public class CacheImpl implements Cache {
 	}
 
 	/**
-	 * Returns the instance with the key
+	 * Returns the instance with the id
 	 * 
-	 * @param clazz
-	 *            the class of the instance
-	 * @param primaryKey
-	 *            the primary key of the instance
+	 * @param id
+	 *            the managed id of the instance
+	 * @return the cached instance or <code>null</code>
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public CacheInstance get(ManagedId<?> id) {
+		final Class<?> clazz = id.getType().getRootMapping().getJavaType();
+		final CacheInstance cacheInstance = this.getEntityMap(clazz).get(id.getId());
+
+		if (cacheInstance != null) {
+			this.stats.hit(id.getId());
+			this.getStats(clazz).hit(id.getId());
+		}
+		else {
+			this.stats.miss(id.getId());
+			this.getStats(clazz).miss(id.getId());
+		}
+
+		return cacheInstance;
+	}
+
+	/**
+	 * Returns the resultset for the query
+	 * 
+	 * @param sql
+	 *            the sql
+	 * @param parameters
+	 *            the parameters
 	 * @return the cached instance
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public CacheInstance get(Class<?> clazz, Object primaryKey) {
-		final CacheInstance cacheInstance = this.getEntityMap(clazz).get(primaryKey);
+	public List<CacheReference[]> get(String sql, Object[] parameters) {
+		final ResultListReference reference = new ResultListReference(sql, parameters);
+		final List<CacheReference[]> results = this.queryCacheDelegate.get(reference);
 
-		if (cacheInstance != null) {
-			this.stats.hit(primaryKey);
-			this.getStats(clazz).hit(primaryKey);
+		if (results != null) {
+			this.stats.qhit(sql);
 		}
 		else {
-			this.stats.miss(primaryKey);
-			this.getStats(clazz).miss(primaryKey);
+			this.stats.qmiss(sql);
 		}
 
-		return cacheInstance;
+		return results;
 	}
 
 	/**
@@ -302,20 +332,60 @@ public class CacheImpl implements Cache {
 	 */
 	public void put(ManagedInstance<?> instance) {
 		final Class<?> clazz = instance.getType().getRootType().getJavaType();
-		final Object key = instance.getId().getId();
+		final Object id = instance.getId().getId();
 
 		if (instance.getStatus() == Status.REMOVED) {
-			this.getEntityMap(clazz).remove(key);
+			this.getEntityMap(clazz).remove(id);
 
-			this.stats.evict(key);
-			this.getStats(clazz).evict(key);
+			this.stats.evict(instance.getType().getJavaType() + ":" + id);
+			this.getStats(clazz).evict(id);
 		}
 		else {
-			this.getEntityMap(clazz).put(key, new CacheInstance(this, instance));
+			this.getEntityMap(clazz).put(id, new CacheInstance(this, instance));
 
-			this.stats.put(key);
-			this.getStats(clazz).put(key);
+			this.stats.put(instance.getType().getJavaType() + ":" + id);
+			this.getStats(clazz).put(id);
 		}
+	}
+
+	/**
+	 * Puts the query result to cache.
+	 * 
+	 * @param sql
+	 *            the sql
+	 * @param parameters
+	 *            the parameters
+	 * @param results
+	 *            the results
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void put(String sql, Object[] parameters, List<?> results) {
+		final MetamodelImpl metamodel = this.emf.getMetamodel();
+
+		final List<CacheReference[]> references = Lists.newArrayList();
+
+		for (final Object result : results) {
+			CacheReference[] referenceArray;
+
+			if (result instanceof Object[]) {
+				final Object[] resultArray = (Object[]) result;
+				referenceArray = new CacheReference[resultArray.length];
+
+				for (int i = 0; i < resultArray.length; i++) {
+					referenceArray[i] = new CacheReference(metamodel, resultArray[i]);
+				}
+			}
+			else {
+				referenceArray = new CacheReference[] { new CacheReference(metamodel, result) };
+			}
+
+			references.add(referenceArray);
+		}
+
+		final ResultListReference reference = new ResultListReference(sql, parameters);
+		this.queryCacheDelegate.put(reference, references);
 	}
 
 	private void reset() {

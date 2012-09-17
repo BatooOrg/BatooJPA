@@ -53,5 +53,4 @@ public class IncrementalNamingThreadFactory implements ThreadFactory {
 	public Thread newThread(Runnable r) {
 		return new Thread(r, this.name + " [" + this.nextThreadNo++ + "]");
 	}
-
 }

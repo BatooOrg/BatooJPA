@@ -452,7 +452,7 @@ public class EntityManagerImpl implements EntityManager {
 
 		CacheStoreMode cacheStoreMode = null;
 		if (properties != null) {
-			cacheStoreMode = (CacheStoreMode) properties.get(JPASettings.SHARED_CACHE_RETRIEVE_MODE);
+			cacheStoreMode = (CacheStoreMode) properties.get(JPASettings.SHARED_CACHE_STORE_MODE);
 			if (cacheStoreMode != null) {
 				this.emf.getCache().setCacheStoreMode(cacheStoreMode);
 			}

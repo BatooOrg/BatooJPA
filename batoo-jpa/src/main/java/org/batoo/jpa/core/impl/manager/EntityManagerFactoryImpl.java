@@ -142,7 +142,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		this.jta = StringUtils.isNotBlank(parser.getJtaDatasource());
 		this.datasource = this.createDatasource(parser);
 		this.transactionManager = this.lookupTransactionManager();
-		this.cache = new CacheImpl(this.metamodel, parser.getSharedCacheMode());
+		this.cache = new CacheImpl(this, parser.getSharedCacheMode());
 
 		this.ddlMode = this.readDdlMode();
 

@@ -181,4 +181,19 @@ public class CompoundSelectionImpl<X> extends AbstractSelection<X> implements Co
 			throw new PersistenceException("Cannot construct result object", e);
 		}
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isEntityList() {
+		for (final AbstractSelection<?> selection : this.selections) {
+			if (!selection.isEntityList()) {
+				return false;
+			}
+		}
+
+		return true;
+	}
 }

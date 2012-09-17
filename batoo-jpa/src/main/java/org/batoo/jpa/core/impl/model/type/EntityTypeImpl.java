@@ -45,8 +45,6 @@ import javax.validation.ValidatorFactory;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.reflect.ReflectHelper;
-import org.batoo.jpa.core.impl.cache.CacheImpl;
-import org.batoo.jpa.core.impl.cache.CacheInstance;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
@@ -1863,42 +1861,5 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	@Override
 	public String toString() {
 		return "EntityTypeImpl [name=" + this.name + "]";
-	}
-
-	/**
-	 * Tries to locate the instance in the cache and returns the instance from the cache.
-	 * 
-	 * @param cache
-	 *            the cache
-	 * @param session
-	 *            the session
-	 * @param primaryKey
-	 *            the primary key
-	 * @return the managed instance or null
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public ManagedInstance<X> tryGetFromCache(CacheImpl cache, SessionImpl session, Object primaryKey) {
-		final CacheInstance instance = cache.get(this.getRootMapping().getJavaType(), primaryKey);
-
-		if (instance != null) {
-			final ManagedId<X> managedId = new ManagedId<X>(primaryKey, this);
-			final ManagedInstance<X> managedInstance = this.getManagedInstanceById(session, managedId, false);
-
-			instance.copyTo(cache, managedInstance);
-
-			session.setLoadTracker();
-			try {
-				session.put(managedInstance);
-			}
-			finally {
-				session.releaseLoadTracker();
-			}
-
-			return managedInstance;
-		}
-
-		return null;
 	}
 }

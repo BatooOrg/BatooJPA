@@ -54,8 +54,7 @@ public class CacheInstance implements Serializable {
 	private final Map<String, List<CacheReference>> pluralMappings = Maps.newHashMap();
 	private final Map<String, CacheReference> singularMappings = Maps.newHashMap();
 
-	private final String clazz;
-
+	private final String entityName;
 	private final Object id;
 
 	/**
@@ -70,7 +69,7 @@ public class CacheInstance implements Serializable {
 	public CacheInstance(CacheImpl cache, ManagedInstance<?> managedInstance) {
 		super();
 
-		this.clazz = managedInstance.getType().getJavaType().getName();
+		this.entityName = managedInstance.getType().getName();
 		this.id = managedInstance.getId().getId();
 
 		final EntityTypeImpl<?> type = managedInstance.getType();
@@ -191,6 +190,18 @@ public class CacheInstance implements Serializable {
 	}
 
 	/**
+	 * Returns the name of the entity of the cache instance.
+	 * 
+	 * @return the name of the entity of the cache instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getEntityName() {
+		return this.entityName;
+	}
+
+	/**
 	 * @param cache
 	 *            the cache
 	 * @param mapping
@@ -215,8 +226,8 @@ public class CacheInstance implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return "CacheInstance [clazz=" + this.clazz + ", id=" + this.id + ", basicMappings=" + this.basicMappings + ", pluralMappings=" + this.pluralMappings
-			+ "]";
+		return "CacheInstance [clazz=" + this.entityName + ", id=" + this.id + ", basicMappings=" + this.basicMappings + ", pluralMappings="
+			+ this.pluralMappings + "]";
 	}
 
 	/**

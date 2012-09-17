@@ -149,4 +149,16 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	public boolean isCompoundSelection() {
 		return false;
 	}
+
+	/**
+	 * Returns if the selection is comprises of entities only.
+	 * 
+	 * @return true if the selection is comprises of entities only, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isEntityList() {
+		return false;
+	}
 }

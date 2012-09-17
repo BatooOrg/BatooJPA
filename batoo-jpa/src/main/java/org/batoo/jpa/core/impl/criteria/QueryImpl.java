@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.persistence.CacheRetrieveMode;
+import javax.persistence.CacheStoreMode;
 import javax.persistence.EntityTransaction;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
@@ -47,12 +49,17 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.jpa.core.JPASettings;
+import org.batoo.jpa.core.impl.cache.CacheImpl;
+import org.batoo.jpa.core.impl.cache.CacheReference;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
+import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor.PaginationParamsOrder;
 
 import com.google.common.collect.Lists;
@@ -73,6 +80,7 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>>, Q
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(QueryImpl.class);
 
+	private final EntityManagerFactoryImpl emf;
 	private final EntityManagerImpl em;
 	private final BaseQuery<X> q;
 	private String sql;
@@ -81,7 +89,7 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>>, Q
 	private int maxResult = Integer.MAX_VALUE;
 
 	private final Map<ParameterExpressionImpl<?>, Object> parameters = Maps.newHashMap();
-	private final List<X> results = Lists.newArrayList();
+	private List<X> results;
 
 	private LockModeType lockMode;
 
@@ -103,8 +111,9 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>>, Q
 	public QueryImpl(BaseQuery<X> q, EntityManagerImpl entityManager) {
 		super();
 
-		this.q = q;
+		this.emf = entityManager.getEntityManagerFactory();
 		this.em = entityManager;
+		this.q = q;
 		this.sql = this.q.getSql();
 
 		for (final ParameterExpression<?> p : this.q.getParameters()) {
@@ -228,6 +237,66 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>>, Q
 		}
 
 		return parameters;
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<X> buildResultSet(CacheImpl cache, List<CacheReference[]> cachedResults) {
+		final MetamodelImpl metamodel = this.em.getMetamodel();
+
+		this.results = Lists.newArrayList();
+
+		for (int i = 0; i < cachedResults.size(); i++) {
+			final CacheReference[] references = cachedResults.get(i);
+			if (references.length == 1) {
+				final EntityTypeImpl<?> childType = metamodel.entity(references[0].getType());
+				final X instance = (X) this.em.find(childType.getJavaType(), references[0].getId());
+
+				this.results.add(instance);
+			}
+			else {
+				final Object[] instanceArray = new Object[references.length];
+				for (int j = 0; j < references.length; j++) {
+
+					final EntityTypeImpl<?> childType = metamodel.entity(references[0].getType());
+					instanceArray[j] = this.em.find(childType.getJavaType(), references[0].getId());
+
+				}
+
+				this.results.add((X) instanceArray);
+			}
+		}
+
+		return this.results;
+	}
+
+	private List<X> buildResultSet(final Object[] parameters, CacheStoreMode cacheStoreMode) {
+		this.results = Lists.newArrayList();
+
+		try {
+			final ConnectionImpl connection = this.em.getConnection();
+			try {
+				new QueryRunner(this.em.getMetamodel().getJdbcAdaptor().isPmdBroken()).query(connection, this.sql, this, parameters);
+
+				if (((cacheStoreMode == CacheStoreMode.REFRESH) || (cacheStoreMode == CacheStoreMode.USE)) && (this.q instanceof CriteriaQueryImpl)) {
+					this.emf.getCache().put(this.sql, parameters, this.results);
+				}
+
+				return this.results;
+			}
+			finally {
+				this.em.closeConnectionIfNecessary();
+			}
+		}
+		catch (final SQLException e) {
+			QueryImpl.LOG.error(e, "Query failed" + QueryImpl.LOG.lazyBoxed(this.sql, parameters));
+
+			final EntityTransaction transaction = this.em.getTransaction();
+			if (transaction != null) {
+				transaction.setRollbackOnly();
+			}
+
+			throw new PersistenceException("Query failed", e);
+		}
 	}
 
 	private void dumpResultSet() throws SQLException {
@@ -474,8 +543,6 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>>, Q
 	 */
 	@Override
 	public List<X> getResultList() {
-		this.em.getSession().setLoadTracker();
-
 		ManagedInstance.LOCK_CONTEXT.set(this.getLockMode());
 		try {
 			return this.getResultListImpl();
@@ -486,37 +553,58 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>>, Q
 	}
 
 	private List<X> getResultListImpl() {
+		// if we already have the results then return the results
+		if (this.results != null) {
+			return this.results;
+		}
+
+		this.em.getSession().setLoadTracker();
+
+		final CacheImpl cache = this.emf.getCache();
+
+		final CacheRetrieveMode cacheRetrieveMode = (CacheRetrieveMode) this.hints.get(JPASettings.SHARED_CACHE_RETRIEVE_MODE);
+		if (cacheRetrieveMode != null) {
+			cache.setCacheRetrieveMode(cacheRetrieveMode);
+		}
+
+		final CacheStoreMode cacheStoreMode = (CacheStoreMode) this.hints.get(JPASettings.SHARED_CACHE_STORE_MODE);
+		if (cacheStoreMode != null) {
+			cache.setCacheStoreMode(cacheStoreMode);
+		}
+
 		try {
 			final LockModeType lockMode = this.getLockMode();
-			if ((lockMode == LockModeType.PESSIMISTIC_READ) || (lockMode == LockModeType.PESSIMISTIC_WRITE)
-				|| (lockMode == LockModeType.PESSIMISTIC_FORCE_INCREMENT)) {
+			final boolean hasLock = (lockMode == LockModeType.PESSIMISTIC_READ) || (lockMode == LockModeType.PESSIMISTIC_WRITE)
+				|| (lockMode == LockModeType.PESSIMISTIC_FORCE_INCREMENT);
+			if (hasLock) {
 				this.sql = this.em.getJdbcAdaptor().applyLock(this.sql, lockMode);
 			}
 
 			final Object[] parameters = this.applyParameters();
 
-			try {
-				final ConnectionImpl connection = this.em.getConnection();
-				try {
-					return new QueryRunner(this.em.getMetamodel().getJdbcAdaptor().isPmdBroken()).query(connection, this.sql, this, parameters);
-				}
-				finally {
-					this.em.closeConnectionIfNecessary();
+			if ((cacheRetrieveMode == CacheRetrieveMode.USE) && !hasLock && (this.q instanceof CriteriaQueryImpl)) {
+				final CriteriaQueryImpl<X> cq = (CriteriaQueryImpl<X>) this.q;
+				if (cq.getSelection().isEntityList()) {
+					final List<CacheReference[]> cachedResults = cache.get(this.sql, parameters);
+
+					if (cachedResults != null) {
+						return this.buildResultSet(cache, cachedResults);
+					}
 				}
 			}
-			catch (final SQLException e) {
-				QueryImpl.LOG.error(e, "Query failed" + QueryImpl.LOG.lazyBoxed(this.sql, parameters));
 
-				final EntityTransaction transaction = this.em.getTransaction();
-				if (transaction != null) {
-					transaction.setRollbackOnly();
-				}
-
-				throw new PersistenceException("Query failed", e);
-			}
+			return this.buildResultSet(parameters, cacheStoreMode);
 		}
 		finally {
 			this.em.getSession().releaseLoadTracker();
+
+			if (cacheRetrieveMode != null) {
+				cache.setCacheRetrieveMode(null);
+			}
+
+			if (cacheStoreMode != null) {
+				cache.setCacheStoreMode(null);
+			}
 		}
 	}
 

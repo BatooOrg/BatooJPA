@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.cache;
 
+import java.io.Serializable;
 import java.text.MessageFormat;
 
 import org.batoo.jpa.common.log.BLogger;
@@ -29,7 +30,7 @@ import org.batoo.jpa.common.log.BLoggerFactory;
  * @author hceylan
  * @since $version
  */
-public class CacheStats {
+public class CacheStats implements Serializable {
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(CacheStats.class);
 
@@ -38,6 +39,8 @@ public class CacheStats {
 	private int puts;
 	private int hits;
 	private int misses;
+	private int qhits;
+	private int qmisses;
 
 	/**
 	 * @param name
@@ -159,6 +162,62 @@ public class CacheStats {
 	 */
 	public int puts() {
 		return this.puts;
+	}
+
+	/**
+	 * Increments the query hits counter.
+	 * 
+	 * @param sql
+	 *            the sql
+	 * 
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	/* package */void qhit(String sql) {
+		this.qhits++;
+
+		CacheStats.LOG.debug("QHIT {0}:{1} \nputs:{2} evicts:{3} hits:{4}, misses:{5}", this.name, sql, this.puts, this.evicts, this.hits, this.misses);
+	}
+
+	/**
+	 * Returns the number of query hits.
+	 * 
+	 * @return the number of query hits
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public int qhits() {
+		return this.qhits;
+	}
+
+	/**
+	 * Increments the query missses counter.
+	 * 
+	 * @param primaryKey
+	 *            the primary key
+	 * 
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	/* package */void qmiss(String sql) {
+		this.qmisses++;
+
+		CacheStats.LOG.debug("QMISS {0}:{1} \n puts:{2} evicts:{3} hits:{4}, misses:{5}", this.name, sql, this.puts, this.evicts, this.hits, this.misses);
+	}
+
+	/**
+	 * Returns the number of query misses.
+	 * 
+	 * @return the number of query misses
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public int qmisses() {
+		return this.qmisses;
 	}
 
 	/**
