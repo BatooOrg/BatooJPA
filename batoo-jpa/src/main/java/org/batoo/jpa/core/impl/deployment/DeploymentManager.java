@@ -154,8 +154,8 @@ public abstract class DeploymentManager<X> {
 			throw (BatooException) t;
 		}
 
-		if (t.getCause() == null) {
-			throw new BatooException("Unknown error occurred during deployment", t);
+		if (t.getCause() != null) {
+			throw new BatooException("Unknown error occurred during deployment", t.getCause());
 		}
 
 		this.handleException(t.getCause());
