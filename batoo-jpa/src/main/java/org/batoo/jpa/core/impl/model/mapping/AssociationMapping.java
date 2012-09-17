@@ -300,9 +300,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 			final RootImpl<?> r = q.from(type);
 			r.alias(BatooUtils.acronym(type.getName()).toLowerCase());
 			final AbstractJoin<?, Y> join = r.<Y> join(attribute.getName());
-			if (this.getInverse() != null) {
-				join.fetch(this.getInverse().getAttribute().getName());
-			}
 			join.alias(BatooUtils.acronym(entity.getName()).toLowerCase());
 			q = q.select(join);
 
