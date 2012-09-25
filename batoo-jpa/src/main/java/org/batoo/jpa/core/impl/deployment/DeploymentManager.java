@@ -21,8 +21,11 @@ package org.batoo.jpa.core.impl.deployment;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -79,6 +82,33 @@ public abstract class DeploymentManager<X> {
 		NAMED_QUERIES
 	}
 
+	private class DeploymentUnitFuture extends FutureTask<Void> implements Comparable<DeploymentUnitFuture> {
+
+		private final DeploymentUnitTask task;
+
+		/**
+		 * @param task
+		 *            the deployment unit task.
+		 * 
+		 * @since $version
+		 * @author hceylan
+		 */
+		public DeploymentUnitFuture(DeploymentUnitTask task) {
+			super(task);
+
+			this.task = task;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 */
+		@Override
+		public int compareTo(DeploymentUnitFuture o) {
+			return this.task.compareTo(o.task);
+		}
+	}
+
 	private final BLogger log;
 	private final MetamodelImpl metamodel;
 	private final List<ManagedType<?>> types = Lists.newArrayList();
@@ -101,6 +131,7 @@ public abstract class DeploymentManager<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
+	@SuppressWarnings({ "unchecked" })
 	public DeploymentManager(BLogger log, String name, MetamodelImpl metamodel, Context context) {
 		super();
 
@@ -124,7 +155,16 @@ public abstract class DeploymentManager<X> {
 
 		final int nThreads = Runtime.getRuntime().availableProcessors() * 2;
 		this.executer = new ThreadPoolExecutor(nThreads, nThreads, 0L, TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>(),
-			new IncrementalNamingThreadFactory(name));
+			new IncrementalNamingThreadFactory(name)) {
+			/**
+			 * {@inheritDoc}
+			 * 
+			 */
+			@Override
+			protected <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
+				return (RunnableFuture<T>) new DeploymentUnitFuture((DeploymentUnitTask) callable);
+			}
+		};
 
 		this.log.debug("Number of threads is {0}", nThreads);
 	}

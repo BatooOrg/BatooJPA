@@ -30,7 +30,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import org.apache.commons.dbutils.QueryRunner;
+import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;

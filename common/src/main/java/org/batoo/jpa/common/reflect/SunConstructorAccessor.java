@@ -16,54 +16,38 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.core.impl.instance;
+package org.batoo.jpa.common.reflect;
 
-import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 
 /**
- * Interface implemented by enhanced managed instances.
+ * Constructor accessor for sun java environents.
  * 
  * @author hceylan
  * @since $version
  */
-public interface EnhancedInstance extends Serializable {
+@SuppressWarnings("restriction")
+public class SunConstructorAccessor implements ConstructorAccessor {
+
+	private final sun.reflect.ConstructorAccessor constructor;
 
 	/**
-	 * Returns the managed instance of the instance.
-	 * 
-	 * @return the managed instance of the instance
+	 * @param constructor
+	 *            the constructor
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	ManagedInstance<?> __enhanced__$$__getManagedInstance();
+	public SunConstructorAccessor(Object constructor) {
+		this.constructor = (sun.reflect.ConstructorAccessor) constructor;
+	}
 
 	/**
-	 * Returns if the instance has been initialized.
+	 * {@inheritDoc}
 	 * 
-	 * @return true if the instance has been initialized
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	boolean __enhanced__$$__isInitialized();
-
-	/**
-	 * Marks the instance as initialized.
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	void __enhanced__$$__setInitialized();
-
-	/**
-	 * Sets the managed instance of the instance.
-	 * 
-	 * @param instance
-	 *            the instance to set
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	void __enhanced__$$__setManagedInstance(ManagedInstance<?> instance);
+	@Override
+	public Object newInstance(Object[] args) throws InstantiationException, IllegalArgumentException, InvocationTargetException {
+		return this.constructor.newInstance(args);
+	}
 }

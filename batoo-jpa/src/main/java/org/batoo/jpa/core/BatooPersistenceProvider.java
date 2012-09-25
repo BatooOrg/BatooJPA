@@ -26,6 +26,7 @@ import javax.persistence.spi.PersistenceProvider;
 import javax.persistence.spi.PersistenceUnitInfo;
 import javax.persistence.spi.ProviderUtil;
 
+import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.BatooException;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
@@ -65,9 +66,11 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 	@SuppressWarnings("rawtypes")
 	public EntityManagerFactoryImpl createContainerEntityManagerFactory(PersistenceUnitInfo info, Map map) {
 		try {
-			final PersistenceParser parser = new PersistenceParser(info, null);
+			final PersistenceParser parser = new org.batoo.jpa.parser.PersistenceParserImpl(info, null);
 
-			return new EntityManagerFactoryImpl(info.getPersistenceUnitName(), parser);
+			return StringUtils.isNotBlank(parser.getJtaDatasource()) ? //
+				new org.batoo.jpa.core.impl.manager.JtaEntityManagerFactoryImpl(info.getPersistenceUnitName(), parser) : new EntityManagerFactoryImpl(
+					info.getPersistenceUnitName(), parser);
 		}
 		catch (final Throwable e) {
 			if ((e instanceof PersistenceException) || (e instanceof MappingException) || (e instanceof BatooException)) {
@@ -89,7 +92,7 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 	public EntityManagerFactory createEntityManagerFactory(String emName, Map map) {
 		try {
 			// create the persistence parser
-			final PersistenceParser parser = new PersistenceParser(emName);
+			final PersistenceParser parser = new org.batoo.jpa.parser.PersistenceParserImpl(emName);
 
 			// finally, create the entity manager factory
 			return new EntityManagerFactoryImpl(emName, parser);
@@ -100,6 +103,39 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 			}
 
 			BatooPersistenceProvider.LOG.info(e, "Unable to find Batoo JPA persistence unit: " + emName);
+
+			return null;
+		}
+	}
+
+	/**
+	 * Creates a persistence unit without persistence.xml file. Suitable for non-standard platforms such as Android.
+	 * 
+	 * @param emName
+	 *            the name of the persistence unit
+	 * @param map
+	 *            the properties
+	 * @param classes
+	 *            the list of classes
+	 * @return the entity manager factory
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public EntityManagerFactory createEntityManagerFactory(String emName, Map<String, String> map, String[] classes) {
+		try {
+			// create the persistence parser
+			final PersistenceParser parser = new org.batoo.jpa.parser.AndroidPersistenceParserImpl(map, classes);
+
+			// finally, create the entity manager factory
+			return new EntityManagerFactoryImpl(emName, parser);
+		}
+		catch (final Throwable e) {
+			if ((e instanceof PersistenceException) || (e instanceof MappingException) || (e instanceof BatooException)) {
+				throw (RuntimeException) e;
+			}
+
+			BatooPersistenceProvider.LOG.info(e, "Unable to build persistence unit: " + emName);
 
 			return null;
 		}

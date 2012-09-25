@@ -658,6 +658,10 @@ public class MetamodelImpl implements Metamodel {
 	 * @author hceylan
 	 */
 	public void performForeignKeysDdl(DataSourceImpl datasource, DDLMode ddlMode, EntityTypeImpl<?> entity) {
+		if ((ddlMode == DDLMode.NONE)) {
+			return;
+		}
+
 		MetamodelImpl.LOG.info("Performing foreign key DDL operations for entiy {0}, mode {1}", entity.getName(), ddlMode);
 
 		for (final EntityTable table : entity.getTables()) {

@@ -16,54 +16,44 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.core.impl.instance;
+package org.batoo.jpa.core.impl.jdbc.dbutils;
 
-import java.io.Serializable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.apache.commons.dbutils.ResultSetHandler;
 
 /**
- * Interface implemented by enhanced managed instances.
+ * A Handler to return single values from the result sets.
+ * 
+ * @param <T>
+ *            the target type the input ResultSet will be converted to.
  * 
  * @author hceylan
  * @since $version
  */
-public interface EnhancedInstance extends Serializable {
+public class SingleValueHandler<T> implements ResultSetHandler<T> {
 
 	/**
-	 * Returns the managed instance of the instance.
-	 * 
-	 * @return the managed instance of the instance
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	ManagedInstance<?> __enhanced__$$__getManagedInstance();
+	public SingleValueHandler() {
+		super();
+	}
 
 	/**
-	 * Returns if the instance has been initialized.
+	 * {@inheritDoc}
 	 * 
-	 * @return true if the instance has been initialized
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	boolean __enhanced__$$__isInitialized();
+	@Override
+	@SuppressWarnings("unchecked")
+	public T handle(ResultSet rs) throws SQLException {
+		if (rs.next()) {
+			return (T) rs.getObject(1);
+		}
 
-	/**
-	 * Marks the instance as initialized.
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	void __enhanced__$$__setInitialized();
-
-	/**
-	 * Sets the managed instance of the instance.
-	 * 
-	 * @param instance
-	 *            the instance to set
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	void __enhanced__$$__setManagedInstance(ManagedInstance<?> instance);
+		return null;
+	}
 }

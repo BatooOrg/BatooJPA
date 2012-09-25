@@ -28,11 +28,11 @@ import javax.persistence.PersistenceException;
 import javax.persistence.criteria.CriteriaBuilder.Trimspec;
 import javax.sql.DataSource;
 
-import org.apache.commons.dbutils.QueryRunner;
+import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
-import org.batoo.jpa.core.impl.jdbc.SingleValueHandler;
+import org.batoo.jpa.core.impl.jdbc.dbutils.SingleValueHandler;
 import org.batoo.jpa.core.impl.model.SequenceGenerator;
 import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.util.BatooUtils;

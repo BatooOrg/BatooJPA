@@ -18,35 +18,28 @@
  */
 package org.batoo.jpa.common.reflect;
 
-import java.beans.PropertyDescriptor;
-import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.batoo.jpa.common.BatooException;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
-import org.reflections.util.ClasspathHelper;
-
-import sun.reflect.ConstructorAccessor;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 /**
@@ -59,24 +52,13 @@ public class ReflectHelper {
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(ReflectHelper.class);
 
-	private static boolean hasUnsafe;
+	private static final String GET_PREFIX = "get";
+	private static final String IS_PREFIX = "is";
+
 	static final sun.misc.Unsafe unsafe;
 
 	static {
-		ReflectHelper.hasUnsafe = true;
-		try {
-			Class.forName("sun.misc.Unsafe");
-		}
-		catch (final Exception e) {
-			ReflectHelper.hasUnsafe = false;
-		}
-
-		if (ReflectHelper.hasUnsafe) {
-			unsafe = ReflectHelper.getUnSafe();
-		}
-		else {
-			unsafe = null;
-		}
+		unsafe = ReflectHelper.getUnSafe();
 	}
 
 	/**
@@ -131,6 +113,17 @@ public class ReflectHelper {
 	 */
 	public static ConstructorAccessor createConstructor(Constructor<?> constructor) {
 		try {
+			Class.forName("sun.reflect.ConstructorAccessor");
+		}
+		catch (final ClassNotFoundException e) {
+			return new SimpleConstructorAccessor(constructor);
+		}
+
+		return ReflectHelper.createConstructorImpl(constructor);
+	}
+
+	private static ConstructorAccessor createConstructorImpl(Constructor<?> constructor) {
+		try {
 			final Class<?> magClass = Class.forName("sun.reflect.MethodAccessorGenerator");
 			final Constructor<?> c = magClass.getDeclaredConstructors()[0];
 			final Method generateMethod = magClass.getMethod("generateConstructor", Class.class, Class[].class, Class[].class, Integer.TYPE);
@@ -140,8 +133,9 @@ public class ReflectHelper {
 
 			try {
 				final Object mag = c.newInstance();
-				return (sun.reflect.ConstructorAccessor) generateMethod.invoke(mag, constructor.getDeclaringClass(), constructor.getParameterTypes(),
-					constructor.getExceptionTypes(), constructor.getModifiers());
+
+				return new SunConstructorAccessor(generateMethod.invoke(mag, constructor.getDeclaringClass(), constructor.getParameterTypes(),
+					constructor.getExceptionTypes(), constructor.getModifiers()));
 			}
 			finally {
 				ReflectHelper.setAccessible(c, false);
@@ -179,14 +173,14 @@ public class ReflectHelper {
 	 */
 	public static AbstractAccessor getAccessor(Member javaMember) {
 		if (javaMember instanceof Field) {
-			return new FieldAccessor((Field) javaMember);
+			return ReflectHelper.unsafe != null ? new UnsafeFieldAccessor((Field) javaMember) : new FieldAccessor((Field) javaMember);
 		}
 		else {
 			final Class<?> clazz = javaMember.getDeclaringClass();
-			final PropertyDescriptor[] descriptors = PropertyUtils.getPropertyDescriptors(clazz);
+			final PropertyDescriptor[] descriptors = ReflectHelper.getProperties(clazz);
 			for (final PropertyDescriptor descriptor : descriptors) {
-				if (descriptor.getReadMethod() == javaMember) {
-					return new MethodAccessor(descriptor.getReadMethod(), descriptor.getWriteMethod());
+				if (descriptor.getReader() == javaMember) {
+					return new MethodAccessor(descriptor.getReader(), descriptor.getWriter());
 				}
 			}
 
@@ -219,33 +213,6 @@ public class ReflectHelper {
 		}
 
 		throw new IllegalArgumentException("Member is neither field nor method: " + member);
-	}
-
-	/**
-	 * Returns the class path URLSs.
-	 * 
-	 * @return the class path URLSs
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public static Set<URL> getClasspathUrls() {
-		final Set<URL> urls = ClasspathHelper.forClassLoader(ClasspathHelper.defaultClassLoaders);
-		for (final Iterator<URL> i = urls.iterator(); i.hasNext();) {
-			final URL item = i.next();
-			try {
-				final File file = new File(item.toURI());
-				if (file.isDirectory() || file.getAbsolutePath().endsWith(".jar")) {
-					continue;
-				}
-			}
-			catch (final URISyntaxException e) {}
-
-			ReflectHelper.LOG.warn("Skipping classpath url {0}", item);
-			i.remove();
-		}
-
-		return urls;
 	}
 
 	/**
@@ -311,6 +278,48 @@ public class ReflectHelper {
 		return ((Method) member).getReturnType();
 	}
 
+	/**
+	 * Returns the property descriptors for the class.
+	 * 
+	 * @param clazz
+	 *            the class
+	 * @return the property descriptors
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public static PropertyDescriptor[] getProperties(Class<?> clazz) {
+		final List<Method> properties = Lists.newArrayList();
+
+		final Method[] methodList = clazz.getMethods();
+
+		// check each method.
+		for (final Method method : methodList) {
+			if (method == null) {
+				continue;
+			}
+
+			// skip static and private methods.
+			final int mods = method.getModifiers();
+			if (Modifier.isStatic(mods) || !Modifier.isPublic(mods)) {
+				continue;
+			}
+
+			final String name = method.getName();
+
+			if (method.getParameterTypes().length == 0) {
+				if (name.startsWith(ReflectHelper.GET_PREFIX)) {
+					new PropertyDescriptor(clazz, name.substring(3), method);
+				}
+				else if ((method.getReturnType() == boolean.class) && name.startsWith(ReflectHelper.IS_PREFIX)) {
+					new PropertyDescriptor(clazz, name.substring(2), method);
+				}
+			}
+		}
+
+		return properties.toArray(new PropertyDescriptor[properties.size()]);
+	}
+
 	private static sun.misc.Unsafe getUnSafe() {
 		try {
 			ReflectHelper.LOG.debug("Loading direct access library....");
@@ -325,7 +334,7 @@ public class ReflectHelper {
 			}
 		}
 		catch (final Exception e) {
-			ReflectHelper.LOG.warn(e, "Direct access library cannot be loaded");
+			ReflectHelper.LOG.warn("Direct access library cannot be loaded");
 		}
 
 		return null;
@@ -421,5 +430,4 @@ public class ReflectHelper {
 			logger.warn("Following annotations on {0} were ignored: {1}", ReflectHelper.createMemberName(member), Joiner.on(", ").join(filtered));
 		}
 	}
-
 }

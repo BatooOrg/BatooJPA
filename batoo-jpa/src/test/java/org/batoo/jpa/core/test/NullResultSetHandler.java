@@ -34,9 +34,8 @@ public class NullResultSetHandler implements ResultSetHandler<Object> {
 	 * {@inheritDoc}
 	 * 
 	 */
+	@Override
 	public Object handle(ResultSet rs) throws SQLException {
-		// TODO Auto-generated method stub
 		return null;
 	}
-
 }

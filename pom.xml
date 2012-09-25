@@ -156,7 +156,7 @@
 				<artifactId>asm</artifactId>
 				<version>4.0</version>
 			</dependency>
-
+			
 			<!-- Logging -->
 			<dependency>
 				<groupId>org.slf4j</groupId>
@@ -184,11 +184,6 @@
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
 				<version>11.0.2</version>
-			</dependency>
-			<dependency>
-				<groupId>org.reflections</groupId>
-				<artifactId>reflections</artifactId>
-				<version>0.9.5</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-beanutils</groupId>

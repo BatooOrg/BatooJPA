@@ -27,11 +27,10 @@ import javax.persistence.Tuple;
 import javax.persistence.criteria.CompoundSelection;
 import javax.persistence.criteria.Selection;
 
+import org.batoo.jpa.common.reflect.ConstructorAccessor;
 import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.parser.MappingException;
-
-import sun.reflect.ConstructorAccessor;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -46,7 +45,6 @@ import com.google.common.collect.Lists;
  * @author hceylan
  * @since $version
  */
-@SuppressWarnings("restriction")
 public class CompoundSelectionImpl<X> extends AbstractSelection<X> implements CompoundSelection<X> {
 
 	private final List<AbstractSelection<?>> selections = Lists.newArrayList();

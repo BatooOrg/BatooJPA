@@ -29,15 +29,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceException;
 import javax.persistence.PersistenceUnitUtil;
 import javax.persistence.Query;
-import javax.transaction.TransactionManager;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 import javax.validation.groups.Default;
@@ -79,18 +76,12 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(EntityManagerFactoryImpl.class);
 
-	private static final String[] TRANSACTION_MANAGERS = new String[] { //
-	"java:appserver/TransactionManager", //
-		"java:/TransactionManager" };
-
 	private static final int NO_QUERIES_MAX = 1000;
 	private static final int NO_QUERIES_TRIM = 100;
 
 	private final MetamodelImpl metamodel;
 	private final DataSourceImpl datasource;
-	private final TransactionManager transactionManager;
 	private final CacheImpl cache;
-	private final boolean jta;
 	private final DDLMode ddlMode;
 
 	private final JdbcAdaptor jdbcAdaptor;
@@ -139,9 +130,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 			this.removeValidators = null;
 		}
 
-		this.jta = StringUtils.isNotBlank(parser.getJtaDatasource());
 		this.datasource = this.createDatasource(parser);
-		this.transactionManager = this.lookupTransactionManager();
 		this.cache = new CacheImpl(this, parser.getSharedCacheMode());
 
 		this.ddlMode = this.readDdlMode();
@@ -234,7 +223,13 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		});
 	}
 
-	private void assertOpen() {
+	/**
+	 * Checks if the entity manager factory is open.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected void assertOpen() {
 		if (!this.open) {
 			throw new IllegalStateException("EntityManagerFactory has been previously closed");
 		}
@@ -497,18 +492,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	}
 
 	/**
-	 * Returns the transaction manager.
-	 * 
-	 * @return the transaction manager
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public TransactionManager getTransactionManager() {
-		return this.transactionManager;
-	}
-
-	/**
 	 * Returns the set of update validators.
 	 * 
 	 * @return the set of update validators.
@@ -567,51 +550,12 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	}
 
 	/**
-	 * Returns the jta of the EntityManagerFactoryImpl.
-	 * 
-	 * @return the jta of the EntityManagerFactoryImpl
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public boolean isJta() {
-		return this.jta;
-	}
-
-	/**
 	 * {@inheritDoc}
 	 * 
 	 */
 	@Override
 	public boolean isOpen() {
 		return this.open;
-	}
-
-	private TransactionManager lookupTransactionManager() {
-		if (!this.jta) {
-			return null;
-		}
-
-		for (final String jndiName : EntityManagerFactoryImpl.TRANSACTION_MANAGERS) {
-			final TransactionManager manager = this.lookupTransactionManager(jndiName);
-			if (manager != null) {
-				EntityManagerFactoryImpl.LOG.info("Using JTA Transaction manager: {0}", jndiName);
-				return manager;
-			}
-		}
-
-		throw new PersistenceException("Unable to locate the transa ction manager");
-	}
-
-	private TransactionManager lookupTransactionManager(String jndiName) {
-		try {
-			EntityManagerFactoryImpl.LOG.debug("Trying JTA Transaction Manager: {0}", jndiName);
-
-			return (TransactionManager) new InitialContext().lookup(jndiName);
-		}
-		catch (final NamingException e) {}
-
-		return null;
 	}
 
 	private void prepareProperties(PersistenceParser parser) {

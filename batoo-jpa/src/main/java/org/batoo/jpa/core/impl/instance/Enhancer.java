@@ -8,11 +8,8 @@ import java.util.Set;
 import javax.persistence.PersistenceException;
 import javax.persistence.metamodel.EntityType;
 
-import org.batoo.jpa.common.log.BLogger;
-import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -28,9 +25,7 @@ import com.google.common.collect.Sets;
  * @author hceylan
  * @since $version
  */
-public final class Enhancer implements Opcodes {
-
-	private static final BLogger LOG = BLoggerFactory.getLogger(Enhancer.class);
+public final class Enhancer {
 
 	private static final Set<String> IGNORED_METHODS = Sets.newHashSet();
 
@@ -40,8 +35,12 @@ public final class Enhancer implements Opcodes {
 		}
 	}
 
+	/**
+	 * The enhanced suffix for the class
+	 */
+	public static final String SUFFIX_ENHANCED = "$Enhanced";
+
 	private static final String THIS = "this";
-	private static final String SUFFIX_ENHANCED = "$Enhanced";
 
 	private static final String CLASS_ENHANCED_SUFFIX = Enhancer.SUFFIX_ENHANCED;
 
@@ -57,7 +56,6 @@ public final class Enhancer implements Opcodes {
 	private static final String METHOD_ENHANCED_IS_INITIALIZED = "__enhanced__$$__isInitialized";
 	private static final String METHOD_ENHANCED_SET_INITIALIZED = "__enhanced__$$__setInitialized";
 	private static final String METHOD_ENHANCED_CHECK = "__enhanced_$$__check";
-	private static final String METHOD_ENHANCED_GET_ID = "__enhanced__$$__getId";
 	private static final String METHOD_GET_ENTITY_MANAGER = "getEntityManager";
 	private static final String METHOD_ENHANCED_GET_MANAGED_INSTANCE = "__enhanced__$$__getManagedInstance";
 	private static final String METHOD_ENHANCED_SET_MANAGED_INSTANCE = "__enhanced__$$__setManagedInstance";
@@ -75,8 +73,20 @@ public final class Enhancer implements Opcodes {
 	private static final String INTERNAL_ENTITY_MANAGER = Type.getInternalName(EntityManagerImpl.class);
 	private static final String INTERNAL_MANAGED_INSTANCE = Type.getInternalName(ManagedInstance.class);
 
+	/**
+	 * Returns the enhanced class bytecode.
+	 * 
+	 * @param clazz
+	 *            the class to enhance
+	 * @return the enhanced class
+	 * @throws Exception
+	 *             thrown in case of an error
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
 	//@formatter:off
-	private static byte[] create(EntityType<?> type, Class<?> clazz) throws Exception {
+	public static byte[] create(Class<?> clazz) throws Exception {
 
 		final String enhancingClassName = Type.getInternalName(clazz);
 		final String enhancedClassName = enhancingClassName + Enhancer.SUFFIX_ENHANCED;
@@ -103,7 +113,6 @@ public final class Enhancer implements Opcodes {
 		Enhancer.createMethodIsInitialized(enhancedClassName, descEnhancer, cw);
 		Enhancer.createMethodSetInitialized(enhancedClassName, descEnhancer, cw);
 		Enhancer.createMethodCheck(enhancedClassName, descEnhancer, cw);
-		Enhancer.createMethodGetId(enhancedClassName, descEnhancer, cw);
 		Enhancer.createMethodGetManagedInstance(enhancedClassName, descEnhancer, cw);
 		Enhancer.createMethodSetManagedInstance(enhancedClassName, descEnhancer, cw);
 
@@ -124,16 +133,11 @@ public final class Enhancer implements Opcodes {
 				modifiers &= Modifier.STRICT;
 
 				if ((modifiers == Modifier.PUBLIC) || (modifiers == 0)) {
-					// we are not interested in getters for id methods
-					if (!((EntityTypeImpl<?>) type).isIdMethod(method)) {
+					// we are not interested in the return type to omit the overridden methods
+					final String desc = method.getName() + Enhancer.makeDescription(Void.TYPE, method.getParameterTypes());
 
-						// we are not interested in the return type to omit the overridden methods
-						final String desc = method.getName() + Enhancer.makeDescription(Void.TYPE, method.getParameterTypes());
-
-						if (methods.get(desc) == null) {
-							Enhancer.LOG.trace("Method candidate for enhancement: {0}", method);
-							methods.put(desc, method);
-						}
+					if (methods.get(desc) == null) {
+						methods.put(desc, method);
 					}
 				}
 			}
@@ -266,23 +270,6 @@ public final class Enhancer implements Opcodes {
 		mv.visitEnd();
 	}
 
-	private static void createMethodGetId(final String enhancedClassName, final String descEnhancer, final ClassWriter cw) {
-		final MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, Enhancer.METHOD_ENHANCED_GET_ID, Enhancer.makeDescription(Object.class), null, null);
-		mv.visitCode();
-
-		final Label l0 = new Label();
-		mv.visitLabel(l0);
-		mv.visitVarInsn(Opcodes.ALOAD, 0);
-		mv.visitFieldInsn(Opcodes.GETFIELD, enhancedClassName, Enhancer.FIELD_ENHANCED_MANAGED_INSTANCE, Enhancer.DESCRIPTOR_OBJECT);
-		mv.visitInsn(Opcodes.ARETURN);
-
-		final Label l1 = new Label();
-		mv.visitLabel(l1);
-		mv.visitLocalVariable(Enhancer.THIS, descEnhancer, null, l0, l1, 0);
-		mv.visitMaxs(0, 0);
-		mv.visitEnd();
-	}
-
 	private static void createMethodGetManagedInstance(final String enhancedClassName, final String descEnhancer, final ClassWriter cw) {
 		final MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, Enhancer.METHOD_ENHANCED_GET_MANAGED_INSTANCE, Enhancer.makeDescription(ManagedInstance.class), null, null);
 		mv.visitCode();
@@ -390,7 +377,6 @@ public final class Enhancer implements Opcodes {
 	private static void createOverrriddenMethod(final String enhancingClassName, final String enhancedClassName, final String descEnhancer,
 		final ClassWriter cw, Method method) {
 		final String methodDescription = Enhancer.makeDescription(method.getReturnType(), method.getParameterTypes());
-		Enhancer.LOG.debug("Enhancing method: {0}", method);
 
 		// TODO Exception types
 		for (int i = 0; i < method.getExceptionTypes().length; i++) {}
@@ -461,17 +447,13 @@ public final class Enhancer implements Opcodes {
 			return enhancedClass;
 		}
 
-		return Enhancer.enhance0(type, javaType, classLoader, className);
+		return Enhancer.enhance0(javaType, classLoader, className);
 	}
 
-	private synchronized static <T> Class<T> enhance0(EntityType<T> type, final Class<T> javaType, final ClassLoader classLoader, final String className)
-		throws Exception {
-		Enhancer.LOG.debug("Enhancing class: {0}", type.getJavaType());
+	private synchronized static <T> Class<T> enhance0(final Class<T> javaType, final ClassLoader classLoader, final String className) throws Exception {
+		final byte[] byteCode = Enhancer.create(javaType);
 
-		final byte[] byteCode = Enhancer.create(type, javaType);
 		final Class<T> enhancedClass = Enhancer.loadClass(classLoader, byteCode, className);
-
-		Enhancer.LOG.debug("Successfully enhanced class {0}...", type.getJavaType());
 
 		return enhancedClass;
 	}
@@ -569,8 +551,26 @@ public final class Enhancer implements Opcodes {
 		return Opcodes.IRETURN;
 	}
 
+	/**
+	 * Loads the class.
+	 * 
+	 * @param classLoader
+	 *            the class loader
+	 * @param byteCode
+	 *            the bytecode
+	 * @param className
+	 *            the name of the class
+	 * @param <T>
+	 *            the type of the class
+	 * @return the loaded class
+	 * @throws Exception
+	 *             if class cannot be loaded
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
 	@SuppressWarnings("unchecked")
-	private static <T> Class<T> loadClass(ClassLoader classLoader, byte[] byteCode, String className) throws Exception {
+	public static <T> Class<T> loadClass(ClassLoader classLoader, byte[] byteCode, String className) throws Exception {
 		final Class<?> cls = Class.forName("java.lang.ClassLoader");
 		final java.lang.reflect.Method method = cls.getDeclaredMethod("defineClass", new Class[] { String.class, byte[].class, Integer.TYPE, Integer.TYPE });
 
@@ -604,7 +604,6 @@ public final class Enhancer implements Opcodes {
 		mv.visitLocalVariable(Enhancer.THIS, descEnhancer, null, l0, l, 0);
 		for (int i = 0, r = 1; i < method.getParameterTypes().length; i++, r++) {
 			final Class<?> paramClass = method.getParameterTypes()[i];
-			Enhancer.LOG.trace("mv.visitLocalVariable(\"{0}\", \"{1}\", null, l0, l3, {2});", "arg" + i, Type.getDescriptor(paramClass), r);
 			mv.visitLocalVariable("arg" + i, Type.getDescriptor(paramClass), null, l0, l, r);
 
 			if ((paramClass == Double.TYPE) || (paramClass == Long.TYPE)) {

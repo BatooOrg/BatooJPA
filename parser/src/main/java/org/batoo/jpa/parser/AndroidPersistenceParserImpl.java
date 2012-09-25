@@ -23,14 +23,49 @@ import java.util.Map;
 import javax.persistence.SharedCacheMode;
 
 import org.batoo.jpa.parser.impl.metadata.MetadataImpl;
+import org.batoo.jpa.parser.persistence.Persistence.PersistenceUnit;
+import org.batoo.jpa.parser.persistence.PersistenceUnitCachingType;
+
+import com.google.common.collect.Maps;
 
 /**
+ * The main entry point to parse the persistence units for Android platforms.
  * 
- *
  * @author hceylan
  * @since $version
  */
-public interface PersistenceParser {
+public class AndroidPersistenceParserImpl implements PersistenceParser {
+
+	private final ClassLoader classloader;
+	private final MetadataImpl metadata;
+	private final PersistenceUnit persistenceUnit;
+	private final Map<String, Object> properties = Maps.newHashMap();
+
+	/**
+	 * @param properties
+	 *            the list of properties
+	 * @param classes
+	 *            the array of classes
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public AndroidPersistenceParserImpl(Map<String, String> properties, String[] classes) {
+		super();
+
+		this.classloader = Thread.currentThread().getContextClassLoader();
+
+		// initialize the persistence unit
+		this.persistenceUnit = new PersistenceUnit();
+		for (final String clazz : classes) {
+			this.persistenceUnit.getClazzs().add(clazz);
+		}
+
+		this.properties.putAll(properties);
+
+		this.metadata = new MetadataImpl(this.persistenceUnit.getClazzs());
+		this.metadata.parse(this.classloader);
+	}
 
 	/**
 	 * Returns the classloader of the PersistenceParser.
@@ -40,7 +75,10 @@ public interface PersistenceParser {
 	 * @since $version
 	 * @author hceylan
 	 */
-	ClassLoader getClassloader();
+	@Override
+	public ClassLoader getClassloader() {
+		return this.classloader;
+	}
 
 	/**
 	 * Returns the JTA datasource JNDI name.
@@ -50,7 +88,10 @@ public interface PersistenceParser {
 	 * @since $version
 	 * @author hceylan
 	 */
-	String getJtaDatasource();
+	@Override
+	public String getJtaDatasource() {
+		return this.persistenceUnit.getJtaDataSource();
+	}
 
 	/**
 	 * Returns the metadata of the parser.
@@ -60,7 +101,10 @@ public interface PersistenceParser {
 	 * @since $version
 	 * @author hceylan
 	 */
-	MetadataImpl getMetadata();
+	@Override
+	public MetadataImpl getMetadata() {
+		return this.metadata;
+	}
 
 	/**
 	 * Returns the non-JTA datasource JNDI name.
@@ -70,7 +114,10 @@ public interface PersistenceParser {
 	 * @since $version
 	 * @author hceylan
 	 */
-	String getNonJtaDatasource();
+	@Override
+	public String getNonJtaDatasource() {
+		return this.persistenceUnit.getNonJtaDataSource();
+	}
 
 	/**
 	 * Returns the properties of the persistence unit.
@@ -80,7 +127,10 @@ public interface PersistenceParser {
 	 * @since $version
 	 * @author hceylan
 	 */
-	Map<String, Object> getProperties();
+	@Override
+	public Map<String, Object> getProperties() {
+		return this.properties;
+	}
 
 	/**
 	 * Returns the specification of how the provider must use a second-level cache for the persistence unit.
@@ -90,7 +140,12 @@ public interface PersistenceParser {
 	 * @since $version
 	 * @author hceylan
 	 */
-	SharedCacheMode getSharedCacheMode();
+	@Override
+	public SharedCacheMode getSharedCacheMode() {
+		final PersistenceUnitCachingType cacheMode = this.persistenceUnit.getSharedCacheMode();
+
+		return cacheMode == null ? SharedCacheMode.NONE : SharedCacheMode.valueOf(cacheMode.name());
+	}
 
 	/**
 	 * Returns if the persistence unit has validators
@@ -100,6 +155,8 @@ public interface PersistenceParser {
 	 * @since $version
 	 * @author hceylan
 	 */
-	boolean hasValidators();
-
+	@Override
+	public boolean hasValidators() {
+		return false;
+	}
 }

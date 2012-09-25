@@ -18,7 +18,6 @@
  */
 package org.batoo.jpa.parser.impl.metadata.attribute;
 
-import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
@@ -44,10 +43,10 @@ import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.common.log.ToStringBuilder;
+import org.batoo.jpa.common.reflect.PropertyDescriptor;
 import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.metadata.type.EntityMetadataImpl;
@@ -868,29 +867,24 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 */
 	private void probeProperties(Class<?> clazz, AccessType accessType) {
 		// get the properties of the class
-		final PropertyDescriptor[] properties = PropertyUtils.getPropertyDescriptors(clazz);
+		final PropertyDescriptor[] properties = ReflectHelper.getProperties(clazz);
 
 		// for each of the properties if there is a no arg getter then inspect it
 		for (final PropertyDescriptor property : properties) {
 
-			final Method getter = property.getReadMethod();
+			final Method method = property.getReader();
 
-			// check if the property has non-indexed getter
-			if ((getter != null) && (getter.getParameterTypes().length == 0)) {
-				final Method method = property.getReadMethod();
+			final String name = property.getName();
 
-				final String name = property.getName();
+			// locate the ORM Metadata attribute
+			final AttributeMetadata ormMetadata = this.ormAttributeMap.get(name);
 
-				// locate the ORM Metadata attribute
-				final AttributeMetadata ormMetadata = this.ormAttributeMap.get(name);
+			// find out if it is applicable
+			final boolean applicable = this.isApplicableToAccessType(method, ormMetadata);
 
-				// find out if it is applicable
-				final boolean applicable = this.isApplicableToAccessType(method, ormMetadata);
-
-				// if applicable then add to the member map
-				if (applicable) {
-					this.memberMap.put(name, method);
-				}
+			// if applicable then add to the member map
+			if (applicable) {
+				this.memberMap.put(name, method);
 			}
 		}
 	}

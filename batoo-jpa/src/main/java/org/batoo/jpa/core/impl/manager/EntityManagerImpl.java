@@ -38,9 +38,6 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.metamodel.PluralAttribute.CollectionType;
 import javax.sql.DataSource;
-import javax.transaction.Synchronization;
-import javax.transaction.SystemException;
-import javax.transaction.Transaction;
 
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.common.log.BLogger;
@@ -84,7 +81,6 @@ public class EntityManagerImpl implements EntityManager {
 
 	private boolean open;
 	private EntityTransactionImpl transaction;
-	private Transaction jtaTransaction;
 
 	private ConnectionImpl connection;
 	private final SessionImpl session;
@@ -121,7 +117,13 @@ public class EntityManagerImpl implements EntityManager {
 		this.open = true;
 	}
 
-	private void assertOpen() {
+	/**
+	 * Checks if the entity manager is open.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected void assertOpen() {
 		if (!this.open) {
 			throw new IllegalStateException("EntityManager has been previously closed");
 		}
@@ -135,16 +137,6 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	public void assertTransaction() {
 		this.assertOpen();
-
-		if (this.emf.isJta()) {
-			this.joinTransaction();
-
-			if (this.jtaTransaction == null) {
-				throw new TransactionRequiredException("No active transaction");
-			}
-
-			return;
-		}
 
 		if ((this.transaction == null) || !this.transaction.isActive()) {
 			throw new TransactionRequiredException("No active transaction");
@@ -246,7 +238,13 @@ public class EntityManagerImpl implements EntityManager {
 		this.open = false;
 	}
 
-	private void closeConnection() {
+	/**
+	 * Closes the database connection.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected void closeConnection() {
 		if (this.connection != null) {
 			try {
 				this.connection.close();
@@ -255,7 +253,6 @@ public class EntityManagerImpl implements EntityManager {
 		}
 
 		this.connection = null;
-		this.jtaTransaction = null;
 	}
 
 	/**
@@ -265,9 +262,6 @@ public class EntityManagerImpl implements EntityManager {
 	 * @author hceylan
 	 */
 	public void closeConnectionIfNecessary() {
-		if (this.emf.isJta() && (this.jtaTransaction == null)) {
-			this.closeConnection();
-		}
 	}
 
 	/**
@@ -534,10 +528,9 @@ public class EntityManagerImpl implements EntityManager {
 		if (this.connection != null) {
 			return this.connection;
 		}
+
 		try {
-			if (this.emf.isJta()) {
-				this.joinTransaction();
-			}
+			this.joinTransaction();
 
 			// create a new connection and return it
 			return this.connection = this.datasource.getConnection();
@@ -673,10 +666,6 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public EntityTransactionImpl getTransaction() {
-		if (this.emf.isJta()) {
-			throw new PersistenceException("Transactions are configured as container managed");
-		}
-
 		// if the transaction exists simply return it
 		if (this.transaction != null) {
 			return this.transaction;
@@ -697,15 +686,6 @@ public class EntityManagerImpl implements EntityManager {
 	 * @author hceylan
 	 */
 	public boolean hasTransactionMarkedForRollback() {
-		if (this.jtaTransaction != null) {
-			try {
-				return this.jtaTransaction.getStatus() == javax.transaction.Status.STATUS_MARKED_ROLLBACK;
-			}
-			catch (final SystemException e) {
-				throw new PersistenceException("Cannot check transaction status", e);
-			}
-		}
-
 		if (this.transaction != null) {
 			return this.transaction.getRollbackOnly();
 		}
@@ -719,7 +699,7 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public boolean isJoinedToTransaction() {
-		return this.jtaTransaction != null;
+		return false;
 	}
 
 	/**
@@ -752,33 +732,6 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public void joinTransaction() {
-		if (this.jtaTransaction != null) {
-			return;
-		}
-
-		this.assertOpen();
-
-		try {
-			this.jtaTransaction = this.emf.getTransactionManager().getTransaction();
-
-			if (this.jtaTransaction != null) {
-				this.jtaTransaction.registerSynchronization(new Synchronization() {
-
-					@Override
-					public void afterCompletion(int status) {
-						EntityManagerImpl.this.closeConnection();
-					}
-
-					@Override
-					public void beforeCompletion() {
-						EntityManagerImpl.this.flush();
-					}
-				});
-			}
-		}
-		catch (final Exception e) {
-			throw new PersistenceException("Unable to join JTA");
-		}
 	}
 
 	/**

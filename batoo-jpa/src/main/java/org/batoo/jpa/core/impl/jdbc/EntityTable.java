@@ -23,8 +23,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
+import org.batoo.jpa.core.impl.jdbc.dbutils.SingleValueHandler;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;

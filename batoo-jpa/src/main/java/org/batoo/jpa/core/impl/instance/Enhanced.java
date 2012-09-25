@@ -57,11 +57,6 @@ public class Enhanced implements EnhancedInstance {
 	}
 
 	@Override
-	public Object __enhanced__$$__getId() {
-		return this.__enhanced_$$__id;
-	}
-
-	@Override
 	public ManagedInstance<?> __enhanced__$$__getManagedInstance() {
 		return this.__enhanced__$$__managedInstance;
 	}

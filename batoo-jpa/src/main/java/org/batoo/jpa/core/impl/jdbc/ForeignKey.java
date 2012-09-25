@@ -25,7 +25,7 @@ import java.util.List;
 
 import javax.persistence.criteria.JoinType;
 
-import org.apache.commons.dbutils.QueryRunner;
+import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;

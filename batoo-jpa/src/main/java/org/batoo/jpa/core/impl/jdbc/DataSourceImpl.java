@@ -25,7 +25,6 @@ import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.logging.Logger;
 
-import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang.NotImplementedException;
@@ -71,7 +70,7 @@ public class DataSourceImpl implements DataSource {
 		super();
 
 		try {
-			this.datasource = (DataSource) new InitialContext().lookup(datasource);
+			this.datasource = (DataSource) new javax.naming.InitialContext().lookup(datasource);
 		}
 		catch (final Exception e) {
 			throw new BatooException("Unable to lookup datasource: " + datasource, e);

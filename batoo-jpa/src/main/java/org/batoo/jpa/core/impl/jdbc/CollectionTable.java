@@ -25,7 +25,7 @@ import java.util.List;
 import javax.persistence.EnumType;
 import javax.persistence.TemporalType;
 
-import org.apache.commons.dbutils.QueryRunner;
+import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.model.mapping.ElementMapping;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;

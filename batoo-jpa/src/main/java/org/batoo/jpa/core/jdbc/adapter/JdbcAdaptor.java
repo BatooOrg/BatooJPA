@@ -39,7 +39,6 @@ import javax.persistence.criteria.CriteriaBuilder.Trimspec;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.DbUtils;
-import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.log.BLogger;
@@ -55,6 +54,7 @@ import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinColumn;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
+import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.model.SequenceGenerator;
 import org.batoo.jpa.core.impl.model.TableGenerator;
 import org.batoo.jpa.core.jdbc.DDLMode;
@@ -932,8 +932,12 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 		ResultSet tables = null;
 		try {
 			final DatabaseMetaData dbMetadata = connection.getMetaData();
-			catalog = StringUtils.isNotBlank(catalog) ? catalog : null;
-			schema = StringUtils.isNotBlank(schema) ? schema : null;
+			if (StringUtils.isBlank(catalog)) {
+				catalog = null;
+			}
+			if (StringUtils.isBlank(schema)) {
+				schema = null;
+			}
 
 			if (dbMetadata.storesUpperCaseIdentifiers()) {
 				tables = dbMetadata.getTables(//

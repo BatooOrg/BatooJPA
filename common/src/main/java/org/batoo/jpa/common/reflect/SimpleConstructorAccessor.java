@@ -16,31 +16,32 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.core.impl.jdbc;
+package org.batoo.jpa.common.reflect;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import org.apache.commons.dbutils.ResultSetHandler;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 /**
- * A Handler to return single values from the result sets.
- * 
- * @param <T>
- *            the target type the input ResultSet will be converted to.
+ * Constructor accessor for non-sun java environments.
  * 
  * @author hceylan
  * @since $version
  */
-public class SingleValueHandler<T> implements ResultSetHandler<T> {
+public class SimpleConstructorAccessor implements ConstructorAccessor {
+
+	private final Constructor<?> constructor;
 
 	/**
+	 * @param constructor
+	 *            the constructor
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SingleValueHandler() {
+	public SimpleConstructorAccessor(Constructor<?> constructor) {
 		super();
+
+		this.constructor = constructor;
 	}
 
 	/**
@@ -48,12 +49,7 @@ public class SingleValueHandler<T> implements ResultSetHandler<T> {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
-	public T handle(ResultSet rs) throws SQLException {
-		if (rs.next()) {
-			return (T) rs.getObject(1);
-		}
-
-		return null;
+	public Object newInstance(Object[] args) throws InstantiationException, IllegalArgumentException, InvocationTargetException, IllegalAccessException {
+		return this.constructor.newInstance(args);
 	}
 }

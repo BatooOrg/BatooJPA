@@ -22,7 +22,7 @@ import java.lang.reflect.Field;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-import javax.persistence.PersistenceException;
+import org.batoo.jpa.common.BatooException;
 
 /**
  * Accessor implementation of {@link AbstractAccessor} for the members of {@link Field}s.
@@ -57,9 +57,7 @@ public class FieldAccessor extends AbstractAccessor {
 	}
 
 	private final Field field;
-	private final long fieldOffset;
 	private final PrimitiveType primitiveType;
-
 	private Class<?> numberType;
 
 	/**
@@ -69,7 +67,6 @@ public class FieldAccessor extends AbstractAccessor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("restriction")
 	public FieldAccessor(Field field) {
 		super();
 
@@ -85,7 +82,6 @@ public class FieldAccessor extends AbstractAccessor {
 		});
 
 		this.primitiveType = this.getPrimitiveType();
-		this.fieldOffset = ReflectHelper.unsafe != null ? ReflectHelper.unsafe.objectFieldOffset(field) : -1;
 
 		if (Number.class.isAssignableFrom(this.field.getType()) //
 			|| (this.field.getType() == Byte.TYPE) //
@@ -102,39 +98,12 @@ public class FieldAccessor extends AbstractAccessor {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings({ "restriction" })
 	public Object get(Object instance) {
-		if (this.fieldOffset != -1) {
-
-			if (this.primitiveType == null) {
-				return ReflectHelper.unsafe.getObject(instance, this.fieldOffset);
-			}
-
-			switch (this.primitiveType) {
-				case BOOLEAN:
-					return Boolean.valueOf(ReflectHelper.unsafe.getBoolean(instance, this.fieldOffset));
-				case INTEGER:
-					return Integer.valueOf(ReflectHelper.unsafe.getInt(instance, this.fieldOffset));
-				case FLOAT:
-					return Float.valueOf(ReflectHelper.unsafe.getFloat(instance, this.fieldOffset));
-				case DOUBLE:
-					return Double.valueOf(ReflectHelper.unsafe.getDouble(instance, this.fieldOffset));
-				case LONG:
-					return Long.valueOf(ReflectHelper.unsafe.getLong(instance, this.fieldOffset));
-				case SHORT:
-					return Short.valueOf(ReflectHelper.unsafe.getShort(instance, this.fieldOffset));
-				case BYTE:
-					return Byte.valueOf(ReflectHelper.unsafe.getByte(instance, this.fieldOffset));
-				default: // CHAR
-					return Character.valueOf(ReflectHelper.unsafe.getChar(instance, this.fieldOffset));
-			}
-		}
-
 		try {
 			return this.field.get(instance);
 		}
 		catch (final Exception e) {
-			throw new PersistenceException("Cannot get field value: " + this.field, e);
+			throw new BatooException("Cannot get field value: " + this.field, e);
 		}
 	}
 
@@ -162,116 +131,62 @@ public class FieldAccessor extends AbstractAccessor {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("restriction")
 	public void set(Object instance, Object value) {
 		if (instance == null) {
 			throw new NullPointerException();
 		}
 
-		if (this.fieldOffset != -1) {
+		try {
 			if (this.primitiveType == null) {
 				if ((this.numberType != null) && (value != null) && (this.numberType != value.getClass())) {
 					final Number number = ReflectHelper.convertNumber((Number) value, this.numberType);
-
-					ReflectHelper.unsafe.putObject(instance, this.fieldOffset, number);
+					this.field.set(instance, number);
 				}
 				else {
-					ReflectHelper.unsafe.putObject(instance, this.fieldOffset, value);
+					this.field.set(instance, value);
 				}
 			}
 			else {
 				switch (this.primitiveType) {
 					case BOOLEAN:
 						if (value instanceof Number) {
-							ReflectHelper.unsafe.putBoolean(instance, this.fieldOffset, ((Number) value).byteValue() == 0 ? false : true);
+							this.field.set(instance, ((Number) value).byteValue() == 0 ? false : true);
 						}
 						else {
-							ReflectHelper.unsafe.putBoolean(instance, this.fieldOffset, (Boolean) value);
+							this.field.set(instance, value);
 						}
 						break;
 					case INTEGER:
-						ReflectHelper.unsafe.putInt(instance, this.fieldOffset, ((Number) value).intValue());
+						this.field.set(instance, value);
 						break;
 					case FLOAT:
-						ReflectHelper.unsafe.putFloat(instance, this.fieldOffset, ((Number) value).floatValue());
+						this.field.set(instance, ((Number) value).floatValue());
 						break;
 					case DOUBLE:
-						ReflectHelper.unsafe.putDouble(instance, this.fieldOffset, ((Number) value).doubleValue());
+						this.field.set(instance, value);
 						break;
 					case LONG:
-						ReflectHelper.unsafe.putLong(instance, this.fieldOffset, ((Number) value).longValue());
+						this.field.set(instance, value);
 						break;
 					case SHORT:
-						ReflectHelper.unsafe.putShort(instance, this.fieldOffset, ((Number) value).shortValue());
+						this.field.set(instance, ((Number) value).shortValue());
 						break;
 					case BYTE:
-						ReflectHelper.unsafe.putByte(instance, this.fieldOffset, ((Number) value).byteValue());
+						this.field.set(instance, ((Number) value).byteValue());
 						break;
 					default: // CHAR
 						if (value == null) {
-							ReflectHelper.unsafe.putChar(instance, this.fieldOffset, '\u0000');
+							this.field.set(instance, '\u0000');
 						}
 						else {
-							ReflectHelper.unsafe.putChar(instance, this.fieldOffset, (Character) value);
+							this.field.set(instance, value);
 						}
 						break;
 				}
 			}
 		}
-		else {
-			try {
-				if (this.primitiveType == null) {
-					if ((this.numberType != null) && (value != null) && (this.numberType != value.getClass())) {
-						final Number number = ReflectHelper.convertNumber((Number) value, this.numberType);
-						this.field.set(instance, number);
-					}
-					else {
-						this.field.set(instance, value);
-					}
-				}
-				else {
-					switch (this.primitiveType) {
-						case BOOLEAN:
-							if (value instanceof Number) {
-								this.field.set(instance, ((Number) value).byteValue() == 0 ? false : true);
-							}
-							else {
-								this.field.set(instance, value);
-							}
-							break;
-						case INTEGER:
-							this.field.set(instance, value);
-							break;
-						case FLOAT:
-							this.field.set(instance, ((Number) value).floatValue());
-							break;
-						case DOUBLE:
-							this.field.set(instance, value);
-							break;
-						case LONG:
-							this.field.set(instance, value);
-							break;
-						case SHORT:
-							this.field.set(instance, ((Number) value).shortValue());
-							break;
-						case BYTE:
-							this.field.set(instance, ((Number) value).byteValue());
-							break;
-						default: // CHAR
-							if (value == null) {
-								this.field.set(instance, '\u0000');
-							}
-							else {
-								this.field.set(instance, value);
-							}
-							break;
-					}
-				}
-			}
-			catch (final Exception e) {
-				throw new PersistenceException("Cannot set field value: " + this.field, e);
-			}
+		catch (final Exception e) {
+			throw new RuntimeException("Cannot set field value: " + this.field, e);
 		}
 	}
-
 }

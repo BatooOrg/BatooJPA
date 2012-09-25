@@ -44,6 +44,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.common.reflect.ConstructorAccessor;
 import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
@@ -90,8 +91,6 @@ import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 import org.batoo.jpa.util.BatooUtils;
 
-import sun.reflect.ConstructorAccessor;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -105,7 +104,6 @@ import com.google.common.collect.Sets;
  * @author hceylan
  * @since $version
  */
-@SuppressWarnings("restriction")
 public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements EntityType<X> {
 
 	private static final int MAX_DEPTH = 5;
@@ -120,7 +118,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private final HashMap<String, AssociatedSingularAttribute<? super X, ?>> idMap = Maps.newHashMap();
 	private final boolean cachable;
 
-	private final sun.reflect.ConstructorAccessor constructor;
+	private final ConstructorAccessor constructor;
 
 	private CriteriaQueryImpl<X> selectCriteria;
 	private CriteriaQueryImpl<X> refreshCriteria;

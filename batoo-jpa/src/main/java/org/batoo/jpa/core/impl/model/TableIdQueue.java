@@ -21,9 +21,9 @@ package org.batoo.jpa.core.impl.model;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 
-import org.apache.commons.dbutils.QueryRunner;
+import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
-import org.batoo.jpa.core.impl.jdbc.SingleValueHandler;
+import org.batoo.jpa.core.impl.jdbc.dbutils.SingleValueHandler;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 
 /**

@@ -25,14 +25,13 @@ import java.util.List;
 import javax.persistence.metamodel.EmbeddableType;
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.batoo.jpa.common.reflect.ConstructorAccessor;
 import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
 import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.type.EmbeddableMetadata;
-
-import sun.reflect.ConstructorAccessor;
 
 import com.google.common.collect.Lists;
 
@@ -45,7 +44,6 @@ import com.google.common.collect.Lists;
  * @author hceylan
  * @since $version
  */
-@SuppressWarnings("restriction")
 public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements EmbeddableType<X> {
 	private static final Object[] EMPTY_PARAMS = new Object[] {};
 
