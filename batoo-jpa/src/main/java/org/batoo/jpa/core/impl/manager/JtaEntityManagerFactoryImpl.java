@@ -39,7 +39,11 @@ public class JtaEntityManagerFactoryImpl extends EntityManagerFactoryImpl {
 
 	private static final String[] TRANSACTION_MANAGERS = new String[] { //
 	"java:appserver/TransactionManager", //
-		"java:/TransactionManager" };
+		"java:/TransactionManager",//
+		"java:jboss/TransactionManager", //
+		"java:comp/pm/TransactionManager", //
+		"TransactionManager", //
+		"java:appserver/TransactionManager" };
 
 	private final TransactionManager transactionManager;
 
