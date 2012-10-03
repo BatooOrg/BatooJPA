@@ -22,6 +22,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
+
 	<groupId>org.batoo.jpa</groupId>
 	<artifactId>parent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
@@ -29,7 +35,9 @@
 	<packaging>pom</packaging>
 
 	<name>Batoo Persistence Parent</name>
-	<description>Yet another JPA Implementation</description>
+	<description>The fastest JPA 2.0 Implementation</description>
+
+	<url>http://batoo.jp</url>
 
 	<developers>
 		<developer>
@@ -46,24 +54,24 @@
 	</developers>
 
 	<organization>
-		<name>batoo.org</name>
-		<url>http://www.batoo.org</url>
+		<name>Batoo Software &amp; Consultancy</name>
+		<url>http://www.batoo.jp</url>
 	</organization>
 
 	<inceptionYear>2012</inceptionYear>
 
 	<licenses>
 		<license>
-			<name>Apache Licence 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
+			<name>GNU Lesser General Public License</name>
+			<url>http://www.gnu.org/licenses/lgpl.html</url>
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
 
 	<scm>
-		<connection>scm:git:git://github.com/hceylan/batoo-jpa.git</connection>
-		<developerConnection>scm:git:git@github.com:hceylan/batoo-jpa.git</developerConnection>
-		<url>https://github.com/hceylan/batoo-jpa</url>
+		<connection>scm:git:git://github.com/BatooOrg/BatooJPA.git</connection>
+		<developerConnection>scm:git:git@github.com:BatooOrg/BatooJPA.git</developerConnection>
+		<url>https://github.com/BatooOrg/BatooJPA</url>
 	</scm>
 
 	<ciManagement>
@@ -156,7 +164,7 @@
 				<artifactId>asm</artifactId>
 				<version>4.0</version>
 			</dependency>
-			
+
 			<!-- Logging -->
 			<dependency>
 				<groupId>org.slf4j</groupId>
@@ -291,7 +299,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
-	
+
 		<pluginManagement>
 			<plugins>
 				<plugin>
