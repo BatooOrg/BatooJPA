@@ -23,45 +23,41 @@
 	<parent>
 		<artifactId>parent</artifactId>
 		<groupId>org.batoo.jpa</groupId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.1.2</version>
 	</parent>
 
+	<version>0.1.2-SNAPSHOT</version>
+
 	<artifactId>batoo-maven-plugin</artifactId>
-	<version>0.0.1</version>
 	<packaging>maven-plugin</packaging>
 	<name>Batoo JPA Maven Plugin</name>
 	<description>Batoo JPA Enhanced Class Generator</description>
-
-	<properties>
-		<batoo.version>0.0.1-SNAPSHOT</batoo.version>
-	</properties>
 
 	<dependencies>
 		<!-- Internal Dependencies -->
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>batoo-jpa</artifactId>
-			<version>${batoo.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>batoo-annotations</artifactId>
-			<version>${batoo.version}</version>
+			<version>0.1.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>common</artifactId>
-			<version>${batoo.version}</version>
+			<version>0.1.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>jpql</artifactId>
-			<version>${batoo.version}</version>
+			<version>0.1.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>parser</artifactId>
-			<version>${batoo.version}</version>
+			<version>0.1.2</version>
 		</dependency>
 
 		<dependency>
