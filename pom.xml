@@ -331,7 +331,6 @@
 	</build>
 
 	<modules>
-		<module>persistence-api</module>
 		<module>common</module>
 		<module>parser</module>
 		<module>jpql</module>
