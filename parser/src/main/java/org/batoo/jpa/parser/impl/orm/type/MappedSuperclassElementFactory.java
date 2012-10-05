@@ -181,7 +181,7 @@ public class MappedSuperclassElementFactory extends ParentElement implements Map
 			this.idClass = ((IdClassElement) child).getIdClass();
 		}
 
-		if (child instanceof EntityListenerElement) {
+		if (child instanceof EntityListenersElement) {
 			this.listeners.addAll(((EntityListenersElement) child).getListeners());
 		}
 
