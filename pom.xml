@@ -337,5 +337,6 @@
 		<module>batoo-jpa</module>
 		<module>batoo-annotations</module>
 		<module>batoo-maven-plugin</module>
+		<module>community</module>
 	</modules>
 </project>
