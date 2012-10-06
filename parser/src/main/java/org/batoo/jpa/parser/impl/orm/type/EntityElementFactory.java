@@ -386,7 +386,7 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 			this.idClass = ((IdClassElement) child).getIdClass();
 		}
 
-		if (child instanceof EntityListenerElement) {
+		if (child instanceof EntityListenersElement) {
 			this.listeners.addAll(((EntityListenersElement) child).getListeners());
 		}
 
