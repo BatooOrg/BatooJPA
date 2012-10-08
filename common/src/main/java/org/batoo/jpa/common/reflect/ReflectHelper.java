@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.BatooException;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
@@ -176,15 +177,16 @@ public class ReflectHelper {
 			return ReflectHelper.unsafe != null ? new UnsafeFieldAccessor((Field) javaMember) : new FieldAccessor((Field) javaMember);
 		}
 		else {
-			final Class<?> clazz = javaMember.getDeclaringClass();
-			final PropertyDescriptor[] descriptors = ReflectHelper.getProperties(clazz);
-			for (final PropertyDescriptor descriptor : descriptors) {
-				if (descriptor.getReader() == javaMember) {
-					return new MethodAccessor(descriptor.getReader(), descriptor.getWriter());
-				}
+			final String name = javaMember.getName().startsWith(ReflectHelper.IS_PREFIX) ? javaMember.getName().substring(2)
+				: javaMember.getName().substring(3);
+			Field field;
+			try {
+				field = javaMember.getDeclaringClass().getDeclaredField(StringUtils.uncapitalize(name));
+				return new FieldAccessor(field);
 			}
-
-			throw new BatooException("Method " + javaMember.getName() + " could not be found");
+			catch (final Exception e) {
+				throw new BatooException("Cannot find instance variable field " + javaMember.getDeclaringClass().getName() + "." + name);
+			}
 		}
 	}
 
@@ -289,9 +291,9 @@ public class ReflectHelper {
 	 * @author hceylan
 	 */
 	public static PropertyDescriptor[] getProperties(Class<?> clazz) {
-		final List<Method> properties = Lists.newArrayList();
+		final List<PropertyDescriptor> properties = Lists.newArrayList();
 
-		final Method[] methodList = clazz.getMethods();
+		final Method[] methodList = clazz.getDeclaredMethods();
 
 		// check each method.
 		for (final Method method : methodList) {
@@ -309,10 +311,10 @@ public class ReflectHelper {
 
 			if (method.getParameterTypes().length == 0) {
 				if (name.startsWith(ReflectHelper.GET_PREFIX)) {
-					new PropertyDescriptor(clazz, name.substring(3), method);
+					properties.add(new PropertyDescriptor(clazz, name.substring(3), method));
 				}
 				else if ((method.getReturnType() == boolean.class) && name.startsWith(ReflectHelper.IS_PREFIX)) {
-					new PropertyDescriptor(clazz, name.substring(2), method);
+					properties.add(new PropertyDescriptor(clazz, name.substring(2), method));
 				}
 			}
 		}
@@ -409,7 +411,7 @@ public class ReflectHelper {
 			existing = Sets.newHashSet(((Field) member).getAnnotations());
 		}
 		else {
-			existing = Sets.newHashSet(((Field) member).getAnnotations());
+			existing = Sets.newHashSet(((Method) member).getAnnotations());
 		}
 
 		final Set<Annotation> filtered = Sets.filter(existing, new Predicate<Annotation>() {

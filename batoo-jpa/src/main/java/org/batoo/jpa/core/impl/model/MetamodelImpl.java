@@ -593,7 +593,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Object getNextTableValue(String generator) {
+	public Long getNextTableValue(String generator) {
 		try {
 			return this.tableIdQueues.get(generator).poll(MetamodelImpl.POLL_TIMEOUT, TimeUnit.SECONDS);
 		}

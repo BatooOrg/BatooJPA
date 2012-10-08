@@ -52,8 +52,9 @@ public class PropertyDescriptor {
 		super();
 
 		this.reader = reader;
-		this.writer = this.getWriter(clazz);
 		this.name = StringUtils.uncapitalize(name);
+
+		this.writer = this.getWriter(clazz);
 	}
 
 	/**
@@ -94,11 +95,10 @@ public class PropertyDescriptor {
 
 	private Method getWriter(Class<?> clazz) {
 		try {
-			return clazz.getMethod(PropertyDescriptor.SET_PREFIX, this.reader.getReturnType());
+			return clazz.getMethod(PropertyDescriptor.SET_PREFIX + StringUtils.capitalize(this.name), this.reader.getReturnType());
 		}
 		catch (final Exception e) {
 			return null;
 		}
 	}
-
 }

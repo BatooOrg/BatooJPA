@@ -31,6 +31,7 @@ import java.util.Set;
 
 import javax.persistence.InheritanceType;
 import javax.persistence.LockModeType;
+import javax.persistence.PersistenceException;
 import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.FetchParent;
 import javax.persistence.criteria.JoinType;
@@ -1056,9 +1057,9 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 			return managedInstance;
 		}
-		catch (final Exception e) {} // not possible
-
-		return null;
+		catch (final Exception e) {
+			throw new PersistenceException("Cannot create instance " + id, e);
+		} // not possible
 	}
 
 	/**

@@ -28,6 +28,7 @@ import javax.persistence.TemporalType;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.AbstractGenerator;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
@@ -256,6 +257,8 @@ public final class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 			throw new PersistenceException("Ids should be manually assigned");
 		}
 
+		Long id;
+
 		// fill the id
 		switch (this.idType) {
 			case IDENTITY:
@@ -268,11 +271,13 @@ public final class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 				}
 			case SEQUENCE:
 				// fill with the sequence
-				this.set(instance, this.getMetamodel().getNextSequence(this.generator));
+				id = this.getMetamodel().getNextSequence(this.generator);
+				this.set(instance, ReflectHelper.convertNumber(id, this.getJavaType()));
 				break;
 			case TABLE:
 				// fill with the next table generator id
-				this.set(instance, this.getMetamodel().getNextTableValue(this.generator));
+				id = this.getMetamodel().getNextTableValue(this.generator);
+				this.set(instance, ReflectHelper.convertNumber(id, this.getJavaType()));
 				break;
 		}
 
