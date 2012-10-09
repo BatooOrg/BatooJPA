@@ -52,9 +52,9 @@ Bato JPA has been tested with the following databases:
 Bato JPA has been tested with the following platforms:
 - Java SE 1.6
 - Java SE 1.7
-- Jboss AS 6.1.0.Final
-- Jboss AS 7.1.1.Final
-- Glassfish 3.1.2.1
+- JBoss AS 6.1.0.Final
+- JBoss AS 7.1.1.Final
+- GlassFish 3.1.2.1
 
 
 B U I L D I N G
@@ -65,10 +65,10 @@ B U I L D I N G
 
 3) check the project using
 	$ git clone git://github.com/BatooOrg/BatooJPA.git
-	$ cd BaooJPA
+	$ cd BatooJPA
 	$ mvn install
 	
-Not: The initial build may take a long time.
+Note: The initial build may take a long time.
 
 
 
@@ -84,7 +84,7 @@ cleanup.xml -> Code cleanup profile
 codetemplates.xml - Code templates profile
 dictionary.txt - The custom spell checker dictionary
 formatter.xml - The source formatter
-templates.xml - The custom java templates
+templates.xml - The custom Java templates
 
 There are 4 lunch shortcuts to benchmark Batoo JPA
 Benchmark - Batoo.launch
