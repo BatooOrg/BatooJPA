@@ -24,6 +24,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -112,7 +113,7 @@ public class MetadataImpl implements Metadata {
 					root = root + "classes/";
 				}
 
-				if (!root.endsWith(File.separator)) {
+				if (!root.endsWith(File.separator) && !root.endsWith("/")) {
 					root = root + File.separator;
 				}
 
@@ -134,6 +135,11 @@ public class MetadataImpl implements Metadata {
 			String path = file.getPath();
 
 			if (path.endsWith(".class")) {
+				// Windows compatibility
+				if (System.getProperty("os.name").toUpperCase(Locale.ENGLISH).startsWith("WINDOWS")) {
+					rootLength--;
+				}
+
 				path = path.substring(rootLength, path.length() - 6).replace("/", ".").replace("\\", ".");
 				try {
 					final Class<?> clazz = classPath.loadClass(path);
