@@ -112,8 +112,8 @@ public class MetadataImpl implements Metadata {
 					root = root + "classes/";
 				}
 
-				if (!root.endsWith("/")) {
-					root = root + "/";
+				if (!root.endsWith(File.separator)) {
+					root = root + File.separator;
 				}
 
 				this.findClasses(classPath, classes, root.length(), new File(root));
@@ -134,7 +134,7 @@ public class MetadataImpl implements Metadata {
 			String path = file.getPath();
 
 			if (path.endsWith(".class")) {
-				path = path.substring(rootLength - 1, path.length() - 6).replace("/", ".").replace("\\", ".");
+				path = path.substring(rootLength, path.length() - 6).replace("/", ".").replace("\\", ".");
 				try {
 					final Class<?> clazz = classPath.loadClass(path);
 					if ((clazz.getAnnotation(Embeddable.class) != null) || //
