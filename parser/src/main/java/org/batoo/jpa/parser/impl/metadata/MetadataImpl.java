@@ -134,7 +134,7 @@ public class MetadataImpl implements Metadata {
 			String path = file.getPath();
 
 			if (path.endsWith(".class")) {
-				path = path.substring(rootLength, path.length() - 6).replace("/", ".");
+				path = path.substring(rootLength - 1, path.length() - 6).replace("/", ".").replace("\\", ".");
 				try {
 					final Class<?> clazz = classPath.loadClass(path);
 					if ((clazz.getAnnotation(Embeddable.class) != null) || //

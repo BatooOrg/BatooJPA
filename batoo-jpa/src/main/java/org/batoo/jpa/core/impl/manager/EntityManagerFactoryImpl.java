@@ -354,6 +354,30 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	}
 
 	/**
+	 * Returns the datasource of the entity manager factory.
+	 * 
+	 * @return the datasource of the entity manager
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected DataSourceImpl getDatasource() {
+		return this.datasource;
+	}
+
+	/**
+	 * Returns the JDBC Adaptor of the entity manager factory.
+	 * 
+	 * @return the JDBC Adaptor of the entity manager
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected JdbcAdaptor getJdbcAdaptor() {
+		return this.jdbcAdaptor;
+	}
+
+	/**
 	 * Returns a lazy created {@link JpqlQuery} for the query.
 	 * 
 	 * @param qlString

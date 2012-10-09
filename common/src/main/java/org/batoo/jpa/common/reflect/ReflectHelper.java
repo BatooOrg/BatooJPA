@@ -335,8 +335,8 @@ public class ReflectHelper {
 				ReflectHelper.LOG.debug("Direct access library loaded successfully");
 			}
 		}
-		catch (final Exception e) {
-			ReflectHelper.LOG.warn("Direct access library cannot be loaded");
+		catch (final Throwable e) {
+			ReflectHelper.LOG.warn("Direct access library cannot be loaded! Direct access library only adds some performance, but not necessary to operate. It is safe to ignore...");
 		}
 
 		return null;
