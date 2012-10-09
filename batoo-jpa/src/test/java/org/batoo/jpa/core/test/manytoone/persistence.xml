@@ -18,16 +18,21 @@
 	Boston, MA  02110-1301  USA
 
  -->
- <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<artifactId>parent</artifactId>
-		<groupId>org.batoo.jpa</groupId>
-		<version>0.1.5-SNAPSHOT</version>
-	</parent>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+	version="2.0">
 
-	<artifactId>persistence-api</artifactId>
-	<name>Batoo Persistence API</name>
-	<version>2.1-SNAPSHOT</version>
-	
-</project>
+	<persistence-unit name="default">
+		<provider>org.batoo.jpa.core.PersistenceProvider</provider>
+		
+		<class>org.batoo.jpa.core.test.manytoone.Address</class>
+		<class>org.batoo.jpa.core.test.manytoone.Person</class>
+		
+		<properties>
+			<property name="org.batoo.jpa.ddl" value="DROP" />
+		</properties>
+
+	</persistence-unit>
+
+</persistence>
