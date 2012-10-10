@@ -24,7 +24,10 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Selection;
 
 import junit.framework.Assert;
@@ -318,6 +321,28 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 		Assert.assertEquals(3, resultList.get(0).getAddresses().size());
 	}
 
+	/**
+	 * 
+	 * @since $version
+	 * @author asimarslan
+	 */
+	@Test
+	public void testRootCount() {
+		this.persist(this.person());
+		this.persist(this.person());
+		this.commit();
+//
+		this.close();
+        
+		final CriteriaBuilderImpl cb = this.em().getCriteriaBuilder();
+		final CriteriaQueryImpl<Long> q = cb.createQuery(Long.class);
+		final RootImpl<Person> r = q.from(Person.class);
+						
+		Long count =this.em().createQuery(q.select(cb.count(r))).getSingleResult();
+
+		Assert.assertEquals(2, count.longValue());
+	}
+	
 	/**
 	 * 
 	 * @since $version
