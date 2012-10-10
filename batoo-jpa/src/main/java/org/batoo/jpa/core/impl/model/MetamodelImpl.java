@@ -670,7 +670,7 @@ public class MetamodelImpl implements Metamodel {
 				continue;
 			}
 
-			MetamodelImpl.LOG.info("Performing foreign key DDL operations for table {0}, mode {1}", table.getName(), ddlMode);
+			MetamodelImpl.LOG.info("Performing foreign key DDL operations for table {0}, mode {1}", table.getQName(), ddlMode);
 
 			for (final ForeignKey foreignKey : table.getForeignKeys()) {
 				this.jdbcAdaptor.createForeignKey(datasource, foreignKey);
@@ -684,7 +684,7 @@ public class MetamodelImpl implements Metamodel {
 				continue;
 			}
 
-			MetamodelImpl.LOG.info("Performing foreign key DDL operations for join table {0}, mode {1}", table.getName(), ddlMode);
+			MetamodelImpl.LOG.info("Performing foreign key DDL operations for join table {0}, mode {1}", table.getQName(), ddlMode);
 
 			for (final ForeignKey foreignKey : table.getForeignKeys()) {
 				this.jdbcAdaptor.createForeignKey(datasource, foreignKey);
@@ -694,7 +694,7 @@ public class MetamodelImpl implements Metamodel {
 		for (final PluralMapping<?, ?, ?> mapping : entity.getMappingsPlural()) {
 			if (!mapping.isAssociation()) {
 				final AbstractTable table = (AbstractTable) mapping.getTable();
-				MetamodelImpl.LOG.info("Performing foreign key DDL operations for join table {0}, mode {1}", table.getName(), ddlMode);
+				MetamodelImpl.LOG.info("Performing foreign key DDL operations for join table {0}, mode {1}", table.getQName(), ddlMode);
 
 				for (final ForeignKey foreignKey : table.getForeignKeys()) {
 					this.jdbcAdaptor.createForeignKey(datasource, foreignKey);
@@ -766,7 +766,7 @@ public class MetamodelImpl implements Metamodel {
 				continue;
 			}
 
-			MetamodelImpl.LOG.info("Performing DDL operations for {0}, mode {1}", table.getName(), ddlMode);
+			MetamodelImpl.LOG.info("Performing DDL operations for {0}, mode {1}", table.getQName(), ddlMode);
 
 			this.jdbcAdaptor.createOrUpdateTable(table, datasource, ddlMode);
 		}

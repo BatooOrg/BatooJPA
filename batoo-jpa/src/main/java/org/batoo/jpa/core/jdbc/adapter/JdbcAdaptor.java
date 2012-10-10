@@ -382,8 +382,8 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 			}
 
 			// create the foreign key
-			final String referenceTableName = foreignKey.getReferencedTableName();
-			final String tableName = foreignKey.getTable().getName();
+			final String referenceTableName = foreignKey.getReferencedTableQName();
+			final String tableName = foreignKey.getTable().getQName();
 
 			final String foreignKeyColumns = Joiner.on(", ").join(Lists.transform(foreignKey.getJoinColumns(), new Function<JoinColumn, String>() {
 
@@ -487,7 +487,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 			}
 		}
 		catch (final SQLException e) {
-			this.logRelaxed(e, "Table DDL Failed for table " + table.getName());
+			this.logRelaxed(e, "Table DDL Failed for table " + table.getQName());
 		}
 	}
 
@@ -509,7 +509,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 			new QueryRunner(datasource, this.isPmdBroken()).update(this.createCreateTableStatement(table));
 		}
 		catch (final SQLException e) {
-			this.logRelaxed(e, "Cannot create table " + table.getName());
+			this.logRelaxed(e, "Cannot create table " + table.getQName());
 		}
 
 		this.createIndexes(datasource, table);

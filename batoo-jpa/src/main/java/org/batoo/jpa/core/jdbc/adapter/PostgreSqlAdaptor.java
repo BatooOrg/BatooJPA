@@ -26,10 +26,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.LockModeType;
 import javax.sql.DataSource;
 
-import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
+import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.jdbc.dbutils.SingleValueHandler;
 import org.batoo.jpa.core.impl.model.SequenceGenerator;
 import org.batoo.jpa.core.jdbc.IdType;
@@ -247,7 +247,7 @@ public class PostgreSqlAdaptor extends JdbcAdaptor {
 	 */
 	@Override
 	public String getSelectLastIdentitySql(PkColumn identityColumn) {
-		return "SELECT CURRVAL('" + identityColumn.getTable().getName() + "_" + identityColumn.getName() + "_seq')";
+		return "SELECT CURRVAL('" + identityColumn.getTable().getQName() + "_" + identityColumn.getName() + "_seq')";
 	}
 
 	/**

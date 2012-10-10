@@ -25,9 +25,9 @@ import java.util.List;
 
 import javax.persistence.criteria.JoinType;
 
-import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
@@ -216,7 +216,7 @@ public class ForeignKey {
 			return this.createSourceJoin(joinType, parentAlias, alias);
 		}
 
-		return this.createJoin(joinType, parentAlias, alias, this.joinColumns.get(0).getReferencedTable().getName(), false);
+		return this.createJoin(joinType, parentAlias, alias, this.joinColumns.get(0).getReferencedTable().getQName(), false);
 	}
 
 	private void createEmbeddedJoins(SecondaryTable table, EmbeddedMapping<?, ?> mapping, List<PrimaryKeyJoinColumnMetadata> metadata) {
@@ -280,7 +280,7 @@ public class ForeignKey {
 	 * @author hceylan
 	 */
 	public String createSourceJoin(JoinType joinType, String parentAlias, String alias) {
-		return this.createJoin(joinType, parentAlias, alias, this.joinColumns.get(0).getTable().getName(), true);
+		return this.createJoin(joinType, parentAlias, alias, this.joinColumns.get(0).getTable().getQName(), true);
 	}
 
 	/**
@@ -411,6 +411,18 @@ public class ForeignKey {
 	 */
 	public String getReferencedTableName() {
 		return this.joinColumns.get(0).getReferencedTable().getName();
+	}
+
+	/**
+	 * Returns the qualified referenced table of the foreign key.
+	 * 
+	 * @return the qualified referenced table of the foreign key
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getReferencedTableQName() {
+		return this.joinColumns.get(0).getReferencedTable().getQName();
 	}
 
 	/**
@@ -714,6 +726,6 @@ public class ForeignKey {
 	 */
 	@Override
 	public String toString() {
-		return "ForeignKey [tableName=" + this.table.getName() + ", joinColumns=" + this.joinColumns + "]";
+		return "ForeignKey [tableName=" + this.table.getQName() + ", joinColumns=" + this.joinColumns + "]";
 	}
 }
