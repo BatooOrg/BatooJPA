@@ -70,7 +70,6 @@ public abstract class AbstractTable {
 	private AbstractColumn[] versionUpdateColumns;
 	private AbstractColumn[] selectVersionColumns;
 	private final Map<EntityTypeImpl<?>, AbstractColumn[]> insertColumnsMap = Maps.newHashMap();
-
 	private final Map<EntityTypeImpl<?>, AbstractColumn[]> updateColumnsMap = Maps.newHashMap();
 
 	/**
@@ -171,6 +170,10 @@ public abstract class AbstractTable {
 				@Override
 				public boolean apply(AbstractColumn input) {
 					if ((input instanceof PkColumn) && (((PkColumn) input).getIdType() == IdType.IDENTITY)) {
+						return false;
+					}
+
+					if (!input.isInsertable()) {
 						return false;
 					}
 
@@ -304,6 +307,10 @@ public abstract class AbstractTable {
 				@Override
 				public boolean apply(AbstractColumn input) {
 					if ((input.isPrimaryKey()) || (input instanceof DiscriminatorColumn)) {
+						return false;
+					}
+
+					if (!input.isUpdatable()) {
 						return false;
 					}
 
