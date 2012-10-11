@@ -71,6 +71,13 @@ B U I L D I N G
 Note: The initial build may take a long time.
 
 
+B E N C H M A R K
+
+During normal build the the benchmark is also run. 
+
+The output of benchmark results can be found in 
+/benchmark/target/surefire-reports/org.batoo.jpa.benchmark.BenchmarkTest-output.txt
+
 
 D E V E L O P M E N T
 
