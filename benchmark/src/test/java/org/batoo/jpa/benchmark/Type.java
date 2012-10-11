@@ -33,10 +33,10 @@ public enum Type {
 	/**
 	 * Hibernate
 	 */
-	HIBERNATE,
+	HBRNT,
 
 	/**
 	 * EclipseLink
 	 */
-	ECLIPSELINK,
+	ELINK,
 }

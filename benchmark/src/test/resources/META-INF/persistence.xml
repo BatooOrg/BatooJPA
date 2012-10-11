@@ -42,7 +42,7 @@
 
 	</persistence-unit>
 
-	<persistence-unit name="hibernate" transaction-type="RESOURCE_LOCAL">
+	<persistence-unit name="hbrnt" transaction-type="RESOURCE_LOCAL">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 
 		<class>org.batoo.jpa.benchmark.Country</class>
@@ -59,7 +59,7 @@
 		</properties>
 	</persistence-unit>
 	
-	<persistence-unit name="eclipselink" transaction-type="RESOURCE_LOCAL">
+	<persistence-unit name="elink" transaction-type="RESOURCE_LOCAL">
 		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
 
 		<class>org.batoo.jpa.benchmark.Country</class>

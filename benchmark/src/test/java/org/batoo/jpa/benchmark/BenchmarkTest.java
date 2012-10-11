@@ -44,8 +44,10 @@ import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Root;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -56,7 +58,13 @@ import com.google.common.collect.Maps;
  * 
  * @since $version
  */
-public class Playground {
+public class BenchmarkTest {
+
+	// The number of tests to run
+	private static final int BENCHMARK_LENGTH = 1000;
+
+	// If the results should be summarized
+	private static final boolean SUMMARIZE = true;
 
 	/**
 	 * 
@@ -69,14 +77,33 @@ public class Playground {
 			DriverManager.getConnection("jdbc:derby:memory:testDB;create=true");
 		}
 		catch (final SQLException e) {}
+
+		if (BenchmarkTest.SUMMARIZE) {
+			System.out.println("=============================================================");
+			System.out.println("Prvdr | Total Time | JPA Time   | DB Time   | Name Of The Test");
+		}
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@AfterClass
+	public static void finish() {
+		if (BenchmarkTest.SUMMARIZE) {
+			System.out.println("=============================================================");
+		}
 	}
 
 	private Country country;
-
 	private TimeElement element;
 	private final HashMap<String, TimeElement> elements = Maps.newHashMap();
 	private boolean running;
+
 	private long oldTime;
+
+	private Type type;
 
 	/**
 	 * @param id
@@ -96,8 +123,8 @@ public class Playground {
 
 			@Override
 			public void run() {
-				while (Playground.this.running) {
-					Playground.this._measureSingleTime(id, mxBean);
+				while (BenchmarkTest.this.running) {
+					BenchmarkTest.this._measureSingleTime(id, mxBean);
 					try {
 						Thread.sleep(0, 10);
 					}
@@ -118,26 +145,31 @@ public class Playground {
 	public void _measureAfter() {
 		this.running = false;
 
-		this.element.dump(0, 0);
-
-		System.out.println("\n");
-
-		int rowNo = 0;
-		final ArrayList<TimeElement> elements = Lists.newArrayList(this.elements.values());
-		Collections.sort(elements, new Comparator<TimeElement>() {
-
-			@Override
-			public int compare(TimeElement o1, TimeElement o2) {
-				return o1.getSelf().compareTo(o2.getSelf());
-			}
-		});
-
-		for (final TimeElement element : elements) {
-			rowNo++;
-			element.dump2(rowNo);
+		if (BenchmarkTest.SUMMARIZE) {
+			this.element.dump0(this.type);
 		}
+		else {
+			this.element.dump1(0, 0);
 
-		System.out.println("\n");
+			System.out.println("\n");
+
+			int rowNo = 0;
+			final ArrayList<TimeElement> elements = Lists.newArrayList(this.elements.values());
+			Collections.sort(elements, new Comparator<TimeElement>() {
+
+				@Override
+				public int compare(TimeElement o1, TimeElement o2) {
+					return o1.getSelf().compareTo(o2.getSelf());
+				}
+			});
+
+			for (final TimeElement element : elements) {
+				rowNo++;
+				element.dump2(rowNo);
+			}
+
+			System.out.println("\n");
+		}
 	}
 
 	/**
@@ -152,10 +184,14 @@ public class Playground {
 
 			@Override
 			public void run() {
-				Playground.this.running = true;
-				Playground.this._measure(id);
+				BenchmarkTest.this.running = true;
+				BenchmarkTest.this._measure(id);
 			}
 		}).start();
+
+		if (BenchmarkTest.SUMMARIZE) {
+			System.out.println("_____________________________________________________________");
+		}
 	}
 
 	private void _measureSingleTime(long id, final ThreadMXBean mxBean) {
@@ -188,7 +224,10 @@ public class Playground {
 
 				gotStart = true;
 
-				final String key = stElement.getClassName() + "." + stElement.getMethodName() + "." + stElement.getLineNumber();
+				final String key = BenchmarkTest.SUMMARIZE ? //
+					stElement.getClassName() + "." + stElement.getMethodName() : //
+					stElement.getClassName() + "." + stElement.getMethodName() + "." + stElement.getLineNumber();
+
 				child = child.get(key);
 				TimeElement child2 = this.elements.get(key);
 				if (child2 == null) {
@@ -266,7 +305,7 @@ public class Playground {
 		this.doTest(Type.BATOO);
 	}
 
-	private void doCriteria(final EntityManagerFactory emf, final Person person, CriteriaQuery<Address> cq, ParameterExpression<Person> p) {
+	private void doBenchmarkCriteria(final EntityManagerFactory emf, final Person person, CriteriaQuery<Address> cq, ParameterExpression<Person> p) {
 		for (int i = 1; i < 25; i++) {
 			final EntityManager em = emf.createEntityManager();
 
@@ -278,17 +317,7 @@ public class Playground {
 		}
 	}
 
-	/**
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@Test
-	public void doeclipselink() {
-		this.doTest(Type.ECLIPSELINK);
-	}
-
-	private void doFind(final EntityManagerFactory emf, final Person person) {
+	private void doBenchmarkFind(final EntityManagerFactory emf, final Person person) {
 		for (int i = 0; i < 250; i++) {
 			final EntityManager em = emf.createEntityManager();
 
@@ -298,17 +327,7 @@ public class Playground {
 		}
 	}
 
-	/**
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@Test
-	public void dohibernate() {
-		this.doTest(Type.HIBERNATE);
-	}
-
-	private void doJpql(final EntityManagerFactory emf, final Person person) {
+	private void doBenchmarkJpql(final EntityManagerFactory emf, final Person person) {
 		for (int i = 0; i < 25; i++) {
 			final EntityManager em = emf.createEntityManager();
 
@@ -323,7 +342,7 @@ public class Playground {
 		}
 	}
 
-	private void doPersist(final EntityManagerFactory emf, List<Person>[] persons) {
+	private void doBenchmarkPersist(final EntityManagerFactory emf, List<Person>[] persons) {
 		for (final List<Person> list : persons) {
 			final EntityManager em = emf.createEntityManager();
 
@@ -341,27 +360,58 @@ public class Playground {
 		}
 	}
 
+	private void doBenchmarkRemove(final EntityManager em, final Person[] personsToRemove) {
+		for (int i = 0; i < 5; i++) {
+			em.remove(personsToRemove[i]);
+		}
+		em.getTransaction().commit();
+	}
+
+	private void doBenchmarkRemove(int i, final EntityManager em, final Person person2) {
+		final EntityTransaction tx = em.getTransaction();
+		tx.begin();
+		person2.setName("Ceylan" + i);
+		tx.commit();
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	@Ignore
+	public void doeclipselink() {
+		this.doTest(Type.ELINK);
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void dohibernate() {
+		this.doTest(Type.HBRNT);
+	}
+
 	private void doRemove(final EntityManagerFactory emf, final List<Person>[] persons) {
 		final EntityManager em = emf.createEntityManager();
 		em.getTransaction().begin();
 
+		final Person[] personsToRemove = new Person[5];
+
 		for (int i = 0; i < 5; i++) {
 			for (final Person person : persons[i]) {
-				final Person person2 = em.find(Person.class, person.getId());
-				em.remove(person2);
+				personsToRemove[i] = em.find(Person.class, person.getId());
 			}
 		}
 
-		em.getTransaction().commit();
+		this.doBenchmarkRemove(em, personsToRemove);
 		em.close();
 	}
 
 	private void doTest(Type type) {
-		// final ClassLoader old = Thread.currentThread().getContextClassLoader();
-		// try {
-		// Thread.currentThread().setContextClassLoader(new BenchmarkClassLoader(old, type));
-		// System.currentTimeMillis();;
-
 		final EntityManagerFactory emf = Persistence.createEntityManagerFactory(type.name().toLowerCase());
 
 		final EntityManager em = emf.createEntityManager();
@@ -374,13 +424,7 @@ public class Playground {
 
 		em.close();
 
-		// System.currentTimeMillis();
-
 		this.test(type, emf);
-
-		// finally {
-		// Thread.currentThread().setContextClassLoader(old);
-		// }
 	}
 
 	private void doUpdate(final EntityManagerFactory emf, final Person person) {
@@ -389,30 +433,29 @@ public class Playground {
 
 			final Person person2 = em.find(Person.class, person.getId());
 
-			final EntityTransaction tx = em.getTransaction();
-			tx.begin();
-			person2.setName("Ceylan" + i);
-			tx.commit();
+			this.doBenchmarkRemove(i, em, person2);
 
 			em.close();
 		}
 	}
 
 	private void singleTest(final EntityManagerFactory emf, List<Person>[] persons, CriteriaQuery<Address> cq, ParameterExpression<Person> p) {
-		this.doPersist(emf, persons);
+		this.doBenchmarkPersist(emf, persons);
 
-		this.doFind(emf, persons[0].get(0));
+		this.doBenchmarkFind(emf, persons[0].get(0));
 
 		this.doUpdate(emf, persons[0].get(0));
 
-		this.doCriteria(emf, persons[0].get(0), cq, p);
+		this.doBenchmarkCriteria(emf, persons[0].get(0), cq, p);
 
-		this.doJpql(emf, persons[0].get(0));
+		this.doBenchmarkJpql(emf, persons[0].get(0));
 
 		this.doRemove(emf, persons);
 	}
 
 	private void test(Type type, final EntityManagerFactory emf) {
+		this.type = type;
+
 		final CriteriaBuilder cb = emf.getCriteriaBuilder();
 		final CriteriaQuery<Address> cq = cb.createQuery(Address.class);
 
@@ -432,7 +475,7 @@ public class Playground {
 			catch (final InterruptedException e) {}
 		}
 
-		for (int i = 0; i < 1000; i++) {
+		for (int i = 0; i < BenchmarkTest.BENCHMARK_LENGTH; i++) {
 			this.singleTest(emf, this.createPersons(), cq, p);
 		}
 	}

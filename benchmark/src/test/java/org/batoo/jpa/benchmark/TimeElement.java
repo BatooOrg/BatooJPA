@@ -85,6 +85,34 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	}
 
 	/**
+	 * Dumps the summary of the test.
+	 * 
+	 * @param type
+	 *            the benchmark type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void dump0(Type type) {
+		final int nameStart = this.key.indexOf("doBenchmark");
+
+		if (nameStart > -1) {
+			System.out.println(//
+			type.name() + //
+				" | " + String.format("%010d", this.time / 1000000) + //
+				" | " + String.format("%010d", this.timeWithoutDerby / 1000000) + //
+				" | " + String.format("%010d", (this.time - this.timeWithoutDerby) / 1000000) + //
+				" | " + this.key.substring(nameStart + 11) + " Test");
+		}
+
+		final List<TimeElement> children = Lists.newArrayList(this.values());
+		Collections.sort(children);
+		for (final TimeElement child : children) {
+			child.dump0(type);
+		}
+	}
+
+	/**
 	 * @param rowNo
 	 *            the row no
 	 * @param depth
@@ -94,7 +122,7 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	 * @since $version
 	 * @author hceylan
 	 */
-	public int dump(int rowNo, int depth) {
+	public int dump1(int rowNo, int depth) {
 		if ((depth > 0) && (this.timeWithoutDerby > 10000000)) {
 			rowNo++;
 			final String tabs = StringUtils.repeat(" ", depth);
@@ -111,7 +139,7 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 		final List<TimeElement> children = Lists.newArrayList(this.values());
 		Collections.sort(children);
 		for (final TimeElement child : children) {
-			rowNo = child.dump(rowNo, depth + 1);
+			rowNo = child.dump1(rowNo, depth + 1);
 		}
 
 		return rowNo;

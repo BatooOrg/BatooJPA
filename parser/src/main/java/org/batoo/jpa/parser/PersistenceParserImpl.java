@@ -173,6 +173,7 @@ public class PersistenceParserImpl implements PersistenceParser {
 
 			final Enumeration<URL> xmls = this.classloader.getResources(PersistenceParserImpl.PERSISTENCE_XML);
 			while (xmls.hasMoreElements()) {
+				URL nextElement = xmls.nextElement();
 				final InputStream is = this.classloader.getResourceAsStream(PersistenceParserImpl.PERSISTENCE_XML);
 				// Try to load the Persistence XML
 				if (is == null) {

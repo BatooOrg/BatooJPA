@@ -338,5 +338,6 @@
 		<module>batoo-annotations</module>
 		<module>batoo-maven-plugin</module>
 		<module>community</module>
+		<module>benchmark</module>
 	</modules>
 </project>
