@@ -79,6 +79,10 @@ public class Person {
 		return this.addressId;
 	}
 
+	/**
+	 * @return the home address
+	 * 
+	 */
 	public Address getHomeAddress() {
 		return this.homeAddress;
 	}
@@ -108,6 +112,9 @@ public class Person {
 	/**
 	 * Set the homeAddress without adding this Account instance on the passed homeAddress If you want to preserve referential integrity we
 	 * recommend to use instead the corresponding adder method provided by {@link Address}
+	 * 
+	 * @param homeAddress
+	 *            the home address to set
 	 */
 	public void setHomeAddress(Address homeAddress) {
 		this.homeAddress = homeAddress;

@@ -55,6 +55,27 @@ public class ManyToOneTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
+	public void testColumnInsertUpdateFalse() {
+		final Person person = this.person();
+
+		this.persist(person);
+
+		this.commit();
+		this.close();
+
+		final Person person2 = this.find(Person.class, person.getId());
+
+		Assert.assertEquals(person.getName(), person2.getName());
+		Assert.assertNotNull(person2.getAddressId());
+	}
+
+	/**
+	 * Tests to {@link EntityManager#find(Class, Object)} person.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
 	public void testFind() {
 		final Person person = this.person();
 		this.persist(person);
@@ -64,7 +85,7 @@ public class ManyToOneTest extends BaseCoreTest {
 
 		final Person person2 = this.find(Person.class, person.getId());
 		Assert.assertEquals(person.getName(), person2.getName());
-		Assert.assertEquals(person.getAddressId(), person2.getAddressId());
+		Assert.assertEquals(person2.getAddressId(), person2.getHomeAddress().getId());
 	}
 
 	/**
@@ -101,35 +122,10 @@ public class ManyToOneTest extends BaseCoreTest {
 		final Person person2 = this.find(Person.class, person.getId());
 
 		Assert.assertEquals(person.getName(), person2.getName());
-		Assert.assertNull(person2.getAddressId());
-		Assert.assertEquals(person.getAddressId(), person2.getHomeAddress().getId());
+		Assert.assertNotNull(person2.getAddressId());
+		Assert.assertEquals(person2.getAddressId(), person2.getHomeAddress().getId());
 	}
 
-	/**
-	 * Tests to {@link EntityManager#find(Class, Object)} person.
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@Test
-	public void testColumnInsertUpdateFalse() {
-		final Person person = this.person();
-		
-		person.setAddressId(999);
-
-		this.persist(person);
-
-		this.commit();				
-		this.close();
-
-		final Person person2 = this.find(Person.class, person.getId());
-
-		Assert.assertEquals(person.getName(), person2.getName());
-		Assert.assertNull(person2.getAddressId());
-
-	}
-	
-	
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} Parent which cascades to Child1.
 	 * 
@@ -141,28 +137,26 @@ public class ManyToOneTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testJoinColumnName() throws SQLException {
-		
 		Field f = null;
 		try {
 			f = Person.class.getDeclaredField("homeAddress");
-			
-			JoinColumn annotation = f.getAnnotation(JoinColumn.class);
-			Assert.assertEquals("address_id",annotation.name());
-						
-		} catch (NoSuchFieldException e) {
-			e.printStackTrace();
-			Assert.fail();
-		} catch (SecurityException e) {
+
+			final JoinColumn annotation = f.getAnnotation(JoinColumn.class);
+			Assert.assertEquals("address_id", annotation.name());
+
+		}
+		catch (final NoSuchFieldException e) {
 			e.printStackTrace();
 			Assert.fail();
 		}
-		
+		catch (final SecurityException e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+
 		this.persist(this.person());
-		
+
 		this.commit();
-		Assert.assertNull(new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT homeAddress_id FROM Person", new SingleValueHandler<Number>()) );
-		Assert.assertNotNull(new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT address_id FROM Person", new SingleValueHandler<Number>()) );
-
-
+		Assert.assertNotNull(new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT address_id FROM Person", new SingleValueHandler<Number>()));
 	}
 }

@@ -22,8 +22,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 
 /**
  * 
@@ -48,8 +46,6 @@ public class Address {
 	}
 
 	/**
-	 * @param person
-	 *            the person
 	 * @param city
 	 *            the city
 	 * 
@@ -61,33 +57,33 @@ public class Address {
 		this.city = city;
 	}
 
-
 	/**
 	 * @return the city
 	 */
 	public String getCity() {
-		return city;
+		return this.city;
 	}
 
 	/**
 	 * @return the id
 	 */
 	public Integer getId() {
-		return id;
+		return this.id;
 	}
 
 	/**
-	 * @param city the city to set
+	 * @param city
+	 *            the city to set
 	 */
 	public void setCity(String city) {
 		this.city = city;
 	}
 
 	/**
-	 * @param id the id to set
+	 * @param id
+	 *            the id to set
 	 */
 	public void setId(Integer id) {
 		this.id = id;
 	}
-
 }

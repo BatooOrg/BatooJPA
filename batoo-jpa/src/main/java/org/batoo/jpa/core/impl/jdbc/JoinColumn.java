@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
+import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
@@ -148,6 +149,7 @@ public class JoinColumn extends AbstractColumn {
 		this.referencedColumnName = metadata.getReferencedColumnName();
 		this.columnDefinition = metadata.getColumnDefinition();
 		this.tableName = metadata.getTable();
+		this.name = metadata.getName();
 		this.insertable = metadata.isInsertable();
 		this.nullable = metadata.isNullable();
 		this.unique = metadata.isUnique();
@@ -465,12 +467,16 @@ public class JoinColumn extends AbstractColumn {
 		if (mapping != null) {
 			this.mapping = mapping;
 			this.mappingName = mapping.getName() + "_" + referencedMapping.getColumn().getName();
-			this.name = this.jdbcAdaptor.escape(this.mappingName);
+			if (StringUtils.isBlank(this.name)) {
+				this.name = this.jdbcAdaptor.escape(this.mappingName);
+			}
 		}
 		else {
 			final EntityTypeImpl<?> type = (EntityTypeImpl<?>) referencedMapping.getRoot().getType();
 			this.mappingName = type.getName() + "_" + referencedMapping.getColumn().getName();
-			this.name = this.jdbcAdaptor.escape(this.mappingName);
+			if (StringUtils.isBlank(this.name)) {
+				this.name = this.jdbcAdaptor.escape(this.mappingName);
+			}
 		}
 
 		this.setColumnProperties(referencedMapping);

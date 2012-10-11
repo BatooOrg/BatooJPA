@@ -297,25 +297,32 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @param table
 	 *            the table
 	 * @return the SQL to create the table
+	 * @throws SQLException
+	 *             thrown if there is repetitive column names with different DDL
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	private String createCreateTableStatement(AbstractTable table) {
-		final List<String> ddlColumns = Lists.newArrayList();
+	private String createCreateTableStatement(AbstractTable table) throws SQLException {
+		final Map<String, String> ddlColumns = Maps.newHashMap();
 		final List<String> pkColumns = Lists.newArrayList();
 
 		final Collection<AbstractColumn> columns = this.getColumns(table);
 
 		for (final AbstractColumn column : columns) {
-			ddlColumns.add(this.createColumnDDL(column));
+			final String columnDDL = this.createColumnDDL(column);
+			final String existingColumnDDL = ddlColumns.get(column.getName());
+			if ((existingColumnDDL != null) && !existingColumnDDL.equals(columnDDL)) {
+				throw new SQLException("Table " + table.getName() + " has two columns with same name '" + column.getName() + "' but different DDL");
+			}
+			ddlColumns.put(column.getName(), columnDDL);
 
 			if (column.isPrimaryKey()) {
 				pkColumns.add(column.getName());
 			}
 		}
 
-		return this.createCreateTableStatement(table, ddlColumns, pkColumns);
+		return this.createCreateTableStatement(table, ddlColumns.values(), pkColumns);
 	}
 
 	/**
@@ -332,7 +339,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public String createCreateTableStatement(AbstractTable table, List<String> ddlColumns, List<String> pkColumns) {
+	public String createCreateTableStatement(AbstractTable table, Collection<String> ddlColumns, List<String> pkColumns) {
 		final String columns = Joiner.on(",\n\t").join(ddlColumns);
 		final String keys = Joiner.on(", ").join(pkColumns);
 
