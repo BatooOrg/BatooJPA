@@ -18,9 +18,11 @@
  */
 package org.batoo.jpa.core.test.manytoone;
 
+import java.lang.reflect.Field;
 import java.sql.SQLException;
 
 import javax.persistence.EntityManager;
+import javax.persistence.JoinColumn;
 import javax.sql.DataSource;
 
 import junit.framework.Assert;
@@ -93,8 +95,6 @@ public class ManyToOneTest extends BaseCoreTest {
 		final Person person = this.person();
 		this.persist(person);
 
-		person.setAddressId(person.getHomeAddress().getId());
-
 		this.commit();
 		this.close();
 
@@ -106,6 +106,31 @@ public class ManyToOneTest extends BaseCoreTest {
 	}
 
 	/**
+	 * Tests to {@link EntityManager#find(Class, Object)} person.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testColumnInsertUpdateFalse() {
+		final Person person = this.person();
+		
+		person.setAddressId(999);
+
+		this.persist(person);
+
+		this.commit();				
+		this.close();
+
+		final Person person2 = this.find(Person.class, person.getId());
+
+		Assert.assertEquals(person.getName(), person2.getName());
+		Assert.assertNull(person2.getAddressId());
+
+	}
+	
+	
+	/**
 	 * Tests to {@link EntityManager#persist(Object)} Parent which cascades to Child1.
 	 * 
 	 * @throws SQLException
@@ -115,15 +140,29 @@ public class ManyToOneTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
-	public void testPersistPerson() throws SQLException {
+	public void testJoinColumnName() throws SQLException {
+		
+		Field f = null;
+		try {
+			f = Person.class.getDeclaredField("homeAddress");
+			
+			JoinColumn annotation = f.getAnnotation(JoinColumn.class);
+			Assert.assertEquals("address_id",annotation.name());
+						
+		} catch (NoSuchFieldException e) {
+			e.printStackTrace();
+			Assert.fail();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+		
 		this.persist(this.person());
-
+		
 		this.commit();
+		Assert.assertNull(new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT homeAddress_id FROM Person", new SingleValueHandler<Number>()) );
+		Assert.assertNotNull(new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT address_id FROM Person", new SingleValueHandler<Number>()) );
 
-		Assert.assertEquals(1,
-			new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM Person", new SingleValueHandler<Number>()).intValue());
 
-		Assert.assertEquals(1,
-			new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM Address", new SingleValueHandler<Number>()).intValue());
 	}
 }
