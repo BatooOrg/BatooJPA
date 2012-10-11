@@ -367,7 +367,7 @@ public class BenchmarkTest {
 		em.getTransaction().commit();
 	}
 
-	private void doBenchmarkRemove(int i, final EntityManager em, final Person person2) {
+	private void doBenchmarkUpdate(int i, final EntityManager em, final Person person2) {
 		final EntityTransaction tx = em.getTransaction();
 		tx.begin();
 		person2.setName("Ceylan" + i);
@@ -433,7 +433,7 @@ public class BenchmarkTest {
 
 			final Person person2 = em.find(Person.class, person.getId());
 
-			this.doBenchmarkRemove(i, em, person2);
+			this.doBenchmarkUpdate(i, em, person2);
 
 			em.close();
 		}
