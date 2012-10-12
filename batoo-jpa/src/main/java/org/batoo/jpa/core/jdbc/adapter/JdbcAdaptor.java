@@ -374,6 +374,11 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 		try {
 			// locate the foreign key metada
 			final JdbcTable tableMetadata = this.getTableMetadata(datasource, foreignKey.getTable());
+			if (tableMetadata == null) {
+				JdbcAdaptor.LOG.warn("Foreign key {0} cannot be created, table not found: ", foreignKey);
+				return;
+			}
+
 			final JdbcForeignKey foreignKeyMetadata = tableMetadata.getForeignKey(foreignKey.getName());
 
 			// if it exists, then if there is no change then bail out, otherwise drop and continue with the creation

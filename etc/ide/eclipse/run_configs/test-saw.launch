@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.junit.launchconfig">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/org.batoo.jpa.batoo-jpa/src/test/java/org/batoo/jpa/core/test/simple2/SimpleTest.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<mapAttribute key="org.eclipse.debug.core.environmentVariables">
+<mapEntry key="LD_LIBRARY_PATH" value="/opt/sqlanywhere12/lib64/"/>
+<mapEntry key="SQLANY12" value="/opt/sqlanywhere12"/>
+</mapAttribute>
+<stringAttribute key="org.eclipse.jdt.junit.CONTAINER" value=""/>
+<booleanAttribute key="org.eclipse.jdt.junit.KEEPRUNNING_ATTR" value="false"/>
+<stringAttribute key="org.eclipse.jdt.junit.TESTNAME" value=""/>
+<stringAttribute key="org.eclipse.jdt.junit.TEST_KIND" value="org.eclipse.jdt.junit.loader.junit4"/>
+<stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.m2e.launchconfig.classpathProvider"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.batoo.jpa.core.test.simple2.SimpleTest"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="org.batoo.jpa.batoo-jpa"/>
+<stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djavax.persistence.jdbc.driver=sybase.jdbc.sqlanywhere.IDriver -Djavax.persistence.jdbc.url=jdbc:sqlanywhere:uid=DBA;pwd=sql;dbf=/tmp/batoo.dbf;START=/opt/sqlanywhere12/bin64/dbeng12;POOLING=FALSE; -Djavax.persistence.jdbc.user=DBA -Djavax.persistence.jdbc.password=sql -DtestMode=saw"/>
+</launchConfiguration>

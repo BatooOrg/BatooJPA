@@ -252,6 +252,13 @@
 		</dependency>
 		-->
 		<dependency>
+			<groupId>sybase.jdbc.sqlanywhere</groupId>
+			<artifactId>sajdbc</artifactId>
+			<version>12.0.0</version>
+			<scope>test</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.derby</groupId>
 			<artifactId>derby</artifactId>
 			<scope>test</scope>

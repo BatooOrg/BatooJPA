@@ -30,6 +30,7 @@ import org.batoo.jpa.core.jdbc.adapter.MsSqlAdaptor;
 import org.batoo.jpa.core.jdbc.adapter.MySqlAdaptor;
 import org.batoo.jpa.core.jdbc.adapter.OracleAdaptor;
 import org.batoo.jpa.core.jdbc.adapter.PostgreSqlAdaptor;
+import org.batoo.jpa.core.jdbc.adapter.SawSqlAdaptor;
 
 import com.google.common.collect.Maps;
 
@@ -78,6 +79,7 @@ public abstract class AbstractJdbcAdaptor {
 		AbstractJdbcAdaptor.putAdaptor(adaptors, new H2Adaptor());
 		AbstractJdbcAdaptor.putAdaptor(adaptors, new HsqlAdaptor());
 		AbstractJdbcAdaptor.putAdaptor(adaptors, new PostgreSqlAdaptor());
+		AbstractJdbcAdaptor.putAdaptor(adaptors, new SawSqlAdaptor());
 
 		return adaptors;
 	}

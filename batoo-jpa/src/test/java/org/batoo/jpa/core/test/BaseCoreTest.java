@@ -30,12 +30,12 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.junit.After;
@@ -454,6 +454,14 @@ public abstract class BaseCoreTest { // extends BaseTest {
 		}
 
 		final String testMode = System.getProperty("testMode");
+		if ("saw".equals(System.getProperty("testMode"))) {
+			try {
+				Runtime.getRuntime().exec("/bin/sh src/test/resources/saw.sh").waitFor();
+			}
+			catch (final Exception e) {
+				throw new SQLException(e);
+			}
+		}
 
 		if ("mssql".equals(testMode)) {
 			final String username = System.getProperty("javax.persistence.jdbc.user");

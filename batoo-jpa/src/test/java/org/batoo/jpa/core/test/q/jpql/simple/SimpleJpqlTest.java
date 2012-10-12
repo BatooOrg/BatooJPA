@@ -383,7 +383,7 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		this.commit();
 
 		double expected = 314.159265;
-		if ("hsql".equals(testMode) || "derby".equals(testMode) || "h2".equals(testMode) || "mssql".equals(testMode)) {
+		if ("hsql".equals(testMode) || "derby".equals(testMode) || "h2".equals(testMode) || "mssql".equals(testMode) || "saw".equals(testMode)) {
 			expected = 314.1592653589793;
 		}
 
@@ -487,14 +487,14 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		final String testMode = System.getProperty("testMode");
 		String expected = null;
 
-		if ("mysql".equals(testMode) || "hsql".equals(testMode) || "h2".equals(testMode) || "mssql".equals(testMode)) {
+		if ("mysql".equals(testMode) || "hsql".equals(testMode) || "h2".equals(testMode) || "mssql".equals(testMode) || "saw".equals(testMode)) {
 			expected = SimpleJpqlTest.COUNTRY_USA;
 		}
 
 		Assert.assertEquals(expected, this.cq("select c.name from Country c order by c.name desc", String.class).setMaxResults(1).getSingleResult());
 
 		expected = SimpleJpqlTest.COUNTRY_TR;
-		if ("mysql".equals(testMode) || "hsql".equals(testMode) || "h2".equals(testMode) || "mssql".equals(testMode)) {
+		if ("mysql".equals(testMode) || "hsql".equals(testMode) || "h2".equals(testMode) || "mssql".equals(testMode) || "saw".equals(testMode)) {
 			expected = null;
 		}
 
@@ -616,7 +616,7 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		q2 = this.cq("select concat(c.code, '_', c.name) from Country c order by c.code", String.class);
 		String expected = "[null, TR_Turkey, UK_United Kingdom, USA_United States of America]";
-		if (testMode.equals("oracle")) {
+		if (testMode.equals("oracle") || "saw".equals(testMode)) {
 			expected = "[BR_, TR_Turkey, UK_United Kingdom, USA_United States of America]";
 		}
 		Assert.assertEquals(expected, q2.getResultList().toString());
@@ -639,7 +639,7 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		q2 = this.cq("select trim(both from ' a ') from Country c where c = :country", String.class).setParameter("country", SimpleJpqlTest.TR);
 		Assert.assertEquals("a", q2.getSingleResult());
 
-		if (!"mssql".equals(testMode)) {
+		if (!"mssql".equals(testMode) && !"saw".equals(testMode)) {
 			q2 = this.cq("select trim(both 'c' from 'cac') from Country c where c = :country", String.class).setParameter("country", SimpleJpqlTest.TR);
 			Assert.assertEquals("a", q2.getSingleResult());
 		}
