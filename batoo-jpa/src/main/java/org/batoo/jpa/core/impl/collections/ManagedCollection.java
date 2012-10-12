@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.collections;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.IdentityHashMap;
@@ -46,7 +47,7 @@ import com.google.common.collect.Lists;
  * @author hceylan
  * @since $version
  */
-public abstract class ManagedCollection<E> {
+public abstract class ManagedCollection<E> implements Serializable {
 
 	private final transient PluralMapping<?, ?, E> mapping;
 	private final transient ManagedInstance<?> managedInstance;
