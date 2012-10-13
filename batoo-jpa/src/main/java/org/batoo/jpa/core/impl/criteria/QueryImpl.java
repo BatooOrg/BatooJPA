@@ -140,8 +140,8 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 		final List<ParameterExpressionImpl<?>> sqlParameters = this.q.getSqlParameters();
 
 		int paramCount = 0;
-		for (final ParameterExpressionImpl<?> parameter : sqlParameters) {
-			paramCount += parameter.getExpandedCount(metamodel);
+		for (int i = 0; i < sqlParameters.size(); i++) {
+			paramCount += sqlParameters.get(i).getExpandedCount(metamodel);
 		}
 
 		// determine if we need to expand param count for pagination
@@ -239,7 +239,8 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 		final MutableInt sqlIndex = new MutableInt(0);
 		final Object[] parameters = new Object[paramCount];
 
-		for (final ParameterExpressionImpl<?> parameter : sqlParameters) {
+		for (int i = 0; i < sqlParameters.size(); i++) {
+			final ParameterExpressionImpl<?> parameter = sqlParameters.get(i);
 			parameter.setParameter(metamodel, parameters, sqlIndex, this.parameters.get(parameter));
 		}
 
@@ -746,8 +747,8 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 
 		final LockModeType lockMode = this.getLockMode();
 		if (lockMode != null) {
-			for (final X instance : this.results) {
-				this.em.lock(session.get(instance), lockMode, null);
+			for (int i = 0; i < this.results.size(); i++) {
+				this.em.lock(session.get(this.results.get(i)), lockMode, null);
 			}
 		}
 

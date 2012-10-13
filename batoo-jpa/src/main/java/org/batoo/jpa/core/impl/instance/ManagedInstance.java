@@ -634,7 +634,9 @@ public class ManagedInstance<X> {
 	public void handleAdditions(EntityManagerImpl entityManager) {
 		ManagedInstance.LOG.debug("Inspecting additions for instance {0}", this);
 
-		for (final PluralMapping<?, ?, ?> collection : this.collectionsChanged) {
+		for (int i = 0; i < this.collectionsChanged.size(); i++) {
+			final PluralMapping<?, ?, ?> collection = this.collectionsChanged.get(i);
+
 			if (collection instanceof PluralAssociationMapping) {
 				((PluralAssociationMapping<?, ?, ?>) collection).persistAdditions(entityManager, this);
 			}
@@ -653,7 +655,8 @@ public class ManagedInstance<X> {
 	public void handleOrphans(EntityManagerImpl entityManager) {
 		ManagedInstance.LOG.debug("Inspecting orphans for instance {0}", this);
 
-		for (final PluralMapping<?, ?, ?> collection : this.collectionsChanged) {
+		for (int i = 0; i < this.collectionsChanged.size(); i++) {
+			final PluralMapping<?, ?, ?> collection = this.collectionsChanged.get(i);
 			if (collection.isAssociation()) {
 				((PluralAssociationMapping<?, ?, ?>) collection).removeOrphans(entityManager, this);
 			}

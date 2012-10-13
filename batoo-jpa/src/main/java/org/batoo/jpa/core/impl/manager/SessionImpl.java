@@ -93,13 +93,15 @@ public class SessionImpl {
 	/**
 	 * Cascades the removals.
 	 * 
+	 * @param instances
+	 *            array of changed instances
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void cascadeRemovals() {
+	public void cascadeRemovals(ManagedInstance<?>[] instances) {
 		SessionImpl.LOG.debug("Cascading removals on session {0}", this.sessionId);
 
-		final ArrayList<ManagedInstance<?>> instances = Lists.newArrayList(this.changedEntities);
 		for (final ManagedInstance<?> instance : instances) {
 			if (instance.getStatus() == Status.REMOVED) {
 				instance.cascadeRemove(this.em);
@@ -347,7 +349,9 @@ public class SessionImpl {
 		// move new entities to external entities
 		this.externalEntities.addAll(this.newEntities);
 
-		for (final ManagedInstance<?> instance : this.newEntities) {
+		for (int i = 0; i < this.newEntities.size(); i++) {
+			final ManagedInstance<?> instance = this.newEntities.get(i);
+
 			if (!instance.hasInitialId()) {
 				this.repository.put(instance.getId(), instance);
 			}
@@ -472,15 +476,20 @@ public class SessionImpl {
 	/**
 	 * Handles the additions to the collections.
 	 * 
+	 * @return the array of changed instances
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void handleAdditions() {
+	public ManagedInstance<?>[] handleAdditions() {
 		SessionImpl.LOG.debug("Processing additions to the session {0}", this.sessionId);
 
-		for (final ManagedInstance<?> instance : this.changedEntities) {
+		final ManagedInstance<?>[] instances = this.changedEntities.toArray(new ManagedInstance[this.changedEntities.size()]);
+		for (final ManagedInstance<?> instance : instances) {
 			instance.handleAdditions(this.em);
 		}
+
+		return instances;
 	}
 
 	/**
@@ -492,21 +501,24 @@ public class SessionImpl {
 	public void handleExternals() {
 		SessionImpl.LOG.debug("Inspecting updated external entities on session {0}", this.sessionId);
 
-		for (final ManagedInstance<?> instance : this.externalEntities) {
-			instance.checkUpdated();
+		for (int i = 0; i < this.externalEntities.size(); i++) {
+			this.externalEntities.get(i).checkUpdated();
 		}
 	}
 
 	/**
 	 * Removes entities that have been orphaned
 	 * 
+	 * @param instances
+	 *            the array of changed instances
+	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void handleOrphans() {
+	public void handleOrphans(ManagedInstance<?>[] instances) {
 		SessionImpl.LOG.debug("Inspecting orphan on session {0}", this.sessionId);
 
-		for (final ManagedInstance<?> instance : this.changedEntities) {
+		for (final ManagedInstance<?> instance : instances) {
 			if (instance.getStatus() != Status.REMOVED) {
 				instance.handleOrphans(this.em);
 			}

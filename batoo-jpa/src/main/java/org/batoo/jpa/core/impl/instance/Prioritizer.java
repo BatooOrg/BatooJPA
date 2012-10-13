@@ -74,9 +74,8 @@ public class Prioritizer {
 		int instanceNo = 0;
 
 		final HashSet<EntityTypeImpl<?>> entities = Sets.newHashSet();
-		for (final ManagedInstance<?> instance : updates) {
-			final EntityTypeImpl<?> type = instance.getType();
-			entities.add(type);
+		for (int i = 0; i < updates.size(); i++) {
+			entities.add(updates.get(i).getType());
 		}
 
 		for (final EntityTypeImpl<?> entity : entities) {

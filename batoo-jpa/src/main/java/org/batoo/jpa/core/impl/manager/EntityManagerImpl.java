@@ -498,9 +498,11 @@ public class EntityManagerImpl implements EntityManager {
 
 		try {
 			this.session.handleExternals();
-			this.session.handleAdditions();
-			this.session.cascadeRemovals();
-			this.session.handleOrphans();
+
+			final ManagedInstance<?>[] instances = this.session.handleAdditions();
+			this.session.cascadeRemovals(instances);
+			this.session.handleOrphans(instances);
+
 			this.session.flush(this.getConnection());
 		}
 		catch (final SQLException e) {
