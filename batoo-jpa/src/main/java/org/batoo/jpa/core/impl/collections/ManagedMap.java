@@ -101,9 +101,7 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	public ManagedMap(PluralMapping<?, ?, V> mapping, ManagedInstance<?> managedInstance, Map<? extends K, ? extends V> values) {
 		this(mapping, managedInstance, false);
 
-		this.delegate = Maps.newHashMap();
-
-		this.delegate.putAll(values);
+		this.delegate = Maps.newHashMap(values);
 
 		this.initialized = true;
 	}

@@ -97,9 +97,7 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	public ManagedSet(PluralMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
 		super(mapping, managedInstance);
 
-		this.delegate = Sets.newHashSet();
-
-		this.delegate.addAll(values);
+		this.delegate = Sets.newHashSet(values);
 
 		this.initialized = true;
 	}

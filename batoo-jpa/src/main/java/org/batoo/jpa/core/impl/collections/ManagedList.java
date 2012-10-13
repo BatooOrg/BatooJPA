@@ -179,9 +179,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	public ManagedList(PluralMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
 		super(mapping, managedInstance);
 
-		this.delegate = Lists.newArrayList();
-
-		this.delegate.addAll(values);
+		this.delegate = Lists.newArrayList(values);
 
 		for (final E e : values) {
 			if (e == null) {
