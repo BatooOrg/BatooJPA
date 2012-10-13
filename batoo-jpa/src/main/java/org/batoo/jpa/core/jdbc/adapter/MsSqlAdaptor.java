@@ -358,6 +358,10 @@ public class MsSqlAdaptor extends JdbcAdaptor {
 			return IdType.IDENTITY;
 		}
 
+		if (type == GenerationType.SEQUENCE) {
+			throw new UnsupportedOperationException("MSSQL does not support sequences");
+		}
+
 		return IdType.TABLE;
 	}
 }
