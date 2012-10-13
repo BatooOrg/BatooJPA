@@ -20,6 +20,8 @@ package org.batoo.jpa.core.impl.manager;
 
 import javax.persistence.PersistenceUnitUtil;
 
+import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
@@ -79,10 +81,31 @@ public class PersistenceUnitUtilImpl implements PersistenceUnitUtil {
 	 */
 	@Override
 	public boolean isLoaded(Object entity, String attributeName) {
+		if ((entity == null) || StringUtils.isBlank(attributeName)) {
+			throw new NullPointerException();
+		}
+
 		if (entity instanceof EnhancedInstance) {
 			final EnhancedInstance instance = (EnhancedInstance) entity;
 
-			return instance.__enhanced__$$__getManagedInstance().isJoinLoaded(attributeName);
+			if (instance.__enhanced__$$__getManagedInstance() != null) {
+				return instance.__enhanced__$$__getManagedInstance().isJoinLoaded(attributeName);
+			}
+
+			try {
+				final Object value = entity.getClass().getMethod("get" + StringUtils.capitalize(attributeName)).invoke(entity);
+
+				if (value instanceof EnhancedInstance) {
+					return this.isLoaded(value);
+				}
+
+				if (value instanceof ManagedCollection) {
+					return ((ManagedCollection<?>) value).isInitialized();
+				}
+			}
+			catch (final Exception e) {
+				throw new IllegalArgumentException("Unable to get attribute " + attributeName);
+			}
 		}
 
 		return true;

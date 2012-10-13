@@ -129,9 +129,18 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 		}
 	}
 
-	private final ArrayList<E> delegate = Lists.newArrayList();
-	private ArrayList<E> snapshot;
+	private ArrayList<E> delegate;
+	private transient ArrayList<E> snapshot;
 	private boolean initialized;
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ManagedList() {
+		super();
+	}
 
 	/**
 	 * Constructor for lazy initialization.
@@ -148,6 +157,8 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 */
 	public ManagedList(PluralMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
 		super(mapping, managedInstance);
+
+		this.delegate = Lists.newArrayList();
 
 		this.initialized = !lazy;
 	}
@@ -167,6 +178,8 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 */
 	public ManagedList(PluralMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
 		super(mapping, managedInstance);
+
+		this.delegate = Lists.newArrayList();
 
 		this.delegate.addAll(Lists.newArrayList(values));
 
@@ -671,7 +684,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	protected void snapshot() {
 		this.initialize();
 
-		if (this.snapshot == null) {
+		if ((this.getManagedInstance() != null) && (this.snapshot == null)) {
 			this.snapshot = Lists.newArrayList(this.delegate);
 			this.reset();
 		}

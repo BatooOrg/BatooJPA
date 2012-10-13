@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.test.fetch.lazy;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -36,7 +37,7 @@ import com.google.common.collect.Lists;
  * @since $version
  */
 @Entity
-public class Person {
+public class Person implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)

@@ -18,6 +18,11 @@
  */
 package org.batoo.jpa.core.test.fetch.lazy;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 
@@ -219,4 +224,44 @@ public class LazyTest extends BaseCoreTest {
 
 		this.commit();
 	}
+
+	/**
+	 * Tests to {@link EntityManager#persist(Object)} Parent which cascades to Child1.
+	 * 
+	 * @throws Exception
+	 *             in case of an error
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testSerializePerson() throws Exception {
+		Person person = this.person();
+		this.persist(person);
+
+		this.commit();
+		this.close();
+
+		person = this.find(Person.class, person.getId());
+
+		final ByteArrayOutputStream s = new ByteArrayOutputStream();
+		// serialize
+		final ObjectOutputStream os = new ObjectOutputStream(s);
+		try {
+			os.writeObject(person);
+		}
+		finally {
+			os.close();
+		}
+
+		// unserialize
+		final ObjectInputStream is = new ObjectInputStream(new ByteArrayInputStream(s.toByteArray()));
+
+		final Person person2 = (Person) is.readObject();
+
+		Assert.assertEquals(person.getId(), person2.getId());
+		Assert.assertEquals(person.getAddresses().size(), person2.getAddresses().size());
+		Assert.assertTrue(this.emf().getPersistenceUnitUtil().isLoaded(person2, "addresses"));
+		Assert.assertFalse(this.emf().getPersistenceUnitUtil().isLoaded(person2, "phones"));
+	}
+
 }

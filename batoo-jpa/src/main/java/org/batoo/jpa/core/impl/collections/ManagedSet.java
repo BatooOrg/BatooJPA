@@ -46,10 +46,19 @@ import com.google.common.collect.Sets;
  */
 public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 
-	private final HashSet<E> delegate = Sets.newHashSet();
-	private HashSet<E> snapshot;
+	private HashSet<E> delegate;
+	private transient HashSet<E> snapshot;
 
 	private boolean initialized;
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ManagedSet() {
+		super();
+	}
 
 	/**
 	 * Constructor for lazy initialization.
@@ -66,6 +75,8 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 */
 	public ManagedSet(PluralMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
 		super(mapping, managedInstance);
+
+		this.delegate = Sets.newHashSet();
 
 		this.initialized = !lazy;
 	}
@@ -85,6 +96,8 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 */
 	public ManagedSet(PluralMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
 		super(mapping, managedInstance);
+
+		this.delegate = Sets.newHashSet();
 
 		this.delegate.addAll(values);
 
@@ -427,7 +440,7 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	protected void snapshot() {
 		this.initialize();
 
-		if (this.snapshot == null) {
+		if ((this.getManagedInstance() != null) && (this.snapshot == null)) {
 			this.snapshot = Sets.newHashSet(this.delegate);
 			this.reset();
 		}

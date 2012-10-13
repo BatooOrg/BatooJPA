@@ -49,10 +49,24 @@ import com.google.common.collect.Lists;
  */
 public abstract class ManagedCollection<E> implements Serializable {
 
-	private final transient PluralMapping<?, ?, E> mapping;
+	private transient boolean changed;
 	private final transient ManagedInstance<?> managedInstance;
-	private boolean changed;
-	private AssociationMapping<?, ?, ?> inverse;
+	private final transient PluralMapping<?, ?, E> mapping;
+	private transient AssociationMapping<?, ?, ?> inverse;
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ManagedCollection() {
+		super();
+
+		this.mapping = null;
+		this.managedInstance = null;
+		this.inverse = null;
+		this.changed = false;
+	}
 
 	/**
 	 * @param mapping

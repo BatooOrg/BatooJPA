@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.core.test.fetch.lazy;
 
+import java.io.Serializable;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -27,7 +29,7 @@ import javax.persistence.Id;
  * @since $version
  */
 @Entity
-public class Country {
+public class Country implements Serializable {
 
 	@Id
 	private Integer id;

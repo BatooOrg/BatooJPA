@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.collections;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -49,10 +50,19 @@ import com.google.common.collect.Maps;
  */
 public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, V> {
 
-	private final HashMap<K, V> delegate = Maps.newHashMap();
+	private HashMap<K, V> delegate;
 	private HashMap<K, V> snapshot;
 
 	private boolean initialized;
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ManagedMap() {
+		super();
+	}
 
 	/**
 	 * Constructor for lazy initialization.
@@ -69,6 +79,8 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	 */
 	public ManagedMap(PluralMapping<?, ?, V> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
 		super(mapping, managedInstance);
+
+		this.delegate = Maps.newHashMap();
 
 		this.initialized = !lazy;
 	}
@@ -88,6 +100,8 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	 */
 	public ManagedMap(PluralMapping<?, ?, V> mapping, ManagedInstance<?> managedInstance, Map<? extends K, ? extends V> values) {
 		this(mapping, managedInstance, false);
+
+		this.delegate = Maps.newHashMap();
 
 		this.delegate.putAll(values);
 
@@ -173,8 +187,7 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	public Set<Entry<K, V>> entrySet() {
 		this.initialize();
 
-		// TODO wrap
-		return this.delegate.entrySet();
+		return Collections.unmodifiableSet(this.delegate.entrySet());
 	}
 
 	/**
@@ -293,8 +306,7 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	public Set<K> keySet() {
 		this.initialize();
 
-		// TODO wrap
-		return this.delegate.keySet();
+		return Collections.unmodifiableSet(this.delegate.keySet());
 	}
 
 	private UnsupportedOperationException noDuplicates() {
@@ -403,7 +415,7 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	protected void snapshot() {
 		this.initialize();
 
-		if (this.snapshot == null) {
+		if ((this.getManagedInstance() != null) && (this.snapshot == null)) {
 			this.snapshot = Maps.newHashMap(this.delegate);
 			this.reset();
 		}
@@ -430,6 +442,6 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	public Collection<V> values() {
 		this.initialize();
 
-		return this.delegate.values();
+		return Collections.unmodifiableCollection(this.delegate.values());
 	}
 }

@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.core.test.fetch.lazy;
 
+import java.io.Serializable;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -29,7 +31,7 @@ import javax.persistence.MappedSuperclass;
  * @since $version
  */
 @MappedSuperclass
-public class Phone {
+public class Phone implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
