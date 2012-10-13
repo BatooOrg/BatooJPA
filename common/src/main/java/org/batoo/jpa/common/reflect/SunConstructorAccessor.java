@@ -27,7 +27,7 @@ import java.lang.reflect.InvocationTargetException;
  * @since $version
  */
 @SuppressWarnings("restriction")
-public class SunConstructorAccessor implements ConstructorAccessor {
+public class SunConstructorAccessor extends ConstructorAccessor {
 
 	private final sun.reflect.ConstructorAccessor constructor;
 

@@ -27,7 +27,7 @@ import java.lang.reflect.InvocationTargetException;
  * @author hceylan
  * @since $version
  */
-public interface ConstructorAccessor {
+public abstract class ConstructorAccessor {
 
 	/**
 	 * Constructs the object.
@@ -55,5 +55,6 @@ public interface ConstructorAccessor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Object newInstance(Object[] args) throws InstantiationException, IllegalArgumentException, InvocationTargetException, IllegalAccessException;
+	public abstract Object newInstance(Object[] args)
+		throws InstantiationException, IllegalArgumentException, InvocationTargetException, IllegalAccessException;
 }

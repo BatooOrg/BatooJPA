@@ -27,7 +27,7 @@ import java.lang.reflect.InvocationTargetException;
  * @author hceylan
  * @since $version
  */
-public class SimpleConstructorAccessor implements ConstructorAccessor {
+public class SimpleConstructorAccessor extends ConstructorAccessor {
 
 	private final Constructor<?> constructor;
 
@@ -42,6 +42,7 @@ public class SimpleConstructorAccessor implements ConstructorAccessor {
 		super();
 
 		this.constructor = constructor;
+		this.constructor.setAccessible(true);
 	}
 
 	/**
