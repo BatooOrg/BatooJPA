@@ -79,7 +79,7 @@ public class BenchmarkTest {
 		catch (final SQLException e) {}
 
 		if (BenchmarkTest.SUMMARIZE) {
-			System.out.println("=============================================================");
+			System.out.println("==============================================================");
 			System.out.println("Prvdr | Total Time | JPA Time   | DB Time   | Name Of The Test");
 		}
 	}
@@ -92,7 +92,7 @@ public class BenchmarkTest {
 	@AfterClass
 	public static void finish() {
 		if (BenchmarkTest.SUMMARIZE) {
-			System.out.println("=============================================================");
+			System.out.println("==============================================================");
 		}
 	}
 
@@ -190,7 +190,7 @@ public class BenchmarkTest {
 		}).start();
 
 		if (BenchmarkTest.SUMMARIZE) {
-			System.out.println("_____________________________________________________________");
+			System.out.println("______________________________________________________________");
 		}
 	}
 
