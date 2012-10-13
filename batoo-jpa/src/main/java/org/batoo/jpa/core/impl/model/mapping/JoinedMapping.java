@@ -123,6 +123,16 @@ public interface JoinedMapping<Z, X, Y> {
 	MappingType getMappingType();
 
 	/**
+	 * Returns the path of the mapping.
+	 * 
+	 * @return the path of the mapping
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	String getPath();
+
+	/**
 	 * Returns the table for the relation.
 	 * <p>
 	 * This is, for associations the JoinTable, for element collections the CollectionTable.

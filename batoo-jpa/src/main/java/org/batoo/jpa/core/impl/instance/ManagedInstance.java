@@ -23,7 +23,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
@@ -56,8 +55,8 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.util.Pair;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /**
  * The managed instance to track entity instances.
@@ -84,8 +83,8 @@ public class ManagedInstance<X> {
 	private final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>[] idMappings;
 
 	private final HashMap<Mapping<?, ?, ?>, Object> snapshot = Maps.newHashMap();
-	private final HashSet<JoinedMapping<?, ?, ?>> joinsLoaded;
-	private final HashSet<PluralMapping<?, ?, ?>> collectionsChanged;
+	private final ArrayList<String> joinsLoaded;
+	private final ArrayList<PluralMapping<?, ?, ?>> collectionsChanged;
 
 	private boolean loading;
 	private boolean loadingFromCache;
@@ -121,8 +120,8 @@ public class ManagedInstance<X> {
 		this.instance = instance;
 		this.lockMode = ManagedInstance.LOCK_CONTEXT.get();
 
-		this.collectionsChanged = Sets.newHashSet();
-		this.joinsLoaded = Sets.newHashSet();
+		this.collectionsChanged = Lists.newArrayList();
+		this.joinsLoaded = Lists.newArrayList();
 
 		if (type.getRootType().hasSingleIdAttribute()) {
 			this.idMapping = type.getRootType().getIdMapping();
@@ -556,18 +555,6 @@ public class ManagedInstance<X> {
 	}
 
 	/**
-	 * Returns the associations that are loaded.
-	 * 
-	 * @return the associations that are loaded.
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public HashSet<JoinedMapping<?, ?, ?>> getAssociationsLoaded() {
-		return this.joinsLoaded;
-	}
-
-	/**
 	 * Returns the id of the instance.
 	 * 
 	 * @return the id of the instance
@@ -833,7 +820,7 @@ public class ManagedInstance<X> {
 			return true;
 		}
 
-		return this.joinsLoaded.contains(mapping);
+		return this.joinsLoaded.contains(mapping.getPath());
 	}
 
 	/**
@@ -913,7 +900,7 @@ public class ManagedInstance<X> {
 		ManagedInstance.LOG.debug("Post processing associations for instance {0}", this);
 
 		for (final PluralMapping<?, ?, ?> mapping : this.type.getMappingsPlural()) {
-			if (!this.joinsLoaded.contains(mapping)) {
+			if (!this.joinsLoaded.contains(mapping.getPath())) {
 				if (mapping.isEager()) {
 					mapping.load(this);
 				}
@@ -1019,7 +1006,7 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void setJoinLoaded(JoinedMapping<?, ?, ?> mapping) {
-		this.joinsLoaded.add(mapping);
+		this.joinsLoaded.add(mapping.getPath());
 	}
 
 	/**
