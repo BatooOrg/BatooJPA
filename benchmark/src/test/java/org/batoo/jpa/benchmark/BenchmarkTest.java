@@ -366,9 +366,8 @@ public class BenchmarkTest {
 				em.persist(list.get(i));
 
 				tx.commit();
+				em.close();
 			}
-
-			em.close();
 		}
 	}
 
