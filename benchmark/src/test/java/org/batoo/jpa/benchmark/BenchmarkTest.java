@@ -74,7 +74,7 @@ public class BenchmarkTest {
 	@BeforeClass
 	public static void boot() {
 		try {
-			DriverManager.getConnection("jdbc:derby:memory:testDB;create=true");
+			DriverManager.getConnection("jdbc:mysql://localhost/test");
 		}
 		catch (final SQLException e) {}
 
@@ -206,11 +206,11 @@ public class BenchmarkTest {
 			boolean gotStart = false;
 			boolean last = false;
 
-			boolean inDerby = false;
+			boolean inDb = false;
 			for (int i = threadInfo.getStackTrace().length - 1; i >= 0; i--) {
 				final StackTraceElement stElement = threadInfo.getStackTrace()[i];
-				if (stElement.getClassName().startsWith("org.apache.derby")) {
-					inDerby = true;
+				if (stElement.getClassName().startsWith("org.apache.derby") || stElement.getClassName().startsWith("com.mysql")) {
+					inDb = true;
 					break;
 				}
 			}
@@ -234,14 +234,14 @@ public class BenchmarkTest {
 					this.elements.put(key, child2 = new TimeElement(key));
 				}
 
-				if (stElement.getClassName().startsWith("org.apache.derby") || (i == 0)) {
-					child.addTime(newTime - this.oldTime, true, inDerby);
-					child2.addTime(newTime - this.oldTime, true, inDerby);
+				if (stElement.getClassName().startsWith("org.apache.derby") || stElement.getClassName().startsWith("com.mysql") || (i == 0)) {
+					child.addTime(newTime - this.oldTime, true, inDb);
+					child2.addTime(newTime - this.oldTime, true, inDb);
 					last = true;
 				}
 				else {
-					child.addTime(newTime - this.oldTime, false, inDerby);
-					child2.addTime(newTime - this.oldTime, false, inDerby);
+					child.addTime(newTime - this.oldTime, false, inDb);
+					child2.addTime(newTime - this.oldTime, false, inDb);
 				}
 
 				if (last) {
@@ -306,12 +306,16 @@ public class BenchmarkTest {
 	}
 
 	private void doBenchmarkCriteria(final EntityManagerFactory emf, final Person person, CriteriaQuery<Address> cq, ParameterExpression<Person> p) {
-		for (int i = 1; i < 25; i++) {
+		for (int i = 1; i < 250; i++) {
 			final EntityManager em = emf.createEntityManager();
+
+			em.getTransaction().begin();
 
 			final TypedQuery<Address> q = em.createQuery(cq);
 			q.setParameter(p, person);
 			q.getResultList();
+
+			em.getTransaction().commit();
 
 			em.close();
 		}
@@ -320,16 +324,22 @@ public class BenchmarkTest {
 	private void doBenchmarkFind(final EntityManagerFactory emf, final Person person) {
 		for (int i = 0; i < 250; i++) {
 			final EntityManager em = emf.createEntityManager();
+			em.getTransaction().begin();
 
 			final Person person2 = em.find(Person.class, person.getId());
 			person2.getPhones().size();
+
+			em.getTransaction().commit();
+
 			em.close();
 		}
 	}
 
 	private void doBenchmarkJpql(final EntityManagerFactory emf, final Person person) {
-		for (int i = 0; i < 25; i++) {
+		for (int i = 0; i < 250; i++) {
 			final EntityManager em = emf.createEntityManager();
+
+			em.getTransaction().begin();
 
 			emf.getCriteriaBuilder();
 			final TypedQuery<Address> q = em.createQuery(
@@ -337,6 +347,8 @@ public class BenchmarkTest {
 
 			q.setParameter("person", person);
 			q.getResultList();
+
+			em.getTransaction().commit();
 
 			em.close();
 		}
@@ -346,25 +358,28 @@ public class BenchmarkTest {
 		for (final List<Person> list : persons) {
 			final EntityManager em = emf.createEntityManager();
 
-			final EntityTransaction tx = em.getTransaction();
+			for (int i = 0; i < list.size(); i++) {
+				final EntityTransaction tx = em.getTransaction();
 
-			tx.begin();
+				tx.begin();
 
-			for (final Person person : list) {
-				em.persist(person);
+				em.persist(list.get(i));
+
+				tx.commit();
 			}
-
-			tx.commit();
 
 			em.close();
 		}
 	}
 
-	private void doBenchmarkRemove(final EntityManager em, final Person[] personsToRemove) {
-		for (int i = 0; i < 5; i++) {
-			em.remove(personsToRemove[i]);
-		}
+	private void doBenchmarkRemove(final EntityManager em, final Person person) {
+		em.getTransaction().begin();
+
+		em.remove(person);
+
 		em.getTransaction().commit();
+
+		em.close();
 	}
 
 	private void doBenchmarkUpdate(int i, final EntityManager em, final Person person2) {
@@ -396,19 +411,13 @@ public class BenchmarkTest {
 	}
 
 	private void doRemove(final EntityManagerFactory emf, final List<Person>[] persons) {
-		final EntityManager em = emf.createEntityManager();
-		em.getTransaction().begin();
-
-		final Person[] personsToRemove = new Person[5];
-
 		for (int i = 0; i < 5; i++) {
 			for (final Person person : persons[i]) {
-				personsToRemove[i] = em.find(Person.class, person.getId());
+				final EntityManager em = emf.createEntityManager();
+
+				this.doBenchmarkRemove(em, em.find(Person.class, person.getId()));
 			}
 		}
-
-		this.doBenchmarkRemove(em, personsToRemove);
-		em.close();
 	}
 
 	private void doTest(Type type) {
@@ -431,9 +440,7 @@ public class BenchmarkTest {
 		for (int i = 0; i < 100; i++) {
 			final EntityManager em = emf.createEntityManager();
 
-			final Person person2 = em.find(Person.class, person.getId());
-
-			this.doBenchmarkUpdate(i, em, person2);
+			this.doBenchmarkUpdate(i, em, em.find(Person.class, person.getId()));
 
 			em.close();
 		}

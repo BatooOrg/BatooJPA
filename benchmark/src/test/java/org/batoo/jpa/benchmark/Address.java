@@ -23,19 +23,19 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
+import javax.persistence.TableGenerator;
 
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since $versiimport javax.persistence.TableGenerator; on
  */
 @Entity
-@SequenceGenerator(name = "address_id", allocationSize = 1000)
+@TableGenerator(name = "address_id", allocationSize = 1000)
 public class Address {
 
 	@Id
-	@GeneratedValue(generator = "address_id", strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(generator = "address_id", strategy = GenerationType.TABLE)
 	private Integer id;
 
 	@ManyToOne

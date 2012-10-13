@@ -27,7 +27,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
+import javax.persistence.TableGenerator;
 import javax.persistence.Version;
 
 import com.google.common.collect.Lists;
@@ -38,11 +38,11 @@ import com.google.common.collect.Lists;
  * @since $version
  */
 @Entity
-@SequenceGenerator(name = "person_id", allocationSize = 1000)
+@TableGenerator(name = "person_id", allocationSize = 1000)
 public class Person {
 
 	@Id
-	@GeneratedValue(generator = "person_id", strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(generator = "person_id", strategy = GenerationType.TABLE)
 	private Integer id;
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "person")

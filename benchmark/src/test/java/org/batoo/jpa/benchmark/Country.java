@@ -22,7 +22,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
+import javax.persistence.TableGenerator;
 
 /**
  * 
@@ -30,11 +30,11 @@ import javax.persistence.SequenceGenerator;
  * @since $version
  */
 @Entity
-@SequenceGenerator(name = "country_id", allocationSize = 1000)
+@TableGenerator(name = "country_id", allocationSize = 1000)
 public class Country {
 
 	@Id
-	@GeneratedValue(generator = "country_id", strategy = GenerationType.SEQUENCE)
+	@GeneratedValue(generator = "country_id", strategy = GenerationType.TABLE)
 	private Integer id;
 
 	private String name;
