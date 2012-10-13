@@ -181,7 +181,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 
 		this.delegate = Lists.newArrayList();
 
-		this.delegate.addAll(Lists.newArrayList(values));
+		this.delegate.addAll(values);
 
 		for (final E e : values) {
 			if (e == null) {
