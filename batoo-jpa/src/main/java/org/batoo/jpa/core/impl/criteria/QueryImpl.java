@@ -18,9 +18,12 @@
  */
 package org.batoo.jpa.core.impl.criteria;
 
+import java.sql.ParameterMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -43,7 +46,7 @@ import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.ParameterExpression;
 
-import org.apache.commons.dbutils.ResultSetHandler;
+import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.common.log.BLogger;
@@ -74,7 +77,7 @@ import com.google.common.collect.Sets;
  * @author hceylan
  * @since $version
  */
-public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>>, Query {
+public class QueryImpl<X> implements TypedQuery<X>, Query {
 
 	private static final int MAX_COL_LENGTH = 30;
 
@@ -99,6 +102,8 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>>, Q
 
 	private FlushModeType flushMode = FlushModeType.AUTO;
 
+	private boolean pmdBroken;
+
 	/**
 	 * @param q
 	 *            the criteria query
@@ -119,6 +124,8 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>>, Q
 		for (final ParameterExpression<?> p : this.q.getParameters()) {
 			this.parameters.put((ParameterExpressionImpl<?>) p, null);
 		}
+
+		this.pmdBroken = entityManager.getJdbcAdaptor().isPmdBroken();
 	}
 
 	private Object[] applyParameters() {
@@ -275,7 +282,7 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>>, Q
 		try {
 			final ConnectionImpl connection = this.em.getConnection();
 			try {
-				new QueryRunner(this.em.getMetamodel().getJdbcAdaptor().isPmdBroken()).query(connection, this.sql, this, parameters);
+				this.buildResultSetImpl(connection, parameters);
 
 				if (((cacheStoreMode == CacheStoreMode.REFRESH) || (cacheStoreMode == CacheStoreMode.USE)) && (this.q instanceof CriteriaQueryImpl)) {
 					this.emf.getCache().put(this.sql, parameters, this.results);
@@ -296,6 +303,39 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>>, Q
 			}
 
 			throw new PersistenceException("Query failed", e);
+		}
+	}
+
+	/**
+	 * The implementation of the result set build. Manages the statement, parameters and result set.
+	 * 
+	 * @param connection
+	 *            the connection
+	 * @param parameters
+	 *            the parameters
+	 * @throws SQLException
+	 *             thrown by the underlying database in case of an error
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void buildResultSetImpl(final ConnectionImpl connection, final Object[] parameters) throws SQLException {
+		PreparedStatement statement = null;
+		ResultSet resultSet = null;
+
+		try {
+			statement = connection.prepareStatement(this.sql);
+			this.fillStatement(statement, parameters);
+			resultSet = statement.executeQuery();
+			this.results = this.handle(resultSet);
+		}
+		finally {
+			try {
+				DbUtils.close(resultSet);
+			}
+			finally {
+				DbUtils.close(statement);
+			}
 		}
 	}
 
@@ -386,6 +426,51 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>>, Q
 			}
 
 			throw new PersistenceException("Query failed", e);
+		}
+	}
+
+	/**
+	 * Fills the statement with the parameters supplied.
+	 * 
+	 * @param statement
+	 *            the statement
+	 * @param parameters
+	 *            the parameters
+	 * @throws SQLException
+	 *             thrown in case of an underlying SQL Exception
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void fillStatement(PreparedStatement statement, Object[] parameters) throws SQLException {
+		// the dollowing code has been adopted from Apache Commons DBUtils.
+
+		// no paramaters nothing to do
+		if ((parameters == null) || (parameters.length == 0)) {
+			return;
+		}
+
+		final ParameterMetaData pmd = this.pmdBroken ? null : statement.getParameterMetaData();
+
+		for (int i = 0; i < parameters.length; i++) {
+			if (parameters[i] != null) {
+				statement.setObject(i + 1, parameters[i]);
+			}
+			else {
+				// VARCHAR works with many drivers regardless
+				// of the actual column type. Oddly, NULL and
+				// OTHER don't work with Oracle's drivers.
+				int sqlType = Types.VARCHAR;
+				if (!this.pmdBroken) {
+					try {
+						sqlType = pmd.getParameterType(i + 1);
+					}
+					catch (final SQLException e) {
+						this.pmdBroken = true;
+					}
+				}
+				statement.setNull(i + 1, sqlType);
+			}
 		}
 	}
 
@@ -628,11 +713,14 @@ public class QueryImpl<X> implements TypedQuery<X>, ResultSetHandler<List<X>>, Q
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * @param rs
+	 * @return
+	 * @throws SQLException
 	 * 
+	 * @since $version
+	 * @author hceylan
 	 */
-	@Override
-	public List<X> handle(ResultSet rs) throws SQLException {
+	private List<X> handle(ResultSet rs) throws SQLException {
 		this.md = rs.getMetaData();
 
 		final CriteriaQueryImpl<X> cq = (CriteriaQueryImpl<X>) this.q;
