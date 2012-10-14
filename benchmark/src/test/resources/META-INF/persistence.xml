@@ -56,6 +56,16 @@
 			<property name="hibernate.connection.url" value="jdbc:derby:memory:H;create=true" />
 			<property name="hibernate.connection.username" value="sa" />
 			<property name="hibernate.connection.password" value="" />
+			
+			<!-- 
+				As per the Hibernate Lead Developer Request
+				The following parameters suggested to be added
+				
+				http://highscalability.com/blog/2012/10/9/batoo-jpa-the-new-jpa-implementation-that-runs-over-15-times.html
+			 -->
+			<property name="hibernate.jdbc.batch_size" value="50"/>
+			<property name="hibernate.order_updates" value="true"/>
+			<property name="hibernate.id.new_generator_mappings" value="true"/>
 		</properties>
 	</persistence-unit>
 	
