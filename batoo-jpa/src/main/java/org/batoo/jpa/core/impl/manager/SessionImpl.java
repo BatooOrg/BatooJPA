@@ -56,6 +56,11 @@ public class SessionImpl {
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(SessionImpl.class);
 
+	/**
+	 * Max size of the batch. TODO: Consider making this parametric
+	 */
+	public static final int BATCH_SIZE = 50;
+
 	private static volatile int nextSessionId = 0;
 
 	private final EntityManagerImpl em;
@@ -146,6 +151,113 @@ public class SessionImpl {
 		this.repository.clear();
 		this.externalEntities.clear();
 		this.changedEntities.clear();
+	}
+
+	/**
+	 * Performs the remove operations. Batches together the removes on the same tables.
+	 * 
+	 * @param connection
+	 *            the connection
+	 * @param removes
+	 *            the array of removes
+	 * @throws SQLException
+	 *             thrown in case of an underlying SQL error
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void doRemoves(ConnectionImpl connection, final ManagedInstance<?>[] removes) throws SQLException {
+		final ManagedInstance<?>[] batch = new ManagedInstance[SessionImpl.BATCH_SIZE];
+
+		int i = 0;
+
+		while (i < removes.length) {
+			int batchSize = 0;
+			EntityTypeImpl<?> lastEntity = null;
+
+			// group upto BATCH_SIZE and same type entities into a single batch
+			while ((i < removes.length) && //
+				(batchSize < SessionImpl.BATCH_SIZE) && //
+				((lastEntity == null) || (lastEntity == removes[i].getType()))) {
+
+				lastEntity = removes[i].getType();
+
+				batch[batchSize] = removes[i];
+				batchSize++;
+				i++;
+				continue;
+			}
+
+			SessionImpl.LOG.debug("Batch remove is being performed for {0} with the size {1}", lastEntity.getName(), batchSize);
+
+			lastEntity.performRemove(connection, batch, batchSize);
+
+			batchSize = 0;
+			lastEntity = null;
+		}
+	}
+
+	/**
+	 * Performs the insert / update operations. Batches together the inserts on the same tables.
+	 * 
+	 * @param connection
+	 *            the connection
+	 * @param updates
+	 *            the array of updates
+	 * @throws SQLException
+	 *             thrown in case of an underlying SQL error
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void doUpdates(ConnectionImpl connection, final ManagedInstance<?>[] updates) throws SQLException {
+		final ManagedInstance<?>[] inserts = new ManagedInstance[SessionImpl.BATCH_SIZE];
+
+		int i = 0;
+
+		while (i < updates.length) {
+			EntityTypeImpl<?> lastEntity = null;
+			int batchSize = 0;
+
+			// group upto MAX_INSERTS and same type entities that are new into a single batch
+			while ((i < updates.length) && //
+				(batchSize < SessionImpl.BATCH_SIZE) && //
+				(updates[i].getStatus() == Status.NEW) && //
+				((lastEntity == null) || (lastEntity == updates[i].getType()))) {
+
+				// batch inserts only possible for non identity-type entities.
+				if (lastEntity == null) {
+					if (!updates[i].getType().isSuitableForBatchInsert()) {
+						break;
+					}
+
+					lastEntity = updates[i].getType();
+				}
+
+				inserts[batchSize] = updates[i];
+				batchSize++;
+				i++;
+				continue;
+			}
+
+			if (batchSize > 0) {
+				SessionImpl.LOG.debug("Batch insert is being performed for {0} with the size {1}", lastEntity.getName(), batchSize);
+
+				lastEntity.performInsert(connection, inserts, batchSize);
+			}
+			else {
+				final ManagedInstance<?> instance = updates[i];
+				if (instance.getStatus() == Status.NEW) {
+					inserts[0] = instance;
+					instance.getType().performInsert(connection, inserts, 1);
+				}
+				else {
+					instance.getType().performUpdate(connection, instance);
+				}
+
+				i++;
+			}
+		}
 	}
 
 	/**
@@ -321,13 +433,8 @@ public class SessionImpl {
 			instance.flushAssociations(connection, true, false);
 		}
 
-		for (final ManagedInstance<?> instance : sortedRemovals) {
-			instance.flush(connection);
-		}
-
-		for (final ManagedInstance<?> instance : sortedUpdates) {
-			instance.flush(connection);
-		}
+		this.doRemoves(connection, sortedRemovals);
+		this.doUpdates(connection, sortedUpdates);
 
 		for (final ManagedInstance<?> instance : sortedUpdates) {
 			instance.checkTransients();

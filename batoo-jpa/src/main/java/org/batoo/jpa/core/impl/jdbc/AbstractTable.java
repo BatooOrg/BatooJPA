@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.jdbc;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,18 +59,16 @@ public abstract class AbstractTable {
 	private final Map<String, String[]> uniqueConstraints = Maps.newHashMap();
 	private final List<ForeignKey> foreignKeys = Lists.newArrayList();
 
-	private final Map<EntityTypeImpl<?>, String> insertSqlMap = Maps.newHashMap();
-	private final Map<EntityTypeImpl<?>, String> updateSqlMap = Maps.newHashMap();
-	private String insertSql;
+	private final HashMap<String, String> insertSqlMap = Maps.newHashMap();
+	private final HashMap<EntityTypeImpl<?>, String> updateSqlMap = Maps.newHashMap();
 	private String updateSql;
 	private String versionUpdateSql;
 	private String versionSelectSql;
 
-	private AbstractColumn[] insertColumns;
 	private AbstractColumn[] updateColumns;
 	private AbstractColumn[] versionUpdateColumns;
 	private AbstractColumn[] selectVersionColumns;
-	private final Map<EntityTypeImpl<?>, AbstractColumn[]> insertColumnsMap = Maps.newHashMap();
+	private final Map<String, AbstractColumn[]> insertColumnsMap = Maps.newHashMap();
 	private final Map<EntityTypeImpl<?>, AbstractColumn[]> updateColumnsMap = Maps.newHashMap();
 
 	/**
@@ -156,8 +155,10 @@ public abstract class AbstractTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private synchronized void generateInsertSql(final EntityTypeImpl<?> type) {
-		String sql = type != null ? this.insertSqlMap.get(type) : this.insertSql;
+	private synchronized void generateInsertSql(final EntityTypeImpl<?> type, int size) {
+		final String sqlKey = type != null ? type.getName() + size : "" + size;
+
+		String sql = this.insertSqlMap.get(sqlKey);
 		if (sql != null) { // other thread finished the job for us
 			return;
 		}
@@ -209,32 +210,20 @@ public abstract class AbstractTable {
 		});
 
 		// prepare the parameters in the form of "? [, ?]*"
-		final Collection<String> parameters = Collections2.transform(filteredColumns, new Function<AbstractColumn, String>() {
-
-			@Override
-			public String apply(AbstractColumn input) {
-				return "?";
-			}
-		});
+		final String singleParamStr = "\t(" + StringUtils.repeat("?", ", ", filteredColumns.size()) + ")";
+		final String parametersStr = StringUtils.repeat(singleParamStr, ",\n", size);
 
 		final String columnNamesStr = Joiner.on(", ").join(columnNames);
-		final String parametersStr = Joiner.on(", ").join(parameters);
 
 		// INSERT INTO SCHEMA.TABLE
 		// (COL [, COL]*)
 		// VALUES (PARAM [, PARAM]*)
 		sql = "INSERT INTO " + this.getQName() //
 			+ "\n(" + columnNamesStr + ")"//
-			+ "\nVALUES (" + parametersStr + ")";
+			+ "\nVALUES\n" + parametersStr;
 
-		if (type != null) {
-			this.insertSqlMap.put(type, sql);
-			this.insertColumnsMap.put(type, insertColumns.toArray(new AbstractColumn[insertColumns.size()]));
-		}
-		else {
-			this.insertSql = sql;
-			this.insertColumns = insertColumns.toArray(new AbstractColumn[insertColumns.size()]);
-		}
+		this.insertSqlMap.put(sqlKey, sql);
+		this.insertColumnsMap.put(sqlKey, insertColumns.toArray(new AbstractColumn[insertColumns.size()]));
 	}
 
 	/**
@@ -294,7 +283,7 @@ public abstract class AbstractTable {
 	 * @param pkColumns
 	 */
 	private synchronized void generateUpdateSql(final EntityTypeImpl<?> type, Map<String, AbstractColumn> pkColumns) {
-		String sql = type != null ? this.updateSqlMap.get(type) : this.insertSql;
+		String sql = this.updateSqlMap.get(type);
 		if (sql != null) { // other thread finished the job for us
 			return;
 		}
@@ -475,17 +464,15 @@ public abstract class AbstractTable {
 	 * 
 	 * @param entity
 	 *            the entity to returns columns for or null for generic columns
+	 * @param size
+	 *            the batch size
 	 * @return the insert columns
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected AbstractColumn[] getInsertColumns(final EntityTypeImpl<?> entity) {
-		if (entity == null) {
-			return this.insertColumns;
-		}
-
-		return this.insertColumnsMap.get(entity);
+	protected AbstractColumn[] getInsertColumns(final EntityTypeImpl<?> entity, int size) {
+		return this.insertColumnsMap.get(entity != null ? entity.getName() + size : "" + size);
 	}
 
 	/**
@@ -493,28 +480,24 @@ public abstract class AbstractTable {
 	 * 
 	 * @param entity
 	 *            the entity to return insert statement for or null for generic SQL
+	 * @param size
+	 *            the batch size
 	 * @return the insert statement
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected String getInsertSql(EntityTypeImpl<?> entity) {
-		if (entity == null) {
-			if (this.insertSql == null) {
-				this.generateInsertSql(null);
-			}
+	protected String getInsertSql(EntityTypeImpl<?> entity, int size) {
+		final String sqlKey = entity != null ? entity.getName() + size : "" + size;
 
-			return this.insertSql;
+		final String sql = this.insertSqlMap.get(sqlKey);
+		if (sql != null) { // other thread finished the job for us
+			return sql;
 		}
 
-		String sql = this.insertSqlMap.get(entity);
-		if (sql == null) {
-			this.generateInsertSql(entity);
+		this.generateInsertSql(entity, size);
 
-			sql = this.insertSqlMap.get(entity);
-		}
-
-		return sql;
+		return this.insertSqlMap.get(sqlKey);
 	}
 
 	/**

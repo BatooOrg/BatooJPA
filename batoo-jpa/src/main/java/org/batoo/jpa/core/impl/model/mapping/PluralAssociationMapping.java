@@ -43,6 +43,7 @@ import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
+import org.batoo.jpa.core.impl.jdbc.Joinable;
 import org.batoo.jpa.core.impl.jdbc.OrderColumn;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -152,12 +153,12 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * 
 	 */
 	@Override
-	public void attach(ConnectionImpl connection, ManagedInstance<?> instance, Object key, Object child, int index) throws SQLException {
+	public void attach(ConnectionImpl connection, ManagedInstance<?> instance, Joinable[] batch, int batchSize) throws SQLException {
 		if (this.joinTable != null) {
-			this.joinTable.performInsert(connection, instance.getInstance(), key, child, index);
+			this.joinTable.performInsert(connection, instance.getInstance(), batch, batchSize);
 		}
 		else if (this.foreignKey != null) {
-			this.foreignKey.performAttachChild(connection, instance, key, child, index);
+			this.foreignKey.performAttachChild(connection, instance, batch, batchSize);
 		}
 	}
 

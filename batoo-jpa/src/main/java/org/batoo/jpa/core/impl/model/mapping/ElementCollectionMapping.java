@@ -49,6 +49,7 @@ import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.CollectionTable;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
+import org.batoo.jpa.core.impl.jdbc.Joinable;
 import org.batoo.jpa.core.impl.jdbc.JoinableTable;
 import org.batoo.jpa.core.impl.jdbc.OrderColumn;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
@@ -158,8 +159,8 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	 * 
 	 */
 	@Override
-	public void attach(ConnectionImpl connection, ManagedInstance<?> instance, Object key, Object child, int index) throws SQLException {
-		this.collectionTable.performInsert(connection, instance.getInstance(), key, child, index);
+	public void attach(ConnectionImpl connection, ManagedInstance<?> instance, Joinable[] batch, int size) throws SQLException {
+		this.collectionTable.performInsert(connection, instance.getInstance(), batch, size);
 	}
 
 	/**

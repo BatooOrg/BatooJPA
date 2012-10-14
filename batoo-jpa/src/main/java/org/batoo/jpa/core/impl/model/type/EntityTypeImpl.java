@@ -81,6 +81,7 @@ import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
+import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.core.util.Pair;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
@@ -144,6 +145,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private final Map<Method, Method> idMethods = Maps.newHashMap();
 
 	private SingularMapping<? super X, ?> idMapping;
+	private Boolean suitableForBatchInsert;
 
 	private Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>[] idMappings;
 	private final InheritanceType inheritanceType;
@@ -1508,6 +1510,23 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
+	 * Returns if the entity is suitable for batch insert, that is not of {@link IdType#IDENTITY}.
+	 * 
+	 * @return true if the entity is suitable for batch insert, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isSuitableForBatchInsert() {
+		if (this.suitableForBatchInsert != null) {
+			return this.suitableForBatchInsert;
+		}
+
+		return this.suitableForBatchInsert = this.hasSingleIdAttribute() && (this.idMapping instanceof BasicMapping)
+			&& (((BasicMapping<? super X, ?>) this.idMapping).getAttribute().getIdType() != IdType.IDENTITY);
+	}
+
+	/**
 	 * Links the entity's attribute mappings.
 	 * 
 	 * @since $version
@@ -1545,17 +1564,19 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * 
 	 * @param connection
 	 *            the connection to use
-	 * @param instance
-	 *            the managed instance to perform insert for
+	 * @param instances
+	 *            the managed instances to perform insert for
+	 * @param size
+	 *            the size of the batch
 	 * @throws SQLException
 	 *             thrown in case of an SQL Error
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performInsert(ConnectionImpl connection, ManagedInstance<X> instance) throws SQLException {
+	public void performInsert(ConnectionImpl connection, ManagedInstance<?>[] instances, int size) throws SQLException {
 		for (final EntityTable table : this.getTables()) {
-			table.performInsert(connection, instance);
+			table.performInsert(connection, instances, size);
 		}
 	}
 
@@ -1599,17 +1620,19 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	/**
 	 * @param connection
 	 *            the connection to use
-	 * @param instance
+	 * @param instances
 	 *            the managed instance to perform remove for
+	 * @param size
+	 *            the size of the batch
 	 * @throws SQLException
 	 *             thrown in case of an SQL Error
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performRemove(ConnectionImpl connection, ManagedInstance<X> instance) throws SQLException {
+	public void performRemove(ConnectionImpl connection, ManagedInstance<?>[] instances, int size) throws SQLException {
 		for (final EntityTable table : this.getTables()) {
-			table.performRemove(connection, instance);
+			table.performRemove(connection, instances, size);
 		}
 	}
 
@@ -1677,7 +1700,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performUpdate(ConnectionImpl connection, ManagedInstance<X> instance) throws SQLException {
+	public void performUpdate(ConnectionImpl connection, ManagedInstance<?> instance) throws SQLException {
 		if (this.updateTables != null) {
 			for (final EntityTable table : this.updateTables) {
 				table.performUpdate(connection, instance);

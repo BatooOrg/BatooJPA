@@ -499,37 +499,6 @@ public class ManagedInstance<X> {
 	}
 
 	/**
-	 * 
-	 * Flushes the state of the instance to the database.
-	 * 
-	 * @param connection
-	 *            the connection to use to flush
-	 * @throws SQLException
-	 *             thrown in case of an SQL error
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void flush(ConnectionImpl connection) throws SQLException {
-		ManagedInstance.LOG.debug("Flushing instance as {0}: {1}", this.status, this);
-
-		switch (this.status) {
-			case NEW:
-				this.type.performInsert(connection, this);
-				this.status = Status.MANAGED;
-				break;
-			case MANAGED:
-				this.type.performUpdate(connection, this);
-				break;
-			case REMOVED:
-				this.type.performRemove(connection, this);
-				break;
-			case DETACHED:
-				// N/A
-		}
-	}
-
-	/**
 	 * Flushes the associations.
 	 * 
 	 * @param connection
@@ -1071,7 +1040,7 @@ public class ManagedInstance<X> {
 	 * @since $version
 	 */
 	public void setStatus(Status status) {
-		this.oldStatus = status;
+		this.oldStatus = this.status;
 
 		if (status != this.status) {
 			ManagedInstance.LOG.debug("Instance status changing for {0}: {1} -> {2}", this, this.status, status);

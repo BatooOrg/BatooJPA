@@ -20,10 +20,13 @@ package org.batoo.jpa.core.impl.jdbc;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.instance.Status;
 import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.jdbc.dbutils.SingleValueHandler;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
@@ -49,9 +52,10 @@ public class EntityTable extends AbstractTable {
 
 	private final JdbcAdaptor jdbcAdaptor;
 	private PkColumn identityColumn;
-	private String removeSql;
-	private AbstractColumn[] removeColumns;
 	private final Map<String, BasicColumn[]> indexes = Maps.newHashMap();
+
+	private final HashMap<Integer, String> removeSqlMap = Maps.newHashMap();
+	private AbstractColumn[] removeColumns;
 
 	/**
 	 * @param entity
@@ -174,28 +178,44 @@ public class EntityTable extends AbstractTable {
 		return this.pkColumns.values();
 	}
 
-	private String getRemoveSql() {
-		if (this.removeSql != null) {
-			return this.removeSql;
+	private String getRemoveSql(int size) {
+		String sql = this.removeSqlMap.get(size);
+		if (sql != null) {
+			return sql;
 		}
 
 		synchronized (this) {
-			if (this.removeSql != null) {
-				return this.removeSql;
+			sql = this.removeSqlMap.get(size);
+			if (sql != null) {
+				return sql;
 			}
 
 			this.removeColumns = new AbstractColumn[this.pkColumns.size()];
 			this.pkColumns.values().toArray(this.removeColumns);
 
-			final Collection<String> restrictions = Collections2.transform(this.pkColumns.values(), new Function<AbstractColumn, String>() {
+			String restriction;
+			if (this.pkColumns.size() > 1) {
+				final Collection<String> restrictions = Collections2.transform(this.pkColumns.values(), new Function<AbstractColumn, String>() {
 
-				@Override
-				public String apply(AbstractColumn input) {
-					return input.getName() + " = ?";
-				}
-			});
+					@Override
+					public String apply(AbstractColumn input) {
+						return input.getName() + " = ?";
+					}
+				});
+				final String singleRestriction = Joiner.on(" AND ").join(restrictions);
+				restriction = StringUtils.repeat(singleRestriction, " OR ", size);
+			}
+			else if (size == 1) {
+				restriction = this.removeColumns[0].getName() + " = ?";
+			}
+			else {
+				restriction = this.removeColumns[0].getName() + " IN (" + StringUtils.repeat("?", ", ", size) + ")";
+			}
 
-			return this.removeSql = "DELETE FROM " + this.getQName() + " WHERE " + Joiner.on(" AND ").join(restrictions);
+			sql = "DELETE FROM " + this.getQName() + " WHERE " + restriction;
+			this.removeSqlMap.put(size, sql);
+
+			return sql;
 		}
 	}
 
@@ -204,44 +224,51 @@ public class EntityTable extends AbstractTable {
 	 * 
 	 * @param connection
 	 *            the connection to use
-	 * @param managedInstance
-	 *            the managed instance to perform insert for
+	 * @param managedInstances
+	 *            the managed instances to perform insert for
+	 * @param size
+	 *            the size of the batch
 	 * @throws SQLException
 	 *             thrown in case of underlying SQLException
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performInsert(ConnectionImpl connection, final ManagedInstance<?> managedInstance) throws SQLException {
-		final EntityTypeImpl<?> entityType = managedInstance.getType();
-		final Object instance = managedInstance.getInstance();
+	public void performInsert(ConnectionImpl connection, final ManagedInstance<?>[] managedInstances, int size) throws SQLException {
+		final EntityTypeImpl<?> entityType = managedInstances[0].getType();
 
 		// Do not inline, generation of the insert SQL will initialize the insertColumns!
-		final String insertSql = this.getInsertSql(entityType);
-		final AbstractColumn[] insertColumns = this.getInsertColumns(entityType);
+		final String insertSql = this.getInsertSql(entityType, size);
+		final AbstractColumn[] insertColumns = this.getInsertColumns(entityType, size);
 
 		// prepare the parameters
-		final Object[] params = new Object[insertColumns.length];
-		for (int i = 0; i < insertColumns.length; i++) {
-			final AbstractColumn column = insertColumns[i];
-			if (column instanceof DiscriminatorColumn) {
-				params[i] = managedInstance.getType().getDiscriminatorValue();
+		final Object[] params = new Object[insertColumns.length * size];
+
+		for (int i = 0; i < size; i++) {
+			final ManagedInstance<?> managedInstance = managedInstances[i];
+			final Object instance = managedInstance.getInstance();
+
+			for (int j = 0; j < insertColumns.length; j++) {
+				final AbstractColumn column = insertColumns[j];
+				if (column instanceof DiscriminatorColumn) {
+					params[(i * insertColumns.length) + j] = entityType.getDiscriminatorValue();
+				}
+				else {
+					params[(i * insertColumns.length) + j] = column.getValue(instance);
+				}
 			}
-			else {
-				params[i] = column.getValue(instance);
-			}
+
+			managedInstance.setStatus(Status.MANAGED);
 		}
 
-		// execute the insert
-		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor.isPmdBroken());
-		runner.update(connection, insertSql, params);
+		new QueryRunner(this.jdbcAdaptor.isPmdBroken()).update(connection, insertSql, params);
 
 		// if there is an identity column, extract the identity and set it back to the instance
 		if (this.identityColumn != null) {
 			final String selectLastIdSql = this.jdbcAdaptor.getSelectLastIdentitySql(this.identityColumn);
-			final Number id = runner.query(connection, selectLastIdSql, new SingleValueHandler<Number>());
+			final Number id = new QueryRunner(this.jdbcAdaptor.isPmdBroken()).query(connection, selectLastIdSql, new SingleValueHandler<Number>());
 
-			this.identityColumn.setValue(managedInstance.getInstance(), id);
+			this.identityColumn.setValue(managedInstances[0].getInstance(), id);
 		}
 	}
 
@@ -250,22 +277,28 @@ public class EntityTable extends AbstractTable {
 	 * 
 	 * @param connection
 	 *            the connection to use
-	 * @param managedInstance
+	 * @param managedInstances
 	 *            the managed instance to perform remove for
+	 * @param size
+	 *            the size of the batch
 	 * @throws SQLException
 	 *             thrown in case of underlying SQLException
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performRemove(ConnectionImpl connection, final ManagedInstance<?> managedInstance) throws SQLException {
-		final String removeSql = this.getRemoveSql();
+	public void performRemove(ConnectionImpl connection, final ManagedInstance<?>[] managedInstances, int size) throws SQLException {
+		final String removeSql = this.getRemoveSql(size);
 
 		// prepare the parameters
-		final Object[] params = new Object[this.removeColumns.length];
-		for (int i = 0; i < this.removeColumns.length; i++) {
-			final AbstractColumn column = this.removeColumns[i];
-			params[i] = column.getValue(managedInstance.getInstance());
+		final Object[] params = new Object[size * this.removeColumns.length];
+		for (int i = 0; i < size; i++) {
+			final Object instance = managedInstances[i].getInstance();
+
+			for (int j = 0; j < this.removeColumns.length; j++) {
+				final AbstractColumn column = this.removeColumns[j];
+				params[(i * this.removeColumns.length) + j] = column.getValue(instance);
+			}
 		}
 
 		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor.isPmdBroken());

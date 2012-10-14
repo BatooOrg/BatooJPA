@@ -356,9 +356,8 @@ public class BenchmarkTest {
 
 	private void doBenchmarkPersist(final EntityManagerFactory emf, List<Person>[] persons) {
 		for (final List<Person> list : persons) {
-			final EntityManager em = emf.createEntityManager();
-
 			for (int i = 0; i < list.size(); i++) {
+				final EntityManager em = emf.createEntityManager();
 				final EntityTransaction tx = em.getTransaction();
 
 				tx.begin();

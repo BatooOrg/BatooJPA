@@ -31,6 +31,8 @@ import org.apache.commons.lang.ObjectUtils;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
+import org.batoo.jpa.core.impl.jdbc.Joinable;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 
@@ -313,6 +315,27 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 		return false;
 	}
 
+	private void attachChildren(ConnectionImpl connection, final ManagedInstance<?> instance, final PluralMapping<?, ?, E> mapping) throws SQLException {
+		final Joinable[] batch = new Joinable[SessionImpl.BATCH_SIZE];
+
+		int i = 0;
+		while (i < this.delegate.size()) {
+			int batchSize = 0;
+			while ((i < this.delegate.size()) && (batchSize < SessionImpl.BATCH_SIZE)) {
+				final E child = this.delegate.get(i);
+
+				batch[batchSize] = new Joinable(null, child, i);
+				batchSize++;
+
+				i++;
+			}
+
+			if (batchSize > 0) {
+				mapping.attach(connection, instance, batch, batchSize);
+			}
+		}
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * 
@@ -377,9 +400,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 
 		// forced creation of relations for the new entities
 		if (force) {
-			for (int i = 0; i < this.delegate.size(); i++) {
-				mapping.attach(connection, instance, null, this.delegate.get(i), i);
-			}
+			this.attachChildren(connection, instance, mapping);
 
 			return;
 		}
@@ -392,10 +413,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 			mapping.detachAll(connection, instance);
 		}
 		else {
-			// create the additions
-			for (int i = 0; i < this.delegate.size(); i++) {
-				mapping.attach(connection, instance, null, this.delegate.get(i), i);
-			}
+			this.attachChildren(connection, instance, mapping);
 		}
 	}
 

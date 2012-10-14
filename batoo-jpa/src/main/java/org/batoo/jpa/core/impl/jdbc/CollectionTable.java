@@ -25,8 +25,8 @@ import java.util.List;
 import javax.persistence.EnumType;
 import javax.persistence.TemporalType;
 
-import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.model.mapping.ElementMapping;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
@@ -225,29 +225,31 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	 * 
 	 */
 	@Override
-	public void performInsert(ConnectionImpl connection, Object source, Object key, Object destination, int order) throws SQLException {
-		final String insertSql = this.getInsertSql(null);
-		final AbstractColumn[] insertColumns = this.getInsertColumns(null);
+	public void performInsert(ConnectionImpl connection, Object source, Joinable[] batch, int size) throws SQLException {
+		final String insertSql = this.getInsertSql(null, size);
+		final AbstractColumn[] insertColumns = this.getInsertColumns(null, size);
 
 		// prepare the parameters
-		final Object[] params = new Object[insertColumns.length];
-		for (int i = 0; i < insertColumns.length; i++) {
-			final AbstractColumn column = insertColumns[i];
+		final Object[] params = new Object[insertColumns.length * size];
 
-			if (column == this.orderColumn) {
-				params[i] = order;
-			}
-			else if (column == this.keyColumn) {
-				params[i] = key;
-			}
-			else if (this.elementColumn == column) {
-				params[i] = this.elementColumn.getValue(destination);
-			}
-			else if (column instanceof JoinColumn) {
-				params[i] = column.getValue(source);
-			}
-			else {
-				params[i] = column.getValue(destination);
+		int paramIndex = 0;
+		for (int i = 0; i < size; i++) {
+			for (final AbstractColumn column : insertColumns) {
+				if (column == this.orderColumn) {
+					params[paramIndex++] = batch[i].getIndex();
+				}
+				else if (column == this.keyColumn) {
+					params[paramIndex++] = batch[i].getKey();
+				}
+				else if (this.elementColumn == column) {
+					params[paramIndex++] = this.elementColumn.getValue(batch[i].getValue());
+				}
+				else if (column instanceof JoinColumn) {
+					params[paramIndex++] = column.getValue(source);
+				}
+				else {
+					params[paramIndex++] = column.getValue(batch[i].getValue());
+				}
 			}
 		}
 

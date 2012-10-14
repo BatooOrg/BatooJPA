@@ -237,21 +237,27 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 	 * 
 	 */
 	@Override
-	public void performInsert(ConnectionImpl connection, Object source, Object key, Object destination, int order) throws SQLException {
-		final String insertSql = this.getInsertSql(null);
-		final AbstractColumn[] insertColumns = this.getInsertColumns(null);
+	public void performInsert(ConnectionImpl connection, Object source, Joinable[] batch, int size) throws SQLException {
+		final String insertSql = this.getInsertSql(null, size);
+		final AbstractColumn[] insertColumns = this.getInsertColumns(null, size);
 
 		// prepare the parameters
-		final Object[] params = new Object[insertColumns.length];
-		for (int i = 0; i < insertColumns.length; i++) {
-			final AbstractColumn column = insertColumns[i];
+		final Object[] params = new Object[insertColumns.length * size];
 
-			final Object object = this.sourceKey.getJoinColumns().contains(column) ? source : destination;
-			if (column == this.orderColumn) {
-				params[i] = order;
-			}
-			else {
-				params[i] = column.getValue(object);
+		int paramIndex = 0;
+		for (int i = 0; i < size; i++) {
+			for (final AbstractColumn column : insertColumns) {
+				final Joinable joinable = batch[i];
+				final Object destination = joinable.getValue();
+				final int order = joinable.getIndex();
+
+				final Object object = this.sourceKey.getJoinColumns().contains(column) ? source : destination;
+				if (column != this.orderColumn) {
+					params[paramIndex++] = column.getValue(object);
+				}
+				else {
+					params[paramIndex++] = order;
+				}
 			}
 		}
 

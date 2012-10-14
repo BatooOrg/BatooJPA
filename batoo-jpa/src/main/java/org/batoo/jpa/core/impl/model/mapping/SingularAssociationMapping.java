@@ -31,6 +31,7 @@ import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
+import org.batoo.jpa.core.impl.jdbc.Joinable;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
@@ -124,7 +125,8 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 		if (this.getTable() != null) {
 			if (!removals) {
 				final X entity = this.get(managedInstance.getInstance());
-				this.getTable().performInsert(connection, managedInstance.getInstance(), null, entity, -1);
+				final Joinable[] batch = new Joinable[] { new Joinable(null, entity, 0) };
+				this.joinTable.performInsert(connection, managedInstance.getInstance(), batch, 1);
 			}
 		}
 	}

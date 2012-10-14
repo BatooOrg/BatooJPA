@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
+import org.batoo.jpa.core.impl.jdbc.Joinable;
 import org.batoo.jpa.core.impl.jdbc.OrderColumn;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
 
@@ -51,17 +52,17 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 *            the instance
 	 * @param key
 	 *            the key, may be null
-	 * @param child
-	 *            the child
-	 * @param index
-	 *            the index
+	 * @param batch
+	 *            the batch of children
+	 * @param size
+	 *            the size of the batch
 	 * @throws SQLException
 	 *             thrown in case of an SQL error
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	void attach(ConnectionImpl connection, ManagedInstance<?> instance, Object key, Object child, int index) throws SQLException;
+	void attach(ConnectionImpl connection, ManagedInstance<?> instance, Joinable[] batch, int size) throws SQLException;
 
 	/**
 	 * Returns if merges are cascaded.
@@ -170,16 +171,6 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @author hceylan
 	 */
 	OrderColumn getOrderColumn();
-
-	/**
-	 * Returns the path of the mapping.
-	 * 
-	 * @return the path of the mapping
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	String getPath();
 
 	/**
 	 * Returns the root mapping.

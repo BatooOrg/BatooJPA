@@ -29,6 +29,8 @@ import javax.persistence.PersistenceException;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
+import org.batoo.jpa.core.impl.jdbc.Joinable;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 import org.batoo.jpa.util.BatooUtils;
 
@@ -168,6 +170,26 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 		return false;
 	}
 
+	private void attachChildren(ConnectionImpl connection, final ManagedInstance<?> instance, final PluralMapping<?, ?, E> mapping, Collection<E> children)
+		throws SQLException {
+		final Joinable[] batch = new Joinable[SessionImpl.BATCH_SIZE];
+
+		final Iterator<E> i = children.iterator();
+		while (i.hasNext()) {
+			int batchSize = 0;
+			while (i.hasNext() && (batchSize < SessionImpl.BATCH_SIZE)) {
+				final E child = i.next();
+
+				batch[batchSize] = new Joinable(null, child, 0);
+				batchSize++;
+			}
+
+			if (batchSize > 0) {
+				mapping.attach(connection, instance, batch, batchSize);
+			}
+		}
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * 
@@ -231,9 +253,7 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 
 		// forced creation of relations for the new entities
 		if (force) {
-			for (final E child : this.delegate) {
-				mapping.attach(connection, managedInstance, null, child, -1);
-			}
+			this.attachChildren(connection, managedInstance, mapping, this.delegate);
 
 			return;
 		}
@@ -252,9 +272,7 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 		else {
 			// create the additions
 			final Collection<E> childrenAdded = BatooUtils.subtract(this.delegate, this.snapshot);
-			for (final E child : childrenAdded) {
-				mapping.attach(connection, managedInstance, null, child, -1);
-			}
+			this.attachChildren(connection, managedInstance, mapping, childrenAdded);
 		}
 	}
 

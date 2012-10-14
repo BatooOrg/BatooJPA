@@ -35,12 +35,10 @@ public interface JoinableTable {
 	 *            the connection
 	 * @param source
 	 *            the source instance
-	 * @param key
-	 *            the key object
-	 * @param destination
-	 *            the destination instance
-	 * @param order
-	 *            the order of the column
+	 * @param batch
+	 *            the array of joinable batch
+	 * @param size
+	 *            the size of the batch
 	 * 
 	 * @throws SQLException
 	 *             thrown if there is an underlying SQL Exception
@@ -48,7 +46,7 @@ public interface JoinableTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	void performInsert(ConnectionImpl connection, Object source, Object key, Object destination, int order) throws SQLException;
+	void performInsert(ConnectionImpl connection, Object source, Joinable[] batch, int size) throws SQLException;
 
 	/**
 	 * Performs the remove for the join.

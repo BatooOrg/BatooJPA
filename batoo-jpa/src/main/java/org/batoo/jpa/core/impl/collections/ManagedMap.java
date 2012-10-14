@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,6 +31,8 @@ import javax.persistence.PersistenceException;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
+import org.batoo.jpa.core.impl.jdbc.Joinable;
+import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 import org.batoo.jpa.util.BatooUtils;
 
@@ -144,6 +147,27 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 		return false;
 	}
 
+	private void attachChildren(ConnectionImpl connection, final ManagedInstance<?> instance, final PluralMapping<?, ?, V> mapping, Collection<K> keySet)
+		throws SQLException {
+		final Joinable[] batch = new Joinable[SessionImpl.BATCH_SIZE];
+
+		final Iterator<K> i = keySet.iterator();
+		while (i.hasNext()) {
+			int batchSize = 0;
+			while (i.hasNext() && (batchSize < SessionImpl.BATCH_SIZE)) {
+				final K key = i.next();
+				final V child = this.delegate.get(key);
+
+				batch[batchSize] = new Joinable(key, child, 0);
+				batchSize++;
+			}
+
+			if (batchSize > 0) {
+				mapping.attach(connection, instance, batch, batchSize);
+			}
+		}
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * 
@@ -198,14 +222,12 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 			return;
 		}
 
-		final ManagedInstance<?> managedInstance = this.getManagedInstance();
+		final ManagedInstance<?> instance = this.getManagedInstance();
 		final PluralMapping<?, ?, V> mapping = this.getMapping();
 
 		// forced creation of relations for the new entities
 		if (force) {
-			for (final Entry<K, V> entry : this.delegate.entrySet()) {
-				mapping.attach(connection, managedInstance, entry.getKey(), entry.getValue(), -1);
-			}
+			this.attachChildren(connection, instance, mapping, this.delegate.keySet());
 
 			return;
 		}
@@ -218,15 +240,13 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 			// delete the removals
 			final Collection<K> childrenRemoved = BatooUtils.subtract(this.snapshot.keySet(), this.delegate.keySet());
 			for (final K key : childrenRemoved) {
-				mapping.detach(connection, managedInstance, key, this.snapshot.get(key));
+				mapping.detach(connection, instance, key, this.snapshot.get(key));
 			}
 		}
 		else {
 			// create the additions
 			final Collection<K> childrenAdded = BatooUtils.subtract(this.delegate.keySet(), this.snapshot.keySet());
-			for (final K key : childrenAdded) {
-				mapping.attach(connection, managedInstance, key, this.delegate.get(key), -1);
-			}
+			this.attachChildren(connection, instance, mapping, childrenAdded);
 		}
 	}
 

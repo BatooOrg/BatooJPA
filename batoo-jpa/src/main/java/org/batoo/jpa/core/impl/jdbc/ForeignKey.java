@@ -589,38 +589,44 @@ public class ForeignKey {
 	 *            the connection
 	 * @param instance
 	 *            the instance
-	 * @param key
-	 *            the key object
-	 * @param child
-	 *            the child
-	 * @param index
-	 *            the index
+	 * @param batch
+	 *            the batch of joinables
+	 * @param size
+	 *            the size of the batch
 	 * @throws SQLException
 	 *             thrown in case of an SQL error
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performAttachChild(ConnectionImpl connection, ManagedInstance<?> instance, Object key, Object child, int index) throws SQLException {
+	public void performAttachChild(ConnectionImpl connection, ManagedInstance<?> instance, Joinable[] batch, int size) throws SQLException {
 		final String sql = this.getSingleChildSql();
 
 		final Object[] parameters = new Object[this.singleChildUpdates.length + this.singleChildRestrictions.length];
 
-		int i = 0;
-		for (final AbstractColumn column : this.singleChildUpdates) {
-			if (column instanceof JoinColumn) {
-				parameters[i++] = column.getValue(instance.getInstance());
+		for (int i = 0; i < size; i++) {
+			final Joinable joinable = batch[i];
+			int paramIndex = 0;
+			for (final AbstractColumn column : this.singleChildUpdates) {
+				if (column instanceof JoinColumn) {
+					parameters[paramIndex++] = column.getValue(instance.getInstance());
+				}
+				else {
+					parameters[paramIndex++] = joinable.getIndex();
+				}
 			}
-			else {
-				parameters[i++] = index;
+
+			for (final AbstractColumn column : this.singleChildRestrictions) {
+				try {
+					parameters[paramIndex++] = column.getValue(joinable.getValue());
+				}
+				catch (final NullPointerException e) {
+					System.out.println("");
+				}
 			}
-		}
 
-		for (final AbstractColumn column : this.singleChildRestrictions) {
-			parameters[i++] = column.getValue(child);
+			new QueryRunner(this.jdbcAdaptor.isPmdBroken()).update(connection, sql, parameters);
 		}
-
-		new QueryRunner(this.jdbcAdaptor.isPmdBroken()).update(connection, sql, parameters);
 	}
 
 	/**
