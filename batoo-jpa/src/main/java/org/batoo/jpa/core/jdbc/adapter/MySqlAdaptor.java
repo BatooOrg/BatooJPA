@@ -244,10 +244,6 @@ public class MySqlAdaptor extends JdbcAdaptor {
 			return IdType.IDENTITY;
 		}
 
-		if (type == GenerationType.SEQUENCE) {
-			throw new UnsupportedOperationException("Mysql does not support sequences");
-		}
-
 		return IdType.TABLE;
 	}
 }
