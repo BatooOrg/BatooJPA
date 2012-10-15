@@ -453,11 +453,11 @@ public abstract class BaseCoreTest { // extends BaseTest {
 			// System.setProperty("testMode", "hsql");
 			// System.setProperty("javax.persistence.jdbc.driver", "org.hsqldb.jdbcDriver");
 			// System.setProperty("javax.persistence.jdbc.url", "jdbc:hsqldb:mem:test");
-			System.setProperty("testMode", "derby");
-			System.setProperty("javax.persistence.jdbc.driver", "org.apache.derby.jdbc.Driver40");
-			System.setProperty("javax.persistence.jdbc.url", "jdbc:derby:memory:E;create=true");
+			System.setProperty("testMode", "h2");
+			System.setProperty("javax.persistence.jdbc.driver", "org.h2.Driver");
+			System.setProperty("javax.persistence.jdbc.url", "jdbc:h2:mem:test");
 
-			System.setProperty("javax.persistence.jdbc.user", "sa");
+			System.setProperty("javax.persistence.jdbc.user", "root");
 			System.setProperty("javax.persistence.jdbc.password", "");
 		}
 
