@@ -85,7 +85,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 
 	private final EntityManagerFactoryImpl emf;
 	private final EntityManagerImpl em;
-	private final BaseQuery<X> q;
+	private final BaseQueryImpl<X> q;
 	private String sql;
 	private final Map<String, Object> hints = Maps.newHashMap();
 	private int startPosition = 0;
@@ -104,6 +104,8 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 
 	private boolean pmdBroken;
 
+	private final int baseParamCount;
+
 	/**
 	 * @param q
 	 *            the criteria query
@@ -113,7 +115,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public QueryImpl(BaseQuery<X> q, EntityManagerImpl entityManager) {
+	public QueryImpl(BaseQueryImpl<X> q, EntityManagerImpl entityManager) {
 		super();
 
 		this.emf = entityManager.getEntityManagerFactory();
@@ -124,6 +126,8 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 		for (final ParameterExpression<?> p : this.q.getParameters()) {
 			this.parameters.put((ParameterExpressionImpl<?>) p, null);
 		}
+
+		this.baseParamCount = this.q.getSqlParameterCount();
 
 		this.pmdBroken = entityManager.getJdbcAdaptor().isPmdBroken();
 	}
@@ -139,10 +143,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 
 		final List<ParameterExpressionImpl<?>> sqlParameters = this.q.getSqlParameters();
 
-		int paramCount = 0;
-		for (int i = 0; i < sqlParameters.size(); i++) {
-			paramCount += sqlParameters.get(i).getExpandedCount(metamodel);
-		}
+		int paramCount = this.baseParamCount;
 
 		// determine if we need to expand param count for pagination
 		if ((this.maxResult != Integer.MAX_VALUE) || (this.startPosition != 0)) {

@@ -61,6 +61,8 @@ public abstract class BaseQueryImpl<T> implements BaseQuery<T> {
 
 	private final List<ParameterExpressionImpl<?>> sqlParameters = Lists.newArrayList();
 
+	private int sqlParamCount = -1;
+
 	/**
 	 * @param metamodel
 	 *            the metamodel
@@ -206,6 +208,32 @@ public abstract class BaseQueryImpl<T> implements BaseQuery<T> {
 			}
 
 			return this.sql = this.generateSql();
+		}
+	}
+
+	/**
+	 * Returns the number of SQL parameters of the query.
+	 * 
+	 * @return the number of SQL parameters of the query
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public int getSqlParameterCount() {
+		if (this.sqlParamCount != -1) {
+			return this.sqlParamCount;
+		}
+
+		synchronized (this) {
+			if (this.sqlParamCount != -1) {
+				return this.sqlParamCount;
+			}
+
+			int sqlParamCount = 0;
+			for (int i = 0; i < this.sqlParameters.size(); i++) {
+				sqlParamCount += this.sqlParameters.get(i).getExpandedCount(this.metamodel);
+			}
+			return this.sqlParamCount = sqlParamCount;
 		}
 	}
 

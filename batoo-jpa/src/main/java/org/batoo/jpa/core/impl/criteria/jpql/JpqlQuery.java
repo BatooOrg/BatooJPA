@@ -103,7 +103,7 @@ public class JpqlQuery {
 
 	private final MetamodelImpl metamodel;
 	private final String qlString;
-	private final BaseQuery<?> q;
+	private final BaseQueryImpl<?> q;
 
 	private final Map<BaseQuery<?>, Map<String, AbstractFrom<?, ?>>> aliasMap = Maps.newHashMap();
 	private HashMap<String, Object> hints;
@@ -865,7 +865,7 @@ public class JpqlQuery {
 			this.lastUsed = System.currentTimeMillis();
 		}
 
-		final QueryImpl<T> typedQuery = new QueryImpl<T>((BaseQuery<T>) this.q, entityManager);
+		final QueryImpl<T> typedQuery = new QueryImpl<T>((BaseQueryImpl<T>) this.q, entityManager);
 
 		if (this.lockMode != null) {
 			typedQuery.setLockMode(this.lockMode);
