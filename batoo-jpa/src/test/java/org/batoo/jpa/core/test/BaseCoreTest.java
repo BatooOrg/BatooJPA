@@ -35,6 +35,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.jpa.core.BJPASettings;
 import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
@@ -445,10 +446,17 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 */
 	@Before
 	public void setup() throws SQLException {
+		System.setProperty(BJPASettings.DROP_ON_CLOSE, "true");
+
 		if (System.getProperty("testMode") == null) {
-			System.setProperty("testMode", "hsql");
-			System.setProperty("javax.persistence.jdbc.driver", "org.hsqldb.jdbcDriver");
-			System.setProperty("javax.persistence.jdbc.url", "jdbc:hsqldb:mem:test");
+
+			// System.setProperty("testMode", "hsql");
+			// System.setProperty("javax.persistence.jdbc.driver", "org.hsqldb.jdbcDriver");
+			// System.setProperty("javax.persistence.jdbc.url", "jdbc:hsqldb:mem:test");
+			System.setProperty("testMode", "derby");
+			System.setProperty("javax.persistence.jdbc.driver", "org.apache.derby.jdbc.Driver40");
+			System.setProperty("javax.persistence.jdbc.url", "jdbc:derby:memory:E;create=true");
+
 			System.setProperty("javax.persistence.jdbc.user", "sa");
 			System.setProperty("javax.persistence.jdbc.password", "");
 		}
@@ -580,7 +588,9 @@ public abstract class BaseCoreTest { // extends BaseTest {
 			try {
 				this.emf.close();
 			}
-			catch (final Exception e) {}
+			catch (final Exception e) {
+				BaseCoreTest.LOG.error(e, "Error in clean up!");
+			}
 			this.emf = null;
 		}
 

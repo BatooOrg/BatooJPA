@@ -244,6 +244,12 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		this.assertOpen();
 
 		this.metamodel.stopIdGenerators();
+
+		final String dropOnClose = (String) this.getProperty(BJPASettings.DROP_ON_CLOSE);
+		if ("true".equals(dropOnClose)) {
+			this.metamodel.dropAllTables(this.datasource);
+		}
+
 		this.datasource.close();
 
 		this.open = false;

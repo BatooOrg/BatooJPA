@@ -34,4 +34,9 @@ public interface BJPASettings {
 	 * DDL operations, DROP | CREATE (*) | UPDATE | VERIFY | NONE
 	 */
 	String DDL = "org.batoo.jpa.ddl";
+
+	/**
+	 * Boolean value, indicating that the all tables & sequences should be dropped on close, useful for stateless applications and testing.
+	 */
+	String DROP_ON_CLOSE = "org.batoo.jpa.dropOnClose";
 }
