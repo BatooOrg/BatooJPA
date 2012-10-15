@@ -58,7 +58,7 @@ import com.google.common.collect.Maps;
  * 
  * @since $version
  */
-public class BenchmarkTest {
+public class Benchmark {
 
 	// The number of tests to run
 	private static final int BENCHMARK_LENGTH = 1000;
@@ -78,8 +78,8 @@ public class BenchmarkTest {
 		}
 		catch (final SQLException e) {}
 
-		if (BenchmarkTest.SUMMARIZE) {
-			System.out.println("==============================================================");
+		if (Benchmark.SUMMARIZE) {
+			System.out.println("Single Entity Operations======================================");
 			System.out.println("Prvdr | Total Time | JPA Time   | DB Time   | Name Of The Test");
 		}
 	}
@@ -91,7 +91,7 @@ public class BenchmarkTest {
 	 */
 	@AfterClass
 	public static void finish() {
-		if (BenchmarkTest.SUMMARIZE) {
+		if (Benchmark.SUMMARIZE) {
 			System.out.println("==============================================================");
 		}
 	}
@@ -123,8 +123,8 @@ public class BenchmarkTest {
 
 			@Override
 			public void run() {
-				while (BenchmarkTest.this.running) {
-					BenchmarkTest.this._measureSingleTime(id, mxBean);
+				while (Benchmark.this.running) {
+					Benchmark.this._measureSingleTime(id, mxBean);
 					try {
 						Thread.sleep(0, 10);
 					}
@@ -145,7 +145,7 @@ public class BenchmarkTest {
 	public void _measureAfter() {
 		this.running = false;
 
-		if (BenchmarkTest.SUMMARIZE) {
+		if (Benchmark.SUMMARIZE) {
 			this.element.dump0(this.type);
 		}
 		else {
@@ -184,12 +184,12 @@ public class BenchmarkTest {
 
 			@Override
 			public void run() {
-				BenchmarkTest.this.running = true;
-				BenchmarkTest.this._measure(id);
+				Benchmark.this.running = true;
+				Benchmark.this._measure(id);
 			}
 		}).start();
 
-		if (BenchmarkTest.SUMMARIZE) {
+		if (Benchmark.SUMMARIZE) {
 			System.out.println("______________________________________________________________");
 		}
 	}
@@ -224,7 +224,7 @@ public class BenchmarkTest {
 
 				gotStart = true;
 
-				final String key = BenchmarkTest.SUMMARIZE ? //
+				final String key = Benchmark.SUMMARIZE ? //
 					stElement.getClassName() + "." + stElement.getMethodName() : //
 					stElement.getClassName() + "." + stElement.getMethodName() + "." + stElement.getLineNumber();
 
@@ -309,13 +309,9 @@ public class BenchmarkTest {
 		for (int i = 1; i < 250; i++) {
 			final EntityManager em = emf.createEntityManager();
 
-			em.getTransaction().begin();
-
 			final TypedQuery<Address> q = em.createQuery(cq);
 			q.setParameter(p, person);
 			q.getResultList();
-
-			em.getTransaction().commit();
 
 			em.close();
 		}
@@ -324,12 +320,9 @@ public class BenchmarkTest {
 	private void doBenchmarkFind(final EntityManagerFactory emf, final Person person) {
 		for (int i = 0; i < 250; i++) {
 			final EntityManager em = emf.createEntityManager();
-			em.getTransaction().begin();
 
 			final Person person2 = em.find(Person.class, person.getId());
 			person2.getPhones().size();
-
-			em.getTransaction().commit();
 
 			em.close();
 		}
@@ -339,16 +332,12 @@ public class BenchmarkTest {
 		for (int i = 0; i < 250; i++) {
 			final EntityManager em = emf.createEntityManager();
 
-			em.getTransaction().begin();
-
 			emf.getCriteriaBuilder();
 			final TypedQuery<Address> q = em.createQuery(
 				"select a from Person p inner join p.addresses a left join fetch a.country left join fetch a.person where p = :person", Address.class);
 
 			q.setParameter("person", person);
 			q.getResultList();
-
-			em.getTransaction().commit();
 
 			em.close();
 		}
@@ -383,8 +372,11 @@ public class BenchmarkTest {
 	private void doBenchmarkUpdate(int i, final EntityManager em, final Person person2) {
 		final EntityTransaction tx = em.getTransaction();
 		tx.begin();
+
 		person2.setName("Ceylan" + i);
+
 		tx.commit();
+		em.close();
 	}
 
 	/**
@@ -439,8 +431,6 @@ public class BenchmarkTest {
 			final EntityManager em = emf.createEntityManager();
 
 			this.doBenchmarkUpdate(i, em, em.find(Person.class, person.getId()));
-
-			em.close();
 		}
 	}
 
@@ -480,7 +470,7 @@ public class BenchmarkTest {
 			catch (final InterruptedException e) {}
 		}
 
-		for (int i = 0; i < BenchmarkTest.BENCHMARK_LENGTH; i++) {
+		for (int i = 0; i < Benchmark.BENCHMARK_LENGTH; i++) {
 			this.singleTest(emf, this.createPersons(), cq, p);
 		}
 	}
