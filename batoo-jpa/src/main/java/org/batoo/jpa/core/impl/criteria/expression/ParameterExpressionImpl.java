@@ -49,7 +49,6 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 
 	private TypeImpl<?> type;
 	private Integer position;
-	private int expandedCount;
 
 	/**
 	 * @param type
@@ -137,24 +136,20 @@ public class ParameterExpressionImpl<T> extends AbstractExpression<T> implements
 	 * @author hceylan
 	 */
 	public int getExpandedCount(MetamodelImpl metamodelImpl) {
-		if (this.expandedCount != -1) {
-			return this.expandedCount;
-		}
-
 		if (this.getJavaType() == Class.class) {
-			return this.expandedCount = 1;
+			return 1;
 		}
 
 		this.ensureTypeResolved(metamodelImpl);
 
 		if (this.type.getPersistenceType() == PersistenceType.BASIC) {
-			return this.expandedCount = 1;
+			return 1;
 		}
 		else if (this.type.getPersistenceType() == PersistenceType.EMBEDDABLE) {
-			return this.expandedCount = ((EmbeddableTypeImpl<?>) this.type).getAttributeCount();
+			return ((EmbeddableTypeImpl<?>) this.type).getAttributeCount();
 		}
 
-		return this.expandedCount = ((EntityTypeImpl<?>) this.type).getPrimaryTable().getPkColumns().size();
+		return ((EntityTypeImpl<?>) this.type).getPrimaryTable().getPkColumns().size();
 	}
 
 	/**

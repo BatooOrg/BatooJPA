@@ -103,7 +103,6 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	private FlushModeType flushMode = FlushModeType.AUTO;
 
 	private boolean pmdBroken;
-
 	private final int baseParamCount;
 
 	/**
