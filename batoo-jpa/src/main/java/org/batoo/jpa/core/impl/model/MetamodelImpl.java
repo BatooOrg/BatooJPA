@@ -149,7 +149,7 @@ public class MetamodelImpl implements Metamodel {
 		this.emf = entityManagerFactory;
 		this.jdbcAdaptor = jdbcAdaptor;
 
-		final List<ManagedTypeMetadata> entities = Lists.newArrayList(metadata.getEntityMappings());
+		final List<ManagedTypeMetadata> entities = metadata.getEntityMappings();
 		final List<ManagedTypeMetadata> sortedEntities = Lists.newArrayList();
 
 		// sort so that the embeddables are first
@@ -251,7 +251,9 @@ public class MetamodelImpl implements Metamodel {
 		this.callbackManager = new CallbackManager(metadata.getEntityListeners());
 
 		this.addNamedQueries(metadata.getNamedQueries());
-		for (final ManagedTypeMetadata entity : entities) {
+		for (int i = 0; i < entities.size(); i++) {
+			final ManagedTypeMetadata entity = entities.get(i);
+
 			if (entity instanceof EntityMetadata) {
 				this.addNamedQueries(((EntityMetadata) entity).getNamedQueries());
 			}
@@ -267,7 +269,9 @@ public class MetamodelImpl implements Metamodel {
 	 * @author hceylan
 	 */
 	private void addNamedQueries(List<NamedQueryMetadata> namedQueries) {
-		for (final NamedQueryMetadata namedQuery : namedQueries) {
+		for (int i = 0; i < namedQueries.size(); i++) {
+			final NamedQueryMetadata namedQuery = namedQueries.get(i);
+
 			final NamedQueryMetadata existing = this.namedQueries.put(namedQuery.getName(), namedQuery);
 			if (existing != null) {
 				throw new MappingException("Duplicate named query with the name: " + namedQuery.getName(), existing.getLocator(), namedQuery.getLocator());

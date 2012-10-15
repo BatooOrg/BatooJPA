@@ -20,7 +20,7 @@ package org.batoo.jpa.core.impl.criteria.jpql;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -268,8 +268,12 @@ public class JpqlQuery {
 
 				AbstractFrom<?, ?> parent = this.getAliased(q, from.getChild(0).getText());
 
+				final LinkedList<String> segments = aliased.getQualified().getSegments();
+
 				int depth = 0;
-				for (final String segment : aliased.getQualified().getSegments()) {
+				for (int j = 0; j < segments.size(); j++) {
+					final String segment = segments.get(j);
+
 					if ((depth > 0) && (parent instanceof PluralJoin)) {
 						throw new PersistenceException("Cannot qualify, only embeddable joins within the path allowed, " + "line " + from.getLine() + ":"
 							+ from.getCharPositionInLine());
@@ -356,8 +360,12 @@ public class JpqlQuery {
 
 				AbstractFrom<?, ?> parent = this.getAliased(q, join.getChild(1).getText());
 
+				final LinkedList<String> segments = aliased.getQualified().getSegments();
+
 				int depth = 0;
-				for (final String segment : aliased.getQualified().getSegments()) {
+				for (int j = 0; j < segments.size(); j++) {
+					final String segment = segments.get(j);
+
 					if ((depth > 0) && (parent instanceof PluralJoin)) {
 						throw new PersistenceException("Cannot qualify, only embeddable joins within the path allowed, " + "line " + join.getLine() + ":"
 							+ join.getCharPositionInLine());
@@ -939,9 +947,11 @@ public class JpqlQuery {
 			AbstractSelection<?> expression = this.getAliased(q, exprDef.getChild(0).getText());
 
 			final Qualified qualified = new Qualified(exprDef.getChild(1));
-			final Iterator<String> i = qualified.getSegments().iterator();
-			while (i.hasNext()) {
-				final String segment = i.next();
+
+			final LinkedList<String> segments = qualified.getSegments();
+
+			for (int i = 0; i < segments.size(); i++) {
+				final String segment = segments.get(i);
 
 				if (expression instanceof ParentPath) {
 					expression = ((ParentPath<?, ?>) expression).getExpression(segment);

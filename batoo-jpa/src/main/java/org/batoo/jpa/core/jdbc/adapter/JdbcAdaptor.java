@@ -307,9 +307,11 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 		final Map<String, String> ddlColumns = Maps.newHashMap();
 		final List<String> pkColumns = Lists.newArrayList();
 
-		final Collection<AbstractColumn> columns = this.getColumns(table);
+		final List<AbstractColumn> columns = this.getColumns(table);
 
-		for (final AbstractColumn column : columns) {
+		for (int i = 0; i < columns.size(); i++) {
+			final AbstractColumn column = columns.get(i);
+
 			final String columnDDL = this.createColumnDDL(column);
 			final String existingColumnDDL = ddlColumns.get(column.getName());
 			if ((existingColumnDDL != null) && !existingColumnDDL.equals(columnDDL)) {
@@ -708,7 +710,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected Collection<AbstractColumn> getColumns(AbstractTable table) {
+	protected List<AbstractColumn> getColumns(AbstractTable table) {
 		final List<AbstractColumn> columns = Lists.newArrayList(table.getColumns());
 
 		Collections.sort(columns, new Comparator<AbstractColumn>() {
