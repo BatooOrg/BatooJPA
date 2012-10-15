@@ -383,7 +383,8 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		this.commit();
 
 		double expected = 314.159265;
-		if ("hsql".equals(testMode) || "derby".equals(testMode) || "h2".equals(testMode) || "mssql".equals(testMode) || "saw".equals(testMode)) {
+		if ("hsql".equals(testMode) || "derby".equals(testMode) || "h2".equals(testMode) || "mssql".equals(testMode) || "saw".equals(testMode)
+			|| "pgsql".equals(testMode)) {
 			expected = 314.1592653589793;
 		}
 
