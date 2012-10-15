@@ -27,6 +27,7 @@ import javax.persistence.LockModeType;
 import javax.sql.DataSource;
 
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
+import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
@@ -139,6 +140,15 @@ public class PostgreSqlAdaptor extends JdbcAdaptor {
 		catch (final SQLException e) {
 			this.logRelaxed(e, "Cannot create sequence " + sequence.getName());
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	protected void dropTable(QueryRunner runner, AbstractTable table) throws SQLException {
+		runner.update("DROP TABLE " + table.getQName() + " CASCADE");
 	}
 
 	/**

@@ -634,7 +634,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 				this.tables.remove(table);
 
 				if (tableMetadata != null) {
-					runner.update("DROP TABLE " + table.getQName());
+					this.dropTable(runner, table);
 				}
 			}
 			catch (final SQLException e) {
@@ -658,6 +658,22 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 */
 	protected void dropSequence(final QueryRunner runner, final SequenceGenerator sequence) throws SQLException {
 		runner.update("DROP SEQUENCE " + sequence.getQName());
+	}
+
+	/**
+	 * Drops the table
+	 * 
+	 * @param runner
+	 *            the runner
+	 * @param table
+	 *            the table
+	 * @throws SQLException
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected void dropTable(final QueryRunner runner, final AbstractTable table) throws SQLException {
+		runner.update("DROP TABLE " + table.getQName());
 	}
 
 	/**
