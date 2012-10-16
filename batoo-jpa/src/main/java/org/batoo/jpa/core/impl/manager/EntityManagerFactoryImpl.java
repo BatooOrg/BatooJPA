@@ -55,6 +55,7 @@ import org.batoo.jpa.core.impl.deployment.DdlManager;
 import org.batoo.jpa.core.impl.deployment.LinkManager;
 import org.batoo.jpa.core.impl.deployment.NamedQueriesManager;
 import org.batoo.jpa.core.impl.jdbc.AbstractJdbcAdaptor;
+import org.batoo.jpa.core.impl.jdbc.BoneCPDataSource;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
@@ -66,7 +67,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.jolbox.bonecp.BoneCPDataSource;
 
 /**
  * Implementation of {@link EntityManagerFactory}.
@@ -284,6 +284,9 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		dataSource.setJdbcUrl(jdbcUrl);
 		dataSource.setUsername(jdbcUser);
 		dataSource.setPassword(jdbcPassword);
+
+		dataSource.setStatementsCacheSize(50);
+		dataSource.setReleaseHelperThreads(0);
 
 		return dataSource;
 	}
