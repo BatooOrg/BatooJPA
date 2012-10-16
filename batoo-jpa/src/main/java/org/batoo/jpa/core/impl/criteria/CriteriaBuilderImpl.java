@@ -37,6 +37,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Predicate.BooleanOperator;
 import javax.persistence.criteria.Selection;
 import javax.persistence.criteria.Subquery;
+import javax.persistence.metamodel.Type.PersistenceType;
 
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.AggregationExpression;
@@ -187,7 +188,30 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <Y extends Comparable<? super Y>> Predicate between(Expression<? extends Y> v, Y x, Y y) {
+		this.checkConstant(x);
+		this.checkConstant(y);
+
 		return new PredicateImpl(new ComparisonExpression(Comparison.BETWEEN, v, new ConstantExpression<Y>(null, x), new ConstantExpression<Y>(null, y)));
+	}
+
+	/**
+	 * Checks to see the constant expression is not null and basic type.
+	 * 
+	 * @param x
+	 *            the constant value
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void checkConstant(Object x) {
+		if (x == null) {
+			throw new NullPointerException("Constant expression cannot be null");
+		}
+
+		final TypeImpl<? extends Object> type = this.metamodel.type(x.getClass());
+		if (type.getPersistenceType() != PersistenceType.BASIC) {
+			throw new IllegalArgumentException("Constant expression must be basic type: " + x + "! Please use parameters instead.");
+		}
 	}
 
 	/**
@@ -214,6 +238,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <Y> CoalesceExpression<Y> coalesce(Expression<? extends Y> x, Y y) {
+		this.checkConstant(y);
+
 		return new CoalesceExpression<Y>(x, new ConstantExpression<Y>(null, y));
 	}
 
@@ -234,6 +260,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	@Override
 	@SuppressWarnings("unchecked")
 	public Expression<String> concat(Expression<String> x, String y) {
+		this.checkConstant(y);
+
 		return new ConcatExpression(x, new ConstantExpression<String>(null, y));
 	}
 
@@ -244,6 +272,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	@Override
 	@SuppressWarnings("unchecked")
 	public Expression<String> concat(String x, Expression<String> y) {
+		this.checkConstant(y);
+
 		return new ConcatExpression(new ConstantExpression<String>(null, x), y);
 	}
 
@@ -362,6 +392,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <N extends Number> Expression<N> diff(Expression<? extends N> x, N y) {
+		this.checkConstant(y);
+
 		return new ArithmeticExression<N>(ArithmeticOperation.SUBTRACT, x, new ConstantExpression<N>(null, y));
 	}
 
@@ -371,6 +403,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <N extends Number> Expression<N> diff(N x, Expression<? extends N> y) {
+		this.checkConstant(y);
+
 		return new ArithmeticExression<N>(ArithmeticOperation.SUBTRACT, new ConstantExpression<N>(null, x), y);
 	}
 
@@ -399,6 +433,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public PredicateImpl equal(Expression<?> x, Object y) {
+		this.checkConstant(y);
+
 		return new PredicateImpl(new ComparisonExpression(Comparison.EQUAL, x, new ConstantExpression(null, y)));
 	}
 
@@ -435,6 +471,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public PredicateImpl ge(Expression<? extends Number> x, Number y) {
+		this.checkConstant(y);
+
 		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER_OR_EQUAL, x, new ConstantExpression<Number>(null, y)));
 	}
 
@@ -463,6 +501,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <Y extends Comparable<? super Y>> PredicateImpl greaterThan(Expression<? extends Y> x, Y y) {
+		this.checkConstant(y);
+
 		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER, x, new ConstantExpression<Y>(null, y)));
 	}
 
@@ -481,6 +521,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <Y extends Comparable<? super Y>> PredicateImpl greaterThanOrEqualTo(Expression<? extends Y> x, Y y) {
+		this.checkConstant(y);
+
 		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER_OR_EQUAL, x, new ConstantExpression<Y>(null, y)));
 	}
 
@@ -508,6 +550,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public PredicateImpl gt(Expression<? extends Number> x, Number y) {
+		this.checkConstant(y);
+
 		return new PredicateImpl(new ComparisonExpression(Comparison.LESS, x, new ConstantExpression<Number>(null, y)));
 	}
 
@@ -544,6 +588,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <E, C extends Collection<E>> Predicate isMember(E elem, Expression<C> collection) {
+		this.checkConstant(elem);
+
 		return new PredicateImpl(new MemberOfExpression<C, E>(false, new ConstantExpression<E>(null, elem), collection));
 	}
 
@@ -571,6 +617,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <E, C extends Collection<E>> Predicate isNotMember(E elem, Expression<C> collection) {
+		this.checkConstant(elem);
+
 		return new PredicateImpl(new MemberOfExpression<C, E>(true, new ConstantExpression<E>(null, elem), collection));
 	}
 
@@ -634,6 +682,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public PredicateImpl le(Expression<? extends Number> x, Number y) {
+		this.checkConstant(y);
+
 		return new PredicateImpl(new ComparisonExpression(Comparison.LESS_OR_EQUAL, x, new ConstantExpression<Number>(null, y)));
 	}
 
@@ -670,6 +720,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <Y extends Comparable<? super Y>> PredicateImpl lessThan(Expression<? extends Y> x, Y y) {
+		this.checkConstant(y);
+
 		return new PredicateImpl(new ComparisonExpression(Comparison.LESS, x, new ConstantExpression<Y>(null, y)));
 	}
 
@@ -688,6 +740,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <Y extends Comparable<? super Y>> Predicate lessThanOrEqualTo(Expression<? extends Y> x, Y y) {
+		this.checkConstant(y);
+
 		return new PredicateImpl(new ComparisonExpression(Comparison.LESS_OR_EQUAL, x, new ConstantExpression<Y>(null, y)));
 	}
 
@@ -898,6 +952,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public PredicateImpl notEqual(Expression<?> x, Object y) {
+		this.checkConstant(y);
+
 		return new PredicateImpl(new ComparisonExpression(Comparison.NOT_EQUAL, x, new ConstantExpression<Object>(null, y)));
 	}
 
@@ -971,6 +1027,8 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <Y> Expression<Y> nullif(Expression<Y> x, Y y) {
+		this.checkConstant(y);
+
 		return new NullIfExpression<Y>(x, new ConstantExpression<Y>(null, y));
 	}
 

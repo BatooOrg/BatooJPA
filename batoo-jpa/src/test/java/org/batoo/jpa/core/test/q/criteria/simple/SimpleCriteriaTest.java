@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.test.q.criteria.simple;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
@@ -25,6 +26,7 @@ import java.util.List;
 
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Selection;
 
 import junit.framework.Assert;
@@ -34,6 +36,7 @@ import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
 import org.batoo.jpa.core.impl.criteria.join.AbstractJoin;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 import org.batoo.jpa.core.test.BaseCoreTest;
@@ -430,5 +433,30 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 		final List<Country> resultList = tq.getResultList();
 
 		Assert.assertEquals(1, resultList.size());
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public void testSimple3() {
+		final Person person = this.person();
+
+		final CriteriaBuilderImpl criteriaBuilder = this.em().getCriteriaBuilder();
+		final CriteriaQueryImpl<Address> criteriaQuery = criteriaBuilder.createQuery(Address.class);
+		final RootImpl<Address> from = criteriaQuery.from(Address.class);
+		final List<PredicateImpl> predicates = new ArrayList<PredicateImpl>();
+
+		predicates.add(criteriaBuilder.equal(from.get("person"), person));
+
+		criteriaQuery.select(from);
+		if (!predicates.isEmpty()) {
+			criteriaQuery.where(criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()])));
+		}
+		final TypedQuery<Address> query = this.em().createQuery(criteriaQuery);
+
+		query.getResultList();
 	}
 }
