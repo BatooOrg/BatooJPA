@@ -36,6 +36,25 @@ public interface BJPASettings {
 	final String DROP_ON_CLOSE = "org.batoo.jpa.dropOnClose";
 
 	/**
+	 * Boolean value, indicating how the sql statements should be printed, NONE | STDOUT | STDERR.
+	 * <p>
+	 * If you have a logging infrastructor, prefer org.batoo.jpa.SQL for logging.
+	 */
+	final String SQL_LOGGING = "org.batoo.jpa.sql_logging";
+
+	/**
+	 * Long value indicating that the number of milliseconds to deem an SQL execution as slow.
+	 * <p>
+	 * If an execution is deemed as slow it will be logged as warning.
+	 */
+	final String SLOW_SQL_THRESHOLD = "org.batoo.jpa.slow_sql_threshold";
+
+	/**
+	 * Default value for {@link #SLOW_SQL_THRESHOLD} that is 2500.
+	 */
+	final Long DEFAULT_SLOW_SQL_THRESHOLD = 2500l;
+
+	/**
 	 * The default for {@link #MAX_CONNECTIONS} that is 50.
 	 */
 	final Integer DEFAULT_MAX_CONNECTIONS = 50;

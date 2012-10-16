@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -56,6 +57,7 @@ import org.batoo.jpa.core.impl.deployment.LinkManager;
 import org.batoo.jpa.core.impl.deployment.NamedQueriesManager;
 import org.batoo.jpa.core.impl.jdbc.AbstractJdbcAdaptor;
 import org.batoo.jpa.core.impl.jdbc.BoneCPDataSource;
+import org.batoo.jpa.core.impl.jdbc.PreparedStatementProxy.SqlLoggingType;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
@@ -82,9 +84,13 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	private static final int NO_QUERIES_TRIM = 100;
 
 	private final MetamodelImpl metamodel;
-	private final DataSource dataSource;
-	private final CacheImpl cache;
 	private final DDLMode ddlMode;
+
+	private final DataSource dataSource;
+	private final long slowSqlThreshold;
+	private final SqlLoggingType sqlLogging;
+
+	private final CacheImpl cache;
 
 	private final JdbcAdaptor jdbcAdaptor;
 	private final Map<String, Object> properties = Maps.newHashMap();
@@ -133,6 +139,25 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		}
 
 		this.dataSource = this.createDatasource(parser);
+
+		try {
+			this.slowSqlThreshold = this.getProperty(BJPASettings.SLOW_SQL_THRESHOLD) != null ? //
+				Long.valueOf((String) this.getProperty(BJPASettings.SLOW_SQL_THRESHOLD)) : //
+				BJPASettings.DEFAULT_SLOW_SQL_THRESHOLD;
+		}
+		catch (final Exception e) {
+			throw new IllegalArgumentException("Illegal value " + this.getProperty(BJPASettings.SLOW_SQL_THRESHOLD) + " for " + BJPASettings.SLOW_SQL_THRESHOLD);
+		}
+
+		try {
+			this.sqlLogging = this.getProperty(BJPASettings.SQL_LOGGING) != null ? //
+				SqlLoggingType.valueOf(((String) this.getProperty(BJPASettings.SQL_LOGGING)).toUpperCase(Locale.ENGLISH)) : //
+				SqlLoggingType.NONE;
+		}
+		catch (final Exception e) {
+			throw new IllegalArgumentException("Illegal value " + this.getProperty(BJPASettings.SQL_LOGGING) + " for " + BJPASettings.SQL_LOGGING);
+		}
+
 		this.cache = new CacheImpl(this, parser.getSharedCacheMode());
 
 		this.ddlMode = this.readDdlMode();
@@ -273,40 +298,45 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 			throw new PersistenceException("Cannot lookup datasource: " + e.getMessage(), e);
 		}
 
-		// read the properties
-		final String jdbcDriver = (String) this.getProperty(JPASettings.JDBC_DRIVER);
-		final String jdbcUrl = (String) this.getProperty(JPASettings.JDBC_URL);
-		final String jdbcUser = (String) this.getProperty(JPASettings.JDBC_USER);
-		final String jdbcPassword = (String) this.getProperty(JPASettings.JDBC_PASSWORD);
+		try {
+			// read the properties
+			final String jdbcDriver = (String) this.getProperty(JPASettings.JDBC_DRIVER);
+			final String jdbcUrl = (String) this.getProperty(JPASettings.JDBC_URL);
+			final String jdbcUser = (String) this.getProperty(JPASettings.JDBC_USER);
+			final String jdbcPassword = (String) this.getProperty(JPASettings.JDBC_PASSWORD);
 
-		final Integer statementsCacheSize = this.getProperty(BJPASettings.STATEMENT_CACHE_SIZE) != null ? //
-			Integer.valueOf((String) this.getProperty(BJPASettings.STATEMENT_CACHE_SIZE)) : //
-			BJPASettings.DEFAULT_STATEMENT_CACHE_SIZE;
+			final Integer statementsCacheSize = this.getProperty(BJPASettings.STATEMENT_CACHE_SIZE) != null ? //
+				Integer.valueOf((String) this.getProperty(BJPASettings.STATEMENT_CACHE_SIZE)) : //
+				BJPASettings.DEFAULT_STATEMENT_CACHE_SIZE;
 
-		final Integer maxConnections = this.getProperty(BJPASettings.MAX_CONNECTIONS) != null ? //
-			Integer.valueOf((String) this.getProperty(BJPASettings.MAX_CONNECTIONS)) : //
-			BJPASettings.DEFAULT_MAX_CONNECTIONS;
+			final Integer maxConnections = this.getProperty(BJPASettings.MAX_CONNECTIONS) != null ? //
+				Integer.valueOf((String) this.getProperty(BJPASettings.MAX_CONNECTIONS)) : //
+				BJPASettings.DEFAULT_MAX_CONNECTIONS;
 
-		final Integer minConnections = this.getProperty(BJPASettings.MIN_CONNECTIONS) != null ? //
-			Integer.valueOf((String) this.getProperty(BJPASettings.MIN_CONNECTIONS)) : //
-			BJPASettings.DEFAULT_MIN_CONNECTIONS;
+			final Integer minConnections = this.getProperty(BJPASettings.MIN_CONNECTIONS) != null ? //
+				Integer.valueOf((String) this.getProperty(BJPASettings.MIN_CONNECTIONS)) : //
+				BJPASettings.DEFAULT_MIN_CONNECTIONS;
 
-		// create the datasource
-		final BoneCPDataSource dataSource = new BoneCPDataSource();
+			// create the datasource
+			final BoneCPDataSource dataSource = new BoneCPDataSource();
 
-		dataSource.setDriverClass(jdbcDriver);
-		dataSource.setJdbcUrl(jdbcUrl);
-		dataSource.setUsername(jdbcUser);
-		dataSource.setPassword(jdbcPassword);
+			dataSource.setDriverClass(jdbcDriver);
+			dataSource.setJdbcUrl(jdbcUrl);
+			dataSource.setUsername(jdbcUser);
+			dataSource.setPassword(jdbcPassword);
 
-		// This is slow so always set it to 0
-		dataSource.setReleaseHelperThreads(0);
+			// This is slow so always set it to 0
+			dataSource.setReleaseHelperThreads(0);
 
-		dataSource.setStatementsCacheSize(statementsCacheSize);
-		dataSource.setMinConnectionsPerPartition(minConnections);
-		dataSource.setMaxConnectionsPerPartition(maxConnections);
+			dataSource.setStatementsCacheSize(statementsCacheSize);
+			dataSource.setMinConnectionsPerPartition(minConnections);
+			dataSource.setMaxConnectionsPerPartition(maxConnections);
 
-		return dataSource;
+			return dataSource;
+		}
+		catch (final Exception e) {
+			throw new IllegalArgumentException("Illegal values for datasource settings!");
+		}
 	}
 
 	/**
@@ -546,6 +576,30 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 */
 	public Class<?>[] getRemoveValidators() {
 		return this.removeValidators;
+	}
+
+	/**
+	 * Returns the time to decide if SQL is deemed as slow.
+	 * 
+	 * @return the time to decide if SQL is deemed as slow
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public long getSlowSqlThreshold() {
+		return this.slowSqlThreshold;
+	}
+
+	/**
+	 * Returns the sql logging type of the entity manager factory.
+	 * 
+	 * @return the sql logging type of the entity manager factory
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public SqlLoggingType getSqlLogging() {
+		return this.sqlLogging;
 	}
 
 	/**
