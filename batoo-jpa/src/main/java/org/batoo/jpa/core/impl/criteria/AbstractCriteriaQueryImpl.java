@@ -506,7 +506,10 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 	@Override
 	public AbstractQuery<T> where(Expression<Boolean> restriction) {
 		if (restriction instanceof PredicateImpl) {
-			this.restriction = (PredicateImpl) restriction;
+			final PredicateImpl predicate = (PredicateImpl) restriction;
+			if (predicate.getExpressions().size() > 0) {
+				this.restriction = predicate;
+			}
 		}
 		else {
 			this.restriction = new PredicateImpl((AbstractExpression<Boolean>) restriction);

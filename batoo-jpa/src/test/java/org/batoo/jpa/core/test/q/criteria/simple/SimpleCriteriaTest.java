@@ -452,9 +452,27 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 		predicates.add(criteriaBuilder.equal(from.get("person"), person));
 
 		criteriaQuery.select(from);
-		if (!predicates.isEmpty()) {
-			criteriaQuery.where(criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()])));
-		}
+		criteriaQuery.where(criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()])));
+		final TypedQuery<Address> query = this.em().createQuery(criteriaQuery);
+
+		query.getResultList();
+	}
+
+	/**
+	 * Test the empty predicates.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testSimple4() {
+		final CriteriaBuilderImpl criteriaBuilder = this.em().getCriteriaBuilder();
+		final CriteriaQueryImpl<Address> criteriaQuery = criteriaBuilder.createQuery(Address.class);
+		final RootImpl<Address> from = criteriaQuery.from(Address.class);
+		final List<PredicateImpl> predicates = new ArrayList<PredicateImpl>();
+
+		criteriaQuery.select(from);
+		criteriaQuery.where(criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()])));
 		final TypedQuery<Address> query = this.em().createQuery(criteriaQuery);
 
 		query.getResultList();
