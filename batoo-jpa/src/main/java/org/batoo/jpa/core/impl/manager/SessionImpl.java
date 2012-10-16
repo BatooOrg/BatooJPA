@@ -541,7 +541,7 @@ public class SessionImpl {
 
 		if (entity instanceof EnhancedInstance) {
 			final ManagedInstance<?> instance = ((EnhancedInstance) entity).__enhanced__$$__getManagedInstance();
-			if (instance.getSession() == this) {
+			if ((instance != null) && (instance.getSession() == this)) {
 				return (ManagedInstance<X>) instance;
 			}
 
