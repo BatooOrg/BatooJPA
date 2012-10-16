@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.criteria;
 
+import java.sql.Connection;
 import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -56,7 +57,6 @@ import org.batoo.jpa.core.impl.cache.CacheImpl;
 import org.batoo.jpa.core.impl.cache.CacheReference;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
@@ -281,7 +281,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 		this.results = Lists.newArrayList();
 
 		try {
-			final ConnectionImpl connection = this.em.getConnection();
+			final Connection connection = this.em.getConnection();
 			try {
 				this.buildResultSetImpl(connection, parameters);
 
@@ -320,7 +320,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private void buildResultSetImpl(final ConnectionImpl connection, final Object[] parameters) throws SQLException {
+	private void buildResultSetImpl(final Connection connection, final Object[] parameters) throws SQLException {
 		PreparedStatement statement = null;
 		ResultSet resultSet = null;
 

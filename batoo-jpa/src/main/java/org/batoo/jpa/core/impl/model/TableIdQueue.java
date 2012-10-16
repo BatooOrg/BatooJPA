@@ -21,8 +21,9 @@ package org.batoo.jpa.core.impl.model;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 
+import javax.sql.DataSource;
+
 import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
-import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.dbutils.SingleValueHandler;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 
@@ -44,7 +45,7 @@ public class TableIdQueue extends IdQueue {
 
 	private Long nextId;
 
-	private final DataSourceImpl datasource;
+	private final DataSource datasource;
 
 	private final JdbcAdaptor jdbcAdaptor;
 
@@ -61,7 +62,7 @@ public class TableIdQueue extends IdQueue {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public TableIdQueue(JdbcAdaptor jdbcAdaptor, DataSourceImpl datasource, ExecutorService idExecuter, TableGenerator generator) {
+	public TableIdQueue(JdbcAdaptor jdbcAdaptor, DataSource datasource, ExecutorService idExecuter, TableGenerator generator) {
 		super(idExecuter, generator.getName(), generator.getAllocationSize());
 
 		this.jdbcAdaptor = jdbcAdaptor;

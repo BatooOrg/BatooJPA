@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.model.mapping;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,7 +41,6 @@ import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.collections.ManagedList;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
 import org.batoo.jpa.core.impl.jdbc.Joinable;
@@ -153,7 +153,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * 
 	 */
 	@Override
-	public void attach(ConnectionImpl connection, ManagedInstance<?> instance, Joinable[] batch, int batchSize) throws SQLException {
+	public void attach(Connection connection, ManagedInstance<?> instance, Joinable[] batch, int batchSize) throws SQLException {
 		if (this.joinTable != null) {
 			this.joinTable.performInsert(connection, instance.getInstance(), batch, batchSize);
 		}
@@ -190,7 +190,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * 
 	 */
 	@Override
-	public void detach(ConnectionImpl connection, ManagedInstance<?> instance, Object key, Object child) throws SQLException {
+	public void detach(Connection connection, ManagedInstance<?> instance, Object key, Object child) throws SQLException {
 		if (this.joinTable != null) {
 			this.joinTable.performRemove(connection, instance.getInstance(), key, child);
 		}
@@ -204,7 +204,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * 
 	 */
 	@Override
-	public void detachAll(ConnectionImpl connection, ManagedInstance<?> instance) throws SQLException {
+	public void detachAll(Connection connection, ManagedInstance<?> instance) throws SQLException {
 		if (this.joinTable != null) {
 			this.joinTable.performRemoveAll(connection, instance.getInstance());
 		}
@@ -254,7 +254,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public void flush(ConnectionImpl connection, ManagedInstance<?> managedInstance, boolean removals, boolean force) throws SQLException {
+	public void flush(Connection connection, ManagedInstance<?> managedInstance, boolean removals, boolean force) throws SQLException {
 		final Object collection = this.get(managedInstance.getInstance());
 
 		((ManagedCollection<E>) collection).flush(connection, removals, force);

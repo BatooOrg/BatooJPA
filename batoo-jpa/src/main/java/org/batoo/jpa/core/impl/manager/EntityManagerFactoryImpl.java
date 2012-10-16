@@ -29,12 +29,14 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import javax.naming.NamingException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceException;
 import javax.persistence.PersistenceUnitUtil;
 import javax.persistence.Query;
+import javax.sql.DataSource;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 import javax.validation.groups.Default;
@@ -53,7 +55,6 @@ import org.batoo.jpa.core.impl.deployment.DdlManager;
 import org.batoo.jpa.core.impl.deployment.LinkManager;
 import org.batoo.jpa.core.impl.deployment.NamedQueriesManager;
 import org.batoo.jpa.core.impl.jdbc.AbstractJdbcAdaptor;
-import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
@@ -65,6 +66,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.jolbox.bonecp.BoneCPDataSource;
 
 /**
  * Implementation of {@link EntityManagerFactory}.
@@ -80,7 +82,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	private static final int NO_QUERIES_TRIM = 100;
 
 	private final MetamodelImpl metamodel;
-	private final DataSourceImpl datasource;
+	private final DataSource dataSource;
 	private final CacheImpl cache;
 	private final DDLMode ddlMode;
 
@@ -130,7 +132,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 			this.removeValidators = null;
 		}
 
-		this.datasource = this.createDatasource(parser);
+		this.dataSource = this.createDatasource(parser);
 		this.cache = new CacheImpl(this, parser.getSharedCacheMode());
 
 		this.ddlMode = this.readDdlMode();
@@ -142,15 +144,15 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 
 		// drop all tables if ddl mode is drop
 		if (this.ddlMode == DDLMode.DROP) {
-			this.metamodel.dropAllTables(this.datasource);
+			this.metamodel.dropAllTables(this.dataSource);
 		}
 
-		DdlManager.perform(this.datasource, this.metamodel, this.ddlMode);
+		DdlManager.perform(this.dataSource, this.metamodel, this.ddlMode);
 
-		this.metamodel.performSequencesDdl(this.datasource, this.ddlMode);
-		this.metamodel.performTableGeneratorsDdl(this.datasource, this.ddlMode);
+		this.metamodel.performSequencesDdl(this.dataSource, this.ddlMode);
+		this.metamodel.performTableGeneratorsDdl(this.dataSource, this.ddlMode);
 
-		this.metamodel.preFillGenerators(this.datasource);
+		this.metamodel.preFillGenerators(this.dataSource);
 		this.criteriaBuilder = new CriteriaBuilderImpl(this.metamodel);
 
 		NamedQueriesManager.perform(this.metamodel, this.criteriaBuilder);
@@ -247,21 +249,28 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 
 		final String dropOnClose = (String) this.getProperty(BJPASettings.DROP_ON_CLOSE);
 		if ("true".equals(dropOnClose)) {
-			this.metamodel.dropAllTables(this.datasource);
+			this.metamodel.dropAllTables(this.dataSource);
 		}
 
-		this.datasource.close();
+		if (this.dataSource instanceof BoneCPDataSource) {
+			((BoneCPDataSource) this.dataSource).close();
+		}
 
 		this.open = false;
 	}
 
-	private DataSourceImpl createDatasource(PersistenceParser parser) {
-		if (StringUtils.isNotBlank(parser.getJtaDatasource())) {
-			return new DataSourceImpl(parser.getJtaDatasource());
-		}
+	private DataSource createDatasource(PersistenceParser parser) {
+		try {
+			if (StringUtils.isNotBlank(parser.getJtaDatasource())) {
+				return (DataSource) new javax.naming.InitialContext().lookup(parser.getJtaDatasource());
+			}
 
-		if (StringUtils.isNotBlank(parser.getNonJtaDatasource())) {
-			return new DataSourceImpl(parser.getNonJtaDatasource());
+			if (StringUtils.isNotBlank(parser.getNonJtaDatasource())) {
+				return (DataSource) new javax.naming.InitialContext().lookup(parser.getNonJtaDatasource());
+			}
+		}
+		catch (final NamingException e) {
+			throw new PersistenceException("Cannot lookup datasource: " + e.getMessage(), e);
 		}
 
 		final String jdbcDriver = (String) this.getProperty(JPASettings.JDBC_DRIVER);
@@ -269,17 +278,14 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		final String jdbcUser = (String) this.getProperty(JPASettings.JDBC_USER);
 		final String jdbcPassword = (String) this.getProperty(JPASettings.JDBC_PASSWORD);
 
-		try {
-			try {
-				this.classloader.loadClass(jdbcDriver).newInstance();
-			}
-			catch (final Exception e) {}
+		final BoneCPDataSource dataSource = new BoneCPDataSource();
 
-			return new DataSourceImpl(jdbcUrl, jdbcUser, jdbcPassword);
-		}
-		catch (final Exception e) {
-			throw new BatooException("Datasource cannot be created", e);
-		}
+		dataSource.setDriverClass(jdbcDriver);
+		dataSource.setJdbcUrl(jdbcUrl);
+		dataSource.setUsername(jdbcUser);
+		dataSource.setPassword(jdbcPassword);
+
+		return dataSource;
 	}
 
 	/**
@@ -290,7 +296,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	public EntityManagerImpl createEntityManager() {
 		this.assertOpen();
 
-		return new EntityManagerImpl(this, this.metamodel, this.datasource, Collections.<String, Object> emptyMap(), this.jdbcAdaptor);
+		return new EntityManagerImpl(this, this.metamodel, this.dataSource, Collections.<String, Object> emptyMap(), this.jdbcAdaptor);
 	}
 
 	/**
@@ -301,7 +307,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	public EntityManager createEntityManager(Map<String, Object> map) {
 		this.assertOpen();
 
-		return new EntityManagerImpl(this, this.metamodel, this.datasource, map, this.jdbcAdaptor);
+		return new EntityManagerImpl(this, this.metamodel, this.dataSource, map, this.jdbcAdaptor);
 	}
 
 	/**
@@ -314,7 +320,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 */
 	private JdbcAdaptor createJdbcAdaptor() {
 		try {
-			final Connection connection = this.datasource.getConnection();
+			final Connection connection = this.dataSource.getConnection();
 			try {
 				return AbstractJdbcAdaptor.getAdapter(this.classloader, connection.getMetaData().getDatabaseProductName());
 			}
@@ -367,8 +373,8 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected DataSourceImpl getDatasource() {
-		return this.datasource;
+	protected DataSource getDatasource() {
+		return this.dataSource;
 	}
 
 	/**

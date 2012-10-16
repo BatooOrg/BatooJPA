@@ -18,13 +18,12 @@
  */
 package org.batoo.jpa.core.impl.manager;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
 import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceException;
 import javax.persistence.TransactionRequiredException;
-
-import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 
 /**
  * Implementation of {@link EntityTransaction}.
@@ -35,7 +34,7 @@ import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 public class EntityTransactionImpl implements EntityTransaction {
 
 	private final EntityManagerImpl em;
-	private final ConnectionImpl connection;
+	private final Connection connection;
 	private boolean active;
 	private boolean rollbackOnly;
 
@@ -48,7 +47,7 @@ public class EntityTransactionImpl implements EntityTransaction {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EntityTransactionImpl(EntityManagerImpl entityManager, ConnectionImpl connection) {
+	public EntityTransactionImpl(EntityManagerImpl entityManager, Connection connection) {
 		super();
 
 		this.em = entityManager;

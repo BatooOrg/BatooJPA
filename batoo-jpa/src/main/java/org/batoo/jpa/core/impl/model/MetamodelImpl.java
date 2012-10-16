@@ -42,12 +42,12 @@ import javax.persistence.metamodel.IdentifiableType;
 import javax.persistence.metamodel.ManagedType;
 import javax.persistence.metamodel.MappedSuperclassType;
 import javax.persistence.metamodel.Metamodel;
+import javax.sql.DataSource;
 
 import org.batoo.jpa.common.BatooException;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
-import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
@@ -336,7 +336,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void dropAllTables(DataSourceImpl datasource) {
+	public void dropAllTables(DataSource datasource) {
 		final Set<AbstractTable> tables = Sets.newHashSet();
 
 		for (final EntityTypeImpl<?> entity : this.entities.values()) {
@@ -657,7 +657,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performForeignKeysDdl(DataSourceImpl datasource, DDLMode ddlMode, EntityTypeImpl<?> entity) {
+	public void performForeignKeysDdl(DataSource datasource, DDLMode ddlMode, EntityTypeImpl<?> entity) {
 		if ((ddlMode == DDLMode.NONE)) {
 			return;
 		}
@@ -714,7 +714,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performSequencesDdl(DataSourceImpl datasource, DDLMode ddlMode) {
+	public void performSequencesDdl(DataSource datasource, DDLMode ddlMode) {
 		for (final SequenceGenerator sequenceGenerator : this.sequenceGenerators.values()) {
 			MetamodelImpl.LOG.info("Performing DDL operations for sequence generators for {0}, mode {1}", sequenceGenerator.getName(), ddlMode);
 
@@ -733,7 +733,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performTableGeneratorsDdl(DataSourceImpl datasource, DDLMode ddlMode) {
+	public void performTableGeneratorsDdl(DataSource datasource, DDLMode ddlMode) {
 		for (final TableGenerator tableGenerator : this.tableGenerators.values()) {
 			MetamodelImpl.LOG.info("Performing DDL operations for sequence generators for mode table {1}, mode {0}", tableGenerator.getName(), ddlMode);
 
@@ -756,7 +756,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performTablesDdl(DataSourceImpl datasource, DDLMode ddlMode, EntityTypeImpl<?> entity) {
+	public void performTablesDdl(DataSource datasource, DDLMode ddlMode, EntityTypeImpl<?> entity) {
 		MetamodelImpl.LOG.info("Performing DDL operations for entity {0}, mode {1}", entity.getName(), ddlMode);
 
 		// create the entity tables
@@ -802,7 +802,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void preFillGenerators(DataSourceImpl datasource) {
+	public void preFillGenerators(DataSource datasource) {
 		final int nThreads = Runtime.getRuntime().availableProcessors();
 
 		this.idGeneratorExecuter = new ThreadPoolExecutor(1, nThreads, //

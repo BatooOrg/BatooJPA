@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.model.mapping;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.IdentityHashMap;
 
@@ -28,7 +29,6 @@ import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
 import org.batoo.jpa.core.impl.jdbc.Joinable;
@@ -121,7 +121,7 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 	 * 
 	 */
 	@Override
-	public void flush(ConnectionImpl connection, ManagedInstance<?> managedInstance, boolean removals, boolean force) throws SQLException {
+	public void flush(Connection connection, ManagedInstance<?> managedInstance, boolean removals, boolean force) throws SQLException {
 		if (this.getTable() != null) {
 			if (!removals) {
 				final X entity = this.get(managedInstance.getInstance());

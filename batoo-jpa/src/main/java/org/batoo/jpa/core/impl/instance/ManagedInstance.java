@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.instance;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -37,7 +38,6 @@ import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.cache.CacheImpl;
 import org.batoo.jpa.core.impl.cache.CacheInstance;
-import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -393,7 +393,7 @@ public class ManagedInstance<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void checkVersion(ConnectionImpl connection) throws SQLException {
+	public void checkVersion(Connection connection) throws SQLException {
 		// no optimistic lock, nothing to check
 		if (!this.optimisticLock) {
 			return;
@@ -513,7 +513,7 @@ public class ManagedInstance<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void flushAssociations(ConnectionImpl connection, boolean removals, boolean force) throws SQLException {
+	public void flushAssociations(Connection connection, boolean removals, boolean force) throws SQLException {
 		if (!removals || (this.status != Status.NEW)) {
 			ManagedInstance.LOG.debug("Flushing associations for instance {0}", this);
 
@@ -700,7 +700,7 @@ public class ManagedInstance<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void incrementVersion(ConnectionImpl connection, boolean commit) throws SQLException {
+	public void incrementVersion(Connection connection, boolean commit) throws SQLException {
 		if (!this.type.getRootType().hasVersionAttribute()) {
 			return;
 		}
@@ -896,7 +896,7 @@ public class ManagedInstance<X> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void refresh(EntityManagerImpl entityManager, ConnectionImpl connection, LockModeType lockMode) {
+	public void refresh(EntityManagerImpl entityManager, Connection connection, LockModeType lockMode) {
 		ManagedInstance.LOG.debug("Refeshing instance {0}", this);
 
 		this.type.performRefresh(connection, this, lockMode);

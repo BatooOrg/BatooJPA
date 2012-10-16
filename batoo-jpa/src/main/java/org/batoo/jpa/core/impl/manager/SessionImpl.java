@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.manager;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +39,6 @@ import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.Prioritizer;
 import org.batoo.jpa.core.impl.instance.Status;
-import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
@@ -166,7 +166,7 @@ public class SessionImpl {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private void doRemoves(ConnectionImpl connection, final ManagedInstance<?>[] removes) throws SQLException {
+	private void doRemoves(Connection connection, final ManagedInstance<?>[] removes) throws SQLException {
 		final ManagedInstance<?>[] batch = new ManagedInstance[SessionImpl.BATCH_SIZE];
 
 		int i = 0;
@@ -210,7 +210,7 @@ public class SessionImpl {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private void doUpdates(ConnectionImpl connection, final ManagedInstance<?>[] updates) throws SQLException {
+	private void doUpdates(Connection connection, final ManagedInstance<?>[] updates) throws SQLException {
 		final ManagedInstance<?>[] inserts = new ManagedInstance[SessionImpl.BATCH_SIZE];
 
 		int i = 0;
@@ -275,7 +275,7 @@ public class SessionImpl {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private void doVersionChecks(ConnectionImpl connection, ManagedInstance<?>[] removals, ManagedInstance<?>[] updates) throws SQLException {
+	private void doVersionChecks(Connection connection, ManagedInstance<?>[] removals, ManagedInstance<?>[] updates) throws SQLException {
 		SessionImpl.LOG.debug("Performing version checks on session {0}", this.sessionId);
 
 		for (final ManagedInstance<?> instance : removals) {
@@ -300,7 +300,7 @@ public class SessionImpl {
 	 * @since $version
 	 * @author hceylan
 	 */
-	private void doVersionUpgrades(ConnectionImpl connection, ManagedInstance<?>[] updates) throws SQLException {
+	private void doVersionUpgrades(Connection connection, ManagedInstance<?>[] updates) throws SQLException {
 		SessionImpl.LOG.debug("Performing version upgrades on session {0}", this.sessionId);
 
 		for (final ManagedInstance<?> instance : updates) {
@@ -374,7 +374,7 @@ public class SessionImpl {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void flush(ConnectionImpl connection) throws SQLException {
+	public void flush(Connection connection) throws SQLException {
 		SessionImpl.LOG.debug("Flushing session {0}", this.sessionId);
 
 		final ArrayList<ManagedInstance<?>> updates = Lists.newArrayList(this.newEntities);

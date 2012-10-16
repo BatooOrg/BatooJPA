@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Comparator;
@@ -599,7 +600,7 @@ public class ForeignKey {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performAttachChild(ConnectionImpl connection, ManagedInstance<?> instance, Joinable[] batch, int size) throws SQLException {
+	public void performAttachChild(Connection connection, ManagedInstance<?> instance, Joinable[] batch, int size) throws SQLException {
 		final String sql = this.getSingleChildSql();
 
 		final Object[] parameters = new Object[this.singleChildUpdates.length + this.singleChildRestrictions.length];
@@ -642,7 +643,7 @@ public class ForeignKey {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performDetachAll(ConnectionImpl connection, ManagedInstance<?> instance) throws SQLException {
+	public void performDetachAll(Connection connection, ManagedInstance<?> instance) throws SQLException {
 		final String sql = this.getAllChildrenSql();
 
 		final Object[] parameters = new Object[this.allChildrenRestrictions.length];
@@ -670,7 +671,7 @@ public class ForeignKey {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performDetachChild(ConnectionImpl connection, Object key, Object child) throws SQLException {
+	public void performDetachChild(Connection connection, Object key, Object child) throws SQLException {
 		final String sql = this.getSingleChildSql();
 
 		final Object[] parameters = new Object[this.singleChildUpdates.length + this.singleChildRestrictions.length];

@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
@@ -46,7 +47,7 @@ public interface JoinableTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	void performInsert(ConnectionImpl connection, Object source, Joinable[] batch, int size) throws SQLException;
+	void performInsert(Connection connection, Object source, Joinable[] batch, int size) throws SQLException;
 
 	/**
 	 * Performs the remove for the join.
@@ -66,7 +67,7 @@ public interface JoinableTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	void performRemove(ConnectionImpl connection, Object source, Object key, Object destination) throws SQLException;
+	void performRemove(Connection connection, Object source, Object key, Object destination) throws SQLException;
 
 	/**
 	 * Performs the remove for the join.
@@ -82,5 +83,5 @@ public interface JoinableTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	void performRemoveAll(ConnectionImpl connection, Object source) throws SQLException;
+	void performRemoveAll(Connection connection, Object source) throws SQLException;
 }

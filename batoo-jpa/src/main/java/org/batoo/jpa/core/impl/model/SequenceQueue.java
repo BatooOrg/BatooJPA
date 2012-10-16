@@ -21,7 +21,8 @@ package org.batoo.jpa.core.impl.model;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 
-import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
+import javax.sql.DataSource;
+
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 
 /**
@@ -34,7 +35,7 @@ public class SequenceQueue extends IdQueue {
 
 	private static final long serialVersionUID = 1L;
 	private final JdbcAdaptor jdbcAdaptor;
-	private final DataSourceImpl datasource;
+	private final DataSource datasource;
 	private final String sequenceName;
 
 	/**
@@ -52,7 +53,7 @@ public class SequenceQueue extends IdQueue {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SequenceQueue(JdbcAdaptor jdbcAdaptor, DataSourceImpl datasource, ExecutorService idExecuter, String sequenceName, int allocationSize) {
+	public SequenceQueue(JdbcAdaptor jdbcAdaptor, DataSource datasource, ExecutorService idExecuter, String sequenceName, int allocationSize) {
 		super(idExecuter, sequenceName, allocationSize);
 
 		this.jdbcAdaptor = jdbcAdaptor;

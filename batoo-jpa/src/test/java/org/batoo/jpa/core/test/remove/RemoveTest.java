@@ -23,9 +23,9 @@ import java.util.Arrays;
 
 import javax.sql.DataSource;
 
-import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.jdbc.dbutils.SingleValueHandler;
 import org.batoo.jpa.core.test.BaseCoreTest;
 import org.junit.Assert;

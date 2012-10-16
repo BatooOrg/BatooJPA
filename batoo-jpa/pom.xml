@@ -141,6 +141,13 @@
 			</exclusions>
 		</dependency>
 
+		<!-- BoneCP -->
+		<dependency>
+			<groupId>com.jolbox</groupId>
+			<artifactId>bonecp</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
 		<!-- ASM -->
 		<dependency>
 			<groupId>asm</groupId>

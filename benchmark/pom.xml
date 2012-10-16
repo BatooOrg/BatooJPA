@@ -89,6 +89,12 @@
 		 -->
 
 		<dependency>
+			<groupId>com.jolbox</groupId>
+			<artifactId>bonecp</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>org.antlr</groupId>
 			<artifactId>antlr-runtime</artifactId>
 			<scope>test</scope>

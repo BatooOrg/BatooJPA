@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.collections;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,7 +31,6 @@ import javax.persistence.PersistenceException;
 import org.apache.commons.lang.ObjectUtils;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.Joinable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
@@ -315,7 +315,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 		return false;
 	}
 
-	private void attachChildren(ConnectionImpl connection, final ManagedInstance<?> instance, final PluralMapping<?, ?, E> mapping) throws SQLException {
+	private void attachChildren(Connection connection, final ManagedInstance<?> instance, final PluralMapping<?, ?, E> mapping) throws SQLException {
 		final Joinable[] batch = new Joinable[SessionImpl.BATCH_SIZE];
 
 		int i = 0;
@@ -389,7 +389,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 * 
 	 */
 	@Override
-	public void flush(ConnectionImpl connection, boolean removals, boolean force) throws SQLException {
+	public void flush(Connection connection, boolean removals, boolean force) throws SQLException {
 		if (this.removed(connection, removals)) {
 			return;
 		}

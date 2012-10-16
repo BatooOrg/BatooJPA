@@ -18,12 +18,12 @@
  */
 package org.batoo.jpa.core.impl.model.mapping;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.Joinable;
 import org.batoo.jpa.core.impl.jdbc.OrderColumn;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
@@ -62,7 +62,7 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	void attach(ConnectionImpl connection, ManagedInstance<?> instance, Joinable[] batch, int size) throws SQLException;
+	void attach(Connection connection, ManagedInstance<?> instance, Joinable[] batch, int size) throws SQLException;
 
 	/**
 	 * Returns if merges are cascaded.
@@ -91,7 +91,7 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	void detach(ConnectionImpl connection, ManagedInstance<?> instance, Object key, Object child) throws SQLException;
+	void detach(Connection connection, ManagedInstance<?> instance, Object key, Object child) throws SQLException;
 
 	/**
 	 * Details all the children.
@@ -106,7 +106,7 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	void detachAll(ConnectionImpl connection, ManagedInstance<?> instance) throws SQLException;
+	void detachAll(Connection connection, ManagedInstance<?> instance) throws SQLException;
 
 	/**
 	 * Enhances the collection to the managed collection

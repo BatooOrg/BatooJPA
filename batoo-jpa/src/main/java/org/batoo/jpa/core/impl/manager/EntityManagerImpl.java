@@ -53,8 +53,6 @@ import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.Status;
-import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
-import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
@@ -76,13 +74,13 @@ public class EntityManagerImpl implements EntityManager {
 
 	private final EntityManagerFactoryImpl emf;
 	private final MetamodelImpl metamodel;
-	private final DataSourceImpl datasource;
+	private final DataSource datasource;
 	private final JdbcAdaptor jdbcAdaptor;
 
 	private boolean open;
 	private EntityTransactionImpl transaction;
 
-	private ConnectionImpl connection;
+	private Connection connection;
 	private final SessionImpl session;
 	private final CriteriaBuilderImpl criteriaBuilder;
 	private final Map<String, Object> properties;
@@ -102,7 +100,7 @@ public class EntityManagerImpl implements EntityManager {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EntityManagerImpl(EntityManagerFactoryImpl entityManagerFactory, MetamodelImpl metamodel, DataSourceImpl datasource, Map<String, Object> properties,
+	public EntityManagerImpl(EntityManagerFactoryImpl entityManagerFactory, MetamodelImpl metamodel, DataSource datasource, Map<String, Object> properties,
 		JdbcAdaptor jdbcAdaptor) {
 		super();
 
@@ -525,7 +523,7 @@ public class EntityManagerImpl implements EntityManager {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ConnectionImpl getConnection() {
+	public Connection getConnection() {
 		// if the connection exists then simply return it
 		if (this.connection != null) {
 			return this.connection;

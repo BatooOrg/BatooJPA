@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
@@ -237,7 +238,7 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 	 * 
 	 */
 	@Override
-	public void performInsert(ConnectionImpl connection, Object source, Joinable[] batch, int size) throws SQLException {
+	public void performInsert(Connection connection, Object source, Joinable[] batch, int size) throws SQLException {
 		final String insertSql = this.getInsertSql(null, size);
 		final AbstractColumn[] insertColumns = this.getInsertColumns(null, size);
 
@@ -269,7 +270,7 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 	 * 
 	 */
 	@Override
-	public void performRemove(ConnectionImpl connection, Object source, Object key, Object destination) throws SQLException {
+	public void performRemove(Connection connection, Object source, Object key, Object destination) throws SQLException {
 		final String removeSql = this.getRemoveSql();
 
 		final Object[] params = new Object[this.sourceKey.getJoinColumns().size() + this.destinationKey.getJoinColumns().size()];
@@ -291,7 +292,7 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 	 * 
 	 */
 	@Override
-	public void performRemoveAll(ConnectionImpl connection, Object source) throws SQLException {
+	public void performRemoveAll(Connection connection, Object source) throws SQLException {
 		final String removeAllSql = this.getRemoveAllSql();
 
 		final Object[] params = new Object[this.removeAllColumns.length];

@@ -30,7 +30,6 @@ import javax.sql.DataSource;
 
 import org.batoo.jpa.core.impl.criteria.expression.NumericFunctionExpression.NumericFunctionType;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
-import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.model.SequenceGenerator;
 import org.batoo.jpa.core.jdbc.IdType;
@@ -273,7 +272,7 @@ public class MsSqlAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
-	public long getNextSequence(DataSourceImpl datasource, String sequenceName) throws SQLException {
+	public long getNextSequence(DataSource datasource, String sequenceName) throws SQLException {
 		throw new UnsupportedOperationException("MSSQL does not support sequences");
 	}
 

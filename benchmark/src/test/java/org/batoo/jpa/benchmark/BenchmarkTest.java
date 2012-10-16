@@ -33,7 +33,6 @@ import java.util.concurrent.Executors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -47,7 +46,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -79,7 +77,7 @@ public class BenchmarkTest {
 		catch (final SQLException e) {}
 
 		if (BenchmarkTest.SUMMARIZE) {
-			System.out.println("==============================================================");
+			System.out.println("Single Entity Operations  ====================================");
 			System.out.println("Prvdr | Total Time | JPA Time   | DB Time   | Name Of The Test");
 		}
 	}
@@ -254,6 +252,12 @@ public class BenchmarkTest {
 		this.oldTime = newTime;
 	}
 
+	private void close(final EntityManager em) {
+		em.getTransaction().commit();
+
+		em.close();
+	}
+
 	@SuppressWarnings("unchecked")
 	private List<Person>[] createPersons() {
 		final List<Person>[] persons = new List[10];
@@ -307,84 +311,63 @@ public class BenchmarkTest {
 
 	private void doBenchmarkCriteria(final EntityManagerFactory emf, final Person person, CriteriaQuery<Address> cq, ParameterExpression<Person> p) {
 		for (int i = 1; i < 250; i++) {
-			final EntityManager em = emf.createEntityManager();
-
-			em.getTransaction().begin();
+			final EntityManager em = this.open(emf);
 
 			final TypedQuery<Address> q = em.createQuery(cq);
 			q.setParameter(p, person);
 			q.getResultList();
 
-			em.getTransaction().commit();
-
-			em.close();
+			this.close(em);
 		}
 	}
 
 	private void doBenchmarkFind(final EntityManagerFactory emf, final Person person) {
 		for (int i = 0; i < 250; i++) {
-			final EntityManager em = emf.createEntityManager();
-			em.getTransaction().begin();
+			final EntityManager em = this.open(emf);
 
 			final Person person2 = em.find(Person.class, person.getId());
 			person2.getPhones().size();
 
-			em.getTransaction().commit();
-
-			em.close();
+			this.close(em);
 		}
 	}
 
 	private void doBenchmarkJpql(final EntityManagerFactory emf, final Person person) {
 		for (int i = 0; i < 250; i++) {
-			final EntityManager em = emf.createEntityManager();
+			final EntityManager em = this.open(emf);
 
-			em.getTransaction().begin();
-
-			emf.getCriteriaBuilder();
 			final TypedQuery<Address> q = em.createQuery(
 				"select a from Person p inner join p.addresses a left join fetch a.country left join fetch a.person where p = :person", Address.class);
 
 			q.setParameter("person", person);
 			q.getResultList();
 
-			em.getTransaction().commit();
-
-			em.close();
+			this.close(em);
 		}
 	}
 
 	private void doBenchmarkPersist(final EntityManagerFactory emf, List<Person>[] persons) {
 		for (final List<Person> list : persons) {
 			for (int i = 0; i < list.size(); i++) {
-				final EntityManager em = emf.createEntityManager();
-				final EntityTransaction tx = em.getTransaction();
-
-				tx.begin();
+				final EntityManager em = this.open(emf);
 
 				em.persist(list.get(i));
 
-				tx.commit();
-				em.close();
+				this.close(em);
 			}
 		}
 	}
 
 	private void doBenchmarkRemove(final EntityManager em, final Person person) {
-		em.getTransaction().begin();
-
 		em.remove(person);
 
-		em.getTransaction().commit();
-
-		em.close();
+		this.close(em);
 	}
 
 	private void doBenchmarkUpdate(int i, final EntityManager em, final Person person2) {
-		final EntityTransaction tx = em.getTransaction();
-		tx.begin();
 		person2.setName("Ceylan" + i);
-		tx.commit();
+
+		this.close(em);
 	}
 
 	/**
@@ -393,7 +376,6 @@ public class BenchmarkTest {
 	 * @author hceylan
 	 */
 	@Test
-	@Ignore
 	public void doeclipselink() {
 		this.doTest(Type.ELINK);
 	}
@@ -411,7 +393,7 @@ public class BenchmarkTest {
 	private void doRemove(final EntityManagerFactory emf, final List<Person>[] persons) {
 		for (int i = 0; i < 5; i++) {
 			for (final Person person : persons[i]) {
-				final EntityManager em = emf.createEntityManager();
+				final EntityManager em = this.open(emf);
 
 				this.doBenchmarkRemove(em, em.find(Person.class, person.getId()));
 			}
@@ -421,27 +403,31 @@ public class BenchmarkTest {
 	private void doTest(Type type) {
 		final EntityManagerFactory emf = Persistence.createEntityManagerFactory(type.name().toLowerCase());
 
-		final EntityManager em = emf.createEntityManager();
+		final EntityManager em = this.open(emf);
 		this.country = new Country();
 
 		this.country.setName("Turkey");
-		em.getTransaction().begin();
 		em.persist(this.country);
-		em.getTransaction().commit();
 
-		em.close();
+		this.close(em);
 
 		this.test(type, emf);
 	}
 
 	private void doUpdate(final EntityManagerFactory emf, final Person person) {
 		for (int i = 0; i < 100; i++) {
-			final EntityManager em = emf.createEntityManager();
+			final EntityManager em = this.open(emf);
 
 			this.doBenchmarkUpdate(i, em, em.find(Person.class, person.getId()));
-
-			em.close();
 		}
+	}
+
+	private EntityManager open(final EntityManagerFactory emf) {
+		final EntityManager em = emf.createEntityManager();
+
+		em.getTransaction().begin();
+
+		return em;
 	}
 
 	private void singleTest(final EntityManagerFactory emf, List<Person>[] persons, CriteriaQuery<Address> cq, ParameterExpression<Person> p) {

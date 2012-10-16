@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -234,7 +235,7 @@ public class EntityTable extends AbstractTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performInsert(ConnectionImpl connection, final ManagedInstance<?>[] managedInstances, int size) throws SQLException {
+	public void performInsert(Connection connection, final ManagedInstance<?>[] managedInstances, int size) throws SQLException {
 		final EntityTypeImpl<?> entityType = managedInstances[0].getType();
 
 		// Do not inline, generation of the insert SQL will initialize the insertColumns!
@@ -287,7 +288,7 @@ public class EntityTable extends AbstractTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performRemove(ConnectionImpl connection, final ManagedInstance<?>[] managedInstances, int size) throws SQLException {
+	public void performRemove(Connection connection, final ManagedInstance<?>[] managedInstances, int size) throws SQLException {
 		final String removeSql = this.getRemoveSql(size);
 
 		// prepare the parameters
@@ -319,7 +320,7 @@ public class EntityTable extends AbstractTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Object performSelectVersion(ConnectionImpl connection, final ManagedInstance<?> managedInstance) throws SQLException {
+	public Object performSelectVersion(Connection connection, final ManagedInstance<?> managedInstance) throws SQLException {
 		final Object instance = managedInstance.getInstance();
 
 		// Do not inline, generation of the update SQL will initialize the insertColumns!
@@ -352,7 +353,7 @@ public class EntityTable extends AbstractTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performUpdate(ConnectionImpl connection, final ManagedInstance<?> managedInstance) throws SQLException {
+	public void performUpdate(Connection connection, final ManagedInstance<?> managedInstance) throws SQLException {
 		final EntityTypeImpl<?> entityType = managedInstance.getType();
 		final Object instance = managedInstance.getInstance();
 
@@ -386,7 +387,7 @@ public class EntityTable extends AbstractTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public boolean performUpdateWithUpdatability(ConnectionImpl connection, final ManagedInstance<?> managedInstance) throws SQLException {
+	public boolean performUpdateWithUpdatability(Connection connection, final ManagedInstance<?> managedInstance) throws SQLException {
 		final EntityTypeImpl<?> entityType = managedInstance.getType();
 		final Object instance = managedInstance.getInstance();
 
@@ -427,7 +428,7 @@ public class EntityTable extends AbstractTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performVersionUpdate(ConnectionImpl connection, final ManagedInstance<?> managedInstance) throws SQLException {
+	public void performVersionUpdate(Connection connection, final ManagedInstance<?> managedInstance) throws SQLException {
 		final Object instance = managedInstance.getInstance();
 
 		// Do not inline, generation of the update SQL will initialize the insertColumns!

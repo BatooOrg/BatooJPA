@@ -18,12 +18,12 @@
  */
 package org.batoo.jpa.core.impl.model.mapping;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
 import javax.persistence.criteria.JoinType;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.JoinableTable;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
@@ -100,7 +100,7 @@ public interface JoinedMapping<Z, X, Y> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	void flush(ConnectionImpl connection, ManagedInstance<?> managedInstance, boolean removals, boolean force) throws SQLException;
+	void flush(Connection connection, ManagedInstance<?> managedInstance, boolean removals, boolean force) throws SQLException;
 
 	/**
 	 * Returns the attribute of the mapping

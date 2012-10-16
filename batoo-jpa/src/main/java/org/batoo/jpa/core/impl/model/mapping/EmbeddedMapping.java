@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.model.mapping;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,7 +27,6 @@ import java.util.List;
 import javax.persistence.criteria.JoinType;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.JoinableTable;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
@@ -115,7 +115,7 @@ public class EmbeddedMapping<Z, X> extends ParentMapping<Z, X> implements Singul
 	 * 
 	 */
 	@Override
-	public void flush(ConnectionImpl connection, ManagedInstance<?> managedInstance, boolean removals, boolean force) throws SQLException {
+	public void flush(Connection connection, ManagedInstance<?> managedInstance, boolean removals, boolean force) throws SQLException {
 		// TODO Auto-generated method stub
 
 	}

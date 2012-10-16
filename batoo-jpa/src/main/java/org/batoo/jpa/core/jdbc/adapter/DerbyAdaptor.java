@@ -25,10 +25,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.LockModeType;
 import javax.sql.DataSource;
 
-import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
-import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
+import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.jdbc.dbutils.SingleValueHandler;
 import org.batoo.jpa.core.impl.model.SequenceGenerator;
 import org.batoo.jpa.core.jdbc.IdType;
@@ -165,7 +164,7 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
-	public long getNextSequence(DataSourceImpl datasource, String sequenceName) throws SQLException {
+	public long getNextSequence(DataSource datasource, String sequenceName) throws SQLException {
 		return new QueryRunner(datasource) //
 		.query("VALUES (NEXT VALUE FOR " + sequenceName + ")", new SingleValueHandler<Number>()).longValue();
 	}

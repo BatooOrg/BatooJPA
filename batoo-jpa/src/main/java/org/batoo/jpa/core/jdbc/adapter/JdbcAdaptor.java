@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.jdbc.adapter;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -48,8 +49,6 @@ import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.AbstractJdbcAdaptor;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
-import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
-import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinColumn;
@@ -368,7 +367,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public synchronized void createForeignKey(DataSourceImpl datasource, ForeignKey foreignKey) {
+	public synchronized void createForeignKey(DataSource datasource, ForeignKey foreignKey) {
 		final QueryRunner runner = new QueryRunner(datasource, this.isPmdBroken());
 
 		try {
@@ -441,7 +440,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected void createIndex(DataSourceImpl datasource, EntityTable table, String indexName, BasicColumn[] columns) throws SQLException {
+	protected void createIndex(DataSource datasource, EntityTable table, String indexName, BasicColumn[] columns) throws SQLException {
 		final String columnNames = Joiner.on(", ").join(Lists.transform(Lists.newArrayList(columns), new Function<BasicColumn, String>() {
 
 			@Override
@@ -453,7 +452,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 		new QueryRunner(datasource, this.isPmdBroken()).update("CREATE INDEX " + indexName + " ON " + table.getQName() + "(" + columnNames + ")");
 	}
 
-	private void createIndexes(DataSourceImpl datasource, AbstractTable table) {
+	private void createIndexes(DataSource datasource, AbstractTable table) {
 		if (table instanceof EntityTable) {
 			final Map<String, BasicColumn[]> indexes = ((EntityTable) table).getIndexes();
 			for (final Entry<String, BasicColumn[]> entry : indexes.entrySet()) {
@@ -480,7 +479,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void createOrUpdateTable(AbstractTable table, DataSourceImpl datasource, DDLMode ddlMode) {
+	public void createOrUpdateTable(AbstractTable table, DataSource datasource, DDLMode ddlMode) {
 		try {
 			if ((ddlMode == DDLMode.DROP) || (ddlMode == DDLMode.CREATE)) {
 				final JdbcTable tableMetadata = this.getTableMetadata(datasource, table);
@@ -516,7 +515,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 */
 	public abstract void createSequenceIfNecessary(DataSource datasource, SequenceGenerator sequence);
 
-	private void createTable(DataSourceImpl datasource, AbstractTable table) {
+	private void createTable(DataSource datasource, AbstractTable table) {
 		try {
 			new QueryRunner(datasource, this.isPmdBroken()).update(this.createCreateTableStatement(table));
 		}
@@ -538,7 +537,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public final void createTableGeneratorIfNecessary(DataSourceImpl datasource, TableGenerator table) {
+	public final void createTableGeneratorIfNecessary(DataSource datasource, TableGenerator table) {
 		try {
 			if (this.getTableMetadata(datasource, table.getCatalog(), table.getSchema(), table.getTable()) == null) {
 
@@ -564,7 +563,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void dropAllForeignKeys(DataSourceImpl datasource, Set<AbstractTable> tables) {
+	public void dropAllForeignKeys(DataSource datasource, Set<AbstractTable> tables) {
 		for (final AbstractTable table : tables) {
 			JdbcTable tableMetadata = null;
 			try {
@@ -599,7 +598,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void dropAllSequences(DataSourceImpl datasource, Collection<SequenceGenerator> sequences) throws SQLException {
+	public void dropAllSequences(DataSource datasource, Collection<SequenceGenerator> sequences) throws SQLException {
 		final QueryRunner runner = new QueryRunner(datasource, this.isPmdBroken());
 
 		for (final SequenceGenerator sequence : sequences) {
@@ -625,7 +624,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void dropAllTables(DataSourceImpl datasource, Collection<AbstractTable> tables) throws SQLException {
+	public void dropAllTables(DataSource datasource, Collection<AbstractTable> tables) throws SQLException {
 		final QueryRunner runner = new QueryRunner(datasource, this.isPmdBroken());
 
 		for (final AbstractTable table : tables) {
@@ -853,7 +852,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract long getNextSequence(DataSourceImpl datasource, String sequenceName) throws SQLException;
+	public abstract long getNextSequence(DataSource datasource, String sequenceName) throws SQLException;
 
 	/**
 	 * Returns the numeric function template.
@@ -940,7 +939,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 */
 	public abstract String getSelectLastIdentitySql(PkColumn identityColumn);
 
-	private synchronized JdbcTable getTableMetadata(DataSourceImpl datasource, AbstractTable table) throws SQLException {
+	private synchronized JdbcTable getTableMetadata(DataSource datasource, AbstractTable table) throws SQLException {
 		JdbcTable tableMetadata = this.tables.get(table);
 		if (tableMetadata != null) {
 			return tableMetadata;
@@ -954,8 +953,8 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 		return tableMetadata;
 	}
 
-	private JdbcTable getTableMetadata(DataSourceImpl datasource, String catalog, String schema, String table) throws SQLException {
-		final ConnectionImpl connection = datasource.getConnection();
+	private JdbcTable getTableMetadata(DataSource datasource, String catalog, String schema, String table) throws SQLException {
+		final Connection connection = datasource.getConnection();
 
 		ResultSet tables = null;
 		try {
@@ -1107,7 +1106,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 */
 	public abstract IdType supports(GenerationType type);
 
-	private void updateTable(DataSourceImpl datasource, AbstractTable table) {
+	private void updateTable(DataSource datasource, AbstractTable table) {
 		final QueryRunner runner = new QueryRunner(datasource, this.isPmdBroken());
 
 		try {

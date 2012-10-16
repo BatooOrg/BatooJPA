@@ -22,11 +22,11 @@ import java.util.Map;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.TransactionRequiredException;
+import javax.sql.DataSource;
 import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 
-import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 
@@ -55,7 +55,7 @@ public class JtaEntityManagerImpl extends EntityManagerImpl {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public JtaEntityManagerImpl(JtaEntityManagerFactoryImpl entityManagerFactory, MetamodelImpl metamodel, DataSourceImpl datasource,
+	public JtaEntityManagerImpl(JtaEntityManagerFactoryImpl entityManagerFactory, MetamodelImpl metamodel, DataSource datasource,
 		Map<String, Object> properties, JdbcAdaptor jdbcAdaptor) {
 		super(entityManagerFactory, metamodel, datasource, properties, jdbcAdaptor);
 

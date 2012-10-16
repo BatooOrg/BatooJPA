@@ -157,6 +157,13 @@
 				<version>3.4</version>
 			</dependency>
 
+			<!-- BoneCP -->
+			<dependency>
+				<groupId>com.jolbox</groupId>
+				<artifactId>bonecp</artifactId>
+				<version>0.7.1.RELEASE</version>
+			</dependency>
+
 			<!-- ASM -->
 			<dependency>
 				<groupId>asm</groupId>

@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.model.type;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -59,7 +60,6 @@ import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
-import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.jdbc.DiscriminatorColumn;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.SecondaryTable;
@@ -1574,7 +1574,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performInsert(ConnectionImpl connection, ManagedInstance<?>[] instances, int size) throws SQLException {
+	public void performInsert(Connection connection, ManagedInstance<?>[] instances, int size) throws SQLException {
 		for (final EntityTable table : this.getTables()) {
 			table.performInsert(connection, instances, size);
 		}
@@ -1593,7 +1593,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performRefresh(ConnectionImpl connection, ManagedInstance<X> instance, LockModeType lockMode) {
+	public void performRefresh(Connection connection, ManagedInstance<X> instance, LockModeType lockMode) {
 		final SessionImpl session = instance.getSession();
 
 		final QueryImpl<X> q = session.getEntityManager().createQuery(this.getCriteriaRefresh());
@@ -1630,7 +1630,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performRemove(ConnectionImpl connection, ManagedInstance<?>[] instances, int size) throws SQLException {
+	public void performRemove(Connection connection, ManagedInstance<?>[] instances, int size) throws SQLException {
 		for (final EntityTable table : this.getTables()) {
 			table.performRemove(connection, instances, size);
 		}
@@ -1683,7 +1683,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Object performSelectVersion(ConnectionImpl connection, ManagedInstance<? extends X> instance) throws SQLException {
+	public Object performSelectVersion(Connection connection, ManagedInstance<? extends X> instance) throws SQLException {
 		return this.getTables()[0].performSelectVersion(connection, instance);
 	}
 
@@ -1700,7 +1700,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performUpdate(ConnectionImpl connection, ManagedInstance<?> instance) throws SQLException {
+	public void performUpdate(Connection connection, ManagedInstance<?> instance) throws SQLException {
 		if (this.updateTables != null) {
 			for (final EntityTable table : this.updateTables) {
 				table.performUpdate(connection, instance);
@@ -1740,7 +1740,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performVersionUpdate(ConnectionImpl connection, ManagedInstance<? extends X> instance) throws SQLException {
+	public void performVersionUpdate(Connection connection, ManagedInstance<? extends X> instance) throws SQLException {
 		this.getTables()[0].performVersionUpdate(connection, instance);
 	}
 

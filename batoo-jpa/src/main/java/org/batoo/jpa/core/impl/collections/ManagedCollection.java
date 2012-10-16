@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.impl.collections;
 
 import java.io.Serializable;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.IdentityHashMap;
@@ -28,7 +29,6 @@ import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.Status;
-import org.batoo.jpa.core.impl.jdbc.ConnectionImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
@@ -141,7 +141,7 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract void flush(ConnectionImpl connection, boolean removals, boolean force) throws SQLException;
+	public abstract void flush(Connection connection, boolean removals, boolean force) throws SQLException;
 
 	/**
 	 * Returns the delegate collection.
@@ -318,7 +318,7 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected boolean removed(ConnectionImpl connection, boolean removals) throws SQLException {
+	protected boolean removed(Connection connection, boolean removals) throws SQLException {
 		// if the instance removed remove all the relations
 		if (removals && (this.managedInstance.getStatus() == Status.REMOVED)) {
 			this.mapping.detachAll(connection, this.managedInstance);

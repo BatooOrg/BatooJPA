@@ -28,7 +28,6 @@ import javax.sql.DataSource;
 
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
-import org.batoo.jpa.core.impl.jdbc.DataSourceImpl;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.jdbc.dbutils.SingleValueHandler;
@@ -228,7 +227,7 @@ public class PostgreSqlAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
-	public long getNextSequence(DataSourceImpl datasource, String sequenceName) throws SQLException {
+	public long getNextSequence(DataSource datasource, String sequenceName) throws SQLException {
 		return new QueryRunner(datasource) //
 		.query("SELECT NEXTVAL('" + sequenceName + "')", new SingleValueHandler<Number>()).longValue();
 	}
