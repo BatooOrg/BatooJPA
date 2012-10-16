@@ -26,17 +26,42 @@ package org.batoo.jpa.core;
 public interface BJPASettings {
 
 	/**
-	 * The warn time for SQL operations taking too long.
-	 */
-	final long WARN_TIME = 2500;
-
-	/**
 	 * DDL operations, DROP | CREATE (*) | UPDATE | VERIFY | NONE
 	 */
-	String DDL = "org.batoo.jpa.ddl";
+	final String DDL = "org.batoo.jpa.ddl";
 
 	/**
 	 * Boolean value, indicating that the all tables & sequences should be dropped on close, useful for stateless applications and testing.
 	 */
-	String DROP_ON_CLOSE = "org.batoo.jpa.dropOnClose";
+	final String DROP_ON_CLOSE = "org.batoo.jpa.dropOnClose";
+
+	/**
+	 * The default for {@link #MAX_CONNECTIONS} that is 50.
+	 */
+	final Integer DEFAULT_MAX_CONNECTIONS = 50;
+
+	/**
+	 * The default for {@link #MIN_CONNECTIONS} that is 10.
+	 */
+	final Integer DEFAULT_MIN_CONNECTIONS = 1;
+
+	/**
+	 * The default for {@link #STATEMENT_CACHE_SIZE} that is 50.
+	 */
+	final Integer DEFAULT_STATEMENT_CACHE_SIZE = 50;
+
+	/**
+	 * The size of the datasource statement cache size
+	 */
+	final String STATEMENT_CACHE_SIZE = "org.batoo.jdbc.statement_cache_size";
+
+	/**
+	 * The max size of the connection pool.
+	 */
+	final String MAX_CONNECTIONS = "org.batoo.jdbc.max_connections";
+
+	/**
+	 * The min size of the connection pool.
+	 */
+	final String MIN_CONNECTIONS = "org.batoo.jdbc.min_connections";
 }
