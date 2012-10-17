@@ -57,6 +57,7 @@ import org.batoo.jpa.core.impl.deployment.LinkManager;
 import org.batoo.jpa.core.impl.deployment.NamedQueriesManager;
 import org.batoo.jpa.core.impl.jdbc.AbstractJdbcAdaptor;
 import org.batoo.jpa.core.impl.jdbc.BoneCPDataSource;
+import org.batoo.jpa.core.impl.jdbc.DataSourceProxy;
 import org.batoo.jpa.core.impl.jdbc.PreparedStatementProxy.SqlLoggingType;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.jdbc.DDLMode;
@@ -87,8 +88,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	private final DDLMode ddlMode;
 
 	private final DataSource dataSource;
-	private final long slowSqlThreshold;
-	private final SqlLoggingType sqlLogging;
 
 	private final CacheImpl cache;
 
@@ -138,19 +137,14 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 			this.removeValidators = null;
 		}
 
-		this.dataSource = this.createDatasource(parser);
-
+		SqlLoggingType sqlLogging;
+		Long slowSqlThreshold;
 		try {
-			this.slowSqlThreshold = this.getProperty(BJPASettings.SLOW_SQL_THRESHOLD) != null ? //
+			slowSqlThreshold = this.getProperty(BJPASettings.SLOW_SQL_THRESHOLD) != null ? //
 				Long.valueOf((String) this.getProperty(BJPASettings.SLOW_SQL_THRESHOLD)) : //
 				BJPASettings.DEFAULT_SLOW_SQL_THRESHOLD;
-		}
-		catch (final Exception e) {
-			throw new IllegalArgumentException("Illegal value " + this.getProperty(BJPASettings.SLOW_SQL_THRESHOLD) + " for " + BJPASettings.SLOW_SQL_THRESHOLD);
-		}
 
-		try {
-			this.sqlLogging = this.getProperty(BJPASettings.SQL_LOGGING) != null ? //
+			sqlLogging = this.getProperty(BJPASettings.SQL_LOGGING) != null ? //
 				SqlLoggingType.valueOf(((String) this.getProperty(BJPASettings.SQL_LOGGING)).toUpperCase(Locale.ENGLISH)) : //
 				SqlLoggingType.NONE;
 		}
@@ -158,6 +152,8 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 			throw new IllegalArgumentException("Illegal value " + this.getProperty(BJPASettings.SQL_LOGGING) + " for " + BJPASettings.SQL_LOGGING);
 		}
 
+		this.dataSource = new DataSourceProxy(this.createDatasource(parser), sqlLogging, slowSqlThreshold);
+		
 		this.cache = new CacheImpl(this, parser.getSharedCacheMode());
 
 		this.ddlMode = this.readDdlMode();
@@ -576,30 +572,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 */
 	public Class<?>[] getRemoveValidators() {
 		return this.removeValidators;
-	}
-
-	/**
-	 * Returns the time to decide if SQL is deemed as slow.
-	 * 
-	 * @return the time to decide if SQL is deemed as slow
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public long getSlowSqlThreshold() {
-		return this.slowSqlThreshold;
-	}
-
-	/**
-	 * Returns the sql logging type of the entity manager factory.
-	 * 
-	 * @return the sql logging type of the entity manager factory
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public SqlLoggingType getSqlLogging() {
-		return this.sqlLogging;
 	}
 
 	/**

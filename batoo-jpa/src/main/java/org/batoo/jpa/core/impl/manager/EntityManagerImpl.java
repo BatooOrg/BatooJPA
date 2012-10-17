@@ -53,8 +53,6 @@ import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.Status;
-import org.batoo.jpa.core.impl.jdbc.ConnectionProxy;
-import org.batoo.jpa.core.impl.jdbc.PreparedStatementProxy.SqlLoggingType;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
@@ -87,9 +85,6 @@ public class EntityManagerImpl implements EntityManager {
 	private final CriteriaBuilderImpl criteriaBuilder;
 	private final Map<String, Object> properties;
 
-	private final long slowSqlThreshold;
-	private final SqlLoggingType sqlLogging;
-
 	/**
 	 * @param entityManagerFactory
 	 *            the entity manager factory
@@ -115,8 +110,6 @@ public class EntityManagerImpl implements EntityManager {
 		this.jdbcAdaptor = jdbcAdaptor;
 		this.session = new SessionImpl(this, metamodel);
 		this.criteriaBuilder = this.emf.getCriteriaBuilder();
-		this.slowSqlThreshold = this.emf.getSlowSqlThreshold();
-		this.sqlLogging = this.emf.getSqlLogging();
 
 		this.properties = properties;
 
@@ -541,7 +534,7 @@ public class EntityManagerImpl implements EntityManager {
 			this.joinTransaction();
 
 			// create a new connection and return it
-			return this.connection = new ConnectionProxy(this.datasource.getConnection(), this.slowSqlThreshold, this.sqlLogging);
+			return this.connection = this.datasource.getConnection();
 		}
 		catch (final SQLException e) {
 			throw new PersistenceException("Unable to obtain connection from the datasource", e);
