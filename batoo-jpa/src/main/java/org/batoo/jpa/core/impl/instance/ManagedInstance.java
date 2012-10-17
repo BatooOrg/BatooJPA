@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.LockModeType;
@@ -230,16 +231,31 @@ public class ManagedInstance<X> {
 			if (association instanceof PluralAssociationMapping) {
 				final PluralAssociationMapping<?, ?, ?> mapping = (PluralAssociationMapping<?, ?, ?>) association;
 
-				if (mapping.getAttribute().getCollectionType() == CollectionType.MAP) {
-					// extract the collection
-					final Map<?, ?> map = (Map<?, ?>) mapping.get(this.instance);
+				switch (mapping.getAttribute().getCollectionType()) {
+					case MAP:
+						// extract the collection
+						final Map<?, ?> map = (Map<?, ?>) mapping.get(this.instance);
 
-					// cascade to each element in the collection
-					for (final Object element : map.values()) {
-						requiresFlush |= entityManager.persistImpl(element, processed);
-					}
+						// cascade to each element in the collection
+						for (final Object element : map.values()) {
+							requiresFlush |= entityManager.persistImpl(element, processed);
+						}
+
+						break;
+					case LIST:
+						// extract the collection
+						final List<?> collection = (List<?>) mapping.get(this.instance);
+
+						// cascade to each element in the collection
+						for (int i = 0; i < collection.size(); i++) {
+							requiresFlush |= entityManager.persistImpl(collection.get(i), processed);
+						}
+
+						break;
+					default:
+						break;
 				}
-				else {
+				if (mapping.getAttribute().getCollectionType() == CollectionType.MAP) {
 					// extract the collection
 					final Collection<?> collection = (Collection<?>) mapping.get(this.instance);
 

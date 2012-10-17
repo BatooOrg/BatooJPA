@@ -22,6 +22,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -183,13 +184,17 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 
 		this.delegate = Lists.newArrayList(values);
 
-		for (final E e : values) {
-			if (e == null) {
-				throw new NullPointerException();
+		final HashSet<Object> uniqueSet = Sets.newHashSet();
+		for (int i = 0; i < this.delegate.size(); i++) {
+			final E child = this.delegate.get(i);
+			if (child == null) {
+				throw new NullPointerException("Instance " + this.getManagedInstance() + " has null items in its collection " + this.getMapping().getPath());
 			}
+
+			uniqueSet.add(child);
 		}
 
-		if (Sets.newHashSet(values).size() != values.size()) {
+		if (uniqueSet.size() != this.delegate.size()) {
 			throw this.noDuplicates();
 		}
 
