@@ -20,6 +20,7 @@ package org.batoo.jpa.core.test.fetch.lazy;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
@@ -77,6 +78,24 @@ public class LazyTest extends BaseCoreTest {
 		this.persist(LazyTest.TR);
 		this.persist(LazyTest.USA);
 		this.persist(LazyTest.UK);
+	}
+
+	private Person serializePerson(Person person) throws IOException, ClassNotFoundException {
+		final ByteArrayOutputStream s = new ByteArrayOutputStream();
+		// serialize
+		final ObjectOutputStream os = new ObjectOutputStream(s);
+		try {
+			os.writeObject(person);
+		}
+		finally {
+			os.close();
+		}
+
+		// unserialize
+		final ObjectInputStream is = new ObjectInputStream(new ByteArrayInputStream(s.toByteArray()));
+
+		final Person person2 = (Person) is.readObject();
+		return person2;
 	}
 
 	/**
@@ -198,6 +217,36 @@ public class LazyTest extends BaseCoreTest {
 	}
 
 	/**
+	 * Tests no lazy exception when lazy collection is initialized
+	 * 
+	 * @throws Exception
+	 *             in case of an error
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test(expected = PersistenceException.class)
+	public void testLazyCollection() throws Exception {
+		final Person person = this.person();
+		this.persist(person);
+
+		this.commit();
+		this.close();
+
+		Person person2 = this.find(Person.class, person.getId());
+
+		this.em().close();
+
+		Assert.assertEquals(person.getPhones().size(), person2.getPhones().size());
+
+		this.close();
+
+		person2 = this.find(Person.class, person.getId());
+		person2 = this.serializePerson(person2);
+
+		person2.getWorkPhones().size();
+	}
+
+	/**
 	 * Tests to {@link EntityManager#persist(Object)} address which does not cascade to Parent. PersistenceException expected.
 	 * 
 	 * @since $version
@@ -243,25 +292,11 @@ public class LazyTest extends BaseCoreTest {
 
 		person = this.find(Person.class, person.getId());
 
-		final ByteArrayOutputStream s = new ByteArrayOutputStream();
-		// serialize
-		final ObjectOutputStream os = new ObjectOutputStream(s);
-		try {
-			os.writeObject(person);
-		}
-		finally {
-			os.close();
-		}
-
-		// unserialize
-		final ObjectInputStream is = new ObjectInputStream(new ByteArrayInputStream(s.toByteArray()));
-
-		final Person person2 = (Person) is.readObject();
+		final Person person2 = this.serializePerson(person);
 
 		Assert.assertEquals(person.getId(), person2.getId());
 		Assert.assertEquals(person.getAddresses().size(), person2.getAddresses().size());
 		Assert.assertTrue(this.emf().getPersistenceUnitUtil().isLoaded(person2, "addresses"));
 		Assert.assertFalse(this.emf().getPersistenceUnitUtil().isLoaded(person2, "phones"));
 	}
-
 }
