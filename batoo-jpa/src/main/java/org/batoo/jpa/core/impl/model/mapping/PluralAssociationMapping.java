@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -569,12 +568,14 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 		}
 
 		final Object instance = managedInstance.getInstance();
+
 		if ((this.getInverse() != null) && (this.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_MANY)) {
-			for (final Iterator<E> i = children.iterator(); i.hasNext();) {
-				final E child = i.next();
+			final Object[] childrenToProcess = children.toArray(new Object[children.size()]);
+
+			for (final Object child : childrenToProcess) {
 				final Object newParent = this.getInverse().get(child);
 				if ((newParent != null) && (newParent != managedInstance.getInstance())) {
-					i.remove();
+					children.remove(child);
 				}
 				else {
 					this.getInverse().set(child, instance);
