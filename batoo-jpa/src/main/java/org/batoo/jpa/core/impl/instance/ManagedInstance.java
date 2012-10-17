@@ -233,36 +233,37 @@ public class ManagedInstance<X> {
 
 				switch (mapping.getAttribute().getCollectionType()) {
 					case MAP:
-						// extract the collection
+						// extract the map
 						final Map<?, ?> map = (Map<?, ?>) mapping.get(this.instance);
 
-						// cascade to each element in the collection
+						// cascade to each element in the map
 						for (final Object element : map.values()) {
 							requiresFlush |= entityManager.persistImpl(element, processed);
 						}
 
 						break;
 					case LIST:
-						// extract the collection
-						final List<?> collection = (List<?>) mapping.get(this.instance);
+						// extract the list
+						final List<?> list = (List<?>) mapping.get(this.instance);
 
-						// cascade to each element in the collection
-						for (int i = 0; i < collection.size(); i++) {
-							requiresFlush |= entityManager.persistImpl(collection.get(i), processed);
+						// cascade to each element in the list
+						for (int i = 0; i < list.size(); i++) {
+							requiresFlush |= entityManager.persistImpl(list.get(i), processed);
 						}
 
 						break;
 					default:
-						break;
-				}
-				if (mapping.getAttribute().getCollectionType() == CollectionType.MAP) {
-					// extract the collection
-					final Collection<?> collection = (Collection<?>) mapping.get(this.instance);
+						// extract the collection
+						final Collection<?> collection = (Collection<?>) mapping.get(this.instance);
 
-					// cascade to each element in the collection
-					for (final Object element : collection) {
-						requiresFlush |= entityManager.persistImpl(element, processed);
-					}
+						// cascade to each element in the collection
+
+						// cascade to each element in the collection
+						for (final Object element : collection) {
+							requiresFlush |= entityManager.persistImpl(element, processed);
+						}
+
+						break;
 				}
 			}
 			else {
