@@ -196,15 +196,15 @@ public class ManagedInstance<X> {
 
 				// cascade to each element in the collection
 				if (collection instanceof List) {
-				    final List<?> list = (List<?>) collection;
-				    for (int i = 0; i < list.size(); i++) {
-				        entityManager.detach(list.get(i));
-				    }
+					final List<?> list = (List<?>) collection;
+					for (int i = 0; i < list.size(); i++) {
+						entityManager.detach(list.get(i));
+					}
 				}
 				else {
-    				for (final Object element : collection) {
-    					entityManager.detach(element);
-    				}
+					for (final Object element : collection) {
+						entityManager.detach(element);
+					}
 				}
 			}
 			else {
@@ -267,15 +267,15 @@ public class ManagedInstance<X> {
 						// cascade to each element in the collection
 
 						if (collection instanceof List) {
-                            final List<?> castedList = (List<?>) collection;
-						    for (int i = 0; i < castedList.size(); i++) {
-                                requiresFlush |= entityManager.persistImpl(castedList.get(i), processed);
-                            }
+							final List<?> castedList = (List<?>) collection;
+							for (int i = 0; i < castedList.size(); i++) {
+								requiresFlush |= entityManager.persistImpl(castedList.get(i), processed);
+							}
 						}
 						else {
-						    for (final Object element : collection) {
-						        requiresFlush |= entityManager.persistImpl(element, processed);
-						    }
+							for (final Object element : collection) {
+								requiresFlush |= entityManager.persistImpl(element, processed);
+							}
 						}
 
 						break;
@@ -322,15 +322,15 @@ public class ManagedInstance<X> {
 
 				// cascade to each element in the collection
 				if (collection instanceof List) {
-				    final List<?> list = (List<?>) collection;
-                    for (int i = 0; i < list.size(); i++) {
-                        entityManager.remove(list.get(i));
-                    }
+					final List<?> list = (List<?>) collection;
+					for (int i = 0; i < list.size(); i++) {
+						entityManager.remove(list.get(i));
+					}
 				}
 				else {
-    				for (final Object element : collection) {
-    					entityManager.remove(element);
-    				}
+					for (final Object element : collection) {
+						entityManager.remove(element);
+					}
 				}
 			}
 			else {
@@ -887,8 +887,6 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void mergeWith(EntityManagerImpl entityManager, X entity, MutableBoolean requiresFlush, IdentityHashMap<Object, Object> processed) {
-		ManagedInstance.LOG.debug("Merging instance  {0} with {1}", this, entity);
-
 		this.snapshot();
 
 		for (final BasicMapping<?, ?> mapping : this.type.getBasicMappings()) {

@@ -280,7 +280,9 @@ public class EntityManagerImpl implements EntityManager {
 	public boolean contains(Object entity) {
 		this.assertOpen();
 
-		return this.session.get(entity) != null;
+		final ManagedInstance<Object> instance = this.session.get(entity);
+
+		return (instance != null) && (instance.getInstance() == entity);
 	}
 
 	/**
@@ -1062,7 +1064,7 @@ public class EntityManagerImpl implements EntityManager {
 		if (entity instanceof EnhancedInstance) {
 			final EnhancedInstance enhancedInstance = (EnhancedInstance) entity;
 			final ManagedInstance<?> instance = enhancedInstance.__enhanced__$$__getManagedInstance();
-			if (instance.getStatus() == Status.DETACHED) {
+			if ((instance != null) & (instance.getStatus() == Status.DETACHED)) {
 				throw new IllegalArgumentException("Entity has been previously detached");
 			}
 		}
