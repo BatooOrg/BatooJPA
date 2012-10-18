@@ -59,6 +59,30 @@ public class BatooUtils {
 	}
 
 	/**
+	 * Adds all the elements in the source to target.
+	 * 
+	 * @param source
+	 *            the source collection
+	 * @param target
+	 *            the destination collection
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static void addAll(Collection source, Collection target) {
+		if (source instanceof List) {
+			final List<?> list = (List<?>) source;
+			for (int i = 0; i < list.size(); i++) {
+				target.add(list.get(i));
+			}
+		}
+		else {
+			target.addAll(source);
+		}
+	}
+
+	/**
 	 * Indents the <code>string</code> by one <code>tab</code>.
 	 * 
 	 * @param str
@@ -102,7 +126,7 @@ public class BatooUtils {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public static <X> Collection<X> subtract(final Collection<X> a, final Collection<X> b) {
+	public static <X> List<X> subtract(final Collection<X> a, final Collection<X> b) {
 		final List<X> list = Lists.newArrayList(a);
 
 		for (final Object element : b) {

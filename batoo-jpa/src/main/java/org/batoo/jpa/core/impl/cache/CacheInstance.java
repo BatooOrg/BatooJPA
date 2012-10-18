@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.impl.cache;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -169,8 +170,9 @@ public class CacheInstance implements Serializable {
 		}
 
 		try {
-			final Collection childEntities = Lists.newArrayList();
-			for (final CacheReference childReference : children) {
+			final ArrayList childEntities = Lists.newArrayList();
+			for (int i = 0; i < children.size(); i++) {
+				final CacheReference childReference = children.get(i);
 				final EntityTypeImpl<?> childType = metamodel.entity(childReference.getType());
 				final Object child = entityManager.find(childType.getJavaType(), childReference.getId());
 
@@ -272,8 +274,16 @@ public class CacheInstance implements Serializable {
 		}
 
 		// populate the reference list and put to cache
-		for (final Object child : collection.getDelegate()) {
-			references.add(new CacheReference(metamodel, child));
+		if (collection.getDelegate() instanceof List) {
+			final List<?> delegateList = (List<?>) collection.getDelegate();
+			for (int i = 0; i < delegateList.size(); i++) {
+				references.add(new CacheReference(metamodel, delegateList.get(i)));
+			}
+		}
+		else {
+			for (final Object child : collection.getDelegate()) {
+				references.add(new CacheReference(metamodel, child));
+			}
 		}
 
 		this.pluralMappings.put(mapping.getPath(), references);

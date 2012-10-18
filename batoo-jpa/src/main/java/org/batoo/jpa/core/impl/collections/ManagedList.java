@@ -36,6 +36,7 @@ import org.batoo.jpa.core.impl.jdbc.Joinable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
+import org.batoo.jpa.util.BatooUtils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -182,16 +183,31 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	public ManagedList(PluralMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
 		super(mapping, managedInstance);
 
-		this.delegate = Lists.newArrayList(values);
+		this.delegate = Lists.newArrayList();
 
 		final HashSet<Object> uniqueSet = Sets.newHashSet();
-		for (int i = 0; i < this.delegate.size(); i++) {
-			final E child = this.delegate.get(i);
-			if (child == null) {
-				throw new NullPointerException("Instance " + this.getManagedInstance() + " has null items in its collection " + this.getMapping().getPath());
-			}
 
-			uniqueSet.add(child);
+		if (values instanceof List) {
+			final ArrayList<? extends E> valuesList = (ArrayList<? extends E>) values;
+			for (int i = 0; i < valuesList.size(); i++) {
+				final E child = valuesList.get(i);
+				if (child == null) {
+					throw new NullPointerException("Instance " + this.getManagedInstance() + " has null items in its collection " + this.getMapping().getPath());
+				}
+
+				this.delegate.add(child);
+				uniqueSet.add(child);
+			}
+		}
+		else {
+			for (final E child : values) {
+				if (child == null) {
+					throw new NullPointerException("Instance " + this.getManagedInstance() + " has null items in its collection " + this.getMapping().getPath());
+				}
+
+				this.delegate.add(child);
+				uniqueSet.add(child);
+			}
 		}
 
 		if (uniqueSet.size() != this.delegate.size()) {
@@ -252,9 +268,19 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	public boolean addAll(Collection<? extends E> c) {
 		this.snapshot();
 
-		for (final E e : c) {
-			if (this.delegate.contains(e)) {
-				throw this.noDuplicates();
+		if (c instanceof List) {
+			final List<? extends E> list = (List<? extends E>) c;
+			for (int i = 0; i < list.size(); i++) {
+				if (this.delegate.contains(list.get(i))) {
+					throw this.noDuplicates();
+				}
+			}
+		}
+		else {
+			for (final E e : c) {
+				if (this.delegate.contains(e)) {
+					throw this.noDuplicates();
+				}
 			}
 		}
 
@@ -274,9 +300,19 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	public boolean addAll(int index, Collection<? extends E> c) {
 		this.snapshot();
 
-		for (final E e : c) {
-			if (this.delegate.contains(e)) {
-				throw this.noDuplicates();
+		if (c instanceof List) {
+			final List<? extends E> list = (List<? extends E>) c;
+			for (int i = 0; i < list.size(); i++) {
+				if (this.delegate.contains(list.get(i))) {
+					throw this.noDuplicates();
+				}
+			}
+		}
+		else {
+			for (final E e : c) {
+				if (this.delegate.contains(e)) {
+					throw this.noDuplicates();
+				}
 			}
 		}
 
@@ -490,7 +526,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 
 			if (!(mapping instanceof PluralAssociationMapping) //
 				|| !managedInstance.tryLoadFromCache((PluralAssociationMapping<?, ?, ?>) mapping)) {
-				this.delegate.addAll(mapping.loadCollection(managedInstance));
+				BatooUtils.addAll(mapping.loadCollection(managedInstance), this.delegate);
 				mapping.sortList(managedInstance.getInstance());
 
 				this.initialized = true;

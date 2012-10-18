@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.CacheRetrieveMode;
@@ -179,8 +180,16 @@ public class EntityManagerImpl implements EntityManager {
 
 				if (children != null) {
 					// iterate over children and merge them all
-					for (final Object child : children) {
-						this.mergeImpl(child, requiresFlush, processed, association.cascadesMerge());
+					if (children instanceof List) {
+						final List<?> childrenList = (List<?>) children;
+						for (int i = 0; i < childrenList.size(); i++) {
+							this.mergeImpl(childrenList.get(i), requiresFlush, processed, association.cascadesMerge());
+						}
+					}
+					else {
+						for (final Object child : children) {
+							this.mergeImpl(child, requiresFlush, processed, association.cascadesMerge());
+						}
 					}
 				}
 			}

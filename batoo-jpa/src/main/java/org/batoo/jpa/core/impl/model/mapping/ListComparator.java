@@ -113,7 +113,8 @@ public class ListComparator<E> implements Comparator<E> {
 	 */
 	@Override
 	public int compare(E o1, E o2) {
-		for (final ComparableMapping mapping : this.comparables) {
+		for (int i = 0; i < this.comparables.size(); i++) {
+			final ComparableMapping mapping = this.comparables.get(i);
 			final Object v1 = mapping.getMapping().get(o1);
 			final Object v2 = mapping.getMapping().get(o2);
 

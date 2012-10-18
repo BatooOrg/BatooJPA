@@ -21,8 +21,10 @@ package org.batoo.jpa.core.impl.collections;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.mutable.MutableBoolean;
@@ -214,7 +216,7 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 */
 	@SuppressWarnings("unchecked")
 	public void mergeWith(EntityManagerImpl entityManager, Object instance, MutableBoolean requiresFlush, IdentityHashMap<Object, Object> processed) {
-		final Collection<E> mergedChildren = Lists.newArrayList();
+		final ArrayList<E> mergedChildren = Lists.newArrayList();
 
 		final Object children = this.mapping.get(instance);
 
@@ -241,7 +243,8 @@ public abstract class ManagedCollection<E> implements Serializable {
 
 		// TODO needs to be overriden by ManagedMap
 		// add the new children
-		for (final E child : mergedChildren) {
+		for (int i = 0; i < mergedChildren.size(); i++) {
+			final E child = mergedChildren.get(i);
 			if (!delegate.contains(child)) {
 				this.getDelegate().add(child);
 
@@ -254,7 +257,9 @@ public abstract class ManagedCollection<E> implements Serializable {
 		}
 
 		// remove the non existent children
-		for (final E child : Lists.newArrayList(delegate)) {
+		final ArrayList<E> delegateList = Lists.newArrayList(delegate);
+		for (int i = 0; i < delegateList.size(); i++) {
+			final E child = delegateList.get(i);
 			if (!mergedChildren.contains(child)) {
 				this.removeChild(child);
 
@@ -339,9 +344,9 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 * @author hceylan
 	 */
 	public void removeOrphans(EntityManagerImpl entityManager) {
-		final Collection<E> removed = BatooUtils.subtract(this.getSnapshot(), this.getDelegate());
-		for (final E e : removed) {
-			entityManager.remove(e);
+		final List<E> removed = BatooUtils.subtract(this.getSnapshot(), this.getDelegate());
+		for (int i = 0; i < removed.size(); i++) {
+			entityManager.remove(removed.get(i));
 		}
 	}
 

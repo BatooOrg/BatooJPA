@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.cache;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -364,17 +365,19 @@ public class CacheImpl implements Cache {
 	public void put(String sql, Object[] parameters, List<?> results) {
 		final MetamodelImpl metamodel = this.emf.getMetamodel();
 
-		final List<CacheReference[]> references = Lists.newArrayList();
+		final ArrayList<CacheReference[]> references = Lists.newArrayList();
 
-		for (final Object result : results) {
+		for (int i = 0; i < results.size(); i++) {
+			final Object result = results.get(i);
+
 			CacheReference[] referenceArray;
 
 			if (result instanceof Object[]) {
 				final Object[] resultArray = (Object[]) result;
 				referenceArray = new CacheReference[resultArray.length];
 
-				for (int i = 0; i < resultArray.length; i++) {
-					referenceArray[i] = new CacheReference(metamodel, resultArray[i]);
+				for (int j = 0; j < resultArray.length; j++) {
+					referenceArray[j] = new CacheReference(metamodel, resultArray[j]);
 				}
 			}
 			else {

@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.PersistenceException;
@@ -264,9 +265,9 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 
 		if (removals) {
 			// delete the removals
-			final Collection<E> childrenRemoved = BatooUtils.subtract(this.snapshot, this.delegate);
-			for (final E child : childrenRemoved) {
-				mapping.detach(connection, managedInstance, null, child);
+			final List<E> childrenRemoved = BatooUtils.subtract(this.snapshot, this.delegate);
+			for (int i = 0; i < childrenRemoved.size(); i++) {
+				mapping.detach(connection, managedInstance, null, childrenRemoved.get(i));
 			}
 		}
 		else {

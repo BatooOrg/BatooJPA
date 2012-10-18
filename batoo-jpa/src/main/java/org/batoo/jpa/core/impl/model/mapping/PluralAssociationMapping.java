@@ -58,6 +58,7 @@ import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.PluralAttributeMetadata;
+import org.batoo.jpa.util.BatooUtils;
 
 import com.google.common.collect.Lists;
 
@@ -172,7 +173,13 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 
 		final SessionImpl session = managedInstance.getSession();
 
-		if (values instanceof Collection) {
+		if (values instanceof List) {
+			final List<E> list = (List<E>) values;
+			for (int i = 0; i < list.size(); i++) {
+				session.checkTransient(list.get(i));
+			}
+		}
+		else if (values instanceof Collection) {
 			for (final Object entity : ((Collection<E>) values).toArray()) {
 				session.checkTransient(entity);
 			}
@@ -538,7 +545,8 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 
 			final Collection<E> collection = (Collection<E>) cacheInstance.getCollection(managedInstance, this);
 			if (collection != null) {
-				children = Lists.newArrayList(collection);
+				children = Lists.newArrayList();
+				BatooUtils.addAll(collection, children);
 			}
 		}
 
@@ -669,8 +677,16 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 		collection.refreshChildren();
 
 		if (this.cascadesRefresh()) {
-			for (final E child : collection.getDelegate()) {
-				entityManager.refresh(child);
+			if (collection.getDelegate() instanceof List) {
+				final List<E> list = (List<E>) collection.getDelegate();
+				for (int i = 0; i < list.size(); i++) {
+					entityManager.refresh(list.get(i));
+				}
+			}
+			else {
+				for (final E child : collection.getDelegate()) {
+					entityManager.refresh(child);
+				}
 			}
 		}
 	}
@@ -703,7 +719,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	public void setCollection(ManagedInstance<?> instance, Collection<? extends E> children) {
 		final ManagedCollection<E> collection = (ManagedCollection<E>) this.attribute.newCollection(this, instance, false);
 
-		collection.getDelegate().addAll(children);
+		BatooUtils.addAll(children, collection.getDelegate());
 
 		this.set(instance.getInstance(), collection);
 	}

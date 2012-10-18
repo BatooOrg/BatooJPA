@@ -386,8 +386,8 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 	public AbstractQuery<T> groupBy(List<Expression<?>> grouping) {
 		this.groupList.clear();
 
-		for (final Expression<?> expression : grouping) {
-			this.groupList.add((AbstractExpression<?>) expression);
+		for (int i = 0; i < grouping.size(); i++) {
+			this.groupList.add((AbstractExpression<?>) grouping.get(i));
 		}
 
 		return this;
