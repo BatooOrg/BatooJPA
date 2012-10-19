@@ -22,6 +22,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 import java.util.Set;
 
+import javax.persistence.Version;
+
 import org.batoo.jpa.parser.metadata.attribute.VersionAttributeMetadata;
 
 /**
@@ -45,6 +47,8 @@ public class VersionAttributeMetadataImpl extends PhysicalAttributeMetadataImpl 
 	 */
 	public VersionAttributeMetadataImpl(Member member, String name, Set<Class<? extends Annotation>> parsed) {
 		super(member, name, parsed);
+
+		parsed.add(Version.class);
 	}
 
 	/**
@@ -59,5 +63,4 @@ public class VersionAttributeMetadataImpl extends PhysicalAttributeMetadataImpl 
 	public VersionAttributeMetadataImpl(Member member, VersionAttributeMetadata metadata) {
 		super(member, metadata);
 	}
-
 }

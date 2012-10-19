@@ -668,9 +668,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 					return new TransientAttributeMetadataImpl(member, metadata);
 				}
 				else {
-					parsed.add(Transient.class);
-
-					return new TransientAttributeMetadataImpl(member, name);
+					return new TransientAttributeMetadataImpl(member, name, parsed);
 				}
 			}
 		};

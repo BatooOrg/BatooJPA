@@ -127,6 +127,8 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	public ElementCollectionAttributeMetadataImpl(Member member, String name, ElementCollection elementCollection, Set<Class<? extends Annotation>> parsed) {
 		super(member, name);
 
+		parsed.add(ElementCollection.class);
+
 		this.targetClass = "void".equals(elementCollection.targetClass()) ? null : elementCollection.targetClass().getName();
 		this.fetchType = elementCollection.fetch();
 

@@ -27,6 +27,7 @@ import javax.persistence.AssociationOverride;
 import javax.persistence.AssociationOverrides;
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
+import javax.persistence.Embedded;
 
 import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.parser.impl.metadata.AssociationOverrideMetadataImpl;
@@ -77,6 +78,8 @@ public class EmbeddedAttributeMetadataImpl extends AttributeMetadataImpl impleme
 	 */
 	public EmbeddedAttributeMetadataImpl(Member member, String name, Set<Class<? extends Annotation>> parsed) {
 		super(member, name);
+
+		parsed.add(Embedded.class);
 
 		// if there is AttributesOverrides annotation use it
 		final AttributeOverrides attributeOverrides = ReflectHelper.getAnnotation(member, AttributeOverrides.class);

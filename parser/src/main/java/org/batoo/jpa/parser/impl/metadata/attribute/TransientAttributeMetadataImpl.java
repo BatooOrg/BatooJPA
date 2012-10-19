@@ -18,7 +18,11 @@
  */
 package org.batoo.jpa.parser.impl.metadata.attribute;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
+import java.util.Set;
+
+import javax.persistence.Transient;
 
 import org.batoo.jpa.parser.metadata.attribute.TransientAttributeMetadata;
 
@@ -35,12 +39,16 @@ public class TransientAttributeMetadataImpl extends AttributeMetadataImpl implem
 	 *            the java member of transient attribute
 	 * @param name
 	 *            the name of the transient attribute
+	 * @param parsed
+	 *            the annotations parsed
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public TransientAttributeMetadataImpl(Member member, String name) {
+	public TransientAttributeMetadataImpl(Member member, String name, Set<Class<? extends Annotation>> parsed) {
 		super(member, name);
+
+		parsed.add(Transient.class);
 	}
 
 	/**
