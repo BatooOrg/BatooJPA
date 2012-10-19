@@ -18,16 +18,20 @@
  */
 package org.batoo.jpa.core.jdbc.adapter;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -64,6 +68,7 @@ import org.batoo.jpa.util.BatooUtils;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -1027,18 +1032,14 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 			return;
 		}
 
+		final String sql;
 		try {
-			// TODO large sql may generate error better split into chunks
-			final String sql = IOUtils.toString(is);
-
-			JdbcAdaptor.LOG.info("Executing import sql: {0}", importSqlFileName);
-
-			new QueryRunner(dataSource, this.isPmdBroken()).update(sql);
-
-			JdbcAdaptor.LOG.info("Import successful.");
+			sql = IOUtils.toString(is);
 		}
 		catch (final Exception e) {
-			JdbcAdaptor.LOG.error("Cannot load the import sql resource: {0}", importSqlFileName);
+			JdbcAdaptor.LOG.error(e, "Cannot load the import sql resource: {0}", importSqlFileName);
+
+			return;
 		}
 		finally {
 			try {
@@ -1046,6 +1047,55 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 			}
 			catch (final IOException e) {}
 		}
+
+		JdbcAdaptor.LOG.info("Executing import sql: {0}", importSqlFileName);
+
+		try {
+			final Connection connection = dataSource.getConnection();
+
+			try {
+				connection.setAutoCommit(false);
+
+				final Statement statement = connection.createStatement();
+				try {
+					final BufferedReader reader = new BufferedReader(new StringReader(sql));
+
+					String line = null;
+					while ((line = reader.readLine()) != null) {
+						final String sqlLine = line.trim();
+
+						if (sqlLine.startsWith("--")) {
+							continue;
+						}
+						if (sqlLine.startsWith("//")) {
+							continue;
+						}
+						if (sqlLine.startsWith("/*")) {
+							continue;
+						}
+
+						final Iterator<String> statements = Splitter.on(";").split(sqlLine).iterator();
+
+						while (statements.hasNext()) {
+							statement.execute(statements.next());
+						}
+					}
+
+					connection.setAutoCommit(true);
+				}
+				finally {
+					DbUtils.closeQuietly(statement);
+				}
+			}
+			finally {
+				DbUtils.closeQuietly(connection);
+			}
+		}
+		catch (final Exception e) {
+			JdbcAdaptor.LOG.error(e, "Error executing import sql: {0}", importSqlFileName);
+		}
+
+		JdbcAdaptor.LOG.info("Import successful.");
 	}
 
 	/**
