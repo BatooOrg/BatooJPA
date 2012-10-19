@@ -188,7 +188,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 		final HashSet<Object> uniqueSet = Sets.newHashSet();
 
 		if (values instanceof List) {
-			final ArrayList<? extends E> valuesList = (ArrayList<? extends E>) values;
+			final List<? extends E> valuesList = (List<? extends E>) values;
 			for (int i = 0; i < valuesList.size(); i++) {
 				final E child = valuesList.get(i);
 				if (child == null) {
