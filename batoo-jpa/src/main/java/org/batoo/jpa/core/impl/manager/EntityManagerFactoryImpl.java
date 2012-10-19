@@ -153,7 +153,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		}
 
 		this.dataSource = new DataSourceProxy(this.createDatasource(parser), sqlLogging, slowSqlThreshold);
-		
+
 		this.cache = new CacheImpl(this, parser.getSharedCacheMode());
 
 		this.ddlMode = this.readDdlMode();
@@ -179,6 +179,8 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		NamedQueriesManager.perform(this.metamodel, this.criteriaBuilder);
 
 		this.persistenceUtil = new PersistenceUnitUtilImpl(this);
+
+		this.jdbcAdaptor.importSql(this.classloader, this.dataSource, (String) this.getProperties().get(BJPASettings.IMPORT_SQL));
 
 		this.open = true;
 	}

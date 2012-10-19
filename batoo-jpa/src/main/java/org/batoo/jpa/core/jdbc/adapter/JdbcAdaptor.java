@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.jdbc.adapter;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -997,6 +998,54 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Executes the initial import sql.
+	 * 
+	 * @param classLoader
+	 *            the class loader
+	 * @param dataSource
+	 *            the datasource
+	 * @param importSqlFileName
+	 *            the name of the import sql
+	 * 
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void importSql(ClassLoader classLoader, DataSource dataSource, String importSqlFileName) {
+		// no import sql
+		if (StringUtils.isBlank(importSqlFileName)) {
+			return;
+		}
+
+		final InputStream is = classLoader.getResourceAsStream(importSqlFileName);
+		if (is == null) {
+			JdbcAdaptor.LOG.error("Cannot load the import sql resource: {0}", importSqlFileName);
+
+			return;
+		}
+
+		try {
+			// TODO large sql may generate error better split into chunks
+			final String sql = IOUtils.toString(is);
+
+			JdbcAdaptor.LOG.info("Executing import sql: {0}", importSqlFileName);
+
+			new QueryRunner(dataSource, this.isPmdBroken()).update(sql);
+
+			JdbcAdaptor.LOG.info("Import successful.");
+		}
+		catch (final Exception e) {
+			JdbcAdaptor.LOG.error("Cannot load the import sql resource: {0}", importSqlFileName);
+		}
+		finally {
+			try {
+				is.close();
+			}
+			catch (final IOException e) {}
+		}
 	}
 
 	/**

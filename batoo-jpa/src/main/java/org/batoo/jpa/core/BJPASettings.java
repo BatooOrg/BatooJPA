@@ -83,4 +83,9 @@ public interface BJPASettings {
 	 * The min size of the connection pool.
 	 */
 	final String MIN_CONNECTIONS = "org.batoo.jdbc.min_connections";
+
+	/**
+	 * The name of the sql to execute to import the initial data.
+	 */
+	final String IMPORT_SQL = "org.batoo.jdbc.import_sql";
 }
