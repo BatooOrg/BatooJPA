@@ -329,6 +329,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 			dataSource.setStatementsCacheSize(statementsCacheSize);
 			dataSource.setMinConnectionsPerPartition(minConnections);
 			dataSource.setMaxConnectionsPerPartition(maxConnections);
+			dataSource.setDisableConnectionTracking(true);
 
 			return dataSource;
 		}
