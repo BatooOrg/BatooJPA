@@ -33,6 +33,7 @@ import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.Status;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
@@ -214,7 +215,7 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void mergeWith(EntityManagerImpl entityManager, Object instance, MutableBoolean requiresFlush, IdentityHashMap<Object, Object> processed) {
 		final ArrayList<E> mergedChildren = Lists.newArrayList();
 
@@ -241,6 +242,9 @@ public abstract class ManagedCollection<E> implements Serializable {
 
 		final SessionImpl session = entityManager.getSession();
 
+		final PluralAssociationMapping<?, ?, ?> inversePluralMapping = (this.inverse != null) && (this.inverse.getAttribute() instanceof PluralAttributeImpl) ? //
+			(PluralAssociationMapping<?, ?, ?>) this.inverse : null;
+
 		// TODO needs to be overriden by ManagedMap
 		// add the new children
 		for (int i = 0; i < mergedChildren.size(); i++) {
@@ -249,7 +253,15 @@ public abstract class ManagedCollection<E> implements Serializable {
 				this.getDelegate().add(child);
 
 				if (this.inverse != null) {
-					this.inverse.set(session.get(child).getInstance(), this.managedInstance.getInstance());
+					if (inversePluralMapping != null) {
+						final Collection inverseCollection = (Collection<?>) inversePluralMapping.get(child);
+						if (!inverseCollection.contains(this.managedInstance.getInstance())) {
+							inverseCollection.add(this.managedInstance.getInstance());
+						}
+					}
+					else {
+						this.inverse.set(session.get(child).getInstance(), this.managedInstance.getInstance());
+					}
 				}
 
 				changed = true;
@@ -264,7 +276,13 @@ public abstract class ManagedCollection<E> implements Serializable {
 				this.removeChild(child);
 
 				if (this.inverse != null) {
-					this.inverse.set(session.get(child).getInstance(), null);
+					if (inversePluralMapping != null) {
+						final Collection inverseCollection = (Collection<?>) inversePluralMapping.get(child);
+						inverseCollection.remove(this.managedInstance.getInstance());
+					}
+					else {
+						this.inverse.set(session.get(child).getInstance(), null);
+					}
 				}
 
 				changed = true;
