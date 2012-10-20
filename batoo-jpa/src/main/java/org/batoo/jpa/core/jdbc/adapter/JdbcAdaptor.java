@@ -1067,17 +1067,24 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 						if (sqlLine.startsWith("--")) {
 							continue;
 						}
-						if (sqlLine.startsWith("//")) {
+						else if (sqlLine.startsWith("//")) {
 							continue;
 						}
-						if (sqlLine.startsWith("/*")) {
+						else if (sqlLine.startsWith("/*")) {
 							continue;
 						}
 
-						final Iterator<String> statements = Splitter.on(";").split(sqlLine).iterator();
+						final Iterator<String> statements = Splitter.on(";").omitEmptyStrings().split(sqlLine).iterator();
 
 						while (statements.hasNext()) {
-							statement.execute(statements.next());
+							try {
+								statement.execute(statements.next());
+							}
+							catch (final SQLException e) {
+								JdbcAdaptor.LOG.error("Error executing sql import fragment: {0}", sqlLine);
+
+								throw e;
+							}
 						}
 					}
 
