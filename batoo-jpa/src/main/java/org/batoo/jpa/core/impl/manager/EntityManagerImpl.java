@@ -32,6 +32,7 @@ import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.persistence.TransactionRequiredException;
@@ -888,7 +889,11 @@ public class EntityManagerImpl implements EntityManager {
 
 		// if it has an id try to locate instance in the database
 		if (id != null) {
-			final T existingEntity = this.find((Class<T>) clazz, id);
+			T existingEntity = null;
+			try {
+				existingEntity = this.find((Class<T>) clazz, id);
+			}
+			catch (final NoResultException e) {}
 
 			// if it is found in the database then merge and return
 			if (existingEntity != null) {
