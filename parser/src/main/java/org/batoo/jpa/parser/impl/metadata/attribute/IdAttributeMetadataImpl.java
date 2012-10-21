@@ -89,9 +89,8 @@ public class IdAttributeMetadataImpl extends PhysicalAttributeMetadataImpl imple
 		parsed.add(GeneratedValue.class);
 
 		this.generatedValue = generatedValue != null ? new GeneratedValueMetadataImpl(this.getLocator(), generatedValue) : null;
-		this.tableGenerator = this.tableGenerator != null ? new TableGeneratorMetadataImpl(this.getLocator(), tableGenerator) : null;
-		this.sequenceGenerator = this.sequenceGenerator != null ? new SequenceGeneratorMetadataImpl(this.getLocator(), sequenceGenerator)
-			: null;
+		this.tableGenerator = tableGenerator != null ? new TableGeneratorMetadataImpl(this.getLocator(), tableGenerator) : null;
+		this.sequenceGenerator = sequenceGenerator != null ? new SequenceGeneratorMetadataImpl(this.getLocator(), sequenceGenerator) : null;
 	}
 
 	/**
