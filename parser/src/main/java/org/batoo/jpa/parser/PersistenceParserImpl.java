@@ -92,6 +92,10 @@ public class PersistenceParserImpl implements PersistenceParser {
 			this.properties.put((String) entry.getKey(), entry.getValue());
 		}
 
+		for (final Entry<String, Object> entry : properties.entrySet()) {
+			this.properties.put(entry.getKey(), entry.getValue());
+		}
+
 		this.hasValidators = (puInfo.getValidationMode() == ValidationMode.AUTO) || (puInfo.getValidationMode() == ValidationMode.CALLBACK);
 		this.metadata = new MetadataImpl();
 		this.ormMappingFiles = puInfo.getMappingFileNames();
