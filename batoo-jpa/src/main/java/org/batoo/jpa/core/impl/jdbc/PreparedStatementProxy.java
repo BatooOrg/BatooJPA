@@ -971,7 +971,7 @@ public class PreparedStatementProxy implements PreparedStatement {
 	 */
 	@Override
 	public void setNull(int parameterIndex, int sqlType) throws SQLException {
-		if (this.debug && (this.parameters != null)) {
+		if ((this.debug || (this.sqlStream != null)) && (this.parameters != null)) {
 			this.parameters[parameterIndex - 1] = null;
 		}
 
@@ -993,7 +993,7 @@ public class PreparedStatementProxy implements PreparedStatement {
 	 */
 	@Override
 	public void setObject(int parameterIndex, Object x) throws SQLException {
-		if (this.debug && (this.parameters != null)) {
+		if ((this.debug || (this.sqlStream != null)) && (this.parameters != null)) {
 			this.parameters[parameterIndex - 1] = x;
 		}
 
