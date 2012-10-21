@@ -758,7 +758,7 @@ public class ManagedInstance<X> {
 
 				break;
 			case SHORT_OBJECT:
-				final Short shortObjValue = version.get(this.instance) == null ? 0 //
+				final Short shortObjValue = version.get(this.instance) == null ? 1 //
 					: new Short((short) (((Number) version.get(this.instance)).shortValue() + 1));
 				version.set(this.instance, shortObjValue);
 
@@ -774,7 +774,7 @@ public class ManagedInstance<X> {
 
 				break;
 			case INT_OBJECT:
-				final Integer intObjValue = version.get(this.instance) == null ? 0 : //
+				final Integer intObjValue = version.get(this.instance) == null ? 1 : //
 					new Integer((((Number) version.get(this.instance)).intValue() + 1));
 				version.set(this.instance, intObjValue);
 
@@ -790,7 +790,7 @@ public class ManagedInstance<X> {
 
 				break;
 			case LONG_OBJECT:
-				final Long longObjValue = version.get(this.instance) == null ? 0 : //
+				final Long longObjValue = version.get(this.instance) == null ? 1l : //
 					new Long((((Number) version.get(this.instance)).longValue() + 1));
 				version.set(this.instance, longObjValue);
 
