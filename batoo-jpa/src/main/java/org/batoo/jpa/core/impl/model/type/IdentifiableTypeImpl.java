@@ -322,7 +322,9 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 			return (SingularAttribute<? super X, Y>) this.idAttributes.values().iterator().next();
 		}
 
-		return null;
+		final SingularAttributeImpl<? super X, Y> attribute = (SingularAttributeImpl<? super X, Y>) this.idAttributes.values().iterator().next();
+
+		return attribute.getJavaType() == type ? attribute : null;
 	}
 
 	/**
