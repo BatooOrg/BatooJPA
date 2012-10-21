@@ -21,12 +21,13 @@ package org.batoo.jpa.parser;
 import java.util.Map;
 
 import javax.persistence.SharedCacheMode;
+import javax.sql.DataSource;
 
 import org.batoo.jpa.parser.impl.metadata.MetadataImpl;
 
 /**
  * 
- *
+ * 
  * @author hceylan
  * @since $version
  */
@@ -50,7 +51,7 @@ public interface PersistenceParser {
 	 * @since $version
 	 * @author hceylan
 	 */
-	String getJtaDatasource();
+	DataSource getJtaDatasource();
 
 	/**
 	 * Returns the metadata of the parser.
@@ -70,7 +71,7 @@ public interface PersistenceParser {
 	 * @since $version
 	 * @author hceylan
 	 */
-	String getNonJtaDatasource();
+	DataSource getNonJtaDatasource();
 
 	/**
 	 * Returns the properties of the persistence unit.

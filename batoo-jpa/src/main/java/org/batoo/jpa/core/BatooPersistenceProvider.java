@@ -26,7 +26,6 @@ import javax.persistence.spi.PersistenceProvider;
 import javax.persistence.spi.PersistenceUnitInfo;
 import javax.persistence.spi.ProviderUtil;
 
-import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.BatooException;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
@@ -66,9 +65,9 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 	@SuppressWarnings("rawtypes")
 	public EntityManagerFactoryImpl createContainerEntityManagerFactory(PersistenceUnitInfo info, Map map) {
 		try {
-			final PersistenceParser parser = new org.batoo.jpa.parser.PersistenceParserImpl(info, null);
+			final PersistenceParser parser = new org.batoo.jpa.parser.PersistenceParserImpl(info, map);
 
-			return StringUtils.isNotBlank(parser.getJtaDatasource()) ? //
+			return parser.getJtaDatasource() != null ? //
 				new org.batoo.jpa.core.impl.manager.JtaEntityManagerFactoryImpl(info.getPersistenceUnitName(), parser) : new EntityManagerFactoryImpl(
 					info.getPersistenceUnitName(), parser);
 		}

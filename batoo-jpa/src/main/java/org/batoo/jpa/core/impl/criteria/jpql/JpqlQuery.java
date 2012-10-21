@@ -727,8 +727,8 @@ public class JpqlQuery {
 			}
 
 			try {
-				return cb.construct(Class.forName(className.toString()), //
-					childSelections.toArray(new Selection[childSelections.size()]));
+				final Class<?> clazz = this.metamodel.getEntityManagerFactory().getClassloader().loadClass(className);
+				return cb.construct(clazz, childSelections.toArray(new Selection[childSelections.size()]));
 			}
 			catch (final ClassNotFoundException e) {
 				throw new PersistenceException("Cannot load class: " + className + ", line " + selectDef.getLine() + ":" + selectDef.getCharPositionInLine());

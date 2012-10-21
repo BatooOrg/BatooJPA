@@ -19,14 +19,14 @@
 package org.batoo.jpa.parser;
 
 import java.io.InputStream;
-import java.net.URL;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.persistence.SharedCacheMode;
+import javax.persistence.ValidationMode;
 import javax.persistence.spi.PersistenceUnitInfo;
+import javax.sql.DataSource;
 
 import org.batoo.jpa.common.BatooException;
 import org.batoo.jpa.common.log.BLogger;
@@ -39,6 +39,7 @@ import org.batoo.jpa.parser.persistence.Persistence.PersistenceUnit.Properties.P
 import org.batoo.jpa.parser.persistence.PersistenceUnitCachingType;
 import org.batoo.jpa.parser.persistence.PersistenceUnitValidationModeType;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
@@ -62,69 +63,94 @@ public class PersistenceParserImpl implements PersistenceParser {
 	private static final BLogger LOG = BLoggerFactory.getLogger(PersistenceParserImpl.class);
 
 	private final String puName;
-	private final PersistenceUnitInfo persistenceUnitInfo;
 	private final ClassLoader classloader;
 	private final MetadataImpl metadata;
-	private final PersistenceUnit persistenceUnit;
 	private final Map<String, Object> properties = Maps.newHashMap();
+	private final List<String> ormMappingFiles;
 
 	private final boolean hasValidators;
+	private final SharedCacheMode sharedCacheMode;
+	private final DataSource jtaDataSource;
+	private final DataSource nonJtaDataSource;
 
 	/**
-	 * @param persistenceUnitName
-	 *            the name of the persistence unit
-	 * @param persistenceUnitInfo
+	 * @param puInfo
 	 *            the persistence unit info
+	 * @param properties
+	 *            the properties of the persistence unit
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PersistenceParserImpl(PersistenceUnitInfo persistenceUnitInfo, String persistenceUnitName) {
+	public PersistenceParserImpl(PersistenceUnitInfo puInfo, Map<String, Object> properties) {
 		super();
 
-		this.persistenceUnitInfo = persistenceUnitInfo;
+		this.puName = puInfo.getPersistenceUnitName();
+		this.classloader = puInfo.getClassLoader();
 
-		if (this.persistenceUnitInfo != null) {
-			this.puName = this.persistenceUnitInfo.getPersistenceUnitName();
-			this.classloader = this.persistenceUnitInfo.getClassLoader();
-		}
-		else {
-			this.puName = persistenceUnitName;
-			this.classloader = Thread.currentThread().getContextClassLoader();
+		for (final Entry<Object, Object> entry : puInfo.getProperties().entrySet()) {
+			this.properties.put((String) entry.getKey(), entry.getValue());
 		}
 
-		// initialize the persistence unit
-		this.persistenceUnit = this.createPersistenceUnit();
-		this.readProperties();
-
-		this.hasValidators = (this.persistenceUnit.getValidationMode() == PersistenceUnitValidationModeType.AUTO)
-			|| (this.persistenceUnit.getValidationMode() == PersistenceUnitValidationModeType.CALLBACK);
-
-		this.metadata = new MetadataImpl(this.persistenceUnit.getClazzs());
+		this.hasValidators = (puInfo.getValidationMode() == ValidationMode.AUTO) || (puInfo.getValidationMode() == ValidationMode.CALLBACK);
+		this.metadata = new MetadataImpl();
+		this.ormMappingFiles = puInfo.getMappingFileNames();
 
 		this.parseOrmXmls();
-		if (this.persistenceUnitInfo != null) {
-			List<URL> jarFiles = this.persistenceUnitInfo.getJarFileUrls();
-			if (jarFiles == null) {
-				jarFiles = Collections.emptyList();
-			}
 
-			this.metadata.parse(jarFiles, this.classloader);
-		}
-		else {
-			this.metadata.parse(this.classloader);
-		}
+		this.metadata.parse(puInfo.getJarFileUrls(), this.classloader);
+		this.sharedCacheMode = puInfo.getSharedCacheMode();
+		this.jtaDataSource = puInfo.getJtaDataSource();
+		this.nonJtaDataSource = puInfo.getNonJtaDataSource();
 	}
 
 	/**
-	 * @param persistenceUnitName
-	 *            the name of the persistence unit
+	 * @param puName
+	 *            the name of the persistence unit.
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PersistenceParserImpl(String persistenceUnitName) {
-		this(null, persistenceUnitName);
+	public PersistenceParserImpl(String puName) {
+		super();
+
+		this.puName = puName;
+		this.classloader = Thread.currentThread().getContextClassLoader();
+
+		final PersistenceUnit puInfo = this.createPersistenceUnit();
+
+		for (final Property entry : puInfo.getProperties().getProperties()) {
+			this.properties.put(entry.getName(), entry.getValue());
+		}
+
+		this.hasValidators = (puInfo.getValidationMode() == PersistenceUnitValidationModeType.AUTO)
+			|| (puInfo.getValidationMode() == PersistenceUnitValidationModeType.CALLBACK);
+		this.metadata = new MetadataImpl(puInfo.getClazzs());
+		this.ormMappingFiles = puInfo.getMappingFiles();
+
+		this.parseOrmXmls();
+
+		this.metadata.parse(this.classloader);
+		switch (puInfo.getSharedCacheMode() != null ? puInfo.getSharedCacheMode() : PersistenceUnitCachingType.NONE) {
+			case ALL:
+				this.sharedCacheMode = SharedCacheMode.ALL;
+				break;
+			case DISABLE_SELECTIVE:
+				this.sharedCacheMode = SharedCacheMode.DISABLE_SELECTIVE;
+				break;
+			case ENABLE_SELECTIVE:
+				this.sharedCacheMode = SharedCacheMode.ENABLE_SELECTIVE;
+				break;
+			case NONE:
+				this.sharedCacheMode = SharedCacheMode.NONE;
+				break;
+			default:
+				this.sharedCacheMode = SharedCacheMode.NONE;
+				break;
+		}
+
+		this.jtaDataSource = null;
+		this.nonJtaDataSource = null;
 	}
 
 	/**
@@ -141,23 +167,29 @@ public class PersistenceParserImpl implements PersistenceParser {
 	public PersistenceParserImpl(String emName, Map<String, String> properties, String[] classes) {
 		super();
 
-		this.persistenceUnitInfo = null;
-
 		this.puName = emName;
 		this.classloader = Thread.currentThread().getContextClassLoader();
 
 		// initialize the persistence unit
-		this.persistenceUnit = new PersistenceUnit();
+		final PersistenceUnit pu = new PersistenceUnit();
 		for (final String clazz : classes) {
-			this.persistenceUnit.getClazzs().add(clazz);
+			pu.getClazzs().add(clazz);
+		}
+
+		for (final Entry<String, String> property : properties.entrySet()) {
+			this.properties.put(property.getKey(), property.getValue());
 		}
 
 		this.properties.putAll(properties);
-
 		this.hasValidators = true;
 
-		this.metadata = new MetadataImpl(this.persistenceUnit.getClazzs());
+		this.metadata = new MetadataImpl(pu.getClazzs());
 		this.metadata.parse(this.classloader);
+
+		this.ormMappingFiles = Lists.newArrayList();
+		this.jtaDataSource = null;
+		this.nonJtaDataSource = null;
+		this.sharedCacheMode = null;
 	}
 
 	/**
@@ -171,23 +203,19 @@ public class PersistenceParserImpl implements PersistenceParser {
 		try {
 			PersistenceParserImpl.LOG.info("Loading persistence.xml");
 
-			final Enumeration<URL> xmls = this.classloader.getResources(PersistenceParserImpl.PERSISTENCE_XML);
-			while (xmls.hasMoreElements()) {
-				URL nextElement = xmls.nextElement();
-				final InputStream is = this.classloader.getResourceAsStream(PersistenceParserImpl.PERSISTENCE_XML);
-				// Try to load the Persistence XML
-				if (is == null) {
-					throw new BatooException("persistence.xml not found in the classpath");
-				}
+			final InputStream is = this.classloader.getResourceAsStream(PersistenceParserImpl.PERSISTENCE_XML);
+			// Try to load the Persistence XML
+			if (is == null) {
+				throw new BatooException("persistence.xml not found in the classpath");
+			}
 
-				final javax.xml.bind.JAXBContext context = javax.xml.bind.JAXBContext.newInstance(Persistence.class);
-				final javax.xml.bind.Unmarshaller unmarshaller = context.createUnmarshaller();
+			final javax.xml.bind.JAXBContext context = javax.xml.bind.JAXBContext.newInstance(Persistence.class);
+			final javax.xml.bind.Unmarshaller unmarshaller = context.createUnmarshaller();
 
-				final Persistence persistence = (Persistence) unmarshaller.unmarshal(is);
-				for (final PersistenceUnit persistenceUnit : persistence.getPersistenceUnits()) {
-					if (this.puName.equals(persistenceUnit.getName())) {
-						return persistenceUnit;
-					}
+			final Persistence persistence = (Persistence) unmarshaller.unmarshal(is);
+			for (final PersistenceUnit persistenceUnit : persistence.getPersistenceUnits()) {
+				if (this.puName.equals(persistenceUnit.getName())) {
+					return persistenceUnit;
 				}
 			}
 		}
@@ -200,7 +228,7 @@ public class PersistenceParserImpl implements PersistenceParser {
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public ClassLoader getClassloader() {
@@ -209,16 +237,16 @@ public class PersistenceParserImpl implements PersistenceParser {
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
-	public String getJtaDatasource() {
-		return this.persistenceUnit.getJtaDataSource();
+	public DataSource getJtaDatasource() {
+		return this.jtaDataSource;
 	}
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public MetadataImpl getMetadata() {
@@ -227,16 +255,16 @@ public class PersistenceParserImpl implements PersistenceParser {
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
-	public String getNonJtaDatasource() {
-		return this.persistenceUnit.getNonJtaDataSource();
+	public DataSource getNonJtaDatasource() {
+		return this.nonJtaDataSource;
 	}
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public Map<String, Object> getProperties() {
@@ -245,18 +273,16 @@ public class PersistenceParserImpl implements PersistenceParser {
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public SharedCacheMode getSharedCacheMode() {
-		final PersistenceUnitCachingType cacheMode = this.persistenceUnit.getSharedCacheMode();
-
-		return cacheMode == null ? SharedCacheMode.NONE : SharedCacheMode.valueOf(cacheMode.name());
+		return this.sharedCacheMode;
 	}
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public boolean hasValidators() {
@@ -292,25 +318,13 @@ public class PersistenceParserImpl implements PersistenceParser {
 	 * @author hceylan
 	 */
 	private void parseOrmXmls() {
-		if (this.persistenceUnit.getMappingFiles().size() > 0) {
-			for (final String mappingFile : this.persistenceUnit.getMappingFiles()) {
+		if (this.ormMappingFiles.size() > 0) {
+			for (final String mappingFile : this.ormMappingFiles) {
 				this.parseOrmXml(mappingFile);
 			}
 		}
 		else {
 			this.parseOrmXml(PersistenceParserImpl.ORM_XML);
-		}
-	}
-
-	/**
-	 * Reads the properties from the persistence unit.
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	private void readProperties() {
-		for (final Property property : this.persistenceUnit.getProperties().getProperties()) {
-			this.properties.put(property.getName(), property.getValue());
 		}
 	}
 }

@@ -81,6 +81,15 @@ public class MetadataImpl implements Metadata {
 	private boolean cascadePersist;
 
 	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public MetadataImpl() {
+		super();
+	}
+
+	/**
 	 * @param classes
 	 *            the explicit classes obtained from the Persistence XML
 	 * 

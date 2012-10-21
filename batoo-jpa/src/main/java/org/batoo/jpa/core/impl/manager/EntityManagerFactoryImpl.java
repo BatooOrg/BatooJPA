@@ -30,7 +30,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.naming.NamingException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.LockModeType;
@@ -283,17 +282,12 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	}
 
 	private DataSource createDatasource(PersistenceParser parser) {
-		try {
-			if (StringUtils.isNotBlank(parser.getJtaDatasource())) {
-				return (DataSource) new javax.naming.InitialContext().lookup(parser.getJtaDatasource());
-			}
-
-			if (StringUtils.isNotBlank(parser.getNonJtaDatasource())) {
-				return (DataSource) new javax.naming.InitialContext().lookup(parser.getNonJtaDatasource());
-			}
+		if (parser.getJtaDatasource() != null) {
+			return parser.getJtaDatasource();
 		}
-		catch (final NamingException e) {
-			throw new PersistenceException("Cannot lookup datasource: " + e.getMessage(), e);
+
+		if (parser.getNonJtaDatasource() != null) {
+			return parser.getNonJtaDatasource();
 		}
 
 		try {

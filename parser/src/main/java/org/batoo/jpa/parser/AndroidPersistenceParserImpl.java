@@ -21,6 +21,7 @@ package org.batoo.jpa.parser;
 import java.util.Map;
 
 import javax.persistence.SharedCacheMode;
+import javax.sql.DataSource;
 
 import org.batoo.jpa.parser.impl.metadata.MetadataImpl;
 import org.batoo.jpa.parser.persistence.Persistence.PersistenceUnit;
@@ -89,8 +90,8 @@ public class AndroidPersistenceParserImpl implements PersistenceParser {
 	 * @author hceylan
 	 */
 	@Override
-	public String getJtaDatasource() {
-		return this.persistenceUnit.getJtaDataSource();
+	public DataSource getJtaDatasource() {
+		return null;
 	}
 
 	/**
@@ -115,8 +116,8 @@ public class AndroidPersistenceParserImpl implements PersistenceParser {
 	 * @author hceylan
 	 */
 	@Override
-	public String getNonJtaDatasource() {
-		return this.persistenceUnit.getNonJtaDataSource();
+	public DataSource getNonJtaDatasource() {
+		return null;
 	}
 
 	/**
