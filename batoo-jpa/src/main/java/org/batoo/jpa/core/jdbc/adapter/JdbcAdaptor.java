@@ -646,6 +646,11 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 				this.logRelaxed(e, "Cannot drop table " + table.getName());
 			}
 		}
+
+		try {
+			runner.update("DROP TABLE BATOO_ID");
+		}
+		catch (final SQLException e) {}
 	}
 
 	/**
