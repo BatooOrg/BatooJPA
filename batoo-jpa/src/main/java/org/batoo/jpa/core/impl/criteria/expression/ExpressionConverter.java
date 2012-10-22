@@ -105,8 +105,8 @@ public abstract class ExpressionConverter<N> {
 			if (value instanceof Double) {
 				return (Double) value;
 			}
-
-			return new Double(((Number) value).doubleValue());
+			
+			return Double.valueOf(((Number) value).doubleValue());
 		}
 	};
 
@@ -121,7 +121,7 @@ public abstract class ExpressionConverter<N> {
 				return (Float) value;
 			}
 
-			return new Float(((Number) value).floatValue());
+			return Float.valueOf(((Number) value).floatValue());
 		}
 	};
 
@@ -136,7 +136,7 @@ public abstract class ExpressionConverter<N> {
 				return (Short) value;
 			}
 
-			return new Short(((Number) value).shortValue());
+			return Short.valueOf(((Number) value).shortValue());
 		}
 	};
 
@@ -151,7 +151,7 @@ public abstract class ExpressionConverter<N> {
 				return (Long) value;
 			}
 
-			return new Long(((Number) value).longValue());
+			return Long.valueOf(((Number) value).longValue());
 		}
 	};
 
@@ -166,7 +166,7 @@ public abstract class ExpressionConverter<N> {
 				return (Integer) value;
 			}
 
-			return new Integer(((Number) value).intValue());
+			return Integer.valueOf(((Number) value).intValue());
 		}
 	};
 
