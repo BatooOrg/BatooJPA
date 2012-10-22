@@ -212,7 +212,7 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 */
 	@Override
 	public List<NamedNativeQueryMetadata> getNamedNativeQueries() {
-		return this.getNamedNativeQueries();
+		return this.namedNativeQueries;
 	}
 
 	/**

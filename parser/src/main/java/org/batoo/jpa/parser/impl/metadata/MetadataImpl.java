@@ -283,9 +283,7 @@ public class MetadataImpl implements Metadata {
 			final ManagedTypeMetadata existing = this.entityMap.put(managedType.getClassName(), managedType);
 
 			if (existing != null) {
-				if (existing != null) {
-					throw new MappingException("Duplicate definitions for " + managedType.getClassName(), managedType.getLocator(), existing.getLocator());
-				}
+				throw new MappingException("Duplicate definitions for " + managedType.getClassName(), managedType.getLocator(), existing.getLocator());
 			}
 		}
 	}
