@@ -46,6 +46,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -59,7 +60,7 @@ import com.google.common.collect.Maps;
 public class BenchmarkTest {
 
 	// The number of tests to run
-	private static final int BENCHMARK_LENGTH = 1000;
+	private static final int BENCHMARK_LENGTH = 100;
 
 	// If the results should be summarized
 	private static final boolean SUMMARIZE = true;
@@ -376,6 +377,7 @@ public class BenchmarkTest {
 	 * @author hceylan
 	 */
 	@Test
+	@Ignore
 	public void doeclipselink() {
 		this.doTest(Type.ELINK);
 	}
