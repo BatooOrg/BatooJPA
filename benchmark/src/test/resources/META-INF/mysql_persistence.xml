@@ -37,7 +37,7 @@
 			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
 			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/test" />
 			<property name="javax.persistence.jdbc.user" value="root" />
-			<property name="javax.persistence.jdbc.password" value="toor" />
+			<property name="javax.persistence.jdbc.password" value="" />
 		</properties>
 
 	</persistence-unit>
@@ -55,7 +55,7 @@
 			<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver" />
 			<property name="hibernate.connection.url" value="jdbc:mysql://localhost/test" />
 			<property name="hibernate.connection.username" value="root" />
-			<property name="hibernate.connection.password" value="toor" />
+			<property name="hibernate.connection.password" value="" />
 		</properties>
 	</persistence-unit>
 	
@@ -71,7 +71,7 @@
 			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
 			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/test" />
 			<property name="javax.persistence.jdbc.user" value="root" />
-			<property name="javax.persistence.jdbc.password" value="toor" />
+			<property name="javax.persistence.jdbc.password" value="" />
 			
 			<property name="eclipselink.cache.shared.default" value="false"/>
 			<property name="eclipselink.ddl-generation" value="create-tables" />
