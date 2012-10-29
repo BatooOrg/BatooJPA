@@ -62,7 +62,7 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public EntityManagerFactoryImpl createContainerEntityManagerFactory(PersistenceUnitInfo info, Map map) {
 		try {
 			final PersistenceParser parser = new org.batoo.jpa.parser.PersistenceParserImpl(info, map);
@@ -71,7 +71,7 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 				new org.batoo.jpa.core.impl.manager.JtaEntityManagerFactoryImpl(info.getPersistenceUnitName(), parser) : new EntityManagerFactoryImpl(
 					info.getPersistenceUnitName(), parser);
 		}
-		catch (final Throwable e) {
+		catch (final Exception e) {
 			if ((e instanceof PersistenceException) || (e instanceof MappingException) || (e instanceof BatooException)) {
 				throw (RuntimeException) e;
 			}
@@ -96,7 +96,7 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 			// finally, create the entity manager factory
 			return new EntityManagerFactoryImpl(emName, parser);
 		}
-		catch (final Throwable e) {
+		catch (final Exception e) {
 			if ((e instanceof PersistenceException) || (e instanceof MappingException) || (e instanceof BatooException)) {
 				throw (RuntimeException) e;
 			}
@@ -129,7 +129,7 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 			// finally, create the entity manager factory
 			return new EntityManagerFactoryImpl(emName, parser);
 		}
-		catch (final Throwable e) {
+		catch (final Exception e) {
 			if ((e instanceof PersistenceException) || (e instanceof MappingException) || (e instanceof BatooException)) {
 				throw (RuntimeException) e;
 			}

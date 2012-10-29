@@ -112,7 +112,7 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 	 * 
 	 */
 	@Override
-	public Object extractKey(X value) {
+	public Object extractKey(Object value) {
 		return null;
 	}
 

@@ -38,7 +38,7 @@ public class BoneCPDataSource extends BoneCPConfig implements DataSource, Object
 	private static final long serialVersionUID = -1561804548443209469L;
 
 	/** Config setting. */
-	private PrintWriter logWriter = null;
+	private transient PrintWriter logWriter = null;
 
 	/** Pool handle. */
 	private BoneCP pool;
@@ -53,7 +53,7 @@ public class BoneCPDataSource extends BoneCPConfig implements DataSource, Object
 	 * Constructs (and caches) a datasource on the fly based on the given username/password.
 	 */
 	@SuppressWarnings("deprecation")
-	private final Map<UsernamePassword, BoneCPDataSource> multiDataSource = new MapMaker().makeComputingMap(new Function<UsernamePassword, BoneCPDataSource>() {
+	private transient final Map<UsernamePassword, BoneCPDataSource> multiDataSource = new MapMaker().makeComputingMap(new Function<UsernamePassword, BoneCPDataSource>() {
 
 		@Override
 		public BoneCPDataSource apply(UsernamePassword key) {

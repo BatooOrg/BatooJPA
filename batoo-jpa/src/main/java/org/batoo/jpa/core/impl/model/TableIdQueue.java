@@ -37,17 +37,15 @@ public class TableIdQueue extends IdQueue {
 
 	private static final long serialVersionUID = 1L;
 
-	private final TableGenerator generator;
+	private final DataSource datasource;
+	private transient final TableGenerator generator;
+	private transient final JdbcAdaptor jdbcAdaptor;
 
 	private String selectSql;
 	private String insertSql;
 	private String updateSql;
 
 	private Long nextId;
-
-	private final DataSource datasource;
-
-	private final JdbcAdaptor jdbcAdaptor;
 
 	/**
 	 * @param jdbcAdaptor

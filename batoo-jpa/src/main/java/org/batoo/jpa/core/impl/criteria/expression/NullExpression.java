@@ -20,50 +20,30 @@ package org.batoo.jpa.core.impl.criteria.expression;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.MessageFormat;
 
-import javax.persistence.criteria.Expression;
-
-import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 
 /**
- * The expression for numeric functions
+ * Expression for nulls.
  * 
- * @param <N>
- *            the type of the expression
  * 
  * @author hceylan
  * @since $version
  */
-public class NumericFunctionExpression<N extends Number> extends AbstractExpression<N> {
-
-	private final NumericFunctionType type;
-	private final AbstractExpression<?> x;
-	private final AbstractExpression<Integer> y;
-	private String alias;
+public class NullExpression<T> extends AbstractExpression<T> {
 
 	/**
-	 * @param type
-	 *            the type of the function
-	 * @param x
-	 *            the first parameter
-	 * @param y
-	 *            the optional second parameter
+	 * @param clazz
+	 *            the class type
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
-	public NumericFunctionExpression(NumericFunctionType type, Expression<?> x, Expression<Integer> y) {
-		super((Class<N>) x.getJavaType());
-
-		this.type = type;
-		this.x = (AbstractExpression<?>) x;
-		this.y = (AbstractExpression<Integer>) y;
+	public NullExpression(Class<T> clazz) {
+		super(clazz);
 	}
 
 	/**
@@ -72,10 +52,7 @@ public class NumericFunctionExpression<N extends Number> extends AbstractExpress
 	 */
 	@Override
 	public String generateJpqlRestriction(BaseQueryImpl<?> query) {
-		final String xExpr = this.x.generateJpqlRestriction(query);
-		final String yExpr = this.y != null ? this.y.generateJpqlRestriction(query) : null;
-
-		return MessageFormat.format(this.type.jpqlFragment, xExpr, yExpr);
+		return "null";
 	}
 
 	/**
@@ -84,10 +61,6 @@ public class NumericFunctionExpression<N extends Number> extends AbstractExpress
 	 */
 	@Override
 	public String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
-		if (StringUtils.isNotBlank(this.getAlias())) {
-			return this.generateJpqlRestriction(query) + " as " + this.getAlias();
-		}
-
 		return this.generateJpqlRestriction(query);
 	}
 
@@ -97,12 +70,6 @@ public class NumericFunctionExpression<N extends Number> extends AbstractExpress
 	 */
 	@Override
 	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
-		this.alias = query.getAlias(this);
-
-		if (selected) {
-			return this.getSqlRestrictionFragments(query)[0] + " AS " + this.alias;
-		}
-
 		return this.getSqlRestrictionFragments(query)[0];
 	}
 
@@ -112,11 +79,7 @@ public class NumericFunctionExpression<N extends Number> extends AbstractExpress
 	 */
 	@Override
 	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
-		final String xExpr = this.x.getSqlRestrictionFragments(query)[0];
-		final String yExpr = this.y != null ? this.y.getSqlRestrictionFragments(query)[0] : null;
-
-		return new String[] { MessageFormat.format(query.getJdbcAdaptor().getNumericFunctionTemplate(this.type), xExpr, yExpr) };
-
+		return new String[] { "null" };
 	}
 
 	/**
@@ -124,8 +87,7 @@ public class NumericFunctionExpression<N extends Number> extends AbstractExpress
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
-	public N handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
-		return (N) row.getObject(this.alias);
+	public T handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
+		return null;
 	}
 }

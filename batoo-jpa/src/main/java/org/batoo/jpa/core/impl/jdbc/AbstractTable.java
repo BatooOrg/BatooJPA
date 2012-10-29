@@ -164,38 +164,16 @@ public abstract class AbstractTable {
 		}
 
 		final List<AbstractColumn> insertColumns = Lists.newArrayList();
+
 		// Filter out the identity physicalColumns
 		final Collection<AbstractColumn> filteredColumns = type == null ? this.getColumns() : Collections2.filter(this.getColumns(),
 			new Predicate<AbstractColumn>() {
 
 				@Override
 				public boolean apply(AbstractColumn input) {
-					if ((input instanceof PkColumn) && (((PkColumn) input).getIdType() == IdType.IDENTITY)) {
-						return false;
-					}
-
-					if (!input.isInsertable()) {
-						return false;
-					}
-
-					if (input instanceof DiscriminatorColumn) {
-						return true;
-					}
-
-					final EntityTypeImpl<?> root;
-
-					if ((input instanceof JoinColumn) && (input.getMapping() == null)) {
-						root = (EntityTypeImpl<?>) ((JoinColumn) input).getReferencedMapping().getRoot().getType();
-					}
-					else {
-						root = (EntityTypeImpl<?>) input.getMapping().getRoot().getType();
-					}
-
-					final Class<?> parent = root.getJavaType();
-					final Class<?> javaType = type.getJavaType();
-
-					return parent.isAssignableFrom(javaType);
+					return AbstractTable.this.isInsertableColumn(type, input);
 				}
+
 			});
 
 		// prepare the names tuple in the form of "COLNAME [, COLNAME]*"
@@ -264,12 +242,14 @@ public abstract class AbstractTable {
 
 		final String restrictionStr = Joiner.on(" AND ").join(restrictions);
 
-		// SELECT VERSION_COLUMN FROM SCHEMA.TABLE SET
-		// WHERE (PARAM [, PARAM]*)
-		this.versionSelectSql = "SELECT " + versionColumn.getName() + " FROM " + this.getQName() //
-			+ "\nWHERE " + restrictionStr;
+		if (versionColumn != null) {
+			// SELECT VERSION_COLUMN FROM SCHEMA.TABLE SET
+			// WHERE (PARAM [, PARAM]*)
+			this.versionSelectSql = "SELECT " + versionColumn.getName() + " FROM " + this.getQName() //
+				+ "\nWHERE " + restrictionStr;
 
-		this.selectVersionColumns = selectVersionColumns.toArray(new AbstractColumn[selectVersionColumns.size()]);
+			this.selectVersionColumns = selectVersionColumns.toArray(new AbstractColumn[selectVersionColumns.size()]);
+		}
 	}
 
 	/**
@@ -295,27 +275,7 @@ public abstract class AbstractTable {
 
 				@Override
 				public boolean apply(AbstractColumn input) {
-					if ((input.isPrimaryKey()) || (input instanceof DiscriminatorColumn)) {
-						return false;
-					}
-
-					if (!input.isUpdatable()) {
-						return false;
-					}
-
-					final EntityTypeImpl<?> root;
-
-					if ((input instanceof JoinColumn) && (input.getMapping() == null)) {
-						root = (EntityTypeImpl<?>) ((JoinColumn) input).getReferencedMapping().getRoot().getType();
-					}
-					else {
-						root = (EntityTypeImpl<?>) input.getMapping().getRoot().getType();
-					}
-
-					final Class<?> parent = root.getJavaType();
-					final Class<?> javaType = type.getJavaType();
-
-					return parent.isAssignableFrom(javaType);
+					return AbstractTable.this.isUpdatableColumn(type, input);
 				}
 			});
 
@@ -679,6 +639,58 @@ public abstract class AbstractTable {
 		}
 
 		return this.updateSql;
+	}
+
+	private boolean isInsertableColumn(final EntityTypeImpl<?> type, AbstractColumn input) {
+		if ((input instanceof PkColumn) && (((PkColumn) input).getIdType() == IdType.IDENTITY)) {
+			return false;
+		}
+
+		if (!input.isInsertable()) {
+			return false;
+		}
+
+		if (input instanceof DiscriminatorColumn) {
+			return true;
+		}
+
+		final EntityTypeImpl<?> root;
+
+		if ((input instanceof JoinColumn) && (input.getMapping() == null)) {
+			root = (EntityTypeImpl<?>) ((JoinColumn) input).getReferencedMapping().getRoot().getType();
+		}
+		else {
+			root = (EntityTypeImpl<?>) input.getMapping().getRoot().getType();
+		}
+
+		final Class<?> parent = root.getJavaType();
+		final Class<?> javaType = type.getJavaType();
+
+		return parent.isAssignableFrom(javaType);
+	}
+
+	private boolean isUpdatableColumn(final EntityTypeImpl<?> type, AbstractColumn input) {
+		if ((input.isPrimaryKey()) || (input instanceof DiscriminatorColumn)) {
+			return false;
+		}
+
+		if (!input.isUpdatable()) {
+			return false;
+		}
+
+		final EntityTypeImpl<?> root;
+
+		if ((input instanceof JoinColumn) && (input.getMapping() == null)) {
+			root = (EntityTypeImpl<?>) ((JoinColumn) input).getReferencedMapping().getRoot().getType();
+		}
+		else {
+			root = (EntityTypeImpl<?>) input.getMapping().getRoot().getType();
+		}
+
+		final Class<?> parent = root.getJavaType();
+		final Class<?> javaType = type.getJavaType();
+
+		return parent.isAssignableFrom(javaType);
 	}
 
 	/**

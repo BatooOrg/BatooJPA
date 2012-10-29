@@ -78,7 +78,7 @@ public class CollectionTableElement extends TableElement implements JoinTableMet
 	protected void handleChild(Element child) {
 		super.handleChild(child);
 
-		if (child instanceof CollectionTableElement) {
+		if (child instanceof JoinColumnMetadata) {
 			this.joinColumns.add((JoinColumnMetadata) child);
 		}
 	}

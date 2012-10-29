@@ -98,7 +98,7 @@ public final class Enhancer {
 
 		// Field: serialVersionUID
 		cw.visitField(Opcodes.ACC_PRIVATE + Opcodes.ACC_FINAL + Opcodes.ACC_STATIC, Enhancer.FIELD_SERIAL_VERSION_UID,
-			Type.getDescriptor(Long.TYPE), null, new Long(1L)).visitEnd();
+			Type.getDescriptor(Long.TYPE), null, Long.valueOf(1L)).visitEnd();
 
 		// Container fields
 		cw.visitField(Opcodes.ACC_PRIVATE, Enhancer.FIELD_ENHANCED_INITIALIZED, Enhancer.DESCRIPTOR_BOOLEAN, null, null).visitEnd();
@@ -577,7 +577,7 @@ public final class Enhancer {
 		// protected method invocation
 		method.setAccessible(true);
 		try {
-			final Object[] args = new Object[] { className, byteCode, new Integer(0), new Integer(byteCode.length) };
+			final Object[] args = new Object[] { className, byteCode, Integer.valueOf(0), Integer.valueOf(byteCode.length) };
 			return (Class<T>) method.invoke(classLoader, args);
 		}
 		finally {

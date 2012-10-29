@@ -40,41 +40,7 @@ public abstract class ExpressionConverter<N> {
 
 		@Override
 		public BigDecimal convertImpl(Object original) {
-			final Number value = (Number) original;
-
-			if (value instanceof BigDecimal) {
-				return (BigDecimal) value;
-			}
-
-			if (value instanceof Float) {
-				return new BigDecimal(value.floatValue());
-			}
-
-			if (value instanceof Double) {
-				return new BigDecimal(value.doubleValue());
-			}
-
-			if (value instanceof Byte) {
-				return new BigDecimal(value.byteValue());
-			}
-
-			if (value instanceof Integer) {
-				return new BigDecimal(value.intValue());
-			}
-
-			if (value instanceof Long) {
-				return new BigDecimal(value.longValue());
-			}
-
-			if (value instanceof Short) {
-				return new BigDecimal(value.shortValue());
-			}
-
-			if (value instanceof BigInteger) {
-				return new BigDecimal((BigInteger) value);
-			}
-
-			throw new IllegalArgumentException("Cannot convert from " + value);
+			return ExpressionConverter.convertExpressionImpl(original);
 		}
 	};
 
@@ -136,7 +102,7 @@ public abstract class ExpressionConverter<N> {
 				return (Short) value;
 			}
 
-			return new Short(((Number) value).shortValue());
+			return Short.valueOf(((Number) value).shortValue());
 		}
 	};
 
@@ -151,7 +117,7 @@ public abstract class ExpressionConverter<N> {
 				return (Long) value;
 			}
 
-			return new Long(((Number) value).longValue());
+			return Long.valueOf(((Number) value).longValue());
 		}
 	};
 
@@ -166,7 +132,7 @@ public abstract class ExpressionConverter<N> {
 				return (Integer) value;
 			}
 
-			return new Integer(((Number) value).intValue());
+			return Integer.valueOf(((Number) value).intValue());
 		}
 	};
 
@@ -188,6 +154,44 @@ public abstract class ExpressionConverter<N> {
 			throw new IllegalArgumentException("Cannot convert from " + value);
 		}
 	};
+
+	private static BigDecimal convertExpressionImpl(Object original) {
+		final Number value = (Number) original;
+
+		if (value instanceof BigDecimal) {
+			return (BigDecimal) value;
+		}
+
+		if (value instanceof Float) {
+			return new BigDecimal(value.floatValue());
+		}
+
+		if (value instanceof Double) {
+			return new BigDecimal(value.doubleValue());
+		}
+
+		if (value instanceof Byte) {
+			return new BigDecimal(value.byteValue());
+		}
+
+		if (value instanceof Integer) {
+			return new BigDecimal(value.intValue());
+		}
+
+		if (value instanceof Long) {
+			return new BigDecimal(value.longValue());
+		}
+
+		if (value instanceof Short) {
+			return new BigDecimal(value.shortValue());
+		}
+
+		if (value instanceof BigInteger) {
+			return new BigDecimal((BigInteger) value);
+		}
+
+		throw new IllegalArgumentException("Cannot convert from " + value);
+	}
 
 	/**
 	 * Converts the number to <code>T</code> type.

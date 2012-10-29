@@ -49,7 +49,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
-import org.batoo.jpa.core.impl.criteria.expression.NumericFunctionExpression.NumericFunctionType;
+import org.batoo.jpa.core.impl.criteria.expression.NumericFunctionType;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.AbstractJdbcAdaptor;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;

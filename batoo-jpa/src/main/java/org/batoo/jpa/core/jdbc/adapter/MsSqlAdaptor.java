@@ -28,7 +28,7 @@ import javax.persistence.PersistenceException;
 import javax.persistence.criteria.CriteriaBuilder.Trimspec;
 import javax.sql.DataSource;
 
-import org.batoo.jpa.core.impl.criteria.expression.NumericFunctionExpression.NumericFunctionType;
+import org.batoo.jpa.core.impl.criteria.expression.NumericFunctionType;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.model.SequenceGenerator;

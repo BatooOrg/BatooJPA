@@ -63,9 +63,10 @@ import org.batoo.jpa.core.impl.criteria.expression.LikeExpression;
 import org.batoo.jpa.core.impl.criteria.expression.LocateExpression;
 import org.batoo.jpa.core.impl.criteria.expression.MemberOfExpression;
 import org.batoo.jpa.core.impl.criteria.expression.NegationExpression;
+import org.batoo.jpa.core.impl.criteria.expression.NullExpression;
 import org.batoo.jpa.core.impl.criteria.expression.NullIfExpression;
 import org.batoo.jpa.core.impl.criteria.expression.NumericFunctionExpression;
-import org.batoo.jpa.core.impl.criteria.expression.NumericFunctionExpression.NumericFunctionType;
+import org.batoo.jpa.core.impl.criteria.expression.NumericFunctionType;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
 import org.batoo.jpa.core.impl.criteria.expression.SimpleCaseImpl;
@@ -1038,7 +1039,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <T> Expression<T> nullLiteral(Class<T> resultClass) {
-		return new ConstantExpression<T>(this.metamodel.type(resultClass), null);
+		return new NullExpression<T>(resultClass);
 	}
 
 	/**

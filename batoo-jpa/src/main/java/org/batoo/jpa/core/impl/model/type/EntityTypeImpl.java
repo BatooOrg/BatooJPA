@@ -281,7 +281,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	public EntityTable[] getAllTables() {
 		if (this.allTables != null) {
 			return this.allTables;
-
 		}
 
 		synchronized (this) {
@@ -289,13 +288,13 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.allTables;
 			}
 
-			final Map<String, EntityTable> tableMap = Maps.newHashMap();
-			this.getAllTables(tableMap);
+			final Map<String, EntityTable> _tableMap = Maps.newHashMap();
+			this.getAllTables(_tableMap);
 
-			final EntityTable[] tables = new EntityTable[tableMap.size()];
-			tableMap.values().toArray(tables);
+			final EntityTable[] _tables = new EntityTable[_tableMap.size()];
+			_tableMap.values().toArray(_tables);
 
-			Arrays.sort(tables, new Comparator<EntityTable>() {
+			Arrays.sort(_tables, new Comparator<EntityTable>() {
 
 				@Override
 				public int compare(EntityTable o1, EntityTable o2) {
@@ -311,7 +310,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				}
 			});
 
-			return this.allTables = tables;
+			return this.allTables = _tables;
 		}
 	}
 
@@ -364,14 +363,14 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.associations;
 			}
 
-			final List<AssociationMapping<?, ?, ?>> associations = Lists.newArrayList();
+			final List<AssociationMapping<?, ?, ?>> _associations = Lists.newArrayList();
 
-			this.entityMapping.addAssociations(associations);
+			this.entityMapping.addAssociations(_associations);
 
-			final AssociationMapping<?, ?, ?>[] associatedAttributes0 = new AssociationMapping[associations.size()];
-			associations.toArray(associatedAttributes0);
+			final AssociationMapping<?, ?, ?>[] __associatedAttributes = new AssociationMapping[_associations.size()];
+			_associations.toArray(__associatedAttributes);
 
-			return this.associations = associatedAttributes0;
+			return this.associations = __associatedAttributes;
 		}
 	}
 
@@ -393,18 +392,18 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.associationsDetachable;
 			}
 
-			final List<AssociationMapping<?, ?, ?>> associationsDetachable = Lists.newArrayList();
+			final List<AssociationMapping<?, ?, ?>> _associationsDetachable = Lists.newArrayList();
 
 			for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
 				if (association.cascadesDetach()) {
-					associationsDetachable.add(association);
+					_associationsDetachable.add(association);
 				}
 			}
 
-			final AssociationMapping<?, ?, ?>[] associationsDetachable0 = new AssociationMapping[associationsDetachable.size()];
-			associationsDetachable.toArray(associationsDetachable0);
+			final AssociationMapping<?, ?, ?>[] __associationsDetachable = new AssociationMapping[_associationsDetachable.size()];
+			_associationsDetachable.toArray(__associationsDetachable);
 
-			return this.associationsDetachable = associationsDetachable0;
+			return this.associationsDetachable = __associationsDetachable;
 		}
 	}
 
@@ -459,20 +458,20 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.associationsNotPersistable;
 			}
 
-			final List<AssociationMapping<?, ?, ?>> associationsNotPersistable = Lists.newArrayList();
+			final List<AssociationMapping<?, ?, ?>> _associationsNotPersistable = Lists.newArrayList();
 			for (final AssociationMapping<?, ?, ?> mapping : this.getAssociations()) {
 				// skip persistable associations
 				if (mapping.cascadesPersist()) {
 					continue;
 				}
 
-				associationsNotPersistable.add(mapping);
+				_associationsNotPersistable.add(mapping);
 			}
 
-			final AssociationMapping<?, ?, ?>[] associationsNotPersistable0 = new AssociationMapping[associationsNotPersistable.size()];
-			associationsNotPersistable.toArray(associationsNotPersistable0);
+			final AssociationMapping<?, ?, ?>[] __associationsNotPersistable = new AssociationMapping[_associationsNotPersistable.size()];
+			_associationsNotPersistable.toArray(__associationsNotPersistable);
 
-			return this.associationsNotPersistable = associationsNotPersistable0;
+			return this.associationsNotPersistable = __associationsNotPersistable;
 		}
 	}
 
@@ -494,18 +493,18 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.associationsPersistable;
 			}
 
-			final List<AssociationMapping<?, ?, ?>> persistableAssociations = Lists.newArrayList();
+			final List<AssociationMapping<?, ?, ?>> _associationsPersistable = Lists.newArrayList();
 
 			for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
 				if (association.cascadesPersist()) {
-					persistableAssociations.add(association);
+					_associationsPersistable.add(association);
 				}
 			}
 
-			final AssociationMapping<?, ?, ?>[] persistableAssociations0 = new AssociationMapping[persistableAssociations.size()];
-			persistableAssociations.toArray(persistableAssociations0);
+			final AssociationMapping<?, ?, ?>[] __associationsPersistable = new AssociationMapping[_associationsPersistable.size()];
+			_associationsPersistable.toArray(__associationsPersistable);
 
-			return this.associationsPersistable = persistableAssociations0;
+			return this.associationsPersistable = __associationsPersistable;
 		}
 	}
 
@@ -527,17 +526,17 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.associationsPlural;
 			}
 
-			final List<PluralAssociationMapping<?, ?, ?>> associationsPlural = Lists.newArrayList();
+			final List<PluralAssociationMapping<?, ?, ?>> _associationsPlural = Lists.newArrayList();
 			for (final AssociationMapping<?, ?, ?> mapping : this.getAssociations()) {
 				if (mapping instanceof PluralAssociationMapping) {
-					associationsPlural.add((PluralAssociationMapping<?, ?, ?>) mapping);
+					_associationsPlural.add((PluralAssociationMapping<?, ?, ?>) mapping);
 				}
 			}
 
-			final PluralAssociationMapping<?, ?, ?>[] associationsPlural0 = new PluralAssociationMapping[associationsPlural.size()];
-			associationsPlural.toArray(associationsPlural0);
+			final PluralAssociationMapping<?, ?, ?>[] __associationsPlural = new PluralAssociationMapping[_associationsPlural.size()];
+			_associationsPlural.toArray(__associationsPlural);
 
-			return this.associationsPlural = associationsPlural0;
+			return this.associationsPlural = __associationsPlural;
 		}
 	}
 
@@ -559,18 +558,18 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.associationsRemovable;
 			}
 
-			final List<AssociationMapping<?, ?, ?>> associationsRemovable = Lists.newArrayList();
+			final List<AssociationMapping<?, ?, ?>> _associationsRemovable = Lists.newArrayList();
 
 			for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
 				if (association.cascadesRemove() || association.removesOrphans()) {
-					associationsRemovable.add(association);
+					_associationsRemovable.add(association);
 				}
 			}
 
-			final AssociationMapping<?, ?, ?>[] associationsRemovable0 = new AssociationMapping[associationsRemovable.size()];
-			associationsRemovable.toArray(associationsRemovable0);
+			final AssociationMapping<?, ?, ?>[] __associationsRemovable = new AssociationMapping[_associationsRemovable.size()];
+			_associationsRemovable.toArray(__associationsRemovable);
 
-			return this.associationsRemovable = associationsRemovable0;
+			return this.associationsRemovable = __associationsRemovable;
 		}
 	}
 
@@ -592,18 +591,18 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.associationsSingular;
 			}
 
-			final List<SingularAssociationMapping<?, ?>> associationsSingular = Lists.newArrayList();
+			final List<SingularAssociationMapping<?, ?>> _associationsSingular = Lists.newArrayList();
 
 			for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
 				if (association instanceof SingularAssociationMapping) {
-					associationsSingular.add((SingularAssociationMapping<?, ?>) association);
+					_associationsSingular.add((SingularAssociationMapping<?, ?>) association);
 				}
 			}
 
-			final SingularAssociationMapping<?, ?>[] associationsSingular0 = new SingularAssociationMapping[associationsSingular.size()];
-			associationsSingular.toArray(associationsSingular0);
+			final SingularAssociationMapping<?, ?>[] __associationsSingular = new SingularAssociationMapping[_associationsSingular.size()];
+			_associationsSingular.toArray(__associationsSingular);
 
-			return this.associationsSingular = associationsSingular0;
+			return this.associationsSingular = __associationsSingular;
 		}
 	}
 
@@ -625,20 +624,20 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.associationsSingularLazy;
 			}
 
-			final List<SingularAssociationMapping<?, ?>> associationsSingularLazy = Lists.newArrayList();
+			final List<SingularAssociationMapping<?, ?>> _associationsSingularLazy = Lists.newArrayList();
 			for (final AssociationMapping<?, ?, ?> mapping : this.getAssociations()) {
 				if (mapping instanceof SingularAssociationMapping) {
 					final SingularAssociationMapping<?, ?> singularMapping = (SingularAssociationMapping<?, ?>) mapping;
 					if (singularMapping.isOwner() && !singularMapping.isEager()) {
-						associationsSingularLazy.add(singularMapping);
+						_associationsSingularLazy.add(singularMapping);
 					}
 				}
 			}
 
-			final SingularAssociationMapping<?, ?>[] associationsSingularLazy0 = new SingularAssociationMapping[associationsSingularLazy.size()];
-			associationsSingularLazy.toArray(associationsSingularLazy0);
+			final SingularAssociationMapping<?, ?>[] __associationsSingularLazy = new SingularAssociationMapping[_associationsSingularLazy.size()];
+			_associationsSingularLazy.toArray(__associationsSingularLazy);
 
-			return this.associationsSingularLazy = associationsSingularLazy0;
+			return this.associationsSingularLazy = __associationsSingularLazy;
 		}
 	}
 
@@ -680,14 +679,14 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.basicMappings;
 			}
 
-			final List<BasicMapping<?, ?>> basicMappings = Lists.newArrayList();
+			final List<BasicMapping<?, ?>> _basicMappings = Lists.newArrayList();
 
-			this.entityMapping.addBasicMappings(basicMappings);
+			this.entityMapping.addBasicMappings(_basicMappings);
 
-			final BasicMapping<?, ?>[] basicMappings0 = new BasicMapping[basicMappings.size()];
-			basicMappings.toArray(basicMappings0);
+			final BasicMapping<?, ?>[] __basicMappings = new BasicMapping[_basicMappings.size()];
+			_basicMappings.toArray(__basicMappings);
 
-			return this.basicMappings = basicMappings0;
+			return this.basicMappings = __basicMappings;
 		}
 	}
 
@@ -810,26 +809,30 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 			// has single id mapping
 			if (this.getRootType().hasSingleIdAttribute()) {
-				final SingularMapping<? super X, ?> idMapping = this.getRootType().getIdMapping();
-				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
-				final Path<?> path = r.get(idMapping.getAttribute());
+				final SingularMapping<? super X, ?> _idMapping = this.getRootType().getIdMapping();
+				final ParameterExpressionImpl<?> pe = cb.parameter(_idMapping.getAttribute().getJavaType());
+				final Path<?> path = r.get(_idMapping.getAttribute());
 				final PredicateImpl predicate = cb.equal(path, pe);
 
-				return this.selectCriteria = q.where(predicate);
+				this.selectCriteria = q.where(predicate);
+
+				return this.selectCriteria;
 			}
 
 			// has multiple id mappings
 			final List<PredicateImpl> predicates = Lists.newArrayList();
 			for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.getIdMappings()) {
-				final BasicMapping<? super X, ?> idMapping = pair.getFirst();
-				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
-				final Path<?> path = r.get(idMapping.getAttribute());
+				final BasicMapping<? super X, ?> _idMapping = pair.getFirst();
+				final ParameterExpressionImpl<?> pe = cb.parameter(_idMapping.getAttribute().getJavaType());
+				final Path<?> path = r.get(_idMapping.getAttribute());
 				final PredicateImpl predicate = cb.equal(path, pe);
 
 				predicates.add(predicate);
 			}
 
-			return this.selectCriteria = q.where(predicates.toArray(new PredicateImpl[predicates.size()]));
+			this.selectCriteria = q.where(predicates.toArray(new PredicateImpl[predicates.size()]));
+
+			return this.selectCriteria;
 		}
 	}
 
@@ -914,7 +917,9 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 			for (final Mapping<? super X, ?, ?> mapping : this.entityMapping.getChildren()) {
 				if ((mapping instanceof SingularMapping) && ((SingularMapping<? super X, ?>) mapping).getAttribute().isId()) {
-					return this.idMapping = (SingularMapping<? super X, ?>) mapping;
+					this.idMapping = (SingularMapping<? super X, ?>) mapping;
+
+					return this.idMapping;
 				}
 			}
 
@@ -943,7 +948,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			}
 
 			final EmbeddableTypeImpl<?> idType = (EmbeddableTypeImpl<?>) this.getIdType();
-			final List<Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>> idMappings = Lists.newArrayList();
+			final List<Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>> _idMappings = Lists.newArrayList();
 
 			for (final Mapping<? super X, ?, ?> mapping : this.entityMapping.getChildren()) {
 				// only interested in id mappings
@@ -956,7 +961,12 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 				// must have a corresponding attribute
 				final AttributeImpl<?, ?> attribute = idType.getAttribute(mapping.getName());
-				if ((attribute == null) || (attribute.getJavaType() != mapping.getJavaType())) {
+
+				if (attribute == null) {
+					throw new MappingException("Attribute not found: " + mapping.getJavaType(), basicMapping.getAttribute().getLocator());
+				}
+
+				if (attribute.getJavaType() != mapping.getJavaType()) {
 					throw new MappingException("Attribute types mismatch: " + attribute.getJavaMember() + ", " + mapping.getJavaType(), attribute.getLocator(),
 						basicMapping.getAttribute().getLocator());
 				}
@@ -964,11 +974,11 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				// attribute must be of basic type
 				final BasicAttribute<?, ?> basicAttribute = (BasicAttribute<?, ?>) attribute;
 
-				idMappings.add(new Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>(basicMapping, basicAttribute));
+				_idMappings.add(new Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>(basicMapping, basicAttribute));
 			}
 
-			final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>[] idMappings0 = new Pair[idMappings.size()];
-			idMappings.toArray(idMappings0);
+			final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>[] idMappings0 = new Pair[_idMappings.size()];
+			_idMappings.toArray(idMappings0);
 
 			this.idMappings = idMappings0;
 		}
@@ -999,17 +1009,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public Object getInstanceId(X instance) {
-		if (this.getIdMapping() != null) {
-			return this.idMapping.get(instance);
-		}
-
-		final Object id = ((EmbeddableTypeImpl<?>) this.getIdType()).newInstance();
-		for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.getIdMappings()) {
-			final Object value = pair.getSecond().get(instance);
-			pair.getFirst().getAttribute().set(id, value);
-		}
-
-		return id;
+		return this.getIdMapping().get(instance);
 	}
 
 	/**
@@ -1089,8 +1089,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 		final EntityTypeImpl<?> entity = this.getMetamodel().entity(mappedEntity.getClass());
 		if (entity.hasSingleIdAttribute()) {
-			final SingularMapping<?, ?> idMapping = entity.getIdMapping();
-			return idMapping.get(mappedEntity);
+			return entity.getIdMapping().get(mappedEntity);
 		}
 
 		return null;
@@ -1114,13 +1113,13 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.mappingsJoined;
 			}
 
-			final List<JoinedMapping<?, ?, ?>> mappingsJoined = Lists.newArrayList();
-			this.entityMapping.addJoinedMappings(mappingsJoined);
+			final List<JoinedMapping<?, ?, ?>> _mappingsJoined = Lists.newArrayList();
+			this.entityMapping.addJoinedMappings(_mappingsJoined);
 
-			final JoinedMapping<?, ?, ?>[] mappingsJoined0 = new JoinedMapping[mappingsJoined.size()];
-			mappingsJoined.toArray(mappingsJoined0);
+			final JoinedMapping<?, ?, ?>[] __mappingsJoined = new JoinedMapping[_mappingsJoined.size()];
+			_mappingsJoined.toArray(__mappingsJoined);
 
-			return this.mappingsJoined = mappingsJoined0;
+			return this.mappingsJoined = __mappingsJoined;
 		}
 	}
 
@@ -1142,13 +1141,13 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.mappingsPlural;
 			}
 
-			final List<PluralMapping<?, ?, ?>> mappingsPlural = Lists.newArrayList();
-			this.entityMapping.addPluralMappings(mappingsPlural);
+			final List<PluralMapping<?, ?, ?>> _mappingsPlural = Lists.newArrayList();
+			this.entityMapping.addPluralMappings(_mappingsPlural);
 
-			final PluralMapping<?, ?, ?>[] mappingsPlural0 = new PluralMapping[mappingsPlural.size()];
-			mappingsPlural.toArray(mappingsPlural0);
+			final PluralMapping<?, ?, ?>[] __mappingsPlural = new PluralMapping[_mappingsPlural.size()];
+			_mappingsPlural.toArray(__mappingsPlural);
 
-			return this.mappingsPlural = mappingsPlural0;
+			return this.mappingsPlural = __mappingsPlural;
 		}
 	}
 
@@ -1170,17 +1169,17 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.mappingsPluralSorted;
 			}
 
-			final List<PluralMapping<?, ?, ?>> mappingsPluralSorted = Lists.newArrayList();
+			final List<PluralMapping<?, ?, ?>> _mappingsPluralSorted = Lists.newArrayList();
 			for (final PluralMapping<?, ?, ?> mapping : this.getMappingsPlural()) {
 				if (StringUtils.isNotBlank(mapping.getOrderBy())) {
-					mappingsPluralSorted.add(mapping);
+					_mappingsPluralSorted.add(mapping);
 				}
 			}
 
-			final PluralMapping<?, ?, ?>[] mappingsPluralSorted0 = new PluralMapping[mappingsPluralSorted.size()];
-			mappingsPluralSorted.toArray(mappingsPluralSorted0);
+			final PluralMapping<?, ?, ?>[] __mappingsPluralSorted = new PluralMapping[_mappingsPluralSorted.size()];
+			_mappingsPluralSorted.toArray(__mappingsPluralSorted);
 
-			return this.mappingsPluralSorted = mappingsPluralSorted0;
+			return this.mappingsPluralSorted = __mappingsPluralSorted;
 		}
 	}
 
@@ -1202,14 +1201,14 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.singularMappings;
 			}
 
-			final List<Mapping<?, ?, ?>> singularMappings = Lists.newArrayList();
+			final List<Mapping<?, ?, ?>> _singularMappings = Lists.newArrayList();
 
-			this.entityMapping.addSingularMappings(singularMappings);
+			this.entityMapping.addSingularMappings(_singularMappings);
 
-			final Mapping<?, ?, ?>[] singularMappings0 = new Mapping[singularMappings.size()];
-			singularMappings.toArray(singularMappings0);
+			final Mapping<?, ?, ?>[] __singularMappings = new Mapping[_singularMappings.size()];
+			_singularMappings.toArray(__singularMappings);
 
-			return this.singularMappings = singularMappings0;
+			return this.singularMappings = __singularMappings;
 		}
 	}
 
@@ -1334,10 +1333,10 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.tables;
 			}
 
-			final EntityTable[] tables = new EntityTable[this.tableMap.size()];
-			this.tableMap.values().toArray(tables);
+			final EntityTable[] _tables = new EntityTable[this.tableMap.size()];
+			this.tableMap.values().toArray(_tables);
 
-			Arrays.sort(tables, new Comparator<EntityTable>() {
+			Arrays.sort(_tables, new Comparator<EntityTable>() {
 
 				@Override
 				public int compare(EntityTable o1, EntityTable o2) {
@@ -1353,7 +1352,34 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				}
 			});
 
-			return this.tables = tables;
+			return this.tables = _tables;
+		}
+	}
+
+	/**
+	 * Initializes the custom indexes
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private void initCustomIndexes() {
+		for (final IndexMetadata index : this.indexes) {
+			final EntityTable table = StringUtils.isNotBlank(index.getTable()) ? this.tableMap.get(index.getTable()) : this.primaryTable;
+			if (table == null) {
+				throw new MappingException("Cannot locate table for index " + index.getName(), index.getLocator());
+			}
+
+			final List<BasicColumn> columns = Lists.newArrayList();
+			for (final String path : index.getColumnNames()) {
+				final Mapping<?, ?, ?> mapping = this.getRootMapping().getMapping(path);
+				if (!(mapping instanceof BasicMapping)) {
+					throw new MappingException("Cannot locate the basic path " + path + " for index " + index.getName(), index.getLocator());
+				}
+
+				columns.add(((BasicMapping<?, ?>) mapping).getColumn());
+			}
+
+			table.addIndex(index.getName(), columns.toArray(new BasicColumn[columns.size()]));
 		}
 	}
 
@@ -1378,24 +1404,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			}
 		}
 
-		for (final IndexMetadata index : this.indexes) {
-			final EntityTable table = StringUtils.isNotBlank(index.getTable()) ? this.tableMap.get(index.getTable()) : this.primaryTable;
-			if (table == null) {
-				throw new MappingException("Cannot locate table for index " + index.getName(), index.getLocator());
-			}
-
-			final List<BasicColumn> columns = Lists.newArrayList();
-			for (final String path : index.getColumnNames()) {
-				final Mapping<?, ?, ?> mapping = this.getRootMapping().getMapping(path);
-				if (!(mapping instanceof BasicMapping)) {
-					throw new MappingException("Cannot locate the basic path " + path + " for index " + index.getName(), index.getLocator());
-				}
-
-				columns.add(((BasicMapping<?, ?>) mapping).getColumn());
-			}
-
-			table.addIndex(index.getName(), columns.toArray(new BasicColumn[columns.size()]));
-		}
+		this.initCustomIndexes();
 	}
 
 	/**
@@ -1714,14 +1723,14 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 					}
 				}
 				else {
-					final List<EntityTable> updateTables = Lists.newArrayList(this.getTables());
-					for (final Iterator<EntityTable> i = updateTables.iterator(); i.hasNext();) {
+					final List<EntityTable> _updateTables = Lists.newArrayList(this.getTables());
+					for (final Iterator<EntityTable> i = _updateTables.iterator(); i.hasNext();) {
 						if (!i.next().performUpdateWithUpdatability(connection, instance)) {
 							i.remove();
 						}
 					}
 
-					this.updateTables = updateTables.toArray(new EntityTable[updateTables.size()]);
+					this.updateTables = _updateTables.toArray(new EntityTable[_updateTables.size()]);
 				}
 			}
 		}

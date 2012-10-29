@@ -54,7 +54,7 @@ public class TupleImpl implements Tuple {
 		this.aliases = aliases;
 
 		this.selections = selections;
-		this.values = values;
+		this.values = values != null ? Arrays.copyOf(values, values.length) : null;
 	}
 
 	/**

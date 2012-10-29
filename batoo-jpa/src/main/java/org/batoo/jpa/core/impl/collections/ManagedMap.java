@@ -447,8 +447,7 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	 */
 	@Override
 	public String toString() {
-		final Object id = this.getManagedInstance().getId() != null ? this.getManagedInstance().getId().getId() : null;
-		final String instance = this.getManagedInstance().getType().getName() + "@" + id;
+		final String instance = this.getManagedInstance().getType().getName() + "@" + this.getManagedInstance().getId().getId();
 
 		return "ManagedMap [initialized=" + this.initialized + ", managedInstance=" + instance + ", delegate=" + this.delegate + ", snapshot=" + this.snapshot
 			+ ", mapping=" + this.getMapping() + "]";

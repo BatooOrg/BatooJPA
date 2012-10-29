@@ -239,7 +239,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * 
 	 */
 	@Override
-	public Object extractKey(E value) {
+	public Object extractKey(Object value) {
 		Object key = null;
 
 		if (this.mapKeyMapping != null) {
@@ -750,9 +750,8 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	@SuppressWarnings("unchecked")
 	public void sortList(Object instance) {
 		final ManagedList<Z, E> list = (ManagedList<Z, E>) this.get(instance);
-		final ArrayList<E> delegate = list.getDelegate();
-		if ((list != null) && list.isInitialized()) {
-			Collections.sort(delegate, this.getComparator());
+		if (list.isInitialized()) {
+			Collections.sort(list.getDelegate(), this.getComparator());
 		}
 	}
 }

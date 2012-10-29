@@ -65,6 +65,7 @@ import com.google.common.collect.Sets;
  * @author hceylan
  * @since $version
  */
+// FIXME: ORM.xml registry clean up
 public abstract class Element extends ElementConstants implements LocatableMatadata {
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(Element.class);
@@ -74,8 +75,8 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	static {
 		// metamodel
 		Element.factoryMap.put(ElementConstants.ELEMENT_ENTITY_MAPPINGS, EntityMappings.class);
-		Element.factoryMap.put(ElementConstants.ELEMENT_CATALOG, InheritanceElement.class);
-		Element.factoryMap.put(ElementConstants.ELEMENT_SCHEMA, InheritanceElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_CATALOG, CatalogElement.class);
+		Element.factoryMap.put(ElementConstants.ELEMENT_SCHEMA, SchemaElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_ACCESS, AccessElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_PERSISTENT_UNIT_METADATA, PersistenceUnitMetadataElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_XML_MAPPING_METADATA_COMPLETE, XmlMappingMetadataCompleteElement.class);
@@ -109,7 +110,6 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 		Element.factoryMap.put(ElementConstants.ELEMENT_TRANSIENT, TransientElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_ID, IdAttributeElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_ID_CLASS, IdClassElement.class);
-		Element.factoryMap.put(ElementConstants.ELEMENT_EMBEDDED, IdAttributeElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_EMBEDDED_ID, EmbeddedIdAttributeElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_VERSION, VersionAttributeElement.class);
 		Element.factoryMap.put(ElementConstants.ELEMENT_BASIC, BasicAttributeElement.class);

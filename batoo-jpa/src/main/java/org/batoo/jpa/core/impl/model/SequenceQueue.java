@@ -34,7 +34,7 @@ import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 public class SequenceQueue extends IdQueue {
 
 	private static final long serialVersionUID = 1L;
-	private final JdbcAdaptor jdbcAdaptor;
+	private transient final JdbcAdaptor jdbcAdaptor;
 	private final DataSource datasource;
 	private final String sequenceName;
 

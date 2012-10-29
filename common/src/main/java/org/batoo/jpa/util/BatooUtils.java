@@ -69,10 +69,9 @@ public class BatooUtils {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static void addAll(Collection source, Collection target) {
+	public static <E> void addAll(Collection<? extends E> source, Collection<E> target) {
 		if (source instanceof List) {
-			final List<?> list = (List<?>) source;
+			final List<? extends E> list = (List<? extends E>) source;
 			for (int i = 0; i < list.size(); i++) {
 				target.add(list.get(i));
 			}

@@ -44,7 +44,7 @@ public class ResultListReference {
 		super();
 
 		this.sql = sql;
-		this.parameters = parameters;
+		this.parameters = parameters != null ? Arrays.copyOf(parameters, parameters.length) : null;
 	}
 
 	/**

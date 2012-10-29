@@ -96,9 +96,7 @@ public class CacheImpl implements Cache {
 	 */
 	@Override
 	public boolean contains(Class<?> cls, Object primaryKey) {
-		final EntityTypeImpl<?> entity = this.emf.getMetamodel().getEntity(cls);
-
-		return this.cacheDelegate.containsKey(entity + "_" + primaryKey);
+		return this.getEntityMap(cls).containsKey(primaryKey);
 	}
 
 	/**

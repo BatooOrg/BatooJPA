@@ -726,20 +726,18 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 
 	@SuppressWarnings("unchecked")
 	private Mapping<?, ?, ?> getMapping(String attributeName) {
-		Mapping<?, ?, ?> mapping = null;
+		if (this.entity != null) {
+			return this.entity.getRootMapping().getMapping(attributeName);
+		}
 
-		if (this.entity instanceof EntityTypeImpl) {
-			mapping = this.entity.getRootMapping().getMapping(attributeName);
-		}
-		else if (this.type instanceof EmbeddableTypeImpl) {
+		if (this.type instanceof EmbeddableTypeImpl) {
 			if (this.getMapping() instanceof EmbeddedMapping) {
-				mapping = ((EmbeddedMapping<? super Z, X>) this.getMapping()).getChild(attributeName);
+				return ((EmbeddedMapping<? super Z, X>) this.getMapping()).getChild(attributeName);
 			}
-			else {
-				mapping = ((ElementCollectionMapping<? super Z, ?, X>) this.getMapping()).getMapping(attributeName);
-			}
+			return ((ElementCollectionMapping<? super Z, ?, X>) this.getMapping()).getMapping(attributeName);
 		}
-		return mapping;
+
+		return null;
 	}
 
 	/**
@@ -907,11 +905,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 
 	private void handleElementCollectionFetch(SessionImpl session, ResultSet row, Object instance, FetchImpl<X, ?> fetch) throws SQLException {
 		final EntryImpl<Object, ?> child = fetch.handleElementFetch(row, MapSelectType.ENTRY);
-
-		// if null then continue
-		if (child == null) {
-			return;
-		}
 
 		final ElementCollectionMapping<? super X, ?, ?> mapping = (ElementCollectionMapping<? super X, ?, ?>) fetch.getMapping();
 

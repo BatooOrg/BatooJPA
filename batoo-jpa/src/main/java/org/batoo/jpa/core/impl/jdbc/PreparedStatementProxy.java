@@ -337,8 +337,8 @@ public class PreparedStatementProxy implements PreparedStatement {
 					new OperationTookLongTimeWarning().printStackTrace(this.sqlStream);
 				}
 
-				PreparedStatementProxy.LOG.warn(new OperationTookLongTimeWarning(), "{0}:{1} {2} msecs, executeUpdate()", this.statementNo, this.executionNo,
-					time);
+				PreparedStatementProxy.LOG.warn("{0}:{1} {2} msecs, executeUpdate()", this.statementNo, this.executionNo, time);
+				PreparedStatementProxy.LOG.debug(new OperationTookLongTimeWarning(), "");
 			}
 			else {
 				if (this.sqlStream != null) {

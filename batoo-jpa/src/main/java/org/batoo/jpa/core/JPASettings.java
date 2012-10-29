@@ -33,7 +33,7 @@ public interface JPASettings extends BJPASettings {
 	 * <p/>
 	 * See section 8.2.1.9
 	 */
-	public static final String JDBC_DRIVER = "javax.persistence.jdbc.driver";
+	String JDBC_DRIVER = "javax.persistence.jdbc.driver";
 
 	/**
 	 * The JDBC connection password.
@@ -43,7 +43,7 @@ public interface JPASettings extends BJPASettings {
 	 * <p/>
 	 * See JPA 2 section 8.2.1.9
 	 */
-	public static final String JDBC_PASSWORD = "javax.persistence.jdbc.password";
+	String JDBC_PASSWORD = "javax.persistence.jdbc.password";
 
 	/**
 	 * The JDBC connection url to use to connect to the database.
@@ -53,7 +53,7 @@ public interface JPASettings extends BJPASettings {
 	 * <p/>
 	 * See section 8.2.1.9
 	 */
-	public static final String JDBC_URL = "javax.persistence.jdbc.url";
+	String JDBC_URL = "javax.persistence.jdbc.url";
 
 	/**
 	 * The JDBC connection user name.
@@ -63,56 +63,56 @@ public interface JPASettings extends BJPASettings {
 	 * <p/>
 	 * See section 8.2.1.9
 	 */
-	public static final String JDBC_USER = "javax.persistence.jdbc.user";
+	String JDBC_USER = "javax.persistence.jdbc.user";
 
 	/**
 	 * The JNDI name of a JTA {@link javax.sql.DataSource}.
 	 * <p/>
 	 * See JPA 2 sections 9.4.3 and 8.2.1.5
 	 */
-	public static final String JTA_DATASOURCE = "javax.persistence.jtaDataSource";
+	String JTA_DATASOURCE = "javax.persistence.jtaDataSource";
 
 	/**
 	 * Used to request (hint) a pessimistic lock scope.
 	 * <p/>
 	 * See JPA 2 sections 8.2.1.9 and 3.4.4.3
 	 */
-	public static final String LOCK_SCOPE = "javax.persistence.lock.scope";
+	String LOCK_SCOPE = "javax.persistence.lock.scope";
 
 	/**
 	 * Used to request (hint) a pessimistic lock timeout (in milliseconds).
 	 * <p/>
 	 * See JPA 2 sections 8.2.1.9 and 3.4.4.3
 	 */
-	public static final String LOCK_TIMEOUT = "javax.persistence.lock.timeout";
+	String LOCK_TIMEOUT = "javax.persistence.lock.timeout";
 
 	/**
 	 * The JNDI name of a non-JTA {@link javax.sql.DataSource}.
 	 * <p/>
 	 * See JPA 2 sections 9.4.3 and 8.2.1.5
 	 */
-	public static final String NON_JTA_DATASOURCE = "javax.persistence.nonJtaDataSource";
+	String NON_JTA_DATASOURCE = "javax.persistence.nonJtaDataSource";
 
 	/**
 	 * Used to coordinate with bean validators
 	 * <p/>
 	 * See JPA 2 section 8.2.1.9
 	 */
-	public static final String PERSIST_VALIDATION_GROUP = "javax.persistence.validation.group.pre-persist";
+	String PERSIST_VALIDATION_GROUP = "javax.persistence.validation.group.pre-persist";
 
 	/**
 	 * THe name of the {@link javax.persistence.spi.PersistenceProvider} implementor
 	 * <p/>
 	 * See JPA 2 sections 9.4.3 and 8.2.1.4
 	 */
-	public static final String PROVIDER = "javax.persistence.provider";
+	String PROVIDER = "javax.persistence.provider";
 
 	/**
 	 * Used to coordinate with bean validators
 	 * <p/>
 	 * See JPA 2 section 8.2.1.9
 	 */
-	public static final String REMOVE_VALIDATION_GROUP = "javax.persistence.validation.group.pre-remove";
+	String REMOVE_VALIDATION_GROUP = "javax.persistence.validation.group.pre-remove";
 
 	/**
 	 * Used to indicate whether second-level (what JPA terms shared cache) caching is enabled as per the rules defined in JPA 2 section
@@ -122,7 +122,7 @@ public interface JPASettings extends BJPASettings {
 	 * 
 	 * @see javax.persistence.SharedCacheMode
 	 */
-	public static final String SHARED_CACHE_MODE = "javax.persistence.sharedCache.mode";
+	String SHARED_CACHE_MODE = "javax.persistence.sharedCache.mode";
 
 	/**
 	 * NOTE : Not a valid EMF property...
@@ -131,7 +131,7 @@ public interface JPASettings extends BJPASettings {
 	 * 
 	 * @see javax.persistence.CacheRetrieveMode
 	 */
-	public static final String SHARED_CACHE_RETRIEVE_MODE = "javax.persistence.cache.retrieveMode";
+	String SHARED_CACHE_RETRIEVE_MODE = "javax.persistence.cache.retrieveMode";
 
 	/**
 	 * NOTE : Not a valid EMF property...
@@ -140,26 +140,26 @@ public interface JPASettings extends BJPASettings {
 	 * 
 	 * @see javax.persistence.CacheStoreMode
 	 */
-	public static final String SHARED_CACHE_STORE_MODE = "javax.persistence.cache.storeMode";
+	String SHARED_CACHE_STORE_MODE = "javax.persistence.cache.storeMode";
 
 	/**
 	 * The type of transactions supported by the entity managers.
 	 * <p/>
 	 * See JPA 2 sections 9.4.3 and 8.2.1.2
 	 */
-	public static final String TRANSACTION_TYPE = "javax.persistence.transactionType";
+	String TRANSACTION_TYPE = "javax.persistence.transactionType";
 
 	/**
 	 * Used to coordinate with bean validators
 	 * <p/>
 	 * See JPA 2 section 8.2.1.9
 	 */
-	public static final String UPDATE_VALIDATION_GROUP = "javax.persistence.validation.group.pre-update";
+	String UPDATE_VALIDATION_GROUP = "javax.persistence.validation.group.pre-update";
 
 	/**
 	 * Used to pass along any discovered validator factory.
 	 */
-	public static final String VALIDATION_FACTORY = "javax.persistence.validation.factory";
+	String VALIDATION_FACTORY = "javax.persistence.validation.factory";
 
 	/**
 	 * Used to indicate what form of automatic validation is in effect as per rules defined in JPA 2 section 3.6.1.1
@@ -168,5 +168,5 @@ public interface JPASettings extends BJPASettings {
 	 * 
 	 * @see javax.persistence.ValidationMode
 	 */
-	public static final String VALIDATION_MODE = "javax.persistence.validation.mode";
+	String VALIDATION_MODE = "javax.persistence.validation.mode";
 }

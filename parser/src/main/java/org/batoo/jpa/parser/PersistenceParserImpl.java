@@ -88,6 +88,7 @@ public class PersistenceParserImpl implements PersistenceParser {
 		this.puName = puInfo.getPersistenceUnitName();
 		this.classloader = puInfo.getClassLoader();
 
+		// FIXME: If properties does not exist at all NPE
 		for (final Entry<Object, Object> entry : puInfo.getProperties().entrySet()) {
 			this.properties.put((String) entry.getKey(), entry.getValue());
 		}
@@ -303,6 +304,7 @@ public class PersistenceParserImpl implements PersistenceParser {
 	 * @author hceylan
 	 */
 	private void parseOrmXml(final String mappingFile) {
+		// TODO do we have the classloader provided
 		final InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(mappingFile);
 
 		if (is != null) {
@@ -313,6 +315,7 @@ public class PersistenceParserImpl implements PersistenceParser {
 
 			PersistenceParserImpl.LOG.trace("Merged metamodel {0}", this.metadata);
 		}
+		// TODO error on not found orm.xml
 	}
 
 	/**

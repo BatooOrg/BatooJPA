@@ -71,8 +71,6 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	private final Map<String, SingularAttributeImpl<? super X, ?>> singularAttributes = Maps.newHashMap();
 	private final Map<String, PluralAttributeImpl<? super X, ?, ?>> pluralAttributes = Maps.newHashMap();
 
-	// private final Set<Class<?>> validationGroups = Sets.newHashSet();
-
 	/**
 	 * @param metamodel
 	 *            the meta model
@@ -121,8 +119,6 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 
 			this.pluralAttributes.put(attribute.getName(), (PluralAttributeImpl<? super X, ?, ?>) attribute);
 		}
-
-		// this.validationGroups.addAll(this.getValidation(attribute));
 	}
 
 	/**
@@ -485,52 +481,4 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 
 		return attributes;
 	}
-
-	// private Collection<? extends Class<?>> getValidation(AttributeImpl<? super X, ?> attribute) {
-	// final Set<Class<?>> groups = Sets.newHashSet();
-	//
-	// final Member member = attribute.getJavaMember();
-	//
-	// Annotation[] annotations;
-	// if (member instanceof Field) {
-	// annotations = ((Field) member).getAnnotations();
-	// }
-	// else {
-	// annotations = ((Method) member).getAnnotations();
-	// }
-	//
-	// for (final Annotation annotation : annotations) {
-	// if (annotation.getClass().getAnnotation(Constraint.class) != null) {
-	// try {
-	// final Method method = annotation.getClass().getMethod("groups");
-	// final Class<?>[] singleGroups = (Class<?>[]) method.invoke(annotation);
-	// if (singleGroups.length == 0) {
-	// groups.add(Default.class);
-	// }
-	// else {
-	// for (final Class<?> group : singleGroups) {
-	// groups.add(group);
-	// }
-	// }
-	// }
-	// catch (final Exception e) {
-	// throw new MappingException("Cannot find groups property on validation constraint", attribute.getLocator());
-	// }
-	// }
-	// }
-	//
-	// return groups;
-	// }
-	//
-	// /**
-	// * Returns the set of validation groups.
-	// *
-	// * @return the set of validation groups
-	// *
-	// * @since $version
-	// * @author hceylan
-	// */
-	// public Set<Class<?>> getValidationGroups() {
-	// return this.validationGroups;
-	// }
 }

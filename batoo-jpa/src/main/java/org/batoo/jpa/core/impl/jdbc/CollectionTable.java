@@ -28,6 +28,7 @@ import javax.persistence.TemporalType;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
+import org.batoo.jpa.core.impl.model.mapping.ElementCollectionMapping;
 import org.batoo.jpa.core.impl.model.mapping.ElementMapping;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
@@ -165,6 +166,43 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	}
 
 	/**
+	 * @param type
+	 *            the type of the collection
+	 * @param defaultName
+	 *            the default name
+	 * @param metadata
+	 *            the column metadata
+	 * @param lob
+	 *            if the column is a lob type
+	 * @param temporalType
+	 *            the temporal type
+	 * @param enumType
+	 *            the enum type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void link(ElementCollectionMapping mapping, TypeImpl<?> type, String defaultName, ColumnMetadata metadata, EnumType enumType,
+		TemporalType temporalType, boolean lob) {
+		if (StringUtils.isBlank(this.getName())) {
+			this.setName(this.entity.getName() + "_" + defaultName);
+		}
+
+		this.key.link(null, this.entity);
+		this.key.setTable(this);
+
+		this.elementColumn = new ElementColumn(this.entity.getMetamodel().getJdbcAdaptor(), //
+			mapping, //
+			this, //
+			(metadata == null) || StringUtils.isBlank(metadata.getName()) ? defaultName : metadata.getName(), //
+			type.getJavaType(), //
+			enumType, //
+			temporalType, //
+			lob, //
+			metadata);
+	}
+
+	/**
 	 * Links
 	 * 
 	 * @param type
@@ -184,41 +222,6 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 
 		this.key.link(null, this.entity);
 		this.key.setTable(this);
-	}
-
-	/**
-	 * @param type
-	 *            the type of the collection
-	 * @param defaultName
-	 *            the default name
-	 * @param metadata
-	 *            the column metadata
-	 * @param lob
-	 *            if the column is a lob type
-	 * @param temporalType
-	 *            the temporal type
-	 * @param enumType
-	 *            the enum type
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void link(TypeImpl<?> type, String defaultName, ColumnMetadata metadata, EnumType enumType, TemporalType temporalType, boolean lob) {
-		if (StringUtils.isBlank(this.getName())) {
-			this.setName(this.entity.getName() + "_" + defaultName);
-		}
-
-		this.key.link(null, this.entity);
-		this.key.setTable(this);
-
-		this.elementColumn = new ElementColumn(this.entity.getMetamodel().getJdbcAdaptor(), //
-			this, //
-			(metadata == null) || StringUtils.isBlank(metadata.getName()) ? defaultName : metadata.getName(), //
-			type.getJavaType(), //
-			enumType, //
-			temporalType, //
-			lob, //
-			metadata);
 	}
 
 	/**

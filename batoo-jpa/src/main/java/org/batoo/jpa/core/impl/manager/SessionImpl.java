@@ -61,11 +61,8 @@ public class SessionImpl {
 	 */
 	public static final int BATCH_SIZE = 50;
 
-	private static volatile int nextSessionId = 0;
-
 	private final EntityManagerImpl em;
 	private final MetamodelImpl metamodel;
-	private final int sessionId;
 
 	private final HashMap<ManagedId<?>, ManagedInstance<?>> repository = Maps.newHashMap();
 
@@ -92,7 +89,6 @@ public class SessionImpl {
 
 		this.em = entityManager;
 		this.metamodel = metamodel;
-		this.sessionId = ++SessionImpl.nextSessionId;
 	}
 
 	/**
@@ -105,7 +101,7 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public void cascadeRemovals(ManagedInstance<?>[] instances) {
-		SessionImpl.LOG.debug("Cascading removals on session {0}", this.sessionId);
+		SessionImpl.LOG.debug("Cascading removals on session {0}", this);
 
 		for (final ManagedInstance<?> instance : instances) {
 			if (instance.getStatus() == Status.REMOVED) {
@@ -145,7 +141,7 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public void clear() {
-		SessionImpl.LOG.debug("Session clearing {0}", this.sessionId);
+		SessionImpl.LOG.debug("Session clearing {0}", this);
 
 		// TODO detach all the entities if there is in existing repository
 		this.repository.clear();
@@ -185,7 +181,6 @@ public class SessionImpl {
 				batch[batchSize] = removes[i];
 				batchSize++;
 				i++;
-				continue;
 			}
 
 			SessionImpl.LOG.debug("Batch remove is being performed for {0} with the size {1}", lastEntity.getName(), batchSize);
@@ -276,7 +271,7 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	private void doVersionChecks(Connection connection, ManagedInstance<?>[] removals, ManagedInstance<?>[] updates) throws SQLException {
-		SessionImpl.LOG.debug("Performing version checks on session {0}", this.sessionId);
+		SessionImpl.LOG.debug("Performing version checks on session {0}", this);
 
 		for (final ManagedInstance<?> instance : removals) {
 			instance.checkVersion(connection);
@@ -301,7 +296,7 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	private void doVersionUpgrades(Connection connection, ManagedInstance<?>[] updates) throws SQLException {
-		SessionImpl.LOG.debug("Performing version upgrades on session {0}", this.sessionId);
+		SessionImpl.LOG.debug("Performing version upgrades on session {0}", this);
 
 		for (final ManagedInstance<?> instance : updates) {
 			instance.incrementVersion(connection, false);
@@ -375,7 +370,7 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public void flush(Connection connection) throws SQLException {
-		SessionImpl.LOG.debug("Flushing session {0}", this.sessionId);
+		SessionImpl.LOG.debug("Flushing session {0}", this);
 
 		final ArrayList<ManagedInstance<?>> updates = Lists.newArrayList(this.newEntities);
 		final ArrayList<ManagedInstance<?>> removals = Lists.newArrayListWithCapacity(this.changedEntities.size());
@@ -404,11 +399,12 @@ public class SessionImpl {
 
 		Prioritizer.sort(updates, removals, sortedUpdates, sortedRemovals, callbackAvailability);
 
-		SessionImpl.LOG.debug("Flushing session {0}: updates {1}, removals {2}", this.sessionId, sortedUpdates.length, sortedRemovals.length);
+		SessionImpl.LOG.debug("Flushing session {0}: updates {1}, removals {2}", this, sortedUpdates.length, sortedRemovals.length);
 
 		// validations
 		final EntityManagerFactoryImpl entityManagerFactory = this.em.getEntityManagerFactory();
 		if (entityManagerFactory.hasValidators()) {
+			// FIXME: Validate the whole session
 			for (final ManagedInstance<?> instance : sortedUpdates) {
 				instance.getType().runValidators(entityManagerFactory, instance);
 			}
@@ -449,7 +445,7 @@ public class SessionImpl {
 		// fire callbacks
 		this.firePostCallbacks(sortedUpdates, sortedRemovals, callbackAvailability);
 
-		SessionImpl.LOG.debug("Flush successful for session {0}", this.sessionId);
+		SessionImpl.LOG.debug("Flush successful for session {0}", this);
 
 		this.putInstancesToCache(this.em.getEntityManagerFactory().getCache(), sortedUpdates, sortedRemovals);
 
@@ -571,16 +567,6 @@ public class SessionImpl {
 	}
 
 	/**
-	 * Returns the sessionId.
-	 * 
-	 * @return the sessionId
-	 * @since $version
-	 */
-	public int getSessionId() {
-		return this.sessionId;
-	}
-
-	/**
 	 * Handles the additions to the collections.
 	 * 
 	 * @return the array of changed instances
@@ -589,7 +575,7 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public ManagedInstance<?>[] handleAdditions() {
-		SessionImpl.LOG.debug("Processing additions to the session {0}", this.sessionId);
+		SessionImpl.LOG.debug("Processing additions to the session {0}", this);
 
 		final ManagedInstance<?>[] instances = this.changedEntities.toArray(new ManagedInstance[this.changedEntities.size()]);
 		for (final ManagedInstance<?> instance : instances) {
@@ -606,7 +592,7 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public void handleExternals() {
-		SessionImpl.LOG.debug("Inspecting updated external entities on session {0}", this.sessionId);
+		SessionImpl.LOG.debug("Inspecting updated external entities on session {0}", this);
 
 		for (int i = 0; i < this.externalEntities.size(); i++) {
 			this.externalEntities.get(i).checkUpdated();
@@ -623,7 +609,7 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	public void handleOrphans(ManagedInstance<?>[] instances) {
-		SessionImpl.LOG.debug("Inspecting orphan on session {0}", this.sessionId);
+		SessionImpl.LOG.debug("Inspecting orphan on session {0}", this);
 
 		for (final ManagedInstance<?> instance : instances) {
 			if (instance.getStatus() != Status.REMOVED) {
@@ -716,7 +702,7 @@ public class SessionImpl {
 		if (this.loadTracker == 0) {
 			final CacheImpl cache = this.getEntityManager().getEntityManagerFactory().getCache();
 
-			SessionImpl.LOG.debug("Load tracker is released on session {0}", this.sessionId);
+			SessionImpl.LOG.debug("Load tracker is released on session {0}", this);
 
 			// swap the set
 			final ManagedInstance<?>[] entitiesLoaded = this.entitiesLoading.toArray(new ManagedInstance[this.entitiesLoading.size()]);
@@ -803,7 +789,7 @@ public class SessionImpl {
 		this.loadTracker++;
 
 		if (this.loadTracker == 1) {
-			SessionImpl.LOG.debug("Load tracker is triggered on session {0}", this.sessionId);
+			SessionImpl.LOG.debug("Load tracker is triggered on session {0}", this);
 		}
 	}
 }

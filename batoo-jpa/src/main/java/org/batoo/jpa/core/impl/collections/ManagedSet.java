@@ -491,8 +491,7 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 */
 	@Override
 	public String toString() {
-		final Object id = this.getManagedInstance().getId() != null ? this.getManagedInstance().getId().getId() : null;
-		final String instance = this.getManagedInstance().getType().getName() + "@" + id;
+		final String instance = this.getManagedInstance().getType().getName() + "@" + this.getManagedInstance().getId().getId();
 
 		return "ManagedSet [initialized=" + this.initialized + ", managedInstance=" + instance + ", delegate=" + this.delegate + ", snapshot=" + this.snapshot
 			+ ", mapping=" + this.getMapping() + "]";

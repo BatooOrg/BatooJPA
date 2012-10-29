@@ -265,7 +265,6 @@ public class ManagedInstance<X> {
 						final Collection<?> collection = (Collection<?>) mapping.get(this.instance);
 
 						// cascade to each element in the collection
-
 						if (collection instanceof List) {
 							final List<?> castedList = (List<?>) collection;
 							for (int i = 0; i < castedList.size(); i++) {
@@ -401,14 +400,8 @@ public class ManagedInstance<X> {
 
 			// if it is changed then mark as changed and bail out
 			if (mapping.getAttribute().getPersistentAttributeType() == PersistentAttributeType.BASIC) {
-				if (oldValue != newValue) {
-					if ((oldValue == null) || (newValue == null)) {
-						return true;
-					}
-
-					if (!ObjectUtils.equals(oldValue, newValue)) {
-						return true;
-					}
+				if (!ObjectUtils.equals(oldValue, newValue)) {
+					return true;
 				}
 
 				continue;
@@ -477,12 +470,11 @@ public class ManagedInstance<X> {
 			return true;
 		}
 
-		@SuppressWarnings("unchecked")
-		final ManagedInstance<? super X> other = (ManagedInstance<? super X>) obj;
-
-		if (this.getId() == null) {
+		if (obj == null) {
 			return false;
 		}
+
+		final ManagedInstance<?> other = (ManagedInstance<?>) obj;
 
 		return this.getId().equals(other.getId());
 	}
@@ -499,7 +491,9 @@ public class ManagedInstance<X> {
 	public boolean fillIdValues() {
 		ManagedInstance.LOG.debug("Auto generating id values for {0}", this);
 
-		return this.hasInitialId = this.fillValuesImpl();
+		this.hasInitialId = this.fillValuesImpl();
+
+		return this.hasInitialId;
 	}
 
 	private boolean fillValuesImpl() {
@@ -527,15 +521,17 @@ public class ManagedInstance<X> {
 	 * @author hceylan
 	 */
 	public void fireCallbacks(EntityListenerType type) {
+		EntityListenerType typeToFire = type;
+
 		if ((type == EntityListenerType.PRE_UPDATE) && (this.status == Status.NEW)) {
-			type = EntityListenerType.PRE_PERSIST;
+			typeToFire = EntityListenerType.PRE_PERSIST;
 		}
 
 		if ((type == EntityListenerType.POST_UPDATE) && (this.oldStatus == Status.NEW)) {
-			type = EntityListenerType.POST_PERSIST;
+			typeToFire = EntityListenerType.POST_PERSIST;
 		}
 
-		this.type.fireCallbacks(this.instance, type);
+		this.type.fireCallbacks(this.instance, typeToFire);
 	}
 
 	/**
@@ -576,7 +572,9 @@ public class ManagedInstance<X> {
 			return this.id;
 		}
 
-		return this.id = new ManagedId<X>(this.type, this.instance);
+		this.id = new ManagedId<X>(this.type, this.instance);
+
+		return this.id;
 	}
 
 	/**
@@ -683,9 +681,6 @@ public class ManagedInstance<X> {
 		}
 
 		final Object id = this.getId();
-		if (id == null) {
-			return 1;
-		}
 
 		final int prime = 31;
 		final int result = 1;
@@ -758,8 +753,8 @@ public class ManagedInstance<X> {
 
 				break;
 			case SHORT_OBJECT:
-				final Short shortObjValue = version.get(this.instance) == null ? 1 //
-					: new Short((short) (((Number) version.get(this.instance)).shortValue() + 1));
+				final Short shortObjValue = version.get(this.instance) == null ? 1 : //
+					Short.valueOf((short) (((Number) version.get(this.instance)).shortValue() + 1));
 				version.set(this.instance, shortObjValue);
 
 				ManagedInstance.LOG.debug("Version upgraded instance: {0} - {1}", this, shortObjValue);
@@ -775,7 +770,7 @@ public class ManagedInstance<X> {
 				break;
 			case INT_OBJECT:
 				final Integer intObjValue = version.get(this.instance) == null ? 1 : //
-					new Integer((((Number) version.get(this.instance)).intValue() + 1));
+					Integer.valueOf(((Number) version.get(this.instance)).intValue() + 1);
 				version.set(this.instance, intObjValue);
 
 				ManagedInstance.LOG.debug("Version upgraded instance: {0} - {1}", this, intObjValue);
@@ -791,7 +786,7 @@ public class ManagedInstance<X> {
 				break;
 			case LONG_OBJECT:
 				final Long longObjValue = version.get(this.instance) == null ? 1l : //
-					new Long((((Number) version.get(this.instance)).longValue() + 1));
+					Long.valueOf((((Number) version.get(this.instance)).longValue() + 1));
 				version.set(this.instance, longObjValue);
 
 				ManagedInstance.LOG.debug("Version upgraded instance: {0} - {1}", this, longObjValue);
@@ -1121,7 +1116,7 @@ public class ManagedInstance<X> {
 	 */
 	@Override
 	public String toString() {
-		return "ManagedInstance [session=" + this.session.getSessionId() //
+		return "ManagedInstance [session=" + this.session //
 			+ ", type=" + this.type.getName() //
 			+ ", status=" + this.status //
 			+ ", id=" + (this.id != null ? this.id.getId() : null) + "]";

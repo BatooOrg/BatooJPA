@@ -81,7 +81,7 @@ public interface JoinedMapping<Z, X, Y> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Object extractKey(Y value);
+	public Object extractKey(Object value);
 
 	/**
 	 * Flushes the associates.

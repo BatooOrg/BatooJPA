@@ -100,9 +100,11 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 						break;
 					case EMBEDDED:
 						attributeCount += ((EmbeddableTypeImpl<?>) attribute).getAttributeCount();
+						break;
 					case MANY_TO_ONE:
 					case ONE_TO_ONE:
 						attributeCount += ((EntityTypeImpl<?>) attribute.getType()).getPrimaryTable().getPkColumns().size();
+						break;
 					case ELEMENT_COLLECTION:
 					case MANY_TO_MANY:
 					case ONE_TO_MANY:

@@ -979,6 +979,8 @@ public class EntityManagerImpl implements EntityManager {
 			switch (existing.getStatus()) {
 				case REMOVED:
 					existing.setStatus(Status.MANAGED);
+
+					return existing.cascadePersist(this, processed);
 				case NEW:
 				case MANAGED:
 					return existing.cascadePersist(this, processed);
@@ -1069,7 +1071,7 @@ public class EntityManagerImpl implements EntityManager {
 		if (entity instanceof EnhancedInstance) {
 			final EnhancedInstance enhancedInstance = (EnhancedInstance) entity;
 			final ManagedInstance<?> instance = enhancedInstance.__enhanced__$$__getManagedInstance();
-			if ((instance != null) & (instance.getStatus() == Status.DETACHED)) {
+			if ((instance != null) && (instance.getStatus() == Status.DETACHED)) {
 				throw new IllegalArgumentException("Entity has been previously detached");
 			}
 		}

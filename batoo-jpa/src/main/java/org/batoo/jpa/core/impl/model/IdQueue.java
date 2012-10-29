@@ -102,7 +102,7 @@ public abstract class IdQueue extends LinkedBlockingQueue<Long> {
 			catch (final InterruptedException e) {
 				return;
 			}
-			catch (final Throwable e) {
+			catch (final Exception e) {
 				try {
 					Thread.currentThread();
 					Thread.sleep(1000);

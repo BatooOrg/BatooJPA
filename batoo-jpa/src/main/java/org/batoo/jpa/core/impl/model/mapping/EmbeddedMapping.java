@@ -76,7 +76,7 @@ public class EmbeddedMapping<Z, X> extends ParentMapping<Z, X> implements Singul
 	 * 
 	 */
 	@Override
-	public Object extractKey(X value) {
+	public Object extractKey(Object value) {
 		return null;
 	}
 

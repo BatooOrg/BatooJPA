@@ -82,7 +82,7 @@ public abstract class DeploymentManager<X> {
 		NAMED_QUERIES
 	}
 
-	private class DeploymentUnitFuture extends FutureTask<Void> implements Comparable<DeploymentUnitFuture> {
+	private static class DeploymentUnitFuture extends FutureTask<Void> implements Comparable<DeploymentUnitFuture> {
 
 		private final DeploymentUnitTask task;
 
@@ -106,6 +106,49 @@ public abstract class DeploymentManager<X> {
 		@Override
 		public int compareTo(DeploymentUnitFuture o) {
 			return this.task.compareTo(o.task);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 */
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+
+			if (obj == null) {
+				return false;
+			}
+
+			if (this.getClass() != obj.getClass()) {
+				return false;
+			}
+
+			final DeploymentUnitFuture other = (DeploymentUnitFuture) obj;
+			if (this.task == null) {
+				if (other.task != null) {
+					return false;
+				}
+			}
+			else if (!this.task.equals(other.task)) {
+				return false;
+			}
+
+			return true;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 */
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = (prime * result) + ((this.task == null) ? 0 : this.task.hashCode());
+			return result;
 		}
 	}
 
@@ -253,7 +296,7 @@ public abstract class DeploymentManager<X> {
 				future.get();
 			}
 		}
-		catch (final Throwable t) {
+		catch (final Exception t) {
 			this.handleException(t);
 		}
 		finally {

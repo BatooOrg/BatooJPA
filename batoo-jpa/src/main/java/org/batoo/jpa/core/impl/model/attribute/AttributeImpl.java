@@ -45,6 +45,10 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y> {
 
 	private static int nextAttributeId;
 
+	private static int nextAttributeId() {
+		return AttributeImpl.nextAttributeId++;
+	}
+
 	private final int attributeId;
 	private final AttributeMetadata metadata;
 	private final ManagedTypeImpl<X> declaringType;
@@ -52,6 +56,7 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y> {
 	private final Member javaMember;
 	private final Class<Y> javaType;
 	private final MetamodelImpl metamodel;
+
 	private final AbstractAccessor accessor;
 
 	/**
@@ -67,7 +72,7 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y> {
 	public AttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata) {
 		super();
 
-		this.attributeId = AttributeImpl.nextAttributeId++;
+		this.attributeId = AttributeImpl.nextAttributeId();
 		this.metadata = metadata;
 
 		this.declaringType = declaringType;

@@ -20,7 +20,6 @@ package org.batoo.jpa.core.impl.model.mapping;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -210,7 +209,7 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	 * 
 	 */
 	@Override
-	public Object extractKey(E value) {
+	public Object extractKey(Object value) {
 		return this.keyMapping.get(value);
 	}
 
@@ -546,7 +545,7 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 			this.collectionTable.link((EmbeddableTypeImpl<E>) this.type, defaultName, this.rootMapping);
 		}
 		else {
-			this.collectionTable.link(this.type, defaultName, this.column, this.enumType, this.temporalType, this.lob);
+			this.collectionTable.link(this, this.type, defaultName, this.column, this.enumType, this.temporalType, this.lob);
 
 		}
 
@@ -637,7 +636,7 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	public void setCollection(ManagedInstance<?> instance, Collection<? extends E> children) {
 		final ManagedCollection<E> collection = (ManagedCollection<E>) this.attribute.newCollection(this, instance, false);
 
-		collection.getDelegate().addAll(children);
+		BatooUtils.addAll(children, collection.getDelegate());
 
 		this.set(instance.getInstance(), collection);
 	}
@@ -659,9 +658,8 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	@SuppressWarnings("unchecked")
 	public void sortList(Object instance) {
 		final ManagedList<Z, E> list = (ManagedList<Z, E>) this.get(instance);
-		final ArrayList<E> delegate = list.getDelegate();
-		if ((list != null) && list.isInitialized()) {
-			Collections.sort(delegate, this.getComparator());
+		if (list.isInitialized()) {
+			Collections.sort(list.getDelegate(), this.getComparator());
 		}
 	}
 }

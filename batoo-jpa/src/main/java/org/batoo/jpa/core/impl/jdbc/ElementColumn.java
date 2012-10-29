@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import javax.persistence.EnumType;
 import javax.persistence.TemporalType;
 
+import org.batoo.jpa.core.impl.model.mapping.ElementCollectionMapping;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.MappingException;
@@ -37,6 +38,7 @@ import org.batoo.jpa.parser.metadata.ColumnMetadata;
  */
 public class ElementColumn extends AbstractColumn {
 
+	private final ElementCollectionMapping<?, ?, ?> mapping;
 	private final CollectionTable table;
 	private final int sqlType;
 	private final String columnDefinition;
@@ -57,6 +59,8 @@ public class ElementColumn extends AbstractColumn {
 	 * 
 	 * @param jdbcAdaptor
 	 *            the jdbc adaptor
+	 * @param mapping
+	 *            the mapping
 	 * @param table
 	 *            the table
 	 * @param name
@@ -75,11 +79,12 @@ public class ElementColumn extends AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ElementColumn(JdbcAdaptor jdbcAdaptor, CollectionTable table, String name, Class<?> javaType, EnumType enumType, TemporalType temporalType,
-		boolean lob, ColumnMetadata metadata) {
+	public ElementColumn(JdbcAdaptor jdbcAdaptor, ElementCollectionMapping<?, ?, ?> mapping, CollectionTable table, String name, Class<?> javaType,
+		EnumType enumType, TemporalType temporalType, boolean lob, ColumnMetadata metadata) {
 		super();
 
 		this.locator = metadata != null ? metadata.getLocator() : null;
+		this.mapping = mapping;
 
 		this.table = table;
 		this.sqlType = TypeFactory.getSqlType(javaType, temporalType, enumType, lob);
@@ -304,5 +309,7 @@ public class ElementColumn extends AbstractColumn {
 				catch (final Exception e) {}
 			}
 		}
+
+		this.mapping.set(instance, value);
 	}
 }

@@ -264,11 +264,6 @@ public final class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 			case IDENTITY:
 				// indicate a requirement for an implicit flush
 				return false;
-			case MANUAL:
-				// only check if the id is not null
-				if (value == null) {
-					throw new PersistenceException("Manual id cannot be null");
-				}
 			case SEQUENCE:
 				// fill with the sequence
 				id = this.getMetamodel().getNextSequence(this.generator);

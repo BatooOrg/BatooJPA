@@ -87,6 +87,10 @@ public abstract class Mapping<Z, X, Y> {
 			return true;
 		}
 
+		if (obj == null) {
+			return false;
+		}
+
 		final Mapping<?, ?, ?> other = (Mapping<?, ?, ?>) obj;
 
 		return this.getPath().equals(other.getPath());
@@ -199,7 +203,9 @@ public abstract class Mapping<Z, X, Y> {
 			sb.append(".").append(this.path);
 		}
 
-		return this.h = this.path.toString().hashCode();
+		this.h = sb.toString().hashCode();
+
+		return this.h;
 	}
 
 	/**
