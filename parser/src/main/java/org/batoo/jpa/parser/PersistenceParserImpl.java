@@ -39,7 +39,6 @@ import org.batoo.jpa.parser.persistence.Persistence.PersistenceUnit.Properties.P
 import org.batoo.jpa.parser.persistence.PersistenceUnitCachingType;
 import org.batoo.jpa.parser.persistence.PersistenceUnitValidationModeType;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
@@ -103,7 +102,7 @@ public class PersistenceParserImpl implements PersistenceParser {
 
 		this.parseOrmXmls();
 
-		this.metadata.parse(puInfo.getJarFileUrls(), this.classloader);
+		this.metadata.parse(puInfo.getJarFileUrls(), this.classloader, puInfo.getManagedClassNames(), puInfo.excludeUnlistedClasses());
 		this.sharedCacheMode = puInfo.getSharedCacheMode();
 		this.jtaDataSource = puInfo.getJtaDataSource();
 		this.nonJtaDataSource = puInfo.getNonJtaDataSource();
@@ -156,45 +155,6 @@ public class PersistenceParserImpl implements PersistenceParser {
 
 		this.jtaDataSource = null;
 		this.nonJtaDataSource = null;
-	}
-
-	/**
-	 * @param emName
-	 *            the name of the entity manager
-	 * @param properties
-	 *            the list of properties
-	 * @param classes
-	 *            the array of classes
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public PersistenceParserImpl(String emName, Map<String, String> properties, String[] classes) {
-		super();
-
-		this.puName = emName;
-		this.classloader = Thread.currentThread().getContextClassLoader();
-
-		// initialize the persistence unit
-		final PersistenceUnit pu = new PersistenceUnit();
-		for (final String clazz : classes) {
-			pu.getClazzs().add(clazz);
-		}
-
-		for (final Entry<String, String> property : properties.entrySet()) {
-			this.properties.put(property.getKey(), property.getValue());
-		}
-
-		this.properties.putAll(properties);
-		this.hasValidators = true;
-
-		this.metadata = new MetadataImpl(pu.getClazzs());
-		this.metadata.parse(this.classloader);
-
-		this.ormMappingFiles = Lists.newArrayList();
-		this.jtaDataSource = null;
-		this.nonJtaDataSource = null;
-		this.sharedCacheMode = null;
 	}
 
 	/**

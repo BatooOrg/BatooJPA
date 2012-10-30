@@ -346,14 +346,28 @@ public class MetadataImpl implements Metadata {
 	 *            the optional jar files
 	 * @param classloader
 	 *            the class loader
+	 * @param managedClassNames
+	 *            the list of explicist managed class names
+	 * @param excludeUnlistedClasses
+	 *            if unlisted classes should be excluded
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void parse(List<URL> jarFiles, ClassLoader classloader) {
-		final URLClassLoader classPath = new URLClassLoader(jarFiles.toArray(new URL[jarFiles.size()]), classloader);
+	public void parse(List<URL> jarFiles, ClassLoader classloader, List<String> managedClassNames, boolean excludeUnlistedClasses) {
+		final URL[] urls = jarFiles.toArray(new URL[jarFiles.size()]);
+		final URLClassLoader classPath = excludeUnlistedClasses ? new URLClassLoader(urls) : new URLClassLoader(urls, classloader);
 
 		final Set<Class<?>> classes = Sets.newHashSet();
+
+		for (final String className : managedClassNames) {
+			try {
+				classes.add(classloader.loadClass(className));
+			}
+			catch (final ClassNotFoundException e) {
+				throw new PersistenceException("Unable to load listed managed class " + className);
+			}
+		}
 
 		this.findClasses(classes, classPath);
 
