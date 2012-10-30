@@ -20,7 +20,6 @@ package org.batoo.jpa.core.impl.model.mapping;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -59,6 +58,7 @@ import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.PluralAttributeMetadata;
 import org.batoo.jpa.util.BatooUtils;
+import org.batoo.jpa.util.FinalWrapper;
 
 import com.google.common.collect.Lists;
 
@@ -86,7 +86,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	private Pair<BasicMapping<? super E, ?>, BasicAttribute<?, ?>>[] mapKeyMappings;
 	private EmbeddableTypeImpl<?> keyClass;
 	private String orderBy;
-	private Comparator<E> comparator;
+	private FinalWrapper<Comparator<E>> comparator;
 	private ColumnMetadata orderColumn;
 	private final String mapKey;
 	private ColumnMetadata mapKeyColumn;
@@ -276,16 +276,19 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	}
 
 	private Comparator<E> getComparator() {
-		if (this.comparator != null) {
-			return this.comparator;
-		}
-		synchronized (this) {
-			if (this.comparator != null) {
-				return this.comparator;
-			}
+		FinalWrapper<Comparator<E>> wrapper = this.comparator;
 
-			return this.comparator = new ListComparator<E>(this);
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.comparator == null) {
+					this.comparator = new FinalWrapper<Comparator<E>>(new ListComparator<E>(this));
+				}
+
+				wrapper = this.comparator;
+			}
 		}
+
+		return wrapper.value;
 	}
 
 	/**

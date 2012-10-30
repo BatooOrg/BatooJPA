@@ -42,6 +42,7 @@ import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
 import org.batoo.jpa.parser.metadata.PrimaryKeyJoinColumnMetadata;
+import org.batoo.jpa.util.FinalWrapper;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -63,9 +64,10 @@ public class ForeignKey {
 	private String tableName;
 	private OrderColumn orderColumn;
 
-	private String singleChildSql;
+	private FinalWrapper<String> singleChildSql;
 	private AbstractColumn[] singleChildRestrictions;
-	private String allChildrenSql;
+
+	private FinalWrapper<String> allChildrenSql;
 	private AbstractColumn[] singleChildUpdates;
 
 	private JoinColumn[] allChildrenRestrictions;
@@ -293,47 +295,49 @@ public class ForeignKey {
 	 * @author hceylan
 	 */
 	private String getAllChildrenSql() {
-		if (this.allChildrenSql != null) {
-			return this.allChildrenSql;
-		}
+		FinalWrapper<String> wrapper = this.allChildrenSql;
 
-		synchronized (this) {
-			if (this.allChildrenSql != null) {
-				return this.allChildrenSql;
-			}
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.allChildrenSql == null) {
 
-			final List<JoinColumn> allChildrenRestrictions = Lists.newArrayList();
+					final List<JoinColumn> allChildrenRestrictions = Lists.newArrayList();
 
-			final String updates = Joiner.on(", ").join(Lists.transform(this.joinColumns, new Function<JoinColumn, String>() {
+					final String updates = Joiner.on(", ").join(Lists.transform(this.joinColumns, new Function<JoinColumn, String>() {
 
-				@Override
-				public String apply(JoinColumn input) {
-					return input.getName() + " = NULL";
+						@Override
+						public String apply(JoinColumn input) {
+							return input.getName() + " = NULL";
+						}
+					}));
+
+					final String restrictions = Joiner.on(", ").join(Lists.transform(this.joinColumns, new Function<JoinColumn, String>() {
+
+						@Override
+						public String apply(JoinColumn input) {
+							allChildrenRestrictions.add(input);
+
+							return input.getName() + " = ?";
+						}
+					}));
+
+					final String order;
+					if (this.orderColumn != null) {
+						order = ", " + this.orderColumn.getName() + " = NULL";
+					}
+					else {
+						order = "";
+					}
+
+					this.allChildrenRestrictions = allChildrenRestrictions.toArray(new JoinColumn[allChildrenRestrictions.size()]);
+
+					this.allChildrenSql = new FinalWrapper<String>("UPDATE " + this.table.getQName() + "\nSET " + updates + order + "\nWHERE " + restrictions);
 				}
-			}));
 
-			final String restrictions = Joiner.on(", ").join(Lists.transform(this.joinColumns, new Function<JoinColumn, String>() {
-
-				@Override
-				public String apply(JoinColumn input) {
-					allChildrenRestrictions.add(input);
-
-					return input.getName() + " = ?";
-				}
-			}));
-
-			final String order;
-			if (this.orderColumn != null) {
-				order = ", " + this.orderColumn.getName() + " = NULL";
+				wrapper = this.allChildrenSql;
 			}
-			else {
-				order = "";
-			}
-
-			this.allChildrenRestrictions = allChildrenRestrictions.toArray(new JoinColumn[allChildrenRestrictions.size()]);
-
-			return this.allChildrenSql = "UPDATE " + this.table.getQName() + "\nSET " + updates + order + "\nWHERE " + restrictions;
 		}
+		return wrapper.value;
 	}
 
 	private PrimaryKeyJoinColumnMetadata getColumnMetadata(List<PrimaryKeyJoinColumnMetadata> metadata, BasicMapping<?, ?> basicMapping) {
@@ -435,54 +439,57 @@ public class ForeignKey {
 	 * @author hceylan
 	 */
 	private String getSingleChildSql() {
-		if (this.singleChildSql != null) {
-			return this.singleChildSql;
+		FinalWrapper<String> wrapper = this.singleChildSql;
+
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.singleChildSql == null) {
+
+					final List<AbstractColumn> singleChildRestrictions = Lists.newArrayList();
+					final List<AbstractColumn> singleChildUpdates = Lists.newArrayList();
+
+					final String updates = Joiner.on(", ").join(Lists.transform(this.joinColumns, new Function<JoinColumn, String>() {
+
+						@Override
+						public String apply(JoinColumn input) {
+							singleChildUpdates.add(input);
+
+							return input.getName() + " = ?";
+						}
+					}));
+
+					final String order;
+					if (this.orderColumn != null) {
+						singleChildUpdates.add(this.orderColumn);
+
+						order = ", " + this.orderColumn.getName() + " = ?";
+					}
+					else {
+						order = "";
+					}
+
+					final EntityTable table = (EntityTable) this.table;
+					final String restrictions = Joiner.on(" AND ").join(Collections2.transform(table.getPkColumns(), new Function<AbstractColumn, String>() {
+
+						@Override
+						public String apply(AbstractColumn input) {
+							singleChildRestrictions.add(input);
+
+							return input.getName() + " = ?";
+						}
+					}));
+
+					this.singleChildRestrictions = singleChildRestrictions.toArray(new AbstractColumn[singleChildRestrictions.size()]);
+					this.singleChildUpdates = singleChildUpdates.toArray(new AbstractColumn[singleChildUpdates.size()]);
+
+					this.singleChildSql = new FinalWrapper<String>("UPDATE " + this.table.getQName() + "\nSET " + updates + order + "\nWHERE " + restrictions);
+				}
+
+				wrapper = this.singleChildSql;
+			}
 		}
 
-		synchronized (this) {
-			if (this.singleChildSql != null) {
-				return this.singleChildSql;
-			}
-
-			final List<AbstractColumn> singleChildRestrictions = Lists.newArrayList();
-			final List<AbstractColumn> singleChildUpdates = Lists.newArrayList();
-
-			final String updates = Joiner.on(", ").join(Lists.transform(this.joinColumns, new Function<JoinColumn, String>() {
-
-				@Override
-				public String apply(JoinColumn input) {
-					singleChildUpdates.add(input);
-
-					return input.getName() + " = ?";
-				}
-			}));
-
-			final String order;
-			if (this.orderColumn != null) {
-				singleChildUpdates.add(this.orderColumn);
-
-				order = ", " + this.orderColumn.getName() + " = ?";
-			}
-			else {
-				order = "";
-			}
-
-			final EntityTable table = (EntityTable) this.table;
-			final String restrictions = Joiner.on(" AND ").join(Collections2.transform(table.getPkColumns(), new Function<AbstractColumn, String>() {
-
-				@Override
-				public String apply(AbstractColumn input) {
-					singleChildRestrictions.add(input);
-
-					return input.getName() + " = ?";
-				}
-			}));
-
-			this.singleChildRestrictions = singleChildRestrictions.toArray(new AbstractColumn[singleChildRestrictions.size()]);
-			this.singleChildUpdates = singleChildUpdates.toArray(new AbstractColumn[singleChildUpdates.size()]);
-
-			return this.singleChildSql = "UPDATE " + this.table.getQName() + "\nSET " + updates + order + "\nWHERE " + restrictions;
-		}
+		return wrapper.value;
 	}
 
 	/**

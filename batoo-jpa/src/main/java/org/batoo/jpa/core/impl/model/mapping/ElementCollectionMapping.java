@@ -64,6 +64,7 @@ import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.ElementCollectionAttributeMetadata;
 import org.batoo.jpa.util.BatooUtils;
+import org.batoo.jpa.util.FinalWrapper;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -102,7 +103,7 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	private SingularMapping<? super E, ?> keyMapping;
 
 	private ElementMapping<E> rootMapping;
-	private Comparator<E> comparator;
+	private FinalWrapper<Comparator<E>> comparator;
 	private CriteriaQueryImpl<E> selectCriteria;
 
 	private CriteriaQueryImpl<Object[]> selectMapCriteria;
@@ -247,16 +248,19 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	}
 
 	private Comparator<E> getComparator() {
-		if (this.comparator != null) {
-			return this.comparator;
-		}
-		synchronized (this) {
-			if (this.comparator != null) {
-				return this.comparator;
-			}
+		FinalWrapper<Comparator<E>> wrapper = this.comparator;
 
-			return this.comparator = new ListComparator<E>(this);
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.comparator == null) {
+					this.comparator = new FinalWrapper<Comparator<E>>(new ListComparator<E>(this));
+				}
+
+				wrapper = this.comparator;
+			}
 		}
+
+		return wrapper.value;
 	}
 
 	/**

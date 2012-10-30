@@ -32,6 +32,7 @@ import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
 import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.type.EmbeddableMetadata;
+import org.batoo.jpa.util.FinalWrapper;
 
 import com.google.common.collect.Lists;
 
@@ -48,7 +49,7 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	private static final Object[] EMPTY_PARAMS = new Object[] {};
 
 	private ConstructorAccessor constructor;
-	private Integer attributeCount;
+	private FinalWrapper<Integer> attributeCount;
 	private SingularAttributeImpl<?, ?>[] singularMappings;
 
 	/**
@@ -71,7 +72,7 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 			this.constructor = ReflectHelper.createConstructor(javaType.getConstructor());
 		}
 		catch (final Exception e) {
-			throw new MappingException("Embeddable type does not have a default constructor", this.getLocator());
+			throw new MappingException("Embeddable type does not have a default constructor", e, this.getLocator());
 		}
 	}
 
@@ -84,36 +85,39 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	 * @author hceylan
 	 */
 	public int getAttributeCount() {
-		if (this.attributeCount != null) {
-			return this.attributeCount;
-		}
-		synchronized (this) {
-			if (this.attributeCount != null) {
-				return this.attributeCount;
-			}
+		FinalWrapper<Integer> wrapper = this.attributeCount;
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.attributeCount == null) {
 
-			int attributeCount = 0;
-			for (final SingularAttribute<?, ?> attribute : this.getSingularAttributes()) {
-				switch (attribute.getPersistentAttributeType()) {
-					case BASIC:
-						attributeCount++;
-						break;
-					case EMBEDDED:
-						attributeCount += ((EmbeddableTypeImpl<?>) attribute).getAttributeCount();
-						break;
-					case MANY_TO_ONE:
-					case ONE_TO_ONE:
-						attributeCount += ((EntityTypeImpl<?>) attribute.getType()).getPrimaryTable().getPkColumns().size();
-						break;
-					case ELEMENT_COLLECTION:
-					case MANY_TO_MANY:
-					case ONE_TO_MANY:
-						break;
+					int attributeCount = 0;
+					for (final SingularAttribute<?, ?> attribute : this.getSingularAttributes()) {
+						switch (attribute.getPersistentAttributeType()) {
+							case BASIC:
+								attributeCount++;
+								break;
+							case EMBEDDED:
+								attributeCount += ((EmbeddableTypeImpl<?>) attribute).getAttributeCount();
+								break;
+							case MANY_TO_ONE:
+							case ONE_TO_ONE:
+								attributeCount += ((EntityTypeImpl<?>) attribute.getType()).getPrimaryTable().getPkColumns().size();
+								break;
+							case ELEMENT_COLLECTION:
+							case MANY_TO_MANY:
+							case ONE_TO_MANY:
+								break;
+						}
+					}
+
+					this.attributeCount = new FinalWrapper<Integer>(attributeCount);
 				}
-			}
 
-			return this.attributeCount = attributeCount;
+				wrapper = this.attributeCount;
+			}
 		}
+
+		return this.attributeCount.value;
 	}
 
 	/**

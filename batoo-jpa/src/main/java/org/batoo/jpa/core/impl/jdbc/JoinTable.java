@@ -33,6 +33,7 @@ import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
 import org.batoo.jpa.parser.metadata.JoinTableMetadata;
+import org.batoo.jpa.util.FinalWrapper;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -45,19 +46,20 @@ import com.google.common.collect.Lists;
  */
 public class JoinTable extends AbstractTable implements JoinableTable {
 
+	private final JdbcAdaptor jdbcAdaptor;
+
 	private final ForeignKey sourceKey;
 	private final ForeignKey destinationKey;
 	private final EntityTypeImpl<?> entity;
 
 	private OrderColumn orderColumn;
 
-	private String removeSql;
+	private FinalWrapper<String> removeSql;
+	private FinalWrapper<String> removeAllSql;
 
-	private String removeAllSql;
 	private JoinColumn[] sourceRemoveColumns;
 	private JoinColumn[] destinationRemoveColumns;
 	private JoinColumn[] removeAllColumns;
-	private final JdbcAdaptor jdbcAdaptor;
 
 	/**
 	 * @param entity
@@ -148,56 +150,62 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 	}
 
 	private String getRemoveAllSql() {
-		if (this.removeAllSql != null) {
-			return this.removeAllSql;
+		FinalWrapper<String> wrapper = this.removeAllSql;
+
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.removeAllSql == null) {
+
+					final List<String> restrictions = Lists.newArrayList();
+					this.removeAllColumns = new JoinColumn[this.sourceKey.getJoinColumns().size()];
+
+					int i = 0;
+					for (final JoinColumn column : this.sourceKey.getJoinColumns()) {
+						restrictions.add(column.getName() + " = ?");
+						this.removeAllColumns[i++] = column;
+					}
+
+					this.removeAllSql = new FinalWrapper<String>("DELETE FROM " + this.getQName() + " WHERE " + Joiner.on(" AND ").join(restrictions));
+				}
+
+				wrapper = this.removeAllSql;
+			}
 		}
 
-		synchronized (this) {
-			if (this.removeAllSql != null) {
-				return this.removeAllSql;
-			}
-
-			final List<String> restrictions = Lists.newArrayList();
-			this.removeAllColumns = new JoinColumn[this.sourceKey.getJoinColumns().size()];
-
-			int i = 0;
-			for (final JoinColumn column : this.sourceKey.getJoinColumns()) {
-				restrictions.add(column.getName() + " = ?");
-				this.removeAllColumns[i++] = column;
-			}
-
-			return this.removeAllSql = "DELETE FROM " + this.getQName() + " WHERE " + Joiner.on(" AND ").join(restrictions);
-		}
+		return wrapper.value;
 	}
 
 	private String getRemoveSql() {
-		if (this.removeSql != null) {
-			return this.removeSql;
+		FinalWrapper<String> wrapper = this.removeSql;
+
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.removeSql == null) {
+
+					final List<String> restrictions = Lists.newArrayList();
+					this.sourceRemoveColumns = new JoinColumn[this.sourceKey.getJoinColumns().size()];
+					this.destinationRemoveColumns = new JoinColumn[this.sourceKey.getJoinColumns().size()];
+
+					int i = 0;
+					for (final JoinColumn column : this.sourceKey.getJoinColumns()) {
+						restrictions.add(column.getName() + " = ?");
+						this.sourceRemoveColumns[i++] = column;
+					}
+
+					i = 0;
+					for (final JoinColumn column : this.destinationKey.getJoinColumns()) {
+						restrictions.add(column.getName() + " = ?");
+						this.destinationRemoveColumns[i++] = column;
+					}
+
+					this.removeSql = new FinalWrapper<String>("DELETE FROM " + this.getQName() + " WHERE " + Joiner.on(" AND ").join(restrictions));
+				}
+
+				wrapper = this.removeSql;
+			}
 		}
 
-		synchronized (this) {
-			if (this.removeSql != null) {
-				return this.removeSql;
-			}
-
-			final List<String> restrictions = Lists.newArrayList();
-			this.sourceRemoveColumns = new JoinColumn[this.sourceKey.getJoinColumns().size()];
-			this.destinationRemoveColumns = new JoinColumn[this.sourceKey.getJoinColumns().size()];
-
-			int i = 0;
-			for (final JoinColumn column : this.sourceKey.getJoinColumns()) {
-				restrictions.add(column.getName() + " = ?");
-				this.sourceRemoveColumns[i++] = column;
-			}
-
-			i = 0;
-			for (final JoinColumn column : this.destinationKey.getJoinColumns()) {
-				restrictions.add(column.getName() + " = ?");
-				this.destinationRemoveColumns[i++] = column;
-			}
-
-			return this.removeSql = "DELETE FROM " + this.getQName() + " WHERE " + Joiner.on(" AND ").join(restrictions);
-		}
+		return wrapper.value;
 	}
 
 	/**

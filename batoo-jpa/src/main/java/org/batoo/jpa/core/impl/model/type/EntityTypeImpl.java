@@ -92,6 +92,7 @@ import org.batoo.jpa.parser.metadata.IndexMetadata;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
 import org.batoo.jpa.util.BatooUtils;
+import org.batoo.jpa.util.FinalWrapper;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -114,9 +115,9 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private final String name;
 	private EntityTable primaryTable;
 	private final Map<String, EntityTable> tableMap = Maps.newHashMap();
-	private EntityTable[] tables;
-	private EntityTable[] updateTables;
-	private EntityTable[] allTables;
+	private FinalWrapper<EntityTable[]> tables;
+	private FinalWrapper<EntityTable[]> updateTables;
+	private FinalWrapper<EntityTable[]> allTables;
 	private final HashMap<String, AssociatedSingularAttribute<? super X, ?>> idMap = Maps.newHashMap();
 	private final boolean cachable;
 
@@ -127,21 +128,21 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private int dependencyCount;
 
 	private final HashMap<EntityTypeImpl<?>, AssociationMapping<?, ?, ?>[]> dependencyMap = Maps.newHashMap();
-	private BasicMapping<?, ?>[] basicMappings;
+	private FinalWrapper<BasicMapping<?, ?>[]> basicMappings;
 
-	private Mapping<?, ?, ?>[] singularMappings;
-	private PluralMapping<?, ?, ?>[] mappingsPluralSorted;
-	private PluralMapping<?, ?, ?>[] mappingsPlural;
-	private JoinedMapping<?, ?, ?>[] mappingsJoined;
-	private AssociationMapping<?, ?, ?>[] associations;
-	private AssociationMapping<?, ?, ?>[] associationsDetachable;
-	private AssociationMapping<?, ?, ?>[] associationsJoined;
-	private AssociationMapping<?, ?, ?>[] associationsNotPersistable;
-	private AssociationMapping<?, ?, ?>[] associationsPersistable;
-	private AssociationMapping<?, ?, ?>[] associationsRemovable;
-	private PluralAssociationMapping<?, ?, ?>[] associationsPlural;
-	private SingularAssociationMapping<?, ?>[] associationsSingular;
-	private SingularAssociationMapping<?, ?>[] associationsSingularLazy;
+	private FinalWrapper<Mapping<?, ?, ?>[]> singularMappings;
+	private FinalWrapper<PluralMapping<?, ?, ?>[]> mappingsPluralSorted;
+	private FinalWrapper<PluralMapping<?, ?, ?>[]> mappingsPlural;
+	private FinalWrapper<JoinedMapping<?, ?, ?>[]> mappingsJoined;
+	private FinalWrapper<AssociationMapping<?, ?, ?>[]> associations;
+	private FinalWrapper<AssociationMapping<?, ?, ?>[]> associationsDetachable;
+	private FinalWrapper<AssociationMapping<?, ?, ?>[]> associationsJoined;
+	private FinalWrapper<AssociationMapping<?, ?, ?>[]> associationsNotPersistable;
+	private FinalWrapper<AssociationMapping<?, ?, ?>[]> associationsPersistable;
+	private FinalWrapper<AssociationMapping<?, ?, ?>[]> associationsRemovable;
+	private FinalWrapper<PluralAssociationMapping<?, ?, ?>[]> associationsPlural;
+	private FinalWrapper<SingularAssociationMapping<?, ?>[]> associationsSingular;
+	private FinalWrapper<SingularAssociationMapping<?, ?>[]> associationsSingularLazy;
 	private final Map<Method, Method> idMethods = Maps.newHashMap();
 
 	private SingularMapping<? super X, ?> idMapping;
@@ -279,39 +280,42 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public EntityTable[] getAllTables() {
-		if (this.allTables != null) {
-			return this.allTables;
-		}
+		FinalWrapper<EntityTable[]> wrapper = this.allTables;
 
-		synchronized (this) {
-			if (this.allTables != null) {
-				return this.allTables;
-			}
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.allTables == null) {
 
-			final Map<String, EntityTable> _tableMap = Maps.newHashMap();
-			this.getAllTables(_tableMap);
+					final Map<String, EntityTable> _tableMap = Maps.newHashMap();
+					this.getAllTables(_tableMap);
 
-			final EntityTable[] _tables = new EntityTable[_tableMap.size()];
-			_tableMap.values().toArray(_tables);
+					final EntityTable[] _tables = new EntityTable[_tableMap.size()];
+					_tableMap.values().toArray(_tables);
 
-			Arrays.sort(_tables, new Comparator<EntityTable>() {
+					Arrays.sort(_tables, new Comparator<EntityTable>() {
 
-				@Override
-				public int compare(EntityTable o1, EntityTable o2) {
-					if ((o1 instanceof SecondaryTable) && !(o2 instanceof SecondaryTable)) {
-						return 1;
-					}
+						@Override
+						public int compare(EntityTable o1, EntityTable o2) {
+							if ((o1 instanceof SecondaryTable) && !(o2 instanceof SecondaryTable)) {
+								return 1;
+							}
 
-					if ((o2 instanceof SecondaryTable) && !(o1 instanceof SecondaryTable)) {
-						return -1;
-					}
+							if ((o2 instanceof SecondaryTable) && !(o1 instanceof SecondaryTable)) {
+								return -1;
+							}
 
-					return o1.getName().compareTo(o2.getName());
+							return o1.getName().compareTo(o2.getName());
+						}
+					});
+
+					this.allTables = new FinalWrapper<EntityTable[]>(_tables);
 				}
-			});
 
-			return this.allTables = _tables;
+				wrapper = this.allTables;
+			}
 		}
+
+		return wrapper.value;
 	}
 
 	private void getAllTables(final Map<String, EntityTable> tableMap) {
@@ -354,24 +358,27 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public AssociationMapping<?, ?, ?>[] getAssociations() {
-		if (this.associations != null) {
-			return this.associations;
-		}
+		FinalWrapper<AssociationMapping<?, ?, ?>[]> wrapper = this.associations;
 
-		synchronized (this) {
-			if (this.associations != null) {
-				return this.associations;
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.associations == null) {
+
+					final List<AssociationMapping<?, ?, ?>> _associations = Lists.newArrayList();
+
+					this.entityMapping.addAssociations(_associations);
+
+					final AssociationMapping<?, ?, ?>[] __associatedAttributes = new AssociationMapping[_associations.size()];
+					_associations.toArray(__associatedAttributes);
+
+					this.associations = new FinalWrapper<AssociationMapping<?, ?, ?>[]>(__associatedAttributes);
+				}
+
+				wrapper = this.associations;
 			}
-
-			final List<AssociationMapping<?, ?, ?>> _associations = Lists.newArrayList();
-
-			this.entityMapping.addAssociations(_associations);
-
-			final AssociationMapping<?, ?, ?>[] __associatedAttributes = new AssociationMapping[_associations.size()];
-			_associations.toArray(__associatedAttributes);
-
-			return this.associations = __associatedAttributes;
 		}
+
+		return wrapper.value;
 	}
 
 	/**
@@ -383,28 +390,31 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public AssociationMapping<?, ?, ?>[] getAssociationsDetachable() {
-		if (this.associationsDetachable != null) {
-			return this.associationsDetachable;
-		}
+		FinalWrapper<AssociationMapping<?, ?, ?>[]> wrapper = this.associationsDetachable;
 
-		synchronized (this) {
-			if (this.associationsDetachable != null) {
-				return this.associationsDetachable;
-			}
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.associationsDetachable == null) {
 
-			final List<AssociationMapping<?, ?, ?>> _associationsDetachable = Lists.newArrayList();
+					final List<AssociationMapping<?, ?, ?>> _associationsDetachable = Lists.newArrayList();
 
-			for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
-				if (association.cascadesDetach()) {
-					_associationsDetachable.add(association);
+					for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
+						if (association.cascadesDetach()) {
+							_associationsDetachable.add(association);
+						}
+					}
+
+					final AssociationMapping<?, ?, ?>[] __associationsDetachable = new AssociationMapping[_associationsDetachable.size()];
+					_associationsDetachable.toArray(__associationsDetachable);
+
+					this.associationsDetachable = new FinalWrapper<AssociationMapping<?, ?, ?>[]>(__associationsDetachable);
 				}
+
+				wrapper = this.associationsDetachable;
 			}
-
-			final AssociationMapping<?, ?, ?>[] __associationsDetachable = new AssociationMapping[_associationsDetachable.size()];
-			_associationsDetachable.toArray(__associationsDetachable);
-
-			return this.associationsDetachable = __associationsDetachable;
 		}
+
+		return wrapper.value;
 	}
 
 	/**
@@ -416,28 +426,29 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public AssociationMapping<?, ?, ?>[] getAssociationsJoined() {
-		if (this.associationsJoined != null) {
-			return this.associationsJoined;
-		}
+		final FinalWrapper<AssociationMapping<?, ?, ?>[]> wrapper = this.associationsJoined;
 
-		synchronized (this) {
-			if (this.associationsJoined != null) {
-				return this.associationsJoined;
-			}
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.associationsJoined == null) {
 
-			final List<AssociationMapping<?, ?, ?>> joinedAssociations = Lists.newArrayList();
+					final List<AssociationMapping<?, ?, ?>> joinedAssociations = Lists.newArrayList();
 
-			for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
-				if (association.getTable() != null) {
-					joinedAssociations.add(association);
+					for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
+						if (association.getTable() != null) {
+							joinedAssociations.add(association);
+						}
+					}
+
+					final AssociationMapping<?, ?, ?>[] __joinedAssociations = new AssociationMapping[joinedAssociations.size()];
+					joinedAssociations.toArray(__joinedAssociations);
+
+					this.associationsJoined = new FinalWrapper<AssociationMapping<?, ?, ?>[]>(__joinedAssociations);
 				}
 			}
-
-			final AssociationMapping<?, ?, ?>[] joinedAssociations0 = new AssociationMapping[joinedAssociations.size()];
-			joinedAssociations.toArray(joinedAssociations0);
-
-			return this.associationsJoined = joinedAssociations0;
 		}
+
+		return wrapper.value;
 	}
 
 	/**
@@ -449,30 +460,33 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public AssociationMapping<?, ?, ?>[] getAssociationsNotPersistable() {
-		if (this.associationsNotPersistable != null) {
-			return this.associationsNotPersistable;
-		}
+		FinalWrapper<AssociationMapping<?, ?, ?>[]> wrapper = this.associationsNotPersistable;
 
-		synchronized (this) {
-			if (this.associationsNotPersistable != null) {
-				return this.associationsNotPersistable;
-			}
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.associationsNotPersistable == null) {
 
-			final List<AssociationMapping<?, ?, ?>> _associationsNotPersistable = Lists.newArrayList();
-			for (final AssociationMapping<?, ?, ?> mapping : this.getAssociations()) {
-				// skip persistable associations
-				if (mapping.cascadesPersist()) {
-					continue;
+					final List<AssociationMapping<?, ?, ?>> _associationsNotPersistable = Lists.newArrayList();
+					for (final AssociationMapping<?, ?, ?> mapping : this.getAssociations()) {
+						// skip persistable associations
+						if (mapping.cascadesPersist()) {
+							continue;
+						}
+
+						_associationsNotPersistable.add(mapping);
+					}
+
+					final AssociationMapping<?, ?, ?>[] __associationsNotPersistable = new AssociationMapping[_associationsNotPersistable.size()];
+					_associationsNotPersistable.toArray(__associationsNotPersistable);
+
+					this.associationsNotPersistable = new FinalWrapper<AssociationMapping<?, ?, ?>[]>(__associationsNotPersistable);
 				}
 
-				_associationsNotPersistable.add(mapping);
+				wrapper = this.associationsNotPersistable;
 			}
-
-			final AssociationMapping<?, ?, ?>[] __associationsNotPersistable = new AssociationMapping[_associationsNotPersistable.size()];
-			_associationsNotPersistable.toArray(__associationsNotPersistable);
-
-			return this.associationsNotPersistable = __associationsNotPersistable;
 		}
+
+		return wrapper.value;
 	}
 
 	/**
@@ -484,28 +498,31 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public AssociationMapping<?, ?, ?>[] getAssociationsPersistable() {
-		if (this.associationsPersistable != null) {
-			return this.associationsPersistable;
-		}
+		FinalWrapper<AssociationMapping<?, ?, ?>[]> wrapper = this.associationsPersistable;
 
-		synchronized (this) {
-			if (this.associationsPersistable != null) {
-				return this.associationsPersistable;
-			}
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.associationsPersistable == null) {
 
-			final List<AssociationMapping<?, ?, ?>> _associationsPersistable = Lists.newArrayList();
+					final List<AssociationMapping<?, ?, ?>> _associationsPersistable = Lists.newArrayList();
 
-			for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
-				if (association.cascadesPersist()) {
-					_associationsPersistable.add(association);
+					for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
+						if (association.cascadesPersist()) {
+							_associationsPersistable.add(association);
+						}
+					}
+
+					final AssociationMapping<?, ?, ?>[] __associationsPersistable = new AssociationMapping[_associationsPersistable.size()];
+					_associationsPersistable.toArray(__associationsPersistable);
+
+					this.associationsPersistable = new FinalWrapper<AssociationMapping<?, ?, ?>[]>(__associationsPersistable);
 				}
+
+				wrapper = this.associationsPersistable;
 			}
-
-			final AssociationMapping<?, ?, ?>[] __associationsPersistable = new AssociationMapping[_associationsPersistable.size()];
-			_associationsPersistable.toArray(__associationsPersistable);
-
-			return this.associationsPersistable = __associationsPersistable;
 		}
+
+		return wrapper.value;
 	}
 
 	/**
@@ -517,27 +534,30 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public PluralAssociationMapping<?, ?, ?>[] getAssociationsPlural() {
-		if (this.associationsPlural != null) {
-			return this.associationsPlural;
-		}
+		FinalWrapper<PluralAssociationMapping<?, ?, ?>[]> wrapper = this.associationsPlural;
 
-		synchronized (this) {
-			if (this.associationsPlural != null) {
-				return this.associationsPlural;
-			}
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.associationsPlural == null) {
 
-			final List<PluralAssociationMapping<?, ?, ?>> _associationsPlural = Lists.newArrayList();
-			for (final AssociationMapping<?, ?, ?> mapping : this.getAssociations()) {
-				if (mapping instanceof PluralAssociationMapping) {
-					_associationsPlural.add((PluralAssociationMapping<?, ?, ?>) mapping);
+					final List<PluralAssociationMapping<?, ?, ?>> _associationsPlural = Lists.newArrayList();
+					for (final AssociationMapping<?, ?, ?> mapping : this.getAssociations()) {
+						if (mapping instanceof PluralAssociationMapping) {
+							_associationsPlural.add((PluralAssociationMapping<?, ?, ?>) mapping);
+						}
+					}
+
+					final PluralAssociationMapping<?, ?, ?>[] __associationsPlural = new PluralAssociationMapping[_associationsPlural.size()];
+					_associationsPlural.toArray(__associationsPlural);
+
+					this.associationsPlural = new FinalWrapper<PluralAssociationMapping<?, ?, ?>[]>(__associationsPlural);
 				}
+
+				wrapper = this.associationsPlural;
 			}
-
-			final PluralAssociationMapping<?, ?, ?>[] __associationsPlural = new PluralAssociationMapping[_associationsPlural.size()];
-			_associationsPlural.toArray(__associationsPlural);
-
-			return this.associationsPlural = __associationsPlural;
 		}
+
+		return wrapper.value;
 	}
 
 	/**
@@ -549,28 +569,31 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public AssociationMapping<?, ?, ?>[] getAssociationsRemovable() {
-		if (this.associationsRemovable != null) {
-			return this.associationsRemovable;
-		}
+		FinalWrapper<AssociationMapping<?, ?, ?>[]> wrapper = this.associationsRemovable;
 
-		synchronized (this) {
-			if (this.associationsRemovable != null) {
-				return this.associationsRemovable;
-			}
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.associationsRemovable == null) {
 
-			final List<AssociationMapping<?, ?, ?>> _associationsRemovable = Lists.newArrayList();
+					final List<AssociationMapping<?, ?, ?>> _associationsRemovable = Lists.newArrayList();
 
-			for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
-				if (association.cascadesRemove() || association.removesOrphans()) {
-					_associationsRemovable.add(association);
+					for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
+						if (association.cascadesRemove() || association.removesOrphans()) {
+							_associationsRemovable.add(association);
+						}
+					}
+
+					final AssociationMapping<?, ?, ?>[] __associationsRemovable = new AssociationMapping[_associationsRemovable.size()];
+					_associationsRemovable.toArray(__associationsRemovable);
+
+					this.associationsRemovable = new FinalWrapper<AssociationMapping<?, ?, ?>[]>(__associationsRemovable);
 				}
+
+				wrapper = this.associationsRemovable;
 			}
-
-			final AssociationMapping<?, ?, ?>[] __associationsRemovable = new AssociationMapping[_associationsRemovable.size()];
-			_associationsRemovable.toArray(__associationsRemovable);
-
-			return this.associationsRemovable = __associationsRemovable;
 		}
+
+		return wrapper.value;
 	}
 
 	/**
@@ -582,28 +605,31 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public SingularAssociationMapping<?, ?>[] getAssociationsSingular() {
-		if (this.associationsSingular != null) {
-			return this.associationsSingular;
-		}
+		FinalWrapper<SingularAssociationMapping<?, ?>[]> wrapper = this.associationsSingular;
 
-		synchronized (this) {
-			if (this.associationsSingular != null) {
-				return this.associationsSingular;
-			}
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.associationsSingular == null) {
 
-			final List<SingularAssociationMapping<?, ?>> _associationsSingular = Lists.newArrayList();
+					final List<SingularAssociationMapping<?, ?>> _associationsSingular = Lists.newArrayList();
 
-			for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
-				if (association instanceof SingularAssociationMapping) {
-					_associationsSingular.add((SingularAssociationMapping<?, ?>) association);
+					for (final AssociationMapping<?, ?, ?> association : this.getAssociations()) {
+						if (association instanceof SingularAssociationMapping) {
+							_associationsSingular.add((SingularAssociationMapping<?, ?>) association);
+						}
+					}
+
+					final SingularAssociationMapping<?, ?>[] __associationsSingular = new SingularAssociationMapping[_associationsSingular.size()];
+					_associationsSingular.toArray(__associationsSingular);
+
+					this.associationsSingular = new FinalWrapper<SingularAssociationMapping<?, ?>[]>(__associationsSingular);
 				}
-			}
 
-			final SingularAssociationMapping<?, ?>[] __associationsSingular = new SingularAssociationMapping[_associationsSingular.size()];
-			_associationsSingular.toArray(__associationsSingular);
-
-			return this.associationsSingular = __associationsSingular;
+				wrapper = this.associationsSingular;
+			};
 		}
+
+		return wrapper.value;
 	}
 
 	/**
@@ -615,30 +641,33 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public SingularAssociationMapping<?, ?>[] getAssociationsSingularOwnerLazy() {
-		if (this.associationsSingularLazy != null) {
-			return this.associationsSingularLazy;
-		}
+		FinalWrapper<SingularAssociationMapping<?, ?>[]> wrapper = this.associationsSingularLazy;
 
-		synchronized (this) {
-			if (this.associationsSingularLazy != null) {
-				return this.associationsSingularLazy;
-			}
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.associationsSingularLazy == null) {
 
-			final List<SingularAssociationMapping<?, ?>> _associationsSingularLazy = Lists.newArrayList();
-			for (final AssociationMapping<?, ?, ?> mapping : this.getAssociations()) {
-				if (mapping instanceof SingularAssociationMapping) {
-					final SingularAssociationMapping<?, ?> singularMapping = (SingularAssociationMapping<?, ?>) mapping;
-					if (singularMapping.isOwner() && !singularMapping.isEager()) {
-						_associationsSingularLazy.add(singularMapping);
+					final List<SingularAssociationMapping<?, ?>> _associationsSingularLazy = Lists.newArrayList();
+					for (final AssociationMapping<?, ?, ?> mapping : this.getAssociations()) {
+						if (mapping instanceof SingularAssociationMapping) {
+							final SingularAssociationMapping<?, ?> singularMapping = (SingularAssociationMapping<?, ?>) mapping;
+							if (singularMapping.isOwner() && !singularMapping.isEager()) {
+								_associationsSingularLazy.add(singularMapping);
+							}
+						}
 					}
+
+					final SingularAssociationMapping<?, ?>[] __associationsSingularLazy = new SingularAssociationMapping[_associationsSingularLazy.size()];
+					_associationsSingularLazy.toArray(__associationsSingularLazy);
+
+					this.associationsSingularLazy = new FinalWrapper<SingularAssociationMapping<?, ?>[]>(__associationsSingularLazy);
 				}
+
+				wrapper = this.associationsSingularLazy;
 			}
-
-			final SingularAssociationMapping<?, ?>[] __associationsSingularLazy = new SingularAssociationMapping[_associationsSingularLazy.size()];
-			_associationsSingularLazy.toArray(__associationsSingularLazy);
-
-			return this.associationsSingularLazy = __associationsSingularLazy;
 		}
+
+		return wrapper.value;
 	}
 
 	/**
@@ -670,24 +699,27 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public BasicMapping<?, ?>[] getBasicMappings() {
-		if (this.basicMappings != null) {
-			return this.basicMappings;
-		}
+		FinalWrapper<BasicMapping<?, ?>[]> wrapper = this.basicMappings;
 
-		synchronized (this) {
-			if (this.basicMappings != null) {
-				return this.basicMappings;
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.basicMappings == null) {
+
+					final List<BasicMapping<?, ?>> _basicMappings = Lists.newArrayList();
+
+					this.entityMapping.addBasicMappings(_basicMappings);
+
+					final BasicMapping<?, ?>[] __basicMappings = new BasicMapping[_basicMappings.size()];
+					_basicMappings.toArray(__basicMappings);
+
+					this.basicMappings = new FinalWrapper<BasicMapping<?, ?>[]>(__basicMappings);
+				}
+
+				wrapper = this.basicMappings;
 			}
-
-			final List<BasicMapping<?, ?>> _basicMappings = Lists.newArrayList();
-
-			this.entityMapping.addBasicMappings(_basicMappings);
-
-			final BasicMapping<?, ?>[] __basicMappings = new BasicMapping[_basicMappings.size()];
-			_basicMappings.toArray(__basicMappings);
-
-			return this.basicMappings = __basicMappings;
 		}
+
+		return wrapper.value;
 	}
 
 	/**
@@ -1104,23 +1136,26 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public JoinedMapping<?, ?, ?>[] getMappingsJoined() {
-		if (this.mappingsJoined != null) {
-			return this.mappingsJoined;
-		}
+		FinalWrapper<JoinedMapping<?, ?, ?>[]> wrapper = this.mappingsJoined;
 
-		synchronized (this) {
-			if (this.mappingsJoined != null) {
-				return this.mappingsJoined;
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.mappingsJoined == null) {
+
+					final List<JoinedMapping<?, ?, ?>> _mappingsJoined = Lists.newArrayList();
+					this.entityMapping.addJoinedMappings(_mappingsJoined);
+
+					final JoinedMapping<?, ?, ?>[] __mappingsJoined = new JoinedMapping[_mappingsJoined.size()];
+					_mappingsJoined.toArray(__mappingsJoined);
+
+					this.mappingsJoined = new FinalWrapper<JoinedMapping<?, ?, ?>[]>(__mappingsJoined);
+				}
+
+				wrapper = this.mappingsJoined;
 			}
-
-			final List<JoinedMapping<?, ?, ?>> _mappingsJoined = Lists.newArrayList();
-			this.entityMapping.addJoinedMappings(_mappingsJoined);
-
-			final JoinedMapping<?, ?, ?>[] __mappingsJoined = new JoinedMapping[_mappingsJoined.size()];
-			_mappingsJoined.toArray(__mappingsJoined);
-
-			return this.mappingsJoined = __mappingsJoined;
 		}
+
+		return wrapper.value;
 	}
 
 	/**
@@ -1132,23 +1167,26 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public PluralMapping<?, ?, ?>[] getMappingsPlural() {
-		if (this.mappingsPlural != null) {
-			return this.mappingsPlural;
-		}
+		FinalWrapper<PluralMapping<?, ?, ?>[]> wrapper = this.mappingsPlural;
 
-		synchronized (this) {
-			if (this.mappingsPlural != null) {
-				return this.mappingsPlural;
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.mappingsPlural == null) {
+
+					final List<PluralMapping<?, ?, ?>> _mappingsPlural = Lists.newArrayList();
+					this.entityMapping.addPluralMappings(_mappingsPlural);
+
+					final PluralMapping<?, ?, ?>[] __mappingsPlural = new PluralMapping[_mappingsPlural.size()];
+					_mappingsPlural.toArray(__mappingsPlural);
+
+					this.mappingsPlural = new FinalWrapper<PluralMapping<?, ?, ?>[]>(__mappingsPlural);
+				}
+
+				wrapper = this.mappingsPlural;
 			}
-
-			final List<PluralMapping<?, ?, ?>> _mappingsPlural = Lists.newArrayList();
-			this.entityMapping.addPluralMappings(_mappingsPlural);
-
-			final PluralMapping<?, ?, ?>[] __mappingsPlural = new PluralMapping[_mappingsPlural.size()];
-			_mappingsPlural.toArray(__mappingsPlural);
-
-			return this.mappingsPlural = __mappingsPlural;
 		}
+
+		return wrapper.value;
 	}
 
 	/**
@@ -1160,27 +1198,30 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public PluralMapping<?, ?, ?>[] getMappingsPluralSorted() {
-		if (this.mappingsPluralSorted != null) {
-			return this.mappingsPluralSorted;
-		}
+		FinalWrapper<PluralMapping<?, ?, ?>[]> wrapper = this.mappingsPluralSorted;
 
-		synchronized (this) {
-			if (this.mappingsPluralSorted != null) {
-				return this.mappingsPluralSorted;
-			}
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.mappingsPluralSorted == null) {
 
-			final List<PluralMapping<?, ?, ?>> _mappingsPluralSorted = Lists.newArrayList();
-			for (final PluralMapping<?, ?, ?> mapping : this.getMappingsPlural()) {
-				if (StringUtils.isNotBlank(mapping.getOrderBy())) {
-					_mappingsPluralSorted.add(mapping);
+					final List<PluralMapping<?, ?, ?>> _mappingsPluralSorted = Lists.newArrayList();
+					for (final PluralMapping<?, ?, ?> mapping : this.getMappingsPlural()) {
+						if (StringUtils.isNotBlank(mapping.getOrderBy())) {
+							_mappingsPluralSorted.add(mapping);
+						}
+					}
+
+					final PluralMapping<?, ?, ?>[] __mappingsPluralSorted = new PluralMapping[_mappingsPluralSorted.size()];
+					_mappingsPluralSorted.toArray(__mappingsPluralSorted);
+
+					this.mappingsPluralSorted = new FinalWrapper<PluralMapping<?, ?, ?>[]>(__mappingsPluralSorted);
 				}
+
+				wrapper = this.mappingsPluralSorted;
 			}
-
-			final PluralMapping<?, ?, ?>[] __mappingsPluralSorted = new PluralMapping[_mappingsPluralSorted.size()];
-			_mappingsPluralSorted.toArray(__mappingsPluralSorted);
-
-			return this.mappingsPluralSorted = __mappingsPluralSorted;
 		}
+
+		return wrapper.value;
 	}
 
 	/**
@@ -1192,24 +1233,27 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public Mapping<?, ?, ?>[] getMappingsSingular() {
-		if (this.singularMappings != null) {
-			return this.singularMappings;
-		}
+		FinalWrapper<Mapping<?, ?, ?>[]> wrapper = this.singularMappings;
 
-		synchronized (this) {
-			if (this.singularMappings != null) {
-				return this.singularMappings;
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.singularMappings == null) {
+
+					final List<Mapping<?, ?, ?>> _singularMappings = Lists.newArrayList();
+
+					this.entityMapping.addSingularMappings(_singularMappings);
+
+					final Mapping<?, ?, ?>[] __singularMappings = new Mapping[_singularMappings.size()];
+					_singularMappings.toArray(__singularMappings);
+
+					this.singularMappings = new FinalWrapper<Mapping<?, ?, ?>[]>(__singularMappings);
+				}
+
+				wrapper = this.singularMappings;
 			}
-
-			final List<Mapping<?, ?, ?>> _singularMappings = Lists.newArrayList();
-
-			this.entityMapping.addSingularMappings(_singularMappings);
-
-			final Mapping<?, ?, ?>[] __singularMappings = new Mapping[_singularMappings.size()];
-			_singularMappings.toArray(__singularMappings);
-
-			return this.singularMappings = __singularMappings;
 		}
+
+		return wrapper.value;
 	}
 
 	/**
@@ -1323,37 +1367,39 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public EntityTable[] getTables() {
-		if (this.tables != null) {
-			return this.tables;
+		FinalWrapper<EntityTable[]> wrapper = this.tables;
 
-		}
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.tables == null) {
 
-		synchronized (this) {
-			if (this.tables != null) {
-				return this.tables;
-			}
+					final EntityTable[] _tables = new EntityTable[this.tableMap.size()];
+					this.tableMap.values().toArray(_tables);
 
-			final EntityTable[] _tables = new EntityTable[this.tableMap.size()];
-			this.tableMap.values().toArray(_tables);
+					Arrays.sort(_tables, new Comparator<EntityTable>() {
 
-			Arrays.sort(_tables, new Comparator<EntityTable>() {
+						@Override
+						public int compare(EntityTable o1, EntityTable o2) {
+							if ((o1 instanceof SecondaryTable) && !(o2 instanceof SecondaryTable)) {
+								return 1;
+							}
 
-				@Override
-				public int compare(EntityTable o1, EntityTable o2) {
-					if ((o1 instanceof SecondaryTable) && !(o2 instanceof SecondaryTable)) {
-						return 1;
-					}
+							if ((o2 instanceof SecondaryTable) && !(o1 instanceof SecondaryTable)) {
+								return -1;
+							}
 
-					if ((o2 instanceof SecondaryTable) && !(o1 instanceof SecondaryTable)) {
-						return -1;
-					}
+							return o1.getName().compareTo(o2.getName());
+						}
+					});
 
-					return o1.getName().compareTo(o2.getName());
+					this.tables = new FinalWrapper<EntityTable[]>(_tables);
 				}
-			});
 
-			return this.tables = _tables;
+				wrapper = this.tables;
+			}
 		}
+
+		return wrapper.value;
 	}
 
 	/**
@@ -1710,19 +1756,11 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public void performUpdate(Connection connection, ManagedInstance<?> instance) throws SQLException {
-		if (this.updateTables != null) {
-			for (final EntityTable table : this.updateTables) {
-				table.performUpdate(connection, instance);
-			}
-		}
-		else {
+		FinalWrapper<EntityTable[]> wrapper = this.updateTables;
+
+		if (wrapper == null) {
 			synchronized (this) {
-				if (this.updateTables != null) {
-					for (final EntityTable table : this.updateTables) {
-						table.performUpdate(connection, instance);
-					}
-				}
-				else {
+				if (this.updateTables == null) {
 					final List<EntityTable> _updateTables = Lists.newArrayList(this.getTables());
 					for (final Iterator<EntityTable> i = _updateTables.iterator(); i.hasNext();) {
 						if (!i.next().performUpdateWithUpdatability(connection, instance)) {
@@ -1730,9 +1768,15 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 						}
 					}
 
-					this.updateTables = _updateTables.toArray(new EntityTable[_updateTables.size()]);
+					this.updateTables = new FinalWrapper<EntityTable[]>(_updateTables.toArray(new EntityTable[_updateTables.size()]));
 				}
+
+				wrapper = this.updateTables;
 			}
+		}
+
+		for (final EntityTable table : wrapper.value) {
+			table.performUpdate(connection, instance);
 		}
 	}
 
