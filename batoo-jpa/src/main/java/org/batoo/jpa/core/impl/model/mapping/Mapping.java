@@ -74,7 +74,7 @@ public abstract class Mapping<Z, X, Y> {
 		this.path = (parent != null) && (parent.getPath() != null) ? parent.getPath() + "." + name : name;
 		this.root = parent instanceof RootMapping;
 		this.entity = (EntityTypeImpl<?>) (this.getRoot().isEntity() ? this.getRoot().getType() : null);
-		this.inherited = (this.entity != null) && (this.entity.getRootType().getInheritanceType() != null);
+		this.inherited = (this.entity != null) && (this.entity.getRootType() != this.entity);
 	}
 
 	/**

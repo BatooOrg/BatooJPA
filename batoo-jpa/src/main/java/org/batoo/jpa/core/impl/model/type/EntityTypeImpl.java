@@ -149,7 +149,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private Boolean suitableForBatchInsert;
 
 	private Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>[] idMappings;
-	private final InheritanceType inheritanceType;
+	private InheritanceType inheritanceType;
 
 	private final Map<String, EntityTypeImpl<? extends X>> children = Maps.newHashMap();
 	private final String discriminatorValue;
@@ -1461,7 +1461,11 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @param metadata
 	 */
 	private void initTables(EntityMetadata metadata) {
-		if (this.getRootType().getInheritanceType() != null) {
+		if (this.getRootType() != this) {
+			if (this.getRootType().getInheritanceType() == null) {
+				this.getRootType().setInherited();
+			}
+
 			switch (this.getRootType().getInheritanceType()) {
 				case SINGLE_TABLE:
 					// if this is the root, create the primary table
@@ -1926,6 +1930,16 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				violations.add((ConstraintViolation<?>) violation);
 			}
 			throw new ConstraintViolationException(violations);
+		}
+	}
+
+	private synchronized void setInherited() {
+		if (this.inheritanceType == null) {
+			this.inheritanceType = InheritanceType.SINGLE_TABLE;
+
+			if (this.discriminatorColumn == null) {
+				this.discriminatorColumn = new DiscriminatorColumn(this, this.metadata.getDiscriminatorColumn());
+			}
 		}
 	}
 

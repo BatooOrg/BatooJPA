@@ -458,6 +458,10 @@ public abstract class AbstractTable {
 					AbstractColumn versionColumn = null;
 
 					for (final AbstractColumn column : this.getColumns()) {
+						if (column instanceof DiscriminatorColumn) {
+							continue;
+						}
+
 						final AttributeImpl<?, ?> attribute = column.getMapping().getAttribute();
 
 						if ((attribute instanceof BasicAttribute) && ((BasicAttribute<?, ?>) attribute).isVersion()) {
