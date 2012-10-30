@@ -50,7 +50,7 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 
 	private ConstructorAccessor constructor;
 	private FinalWrapper<Integer> attributeCount;
-	private SingularAttributeImpl<?, ?>[] singularMappings;
+	private FinalWrapper<SingularAttributeImpl<?, ?>[]> singularMappings;
 
 	/**
 	 * @param metamodel
@@ -86,6 +86,7 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	 */
 	public int getAttributeCount() {
 		FinalWrapper<Integer> wrapper = this.attributeCount;
+
 		if (wrapper == null) {
 			synchronized (this) {
 				if (this.attributeCount == null) {
@@ -138,47 +139,51 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	 * @author hceylan
 	 */
 	public SingularAttributeImpl<?, ?>[] getSingularMappings() {
-		if (this.singularMappings != null) {
-			return this.singularMappings;
-		}
+		FinalWrapper<SingularAttributeImpl<?, ?>[]> wrapper = this.singularMappings;
 
-		synchronized (this) {
-			if (this.singularMappings != null) {
-				return this.singularMappings;
-			}
+		if (this.singularMappings == null) {
+			synchronized (this) {
+				if (this.singularMappings == null) {
 
-			final List<SingularAttributeImpl<? super X, ?>> singularMappings = Lists.newArrayList();
-			for (final SingularAttribute<? super X, ?> attribute : this.getSingularAttributes()) {
-				switch (attribute.getPersistentAttributeType()) {
-					case BASIC:
-					case EMBEDDED:
-						singularMappings.add((SingularAttributeImpl<? super X, ?>) attribute);
-						break;
-					case MANY_TO_ONE:
-					case ONE_TO_ONE:
-						final AssociatedSingularAttribute<? super X, ?> association = (AssociatedSingularAttribute<? super X, ?>) attribute;
-						if (!association.isOwner() || !association.isJoined()) {
-							continue;
+					final List<SingularAttributeImpl<? super X, ?>> singularMappings = Lists.newArrayList();
+					for (final SingularAttribute<? super X, ?> attribute : this.getSingularAttributes()) {
+						switch (attribute.getPersistentAttributeType()) {
+							case BASIC:
+							case EMBEDDED:
+								singularMappings.add((SingularAttributeImpl<? super X, ?>) attribute);
+								break;
+							case MANY_TO_ONE:
+							case ONE_TO_ONE:
+								final AssociatedSingularAttribute<? super X, ?> association = (AssociatedSingularAttribute<? super X, ?>) attribute;
+								if (!association.isOwner() || !association.isJoined()) {
+									continue;
+								}
+
+								singularMappings.add((SingularAttributeImpl<? super X, ?>) attribute);
+							case ELEMENT_COLLECTION:
+							case MANY_TO_MANY:
+							case ONE_TO_MANY:
+								// N/A
 						}
+					}
 
-						singularMappings.add((SingularAttributeImpl<? super X, ?>) attribute);
-					case ELEMENT_COLLECTION:
-					case MANY_TO_MANY:
-					case ONE_TO_MANY:
-						// N/A
+					Collections.sort(singularMappings, new Comparator<SingularAttributeImpl<? super X, ?>>() {
+
+						@Override
+						public int compare(SingularAttributeImpl<? super X, ?> o1, SingularAttributeImpl<? super X, ?> o2) {
+							return o1.getAttributeId().compareTo(o2.getAttributeId());
+						}
+					});
+
+					this.singularMappings = new FinalWrapper<SingularAttributeImpl<?, ?>[]>(
+						singularMappings.toArray(new SingularAttributeImpl[singularMappings.size()]));
 				}
+
+				wrapper = this.singularMappings;
 			}
-
-			Collections.sort(singularMappings, new Comparator<SingularAttributeImpl<? super X, ?>>() {
-
-				@Override
-				public int compare(SingularAttributeImpl<? super X, ?> o1, SingularAttributeImpl<? super X, ?> o2) {
-					return o1.getAttributeId().compareTo(o2.getAttributeId());
-				}
-			});
-
-			return this.singularMappings = singularMappings.toArray(new SingularAttributeImpl[singularMappings.size()]);
 		}
+
+		return wrapper.value;
 	}
 
 	/**

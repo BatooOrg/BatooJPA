@@ -104,9 +104,8 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 
 	private ElementMapping<E> rootMapping;
 	private FinalWrapper<Comparator<E>> comparator;
-	private CriteriaQueryImpl<E> selectCriteria;
-
-	private CriteriaQueryImpl<Object[]> selectMapCriteria;
+	private FinalWrapper<CriteriaQueryImpl<E>> selectCriteria;
+	private FinalWrapper<CriteriaQueryImpl<Object[]>> selectMapCriteria;
 
 	/**
 	 * @param parent
@@ -338,103 +337,109 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	}
 
 	private CriteriaQueryImpl<E> getSelectCriteria() {
-		if (this.selectCriteria != null) {
-			return this.selectCriteria;
-		}
+		FinalWrapper<CriteriaQueryImpl<E>> wrapper = this.selectCriteria;
 
 		synchronized (this) {
 			// other thread prepared before this one
-			if (this.selectCriteria != null) {
-				return this.selectCriteria;
+			if (this.selectCriteria == null) {
+
+				final MetamodelImpl metamodel = this.getRoot().getType().getMetamodel();
+				final CriteriaBuilderImpl cb = metamodel.getEntityManagerFactory().getCriteriaBuilder();
+
+				CriteriaQueryImpl<E> q = cb.createQuery(this.attribute.getBindableJavaType());
+				q.internal();
+
+				final EntityTypeImpl<?> type = (EntityTypeImpl<?>) this.getRoot().getType();
+				final RootImpl<?> r = q.from(type);
+				r.alias(BatooUtils.acronym(type.getName()).toLowerCase());
+				final AbstractJoin<?, E> join = r.<E> join(this.attribute.getName());
+				join.alias(BatooUtils.acronym(this.attribute.getName()));
+				q = q.select(join);
+
+				// has single id mapping
+				if (type.hasSingleIdAttribute()) {
+					final SingularMapping<?, ?> idMapping = type.getIdMapping();
+					final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
+					final Path<?> path = r.get(idMapping.getAttribute().getName());
+					final PredicateImpl predicate = cb.equal(path, pe);
+
+					this.selectCriteria = new FinalWrapper<CriteriaQueryImpl<E>>(q.where(predicate));
+				}
+				else {
+
+					// has multiple id mappings
+					final List<PredicateImpl> predicates = Lists.newArrayList();
+					for (final Pair<?, BasicAttribute<?, ?>> pair : type.getIdMappings()) {
+						final BasicMapping<?, ?> idMapping = (BasicMapping<?, ?>) pair.getFirst();
+						final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
+						final Path<?> path = r.get(idMapping.getAttribute().getName());
+						final PredicateImpl predicate = cb.equal(path, pe);
+
+						predicates.add(predicate);
+					}
+
+					this.selectCriteria = new FinalWrapper<CriteriaQueryImpl<E>>(q.where(predicates.toArray(new PredicateImpl[predicates.size()])));
+				}
 			}
 
-			final MetamodelImpl metamodel = this.getRoot().getType().getMetamodel();
-			final CriteriaBuilderImpl cb = metamodel.getEntityManagerFactory().getCriteriaBuilder();
-
-			CriteriaQueryImpl<E> q = cb.createQuery(this.attribute.getBindableJavaType());
-			q.internal();
-
-			final EntityTypeImpl<?> type = (EntityTypeImpl<?>) this.getRoot().getType();
-			final RootImpl<?> r = q.from(type);
-			r.alias(BatooUtils.acronym(type.getName()).toLowerCase());
-			final AbstractJoin<?, E> join = r.<E> join(this.attribute.getName());
-			join.alias(BatooUtils.acronym(this.attribute.getName()));
-			q = q.select(join);
-
-			// has single id mapping
-			if (type.hasSingleIdAttribute()) {
-				final SingularMapping<?, ?> idMapping = type.getIdMapping();
-				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
-				final Path<?> path = r.get(idMapping.getAttribute().getName());
-				final PredicateImpl predicate = cb.equal(path, pe);
-
-				return this.selectCriteria = q.where(predicate);
-			}
-
-			// has multiple id mappings
-			final List<PredicateImpl> predicates = Lists.newArrayList();
-			for (final Pair<?, BasicAttribute<?, ?>> pair : type.getIdMappings()) {
-				final BasicMapping<?, ?> idMapping = (BasicMapping<?, ?>) pair.getFirst();
-				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
-				final Path<?> path = r.get(idMapping.getAttribute().getName());
-				final PredicateImpl predicate = cb.equal(path, pe);
-
-				predicates.add(predicate);
-			}
-
-			return this.selectCriteria = q.where(predicates.toArray(new PredicateImpl[predicates.size()]));
+			wrapper = this.selectCriteria;
 		}
+
+		return wrapper.value;
 	}
 
 	@SuppressWarnings("unchecked")
 	private CriteriaQueryImpl<Object[]> getSelectMapCriteria() {
-		if (this.selectCriteria != null) {
-			return this.selectMapCriteria;
-		}
+		FinalWrapper<CriteriaQueryImpl<Object[]>> wrapper = this.selectMapCriteria;
 
 		synchronized (this) {
 			// other thread prepared before this one
-			if (this.selectCriteria != null) {
-				return this.selectMapCriteria;
+			if (this.selectCriteria == null) {
+
+				final MetamodelImpl metamodel = this.getRoot().getType().getMetamodel();
+				final CriteriaBuilderImpl cb = metamodel.getEntityManagerFactory().getCriteriaBuilder();
+
+				CriteriaQueryImpl<Object[]> q = cb.createQuery(Object[].class);
+				q.internal();
+
+				final EntityTypeImpl<?> type = (EntityTypeImpl<?>) this.getRoot().getType();
+				final RootImpl<?> r = q.from(type);
+				r.alias(BatooUtils.acronym(type.getName()).toLowerCase());
+				final MapJoinImpl<?, ?, E> join = (MapJoinImpl<?, ?, E>) r.<E> join(this.attribute.getName());
+				join.alias(BatooUtils.acronym(this.attribute.getName()));
+
+				q = q.multiselect(join.key(), join.value());
+
+				// has single id mapping
+				if (type.hasSingleIdAttribute()) {
+					final SingularMapping<?, ?> idMapping = type.getIdMapping();
+					final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
+					final Path<?> path = r.get(idMapping.getAttribute().getName());
+					final PredicateImpl predicate = cb.equal(path, pe);
+
+					this.selectMapCriteria = new FinalWrapper<CriteriaQueryImpl<Object[]>>(q.where(predicate));
+				}
+				else {
+
+					// has multiple id mappings
+					final List<PredicateImpl> predicates = Lists.newArrayList();
+					for (final Pair<?, BasicAttribute<?, ?>> pair : type.getIdMappings()) {
+						final BasicMapping<?, ?> idMapping = (BasicMapping<?, ?>) pair.getFirst();
+						final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
+						final Path<?> path = r.get(idMapping.getAttribute().getName());
+						final PredicateImpl predicate = cb.equal(path, pe);
+
+						predicates.add(predicate);
+					}
+
+					this.selectMapCriteria = new FinalWrapper<CriteriaQueryImpl<Object[]>>(q.where(predicates.toArray(new PredicateImpl[predicates.size()])));
+				}
 			}
 
-			final MetamodelImpl metamodel = this.getRoot().getType().getMetamodel();
-			final CriteriaBuilderImpl cb = metamodel.getEntityManagerFactory().getCriteriaBuilder();
-
-			CriteriaQueryImpl<Object[]> q = cb.createQuery(Object[].class);
-			q.internal();
-
-			final EntityTypeImpl<?> type = (EntityTypeImpl<?>) this.getRoot().getType();
-			final RootImpl<?> r = q.from(type);
-			r.alias(BatooUtils.acronym(type.getName()).toLowerCase());
-			final MapJoinImpl<?, ?, E> join = (MapJoinImpl<?, ?, E>) r.<E> join(this.attribute.getName());
-			join.alias(BatooUtils.acronym(this.attribute.getName()));
-
-			q = q.multiselect(join.key(), join.value());
-
-			// has single id mapping
-			if (type.hasSingleIdAttribute()) {
-				final SingularMapping<?, ?> idMapping = type.getIdMapping();
-				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
-				final Path<?> path = r.get(idMapping.getAttribute().getName());
-				final PredicateImpl predicate = cb.equal(path, pe);
-
-				return this.selectMapCriteria = q.where(predicate);
-			}
-
-			// has multiple id mappings
-			final List<PredicateImpl> predicates = Lists.newArrayList();
-			for (final Pair<?, BasicAttribute<?, ?>> pair : type.getIdMappings()) {
-				final BasicMapping<?, ?> idMapping = (BasicMapping<?, ?>) pair.getFirst();
-				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
-				final Path<?> path = r.get(idMapping.getAttribute().getName());
-				final PredicateImpl predicate = cb.equal(path, pe);
-
-				predicates.add(predicate);
-			}
-
-			return this.selectMapCriteria = q.where(predicates.toArray(new PredicateImpl[predicates.size()]));
+			wrapper = this.selectMapCriteria;
 		}
+
+		return wrapper.value;
 	}
 
 	/**

@@ -17,6 +17,7 @@ import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
 import javax.sql.DataSource;
 
+import org.batoo.jpa.util.FinalWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +42,7 @@ public class BoneCPDataSource extends BoneCPConfig implements DataSource, Object
 	private transient PrintWriter logWriter = null;
 
 	/** Pool handle. */
-	private BoneCP pool;
+	private FinalWrapper<BoneCP> pool;
 
 	/** JDBC driver to use. */
 	private String driverClass;
@@ -100,7 +101,7 @@ public class BoneCPDataSource extends BoneCPConfig implements DataSource, Object
 	 */
 	public void close() {
 		if (this.pool != null) {
-			this.pool.shutdown();
+			this.pool.value.shutdown();
 
 			this.pool = null;
 		}
@@ -122,19 +123,19 @@ public class BoneCPDataSource extends BoneCPConfig implements DataSource, Object
 	 */
 	@Override
 	public Connection getConnection() throws SQLException {
-		if (this.pool != null) {
-			return this.pool.getConnection();
-		}
+		FinalWrapper<BoneCP> wrapper = this.pool;
 
-		synchronized (this) {
-			if (this.pool != null) {
-				return this.pool.getConnection();
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.pool == null) {
+					this.maybeInit();
+				}
+
+				wrapper = this.pool;
 			}
-
-			this.maybeInit();
-
-			return this.pool.getConnection();
 		}
+
+		return wrapper.value.getConnection();
 	}
 
 	/**
@@ -215,7 +216,7 @@ public class BoneCPDataSource extends BoneCPConfig implements DataSource, Object
 	 * @return total leased connections
 	 */
 	public int getTotalLeased() {
-		return this.pool.getTotalLeased();
+		return this.pool.value.getTotalLeased();
 	}
 
 	/**
@@ -249,7 +250,7 @@ public class BoneCPDataSource extends BoneCPConfig implements DataSource, Object
 
 		BoneCPDataSource.logger.debug(this.toString());
 
-		this.pool = new BoneCP(this);
+		this.pool = new FinalWrapper<BoneCP>(new BoneCP(this));
 	}
 
 	/**
