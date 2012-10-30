@@ -46,7 +46,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -377,9 +376,14 @@ public class BenchmarkTest {
 	 * @author hceylan
 	 */
 	@Test
-	@Ignore
 	public void doeclipselink() {
-		this.doTest(Type.ELINK);
+		try {
+			this.doTest(Type.ELINK);
+		}
+		catch (final Exception e) {
+			System.err.println("To benchmark EclipseLink, please uncomment EclipseLink dependency in pom.xml and \n"
+				+ "deploy EclipseLink jar file to your local repository...");
+		}
 	}
 
 	/**
