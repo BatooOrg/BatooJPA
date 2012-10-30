@@ -62,6 +62,8 @@ public class PersistenceParserImpl implements PersistenceParser {
 	private static final BLogger LOG = BLoggerFactory.getLogger(PersistenceParserImpl.class);
 
 	private final String puName;
+	private final String provider;
+
 	private final ClassLoader classloader;
 	private final MetadataImpl metadata;
 	private final Map<String, Object> properties = Maps.newHashMap();
@@ -86,6 +88,7 @@ public class PersistenceParserImpl implements PersistenceParser {
 
 		this.puName = puInfo.getPersistenceUnitName();
 		this.classloader = puInfo.getClassLoader();
+		this.provider = null;
 
 		// FIXME: If properties does not exist at all NPE
 		for (final Entry<Object, Object> entry : puInfo.getProperties().entrySet()) {
@@ -122,6 +125,8 @@ public class PersistenceParserImpl implements PersistenceParser {
 		this.classloader = Thread.currentThread().getContextClassLoader();
 
 		final PersistenceUnit puInfo = this.createPersistenceUnit();
+
+		this.provider = puInfo.getProvider();
 
 		for (final Property entry : puInfo.getProperties().getProperties()) {
 			this.properties.put(entry.getName(), entry.getValue());
@@ -234,6 +239,15 @@ public class PersistenceParserImpl implements PersistenceParser {
 	@Override
 	public Map<String, Object> getProperties() {
 		return this.properties;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getProvider() {
+		return this.provider;
 	}
 
 	/**

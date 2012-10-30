@@ -38,6 +38,7 @@ import javax.persistence.PersistenceUnitUtil;
 import javax.persistence.Query;
 import javax.sql.DataSource;
 import javax.validation.Validation;
+import javax.validation.ValidationException;
 import javax.validation.ValidatorFactory;
 import javax.validation.groups.Default;
 
@@ -123,8 +124,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 
 		final boolean hasValidators = parser.hasValidators();
 		if (hasValidators) {
-			this.validationFactory = Validation.buildDefaultValidatorFactory();
-
+			this.validationFactory = this.createValidationFactory();
 			this.persistValidators = this.getValidatorsFor(parser, JPASettings.PERSIST_VALIDATION_GROUP);
 			this.updateValidators = this.getValidatorsFor(parser, JPASettings.UPDATE_VALIDATION_GROUP);
 			this.removeValidators = this.getValidatorsFor(parser, JPASettings.REMOVE_VALIDATION_GROUP);
@@ -374,6 +374,23 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		}
 		catch (final SQLException e) {
 			throw new BatooException("Unable to get connection from the datasource", e);
+		}
+	}
+
+	private ValidatorFactory createValidationFactory() {
+		try {
+			return Validation.buildDefaultValidatorFactory();
+		}
+		catch (final ValidationException e) {
+			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+
+			Thread.currentThread().setContextClassLoader(this.classloader);
+			try {
+				return Validation.buildDefaultValidatorFactory();
+			}
+			finally {
+				Thread.currentThread().setContextClassLoader(oldClassLoader);
+			}
 		}
 	}
 

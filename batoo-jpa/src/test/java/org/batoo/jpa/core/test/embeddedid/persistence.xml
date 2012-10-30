@@ -25,7 +25,7 @@
 
 	<persistence-unit name="default">
 	
-		<provider>org.batoo.jpa.core.PersistenceProvider</provider>
+		<provider>org.batoo.jpa.core.BatooPersistenceProvider</provider>
 		<class>org.batoo.jpa.core.test.embeddedid.Foo</class>
 		<class>org.batoo.jpa.core.test.embeddedid.FooPk</class>
 		

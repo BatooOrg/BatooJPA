@@ -44,6 +44,8 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(BatooPersistenceProvider.class);
 
+	private static final String PROVIDER_NAME = "org.batoo.jpa.core.BatooPersistenceProvider";
+
 	private final ProviderUtil providerUtil;
 
 	/**
@@ -81,9 +83,7 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 			throw e;
 		}
 		catch (final Exception e) {
-			BatooPersistenceProvider.LOG.info(e, "Unable to find Batoo JPA persistence unit: " + info.getPersistenceUnitName());
-
-			return null;
+			throw new PersistenceException("Unable to build the entity manager factory for persistence unit: " + info.getPersistenceUnitName(), e);
 		}
 	}
 
@@ -94,21 +94,42 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 	@Override
 	@SuppressWarnings("rawtypes")
 	public EntityManagerFactory createEntityManagerFactory(String emName, Map map) {
+		String provider;
+
 		try {
 			// create the persistence parser
 			final PersistenceParser parser = new org.batoo.jpa.parser.PersistenceParserImpl(emName);
 
-			// finally, create the entity manager factory
-			return new EntityManagerFactoryImpl(emName, parser);
+			provider = parser.getProvider();
+			if ((provider == null) || BatooPersistenceProvider.PROVIDER_NAME.equals(provider)) {
+				// finally, create the entity manager factory
+				return new EntityManagerFactoryImpl(emName, parser);
+			}
 		}
 		catch (final Exception e) {
 			if ((e instanceof PersistenceException) || (e instanceof MappingException) || (e instanceof BatooException)) {
 				throw (RuntimeException) e;
 			}
 
-			BatooPersistenceProvider.LOG.info(e, "Unable to find Batoo JPA persistence unit: " + emName);
+			throw new PersistenceException("Unable to build entity manager factory for persistence unit " + emName, e);
+		}
 
-			return null;
+		try {
+			// try to delegate
+			final Class<?> providerClass = Class.forName(provider);
+			final PersistenceProvider persistenceProvider = (PersistenceProvider) providerClass.newInstance();
+
+			return persistenceProvider.createEntityManagerFactory(emName, map);
+		}
+		catch (final ClassNotFoundException e) {
+			throw new PersistenceException("Persistence provider " + provider + " is not found for persistence unit " + emName);
+		}
+		catch (final Exception e) {
+			if (e instanceof RuntimeException) {
+				throw (RuntimeException) e;
+			}
+
+			throw new RuntimeException(e);
 		}
 	}
 

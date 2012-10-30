@@ -134,6 +134,15 @@ public class AndroidPersistenceParserImpl implements PersistenceParser {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getProvider() {
+		return null;
+	}
+
+	/**
 	 * Returns the specification of how the provider must use a second-level cache for the persistence unit.
 	 * 
 	 * @return the second-level cache mode that must be used by the provider for the persistence unit
