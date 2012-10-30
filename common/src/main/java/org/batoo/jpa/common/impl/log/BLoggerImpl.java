@@ -139,7 +139,7 @@ public class BLoggerImpl implements BLogger {
 
 			return boxed.toString();
 		}
-		catch (final Throwable e) {
+		catch (final Exception e) {
 			return block;
 		}
 	}
@@ -508,7 +508,7 @@ public class BLoggerImpl implements BLogger {
 				try {
 					return this.call();
 				}
-				catch (final Throwable e) {
+				catch (final Exception e) {
 					return null;
 				}
 			}

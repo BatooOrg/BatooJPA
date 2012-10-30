@@ -201,18 +201,18 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	@Override
 	@SuppressWarnings("unchecked")
 	public <Y> FetchImpl<X, Y> fetch(String attributeName, JoinType jt) {
-		final Mapping<?, ?, ?> mapping = this.getMapping(attributeName);
+		final Mapping<?, ?, ?> _mapping = this.getMapping(attributeName);
 
-		if (!(mapping instanceof JoinedMapping)) {
+		if (!(_mapping instanceof JoinedMapping)) {
 			throw new IllegalArgumentException("Cannot dereference attribute " + attributeName);
 		}
 
-		if (this.fetches.get(mapping) != null) {
-			return (FetchImpl<X, Y>) this.fetches.get(mapping);
+		if (this.fetches.get(_mapping) != null) {
+			return (FetchImpl<X, Y>) this.fetches.get(_mapping);
 		}
 
-		final FetchImpl<X, Y> fetch = new FetchImpl<X, Y>(this, (JoinedMapping<? super X, ?, Y>) mapping, jt);
-		this.fetches.put(mapping, fetch);
+		final FetchImpl<X, Y> fetch = new FetchImpl<X, Y>(this, (JoinedMapping<? super X, ?, Y>) _mapping, jt);
+		this.fetches.put(_mapping, fetch);
 
 		return fetch;
 	}
@@ -258,7 +258,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	public String generateJpqlFetches(final String parent) {
 		final StringBuilder description = new StringBuilder();
 
-		final Collection<String> fetches = Collections2.transform(this.fetches.values(), new Function<FetchImpl<X, ?>, String>() {
+		final Collection<String> _fetches = Collections2.transform(this.fetches.values(), new Function<FetchImpl<X, ?>, String>() {
 
 			@Override
 			public String apply(FetchImpl<X, ?> input) {
@@ -266,7 +266,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			}
 		});
 
-		description.append(Joiner.on("\n").join(fetches));
+		description.append(Joiner.on("\n").join(_fetches));
 
 		return description.toString();
 	}
@@ -284,10 +284,10 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 */
 	public void generateSqlJoins(AbstractCriteriaQueryImpl<?> query, final List<String> selfJoins) {
 		for (final Entry<SecondaryTable, String> e : this.tableAliases.entrySet()) {
-			final String alias = e.getValue();
+			final String _alias = e.getValue();
 			final SecondaryTable table = e.getKey();
 
-			selfJoins.add(table.joinPrimary(this.getPrimaryTableAlias(query), alias));
+			selfJoins.add(table.joinPrimary(this.getPrimaryTableAlias(query), _alias));
 		}
 	}
 
@@ -450,17 +450,17 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 				this.discriminatorAlias = fieldAlias;
 			}
 			else if (column.getMapping() instanceof SingularAssociationMapping) {
-				final SingularAssociationMapping<?, ?> mapping = (SingularAssociationMapping<?, ?>) column.getMapping();
+				final SingularAssociationMapping<?, ?> _mapping = (SingularAssociationMapping<?, ?>) column.getMapping();
 
 				// if we are on a join on that path then ignore
-				if (!root && this.ignoreJoin(mapping)) {
+				if (!root && this.ignoreJoin(_mapping)) {
 					continue;
 				}
 
 				fieldAlias = tableAlias + "_F" + query.getFieldAlias(tableAlias, column);
 				field = Joiner.on(".").skipNulls().join(tableAlias, column.getName());
 
-				this.singularJoins.add(mapping);
+				this.singularJoins.add(_mapping);
 				this.joinFields.put(column, fieldAlias);
 			}
 			else {
@@ -540,10 +540,10 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 */
 	@Override
 	public final Set<Fetch<X, ?>> getFetches() {
-		final Set<Fetch<X, ?>> fetches = Sets.newHashSet();
-		fetches.addAll(this.fetches.values());
+		final Set<Fetch<X, ?>> _fetches = Sets.newHashSet();
+		_fetches.addAll(this.fetches.values());
 
-		return fetches;
+		return _fetches;
 	}
 
 	private Object getId(ResultSet row) throws SQLException {
@@ -574,9 +574,9 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	}
 
 	private Object getId(SingularAssociationMapping<?, ?> mapping, ResultSet row) throws SQLException {
-		final EntityTypeImpl<?> entity = mapping.getType();
-		if (entity.hasSingleIdAttribute()) {
-			final SingularMapping<?, ?> idMapping = entity.getIdMapping();
+		final EntityTypeImpl<?> _entity = mapping.getType();
+		if (_entity.hasSingleIdAttribute()) {
+			final SingularMapping<?, ?> idMapping = _entity.getIdMapping();
 			if (idMapping instanceof BasicMapping) {
 				final JoinColumn joinColumn = mapping.getForeignKey().getJoinColumns().get(0);
 				final String field = this.joinFields.get(joinColumn);
@@ -589,7 +589,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			return allNull.booleanValue() ? null : id;
 		}
 
-		final Object id = ((EmbeddableTypeImpl<?>) entity.getIdType()).newInstance();
+		final Object id = ((EmbeddableTypeImpl<?>) _entity.getIdType()).newInstance();
 		for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.entity.getIdMappings()) {
 			final BasicColumn column = pair.getFirst().getColumn();
 
@@ -804,13 +804,13 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	@Override
 	public String getTableAlias(BaseQueryImpl<?> query, AbstractTable table) {
 		if (table instanceof SecondaryTable) {
-			String alias = this.tableAliases.get(table);
-			if (alias == null) {
-				alias = this.alias + "_S" + this.nextTableAlias++;
-				this.tableAliases.put((SecondaryTable) table, alias);
+			String _alias = this.tableAliases.get(table);
+			if (_alias == null) {
+				_alias = this.alias + "_S" + this.nextTableAlias++;
+				this.tableAliases.put((SecondaryTable) table, _alias);
 			}
 
-			return alias;
+			return _alias;
 		}
 
 		return this.getPrimaryTableAlias(query);
@@ -864,27 +864,25 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 
 		final ManagedInstance<?> child = pair.getValue();
 
-		final AssociationMapping<? super X, ?, ?> mapping = (AssociationMapping<? super X, ?, ?>) fetch.getMapping();
+		final AssociationMapping<? super X, ?, ?> _mapping = (AssociationMapping<? super X, ?, ?>) fetch.getMapping();
 
-		if (mapping.getMappingType() == MappingType.PLURAL_ASSOCIATION) {
+		if (_mapping.getMappingType() == MappingType.PLURAL_ASSOCIATION) {
 			// if it is a plural association then we will test if we processed the child
-			if (((ManagedCollection<?>) mapping.get(instance)).addChild(pair)) {
-				// if it is a one-to-many mapping and has an inverse then set the inverses
-				if ((mapping.getInverse() != null) && //
-					(mapping.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_MANY)) {
-					mapping.getInverse().set(child.getInstance(), instance);
-					child.setJoinLoaded(mapping.getInverse());
-				}
+			// if it is a one-to-many mapping and has an inverse then set the inverses
+			if (((ManagedCollection<?>) _mapping.get(instance)).addChild(pair) && (_mapping.getInverse() != null) && //
+				(_mapping.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_MANY)) {
+				_mapping.getInverse().set(child.getInstance(), instance);
+				child.setJoinLoaded(_mapping.getInverse());
 			}
 		}
 		// if it is singular association then set the instance
 		else {
-			mapping.set(instance, child.getInstance());
+			_mapping.set(instance, child.getInstance());
 
 			// if this is a one-to-one mapping and has an inverse then set it
-			if ((mapping.getInverse() != null) && (mapping.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_ONE)) {
-				mapping.getInverse().set(child.getInstance(), instance);
-				child.setJoinLoaded(mapping);
+			if ((_mapping.getInverse() != null) && (_mapping.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_ONE)) {
+				_mapping.getInverse().set(child.getInstance(), instance);
+				child.setJoinLoaded(_mapping);
 			}
 		}
 	}
@@ -903,13 +901,13 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		return instance;
 	}
 
-	private void handleElementCollectionFetch(SessionImpl session, ResultSet row, Object instance, FetchImpl<X, ?> fetch) throws SQLException {
+	private void handleElementCollectionFetch(ResultSet row, Object instance, FetchImpl<X, ?> fetch) throws SQLException {
 		final EntryImpl<Object, ?> child = fetch.handleElementFetch(row, MapSelectType.ENTRY);
 
-		final ElementCollectionMapping<? super X, ?, ?> mapping = (ElementCollectionMapping<? super X, ?, ?>) fetch.getMapping();
+		final ElementCollectionMapping<? super X, ?, ?> _mapping = (ElementCollectionMapping<? super X, ?, ?>) fetch.getMapping();
 
 		// if it is a plural association then we will test if we processed the child
-		((ManagedCollection<?>) mapping.get(instance)).addElement(child);
+		((ManagedCollection<?>) _mapping.get(instance)).addElement(child);
 	}
 
 	/**
@@ -1010,15 +1008,14 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 
 	void handleFetches(SessionImpl session, final ResultSet row, Object instance) throws SQLException {
 		for (final FetchImpl<X, ?> fetch : this.fetches.values()) {
-			final JoinedMapping<? super X, ?, ?> mapping = fetch.getMapping();
+			final MappingType mappingType = fetch.getMapping().getMappingType();
 
-			final MappingType mappingType = mapping.getMappingType();
 			switch (mappingType) {
 				case EMBEDDABLE:
 					fetch.handleFetches(session, row, instance);
 					break;
 				case ELEMENT_COLLECTION:
-					this.handleElementCollectionFetch(session, row, instance, fetch);
+					this.handleElementCollectionFetch(row, instance, fetch);
 					break;
 				default:
 					this.handleAssociationFetch(session, row, instance, fetch);
@@ -1068,12 +1065,12 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		}
 
 		for (final FetchImpl<X, ?> fetch : this.fetches.values()) {
-			final JoinedMapping<? super X, ?, ?> mapping = fetch.getMapping();
-			if (!(mapping instanceof SingularAssociationMapping)) {
-				mapping.initialize(managedInstance);
+			final JoinedMapping<? super X, ?, ?> _mapping = fetch.getMapping();
+			if (!(_mapping instanceof SingularAssociationMapping)) {
+				_mapping.initialize(managedInstance);
 			}
 
-			managedInstance.setJoinLoaded(mapping);
+			managedInstance.setJoinLoaded(_mapping);
 		}
 	}
 
@@ -1093,13 +1090,13 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 */
 	@SuppressWarnings("unchecked")
 	public <Y> FetchImpl<X, Y> join(String attributeName, JoinType jt) {
-		final Mapping<?, ?, ?> mapping = this.getMapping(attributeName);
+		final Mapping<?, ?, ?> _mapping = this.getMapping(attributeName);
 
-		if (!(mapping instanceof JoinedMapping)) {
+		if (!(_mapping instanceof JoinedMapping)) {
 			throw new IllegalArgumentException("Cannot dereference attribute " + attributeName);
 		}
 
-		final FetchImpl<X, Y> fetch = new FetchImpl<X, Y>(this, (JoinedMapping<? super X, ?, Y>) mapping, jt);
+		final FetchImpl<X, Y> fetch = new FetchImpl<X, Y>(this, (JoinedMapping<? super X, ?, Y>) _mapping, jt);
 		this.joins.add(fetch);
 
 		return fetch;

@@ -307,7 +307,7 @@ public class MetadataImpl implements Metadata {
 
 				if (metadata == null) {
 					if (clazz.getAnnotation(Entity.class) != null) {
-						final EntityMetadataImpl entityMetadata = new EntityMetadataImpl(clazz, (EntityMetadata) metadata);
+						final EntityMetadataImpl entityMetadata = new EntityMetadataImpl(clazz, null);
 						this.entityMap.put(className, entityMetadata);
 
 						this.namedQueries.addAll(entityMetadata.getNamedQueries());
@@ -334,7 +334,7 @@ public class MetadataImpl implements Metadata {
 				}
 			}
 			catch (final ClassNotFoundException e) { // class could not be found
-				throw new MappingException("Class " + className + " cound not be found.", metadata.getLocator());
+				throw new MappingException("Class " + className + " cound not be found.", metadata != null ? metadata.getLocator() : null);
 			}
 		}
 	}

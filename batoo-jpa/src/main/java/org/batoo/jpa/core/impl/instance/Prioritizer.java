@@ -35,7 +35,7 @@ import com.google.common.collect.Sets;
  * @author hceylan
  * @since $version
  */
-public class Prioritizer {
+public final class Prioritizer {
 
 	/**
 	 * Sorts the managed instances based on their dependencies.

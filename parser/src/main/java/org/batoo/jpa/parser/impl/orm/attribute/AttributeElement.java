@@ -58,6 +58,10 @@ public abstract class AttributeElement extends ParentElement implements Attribut
 	 */
 	@Override
 	public boolean equals(Object object) {
+		if (object == null) {
+			return false;
+		}
+
 		// if the object is a string provide equality based on name and object equality
 		if (object instanceof String) {
 			return this.name.equals(object);
@@ -74,8 +78,7 @@ public abstract class AttributeElement extends ParentElement implements Attribut
 	@Override
 	protected void generate() {
 		this.name = this.getAttribute(ElementConstants.ATTR_NAME, ElementConstants.EMPTY);
-		this.access = this.getAttribute(ElementConstants.ATTR_ACCESS) != null
-			? AccessType.valueOf(this.getAttribute(ElementConstants.ATTR_ACCESS)) : null;
+		this.access = this.getAttribute(ElementConstants.ATTR_ACCESS) != null ? AccessType.valueOf(this.getAttribute(ElementConstants.ATTR_ACCESS)) : null;
 	}
 
 	/**
@@ -94,5 +97,14 @@ public abstract class AttributeElement extends ParentElement implements Attribut
 	@Override
 	public String getName() {
 		return this.name;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int hashCode() {
+		return this.name.hashCode();
 	}
 }

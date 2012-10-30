@@ -257,7 +257,7 @@ public class ReflectHelper {
 
 		final ParameterizedType parameterizedType = (ParameterizedType) type;
 
-		final Type[] types = parameterizedType != null ? parameterizedType.getActualTypeArguments() : null;
+		final Type[] types = parameterizedType.getActualTypeArguments();
 
 		return (Class<X>) ((types != null) && (index < types.length) ? types[index] : null);
 	}
@@ -335,7 +335,7 @@ public class ReflectHelper {
 				ReflectHelper.LOG.debug("Direct access library loaded successfully");
 			}
 		}
-		catch (final Throwable e) {
+		catch (final Exception e) {
 			ReflectHelper.LOG.warn("Direct access library cannot be loaded! Direct access library only adds some performance, but not necessary to operate. It is safe to ignore...");
 		}
 

@@ -29,6 +29,7 @@ import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
+import org.batoo.jpa.util.FinalWrapper;
 
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
@@ -56,8 +57,8 @@ public abstract class BaseQueryImpl<T> implements BaseQuery<T> {
 	private final HashBiMap<ParameterExpressionImpl<?>, Integer> parameters = HashBiMap.create();
 	private final HashMap<String, List<AbstractColumn>> fields = Maps.newHashMap();
 
-	private String sql;
-	private String jpql;
+	private FinalWrapper<String> sql;
+	private FinalWrapper<String> jpql;
 
 	private final List<ParameterExpressionImpl<?>> sqlParameters = Lists.newArrayList();
 
@@ -147,17 +148,19 @@ public abstract class BaseQueryImpl<T> implements BaseQuery<T> {
 	 */
 	@Override
 	public String getJpql() {
-		if (this.jpql != null) {
-			return this.jpql;
-		}
+		FinalWrapper<String> wrapper = this.jpql;
 
-		synchronized (this) {
-			if (this.jpql != null) {
-				return this.jpql;
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.jpql == null) {
+					this.jpql = new FinalWrapper<String>(this.generateJpql());
+				}
+
+				wrapper = this.jpql;
 			}
-
-			return this.jpql = this.generateJpql();
 		}
+
+		return wrapper.value;
 	}
 
 	/**
@@ -196,17 +199,19 @@ public abstract class BaseQueryImpl<T> implements BaseQuery<T> {
 	 */
 	@Override
 	public String getSql() {
-		if (this.sql != null) {
-			return this.sql;
-		}
+		FinalWrapper<String> wrapper = this.sql;
 
-		synchronized (this) {
-			if (this.sql != null) {
-				return this.sql;
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.sql == null) {
+					this.sql = new FinalWrapper<String>(this.generateSql());
+				}
+
+				wrapper = this.sql;
 			}
-
-			return this.sql = this.generateSql();
 		}
+
+		return wrapper.value;
 	}
 
 	/**

@@ -71,11 +71,16 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 				new org.batoo.jpa.core.impl.manager.JtaEntityManagerFactoryImpl(info.getPersistenceUnitName(), parser) : new EntityManagerFactoryImpl(
 					info.getPersistenceUnitName(), parser);
 		}
+		catch (final PersistenceException e) {
+			throw e;
+		}
+		catch (final MappingException e) {
+			throw e;
+		}
+		catch (final BatooException e) {
+			throw e;
+		}
 		catch (final Exception e) {
-			if ((e instanceof PersistenceException) || (e instanceof MappingException) || (e instanceof BatooException)) {
-				throw (RuntimeException) e;
-			}
-
 			BatooPersistenceProvider.LOG.info(e, "Unable to find Batoo JPA persistence unit: " + info.getPersistenceUnitName());
 
 			return null;
