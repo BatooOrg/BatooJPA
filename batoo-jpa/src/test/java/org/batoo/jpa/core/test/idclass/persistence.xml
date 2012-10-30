@@ -27,7 +27,6 @@
 		<provider>org.batoo.jpa.core.PersistenceProvider</provider>
 		
 		<class>org.batoo.jpa.core.test.idclass.Foo</class>
-		<class>org.batoo.jpa.core.test.idclass.FooPk</class>
 		
 		<properties>
 			<property name="org.batoo.jpa.ddl" value="DROP" />

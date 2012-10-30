@@ -18,13 +18,11 @@
  */
 package org.batoo.jpa.core.test.idclass;
 
-import javax.persistence.Embeddable;
 
 /**
  * @author hceylan
  * @since $version
  */
-@Embeddable
 public class FooPk {
 
 	private String strKey;

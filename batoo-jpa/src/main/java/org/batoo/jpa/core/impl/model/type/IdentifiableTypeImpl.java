@@ -116,7 +116,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 						attribute.getLocator(), this.embeddedId.getLocator());
 				}
 
-				if ((this.idType == null) && (this.idAttributes.size() > 0)) {
+				if ((this.idType == null) && (this.idAttributes.size() > 1)) {
 					throw new MappingException("Multiple id attributes are only allowed with id class declaration.", //
 						attribute.getLocator(), this.idAttributes.values().iterator().next().getLocator());
 				}
@@ -337,14 +337,9 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	private EmbeddableTypeImpl<?> getIdClass(IdentifiableTypeMetadata metadata) {
 		if (StringUtils.isNotBlank(metadata.getIdClass())) {
 			try {
-				final Class<?> clazz = Class.forName(metadata.getIdClass());
-				final EmbeddableTypeImpl<?> embeddable = this.getMetamodel().embeddable(clazz);
+				final Class<?> clazz = this.getMetamodel().getEntityManagerFactory().getClassloader().loadClass(metadata.getIdClass());
 
-				if (embeddable == null) {
-					throw new MappingException("IdClass " + clazz + " does not have a corresponding embeddable type.", metadata.getLocator());
-				}
-
-				return embeddable;
+				return this.getMetamodel().idClass(clazz);
 			}
 			catch (final ClassNotFoundException e) {}
 		}
