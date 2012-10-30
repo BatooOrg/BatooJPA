@@ -64,8 +64,9 @@
 				http://highscalability.com/blog/2012/10/9/batoo-jpa-the-new-jpa-implementation-that-runs-over-15-times.html
 			 -->
 			<property name="hibernate.jdbc.batch_size" value="50"/>
-			<property name="hibernate.order_updates" value="true"/>
+			<property name="hibernate.order_update" value="true"/>
 			<property name="hibernate.id.new_generator_mappings" value="true"/>
+			<property name="hibernate.connection.autocommit" value="false" />
 		</properties>
 	</persistence-unit>
 	

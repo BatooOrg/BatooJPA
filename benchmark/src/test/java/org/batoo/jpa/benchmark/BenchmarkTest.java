@@ -60,7 +60,7 @@ import com.google.common.collect.Maps;
 public class BenchmarkTest {
 
 	// The number of tests to run
-	private static final int BENCHMARK_LENGTH = 100;
+	private static final int BENCHMARK_LENGTH = 1000;
 
 	// If the results should be summarized
 	private static final boolean SUMMARIZE = true;
