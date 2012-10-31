@@ -99,6 +99,14 @@
 			<version>1.8.0.10</version>
 			<scope>test</scope>
 		</dependency>
+		
+		<!-- BoneCP -->
+		<dependency>
+			<groupId>com.jolbox</groupId>
+			<artifactId>bonecp</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
 		<!--  Open only for testing
 		<dependency>
 			<groupId>com.microsoft.sqlserver</groupId>
