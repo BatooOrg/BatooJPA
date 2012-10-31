@@ -34,16 +34,16 @@ public class OrderByTest extends BaseCoreTest {
 
 	private Person person() {
 		final Person person = new Person("Ceylan");
-		new Address(person, "Istanbul");
-		new Address(person, "London");
-		new Address(person, "New York");
+		new Address(person, "paris");
+		new Address(person, "london");
+		new Address(person, "new York");
 
-		new Address2(person, "Istanbul", "Street1");
-		new Address2(person, "Istanbul", "Street2");
-		new Address2(person, "Istanbul", "Street3");
-		new Address2(person, "London", "Street5");
-		new Address2(person, "London", "Street4");
-		new Address2(person, "New York", "Broadway");
+		new Address2(person, "paris", "Street1");
+		new Address2(person, "paris", "Street2");
+		new Address2(person, "paris", "Street3");
+		new Address2(person, "london", "Street5");
+		new Address2(person, "london", "Street4");
+		new Address2(person, "new york", "Broadway");
 
 		return person;
 	}
@@ -56,10 +56,13 @@ public class OrderByTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testOrderBy1() {
-		final Person person = this.person();
+		Person person = this.person();
 		this.persist(person);
 
 		this.commit();
+		this.close();
+
+		person = this.find(Person.class, person.getId());
 
 		final Address[] addresses = person.getAddresses().toArray(new Address[person.getAddresses().size()]);
 		for (int i = 1; i < addresses.length; i++) {
@@ -68,7 +71,7 @@ public class OrderByTest extends BaseCoreTest {
 
 		final String addresses2 = Arrays.toString(person.getAddresses2().toArray());
 		Assert.assertEquals(
-			"[Address2 [city=New York, street=Broadway], Address2 [city=Istanbul, street=Street1], Address2 [city=Istanbul, street=Street2], Address2 [city=Istanbul, street=Street3], Address2 [city=London, street=Street4], Address2 [city=London, street=Street5]]",
+			"[Address2 [city=paris, street=Street1], Address2 [city=paris, street=Street2], Address2 [city=paris, street=Street3], Address2 [city=new york, street=Broadway], Address2 [city=london, street=Street4], Address2 [city=london, street=Street5]]",
 			addresses2);
 	}
 
@@ -91,6 +94,8 @@ public class OrderByTest extends BaseCoreTest {
 		new Address(person, "Paris");
 		this.commit();
 
+		this.close();
+
 		person = this.find(Person.class, person.getId());
 
 		final Address[] addresses = person.getAddresses().toArray(new Address[person.getAddresses().size()]);
@@ -100,7 +105,7 @@ public class OrderByTest extends BaseCoreTest {
 
 		final String addresses2 = Arrays.toString(person.getAddresses2().toArray());
 		Assert.assertEquals(
-			"[Address2 [city=New York, street=Broadway], Address2 [city=Istanbul, street=Street1], Address2 [city=Istanbul, street=Street2], Address2 [city=Istanbul, street=Street3], Address2 [city=London, street=Street4], Address2 [city=London, street=Street5]]",
+			"[Address2 [city=paris, street=Street1], Address2 [city=paris, street=Street2], Address2 [city=paris, street=Street3], Address2 [city=new york, street=Broadway], Address2 [city=london, street=Street4], Address2 [city=london, street=Street5]]",
 			addresses2);
 	}
 }

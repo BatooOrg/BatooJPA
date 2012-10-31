@@ -47,7 +47,7 @@ public class Person {
 	private final List<Address> addresses = Lists.newArrayList();
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "person")
-	@OrderBy("city desc , street")
+	@OrderBy("city desc, street")
 	private final List<Address2> addresses2 = Lists.newArrayList();
 
 	private String name;

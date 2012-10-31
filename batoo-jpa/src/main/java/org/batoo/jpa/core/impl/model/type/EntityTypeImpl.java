@@ -1206,7 +1206,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 					final List<PluralMapping<?, ?, ?>> _mappingsPluralSorted = Lists.newArrayList();
 					for (final PluralMapping<?, ?, ?> mapping : this.getMappingsPlural()) {
-						if (StringUtils.isNotBlank(mapping.getOrderBy())) {
+						if (mapping.getOrderBy() != null) {
 							_mappingsPluralSorted.add(mapping);
 						}
 					}

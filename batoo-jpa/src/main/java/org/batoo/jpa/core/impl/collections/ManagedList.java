@@ -527,9 +527,13 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 			if (!(mapping instanceof PluralAssociationMapping) //
 				|| !managedInstance.tryLoadFromCache((PluralAssociationMapping<?, ?, ?>) mapping)) {
 				BatooUtils.addAll(mapping.loadCollection(managedInstance), this.delegate);
-				mapping.sortList(managedInstance.getInstance());
 
 				this.initialized = true;
+
+				if (this.getMapping().getOrderBy() != null) {
+					mapping.sortList(managedInstance.getInstance());
+				}
+
 				managedInstance.updateCollectionCache(mapping);
 			}
 

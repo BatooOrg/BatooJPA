@@ -26,6 +26,8 @@ import javax.persistence.OrderBy;
 import javax.persistence.metamodel.Type.PersistenceType;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.batoo.jpa.common.log.BLogger;
+import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.util.Pair;
@@ -90,6 +92,8 @@ public class ListComparator<E> implements Comparator<E> {
 		}
 	}
 
+	private static final BLogger LOG = BLoggerFactory.getLogger(ListComparator.class);
+
 	private final PluralMapping<?, ?, E> mapping;
 	private final ArrayList<ComparableMapping> comparables = Lists.newArrayList();
 
@@ -113,26 +117,33 @@ public class ListComparator<E> implements Comparator<E> {
 	 */
 	@Override
 	public int compare(E o1, E o2) {
-		for (int i = 0; i < this.comparables.size(); i++) {
-			final ComparableMapping mapping = this.comparables.get(i);
-			final Object v1 = mapping.getMapping().get(o1);
-			final Object v2 = mapping.getMapping().get(o2);
+		int result = 0;
 
-			final int result = ObjectUtils.compare((Comparable<?>) v1, (Comparable<?>) v2);
-			if (result == 0) {
-				continue;
+		try {
+			for (int i = 0; i < this.comparables.size(); i++) {
+				final ComparableMapping mapping = this.comparables.get(i);
+				final Object v1 = mapping.getMapping().get(o1);
+				final Object v2 = mapping.getMapping().get(o2);
+
+				result = ObjectUtils.compare((Comparable<?>) v1, (Comparable<?>) v2);
+				if (result == 0) {
+					continue;
+				}
+
+				if (!mapping.isAscending()) {
+					result = -result;
+				}
+
+				break;
 			}
-			if (result < 0) {
-				if (mapping.isAscending()) {
-					return -1;
-				}
-				else {
-					return 1;
-				}
+
+			return result;
+		}
+		finally {
+			if (ListComparator.LOG.isDebugEnabled()) {
+				ListComparator.LOG.debug("{0} {1} {2}", result < 0 ? o1 : o2, result == 0 ? "=" : "<", result < 0 ? o2 : o1);
 			}
 		}
-
-		return 0;
 	}
 
 	/**
