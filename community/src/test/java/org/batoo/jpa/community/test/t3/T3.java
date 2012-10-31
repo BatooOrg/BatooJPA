@@ -19,7 +19,7 @@ public class T3 extends BaseCoreTest {
 	 */
 	@Test
 	public void test() {
-		final TypedQuery<E1> q = this.cq("select e1 from E1 e1 where  e1.e2.e3 = :oem", E1.class);
+		final TypedQuery<E1> q = this.cq("select e1 from E1 e1 where :oem = e1.e2.e3", E1.class);
 
 		q.setParameter("oem", new E3());
 		q.getResultList();

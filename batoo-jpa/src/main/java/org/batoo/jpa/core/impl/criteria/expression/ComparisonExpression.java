@@ -24,6 +24,7 @@ import java.text.MessageFormat;
 import java.util.List;
 
 import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.ParameterExpression;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
@@ -111,8 +112,15 @@ public class ComparisonExpression extends AbstractExpression<Boolean> {
 
 		this.comparison = comparison;
 
-		this.x = (AbstractExpression<?>) x;
-		this.y = (AbstractExpression<?>) y;
+		if (x instanceof ParameterExpression) {
+			this.x = (AbstractExpression<?>) y;
+			this.y = (AbstractExpression<?>) x;
+		}
+		else {
+			this.x = (AbstractExpression<?>) x;
+			this.y = (AbstractExpression<?>) y;
+		}
+
 		this.z = (AbstractExpression<?>) z;
 	}
 

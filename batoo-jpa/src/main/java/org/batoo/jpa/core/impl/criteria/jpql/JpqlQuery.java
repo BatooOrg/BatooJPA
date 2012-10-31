@@ -486,8 +486,17 @@ public class JpqlQuery {
 				}
 			}
 			else {
-				left = this.getExpression(cb, q, predictionDef.getChild(0), null);
-				right = (AbstractExpression<X>) this.getExpression(cb, q, predictionDef.getChild(1), left.getJavaType());
+				final Tree leftExpr = predictionDef.getChild(0);
+				final Tree rightExpr = predictionDef.getChild(1);
+
+				if ((leftExpr.getType() == JpqlParser.Named_Parameter) || (leftExpr.getType() == JpqlParser.Ordinal_Parameter)) {
+					left = (AbstractExpression<X>) this.getExpression(cb, q, rightExpr, null);
+					right = (AbstractExpression<X>) this.getExpression(cb, q, leftExpr, left.getJavaType());
+				}
+				else {
+					left = this.getExpression(cb, q, leftExpr, null);
+					right = (AbstractExpression<X>) this.getExpression(cb, q, rightExpr, left.getJavaType());
+				}
 			}
 
 			switch (predictionDef.getType()) {
