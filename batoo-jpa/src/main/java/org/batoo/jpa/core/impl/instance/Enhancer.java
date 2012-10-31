@@ -120,9 +120,13 @@ public final class Enhancer {
 
 		Class<?> currentClass = clazz;
 		while (currentClass != Object.class) { // we are not interested in Object.class
-			for (final Method method : currentClass.getDeclaredMethods()) {
+			for (final Method method : currentClass.getMethods()) {
 				int modifiers = method.getModifiers();
 
+				if (Modifier.isStatic(modifiers) || Modifier.isPrivate(modifiers)) {
+					continue;
+				}
+				
 				// Filter out the details that we are not interested
 				modifiers &= Modifier.ABSTRACT;
 				modifiers &= Modifier.FINAL;
