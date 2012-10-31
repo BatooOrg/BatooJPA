@@ -24,7 +24,7 @@
 	version="2.0">
 
 	<persistence-unit name="batoo" transaction-type="RESOURCE_LOCAL">
-		<provider>org.batoo.jpa.core.PersistenceProvider</provider>
+		<provider>org.batoo.jpa.core.BatooPersistenceProvider</provider>
 
 		<class>org.batoo.jpa.benchmark.Country</class>
 		<class>org.batoo.jpa.benchmark.Person</class>
