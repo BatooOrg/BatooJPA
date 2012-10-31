@@ -221,6 +221,11 @@ public abstract class ManagedCollection<E> implements Serializable {
 
 		final Object children = this.mapping.get(instance);
 
+		// if it is a managed collection and not initialized then skip the merge
+		if ((children instanceof ManagedCollection) && !((ManagedCollection<E>) children).isInitialized()) {
+			return;
+		}
+
 		final Collection<E> collection;
 		if (children instanceof Collection) {
 			collection = (Collection<E>) children;
