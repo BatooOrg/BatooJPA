@@ -33,6 +33,18 @@ import org.batoo.jpa.parser.MappingException;
 @Entity
 public class Person {
 
+	/**
+	 * Sample static method.
+	 * 
+	 * @return the person
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public static Person create() {
+		return new Person();
+	}
+
 	@Id
 	private Integer id;
 
