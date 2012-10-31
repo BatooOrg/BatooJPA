@@ -262,7 +262,7 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 
 				final Object object = this.sourceKey.getJoinColumns().contains(column) ? source : destination;
 				if (column != this.orderColumn) {
-					params[paramIndex++] = column.getValue(object);
+					params[paramIndex++] = column.getValue(connection, object);
 				}
 				else {
 					params[paramIndex++] = order;
@@ -270,7 +270,7 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 			}
 		}
 
-		new QueryRunner(this.jdbcAdaptor.isPmdBroken()).update(connection, insertSql, params);
+		new QueryRunner(this.jdbcAdaptor.isPmdBroken(), false).update(connection, insertSql, params);
 	}
 
 	/**
@@ -285,14 +285,14 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 
 		int i = 0;
 		for (final JoinColumn sourceRemoveColumn : this.sourceRemoveColumns) {
-			params[i++] = sourceRemoveColumn.getValue(source);
+			params[i++] = sourceRemoveColumn.getValue(connection, source);
 		}
 
 		for (final JoinColumn destinationRemoveColumn : this.destinationRemoveColumns) {
-			params[i++] = destinationRemoveColumn.getValue(destination);
+			params[i++] = destinationRemoveColumn.getValue(connection, destination);
 		}
 
-		new QueryRunner(this.jdbcAdaptor.isPmdBroken()).update(connection, removeSql, params);
+		new QueryRunner(this.jdbcAdaptor.isPmdBroken(), false).update(connection, removeSql, params);
 	}
 
 	/**
@@ -307,10 +307,10 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 
 		int i = 0;
 		for (final JoinColumn sourceRemoveColumn : this.removeAllColumns) {
-			params[i++] = sourceRemoveColumn.getValue(source);
+			params[i++] = sourceRemoveColumn.getValue(connection, source);
 		}
 
-		new QueryRunner(this.jdbcAdaptor.isPmdBroken()).update(connection, removeAllSql, params);
+		new QueryRunner(this.jdbcAdaptor.isPmdBroken(), false).update(connection, removeAllSql, params);
 	}
 
 	/**

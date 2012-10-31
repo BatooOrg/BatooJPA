@@ -611,6 +611,8 @@ public class MetamodelImpl implements Metamodel {
 	 * @param clazz
 	 *            the class of the idClass
 	 * @return the id class for the <code>clazz</code>
+	 * @param <X>
+	 *            the type of the idClass
 	 * 
 	 * @since $version
 	 * @author hceylan

@@ -92,6 +92,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	private int maxResult = Integer.MAX_VALUE;
 
 	private final Map<ParameterExpressionImpl<?>, Object> parameters = Maps.newHashMap();
+
 	private List<X> results;
 
 	private LockModeType lockMode;
@@ -416,7 +417,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 		try {
 			this.em.assertTransaction();
 
-			return new QueryRunner(this.em.getJdbcAdaptor().isPmdBroken()).update(this.em.getConnection(), this.sql, parameters);
+			return new QueryRunner(this.em.getJdbcAdaptor().isPmdBroken(), false).update(this.em.getConnection(), this.sql, parameters);
 		}
 		catch (final SQLException e) {
 			QueryImpl.LOG.error(e, "Query failed" + QueryImpl.LOG.lazyBoxed(this.sql, parameters));

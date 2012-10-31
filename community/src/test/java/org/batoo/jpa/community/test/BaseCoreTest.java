@@ -461,7 +461,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 			final Connection connection = DriverManager.getConnection(System.getProperty("javax.persistence.jdbc.url"), username, password);
 
 			try {
-				final QueryRunner qr = new QueryRunner(true);
+				final QueryRunner qr = new QueryRunner(true, false);
 				qr.update(connection, "use master");
 				qr.update(connection, "drop database test");
 				qr.update(connection, "create database test");
@@ -477,7 +477,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 			final Connection connection = DriverManager.getConnection(System.getProperty("javax.persistence.jdbc.url"), username, password);
 
 			try {
-				final QueryRunner qr = new QueryRunner(true);
+				final QueryRunner qr = new QueryRunner(true, false);
 				final List<Object[]> tables = qr.query(connection, "select TABLE_NAME from user_tables", new ArrayListHandler());
 				for (final Object[] table : tables) {
 					try {
@@ -550,7 +550,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 
 		this.cleanupTx();
 
-		final QueryRunner qr = "mssql".equals(testMode) ? new QueryRunner(true) : new QueryRunner();
+		final QueryRunner qr = "mssql".equals(testMode) ? new QueryRunner(true, false) : new QueryRunner();
 
 		if (this.emf != null) {
 			if ("mysql".equals(testMode)) {

@@ -701,7 +701,11 @@ public class PreparedStatementProxy implements PreparedStatement {
 	 */
 	@Override
 	public void setBlob(int parameterIndex, Blob x) throws SQLException {
-		this.throwNotImplemented();
+		if ((this.debug || (this.sqlStream != null)) && (this.parameters != null)) {
+			this.parameters[parameterIndex - 1] = "[BLOB]";
+		}
+
+		this.statement.setBlob(parameterIndex, x);
 	}
 
 	/**
@@ -782,7 +786,11 @@ public class PreparedStatementProxy implements PreparedStatement {
 	 */
 	@Override
 	public void setClob(int parameterIndex, Clob x) throws SQLException {
-		this.throwNotImplemented();
+		if ((this.debug || (this.sqlStream != null)) && (this.parameters != null)) {
+			this.parameters[parameterIndex - 1] = "[CLOB]";
+		}
+
+		this.statement.setClob(parameterIndex, x);
 	}
 
 	/**

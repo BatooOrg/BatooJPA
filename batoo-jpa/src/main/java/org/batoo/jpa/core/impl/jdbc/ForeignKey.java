@@ -617,7 +617,7 @@ public class ForeignKey {
 			int paramIndex = 0;
 			for (final AbstractColumn column : this.singleChildUpdates) {
 				if (column instanceof JoinColumn) {
-					parameters[paramIndex++] = column.getValue(instance.getInstance());
+					parameters[paramIndex++] = column.getValue(connection, instance.getInstance());
 				}
 				else {
 					parameters[paramIndex++] = joinable.getIndex();
@@ -626,14 +626,14 @@ public class ForeignKey {
 
 			for (final AbstractColumn column : this.singleChildRestrictions) {
 				try {
-					parameters[paramIndex++] = column.getValue(joinable.getValue());
+					parameters[paramIndex++] = column.getValue(connection, joinable.getValue());
 				}
 				catch (final NullPointerException e) {
 					System.out.println("");
 				}
 			}
 
-			new QueryRunner(this.jdbcAdaptor.isPmdBroken()).update(connection, sql, parameters);
+			new QueryRunner(this.jdbcAdaptor.isPmdBroken(), false).update(connection, sql, parameters);
 		}
 	}
 
@@ -657,10 +657,10 @@ public class ForeignKey {
 
 		int i = 0;
 		for (final AbstractColumn column : this.allChildrenRestrictions) {
-			parameters[i++] = column.getValue(instance.getInstance());
+			parameters[i++] = column.getValue(connection, instance.getInstance());
 		}
 
-		new QueryRunner(this.jdbcAdaptor.isPmdBroken()).update(connection, sql, parameters);
+		new QueryRunner(this.jdbcAdaptor.isPmdBroken(), false).update(connection, sql, parameters);
 	}
 
 	/**
@@ -694,10 +694,10 @@ public class ForeignKey {
 		}
 
 		for (final AbstractColumn column : this.singleChildRestrictions) {
-			parameters[i++] = column.getValue(child);
+			parameters[i++] = column.getValue(connection, child);
 		}
 
-		new QueryRunner(this.jdbcAdaptor.isPmdBroken()).update(connection, sql, parameters);
+		new QueryRunner(this.jdbcAdaptor.isPmdBroken(), false).update(connection, sql, parameters);
 	}
 
 	/**

@@ -18,11 +18,12 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
+import java.sql.Connection;
+
 import javax.persistence.EnumType;
 import javax.persistence.TemporalType;
 
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
-import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 
 /**
@@ -34,7 +35,6 @@ import org.batoo.jpa.parser.metadata.ColumnMetadata;
 public class MapKeyColumn extends AbstractColumn {
 
 	private final String columnDefinition;
-	private final AbstractLocator locator;
 	private final String name;
 	private final AbstractTable table;
 	private final boolean insertable;
@@ -63,12 +63,11 @@ public class MapKeyColumn extends AbstractColumn {
 	 * @author hceylan
 	 */
 	public MapKeyColumn(AbstractTable table, ColumnMetadata metadata, String name, TemporalType temporalType, EnumType enumType, Class<?> javaType) {
-		super();
+		super(metadata != null ? metadata.getLocator() : null);
 
 		this.sqlType = TypeFactory.getSqlType(javaType, temporalType, enumType, false);
 		this.table = table;
 		this.name = name;
-		this.locator = metadata != null ? metadata.getLocator() : null;
 		this.columnDefinition = metadata != null ? metadata.getColumnDefinition() : null;
 		this.insertable = metadata != null ? metadata.isInsertable() : true;
 		this.nullable = metadata != null ? metadata.isNullable() : true;
@@ -95,15 +94,6 @@ public class MapKeyColumn extends AbstractColumn {
 	@Override
 	public int getLength() {
 		return this.length;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public AbstractLocator getLocator() {
-		return this.locator;
 	}
 
 	/**
@@ -183,7 +173,7 @@ public class MapKeyColumn extends AbstractColumn {
 	 * 
 	 */
 	@Override
-	public Object getValue(Object instance) {
+	public Object getValue(Connection connection, Object instance) {
 		return null;
 	}
 

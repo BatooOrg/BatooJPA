@@ -18,10 +18,10 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
+import java.sql.Connection;
 import java.sql.Types;
 
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
-import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 
 /**
@@ -33,7 +33,6 @@ import org.batoo.jpa.parser.metadata.ColumnMetadata;
 public class OrderColumn extends AbstractColumn {
 
 	private final String columnDefinition;
-	private final AbstractLocator locator;
 	private final String name;
 	private final AbstractTable table;
 	private final boolean insertable;
@@ -52,11 +51,10 @@ public class OrderColumn extends AbstractColumn {
 	 * @author hceylan
 	 */
 	public OrderColumn(AbstractTable table, ColumnMetadata orderColumn, String name) {
-		super();
+		super(orderColumn.getLocator());
 
 		this.table = table;
 		this.name = name;
-		this.locator = orderColumn.getLocator();
 		this.columnDefinition = orderColumn.getColumnDefinition();
 		this.insertable = orderColumn.isInsertable();
 		this.nullable = orderColumn.isNullable();
@@ -81,15 +79,6 @@ public class OrderColumn extends AbstractColumn {
 	@Override
 	public int getLength() {
 		return 0;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public AbstractLocator getLocator() {
-		return this.locator;
 	}
 
 	/**
@@ -169,7 +158,7 @@ public class OrderColumn extends AbstractColumn {
 	 * 
 	 */
 	@Override
-	public Object getValue(Object instance) {
+	public Object getValue(Connection connection, Object instance) {
 		return null;
 	}
 

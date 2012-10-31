@@ -18,13 +18,13 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
+import java.sql.Connection;
 import java.sql.Types;
 
 import javax.persistence.DiscriminatorType;
 
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
-import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.DiscriminatorColumnMetadata;
 
 /**
@@ -35,12 +35,34 @@ import org.batoo.jpa.parser.metadata.DiscriminatorColumnMetadata;
  */
 public class DiscriminatorColumn extends AbstractColumn {
 
+	/**
+	 * @param metadata
+	 * @return
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private static Class<?> getJavaType(DiscriminatorColumnMetadata metadata) {
+		if (metadata == null) {
+			return String.class;
+		}
+
+		switch (metadata.getDiscriminatorType()) {
+			case STRING:
+				return String.class;
+			case INTEGER:
+				return Integer.class;
+			default:
+				return char.class;
+		}
+	}
+
 	private final EntityTable table;
-	private final AbstractLocator locator;
 	private final String columnDefinition;
 	private final DiscriminatorType discriminatorType;
 	private final int length;
 	private final String mappingName;
+
 	private final String name;
 
 	/**
@@ -53,9 +75,8 @@ public class DiscriminatorColumn extends AbstractColumn {
 	 * @author hceylan
 	 */
 	public DiscriminatorColumn(EntityTypeImpl<?> entity, DiscriminatorColumnMetadata metadata) {
-		super();
+		super(DiscriminatorColumn.getJavaType(metadata), null, null, false, metadata != null ? metadata.getLocator() : null);
 
-		this.locator = metadata != null ? metadata.getLocator() : null;
 		this.mappingName = metadata != null ? metadata.getName() : "DTYPE";
 		this.name = entity.getMetamodel().getJdbcAdaptor().escape(this.mappingName);
 
@@ -83,15 +104,6 @@ public class DiscriminatorColumn extends AbstractColumn {
 	@Override
 	public int getLength() {
 		return this.length;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public AbstractLocator getLocator() {
-		return this.locator;
 	}
 
 	/**
@@ -177,7 +189,7 @@ public class DiscriminatorColumn extends AbstractColumn {
 	 * 
 	 */
 	@Override
-	public Object getValue(Object instance) {
+	public Object getValue(Connection connection, Object instance) {
 		return null;
 	}
 

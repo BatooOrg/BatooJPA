@@ -245,29 +245,33 @@ public class EntityTable extends AbstractTable {
 		// prepare the parameters
 		final Object[] params = new Object[insertColumns.length * size];
 
+		boolean hasLob = false;
 		for (int i = 0; i < size; i++) {
 			final ManagedInstance<?> managedInstance = managedInstances[i];
 			final Object instance = managedInstance.getInstance();
 
 			for (int j = 0; j < insertColumns.length; j++) {
 				final AbstractColumn column = insertColumns[j];
+
 				if (column instanceof DiscriminatorColumn) {
 					params[(i * insertColumns.length) + j] = entityType.getDiscriminatorValue();
 				}
 				else {
-					params[(i * insertColumns.length) + j] = column.getValue(instance);
+					params[(i * insertColumns.length) + j] = column.getValue(connection, instance);
 				}
+
+				hasLob |= column.isLob();
 			}
 
 			managedInstance.setStatus(Status.MANAGED);
 		}
 
-		new QueryRunner(this.jdbcAdaptor.isPmdBroken()).update(connection, insertSql, params);
+		new QueryRunner(this.jdbcAdaptor.isPmdBroken(), hasLob).update(connection, insertSql, params);
 
 		// if there is an identity column, extract the identity and set it back to the instance
 		if (this.identityColumn != null) {
 			final String selectLastIdSql = this.jdbcAdaptor.getSelectLastIdentitySql(this.identityColumn);
-			final Number id = new QueryRunner(this.jdbcAdaptor.isPmdBroken()).query(connection, selectLastIdSql, new SingleValueHandler<Number>());
+			final Number id = new QueryRunner(this.jdbcAdaptor.isPmdBroken(), false).query(connection, selectLastIdSql, new SingleValueHandler<Number>());
 
 			this.identityColumn.setValue(managedInstances[0].getInstance(), id);
 		}
@@ -298,11 +302,11 @@ public class EntityTable extends AbstractTable {
 
 			for (int j = 0; j < this.removeColumns.length; j++) {
 				final AbstractColumn column = this.removeColumns[j];
-				params[(i * this.removeColumns.length) + j] = column.getValue(instance);
+				params[(i * this.removeColumns.length) + j] = column.getValue(connection, instance);
 			}
 		}
 
-		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor.isPmdBroken());
+		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor.isPmdBroken(), false);
 		runner.update(connection, removeSql, params);
 	}
 
@@ -331,11 +335,11 @@ public class EntityTable extends AbstractTable {
 		final Object[] params = new Object[selectVersionColumns.length];
 		for (int i = 0; i < selectVersionColumns.length; i++) {
 			final AbstractColumn column = selectVersionColumns[i];
-			params[i] = column.getValue(instance);
+			params[i] = column.getValue(connection, instance);
 		}
 
 		// execute the insert
-		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor.isPmdBroken());
+		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor.isPmdBroken(), false);
 
 		return runner.query(connection, updateSql, new SingleValueHandler<Object>(), params);
 	}
@@ -361,15 +365,18 @@ public class EntityTable extends AbstractTable {
 		final String updateSql = this.getUpdateSql(entityType, this.pkColumns);
 		final AbstractColumn[] updateColumns = this.getUpdateColumns(entityType);
 
+		boolean hasLob = false;
 		// prepare the parameters
 		final Object[] params = new Object[updateColumns.length];
 		for (int i = 0; i < updateColumns.length; i++) {
 			final AbstractColumn column = updateColumns[i];
-			params[i] = column.getValue(instance);
+			params[i] = column.getValue(connection, instance);
+
+			hasLob |= column.isLob();
 		}
 
 		// execute the insert
-		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor.isPmdBroken());
+		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor.isPmdBroken(), hasLob);
 		runner.update(connection, updateSql, params);
 	}
 
@@ -395,6 +402,8 @@ public class EntityTable extends AbstractTable {
 		final String updateSql = this.getUpdateSql(entityType, this.pkColumns);
 		final AbstractColumn[] updateColumns = this.getUpdateColumns(entityType);
 
+		boolean hasLob = false;
+
 		// prepare the parameters
 		final Object[] params = new Object[updateColumns.length];
 		for (int i = 0; i < updateColumns.length; i++) {
@@ -405,11 +414,13 @@ public class EntityTable extends AbstractTable {
 				return false;
 			}
 
-			params[i] = column.getValue(instance);
+			params[i] = column.getValue(connection, instance);
+
+			hasLob |= column.isLob();
 		}
 
 		// execute the insert
-		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor.isPmdBroken());
+		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor.isPmdBroken(), hasLob);
 		runner.update(connection, updateSql, params);
 
 		return true;
@@ -439,12 +450,11 @@ public class EntityTable extends AbstractTable {
 		final Object[] params = new Object[versionUpdateColumns.length];
 		for (int i = 0; i < versionUpdateColumns.length; i++) {
 			final AbstractColumn column = versionUpdateColumns[i];
-			params[i] = column.getValue(instance);
+			params[i] = column.getValue(connection, instance);
 		}
 
-		// execute the insert
-		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor.isPmdBroken());
-		runner.update(connection, updateSql, params);
+		// execute the update
+		new QueryRunner(this.jdbcAdaptor.isPmdBroken(), false).update(connection, updateSql, params);
 	}
 
 	/**

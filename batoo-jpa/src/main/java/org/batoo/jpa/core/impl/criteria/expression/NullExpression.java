@@ -29,6 +29,8 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
 /**
  * Expression for nulls.
  * 
+ * @param <T>
+ *            the type of the null
  * 
  * @author hceylan
  * @since $version

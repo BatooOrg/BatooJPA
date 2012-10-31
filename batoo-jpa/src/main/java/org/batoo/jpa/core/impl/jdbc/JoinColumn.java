@@ -18,13 +18,14 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
+import java.sql.Connection;
+
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
-import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
 import org.batoo.jpa.parser.metadata.PrimaryKeyJoinColumnMetadata;
 
@@ -37,7 +38,6 @@ import org.batoo.jpa.parser.metadata.PrimaryKeyJoinColumnMetadata;
 public class JoinColumn extends AbstractColumn {
 
 	private final JdbcAdaptor jdbcAdaptor;
-	private final AbstractLocator locator;
 	private AbstractTable table;
 
 	private final boolean primaryKey;
@@ -74,11 +74,10 @@ public class JoinColumn extends AbstractColumn {
 	 * @author hceylan
 	 */
 	public JoinColumn(JdbcAdaptor jdbcAdaptor, AssociationMapping<?, ?, ?> mapping, BasicMapping<?, ?> idMapping) {
-		super();
+		super(null);
 
 		this.jdbcAdaptor = jdbcAdaptor;
 		this.mapping = mapping;
-		this.locator = null;
 		this.primaryKey = false;
 
 		this.columnDefinition = "";
@@ -105,10 +104,9 @@ public class JoinColumn extends AbstractColumn {
 	 * @author hceylan
 	 */
 	public JoinColumn(JdbcAdaptor jdbcAdaptor, EntityTable table, BasicMapping<?, ?> idMapping) {
-		super();
+		super(null);
 
 		this.jdbcAdaptor = jdbcAdaptor;
-		this.locator = null;
 		this.referencedMapping = idMapping;
 		this.primaryKey = false;
 
@@ -140,10 +138,9 @@ public class JoinColumn extends AbstractColumn {
 	 * @author hceylan
 	 */
 	public JoinColumn(JdbcAdaptor jdbcAdaptor, JoinColumnMetadata metadata) {
-		super();
+		super(metadata.getLocator());
 
 		this.jdbcAdaptor = jdbcAdaptor;
-		this.locator = metadata.getLocator();
 		this.primaryKey = false;
 
 		this.referencedColumnName = metadata.getReferencedColumnName();
@@ -172,10 +169,9 @@ public class JoinColumn extends AbstractColumn {
 	 * @author hceylan
 	 */
 	public JoinColumn(JdbcAdaptor jdbcAdaptor, PrimaryKeyJoinColumnMetadata metadata, SecondaryTable table, BasicMapping<?, ?> idMapping) {
-		super();
+		super(metadata.getLocator());
 
 		this.jdbcAdaptor = jdbcAdaptor;
-		this.locator = metadata.getLocator();
 		this.tableName = table.getName();
 		this.primaryKey = false;
 
@@ -206,10 +202,9 @@ public class JoinColumn extends AbstractColumn {
 	 * @author hceylan
 	 */
 	public JoinColumn(JdbcAdaptor jdbcAdaptor, SecondaryTable table, BasicMapping<?, ?> idMapping) {
-		super();
+		super(null);
 
 		this.jdbcAdaptor = jdbcAdaptor;
-		this.locator = null;
 		this.referencedMapping = idMapping;
 		this.primaryKey = true;
 
@@ -250,19 +245,6 @@ public class JoinColumn extends AbstractColumn {
 	@Override
 	public int getLength() {
 		return this.length;
-	}
-
-	/**
-	 * Returns the locator of the JoinColumn.
-	 * 
-	 * @return the locator of the JoinColumn
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@Override
-	public AbstractLocator getLocator() {
-		return this.locator;
 	}
 
 	/**
@@ -382,7 +364,7 @@ public class JoinColumn extends AbstractColumn {
 	 * 
 	 */
 	@Override
-	public Object getValue(Object instance) {
+	public Object getValue(Connection connection, Object instance) {
 		if (this.mapping != null) {
 			instance = this.mapping.get(instance);
 		}

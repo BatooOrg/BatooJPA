@@ -172,6 +172,8 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	}
 
 	/**
+	 * @param mapping
+	 *            the mapping
 	 * @param type
 	 *            the type of the collection
 	 * @param defaultName
@@ -188,7 +190,7 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void link(ElementCollectionMapping mapping, TypeImpl<?> type, String defaultName, ColumnMetadata metadata, EnumType enumType,
+	public void link(ElementCollectionMapping<?, ?, ?> mapping, TypeImpl<?> type, String defaultName, ColumnMetadata metadata, EnumType enumType,
 		TemporalType temporalType, boolean lob) {
 		if (StringUtils.isBlank(this.getName())) {
 			this.setName(this.entity.getName() + "_" + defaultName);
@@ -242,6 +244,7 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 		// prepare the parameters
 		final Object[] params = new Object[insertColumns.length * size];
 
+		boolean hasLob = false;
 		int paramIndex = 0;
 		for (int i = 0; i < size; i++) {
 			for (final AbstractColumn column : insertColumns) {
@@ -252,18 +255,20 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 					params[paramIndex++] = batch[i].getKey();
 				}
 				else if (this.elementColumn == column) {
-					params[paramIndex++] = this.elementColumn.getValue(batch[i].getValue());
+					params[paramIndex++] = this.elementColumn.getValue(connection, batch[i].getValue());
 				}
 				else if (column instanceof JoinColumn) {
-					params[paramIndex++] = column.getValue(source);
+					params[paramIndex++] = column.getValue(connection, source);
 				}
 				else {
-					params[paramIndex++] = column.getValue(batch[i].getValue());
+					params[paramIndex++] = column.getValue(connection, batch[i].getValue());
 				}
+
+				hasLob |= column.isLob();
 			}
 		}
 
-		new QueryRunner(this.jdbcAdaptor.isPmdBroken()).update(connection, insertSql, params);
+		new QueryRunner(this.jdbcAdaptor.isPmdBroken(), hasLob).update(connection, insertSql, params);
 	}
 
 	/**
@@ -276,23 +281,26 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 
 		final Object[] params = new Object[this.removeColumns.length];
 
+		boolean hasLob = false;
 		int i = 0;
 		for (final AbstractColumn column : this.removeColumns) {
 			if (column instanceof ElementColumn) {
-				params[i++] = column.getValue(destination);
+				params[i++] = column.getValue(connection, destination);
 			}
 			else if (column == this.keyColumn) {
 				params[i++] = key;
 			}
 			else if (column instanceof JoinColumn) {
-				params[i++] = column.getValue(source);
+				params[i++] = column.getValue(connection, source);
 			}
 			else {
-				params[i++] = column.getValue(destination);
+				params[i++] = column.getValue(connection, destination);
 			}
+
+			hasLob |= column.isLob();
 		}
 
-		new QueryRunner(this.jdbcAdaptor.isPmdBroken()).update(connection, removeSql, params);
+		new QueryRunner(this.jdbcAdaptor.isPmdBroken(), hasLob).update(connection, removeSql, params);
 	}
 
 	/**
@@ -307,10 +315,10 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 
 		int i = 0;
 		for (final JoinColumn sourceRemoveColumn : this.removeAllColumns) {
-			params[i++] = sourceRemoveColumn.getValue(source);
+			params[i++] = sourceRemoveColumn.getValue(connection, source);
 		}
 
-		new QueryRunner(this.jdbcAdaptor.isPmdBroken()).update(connection, removeAllSql, params);
+		new QueryRunner(this.jdbcAdaptor.isPmdBroken(), false).update(connection, removeAllSql, params);
 	}
 
 	/**

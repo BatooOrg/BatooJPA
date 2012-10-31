@@ -18,19 +18,11 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
-import java.lang.reflect.Method;
-import java.util.Calendar;
-import java.util.Date;
-
-import javax.persistence.EnumType;
-import javax.persistence.TemporalType;
+import java.sql.Connection;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
-import org.batoo.jpa.parser.MappingException;
-import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 
 /**
@@ -46,7 +38,6 @@ public class BasicColumn extends AbstractColumn {
 	private final String name;
 	private final String columnDefinition;
 	private final int length;
-	private final AbstractLocator locator;
 	private final int precision;
 	private final int scale;
 	private final String tableName;
@@ -57,11 +48,6 @@ public class BasicColumn extends AbstractColumn {
 	private final String mappingName;
 	private final BasicMapping<?, ?> mapping;
 	private final JdbcAdaptor jdbcAdaptor;
-	private final EnumType enumType;
-	private final Enum<?>[] values;
-	private final Method method;
-	private final TemporalType temporalType;
-	private final Class<?> numberType;
 
 	/**
 	 * @param jdbcAdaptor
@@ -76,13 +62,12 @@ public class BasicColumn extends AbstractColumn {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
 	public BasicColumn(JdbcAdaptor jdbcAdaptor, BasicMapping<?, ?> mapping, int sqlType, ColumnMetadata metadata) {
-		super();
+		super(mapping.getAttribute().getJavaType(), mapping.getAttribute().getTemporalType(), mapping.getAttribute().getEnumType(),
+			mapping.getAttribute().isLob(), mapping.getAttribute().getLocator());
 
 		this.jdbcAdaptor = jdbcAdaptor;
 		this.mapping = mapping;
-		this.locator = metadata != null ? metadata.getLocator() : null;
 		this.sqlType = sqlType;
 
 		this.mappingName = (metadata != null) && StringUtils.isNotBlank(metadata.getName()) ? metadata.getName() : this.mapping.getAttribute().getName();
@@ -97,97 +82,6 @@ public class BasicColumn extends AbstractColumn {
 		this.nullable = metadata != null ? metadata.isNullable() : true;
 		this.unique = metadata != null ? metadata.isUnique() : false;
 		this.updatable = metadata != null ? metadata.isUpdatable() : true;
-
-		this.numberType = Number.class.isAssignableFrom(mapping.getAttribute().getJavaType()) ? mapping.getAttribute().getJavaType() : null;
-		this.temporalType = mapping.getAttribute().getTemporalType();
-		this.enumType = mapping.getAttribute().getEnumType();
-		if (this.enumType != null) {
-			Class<Enum<?>> enumJavaType;
-			enumJavaType = (Class<Enum<?>>) mapping.getAttribute().getJavaType();
-			try {
-				if (this.enumType == EnumType.ORDINAL) {
-					this.values = (Enum<?>[]) enumJavaType.getMethod("values").invoke(null);
-					this.method = null;
-				}
-				else {
-					this.values = null;
-					this.method = enumJavaType.getMethod("valueOf", String.class);
-				}
-			}
-			catch (final Exception e) {
-				throw new MappingException("Unable to map enum type", this.mapping.getAttribute().getLocator());
-			}
-		}
-		else {
-			this.values = null;
-			this.method = null;
-		}
-	}
-
-	/**
-	 * Converts the value corresponding to enum or temporal type
-	 * 
-	 * @param value
-	 *            the raw value
-	 * @return the converted value
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public Object convertValue(final Object value) {
-		if (value == null) {
-			return null;
-		}
-
-		if (this.temporalType != null) {
-			switch (this.temporalType) {
-				case DATE:
-					if (value instanceof java.sql.Date) {
-						return value;
-					}
-
-					if (value instanceof Date) {
-						return new java.sql.Date(((Date) value).getTime());
-					}
-
-					return new java.sql.Date(((Calendar) value).getTimeInMillis());
-				case TIME:
-					if (value instanceof java.sql.Time) {
-						return value;
-					}
-
-					if (value instanceof Date) {
-						return new java.sql.Time(((Date) value).getTime());
-					}
-
-					return new java.sql.Time(((Calendar) value).getTimeInMillis());
-				case TIMESTAMP:
-					if (value instanceof java.sql.Timestamp) {
-						return value;
-					}
-
-					if (value instanceof Date) {
-						return new java.sql.Timestamp(((Date) value).getTime());
-					}
-
-					return new java.sql.Timestamp(((Calendar) value).getTimeInMillis());
-			}
-		}
-
-		if (this.numberType != null) {
-			return ReflectHelper.convertNumber((Number) value, this.numberType);
-		}
-
-		if (this.enumType == null) {
-			return value;
-		}
-
-		final Enum<?> enumValue = (Enum<?>) value;
-		if (this.enumType == EnumType.ORDINAL) {
-			return enumValue.ordinal();
-		}
-
-		return enumValue.name();
 	}
 
 	/**
@@ -206,15 +100,6 @@ public class BasicColumn extends AbstractColumn {
 	@Override
 	public int getLength() {
 		return this.length;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public AbstractLocator getLocator() {
-		return this.locator;
 	}
 
 	/**
@@ -298,10 +183,8 @@ public class BasicColumn extends AbstractColumn {
 	 * 
 	 */
 	@Override
-	public Object getValue(Object instance) {
-		final Object value = this.mapping.get(instance);
-
-		return this.convertValue(value);
+	public Object getValue(Connection connection, Object instance) {
+		return this.convertValue(connection, this.mapping.get(instance));
 	}
 
 	/**
@@ -369,18 +252,6 @@ public class BasicColumn extends AbstractColumn {
 	 */
 	@Override
 	public void setValue(Object instance, Object value) {
-		if ((value != null) && (this.enumType != null)) {
-			if (this.enumType == EnumType.ORDINAL) {
-				value = this.values[((Number) value).shortValue()];
-			}
-			else {
-				try {
-					value = this.method.invoke(null, value);
-				}
-				catch (final Exception e) {}
-			}
-		}
-
-		this.mapping.set(instance, value);
+		this.mapping.set(instance, this.convertValueForSet(value));
 	}
 }

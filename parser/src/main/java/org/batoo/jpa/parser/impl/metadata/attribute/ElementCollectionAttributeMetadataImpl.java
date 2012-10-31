@@ -387,7 +387,9 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 			return annotation.value();
 		}
 
-		return null;
+		final Class<Object> type = ReflectHelper.getGenericType(member, 0);
+
+		return type.isEnum() ? EnumType.ORDINAL : null;
 	}
 
 	/**

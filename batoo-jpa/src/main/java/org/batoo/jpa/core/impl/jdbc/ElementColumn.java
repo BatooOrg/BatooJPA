@@ -18,7 +18,7 @@
  */
 package org.batoo.jpa.core.impl.jdbc;
 
-import java.lang.reflect.Method;
+import java.sql.Connection;
 
 import javax.persistence.EnumType;
 import javax.persistence.TemporalType;
@@ -26,8 +26,6 @@ import javax.persistence.TemporalType;
 import org.batoo.jpa.core.impl.model.mapping.ElementCollectionMapping;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
-import org.batoo.jpa.parser.MappingException;
-import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 
 /**
@@ -42,7 +40,6 @@ public class ElementColumn extends AbstractColumn {
 	private final CollectionTable table;
 	private final int sqlType;
 	private final String columnDefinition;
-	private final AbstractLocator locator;
 	private final String name;
 	private final boolean insertable;
 	private final boolean nullable;
@@ -51,9 +48,6 @@ public class ElementColumn extends AbstractColumn {
 	private final int precision;
 	private final int scale;
 	private final boolean unique;
-	private final EnumType enumType;
-	private final Enum<?>[] values;
-	private final Method method;
 
 	/**
 	 * 
@@ -81,9 +75,8 @@ public class ElementColumn extends AbstractColumn {
 	 */
 	public ElementColumn(JdbcAdaptor jdbcAdaptor, ElementCollectionMapping<?, ?, ?> mapping, CollectionTable table, String name, Class<?> javaType,
 		EnumType enumType, TemporalType temporalType, boolean lob, ColumnMetadata metadata) {
-		super();
+		super(javaType, temporalType, enumType, lob, metadata != null ? metadata.getLocator() : null);
 
-		this.locator = metadata != null ? metadata.getLocator() : null;
 		this.mapping = mapping;
 
 		this.table = table;
@@ -98,30 +91,6 @@ public class ElementColumn extends AbstractColumn {
 		this.nullable = metadata != null ? metadata.isNullable() : true;
 		this.unique = metadata != null ? metadata.isUnique() : false;
 		this.updatable = metadata != null ? metadata.isUpdatable() : true;
-
-		if (javaType.isEnum()) {
-			this.enumType = enumType != null ? enumType : EnumType.ORDINAL;
-
-			try {
-				if (this.enumType == EnumType.ORDINAL) {
-					this.values = (Enum<?>[]) javaType.getMethod("values").invoke(null);
-					this.method = null;
-				}
-				else {
-					this.values = null;
-					this.method = javaType.getMethod("valueOf", String.class);
-				}
-			}
-			catch (final Exception e) {
-				throw new MappingException("Unable to map enum type", this.locator);
-			}
-
-		}
-		else {
-			this.enumType = null;
-			this.values = null;
-			this.method = null;
-		}
 
 		this.table.addColumn(this);
 	}
@@ -142,15 +111,6 @@ public class ElementColumn extends AbstractColumn {
 	@Override
 	public int getLength() {
 		return this.length;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public AbstractLocator getLocator() {
-		return this.locator;
 	}
 
 	/**
@@ -230,21 +190,8 @@ public class ElementColumn extends AbstractColumn {
 	 * 
 	 */
 	@Override
-	public Object getValue(Object instance) {
-		if (instance == null) {
-			return null;
-		}
-
-		if (this.enumType == null) {
-			return instance;
-		}
-
-		final Enum<?> enumValue = (Enum<?>) instance;
-		if (this.enumType == EnumType.ORDINAL) {
-			return enumValue.ordinal();
-		}
-
-		return enumValue.name();
+	public Object getValue(Connection connection, Object value) {
+		return this.convertValue(connection, value);
 	}
 
 	/**
@@ -298,18 +245,6 @@ public class ElementColumn extends AbstractColumn {
 	 */
 	@Override
 	public void setValue(Object instance, Object value) {
-		if ((value != null) && (this.enumType != null)) {
-			if (this.enumType == EnumType.ORDINAL) {
-				value = this.values[(Integer) value];
-			}
-			else {
-				try {
-					value = this.method.invoke(null, value);
-				}
-				catch (final Exception e) {}
-			}
-		}
-
-		this.mapping.set(instance, value);
+		this.mapping.set(instance, this.convertValueForSet(value));
 	}
 }
