@@ -51,7 +51,7 @@ public class ConstantExpression<T> extends AbstractExpression<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	public ConstantExpression(TypeImpl<T> type, T value) {
-		super((Class<T>) value.getClass());
+		super(type != null ? type.getJavaType() : (Class<T>) value.getClass());
 
 		this.value = value;
 	}

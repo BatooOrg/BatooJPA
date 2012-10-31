@@ -73,6 +73,7 @@ import org.batoo.jpa.core.impl.criteria.expression.SimpleCaseImpl;
 import org.batoo.jpa.core.impl.criteria.expression.SizeExpression;
 import org.batoo.jpa.core.impl.criteria.expression.SubstringExpression;
 import org.batoo.jpa.core.impl.criteria.expression.TrimExpression;
+import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
 
@@ -189,10 +190,10 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <Y extends Comparable<? super Y>> Predicate between(Expression<? extends Y> v, Y x, Y y) {
-		this.checkConstant(x);
-		this.checkConstant(y);
+		final TypeImpl<Y> typeX = this.checkConstant(x);
+		final TypeImpl<Y> typeY = this.checkConstant(y);
 
-		return new PredicateImpl(new ComparisonExpression(Comparison.BETWEEN, v, new ConstantExpression<Y>(null, x), new ConstantExpression<Y>(null, y)));
+		return new PredicateImpl(new ComparisonExpression(Comparison.BETWEEN, v, new ConstantExpression<Y>(typeX, x), new ConstantExpression<Y>(typeY, y)));
 	}
 
 	/**
@@ -200,19 +201,27 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 * @param x
 	 *            the constant value
+	 * @return the type of the constant
+	 * @param <X>
+	 *            the type of the constant
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	private void checkConstant(Object x) {
+	@SuppressWarnings("unchecked")
+	public <X> TypeImpl<X> checkConstant(X x) {
 		if (x == null) {
 			throw new NullPointerException("Constant expression cannot be null");
 		}
 
-		final TypeImpl<? extends Object> type = this.metamodel.type(x.getClass());
-		if (type.getPersistenceType() != PersistenceType.BASIC) {
-			throw new IllegalArgumentException("Constant expression must be basic type: " + x + "! Please use parameters instead.");
+		final Class<X> clazz = (Class<X>) (x instanceof EnhancedInstance ? x.getClass().getSuperclass() : x.getClass());
+
+		final TypeImpl<X> type = this.metamodel.type(clazz);
+		if ((type == null) || (type.getPersistenceType() == PersistenceType.MAPPED_SUPERCLASS)) {
+			throw new IllegalArgumentException("Cannot locate a type for the constant class: " + x);
 		}
+
+		return type;
 	}
 
 	/**
@@ -239,9 +248,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <Y> CoalesceExpression<Y> coalesce(Expression<? extends Y> x, Y y) {
-		this.checkConstant(y);
+		final TypeImpl<Y> type = this.checkConstant(y);
 
-		return new CoalesceExpression<Y>(x, new ConstantExpression<Y>(null, y));
+		return new CoalesceExpression<Y>(x, new ConstantExpression<Y>(type, y));
 	}
 
 	/**
@@ -261,9 +270,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	@Override
 	@SuppressWarnings("unchecked")
 	public Expression<String> concat(Expression<String> x, String y) {
-		this.checkConstant(y);
+		final TypeImpl<String> type = this.checkConstant(y);
 
-		return new ConcatExpression(x, new ConstantExpression<String>(null, y));
+		return new ConcatExpression(x, new ConstantExpression<String>(type, y));
 	}
 
 	/**
@@ -273,9 +282,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	@Override
 	@SuppressWarnings("unchecked")
 	public Expression<String> concat(String x, Expression<String> y) {
-		this.checkConstant(y);
+		final TypeImpl<String> type = this.checkConstant(x);
 
-		return new ConcatExpression(new ConstantExpression<String>(null, x), y);
+		return new ConcatExpression(new ConstantExpression<String>(type, x), y);
 	}
 
 	/**
@@ -393,9 +402,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <N extends Number> Expression<N> diff(Expression<? extends N> x, N y) {
-		this.checkConstant(y);
+		final TypeImpl<N> type = this.checkConstant(y);
 
-		return new ArithmeticExression<N>(ArithmeticOperation.SUBTRACT, x, new ConstantExpression<N>(null, y));
+		return new ArithmeticExression<N>(ArithmeticOperation.SUBTRACT, x, new ConstantExpression<N>(type, y));
 	}
 
 	/**
@@ -404,9 +413,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <N extends Number> Expression<N> diff(N x, Expression<? extends N> y) {
-		this.checkConstant(y);
+		final TypeImpl<N> type = this.checkConstant(x);
 
-		return new ArithmeticExression<N>(ArithmeticOperation.SUBTRACT, new ConstantExpression<N>(null, x), y);
+		return new ArithmeticExression<N>(ArithmeticOperation.SUBTRACT, new ConstantExpression<N>(type, x), y);
 	}
 
 	/**
@@ -434,9 +443,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public PredicateImpl equal(Expression<?> x, Object y) {
-		this.checkConstant(y);
+		final TypeImpl<Object> type = this.checkConstant(y);
 
-		return new PredicateImpl(new ComparisonExpression(Comparison.EQUAL, x, new ConstantExpression(null, y)));
+		return new PredicateImpl(new ComparisonExpression(Comparison.EQUAL, x, new ConstantExpression(type, y)));
 	}
 
 	/**
@@ -472,9 +481,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public PredicateImpl ge(Expression<? extends Number> x, Number y) {
-		this.checkConstant(y);
+		final TypeImpl<Number> type = this.checkConstant(y);
 
-		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER_OR_EQUAL, x, new ConstantExpression<Number>(null, y)));
+		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER_OR_EQUAL, x, new ConstantExpression<Number>(type, y)));
 	}
 
 	/**
@@ -502,9 +511,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <Y extends Comparable<? super Y>> PredicateImpl greaterThan(Expression<? extends Y> x, Y y) {
-		this.checkConstant(y);
+		final TypeImpl<Y> type = this.checkConstant(y);
 
-		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER, x, new ConstantExpression<Y>(null, y)));
+		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER, x, new ConstantExpression<Y>(type, y)));
 	}
 
 	/**
@@ -522,9 +531,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <Y extends Comparable<? super Y>> PredicateImpl greaterThanOrEqualTo(Expression<? extends Y> x, Y y) {
-		this.checkConstant(y);
+		final TypeImpl<Y> type = this.checkConstant(y);
 
-		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER_OR_EQUAL, x, new ConstantExpression<Y>(null, y)));
+		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER_OR_EQUAL, x, new ConstantExpression<Y>(type, y)));
 	}
 
 	/**
@@ -551,9 +560,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public PredicateImpl gt(Expression<? extends Number> x, Number y) {
-		this.checkConstant(y);
+		final TypeImpl<Number> type = this.checkConstant(y);
 
-		return new PredicateImpl(new ComparisonExpression(Comparison.LESS, x, new ConstantExpression<Number>(null, y)));
+		return new PredicateImpl(new ComparisonExpression(Comparison.LESS, x, new ConstantExpression<Number>(type, y)));
 	}
 
 	/**
@@ -589,9 +598,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <E, C extends Collection<E>> Predicate isMember(E elem, Expression<C> collection) {
-		this.checkConstant(elem);
+		final TypeImpl<E> type = this.checkConstant(elem);
 
-		return new PredicateImpl(new MemberOfExpression<C, E>(false, new ConstantExpression<E>(null, elem), collection));
+		return new PredicateImpl(new MemberOfExpression<C, E>(false, new ConstantExpression<E>(type, elem), collection));
 	}
 
 	/**
@@ -618,9 +627,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <E, C extends Collection<E>> Predicate isNotMember(E elem, Expression<C> collection) {
-		this.checkConstant(elem);
+		final TypeImpl<E> type = this.checkConstant(elem);
 
-		return new PredicateImpl(new MemberOfExpression<C, E>(true, new ConstantExpression<E>(null, elem), collection));
+		return new PredicateImpl(new MemberOfExpression<C, E>(true, new ConstantExpression<E>(type, elem), collection));
 	}
 
 	/**
@@ -683,9 +692,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public PredicateImpl le(Expression<? extends Number> x, Number y) {
-		this.checkConstant(y);
+		final TypeImpl<Number> type = this.checkConstant(y);
 
-		return new PredicateImpl(new ComparisonExpression(Comparison.LESS_OR_EQUAL, x, new ConstantExpression<Number>(null, y)));
+		return new PredicateImpl(new ComparisonExpression(Comparison.LESS_OR_EQUAL, x, new ConstantExpression<Number>(type, y)));
 	}
 
 	/**
@@ -721,9 +730,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <Y extends Comparable<? super Y>> PredicateImpl lessThan(Expression<? extends Y> x, Y y) {
-		this.checkConstant(y);
+		final TypeImpl<Y> type = this.checkConstant(y);
 
-		return new PredicateImpl(new ComparisonExpression(Comparison.LESS, x, new ConstantExpression<Y>(null, y)));
+		return new PredicateImpl(new ComparisonExpression(Comparison.LESS, x, new ConstantExpression<Y>(type, y)));
 	}
 
 	/**
@@ -741,9 +750,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <Y extends Comparable<? super Y>> Predicate lessThanOrEqualTo(Expression<? extends Y> x, Y y) {
-		this.checkConstant(y);
+		final TypeImpl<Y> type = this.checkConstant(y);
 
-		return new PredicateImpl(new ComparisonExpression(Comparison.LESS_OR_EQUAL, x, new ConstantExpression<Y>(null, y)));
+		return new PredicateImpl(new ComparisonExpression(Comparison.LESS_OR_EQUAL, x, new ConstantExpression<Y>(type, y)));
 	}
 
 	/**
@@ -953,9 +962,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public PredicateImpl notEqual(Expression<?> x, Object y) {
-		this.checkConstant(y);
+		final TypeImpl<Object> type = this.checkConstant(y);
 
-		return new PredicateImpl(new ComparisonExpression(Comparison.NOT_EQUAL, x, new ConstantExpression<Object>(null, y)));
+		return new PredicateImpl(new ComparisonExpression(Comparison.NOT_EQUAL, x, new ConstantExpression<Object>(type, y)));
 	}
 
 	/**
@@ -1028,9 +1037,9 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public <Y> Expression<Y> nullif(Expression<Y> x, Y y) {
-		this.checkConstant(y);
+		final TypeImpl<Y> type = this.checkConstant(y);
 
-		return new NullIfExpression<Y>(x, new ConstantExpression<Y>(null, y));
+		return new NullIfExpression<Y>(x, new ConstantExpression<Y>(type, y));
 	}
 
 	/**
