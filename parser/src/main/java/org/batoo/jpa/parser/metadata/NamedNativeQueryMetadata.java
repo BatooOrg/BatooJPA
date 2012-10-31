@@ -26,7 +26,7 @@ import java.util.Map;
  * @author hceylan
  * @since $version
  */
-public interface NamedNativeQueryMetadata extends BindableMetadata, LocatableMatadata {
+public interface NamedNativeQueryMetadata extends BindableMetadata {
 
 	/**
 	 * Returns the list query hints.
