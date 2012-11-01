@@ -108,7 +108,7 @@ import com.google.common.collect.Sets;
  */
 public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements EntityType<X> {
 
-	private static final int MAX_DEPTH = 5;
+	private static final int MAX_DEPTH = 1;
 
 	private final EntityMetadata metadata;
 	private final String name;
