@@ -162,7 +162,14 @@ public class BatooEnhancerMojo extends AbstractMojo {
 					root = root + File.separator;
 				}
 
-				this.findClasses(classPath, classes, includeList, excludeList, root.length(), new File(root));
+				int rootLength = root.length();
+
+				// decrease the length by one if we are on windows
+				if (System.getProperty("os.name").toLowerCase().indexOf("win") > -1) {
+					rootLength--;
+				}
+
+				this.findClasses(classPath, classes, includeList, excludeList, rootLength, new File(root));
 			}
 		}
 		catch (final MojoExecutionException e) {
@@ -184,7 +191,7 @@ public class BatooEnhancerMojo extends AbstractMojo {
 			String path = file.getPath();
 
 			if (path.endsWith(".class") && !path.endsWith("$Enhanced.class")) {
-				path = path.substring(rootLength, path.length() - 6).replace("/", ".");
+				path = path.substring(rootLength, path.length() - 6).replace(File.separator, ".");
 				try {
 					final Class<?> clazz = classPath.loadClass(path);
 					if (!excludeList.isEmpty()) {
