@@ -29,6 +29,8 @@ import java.util.Set;
 import javax.persistence.CacheRetrieveMode;
 import javax.persistence.CacheStoreMode;
 import javax.persistence.PersistenceException;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
@@ -404,13 +406,18 @@ public class SessionImpl {
 		// validations
 		final EntityManagerFactoryImpl entityManagerFactory = this.em.getEntityManagerFactory();
 		if (entityManagerFactory.hasValidators()) {
-			// FIXME: Validate the whole session
+			final Set<ConstraintViolation<?>> violations = Sets.newHashSet();
+
 			for (final ManagedInstance<?> instance : sortedUpdates) {
-				instance.getType().runValidators(entityManagerFactory, instance);
+				violations.addAll(instance.getType().runValidators(entityManagerFactory, instance));
 			}
 
 			for (final ManagedInstance<?> instance : sortedRemovals) {
-				instance.getType().runValidators(entityManagerFactory, instance);
+				violations.addAll(instance.getType().runValidators(entityManagerFactory, instance));
+			}
+
+			if (violations.size() > 0) {
+				throw new ConstraintViolationException("Cannot flush due to validation errors.", violations);
 			}
 		}
 

@@ -40,6 +40,7 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.metamodel.PluralAttribute.CollectionType;
 import javax.sql.DataSource;
+import javax.validation.ConstraintViolationException;
 
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.common.log.BLogger;
@@ -61,6 +62,7 @@ import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -520,6 +522,11 @@ public class EntityManagerImpl implements EntityManager {
 			EntityManagerImpl.LOG.error(e, "Flush failed");
 
 			throw new PersistenceException("Flush failed", e);
+		}
+		catch (final ConstraintViolationException e) {
+			EntityManagerImpl.LOG.debug(e, "Flush failed due to validation errors:\n\t" + Joiner.on("\n\t").join(e.getConstraintViolations()));
+
+			throw e;
 		}
 		catch (final RuntimeException e) {
 			EntityManagerImpl.LOG.error(e, "Flush failed");

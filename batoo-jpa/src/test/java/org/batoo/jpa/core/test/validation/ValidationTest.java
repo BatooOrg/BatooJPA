@@ -40,6 +40,8 @@ public class ValidationTest extends BaseCoreTest {
 	public void testPersist() {
 		final Foo foo = new Foo();
 
+		foo.getBars().add(new Bar());
+
 		this.persist(foo);
 		this.commit();
 	}
@@ -84,6 +86,12 @@ public class ValidationTest extends BaseCoreTest {
 	public void testRemoveOk() {
 		Foo foo = new Foo();
 		foo.setValue("value");
+
+		final Bar bar = new Bar();
+		bar.setFoo(foo);
+		bar.setValue("value");
+		foo.getBars().add(bar);
+
 		this.persist(foo);
 		this.commit();
 
@@ -108,6 +116,11 @@ public class ValidationTest extends BaseCoreTest {
 		Foo foo = new Foo();
 		foo.setValue("value");
 
+		final Bar bar = new Bar();
+		bar.setFoo(foo);
+		bar.setValue("value");
+		foo.getBars().add(bar);
+
 		this.persist(foo);
 		this.commit();
 
@@ -131,6 +144,11 @@ public class ValidationTest extends BaseCoreTest {
 	public void testUpdateOk() {
 		Foo foo = new Foo();
 		foo.setValue("value");
+
+		final Bar bar = new Bar();
+		bar.setFoo(foo);
+		bar.setValue("value");
+		foo.getBars().add(bar);
 
 		this.persist(foo);
 		this.commit();

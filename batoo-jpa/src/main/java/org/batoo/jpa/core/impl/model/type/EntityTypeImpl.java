@@ -41,7 +41,6 @@ import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
@@ -1894,17 +1893,18 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
-	 * Runs the validators for the instance
+	 * Runs the validators for the instance.
 	 * 
 	 * @param entityManagerFactory
 	 *            the entity manager factory
 	 * @param instance
 	 *            the instance
+	 * @return the set of validation errors
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void runValidators(EntityManagerFactoryImpl entityManagerFactory, ManagedInstance<?> instance) {
+	public Set<ConstraintViolation<Object>> runValidators(EntityManagerFactoryImpl entityManagerFactory, ManagedInstance<?> instance) {
 		final ValidatorFactory factory = entityManagerFactory.getValidationFactory();
 
 		final Validator validator = factory.usingContext().getValidator();
@@ -1923,14 +1923,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				break;
 		}
 
-		final Set<?> result = validator.validate(instance.getInstance(), groups);
-		if ((result != null) && (result.size() > 0)) {
-			final Set<ConstraintViolation<?>> violations = Sets.newHashSet();
-			for (final Object violation : result) {
-				violations.add((ConstraintViolation<?>) violation);
-			}
-			throw new ConstraintViolationException(violations);
-		}
+		return validator.validate((Object) instance.getInstance(), groups);
 	}
 
 	private synchronized void setInherited() {

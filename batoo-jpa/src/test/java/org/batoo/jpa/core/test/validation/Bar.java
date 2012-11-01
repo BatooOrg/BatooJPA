@@ -18,18 +18,12 @@
  */
 package org.batoo.jpa.core.test.validation;
 
-import java.util.List;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-
-import com.google.common.collect.Lists;
 
 /**
  * 
@@ -37,7 +31,7 @@ import com.google.common.collect.Lists;
  * @since $version
  */
 @Entity
-public class Foo {
+public class Bar {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -47,30 +41,26 @@ public class Foo {
 	@NotNull
 	private String value;
 
-	@NotNull(groups = { Update.class })
-	@Null(groups = { Remove.class })
-	private Integer value2;
-
-	@NotEmpty
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "foo")
-	private final List<Bar> bars = Lists.newArrayList();
+	@NotNull
+	@ManyToOne
+	private Foo foo;
 
 	/**
-	 * Returns the bars of the Foo.
+	 * Returns the foo of the Bar.
 	 * 
-	 * @return the bars of the Foo
+	 * @return the foo of the Bar
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public List<Bar> getBars() {
-		return this.bars;
+	public Foo getFoo() {
+		return this.foo;
 	}
 
 	/**
-	 * Returns the id of the Foo1.
+	 * Returns the id of the Bar.
 	 * 
-	 * @return the id of the Foo1
+	 * @return the id of the Bar
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -80,9 +70,9 @@ public class Foo {
 	}
 
 	/**
-	 * Returns the value of the Foo1.
+	 * Returns the value of the Bar.
 	 * 
-	 * @return the value of the Foo1
+	 * @return the value of the Bar
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -92,22 +82,23 @@ public class Foo {
 	}
 
 	/**
-	 * Returns the value2 of the Foo.
+	 * Sets the foo of the Bar.
 	 * 
-	 * @return the value2 of the Foo
+	 * @param foo
+	 *            the foo to set for Bar
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Integer getValue2() {
-		return this.value2;
+	public void setFoo(Foo foo) {
+		this.foo = foo;
 	}
 
 	/**
-	 * Sets the value of the Foo1.
+	 * Sets the value of the Bar.
 	 * 
 	 * @param value
-	 *            the value to set for Foo1
+	 *            the value to set for Bar
 	 * 
 	 * @since $version
 	 * @author hceylan
@@ -116,16 +107,4 @@ public class Foo {
 		this.value = value;
 	}
 
-	/**
-	 * Sets the value2 of the Foo.
-	 * 
-	 * @param value2
-	 *            the value2 to set for Foo
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public void setValue2(Integer value2) {
-		this.value2 = value2;
-	}
 }
