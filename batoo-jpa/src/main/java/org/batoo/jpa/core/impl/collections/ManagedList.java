@@ -33,7 +33,6 @@ import org.apache.commons.lang.ObjectUtils;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.Joinable;
-import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 import org.batoo.jpa.util.BatooUtils;
@@ -357,12 +356,14 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	}
 
 	private void attachChildren(Connection connection, final ManagedInstance<?> instance, final PluralMapping<?, ?, E> mapping) throws SQLException {
-		final Joinable[] batch = new Joinable[SessionImpl.BATCH_SIZE];
+		final int insertBatchSize = this.getInsertBatchSize();
+
+		final Joinable[] batch = new Joinable[insertBatchSize];
 
 		int i = 0;
 		while (i < this.delegate.size()) {
 			int batchSize = 0;
-			while ((i < this.delegate.size()) && (batchSize < SessionImpl.BATCH_SIZE)) {
+			while ((i < this.delegate.size()) && (batchSize < insertBatchSize)) {
 				final E child = this.delegate.get(i);
 
 				batch[batchSize] = new Joinable(null, child, i);

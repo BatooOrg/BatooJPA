@@ -58,11 +58,6 @@ public class SessionImpl {
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(SessionImpl.class);
 
-	/**
-	 * Max size of the batch. TODO: Consider making this parametric
-	 */
-	public static final int BATCH_SIZE = 20;
-
 	private final EntityManagerImpl em;
 	private final MetamodelImpl metamodel;
 
@@ -76,6 +71,9 @@ public class SessionImpl {
 	private Set<ManagedId<?>> idsNotCached = Sets.newHashSet();
 
 	private int loadTracker = 0;
+
+	private final int insertBatchSize;
+	private final int removeBatchSize;
 
 	/**
 	 * @param entityManager
@@ -91,6 +89,8 @@ public class SessionImpl {
 
 		this.em = entityManager;
 		this.metamodel = metamodel;
+		this.insertBatchSize = this.em.getJdbcAdaptor().getInsertBatchSize();
+		this.removeBatchSize = this.em.getJdbcAdaptor().getRemoveBatchSize();
 	}
 
 	/**
@@ -165,7 +165,7 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	private void doRemoves(Connection connection, final ManagedInstance<?>[] removes) throws SQLException {
-		final ManagedInstance<?>[] batch = new ManagedInstance[SessionImpl.BATCH_SIZE];
+		final ManagedInstance<?>[] batch = new ManagedInstance[this.removeBatchSize];
 
 		int i = 0;
 
@@ -173,9 +173,9 @@ public class SessionImpl {
 			int batchSize = 0;
 			EntityTypeImpl<?> lastEntity = null;
 
-			// group upto BATCH_SIZE and same type entities into a single batch
+			// group upto INSERT_BATCH_SIZE and same type entities into a single batch
 			while ((i < removes.length) && //
-				(batchSize < SessionImpl.BATCH_SIZE) && //
+				(batchSize < this.removeBatchSize) && //
 				((lastEntity == null) || (lastEntity == removes[i].getType()))) {
 
 				lastEntity = removes[i].getType();
@@ -208,7 +208,7 @@ public class SessionImpl {
 	 * @author hceylan
 	 */
 	private void doUpdates(Connection connection, final ManagedInstance<?>[] updates) throws SQLException {
-		final ManagedInstance<?>[] inserts = new ManagedInstance[SessionImpl.BATCH_SIZE];
+		final ManagedInstance<?>[] inserts = new ManagedInstance[this.insertBatchSize];
 
 		int i = 0;
 
@@ -218,7 +218,7 @@ public class SessionImpl {
 
 			// group upto MAX_INSERTS and same type entities that are new into a single batch
 			while ((i < updates.length) && //
-				(batchSize < SessionImpl.BATCH_SIZE) && //
+				(batchSize < this.insertBatchSize) && //
 				(updates[i].getStatus() == Status.NEW) && //
 				((lastEntity == null) || (lastEntity == updates[i].getType()))) {
 

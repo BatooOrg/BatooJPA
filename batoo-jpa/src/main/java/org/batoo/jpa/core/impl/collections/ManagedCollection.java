@@ -56,6 +56,7 @@ public abstract class ManagedCollection<E> implements Serializable {
 	private final transient ManagedInstance<?> managedInstance;
 	private final transient PluralMapping<?, ?, E> mapping;
 	private transient AssociationMapping<?, ?, ?> inverse;
+	private final transient int insertBatchSize;
 
 	/**
 	 * 
@@ -69,6 +70,8 @@ public abstract class ManagedCollection<E> implements Serializable {
 		this.managedInstance = null;
 		this.inverse = null;
 		this.changed = false;
+
+		this.insertBatchSize = this.managedInstance.getSession().getEntityManager().getJdbcAdaptor().getInsertBatchSize();
 	}
 
 	/**
@@ -85,6 +88,7 @@ public abstract class ManagedCollection<E> implements Serializable {
 
 		this.mapping = mapping;
 		this.managedInstance = managedInstance;
+		this.insertBatchSize = this.managedInstance.getSession().getEntityManager().getJdbcAdaptor().getInsertBatchSize();
 
 		if (mapping instanceof PluralAssociationMapping) {
 			this.inverse = ((PluralAssociationMapping<?, ?, E>) mapping).getInverse();
@@ -155,6 +159,18 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 * @author hceylan
 	 */
 	public abstract Collection<E> getDelegate();
+
+	/**
+	 * Returns the insertBatchSize of the ManagedCollection.
+	 * 
+	 * @return the insertBatchSize of the ManagedCollection
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected int getInsertBatchSize() {
+		return this.insertBatchSize;
+	}
 
 	/**
 	 * Returns the managed instance of the managed collection.

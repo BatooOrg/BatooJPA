@@ -31,7 +31,6 @@ import javax.persistence.PersistenceException;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.Joinable;
-import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
 import org.batoo.jpa.util.BatooUtils;
 
@@ -173,12 +172,14 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 
 	private void attachChildren(Connection connection, final ManagedInstance<?> instance, final PluralMapping<?, ?, E> mapping, Collection<E> children)
 		throws SQLException {
-		final Joinable[] batch = new Joinable[SessionImpl.BATCH_SIZE];
+		final int insertBatchSize = this.getInsertBatchSize();
+
+		final Joinable[] batch = new Joinable[insertBatchSize];
 
 		final Iterator<E> i = children.iterator();
 		while (i.hasNext()) {
 			int batchSize = 0;
-			while (i.hasNext() && (batchSize < SessionImpl.BATCH_SIZE)) {
+			while (i.hasNext() && (batchSize < insertBatchSize)) {
 				final E child = i.next();
 
 				batch[batchSize] = new Joinable(null, child, 0);

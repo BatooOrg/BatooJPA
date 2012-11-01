@@ -133,6 +133,9 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 
 	private final Map<AbstractTable, JdbcTable> tables = Maps.newHashMap();
 
+	private int insertBatchSize;
+	private int removeBatchSize;
+
 	/**
 	 * @since $version
 	 * @author hceylan
@@ -850,6 +853,18 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	}
 
 	/**
+	 * Returns the insertBatchSize of the JdbcAdaptor.
+	 * 
+	 * @return the insertBatchSize of the JdbcAdaptor
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public int getInsertBatchSize() {
+		return this.insertBatchSize;
+	}
+
+	/**
 	 * Returns next sequence number from the database.
 	 * 
 	 * @param datasource
@@ -936,6 +951,18 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 		final String qualifiedName = Joiner.on(".").skipNulls().join(new String[] { schema, table });
 
 		return "ALTER TABLE " + qualifiedName + " DROP PRIMARY KEY";
+	}
+
+	/**
+	 * Returns the removeBatchSize of the JdbcAdaptor.
+	 * 
+	 * @return the removeBatchSize of the JdbcAdaptor
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public int getRemoveBatchSize() {
+		return this.removeBatchSize;
 	}
 
 	/**
@@ -1198,6 +1225,32 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 		}
 
 		return schema + "." + jdbcClassName;
+	}
+
+	/**
+	 * Sets the insertBatchSize of the JdbcAdaptor.
+	 * 
+	 * @param insertBatchSize
+	 *            the insertBatchSize to set for JdbcAdaptor
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setInsertBatchSize(int insertBatchSize) {
+		this.insertBatchSize = insertBatchSize;
+	}
+
+	/**
+	 * Sets the removeBatchSize of the JdbcAdaptor.
+	 * 
+	 * @param removeBatchSize
+	 *            the removeBatchSize to set for JdbcAdaptor
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setRemoveBatchSize(int removeBatchSize) {
+		this.removeBatchSize = removeBatchSize;
 	}
 
 	/**

@@ -270,6 +270,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		SqlLoggingType sqlLogging;
 		long slowSqlThreshold;
 		int jdbcFetchSize;
+
 		try {
 			sqlLogging = this.getProperty(BJPASettings.SQL_LOGGING) != null ? //
 				SqlLoggingType.valueOf(((String) this.getProperty(BJPASettings.SQL_LOGGING)).toUpperCase(Locale.ENGLISH)) : //
@@ -376,7 +377,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	}
 
 	/**
-	 * Creates the JDBC adaptor
+	 * Creates the JDBC adaptor.
 	 * 
 	 * @return the JDBC Adaptor
 	 * 
@@ -384,10 +385,35 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * @author hceylan
 	 */
 	private JdbcAdaptor createJdbcAdaptor() {
+		int insertBatchSize;
+		try {
+			insertBatchSize = this.getProperty(BJPASettings.INSERT_BATCH_SIZE) != null ? //
+				Integer.valueOf(((String) this.getProperty(BJPASettings.INSERT_BATCH_SIZE))) : //
+				BJPASettings.DEFAULT_INSERT_BATCH_SIZE;
+		}
+		catch (final Exception e) {
+			throw new IllegalArgumentException("Illegal value " + this.getProperty(BJPASettings.INSERT_BATCH_SIZE) + " for " + BJPASettings.INSERT_BATCH_SIZE);
+		}
+
+		int removeBatchSize;
+		try {
+			removeBatchSize = this.getProperty(BJPASettings.REMOVE_BATCH_SIZE) != null ? //
+				Integer.valueOf(((String) this.getProperty(BJPASettings.REMOVE_BATCH_SIZE))) : //
+				BJPASettings.DEFAULT_REMOVE_BATCH_SIZE;
+		}
+		catch (final Exception e) {
+			throw new IllegalArgumentException("Illegal value " + this.getProperty(BJPASettings.REMOVE_BATCH_SIZE) + " for " + BJPASettings.REMOVE_BATCH_SIZE);
+		}
+
 		try {
 			final Connection connection = this.dataSource.getConnection();
 			try {
-				return AbstractJdbcAdaptor.getAdapter(this.classloader, connection.getMetaData().getDatabaseProductName());
+				final JdbcAdaptor adapter = AbstractJdbcAdaptor.getAdapter(this.classloader, connection.getMetaData().getDatabaseProductName());
+
+				adapter.setInsertBatchSize(insertBatchSize);
+				adapter.setRemoveBatchSize(removeBatchSize);
+
+				return adapter;
 			}
 			finally {
 				connection.close();
