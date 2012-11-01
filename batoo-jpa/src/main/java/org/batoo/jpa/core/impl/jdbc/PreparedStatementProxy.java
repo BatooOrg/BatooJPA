@@ -871,7 +871,7 @@ public class PreparedStatementProxy implements PreparedStatement {
 	 */
 	@Override
 	public void setFetchSize(int rows) throws SQLException {
-		this.throwNotImplemented();
+		this.statement.setFetchSize(rows);
 	}
 
 	/**

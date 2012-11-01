@@ -65,6 +65,11 @@ public interface BJPASettings {
 	Integer DEFAULT_MIN_CONNECTIONS = 1;
 
 	/**
+	 * The size of the datasource statement cache size
+	 */
+	Integer DEFAULT_FETCH_SIZE = 100;
+
+	/**
 	 * The default for {@link #STATEMENT_CACHE_SIZE} that is 50.
 	 */
 	Integer DEFAULT_STATEMENT_CACHE_SIZE = 50;
@@ -73,6 +78,11 @@ public interface BJPASettings {
 	 * The size of the datasource statement cache size
 	 */
 	String STATEMENT_CACHE_SIZE = "org.batoo.jdbc.statement_cache_size";
+
+	/**
+	 * The size of the datasource statement cache size
+	 */
+	String FETCH_SIZE = "org.batoo.jdbc.fetch_size";
 
 	/**
 	 * The max size of the connection pool.

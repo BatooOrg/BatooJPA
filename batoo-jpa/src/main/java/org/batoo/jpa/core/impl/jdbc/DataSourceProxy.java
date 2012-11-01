@@ -37,7 +37,8 @@ import org.batoo.jpa.core.impl.jdbc.PreparedStatementProxy.SqlLoggingType;
 public class DataSourceProxy implements DataSource {
 
 	private final SqlLoggingType sqlLogging;
-	private final Long slowSqlThreshold;
+	private final long slowSqlThreshold;
+	private final int jdbcFetchSize;
 	private final DataSource datasource;
 
 	/**
@@ -47,16 +48,19 @@ public class DataSourceProxy implements DataSource {
 	 *            the time to decide if SQL is deemed as slow
 	 * @param sqlLogging
 	 *            the sql logging type
+	 * @param jdbcFetchSize
+	 *            the size of the jdbc fetch
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public DataSourceProxy(DataSource datasource, SqlLoggingType sqlLogging, Long slowSqlThreshold) {
+	public DataSourceProxy(DataSource datasource, SqlLoggingType sqlLogging, long slowSqlThreshold, int jdbcFetchSize) {
 		super();
 
 		this.datasource = datasource;
 		this.sqlLogging = sqlLogging;
 		this.slowSqlThreshold = slowSqlThreshold;
+		this.jdbcFetchSize = jdbcFetchSize;
 	}
 
 	/**
@@ -65,7 +69,7 @@ public class DataSourceProxy implements DataSource {
 	 */
 	@Override
 	public Connection getConnection() throws SQLException {
-		return new ConnectionProxy(this.datasource.getConnection(), this.slowSqlThreshold, this.sqlLogging);
+		return new ConnectionProxy(this.datasource.getConnection(), this.slowSqlThreshold, this.sqlLogging, this.jdbcFetchSize);
 	}
 
 	/**
@@ -74,7 +78,7 @@ public class DataSourceProxy implements DataSource {
 	 */
 	@Override
 	public Connection getConnection(String username, String password) throws SQLException {
-		return new ConnectionProxy(this.datasource.getConnection(username, password), this.slowSqlThreshold, this.sqlLogging);
+		return new ConnectionProxy(this.datasource.getConnection(username, password), this.slowSqlThreshold, this.sqlLogging, this.jdbcFetchSize);
 	}
 
 	/**

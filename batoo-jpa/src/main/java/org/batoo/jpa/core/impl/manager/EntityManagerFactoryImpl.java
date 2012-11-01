@@ -136,22 +136,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 			this.removeValidators = null;
 		}
 
-		SqlLoggingType sqlLogging;
-		Long slowSqlThreshold;
-		try {
-			slowSqlThreshold = this.getProperty(BJPASettings.SLOW_SQL_THRESHOLD) != null ? //
-				Long.valueOf((String) this.getProperty(BJPASettings.SLOW_SQL_THRESHOLD)) : //
-				BJPASettings.DEFAULT_SLOW_SQL_THRESHOLD;
-
-			sqlLogging = this.getProperty(BJPASettings.SQL_LOGGING) != null ? //
-				SqlLoggingType.valueOf(((String) this.getProperty(BJPASettings.SQL_LOGGING)).toUpperCase(Locale.ENGLISH)) : //
-				SqlLoggingType.NONE;
-		}
-		catch (final Exception e) {
-			throw new IllegalArgumentException("Illegal value " + this.getProperty(BJPASettings.SQL_LOGGING) + " for " + BJPASettings.SQL_LOGGING);
-		}
-
-		this.dataSource = new DataSourceProxy(this.createDatasource(parser), sqlLogging, slowSqlThreshold);
+		this.dataSource = this.createDatasource(parser);
 
 		this.cache = new CacheImpl(this, parser.getSharedCacheMode());
 
@@ -281,7 +266,43 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		this.open = false;
 	}
 
-	private DataSource createDatasource(PersistenceParser parser) {
+	private DataSourceProxy createDatasource(PersistenceParser parser) {
+		SqlLoggingType sqlLogging;
+		long slowSqlThreshold;
+		int jdbcFetchSize;
+		try {
+			sqlLogging = this.getProperty(BJPASettings.SQL_LOGGING) != null ? //
+				SqlLoggingType.valueOf(((String) this.getProperty(BJPASettings.SQL_LOGGING)).toUpperCase(Locale.ENGLISH)) : //
+				SqlLoggingType.NONE;
+		}
+		catch (final Exception e) {
+			throw new IllegalArgumentException("Illegal value " + this.getProperty(BJPASettings.SQL_LOGGING) + " for " + BJPASettings.SQL_LOGGING);
+		}
+
+		try {
+			slowSqlThreshold = this.getProperty(BJPASettings.SLOW_SQL_THRESHOLD) != null ? //
+				Long.valueOf((String) this.getProperty(BJPASettings.SLOW_SQL_THRESHOLD)) : //
+				BJPASettings.DEFAULT_SLOW_SQL_THRESHOLD;
+
+		}
+		catch (final Exception e) {
+			throw new IllegalArgumentException("Illegal value " + this.getProperty(BJPASettings.SLOW_SQL_THRESHOLD) + " for " + BJPASettings.SLOW_SQL_THRESHOLD);
+		}
+
+		try {
+			jdbcFetchSize = this.getProperty(BJPASettings.FETCH_SIZE) != null ? //
+				Integer.valueOf((String) this.getProperty(BJPASettings.FETCH_SIZE)) : //
+				BJPASettings.DEFAULT_FETCH_SIZE;
+
+		}
+		catch (final Exception e) {
+			throw new IllegalArgumentException("Illegal value " + this.getProperty(BJPASettings.FETCH_SIZE) + " for " + BJPASettings.FETCH_SIZE);
+		}
+
+		return new DataSourceProxy(this.createDatasource0(parser), sqlLogging, slowSqlThreshold, jdbcFetchSize);
+	}
+
+	private DataSource createDatasource0(PersistenceParser parser) {
 		if (parser.getJtaDatasource() != null) {
 			return parser.getJtaDatasource();
 		}
