@@ -67,14 +67,17 @@ ql_statement :
     (select_statement | update_statement | delete_statement) EOF;
 
 update_statement :
-    UPDATE^ update_clause (where_clause)?;
+    UPDATE^ aliased_qid update_clause (where_clause)?;
 
 update_clause :
-    aliased_qid SET update_item (Comma update_item)*
+    SET update_item (Comma update_item)*
         -> ^(ST_UPDATE update_item update_item*);
 
 update_item :
     state_field_path_expression Equals_Operator^ new_value;
+
+delete_statement :
+    DELETE^ aliased_qid (where_clause)?;
 
 new_value options { backtrack=true; }:
     simple_arithmetic_expression
@@ -86,9 +89,6 @@ new_value options { backtrack=true; }:
 orderby_clause :
   	ORDER BY orderby_item (Comma orderby_item)*
   		-> ^(LORDER orderby_item (orderby_item)*);
-
-delete_statement :
-    DELETE^ aliased_qid (where_clause)?;
 
 select_statement :
     select_clause from_clause (where_clause)? (groupby_clause)? (having_clause)? (orderby_clause)?;

@@ -18,11 +18,23 @@
  */
 package org.batoo.jpa.core.impl.criteria;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
 import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
+import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
+import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
+
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Maps;
 
 /**
  * Implementation of CriteriaUpdate.
@@ -33,7 +45,9 @@ import org.batoo.jpa.core.impl.model.MetamodelImpl;
  * @author hceylan
  * @since $version
  */
-public class CriteriaUpdateImpl<T> extends CriteriaModify<T> {
+public class CriteriaUpdateImpl<T> extends CriteriaModify<T> implements CriteriaUpdate<T> {
+
+	private final Map<AbstractPath<?>, AbstractExpression<?>> updates = Maps.newHashMap();
 
 	/**
 	 * @param metamodel
@@ -69,11 +83,20 @@ public class CriteriaUpdateImpl<T> extends CriteriaModify<T> {
 	 */
 	@Override
 	public String generateSql() {
-		final String sqlRestriction = this.generateSqlRestriction();
-		final String updates = "";
+		final String update = Joiner.on(",").join(
+			Collections2.transform(this.updates.entrySet(), new Function<Entry<AbstractPath<?>, AbstractExpression<?>>, String>() {
 
-		return "UPDATE " + this.getRoot().generateSqlFrom(this) + "\nSET " + updates
-			+ (StringUtils.isNotBlank(sqlRestriction) ? "\nWHERE " + sqlRestriction : "");
+				@Override
+				public String apply(Entry<AbstractPath<?>, AbstractExpression<?>> input) {
+					return "\t" + input.getKey().getSqlRestrictionFragments(CriteriaUpdateImpl.this)[0] + " = "
+						+ input.getValue().getSqlRestrictionFragments(CriteriaUpdateImpl.this)[0];
+				}
+			}));
+
+		final String sqlRestriction = this.generateSqlRestriction();
+
+		return "UPDATE " + this.getRoot().generateSqlFrom(this) + " SET\n" + update + //
+			(StringUtils.isNotBlank(sqlRestriction) ? "\nWHERE " + sqlRestriction : "");
 	}
 
 	/**
@@ -105,6 +128,57 @@ public class CriteriaUpdateImpl<T> extends CriteriaModify<T> {
 	@Override
 	public boolean isQuery() {
 		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public <Y> CriteriaUpdateImpl<T> set(Path<Y> attribute, Expression<? extends Y> value) {
+		this.updates.put((AbstractPath<?>) attribute, (AbstractExpression<?>) value);
+
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public <Y, X extends Y> CriteriaUpdate<T> set(Path<Y> attribute, X value) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public <Y> CriteriaUpdate<T> set(SingularAttribute<? super T, Y> attribute, Expression<? extends Y> value) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public <Y, X extends Y> CriteriaUpdate<T> set(SingularAttribute<? super T, Y> attribute, X value) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public CriteriaUpdate<T> set(String attributeName, Object value) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	/**

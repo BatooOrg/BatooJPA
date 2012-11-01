@@ -59,7 +59,7 @@ public class SessionImpl {
 	/**
 	 * Max size of the batch. TODO: Consider making this parametric
 	 */
-	public static final int BATCH_SIZE = 50;
+	public static final int BATCH_SIZE = 20;
 
 	private final EntityManagerImpl em;
 	private final MetamodelImpl metamodel;

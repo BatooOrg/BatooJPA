@@ -70,7 +70,7 @@ public class UpdateJpqlTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
-	public void testUpdate() {
+	public void testDelete() {
 		Assert.assertEquals((Long) 4l, this.cq("select count(c) from Country c", Long.class).getSingleResult());
 
 		this.begin();
@@ -80,5 +80,19 @@ public class UpdateJpqlTest extends BaseCoreTest {
 		this.commit();
 
 		Assert.assertEquals((Long) 3l, this.cq("select count(c) from Country c", Long.class).getSingleResult());
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testUpdate() {
+		this.begin();
+
+		this.cu("update Country c set c.name = :name where c = :code").setParameter("code", UpdateJpqlTest.TR).setParameter("name", "TURKEY").executeUpdate();
+
+		this.commit();
 	}
 }

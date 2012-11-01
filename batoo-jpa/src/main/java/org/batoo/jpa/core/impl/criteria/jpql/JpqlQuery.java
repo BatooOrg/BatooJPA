@@ -76,6 +76,7 @@ import org.batoo.jpa.core.impl.criteria.expression.TrimExpression;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
 import org.batoo.jpa.core.impl.criteria.join.ListJoinImpl;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
+import org.batoo.jpa.core.impl.criteria.path.BasicPath;
 import org.batoo.jpa.core.impl.criteria.path.ParentPath;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
@@ -221,11 +222,6 @@ public class JpqlQuery {
 
 		if (tree.getChildCount() == 2) {
 			q.where(this.constructJunction(cb, q, deleteDef.getChild(1)));
-		}
-		final Tree setDefs = tree.getChild(1);
-		for (int i = 0; i < setDefs.getChildCount(); i++) {
-			final Tree setDef = setDefs.getChild(i);
-			this.getExpression(cb, q, setDef.getChild(0), null);
 		}
 
 		return q;
@@ -838,19 +834,27 @@ public class JpqlQuery {
 	private CriteriaUpdateImpl<?> constructUpdateQuery(CriteriaBuilderImpl cb, CommonTree tree) {
 		final CriteriaUpdateImpl<?> q = new CriteriaUpdateImpl(this.metamodel);
 
-		final Tree deleteDef = tree.getChild(0);
+		final Tree updateDef = tree.getChild(0);
 
-		final Tree aliasedDef = deleteDef.getChild(0);
+		final Tree aliasedDef = updateDef.getChild(0);
 		final Aliased aliased = new Aliased(aliasedDef);
 
 		final EntityTypeImpl entity = this.getEntity(aliased.getQualified().toString());
 		final RootImpl<?> r = (RootImpl<?>) q.from(entity);
 		this.putAlias(q, aliasedDef, aliased, r);
 
-		final Tree setDefs = tree.getChild(1);
+		final Tree setDefs = updateDef.getChild(1);
 		for (int i = 0; i < setDefs.getChildCount(); i++) {
 			final Tree setDef = setDefs.getChild(i);
-			this.getExpression(cb, q, setDef.getChild(0), null);
+
+			final BasicPath left = (BasicPath) this.getExpression(cb, q, setDef.getChild(0), null);
+			final AbstractExpression right = this.getExpression(cb, q, setDef.getChild(1), left.getJavaType());
+
+			q.set(left, right);
+		}
+
+		if (updateDef.getChildCount() == 3) {
+			q.where(this.constructJunction(cb, q, updateDef.getChild(2)));
 		}
 
 		return q;
