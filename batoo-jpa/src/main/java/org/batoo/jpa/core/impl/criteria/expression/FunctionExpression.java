@@ -123,7 +123,7 @@ public class FunctionExpression<T> extends AbstractExpression<T> {
 
 			@Override
 			public String apply(Expression<?> input) {
-				if (input instanceof ConstantExpression) {
+				if (input instanceof SimpleConstantExpression) {
 					final String result = ((AbstractExpression<?>) input).getSqlRestrictionFragments(query)[0];
 					if (result.startsWith("'")) {
 						return result.substring(1, result.length() - 1);

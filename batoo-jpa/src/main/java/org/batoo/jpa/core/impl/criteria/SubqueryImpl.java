@@ -37,7 +37,7 @@ import javax.persistence.criteria.Subquery;
 import javax.persistence.metamodel.EntityType;
 
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
-import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.criteria.expression.AbstractParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
@@ -244,8 +244,8 @@ public class SubqueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 	 * 
 	 */
 	@Override
-	public String getAlias(AbstractSelection<?> selection) {
-		return this.query.getAlias(selection);
+	public Integer getAlias(AbstractParameterExpressionImpl<?> parameter) {
+		return this.query.getAlias(parameter);
 	}
 
 	/**
@@ -253,8 +253,8 @@ public class SubqueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 	 * 
 	 */
 	@Override
-	public Integer getAlias(ParameterExpressionImpl<?> parameter) {
-		return this.query.getAlias(parameter);
+	public String getAlias(AbstractSelection<?> selection) {
+		return this.query.getAlias(selection);
 	}
 
 	/**
@@ -325,7 +325,7 @@ public class SubqueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 	 * 
 	 */
 	@Override
-	public ParameterExpressionImpl<?> getParameter(int position) {
+	public AbstractParameterExpressionImpl<?> getParameter(int position) {
 		return this.query.getParameter(position);
 	}
 
@@ -398,7 +398,7 @@ public class SubqueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 	 * 
 	 */
 	@Override
-	public List<ParameterExpressionImpl<?>> getSqlParameters() {
+	public List<AbstractParameterExpressionImpl<?>> getSqlParameters() {
 		return this.query.getSqlParameters();
 	}
 
@@ -481,7 +481,7 @@ public class SubqueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 	 * 
 	 */
 	@Override
-	public int setNextSqlParam(ParameterExpressionImpl<?> parameter) {
+	public int setNextSqlParam(AbstractParameterExpressionImpl<?> parameter) {
 		return this.query.setNextSqlParam(parameter);
 	}
 

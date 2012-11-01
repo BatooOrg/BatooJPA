@@ -83,7 +83,7 @@ public class InExpression extends AbstractExpression<Boolean> {
 				this.values.add((AbstractExpression<?>) value);
 			}
 			else {
-				this.values.add(new ConstantExpression<Object>(null, value));
+				this.values.add(new EntityConstantExpression<Object>(null, value));
 			}
 		}
 	}

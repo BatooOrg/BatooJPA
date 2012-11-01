@@ -160,6 +160,6 @@ public class CoalesceExpression<T> extends AbstractExpression<T> implements Coal
 	 */
 	@Override
 	public CoalesceExpression<T> value(T value) {
-		return this.value(new ConstantExpression<T>(null, value));
+		return this.value(new EntityConstantExpression<T>(null, value));
 	}
 }

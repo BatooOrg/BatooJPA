@@ -158,8 +158,8 @@ public class BatooEnhancerMojo extends AbstractMojo {
 			final Enumeration<URL> resources = classPath.getResources("");
 			while (resources.hasMoreElements()) {
 				String root = resources.nextElement().getFile();
-				if (!root.endsWith("/")) {
-					root = root + "/";
+				if (!root.endsWith(File.separator) && !root.endsWith("/")) {
+					root = root + File.separator;
 				}
 
 				this.findClasses(classPath, classes, includeList, excludeList, root.length(), new File(root));

@@ -55,6 +55,8 @@ import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.JPASettings;
 import org.batoo.jpa.core.impl.cache.CacheImpl;
 import org.batoo.jpa.core.impl.cache.CacheReference;
+import org.batoo.jpa.core.impl.criteria.expression.AbstractParameterExpressionImpl;
+import org.batoo.jpa.core.impl.criteria.expression.EntityConstantExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
@@ -138,7 +140,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 
 		final MetamodelImpl metamodel = this.em.getMetamodel();
 
-		final List<ParameterExpressionImpl<?>> sqlParameters = this.q.getSqlParameters();
+		final List<AbstractParameterExpressionImpl<?>> sqlParameters = this.q.getSqlParameters();
 
 		int paramCount = 0;
 		for (int i = 0; i < sqlParameters.size(); i++) {
@@ -182,8 +184,14 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 				}
 			}
 
-			for (final ParameterExpressionImpl<?> parameter : sqlParameters) {
-				parameter.setParameter(metamodel, parameters, sqlIndex, this.parameters.get(parameter));
+			for (int i = 0; i < sqlParameters.size(); i++) {
+				final AbstractParameterExpressionImpl<?> parameter = sqlParameters.get(i);
+				if (parameter instanceof EntityConstantExpression) {
+					((EntityConstantExpression<?>) parameter).setParameter(metamodel, parameters, sqlIndex);
+				}
+				else {
+					((ParameterExpressionImpl<?>) parameter).setParameter(metamodel, parameters, sqlIndex, this.parameters.get(parameter));
+				}
 			}
 
 			if (paginationParamsOrder.isAfterMainSql()) {
@@ -241,8 +249,13 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 		final Object[] parameters = new Object[paramCount];
 
 		for (int i = 0; i < sqlParameters.size(); i++) {
-			final ParameterExpressionImpl<?> parameter = sqlParameters.get(i);
-			parameter.setParameter(metamodel, parameters, sqlIndex, this.parameters.get(parameter));
+			final AbstractParameterExpressionImpl<?> parameter = sqlParameters.get(i);
+			if (parameter instanceof EntityConstantExpression) {
+				((EntityConstantExpression<?>) parameter).setParameter(metamodel, parameters, sqlIndex);
+			}
+			else {
+				((ParameterExpressionImpl<?>) parameter).setParameter(metamodel, parameters, sqlIndex, this.parameters.get(parameter));
+			}
 		}
 
 		return parameters;

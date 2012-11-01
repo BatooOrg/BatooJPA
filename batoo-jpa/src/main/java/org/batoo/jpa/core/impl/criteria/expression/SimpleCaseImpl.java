@@ -181,7 +181,7 @@ public class SimpleCaseImpl<C, R> extends AbstractExpression<R> implements Simpl
 	 */
 	@Override
 	public Expression<R> otherwise(R result) {
-		this.otherwise(new ConstantExpression<R>(null, result));
+		this.otherwise(new EntityConstantExpression<R>(null, result));
 
 		return this;
 	}
@@ -210,7 +210,7 @@ public class SimpleCaseImpl<C, R> extends AbstractExpression<R> implements Simpl
 	 */
 	@Override
 	public SimpleCase<C, R> when(C condition, Expression<? extends R> result) {
-		this.conditions.add(new Pair<Expression<C>, Expression<? extends R>>(new ConstantExpression<C>(null, condition), result));
+		this.conditions.add(new Pair<Expression<C>, Expression<? extends R>>(new EntityConstantExpression<C>(null, condition), result));
 
 		return this;
 	}
@@ -221,6 +221,6 @@ public class SimpleCaseImpl<C, R> extends AbstractExpression<R> implements Simpl
 	 */
 	@Override
 	public SimpleCase<C, R> when(C condition, R result) {
-		return this.when(condition, new ConstantExpression<R>(null, result));
+		return this.when(condition, new EntityConstantExpression<R>(null, result));
 	}
 }

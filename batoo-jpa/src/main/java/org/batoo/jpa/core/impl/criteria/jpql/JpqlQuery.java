@@ -63,7 +63,6 @@ import org.batoo.jpa.core.impl.criteria.expression.CaseImpl;
 import org.batoo.jpa.core.impl.criteria.expression.CoalesceExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CollectionExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ConcatExpression;
-import org.batoo.jpa.core.impl.criteria.expression.ConstantExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CountExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ExistsExpression;
 import org.batoo.jpa.core.impl.criteria.expression.FunctionExpression;
@@ -71,6 +70,7 @@ import org.batoo.jpa.core.impl.criteria.expression.MapExpression;
 import org.batoo.jpa.core.impl.criteria.expression.NullIfExpression;
 import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
 import org.batoo.jpa.core.impl.criteria.expression.SimpleCaseImpl;
+import org.batoo.jpa.core.impl.criteria.expression.SimpleConstantExpression;
 import org.batoo.jpa.core.impl.criteria.expression.SubstringExpression;
 import org.batoo.jpa.core.impl.criteria.expression.TrimExpression;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
@@ -1010,17 +1010,17 @@ public class JpqlQuery {
 		}
 
 		if (exprDef.getType() == JpqlParser.NUMERIC_LITERAL) {
-			return (AbstractExpression<X>) new ConstantExpression<Long>(this.metamodel.createBasicType(Long.class), Long.valueOf(exprDef.getText()));
+			return (AbstractExpression<X>) new SimpleConstantExpression<Long>(this.metamodel.createBasicType(Long.class), Long.valueOf(exprDef.getText()));
 		}
 
 		// string literal
 		if (exprDef.getType() == JpqlParser.STRING_LITERAL) {
 			if (javaType == Character.class) {
-				return (AbstractExpression<X>) new ConstantExpression<Character>(this.metamodel.type(Character.class), //
+				return (AbstractExpression<X>) new SimpleConstantExpression<Character>(this.metamodel.type(Character.class), //
 					exprDef.getText().substring(1, 2).toCharArray()[0]);
 			}
 
-			return (AbstractExpression<X>) new ConstantExpression<String>(this.metamodel.type(String.class), //
+			return (AbstractExpression<X>) new SimpleConstantExpression<String>(this.metamodel.type(String.class), //
 				exprDef.getText().substring(1, exprDef.getText().length() - 1));
 		}
 
@@ -1106,7 +1106,7 @@ public class JpqlQuery {
 							+ exprDef.getCharPositionInLine());
 					}
 
-					return (AbstractExpression<X>) new ConstantExpression<String>(null, entity.getDiscriminatorValue());
+					return (AbstractExpression<X>) new SimpleConstantExpression<String>(null, entity.getDiscriminatorValue());
 			}
 		}
 
@@ -1234,7 +1234,7 @@ public class JpqlQuery {
 								+ exprDef.getCharPositionInLine());
 						}
 
-						condition = (AbstractExpression<X>) new ConstantExpression<String>(null, entity.getDiscriminatorValue());
+						condition = (AbstractExpression<X>) new SimpleConstantExpression<String>(null, entity.getDiscriminatorValue());
 					}
 					else {
 						condition = this.getExpression(cb, q, caseDef.getChild(0), null);

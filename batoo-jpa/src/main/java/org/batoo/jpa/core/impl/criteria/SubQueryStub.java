@@ -18,7 +18,7 @@
  */
 package org.batoo.jpa.core.impl.criteria;
 
-import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.criteria.expression.AbstractParameterExpressionImpl;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 
@@ -65,8 +65,8 @@ public class SubQueryStub<T> extends AbstractCriteriaQueryImpl<T> {
 	 * 
 	 */
 	@Override
-	public String getAlias(AbstractSelection<?> selection) {
-		return this.parent.getAlias(selection);
+	public Integer getAlias(AbstractParameterExpressionImpl<?> parameter) {
+		return this.parent.getAlias(parameter);
 	}
 
 	/**
@@ -74,8 +74,8 @@ public class SubQueryStub<T> extends AbstractCriteriaQueryImpl<T> {
 	 * 
 	 */
 	@Override
-	public Integer getAlias(ParameterExpressionImpl<?> parameter) {
-		return this.parent.getAlias(parameter);
+	public String getAlias(AbstractSelection<?> selection) {
+		return this.parent.getAlias(selection);
 	}
 
 	/**

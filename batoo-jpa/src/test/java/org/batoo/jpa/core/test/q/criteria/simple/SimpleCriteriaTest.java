@@ -440,9 +440,15 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testSimple3() {
-		final Person person = this.person();
+		Person person = this.person();
+
+		this.persist(person);
+		this.commit();
+		this.close();
+
+		person = this.find(Person.class, person.getId());
 
 		final CriteriaBuilderImpl criteriaBuilder = this.em().getCriteriaBuilder();
 		final CriteriaQueryImpl<Address> criteriaQuery = criteriaBuilder.createQuery(Address.class);

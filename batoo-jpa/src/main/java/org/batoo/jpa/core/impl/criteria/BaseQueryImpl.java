@@ -25,6 +25,7 @@ import java.util.Set;
 import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Selection;
 
+import org.batoo.jpa.core.impl.criteria.expression.AbstractParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
@@ -54,13 +55,13 @@ public abstract class BaseQueryImpl<T> implements BaseQuery<T> {
 	private int nextparam;
 
 	private final HashMap<Selection<?>, String> selections = Maps.newHashMap();
-	private final HashBiMap<ParameterExpressionImpl<?>, Integer> parameters = HashBiMap.create();
+	private final HashBiMap<AbstractParameterExpressionImpl<?>, Integer> parameters = HashBiMap.create();
 	private final HashMap<String, List<AbstractColumn>> fields = Maps.newHashMap();
 
 	private FinalWrapper<String> sql;
 	private FinalWrapper<String> jpql;
 
-	private final List<ParameterExpressionImpl<?>> sqlParameters = Lists.newArrayList();
+	private final List<AbstractParameterExpressionImpl<?>> sqlParameters = Lists.newArrayList();
 
 	/**
 	 * @param metamodel
@@ -87,11 +88,11 @@ public abstract class BaseQueryImpl<T> implements BaseQuery<T> {
 	 * 
 	 */
 	@Override
-	public String getAlias(AbstractSelection<?> selection) {
-		String alias = this.selections.get(selection);
+	public Integer getAlias(AbstractParameterExpressionImpl<?> parameter) {
+		Integer alias = this.parameters.get(parameter);
 		if (alias == null) {
-			alias = "S" + this.nextSelection++;
-			this.selections.put(selection, alias);
+			alias = this.nextparam++;
+			this.parameters.put(parameter, alias);
 		}
 
 		return alias;
@@ -102,11 +103,11 @@ public abstract class BaseQueryImpl<T> implements BaseQuery<T> {
 	 * 
 	 */
 	@Override
-	public Integer getAlias(ParameterExpressionImpl<?> parameter) {
-		Integer alias = this.parameters.get(parameter);
+	public String getAlias(AbstractSelection<?> selection) {
+		String alias = this.selections.get(selection);
 		if (alias == null) {
-			alias = this.nextparam++;
-			this.parameters.put(parameter, alias);
+			alias = "S" + this.nextSelection++;
+			this.selections.put(selection, alias);
 		}
 
 		return alias;
@@ -177,7 +178,7 @@ public abstract class BaseQueryImpl<T> implements BaseQuery<T> {
 	 * 
 	 */
 	@Override
-	public ParameterExpressionImpl<?> getParameter(int position) {
+	public AbstractParameterExpressionImpl<?> getParameter(int position) {
 		return this.parameters.inverse().get(position);
 	}
 
@@ -188,7 +189,11 @@ public abstract class BaseQueryImpl<T> implements BaseQuery<T> {
 	@Override
 	public Set<ParameterExpression<?>> getParameters() {
 		final Set<ParameterExpression<?>> parameters = Sets.newHashSet();
-		parameters.addAll(this.parameters.keySet());
+		for (final AbstractParameterExpressionImpl<?> parameter : this.parameters.keySet()) {
+			if (parameter instanceof ParameterExpressionImpl) {
+				parameters.add((ParameterExpression<?>) parameter);
+			}
+		}
 
 		return parameters;
 	}
@@ -219,7 +224,7 @@ public abstract class BaseQueryImpl<T> implements BaseQuery<T> {
 	 * 
 	 */
 	@Override
-	public List<ParameterExpressionImpl<?>> getSqlParameters() {
+	public List<AbstractParameterExpressionImpl<?>> getSqlParameters() {
 		return this.sqlParameters;
 	}
 
@@ -238,7 +243,7 @@ public abstract class BaseQueryImpl<T> implements BaseQuery<T> {
 	 * 
 	 */
 	@Override
-	public int setNextSqlParam(ParameterExpressionImpl<?> parameter) {
+	public int setNextSqlParam(AbstractParameterExpressionImpl<?> parameter) {
 		this.sqlParameters.add(parameter);
 
 		return this.sqlParameters.size() - 1;

@@ -23,7 +23,7 @@ import java.util.Set;
 
 import javax.persistence.criteria.ParameterExpression;
 
-import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
+import org.batoo.jpa.core.impl.criteria.expression.AbstractParameterExpressionImpl;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
@@ -71,6 +71,18 @@ public interface BaseQuery<T> {
 	String generateTableAlias(boolean entity);
 
 	/**
+	 * Returns the generated alias for the parameter.
+	 * 
+	 * @param parameter
+	 *            the parameter
+	 * @return the alias
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	Integer getAlias(AbstractParameterExpressionImpl<?> parameter);
+
+	/**
 	 * Returns the generated alias for the selection.
 	 * 
 	 * @param selection
@@ -81,18 +93,6 @@ public interface BaseQuery<T> {
 	 * @author hceylan
 	 */
 	String getAlias(AbstractSelection<?> selection);
-
-	/**
-	 * Returns the generated alias for the parameter.
-	 * 
-	 * @param parameter
-	 *            the parameter
-	 * @return the alias
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	Integer getAlias(ParameterExpressionImpl<?> parameter);
 
 	/**
 	 * @param tableAlias
@@ -144,7 +144,7 @@ public interface BaseQuery<T> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	ParameterExpressionImpl<?> getParameter(int position);
+	AbstractParameterExpressionImpl<?> getParameter(int position);
 
 	/**
 	 * Returns the parameters of the query. Returns empty set if there are no parameters.
@@ -176,7 +176,7 @@ public interface BaseQuery<T> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	List<ParameterExpressionImpl<?>> getSqlParameters();
+	List<AbstractParameterExpressionImpl<?>> getSqlParameters();
 
 	/**
 	 * Adds the parameter to the SQL parameters queue.
@@ -188,7 +188,7 @@ public interface BaseQuery<T> {
 	 * @since $version
 	 * @author hceylan
 	 */
-	int setNextSqlParam(ParameterExpressionImpl<?> parameter);
+	int setNextSqlParam(AbstractParameterExpressionImpl<?> parameter);
 
 	/**
 	 * Create a subquery of the query.

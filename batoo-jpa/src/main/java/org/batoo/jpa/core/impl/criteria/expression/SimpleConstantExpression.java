@@ -21,60 +21,39 @@ package org.batoo.jpa.core.impl.criteria.expression;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import javax.persistence.criteria.ParameterExpression;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
 
 /**
- * Type of criteria query parameter expressions.
+ * Expression for constants.
  * 
  * @param <T>
- *            the type of the parameter expression
+ *            the type of the constant expression
+ * 
  * @author hceylan
  * @since $version
  */
-public class ParameterExpressionImpl<T> extends AbstractParameterExpressionImpl<T> implements ParameterExpression<T> {
+public class SimpleConstantExpression<T> extends AbstractExpression<T> {
 
-	private Integer position;
+	private final T value;
 
 	/**
 	 * @param type
-	 *            the persistent type of the parameter
-	 * @param paramClass
-	 *            the class of the parameter
-	 * @param name
-	 *            the name of the parameter
+	 *            the type of the constant.
+	 * @param value
+	 *            the value
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ParameterExpressionImpl(TypeImpl<T> type, Class<T> paramClass, String name) {
-		super(type, paramClass);
+	@SuppressWarnings("unchecked")
+	public SimpleConstantExpression(TypeImpl<T> type, T value) {
+		super(type != null ? type.getJavaType() : (Class<T>) value.getClass());
 
-		if (StringUtils.isNotBlank(name)) {
-			this.alias(name);
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	protected void ensureAlias(BaseQueryImpl<?> query) {
-		if (this.position == null) {
-			this.position = query.getAlias(this);
-			if (StringUtils.isBlank(this.getAlias())) {
-				this.alias("param" + this.position);
-			}
-		}
+		this.value = value;
 	}
 
 	/**
@@ -83,9 +62,12 @@ public class ParameterExpressionImpl<T> extends AbstractParameterExpressionImpl<
 	 */
 	@Override
 	public String generateJpqlRestriction(BaseQueryImpl<?> query) {
-		this.ensureAlias(query);
-
-		return ":" + this.getAlias();
+		if (Number.class.isAssignableFrom(this.getJavaType())) {
+			return this.value.toString();
+		}
+		else {
+			return "'" + this.value.toString() + "'";
+		}
 	}
 
 	/**
@@ -103,9 +85,7 @@ public class ParameterExpressionImpl<T> extends AbstractParameterExpressionImpl<
 	 */
 	@Override
 	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
-		this.ensureAlias(query);
-
-		return null;
+		return this.getSqlRestrictionFragments(query)[0];
 	}
 
 	/**
@@ -113,8 +93,13 @@ public class ParameterExpressionImpl<T> extends AbstractParameterExpressionImpl<
 	 * 
 	 */
 	@Override
-	public String getName() {
-		return this.getAlias();
+	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
+		if (Number.class.isAssignableFrom(this.getJavaType())) {
+			return new String[] { this.value.toString() };
+		}
+		else {
+			return new String[] { "'" + this.value.toString() + "'" };
+		}
 	}
 
 	/**
@@ -122,38 +107,7 @@ public class ParameterExpressionImpl<T> extends AbstractParameterExpressionImpl<
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
-	public Class<T> getParameterType() {
-		return (Class<T>) this.getJavaType();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public Integer getPosition() {
-		return this.position;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
 	public T handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
-		final T value = query.getParameterValue(this);
-
-		return (T) (this.getConverter() != null ? this.getConverter().convert(value) : value);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public void setParameter(MetamodelImpl metamodel, Object[] parameters, MutableInt sqlIndex, Object value) {
-		super.setParameter(metamodel, parameters, sqlIndex, value);
+		return this.value;
 	}
 }

@@ -22,7 +22,7 @@ import javax.persistence.criteria.CriteriaBuilder.In;
 import javax.persistence.criteria.Expression;
 
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
-import org.batoo.jpa.core.impl.criteria.expression.ConstantExpression;
+import org.batoo.jpa.core.impl.criteria.expression.EntityConstantExpression;
 import org.batoo.jpa.core.impl.criteria.expression.InExpression;
 import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
 
@@ -81,6 +81,6 @@ public class InPredicate<T> extends PredicateImpl implements In<T> {
 	 */
 	@Override
 	public In<T> value(T value) {
-		return this.value(new ConstantExpression<T>(null, value));
+		return this.value(new EntityConstantExpression<T>(null, value));
 	}
 }

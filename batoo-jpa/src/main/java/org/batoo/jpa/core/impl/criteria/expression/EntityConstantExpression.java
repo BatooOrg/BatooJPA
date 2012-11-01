@@ -21,10 +21,13 @@ package org.batoo.jpa.core.impl.criteria.expression;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
 
 /**
@@ -36,9 +39,10 @@ import org.batoo.jpa.core.impl.model.type.TypeImpl;
  * @author hceylan
  * @since $version
  */
-public class ConstantExpression<T> extends AbstractExpression<T> {
+public class EntityConstantExpression<T> extends AbstractParameterExpressionImpl<T> {
 
 	private final T value;
+	private Object position;
 
 	/**
 	 * @param type
@@ -50,10 +54,24 @@ public class ConstantExpression<T> extends AbstractExpression<T> {
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public ConstantExpression(TypeImpl<T> type, T value) {
-		super(type != null ? type.getJavaType() : (Class<T>) value.getClass());
+	public EntityConstantExpression(TypeImpl<T> type, T value) {
+		super(type, (Class<T>) value.getClass());
 
 		this.value = value;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	protected void ensureAlias(BaseQueryImpl<?> query) {
+		if (this.position == null) {
+			this.position = query.getAlias(this);
+			if (StringUtils.isBlank(this.getAlias())) {
+				this.alias("const" + this.position);
+			}
+		}
 	}
 
 	/**
@@ -84,30 +102,24 @@ public class ConstantExpression<T> extends AbstractExpression<T> {
 	 * 
 	 */
 	@Override
-	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
-		return this.getSqlRestrictionFragments(query)[0];
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
-		if (Number.class.isAssignableFrom(this.getJavaType())) {
-			return new String[] { this.value.toString() };
-		}
-		else {
-			return new String[] { "'" + this.value.toString() + "'" };
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public T handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		return this.value;
+	}
+
+	/**
+	 * Sets the parameters expanding if necessary.
+	 * 
+	 * @param metamodel
+	 *            the metamodel
+	 * @param parameters
+	 *            the SQL parameters
+	 * @param sqlIndex
+	 *            the index corresponding to expanded SQL parameter
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setParameter(MetamodelImpl metamodel, Object[] parameters, MutableInt sqlIndex) {
+		super.setParameter(metamodel, parameters, sqlIndex, this.value);
 	}
 }

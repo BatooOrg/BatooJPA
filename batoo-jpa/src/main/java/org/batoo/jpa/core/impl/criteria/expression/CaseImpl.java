@@ -162,7 +162,7 @@ public class CaseImpl<T> extends AbstractExpression<T> implements Case<T> {
 	 */
 	@Override
 	public Expression<T> otherwise(T result) {
-		return this.otherwise(new ConstantExpression<T>(null, result));
+		return this.otherwise(new EntityConstantExpression<T>(null, result));
 	}
 
 	/**
@@ -182,6 +182,6 @@ public class CaseImpl<T> extends AbstractExpression<T> implements Case<T> {
 	 */
 	@Override
 	public Case<T> when(Expression<Boolean> condition, T result) {
-		return this.when(condition, new ConstantExpression<T>(null, result));
+		return this.when(condition, new EntityConstantExpression<T>(null, result));
 	}
 }
