@@ -70,9 +70,11 @@ import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
 import org.batoo.jpa.core.util.Pair;
+import org.batoo.jpa.parser.metadata.ColumnTransformerMetadata;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -465,7 +467,15 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			}
 			else {
 				fieldAlias = tableAlias + "_F" + query.getFieldAlias(tableAlias, column);
-				field = Joiner.on(".").skipNulls().join(tableAlias, column.getName());
+
+				if (column.getMapping() instanceof BasicMapping && ((BasicMapping<?, ?>) column.getMapping()).getAttribute().getColumnTransformer() != null) {
+					final ColumnTransformerMetadata columnTransformer = ((BasicMapping<?, ?>) column.getMapping()).getAttribute().getColumnTransformer();
+					final String columnSql = Strings.isNullOrEmpty(columnTransformer.getRead()) ? column.getName() : columnTransformer.getRead();
+					field = columnSql.replace(column.getName(), Joiner.on(".").skipNulls().join(tableAlias, column.getName()));
+				}
+				else {
+					field = Joiner.on(".").skipNulls().join(tableAlias, column.getName());
+				}
 
 				fieldMap.put(column, fieldAlias);
 			}

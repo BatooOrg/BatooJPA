@@ -28,6 +28,7 @@ import org.batoo.jpa.parser.impl.orm.ElementConstants;
 import org.batoo.jpa.parser.impl.orm.EnumeratedElement;
 import org.batoo.jpa.parser.impl.orm.LobElement;
 import org.batoo.jpa.parser.impl.orm.ParentElement;
+import org.batoo.jpa.parser.metadata.ColumnTransformerMetadata;
 import org.batoo.jpa.parser.metadata.IndexMetadata;
 import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
 
@@ -71,6 +72,11 @@ public class BasicAttributeElement extends PhysicalAttributeElement implements B
 
 		this.fetchType = FetchType.valueOf(this.getAttribute(ElementConstants.ATTR_FETCH, FetchType.EAGER.name()));
 		this.optional = this.getAttribute(ElementConstants.ATTR_OPTIONAL, true);
+	}
+
+	@Override
+	public ColumnTransformerMetadata getColumnTransformer() {
+		return null;
 	}
 
 	/**
