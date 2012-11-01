@@ -24,7 +24,6 @@ import java.util.Map.Entry;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
-import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
@@ -45,7 +44,7 @@ import com.google.common.collect.Maps;
  * @author hceylan
  * @since $version
  */
-public class CriteriaUpdateImpl<T> extends CriteriaModify<T> implements CriteriaUpdate<T> {
+public class CriteriaUpdateImpl<T> extends CriteriaModify<T> {
 
 	private final Map<AbstractPath<?>, AbstractExpression<?>> updates = Maps.newHashMap();
 
@@ -131,54 +130,23 @@ public class CriteriaUpdateImpl<T> extends CriteriaModify<T> implements Criteria
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Adds the set item.
 	 * 
+	 * @param attribute
+	 *            the attribute
+	 * @param value
+	 *            the value
+	 * @return the same update criteria
+	 * @param <Y>
+	 *            the typ of the attribute
+	 * 
+	 * @since $version
+	 * @author hceylan
 	 */
-	@Override
 	public <Y> CriteriaUpdateImpl<T> set(Path<Y> attribute, Expression<? extends Y> value) {
 		this.updates.put((AbstractPath<?>) attribute, (AbstractExpression<?>) value);
 
 		return this;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public <Y, X extends Y> CriteriaUpdate<T> set(Path<Y> attribute, X value) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public <Y> CriteriaUpdate<T> set(SingularAttribute<? super T, Y> attribute, Expression<? extends Y> value) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public <Y, X extends Y> CriteriaUpdate<T> set(SingularAttribute<? super T, Y> attribute, X value) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public CriteriaUpdate<T> set(String attributeName, Object value) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/**
