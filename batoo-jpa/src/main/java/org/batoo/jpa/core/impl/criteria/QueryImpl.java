@@ -148,7 +148,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 		}
 
 		// determine if we need to expand param count for pagination
-		if ((this.maxResult != Integer.MAX_VALUE) || (this.startPosition != 0)) {
+		if (this.q.getMetamodel().getJdbcAdaptor().parameterizedPagination() && ((this.maxResult != Integer.MAX_VALUE) || (this.startPosition != 0))) {
 			final PaginationParamsOrder paginationParamsOrder = this.q.getJdbcAdaptor().getPaginationParamsOrder();
 
 			final boolean paginationHasStart = (this.startPosition != 0) || this.q.getJdbcAdaptor().paginationNeedsStartAlways();

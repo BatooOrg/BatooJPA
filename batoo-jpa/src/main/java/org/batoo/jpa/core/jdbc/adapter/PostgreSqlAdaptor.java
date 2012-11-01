@@ -100,11 +100,11 @@ public class PostgreSqlAdaptor extends JdbcAdaptor {
 	@Override
 	public String applyPagination(String sql, int startPosition, int maxResult) {
 		if (startPosition != 0) {
-			sql = sql + "\nOFFSET ? ROWS";
+			sql = sql + "\nOFFSET " + startPosition + " ROWS";
 		}
 
 		if (maxResult != Integer.MAX_VALUE) {
-			sql = sql + "\nFETCH FIRST ? ROWS ONLY";
+			sql = sql + "\nFETCH FIRST " + maxResult + " ROWS ONLY";
 		}
 
 		return sql;
@@ -274,6 +274,15 @@ public class PostgreSqlAdaptor extends JdbcAdaptor {
 	 */
 	@Override
 	public boolean paginationNeedsStartAlways() {
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean parameterizedPagination() {
 		return false;
 	}
 

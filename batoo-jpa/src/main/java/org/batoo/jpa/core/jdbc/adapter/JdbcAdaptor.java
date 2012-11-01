@@ -1206,6 +1206,18 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	public abstract boolean paginationNeedsStartAlways();
 
 	/**
+	 * Returns if the paginated sql uses parameters instead of hard coded pagination variables.
+	 * 
+	 * @return true if the paginated sql uses parameters instead of hard coded pagination variables, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean parameterizedPagination() {
+		return true;
+	}
+
+	/**
 	 * Returns the schema if it is set otherwise falls back to the default schema.
 	 * 
 	 * @param schema
