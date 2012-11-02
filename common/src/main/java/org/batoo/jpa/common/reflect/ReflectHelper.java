@@ -75,6 +75,10 @@ public class ReflectHelper {
 	 * @author hceylan
 	 */
 	public static Number convertNumber(Number value, Class<?> numberType) {
+		if (value == null) {
+			return null;
+		}
+
 		if (numberType == Integer.class) {
 			return value.intValue();
 		}
