@@ -16,27 +16,24 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.parser.metadata.attribute;
-
-import javax.persistence.AccessType;
-
-import org.batoo.jpa.parser.metadata.BindableMetadata;
+package org.batoo.jpa.annotations;
 
 /**
- * The common definition of the attributes.
+ * Fetch Strategy Types for joins
  * 
- * @author hceylan
+ * @author asimarslan
  * @since $version
  */
-public interface AttributeMetadata extends BindableMetadata {
+public enum FetchStrategyType {
 
 	/**
-	 * Returns the access type of the attribute.
-	 * 
-	 * @return the access type of the attribute
-	 * 
-	 * @since $version
-	 * @author hceylan
+	 * query infers a separate select query for the association
 	 */
-	AccessType getAccess();
+	SELECT, //
+
+	/**
+	 * query infers a join fetch for the association
+	 */
+	JOIN;//
+
 }

@@ -16,27 +16,23 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.parser.metadata.attribute;
+package org.batoo.jpa.annotations;
 
-import javax.persistence.AccessType;
-
-import org.batoo.jpa.parser.metadata.BindableMetadata;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * The common definition of the attributes.
+ * the fetching strategy
  * 
- * @author hceylan
+ * @author asimarslan
  * @since $version
  */
-public interface AttributeMetadata extends BindableMetadata {
+@Target({ ElementType.METHOD, ElementType.FIELD })
+@Retention(RetentionPolicy.RUNTIME)
+public @interface FetchStrategy {
 
-	/**
-	 * Returns the access type of the attribute.
-	 * 
-	 * @return the access type of the attribute
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	AccessType getAccess();
+	FetchStrategyType value();
+
 }

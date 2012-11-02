@@ -16,27 +16,77 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.parser.metadata.attribute;
+package org.batoo.jpa.core.test.fetch.strategy;
 
-import javax.persistence.AccessType;
-
-import org.batoo.jpa.parser.metadata.BindableMetadata;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 /**
- * The common definition of the attributes.
  * 
  * @author hceylan
  * @since $version
  */
-public interface AttributeMetadata extends BindableMetadata {
+@Entity
+public class Country {
+
+	@Id
+	private Integer id;
+
+	private String name;
 
 	/**
-	 * Returns the access type of the attribute.
-	 * 
-	 * @return the access type of the attribute
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Country() {
+		super();
+	}
+
+	/**
+	 * @param id
+	 *            the id
+	 * @param name
+	 *            the name
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	AccessType getAccess();
+	public Country(Integer id, String name) {
+		super();
+
+		this.id = id;
+		this.name = name;
+	}
+
+	/**
+	 * Returns the id.
+	 * 
+	 * @return the id
+	 * @since $version
+	 */
+	public Integer getId() {
+		return this.id;
+	}
+
+	/**
+	 * Returns the name.
+	 * 
+	 * @return the name
+	 * @since $version
+	 */
+	public String getName() {
+		return this.name;
+	}
+
+	/**
+	 * Sets the name.
+	 * 
+	 * @param name
+	 *            the name to set
+	 * @since $version
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
 }
