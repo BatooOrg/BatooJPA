@@ -228,6 +228,15 @@ public class HsqlAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
+	public int getInsertBatchSize() {
+		return 1;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public long getNextSequence(DataSource datasource, String sequenceName) throws SQLException {
 		return new QueryRunner(datasource) //
 		.query("CALL NEXT VALUE FOR " + sequenceName, new SingleValueHandler<Number>()).longValue();
