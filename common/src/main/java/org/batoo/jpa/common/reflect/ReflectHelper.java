@@ -348,6 +348,28 @@ public class ReflectHelper {
 	}
 
 	/**
+	 * check if the class has a field annotated with the annotation
+	 * 
+	 * @param clazz
+	 * @param annotation
+	 * @return true for annotation present on any field
+	 * 
+	 * @author asimarslan
+	 * @since $version
+	 */
+	public static boolean isAnnotationPresentOnAnyField(Class<?> clazz, Class<? extends Annotation> annotation) {
+		for (final Field field : clazz.getDeclaredFields()) {
+			// if the field is transient then skip it
+			if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers()) || ReflectHelper.getAnnotation(field, annotation) == null) {
+				continue;
+			}
+
+			return true;
+		}
+		return false;
+	}
+
+	/**
 	 * Returns if the <code>type</code> is a collection type.
 	 * <p>
 	 * Note that this method uses equality, not assignability to test.

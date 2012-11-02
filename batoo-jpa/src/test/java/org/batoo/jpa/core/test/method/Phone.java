@@ -18,8 +18,6 @@
  */
 package org.batoo.jpa.core.test.method;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -31,7 +29,7 @@ import javax.persistence.Id;
  * @since $version
  */
 @Entity
-@Access(AccessType.PROPERTY)
+// @Access(AccessType.PROPERTY)
 public class Phone {
 
 	private Integer id;
