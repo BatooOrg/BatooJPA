@@ -28,6 +28,7 @@ import javax.persistence.criteria.Path;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableBoolean;
+import org.batoo.jpa.annotations.FetchStrategyType;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
@@ -77,7 +78,10 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	private final boolean cascadesRefresh;
 	private final boolean cascadesRemove;
 	private final String mappedBy;
+
 	private final boolean removesOrphans;
+
+	private final FetchStrategyType fetchStrategy;
 
 	private CriteriaQueryImpl<Y> selectCriteria;
 
@@ -104,6 +108,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 		}
 
 		this.eager = attribute.isCollection() || (this.mappedBy == null) ? metadata.getFetchType() == FetchType.EAGER : true;
+		this.fetchStrategy = metadata.getFetchStrategy();
 
 		if (metadata instanceof OrphanableAssociationAttributeMetadata) {
 			this.removesOrphans = ((OrphanableAssociationAttributeMetadata) metadata).removesOrphans();
@@ -231,6 +236,18 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 
 		// Clause 4: fall back to attribute's column metadata
 		return (AssociationMetadata) this.getAttribute().getMetadata();
+	}
+
+	/**
+	 * Returns the Fetching strategy of the association
+	 * 
+	 * @return the Fetching strategy of the association
+	 * 
+	 * @author asimarslan
+	 * @since $version
+	 */
+	public FetchStrategyType getFetchStrategy() {
+		return this.fetchStrategy;
 	}
 
 	/**

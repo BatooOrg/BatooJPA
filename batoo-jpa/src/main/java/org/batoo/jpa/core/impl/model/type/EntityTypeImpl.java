@@ -45,6 +45,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.annotations.FetchStrategyType;
 import org.batoo.jpa.common.reflect.ConstructorAccessor;
 import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
@@ -1880,6 +1881,11 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				if ((parent != null) && //
 					(association.getInverse() == parent) && //
 					(parent.getAttribute().getPersistentAttributeType() != PersistentAttributeType.MANY_TO_ONE)) {
+					continue;
+				}
+
+				// check association's FetchStrategy
+				if (association.getFetchStrategy() != FetchStrategyType.JOIN) {
 					continue;
 				}
 
