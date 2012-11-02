@@ -353,10 +353,10 @@ public class MsSqlAdaptor extends JdbcAdaptor {
 	 */
 	@Override
 	public IdType supports(GenerationType type) {
-		if (type == GenerationType.IDENTITY) {
-			return IdType.IDENTITY;
+		if (type == GenerationType.TABLE) {
+			return IdType.TABLE;
 		}
 
-		return IdType.TABLE;
+		return IdType.IDENTITY;
 	}
 }
