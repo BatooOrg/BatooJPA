@@ -337,6 +337,18 @@
 		</pluginManagement>
 	</build>
 
+	<profiles>
+		<profile>
+			<id>benchmark</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<modules>
+				<module>benchmark</module>
+			</modules>
+		</profile>
+	</profiles>
+
 	<modules>
 		<module>common</module>
 		<module>parser</module>
@@ -345,6 +357,5 @@
 		<module>batoo-annotations</module>
 		<module>batoo-maven-plugin</module>
 		<module>community</module>
-		<module>benchmark</module>
 	</modules>
 </project>
