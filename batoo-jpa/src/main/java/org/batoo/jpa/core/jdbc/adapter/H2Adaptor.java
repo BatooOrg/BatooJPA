@@ -178,8 +178,9 @@ public class H2Adaptor extends JdbcAdaptor {
 	protected String getColumnType(AbstractColumn cd, int sqlType) {
 		switch (sqlType) {
 			case Types.BLOB:
-			case Types.CLOB:
 				return "VARBINARY(" + cd.getLength() + ")";
+			case Types.CLOB:
+				return "CLOB(" + cd.getLength() + ")";
 			case Types.VARCHAR:
 				return "VARCHAR(" + cd.getLength() + ")";
 			case Types.TIME:

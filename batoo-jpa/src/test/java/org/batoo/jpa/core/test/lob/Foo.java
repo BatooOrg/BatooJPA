@@ -58,6 +58,14 @@ public class Foo {
 		return this.blob;
 	}
 
+	/**
+	 * Returns the clob of the Foo.
+	 * 
+	 * @return the clob of the Foo
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
 	public String getClob() {
 		return this.clob;
 	}
@@ -93,8 +101,16 @@ public class Foo {
 		this.blob = blob;
 	}
 
+	/**
+	 * Sets the clob of the Foo.
+	 * 
+	 * @param clob
+	 *            the clob to set for Foo
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
 	public void setClob(String clob) {
 		this.clob = clob;
 	}
-
 }
