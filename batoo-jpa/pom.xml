@@ -227,19 +227,16 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.21</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>9.1-901-1.jdbc4</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
-			<version>1.8.0.10</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -273,7 +270,6 @@
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
-			<version>2.2.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -291,5 +287,6 @@
 			<artifactId>commons-beanutils</artifactId>
 			<scope>test</scope>
 		</dependency>
+		
 	</dependencies>
 </project>
