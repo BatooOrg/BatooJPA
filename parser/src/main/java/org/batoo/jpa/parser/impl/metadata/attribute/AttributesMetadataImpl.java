@@ -194,24 +194,25 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	private static final BLogger LOG = BLoggerFactory.getLogger(AttributesMetadataImpl.class);
 
 	private final ManagedTypeMetadata parent;
-	private final AttributesMetadata metadata;
 
+	private final AttributesMetadata metadata;
 	private final List<TransientAttributeMetadata> transients;
 	private final List<IdAttributeMetadata> ids;
 	private final List<EmbeddedIdAttributeMetadata> embeddedIds;
 	private final List<BasicAttributeMetadata> basics;
+
 	private final List<VersionAttributeMetadata> versions;
 
 	private final List<EmbeddedAttributeMetadata> embeddeds;
 
 	private final List<ElementCollectionAttributeMetadata> elementCollections;
-
 	private final List<OneToOneAttributeMetadata> oneToOnes;
 	private final List<OneToManyAttributeMetadata> oneToManies;
 	private final List<ManyToOneAttributeMetadata> manyToOnes;
-	private final List<ManyToManyAttributeMetadata> manyToManies;
 
+	private final List<ManyToManyAttributeMetadata> manyToManies;
 	private final Map<String, AttributeMetadata> ormAttributeMap = Maps.newHashMap();
+
 	private final Map<String, Member> memberMap = Maps.newHashMap();
 
 	/**

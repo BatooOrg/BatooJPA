@@ -23,7 +23,9 @@ import java.util.Set;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.Id;
 
+import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.impl.metadata.JavaLocator;
 import org.batoo.jpa.parser.impl.metadata.attribute.AttributesMetadataImpl;
@@ -101,7 +103,8 @@ public abstract class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
 			return access.value();
 		}
 
-		return AccessType.FIELD;
+		// check Id annotation is on Field or Property
+		return ReflectHelper.isAnnotationPresentOnAnyField(this.clazz, Id.class) ? AccessType.FIELD : AccessType.PROPERTY;
 	}
 
 	/**
