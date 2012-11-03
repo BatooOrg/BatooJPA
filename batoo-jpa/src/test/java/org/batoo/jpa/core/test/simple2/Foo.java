@@ -38,7 +38,7 @@ public class Foo {
 
 	// TODO enable BigInteger when it was fixed
 
-	private enum E {
+	public enum E {
 		ONE,
 		TWO;
 	}

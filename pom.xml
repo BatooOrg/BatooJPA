@@ -237,6 +237,17 @@
 				<version>2.2.2</version>
 			</dependency>
 			<dependency>
+				<groupId>com.mysema.querydsl</groupId>
+				<artifactId>querydsl-jpa</artifactId>
+				<version>2.8.1</version>
+			</dependency>
+			<dependency>
+			  <groupId>com.mysema.querydsl</groupId>
+			  <artifactId>querydsl-apt</artifactId>
+			  <version>2.8.1</version>
+			</dependency>
+
+			<dependency>
 				<groupId>hsqldb</groupId>
 				<artifactId>hsqldb</artifactId>
 				<version>1.8.0.10</version>
