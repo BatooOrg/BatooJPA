@@ -85,9 +85,19 @@ public interface BJPASettings {
 	Integer DEFAULT_STATEMENT_CACHE_SIZE = 50;
 
 	/**
+	 * The default for {@value #MAX_FETCH_JOIN_DEPTH} that is 1.
+	 */
+	Integer DEFAULT_MAX_FETCH_JOIN_DEPTH = 1;
+
+	/**
 	 * The size of the datasource statement cache size
 	 */
 	String STATEMENT_CACHE_SIZE = "org.batoo.jdbc.statement_cache_size";
+
+	/**
+	 * The max number of fetch joins allowed.
+	 */
+	String MAX_FETCH_JOIN_DEPTH = "org.batoo.jdbc.max_fetch_join_depth";
 
 	/**
 	 * The size of the datasource statement cache size

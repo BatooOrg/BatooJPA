@@ -39,8 +39,7 @@ import javax.persistence.OrderBy;
 import javax.persistence.OrderColumn;
 import javax.persistence.TemporalType;
 
-import org.batoo.jpa.annotations.FetchStrategy;
-import org.batoo.jpa.annotations.FetchStrategyType;
+import org.batoo.jpa.annotations.FetchJoin;
 import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.parser.impl.metadata.ColumnMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.JoinColumnMetadataImpl;
@@ -64,9 +63,7 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	private String targetEntity;
 	private final Set<CascadeType> cascades;
 	private final FetchType fetchType;
-
-	private final FetchStrategyType fetchStrategy;
-
+	private final int maxFetchDepth;
 	private final JoinTableMetadata joinTable;
 	private final List<JoinColumnMetadata> joinColumns = Lists.newArrayList();
 
@@ -85,8 +82,9 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 		this.cascades = metadata.getCascades();
 		this.fetchType = metadata.getFetchType();
 		this.joinTable = metadata.getJoinTable();
+		this.maxFetchDepth = metadata.getMaxFetchDepth();
+
 		this.joinColumns.addAll(Lists.newArrayList(metadata.getJoinColumns()));
-		this.fetchStrategy = metadata.getFetchStrategy();
 	}
 
 	/**
@@ -117,10 +115,10 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 		final JoinColumns joinColumns = ReflectHelper.getAnnotation(member, JoinColumns.class);
 		final JoinColumn joinColumn = ReflectHelper.getAnnotation(member, JoinColumn.class);
 		final JoinTable joinTable = ReflectHelper.getAnnotation(member, JoinTable.class);
-		final FetchStrategy fetchStrategy = ReflectHelper.getAnnotation(member, FetchStrategy.class);
+		final FetchJoin fetchJoin = ReflectHelper.getAnnotation(member, FetchJoin.class);
 
-		parsed.add(FetchStrategy.class);
-		this.fetchStrategy = (fetchStrategy != null) ? fetchStrategy.value() : FetchStrategyType.JOIN;
+		parsed.add(FetchJoin.class);
+		this.maxFetchDepth = fetchJoin != null ? fetchJoin.maxDepth() : 0;
 
 		if ((joinColumns != null) && (joinColumns.value().length > 0)) {
 			parsed.add(JoinColumns.class);
@@ -162,15 +160,6 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	 * 
 	 */
 	@Override
-	public FetchStrategyType getFetchStrategy() {
-		return this.fetchStrategy;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public FetchType getFetchType() {
 		return this.fetchType;
 	}
@@ -191,6 +180,15 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	@Override
 	public JoinTableMetadata getJoinTable() {
 		return this.joinTable;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int getMaxFetchDepth() {
+		return this.maxFetchDepth;
 	}
 
 	/**

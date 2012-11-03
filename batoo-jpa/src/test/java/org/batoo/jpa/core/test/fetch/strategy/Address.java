@@ -70,7 +70,11 @@ public class Address {
 	}
 
 	/**
-	 * @return
+	 * Returns the city of the Address.
+	 * 
+	 * @return the city of the Address
+	 * 
+	 * @since $version
 	 */
 	public City getCity() {
 		return this.city;
@@ -97,7 +101,12 @@ public class Address {
 	}
 
 	/**
+	 * Sets the city of the Address.
+	 * 
 	 * @param city
+	 *            the city to set for Address
+	 * 
+	 * @since $version
 	 */
 	public void setCity(City city) {
 		this.city = city;

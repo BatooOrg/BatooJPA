@@ -105,6 +105,8 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	private final Class<?>[] updateValidators;
 	private final Class<?>[] removeValidators;
 
+	private final int maxFetchJoinDepth;
+
 	private boolean open;
 
 	/**
@@ -136,10 +138,18 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 			this.removeValidators = null;
 		}
 
+		try {
+			this.maxFetchJoinDepth = this.getProperty(BJPASettings.MAX_FETCH_JOIN_DEPTH) != null ? //
+				Integer.valueOf(((String) this.getProperty(BJPASettings.MAX_FETCH_JOIN_DEPTH))) : //
+				BJPASettings.DEFAULT_MAX_FETCH_JOIN_DEPTH;
+		}
+		catch (final Exception e) {
+			throw new IllegalArgumentException("Illegal value " + this.getProperty(BJPASettings.SQL_LOGGING) + " for " + BJPASettings.SQL_LOGGING);
+		}
+
 		this.dataSource = this.createDatasource(parser);
 
 		this.cache = new CacheImpl(this, parser.getSharedCacheMode());
-
 		this.ddlMode = this.readDdlMode();
 
 		this.jdbcAdaptor = this.createJdbcAdaptor();
@@ -552,6 +562,18 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 
 			throw new PersistenceException("Cannot parse query: " + e.getMessage(), e);
 		}
+	}
+
+	/**
+	 * Returns the global max fetch join depth.
+	 * 
+	 * @return the global max fetch join depth
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public int getMaxFetchJoinDepth() {
+		return this.maxFetchJoinDepth;
 	}
 
 	/**

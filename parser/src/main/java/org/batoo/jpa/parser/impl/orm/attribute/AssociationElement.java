@@ -25,7 +25,6 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
 
-import org.batoo.jpa.annotations.FetchStrategyType;
 import org.batoo.jpa.parser.impl.orm.CascadesElement;
 import org.batoo.jpa.parser.impl.orm.Element;
 import org.batoo.jpa.parser.impl.orm.ElementConstants;
@@ -105,15 +104,6 @@ public class AssociationElement extends AttributeElement implements AssociationA
 	 * 
 	 */
 	@Override
-	public FetchStrategyType getFetchStrategy() {
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public FetchType getFetchType() {
 		return this.fetchType;
 	}
@@ -134,6 +124,15 @@ public class AssociationElement extends AttributeElement implements AssociationA
 	@Override
 	public JoinTableMetadata getJoinTable() {
 		return this.joinTable;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int getMaxFetchDepth() {
+		return 0;
 	}
 
 	/**

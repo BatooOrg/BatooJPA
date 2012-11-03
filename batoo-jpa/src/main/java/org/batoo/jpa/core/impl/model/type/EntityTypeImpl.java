@@ -45,7 +45,6 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.annotations.FetchStrategyType;
 import org.batoo.jpa.common.reflect.ConstructorAccessor;
 import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
@@ -109,8 +108,6 @@ import com.google.common.collect.Sets;
  */
 public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements EntityType<X> {
 
-	private static final int MAX_DEPTH = 1;
-
 	private final EntityMetadata metadata;
 	private final String name;
 	private EntityTable primaryTable;
@@ -158,6 +155,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private final EntityMapping<X> entityMapping;
 
 	private final List<IndexMetadata> indexes;
+	private final int maxFetchJoinDepth;
 
 	/**
 	 * @param metamodel
@@ -180,6 +178,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		this.indexes = metadata.getIndexes();
 		this.inheritanceType = metadata.getInheritanceType();
 		this.discriminatorValue = StringUtils.isNotBlank(metadata.getDiscriminatorValue()) ? metadata.getDiscriminatorValue() : this.name;
+		this.maxFetchJoinDepth = metamodel.getEntityManagerFactory().getMaxFetchJoinDepth();
 
 		this.addAttributes(metadata);
 		this.initTables(metadata);
@@ -1854,7 +1853,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	public void prepareEagerJoins(FetchParent<?, ?> r, int depth, AssociationMapping<?, ?, ?> parent) {
-		if (depth < EntityTypeImpl.MAX_DEPTH) {
+		if (depth < this.maxFetchJoinDepth) {
 			this.prepareEagerJoins(r, depth, parent, this.entityMapping.getEagerMappings());
 		}
 	}
@@ -1884,8 +1883,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 					continue;
 				}
 
-				// check association's FetchStrategy
-				if (association.getFetchStrategy() != FetchStrategyType.JOIN) {
+				// check association's fetch strategy and max depth
+				if (association.getMaxFetchJoinDepth() > depth) {
 					continue;
 				}
 
