@@ -40,6 +40,6 @@ public class ImportTest extends BaseCoreTest {
 	public void testIndex() {
 		Assert.assertEquals(3, this.em().createQuery("select count(distinct f) from Foo f", Long.class).getSingleResult().intValue());
 
-		Assert.assertEquals(6, this.em().createQuery("select sum(f.id) from Foo f", Long.class).getSingleResult().intValue());
+		Assert.assertEquals(6, this.em().createQuery("select sum(f.id) from Foo f", Number.class).getSingleResult().intValue());
 	}
 }

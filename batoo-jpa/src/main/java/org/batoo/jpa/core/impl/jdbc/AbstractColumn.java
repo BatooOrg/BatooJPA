@@ -19,23 +19,23 @@
 package org.batoo.jpa.core.impl.jdbc;
 
 import java.io.ByteArrayInputStream;
-import java.io.CharArrayReader;
+import java.io.ByteArrayOutputStream;
 import java.io.CharArrayWriter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Connection;
-import java.sql.NClob;
 import java.util.Calendar;
 import java.util.Date;
 
 import javax.persistence.EnumType;
 import javax.persistence.PersistenceException;
 import javax.persistence.TemporalType;
+import javax.sql.rowset.serial.SerialBlob;
+import javax.sql.rowset.serial.SerialClob;
 
 import org.apache.commons.io.IOUtils;
 import org.batoo.jpa.common.reflect.ReflectHelper;
@@ -200,48 +200,25 @@ public abstract class AbstractColumn {
 		if (this.lob) {
 			try {
 				if (this.javaType == String.class) {
-					final NClob clob = connection.createNClob();
-					clob.setString(1, (String) value);
-
-					return clob;
+					return new SerialClob(((String) value).toCharArray());
 				}
 				else if (this.javaType == char[].class) {
-					final NClob clob = connection.createNClob();
-					final OutputStream os = clob.setAsciiStream(1);
-
-					try {
-						IOUtils.copy(new CharArrayReader((char[]) value), os);
-					}
-					finally {
-						os.close();
-					}
-
-					return clob;
+					return new SerialClob((char[]) value);
 				}
 				else if (this.javaType == byte[].class) {
-					final Blob blob = connection.createBlob();
-					final OutputStream os = blob.setBinaryStream(1);
-
-					try {
-						IOUtils.copy(new ByteArrayInputStream((byte[]) value), os);
-					}
-					finally {
-						os.close();
-					}
-
-					return blob;
+					return new SerialBlob((byte[]) value);
 				}
 				else {
-					final Blob blob = connection.createBlob();
-					final ObjectOutputStream os = new ObjectOutputStream(blob.setBinaryStream(1));
+					ByteArrayOutputStream os = new ByteArrayOutputStream();
+					final ObjectOutputStream oos = new ObjectOutputStream(os);
 					try {
-						os.writeObject(value);
+						oos.writeObject(value);
 					}
 					finally {
-						os.close();
+						oos.close();
 					}
 
-					return blob;
+					return new SerialBlob(os.toByteArray());
 				}
 			}
 			catch (final Exception e) {
@@ -520,6 +497,9 @@ public abstract class AbstractColumn {
 						is.close();
 					}
 				}
+			}
+			else if (value instanceof String) {
+				return value;
 			}
 			else {
 				final Blob blob = (Blob) value;

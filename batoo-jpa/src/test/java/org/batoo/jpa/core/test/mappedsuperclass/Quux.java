@@ -33,7 +33,7 @@ import javax.persistence.ManyToOne;
 public class Quux {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.TABLE)
 	private Integer key;
 
 	private Integer quuxValue;

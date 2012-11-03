@@ -464,22 +464,6 @@ public abstract class BaseCoreTest { // extends BaseTest {
 			}
 		}
 
-		if ("mssql".equals(testMode)) {
-			final String username = System.getProperty("javax.persistence.jdbc.user");
-			final String password = System.getProperty("javax.persistence.jdbc.password");
-			final Connection connection = DriverManager.getConnection(System.getProperty("javax.persistence.jdbc.url"), username, password);
-
-			try {
-				final QueryRunner qr = new QueryRunner(true, false);
-				qr.update(connection, "use master");
-				qr.update(connection, "drop database test");
-				qr.update(connection, "create database test");
-			}
-			finally {
-				connection.close();
-			}
-		}
-
 		if ("oracle".equals(testMode)) {
 			final String username = System.getProperty("javax.persistence.jdbc.user");
 			final String password = System.getProperty("javax.persistence.jdbc.password");
@@ -559,7 +543,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 
 		this.cleanupTx();
 
-		final QueryRunner qr = "mssql".equals(testMode) ? new QueryRunner(true, false) : new QueryRunner();
+		final QueryRunner qr = new QueryRunner();
 
 		if (this.emf != null) {
 			if ("mysql".equals(testMode)) {
@@ -585,20 +569,6 @@ public abstract class BaseCoreTest { // extends BaseTest {
 				BaseCoreTest.LOG.error(e, "Error in clean up!");
 			}
 			this.emf = null;
-		}
-
-		if ("mssql".equals(testMode)) {
-			final String username = System.getProperty("javax.persistence.jdbc.user");
-			final String password = System.getProperty("javax.persistence.jdbc.password");
-			final Connection connection = DriverManager.getConnection(System.getProperty("javax.persistence.jdbc.url"), username, password);
-			try {
-				qr.update(connection, "use master");
-				qr.update(connection, "drop database test");
-				qr.update(connection, "create database test");
-			}
-			finally {
-				connection.close();
-			}
 		}
 
 		if (StringUtils.isBlank(testMode) || "derby".equals(testMode)) {

@@ -64,6 +64,15 @@ public class DataSourceProxy implements DataSource {
 	}
 
 	/**
+	 * Closes the resource local datasource.
+	 */
+	public void close() {
+		if (this.datasource instanceof BoneCPDataSource) {
+			((BoneCPDataSource) this.datasource).close();
+		}
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */

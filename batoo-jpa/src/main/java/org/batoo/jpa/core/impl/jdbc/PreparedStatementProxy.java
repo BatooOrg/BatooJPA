@@ -1027,6 +1027,16 @@ public class PreparedStatementProxy implements PreparedStatement {
 	}
 
 	/**
+	 * Sets the parameter count for the statement.
+	 * 
+	 * @param count
+	 *            the number of the parameters
+	 */
+	public void setParamCount(int count) {
+		this.parameters = new Object[count];
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */

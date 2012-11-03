@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.core.test.lob;
 
+import java.util.Arrays;
+
 import javax.persistence.EntityManager;
 
 import junit.framework.Assert;
@@ -34,6 +36,11 @@ import com.google.common.collect.Sets;
  */
 public class LobTest extends BaseCoreTest {
 
+	private static final String BLOB_DATA = "Blob Data";
+	private static final String CLOB_DATA = "Clob Data";
+	private static final String VALUE1 = "Value1";
+	private static final String VALUE2 = "Value2";
+
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with lob values
 	 * 
@@ -43,8 +50,11 @@ public class LobTest extends BaseCoreTest {
 	@Test
 	public void testLob() {
 		final Foo foo = new Foo();
-		foo.getValues().add("Value1");
-		foo.getValues().add("Value2");
+		foo.getValues().add(LobTest.VALUE1);
+		foo.getValues().add(LobTest.VALUE2);
+
+		foo.setClob(LobTest.CLOB_DATA);
+		foo.setBlob(LobTest.BLOB_DATA.getBytes());
 
 		this.persist(foo);
 
@@ -54,6 +64,8 @@ public class LobTest extends BaseCoreTest {
 
 		final Foo foo2 = this.find(Foo.class, foo.getKey());
 		Assert.assertEquals(foo.getKey(), foo2.getKey());
-		Assert.assertEquals(Sets.newHashSet("Value1", "Value2"), foo2.getValues());
+		Assert.assertEquals(Sets.newHashSet(LobTest.VALUE1, LobTest.VALUE2), foo2.getValues());
+		Assert.assertEquals(Arrays.toString(LobTest.BLOB_DATA.getBytes()), Arrays.toString(foo2.getBlob()));
+		Assert.assertEquals(LobTest.CLOB_DATA, foo2.getClob());
 	}
 }

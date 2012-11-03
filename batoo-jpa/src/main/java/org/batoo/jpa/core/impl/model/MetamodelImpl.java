@@ -340,7 +340,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @author hceylan
 	 */
 	public void dropAllTables(DataSource datasource) {
-		final Set<AbstractTable> tables = Sets.newHashSet();
+		final Set<AbstractTable> tableSet = Sets.newHashSet();
 
 		for (final EntityTypeImpl<?> entity : this.entities.values()) {
 
@@ -351,7 +351,7 @@ public class MetamodelImpl implements Metamodel {
 					continue;
 				}
 
-				tables.add(table);
+				tableSet.add(table);
 			}
 
 			// collect the join tables
@@ -363,7 +363,7 @@ public class MetamodelImpl implements Metamodel {
 					continue;
 				}
 
-				tables.add(table);
+				tableSet.add(table);
 			}
 
 			// collect the join tables
@@ -371,15 +371,15 @@ public class MetamodelImpl implements Metamodel {
 				if (!mapping.isAssociation()) {
 					final AbstractTable table = (AbstractTable) mapping.getTable();
 					if (table != null) {
-						tables.add(table);
+						tableSet.add(table);
 					}
 				}
 			}
 		}
 
 		try {
-			this.jdbcAdaptor.dropAllForeignKeys(datasource, tables);
-			this.jdbcAdaptor.dropAllTables(datasource, tables);
+			this.jdbcAdaptor.dropAllForeignKeys(datasource, tableSet);
+			this.jdbcAdaptor.dropAllTables(datasource, tableSet);
 			this.jdbcAdaptor.dropAllSequences(datasource, this.sequenceGenerators.values());
 		}
 		catch (final SQLException e) {

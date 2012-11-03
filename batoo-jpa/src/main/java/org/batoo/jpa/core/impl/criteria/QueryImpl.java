@@ -59,6 +59,7 @@ import org.batoo.jpa.core.impl.criteria.expression.AbstractParameterExpressionIm
 import org.batoo.jpa.core.impl.criteria.expression.EntityConstantExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.jdbc.PreparedStatementProxy;
 import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
@@ -466,6 +467,10 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 		}
 
 		final ParameterMetaData pmd = this.pmdBroken ? null : statement.getParameterMetaData();
+
+		if (this.pmdBroken) {
+			((PreparedStatementProxy) statement).setParamCount(parameters.length);
+		}
 
 		for (int i = 0; i < parameters.length; i++) {
 			if (parameters[i] != null) {

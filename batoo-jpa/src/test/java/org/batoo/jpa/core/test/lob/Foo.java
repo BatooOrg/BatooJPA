@@ -43,6 +43,9 @@ public class Foo {
 	@Lob
 	private final HashSet<String> values = Sets.newHashSet();
 
+	@Lob
+	private String clob;
+
 	private byte[] blob;
 
 	/**
@@ -53,6 +56,10 @@ public class Foo {
 	 */
 	public byte[] getBlob() {
 		return this.blob;
+	}
+
+	public String getClob() {
+		return this.clob;
 	}
 
 	/**
@@ -84,6 +91,10 @@ public class Foo {
 	 */
 	public void setBlob(byte[] blob) {
 		this.blob = blob;
+	}
+
+	public void setClob(String clob) {
+		this.clob = clob;
 	}
 
 }
