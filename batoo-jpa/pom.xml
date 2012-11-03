@@ -242,6 +242,11 @@
 			<version>1.8.0.10</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+    		<groupId>net.sourceforge.jtds</groupId>
+    		<artifactId>jtds</artifactId>
+    		<version>1.2.7</version>
+		</dependency>
 		<!--  Open only for testing
 		<dependency>
 			<groupId>com.microsoft.sqlserver</groupId>
@@ -249,7 +254,7 @@
 			<version>3.0</version>
 			<scope>test</scope>
 			<optional>true</optional>
-		</dependency> 
+		</dependency>
 		<dependency>
 			<groupId>com.oracle</groupId>
 			<artifactId>ojdbc16</artifactId>

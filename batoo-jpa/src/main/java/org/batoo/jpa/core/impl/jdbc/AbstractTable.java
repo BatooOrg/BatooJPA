@@ -188,18 +188,25 @@ public abstract class AbstractTable {
 			}
 		});
 
-		// prepare the parameters in the form of "? [, ?]*"
-		final String singleParamStr = "\t(" + StringUtils.repeat("?", ", ", filteredColumns.size()) + ")";
-		final String parametersStr = StringUtils.repeat(singleParamStr, ",\n", size);
+		if (columnNames.size() == 0) {
+			// TODO investigate in others with identity
+			sql = "INSERT INTO " + this.getQName() + " DEFAULT VALUES";
+		}
+		else {
 
-		final String columnNamesStr = Joiner.on(", ").join(columnNames);
+			// prepare the parameters in the form of "? [, ?]*"
+			final String singleParamStr = "\t(" + StringUtils.repeat("?", ", ", filteredColumns.size()) + ")";
+			final String parametersStr = StringUtils.repeat(singleParamStr, ",\n", size);
 
-		// INSERT INTO SCHEMA.TABLE
-		// (COL [, COL]*)
-		// VALUES (PARAM [, PARAM]*)
-		sql = "INSERT INTO " + this.getQName() //
-			+ "\n(" + columnNamesStr + ")"//
-			+ "\nVALUES\n" + parametersStr;
+			final String columnNamesStr = Joiner.on(", ").join(columnNames);
+
+			// INSERT INTO SCHEMA.TABLE
+			// (COL [, COL]*)
+			// VALUES (PARAM [, PARAM]*)
+			sql = "INSERT INTO " + this.getQName() //
+				+ "\n(" + columnNamesStr + ")"//
+				+ "\nVALUES\n" + parametersStr;
+		}
 
 		this.insertSqlMap.put(sqlKey, sql);
 		this.insertColumnsMap.put(sqlKey, insertColumns.toArray(new AbstractColumn[insertColumns.size()]));

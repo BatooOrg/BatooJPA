@@ -41,7 +41,6 @@ public class Foo {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@NotNull
 	private Integer id;
 
 	@NotNull

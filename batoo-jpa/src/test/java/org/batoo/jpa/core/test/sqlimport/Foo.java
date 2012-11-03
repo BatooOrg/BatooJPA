@@ -32,7 +32,7 @@ import javax.persistence.Id;
 public class Foo {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.TABLE)
 	private Integer id;
 
 	private String value;

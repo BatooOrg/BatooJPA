@@ -44,7 +44,7 @@ public class Foo {
 	}
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.TABLE)
 	private Integer key;
 
 	private boolean booleanValue;

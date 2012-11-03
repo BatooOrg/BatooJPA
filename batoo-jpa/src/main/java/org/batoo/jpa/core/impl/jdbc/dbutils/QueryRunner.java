@@ -70,6 +70,7 @@ public class QueryRunner {
 	public QueryRunner(boolean pmdKnownBroken, boolean hasLob) {
 		super();
 
+		this.pmdKnownBroken = pmdKnownBroken;
 		this.hasLob = hasLob;
 		this.datasource = null;
 	}
@@ -168,7 +169,7 @@ public class QueryRunner {
 				}
 			}
 			else {
-				if (this.pmd == null) {
+				if (!this.pmdKnownBroken && (this.pmd == null)) {
 					this.pmd = statement.getParameterMetaData();
 				}
 

@@ -116,10 +116,11 @@ public class MsSqlAdaptor extends JdbcAdaptor {
 		sqlStr.insert(fromIndex, "\t, ROW_NUMBER() OVER (" + orderby + ") AS ROW_NUM__INTERNAL ");
 
 		if (maxResult == Integer.MAX_VALUE) {
-			return "SELECT * FROM (\n" + sqlStr + "\n) AS PAGINATED_RESULT WHERE ROW_NUM__INTERNAL > ? ORDER BY ROW_NUM__INTERNAL";
+			return "SELECT * FROM (\n" + sqlStr + "\n) AS PAGINATED_RESULT WHERE ROW_NUM__INTERNAL > " + startPosition + " ORDER BY ROW_NUM__INTERNAL";
 		}
 
-		return "SELECT * FROM (\n" + sqlStr + ")\nAS PAGINATED_RESULT WHERE ROW_NUM__INTERNAL > ? AND ROW_NUM__INTERNAL < ? ORDER BY ROW_NUM__INTERNAL";
+		return "SELECT * FROM (\n" + sqlStr + ")\nAS PAGINATED_RESULT WHERE ROW_NUM__INTERNAL > " + startPosition + " AND ROW_NUM__INTERNAL < "
+			+ (startPosition + maxResult) + " ORDER BY ROW_NUM__INTERNAL";
 	}
 
 	/**
@@ -352,8 +353,17 @@ public class MsSqlAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
+	public boolean parameterizedPagination() {
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public IdType supports(GenerationType type) {
-		if (type == GenerationType.TABLE) {
+		if ((type == GenerationType.TABLE) || (type == GenerationType.SEQUENCE)) {
 			return IdType.TABLE;
 		}
 

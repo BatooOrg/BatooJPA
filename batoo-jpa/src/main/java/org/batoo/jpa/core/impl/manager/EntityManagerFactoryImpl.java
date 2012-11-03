@@ -87,7 +87,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	private final MetamodelImpl metamodel;
 	private final DDLMode ddlMode;
 
-	private final DataSource dataSource;
+	private final DataSourceProxy dataSource;
 
 	private final CacheImpl cache;
 
@@ -255,13 +255,11 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 		this.metamodel.stopIdGenerators();
 
 		final String dropOnClose = (String) this.getProperty(BJPASettings.DROP_ON_CLOSE);
-		if ("true".equals(dropOnClose)) {
+		if ("true".equalsIgnoreCase(dropOnClose)) {
 			this.metamodel.dropAllTables(this.dataSource);
 		}
 
-		if (this.dataSource instanceof BoneCPDataSource) {
-			((BoneCPDataSource) this.dataSource).close();
-		}
+		this.dataSource.close();
 
 		this.open = false;
 	}

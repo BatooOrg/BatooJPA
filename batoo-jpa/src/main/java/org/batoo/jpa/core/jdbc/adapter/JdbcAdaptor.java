@@ -28,6 +28,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -54,9 +55,11 @@ import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.AbstractJdbcAdaptor;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
+import org.batoo.jpa.core.impl.jdbc.CollectionTable;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinColumn;
+import org.batoo.jpa.core.impl.jdbc.JoinTable;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.model.SequenceGenerator;
@@ -566,13 +569,44 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	/**
 	 * @param datasource
 	 *            the datasource
-	 * @param tables
+	 * @param tableSet
 	 *            the foreign keys
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void dropAllForeignKeys(DataSource datasource, Set<AbstractTable> tables) {
+	public void dropAllForeignKeys(DataSource datasource, Set<AbstractTable> tableSet) {
+		AbstractTable[] tables = tableSet.toArray(new AbstractTable[tableSet.size()]);
+
+		// Order tables by dependency
+		Arrays.sort(tables, new Comparator<AbstractTable>() {
+
+			@Override
+			public int compare(AbstractTable o1, AbstractTable o2) {
+				if ((o1 instanceof JoinTable) || (o1 instanceof CollectionTable)) {
+					return -1;
+				}
+
+				if ((o2 instanceof JoinTable) || (o2 instanceof CollectionTable)) {
+					return 1;
+				}
+
+				for (ForeignKey key : o1.getForeignKeys()) {
+					if (key.getReferencedTableQName().equals(o2.getQName())) {
+						return -1;
+					}
+				}
+
+				for (ForeignKey key : o2.getForeignKeys()) {
+					if (key.getReferencedTableQName().equals(o2.getQName())) {
+						return 1;
+					}
+				}
+
+				return 0;
+			}
+		});
+
 		for (final AbstractTable table : tables) {
 			JdbcTable tableMetadata = null;
 			try {
@@ -1146,7 +1180,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @author hceylan
 	 */
 	public boolean isPmdBroken() {
-		return false;
+		return true;
 	}
 
 	private void loadReservedWords() throws MappingException {

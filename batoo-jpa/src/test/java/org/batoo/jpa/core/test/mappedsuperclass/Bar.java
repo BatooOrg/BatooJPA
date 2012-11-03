@@ -38,7 +38,7 @@ import com.google.common.collect.Lists;
 public class Bar {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.TABLE)
 	private Integer key;
 
 	private String barValue;
