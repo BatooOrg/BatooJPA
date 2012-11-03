@@ -77,7 +77,7 @@ update_item :
     state_field_path_expression Equals_Operator^ new_value;
 
 delete_statement :
-    DELETE^ aliased_qid (where_clause)?;
+    DELETE^ FROM! aliased_qid (where_clause)?;
 
 new_value options { backtrack=true; }:
     simple_arithmetic_expression

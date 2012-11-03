@@ -75,7 +75,7 @@ public class UpdateJpqlTest extends BaseCoreTest {
 
 		this.begin();
 
-		this.cu("delete Country c where c = :code").setParameter("code", UpdateJpqlTest.TR).executeUpdate();
+		this.cu("delete from Country c where c = :code").setParameter("code", UpdateJpqlTest.TR).executeUpdate();
 
 		this.commit();
 
