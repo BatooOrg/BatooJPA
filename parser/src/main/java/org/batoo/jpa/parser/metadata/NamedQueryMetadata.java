@@ -28,7 +28,7 @@ import javax.persistence.LockModeType;
  * @author hceylan
  * @since $version
  */
-public interface NamedQueryMetadata extends BindableMetadata, LocatableMatadata {
+public interface NamedQueryMetadata extends BindableMetadata {
 
 	/**
 	 * Returns the list query hints.

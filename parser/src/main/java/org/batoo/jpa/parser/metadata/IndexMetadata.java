@@ -24,7 +24,7 @@ package org.batoo.jpa.parser.metadata;
  * @author hceylan
  * @since $version
  */
-public interface IndexMetadata extends BindableMetadata, LocatableMatadata {
+public interface IndexMetadata extends BindableMetadata {
 
 	/**
 	 * Returns the list column names that make up the unique constraint.

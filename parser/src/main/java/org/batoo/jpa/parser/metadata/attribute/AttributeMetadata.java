@@ -21,7 +21,6 @@ package org.batoo.jpa.parser.metadata.attribute;
 import javax.persistence.AccessType;
 
 import org.batoo.jpa.parser.metadata.BindableMetadata;
-import org.batoo.jpa.parser.metadata.LocatableMatadata;
 
 /**
  * The common definition of the attributes.
@@ -29,7 +28,7 @@ import org.batoo.jpa.parser.metadata.LocatableMatadata;
  * @author hceylan
  * @since $version
  */
-public interface AttributeMetadata extends BindableMetadata, LocatableMatadata {
+public interface AttributeMetadata extends BindableMetadata {
 
 	/**
 	 * Returns the access type of the attribute.
