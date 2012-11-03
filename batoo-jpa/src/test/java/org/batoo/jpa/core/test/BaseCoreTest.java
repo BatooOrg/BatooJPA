@@ -578,8 +578,8 @@ public abstract class BaseCoreTest { // extends BaseTest {
 			catch (final Exception e) {}
 		}
 		else if ("pgsql".equals(testMode)) {
-			this.exec("/usr/bin/dropdb test -U postgres -h localhost");
-			this.exec("/usr/bin/createdb test -U postgres -h localhost");
+			// this.exec("/usr/bin/dropdb test -U postgres -h localhost");
+			// this.exec("/usr/bin/createdb test -U postgres -h localhost");
 		}
 
 		Thread.currentThread().setContextClassLoader(this.oldContextClassLoader);
