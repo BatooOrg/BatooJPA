@@ -24,7 +24,7 @@ package org.batoo.jpa.parser.metadata;
  * @author hceylan
  * @since $version
  */
-public interface GeneratorMetadata extends BindableMetadata, LocatableMatadata {
+public interface GeneratorMetadata extends BindableMetadata {
 
 	/**
 	 * Returns the allocation size of the generator.

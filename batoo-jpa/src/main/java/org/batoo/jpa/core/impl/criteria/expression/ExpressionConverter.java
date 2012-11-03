@@ -71,8 +71,8 @@ public abstract class ExpressionConverter<N> {
 			if (value instanceof Double) {
 				return (Double) value;
 			}
-
-			return new Double(((Number) value).doubleValue());
+			
+			return Double.valueOf(((Number) value).doubleValue());
 		}
 	};
 
@@ -87,7 +87,7 @@ public abstract class ExpressionConverter<N> {
 				return (Float) value;
 			}
 
-			return new Float(((Number) value).floatValue());
+			return Float.valueOf(((Number) value).floatValue());
 		}
 	};
 
