@@ -23,6 +23,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
 
+import org.batoo.jpa.annotations.FetchStrategyType;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 
 /**
@@ -42,6 +43,15 @@ public interface AssociationAttributeMetadata extends AttributeMetadata, Associa
 	 * @author hceylan
 	 */
 	Set<CascadeType> getCascades();
+
+	/**
+	 * Returns the fetching strategy for eager joins
+	 * 
+	 * @author asimarslan
+	 * @since $version
+	 * @return
+	 */
+	FetchStrategyType getFetchStrategy();
 
 	/**
 	 * Returns the fetch type of the association attribute.

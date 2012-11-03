@@ -25,6 +25,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
 
+import org.batoo.jpa.annotations.FetchStrategyType;
 import org.batoo.jpa.parser.impl.orm.CascadesElement;
 import org.batoo.jpa.parser.impl.orm.Element;
 import org.batoo.jpa.parser.impl.orm.ElementConstants;
@@ -68,8 +69,7 @@ public class AssociationElement extends AttributeElement implements AssociationA
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AssociationElement(ParentElement parent, Map<String, String> attributes, FetchType defaultFetchType,
-		String... expectedChildElements) {
+	public AssociationElement(ParentElement parent, Map<String, String> attributes, FetchType defaultFetchType, String... expectedChildElements) {
 		super(parent, attributes, //
 			ElementConstants.ELEMENT_CASCADE,//
 			ElementConstants.ELEMENT_JOIN_COLUMN, //
@@ -98,6 +98,15 @@ public class AssociationElement extends AttributeElement implements AssociationA
 	@Override
 	public Set<CascadeType> getCascades() {
 		return this.cascades;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public FetchStrategyType getFetchStrategy() {
+		return null;
 	}
 
 	/**
