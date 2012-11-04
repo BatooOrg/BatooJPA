@@ -114,11 +114,13 @@ public class PersistenceParserImpl implements PersistenceParser {
 	/**
 	 * @param puName
 	 *            the name of the persistence unit.
+	 * @param properties
+	 *            the properties for the entity manager
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public PersistenceParserImpl(String puName) {
+	public PersistenceParserImpl(String puName, Map<String, Object> properties) {
 		super();
 
 		this.puName = puName;
@@ -130,6 +132,12 @@ public class PersistenceParserImpl implements PersistenceParser {
 
 		for (final Property entry : puInfo.getProperties().getProperties()) {
 			this.properties.put(entry.getName(), entry.getValue());
+		}
+
+		if (properties != null) {
+			for (final Entry<String, Object> entry : properties.entrySet()) {
+				this.properties.put(entry.getKey(), entry.getValue());
+			}
 		}
 
 		this.hasValidators = (puInfo.getValidationMode() == PersistenceUnitValidationModeType.AUTO)

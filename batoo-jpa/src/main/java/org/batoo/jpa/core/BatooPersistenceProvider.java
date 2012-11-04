@@ -98,7 +98,7 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 
 		try {
 			// create the persistence parser
-			final PersistenceParser parser = new org.batoo.jpa.parser.PersistenceParserImpl(emName);
+			final PersistenceParser parser = new org.batoo.jpa.parser.PersistenceParserImpl(emName, map);
 
 			provider = parser.getProvider();
 			if ((provider == null) || BatooPersistenceProvider.PROVIDER_NAME.equals(provider)) {
