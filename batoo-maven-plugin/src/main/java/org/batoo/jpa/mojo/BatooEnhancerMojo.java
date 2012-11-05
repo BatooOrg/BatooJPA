@@ -25,9 +25,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -35,11 +34,6 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.batoo.jpa.core.impl.instance.Enhancer;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.StringUtils;
-
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 /**
  * Generates the enhanced classes.
@@ -81,7 +75,7 @@ public class BatooEnhancerMojo extends AbstractMojo {
 	/**
 	 * Comma seperated representation of includes.
 	 * 
-	 * @parameter default-value=""
+	 * @parameter default-value="**\/*.class"
 	 */
 	private String includes;
 
@@ -112,32 +106,28 @@ public class BatooEnhancerMojo extends AbstractMojo {
 			return;
 		}
 
-		final ArrayList<String> includeList = Lists.newArrayList();
-		final ArrayList<String> excludeList = Lists.newArrayList();
+		final URLClassLoader cl = this.extendRealmClasspath();
 
-		if (StringUtils.isNotBlank(this.includes)) {
-			for (final String string : Splitter.on(",").trimResults().split(this.includes)) {
-				includeList.add(string);
-			}
-		}
+		final List<File> classes = this.findEntityClassFiles();
+		final int classRootLength = this.classes.toString().length() + 1;
 
-		if (StringUtils.isNotBlank(this.excludes)) {
-			for (final String string : Splitter.on(",").trimResults().split(this.excludes)) {
-				excludeList.add(string);
-			}
-		}
-
-		final URLClassLoader cl = this.getExtendedClasspath();
-
-		final Set<Class<?>> classes = Sets.newHashSet();
-		this.findClasses(cl, classes, includeList, excludeList);
-
-		for (final Class<?> clazz : classes) {
+		for (final File classPath : classes) {
 			try {
-				System.out.println("Enhancing: " + clazz.getName());
+				final String absolutePath = classPath.getAbsolutePath();
+
+				if (absolutePath.endsWith("$Enhanced.class")) {
+					continue;
+				}
+
+				final String className = absolutePath.substring(classRootLength, absolutePath.length() - 6).replace('\\', '.').replace('/', '.');
+
+				this.getLog().info("Enhancing: " + className);
+
+				final Class<?> clazz = cl.loadClass(className);
+
 				final byte[] byteCode = Enhancer.create(clazz);
 				final String outputFile = this.classes.getAbsolutePath() + "/" + clazz.getName().replaceAll("\\.", "/") + Enhancer.SUFFIX_ENHANCED + ".class";
-				System.out.println("Writing enhanced class: " + outputFile);
+				this.getLog().info("Writing  : " + outputFile);
 
 				final FileOutputStream os = new FileOutputStream(outputFile);
 				try {
@@ -148,78 +138,35 @@ public class BatooEnhancerMojo extends AbstractMojo {
 				}
 			}
 			catch (final Exception e) {
-				throw new MojoExecutionException("Enhancement failed for " + clazz.getName());
+				throw new MojoExecutionException("Enhancement failed for " + classPath.getName());
 			}
 		}
 	}
 
-	private void findClasses(URLClassLoader classPath, Set<Class<?>> classes, List<String> includeList, List<String> excludeList) throws MojoExecutionException {
-		try {
-			final Enumeration<URL> resources = classPath.getResources("");
-			while (resources.hasMoreElements()) {
-				String root = resources.nextElement().getFile();
-				if (!root.endsWith(File.separator) && !root.endsWith("/")) {
-					root = root + File.separator;
-				}
+	/**
+	 * This will prepare the current ClassLoader and add all jars and local classpaths (e.g. target/classes) needed by the OpenJPA task.
+	 * 
+	 * @return
+	 * 
+	 * @throws MojoExecutionException
+	 *             on any error inside the mojo
+	 */
+	protected URLClassLoader extendRealmClasspath() throws MojoExecutionException {
+		final List urls = new ArrayList();
 
-				int rootLength = root.length();
-
-				// decrease the length by one if we are on windows
-				if (System.getProperty("os.name").toLowerCase().indexOf("win") > -1) {
-					rootLength--;
-				}
-
-				this.findClasses(classPath, classes, includeList, excludeList, rootLength, new File(root));
+		for (final Iterator itor = this.compileClasspathElements.iterator(); itor.hasNext();) {
+			final File pathElem = new File((String) itor.next());
+			try {
+				final URL url = pathElem.toURI().toURL();
+				urls.add(url);
+				this.getLog().debug("Added classpathElement URL " + url);
+			}
+			catch (final MalformedURLException e) {
+				throw new MojoExecutionException("Error in adding the classpath " + pathElem, e);
 			}
 		}
-		catch (final MojoExecutionException e) {
-			throw e;
-		}
-		catch (final Exception e) {
-			throw new MojoExecutionException("Cannot scan the classpath", e);
-		}
-	}
 
-	private void findClasses(URLClassLoader classPath, Set<Class<?>> classes, List<String> includeList, List<String> excludeList, int rootLength, File file)
-		throws IOException, MojoExecutionException {
-		if (file.isDirectory()) {
-			for (final String child : file.list()) {
-				this.findClasses(classPath, classes, includeList, excludeList, rootLength, new File(file.getCanonicalPath() + "/" + child));
-			}
-		}
-		else {
-			String path = file.getPath();
-
-			if (path.endsWith(".class") && !path.endsWith("$Enhanced.class")) {
-				path = path.substring(rootLength, path.length() - 6).replace(File.separator, ".");
-				try {
-					final Class<?> clazz = classPath.loadClass(path);
-					if (!excludeList.isEmpty()) {
-						for (final String exclude : excludeList) {
-							if (clazz.getName().startsWith(exclude)) {
-								return;
-							}
-						}
-					}
-
-					if (includeList.isEmpty()) {
-						classes.add(clazz);
-					}
-					else {
-						for (final String include : includeList) {
-							if (clazz.getName().startsWith(include)) {
-								classes.add(clazz);
-
-								break;
-							}
-						}
-					}
-				}
-				catch (final Exception e) {
-					throw new MojoExecutionException("Cannot load class: " + path);
-				}
-			}
-		}
+		return new URLClassLoader((URL[]) urls.toArray(new URL[urls.size()]), this.getClass().getClassLoader());
 	}
 
 	/**
@@ -229,11 +176,10 @@ public class BatooEnhancerMojo extends AbstractMojo {
 	 * @throws MojoExecutionException
 	 *             if there was an error scanning class file resources.
 	 */
-	protected List findEntityClassFiles() throws MojoExecutionException {
+	private List findEntityClassFiles() throws MojoExecutionException {
 		List files = new ArrayList();
 
 		try {
-
 			files = FileUtils.getFiles(this.getEntityClasses(), this.includes, this.excludes);
 		}
 		catch (final IOException e) {
@@ -244,66 +190,12 @@ public class BatooEnhancerMojo extends AbstractMojo {
 	}
 
 	/**
-	 * Returns the list of classpath elements for the mojo.
-	 * 
-	 * @return the list of classpath elements for the mojo
-	 */
-	protected List getClasspathElements() {
-		return this.compileClasspathElements;
-	}
-
-	/**
 	 * Returns File location for the persistence classes.
 	 * 
 	 * @return File location for the persistence classes
 	 */
-	protected File getEntityClasses() {
+	private File getEntityClasses() {
 		return this.classes;
-	}
-
-	/**
-	 * Returns the extended class loader for the realm.
-	 * 
-	 * @return the extended class loader
-	 * 
-	 * @throws MojoExecutionException
-	 *             thrown if execution fails.
-	 */
-	private URLClassLoader getExtendedClasspath() throws MojoExecutionException {
-		final List urls = new ArrayList();
-
-		for (final Object path : this.getClasspathElements()) {
-			final File pathElement = new File((String) path);
-			try {
-				final URL url = pathElement.toURI().toURL();
-				urls.add(url);
-				this.getLog().debug("Added URL " + url);
-			}
-			catch (final MalformedURLException e) {
-				throw new MojoExecutionException("Cannot extend classpath realm: " + pathElement, e);
-			}
-		}
-
-		return new URLClassLoader((URL[]) urls.toArray(new URL[urls.size()]));
-	}
-
-	/**
-	 * Returns the converted file paths as array.
-	 * 
-	 * @param files
-	 *            List of files
-	 * @return the converted file paths as array
-	 */
-	protected String[] getFilePaths(List files) {
-		final String[] args = new String[files.size()];
-
-		for (int i = 0; i < files.size(); i++) {
-			final File file = (File) files.get(i);
-
-			args[i] = file.getAbsolutePath();
-		}
-
-		return args;
 	}
 
 	/**
@@ -314,7 +206,7 @@ public class BatooEnhancerMojo extends AbstractMojo {
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected boolean skipMojo() {
+	private boolean skipMojo() {
 		if (this.skip) {
 			this.getLog().info("Skiping enhancement execution");
 
