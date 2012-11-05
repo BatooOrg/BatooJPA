@@ -26,6 +26,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collection;
@@ -79,6 +81,10 @@ public class ReflectHelper {
 			return null;
 		}
 
+		if (numberType.isAssignableFrom(value.getClass())) {
+			return value;
+		}
+
 		if (numberType == Integer.class) {
 			return value.intValue();
 		}
@@ -101,6 +107,14 @@ public class ReflectHelper {
 
 		if (numberType == Double.class) {
 			return value.doubleValue();
+		}
+
+		if (numberType == BigDecimal.class) {
+			return BigDecimal.valueOf(value.doubleValue());
+		}
+
+		if (numberType == BigInteger.class) {
+			return BigInteger.valueOf(value.longValue());
 		}
 
 		throw new IllegalArgumentException(numberType + " not supported");

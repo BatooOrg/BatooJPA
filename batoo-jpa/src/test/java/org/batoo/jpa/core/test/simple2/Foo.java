@@ -36,8 +36,7 @@ import javax.persistence.Id;
 @Entity
 public class Foo {
 
-	// TODO enable BigInteger when it was fixed
-
+	@SuppressWarnings("javadoc")
 	public enum E {
 		ONE,
 		TWO;
