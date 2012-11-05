@@ -209,7 +209,7 @@ public abstract class AbstractColumn {
 					return new SerialBlob((byte[]) value);
 				}
 				else {
-					ByteArrayOutputStream os = new ByteArrayOutputStream();
+					final ByteArrayOutputStream os = new ByteArrayOutputStream();
 					final ObjectOutputStream oos = new ObjectOutputStream(os);
 					try {
 						oos.writeObject(value);
@@ -504,12 +504,22 @@ public abstract class AbstractColumn {
 			else {
 				final Blob blob = (Blob) value;
 
-				final ObjectInputStream is = new ObjectInputStream(blob.getBinaryStream());
-				try {
-					value = is.readObject();
+				if (this.javaType == byte[].class) {
+					final ByteArrayOutputStream os = new ByteArrayOutputStream();
+
+					IOUtils.copy(blob.getBinaryStream(), os);
+
+					value = os.toByteArray();
 				}
-				finally {
-					is.close();
+				else {
+
+					final ObjectInputStream is = new ObjectInputStream(blob.getBinaryStream());
+					try {
+						value = is.readObject();
+					}
+					finally {
+						is.close();
+					}
 				}
 			}
 			return value;

@@ -46,6 +46,7 @@ public class Foo {
 	@Lob
 	private String clob;
 
+	@Lob
 	private byte[] blob;
 
 	/**
