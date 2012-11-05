@@ -126,8 +126,10 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 		if (this.getTable() != null) {
 			if (!removals) {
 				final X entity = this.get(managedInstance.getInstance());
-				final Joinable[] batch = new Joinable[] { new Joinable(null, entity, 0) };
-				this.joinTable.performInsert(connection, managedInstance.getInstance(), batch, 1);
+				if (entity != null) {
+					final Joinable[] batch = new Joinable[] { new Joinable(null, entity, 0) };
+					this.joinTable.performInsert(connection, managedInstance.getInstance(), batch, 1);
+				}
 			}
 		}
 	}

@@ -222,7 +222,9 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	public void flush(Connection connection, ManagedInstance<?> managedInstance, boolean removals, boolean force) throws SQLException {
 		final Object collection = this.get(managedInstance.getInstance());
 
-		((ManagedCollection<E>) collection).flush(connection, removals, force);
+		if (collection != null) {
+			((ManagedCollection<E>) collection).flush(connection, removals, force);
+		}
 	}
 
 	/**

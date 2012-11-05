@@ -116,8 +116,7 @@ public class EmbeddedMapping<Z, X> extends ParentMapping<Z, X> implements Singul
 	 */
 	@Override
 	public void flush(Connection connection, ManagedInstance<?> managedInstance, boolean removals, boolean force) throws SQLException {
-		// TODO Auto-generated method stub
-
+		// noop
 	}
 
 	/**
