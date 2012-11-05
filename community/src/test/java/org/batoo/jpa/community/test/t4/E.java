@@ -22,9 +22,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.validation.constraints.NotNull;
 
 /**
  * 
@@ -33,15 +31,13 @@ import javax.validation.constraints.NotNull;
  * @since $version
  */
 @Entity
-public class E1 {
+public class E {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
 	@ManyToOne
-	@JoinColumn(name = "e1id", nullable = false)
-	@NotNull
 	private E2 e2;
 
 	/**
@@ -49,7 +45,7 @@ public class E1 {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public E1() {
+	public E() {
 		super();
 	}
 
@@ -60,7 +56,7 @@ public class E1 {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public E1(E2 e2) {
+	public E(E2 e2) {
 		super();
 
 		this.e2 = e2;

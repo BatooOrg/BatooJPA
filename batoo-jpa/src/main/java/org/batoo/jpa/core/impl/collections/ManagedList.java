@@ -511,11 +511,11 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	}
 
 	/**
+	 * {@inheritDoc}
 	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	private void initialize() {
+	@Override
+	public void initialize() {
 		if (!this.initialized) {
 			final ManagedInstance<?> managedInstance = this.getManagedInstance();
 
@@ -629,12 +629,14 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 */
 	@Override
 	public void refreshChildren() {
-		super.reset();
+		if (this.initialized) {
+			super.reset();
 
-		this.snapshot = null;
+			this.snapshot = null;
 
-		this.delegate.clear();
-		this.delegate.addAll(this.getMapping().loadCollection(this.getManagedInstance()));
+			this.delegate.clear();
+			this.delegate.addAll(this.getMapping().loadCollection(this.getManagedInstance()));
+		}
 	}
 
 	/**

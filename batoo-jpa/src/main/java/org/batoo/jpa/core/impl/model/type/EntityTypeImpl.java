@@ -1647,15 +1647,20 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 *            the managed instance
 	 * @param lockMode
 	 *            the lock mode
+	 * @param processed
+	 *            the set of processed instances
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void performRefresh(Connection connection, ManagedInstance<X> instance, LockModeType lockMode) {
+	public void performRefresh(Connection connection, ManagedInstance<X> instance, LockModeType lockMode, Set<Object> processed) {
 		final SessionImpl session = instance.getSession();
 
 		final QueryImpl<X> q = session.getEntityManager().createQuery(this.getCriteriaRefresh());
-		q.setLockMode(lockMode);
+
+		if (processed.size() == 0) {
+			q.setLockMode(lockMode);
+		}
 
 		final Object id = instance.getId().getId();
 
@@ -1672,7 +1677,12 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 		instance.setRefreshing(true);
 
-		q.getSingleResult();
+		try {
+			q.getSingleResult();
+		}
+		finally {
+			instance.setRefreshing(false);
+		}
 	}
 
 	/**

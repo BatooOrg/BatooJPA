@@ -47,6 +47,19 @@ public class E2 {
 	}
 
 	/**
+	 * @param e2
+	 *            the e2
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public E2(E2 e2) {
+		super();
+
+		this.id = e2.id;
+	}
+
+	/**
 	 * @param value
 	 *            the value
 	 * 

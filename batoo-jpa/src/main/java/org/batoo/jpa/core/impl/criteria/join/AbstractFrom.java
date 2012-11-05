@@ -49,6 +49,8 @@ import org.batoo.jpa.core.impl.criteria.path.ParentPath;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
+import org.batoo.jpa.core.impl.model.mapping.ElementCollectionMapping;
+import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping.MappingType;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
@@ -541,13 +543,16 @@ public abstract class AbstractFrom<Z, X> extends ParentPath<Z, X> implements Fro
 			mapping = this.entity.getRootMapping().getChild(attributeName);
 		}
 		else if (this.mapping.getMappingType() == MappingType.ELEMENT_COLLECTION) {
-			// TODO handle embeddable element collections
+			mapping = (Mapping<? super X, ?, ?>) ((ElementCollectionMapping<? super Z, ?, ?>) this.mapping).getMapping(attributeName);
+		}
+		else if (this.mapping.getMappingType() == MappingType.EMBEDDABLE) {
+			mapping = (Mapping<? super X, ?, ?>) ((EmbeddedMapping<? super Z, ?>) this.mapping).getChild(attributeName);
 		}
 
 		AbstractJoin<X, Y> join = null;
 
 		final JoinedMapping<X, ?, Y> joinedMapping = (JoinedMapping<X, ?, Y>) mapping;
-		if (joinedMapping.getMappingType() == MappingType.SINGULAR_ASSOCIATION) {
+		if ((joinedMapping.getMappingType() == MappingType.SINGULAR_ASSOCIATION) || (joinedMapping.getMappingType() == MappingType.EMBEDDABLE)) {
 			join = new SingularJoin<X, Y>(this, joinedMapping, jt);
 		}
 		else {

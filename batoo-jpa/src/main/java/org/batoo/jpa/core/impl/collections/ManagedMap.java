@@ -283,11 +283,11 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	}
 
 	/**
+	 * {@inheritDoc}
 	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	private void initialize() {
+	@Override
+	public void initialize() {
 		if (!this.initialized) {
 			if (this.getManagedInstance() == null) {
 				throw new PersistenceException("No session to initialize the collection");
@@ -380,12 +380,14 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	 */
 	@Override
 	public void refreshChildren() {
-		super.reset();
+		if (this.initialized) {
+			super.reset();
 
-		this.snapshot = null;
-		this.delegate.clear();
+			this.snapshot = null;
+			this.delegate.clear();
 
-		this.delegate.putAll(this.getMapping().<K> loadMap(this.getManagedInstance()));
+			this.delegate.putAll(this.getMapping().<K> loadMap(this.getManagedInstance()));
+		}
 	}
 
 	/**

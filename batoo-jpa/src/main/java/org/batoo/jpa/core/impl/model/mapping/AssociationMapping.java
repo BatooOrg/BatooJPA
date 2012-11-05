@@ -19,12 +19,15 @@
 package org.batoo.jpa.core.impl.model.mapping;
 
 import java.util.IdentityHashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Selection;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableBoolean;
@@ -53,6 +56,7 @@ import org.batoo.jpa.parser.metadata.attribute.MappableAssociationAttributeMetad
 import org.batoo.jpa.parser.metadata.attribute.OrphanableAssociationAttributeMetadata;
 import org.batoo.jpa.util.BatooUtils;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 /**
@@ -313,9 +317,18 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 			final EntityTypeImpl<?> type = (EntityTypeImpl<?>) this.getRoot().getType();
 			final RootImpl<?> r = q.from(type);
 			r.alias(BatooUtils.acronym(type.getName()).toLowerCase());
-			final AbstractJoin<?, Y> join = r.<Y> join(attribute.getName());
-			join.alias(BatooUtils.acronym(entity.getName()).toLowerCase());
-			q = q.select(join);
+
+			final Iterator<String> pathIterator = Splitter.on(".").split(this.getPath()).iterator();
+
+			// Drop the root part
+			pathIterator.next();
+
+			AbstractJoin<?, ?> join = null;
+			while (pathIterator.hasNext()) {
+				join = join == null ? r.<Y> join(pathIterator.next()) : join.join(pathIterator.next());
+			}
+
+			q = q.select((Selection<? extends Y>) join);
 
 			entity.prepareEagerJoins(join, 0, this);
 
@@ -447,6 +460,19 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	public abstract boolean references(Object instance, Object reference);
 
 	/**
+	 * Refreshes the association
+	 * 
+	 * @param instance
+	 *            the instance that is the owner of the association
+	 * @param processed
+	 *            the set of processed instances
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract void refresh(ManagedInstance<?> instance, Set<Object> processed);
+
+	/**
 	 * Returns the if the mapping removes orphans.
 	 * 
 	 * @return true if the mapping removes orphans, false otherwise
@@ -468,4 +494,5 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * @author hceylan
 	 */
 	public abstract void setInverse(AssociationMapping<?, ?, ?> inverse);
+
 }

@@ -24,9 +24,11 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceException;
@@ -58,6 +60,7 @@ import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * The managed instance to track entity instances.
@@ -84,7 +87,7 @@ public class ManagedInstance<X> {
 	private final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>[] idMappings;
 
 	private final HashMap<Mapping<?, ?, ?>, Object> snapshot = Maps.newHashMap();
-	private final ArrayList<String> joinsLoaded;
+	private final HashSet<String> joinsLoaded;
 	private final ArrayList<PluralMapping<?, ?, ?>> collectionsChanged;
 
 	private boolean loading;
@@ -122,7 +125,7 @@ public class ManagedInstance<X> {
 		this.lockMode = ManagedInstance.LOCK_CONTEXT.get();
 
 		this.collectionsChanged = Lists.newArrayList();
-		this.joinsLoaded = Lists.newArrayList();
+		this.joinsLoaded = Sets.newHashSet();
 
 		if (type.getRootType().hasSingleIdAttribute()) {
 			this.idMapping = type.getRootType().getIdMapping();
@@ -904,14 +907,23 @@ public class ManagedInstance<X> {
 	public void processJoinedMappings() {
 		ManagedInstance.LOG.debug("Post processing associations for instance {0}", this);
 
+		final HashSet<String> _joinsLoaded = this.joinsLoaded;
+
 		for (final PluralMapping<?, ?, ?> mapping : this.type.getMappingsPlural()) {
-			if (!this.joinsLoaded.contains(mapping.getPath())) {
+			final HashSet<String> joinsLoaded2 = _joinsLoaded;
+			if (!joinsLoaded2.contains(mapping.getPath())) {
 				if (mapping.isEager()) {
 					mapping.load(this);
 				}
 				else {
 					mapping.setLazy(this);
 				}
+			}
+		}
+
+		for (final SingularAssociationMapping<?, ?> mapping : this.type.getAssociationsSingular()) {
+			if (!_joinsLoaded.contains(mapping.getPath())) {
+				mapping.initialize(this);
 			}
 		}
 	}
@@ -925,29 +937,19 @@ public class ManagedInstance<X> {
 	 *            the connection
 	 * @param lockMode
 	 *            the lock mode
+	 * @param processed
+	 *            the set of processed instances
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void refresh(EntityManagerImpl entityManager, Connection connection, LockModeType lockMode) {
+	public void refresh(EntityManagerImpl entityManager, Connection connection, LockModeType lockMode, Set<Object> processed) {
 		ManagedInstance.LOG.debug("Refeshing instance {0}", this);
 
-		this.type.performRefresh(connection, this, lockMode);
+		this.type.performRefresh(connection, this, lockMode, processed);
 
 		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociations()) {
-			if (association instanceof PluralAssociationMapping) {
-				final PluralAssociationMapping<?, ?, ?> pluralAssociationMapping = (PluralAssociationMapping<?, ?, ?>) association;
-				pluralAssociationMapping.refreshCollection(entityManager, this);
-
-				if (pluralAssociationMapping.getOrderBy() != null) {
-					pluralAssociationMapping.sortList(this.instance);
-				}
-			}
-			else if (association.cascadesRefresh()) {
-				final Object associate = association.get(this.instance);
-
-				entityManager.refresh(associate);
-			}
+			association.refresh(this, processed);
 		}
 	}
 

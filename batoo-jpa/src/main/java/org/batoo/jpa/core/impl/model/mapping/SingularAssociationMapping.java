@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.model.mapping;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.IdentityHashMap;
+import java.util.Set;
 
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
@@ -213,6 +214,9 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 			final X child = q.getSingleResult();
 
 			final Object instance = managedInstance.getInstance();
+
+			this.set(instance, child);
+
 			if (this.getInverse() != null) {
 				final Object newParent = this.getInverse().get(child);
 				if ((newParent == null) && (newParent != this)) {
@@ -326,6 +330,19 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 	@Override
 	public boolean references(Object instance, Object reference) {
 		return this.get(instance) == reference;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void refresh(ManagedInstance<?> instance, Set<Object> processed) {
+		this.initialize(instance);
+
+		if (this.cascadesRefresh()) {
+			instance.getSession().getEntityManager().refreshImpl(instance.getInstance(), null, processed);
+		}
 	}
 
 	/**

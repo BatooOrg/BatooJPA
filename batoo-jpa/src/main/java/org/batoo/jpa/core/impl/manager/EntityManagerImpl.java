@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.CacheRetrieveMode;
 import javax.persistence.CacheStoreMode;
@@ -65,6 +66,7 @@ import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Implementation of {@link EntityManager}.
@@ -1042,22 +1044,9 @@ public class EntityManagerImpl implements EntityManager {
 	public void refresh(Object entity, LockModeType lockMode, Map<String, Object> properties) {
 		this.assertOpen();
 
-		ManagedInstance<?> instance = null;
+		this.refreshImpl(entity, lockMode, Sets.newHashSet());
 
-		if (entity instanceof EnhancedInstance) {
-			instance = ((EnhancedInstance) entity).__enhanced__$$__getManagedInstance();
-			if ((instance.getSession() == this.session) && (instance.getStatus() == Status.MANAGED)) {
-				instance.refresh(this, this.getConnection(), lockMode);
-
-				this.closeConnectionIfNecessary();
-
-				this.lock(instance, lockMode, properties);
-
-				return;
-			}
-		}
-
-		throw new IllegalArgumentException("entity is not managed");
+		this.closeConnectionIfNecessary();
 	}
 
 	/**
@@ -1067,6 +1056,45 @@ public class EntityManagerImpl implements EntityManager {
 	@Override
 	public void refresh(Object entity, Map<String, Object> properties) {
 		this.refresh(entity, LockModeType.NONE, properties);
+	}
+
+	/**
+	 * Recursive refresh implementation.
+	 * 
+	 * @param entity
+	 *            the entity to refresh
+	 * @param lockMode
+	 *            the lock mode
+	 * @param processed
+	 *            registry of processed entities
+	 * @return the managed instance
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ManagedInstance<?> refreshImpl(Object entity, LockModeType lockMode, Set<Object> processed) {
+		if (entity == null) {
+			return null;
+		}
+
+		// if already processed just return
+		if (processed.contains(entity)) {
+			return null;
+		}
+
+		if (entity instanceof EnhancedInstance) {
+			final ManagedInstance<?> instance = ((EnhancedInstance) entity).__enhanced__$$__getManagedInstance();
+
+			if ((instance.getSession() == this.session) && (instance.getStatus() == Status.MANAGED)) {
+				instance.refresh(this, this.getConnection(), lockMode, processed);
+
+				processed.add(instance);
+
+				return instance;
+			}
+		}
+
+		throw new IllegalArgumentException("entity is not managed");
 	}
 
 	/**

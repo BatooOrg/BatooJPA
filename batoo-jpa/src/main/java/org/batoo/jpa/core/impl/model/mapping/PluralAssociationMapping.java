@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.EnumType;
 import javax.persistence.TemporalType;
@@ -664,33 +665,41 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	}
 
 	/**
-	 * Refreshes the collection.
+	 * {@inheritDoc}
 	 * 
-	 * @param entityManager
-	 *            the entity manager
-	 * @param instance
-	 *            the managed instance owning the collection
-	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
-	public void refreshCollection(EntityManagerImpl entityManager, ManagedInstance<?> instance) {
-		final ManagedCollection<E> collection = (ManagedCollection<E>) this.get(instance.getInstance());
-		collection.refreshChildren();
+	public void refresh(ManagedInstance<?> instance, Set<Object> processed) {
+		if (this.isEager()) {
+			this.initialize(instance);
 
-		if (this.cascadesRefresh()) {
-			if (collection.getDelegate() instanceof List) {
-				final List<E> list = (List<E>) collection.getDelegate();
-				for (int i = 0; i < list.size(); i++) {
-					entityManager.refresh(list.get(i));
+			final ManagedCollection<E> collection = (ManagedCollection<E>) this.get(instance.getInstance());
+
+			collection.refreshChildren();
+
+			if (this.cascadesRefresh()) {
+				final EntityManagerImpl entityManager = instance.getSession().getEntityManager();
+
+				if (collection.getDelegate() instanceof List) {
+					final List<E> list = (List<E>) collection.getDelegate();
+					for (int i = 0; i < list.size(); i++) {
+						entityManager.refreshImpl(list.get(i), null, processed);
+					}
+				}
+				else {
+					for (final E child : collection.getDelegate()) {
+						entityManager.refreshImpl(child, null, processed);
+					}
 				}
 			}
-			else {
-				for (final E child : collection.getDelegate()) {
-					entityManager.refresh(child);
-				}
+
+			if (this.orderBy != null) {
+				this.sortList(instance);
 			}
+		}
+		else {
+			this.setLazy(instance);
 		}
 	}
 

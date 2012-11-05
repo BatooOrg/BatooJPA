@@ -207,6 +207,14 @@ public abstract class ManagedCollection<E> implements Serializable {
 	protected abstract Collection<E> getSnapshot();
 
 	/**
+	 * Initializes the managed collection.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public abstract void initialize();
+
+	/**
 	 * Returns if the list is initialized.
 	 * 
 	 * @return true if the list is initialized, false otherwise

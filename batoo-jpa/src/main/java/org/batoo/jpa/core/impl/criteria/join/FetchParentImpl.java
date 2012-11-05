@@ -1058,12 +1058,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			this.columns[i].setValue(instance, row.getObject(this.fields[i]));
 		}
 
-		for (int i = 0; i < this.singularJoins.size(); i++) {
-			final Object child = this.getInstance(session, this.singularJoins.get(i), row);
-			this.singularJoins.get(i).set(instance, child);
-			managedInstance.setJoinLoaded(this.singularJoins.get(i));
-		}
-
 		for (final FetchImpl<X, ?> fetch : this.fetches.values()) {
 			final JoinedMapping<? super X, ?, ?> _mapping = fetch.getMapping();
 			if (!(_mapping instanceof SingularAssociationMapping)) {

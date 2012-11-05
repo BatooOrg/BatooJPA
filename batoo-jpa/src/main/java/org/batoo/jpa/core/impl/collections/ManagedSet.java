@@ -308,11 +308,11 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	}
 
 	/**
+	 * {@inheritDoc}
 	 * 
-	 * @since $version
-	 * @author hceylan
 	 */
-	private void initialize() {
+	@Override
+	public void initialize() {
 		if (!this.initialized) {
 			if (this.getManagedInstance() == null) {
 				throw new PersistenceException("No session to initialize the collection");
@@ -373,12 +373,14 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 */
 	@Override
 	public void refreshChildren() {
-		this.reset();
+		if (this.initialized) {
+			this.reset();
 
-		this.snapshot = null;
+			this.snapshot = null;
 
-		this.delegate.clear();
-		this.delegate.addAll(this.getMapping().loadCollection(this.getManagedInstance()));
+			this.delegate.clear();
+			this.delegate.addAll(this.getMapping().loadCollection(this.getManagedInstance()));
+		}
 	}
 
 	/**
