@@ -2,6 +2,8 @@ package org.batoo.jpa.core.test.inheritence.complex;
 
 import java.util.Date;
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -75,6 +77,7 @@ public abstract class BaseEntity {
 	 * @author hceylan
 	 */
 	@Transient
+	@Access(AccessType.PROPERTY)
 	public abstract String getDisplayText();
 
 	/**

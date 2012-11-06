@@ -225,6 +225,11 @@ public abstract class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
 				}
 
 				String name = a.annotationType().getName();
+				// ignore the listener annotations
+				if (name.startsWith("javax.persistence.Post") || name.startsWith("javax.persistence.Pre")) {
+					continue;
+				}
+
 				if (name.startsWith("javax.persistence") || name.startsWith("org.batoo.jpa.annotation")) {
 					name = m.getName();
 
