@@ -16,35 +16,42 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.parser.impl.metadata.type;
+package org.batoo.jpa.core.test.accesstype;
 
-import javax.persistence.AccessType;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.metamodel.Metamodel;
 
-import org.batoo.jpa.parser.metadata.type.MappedSuperclassMetadata;
+import junit.framework.Assert;
+
+import org.batoo.jpa.core.test.BaseCoreTest;
+import org.junit.Test;
 
 /**
- * Implementation {@link MappedSuperclassMetadata}.
  * 
  * @author hceylan
  * @since $version
  */
-public class MappedSuperclassMetadataImpl extends IdentifiableMetadataImpl implements MappedSuperclassMetadata {
+public class AccessTypeTest extends BaseCoreTest {
 
 	/**
-	 * @param clazz
-	 *            the represented class
-	 * @param metadata
-	 *            the metadata
-	 * @param parentAccessType
-	 *            the parent access type
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public MappedSuperclassMetadataImpl(Class<?> clazz, MappedSuperclassMetadata metadata, AccessType parentAccessType) {
-		super(clazz, null, parentAccessType);
+	public AccessTypeTest() {
+		super();
+	}
 
-		this.getAnnotationsParsed().add(MappedSuperclass.class);
+	/**
+	 * 
+	 * Tests deployment when then there is no explicit access type set.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	public void testAccessType() {
+		final Metamodel mm = this.em().getMetamodel();
+
+		Assert.assertEquals(6, mm.getManagedTypes().size());
 	}
 }

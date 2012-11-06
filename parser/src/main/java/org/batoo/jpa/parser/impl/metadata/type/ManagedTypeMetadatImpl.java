@@ -19,17 +19,23 @@
 package org.batoo.jpa.parser.impl.metadata.type;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.PersistenceException;
 
+import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.impl.metadata.JavaLocator;
 import org.batoo.jpa.parser.impl.metadata.attribute.AttributesMetadataImpl;
 import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
 import org.batoo.jpa.parser.metadata.type.ManagedTypeMetadata;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 /**
@@ -51,16 +57,18 @@ public abstract class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
 	 *            the represented class
 	 * @param metadata
 	 *            the metadata
+	 * @param parentAccessType
+	 *            the parent access type
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedTypeMetadatImpl(Class<?> clazz, ManagedTypeMetadata metadata) {
+	public ManagedTypeMetadatImpl(Class<?> clazz, ManagedTypeMetadata metadata, AccessType parentAccessType) {
 		super();
 
 		this.clazz = clazz;
 		this.locator = new JavaLocator(clazz);
-		this.accessType = this.getAccessType(metadata);
+		this.accessType = this.getAccessType(metadata, parentAccessType);
 
 		// handle attributes
 		this.attributes = new AttributesMetadataImpl(this, clazz, metadata != null ? metadata.getAttributes() : null);
@@ -86,12 +94,14 @@ public abstract class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
 	 * 
 	 * @param metadata
 	 *            the metadata
+	 * @param parentAccessType
+	 *            the parent access type
 	 * @return the access type
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	private AccessType getAccessType(ManagedTypeMetadata metadata) {
+	private AccessType getAccessType(ManagedTypeMetadata metadata, AccessType parentAccessType) {
 		if ((metadata != null) && (metadata.getAccessType() != null)) {
 			return metadata.getAccessType();
 		}
@@ -101,7 +111,7 @@ public abstract class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
 			return access.value();
 		}
 
-		return AccessType.FIELD;
+		return this.inferAccessType(parentAccessType);
 	}
 
 	/**
@@ -153,6 +163,127 @@ public abstract class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
 	@Override
 	public final AbstractLocator getLocator() {
 		return this.locator;
+	}
+
+	/**
+	 * Infers and returns the access type based on all persistence annotations being on fields or methods and parent parent access type.
+	 * 
+	 * @param parentAccessType
+	 *            the parent access type
+	 * @return the inferred access type
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private AccessType inferAccessType(AccessType parentAccessType) {
+		boolean methodsHasAnnotations = false;
+		boolean fieldsHasAnnotations = false;
+
+		final List<String> alternated = Lists.newArrayList();
+
+		final Field[] fields = this.clazz.getDeclaredFields();
+		final Method[] methods = this.clazz.getDeclaredMethods();
+
+		// find the alternated ones with @Access
+		for (final Method m : methods) {
+			if ((m.getParameterTypes().length != 0) || (m.getReturnType() == null)) {
+				continue;
+			}
+
+			final Access access = m.getAnnotation(Access.class);
+			if (access != null) {
+				final String name = m.getName();
+				if ((m.getReturnType() == boolean.class) && name.startsWith("is")) {
+					alternated.add(StringUtils.capitalize(name.substring(2)));
+				}
+				else if (name.startsWith("get")) {
+					alternated.add(StringUtils.capitalize(name.substring(3)));
+				}
+			}
+		}
+
+		for (final Field f : fields) {
+			final Access access = f.getAnnotation(Access.class);
+
+			if (access != null) {
+				alternated.add(StringUtils.capitalize(f.getName()));
+			}
+		}
+
+		// check methods
+		for (final Method m : methods) {
+			for (final Annotation a : m.getAnnotations()) {
+				// ignore @Access(PROPERTY)
+				if (a instanceof Access) {
+					if (((Access) a).value() != AccessType.PROPERTY) {
+						continue;
+					}
+				}
+
+				if ((m.getReturnType() == null) || (m.getParameterTypes().length > 0)) {
+					continue;
+				}
+
+				String name = a.annotationType().getName();
+				if (name.startsWith("javax.persistence") || name.startsWith("org.batoo.jpa.annotation")) {
+					name = m.getName();
+
+					if ((boolean.class == m.getReturnType()) || name.startsWith("is")) {
+						name = name.substring(2);
+					}
+					else if (name.startsWith("get")) {
+						name = name.substring(3);
+					}
+
+					if (alternated.contains(StringUtils.capitalize(name))) {
+						continue;
+					}
+
+					methodsHasAnnotations = true;
+					break;
+				}
+			}
+		}
+
+		// check fields
+		for (final Field f : fields) {
+			for (final Annotation a : f.getAnnotations()) {
+				// ignore @Access(FIELD)
+				if (a instanceof Access) {
+					if (((Access) a).value() != AccessType.FIELD) {
+						continue;
+					}
+				}
+
+				final String name = a.annotationType().getName();
+				if (name.startsWith("javax.persistence") || name.startsWith("org.batoo.jpa.annotation")) {
+					if (alternated.contains(StringUtils.capitalize(f.getName()))) {
+						continue;
+					}
+
+					fieldsHasAnnotations = true;
+					break;
+				}
+			}
+		}
+
+		if (fieldsHasAnnotations && methodsHasAnnotations) {
+			throw new PersistenceException("At least one field and one method has persistence annotations: " + this.clazz.getName());
+		}
+
+		if (methodsHasAnnotations) {
+			return AccessType.PROPERTY;
+		}
+
+		if (fieldsHasAnnotations) {
+			return AccessType.FIELD;
+		}
+
+		if (parentAccessType != null) {
+			return parentAccessType;
+		}
+
+		return AccessType.FIELD;
 	}
 
 	/**

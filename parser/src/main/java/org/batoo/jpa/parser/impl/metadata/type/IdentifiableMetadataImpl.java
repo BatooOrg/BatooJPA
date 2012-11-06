@@ -21,6 +21,7 @@ package org.batoo.jpa.parser.impl.metadata.type;
 import java.util.Collections;
 import java.util.List;
 
+import javax.persistence.AccessType;
 import javax.persistence.EntityListeners;
 import javax.persistence.ExcludeDefaultListeners;
 import javax.persistence.ExcludeSuperclassListeners;
@@ -53,12 +54,14 @@ public abstract class IdentifiableMetadataImpl extends ManagedTypeMetadatImpl im
 	 *            the represented class
 	 * @param metadata
 	 *            the metadata
+	 * @param parentAccessType
+	 *            the parent access type
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public IdentifiableMetadataImpl(Class<?> clazz, IdentifiableTypeMetadata metadata) {
-		super(clazz, metadata);
+	public IdentifiableMetadataImpl(Class<?> clazz, IdentifiableTypeMetadata metadata, AccessType parentAccessType) {
+		super(clazz, metadata, parentAccessType);
 
 		this.idClass = this.handleIdClass(metadata);
 		this.excludeDefaultListeners = this.handleDefaultListeners(metadata);

@@ -21,11 +21,13 @@ package org.batoo.jpa.parser.impl.metadata;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -308,23 +310,57 @@ public class MetadataImpl implements Metadata {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void parse(ClassLoader classloader) {
-		for (final Entry<String, ManagedTypeMetadata> entry : this.entityMap.entrySet()) {
-			final String className = entry.getKey();
-			final ManagedTypeMetadata metadata = entry.getValue();
+	public void parse(final ClassLoader classloader) {
+		// sort the emanage classes by inheritence
+		final ArrayList<String> managedClasses = Lists.newArrayList(this.entityMap.keySet());
+		Collections.sort(managedClasses, new Comparator<String>() {
+
+			@Override
+			public int compare(String o1, String o2) {
+				Class<?> c1 = null, c2 = null;
+				try {
+					c1 = classloader.loadClass(o1);
+					c2 = classloader.loadClass(o2);
+				}
+				catch (final ClassNotFoundException e) {}
+
+				if (c1.isAssignableFrom(c2)) {
+					return -1;
+				}
+
+				if (c2.isAssignableFrom(c1)) {
+					return 1;
+				}
+
+				return 0;
+			}
+		});
+
+		for (final String className : managedClasses) {
+			final ManagedTypeMetadata metadata = this.entityMap.get(className);
 
 			try {
 				final Class<?> clazz = classloader.loadClass(className);
+				ManagedTypeMetadata parentMetadata = null;
+
+				Class<?> parentClass = clazz.getSuperclass();
+				while ((parentMetadata == null) && (parentClass != Object.class)) {
+					parentMetadata = this.entityMap.get(parentClass.getName());
+
+					parentClass = parentClass.getSuperclass();
+				}
+
+				final AccessType parentAccessType = parentMetadata != null ? parentMetadata.getAccessType() : null;
 
 				if (metadata == null) {
 					if (clazz.getAnnotation(Entity.class) != null) {
-						final EntityMetadataImpl entityMetadata = new EntityMetadataImpl(clazz, null);
+						final EntityMetadataImpl entityMetadata = new EntityMetadataImpl(clazz, null, parentAccessType);
 						this.entityMap.put(className, entityMetadata);
 
 						this.namedQueries.addAll(entityMetadata.getNamedQueries());
 					}
 					else if (clazz.getAnnotation(MappedSuperclass.class) != null) {
-						this.entityMap.put(className, new MappedSuperclassMetadataImpl(clazz, (MappedSuperclassMetadata) metadata));
+						this.entityMap.put(className, new MappedSuperclassMetadataImpl(clazz, (MappedSuperclassMetadata) metadata, parentAccessType));
 					}
 					else if (clazz.getAnnotation(Embeddable.class) != null) {
 						this.entityMap.put(className, new EmbeddableMetadataImpl(clazz, (EmbeddableMetadata) metadata));
@@ -335,12 +371,12 @@ public class MetadataImpl implements Metadata {
 				}
 				else {
 					if (metadata instanceof EntityMetadata) {
-						this.entityMap.put(className, new EntityMetadataImpl(clazz, (EntityMetadata) metadata));
+						this.entityMap.put(className, new EntityMetadataImpl(clazz, (EntityMetadata) metadata, parentAccessType));
 
 						this.namedQueries.addAll(((EntityMetadata) metadata).getNamedQueries());
 					}
 					else if (metadata instanceof MappedSuperclassMetadata) {
-						this.entityMap.put(className, new MappedSuperclassMetadataImpl(clazz, (MappedSuperclassMetadata) metadata));
+						this.entityMap.put(className, new MappedSuperclassMetadataImpl(clazz, (MappedSuperclassMetadata) metadata, parentAccessType));
 					}
 				}
 			}

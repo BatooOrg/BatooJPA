@@ -16,35 +16,71 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.parser.impl.metadata.type;
+package org.batoo.jpa.core.test.accesstype;
 
-import javax.persistence.AccessType;
-import javax.persistence.MappedSuperclass;
-
-import org.batoo.jpa.parser.metadata.type.MappedSuperclassMetadata;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 
 /**
- * Implementation {@link MappedSuperclassMetadata}.
+ * 
  * 
  * @author hceylan
  * @since $version
  */
-public class MappedSuperclassMetadataImpl extends IdentifiableMetadataImpl implements MappedSuperclassMetadata {
+@Entity
+public class E2 extends E {
+
+	@ManyToOne
+	private E1 e1;
+	private String s;
 
 	/**
-	 * @param clazz
-	 *            the represented class
-	 * @param metadata
-	 *            the metadata
-	 * @param parentAccessType
-	 *            the parent access type
+	 * Returns the e1 of the E2.
+	 * 
+	 * @return the e1 of the E2
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public MappedSuperclassMetadataImpl(Class<?> clazz, MappedSuperclassMetadata metadata, AccessType parentAccessType) {
-		super(clazz, null, parentAccessType);
+	public E1 getE1() {
+		return this.e1;
+	}
 
-		this.getAnnotationsParsed().add(MappedSuperclass.class);
+	/**
+	 * Returns the s of the E2.
+	 * 
+	 * @return the s of the E2
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getS() {
+		return this.s;
+	}
+
+	/**
+	 * Sets the e1 of the E2.
+	 * 
+	 * @param e1
+	 *            the e1 to set for E2
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setE1(E1 e1) {
+		this.e1 = e1;
+	}
+
+	/**
+	 * Sets the s of the E2.
+	 * 
+	 * @param s
+	 *            the s to set for E2
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setS(String s) {
+		this.s = s;
 	}
 }

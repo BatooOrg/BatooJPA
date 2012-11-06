@@ -22,6 +22,7 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.AccessType;
 import javax.persistence.AssociationOverride;
 import javax.persistence.AssociationOverrides;
 import javax.persistence.AttributeOverride;
@@ -98,12 +99,14 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 *            the represented class
 	 * @param metadata
 	 *            the metadata
+	 * @param parentAccessType
+	 *            the parent access type
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EntityMetadataImpl(Class<?> clazz, EntityMetadata metadata) {
-		super(clazz, metadata);
+	public EntityMetadataImpl(Class<?> clazz, EntityMetadata metadata, AccessType parentAccessType) {
+		super(clazz, metadata, parentAccessType);
 
 		final Set<Class<? extends Annotation>> parsed = this.getAnnotationsParsed();
 
