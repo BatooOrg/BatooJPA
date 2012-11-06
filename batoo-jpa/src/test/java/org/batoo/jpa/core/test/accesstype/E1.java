@@ -23,6 +23,7 @@ import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 
 /**
  * 
@@ -37,6 +38,8 @@ public class E1 extends E {
 	private int v2;
 	private List<E2> e2;
 
+	private String transiet;
+
 	/**
 	 * Returns the e2 of the E1.
 	 * 
@@ -48,6 +51,19 @@ public class E1 extends E {
 	@OneToMany
 	public List<E2> getE2() {
 		return this.e2;
+	}
+
+	/**
+	 * Returns the transiet of the E1.
+	 * 
+	 * @return the transiet of the E1
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Transient
+	public String getTransiet() {
+		return this.transiet;
 	}
 
 	/**
@@ -86,6 +102,19 @@ public class E1 extends E {
 	 */
 	public void setE2(List<E2> e2) {
 		this.e2 = e2;
+	}
+
+	/**
+	 * Sets the transiet of the E1.
+	 * 
+	 * @param transiet
+	 *            the transiet to set for E1
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setTransiet(String transiet) {
+		this.transiet = transiet;
 	}
 
 	/**
