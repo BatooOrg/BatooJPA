@@ -127,15 +127,6 @@ public class ElementColumn extends AbstractColumn {
 	 * 
 	 */
 	@Override
-	public String getMappingName() {
-		return this.name;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public String getName() {
 		return this.name;
 	}

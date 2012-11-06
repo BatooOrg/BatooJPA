@@ -41,7 +41,6 @@ public class JoinColumn extends AbstractColumn {
 	private AbstractTable table;
 
 	private final boolean primaryKey;
-	private String mappingName;
 	private String name;
 	private String referencedColumnName;
 
@@ -115,7 +114,6 @@ public class JoinColumn extends AbstractColumn {
 		this.referencedColumnName = referencedColumn.getName();
 		this.columnDefinition = referencedColumn.getColumnDefinition();
 		this.tableName = table.getName();
-		this.mappingName = referencedColumn.getMappingName();
 		this.name = referencedColumn.getName();
 		this.insertable = referencedColumn.isInsertable();
 		this.nullable = referencedColumn.isNullable();
@@ -177,7 +175,7 @@ public class JoinColumn extends AbstractColumn {
 
 		this.referencedColumnName = metadata.getReferencedColumnName();
 		this.columnDefinition = metadata.getColumnDefinition();
-		this.mappingName = metadata.getName();
+		this.name = jdbcAdaptor.escape(metadata.getName());
 
 		this.insertable = true;
 		this.nullable = false;
@@ -213,7 +211,6 @@ public class JoinColumn extends AbstractColumn {
 		this.referencedColumnName = referencedColumn.getName();
 		this.columnDefinition = referencedColumn.getColumnDefinition();
 		this.tableName = table.getName();
-		this.mappingName = referencedColumn.getMappingName();
 		this.name = referencedColumn.getName();
 		this.insertable = referencedColumn.isInsertable();
 		this.nullable = referencedColumn.isNullable();
@@ -254,15 +251,6 @@ public class JoinColumn extends AbstractColumn {
 	@Override
 	public Mapping<?, ?, ?> getMapping() {
 		return this.mapping;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String getMappingName() {
-		return this.mappingName;
 	}
 
 	/**
@@ -448,16 +436,14 @@ public class JoinColumn extends AbstractColumn {
 		// if attribute present then the join column belongs to an entity table
 		if (mapping != null) {
 			this.mapping = mapping;
-			this.mappingName = mapping.getName() + "_" + referencedMapping.getColumn().getName();
 			if (StringUtils.isBlank(this.name)) {
-				this.name = this.jdbcAdaptor.escape(this.mappingName);
+				this.name = this.jdbcAdaptor.escape(mapping.getName() + "_" + referencedMapping.getColumn().getName());
 			}
 		}
 		else {
 			final EntityTypeImpl<?> type = (EntityTypeImpl<?>) referencedMapping.getRoot().getType();
-			this.mappingName = type.getName() + "_" + referencedMapping.getColumn().getName();
 			if (StringUtils.isBlank(this.name)) {
-				this.name = this.jdbcAdaptor.escape(this.mappingName);
+				this.name = this.jdbcAdaptor.escape(type.getName() + "_" + referencedMapping.getColumn().getName());
 			}
 		}
 

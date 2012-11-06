@@ -86,7 +86,7 @@ public class EntityTable extends AbstractTable {
 		if (column instanceof PkColumn) {
 			final PkColumn pkColumn = (PkColumn) column;
 
-			this.pkColumns.put(pkColumn.getMappingName(), pkColumn);
+			this.pkColumns.put(pkColumn.getName(), pkColumn);
 
 			if (pkColumn.getIdType() == IdType.IDENTITY) {
 				this.identityColumn = (PkColumn) column;
@@ -95,7 +95,7 @@ public class EntityTable extends AbstractTable {
 		else if (column instanceof JoinColumn) {
 			final JoinColumn joinColumn = (JoinColumn) column;
 			if (joinColumn.isPrimaryKey()) {
-				this.pkColumns.put(column.getMappingName(), joinColumn);
+				this.pkColumns.put(column.getName(), joinColumn);
 			}
 		}
 	}

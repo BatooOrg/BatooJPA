@@ -95,15 +95,6 @@ public class OrderColumn extends AbstractColumn {
 	 * 
 	 */
 	@Override
-	public String getMappingName() {
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public String getName() {
 		return this.name;
 	}

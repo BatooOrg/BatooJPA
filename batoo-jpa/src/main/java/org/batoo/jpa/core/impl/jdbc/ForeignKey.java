@@ -341,7 +341,7 @@ public class ForeignKey {
 	}
 
 	private PrimaryKeyJoinColumnMetadata getColumnMetadata(List<PrimaryKeyJoinColumnMetadata> metadata, BasicMapping<?, ?> basicMapping) {
-		final String columnName = basicMapping.getColumn().getMappingName();
+		final String columnName = basicMapping.getColumn().getName();
 		for (final PrimaryKeyJoinColumnMetadata columnMetadata : metadata) {
 			if (columnName.equals(columnMetadata.getReferencedColumnName())) {
 				return columnMetadata;
