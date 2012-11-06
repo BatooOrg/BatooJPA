@@ -448,16 +448,22 @@ public class JoinColumn extends AbstractColumn {
 		// if attribute present then the join column belongs to an entity table
 		if (mapping != null) {
 			this.mapping = mapping;
-			this.mappingName = mapping.getName() + "_" + referencedMapping.getColumn().getName();
 			if (StringUtils.isBlank(this.name)) {
+				this.mappingName = mapping.getName() + "_" + referencedMapping.getColumn().getName();
 				this.name = this.jdbcAdaptor.escape(this.mappingName);
+			}
+			else {
+				this.mappingName = this.name;
 			}
 		}
 		else {
 			final EntityTypeImpl<?> type = (EntityTypeImpl<?>) referencedMapping.getRoot().getType();
-			this.mappingName = type.getName() + "_" + referencedMapping.getColumn().getName();
 			if (StringUtils.isBlank(this.name)) {
+				this.mappingName = type.getName() + "_" + referencedMapping.getColumn().getName();
 				this.name = this.jdbcAdaptor.escape(this.mappingName);
+			}
+			else {
+				this.mappingName = this.name;
 			}
 		}
 

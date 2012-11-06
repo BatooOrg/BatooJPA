@@ -47,7 +47,7 @@ public class Person {
 	@Column(name = "address_id", insertable = false, updatable = false)
 	private Integer addressId;
 
-	@JoinColumn(name = "address_id")
+	@JoinColumn(name = "address_id2")
 	@ManyToOne(cascade = PERSIST, fetch = LAZY)
 	private Address homeAddress; // (addressId)
 
