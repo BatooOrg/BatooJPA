@@ -429,7 +429,6 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public PredicateImpl equal(Expression<?> x, Object y) {
 		return new PredicateImpl(new ComparisonExpression(Comparison.EQUAL, x, this.createConstant(y)));
 	}

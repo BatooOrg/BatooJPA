@@ -44,9 +44,6 @@ public class Person {
 	@Column(name = "name")
 	private String name;
 
-	@Column(name = "address_id", insertable = false, updatable = false)
-	private Integer addressId;
-
 	@JoinColumn(name = "address_id")
 	@ManyToOne(cascade = PERSIST, fetch = LAZY)
 	private Address homeAddress; // (addressId)
@@ -73,13 +70,6 @@ public class Person {
 	}
 
 	/**
-	 * @return the addressId
-	 */
-	public Integer getAddressId() {
-		return this.addressId;
-	}
-
-	/**
 	 * @return the home address
 	 * 
 	 */
@@ -102,14 +92,6 @@ public class Person {
 	}
 
 	/**
-	 * @param addressId
-	 *            the addressId to set
-	 */
-	public void setAddressId(Integer addressId) {
-		this.addressId = addressId;
-	}
-
-	/**
 	 * Set the homeAddress without adding this Account instance on the passed homeAddress If you want to preserve referential integrity we
 	 * recommend to use instead the corresponding adder method provided by {@link Address}
 	 * 
@@ -118,20 +100,7 @@ public class Person {
 	 */
 	public void setHomeAddress(Address homeAddress) {
 		this.homeAddress = homeAddress;
-
-		// We set the foreign key property so it can be used by our JPA search
-		// by Example facility.
-		if (homeAddress != null) {
-			this.setAddressId(homeAddress.getId());
-		}
-		else {
-			this.setAddressId(null);
-		}
 	}
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	// many-to-one: Person.addressId ==> Address.id
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 	/**
 	 * @param id

@@ -92,7 +92,7 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public EntityManagerFactory createEntityManagerFactory(String emName, Map map) {
 		String provider;
 
