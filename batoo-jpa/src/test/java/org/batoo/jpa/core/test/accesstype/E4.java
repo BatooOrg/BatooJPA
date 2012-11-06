@@ -16,35 +16,45 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.parser.impl.metadata.type;
+package org.batoo.jpa.core.test.accesstype;
 
-import javax.persistence.AccessType;
-import javax.persistence.MappedSuperclass;
-
-import org.batoo.jpa.parser.metadata.type.MappedSuperclassMetadata;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 
 /**
- * Implementation {@link MappedSuperclassMetadata}.
+ * 
  * 
  * @author hceylan
  * @since $version
  */
-public class MappedSuperclassMetadataImpl extends IdentifiableMetadataImpl implements MappedSuperclassMetadata {
+@Entity
+public class E4 extends E {
+
+	@ManyToOne
+	private E1 e1;
 
 	/**
-	 * @param clazz
-	 *            the represented class
-	 * @param metadata
-	 *            the metadata
-	 * @param parentAccessType
-	 *            the parent access type
+	 * Returns the e1 of the E3.
+	 * 
+	 * @return the e1 of the E3
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public MappedSuperclassMetadataImpl(Class<?> clazz, MappedSuperclassMetadata metadata, AccessType parentAccessType) {
-		super(clazz, null, parentAccessType);
+	public E1 getE1() {
+		return this.e1;
+	}
 
-		this.getAnnotationsParsed().add(MappedSuperclass.class);
+	/**
+	 * Sets the e1 of the E3.
+	 * 
+	 * @param e1
+	 *            the e1 to set for E3
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setE1(E1 e1) {
+		this.e1 = e1;
 	}
 }
