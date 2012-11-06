@@ -61,7 +61,6 @@ public class DiscriminatorColumn extends AbstractColumn {
 	private final String columnDefinition;
 	private final DiscriminatorType discriminatorType;
 	private final int length;
-	private final String mappingName;
 
 	private final String name;
 
@@ -77,8 +76,7 @@ public class DiscriminatorColumn extends AbstractColumn {
 	public DiscriminatorColumn(EntityTypeImpl<?> entity, DiscriminatorColumnMetadata metadata) {
 		super(DiscriminatorColumn.getJavaType(metadata), null, null, false, metadata != null ? metadata.getLocator() : null);
 
-		this.mappingName = metadata != null ? metadata.getName() : "DTYPE";
-		this.name = entity.getMetamodel().getJdbcAdaptor().escape(this.mappingName);
+		this.name = entity.getMetamodel().getJdbcAdaptor().escape(metadata != null ? metadata.getName() : "DTYPE");
 
 		this.table = entity.getPrimaryTable();
 		this.columnDefinition = metadata != null ? metadata.getColumnDefinition() : null;
@@ -113,15 +111,6 @@ public class DiscriminatorColumn extends AbstractColumn {
 	@Override
 	public Mapping<?, ?, ?> getMapping() {
 		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String getMappingName() {
-		return this.mappingName;
 	}
 
 	/**

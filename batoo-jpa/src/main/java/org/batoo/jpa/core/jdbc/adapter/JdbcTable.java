@@ -189,7 +189,7 @@ public class JdbcTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void logNotNullExtraColumns(Set<String> columns) {
+	public void logNotNullExtraColumns(Collection<String> columns) {
 		final Set<String> nonNullColumns = Sets.newHashSet();
 
 		final Set<String> columns2 = Sets.newHashSet();

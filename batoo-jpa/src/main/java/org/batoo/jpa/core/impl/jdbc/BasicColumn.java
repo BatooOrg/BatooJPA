@@ -19,9 +19,11 @@
 package org.batoo.jpa.core.impl.jdbc;
 
 import java.sql.Connection;
+import java.util.LinkedList;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
+import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 
@@ -45,9 +47,9 @@ public class BasicColumn extends AbstractColumn {
 	private final boolean insertable;
 	private final boolean unique;
 	private final boolean updatable;
-	private final String mappingName;
 	private final BasicMapping<?, ?> mapping;
 	private final JdbcAdaptor jdbcAdaptor;
+	private LinkedList<Mapping<?, ?, ?>> readOnlyMappings;
 
 	/**
 	 * @param jdbcAdaptor
@@ -70,8 +72,8 @@ public class BasicColumn extends AbstractColumn {
 		this.mapping = mapping;
 		this.sqlType = sqlType;
 
-		this.mappingName = (metadata != null) && StringUtils.isNotBlank(metadata.getName()) ? metadata.getName() : this.mapping.getAttribute().getName();
-		this.name = this.jdbcAdaptor.escape(this.mappingName);
+		this.name = this.jdbcAdaptor.escape((metadata != null) && StringUtils.isNotBlank(metadata.getName()) ? metadata.getName()
+			: this.mapping.getAttribute().getName());
 
 		this.tableName = metadata != null ? metadata.getTable() : "";
 		this.columnDefinition = metadata != null ? metadata.getColumnDefinition() : "";
@@ -113,15 +115,6 @@ public class BasicColumn extends AbstractColumn {
 	@Override
 	public BasicMapping<?, ?> getMapping() {
 		return this.mapping;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String getMappingName() {
-		return this.mappingName;
 	}
 
 	/**
@@ -253,5 +246,11 @@ public class BasicColumn extends AbstractColumn {
 	@Override
 	public void setValue(Object instance, Object value) {
 		this.mapping.set(instance, this.convertValueForSet(value));
+
+		if (this.readOnlyMappings != null) {
+			for (final Mapping<?, ?, ?> mapping : this.readOnlyMappings) {
+				mapping.set(instance, value);
+			}
+		}
 	}
 }

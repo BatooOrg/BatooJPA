@@ -307,16 +307,6 @@ public abstract class AbstractColumn {
 	public abstract Mapping<?, ?, ?> getMapping();
 
 	/**
-	 * Returns the mapping name of the column.
-	 * 
-	 * @return the mapping name of the column
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public abstract String getMappingName();
-
-	/**
 	 * Returns the name of the column.
 	 * 
 	 * @return the name of the column

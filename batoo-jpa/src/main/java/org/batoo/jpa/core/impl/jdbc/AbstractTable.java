@@ -124,11 +124,12 @@ public abstract class AbstractTable {
 	 * @author hceylan
 	 */
 	public void addColumn(AbstractColumn column) {
-		final AbstractColumn existing = this.columns.put(column.getMappingName(), column);
+		final AbstractColumn existing = this.columns.put(column.getName(), column);
 
 		if (existing != null) {
-			throw new MappingException("Duplicate column names " + column.getMappingName() + " on table " + this.name, column.getLocator(),
-				existing.getLocator());
+			if (column.isUpdatable() || column.isInsertable()) {
+				throw new MappingException("Duplicate column names " + column.getName() + " on table " + this.name, column.getLocator(), existing.getLocator());
+			}
 		}
 	}
 
@@ -304,8 +305,14 @@ public abstract class AbstractTable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Set<String> getColumnNames() {
-		return this.columns.keySet();
+	public Collection<String> getColumnNames() {
+		return Collections2.transform(this.columns.values(), new Function<AbstractColumn, String>() {
+
+			@Override
+			public String apply(AbstractColumn input) {
+				return input.getName();
+			}
+		});
 	}
 
 	/**
