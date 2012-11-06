@@ -125,11 +125,8 @@ public abstract class AbstractTable {
 	 */
 	public void addColumn(AbstractColumn column) {
 		final AbstractColumn existing = this.columns.put(column.getName(), column);
-
 		if (existing != null) {
-			if (column.isUpdatable() || column.isInsertable()) {
-				throw new MappingException("Duplicate column names " + column.getName() + " on table " + this.name, column.getLocator(), existing.getLocator());
-			}
+			throw new MappingException("Duplicate column names " + column.getName() + " on table " + this.name, column.getLocator(), existing.getLocator());
 		}
 	}
 

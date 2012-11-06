@@ -573,39 +573,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		return id;
 	}
 
-	private Object getId(SingularAssociationMapping<?, ?> mapping, ResultSet row) throws SQLException {
-		final EntityTypeImpl<?> _entity = mapping.getType();
-		if (_entity.hasSingleIdAttribute()) {
-			final SingularMapping<?, ?> idMapping = _entity.getIdMapping();
-			if (idMapping instanceof BasicMapping) {
-				final JoinColumn joinColumn = mapping.getForeignKey().getJoinColumns().get(0);
-				final String field = this.joinFields.get(joinColumn);
-				return row.getObject(field);
-			}
-
-			final MutableBoolean allNull = new MutableBoolean(true);
-			final Object id = this.populateEmbeddedId(row, (EmbeddedMapping<?, ?>) idMapping, null, allNull);
-
-			return allNull.booleanValue() ? null : id;
-		}
-
-		final Object id = ((EmbeddableTypeImpl<?>) _entity.getIdType()).newInstance();
-		for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.entity.getIdMappings()) {
-			final BasicColumn column = pair.getFirst().getColumn();
-
-			for (final JoinColumn joinColumn : mapping.getForeignKey().getJoinColumns()) {
-				if (joinColumn.getReferencedColumnName().equals(column.getName())) {
-					final String field = this.joinFields.get(joinColumn);
-					pair.getSecond().set(id, row.getObject(field));
-
-					break;
-				}
-			}
-		}
-
-		return id;
-	}
-
 	/**
 	 * Returns the managed instance based on the id.
 	 * 
@@ -675,41 +642,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		session.put(instance);
 
 		return instance;
-	}
-
-	/**
-	 * Returns the associate either from the session or by creating a lazy instance.
-	 * 
-	 * @param session
-	 *            the session
-	 * @param mapping
-	 *            the mapping
-	 * @param row
-	 *            the row data
-	 * @return the instance
-	 * @throws SQLException
-	 *             thrown in case of an underlying SQL Error
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private Object getInstance(SessionImpl session, SingularAssociationMapping<?, ?> mapping, ResultSet row) throws SQLException {
-		final Object id = this.getId(mapping, row);
-		if (id == null) {
-			return null;
-		}
-
-		ManagedInstance instance = session.get(new ManagedId(id, mapping.getType()));
-		if (instance != null) {
-			return instance.getInstance();
-		}
-
-		final ManagedId managedId = new ManagedId(id, mapping.getType());
-		instance = mapping.getType().getManagedInstanceById(session, managedId, true);
-		session.put(instance);
-
-		return instance.getInstance();
 	}
 
 	/**

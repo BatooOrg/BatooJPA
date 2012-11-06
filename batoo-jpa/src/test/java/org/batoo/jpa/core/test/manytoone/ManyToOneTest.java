@@ -18,11 +18,9 @@
  */
 package org.batoo.jpa.core.test.manytoone;
 
-import java.lang.reflect.Field;
 import java.sql.SQLException;
 
 import javax.persistence.EntityManager;
-import javax.persistence.JoinColumn;
 import javax.sql.DataSource;
 
 import junit.framework.Assert;
@@ -30,7 +28,6 @@ import junit.framework.Assert;
 import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.jdbc.dbutils.SingleValueHandler;
 import org.batoo.jpa.core.test.BaseCoreTest;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -38,8 +35,6 @@ import org.junit.Test;
  * 
  * @since $version
  */
-@Ignore
-// TODO https://github.com/BatooOrg/BatooJPA/issues/77
 public class ManyToOneTest extends BaseCoreTest {
 
 	private Person person() {
@@ -58,27 +53,6 @@ public class ManyToOneTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
-	public void testColumnInsertUpdateFalse() {
-		final Person person = this.person();
-
-		this.persist(person);
-
-		this.commit();
-		this.close();
-
-		final Person person2 = this.find(Person.class, person.getId());
-
-		Assert.assertEquals(person.getName(), person2.getName());
-		Assert.assertNotNull(person2.getAddressId());
-	}
-
-	/**
-	 * Tests to {@link EntityManager#find(Class, Object)} person.
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@Test
 	public void testFind() {
 		final Person person = this.person();
 		this.persist(person);
@@ -88,7 +62,6 @@ public class ManyToOneTest extends BaseCoreTest {
 
 		final Person person2 = this.find(Person.class, person.getId());
 		Assert.assertEquals(person.getName(), person2.getName());
-		Assert.assertEquals(person2.getAddressId(), person2.getHomeAddress().getId());
 	}
 
 	/**
@@ -125,8 +98,6 @@ public class ManyToOneTest extends BaseCoreTest {
 		final Person person2 = this.find(Person.class, person.getId());
 
 		Assert.assertEquals(person.getName(), person2.getName());
-		Assert.assertNotNull(person2.getAddressId());
-		Assert.assertEquals(person2.getAddressId(), person2.getHomeAddress().getId());
 	}
 
 	/**
@@ -140,23 +111,6 @@ public class ManyToOneTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testJoinColumnName() throws SQLException {
-		Field f = null;
-		try {
-			f = Person.class.getDeclaredField("homeAddress");
-
-			final JoinColumn annotation = f.getAnnotation(JoinColumn.class);
-			Assert.assertEquals("address_id", annotation.name());
-
-		}
-		catch (final NoSuchFieldException e) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-		catch (final SecurityException e) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-
 		this.persist(this.person());
 
 		this.commit();
