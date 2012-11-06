@@ -1899,11 +1899,16 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 					continue;
 				}
 
+				// MAKE JOIN:
+				// depth < maxJoinDepth
+				// maxDept <= 0 and FetchStrategy = JOIN
+				// maxDept > 0 and maxDept > depth
 				final Fetch<?, Object> r2 = r.fetch(mapping.getAttribute().getName(), JoinType.LEFT);
-
 				final EntityTypeImpl<?> type = association.getType();
-
 				type.prepareEagerJoins(r2, depth + 1, association);
+
+				// MAKE SELECT
+				// NOOP
 			}
 		}
 	}

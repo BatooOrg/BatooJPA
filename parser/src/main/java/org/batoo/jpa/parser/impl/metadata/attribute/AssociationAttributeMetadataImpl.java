@@ -125,9 +125,14 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 		final FetchStrategy fetchStrategy = ReflectHelper.getAnnotation(member, FetchStrategy.class);
 
 		parsed.add(FetchStrategy.class);
-
-		this.maxFetchDepth = fetchStrategy != null ? fetchStrategy.maxDepth() : 0;
-		this.fetchStrategy = fetchStrategy != null ? fetchStrategy.strategy() : FetchStrategyType.JOIN;
+		if (fetchStrategy != null) {
+			this.maxFetchDepth = fetchStrategy.maxDepth();
+			this.fetchStrategy = fetchStrategy.strategy();
+		}
+		else {
+			this.maxFetchDepth = FetchStrategy.DEFAULT_MAX_DEPTH;
+			this.fetchStrategy = FetchStrategy.DEFAULT_STRATEGY;
+		}
 
 		if ((joinColumns != null) && (joinColumns.value().length > 0)) {
 			parsed.add(JoinColumns.class);
