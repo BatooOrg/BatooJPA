@@ -18,33 +18,41 @@
  */
 package org.batoo.jpa.core.test.accesstype;
 
-import org.batoo.jpa.core.test.BaseCoreTest;
-import org.junit.Test;
+import javax.persistence.Entity;
 
 /**
+ * 
  * 
  * @author hceylan
  * @since $version
  */
-public class AccessTypeTest extends BaseCoreTest {
+@Entity
+public class E6 extends E {
+
+	private String transiet;
 
 	/**
+	 * Returns the transiet of the E6.
+	 * 
+	 * @return the transiet of the E6
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AccessTypeTest() {
-		super();
+	public String getTransiet() {
+		return this.transiet;
 	}
 
 	/**
+	 * Sets the transiet of the E6.
 	 * 
-	 * Tests deployment when then there is no explicit access type set.
+	 * @param transiet
+	 *            the transiet to set for E6
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	@Test
-	public void testAccessType() {
+	public void setTransiet(String transiet) {
+		this.transiet = transiet;
 	}
 }

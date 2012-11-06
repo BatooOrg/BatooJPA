@@ -30,6 +30,8 @@
 		<class>org.batoo.jpa.core.test.accesstype.E3</class>
 		<class>org.batoo.jpa.core.test.accesstype.E4</class>
 		<class>org.batoo.jpa.core.test.accesstype.E5</class>
+		<class>org.batoo.jpa.core.test.accesstype.E6</class>
+		<class>org.batoo.jpa.core.test.accesstype.E7</class>
 
 		<properties>
 			<property name="org.batoo.jpa.ddl" value="DROP" />
