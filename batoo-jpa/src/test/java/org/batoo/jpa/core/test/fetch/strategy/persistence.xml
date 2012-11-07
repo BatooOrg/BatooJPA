@@ -12,6 +12,9 @@
 
 		<properties>
 			<property name="org.batoo.jpa.ddl" value="DROP" />
+			<property name="org.batoo.jdbc.max_fetch_join_depth" value="10" />
+			
+			
 		</properties>
 
 	</persistence-unit>

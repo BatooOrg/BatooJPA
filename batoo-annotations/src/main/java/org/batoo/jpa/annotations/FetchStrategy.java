@@ -34,7 +34,7 @@ import java.lang.annotation.Target;
 public @interface FetchStrategy {
 
 	public final static FetchStrategyType DEFAULT_STRATEGY = FetchStrategyType.AUTO;
-	public final static int DEFAULT_MAX_DEPTH = -1;
+	public final static int DEFAULT_MAX_DEPTH = Integer.MAX_VALUE;
 
 	/**
 	 * Returns the maximum allowed depth for the join.

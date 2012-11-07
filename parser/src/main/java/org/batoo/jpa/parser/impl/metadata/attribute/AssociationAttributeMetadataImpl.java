@@ -126,7 +126,7 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 
 		parsed.add(FetchStrategy.class);
 		if (fetchStrategy != null) {
-			this.maxFetchDepth = fetchStrategy.maxDepth();
+			this.maxFetchDepth = fetchStrategy.maxDepth() > 0 ? fetchStrategy.maxDepth() : FetchStrategy.DEFAULT_MAX_DEPTH;
 			this.fetchStrategy = fetchStrategy.strategy();
 		}
 		else {

@@ -24,7 +24,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 import org.batoo.jpa.annotations.FetchStrategy;
-import org.batoo.jpa.annotations.FetchStrategyType;
 
 /**
  * 
@@ -40,8 +39,7 @@ public class City {
 	private String name;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-	// @FetchStrategy(maxDepth = 2)
-	@FetchStrategy(strategy = FetchStrategyType.SELECT)
+	@FetchStrategy(maxDepth = 1)
 	private Country country;
 
 	/**

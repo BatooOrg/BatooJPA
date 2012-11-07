@@ -577,7 +577,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 
 			children = q.getResultList();
 			if (this.type.isCachable()) {
-
+				// FIXME why am I empty
 			}
 		}
 
