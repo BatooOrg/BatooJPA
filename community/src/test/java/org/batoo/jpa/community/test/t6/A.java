@@ -16,40 +16,39 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.community.test.t1;
+package org.batoo.jpa.community.test.t6;
 
-import java.util.HashSet;
-
-import org.batoo.jpa.community.test.BaseCoreTest;
-import org.junit.Test;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 /**
  * 
  * @author hceylan
  * @since $version
  */
-public class T1 extends BaseCoreTest {
+@Entity
+public class A implements I<String> {
+
+	private String id;
 
 	/**
-	 * Ref: http://stackoverflow.com/questions/12755380/jpa-persisting-a-unidirectional-one-to-many-relationship-fails-with-eclipselin
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Id
+	@Override
+	public String getId() {
+		return this.id;
+	}
+
+	/**
+	 * @param id
+	 *            the id to set
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	@Test
-	public void test1() {
-		this.begin();
-
-		final Service service = new Service();
-		service.setParameters(new HashSet<Parameter>());
-		service.setName("test");
-		final Parameter param = new Parameter();
-		param.setName("test");
-		service.getParameters().add(param);
-
-		this.em().persist(service);
-		this.em().flush();
-
-		this.commit();
+	public void setId(String id) {
+		this.id = id;
 	}
 }
