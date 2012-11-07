@@ -16,7 +16,9 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.community.test.t2;
+package org.batoo.jpa.community.test.t1;
+
+import java.util.HashSet;
 
 import org.batoo.jpa.community.test.BaseCoreTest;
 import org.junit.Test;
@@ -26,40 +28,28 @@ import org.junit.Test;
  * @author hceylan
  * @since $version
  */
-public class T2 extends BaseCoreTest {
+public class Test1 extends BaseCoreTest {
 
 	/**
-	 * Ref: http://stackoverflow.com/questions/12795407/jpa-how-to-select-objects-wich-has-no-multiple-attributes
+	 * Ref: http://stackoverflow.com/questions/12755380/jpa-persisting-a-unidirectional-one-to-many-relationship-fails-with-eclipselin
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
 	@Test
 	public void test1() {
-		this.cq("select ent from OpSubject_vr ent where ent.okved_id_mult is empty");
-	}
-
-	/**
-	 * Ref: http://stackoverflow.com/questions/12795407/jpa-how-to-select-objects-wich-has-no-multiple-attributes
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@Test(expected = IllegalArgumentException.class)
-	public void test2() {
 		this.begin();
 
-		this.cq("select ent from OpSubject_vr ent where ent.okved_id_mult is null");
-	}
+		final Service service = new Service();
+		service.setParameters(new HashSet<Parameter>());
+		service.setName("test");
+		final Parameter param = new Parameter();
+		param.setName("test");
+		service.getParameters().add(param);
 
-	/**
-	 * Ref: http://stackoverflow.com/questions/12795407/jpa-how-to-select-objects-wich-has-no-multiple-attributes
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@Test
-	public void test3() {
-		this.cq("select distinct ent from OpSubject_vr ent left join ent.okved_id_mult i1 where i1.code is null");
+		this.em().persist(service);
+		this.em().flush();
+
+		this.commit();
 	}
 }

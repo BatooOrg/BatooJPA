@@ -10,7 +10,7 @@ import org.junit.Test;
  * @author hceylan
  * @since $version
  */
-public class T5 extends BaseCoreTest {
+public class Test5 extends BaseCoreTest {
 
 	/**
 	 * 
