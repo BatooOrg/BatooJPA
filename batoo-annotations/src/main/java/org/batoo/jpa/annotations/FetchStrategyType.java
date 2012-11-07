@@ -34,6 +34,11 @@ public enum FetchStrategyType {
 	/**
 	 * query infers a join fetch for the association
 	 */
-	JOIN;//
+	JOIN, //
+
+	/**
+	 * maxDepth is used to decise on the type
+	 */
+	AUTO;//
 
 }

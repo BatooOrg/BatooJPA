@@ -1894,10 +1894,30 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 					continue;
 				}
 
+				// @FetchStrategy(maxDept)
+				// association.getMaxFetchJoinDepth() > depth
+
+				// @FetchStrategy(SELECT)
+				// association.getMaxFetchJoinDepth() ==-1 && association.getFetchStrategy() == FetchStrategyType.SELECT
+				// continue
+
+				// @FetchStrategy(JOIN)
+				// association.getMaxFetchJoinDepth() ==-1 && association.getFetchStrategy() == FetchStrategyType.JOIN
+
+				// @FetchStrategy(maxDept,JOIN)
+				// association.getMaxFetchJoinDepth() > 0 && association.getFetchStrategy() == FetchStrategyType.JOIN
+
+				// @FetchStrategy(maxDept,SELECT)
+				// association.getMaxFetchJoinDepth() ==-1 && association.getFetchStrategy() == FetchStrategyType.SELECT
+				// continue
+
 				// check association's fetch strategy and max depth
 				if (association.getMaxFetchJoinDepth() > depth || association.getFetchStrategy() == FetchStrategyType.SELECT) {
 					continue;
 				}
+				/*
+				 * if((association.getFetchStrategy() != FetchStrategyType.SELECT) &&// association.getMaxFetchJoinDepth() > depth && )
+				 */
 
 				// MAKE JOIN:
 				// depth < maxJoinDepth

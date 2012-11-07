@@ -33,7 +33,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface FetchStrategy {
 
-	public final static FetchStrategyType DEFAULT_STRATEGY = FetchStrategyType.SELECT;
+	public final static FetchStrategyType DEFAULT_STRATEGY = FetchStrategyType.AUTO;
 	public final static int DEFAULT_MAX_DEPTH = -1;
 
 	/**
@@ -60,6 +60,6 @@ public @interface FetchStrategy {
 	 * @author asimarslan
 	 * @since $version
 	 */
-	FetchStrategyType strategy() default FetchStrategyType.SELECT;
+	FetchStrategyType strategy() default FetchStrategyType.AUTO;
 
 }
