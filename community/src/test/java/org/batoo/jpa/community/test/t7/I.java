@@ -16,35 +16,24 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.community.test.t6;
+package org.batoo.jpa.community.test.t7;
 
-import org.batoo.jpa.community.test.BaseCoreTest;
-import org.junit.Test;
+import java.io.Serializable;
 
 /**
- * Test for the Methods defined in interfaces using generics are wrongly evaluated for their actual java / sql-type.
- * https://github.com/BatooOrg/BatooJPA/issues/78
+ * @param <IDType>
+ *            the id type
  * 
  * @author hceylan
  * @since $version
  */
-public class Test6 extends BaseCoreTest {
+public interface I<IDType extends Serializable> {
 
 	/**
+	 * @return the id
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Test6() {
-		super();
-	}
-
-	/**
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@Test
-	public void test() {
-	}
+	IDType getId();
 }

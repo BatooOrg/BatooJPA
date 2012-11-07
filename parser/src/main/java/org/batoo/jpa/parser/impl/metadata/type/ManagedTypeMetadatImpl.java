@@ -21,6 +21,7 @@ package org.batoo.jpa.parser.impl.metadata.type;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Set;
 
@@ -186,6 +187,12 @@ public abstract class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
 
 		// find the alternated ones with @Access
 		for (final Method m : methods) {
+			// skip static and private methods.
+			final int mods = m.getModifiers();
+			if (Modifier.isStatic(mods) || !Modifier.isPublic(mods) || m.isBridge() || m.isSynthetic()) {
+				continue;
+			}
+
 			if ((m.getParameterTypes().length != 0) || (m.getReturnType() == null)) {
 				continue;
 			}

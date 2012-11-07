@@ -223,7 +223,7 @@ public class ReflectHelper {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public static <A extends Annotation> A getAnnotation(Member member, Class<A> annotation) {
+	public static <A extends Annotation> A getAnnotation(final Member member, final Class<A> annotation) {
 		if (member instanceof Field) {
 			return ((Field) member).getAnnotation(annotation);
 		}
@@ -321,7 +321,7 @@ public class ReflectHelper {
 
 			// skip static and private methods.
 			final int mods = method.getModifiers();
-			if (Modifier.isStatic(mods) || !Modifier.isPublic(mods)) {
+			if (Modifier.isStatic(mods) || !Modifier.isPublic(mods) || method.isBridge() || method.isSynthetic()) {
 				continue;
 			}
 

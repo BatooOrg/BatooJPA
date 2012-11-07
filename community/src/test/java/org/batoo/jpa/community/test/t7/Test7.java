@@ -16,26 +16,27 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.community.test.t6;
+package org.batoo.jpa.community.test.t7;
 
 import org.batoo.jpa.community.test.BaseCoreTest;
 import org.junit.Test;
 
 /**
- * Test for the Methods defined in interfaces using generics are wrongly evaluated for their actual java / sql-type.
- * https://github.com/BatooOrg/BatooJPA/issues/78
+ * Test for the issue "Transient properties are not ignored".
+ * <p>
+ * https://github.com/BatooOrg/BatooJPA/issues/76
  * 
  * @author hceylan
  * @since $version
  */
-public class Test6 extends BaseCoreTest {
+public class Test7 extends BaseCoreTest {
 
 	/**
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Test6() {
+	public Test7() {
 		super();
 	}
 

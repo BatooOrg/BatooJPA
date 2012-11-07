@@ -32,6 +32,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.ResultSetHandler;
+import org.batoo.jpa.core.impl.jdbc.PreparedStatementProxy;
 
 /**
  * Executes SQL queries with pluggable strategies for handling <code>ResultSet</code>s. This class is thread safe.
@@ -155,6 +156,10 @@ public class QueryRunner {
 	 *             if a database access error occurs
 	 */
 	private void fillStatement(PreparedStatement statement, Object... params) throws SQLException {
+		if (this.pmdKnownBroken) {
+			((PreparedStatementProxy) statement).setParamCount(params.length);
+		}
+
 		for (int i = 0; i < params.length; i++) {
 			final Object param = params[i];
 			if (param != null) {
