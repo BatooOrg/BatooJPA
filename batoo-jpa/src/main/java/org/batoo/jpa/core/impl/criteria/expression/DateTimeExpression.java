@@ -114,7 +114,6 @@ public class DateTimeExpression extends AbstractExpression<Integer> {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public Integer handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
 		return (Integer) row.getObject(this.alias);
 	}

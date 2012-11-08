@@ -65,6 +65,8 @@ public class BatooUtils {
 	 *            the source collection
 	 * @param target
 	 *            the destination collection
+	 * @param <E>
+	 *            the type of the collections
 	 * 
 	 * @since $version
 	 * @author hceylan
