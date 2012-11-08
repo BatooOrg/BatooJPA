@@ -28,9 +28,12 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Lob;
 
+import org.batoo.jpa.annotations.ColumnTransformer;
 import org.batoo.jpa.annotations.Index;
 import org.batoo.jpa.common.reflect.ReflectHelper;
+import org.batoo.jpa.parser.impl.metadata.ColumnTransformerMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.IndexMetadataImpl;
+import org.batoo.jpa.parser.metadata.ColumnTransformerMetadata;
 import org.batoo.jpa.parser.metadata.IndexMetadata;
 import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
 
@@ -47,6 +50,7 @@ public class BasicAttributeMetadataImpl extends PhysicalAttributeMetadataImpl im
 	private final boolean optional;
 	private final FetchType fetchType;
 	private final IndexMetadata index;
+	private final ColumnTransformerMetadata columnTransformer;
 
 	/**
 	 * @param member
@@ -65,6 +69,7 @@ public class BasicAttributeMetadataImpl extends PhysicalAttributeMetadataImpl im
 		this.optional = metadata.isOptional();
 		this.fetchType = metadata.getFetchType();
 		this.index = metadata.getIndex();
+		this.columnTransformer = metadata.getColumnTransformer();
 	}
 
 	/**
@@ -85,18 +90,30 @@ public class BasicAttributeMetadataImpl extends PhysicalAttributeMetadataImpl im
 		final Lob lob = ReflectHelper.getAnnotation(member, Lob.class);
 		final Enumerated enumerated = ReflectHelper.getAnnotation(member, Enumerated.class);
 		final Index index = ReflectHelper.getAnnotation(member, Index.class);
+		final ColumnTransformer columnTransformer = ReflectHelper.getAnnotation(member, ColumnTransformer.class);
 
 		parsed.add(Lob.class);
 		parsed.add(Basic.class);
 		parsed.add(Enumerated.class);
 		parsed.add(Basic.class);
 		parsed.add(Index.class);
+		parsed.add(ColumnTransformer.class);
 
 		this.optional = basic != null ? basic.optional() : true;
 		this.fetchType = basic != null ? basic.fetch() : FetchType.EAGER;
 		this.lob = lob != null;
 		this.enumType = enumerated != null ? enumerated.value() : null;
 		this.index = index != null ? new IndexMetadataImpl(this.getLocator(), index, this.getName()) : null;
+		this.columnTransformer = columnTransformer != null ? new ColumnTransformerMetadataImpl(this.getLocator(), columnTransformer) : null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public ColumnTransformerMetadata getColumnTransformer() {
+		return this.columnTransformer;
 	}
 
 	/**

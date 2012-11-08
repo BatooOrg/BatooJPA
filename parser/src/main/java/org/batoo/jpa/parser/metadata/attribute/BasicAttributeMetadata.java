@@ -21,6 +21,7 @@ package org.batoo.jpa.parser.metadata.attribute;
 import javax.persistence.EnumType;
 import javax.persistence.FetchType;
 
+import org.batoo.jpa.parser.metadata.ColumnTransformerMetadata;
 import org.batoo.jpa.parser.metadata.IndexMetadata;
 
 /**
@@ -30,6 +31,16 @@ import org.batoo.jpa.parser.metadata.IndexMetadata;
  * @since $version
  */
 public interface BasicAttributeMetadata extends PhysicalAttributeMetadata {
+
+	/**
+	 * Returns the columnTransformer
+	 * 
+	 * @return columnTransformer
+	 * 
+	 * @author asimarslan
+	 * @since $version
+	 */
+	ColumnTransformerMetadata getColumnTransformer();
 
 	/**
 	 * Returns the enumType of the basic attribute.

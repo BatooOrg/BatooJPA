@@ -32,6 +32,7 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.AbstractLocator;
+import org.batoo.jpa.parser.metadata.ColumnTransformerMetadata;
 import org.batoo.jpa.parser.metadata.TableMetadata;
 import org.batoo.jpa.parser.metadata.UniqueConstraintMetadata;
 import org.batoo.jpa.util.FinalWrapper;
@@ -39,6 +40,7 @@ import org.batoo.jpa.util.FinalWrapper;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -176,6 +178,7 @@ public abstract class AbstractTable {
 			});
 
 		// prepare the names tuple in the form of "COLNAME [, COLNAME]*"
+
 		final Collection<String> columnNames = Collections2.transform(filteredColumns, new Function<AbstractColumn, String>() {
 
 			@Override
@@ -192,9 +195,24 @@ public abstract class AbstractTable {
 		}
 		else {
 
-			// prepare the parameters in the form of "? [, ?]*"
-			final String singleParamStr = "\t(" + StringUtils.repeat("?", ", ", filteredColumns.size()) + ")";
-			final String parametersStr = StringUtils.repeat(singleParamStr, ",\n", size);
+		final Collection<String> singleParams = Collections2.transform(filteredColumns, new Function<AbstractColumn, String>() {
+
+			@Override
+			public String apply(AbstractColumn input) {
+				String writeParam = null;
+				if (input instanceof BasicColumn) {
+					final ColumnTransformerMetadata columnTransformer = ((BasicColumn) input).getMapping().getAttribute().getColumnTransformer();
+					writeParam = columnTransformer != null ? columnTransformer.getWrite() : null;
+				}
+				writeParam = Strings.isNullOrEmpty(writeParam) ? "?" : writeParam;
+
+				return writeParam;
+			}
+		});
+
+		// prepare the parameters in the form of "? [, ?]*"
+		final String singleParamStr = "\t(" + Joiner.on(", ").join(singleParams) + ")";
+		final String parametersStr = StringUtils.repeat(singleParamStr, ",\n", size);
 
 			final String columnNamesStr = Joiner.on(", ").join(columnNames);
 

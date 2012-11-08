@@ -40,6 +40,7 @@ import org.batoo.jpa.core.impl.model.type.IdentifiableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
+import org.batoo.jpa.parser.metadata.ColumnTransformerMetadata;
 import org.batoo.jpa.parser.metadata.GeneratedValueMetadata;
 import org.batoo.jpa.parser.metadata.IndexMetadata;
 import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
@@ -69,6 +70,7 @@ public final class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 	private final TemporalType temporalType;
 	private final EnumType enumType;
 	private final IndexMetadata index;
+	private final ColumnTransformerMetadata columnTransformer;
 
 	/**
 	 * Constructor for version attributes.
@@ -91,6 +93,7 @@ public final class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 		this.lob = false;
 		this.enumType = null;
 		this.index = null;
+		this.columnTransformer = null;
 
 		this.type = this.getDeclaringType().getMetamodel().createBasicType(this.getJavaType());
 
@@ -132,6 +135,7 @@ public final class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 		this.type = this.getDeclaringType().getMetamodel().createBasicType(this.getJavaType());
 		this.optional = metadata.isOptional();
 		this.index = metadata.getIndex();
+		this.columnTransformer = metadata.getColumnTransformer();
 
 		if (Date.class.isAssignableFrom(this.getJavaType()) || Calendar.class.isAssignableFrom(this.getJavaType())) {
 			if (metadata.getTemporalType() == null) {
@@ -179,6 +183,7 @@ public final class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 		this.lob = false;
 		this.enumType = null;
 		this.index = null;
+		this.columnTransformer = null;
 
 		this.type = this.getDeclaringType().getMetamodel().createBasicType(this.getJavaType());
 		this.temporalType = metadata.getTemporalType();
@@ -276,9 +281,24 @@ public final class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 				id = this.getMetamodel().getNextTableValue(this.generator);
 				this.set(instance, ReflectHelper.convertNumber(id, this.getJavaType()));
 				break;
+			case MANUAL:
+				// not possible, manual already handled
+				break;
 		}
 
 		return true;
+	}
+
+	/**
+	 * Returns columnTransformer definition
+	 * 
+	 * @return the columnTransformer
+	 * 
+	 * @author asimarslan
+	 * @since $version
+	 */
+	public ColumnTransformerMetadata getColumnTransformer() {
+		return this.columnTransformer;
 	}
 
 	/**
