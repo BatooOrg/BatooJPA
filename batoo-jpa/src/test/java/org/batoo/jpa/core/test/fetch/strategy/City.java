@@ -23,7 +23,7 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
-import org.batoo.jpa.annotations.FetchJoin;
+import org.batoo.jpa.annotations.FetchStrategy;
 
 /**
  * 
@@ -39,7 +39,7 @@ public class City {
 	private String name;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-	@FetchJoin(maxDepth = 2)
+	@FetchStrategy(maxDepth = 1)
 	private Country country;
 
 	/**
@@ -55,8 +55,6 @@ public class City {
 	 *            the id
 	 * @param name
 	 *            the name
-	 * @param country
-	 *            the country
 	 * 
 	 * @since $version
 	 * @author hceylan

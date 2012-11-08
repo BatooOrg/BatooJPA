@@ -24,21 +24,20 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The annotation to specify the behavioure for fetch joins.
+ * The annotation to specify the behavior for fetch joins.
  * 
- * @author asimarslan
  * @since $version
+ * @author asimarslan
  */
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface FetchJoin {
+public @interface FetchStrategy {
+
+	public final static FetchStrategyType DEFAULT_STRATEGY = FetchStrategyType.AUTO;
+	public final static int DEFAULT_MAX_DEPTH = Integer.MAX_VALUE;
 
 	/**
 	 * Returns the maximum allowed depth for the join.
-	 * <p>
-	 * -1 denotes that the association should never be joined.
-	 * <p>
-	 * 0 denotes that the default max org.batoo.jdbc.max_fetch_join_depth setting should be used.
 	 * <p>
 	 * Any positive value denotes that the association should be fetched using join provided depth is below maxdepth.
 	 * 
@@ -47,5 +46,20 @@ public @interface FetchJoin {
 	 * @since $version
 	 * @author hceylan
 	 */
-	int maxDepth() default -1;
+	int maxDepth() default DEFAULT_MAX_DEPTH;
+
+	/**
+	 * Returns the preferred strategy for the annotated association
+	 * <p>
+	 * SELECT for a seperate query
+	 * <p>
+	 * JOIN for a left join query
+	 * 
+	 * @return the preferred strategy for the annotated association
+	 * 
+	 * @author asimarslan
+	 * @since $version
+	 */
+	FetchStrategyType strategy() default FetchStrategyType.AUTO;
+
 }
