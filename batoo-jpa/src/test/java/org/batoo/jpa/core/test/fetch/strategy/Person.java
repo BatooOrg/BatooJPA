@@ -28,6 +28,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import org.batoo.jpa.annotations.FetchStrategy;
+import org.batoo.jpa.annotations.FetchStrategyType;
+
 import com.google.common.collect.Lists;
 
 /**
@@ -43,9 +46,11 @@ public class Person {
 	private Integer id;
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "person")
+	@FetchStrategy(maxDepth = 5, strategy = FetchStrategyType.JOIN)
 	private final List<Address> addresses = Lists.newArrayList();
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "person")
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "person")
+	@FetchStrategy(strategy = FetchStrategyType.SELECT)
 	private final List<Phone> phones = Lists.newArrayList();
 
 	private String name;

@@ -45,6 +45,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.jpa.annotations.FetchStrategyType;
 import org.batoo.jpa.common.reflect.ConstructorAccessor;
 import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
@@ -1894,15 +1895,14 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				}
 
 				// check association's fetch strategy and max depth
-				if (association.getMaxFetchJoinDepth() > depth) {
+				if (association.getMaxFetchJoinDepth() < depth || association.getFetchStrategy() == FetchStrategyType.SELECT) {
 					continue;
 				}
 
 				final Fetch<?, Object> r2 = r.fetch(mapping.getAttribute().getName(), JoinType.LEFT);
-
 				final EntityTypeImpl<?> type = association.getType();
-
 				type.prepareEagerJoins(r2, depth + 1, association);
+
 			}
 		}
 	}
