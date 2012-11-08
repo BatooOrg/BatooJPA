@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.model.attribute;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
@@ -30,6 +31,7 @@ import javax.persistence.metamodel.SingularAttribute;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.jdbc.TypeFactory;
 import org.batoo.jpa.core.impl.model.AbstractGenerator;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.BasicTypeImpl;
@@ -127,7 +129,6 @@ public final class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 		this.idType = null;
 		this.generator = null;
 
-		this.lob = metadata.isLob();
 		this.type = this.getDeclaringType().getMetamodel().createBasicType(this.getJavaType());
 		this.optional = metadata.isOptional();
 		this.index = metadata.getIndex();
@@ -156,6 +157,7 @@ public final class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 			this.enumType = null;
 		}
 
+		this.lob = this.inferLobType(metadata.isLob());
 	}
 
 	/**
@@ -352,6 +354,25 @@ public final class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 	@Override
 	public BasicTypeImpl<T> getType() {
 		return this.type;
+	}
+
+	private boolean inferLobType(boolean lob) {
+		if (lob) {
+			return true;
+		}
+
+		try {
+			TypeFactory.getSqlType(this.getJavaType(), this.temporalType, this.enumType, false);
+		}
+		catch (final IllegalArgumentException e) {
+			if (Serializable.class.isAssignableFrom(this.getJavaType())) {
+				return true;
+			}
+
+			throw e;
+		}
+
+		return false;
 	}
 
 	/**

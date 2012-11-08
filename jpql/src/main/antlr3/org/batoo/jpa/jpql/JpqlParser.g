@@ -104,22 +104,9 @@ from_declaration_or_collection_member_declaration :
 from_declaration :
     faliased_qid (join)*
         -> ^(ST_FROM faliased_qid ^(LJOINS (join)*));
-join :
-    fetch_join
-    | left_join
-    | inner_join;
-
-fetch_join :
-    (LEFT)? (OUTER)? JOIN FETCH ID Period qid
-        -> ^(ST_JOIN FETCH ID qid  );
-
-left_join :
-    LEFT (OUTER)? JOIN ID Period qid AS? ID
-        -> ^(ST_JOIN LEFT ID ^(ST_ID_AS qid ID));
-
-inner_join :
-    (INNER)? JOIN ID Period qid AS? ID
-        -> ^(ST_JOIN JOIN ID ^(ST_ID_AS qid ID));
+join : 
+	((LEFT OUTER?) | INNER) JOIN FETCH? ID Period qid (AS? ID)?
+    	-> ^(ST_JOIN LEFT? INNER? ID ^(ST_ID_AS qid ID) FETCH?);
 
 collection_member_declaration :
     IN Left_Paren ID Period qid Right_Paren AS? ID?
@@ -245,6 +232,7 @@ arithmetic_primary :
 	| (Left_Paren! simple_arithmetic_expression Right_Paren!)
 	| input_parameter
 	| functions_returning_numerics
+	| functions_returning_datetime
 	| aggregate_expression
 	| case_expression
 	;
@@ -363,6 +351,16 @@ functions_returning_datetime :
   	CURRENT_DATE
   	| CURRENT_TIME
   	| CURRENT_TIMESTAMP
+  	| SECOND^ Left_Paren! string_primary Right_Paren!
+  	| MINUTE^ Left_Paren! string_primary Right_Paren!
+  	| HOUR^ Left_Paren! string_primary Right_Paren!
+  	| DAY^ Left_Paren! string_primary Right_Paren!
+  	| DAYOFMONTH^ Left_Paren! string_primary Right_Paren!
+  	| DAYOFWEEK^ Left_Paren! string_primary Right_Paren!
+  	| DAYOFYEAR^ Left_Paren! string_primary Right_Paren!
+  	| WEEK^ Left_Paren! string_primary Right_Paren!
+  	| MONTH^ Left_Paren! string_primary Right_Paren!
+  	| YEAR^ Left_Paren! string_primary Right_Paren!
   	;
 
 boolean_expression :
@@ -405,7 +403,7 @@ enum_primary :
 enum_literal: ID;
 
 in_expression :
-  	(state_field_path_expression | input_parameter) (NOT)? IN Left_Paren (subquery | in_items) Right_Paren
+  	(state_field_path_expression | input_parameter) (NOT)? IN (input_parameter | (Left_Paren (subquery | in_items) Right_Paren))
   		-> ^(ST_IN state_field_path_expression? input_parameter? (NOT)? in_items? subquery?);
 
 in_items :

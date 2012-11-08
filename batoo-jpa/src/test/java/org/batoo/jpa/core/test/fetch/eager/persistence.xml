@@ -9,6 +9,7 @@
 		<class>org.batoo.jpa.core.test.fetch.eager.Person</class>
 		<class>org.batoo.jpa.core.test.fetch.eager.Phone</class>
 
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
 			<property name="org.batoo.jpa.ddl" value="DROP" />
 		</properties>

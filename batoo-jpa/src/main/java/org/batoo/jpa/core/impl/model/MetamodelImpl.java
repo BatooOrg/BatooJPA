@@ -641,7 +641,7 @@ public class MetamodelImpl implements Metamodel {
 			return null;
 		}
 
-		if (Serializable.class.isAssignableFrom(clazz) || clazz.isPrimitive()) {
+		if (Serializable.class.isAssignableFrom(clazz) || clazz.isPrimitive() || (Number.class == clazz)) {
 			final BasicTypeImpl basicType = new BasicTypeImpl(this, clazz);
 			this.basics.put(clazz, basicType);
 

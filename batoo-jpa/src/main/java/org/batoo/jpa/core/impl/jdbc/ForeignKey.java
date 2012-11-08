@@ -39,6 +39,7 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.core.util.Pair;
 import org.batoo.jpa.parser.MappingException;
+import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
 import org.batoo.jpa.parser.metadata.PrimaryKeyJoinColumnMetadata;
@@ -58,6 +59,7 @@ import com.google.common.collect.Lists;
 public class ForeignKey {
 
 	private final List<JoinColumn> joinColumns = Lists.newArrayList();
+	private final boolean joinMetadataProvided;
 	private final boolean inverseOwner;
 	private AbstractTable table;
 
@@ -110,6 +112,8 @@ public class ForeignKey {
 		for (final JoinColumnMetadata columnMetadata : metadata) {
 			this.joinColumns.add(new JoinColumn(jdbcAdaptor, columnMetadata));
 		}
+
+		this.joinMetadataProvided = this.joinColumns.size() > 0;
 	}
 
 	/**
@@ -198,6 +202,7 @@ public class ForeignKey {
 
 		this.table = table;
 		this.table.addForeignKey(this);
+		this.joinMetadataProvided = this.joinColumns.size() > 0;
 	}
 
 	/**
@@ -561,7 +566,7 @@ public class ForeignKey {
 
 	private void linkJoinColumn(AssociationMapping<?, ?, ?> mapping, final BasicMapping<?, ?> idMapping) {
 		// no definition for the join columns
-		if (this.joinColumns.size() == 0) {
+		if (!this.joinMetadataProvided) {
 			// create the join column
 			this.joinColumns.add(new JoinColumn(this.jdbcAdaptor, mapping, idMapping));
 		}
@@ -707,12 +712,14 @@ public class ForeignKey {
 	 *            the order column
 	 * @param name
 	 *            the name of the column
+	 * @param locator
+	 *            the locator
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void setOrderColumn(ColumnMetadata orderColumn, String name) {
-		this.orderColumn = new OrderColumn(this.table, orderColumn, name);
+	public void setOrderColumn(ColumnMetadata orderColumn, String name, AbstractLocator locator) {
+		this.orderColumn = new OrderColumn(this.table, orderColumn, name, locator);
 	}
 
 	/**

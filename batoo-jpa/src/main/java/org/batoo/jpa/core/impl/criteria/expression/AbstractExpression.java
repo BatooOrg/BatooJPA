@@ -24,7 +24,6 @@ import java.util.Collection;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Predicate;
 
 import org.batoo.jpa.core.impl.criteria.AbstractSelection;
 import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
@@ -119,7 +118,7 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 * 
 	 */
 	@Override
-	public Predicate in(Collection<?> values) {
+	public PredicateImpl in(Collection<?> values) {
 		return new PredicateImpl(new InExpression(this, values));
 	}
 

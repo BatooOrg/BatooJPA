@@ -33,6 +33,7 @@
 		<class>org.batoo.jpa.core.test.q.Phone</class>
 		<class>org.batoo.jpa.core.test.q.WorkPhone</class>
 		
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
 			<property name="org.batoo.jpa.ddl" value="DROP" />
 		</properties>
@@ -45,6 +46,7 @@
 		<class>org.batoo.jpa.core.test.ddl.update1.Customer</class>
 		<class>org.batoo.jpa.core.test.ddl.update1.Address</class>
 		
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
 			<property name="org.batoo.jpa.ddl" value="DROP" />
 		</properties>
@@ -58,6 +60,7 @@
 		<class>org.batoo.jpa.core.test.ddl.update2.Address</class>
 		<class>org.batoo.jpa.core.test.ddl.update2.Country</class>
 		
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
 			<property name="org.batoo.jpa.ddl" value="UPDATE" />
 		</properties>

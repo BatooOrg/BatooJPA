@@ -218,8 +218,8 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		final TypedQuery<Address> q = this.cq(//
 			"select a from Person p\n" + //
 				"left join p.addresses as a \n" + //
-				"join fetch a.country \n" + //
-				"join fetch a.person \n" + //
+				"left join fetch a.country \n" + //
+				"left join fetch a.person \n" + //
 				"where p = :person", Address.class);
 		q.setParameter("person", person);
 
@@ -547,8 +547,8 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		final TypedQuery<Person> q = this.cq(//
 			"select p from Person p\n" + //
-				"    join fetch p.addresses\n" + //
-				"    join fetch p.addresses.country\n" + //
+				"    left join fetch p.addresses\n" + //
+				"    left join fetch p.addresses.country\n" + //
 				"    left join p.addresses a", //
 			Person.class);
 

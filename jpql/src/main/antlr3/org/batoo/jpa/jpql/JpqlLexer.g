@@ -138,6 +138,18 @@ CURRENT_TIME :
 CURRENT_TIMESTAMP :
     C U R R E N T Underscore T I M E S T A M P;
 
+DAY :
+	D A Y;
+
+DAYOFMONTH :
+	D A Y O F M O N T H;
+
+DAYOFWEEK :
+	D A Y O F W E E K;
+
+DAYOFYEAR :
+	D A Y O F Y E A R;
+
 DELETE :
     D E L E T E;
 
@@ -181,6 +193,9 @@ GROUP :
 
 HAVING :
     H A V I N G;
+
+HOUR :
+	H O U R;
 
 IN :
     I N;
@@ -227,8 +242,14 @@ MEMBER :
 MIN :
     M I N;
 
+MINUTE :
+	M I N U T E;
+
 MOD :
     M O D;
+    
+MONTH :
+	M O N T H;
 
 NEW :
     N E W;
@@ -259,6 +280,9 @@ OUTER :
 
 POSITION :
     P O S I T I O N;
+
+SECOND :
+	S E C O N D;
 
 SELECT :
     S E L E C T;
@@ -308,11 +332,17 @@ UPPER :
 VALUE :
     V A L U E;
 
+WEEK :
+	W E E K;
+
 WHEN :
     W H E N;
 
 WHERE :
     W H E R E;
+
+YEAR :
+	Y E A R;
 
 Not_Equals_Operator :
     '<>';

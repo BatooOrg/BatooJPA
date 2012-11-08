@@ -561,10 +561,9 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 		}
 
 		if (this.attribute.getCollectionType() == CollectionType.LIST) {
-			if (this.orderColumn != null) {
-				final String name = StringUtils.isNotBlank(this.orderColumn.getName()) ? this.orderColumn.getName() : this.attribute.getName() + "_ORDER";
-				this.collectionTable.setOrderColumn(this.orderColumn, name);
-			}
+			final String name = (this.orderColumn != null) && StringUtils.isNotBlank(this.orderColumn.getName()) ? this.orderColumn.getName()
+				: this.attribute.getName() + "_ORDER";
+			this.collectionTable.setOrderColumn(this.orderColumn, name, this.attribute.getLocator());
 		}
 	}
 
@@ -592,10 +591,10 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 
 		// if has single id then pass it on
 		if (rootType.hasSingleIdAttribute()) {
-			q.setParameter(0, id);
+			q.setParameter(1, id);
 		}
 		else {
-			int i = 0;
+			int i = 1;
 			for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
 				q.setParameter(i++, pair.getSecond().get(id));
 			}
@@ -620,10 +619,10 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 
 		// if has single id then pass it on
 		if (rootType.hasSingleIdAttribute()) {
-			q.setParameter(0, id);
+			q.setParameter(1, id);
 		}
 		else {
-			int i = 0;
+			int i = 1;
 			for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
 				q.setParameter(i++, pair.getSecond().get(id));
 			}

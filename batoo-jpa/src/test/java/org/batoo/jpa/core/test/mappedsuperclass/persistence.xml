@@ -30,6 +30,7 @@
 		<class>org.batoo.jpa.core.test.mappedsuperclass.Bar</class>
 		<class>org.batoo.jpa.core.test.mappedsuperclass.Quux</class>
 		
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
 			<property name="org.batoo.jpa.ddl" value="DROP" />
 		</properties>

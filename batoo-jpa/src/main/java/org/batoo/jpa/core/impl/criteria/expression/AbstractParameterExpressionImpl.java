@@ -79,7 +79,7 @@ public abstract class AbstractParameterExpressionImpl<T> extends AbstractExpress
 	 */
 	protected void ensureTypeResolved(MetamodelImpl metamodel) {
 		if (this.type == null) {
-			this.type = metamodel.type(this.getJavaType());
+			this.type = metamodel.createBasicType(this.getJavaType());
 		}
 	}
 
@@ -120,7 +120,7 @@ public abstract class AbstractParameterExpressionImpl<T> extends AbstractExpress
 
 		this.ensureTypeResolved(metamodelImpl);
 
-		if (this.type.getPersistenceType() == PersistenceType.BASIC) {
+		if ((this.type == null) || (this.type.getPersistenceType() == PersistenceType.BASIC)) {
 			return 1;
 		}
 		else if (this.type.getPersistenceType() == PersistenceType.EMBEDDABLE) {
@@ -184,7 +184,7 @@ public abstract class AbstractParameterExpressionImpl<T> extends AbstractExpress
 
 			this.ensureTypeResolved(metamodel);
 
-			if (this.type.getPersistenceType() == PersistenceType.BASIC) {
+			if ((this.type == null) || (this.type.getPersistenceType() == PersistenceType.BASIC)) {
 				parameters[sqlIndex.intValue()] = value;
 
 				sqlIndex.increment();

@@ -1,0 +1,83 @@
+<!-- 
+
+	Copyright (c) 2012 - Batoo Software ve Consultancy Ltd.
+ 
+	This copyrighted material is made available to anyone wishing to use, modify,
+	copy, or redistribute it subject to the terms and conditions of the GNU
+	Lesser General Public License, as published by the Free Software Foundation.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+	or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+	for more details.
+
+	You should have received a copy of the GNU Lesser General Public License
+	along with this distribution; if not, write to:
+	Free Software Foundation, Inc.
+	51 Franklin Street, Fifth Floor
+	Boston, MA  02110-1301  USA
+
+ -->
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" version="2.0">
+
+	<persistence-unit name="default">
+		<provider>org.batoo.jpa.core.BatooPersistenceProvider</provider>
+
+		<class>org.batoo.jpa.community.test.querydsl.Account</class>
+		<class>org.batoo.jpa.community.test.querydsl.Animal</class>
+		<class>org.batoo.jpa.community.test.querydsl.AuditLog</class>
+		<class>org.batoo.jpa.community.test.querydsl.Author</class>
+		<class>org.batoo.jpa.community.test.querydsl.Bar</class>
+		<class>org.batoo.jpa.community.test.querydsl.Book</class>
+		<class>org.batoo.jpa.community.test.querydsl.Calendar</class>
+		<class>org.batoo.jpa.community.test.querydsl.Cat</class>
+		<class>org.batoo.jpa.community.test.querydsl.Catalog</class>
+		<class>org.batoo.jpa.community.test.querydsl.Company</class>
+		<class>org.batoo.jpa.community.test.querydsl.Customer</class>
+		<class>org.batoo.jpa.community.test.querydsl.Department</class>
+		<class>org.batoo.jpa.community.test.querydsl.Document</class>
+		<class>org.batoo.jpa.community.test.querydsl.Dolphin</class>
+		<class>org.batoo.jpa.community.test.querydsl.DomesticCat</class>
+		<class>org.batoo.jpa.community.test.querydsl.EmbeddedType</class>
+		<class>org.batoo.jpa.community.test.querydsl.Employee</class>
+		<class>org.batoo.jpa.community.test.querydsl.Entity1</class>
+		<class>org.batoo.jpa.community.test.querydsl.Entity2</class>
+		<class>org.batoo.jpa.community.test.querydsl.EvilType</class>
+		<class>org.batoo.jpa.community.test.querydsl.Foo</class>
+		<class>org.batoo.jpa.community.test.querydsl.Formula</class>
+		<class>org.batoo.jpa.community.test.querydsl.Human</class>
+		<class>org.batoo.jpa.community.test.querydsl.InheritedProperties</class>
+		<class>org.batoo.jpa.community.test.querydsl.Item</class>
+		<class>org.batoo.jpa.community.test.querydsl.Location</class>
+		<class>org.batoo.jpa.community.test.querydsl.Mammal</class>
+		<class>org.batoo.jpa.community.test.querydsl.Name</class>
+		<class>org.batoo.jpa.community.test.querydsl.Named</class>
+		<class>org.batoo.jpa.community.test.querydsl.NameList</class>
+		<class>org.batoo.jpa.community.test.querydsl.Nationality</class>
+		<class>org.batoo.jpa.community.test.querydsl.Novel</class>
+		<class>org.batoo.jpa.community.test.querydsl.Order</class>
+		<class>org.batoo.jpa.community.test.querydsl.Parameter</class>
+		<class>org.batoo.jpa.community.test.querydsl.Payment</class>
+		<class>org.batoo.jpa.community.test.querydsl.Person</class>
+		<class>org.batoo.jpa.community.test.querydsl.PersonId</class>
+		<class>org.batoo.jpa.community.test.querydsl.Player</class>
+		<class>org.batoo.jpa.community.test.querydsl.Price</class>
+		<class>org.batoo.jpa.community.test.querydsl.Product</class>
+		<class>org.batoo.jpa.community.test.querydsl.Show</class>
+		<class>org.batoo.jpa.community.test.querydsl.SimpleTypes</class>
+		<class>org.batoo.jpa.community.test.querydsl.Status</class>
+		<class>org.batoo.jpa.community.test.querydsl.StatusChange</class>
+		<class>org.batoo.jpa.community.test.querydsl.Store</class>
+		<class>org.batoo.jpa.community.test.querydsl.Superclass</class>
+		<class>org.batoo.jpa.community.test.querydsl.User</class>
+		<class>org.batoo.jpa.community.test.querydsl.World</class>
+
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
+		
+		<properties>
+			<property name="org.batoo.jpa.ddl" value="DROP" />
+		</properties>
+
+	</persistence-unit>
+</persistence>

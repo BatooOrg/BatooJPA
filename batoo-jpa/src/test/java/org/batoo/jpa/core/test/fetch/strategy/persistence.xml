@@ -10,6 +10,7 @@
 		<class>org.batoo.jpa.core.test.fetch.strategy.Person</class>
 		<class>org.batoo.jpa.core.test.fetch.strategy.Phone</class>
 
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
 			<property name="org.batoo.jpa.ddl" value="DROP" />
 		</properties>

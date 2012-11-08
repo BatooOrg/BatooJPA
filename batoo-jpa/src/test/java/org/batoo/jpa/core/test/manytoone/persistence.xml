@@ -29,6 +29,7 @@
 		<class>org.batoo.jpa.core.test.manytoone.Address</class>
 		<class>org.batoo.jpa.core.test.manytoone.Person</class>
 		
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
 			<property name="org.batoo.jpa.ddl" value="DROP" />
 		</properties>

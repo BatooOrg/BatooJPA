@@ -34,6 +34,7 @@
 		<class>org.batoo.jpa.core.test.merge.Foo1</class>
 		<class>org.batoo.jpa.core.test.merge.Foo2</class>
 		
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
 			<property name="org.batoo.jpa.ddl" value="DROP" />
 		</properties>

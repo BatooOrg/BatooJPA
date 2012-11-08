@@ -473,11 +473,9 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 				this.joinTable.link(entity, this.type);
 
 				if (this.attribute.getCollectionType() == CollectionType.LIST) {
-					if (this.orderColumn != null) {
-						final String name = StringUtils.isNotBlank(this.orderColumn.getName()) ? //
-							this.orderColumn.getName() : this.attribute.getName() + "_ORDER";
-						this.joinTable.setOrderColumn(this.orderColumn, name);
-					}
+					final String name = (this.orderColumn != null) && StringUtils.isNotBlank(this.orderColumn.getName()) ? //
+						this.orderColumn.getName() : this.attribute.getName() + "_ORDER";
+					this.joinTable.setOrderColumn(this.orderColumn, name, this.attribute.getLocator());
 				}
 			}
 
@@ -486,10 +484,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 				this.foreignKey.setTable(this.type.getPrimaryTable());
 
 				if (this.orderColumn != null) {
-					final String name = StringUtils.isNotBlank(this.orderColumn.getName()) ? //
-						this.orderColumn.getName() : this.attribute.getName() + "_ORDER";
-
-					this.foreignKey.setOrderColumn(this.orderColumn, name);
+					throw new MappingException("Order column is only allowed for join tables", this.orderColumn.getLocator());
 				}
 			}
 		}
@@ -566,10 +561,10 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 
 			// if has single id then pass it on
 			if (rootType.hasSingleIdAttribute()) {
-				q.setParameter(0, id);
+				q.setParameter(1, id);
 			}
 			else {
-				int i = 0;
+				int i = 1;
 				for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
 					q.setParameter(i++, pair.getSecond().get(id));
 				}

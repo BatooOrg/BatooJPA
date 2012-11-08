@@ -247,13 +247,21 @@ public class MetadataImpl implements Metadata {
 		return this.tableGenerators;
 	}
 
-	private Class<?> isPersistentClass(ClassLoader classPath, String path) throws ClassNotFoundException {
-		final Class<?> clazz = classPath.loadClass(path);
+	private Class<?> isPersistentClass(ClassLoader classPath, String path) {
+		try {
+			final Class<?> clazz = classPath.loadClass(path);
 
-		if ((clazz.getAnnotation(Embeddable.class) != null) || //
-			(clazz.getAnnotation(MappedSuperclass.class) != null) || //
-			(clazz.getAnnotation(Entity.class) != null)) {
-			return clazz;
+			if ((clazz.getAnnotation(Embeddable.class) != null) || //
+				(clazz.getAnnotation(MappedSuperclass.class) != null) || //
+				(clazz.getAnnotation(Entity.class) != null)) {
+				return clazz;
+			}
+		}
+		catch (final Throwable e) {
+			// nasty eclipse JUnit fragment spits bogus class loading errors
+			if (!path.startsWith("org.eclipse.jdt")) {
+				MetadataImpl.LOG.debug(e, "Unable to read class: {0}" + path);
+			}
 		}
 
 		return null;
@@ -415,7 +423,9 @@ public class MetadataImpl implements Metadata {
 			}
 		}
 
-		this.findClasses(classes, classloader);
+		if (!excludeUnlistedClasses) {
+			this.findClasses(classes, classloader);
+		}
 
 		for (final Class<?> clazz : classes) {
 			if (!this.entityMap.containsKey(clazz.getName()) && !this.entityMap.containsKey(clazz.getSimpleName())) {
@@ -450,14 +460,9 @@ public class MetadataImpl implements Metadata {
 					final String className = entry.getName().replace('/', '.').replace('\\', '.');
 
 					if (className.endsWith(".class")) {
-						try {
-							final Class<?> clazz = this.isPersistentClass(classloader, className.substring(0, className.length() - 6));
-							if (clazz != null) {
-								classes.add(clazz);
-							}
-						}
-						catch (final ClassNotFoundException e) {
-							MetadataImpl.LOG.warn(e, "Unable to read class: {0}" + className);
+						final Class<?> clazz = this.isPersistentClass(classloader, className.substring(0, className.length() - 6));
+						if (clazz != null) {
+							classes.add(clazz);
 						}
 					}
 				}

@@ -470,6 +470,15 @@ public class SubqueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 	 * 
 	 */
 	@Override
+	public boolean isInternal() {
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public Subquery<T> select(Expression<T> expression) {
 		this.query.select(expression);
 
@@ -482,7 +491,7 @@ public class SubqueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 	 */
 	@Override
 	public int setNextSqlParam(AbstractParameterExpressionImpl<?> parameter) {
-		return this.query.setNextSqlParam(parameter);
+		return this.parent.setNextSqlParam(parameter);
 	}
 
 	/**

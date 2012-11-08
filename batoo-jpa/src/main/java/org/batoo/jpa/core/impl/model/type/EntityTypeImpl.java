@@ -1666,10 +1666,10 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 		// if has single id then pass it on
 		if (this.hasSingleIdAttribute()) {
-			q.setParameter(0, id);
+			q.setParameter(1, id);
 		}
 		else {
-			int i = 0;
+			int i = 1;
 			for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.getIdMappings()) {
 				q.setParameter(i++, pair.getSecond().get(id));
 			}
@@ -1725,10 +1725,10 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 		// if has single id then pass it on
 		if (this.hasSingleIdAttribute()) {
-			q.setParameter(0, id);
+			q.setParameter(1, id);
 		}
 		else {
-			int i = 0;
+			int i = 1;
 			for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.getIdMappings()) {
 				q.setParameter(i++, pair.getSecond().get(id));
 			}

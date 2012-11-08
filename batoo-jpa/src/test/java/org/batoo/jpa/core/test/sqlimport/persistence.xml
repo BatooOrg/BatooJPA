@@ -28,6 +28,7 @@
 		
 		<class>org.batoo.jpa.core.test.sqlimport.Foo</class>
 		
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
 			<property name="org.batoo.jpa.ddl" value="DROP" />
 			<property name="org.batoo.jdbc.import_sql" value="org/batoo/jpa/core/test/sqlimport/import.sql"/>

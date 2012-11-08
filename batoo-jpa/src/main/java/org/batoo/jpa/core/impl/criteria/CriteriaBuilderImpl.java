@@ -54,6 +54,8 @@ import org.batoo.jpa.core.impl.criteria.expression.ComparisonExpression.Comparis
 import org.batoo.jpa.core.impl.criteria.expression.ConcatExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CountExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CurrentTemporalExpression;
+import org.batoo.jpa.core.impl.criteria.expression.DateTimeExpression;
+import org.batoo.jpa.core.impl.criteria.expression.DateTimeFunctionType;
 import org.batoo.jpa.core.impl.criteria.expression.EntityConstantExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ExistsExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ExpressionConverter;
@@ -181,7 +183,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public <Y extends Comparable<? super Y>> Predicate between(Expression<? extends Y> v, Expression<? extends Y> x, Expression<? extends Y> y) {
+	public <Y extends Comparable<? super Y>> PredicateImpl between(Expression<? extends Y> v, Expression<? extends Y> x, Expression<? extends Y> y) {
 		return new PredicateImpl(new ComparisonExpression(Comparison.BETWEEN, v, x, y));
 	}
 
@@ -190,7 +192,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
-	public <Y extends Comparable<? super Y>> Predicate between(Expression<? extends Y> v, Y x, Y y) {
+	public <Y extends Comparable<? super Y>> PredicateImpl between(Expression<? extends Y> v, Y x, Y y) {
 		return new PredicateImpl(new ComparisonExpression(Comparison.BETWEEN, v, this.createConstant(x), this.createConstant(y)));
 	}
 
@@ -368,6 +370,22 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	@Override
 	public Expression<Timestamp> currentTimestamp() {
 		return new CurrentTemporalExpression<Timestamp>(TemporalType.TIMESTAMP, Timestamp.class);
+	}
+
+	/**
+	 * Returns the date time function expresssion.
+	 * 
+	 * @param type
+	 *            the type of the date time function
+	 * @param x
+	 *            the inner expression
+	 * @return the date tAime function expresssion
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public DateTimeExpression dateTimeExpression(DateTimeFunctionType type, Expression<?> x) {
+		return new DateTimeExpression(type, x);
 	}
 
 	/**

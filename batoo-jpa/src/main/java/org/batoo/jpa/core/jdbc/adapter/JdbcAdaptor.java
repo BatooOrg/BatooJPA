@@ -50,6 +50,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.jpa.core.impl.criteria.expression.DateTimeFunctionType;
 import org.batoo.jpa.core.impl.criteria.expression.NumericFunctionType;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.AbstractJdbcAdaptor;
@@ -61,6 +62,7 @@ import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinColumn;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
 import org.batoo.jpa.core.impl.jdbc.PkColumn;
+import org.batoo.jpa.core.impl.jdbc.SecondaryTable;
 import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.model.SequenceGenerator;
 import org.batoo.jpa.core.impl.model.TableGenerator;
@@ -576,36 +578,57 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @author hceylan
 	 */
 	public void dropAllForeignKeys(DataSource datasource, Set<AbstractTable> tableSet) {
-		AbstractTable[] tables = tableSet.toArray(new AbstractTable[tableSet.size()]);
+		final AbstractTable[] tables = tableSet.toArray(new AbstractTable[tableSet.size()]);
 
-		// Order tables by dependency
-		Arrays.sort(tables, new Comparator<AbstractTable>() {
+		try {
+			// Order tables by dependency
+			Arrays.sort(tables, new Comparator<AbstractTable>() {
 
-			@Override
-			public int compare(AbstractTable o1, AbstractTable o2) {
-				if ((o1 instanceof JoinTable) || (o1 instanceof CollectionTable)) {
-					return -1;
-				}
-
-				if ((o2 instanceof JoinTable) || (o2 instanceof CollectionTable)) {
-					return 1;
-				}
-
-				for (ForeignKey key : o1.getForeignKeys()) {
-					if (key.getReferencedTableQName().equals(o2.getQName())) {
+				@Override
+				public int compare(AbstractTable o1, AbstractTable o2) {
+					if ((o1 instanceof JoinTable) && !(o2 instanceof JoinTable)) {
 						return -1;
 					}
-				}
 
-				for (ForeignKey key : o2.getForeignKeys()) {
-					if (key.getReferencedTableQName().equals(o2.getQName())) {
+					if ((o2 instanceof JoinTable) && !(o1 instanceof JoinTable)) {
 						return 1;
 					}
-				}
 
-				return 0;
-			}
-		});
+					if ((o1 instanceof CollectionTable) && !(o2 instanceof CollectionTable)) {
+						return -1;
+					}
+
+					if ((o2 instanceof CollectionTable) && !(o1 instanceof CollectionTable)) {
+						return 1;
+					}
+
+					if ((o1 instanceof SecondaryTable) && !(o2 instanceof SecondaryTable)) {
+						return -1;
+					}
+
+					if ((o2 instanceof SecondaryTable) && !(o1 instanceof SecondaryTable)) {
+						return 1;
+					}
+
+					for (final ForeignKey key : o1.getForeignKeys()) {
+						if (key.getReferencedTableQName().equals(o2.getQName())) {
+							return 1;
+						}
+					}
+
+					for (final ForeignKey key : o2.getForeignKeys()) {
+						if (key.getReferencedTableQName().equals(o2.getQName())) {
+							return -1;
+						}
+					}
+
+					return 0;
+				}
+			});
+		}
+		catch (final IllegalArgumentException e) {
+			JdbcAdaptor.LOG.warn(e, "");
+		}
 
 		for (final AbstractTable table : tables) {
 			JdbcTable tableMetadata = null;
@@ -865,6 +888,47 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @author hceylan
 	 */
 	protected abstract String getDatabaseName();
+
+	/**
+	 * Returns the date time function template for the type <code>type</code>.
+	 * 
+	 * @param type
+	 *            the type of the function
+	 * @return the date time function template for the type <code>type</code>
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getDateTimeFunctionTemplate(DateTimeFunctionType type) {
+		switch (type) {
+			case SECOND:
+				return "SECOND({0})";
+
+			case MINUTE:
+				return "MINUTE({0})";
+
+			case HOUR:
+				return "HOUR({0})";
+
+			case DAYOFMONTH:
+				return "DAY_OF_MONTH({0})";
+
+			case DAYOFWEEK:
+				return "DAY_OF_WEEK({0})";
+
+			case DAYOFYEAR:
+				return "DAY_OF_YEAR({0})";
+
+			case MONTH:
+				return "MONTH({0})";
+
+			case WEEK:
+				return "WEEK({0})";
+
+			default: // YEAR
+				return "YEAR({0})";
+		}
+	}
 
 	/**
 	 * Returns the SQL to drop the foreign key.

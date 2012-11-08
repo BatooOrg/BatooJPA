@@ -30,6 +30,7 @@
 
 		<shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
 		
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
 			<property name="org.batoo.jpa.ddl" value="DROP" />
 		</properties>

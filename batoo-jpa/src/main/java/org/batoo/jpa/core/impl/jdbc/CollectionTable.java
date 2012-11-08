@@ -34,6 +34,7 @@ import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
+import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.CollectionTableMetadata;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
@@ -349,11 +350,13 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	 *            the order column definition
 	 * @param name
 	 *            the name of the column
+	 * @param locator
+	 *            the locator
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void setOrderColumn(ColumnMetadata orderColumn, String name) {
-		this.orderColumn = new OrderColumn(this, orderColumn, name);
+	public void setOrderColumn(ColumnMetadata orderColumn, String name, AbstractLocator locator) {
+		this.orderColumn = new OrderColumn(this, orderColumn, name, locator);
 	}
 }

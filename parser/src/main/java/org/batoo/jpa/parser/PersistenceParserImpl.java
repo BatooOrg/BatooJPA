@@ -19,10 +19,13 @@
 package org.batoo.jpa.parser;
 
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.persistence.PersistenceException;
 import javax.persistence.SharedCacheMode;
 import javax.persistence.ValidationMode;
 import javax.persistence.spi.PersistenceUnitInfo;
@@ -39,6 +42,8 @@ import org.batoo.jpa.parser.persistence.Persistence.PersistenceUnit.Properties.P
 import org.batoo.jpa.parser.persistence.PersistenceUnitCachingType;
 import org.batoo.jpa.parser.persistence.PersistenceUnitValidationModeType;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
@@ -147,7 +152,22 @@ public class PersistenceParserImpl implements PersistenceParser {
 
 		this.parseOrmXmls();
 
-		this.metadata.parse(this.classloader);
+		final List<URL> jarFiles = Lists.transform(puInfo.getJarFiles(), new Function<String, URL>() {
+
+			@Override
+			public URL apply(String input) {
+				try {
+					return new URL(input);
+				}
+				catch (final MalformedURLException e) {
+					throw new PersistenceException("Cannot create URL: " + input);
+				}
+			}
+		});
+
+		final boolean excludeUnlistedClasses = puInfo.getExcludeUnlistedClasses() != null ? puInfo.getExcludeUnlistedClasses() : false;
+		this.metadata.parse(jarFiles, this.classloader, puInfo.getClazzs(), excludeUnlistedClasses);
+
 		switch (puInfo.getSharedCacheMode() != null ? puInfo.getSharedCacheMode() : PersistenceUnitCachingType.NONE) {
 			case ALL:
 				this.sharedCacheMode = SharedCacheMode.ALL;

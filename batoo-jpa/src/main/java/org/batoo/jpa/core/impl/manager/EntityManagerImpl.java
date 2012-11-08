@@ -91,6 +91,8 @@ public class EntityManagerImpl implements EntityManager {
 	private final CriteriaBuilderImpl criteriaBuilder;
 	private final Map<String, Object> properties;
 
+	private boolean inFlush;
+
 	/**
 	 * @param entityManagerFactory
 	 *            the entity manager factory
@@ -509,7 +511,13 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public void flush() {
+		if (this.inFlush) {
+			return;
+		}
+
 		this.assertTransaction();
+
+		this.inFlush = true;
 
 		try {
 			this.session.handleExternals();
@@ -534,6 +542,9 @@ public class EntityManagerImpl implements EntityManager {
 			EntityManagerImpl.LOG.error(e, "Flush failed");
 
 			throw e;
+		}
+		finally {
+			this.inFlush = false;
 		}
 	}
 

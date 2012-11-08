@@ -7,6 +7,7 @@
 		<class>org.batoo.jpa.core.test.onetoonetoone.Cubicle</class>
 		<class>org.batoo.jpa.core.test.onetoonetoone.Employee</class>
 
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
 			<property name="org.batoo.jpa.ddl" value="DROP" />
 		</properties>

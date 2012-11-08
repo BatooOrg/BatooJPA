@@ -22,6 +22,7 @@ import java.sql.Connection;
 import java.sql.Types;
 
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
+import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 
 /**
@@ -46,19 +47,21 @@ public class OrderColumn extends AbstractColumn {
 	 *            the column definition
 	 * @param name
 	 *            the name of the column
+	 * @param locator
+	 *            the locator
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public OrderColumn(AbstractTable table, ColumnMetadata orderColumn, String name) {
-		super(orderColumn.getLocator());
+	public OrderColumn(AbstractTable table, ColumnMetadata orderColumn, String name, AbstractLocator locator) {
+		super(orderColumn != null ? orderColumn.getLocator() : locator);
 
 		this.table = table;
 		this.name = name;
-		this.columnDefinition = orderColumn.getColumnDefinition();
-		this.insertable = orderColumn.isInsertable();
-		this.nullable = orderColumn.isNullable();
-		this.updatable = orderColumn.isUpdatable();
+		this.columnDefinition = orderColumn != null ? orderColumn.getColumnDefinition() : "";
+		this.insertable = orderColumn != null ? orderColumn.isInsertable() : true;
+		this.nullable = orderColumn != null ? orderColumn.isNullable() : false;
+		this.updatable = orderColumn != null ? orderColumn.isUpdatable() : true;
 
 		this.table.addColumn(this);
 	}

@@ -664,6 +664,9 @@ public abstract class AbstractTable {
 		if ((input instanceof JoinColumn) && (input.getMapping() == null)) {
 			root = (EntityTypeImpl<?>) ((JoinColumn) input).getReferencedMapping().getRoot().getType();
 		}
+		else if ((input instanceof OrderColumn)) {
+			return input.isInsertable();
+		}
 		else {
 			root = (EntityTypeImpl<?>) input.getMapping().getRoot().getType();
 		}

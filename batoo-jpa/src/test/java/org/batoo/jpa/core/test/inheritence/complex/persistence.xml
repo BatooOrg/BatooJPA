@@ -32,6 +32,7 @@
 		<class>org.batoo.jpa.core.test.inheritence.complex.Student</class>
 		<class>org.batoo.jpa.core.test.inheritence.complex.Teacher</class>
 		
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
 			<property name="org.batoo.jpa.ddl" value="DROP" />
 		</properties>

@@ -59,7 +59,7 @@ public class NumericFunctionExpression<N extends Number> extends AbstractExpress
 	 */
 	@SuppressWarnings("unchecked")
 	public NumericFunctionExpression(NumericFunctionType type, Expression<?> x, Expression<Integer> y) {
-		super((Class<N>) x.getJavaType());
+		super((Class<N>) (Number.class.isAssignableFrom(x.getJavaType()) ? x.getJavaType() : Integer.class));
 
 		this.type = type;
 		this.x = (AbstractExpression<?>) x;

@@ -45,6 +45,28 @@ public class ParameterExpressionImpl<T> extends AbstractParameterExpressionImpl<
 	private Integer position;
 
 	/**
+	 * @param q
+	 *            the query
+	 * @param type
+	 *            the persistent type of the parameter
+	 * @param paramClass
+	 *            the class of the parameter
+	 * @param position
+	 *            the ordinal position of the parameter
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ParameterExpressionImpl(BaseQueryImpl<?> q, TypeImpl<T> type, Class<T> paramClass, int position) {
+		super(type, paramClass);
+
+		this.position = position;
+		this.alias(Integer.toString(position));
+
+		q.getAlias(this);
+	}
+
+	/**
 	 * @param type
 	 *            the persistent type of the parameter
 	 * @param paramClass
@@ -69,8 +91,9 @@ public class ParameterExpressionImpl<T> extends AbstractParameterExpressionImpl<
 	 */
 	@Override
 	protected void ensureAlias(BaseQueryImpl<?> query) {
-		if (this.position == null) {
+		if ((this.position == null)) {
 			this.position = query.getAlias(this);
+
 			if (StringUtils.isBlank(this.getAlias())) {
 				this.alias("param" + this.position);
 			}
@@ -84,6 +107,13 @@ public class ParameterExpressionImpl<T> extends AbstractParameterExpressionImpl<
 	@Override
 	public String generateJpqlRestriction(BaseQueryImpl<?> query) {
 		this.ensureAlias(query);
+
+		try {
+			final int positionNo = Integer.parseInt(this.getAlias());
+
+			return "?" + positionNo;
+		}
+		catch (final Exception e) {}
 
 		return ":" + this.getAlias();
 	}

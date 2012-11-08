@@ -179,6 +179,16 @@ public interface BaseQuery<T> {
 	List<AbstractParameterExpressionImpl<?>> getSqlParameters();
 
 	/**
+	 * Returns if the query is internal.
+	 * 
+	 * @return true if the query is internal, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	boolean isInternal();
+
+	/**
 	 * Adds the parameter to the SQL parameters queue.
 	 * 
 	 * @param parameter
@@ -203,5 +213,4 @@ public interface BaseQuery<T> {
 	 * @author hceylan
 	 */
 	<U> SubqueryImpl<U> subquery(Class<U> type);
-
 }

@@ -138,6 +138,15 @@ public abstract class CriteriaModify<T> extends BaseQueryImpl<T> {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isInternal() {
+		return false;
+	}
+
+	/**
 	 * Create a subquery of the query.
 	 * 
 	 * @param type

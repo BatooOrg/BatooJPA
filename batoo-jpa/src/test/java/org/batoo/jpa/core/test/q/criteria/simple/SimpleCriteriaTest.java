@@ -268,7 +268,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testRestriction() {
-		Person person = this.person();
+		final Person person = this.person();
 		this.persist(person);
 		this.persist(this.person());
 		this.commit();
@@ -289,7 +289,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 		q.where(cb.equal(id, p));
 
 		final TypedQuery<Person> tq = this.em().createQuery(q);
-		tq.setParameter(0, person.getId());
+		tq.setParameter(1, person.getId());
 
 		final List<Person> resultList = tq.getResultList();
 		Assert.assertEquals(18, resultList.size());

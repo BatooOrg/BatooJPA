@@ -26,6 +26,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -293,8 +294,6 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	}
 
 	private List<X> buildResultSet(final Object[] parameters, CacheStoreMode cacheStoreMode) {
-		this.results = Lists.newArrayList();
-
 		try {
 			final Connection connection = this.em.getConnection();
 			try {
@@ -340,9 +339,36 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 		ResultSet resultSet = null;
 
 		try {
-			statement = connection.prepareStatement(this.sql);
-			this.fillStatement(statement, parameters);
+			final String _sql = this.sql;
+
+			final Map<Integer, Integer> repeat = Maps.newHashMap();
+
+			int sqlParamNo = 0;
+			for (final Object parameter : parameters) {
+				if (parameter != null) {
+					if (parameter instanceof Collection) {
+						repeat.put(sqlParamNo, ((Collection<?>) parameter).size());
+					}
+					else if (parameter.getClass().isArray()) {
+						repeat.put(sqlParamNo, ((Object[]) parameter).length);
+					}
+				}
+				else {
+					sqlParamNo++;
+				}
+			}
+
+			if (repeat.size() > 0) {
+				statement = connection.prepareStatement(this.expandParams(_sql, repeat));
+			}
+			else {
+				statement = connection.prepareStatement(_sql);
+			}
+
+			this.fillStatement(statement, parameters, repeat);
+
 			resultSet = statement.executeQuery();
+
 			this.results = this.handle(resultSet);
 		}
 		finally {
@@ -446,20 +472,79 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	}
 
 	/**
+	 * Expands the repeated parameters.
+	 * 
+	 * @param _sql
+	 *            the original SQL
+	 * @param repeat
+	 *            the repeat map
+	 * @return the expanded SQL
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private String expandParams(String _sql, Map<Integer, Integer> repeat) {
+		final StringBuffer outSql = new StringBuffer();
+
+		final int sqlIndex = 0;
+		int i = 0;
+		boolean inQuot = false;
+
+		while (i < _sql.length()) {
+			final char current = _sql.charAt(i);
+
+			if (current == '\'') {
+				if (inQuot) {
+					inQuot = !inQuot;
+				}
+
+				outSql.append('\'');
+			}
+			else if (!inQuot && (current == '?')) {
+				final Integer repeatCount = repeat.get(sqlIndex);
+
+				if (repeatCount != null) {
+					int left = repeatCount;
+
+					outSql.append('?');
+					left--;
+
+					while (left > 0) {
+						outSql.append(", ?");
+						left--;
+					}
+				}
+				else {
+					outSql.append('?');
+				}
+			}
+			else {
+				outSql.append(current);
+			}
+
+			i++;
+		}
+
+		return outSql.toString();
+	}
+
+	/**
 	 * Fills the statement with the parameters supplied.
 	 * 
 	 * @param statement
 	 *            the statement
 	 * @param parameters
 	 *            the parameters
+	 * @param repeat
+	 *            the parameter repeat map
 	 * @throws SQLException
 	 *             thrown in case of an underlying SQL Exception
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	private void fillStatement(PreparedStatement statement, Object[] parameters) throws SQLException {
-		// the dollowing code has been adopted from Apache Commons DBUtils.
+	private void fillStatement(PreparedStatement statement, Object[] parameters, Map<Integer, Integer> repeat) throws SQLException {
+		// the following code has been adopted from Apache Commons DBUtils.
 
 		// no paramaters nothing to do
 		if ((parameters == null) || (parameters.length == 0)) {
@@ -469,12 +554,41 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 		final ParameterMetaData pmd = this.pmdBroken ? null : statement.getParameterMetaData();
 
 		if (this.pmdBroken) {
-			((PreparedStatementProxy) statement).setParamCount(parameters.length);
+			int total = parameters.length - repeat.size();
+
+			if (repeat.size() > 0) {
+				for (final Integer repeatSize : repeat.values()) {
+					if (repeatSize != null) {
+						total += repeatSize;
+					}
+				}
+			}
+
+			((PreparedStatementProxy) statement).setParamCount(total);
 		}
 
+		int index = 1;
 		for (int i = 0; i < parameters.length; i++) {
 			if (parameters[i] != null) {
-				statement.setObject(i + 1, parameters[i]);
+				if (repeat.containsKey(i)) {
+					final Object paramValue = parameters[i];
+
+					if (paramValue instanceof Collection) {
+						final Collection<?> collection = (Collection<?>) paramValue;
+						for (final Object subParamValue : collection) {
+							statement.setObject(index++, subParamValue);
+						}
+					}
+					else {
+						final Object[] array = (Object[]) paramValue;
+						for (final Object subParamValue : array) {
+							statement.setObject(index++, subParamValue);
+						}
+					}
+				}
+				else {
+					statement.setObject(index++, parameters[i]);
+				}
 			}
 			else {
 				// VARCHAR works with many drivers regardless
@@ -483,13 +597,14 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 				int sqlType = Types.VARCHAR;
 				if (!this.pmdBroken) {
 					try {
-						sqlType = pmd.getParameterType(i + 1);
+						sqlType = pmd.getParameterType(index++ + 1);
 					}
 					catch (final SQLException e) {
 						this.pmdBroken = true;
 					}
 				}
-				statement.setNull(i + 1, sqlType);
+
+				statement.setNull(index++, sqlType);
 			}
 		}
 	}
@@ -563,7 +678,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 			}
 		}
 
-		return this.getParameter(Integer.toString(position));
+		throw new IllegalArgumentException("Query does not have parameter number " + position);
 	}
 
 	/**
@@ -648,6 +763,10 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 */
 	@Override
 	public List<X> getResultList() {
+		if (!this.q.isInternal() && this.em.getTransaction().isActive()) {
+			this.em.flush();
+		}
+
 		ManagedInstance.LOCK_CONTEXT.set(this.getLockMode());
 		try {
 			return this.getResultListImpl();
@@ -749,6 +868,8 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 		if (debug) {
 			this.prepareLabels(this.md);
 		}
+
+		this.results = Lists.newArrayList();
 
 		final SessionImpl session = this.em.getSession();
 

@@ -203,10 +203,10 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 
 		// if has single id then pass it on
 		if (rootType.hasSingleIdAttribute()) {
-			q.setParameter(0, id);
+			q.setParameter(1, id);
 		}
 		else {
-			int i = 0;
+			int i = 1;
 			for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
 				q.setParameter(i++, pair.getSecond().get(id));
 			}

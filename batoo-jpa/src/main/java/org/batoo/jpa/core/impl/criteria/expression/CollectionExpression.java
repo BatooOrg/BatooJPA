@@ -22,6 +22,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 
+import javax.persistence.PersistenceException;
+
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
@@ -118,7 +120,7 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	 */
 	@Override
 	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
-		throw new IllegalArgumentException("Collection paths cannot be restricted");
+		throw new PersistenceException("Collection paths cannot be restricted");
 	}
 
 	/**

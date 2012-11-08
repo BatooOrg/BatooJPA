@@ -91,7 +91,18 @@ public abstract class BaseQueryImpl<T> implements BaseQuery<T> {
 	public Integer getAlias(AbstractParameterExpressionImpl<?> parameter) {
 		Integer alias = this.parameters.get(parameter);
 		if (alias == null) {
-			alias = this.nextparam++;
+			if (parameter.getAlias() == null) {
+				alias = ++this.nextparam;
+			}
+			else {
+				try {
+					alias = Integer.parseInt(parameter.getAlias());
+				}
+				catch (final Exception e) {
+					alias = ++this.nextparam;
+				}
+			}
+
 			this.parameters.put(parameter, alias);
 		}
 
@@ -244,6 +255,15 @@ public abstract class BaseQueryImpl<T> implements BaseQuery<T> {
 	 */
 	@Override
 	public int setNextSqlParam(AbstractParameterExpressionImpl<?> parameter) {
+		if (parameter instanceof ParameterExpressionImpl) {
+			final Integer position = ((ParameterExpressionImpl<?>) parameter).getPosition();
+			if (position != null) {
+				this.sqlParameters.add(parameter);
+
+				return position;
+			}
+		}
+
 		this.sqlParameters.add(parameter);
 
 		return this.sqlParameters.size() - 1;

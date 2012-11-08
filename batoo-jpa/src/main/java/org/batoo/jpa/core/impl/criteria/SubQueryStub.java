@@ -92,8 +92,26 @@ public class SubQueryStub<T> extends AbstractCriteriaQueryImpl<T> {
 	 * 
 	 */
 	@Override
+	public boolean isInternal() {
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public boolean isQuery() {
 		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int setNextSqlParam(AbstractParameterExpressionImpl<?> parameter) {
+		return this.parent.setNextSqlParam(parameter);
 	}
 
 	/**

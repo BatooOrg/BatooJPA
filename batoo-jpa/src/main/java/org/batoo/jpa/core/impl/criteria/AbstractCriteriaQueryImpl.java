@@ -445,6 +445,15 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isInternal() {
+		return this.internal;
+	}
+
+	/**
 	 * Registers the parameter as the nex SQL parameter
 	 * 
 	 * @param parameter
