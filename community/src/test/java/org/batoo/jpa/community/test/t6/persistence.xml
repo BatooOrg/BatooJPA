@@ -28,6 +28,7 @@
 		
 		<class>org.batoo.jpa.community.test.t6.A</class>
 						
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>		
 		<properties>
 			<property name="org.batoo.jpa.ddl" value="DROP" />
 		</properties>
