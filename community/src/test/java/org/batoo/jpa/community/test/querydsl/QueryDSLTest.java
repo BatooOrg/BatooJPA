@@ -14,8 +14,6 @@
  */
 package org.batoo.jpa.community.test.querydsl;
 
-import java.util.Arrays;
-
 import org.batoo.jpa.community.test.BaseCoreTest;
 import org.junit.Test;
 
@@ -67,10 +65,10 @@ public class QueryDSLTest extends BaseCoreTest {
 		// "from Show show\n" + //
 		// "where containsKey(show.acts,?1)");
 
-		this.cq("select c from Cat c where c.id in (?1)")//
+		// this.cq("select c from Cat c where c.id in (?1)")//
 		// .setParameter(1, 0)//
-		.setParameter(1, Arrays.asList(1, 2))//
+		// .setParameter(1, Arrays.asList(1, 2))//
 		// .setParameter(3, 10)//
-		.getResultList();
+		// .getResultList();
 	}
 }
