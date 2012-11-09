@@ -95,7 +95,7 @@ public abstract class AbstractPath<X> extends AbstractExpression<X> implements P
 	 * 
 	 */
 	@Override
-	public <Y> Path<Y> get(SingularAttribute<? super X, Y> attribute) {
+	public <Y> AbstractPath<Y> get(SingularAttribute<? super X, Y> attribute) {
 		throw this.cannotDereference(attribute.getName());
 	}
 
@@ -104,7 +104,7 @@ public abstract class AbstractPath<X> extends AbstractExpression<X> implements P
 	 * 
 	 */
 	@Override
-	public <Y> Path<Y> get(String attributeName) {
+	public <Y> AbstractPath<Y> get(String attributeName) {
 		throw this.cannotDereference(attributeName);
 	}
 

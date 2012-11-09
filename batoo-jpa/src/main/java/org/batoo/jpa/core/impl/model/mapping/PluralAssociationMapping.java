@@ -80,6 +80,8 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	private final PluralAttributeImpl<? super Z, C, E> attribute;
 	private final JoinTable joinTable;
 	private final ForeignKey foreignKey;
+	private final String mapKey;
+
 	private EntityTypeImpl<E> type;
 	private AssociationMapping<?, ?, ?> inverse;
 
@@ -89,7 +91,6 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	private String orderBy;
 	private FinalWrapper<Comparator<E>> comparator;
 	private ColumnMetadata orderColumn;
-	private final String mapKey;
 	private ColumnMetadata mapKeyColumn;
 	private TemporalType mapKeyTemporalType;
 	private EnumType mapKeyEnumType;
@@ -541,7 +542,6 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 
 		// try to load from the cache
 		if (this.type.isCachable()) {
-
 			final CacheInstance cacheInstance = em.getEntityManagerFactory().getCache().get(managedInstance.getId());
 
 			final Collection<E> collection = (Collection<E>) cacheInstance.getCollection(managedInstance, this);
@@ -551,23 +551,30 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 			}
 		}
 
+		final Object instance = managedInstance.getInstance();
+
 		// load from the database
 		if (children == null) {
 			final QueryImpl<E> q = em.createQuery(this.getSelectCriteria());
 
 			final EntityTypeImpl<?> rootType = managedInstance.getType();
 
-			final Object id = managedInstance.getId().getId();
+			if (this.isOwnerSelect()) {
+				final Object id = managedInstance.getId().getId();
 
-			// if has single id then pass it on
-			if (rootType.hasSingleIdAttribute()) {
-				q.setParameter(1, id);
+				// if has single id then pass it on
+				if (rootType.hasSingleIdAttribute()) {
+					q.setParameter(1, id);
+				}
+				else {
+					int i = 1;
+					for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
+						q.setParameter(i++, pair.getSecond().get(id));
+					}
+				}
 			}
 			else {
-				int i = 1;
-				for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
-					q.setParameter(i++, pair.getSecond().get(id));
-				}
+				q.setParameter(1, instance);
 			}
 
 			children = q.getResultList();
@@ -575,8 +582,6 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 
 			}
 		}
-
-		final Object instance = managedInstance.getInstance();
 
 		if ((this.getInverse() != null) && (this.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_MANY)) {
 			final Object[] childrenToProcess = children.toArray(new Object[children.size()]);

@@ -1902,7 +1902,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				final Fetch<?, Object> r2 = r.fetch(mapping.getAttribute().getName(), JoinType.LEFT);
 				final EntityTypeImpl<?> type = association.getType();
 				type.prepareEagerJoins(r2, depth + 1, association);
-
 			}
 		}
 	}

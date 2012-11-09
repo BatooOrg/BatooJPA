@@ -60,8 +60,8 @@ public class FetchStrategyTest extends BaseCoreTest {
 	private Person person() {
 		final Person person = new Person("Ceylan");
 
-		new Address(person, FetchStrategyTest.ISTANBUL);
-		new Address(person, FetchStrategyTest.NEWYORK);
+		new Address(person, FetchStrategyTest.LONDON);
+		new Address(person, FetchStrategyTest.LONDON);
 		new Address(person, FetchStrategyTest.LONDON);
 
 		new Phone(person, "111 1111111");
@@ -84,7 +84,6 @@ public class FetchStrategyTest extends BaseCoreTest {
 		this.persist(FetchStrategyTest.ISTANBUL);
 		this.persist(FetchStrategyTest.NEWYORK);
 		this.persist(FetchStrategyTest.LONDON);
-
 	}
 
 	/**

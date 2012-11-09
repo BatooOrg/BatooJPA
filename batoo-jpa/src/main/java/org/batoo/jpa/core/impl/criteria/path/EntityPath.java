@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.criteria.path;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Path;
@@ -36,10 +37,15 @@ import org.batoo.jpa.core.impl.criteria.join.FetchImpl;
 import org.batoo.jpa.core.impl.criteria.join.FetchParentImpl;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl.MapSelectType;
+import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
+import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
+import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+
+import com.google.common.collect.Lists;
 
 /**
  * Entity type attribute implementation of {@link Path}.
@@ -54,14 +60,16 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
  */
 public class EntityPath<Z, X> extends ParentPath<Z, X> implements Joinable {
 
-	private final FetchImpl<Z, X> fetchRoot;
+	private final SingularAssociationMapping<?, Z> mapping;
 	private final String pathName;
 	private final EntityTypeImpl<X> entity;
+
+	private FetchImpl<Z, X> fetchRoot;
 
 	/**
 	 * @param parent
 	 *            the parent path
-	 * @param pathName
+	 * @param mapping
 	 *            the path name
 	 * @param entity
 	 *            the entity
@@ -69,13 +77,17 @@ public class EntityPath<Z, X> extends ParentPath<Z, X> implements Joinable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EntityPath(ParentPath<?, Z> parent, String pathName, EntityTypeImpl<X> entity) {
+	@SuppressWarnings("unchecked")
+	public EntityPath(ParentPath<?, Z> parent, SingularAssociationMapping<?, Z> mapping, EntityTypeImpl<X> entity) {
 		super(parent, entity.getJavaType());
 
-		this.pathName = pathName;
+		this.mapping = mapping;
+		this.pathName = mapping.getAttribute().getName();
 		this.entity = entity;
 
-		this.fetchRoot = parent.getFetchRoot().join(pathName, JoinType.LEFT);
+		if (!this.mapping.isOwner() || (this.mapping.getForeignKey() == null)) {
+			this.fetchRoot = (FetchImpl<Z, X>) this.getParentPath().getFetchRoot().join(this.pathName, JoinType.LEFT);
+		}
 	}
 
 	/**
@@ -122,7 +134,7 @@ public class EntityPath<Z, X> extends ParentPath<Z, X> implements Joinable {
 	 */
 	@Override
 	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
-		return this.fetchRoot.generateSqlSelect(query, selected, false);
+		return this.getFetchRoot().generateSqlSelect(query, selected, false);
 	}
 
 	/**
@@ -139,7 +151,12 @@ public class EntityPath<Z, X> extends ParentPath<Z, X> implements Joinable {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public FetchParentImpl<?, X> getFetchRoot() {
+		if (this.fetchRoot == null) {
+			this.fetchRoot = (FetchImpl<Z, X>) this.getParentPath().getFetchRoot().join(this.pathName, JoinType.LEFT);
+		}
+
 		return this.fetchRoot;
 	}
 
@@ -174,7 +191,20 @@ public class EntityPath<Z, X> extends ParentPath<Z, X> implements Joinable {
 	 */
 	@Override
 	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
-		return this.fetchRoot.getSqlRestrictionFragments(query, MapSelectType.VALUE);
+		if (!this.mapping.isOwner() || (this.mapping.getForeignKey() == null)) {
+			return this.getFetchRoot().getSqlRestrictionFragments(query, MapSelectType.VALUE);
+		}
+
+		final List<String> restrictions = Lists.newArrayList();
+
+		final ForeignKey foreignKey = this.mapping.getForeignKey();
+		final String tableAlias = this.getParentPath().getFetchRoot().getTableAlias(query, foreignKey.getTable());
+
+		for (final AbstractColumn column : foreignKey.getJoinColumns()) {
+			restrictions.add(tableAlias + "." + column.getName());
+		}
+
+		return restrictions.toArray(new String[restrictions.size()]);
 	}
 
 	/**

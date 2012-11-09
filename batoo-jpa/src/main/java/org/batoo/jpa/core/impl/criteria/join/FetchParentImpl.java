@@ -107,7 +107,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	private final HashMap<SecondaryTable, String> tableAliases = Maps.newHashMap();
 	private final HashMap<AbstractColumn, String> idFields = Maps.newHashMap();
 	private final HashMap<AbstractColumn, String> joinFields = Maps.newHashMap();
-	private final List<SingularAssociationMapping<?, ?>> singularJoins = Lists.newArrayList();
+	private final Set<SingularAssociationMapping<?, ?>> singularJoins = Sets.newHashSet();
 
 	private int nextTableAlias = 1;
 	private AbstractColumn[] columns;
@@ -468,7 +468,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			else {
 				fieldAlias = tableAlias + "_F" + query.getFieldAlias(tableAlias, column);
 
-				if (column.getMapping() instanceof BasicMapping && ((BasicMapping<?, ?>) column.getMapping()).getAttribute().getColumnTransformer() != null) {
+				if ((column.getMapping() instanceof BasicMapping) && (((BasicMapping<?, ?>) column.getMapping()).getAttribute().getColumnTransformer() != null)) {
 					final ColumnTransformerMetadata columnTransformer = ((BasicMapping<?, ?>) column.getMapping()).getAttribute().getColumnTransformer();
 					final String columnSql = Strings.isNullOrEmpty(columnTransformer.getRead()) ? column.getName() : columnTransformer.getRead();
 					field = columnSql.replace(column.getName(), Joiner.on(".").skipNulls().join(tableAlias, column.getName()));
@@ -535,6 +535,36 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		return this.alias;
 	}
 
+	private Object getAssociateId(ResultSet row, EntityTypeImpl<?> entity, SingularAssociationMapping<?, ?> mapping) throws SQLException {
+		if (entity.hasSingleIdAttribute()) {
+			final SingularMapping<?, ?> idMapping = this.entity.getIdMapping();
+			if (idMapping instanceof BasicMapping) {
+				final JoinColumn column = mapping.getForeignKey().getJoinColumns().get(0);
+				final String field = this.joinFields.get(column);
+
+				return row.getObject(field);
+			}
+
+			// FIXME implement the same login for embedded id temporarily we return null
+			return null;
+		}
+
+		final Object id = ((EmbeddableTypeImpl<?>) entity.getIdType()).newInstance();
+		for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.entity.getIdMappings()) {
+			final String referencedColumnName = pair.getFirst().getColumn().getName();
+
+			for (final JoinColumn joinColumn : mapping.getForeignKey().getJoinColumns()) {
+				if (joinColumn.getReferencedColumnName().equals(referencedColumnName)) {
+					final String field = this.joinFields.get(joinColumn);
+					pair.getSecond().set(id, row.getObject(field));
+					break;
+				}
+			}
+		}
+
+		return id;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * 
@@ -558,16 +588,16 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 
 	private Object getId(ResultSet row) throws SQLException {
 		if (this.entity.hasSingleIdAttribute()) {
-			final SingularMapping<? super X, ?> idMapping = this.entity.getIdMapping();
+			final SingularMapping<?, ?> idMapping = this.entity.getIdMapping();
 			if (idMapping instanceof BasicMapping) {
-				final BasicColumn column = ((BasicMapping<? super X, ?>) idMapping).getColumn();
+				final BasicColumn column = ((BasicMapping<?, ?>) idMapping).getColumn();
 				final String field = this.idFields.get(column);
 
 				return row.getObject(field);
 			}
 
 			final MutableBoolean allNull = new MutableBoolean(true);
-			final Object id = this.populateEmbeddedId(row, (EmbeddedMapping<? super X, ?>) idMapping, null, allNull);
+			final Object id = this.populateEmbeddedId(row, (EmbeddedMapping<?, ?>) idMapping, null, allNull);
 
 			return allNull.booleanValue() ? null : id;
 		}
@@ -991,6 +1021,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		return false;
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void initializeInstance(SessionImpl session, ResultSet row, ManagedInstance<? extends X> managedInstance) throws SQLException {
 		managedInstance.setLoading(true);
 
@@ -998,6 +1029,21 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 
 		for (int i = 0; i < this.fields.length; i++) {
 			this.columns[i].setValue(instance, row.getObject(this.fields[i]));
+		}
+
+		for (final SingularAssociationMapping<?, ?> mapping : this.singularJoins) {
+			final EntityTypeImpl<?> type = mapping.getType();
+			final Object id = this.getAssociateId(row, type, mapping);
+
+			if (id != null) {
+				final ManagedId<?> managedId = new ManagedId(id, type);
+				final ManagedInstance<?> associate = session.get(managedId);
+
+				if (associate != null) {
+					mapping.set(instance, associate.getInstance());
+					managedInstance.setJoinLoaded(mapping);
+				}
+			}
 		}
 
 		for (final FetchImpl<X, ?> fetch : this.fetches.values()) {

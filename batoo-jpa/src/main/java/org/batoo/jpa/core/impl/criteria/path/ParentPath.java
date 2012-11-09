@@ -38,6 +38,7 @@ import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
+import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 import com.google.common.collect.Maps;
@@ -102,7 +103,7 @@ public abstract class ParentPath<Z, X> extends AbstractPath<X> implements Path<X
 			case BASIC:
 				return new BasicPath<Y>(this, (BasicMapping<? super X, Y>) mapping);
 			default:
-				return new EntityPath<X, Y>(this, attribute.getName(), (EntityTypeImpl<Y>) attribute.getType());
+				return new EntityPath<X, Y>(this, (SingularAssociationMapping<Z, X>) mapping, (EntityTypeImpl<Y>) attribute.getType());
 		}
 
 	}

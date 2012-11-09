@@ -28,6 +28,7 @@ import javax.persistence.FetchType;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Selection;
+import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableBoolean;
@@ -39,6 +40,7 @@ import org.batoo.jpa.core.impl.criteria.RootImpl;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
 import org.batoo.jpa.core.impl.criteria.join.AbstractJoin;
+import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
@@ -89,6 +91,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	private final FetchStrategyType fetchStrategy;
 
 	private CriteriaQueryImpl<Y> selectCriteria;
+	private boolean ownerSelect;
 
 	/**
 	 * @param parent
@@ -191,6 +194,81 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * @author hceylan
 	 */
 	public abstract void checkTransient(ManagedInstance<?> managedInstance);
+
+	private CriteriaQueryImpl<Y> generateMappedSelectCriteria(MetamodelImpl metamodel, CriteriaBuilderImpl cb, Class<Y> bindableType, EntityTypeImpl<Y> entity) {
+		final CriteriaQueryImpl<Y> q = cb.createQuery(bindableType);
+		q.internal();
+
+		final RootImpl<Y> r = q.from(entity);
+		r.alias(BatooUtils.acronym(entity.getName()).toLowerCase());
+
+		q.select(r);
+
+		final Iterator<String> pathIterator = Splitter.on(".").split(this.getInverse().getPath()).iterator();
+
+		// Drop the root part
+		pathIterator.next();
+
+		AbstractPath<?> path = null;
+		while (pathIterator.hasNext()) {
+			path = path == null ? r.get(pathIterator.next()) : path.get(pathIterator.next());
+		}
+
+		entity.prepareEagerJoins(r, 0, this);
+
+		final ParameterExpressionImpl<?> pe = cb.parameter(this.getInverse().getJavaType());
+		final PredicateImpl predicate = cb.equal(path, pe);
+		return this.selectCriteria = q.where(predicate);
+	}
+
+	@SuppressWarnings("unchecked")
+	private CriteriaQueryImpl<Y> generateOwnerSelectCriteria(final MetamodelImpl metamodel, final CriteriaBuilderImpl cb, Class<Y> bindableType,
+		EntityTypeImpl<Y> entity) {
+		CriteriaQueryImpl<Y> q = cb.createQuery(bindableType);
+		q.internal();
+
+		final EntityTypeImpl<?> type = (EntityTypeImpl<?>) this.getRoot().getType();
+
+		final RootImpl<?> r = q.from(type);
+		r.alias(BatooUtils.acronym(type.getName()).toLowerCase());
+
+		final Iterator<String> pathIterator = Splitter.on(".").split(this.getPath()).iterator();
+
+		// Drop the root part
+		pathIterator.next();
+
+		AbstractJoin<?, ?> join = null;
+		while (pathIterator.hasNext()) {
+			join = join == null ? r.<Y> join(pathIterator.next()) : join.join(pathIterator.next());
+		}
+
+		q = q.select((Selection<? extends Y>) join);
+
+		entity.prepareEagerJoins(join, 0, this);
+
+		// has single id mapping
+		if (type.hasSingleIdAttribute()) {
+			final SingularMapping<?, ?> idMapping = type.getIdMapping();
+			final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
+			final Path<?> path = r.get(idMapping.getAttribute().getName());
+			final PredicateImpl predicate = cb.equal(path, pe);
+
+			return this.selectCriteria = q.where(predicate);
+		}
+
+		// has multiple id mappings
+		final List<PredicateImpl> predicates = Lists.newArrayList();
+		for (final Pair<?, BasicAttribute<?, ?>> pair : type.getIdMappings()) {
+			final BasicMapping<?, ?> idMapping = (BasicMapping<?, ?>) pair.getFirst();
+			final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
+			final Path<?> path = r.get(idMapping.getAttribute().getName());
+			final PredicateImpl predicate = cb.equal(path, pe);
+
+			predicates.add(predicate);
+		}
+
+		return this.selectCriteria = q.where(predicates.toArray(new PredicateImpl[predicates.size()]));
+	}
 
 	/**
 	 * Returns the effective association metadata for the attribute checking with the parent mappings and entities.
@@ -310,7 +388,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings("unchecked")
 	protected CriteriaQueryImpl<Y> getSelectCriteria() {
 		if (this.selectCriteria != null) {
 			return this.selectCriteria;
@@ -325,53 +402,20 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 			final MetamodelImpl metamodel = this.getRoot().getType().getMetamodel();
 			final CriteriaBuilderImpl cb = metamodel.getEntityManagerFactory().getCriteriaBuilder();
 
-			final AttributeImpl<? super Z, X> attribute = this.getAttribute();
-			final Class<Y> bindableType = (Class<Y>) (attribute instanceof PluralAttributeImpl
-				? ((PluralAttributeImpl<?, ?, ?>) attribute).getBindableJavaType() : ((SingularAttributeImpl<?, ?>) attribute).getBindableJavaType());
+			@SuppressWarnings("unchecked")
+			final Class<Y> bindableType = (Class<Y>) (this.getAttribute() instanceof PluralAttributeImpl
+				? ((PluralAttributeImpl<?, ?, ?>) this.getAttribute()).getBindableJavaType()
+				: ((SingularAttributeImpl<?, ?>) this.getAttribute()).getBindableJavaType());
+
 			final EntityTypeImpl<Y> entity = metamodel.entity(bindableType);
 
-			CriteriaQueryImpl<Y> q = cb.createQuery(bindableType);
-			q.internal();
-			final EntityTypeImpl<?> type = (EntityTypeImpl<?>) this.getRoot().getType();
-			final RootImpl<?> r = q.from(type);
-			r.alias(BatooUtils.acronym(type.getName()).toLowerCase());
-
-			final Iterator<String> pathIterator = Splitter.on(".").split(this.getPath()).iterator();
-
-			// Drop the root part
-			pathIterator.next();
-
-			AbstractJoin<?, ?> join = null;
-			while (pathIterator.hasNext()) {
-				join = join == null ? r.<Y> join(pathIterator.next()) : join.join(pathIterator.next());
+			this.ownerSelect = this.isOwner() || (this.getAttribute().getPersistentAttributeType() == PersistentAttributeType.MANY_TO_MANY);
+			if (this.ownerSelect) {
+				return this.generateOwnerSelectCriteria(metamodel, cb, bindableType, entity);
 			}
-
-			q = q.select((Selection<? extends Y>) join);
-
-			entity.prepareEagerJoins(join, 0, this);
-
-			// has single id mapping
-			if (type.hasSingleIdAttribute()) {
-				final SingularMapping<?, ?> idMapping = type.getIdMapping();
-				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
-				final Path<?> path = r.get(idMapping.getAttribute().getName());
-				final PredicateImpl predicate = cb.equal(path, pe);
-
-				return this.selectCriteria = q.where(predicate);
+			else {
+				return this.generateMappedSelectCriteria(metamodel, cb, bindableType, entity);
 			}
-
-			// has multiple id mappings
-			final List<PredicateImpl> predicates = Lists.newArrayList();
-			for (final Pair<?, BasicAttribute<?, ?>> pair : type.getIdMappings()) {
-				final BasicMapping<?, ?> idMapping = (BasicMapping<?, ?>) pair.getFirst();
-				final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
-				final Path<?> path = r.get(idMapping.getAttribute().getName());
-				final PredicateImpl predicate = cb.equal(path, pe);
-
-				predicates.add(predicate);
-			}
-
-			return this.selectCriteria = q.where(predicates.toArray(new PredicateImpl[predicates.size()]));
 		}
 	}
 
@@ -412,6 +456,17 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 */
 	public final boolean isOwner() {
 		return this.mappedBy == null;
+	}
+
+	/**
+	 * Returns if the selection is owned.
+	 * 
+	 * @return true if the selection is owned, false otherwise
+	 * 
+	 * @since $version
+	 */
+	protected boolean isOwnerSelect() {
+		return this.ownerSelect;
 	}
 
 	/**
@@ -512,5 +567,4 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * @author hceylan
 	 */
 	public abstract void setInverse(AssociationMapping<?, ?, ?> inverse);
-
 }

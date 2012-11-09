@@ -199,17 +199,22 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 
 		final EntityTypeImpl<?> rootType = managedInstance.getType();
 
-		final Object id = managedInstance.getId().getId();
+		if (this.isOwnerSelect()) {
+			final Object id = managedInstance.getId().getId();
 
-		// if has single id then pass it on
-		if (rootType.hasSingleIdAttribute()) {
-			q.setParameter(1, id);
+			// if has single id then pass it on
+			if (rootType.hasSingleIdAttribute()) {
+				q.setParameter(1, id);
+			}
+			else {
+				int i = 1;
+				for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
+					q.setParameter(i++, pair.getSecond().get(id));
+				}
+			}
 		}
 		else {
-			int i = 1;
-			for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
-				q.setParameter(i++, pair.getSecond().get(id));
-			}
+			q.setParameter(1, managedInstance.getInstance());
 		}
 
 		try {

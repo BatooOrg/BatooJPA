@@ -74,6 +74,7 @@ public class ForeignKey {
 
 	private JoinColumn[] allChildrenRestrictions;
 	private final JdbcAdaptor jdbcAdaptor;
+	private FinalWrapper<JoinColumn[]> columns; // optimize getJoinColumns return to array
 
 	/**
 	 * Constructor to create a join foreign key
