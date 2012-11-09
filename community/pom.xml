@@ -27,7 +27,7 @@
 	</parent>
 	<artifactId>community</artifactId>
 
-	<name>BAtoo Persistence Community Tests</name>
+	<name>Batoo Persistence Community Tests</name>
 
 	<build>
 		<testResources>
