@@ -1446,6 +1446,33 @@ public class JpqlQuery {
 			return (AbstractExpression<X>) cb.size(collection);
 		}
 
+		if (exprDef.getType() == JpqlParser.CAST) {
+			final AbstractExpression<?> left = this.getExpression(cb, q, exprDef.getChild(0), null);
+			Class<?> clazz = null;
+
+			switch (exprDef.getChild(1).getType()) {
+				case JpqlParser.BYTE:
+					clazz = Byte.class;
+					break;
+				case JpqlParser.SHORT:
+					clazz = Short.class;
+					break;
+				case JpqlParser.INT:
+					clazz = Integer.class;
+					break;
+				case JpqlParser.LONG:
+					clazz = Long.class;
+					break;
+				case JpqlParser.FLOAT:
+					clazz = Float.class;
+					break;
+				default:
+					clazz = Double.class;
+			}
+
+			return (AbstractExpression<X>) cb.cast(left, clazz);
+		}
+
 		throw new PersistenceException("Unhandled expression: " + exprDef.toStringTree() + ", line " + exprDef.getLine() + ":"
 			+ exprDef.getCharPositionInLine());
 	}

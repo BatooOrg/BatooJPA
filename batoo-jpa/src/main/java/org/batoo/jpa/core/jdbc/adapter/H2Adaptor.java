@@ -175,6 +175,25 @@ public class H2Adaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
+	protected String getCastClassName(Class<?> clazz) {
+		if (clazz == Byte.class) {
+			return "TINYINT";
+		}
+		else if (clazz == Short.class) {
+			return "SMALLINT";
+		}
+		else if (clazz == Float.class) {
+			return "FLOAT4";
+		}
+
+		return super.getCastClassName(clazz);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	protected String getColumnType(AbstractColumn cd, int sqlType) {
 		switch (sqlType) {
 			case Types.BLOB:

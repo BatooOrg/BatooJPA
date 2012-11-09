@@ -108,6 +108,26 @@ public class ComplianceTest extends BaseCoreTest {
 	 * @author hceylan
 	 */
 	@Test
+	public void testCast() {
+		this.persist(this.person(35));
+		this.commit();
+
+		this.close();
+
+		Assert.assertEquals(Byte.class, this.cq("select cast(p.age as byte) from Person p", Number.class).getSingleResult().getClass());
+		Assert.assertEquals(Short.class, this.cq("select cast(p.age as short) from Person p", Number.class).getSingleResult().getClass());
+		Assert.assertEquals(Integer.class, this.cq("select cast(p.age as int) from Person p", Number.class).getSingleResult().getClass());
+		Assert.assertEquals(Long.class, this.cq("select cast(p.age as long) from Person p", Number.class).getSingleResult().getClass());
+		Assert.assertEquals(Float.class, this.cq("select cast(p.age as float) from Person p", Number.class).getSingleResult().getClass());
+		Assert.assertEquals(Double.class, this.cq("select cast(p.age as double) from Person p", Number.class).getSingleResult().getClass());
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
 	public void testFetchAllProperties() {
 		this.persist(this.person(35));
 		this.commit();

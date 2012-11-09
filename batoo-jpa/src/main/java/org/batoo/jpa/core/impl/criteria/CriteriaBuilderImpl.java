@@ -48,6 +48,7 @@ import org.batoo.jpa.core.impl.criteria.expression.ArithmeticExression.Arithmeti
 import org.batoo.jpa.core.impl.criteria.expression.CaseImpl;
 import org.batoo.jpa.core.impl.criteria.expression.CaseTransformationExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CaseTransformationExpression.CaseTransformationType;
+import org.batoo.jpa.core.impl.criteria.expression.CastExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CoalesceExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ComparisonExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ComparisonExpression.Comparison;
@@ -194,6 +195,24 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	@Override
 	public <Y extends Comparable<? super Y>> PredicateImpl between(Expression<? extends Y> v, Y x, Y y) {
 		return new PredicateImpl(new ComparisonExpression(Comparison.BETWEEN, v, this.createConstant(x), this.createConstant(y)));
+	}
+
+	/**
+	 * Casts the inner expression to <code>clazz</code>.
+	 * 
+	 * @param x
+	 *            the inner expression
+	 * @param clazz
+	 *            the class to cast
+	 * @return the cast expressition
+	 * @param <X>
+	 *            the type of the clazz
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public <X> AbstractExpression<X> cast(AbstractExpression<?> x, Class<X> clazz) {
+		return new CastExpression<X>(x, clazz);
 	}
 
 	/**

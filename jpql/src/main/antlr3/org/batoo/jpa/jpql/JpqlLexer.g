@@ -108,8 +108,14 @@ BOTH :
 BY :
     B Y;
 
+BYTE :
+	B Y T E;
+
 CASE :
     C A S E;
+
+CAST :
+	C A S T;
 
 CHAR_LENGTH :
     C H A R Underscore L E N G H T H;
@@ -159,6 +165,9 @@ DESC :
 DISTINCT :
     D I S T I N C T;
 
+DOUBLE :
+	D O U B L E;
+
 ELSE :
     E L S E;
 
@@ -183,7 +192,11 @@ FALSE :
 FETCH :
     F E T C H;
 
-FUNC : F U N C;
+FLOAT :
+	F L O A T;
+
+FUNC : 
+	F U N C;
 
 FROM :
     F R O M;
@@ -199,6 +212,9 @@ HOUR :
 
 IN :
     I N;
+    
+INT :
+    I N T;
 
 INDEX :
     I N D E X;
@@ -229,6 +245,9 @@ LIKE :
 
 LOCATE :
     L O C A T E;
+
+LONG :
+	L O N G;
 
 LOWER :
     L O W E R;
@@ -292,6 +311,9 @@ SELECT :
 
 SET :
     S E T;
+
+SHORT :
+	S H O R T;
 
 SIZE :
     S I Z E;

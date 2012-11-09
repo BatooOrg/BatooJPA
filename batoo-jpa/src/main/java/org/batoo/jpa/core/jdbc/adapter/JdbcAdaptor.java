@@ -48,9 +48,9 @@ import javax.sql.DataSource;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.batoo.common.util.BatooUtils;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
+import org.batoo.common.util.BatooUtils;
 import org.batoo.jpa.core.impl.criteria.expression.DateTimeFunctionType;
 import org.batoo.jpa.core.impl.criteria.expression.NumericFunctionType;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
@@ -149,6 +149,24 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 		super();
 
 		this.loadReservedWords();
+	}
+
+	/**
+	 * Applies cast operation to the expression.
+	 * 
+	 * @param argument
+	 *            the SQL argument
+	 * @param clazz
+	 *            the class to cast
+	 * @return the casted expression
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String applyCast(String argument, Class<?> clazz) {
+		final String className = this.getCastClassName(clazz);
+
+		return "CAST(" + argument + " AS " + className + ")";
 	}
 
 	/**
@@ -766,6 +784,20 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 		}
 
 		return name;
+	}
+
+	/**
+	 * Returns the clazz to DB type data type.
+	 * 
+	 * @param clazz
+	 *            the original cast class
+	 * @return the converted DB type name
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected String getCastClassName(Class<?> clazz) {
+		return clazz.getSimpleName();
 	}
 
 	/**
