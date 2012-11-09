@@ -340,20 +340,33 @@ public class JpqlQuery {
 		for (int i = 0; i < joins.getChildCount(); i++) {
 			final Tree join = joins.getChild(i);
 
-			final JoinType joinType = join.getChild(0).getType() == JpqlParser.INNER ? JoinType.INNER : JoinType.LEFT;
-			if (join.getChildCount() == 4) {
-				FetchParent<?, ?> parent = this.getAliased(q, join.getChild(1).getText());
+			JoinType joinType = JoinType.INNER;
 
-				final Qualified qualified = new Qualified(join.getChild(2).getChild(0));
+			final int joinSpecification = join.getChild(0).getType();
+			int offset = 0;
+
+			if (joinSpecification == JpqlParser.INNER) {
+				offset = 1;
+				joinType = JoinType.INNER;
+			}
+			else if (joinSpecification == JpqlParser.LEFT) {
+				offset = 1;
+				joinType = JoinType.LEFT;
+			}
+
+			if (join.getChildCount() == (offset + 3)) {
+				FetchParent<?, ?> parent = this.getAliased(q, join.getChild(offset).getText());
+
+				final Qualified qualified = new Qualified(join.getChild(offset + 1).getChild(0));
 
 				for (final String segment : qualified.getSegments()) {
 					parent = parent.fetch(segment, joinType);
 				}
 			}
 			else {
-				AbstractFrom<?, ?> parent = this.getAliased(q, join.getChild(1).getText());
+				AbstractFrom<?, ?> parent = this.getAliased(q, join.getChild(offset).getText());
 
-				final Aliased aliased = new Aliased(join.getChild(2));
+				final Aliased aliased = new Aliased(join.getChild(offset + 1));
 
 				int depth = 0;
 				for (final String segment : aliased.getQualified().getSegments()) {
@@ -366,8 +379,6 @@ public class JpqlQuery {
 
 					depth++;
 				}
-
-				parent.alias(aliased.getAlias());
 
 				this.putAlias(q, join.getChild(1), aliased, parent);
 			}
@@ -1486,18 +1497,25 @@ public class JpqlQuery {
 		}
 	}
 
-	private void putAlias(BaseQuery<?> q, Tree aliasedDef, final Aliased aliased, final AbstractFrom<?, ?> r) {
+	private void putAlias(BaseQuery<?> q, Tree aliasedDef, final Aliased aliased, final AbstractFrom<?, ?> from) {
 		Map<String, AbstractFrom<?, ?>> aliasMap = this.aliasMap.get(q);
 		if (aliasMap == null) {
 			aliasMap = Maps.newHashMap();
 			this.aliasMap.put(q, aliasMap);
 		}
 
-		final String alias = aliased.getAlias();
+		String alias = aliased.getAlias();
+
+		if (alias == null) {
+			alias = aliased.getQualified().getSegments().getLast();
+
+			from.alias(alias);
+		}
+
 		if (aliasMap.containsKey(alias)) {
 			throw new PersistenceException("Alias already exists: " + alias + ", line " + aliasedDef.getLine() + ":" + aliasedDef.getCharPositionInLine());
 		}
 
-		aliasMap.put(aliased.getAlias(), r);
+		aliasMap.put(aliased.getAlias(), from);
 	}
 }

@@ -105,8 +105,8 @@ from_declaration :
     faliased_qid (join)*
         -> ^(ST_FROM faliased_qid ^(LJOINS (join)*));
 join : 
-	((LEFT OUTER?) | INNER) JOIN FETCH? ID Period qid (AS? ID)?
-    	-> ^(ST_JOIN LEFT? INNER? ID ^(ST_ID_AS qid ID) FETCH?);
+	((LEFT OUTER?) | INNER)? JOIN FETCH? ID Period qid (AS? ID)?
+    	-> ^(ST_JOIN LEFT? INNER? ID ^(ST_ID_AS qid ID?) FETCH?);
 
 collection_member_declaration :
     IN Left_Paren ID Period qid Right_Paren AS? ID?
@@ -297,11 +297,11 @@ like_expression :
         -> ^(LIKE string_expression string_expression (STRING_LITERAL)? (NOT)?);
 
 comparison_expression options { backtrack=true; }:
-    string_expression comparison_operator^ (string_expression | all_or_any_expression) 
+    arithmetic_expression comparison_operator^ (arithmetic_expression | all_or_any_expression)
+    | string_expression comparison_operator^ (string_expression | all_or_any_expression) 
     | boolean_expression comparison_operator^ (boolean_expression | all_or_any_expression)
     | enum_expression (Equals_Operator | Not_Equals_Operator)^ (enum_expression | all_or_any_expression)
     | datetime_expression comparison_operator^ (datetime_expression | all_or_any_expression)
-    | arithmetic_expression comparison_operator^ (arithmetic_expression | all_or_any_expression)
     | entity_type_expression (Equals_Operator | Not_Equals_Operator)^ entity_type_expression
     ;
 
@@ -316,7 +316,7 @@ comparison_operator :
 
 arithmetic_expression :
  	simple_arithmetic_expression
- 	| Left_Paren subquery Right_Paren
+ 	| Left_Paren! subquery Right_Paren!
 	;
 
 string_expression :

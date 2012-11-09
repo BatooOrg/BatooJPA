@@ -56,7 +56,7 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	@Override
 	public Selection<X> alias(String alias) {
 		if (alias == null) {
-			throw new IllegalStateException("Alias has already been set");
+			throw new NullPointerException();
 		}
 
 		this.alias = alias;

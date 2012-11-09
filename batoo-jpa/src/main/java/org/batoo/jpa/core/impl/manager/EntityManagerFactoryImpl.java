@@ -560,7 +560,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 				throw (IllegalArgumentException) e.getCause();
 			}
 
-			throw new PersistenceException("Cannot parse query: " + e.getMessage(), e);
+			throw new PersistenceException("Cannot parse query: " + qlString, e);
 		}
 	}
 

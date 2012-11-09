@@ -78,7 +78,7 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	 */
 	@Override
 	public String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
-		throw new IllegalArgumentException("Collection paths cannot be selected");
+		throw new IllegalArgumentException("Collection paths cannot be selected: " + this);
 	}
 
 	/**
@@ -87,7 +87,7 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	 */
 	@Override
 	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
-		throw new IllegalArgumentException("Collection paths cannot be selected");
+		throw new IllegalArgumentException("Collection paths cannot be selected: " + this);
 	}
 
 	/**
