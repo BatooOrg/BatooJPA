@@ -28,7 +28,6 @@ import java.sql.Types;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -101,7 +100,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 
 	private LockModeType lockMode;
 
-	private final List<Map<String, Object>> data = Lists.newArrayList();
+	private final List<Object[]> data = Lists.newArrayList();
 	private ResultSetMetaData md;
 	private String[] labels;
 
@@ -387,9 +386,9 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 			lengths[i] = this.max(lengths[i], StringUtils.length(this.labels[i]));
 		}
 
-		for (final Map<String, Object> data : this.data) {
+		for (final Object[] data : this.data) {
 			for (int i = 0; i < this.labels.length; i++) {
-				final Object value = data.get(this.md.getColumnName(i + 1));
+				final Object value = data[i];
 				if (value != null) {
 					lengths[i] = this.max(lengths[i], StringUtils.length(value.toString()));
 				}
@@ -419,11 +418,11 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 		dump.append("\n");
 		dump.append(StringUtils.repeat("-", length));
 
-		for (final Map<String, Object> data : this.data) {
+		for (final Object[] data : this.data) {
 			dump.append("\n| ");
 
 			for (int i = 0; i < this.labels.length; i++) {
-				final Object value = data.get(this.md.getColumnName(i + 1));
+				final Object value = data[i];
 
 				String strValue = value != null ? value.toString() : "!NULL!";
 				strValue = StringUtils.abbreviate(strValue, lengths[i]);
@@ -1092,12 +1091,11 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 * @author hceylan
 	 */
 	public void storeData(ResultSet rs) throws SQLException {
-		final HashMap<String, Object> data = Maps.newHashMap();
+		final Object[] data = new Object[this.md.getColumnCount()];
 
 		final int columnCount = this.md.getColumnCount();
 		for (int i = 0; i < columnCount; i++) {
-			final Object value = rs.getObject(i + 1);
-			data.put(this.md.getColumnName(i + 1), value);
+			data[i] = rs.getObject(i + 1);
 		}
 
 		this.data.add(data);
