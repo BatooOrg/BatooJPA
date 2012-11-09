@@ -249,6 +249,15 @@ public class OracleAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
+	public int getInsertBatchSize() {
+		return 1; // Oracle does not support bulk inserts...
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public long getNextSequence(DataSource datasource, String sequenceName) throws SQLException {
 		return new QueryRunner(datasource) //
 		.query("SELECT " + sequenceName + ".NEXTVAL FROM DUAL", new SingleValueHandler<Number>()).longValue();

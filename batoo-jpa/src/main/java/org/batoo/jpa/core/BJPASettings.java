@@ -87,7 +87,7 @@ public interface BJPASettings {
 	/**
 	 * The default for {@value #MAX_FETCH_JOIN_DEPTH} that is 1.
 	 */
-	Integer DEFAULT_MAX_FETCH_JOIN_DEPTH = 1;
+	Integer DEFAULT_MAX_FETCH_JOIN_DEPTH = 2;
 
 	/**
 	 * The size of the datasource statement cache size

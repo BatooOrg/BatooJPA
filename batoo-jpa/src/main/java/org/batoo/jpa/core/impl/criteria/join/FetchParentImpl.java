@@ -1021,7 +1021,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		return false;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void initializeInstance(SessionImpl session, ResultSet row, ManagedInstance<? extends X> managedInstance) throws SQLException {
 		managedInstance.setLoading(true);
 
@@ -1036,14 +1035,11 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			final Object id = this.getAssociateId(row, type, mapping);
 
 			if (id != null) {
-				final ManagedId<?> managedId = new ManagedId(id, type);
-				final ManagedInstance<?> associate = session.get(managedId);
-
-				if (associate != null) {
-					mapping.set(instance, associate.getInstance());
-					managedInstance.setJoinLoaded(mapping);
-				}
+				final Object reference = session.getEntityManager().getReference(type.getJavaType(), id);
+				mapping.set(instance, reference);
 			}
+
+			managedInstance.setJoinLoaded(mapping);
 		}
 
 		for (final FetchImpl<X, ?> fetch : this.fetches.values()) {

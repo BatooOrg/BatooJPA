@@ -98,5 +98,4 @@ public class Enhanced implements EnhancedInstance {
 	public Object get__enhanced__$$__id() {
 		return this.__enhanced_$$__id;
 	}
-
 }

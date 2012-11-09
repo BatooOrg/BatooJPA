@@ -921,9 +921,22 @@ public class ManagedInstance<X> {
 			}
 		}
 
+		final X _instance = this.instance;
+		final EntityManagerImpl entityManager = this.session.getEntityManager();
+
 		for (final SingularAssociationMapping<?, ?> mapping : this.type.getAssociationsSingular()) {
 			if (!_joinsLoaded.contains(mapping.getPath())) {
 				mapping.initialize(this);
+			}
+			else {
+				final Object associate = mapping.get(_instance);
+				if (associate instanceof EnhancedInstance) {
+					final EnhancedInstance enhancedInstance = (EnhancedInstance) associate;
+					if (!enhancedInstance.__enhanced__$$__isInitialized()) {
+						final ManagedInstance<?> associateManagedInstance = enhancedInstance.__enhanced__$$__getManagedInstance();
+						entityManager.find(associateManagedInstance.getType().getJavaType(), associateManagedInstance.getId().getId());
+					}
+				}
 			}
 		}
 	}
