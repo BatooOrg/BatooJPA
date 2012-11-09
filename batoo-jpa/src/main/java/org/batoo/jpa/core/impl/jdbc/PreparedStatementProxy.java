@@ -45,8 +45,8 @@ import java.util.Calendar;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.batoo.jpa.common.log.BLogger;
-import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.common.log.BLogger;
+import org.batoo.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.manager.OperationTookLongTimeWarning;
 
 /**

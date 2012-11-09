@@ -38,7 +38,7 @@ import javax.sql.rowset.serial.SerialBlob;
 import javax.sql.rowset.serial.SerialClob;
 
 import org.apache.commons.io.IOUtils;
-import org.batoo.jpa.common.reflect.ReflectHelper;
+import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.AbstractLocator;

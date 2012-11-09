@@ -31,9 +31,9 @@ import javax.persistence.ValidationMode;
 import javax.persistence.spi.PersistenceUnitInfo;
 import javax.sql.DataSource;
 
-import org.batoo.jpa.common.BatooException;
-import org.batoo.jpa.common.log.BLogger;
-import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.common.BatooException;
+import org.batoo.common.log.BLogger;
+import org.batoo.common.log.BLoggerFactory;
 import org.batoo.jpa.parser.impl.OrmParser;
 import org.batoo.jpa.parser.impl.metadata.MetadataImpl;
 import org.batoo.jpa.parser.persistence.Persistence;

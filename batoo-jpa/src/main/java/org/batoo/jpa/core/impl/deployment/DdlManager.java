@@ -20,9 +20,9 @@ package org.batoo.jpa.core.impl.deployment;
 
 import javax.sql.DataSource;
 
-import org.batoo.jpa.common.BatooException;
-import org.batoo.jpa.common.log.BLogger;
-import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.common.BatooException;
+import org.batoo.common.log.BLogger;
+import org.batoo.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.jdbc.DDLMode;

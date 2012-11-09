@@ -26,7 +26,7 @@ import javax.persistence.Column;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import org.batoo.jpa.common.reflect.ReflectHelper;
+import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.jpa.parser.impl.metadata.ColumnMetadataImpl;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.PhysicalAttributeMetadata;

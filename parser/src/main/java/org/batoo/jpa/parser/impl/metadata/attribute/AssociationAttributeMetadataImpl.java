@@ -41,7 +41,7 @@ import javax.persistence.TemporalType;
 
 import org.batoo.jpa.annotations.FetchStrategy;
 import org.batoo.jpa.annotations.FetchStrategyType;
-import org.batoo.jpa.common.reflect.ReflectHelper;
+import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.jpa.parser.impl.metadata.ColumnMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.JoinColumnMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.JoinTableMetadaImpl;

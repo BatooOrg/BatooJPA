@@ -27,7 +27,7 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.TableGenerator;
 
-import org.batoo.jpa.common.reflect.ReflectHelper;
+import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.jpa.parser.impl.metadata.GeneratedValueMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.SequenceGeneratorMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.TableGeneratorMetadataImpl;

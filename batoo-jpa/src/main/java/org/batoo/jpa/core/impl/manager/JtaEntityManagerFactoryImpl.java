@@ -25,8 +25,8 @@ import javax.naming.NamingException;
 import javax.persistence.PersistenceException;
 import javax.transaction.TransactionManager;
 
-import org.batoo.jpa.common.log.BLogger;
-import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.common.log.BLogger;
+import org.batoo.common.log.BLoggerFactory;
 import org.batoo.jpa.parser.PersistenceParser;
 
 /**

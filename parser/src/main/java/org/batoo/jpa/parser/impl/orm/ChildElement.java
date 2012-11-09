@@ -20,8 +20,8 @@ package org.batoo.jpa.parser.impl.orm;
 
 import java.util.Map;
 
-import org.batoo.jpa.common.log.ToStringBuilder;
-import org.batoo.jpa.common.log.ToStringBuilder.DetailLevel;
+import org.batoo.common.log.ToStringBuilder;
+import org.batoo.common.log.ToStringBuilder.DetailLevel;
 
 /**
  * Element factories that have no children elements.

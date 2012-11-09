@@ -23,7 +23,7 @@ import java.lang.reflect.Member;
 
 import javax.persistence.AccessType;
 
-import org.batoo.jpa.common.log.ToStringBuilder;
+import org.batoo.common.log.ToStringBuilder;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
 

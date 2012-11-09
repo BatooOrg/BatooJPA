@@ -23,7 +23,7 @@ import java.io.InputStream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.batoo.jpa.common.BatooException;
+import org.batoo.common.BatooException;
 import org.batoo.jpa.parser.impl.orm.OrmContentHandler;
 import org.batoo.jpa.parser.metadata.Metadata;
 import org.xml.sax.InputSource;

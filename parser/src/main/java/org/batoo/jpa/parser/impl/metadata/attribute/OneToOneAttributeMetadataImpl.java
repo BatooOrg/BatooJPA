@@ -27,7 +27,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.PrimaryKeyJoinColumns;
 
-import org.batoo.jpa.common.reflect.ReflectHelper;
+import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.jpa.parser.impl.metadata.PrimaryKeyJoinColumnMetadataImpl;
 import org.batoo.jpa.parser.metadata.PrimaryKeyJoinColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.OneToOneAttributeMetadata;

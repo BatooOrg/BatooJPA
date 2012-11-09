@@ -27,8 +27,8 @@ import javax.persistence.Tuple;
 import javax.persistence.criteria.CompoundSelection;
 import javax.persistence.criteria.Selection;
 
-import org.batoo.jpa.common.reflect.ConstructorAccessor;
-import org.batoo.jpa.common.reflect.ReflectHelper;
+import org.batoo.common.reflect.ConstructorAccessor;
+import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.parser.MappingException;
 

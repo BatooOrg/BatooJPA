@@ -26,8 +26,8 @@ import javax.persistence.metamodel.EmbeddableType;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.batoo.common.util.FinalWrapper;
-import org.batoo.jpa.common.reflect.ConstructorAccessor;
-import org.batoo.jpa.common.reflect.ReflectHelper;
+import org.batoo.common.reflect.ConstructorAccessor;
+import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
 import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;

@@ -26,8 +26,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.dbutils.DbUtils;
-import org.batoo.jpa.common.log.BLogger;
-import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.common.log.BLogger;
+import org.batoo.common.log.BLoggerFactory;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;

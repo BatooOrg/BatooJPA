@@ -43,9 +43,9 @@ import javax.validation.ValidatorFactory;
 import javax.validation.groups.Default;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.common.BatooException;
-import org.batoo.jpa.common.log.BLogger;
-import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.common.BatooException;
+import org.batoo.common.log.BLogger;
+import org.batoo.common.log.BLoggerFactory;
 import org.batoo.jpa.core.BJPASettings;
 import org.batoo.jpa.core.JPASettings;
 import org.batoo.jpa.core.impl.cache.CacheImpl;

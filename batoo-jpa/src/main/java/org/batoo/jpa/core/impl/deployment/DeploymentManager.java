@@ -31,8 +31,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.persistence.metamodel.ManagedType;
 
-import org.batoo.jpa.common.BatooException;
-import org.batoo.jpa.common.log.BLogger;
+import org.batoo.common.BatooException;
+import org.batoo.common.log.BLogger;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
 import org.batoo.jpa.core.util.IncrementalNamingThreadFactory;

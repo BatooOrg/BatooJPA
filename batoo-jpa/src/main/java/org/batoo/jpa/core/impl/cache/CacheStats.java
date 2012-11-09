@@ -21,8 +21,8 @@ package org.batoo.jpa.core.impl.cache;
 import java.io.Serializable;
 import java.text.MessageFormat;
 
-import org.batoo.jpa.common.log.BLogger;
-import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.common.log.BLogger;
+import org.batoo.common.log.BLoggerFactory;
 
 /**
  * The statistics repository for the class.

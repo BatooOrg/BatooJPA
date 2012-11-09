@@ -37,8 +37,8 @@ import javax.persistence.metamodel.PluralAttribute.CollectionType;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.mutable.MutableBoolean;
-import org.batoo.jpa.common.log.BLogger;
-import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.common.log.BLogger;
+import org.batoo.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.cache.CacheImpl;
 import org.batoo.jpa.core.impl.cache.CacheInstance;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;

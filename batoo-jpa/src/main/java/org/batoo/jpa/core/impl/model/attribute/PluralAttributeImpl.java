@@ -29,7 +29,7 @@ import java.util.Set;
 import javax.persistence.metamodel.PluralAttribute;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.common.reflect.ReflectHelper;
+import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;

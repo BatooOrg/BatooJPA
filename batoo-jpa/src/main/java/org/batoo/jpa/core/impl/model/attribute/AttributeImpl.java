@@ -22,8 +22,8 @@ import java.lang.reflect.Member;
 
 import javax.persistence.metamodel.Attribute;
 
-import org.batoo.jpa.common.reflect.AbstractAccessor;
-import org.batoo.jpa.common.reflect.ReflectHelper;
+import org.batoo.common.reflect.AbstractAccessor;
+import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.parser.impl.AbstractLocator;

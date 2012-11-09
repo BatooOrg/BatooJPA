@@ -22,8 +22,8 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.common.log.BLogger;
-import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.common.log.BLogger;
+import org.batoo.common.log.BLoggerFactory;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.Metadata;
 import org.xml.sax.Attributes;

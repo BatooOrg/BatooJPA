@@ -20,7 +20,7 @@ package org.batoo.jpa.parser.impl.metadata;
 
 import java.lang.reflect.Member;
 
-import org.batoo.jpa.common.reflect.ReflectHelper;
+import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 
 /**

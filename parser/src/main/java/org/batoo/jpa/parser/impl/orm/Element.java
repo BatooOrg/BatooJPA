@@ -22,8 +22,8 @@ import java.lang.reflect.Constructor;
 import java.util.Map;
 import java.util.Set;
 
-import org.batoo.jpa.common.log.BLogger;
-import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.common.log.BLogger;
+import org.batoo.common.log.BLoggerFactory;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.orm.CascadesElement.CascadeAllElement;
 import org.batoo.jpa.parser.impl.orm.CascadesElement.CascadeDetachElement;

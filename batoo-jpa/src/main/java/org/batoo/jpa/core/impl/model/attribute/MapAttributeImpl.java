@@ -25,7 +25,7 @@ import javax.persistence.metamodel.MapAttribute;
 import javax.persistence.metamodel.Type;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.common.reflect.ReflectHelper;
+import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.collections.ManagedMap;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;

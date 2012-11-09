@@ -43,11 +43,11 @@ import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 
-import org.batoo.jpa.common.log.BLogger;
-import org.batoo.jpa.common.log.BLoggerFactory;
-import org.batoo.jpa.common.log.ToStringBuilder;
-import org.batoo.jpa.common.reflect.PropertyDescriptor;
-import org.batoo.jpa.common.reflect.ReflectHelper;
+import org.batoo.common.log.BLogger;
+import org.batoo.common.log.BLoggerFactory;
+import org.batoo.common.log.ToStringBuilder;
+import org.batoo.common.reflect.PropertyDescriptor;
+import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.metadata.type.EntityMetadataImpl;
 import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;

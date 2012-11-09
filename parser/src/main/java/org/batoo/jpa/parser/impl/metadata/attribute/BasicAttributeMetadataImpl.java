@@ -30,7 +30,7 @@ import javax.persistence.Lob;
 
 import org.batoo.jpa.annotations.ColumnTransformer;
 import org.batoo.jpa.annotations.Index;
-import org.batoo.jpa.common.reflect.ReflectHelper;
+import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.jpa.parser.impl.metadata.ColumnTransformerMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.IndexMetadataImpl;
 import org.batoo.jpa.parser.metadata.ColumnTransformerMetadata;

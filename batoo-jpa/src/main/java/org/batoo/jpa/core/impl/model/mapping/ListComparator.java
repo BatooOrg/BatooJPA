@@ -26,8 +26,8 @@ import javax.persistence.OrderBy;
 import javax.persistence.metamodel.Type.PersistenceType;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.batoo.jpa.common.log.BLogger;
-import org.batoo.jpa.common.log.BLoggerFactory;
+import org.batoo.common.log.BLogger;
+import org.batoo.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.util.Pair;

@@ -20,7 +20,7 @@ package org.batoo.jpa.parser.impl.orm;
 
 import java.util.Map;
 
-import org.batoo.jpa.common.log.ToStringBuilder;
+import org.batoo.common.log.ToStringBuilder;
 
 /**
  * Element factories that may parent child elements.
