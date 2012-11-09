@@ -34,6 +34,15 @@ public class E2 extends E {
 	private E3 e3;
 
 	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public E2() {
+		super();
+	}
+
+	/**
 	 * @param e3
 	 *            the e3
 	 * 
