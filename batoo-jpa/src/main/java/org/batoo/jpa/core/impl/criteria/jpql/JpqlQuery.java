@@ -1458,6 +1458,7 @@ public class JpqlQuery {
 					clazz = Short.class;
 					break;
 				case JpqlParser.INT:
+				case JpqlParser.INTEGER:
 					clazz = Integer.class;
 					break;
 				case JpqlParser.LONG:
@@ -1466,8 +1467,11 @@ public class JpqlQuery {
 				case JpqlParser.FLOAT:
 					clazz = Float.class;
 					break;
-				default:
+				case JpqlParser.DOUBLE:
 					clazz = Double.class;
+					break;
+				default:
+					clazz = String.class;
 			}
 
 			return (AbstractExpression<X>) cb.cast(left, clazz);

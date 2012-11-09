@@ -117,9 +117,11 @@ public class ComplianceTest extends BaseCoreTest {
 		Assert.assertEquals(Byte.class, this.cq("select cast(p.age as byte) from Person p", Number.class).getSingleResult().getClass());
 		Assert.assertEquals(Short.class, this.cq("select cast(p.age as short) from Person p", Number.class).getSingleResult().getClass());
 		Assert.assertEquals(Integer.class, this.cq("select cast(p.age as int) from Person p", Number.class).getSingleResult().getClass());
+		Assert.assertEquals(Integer.class, this.cq("select cast(p.age as integer) from Person p", Number.class).getSingleResult().getClass());
 		Assert.assertEquals(Long.class, this.cq("select cast(p.age as long) from Person p", Number.class).getSingleResult().getClass());
 		Assert.assertEquals(Float.class, this.cq("select cast(p.age as float) from Person p", Number.class).getSingleResult().getClass());
 		Assert.assertEquals(Double.class, this.cq("select cast(p.age as double) from Person p", Number.class).getSingleResult().getClass());
+		Assert.assertEquals(String.class, this.cq("select cast(p.age as string) from Person p", String.class).getSingleResult().getClass());
 	}
 
 	/**

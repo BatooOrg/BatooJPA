@@ -213,9 +213,6 @@ HOUR :
 IN :
     I N;
     
-INT :
-    I N T;
-
 INDEX :
     I N D E X;
 
@@ -224,6 +221,12 @@ INNER :
 
 IS :
     I S;
+
+INT :
+    I N T;
+
+INTEGER :
+    I N T E G E R;
 
 JOIN :
     J O I N;
@@ -323,6 +326,9 @@ SOME :
 
 SQRT :
     S Q R T;
+
+STRING :
+	S T R I N G;
 
 SUBSTRING :
     S U B S T R I N G;

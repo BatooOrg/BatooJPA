@@ -797,6 +797,10 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @author hceylan
 	 */
 	protected String getCastClassName(Class<?> clazz) {
+		if (clazz == String.class) {
+			return "VARCHAR";
+		}
+
 		return clazz.getSimpleName();
 	}
 
