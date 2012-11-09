@@ -363,6 +363,9 @@ UPPER :
 VALUE :
     V A L U E;
 
+VARCHAR :
+	V A R C H A R;
+
 WEEK :
 	W E E K;
 

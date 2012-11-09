@@ -172,7 +172,7 @@ simple_state_field_path_expression :
         -> ^(ST_PARENTED ID qid);
 
 cast_state_field_path_expression
-	CAST^ Left_Paren! simple_state_field_path_expression AS! (BYTE | SHORT | INT | INTEGER | LONG | FLOAT | DOUBLE | STRING) Right_Paren!;
+	CAST^ Left_Paren! simple_state_field_path_expression AS! (BYTE | SHORT | INT | INTEGER | LONG | FLOAT | DOUBLE | STRING | VARCHAR) Right_Paren!;
 
 constructor_expression :
     NEW qid Left_Paren select_expressions Right_Paren
