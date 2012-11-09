@@ -15,6 +15,7 @@
 package org.batoo.jpa.community.test.querydsl;
 
 import org.batoo.jpa.community.test.BaseCoreTest;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -23,6 +24,7 @@ import org.junit.Test;
  * @author hceylan
  * @since $version
  */
+@Ignore
 public class QueryDSLTest extends BaseCoreTest {
 
 	/**
