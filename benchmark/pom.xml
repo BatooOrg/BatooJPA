@@ -23,7 +23,7 @@
 	<parent>
 		<artifactId>parent</artifactId>
 		<groupId>org.batoo.jpa</groupId>
-		<version>0.1.7-SNAPSHOT</version>
+		<version>2.0.0.RC2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>benchmark</artifactId>
@@ -69,37 +69,50 @@
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>batoo-jpa</artifactId>
+			<version>2.0.0.RC2-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>batoo-annotations</artifactId>
+			<version>2.0.0.RC2-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>parser</artifactId>
+			<version>2.0.0.RC2-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>jpql</artifactId>
+			<version>2.0.0.RC2-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.batoo.jpa</groupId>
-			<artifactId>common</artifactId>
+			<groupId>org.batoo.common</groupId>
+			<artifactId>batoo-common</artifactId>
 			<scope>test</scope>
 		</dependency>
 
 		<!-- Eclipselink
+		 -->
 		<dependency>
 			<groupId>org.eclipse.persistence</groupId>
 			<artifactId>eclipselink</artifactId>
 			<version>2.4.0</version>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- Oracle JDBC
 		 -->
+		<dependency>
+			<groupId>com.oracle</groupId>
+			<artifactId>ojdbc6</artifactId>
+			<version>11.2.0.3</version>
+			<scope>test</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>com.jolbox</groupId>

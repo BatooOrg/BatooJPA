@@ -398,10 +398,13 @@ public class BenchmarkTest {
 
 	private void doRemove(final EntityManagerFactory emf, final List<Person>[] persons) {
 		for (int i = 0; i < 5; i++) {
-			for (final Person person : persons[i]) {
+			for (Person person : persons[i]) {
 				final EntityManager em = this.open(emf);
 
-				this.doBenchmarkRemove(em, em.find(Person.class, person.getId()));
+				person = em.find(Person.class, person.getId());
+				person.getPhones().size();
+
+				this.doBenchmarkRemove(em, person);
 			}
 		}
 	}
