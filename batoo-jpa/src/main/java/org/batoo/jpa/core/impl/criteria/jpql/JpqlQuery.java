@@ -32,6 +32,7 @@ import javax.persistence.criteria.AbstractQuery;
 import javax.persistence.criteria.CriteriaBuilder.Trimspec;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.FetchParent;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
@@ -86,6 +87,7 @@ import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
+import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.jpql.JpqlLexer;
 import org.batoo.jpa.jpql.JpqlParser;
@@ -93,6 +95,7 @@ import org.batoo.jpa.jpql.JpqlParser.ql_statement_return;
 import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -259,6 +262,22 @@ public class JpqlQuery {
 				this.putAlias((BaseQueryImpl<?>) q, from, fromDef, r);
 
 				this.constructJoins(cb, (AbstractCriteriaQueryImpl<?>) q, r, from.getChild(1));
+
+				if (from.getChild(from.getChildCount() - 1).getType() == JpqlParser.LALL_PROPERTIES) {
+					for (final AssociationMapping<?, ?, ?> association : entity.getAssociations()) {
+						if (!association.isEager()) {
+							final Iterator<String> pathIterator = Splitter.on(".").split(association.getPath()).iterator();
+
+							// Drop the root part
+							pathIterator.next();
+
+							Fetch<?, ?> fetch = null;
+							while (pathIterator.hasNext()) {
+								fetch = fetch == null ? r.fetch(pathIterator.next()) : fetch.fetch(pathIterator.next());
+							}
+						}
+					}
+				}
 			}
 
 			// in collection form

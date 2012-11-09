@@ -19,6 +19,7 @@ tokens {
     LAND;
     LOR;
     LIN;
+    LALL_PROPERTIES;
 
     //imaginary AS token
     ST_UPDATE;
@@ -102,8 +103,13 @@ from_declaration_or_collection_member_declaration :
     | collection_member_declaration;
 
 from_declaration :
-    faliased_qid (join)*
-        -> ^(ST_FROM faliased_qid ^(LJOINS (join)*));
+    faliased_qid fetch_all_properties? (join)*
+        -> ^(ST_FROM faliased_qid ^(LJOINS (join)*) fetch_all_properties?);
+        
+fetch_all_properties:
+	FETCH ALL PROPERTIES
+		-> LALL_PROPERTIES;
+
 join : 
 	((LEFT OUTER?) | INNER)? JOIN FETCH? ID Period qid (AS? ID)?
     	-> ^(ST_JOIN LEFT? INNER? ID ^(ST_ID_AS qid ID?) FETCH?);
@@ -249,7 +255,7 @@ functions_returning_numerics :
   	| MOD^ Left_Paren! simple_arithmetic_expression Comma! simple_arithmetic_expression Right_Paren!
   	| SIZE^ Left_Paren! state_field_path_expression Right_Paren!
   	| INDEX^ Left_Paren! ID Right_Paren!
-  ;
+  	;
 	
 functions_returning_strings :
 	SUBSTRING^ Left_Paren! string_primary Comma! simple_arithmetic_expression (Comma! simple_arithmetic_expression)? Right_Paren!

@@ -830,6 +830,10 @@ public class ManagedInstance<X> {
 			return true;
 		}
 
+		if (((AssociationMapping<?, ?, ?>) mapping).isEager()) {
+			return true;
+		}
+
 		return this.joinsLoaded.contains(mapping.getPath());
 	}
 

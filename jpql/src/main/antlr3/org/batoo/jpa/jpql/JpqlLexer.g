@@ -281,6 +281,9 @@ OUTER :
 POSITION :
     P O S I T I O N;
 
+PROPERTIES :
+	P R O P E R T I E S;
+
 SECOND :
 	S E C O N D;
 
