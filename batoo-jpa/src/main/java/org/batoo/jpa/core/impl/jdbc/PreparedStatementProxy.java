@@ -274,6 +274,11 @@ public class PreparedStatementProxy implements PreparedStatement {
 		PreparedStatementProxy.LOG.debug("{0}:{1} executeQuery(){2}", this.statementNo, this.executionNo,
 			PreparedStatementProxy.LOG.lazyBoxed(this.sql, this.parameters));
 
+		if (this.sqlStream != null) {
+			this.sqlStream.println(MessageFormat.format("{0}:{1} executeUpdate(){2}", this.statementNo, this.executionNo,
+				PreparedStatementProxy.LOG.lazyBoxed(this.sql, this.parameters)));
+		}
+
 		final long start = System.currentTimeMillis();
 		try {
 			return this.statement.executeQuery();
@@ -284,9 +289,19 @@ public class PreparedStatementProxy implements PreparedStatement {
 			if (time > this.slowSqlThreshold) {
 				PreparedStatementProxy.LOG.warn(new OperationTookLongTimeWarning(), "{0}:{1} {2} msecs, executeQuery()", this.statementNo, this.executionNo,
 					time);
+
+				if (this.sqlStream != null) {
+					this.sqlStream.println(MessageFormat.format("{0}:{1} {2} msecs, executeQuery()", this.statementNo, this.executionNo, time));
+
+					new OperationTookLongTimeWarning().printStackTrace(this.sqlStream);
+				}
 			}
 			else {
-				PreparedStatementProxy.LOG.trace("{0}:{1} {2} msecs, executeQuery()", this.statementNo, this.executionNo, time);
+				PreparedStatementProxy.LOG.debug("{0}:{1} {2} msecs, executeQuery()", this.statementNo, this.executionNo, time);
+
+				if (this.sqlStream != null) {
+					this.sqlStream.println(MessageFormat.format("{0}:{1} {2} msecs, executeQuery()", this.statementNo, this.executionNo, time));
+				}
 			}
 		}
 	}
@@ -319,6 +334,7 @@ public class PreparedStatementProxy implements PreparedStatement {
 
 		PreparedStatementProxy.LOG.debug("{0}:{1} executeUpdate(){2}", this.statementNo, this.executionNo,
 			PreparedStatementProxy.LOG.lazyBoxed(this.sql, this.parameters));
+
 		if (this.sqlStream != null) {
 			this.sqlStream.println(MessageFormat.format("{0}:{1} executeUpdate(){2}", this.statementNo, this.executionNo,
 				PreparedStatementProxy.LOG.lazyBoxed(this.sql, this.parameters)));
