@@ -45,6 +45,8 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.common.util.BatooUtils;
+import org.batoo.common.util.FinalWrapper;
 import org.batoo.jpa.annotations.FetchStrategyType;
 import org.batoo.jpa.common.reflect.ConstructorAccessor;
 import org.batoo.jpa.common.reflect.ReflectHelper;
@@ -91,8 +93,6 @@ import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
 import org.batoo.jpa.parser.metadata.IndexMetadata;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
-import org.batoo.jpa.util.BatooUtils;
-import org.batoo.jpa.util.FinalWrapper;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -1895,7 +1895,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				}
 
 				// check association's fetch strategy and max depth
-				if (association.getMaxFetchJoinDepth() < depth || association.getFetchStrategy() == FetchStrategyType.SELECT) {
+				if ((association.getMaxFetchJoinDepth() < depth) || (association.getFetchStrategy() == FetchStrategyType.SELECT)) {
 					continue;
 				}
 

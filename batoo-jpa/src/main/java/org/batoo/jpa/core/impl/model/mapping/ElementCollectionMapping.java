@@ -36,6 +36,8 @@ import javax.persistence.metamodel.PluralAttribute.CollectionType;
 import javax.persistence.metamodel.Type.PersistenceType;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.common.util.BatooUtils;
+import org.batoo.common.util.FinalWrapper;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.collections.ManagedList;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
@@ -63,8 +65,6 @@ import org.batoo.jpa.core.util.Pair;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.ElementCollectionAttributeMetadata;
-import org.batoo.jpa.util.BatooUtils;
-import org.batoo.jpa.util.FinalWrapper;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

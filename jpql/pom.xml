@@ -31,12 +31,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.batoo.jpa</groupId>
-			<artifactId>common</artifactId>
-			<version>2.0.0.RC2-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 		</dependency>
@@ -56,6 +50,11 @@
 			<artifactId>antlr-runtime</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.batoo.common</groupId>
+			<artifactId>batoo-common</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

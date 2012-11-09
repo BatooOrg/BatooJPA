@@ -17,7 +17,7 @@ import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
 import javax.sql.DataSource;
 
-import org.batoo.jpa.util.FinalWrapper;
+import org.batoo.common.util.FinalWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

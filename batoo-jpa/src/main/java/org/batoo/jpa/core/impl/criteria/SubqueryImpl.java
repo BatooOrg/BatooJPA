@@ -36,6 +36,7 @@ import javax.persistence.criteria.SetJoin;
 import javax.persistence.criteria.Subquery;
 import javax.persistence.metamodel.EntityType;
 
+import org.batoo.common.util.BatooUtils;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
@@ -43,7 +44,6 @@ import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
-import org.batoo.jpa.util.BatooUtils;
 
 import com.google.common.collect.Sets;
 

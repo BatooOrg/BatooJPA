@@ -71,6 +71,7 @@
 							<createSourcesJar>true</createSourcesJar>
 							<artifactSet>
 								<includes>
+									<include>org.batoo.common:*</include>
 									<include>org.batoo.jpa:*</include>
 								</includes>
 								<excludes>
@@ -115,11 +116,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
-			<artifactId>common</artifactId>
-			<version>2.0.0.RC2-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.batoo.jpa</groupId>
 			<artifactId>parser</artifactId>
 			<version>2.0.0.RC2-SNAPSHOT</version>
 		</dependency>
@@ -127,6 +123,12 @@
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>jpql</artifactId>
 			<version>2.0.0.RC2-SNAPSHOT</version>
+		</dependency>
+
+		<!-- Batoo Projects -->
+		<dependency>
+			<groupId>org.batoo.common</groupId>
+			<artifactId>batoo-common</artifactId>
 		</dependency>
 
 		<dependency>

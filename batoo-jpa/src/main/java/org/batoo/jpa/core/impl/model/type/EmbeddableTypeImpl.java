@@ -25,6 +25,7 @@ import java.util.List;
 import javax.persistence.metamodel.EmbeddableType;
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.batoo.common.util.FinalWrapper;
 import org.batoo.jpa.common.reflect.ConstructorAccessor;
 import org.batoo.jpa.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
@@ -32,7 +33,6 @@ import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
 import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.type.EmbeddableMetadata;
-import org.batoo.jpa.util.FinalWrapper;
 
 import com.google.common.collect.Lists;
 

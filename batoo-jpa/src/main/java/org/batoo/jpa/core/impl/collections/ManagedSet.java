@@ -28,11 +28,11 @@ import java.util.Set;
 
 import javax.persistence.PersistenceException;
 
+import org.batoo.common.util.BatooUtils;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.Joinable;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
-import org.batoo.jpa.util.BatooUtils;
 
 import com.google.common.collect.Sets;
 

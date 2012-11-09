@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.common.util.FinalWrapper;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
@@ -35,7 +36,6 @@ import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.ColumnTransformerMetadata;
 import org.batoo.jpa.parser.metadata.TableMetadata;
 import org.batoo.jpa.parser.metadata.UniqueConstraintMetadata;
-import org.batoo.jpa.util.FinalWrapper;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -195,24 +195,24 @@ public abstract class AbstractTable {
 		}
 		else {
 
-		final Collection<String> singleParams = Collections2.transform(filteredColumns, new Function<AbstractColumn, String>() {
+			final Collection<String> singleParams = Collections2.transform(filteredColumns, new Function<AbstractColumn, String>() {
 
-			@Override
-			public String apply(AbstractColumn input) {
-				String writeParam = null;
-				if (input instanceof BasicColumn) {
-					final ColumnTransformerMetadata columnTransformer = ((BasicColumn) input).getMapping().getAttribute().getColumnTransformer();
-					writeParam = columnTransformer != null ? columnTransformer.getWrite() : null;
+				@Override
+				public String apply(AbstractColumn input) {
+					String writeParam = null;
+					if (input instanceof BasicColumn) {
+						final ColumnTransformerMetadata columnTransformer = ((BasicColumn) input).getMapping().getAttribute().getColumnTransformer();
+						writeParam = columnTransformer != null ? columnTransformer.getWrite() : null;
+					}
+					writeParam = Strings.isNullOrEmpty(writeParam) ? "?" : writeParam;
+
+					return writeParam;
 				}
-				writeParam = Strings.isNullOrEmpty(writeParam) ? "?" : writeParam;
+			});
 
-				return writeParam;
-			}
-		});
-
-		// prepare the parameters in the form of "? [, ?]*"
-		final String singleParamStr = "\t(" + Joiner.on(", ").join(singleParams) + ")";
-		final String parametersStr = StringUtils.repeat(singleParamStr, ",\n", size);
+			// prepare the parameters in the form of "? [, ?]*"
+			final String singleParamStr = "\t(" + Joiner.on(", ").join(singleParams) + ")";
+			final String parametersStr = StringUtils.repeat(singleParamStr, ",\n", size);
 
 			final String columnNamesStr = Joiner.on(", ").join(columnNames);
 

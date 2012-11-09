@@ -31,6 +31,7 @@ import javax.persistence.criteria.Selection;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableBoolean;
+import org.batoo.common.util.BatooUtils;
 import org.batoo.jpa.annotations.FetchStrategyType;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
@@ -55,7 +56,6 @@ import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.MappableAssociationAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.OrphanableAssociationAttributeMetadata;
-import org.batoo.jpa.util.BatooUtils;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;

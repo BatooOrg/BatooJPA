@@ -48,6 +48,7 @@ import javax.sql.DataSource;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.batoo.common.util.BatooUtils;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.expression.DateTimeFunctionType;
@@ -69,7 +70,6 @@ import org.batoo.jpa.core.impl.model.TableGenerator;
 import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.parser.MappingException;
-import org.batoo.jpa.util.BatooUtils;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;

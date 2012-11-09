@@ -27,6 +27,7 @@ import javax.persistence.EnumType;
 import javax.persistence.TemporalType;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.common.util.FinalWrapper;
 import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.model.mapping.ElementCollectionMapping;
 import org.batoo.jpa.core.impl.model.mapping.ElementMapping;
@@ -38,7 +39,6 @@ import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.CollectionTableMetadata;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
-import org.batoo.jpa.util.FinalWrapper;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;

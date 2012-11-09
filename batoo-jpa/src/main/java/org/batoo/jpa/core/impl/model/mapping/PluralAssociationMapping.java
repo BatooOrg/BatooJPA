@@ -35,6 +35,8 @@ import javax.persistence.metamodel.PluralAttribute.CollectionType;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableBoolean;
+import org.batoo.common.util.BatooUtils;
+import org.batoo.common.util.FinalWrapper;
 import org.batoo.jpa.core.impl.cache.CacheInstance;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.collections.ManagedList;
@@ -58,8 +60,6 @@ import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.PluralAttributeMetadata;
-import org.batoo.jpa.util.BatooUtils;
-import org.batoo.jpa.util.FinalWrapper;
 
 import com.google.common.collect.Lists;
 

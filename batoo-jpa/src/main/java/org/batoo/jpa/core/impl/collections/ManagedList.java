@@ -30,12 +30,12 @@ import java.util.ListIterator;
 import javax.persistence.PersistenceException;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.batoo.common.util.BatooUtils;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.Joinable;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
-import org.batoo.jpa.util.BatooUtils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;

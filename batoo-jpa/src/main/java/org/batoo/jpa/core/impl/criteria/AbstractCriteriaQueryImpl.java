@@ -34,6 +34,7 @@ import javax.persistence.criteria.Selection;
 import javax.persistence.metamodel.EntityType;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.common.util.BatooUtils;
 import org.batoo.jpa.common.log.BLogger;
 import org.batoo.jpa.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
@@ -42,7 +43,6 @@ import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
-import org.batoo.jpa.util.BatooUtils;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
