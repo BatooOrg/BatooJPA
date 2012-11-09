@@ -33,9 +33,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface FetchStrategy {
 
-	public final static FetchStrategyType DEFAULT_STRATEGY = FetchStrategyType.AUTO;
-	public final static int DEFAULT_MAX_DEPTH = Integer.MAX_VALUE;
-
 	/**
 	 * Returns the maximum allowed depth for the join.
 	 * <p>
@@ -46,7 +43,7 @@ public @interface FetchStrategy {
 	 * @since $version
 	 * @author hceylan
 	 */
-	int maxDepth() default DEFAULT_MAX_DEPTH;
+	int maxDepth() default Integer.MAX_VALUE;
 
 	/**
 	 * Returns the preferred strategy for the annotated association
@@ -61,5 +58,4 @@ public @interface FetchStrategy {
 	 * @since $version
 	 */
 	FetchStrategyType strategy() default FetchStrategyType.AUTO;
-
 }
