@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.community.test.t2;
 
+import javax.persistence.PersistenceException;
+
 import org.batoo.jpa.community.test.BaseCoreTest;
 import org.junit.Test;
 
@@ -45,7 +47,7 @@ public class Test2 extends BaseCoreTest {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = PersistenceException.class)
 	public void test2() {
 		this.begin();
 

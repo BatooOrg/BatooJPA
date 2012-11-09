@@ -25,7 +25,6 @@ import javax.persistence.AccessType;
 
 import org.batoo.jpa.parser.impl.orm.Element;
 import org.batoo.jpa.parser.impl.orm.ElementConstants;
-import org.batoo.jpa.parser.impl.orm.EntityListenerElement;
 import org.batoo.jpa.parser.impl.orm.EntityListenersElement;
 import org.batoo.jpa.parser.impl.orm.EntityMappings;
 import org.batoo.jpa.parser.impl.orm.ExcludeDefaultListenersElement;

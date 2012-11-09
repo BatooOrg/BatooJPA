@@ -45,11 +45,12 @@ public interface AssociationAttributeMetadata extends AttributeMetadata, Associa
 	Set<CascadeType> getCascades();
 
 	/**
-	 * Returns the fetching strategy for eager joins
+	 * Returns the fetching strategy for eager joins.
+	 * 
+	 * @return the fetching strategy for eager joins
 	 * 
 	 * @author asimarslan
 	 * @since $version
-	 * @return
 	 */
 	FetchStrategyType getFetchStrategy();
 

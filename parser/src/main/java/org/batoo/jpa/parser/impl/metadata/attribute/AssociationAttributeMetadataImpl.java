@@ -126,12 +126,12 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 
 		parsed.add(FetchStrategy.class);
 		if (fetchStrategy != null) {
-			this.maxFetchDepth = fetchStrategy.maxDepth() > 0 ? fetchStrategy.maxDepth() : FetchStrategy.DEFAULT_MAX_DEPTH;
+			this.maxFetchDepth = fetchStrategy.maxDepth() > 0 ? fetchStrategy.maxDepth() : Integer.MAX_VALUE;
 			this.fetchStrategy = fetchStrategy.strategy();
 		}
 		else {
-			this.maxFetchDepth = FetchStrategy.DEFAULT_MAX_DEPTH;
-			this.fetchStrategy = FetchStrategy.DEFAULT_STRATEGY;
+			this.maxFetchDepth = Integer.MAX_VALUE;
+			this.fetchStrategy = FetchStrategyType.AUTO;
 		}
 
 		if ((joinColumns != null) && (joinColumns.value().length > 0)) {

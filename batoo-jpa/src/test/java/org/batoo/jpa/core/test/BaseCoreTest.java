@@ -257,7 +257,16 @@ public abstract class BaseCoreTest { // extends BaseTest {
 		}
 	}
 
-	private void exec(String cmd) {
+	/**
+	 * Executes an artbitrary command as external process and waits for the termination.
+	 * 
+	 * @param cmd
+	 *            the command to execute
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected void exec(String cmd) {
 		try {
 			final Process process = Runtime.getRuntime().exec(cmd);
 			if (process.waitFor() != 0) {

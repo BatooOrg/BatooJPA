@@ -55,6 +55,8 @@ public class City {
 	 *            the id
 	 * @param name
 	 *            the name
+	 * @param country
+	 *            the country
 	 * 
 	 * @since $version
 	 * @author hceylan

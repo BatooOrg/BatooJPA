@@ -74,6 +74,10 @@ public class BasicAttributeElement extends PhysicalAttributeElement implements B
 		this.optional = this.getAttribute(ElementConstants.ATTR_OPTIONAL, true);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
 	@Override
 	public ColumnTransformerMetadata getColumnTransformer() {
 		return null;
