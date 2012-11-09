@@ -929,8 +929,15 @@ public class JpqlQuery {
 				return (AbstractExpression<X>) left.in(this.getExpression(cb, q, inDefs, left.getJavaType()));
 			}
 
-			for (int i = 0; i < inDefs.getChildCount(); i++) {
-				expressions.add((AbstractExpression<X>) this.getExpression(cb, q, inDefs.getChild(i), left != null ? left.getJavaType() : null));
+			if (inDefs.getType() == JpqlParser.ST_SUBQUERY) {
+				final SubqueryImpl<? extends X> subquery = this.constructSubquery(cb, q, inDefs, left.getJavaType());
+
+				return (AbstractExpression<X>) left.in(subquery);
+			}
+			else {
+				for (int i = 0; i < inDefs.getChildCount(); i++) {
+					expressions.add((AbstractExpression<X>) this.getExpression(cb, q, inDefs.getChild(i), left != null ? left.getJavaType() : null));
+				}
 			}
 
 			if (left == null) {
