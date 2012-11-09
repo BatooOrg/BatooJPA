@@ -165,13 +165,15 @@ qualified_identification_variable:
 	;
 
 state_field_path_expression :
-    simple_state_field_path_expression | cast_state_field_path_expression;
+    simple_state_field_path_expression 
+    | cast_state_field_path_expression
+    ;
 
 simple_state_field_path_expression :
     ID Period qid
         -> ^(ST_PARENTED ID qid);
 
-cast_state_field_path_expression
+cast_state_field_path_expression :
 	CAST^ Left_Paren! simple_state_field_path_expression AS! (BYTE | SHORT | INT | INTEGER | LONG | FLOAT | DOUBLE | STRING | VARCHAR) Right_Paren!;
 
 constructor_expression :
