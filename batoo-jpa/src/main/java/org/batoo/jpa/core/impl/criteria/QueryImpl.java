@@ -762,7 +762,9 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 */
 	@Override
 	public List<X> getResultList() {
-		if (!this.q.isInternal() && this.em.getTransaction().isActive()) {
+		// flush if specified
+		if (!this.q.isInternal() && this.em.getTransaction().isActive()
+			&& ((this.flushMode == FlushModeType.AUTO) || (this.em.getFlushMode() == FlushModeType.AUTO))) {
 			this.em.flush();
 		}
 
@@ -945,7 +947,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 */
 	@Override
 	public QueryImpl<X> setFlushMode(FlushModeType flushMode) {
-		this.flushMode = flushMode;;
+		this.flushMode = flushMode;
 
 		return this;
 	}

@@ -80,17 +80,17 @@ public class EntityManagerImpl implements EntityManager {
 
 	private final EntityManagerFactoryImpl emf;
 	private final MetamodelImpl metamodel;
+	private final CriteriaBuilderImpl criteriaBuilder;
 	private final DataSource datasource;
 	private final JdbcAdaptor jdbcAdaptor;
+	private final Map<String, Object> properties;
+	private final SessionImpl session;
 
 	private boolean open;
 	private EntityTransactionImpl transaction;
-
 	private Connection connection;
-	private final SessionImpl session;
-	private final CriteriaBuilderImpl criteriaBuilder;
-	private final Map<String, Object> properties;
 
+	private FlushModeType flushMode;
 	private boolean inFlush;
 
 	/**
@@ -120,6 +120,7 @@ public class EntityManagerImpl implements EntityManager {
 		this.criteriaBuilder = this.emf.getCriteriaBuilder();
 
 		this.properties = properties;
+		this.flushMode = FlushModeType.AUTO;
 
 		this.open = true;
 	}
@@ -608,8 +609,7 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public FlushModeType getFlushMode() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.flushMode;
 	}
 
 	/**
@@ -1146,7 +1146,7 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public void setFlushMode(FlushModeType flushMode) {
-		// TODO Auto-generated method stub
+		this.flushMode = flushMode;
 	}
 
 	/**
