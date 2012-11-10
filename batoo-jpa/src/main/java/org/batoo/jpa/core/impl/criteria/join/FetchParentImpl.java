@@ -264,11 +264,15 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 
 			@Override
 			public String apply(FetchImpl<X, ?> input) {
+				if (input.getMapping().getMappingType() == MappingType.EMBEDDABLE) {
+					return null;
+				}
+
 				return input.generateJpqlFetches(parent);
 			}
 		});
 
-		description.append(Joiner.on("\n").join(_fetches));
+		description.append(Joiner.on("\n").skipNulls().join(_fetches));
 
 		return description.toString();
 	}

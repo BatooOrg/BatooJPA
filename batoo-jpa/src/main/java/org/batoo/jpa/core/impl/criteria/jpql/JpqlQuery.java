@@ -399,6 +399,8 @@ public class JpqlQuery {
 					depth++;
 				}
 
+				parent.alias(aliased.getAlias());
+
 				this.putAlias(q, join.getChild(1), aliased, parent);
 			}
 		}
