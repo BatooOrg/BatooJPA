@@ -352,9 +352,8 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 						repeat.put(sqlParamNo, ((Object[]) parameter).length);
 					}
 				}
-				else {
-					sqlParamNo++;
-				}
+
+				sqlParamNo++;
 			}
 
 			if (repeat.size() > 0) {

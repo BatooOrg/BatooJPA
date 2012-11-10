@@ -157,18 +157,6 @@ public class EmbeddedAttributePath<Z, X> extends ParentPath<Z, X> {
 	}
 
 	/**
-	 * Returns the mapping.
-	 * 
-	 * @return the mapping
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public EmbeddedMapping<? super Z, X> getMapping() {
-		return this.mapping;
-	}
-
-	/**
 	 * {@inheritDoc}
 	 * 
 	 */

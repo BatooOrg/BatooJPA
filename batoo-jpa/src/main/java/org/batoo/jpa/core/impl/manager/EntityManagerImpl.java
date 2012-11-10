@@ -43,6 +43,7 @@ import javax.persistence.metamodel.PluralAttribute.CollectionType;
 import javax.sql.DataSource;
 import javax.validation.ConstraintViolationException;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
@@ -323,8 +324,7 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public Query createNativeQuery(String sqlString) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotImplementedException("Native queries are not yet implemented");
 	}
 
 	/**
@@ -333,8 +333,7 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public Query createNativeQuery(String sqlString, Class<?> resultClass) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotImplementedException("Native queries are not yet implemented");
 	}
 
 	/**
@@ -343,8 +342,7 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public Query createNativeQuery(String sqlString, String resultSetMapping) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotImplementedException("Native queries are not yet implemented");
 	}
 
 	/**

@@ -551,26 +551,31 @@ public abstract class AbstractFrom<Z, X> extends ParentPath<Z, X> implements Fro
 
 		AbstractJoin<X, Y> join = null;
 
-		final JoinedMapping<X, ?, Y> joinedMapping = (JoinedMapping<X, ?, Y>) mapping;
-		if ((joinedMapping.getMappingType() == MappingType.SINGULAR_ASSOCIATION) || (joinedMapping.getMappingType() == MappingType.EMBEDDABLE)) {
-			join = new SingularJoin<X, Y>(this, joinedMapping, jt);
-		}
-		else {
-			final PluralAttributeImpl<? super X, ?, Y> attribute = (PluralAttributeImpl<? super X, ?, Y>) mapping.getAttribute();
-
-			switch (attribute.getCollectionType()) {
-				case SET:
-					join = new SetJoinImpl<X, Y>(this, (PluralMapping<? super X, Set<Y>, Y>) joinedMapping, jt);
-					break;
-				case COLLECTION:
-					join = new CollectionJoinImpl<X, Y>(this, (PluralMapping<? super X, Collection<Y>, Y>) joinedMapping, jt);
-					break;
-				case LIST:
-					join = new ListJoinImpl<X, Y>(this, (PluralMapping<? super X, List<Y>, Y>) joinedMapping, jt);
-					break;
-				case MAP:
-					join = new MapJoinImpl(this, (PluralMapping<? super X, Map<?, Y>, Y>) joinedMapping, jt);
+		try {
+			final JoinedMapping<X, ?, Y> joinedMapping = (JoinedMapping<X, ?, Y>) mapping;
+			if ((joinedMapping.getMappingType() == MappingType.SINGULAR_ASSOCIATION) || (joinedMapping.getMappingType() == MappingType.EMBEDDABLE)) {
+				join = new SingularJoin<X, Y>(this, joinedMapping, jt);
 			}
+			else {
+				final PluralAttributeImpl<? super X, ?, Y> attribute = (PluralAttributeImpl<? super X, ?, Y>) mapping.getAttribute();
+
+				switch (attribute.getCollectionType()) {
+					case SET:
+						join = new SetJoinImpl<X, Y>(this, (PluralMapping<? super X, Set<Y>, Y>) joinedMapping, jt);
+						break;
+					case COLLECTION:
+						join = new CollectionJoinImpl<X, Y>(this, (PluralMapping<? super X, Collection<Y>, Y>) joinedMapping, jt);
+						break;
+					case LIST:
+						join = new ListJoinImpl<X, Y>(this, (PluralMapping<? super X, List<Y>, Y>) joinedMapping, jt);
+						break;
+					case MAP:
+						join = new MapJoinImpl(this, (PluralMapping<? super X, Map<?, Y>, Y>) joinedMapping, jt);
+				}
+			}
+		}
+		catch (final NullPointerException e) {
+			throw e;
 		}
 
 		this.joins.add(join);

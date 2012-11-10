@@ -115,9 +115,14 @@ public class MemberOfExpression<C extends Collection<E>, E> extends AbstractExpr
 		final PluralAttributeImpl<?, C, E> attribute = (PluralAttributeImpl<?, C, E>) this.values.getMapping().getAttribute();
 		final AbstractPluralJoin<?, C, E> j = (AbstractPluralJoin<?, C, E>) r.join(attribute.getName());
 
-		final EntityTypeImpl<E> entity = (EntityTypeImpl<E>) attribute.getElementType();
-		final String idName = entity.getIdMapping().getAttribute().getName();
-		s.select(j.get(idName));
+		if (attribute.getElementType() instanceof EntityTypeImpl) {
+			final EntityTypeImpl<E> entity = (EntityTypeImpl<E>) attribute.getElementType();
+			final String idName = entity.getIdMapping().getAttribute().getName();
+			s.select(j.get(idName));
+		}
+		else {
+			s.select((Expression<Object>) j);
+		}
 
 		s.where(cb.equal(r, (AbstractExpression<?>) rp));
 
