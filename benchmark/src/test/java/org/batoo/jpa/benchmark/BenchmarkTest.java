@@ -377,13 +377,7 @@ public class BenchmarkTest {
 	 */
 	@Test
 	public void doeclipselink() {
-		try {
-			this.doTest(Type.ELINK);
-		}
-		catch (final Exception e) {
-			System.err.println("To benchmark EclipseLink, please uncomment EclipseLink dependency in pom.xml and \n"
-				+ "deploy EclipseLink jar file to your local repository...");
-		}
+		this.doTest(Type.ELINK);
 	}
 
 	/**
