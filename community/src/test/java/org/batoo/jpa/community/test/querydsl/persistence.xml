@@ -72,6 +72,13 @@
 		<class>org.batoo.jpa.community.test.querydsl.Superclass</class>
 		<class>org.batoo.jpa.community.test.querydsl.User</class>
 		<class>org.batoo.jpa.community.test.querydsl.World</class>
+		
+		<class>org.batoo.jpa.community.test.querydsl.BookDefinition</class>
+		<class>org.batoo.jpa.community.test.querydsl.BookID</class>
+		<class>org.batoo.jpa.community.test.querydsl.BookMark</class>
+		<class>org.batoo.jpa.community.test.querydsl.BookVersion</class>
+		<class>org.batoo.jpa.community.test.querydsl.BookVersionPK</class>
+		<class>org.batoo.jpa.community.test.querydsl.Library</class>
 
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>

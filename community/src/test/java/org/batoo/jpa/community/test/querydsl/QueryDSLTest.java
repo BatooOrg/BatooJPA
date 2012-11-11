@@ -72,5 +72,20 @@ public class QueryDSLTest extends BaseCoreTest {
 		// .setParameter(1, Arrays.asList(1, 2))//
 		// .setParameter(3, 10)//
 		// .getResultList();
+
+		// this.cq("select cat\n" + //
+		// "from Cat cat\n" + //
+		// "where cat.name in (select other.name\n" + //
+		// "from Cat other\n" + //
+		// "group by other.name)");
+
+		// this.cq("select count(employee)\n" + //
+		// "from Employee employee\n" + //
+		// "where employee.lastName = ?1 and ?2 member of employee.jobFunctions").getResultList();
+
+		this.cq("select bookVersion\n" + //
+			"from BookVersion bookVersion\n" + //
+			"  inner join bookVersion.definition.bookMarks as bookMark\n" + //
+			"where size(bookVersion.definition.bookMarks) = ?1 and (bookMark.page = ?2 or bookMark.page = ?3)");
 	}
 }
