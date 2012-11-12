@@ -758,7 +758,7 @@ public class JpqlQuery {
 
 		final QueryImpl<T> typedQuery = new QueryImpl<T>((BaseQuery<T>) this.q, entityManager);
 
-		if (this.lockMode != null) {
+		if (this.lockMode != LockModeType.NONE) {
 			typedQuery.setLockMode(this.lockMode);
 		}
 
