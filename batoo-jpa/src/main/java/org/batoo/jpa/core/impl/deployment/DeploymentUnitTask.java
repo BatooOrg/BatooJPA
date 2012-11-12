@@ -119,8 +119,17 @@ public final class DeploymentUnitTask implements Callable<Void>, Comparable<Depl
 			return 1;
 		}
 
+		// if this type is super type of other type then perform this earlier
+		Class<?> javaType = otherUnit.getJavaType();
+		while (javaType.getSuperclass() != null) {
+			javaType = javaType.getSuperclass();
+			if (javaType == thisUnit.getJavaType()) {
+				return -1;
+			}
+		}
+
 		// if the other type is super type of this type then perform other earlier
-		Class<?> javaType = thisUnit.getJavaType();
+		javaType = thisUnit.getJavaType();
 		while (javaType.getSuperclass() != null) {
 			javaType = javaType.getSuperclass();
 			if (javaType == otherUnit.getJavaType()) {
@@ -128,8 +137,8 @@ public final class DeploymentUnitTask implements Callable<Void>, Comparable<Depl
 			}
 		}
 
-		// it is safe to perform this earlier.
-		return -1;
+		// No precedence
+		return 0;
 	}
 
 	/**
