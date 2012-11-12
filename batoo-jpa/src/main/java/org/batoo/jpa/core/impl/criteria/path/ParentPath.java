@@ -94,6 +94,7 @@ public abstract class ParentPath<Z, X> extends AbstractPath<X> implements Path<X
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public final <Y> AbstractPath<Y> get(SingularAttribute<? super X, Y> attribute) {
 		final Mapping<? super X, Y, Y> mapping = this.getMapping(attribute.getName());
 

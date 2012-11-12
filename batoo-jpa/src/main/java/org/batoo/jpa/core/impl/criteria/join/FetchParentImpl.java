@@ -37,7 +37,6 @@ import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.Type.PersistenceType;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
@@ -48,7 +47,6 @@ import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
-import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.jdbc.CollectionTable;
 import org.batoo.jpa.core.impl.jdbc.DiscriminatorColumn;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
@@ -590,33 +588,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		return _fetches;
 	}
 
-	private Object getId(ResultSet row) throws SQLException {
-		if (this.entity.hasSingleIdAttribute()) {
-			final SingularMapping<?, ?> idMapping = this.entity.getIdMapping();
-			if (idMapping instanceof BasicMapping) {
-				final BasicColumn column = ((BasicMapping<?, ?>) idMapping).getColumn();
-				final String field = this.idFields.get(column);
-
-				return row.getObject(field);
-			}
-
-			final MutableBoolean allNull = new MutableBoolean(true);
-			final Object id = this.populateEmbeddedId(row, (EmbeddedMapping<?, ?>) idMapping, null, allNull);
-
-			return allNull.booleanValue() ? null : id;
-		}
-
-		final Object id = ((EmbeddableTypeImpl<?>) this.entity.getIdType()).newInstance();
-		for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.entity.getIdMappings()) {
-			final BasicColumn column = pair.getFirst().getColumn();
-			final String field = this.idFields.get(column);
-
-			pair.getSecond().set(id, row.getObject(field));
-		}
-
-		return id;
-	}
-
 	/**
 	 * Returns the managed instance based on the id.
 	 * 
@@ -634,14 +605,12 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	@SuppressWarnings("unchecked")
 	private <Y extends X> ManagedInstance<Y> getInstance(SessionImpl session, ResultSet row) throws SQLException {
 		// get the id of for the instance
-		final Object id = this.getId(row);
-
-		if (id == null) {
+		final ManagedId<X> managedId = this.entity.getId(row, this.idFields, this.joinFields);
+		if (managedId == null) {
 			return null;
 		}
 
 		// look for it in the session
-		final ManagedId<X> managedId = new ManagedId<X>(id, this.entity);
 		ManagedInstance<Y> instance = session.get(managedId);
 
 		// if found then return it
@@ -1082,61 +1051,5 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		this.joins.add(fetch);
 
 		return fetch;
-	}
-
-	/**
-	 * Populates the embedded id fields from the result set
-	 * 
-	 * @param row
-	 *            the row
-	 * @param idMapping
-	 *            the embedded mapping
-	 * @return the generated embedded id
-	 * @throws SQLException
-	 *             thrown in case of an underlying SQL Error
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	private Object populateEmbeddedId(ResultSet row, EmbeddedMapping<?, ?> idMapping, SingularAssociationMapping<?, ?> mapping, MutableBoolean allNull)
-		throws SQLException {
-		final Object id = idMapping.getAttribute().newInstance();
-
-		for (final Mapping<?, ?, ?> child : idMapping.getChildren()) {
-			if (child instanceof BasicMapping) {
-				final BasicMapping<?, ?> basicMapping = (BasicMapping<?, ?>) child;
-				final BasicColumn column = basicMapping.getColumn();
-
-				if (mapping == null) {
-					final String field = this.idFields.get(column);
-					final Object value = row.getObject(field);
-
-					if (value != null) {
-						allNull.setValue(false);
-					}
-
-					basicMapping.getAttribute().set(id, value);
-				}
-				else {
-					for (final JoinColumn joinColumn : mapping.getForeignKey().getJoinColumns()) {
-						if (joinColumn.getReferencedColumnName().equals(column.getName())) {
-							final String field = this.joinFields.get(joinColumn);
-							final Object value = row.getObject(field);
-
-							if (value != null) {
-								allNull.setValue(false);
-							}
-
-							basicMapping.getAttribute().set(id, value);
-						}
-					}
-				}
-			}
-			else {
-				child.getAttribute().set(id, this.populateEmbeddedId(row, idMapping, mapping, allNull));
-			}
-		}
-
-		return id;
 	}
 }

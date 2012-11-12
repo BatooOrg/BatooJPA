@@ -551,6 +551,7 @@ public abstract class AbstractFrom<Z, X> extends ParentPath<Z, X> implements Fro
 
 		AbstractJoin<X, Y> join = null;
 
+		// FIXME Remove that
 		try {
 			final JoinedMapping<X, ?, Y> joinedMapping = (JoinedMapping<X, ?, Y>) mapping;
 			if ((joinedMapping.getMappingType() == MappingType.SINGULAR_ASSOCIATION) || (joinedMapping.getMappingType() == MappingType.EMBEDDABLE)) {

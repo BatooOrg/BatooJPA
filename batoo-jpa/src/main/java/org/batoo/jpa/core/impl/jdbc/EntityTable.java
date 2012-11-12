@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.common.util.FinalWrapper;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.Status;
 import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
@@ -57,6 +58,7 @@ public class EntityTable extends AbstractTable {
 
 	private final HashMap<Integer, String> removeSqlMap = Maps.newHashMap();
 	private AbstractColumn[] removeColumns;
+	private FinalWrapper<HashMap<AbstractColumn, String>> idColumns;
 
 	/**
 	 * @param entity
@@ -132,6 +134,35 @@ public class EntityTable extends AbstractTable {
 	 */
 	public EntityTypeImpl<?> getEntity() {
 		return this.entity;
+	}
+
+	/**
+	 * Returns the id fields of the table.
+	 * 
+	 * @return the id fields of the table
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public HashMap<AbstractColumn, String> getIdFields() {
+		if (this.idColumns != null) {
+			return this.idColumns.value;
+		}
+
+		synchronized (this) {
+			if (this.idColumns != null) {
+				return this.idColumns.value;
+			}
+
+			final HashMap<AbstractColumn, String> _idFields = Maps.newHashMap();
+			for (final AbstractColumn column : this.pkColumns.values()) {
+				_idFields.put(column, column.getName());
+			}
+
+			this.idColumns = new FinalWrapper<HashMap<AbstractColumn, String>>(_idFields);
+		}
+
+		return this.idColumns.value;
 	}
 
 	/**

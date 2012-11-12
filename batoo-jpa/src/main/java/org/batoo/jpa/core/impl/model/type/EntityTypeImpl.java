@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.model.type;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -45,11 +46,12 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.mutable.MutableBoolean;
+import org.batoo.common.reflect.ConstructorAccessor;
+import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.common.util.BatooUtils;
 import org.batoo.common.util.FinalWrapper;
 import org.batoo.jpa.annotations.FetchStrategyType;
-import org.batoo.common.reflect.ConstructorAccessor;
-import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
@@ -60,10 +62,12 @@ import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.instance.Enhancer;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.jdbc.DiscriminatorColumn;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
+import org.batoo.jpa.core.impl.jdbc.JoinColumn;
 import org.batoo.jpa.core.impl.jdbc.SecondaryTable;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
@@ -926,6 +930,74 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 */
 	public String getDiscriminatorValue() {
 		return this.discriminatorValue;
+	}
+
+	/**
+	 * Returns the id of the entity from the resultset row.
+	 * 
+	 * @param row
+	 *            the row
+	 * @return the managedId or null
+	 * @throws SQLException
+	 *             if an SQL error occurrs
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ManagedId<X> getId(ResultSet row) throws SQLException {
+		return this.getId(row, this.getPrimaryTable().getIdFields(), null);
+	}
+
+	/**
+	 * Returns the id of the entity from the resultset row.
+	 * 
+	 * @param row
+	 *            the row
+	 * @param idFields
+	 *            the id fields
+	 * @param joinFields
+	 *            the join fields
+	 * @return the managedId or null
+	 * @throws SQLException
+	 *             if an SQL error occurrs
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ManagedId<X> getId(ResultSet row, HashMap<AbstractColumn, String> idFields, HashMap<AbstractColumn, String> joinFields) throws SQLException {
+		final Object id = this.getIdImpl(row, idFields, joinFields);
+		if (id == null) {
+			return null;
+		}
+
+		return new ManagedId<X>(id, this);
+	}
+
+	private Object getIdImpl(ResultSet row, HashMap<AbstractColumn, String> idFields, HashMap<AbstractColumn, String> joinFields) throws SQLException {
+		if (this.hasSingleIdAttribute()) {
+			final SingularMapping<?, ?> idMapping = this.getIdMapping();
+			if (idMapping instanceof BasicMapping) {
+				final BasicColumn column = ((BasicMapping<?, ?>) idMapping).getColumn();
+				final String field = idFields.get(column);
+
+				return row.getObject(field);
+			}
+
+			final MutableBoolean allNull = new MutableBoolean(true);
+			final Object id = this.populateEmbeddedId(row, idFields, (EmbeddedMapping<?, ?>) idMapping, joinFields, null, allNull);
+
+			return allNull.booleanValue() ? null : id;
+		}
+
+		final Object id = ((EmbeddableTypeImpl<?>) this.getIdType()).newInstance();
+		for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.getIdMappings()) {
+			final BasicColumn column = pair.getFirst().getColumn();
+			final String field = idFields.get(column);
+
+			pair.getSecond().set(id, row.getObject(field));
+		}
+
+		return id;
 	}
 
 	/**
@@ -1809,6 +1881,66 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 */
 	public void performVersionUpdate(Connection connection, ManagedInstance<? extends X> instance) throws SQLException {
 		this.getTables()[0].performVersionUpdate(connection, instance);
+	}
+
+	/**
+	 * Populates the embedded id fields from the result set
+	 * 
+	 * @param row
+	 *            the row
+	 * @param idFields
+	 *            the id fields
+	 * @param joinFields
+	 *            the join fields
+	 * @param idMapping
+	 *            the embedded mapping
+	 * @return the generated embedded id
+	 * @throws SQLException
+	 *             thrown in case of an underlying SQL Error
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private Object populateEmbeddedId(ResultSet row, HashMap<AbstractColumn, String> idFields, EmbeddedMapping<?, ?> idMapping,
+		HashMap<AbstractColumn, String> joinFields, SingularAssociationMapping<?, ?> mapping, MutableBoolean allNull) throws SQLException {
+		final Object id = idMapping.getAttribute().newInstance();
+
+		for (final Mapping<?, ?, ?> child : idMapping.getChildren()) {
+			if (child instanceof BasicMapping) {
+				final BasicMapping<?, ?> basicMapping = (BasicMapping<?, ?>) child;
+				final BasicColumn column = basicMapping.getColumn();
+
+				if (mapping == null) {
+					final String field = idFields.get(column);
+					final Object value = row.getObject(field);
+
+					if (value != null) {
+						allNull.setValue(false);
+					}
+
+					basicMapping.getAttribute().set(id, value);
+				}
+				else {
+					for (final JoinColumn joinColumn : mapping.getForeignKey().getJoinColumns()) {
+						if (joinColumn.getReferencedColumnName().equals(column.getName())) {
+							final String field = joinFields.get(joinColumn);
+							final Object value = row.getObject(field);
+
+							if (value != null) {
+								allNull.setValue(false);
+							}
+
+							basicMapping.getAttribute().set(id, value);
+						}
+					}
+				}
+			}
+			else {
+				child.getAttribute().set(id, this.populateEmbeddedId(row, idFields, idMapping, joinFields, mapping, allNull));
+			}
+		}
+
+		return id;
 	}
 
 	/**

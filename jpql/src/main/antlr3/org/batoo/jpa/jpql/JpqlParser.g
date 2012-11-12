@@ -119,20 +119,15 @@ collection_member_declaration :
         -> ^(ST_COLL ID ^(ST_ID_AS qid ID));
 
 orderby_item :
-  	(state_field_path_expression | entity_type_expression) (ASC | DESC)?
-  		-> ^(ST_ORDER (state_field_path_expression)? (entity_type_expression)? (DESC)?);
+  	(scalar_expression) (ASC | DESC)?
+  		-> ^(ST_ORDER (scalar_expression)? (DESC)?);
 
 where_clause :
     WHERE^ conditional_expression;
 
 groupby_clause :
-  	GROUP BY groupby_item (Comma groupby_item)* 
-  		-> ^(LGROUP_BY groupby_item (groupby_item) *);
-
-groupby_item :
-  single_valued_path_expression
-  | ID
-  ;
+  	GROUP BY scalar_expression (Comma scalar_expression)* 
+  		-> ^(LGROUP_BY scalar_expression (scalar_expression) *);
 
 having_clause :
   	HAVING^ conditional_expression;

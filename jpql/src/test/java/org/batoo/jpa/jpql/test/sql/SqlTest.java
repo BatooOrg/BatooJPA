@@ -16,7 +16,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.jpql.test.simple;
+package org.batoo.jpa.jpql.test.sql;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -27,76 +27,50 @@ import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.tree.CommonTree;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
-import org.batoo.common.util.BatooUtils;
-import org.batoo.jpa.jpql.JpqlLexer;
-import org.batoo.jpa.jpql.JpqlParser;
-import org.batoo.jpa.jpql.JpqlParser.ql_statement_return;
+import org.batoo.jpa.sql.SqlLexer;
+import org.batoo.jpa.sql.SqlParser;
 import org.junit.Test;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 
 /**
  * 
  * @author hceylan
  * @since $version
  */
-public class SimpleTest {
+public class SqlTest {
 
-	private static final BLogger LOG = BLoggerFactory.getLogger(SimpleTest.class);
+	private static final BLogger LOG = BLoggerFactory.getLogger(SqlTest.class);
 
 	private CommonTree parse(String filename) {
 		try {
-			final String jpql = this.read(filename);
+			final String sql = this.read(filename);
 
-			final JpqlLexer lexer = new JpqlLexer(new ANTLRStringStream(jpql));
+			final SqlLexer lexer = new SqlLexer(new ANTLRStringStream(sql));
 			final CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-			final JpqlParser parser = new JpqlParser(tokenStream);
+			final SqlParser parser = new SqlParser(tokenStream);
 
-			final ql_statement_return ql_statement = parser.ql_statement();
+			final CommonTree tree = (CommonTree) parser.statements().getTree();
 
 			final List<String> errors = parser.getErrors();
 			if (errors.size() > 0) {
-				final String errorMsg = Joiner.on("\n\t").join(errors);
+				final String errorMsg = Joiner.on("\n\t").skipNulls().join(errors);
 
-				SimpleTest.LOG.error("Cannot parse query: {0}", //
-					SimpleTest.LOG.boxed(jpql, //
-						new Object[] { "\n\t" + errorMsg, "\n\n" + ((CommonTree) ql_statement.getTree()).toStringTree() + "\n" }));
+				SqlTest.LOG.error("Cannot parse query: {0}", //
+					SqlTest.LOG.boxed(filename, //
+						new Object[] { "\n\t" + errorMsg, "\n\n" + (tree != null ? CommonTreePrinter.toString(tree) : "") + "\n" }));
 
-				throw new RuntimeException("Cannot parse the query:\n " + errorMsg + ".\n" + jpql);
+				throw new RuntimeException("Cannot parse the query:\n" + errorMsg.trim() + ".");
 			}
 
-			return (CommonTree) ql_statement.getTree();
+			return tree;
+		}
+		catch (final RuntimeException e) {
+			throw e;
 		}
 		catch (final Exception e) {
-			throw new RuntimeException("Cannot parse input: " + e.getMessage(), e);
+			throw new RuntimeException("Cannot parse input", e);
 		}
-	}
-
-	@SuppressWarnings("unchecked")
-	private String print(CommonTree tree) {
-		final StringBuilder builder = new StringBuilder();
-		if (tree.getText() != null) {
-			builder.append(" ").append(tree.getText());
-		}
-		else {
-			builder.append("->");
-		}
-
-		final List<CommonTree> children = tree.getChildren();
-		if (children != null) {
-			builder.append("\n");
-			builder.append(Joiner.on("\n").join(Lists.transform(children, new Function<CommonTree, String>() {
-
-				@Override
-				public String apply(CommonTree input) {
-					return BatooUtils.tree(SimpleTest.this.print(input));
-				}
-			})));
-		}
-
-		return builder.toString();
 	}
 
 	private String read(String filename) throws Exception {
@@ -119,7 +93,11 @@ public class SimpleTest {
 	 * @author hceylan
 	 */
 	@Test
-	public void testTestSimpleSelect() {
-		SimpleTest.LOG.debug(this.print(this.parse("first.jpql")));
+	public void testSql() {
+		SqlTest.LOG.debug("\n" + CommonTreePrinter.toString(this.parse("1.sql")) + "\n");
+
+		SqlTest.LOG.debug("\n" + CommonTreePrinter.toString(this.parse("2.sql")) + "\n");
+
+		SqlTest.LOG.debug("\n" + CommonTreePrinter.toString(this.parse("3.sql")) + "\n");
 	}
 }

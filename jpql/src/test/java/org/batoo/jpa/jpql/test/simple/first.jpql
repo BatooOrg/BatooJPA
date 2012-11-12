@@ -1,4 +1,5 @@
-select p from Person p
+select
+p from Person p
 	join fetch p.addresses
 	join fetch p.addresses.country
 	left join p.addresses a 

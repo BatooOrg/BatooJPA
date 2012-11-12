@@ -62,6 +62,7 @@ import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.impl.nativeQuery.NativeQuery;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 
 import com.google.common.base.Joiner;
@@ -324,7 +325,7 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public Query createNativeQuery(String sqlString) {
-		throw new NotImplementedException("Native queries are not yet implemented");
+		return new NativeQuery(this, sqlString);
 	}
 
 	/**
@@ -333,7 +334,7 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public Query createNativeQuery(String sqlString, Class<?> resultClass) {
-		throw new NotImplementedException("Native queries are not yet implemented");
+		return new NativeQuery(this, sqlString, resultClass);
 	}
 
 	/**
