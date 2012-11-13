@@ -44,6 +44,19 @@ public class TableElement extends ParentElement implements TableMetadata {
 	 *            the parent element factory
 	 * @param attributes
 	 *            the attributes
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public TableElement(ParentElement parent, Map<String, String> attributes) {
+		super(parent, attributes, ElementConstants.ELEMENT_UNIQUE_CONSTRAINT);
+	}
+
+	/**
+	 * @param parent
+	 *            the parent element factory
+	 * @param attributes
+	 *            the attributes
 	 * @param expectedChildElements
 	 *            the name of the elements expected
 	 * 
@@ -51,7 +64,8 @@ public class TableElement extends ParentElement implements TableMetadata {
 	 * @author hceylan
 	 */
 	public TableElement(ParentElement parent, Map<String, String> attributes, String... expectedChildElements) {
-		super(parent, attributes, ElementConstants.ELEMENT_UNIQUE_CONSTRAINT);
+		super(parent, attributes, ParentElement.join(expectedChildElements, //
+			ElementConstants.ELEMENT_UNIQUE_CONSTRAINT));
 	}
 
 	/**

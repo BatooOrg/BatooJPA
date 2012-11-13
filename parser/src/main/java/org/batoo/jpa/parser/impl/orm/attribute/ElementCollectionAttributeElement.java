@@ -80,13 +80,11 @@ public class ElementCollectionAttributeElement extends AttributeElement implemen
 	 *            the parent element factory
 	 * @param attributes
 	 *            the attributes
-	 * @param expectedChildElements
-	 *            the name of the elements expected
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ElementCollectionAttributeElement(ParentElement parent, Map<String, String> attributes, String... expectedChildElements) {
+	public ElementCollectionAttributeElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, //
 			ElementConstants.ELEMENT_ASSOCIATION_OVERRIDE, //
 			ElementConstants.ELEMENT_ATTRIBUTE_OVERRIDE, //

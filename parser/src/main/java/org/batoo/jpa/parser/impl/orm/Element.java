@@ -193,7 +193,9 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 
 			return element;
 		}
-		catch (final Exception e) {} // not possible
+		catch (final Exception e) {
+			Element.LOG.error(e, "Error while processing element: {0}", xmlLocator);
+		} // not possible
 
 		// unreachable
 		return null;

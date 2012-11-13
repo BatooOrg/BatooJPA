@@ -29,6 +29,7 @@ import javax.persistence.AccessType;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.PersistenceException;
 import javax.persistence.spi.PersistenceUnitInfo;
 
 import org.batoo.jpa.parser.MappingException;
@@ -247,9 +248,17 @@ public class MetadataImpl implements Metadata {
 				Class<?> c1 = null, c2 = null;
 				try {
 					c1 = classloader.loadClass(o1);
+				}
+				catch (final ClassNotFoundException e) {
+					throw new PersistenceException("Cannot load persistence class " + o1 + " referenced by orm mapping files");
+				}
+
+				try {
 					c2 = classloader.loadClass(o2);
 				}
-				catch (final ClassNotFoundException e) {}
+				catch (final ClassNotFoundException e) {
+					throw new PersistenceException("Cannot load persistence class " + o2 + " referenced by orm mapping files");
+				}
 
 				if (c1.isAssignableFrom(c2)) {
 					return -1;

@@ -33,7 +33,10 @@ import java.util.Enumeration;
 public class TestClassLoader extends ClassLoader {
 
 	private static final String PERSISTENCE_XML = "persistence.xml";
+	private static final String ORM_XML = "orm.xml";
+
 	private static final String FULL_PERSISTENCE_XML = "META-INF/" + TestClassLoader.PERSISTENCE_XML;
+	private static final String FULL_ORM_XML = "META-INF/" + TestClassLoader.ORM_XML;
 
 	private String root;
 
@@ -69,6 +72,11 @@ public class TestClassLoader extends ClassLoader {
 			return super.getResourceAsStream(name);
 		}
 
+		if (name.equals(TestClassLoader.FULL_ORM_XML)) {
+			name = this.root + "/" + TestClassLoader.ORM_XML;
+			return super.getResourceAsStream(name);
+		}
+
 		return super.getResourceAsStream(name);
 	}
 
@@ -80,6 +88,11 @@ public class TestClassLoader extends ClassLoader {
 	public Enumeration<URL> getResources(String name) throws IOException {
 		if (name.equals(TestClassLoader.FULL_PERSISTENCE_XML)) {
 			name = this.root + "/" + TestClassLoader.PERSISTENCE_XML;
+			return super.getResources(name);
+		}
+
+		if (name.equals(TestClassLoader.FULL_ORM_XML)) {
+			name = this.root + "/" + TestClassLoader.ORM_XML;
 			return super.getResources(name);
 		}
 

@@ -31,6 +31,40 @@ import org.batoo.common.log.ToStringBuilder;
 public abstract class ParentElement extends Element {
 
 	/**
+	 * Returns the joint array of <code>elements1</code> and <code>elements2</code>.
+	 * 
+	 * @param elements1
+	 *            the first array of elements
+	 * @param elements2
+	 *            the second array of elements
+	 * @return the joint array of <code>elements1</code> and <code>elements2</code>
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public static String[] join(String[] elements1, String... elements2) {
+		if ((elements1 == null) || (elements1.length == 0)) {
+			return elements2;
+		}
+
+		if ((elements2 == null) || (elements2.length == 0)) {
+			return elements1;
+		}
+
+		final String[] joined = new String[elements1.length + elements2.length];
+
+		for (int i = 0; i < elements1.length; i++) {
+			joined[i] = elements1[i];
+		}
+
+		for (int i = 0; i < elements2.length; i++) {
+			joined[i + elements1.length] = elements2[i];
+		}
+
+		return joined;
+	}
+
+	/**
 	 * @param parent
 	 *            the parent element factory
 	 * @param attributes

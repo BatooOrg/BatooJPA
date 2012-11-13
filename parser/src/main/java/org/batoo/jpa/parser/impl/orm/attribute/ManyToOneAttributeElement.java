@@ -42,13 +42,11 @@ public class ManyToOneAttributeElement extends AssociationElement implements Man
 	 *            the parent element factory
 	 * @param attributes
 	 *            the attributes
-	 * @param expectedChildElements
-	 *            the name of the elements expected
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManyToOneAttributeElement(ParentElement parent, Map<String, String> attributes, String... expectedChildElements) {
+	public ManyToOneAttributeElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, FetchType.EAGER, //
 			ElementConstants.ELEMENT_CASCADE,//
 			ElementConstants.ELEMENT_JOIN_COLUMN, //

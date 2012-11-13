@@ -46,13 +46,11 @@ public class SecondaryTableElement extends ParentElement implements TableMetadat
 	 *            the parent element factory
 	 * @param attributes
 	 *            the attributes
-	 * @param expectedChildElements
-	 *            the name of the elements expected
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public SecondaryTableElement(ParentElement parent, Map<String, String> attributes, String... expectedChildElements) {
+	public SecondaryTableElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, //
 			ElementConstants.ELEMENT_UNIQUE_CONSTRAINT, //
 			ElementConstants.ELEMENT_PRIMARY_KEY_JOIN_COLUMN);

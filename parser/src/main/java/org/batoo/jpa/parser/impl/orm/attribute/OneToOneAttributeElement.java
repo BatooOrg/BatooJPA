@@ -51,13 +51,11 @@ public class OneToOneAttributeElement extends AssociationElement implements OneT
 	 *            the parent element factory
 	 * @param attributes
 	 *            the attributes
-	 * @param expectedChildElements
-	 *            the name of the elements expected
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public OneToOneAttributeElement(ParentElement parent, Map<String, String> attributes, String... expectedChildElements) {
+	public OneToOneAttributeElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, FetchType.EAGER, //
 			ElementConstants.ELEMENT_CASCADE,//
 			ElementConstants.ELEMENT_JOIN_COLUMN, //

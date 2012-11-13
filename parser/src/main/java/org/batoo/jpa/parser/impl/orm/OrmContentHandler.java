@@ -182,14 +182,13 @@ public class OrmContentHandler implements ContentHandler {
 			attributes.put(name, value);
 		}
 
-		OrmContentHandler.LOG.trace("Start of element url: {0}, localName: {1}, qName: {2}, attributes: {3}", uri, localName, qName,
-			attributes);
+		OrmContentHandler.LOG.trace("Start of element url: {0}, localName: {1}, qName: {2}, attributes: {3}", uri, localName, qName, attributes);
 
 		// if stack is empty we are at the root of the document
 		if (this.elementStack.size() == 0) {
 			if (!ElementConstants.ELEMENT_ENTITY_MAPPINGS.equals(localName)) {
-				throw new MappingException("Unexpected element '" + ElementConstants.ELEMENT_ENTITY_MAPPINGS + "' encountered.",
-					new XmlLocator(this.fileName, localName, this.locator));
+				throw new MappingException("Unexpected element '" + ElementConstants.ELEMENT_ENTITY_MAPPINGS + "' encountered.", new XmlLocator(this.fileName,
+					localName, this.locator));
 			}
 
 			this.entityMappings = new EntityMappings(attributes);
@@ -213,5 +212,4 @@ public class OrmContentHandler implements ContentHandler {
 	public void startPrefixMapping(String prefix, String uri) throws SAXException {
 		OrmContentHandler.LOG.trace("Start of prefix mapping url: {0}, prefix: {1}", uri, prefix);
 	}
-
 }

@@ -46,7 +46,7 @@ import com.google.common.collect.Lists;
  * @author hceylan
  * @since $version
  */
-public class AssociationElement extends AttributeElement implements AssociationAttributeMetadata {
+public abstract class AssociationElement extends AttributeElement implements AssociationAttributeMetadata {
 
 	private String targetEntity;
 	private FetchType fetchType;
@@ -70,11 +70,11 @@ public class AssociationElement extends AttributeElement implements AssociationA
 	 * @author hceylan
 	 */
 	public AssociationElement(ParentElement parent, Map<String, String> attributes, FetchType defaultFetchType, String... expectedChildElements) {
-		super(parent, attributes, //
+		super(parent, attributes, ParentElement.join(expectedChildElements, //
 			ElementConstants.ELEMENT_CASCADE,//
 			ElementConstants.ELEMENT_JOIN_COLUMN, //
 			ElementConstants.ELEMENT_JOIN_TABLE, //
-			ElementConstants.ELEMENT_PRIMARY_KEY_JOIN_COLUMN);
+			ElementConstants.ELEMENT_PRIMARY_KEY_JOIN_COLUMN));
 
 		this.fetchType = defaultFetchType;
 	}

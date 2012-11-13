@@ -69,13 +69,11 @@ public class ManyToManyAttributeElement extends AssociationElement implements Ma
 	 *            the parent element factory
 	 * @param attributes
 	 *            the attributes
-	 * @param expectedChildElements
-	 *            the name of the elements expected
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManyToManyAttributeElement(ParentElement parent, Map<String, String> attributes, String... expectedChildElements) {
+	public ManyToManyAttributeElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, FetchType.LAZY, //
 			ElementConstants.ELEMENT_CASCADE,//
 			ElementConstants.ELEMENT_JOIN_COLUMN, //

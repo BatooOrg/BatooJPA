@@ -48,13 +48,11 @@ public class EmbeddedAttributeElement extends AttributeElement implements Embedd
 	 *            the parent element factory
 	 * @param attributes
 	 *            the attributes
-	 * @param expectedChildElements
-	 *            the name of the elements expected
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public EmbeddedAttributeElement(ParentElement parent, Map<String, String> attributes, String... expectedChildElements) {
+	public EmbeddedAttributeElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, //
 			ElementConstants.ELEMENT_ATTRIBUTE_OVERRIDE,//
 			ElementConstants.ELEMENT_ASSOCIATION_OVERRIDE);

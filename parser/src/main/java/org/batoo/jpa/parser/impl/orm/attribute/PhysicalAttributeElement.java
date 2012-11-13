@@ -35,7 +35,7 @@ import org.batoo.jpa.parser.metadata.attribute.PhysicalAttributeMetadata;
  * @author hceylan
  * @since $version
  */
-public class PhysicalAttributeElement extends AttributeElement implements PhysicalAttributeMetadata {
+public abstract class PhysicalAttributeElement extends AttributeElement implements PhysicalAttributeMetadata {
 
 	private TemporalType temporalType;
 	private ColumnMetadata column;
