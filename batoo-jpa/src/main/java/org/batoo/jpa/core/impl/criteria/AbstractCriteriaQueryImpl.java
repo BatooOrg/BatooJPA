@@ -34,9 +34,9 @@ import javax.persistence.criteria.Selection;
 import javax.persistence.metamodel.EntityType;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.common.util.BatooUtils;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
+import org.batoo.common.util.BatooUtils;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
@@ -263,7 +263,7 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 
 		final String having = this.getGroupRestriction() != null ? this.getGroupRestriction().generateSqlRestriction(this) : null;
 
-		final String from = "FROM " + Joiner.on(",").join(froms);
+		final String from = "FROM " + Joiner.on(", ").join(froms);
 		final String join = Joiner.on("\n").skipNulls().join(joins.values());
 
 		return Joiner.on("\n").skipNulls().join(//

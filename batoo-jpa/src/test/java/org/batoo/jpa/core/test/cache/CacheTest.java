@@ -21,7 +21,6 @@ package org.batoo.jpa.core.test.cache;
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -29,7 +28,6 @@ import org.junit.Test;
  * 
  * @since $version
  */
-@Ignore
 public class CacheTest extends BaseCoreTest {
 
 	/**
@@ -134,7 +132,7 @@ public class CacheTest extends BaseCoreTest {
 		Assert.assertEquals("Global | puts:4 evicts:0 hits:2, misses:3", this.emf().getCache().getStats().toString());
 
 		foo.getBars2().size();
-		Assert.assertEquals("Global | puts:4 evicts:0 hits:5, misses:3", this.emf().getCache().getStats().toString());
+		Assert.assertEquals("Global | puts:4 evicts:0 hits:4, misses:3", this.emf().getCache().getStats().toString());
 	}
 
 	/**
@@ -161,7 +159,7 @@ public class CacheTest extends BaseCoreTest {
 
 		foo = this.find(Foo.class, foo.getId());
 		Assert.assertEquals(1, foo.getBars2().size());
-		Assert.assertEquals("Global | puts:5 evicts:1 hits:4, misses:1", this.emf().getCache().getStats().toString());
+		Assert.assertEquals("Global | puts:5 evicts:1 hits:5, misses:1", this.emf().getCache().getStats().toString());
 	}
 
 	/**
