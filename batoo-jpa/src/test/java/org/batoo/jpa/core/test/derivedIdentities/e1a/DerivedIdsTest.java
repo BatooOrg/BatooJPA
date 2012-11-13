@@ -21,11 +21,15 @@ package org.batoo.jpa.core.test.derivedIdentities.e1a;
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * JPA Spec 2.4.1.3 test.
+=======
+import org.junit.Test;
+
+/**
+ * JPA Spec 2.4.1.3 test
  * 
  * @author asimarslan
  * @since $version
@@ -38,6 +42,13 @@ public class DerivedIdsTest extends BaseCoreTest {
 	 * The parent entity has a simple primary key.
 	 * <p>
 	 * The dependent entity uses IdClass to represent a composite key.
+=======
+	 * 
+	 * Example-1 Case (a):
+	 * <p>
+	 * The parent entity has a simple primary key
+	 * <p>
+	 * The dependent entity uses IdClass to represent a composite key:
 	 * 
 	 * @author asimarslan
 	 * @since $version
