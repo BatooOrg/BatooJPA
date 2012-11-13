@@ -28,6 +28,7 @@ import java.util.Set;
 import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.PersistenceException;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.parser.impl.AbstractLocator;
@@ -227,6 +228,11 @@ public abstract class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
 					}
 				}
 
+				// ignore @Transient
+				if (a instanceof Transient) {
+					continue;
+				}
+
 				if ((m.getReturnType() == null) || (m.getParameterTypes().length > 0)) {
 					continue;
 				}
@@ -265,6 +271,11 @@ public abstract class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
 					if (((Access) a).value() != AccessType.FIELD) {
 						continue;
 					}
+				}
+
+				// ignore @Transient
+				if (a instanceof Transient) {
+					continue;
 				}
 
 				final String name = a.annotationType().getName();

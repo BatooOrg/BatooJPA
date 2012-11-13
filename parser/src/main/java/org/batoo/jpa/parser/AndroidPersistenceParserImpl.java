@@ -90,7 +90,7 @@ public class AndroidPersistenceParserImpl implements PersistenceParser {
 	 * @author hceylan
 	 */
 	@Override
-	public DataSource getJtaDatasource() {
+	public DataSource getJtaDataSource() {
 		return null;
 	}
 
@@ -116,7 +116,7 @@ public class AndroidPersistenceParserImpl implements PersistenceParser {
 	 * @author hceylan
 	 */
 	@Override
-	public DataSource getNonJtaDatasource() {
+	public DataSource getNonJtaDataSource() {
 		return null;
 	}
 

@@ -79,7 +79,7 @@ public class PreparedStatementProxy implements PreparedStatement {
 		STDOUT
 	}
 
-	private static final BLogger LOG = BLoggerFactory.getLogger("org.batoo.jpa.SQL");
+	private static final BLogger LOG = BLoggerFactory.getLogger("org.batoo.jpa.core.SQL");
 
 	private static AtomicLong no = new AtomicLong(0);
 

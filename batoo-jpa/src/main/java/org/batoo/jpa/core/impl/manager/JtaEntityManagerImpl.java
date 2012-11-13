@@ -27,6 +27,8 @@ import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 
+import org.batoo.common.log.BLogger;
+import org.batoo.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 
@@ -37,6 +39,8 @@ import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
  * @since $version
  */
 public class JtaEntityManagerImpl extends EntityManagerImpl {
+
+	private static final BLogger LOG = BLoggerFactory.getLogger(JtaEntityManagerImpl.class);
 
 	private Transaction jtaTransaction;
 	private final JtaEntityManagerFactoryImpl emf;
@@ -108,7 +112,15 @@ public class JtaEntityManagerImpl extends EntityManagerImpl {
 	@Override
 	public EntityTransactionImpl getTransaction() {
 		throw new PersistenceException("Transactions are configured as container managed");
+	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean hasActiveTransaction() {
+		return this.isTransactionInState(javax.transaction.Status.STATUS_ACTIVE);
 	}
 
 	/**
@@ -117,16 +129,7 @@ public class JtaEntityManagerImpl extends EntityManagerImpl {
 	 */
 	@Override
 	public boolean hasTransactionMarkedForRollback() {
-		if (this.jtaTransaction != null) {
-			try {
-				return this.jtaTransaction.getStatus() == javax.transaction.Status.STATUS_MARKED_ROLLBACK;
-			}
-			catch (final SystemException e) {
-				throw new PersistenceException("Cannot check transaction status", e);
-			}
-		}
-
-		return super.hasTransactionMarkedForRollback();
+		return this.isTransactionInState(javax.transaction.Status.STATUS_ROLLEDBACK);
 	}
 
 	/**
@@ -136,6 +139,15 @@ public class JtaEntityManagerImpl extends EntityManagerImpl {
 	@Override
 	public boolean isJoinedToTransaction() {
 		return this.jtaTransaction != null;
+	}
+
+	private boolean isTransactionInState(int statusActive) {
+		try {
+			return (this.jtaTransaction != null) && (this.jtaTransaction.getStatus() == javax.transaction.Status.STATUS_ACTIVE);
+		}
+		catch (final SystemException e) {
+			throw new PersistenceException("Cannot check transaction status", e);
+		}
 	}
 
 	/**
@@ -170,6 +182,25 @@ public class JtaEntityManagerImpl extends EntityManagerImpl {
 		}
 		catch (final Exception e) {
 			throw new PersistenceException("Unable to join JTA");
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void setRollbackOnly() {
+		super.setRollbackOnly();
+
+		if (this.jtaTransaction != null) {
+			try {
+				this.jtaTransaction.setRollbackOnly();
+			}
+			catch (final IllegalStateException e) {}
+			catch (final SystemException e) {
+				JtaEntityManagerImpl.LOG.error("Cannot mark the JTA Transaction as rollback only!", e);
+			}
 		}
 	}
 

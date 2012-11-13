@@ -47,7 +47,7 @@ import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
-import org.batoo.jpa.core.JPASettings;
+import org.batoo.jpa.JPASettings;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaDeleteImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
@@ -89,8 +89,10 @@ public class EntityManagerImpl implements EntityManager {
 	private final SessionImpl session;
 
 	private boolean open;
-	private EntityTransactionImpl transaction;
+
 	private Connection connection;
+	private EntityTransactionImpl transaction;
+	private boolean rollbackOnly;
 
 	private FlushModeType flushMode;
 	private boolean inFlush;
@@ -136,6 +138,10 @@ public class EntityManagerImpl implements EntityManager {
 	protected void assertOpen() {
 		if (!this.open) {
 			throw new IllegalStateException("EntityManager has been previously closed");
+		}
+
+		if (this.rollbackOnly) {
+			throw new IllegalStateException("EntityManager previously encountered an exception.");
 		}
 	}
 
@@ -710,6 +716,18 @@ public class EntityManagerImpl implements EntityManager {
 	}
 
 	/**
+	 * Returns if the entity manager has an active transaction.
+	 * 
+	 * @return true if the entity manager has an active transaction, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean hasActiveTransaction() {
+		return (this.transaction != null) && this.transaction.isActive();
+	}
+
+	/**
 	 * Returns if the entity manager has a transaction which is marked for rollback.
 	 * 
 	 * @return true if the entity manager has a transaction which is marked for rollback, false otherwise
@@ -1155,6 +1173,19 @@ public class EntityManagerImpl implements EntityManager {
 	@Override
 	public void setProperty(String propertyName, Object value) {
 		this.properties.put(propertyName, value);
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setRollbackOnly() {
+		this.rollbackOnly = true;
+
+		if (this.transaction != null) {
+			this.transaction.setRollbackOnly();
+		}
 	}
 
 	/**

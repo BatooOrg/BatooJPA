@@ -35,7 +35,6 @@ import java.util.Set;
 
 import javax.persistence.CacheRetrieveMode;
 import javax.persistence.CacheStoreMode;
-import javax.persistence.EntityTransaction;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
@@ -52,7 +51,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
-import org.batoo.jpa.core.JPASettings;
+import org.batoo.jpa.JPASettings;
 import org.batoo.jpa.core.impl.cache.CacheImpl;
 import org.batoo.jpa.core.impl.cache.CacheReference;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractParameterExpressionImpl;
@@ -311,10 +310,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 		catch (final SQLException e) {
 			QueryImpl.LOG.error(e, "Query failed" + QueryImpl.LOG.lazyBoxed(this.sql, parameters));
 
-			final EntityTransaction transaction = this.em.getTransaction();
-			if (transaction != null) {
-				transaction.setRollbackOnly();
-			}
+			this.em.setRollbackOnly();
 
 			throw new PersistenceException("Query failed", e);
 		}
@@ -460,10 +456,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 		catch (final SQLException e) {
 			QueryImpl.LOG.error(e, "Query failed" + QueryImpl.LOG.lazyBoxed(this.sql, parameters));
 
-			final EntityTransaction transaction = this.em.getTransaction();
-			if (transaction != null) {
-				transaction.setRollbackOnly();
-			}
+			this.em.setRollbackOnly();
 
 			throw new PersistenceException("Query failed", e);
 		}
@@ -762,7 +755,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	@Override
 	public List<X> getResultList() {
 		// flush if specified
-		if (!this.q.isInternal() && this.em.getTransaction().isActive()
+		if (!this.q.isInternal() && this.em.hasActiveTransaction()
 			&& ((this.flushMode == FlushModeType.AUTO) || (this.em.getFlushMode() == FlushModeType.AUTO))) {
 			this.em.flush();
 		}

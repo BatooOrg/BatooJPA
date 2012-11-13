@@ -46,8 +46,8 @@ import org.apache.commons.lang.StringUtils;
 import org.batoo.common.BatooException;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
-import org.batoo.jpa.core.BJPASettings;
-import org.batoo.jpa.core.JPASettings;
+import org.batoo.jpa.BJPASettings;
+import org.batoo.jpa.JPASettings;
 import org.batoo.jpa.core.impl.cache.CacheImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
@@ -312,12 +312,12 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	}
 
 	private DataSource createDatasource0(PersistenceParser parser) {
-		if (parser.getJtaDatasource() != null) {
-			return parser.getJtaDatasource();
+		if (parser.getJtaDataSource() != null) {
+			return parser.getJtaDataSource();
 		}
 
-		if (parser.getNonJtaDatasource() != null) {
-			return parser.getNonJtaDatasource();
+		if (parser.getNonJtaDataSource() != null) {
+			return parser.getNonJtaDataSource();
 		}
 
 		try {

@@ -19,31 +19,20 @@
 package org.batoo.jpa.parser;
 
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.persistence.PersistenceException;
 import javax.persistence.SharedCacheMode;
 import javax.persistence.ValidationMode;
 import javax.persistence.spi.PersistenceUnitInfo;
 import javax.sql.DataSource;
 
-import org.batoo.common.BatooException;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
 import org.batoo.jpa.parser.impl.OrmParser;
 import org.batoo.jpa.parser.impl.metadata.MetadataImpl;
-import org.batoo.jpa.parser.persistence.Persistence;
-import org.batoo.jpa.parser.persistence.Persistence.PersistenceUnit;
-import org.batoo.jpa.parser.persistence.Persistence.PersistenceUnit.Properties.Property;
-import org.batoo.jpa.parser.persistence.PersistenceUnitCachingType;
-import org.batoo.jpa.parser.persistence.PersistenceUnitValidationModeType;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
@@ -66,18 +55,14 @@ public class PersistenceParserImpl implements PersistenceParser {
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(PersistenceParserImpl.class);
 
-	private final String puName;
+	private final PersistenceUnitInfo puInfo;
+	private final Map<String, Object> properties = Maps.newHashMap();
 	private final String provider;
 
-	private final ClassLoader classloader;
 	private final MetadataImpl metadata;
-	private final Map<String, Object> properties = Maps.newHashMap();
 	private final List<String> ormMappingFiles;
 
 	private final boolean hasValidators;
-	private final SharedCacheMode sharedCacheMode;
-	private final DataSource jtaDataSource;
-	private final DataSource nonJtaDataSource;
 
 	/**
 	 * @param puInfo
@@ -91,17 +76,19 @@ public class PersistenceParserImpl implements PersistenceParser {
 	public PersistenceParserImpl(PersistenceUnitInfo puInfo, Map<String, Object> properties) {
 		super();
 
-		this.puName = puInfo.getPersistenceUnitName();
-		this.classloader = puInfo.getClassLoader();
+		this.puInfo = puInfo;
 		this.provider = null;
 
-		// FIXME: If properties does not exist at all NPE
-		for (final Entry<Object, Object> entry : puInfo.getProperties().entrySet()) {
-			this.properties.put((String) entry.getKey(), entry.getValue());
+		if (puInfo.getProperties() != null) {
+			for (final Entry<Object, Object> entry : puInfo.getProperties().entrySet()) {
+				this.properties.put((String) entry.getKey(), entry.getValue());
+			}
 		}
 
-		for (final Entry<String, Object> entry : properties.entrySet()) {
-			this.properties.put(entry.getKey(), entry.getValue());
+		if (properties != null) {
+			for (final Entry<String, Object> entry : properties.entrySet()) {
+				this.properties.put(entry.getKey(), entry.getValue());
+			}
 		}
 
 		this.hasValidators = (puInfo.getValidationMode() == ValidationMode.AUTO) || (puInfo.getValidationMode() == ValidationMode.CALLBACK);
@@ -110,10 +97,7 @@ public class PersistenceParserImpl implements PersistenceParser {
 
 		this.parseOrmXmls();
 
-		this.metadata.parse(puInfo.getJarFileUrls(), this.classloader, puInfo.getManagedClassNames(), puInfo.excludeUnlistedClasses());
-		this.sharedCacheMode = puInfo.getSharedCacheMode();
-		this.jtaDataSource = puInfo.getJtaDataSource();
-		this.nonJtaDataSource = puInfo.getNonJtaDataSource();
+		this.metadata.parse(puInfo);
 	}
 
 	/**
@@ -126,102 +110,7 @@ public class PersistenceParserImpl implements PersistenceParser {
 	 * @author hceylan
 	 */
 	public PersistenceParserImpl(String puName, Map<String, Object> properties) {
-		super();
-
-		this.puName = puName;
-		this.classloader = Thread.currentThread().getContextClassLoader();
-
-		final PersistenceUnit puInfo = this.createPersistenceUnit();
-
-		this.provider = puInfo.getProvider();
-
-		for (final Property entry : puInfo.getProperties().getProperties()) {
-			this.properties.put(entry.getName(), entry.getValue());
-		}
-
-		if (properties != null) {
-			for (final Entry<String, Object> entry : properties.entrySet()) {
-				this.properties.put(entry.getKey(), entry.getValue());
-			}
-		}
-
-		this.hasValidators = (puInfo.getValidationMode() == PersistenceUnitValidationModeType.AUTO)
-			|| (puInfo.getValidationMode() == PersistenceUnitValidationModeType.CALLBACK);
-		this.metadata = new MetadataImpl(puInfo.getClazzs());
-		this.ormMappingFiles = puInfo.getMappingFiles();
-
-		this.parseOrmXmls();
-
-		final List<URL> jarFiles = Lists.transform(puInfo.getJarFiles(), new Function<String, URL>() {
-
-			@Override
-			public URL apply(String input) {
-				try {
-					return new URL(input);
-				}
-				catch (final MalformedURLException e) {
-					throw new PersistenceException("Cannot create URL: " + input);
-				}
-			}
-		});
-
-		final boolean excludeUnlistedClasses = puInfo.getExcludeUnlistedClasses() != null ? puInfo.getExcludeUnlistedClasses() : false;
-		this.metadata.parse(jarFiles, this.classloader, puInfo.getClazzs(), excludeUnlistedClasses);
-
-		switch (puInfo.getSharedCacheMode() != null ? puInfo.getSharedCacheMode() : PersistenceUnitCachingType.NONE) {
-			case ALL:
-				this.sharedCacheMode = SharedCacheMode.ALL;
-				break;
-			case DISABLE_SELECTIVE:
-				this.sharedCacheMode = SharedCacheMode.DISABLE_SELECTIVE;
-				break;
-			case ENABLE_SELECTIVE:
-				this.sharedCacheMode = SharedCacheMode.ENABLE_SELECTIVE;
-				break;
-			case NONE:
-				this.sharedCacheMode = SharedCacheMode.NONE;
-				break;
-			default:
-				this.sharedCacheMode = SharedCacheMode.NONE;
-				break;
-		}
-
-		this.jtaDataSource = null;
-		this.nonJtaDataSource = null;
-	}
-
-	/**
-	 * Initializes the persistence unit by parsing the Persistence XML File.
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 * @return
-	 */
-	private PersistenceUnit createPersistenceUnit() {
-		try {
-			PersistenceParserImpl.LOG.info("Loading persistence.xml");
-
-			final InputStream is = this.classloader.getResourceAsStream(PersistenceParserImpl.PERSISTENCE_XML);
-			// Try to load the Persistence XML
-			if (is == null) {
-				throw new BatooException("persistence.xml not found in the classpath");
-			}
-
-			final javax.xml.bind.JAXBContext context = javax.xml.bind.JAXBContext.newInstance(Persistence.class);
-			final javax.xml.bind.Unmarshaller unmarshaller = context.createUnmarshaller();
-
-			final Persistence persistence = (Persistence) unmarshaller.unmarshal(is);
-			for (final PersistenceUnit persistenceUnit : persistence.getPersistenceUnits()) {
-				if (this.puName.equals(persistenceUnit.getName())) {
-					return persistenceUnit;
-				}
-			}
-		}
-		catch (final Exception e) {
-			throw new BatooException("Unable to parse persistence.xml", e);
-		}
-
-		throw new BatooException("Persistence unit " + this.puName + " not found.");
+		this(new PersistenceUnitInfoImpl(puName), properties);
 	}
 
 	/**
@@ -230,7 +119,7 @@ public class PersistenceParserImpl implements PersistenceParser {
 	 */
 	@Override
 	public ClassLoader getClassloader() {
-		return this.classloader;
+		return this.puInfo.getClassLoader();
 	}
 
 	/**
@@ -238,8 +127,8 @@ public class PersistenceParserImpl implements PersistenceParser {
 	 * 
 	 */
 	@Override
-	public DataSource getJtaDatasource() {
-		return this.jtaDataSource;
+	public DataSource getJtaDataSource() {
+		return this.puInfo.getJtaDataSource();
 	}
 
 	/**
@@ -256,8 +145,8 @@ public class PersistenceParserImpl implements PersistenceParser {
 	 * 
 	 */
 	@Override
-	public DataSource getNonJtaDatasource() {
-		return this.nonJtaDataSource;
+	public DataSource getNonJtaDataSource() {
+		return this.puInfo.getNonJtaDataSource();
 	}
 
 	/**
@@ -284,7 +173,7 @@ public class PersistenceParserImpl implements PersistenceParser {
 	 */
 	@Override
 	public SharedCacheMode getSharedCacheMode() {
-		return this.sharedCacheMode;
+		return this.puInfo.getSharedCacheMode();
 	}
 
 	/**
@@ -301,13 +190,14 @@ public class PersistenceParserImpl implements PersistenceParser {
 	 * 
 	 * @param mappingFile
 	 *            the name of the mapping file
+	 * @param optional
+	 *            if the file is optional
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	private void parseOrmXml(final String mappingFile) {
-		// TODO do we have the classloader provided
-		final InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(mappingFile);
+	private void parseOrmXml(final String mappingFile, boolean optional) {
+		final InputStream is = this.puInfo.getClassLoader().getResourceAsStream(mappingFile);
 
 		if (is != null) {
 			final OrmParser ormParser = new OrmParser(mappingFile);
@@ -315,9 +205,11 @@ public class PersistenceParserImpl implements PersistenceParser {
 
 			this.metadata.merge(ormParser.getMetadata());
 
-			PersistenceParserImpl.LOG.trace("Merged metamodel {0}", this.metadata);
+			PersistenceParserImpl.LOG.debug("Merged ORM Metamodel {0}", this.metadata);
 		}
-		// TODO error on not found orm.xml
+		else if (!optional) {
+			PersistenceParserImpl.LOG.error("ORM Mapping file {0} could not be found!", mappingFile);
+		}
 	}
 
 	/**
@@ -329,11 +221,11 @@ public class PersistenceParserImpl implements PersistenceParser {
 	private void parseOrmXmls() {
 		if (this.ormMappingFiles.size() > 0) {
 			for (final String mappingFile : this.ormMappingFiles) {
-				this.parseOrmXml(mappingFile);
+				this.parseOrmXml(mappingFile, true);
 			}
 		}
 		else {
-			this.parseOrmXml(PersistenceParserImpl.ORM_XML);
+			this.parseOrmXml(PersistenceParserImpl.ORM_XML, false);
 		}
 	}
 }

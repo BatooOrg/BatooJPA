@@ -51,7 +51,7 @@ public interface PersistenceParser {
 	 * @since $version
 	 * @author hceylan
 	 */
-	DataSource getJtaDatasource();
+	DataSource getJtaDataSource();
 
 	/**
 	 * Returns the metadata of the parser.
@@ -71,7 +71,7 @@ public interface PersistenceParser {
 	 * @since $version
 	 * @author hceylan
 	 */
-	DataSource getNonJtaDatasource();
+	DataSource getNonJtaDataSource();
 
 	/**
 	 * Returns the properties of the persistence unit.

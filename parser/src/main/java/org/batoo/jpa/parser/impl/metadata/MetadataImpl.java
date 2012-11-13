@@ -18,29 +18,21 @@
  */
 package org.batoo.jpa.parser.impl.metadata;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 import javax.persistence.AccessType;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.PersistenceException;
+import javax.persistence.spi.PersistenceUnitInfo;
 
-import org.batoo.common.log.BLogger;
-import org.batoo.common.log.BLoggerFactory;
 import org.batoo.jpa.parser.MappingException;
+import org.batoo.jpa.parser.impl.acl.BaseAnnotatedClassLocator;
 import org.batoo.jpa.parser.impl.metadata.type.EmbeddableMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.type.EntityMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.type.MappedSuperclassMetadataImpl;
@@ -57,7 +49,6 @@ import org.batoo.jpa.parser.metadata.type.MappedSuperclassMetadata;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 /**
  * Implementation of {@link Metadata}.
@@ -66,8 +57,6 @@ import com.google.common.collect.Sets;
  * @since $version
  */
 public class MetadataImpl implements Metadata {
-
-	private static final BLogger LOG = BLoggerFactory.getLogger(MetadataImpl.class);
 
 	private AccessType accessType;
 	private boolean xmlMappingMetadataComplete;
@@ -114,56 +103,6 @@ public class MetadataImpl implements Metadata {
 	@Override
 	public boolean cascadePersists() {
 		return this.cascadePersist;
-	}
-
-	private void findClasses(ClassLoader cl, Set<Class<?>> classes, int rootLength, File file) throws IOException {
-		if (file.isDirectory()) {
-			for (final String child : file.list()) {
-				this.findClasses(cl, classes, rootLength, new File(file.getCanonicalPath() + "/" + child));
-			}
-		}
-		else {
-			String path = file.getPath();
-
-			if (path.endsWith(".class")) {
-				// Windows compatibility
-				if (System.getProperty("os.name").toUpperCase(Locale.ENGLISH).startsWith("WINDOWS")) {
-					rootLength--;
-				}
-
-				path = path.substring(rootLength, path.length() - 6).replace("/", ".").replace("\\", ".");
-				try {
-					final Class<?> clazz = this.isPersistentClass(cl, path);
-					if (clazz != null) {
-						classes.add(clazz);
-					}
-				}
-				catch (final Exception e) {
-					MetadataImpl.LOG.warn("Cannot load class {0} in {1}", path, file.getPath());
-				}
-			}
-		}
-	}
-
-	private void findClasses(Set<Class<?>> classes, ClassLoader classPath) {
-		try {
-			final Enumeration<URL> resources = classPath.getResources("");
-			while (resources.hasMoreElements()) {
-				String root = resources.nextElement().getFile();
-				if (root.endsWith("WEB-INF/")) {
-					root = root + "classes/";
-				}
-
-				if (!root.endsWith(File.separator) && !root.endsWith("/")) {
-					root = root + File.separator;
-				}
-
-				this.findClasses(classPath, classes, root.length(), new File(root));
-			}
-		}
-		catch (final Exception e) {
-			throw new PersistenceException("Cannot scan the classpath", e);
-		}
 	}
 
 	/**
@@ -245,26 +184,6 @@ public class MetadataImpl implements Metadata {
 	@Override
 	public List<TableGeneratorMetadata> getTableGenerators() {
 		return this.tableGenerators;
-	}
-
-	private Class<?> isPersistentClass(ClassLoader classPath, String path) {
-		try {
-			final Class<?> clazz = classPath.loadClass(path);
-
-			if ((clazz.getAnnotation(Embeddable.class) != null) || //
-				(clazz.getAnnotation(MappedSuperclass.class) != null) || //
-				(clazz.getAnnotation(Entity.class) != null)) {
-				return clazz;
-			}
-		}
-		catch (final Throwable e) {
-			// nasty eclipse JUnit fragment spits bogus class loading errors
-			if (!path.startsWith("org.eclipse.jdt")) {
-				MetadataImpl.LOG.debug(e, "Unable to read class: {0}" + path);
-			}
-		}
-
-		return null;
 	}
 
 	/**
@@ -397,35 +316,16 @@ public class MetadataImpl implements Metadata {
 	/**
 	 * Parses the types in the metamodel and in the jar files.
 	 * 
-	 * @param jarFiles
-	 *            the optional jar files
-	 * @param classloader
-	 *            the class loader
-	 * @param managedClassNames
-	 *            the list of explicist managed class names
-	 * @param excludeUnlistedClasses
-	 *            if unlisted classes should be excluded
+	 * @param puInfo
+	 *            the persistence unit info
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void parse(List<URL> jarFiles, ClassLoader classloader, List<String> managedClassNames, boolean excludeUnlistedClasses) {
-		final Set<Class<?>> classes = Sets.newHashSet();
+	public void parse(PersistenceUnitInfo puInfo) {
+		final ClassLoader classloader = puInfo.getClassLoader();
 
-		this.visitJars(jarFiles, classloader, classes);
-
-		for (final String className : managedClassNames) {
-			try {
-				classes.add(classloader.loadClass(className));
-			}
-			catch (final ClassNotFoundException e) {
-				throw new PersistenceException("Unable to load listed managed class " + className);
-			}
-		}
-
-		if (!excludeUnlistedClasses) {
-			this.findClasses(classes, classloader);
-		}
+		final Set<Class<?>> classes = BaseAnnotatedClassLocator.locatePersistentClasses(puInfo);
 
 		for (final Class<?> clazz : classes) {
 			if (!this.entityMap.containsKey(clazz.getName()) && !this.entityMap.containsKey(clazz.getSimpleName())) {
@@ -434,42 +334,5 @@ public class MetadataImpl implements Metadata {
 		}
 
 		this.parse(classloader);
-	}
-
-	/**
-	 * @param jarFiles
-	 * @param classloader
-	 * @param classes
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	private void visitJars(List<URL> jarFiles, ClassLoader classloader, Set<Class<?>> classes) {
-		for (final URL jarUrl : jarFiles) {
-			try {
-				final JarFile jarFile = new JarFile(jarUrl.getFile());
-
-				final Enumeration<JarEntry> entries = jarFile.entries();
-				while (entries.hasMoreElements()) {
-					final JarEntry entry = entries.nextElement();
-
-					if (entry.isDirectory()) {
-						continue;
-					}
-
-					final String className = entry.getName().replace('/', '.').replace('\\', '.');
-
-					if (className.endsWith(".class")) {
-						final Class<?> clazz = this.isPersistentClass(classloader, className.substring(0, className.length() - 6));
-						if (clazz != null) {
-							classes.add(clazz);
-						}
-					}
-				}
-			}
-			catch (final IOException e) {
-				MetadataImpl.LOG.warn(e, "unable to read jar file: {0}", jarUrl);
-			}
-		}
 	}
 }

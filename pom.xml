@@ -260,11 +260,6 @@
 				<version>4.10</version>
 			</dependency>
 			<dependency>
-				<groupId>org.mockito</groupId>
-				<artifactId>mockito-core</artifactId>
-				<version>1.9.0</version>
-			</dependency>
-			<dependency>
 				<groupId>org.apache.bval</groupId>
 				<artifactId>bval-jsr303</artifactId>
 				<version>0.4</version>
@@ -287,11 +282,6 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -369,5 +359,6 @@
 		<module>batoo-annotations</module>
 		<module>batoo-maven-plugin</module>
 		<module>community</module>
+		<module>batoo-jpa-spi</module>
 	</modules>
 </project>
