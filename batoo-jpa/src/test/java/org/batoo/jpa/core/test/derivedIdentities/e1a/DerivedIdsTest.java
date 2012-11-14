@@ -24,7 +24,7 @@ import org.batoo.jpa.core.test.BaseCoreTest;
 import org.junit.Test;
 
 /**
- * JPA Spec 2.4.1.3 test
+ * JPA Spec 2.4.1.3 test.
  * 
  * @author asimarslan
  * @since $version
@@ -32,19 +32,17 @@ import org.junit.Test;
 public class DerivedIdsTest extends BaseCoreTest {
 
 	/**
-	 * 
 	 * Example-1 Case (a):
 	 * <p>
-	 * The parent entity has a simple primary key
+	 * The parent entity has a simple primary key.
 	 * <p>
-	 * The dependent entity uses IdClass to represent a composite key:
+	 * The dependent entity uses IdClass to represent a composite key.
 	 * 
 	 * @author asimarslan
 	 * @since $version
 	 */
 	@Test
 	public void test1a() {
-
 		final Employee employee = new Employee("employee1");
 		this.persist(employee);
 		this.commit();
@@ -61,6 +59,5 @@ public class DerivedIdsTest extends BaseCoreTest {
 		final Dependent dependent3 = this.find(Dependent.class, new DependentId(dependent1.getName(), dependent1.getEmp().getEmpId()));
 
 		Assert.assertEquals(dependent1, dependent3);
-
 	}
 }

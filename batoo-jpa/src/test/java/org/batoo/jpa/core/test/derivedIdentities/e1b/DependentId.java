@@ -40,11 +40,13 @@ public class DependentId {
 	}
 
 	/**
+	 * @param name
+	 *            the name
+	 * @param empPK
+	 *            the employee primary key
 	 * 
 	 * @author asimarslan
 	 * @since $version
-	 * @param name
-	 * @param empPK
 	 */
 	public DependentId(String name, Integer empPK) {
 		super();
@@ -64,7 +66,7 @@ public class DependentId {
 		if (obj == null) {
 			return false;
 		}
-		if (getClass() != obj.getClass()) {
+		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
 		final DependentId other = (DependentId) obj;
@@ -117,8 +119,8 @@ public class DependentId {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((this.empPK == null) ? 0 : this.empPK.hashCode());
-		result = prime * result + ((this.name == null) ? 0 : this.name.hashCode());
+		result = (prime * result) + ((this.empPK == null) ? 0 : this.empPK.hashCode());
+		result = (prime * result) + ((this.name == null) ? 0 : this.name.hashCode());
 		return result;
 	}
 

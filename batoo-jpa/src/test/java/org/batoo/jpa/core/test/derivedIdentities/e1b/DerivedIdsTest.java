@@ -30,9 +30,6 @@ import org.junit.Test;
  * @since $version
  */
 public class DerivedIdsTest extends BaseCoreTest {
-	/*
-	 * SELECT d FROM Dependent d WHERE d.id.name = 'Joe' AND d.emp.empName = 'Sam'
-	 */
 
 	/**
 	 * 
@@ -47,7 +44,6 @@ public class DerivedIdsTest extends BaseCoreTest {
 	 */
 	@Test
 	public void test1b() {
-
 		final Employee employee = new Employee("employee1");
 		this.persist(employee);
 		this.commit();
@@ -64,9 +60,8 @@ public class DerivedIdsTest extends BaseCoreTest {
 		this.commit();
 		this.close();
 
-		final Dependent dependent3 = this.find(Dependent.class, dependent1);
+		final Dependent dependent3 = this.find(Dependent.class, dependentId1);
 
 		Assert.assertEquals(dependent1, dependent3);
-
 	}
 }

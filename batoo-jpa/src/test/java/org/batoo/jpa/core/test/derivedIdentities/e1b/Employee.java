@@ -47,10 +47,11 @@ public class Employee {
 	}
 
 	/**
+	 * @param empName
+	 *            the name of the employee
 	 * 
 	 * @author asimarslan
 	 * @since $version
-	 * @param empName
 	 */
 	public Employee(String empName) {
 		super();
@@ -67,9 +68,6 @@ public class Employee {
 			return true;
 		}
 		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
 			return false;
 		}
 		final Employee other = (Employee) obj;
@@ -122,8 +120,8 @@ public class Employee {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((this.id == null) ? 0 : this.id.hashCode());
-		result = prime * result + ((this.empName == null) ? 0 : this.empName.hashCode());
+		result = (prime * result) + ((this.id == null) ? 0 : this.id.hashCode());
+		result = (prime * result) + ((this.empName == null) ? 0 : this.empName.hashCode());
 		return result;
 	}
 

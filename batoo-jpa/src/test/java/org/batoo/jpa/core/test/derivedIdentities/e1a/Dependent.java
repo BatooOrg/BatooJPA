@@ -34,10 +34,9 @@ public class Dependent {
 	@Id
 	private String name;
 
-	// id attribute mapped by join column default
 	@Id
 	@ManyToOne
-	private Employee emp;
+	private Employee emp; // id attribute mapped by join column default
 
 	/**
 	 * 
@@ -49,11 +48,13 @@ public class Dependent {
 	}
 
 	/**
+	 * @param name
+	 *            the name
+	 * @param emp
+	 *            the employee
 	 * 
 	 * @author asimarslan
 	 * @since $version
-	 * @param name
-	 * @param emp
 	 */
 	public Dependent(String name, Employee emp) {
 		super();
@@ -71,9 +72,6 @@ public class Dependent {
 			return true;
 		}
 		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
 			return false;
 		}
 		final Dependent other = (Dependent) obj;
@@ -126,8 +124,8 @@ public class Dependent {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((this.emp == null) ? 0 : this.emp.hashCode());
-		result = prime * result + ((this.name == null) ? 0 : this.name.hashCode());
+		result = (prime * result) + ((this.emp == null) ? 0 : this.emp.hashCode());
+		result = (prime * result) + ((this.name == null) ? 0 : this.name.hashCode());
 		return result;
 	}
 

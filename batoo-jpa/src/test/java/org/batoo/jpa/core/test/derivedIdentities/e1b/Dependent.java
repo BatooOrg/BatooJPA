@@ -34,10 +34,10 @@ public class Dependent {
 	@EmbeddedId
 	private DependentId id;
 
-	// id attribute mapped by join column default
 	@MapsId("empPK")
-	// maps empPK attribute of embedded id
+	// id attribute mapped by join column default
 	@ManyToOne
+	// maps empPK attribute of embedded id
 	private Employee employee;
 
 	/**
@@ -51,7 +51,9 @@ public class Dependent {
 
 	/**
 	 * @param id
+	 *            the dependent id
 	 * @param employee
+	 *            the employee id
 	 * @author aarslan
 	 * @since $version
 	 */
@@ -71,9 +73,6 @@ public class Dependent {
 			return true;
 		}
 		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
 			return false;
 		}
 		final Dependent other = (Dependent) obj;
@@ -122,8 +121,8 @@ public class Dependent {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((this.employee == null) ? 0 : this.employee.hashCode());
-		result = prime * result + ((this.id == null) ? 0 : this.id.hashCode());
+		result = (prime * result) + ((this.employee == null) ? 0 : this.employee.hashCode());
+		result = (prime * result) + ((this.id == null) ? 0 : this.id.hashCode());
 		return result;
 	}
 
@@ -146,5 +145,4 @@ public class Dependent {
 	public void setId(DependentId id) {
 		this.id = id;
 	}
-
 }
