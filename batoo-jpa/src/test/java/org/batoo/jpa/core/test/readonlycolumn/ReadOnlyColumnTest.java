@@ -46,21 +46,12 @@ public class ReadOnlyColumnTest extends BaseCoreTest {
 		return person;
 	}
 
-	// /**
-	// * Tests DDL column names
-	// *
-	// * @throws SQLException
-	// * @since $version
-	// */
-	// @Test
-	// public void testColumnName() throws SQLException {
-	// this.persist(this.person());
-	//
-	// this.commit();
-	// Assert.assertNotNull(new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT * FROM Person", new
-	// SingleValueHandler<Number>()));
-	// }
-
+	/**
+	 * Tests generated DDL column names
+	 * 
+	 * @throws SQLException
+	 * @since $version
+	 */
 	@Test
 	public void testColumnNames() throws SQLException {
 		this.persist(this.person());
@@ -76,40 +67,5 @@ public class ReadOnlyColumnTest extends BaseCoreTest {
 		Assert.assertFalse(columnNames.contains("homeAddress") || columnNames.contains("homeaddress") || columnNames.contains("HOMEADDRESS"));
 
 	}
-
-	// /**
-	// * Tests to {@link EntityManager#find(Class, Object)} person.
-	// *
-	// * @since $version
-	// * @author hceylan
-	// */
-	// @Test
-	// public void testFind() {
-	// final Person person = this.person();
-	// this.persist(person);
-	//
-	// this.commit();
-	// this.close();
-	//
-	// final Person person2 = this.find(Person.class, person.getId());
-	// Assert.assertEquals(person.getName(), person2.getName());
-	// }
-	//
-	// /**
-	// * Tests to {@link EntityManager#find(Class, Object)} person that is in the session.
-	// *
-	// * @since $version
-	// * @author hceylan
-	// */
-	// @Test
-	// public void testFindInSession() {
-	// final Person person = this.person();
-	// this.persist(person);
-	//
-	// this.commit();
-	//
-	// final Person person2 = this.find(Person.class, person.getId());
-	// Assert.assertSame(person, person2);
-	// }
 
 }
