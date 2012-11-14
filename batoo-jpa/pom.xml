@@ -82,23 +82,6 @@
 					</execution>
 				</executions>
 			</plugin>
-	
-			<plugin>
-				<groupId>com.mysema.maven</groupId>
-				<artifactId>maven-apt-plugin</artifactId>
-				<version>1.0.4</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>test-process</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>target/generated-test-sources/java</outputDirectory>
-							<processor>com.mysema.query.apt.jpa.JPAAnnotationProcessor</processor>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 	</build>
 
@@ -250,17 +233,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.mysema.querydsl</groupId>
-			<artifactId>querydsl-jpa</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-		  <groupId>com.mysema.querydsl</groupId>
-		  <artifactId>querydsl-apt</artifactId>
-		  <scope>test</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<scope>test</scope>
@@ -276,9 +248,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-    		<groupId>net.sourceforge.jtds</groupId>
-    		<artifactId>jtds</artifactId>
-    		<version>1.2.7</version>
+			<groupId>net.sourceforge.jtds</groupId>
+			<artifactId>jtds</artifactId>
+			<version>1.2.7</version>
 		</dependency>
 		<!--  Open only for testing
 		<dependency>

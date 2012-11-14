@@ -25,11 +25,6 @@ import org.junit.Test;
 
 /**
  * JPA Spec 2.4.1.3 test.
-=======
-import org.junit.Test;
-
-/**
- * JPA Spec 2.4.1.3 test
  * 
  * @author asimarslan
  * @since $version
@@ -42,13 +37,6 @@ public class DerivedIdsTest extends BaseCoreTest {
 	 * The parent entity has a simple primary key.
 	 * <p>
 	 * The dependent entity uses IdClass to represent a composite key.
-=======
-	 * 
-	 * Example-1 Case (a):
-	 * <p>
-	 * The parent entity has a simple primary key
-	 * <p>
-	 * The dependent entity uses IdClass to represent a composite key:
 	 * 
 	 * @author asimarslan
 	 * @since $version
@@ -92,7 +80,6 @@ public class DerivedIdsTest extends BaseCoreTest {
 	 * @since $version
 	 */
 	@Test
-	@Ignore
 	public void test1a2() {
 		final Employee employee = new Employee("employee1");
 		this.persist(employee);
