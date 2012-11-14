@@ -538,7 +538,7 @@ public class ForeignKey {
 
 		// if the mapping SingularAssociationMapping then create a join column for each of the join columns of the mapping
 		else if (idMapping instanceof SingularAssociationMapping) {
-			final ForeignKey foreignKey = ((SingularAssociationMapping<?, ?>) mapping).getForeignKey();
+			final ForeignKey foreignKey = ((SingularAssociationMapping<?, ?>) idMapping).getForeignKey();
 
 			for (final JoinColumn joinColumn : foreignKey.getJoinColumns()) {
 				this.joinColumns.add(new JoinColumn(this.jdbcAdaptor, mapping, joinColumn, id));

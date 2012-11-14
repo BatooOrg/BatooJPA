@@ -16,9 +16,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.core.test.derivedIdentities.e2a;
-
-import javax.persistence.TypedQuery;
+package org.batoo.jpa.core.test.derivedIdentities.e2b;
 
 import junit.framework.Assert;
 
@@ -45,24 +43,20 @@ public class DerivedIdsTest extends BaseCoreTest {
 	 * @since $version
 	 */
 	@Test
-	public void test2a() {
-		final Employee employee = new Employee("Sam", "Doe");
+	public void test2b() {
+		final Venue venue = new Venue("IN", "Inonu Stadium");
+		final Event event = new Event(venue, "BJK12", "Beşiktaş 2012 - 2013 Season");
+		final Performance performance = new Performance(event, "001", "Veşiktaş JK - Barcelona FC");
 
-		final Dependent dependent1 = new Dependent("Joe", employee);
-
-		this.persist(employee);
-		this.persist(dependent1);
+		this.persist(venue);
+		this.persist(event);
+		this.persist(performance);
 
 		this.commit();
 		this.close();
 
-		final TypedQuery<Dependent> q = this.cq("select d FROM Dependent d where d.name = 'Joe' AND d.emp.firstName = 'Sam'", Dependent.class);
+		final Performance performance2 = this.cq("select p FROM Performance p WHERE p.event.venue.code = 'IN'", Performance.class).getSingleResult();
 
-		Assert.assertNotNull(q.getResultList());
-		Assert.assertEquals(1, q.getResultList().size());
-
-		Assert.assertEquals("Joe", q.getResultList().get(0).getName());
-		Assert.assertEquals("Sam", q.getResultList().get(0).getEmp().getFirstName());
-		Assert.assertEquals("Doe", q.getResultList().get(0).getEmp().getLastName());
+		Assert.assertEquals(performance, performance2);
 	}
 }

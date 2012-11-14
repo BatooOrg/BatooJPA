@@ -287,7 +287,7 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 		final String[] restrictions = new String[this.getRoots().size() + 1];
 
 		if (this.getRestriction() != null) {
-			restrictions[0] = this.getRestriction().generateSqlRestriction(this);
+			restrictions[0] = this.restriction.generateSqlRestriction(this);
 		}
 
 		int i = 0;

@@ -399,6 +399,10 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 			return this.embeddedId.getType();
 		}
 
+		if (this.idAttributes.size() >= 2) {
+			throw new MappingException("Entity " + this.getJavaType() + " with multiple id attributes, must declare the @IdClass", this.getLocator());
+		}
+
 		return this.idAttributes.values().iterator().next().getType();
 	}
 

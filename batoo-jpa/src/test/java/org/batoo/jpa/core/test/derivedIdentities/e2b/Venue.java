@@ -16,50 +16,48 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.core.test.derivedIdentities.e2a;
+package org.batoo.jpa.core.test.derivedIdentities.e2b;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 
 /**
  * 
- * @author asimarslan
+ * 
+ * @author hceylan
  * @since $version
  */
 @Entity
-@IdClass(EmployeeId.class)
-public class Employee {
+public class Venue {
 
 	@Id
-	String firstName;
+	private String venueCode;
 
-	@Id
-	String lastName;
+	private String name;
 
 	/**
 	 * 
-	 * @author asimarslan
 	 * @since $version
+	 * @author hceylan
 	 */
-	public Employee() {
+	public Venue() {
 		super();
 	}
 
 	/**
-	 * @param firstName
-	 *            the first name
-	 * @param lastName
-	 *            the last name
+	 * @param venueCode
+	 *            the code
+	 * @param name
+	 *            the name
 	 * 
-	 * @author asimarslan
 	 * @since $version
+	 * @author hceylan
 	 */
-	public Employee(String firstName, String lastName) {
+	public Venue(String venueCode, String name) {
 		super();
 
-		this.firstName = firstName;
-		this.lastName = lastName;
+		this.venueCode = venueCode;
+		this.name = name;
 	}
 
 	/**
@@ -74,49 +72,43 @@ public class Employee {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof Employee)) {
+		if (!(obj instanceof Venue)) {
 			return false;
 		}
-		final Employee other = (Employee) obj;
-		if (this.firstName == null) {
-			if (other.firstName != null) {
+		final Venue other = (Venue) obj;
+		if (this.venueCode == null) {
+			if (other.venueCode != null) {
 				return false;
 			}
 		}
-		else if (!this.firstName.equals(other.firstName)) {
-			return false;
-		}
-		if (this.lastName == null) {
-			if (other.lastName != null) {
-				return false;
-			}
-		}
-		else if (!this.lastName.equals(other.lastName)) {
+		else if (!this.venueCode.equals(other.venueCode)) {
 			return false;
 		}
 		return true;
 	}
 
 	/**
+	 * Returns the name of the Venue.
 	 * 
-	 * @return the firstName
+	 * @return the name of the Venue
 	 * 
-	 * @author asimarslan
 	 * @since $version
+	 * @author hceylan
 	 */
-	public String getFirstName() {
-		return this.firstName;
+	public String getName() {
+		return this.name;
 	}
 
 	/**
+	 * Returns the venueCode of the Venue.
 	 * 
-	 * @return the lastName
+	 * @return the venueCode of the Venue
 	 * 
-	 * @author asimarslan
 	 * @since $version
+	 * @author hceylan
 	 */
-	public String getLastName() {
-		return this.lastName;
+	public String getVenueCode() {
+		return this.venueCode;
 	}
 
 	/**
@@ -127,32 +119,42 @@ public class Employee {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = (prime * result) + ((this.firstName == null) ? 0 : this.firstName.hashCode());
-		result = (prime * result) + ((this.lastName == null) ? 0 : this.lastName.hashCode());
+		result = (prime * result) + ((this.venueCode == null) ? 0 : this.venueCode.hashCode());
 		return result;
 	}
 
 	/**
+	 * Sets the name of the Venue.
 	 * 
-	 * @param firstName
-	 *            the firstName to set
+	 * @param name
+	 *            the name to set for Venue
 	 * 
-	 * @author asimarslan
 	 * @since $version
+	 * @author hceylan
 	 */
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/**
+	 * Sets the venueCode of the Venue.
 	 * 
-	 * @param lastName
-	 *            the lastName to set
+	 * @param venueCode
+	 *            the venueCode to set for Venue
 	 * 
-	 * @author asimarslan
 	 * @since $version
+	 * @author hceylan
 	 */
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
+	public void setVenueCode(String venueCode) {
+		this.venueCode = venueCode;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "Venue [venueCode=" + this.venueCode + ", name=" + this.name + "]";
 	}
 }

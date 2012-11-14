@@ -1104,7 +1104,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				final AttributeImpl<?, ?> attribute = idType.getAttribute(mapping.getName());
 
 				if (attribute == null) {
-					throw new MappingException("Attribute not found: " + mapping.getJavaType(), mapping.getAttribute().getLocator());
+					throw new MappingException("Attribute not found: " + idType.getJavaType().getName() + "." + mapping.getName(),
+						mapping.getAttribute().getLocator());
 				}
 
 				final Class<?> javaType = mapping instanceof SingularAssociationMapping ? //

@@ -24,6 +24,7 @@ package org.batoo.jpa.core.test.derivedIdentities.e2a;
  * @since $version
  */
 public class EmployeeId {
+
 	String firstName;
 	String lastName;
 
