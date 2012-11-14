@@ -91,6 +91,18 @@ public class DataSourceProxy implements DataSource {
 	}
 
 	/**
+	 * Returns the delegate datasource.
+	 * 
+	 * @return the delegate datasource
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public DataSource getDelegate() {
+		return this.datasource;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */

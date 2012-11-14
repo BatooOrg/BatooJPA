@@ -70,6 +70,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.jolbox.bonecp.BoneCP;
 
 /**
  * Implementation of {@link EntityManagerFactory}.
@@ -751,7 +752,19 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> T unwrap(Class<T> cls) {
-		return (T) this;
+	public <T> T unwrap(Class<T> clazz) {
+		if (clazz == EntityManagerFactoryImpl.class) {
+			return (T) this;
+		}
+
+		if ((clazz == BoneCPDataSource.class) && (this.dataSource.getDelegate() instanceof BoneCPDataSource)) {
+			return (T) this.dataSource.getDelegate();
+		}
+
+		if ((clazz == BoneCP.class) && (this.dataSource.getDelegate() instanceof BoneCP)) {
+			return (T) this.dataSource.getDelegate();
+		}
+
+		return null;
 	}
 }
