@@ -28,7 +28,7 @@ import org.batoo.jpa.core.test.BaseCoreTest;
 import org.junit.Test;
 
 /**
- * JPA Spec 2.4.1.3 test
+ * JPA Spec 2.4.1.3 test.
  * 
  * @author asimarslan
  * @since $version
@@ -39,16 +39,15 @@ public class DerivedIdsTest extends BaseCoreTest {
 	 * 
 	 * Example-2 Case (a):
 	 * <p>
-	 * The parent entity uses IdClass
+	 * The parent entity uses IdClass.
 	 * <p>
-	 * The dependent entity uses IdClass
+	 * The dependent entity uses IdClass.
 	 * 
 	 * @author asimarslan
 	 * @since $version
 	 */
 	@Test
 	public void test2a() {
-
 		final Employee employee = new Employee("Sam", "Doe");
 
 		final Dependent dependent1 = new Dependent("Joe", employee);
@@ -70,6 +69,5 @@ public class DerivedIdsTest extends BaseCoreTest {
 		Assert.assertEquals("Joe", resultList.get(0).getName());
 		Assert.assertEquals("Sam", resultList.get(0).getEmp().getFirstName());
 		Assert.assertEquals("Doe", resultList.get(0).getEmp().getLastName());
-
 	}
 }

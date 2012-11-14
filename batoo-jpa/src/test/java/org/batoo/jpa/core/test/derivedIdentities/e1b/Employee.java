@@ -55,6 +55,7 @@ public class Employee {
 	 */
 	public Employee(String empName) {
 		super();
+
 		this.empName = empName;
 	}
 
@@ -70,21 +71,24 @@ public class Employee {
 		if (obj == null) {
 			return false;
 		}
-		final Employee other = (Employee) obj;
-		if (this.id == null) {
-			if (other.id != null) {
-				return false;
-			}
-		}
-		else if (!this.id.equals(other.id)) {
+		if (!(obj instanceof Employee)) {
 			return false;
 		}
+		final Employee other = (Employee) obj;
 		if (this.empName == null) {
 			if (other.empName != null) {
 				return false;
 			}
 		}
 		else if (!this.empName.equals(other.empName)) {
+			return false;
+		}
+		if (this.id == null) {
+			if (other.id != null) {
+				return false;
+			}
+		}
+		else if (!this.id.equals(other.id)) {
 			return false;
 		}
 		return true;
@@ -120,8 +124,8 @@ public class Employee {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = (prime * result) + ((this.id == null) ? 0 : this.id.hashCode());
 		result = (prime * result) + ((this.empName == null) ? 0 : this.empName.hashCode());
+		result = (prime * result) + ((this.id == null) ? 0 : this.id.hashCode());
 		return result;
 	}
 

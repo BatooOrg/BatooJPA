@@ -37,14 +37,17 @@ public class EmployeeId {
 	}
 
 	/**
+	 * @param firstName
+	 *            the first name
+	 * @param lastName
+	 *            the last name
 	 * 
 	 * @author asimarslan
 	 * @since $version
-	 * @param firstName
-	 * @param lastName
 	 */
 	public EmployeeId(String firstName, String lastName) {
 		super();
+
 		this.firstName = firstName;
 		this.lastName = lastName;
 	}
@@ -61,7 +64,7 @@ public class EmployeeId {
 		if (obj == null) {
 			return false;
 		}
-		if (getClass() != obj.getClass()) {
+		if (!(obj instanceof EmployeeId)) {
 			return false;
 		}
 		final EmployeeId other = (EmployeeId) obj;
@@ -114,8 +117,8 @@ public class EmployeeId {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((this.firstName == null) ? 0 : this.firstName.hashCode());
-		result = prime * result + ((this.lastName == null) ? 0 : this.lastName.hashCode());
+		result = (prime * result) + ((this.firstName == null) ? 0 : this.firstName.hashCode());
+		result = (prime * result) + ((this.lastName == null) ? 0 : this.lastName.hashCode());
 		return result;
 	}
 
@@ -142,5 +145,4 @@ public class EmployeeId {
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
-
 }

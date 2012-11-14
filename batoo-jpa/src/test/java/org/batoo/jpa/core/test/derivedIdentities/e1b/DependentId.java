@@ -67,7 +67,7 @@ public class DependentId {
 		if (obj == null) {
 			return false;
 		}
-		if (getClass() != obj.getClass()) {
+		if (!(obj instanceof DependentId)) {
 			return false;
 		}
 		final DependentId other = (DependentId) obj;

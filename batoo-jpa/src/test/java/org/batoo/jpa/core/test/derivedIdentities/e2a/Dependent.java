@@ -55,6 +55,9 @@ public class Dependent {
 	/**
 	 * 
 	 * @param name
+	 *            the name
+	 * @param emp
+	 *            the meployee
 	 * 
 	 * @author asimarslan
 	 * @since $version
@@ -110,5 +113,4 @@ public class Dependent {
 	public void setName(String name) {
 		this.name = name;
 	}
-
 }

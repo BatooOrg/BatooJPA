@@ -34,8 +34,10 @@ public class Dependent {
 	@EmbeddedId
 	private DependentId id;
 
-	@MapsId("empPK") // id attribute mapped by join column default
-	@ManyToOne // maps empPK attribute of embedded id
+	@MapsId("empPK")
+	// id attribute mapped by join column default
+	@ManyToOne
+	// maps empPK attribute of embedded id
 	private Employee employee;
 
 	/**
@@ -57,6 +59,7 @@ public class Dependent {
 	 */
 	public Dependent(DependentId id, Employee employee) {
 		super();
+
 		this.id = id;
 		this.employee = employee;
 	}
@@ -71,6 +74,9 @@ public class Dependent {
 			return true;
 		}
 		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof Dependent)) {
 			return false;
 		}
 		final Dependent other = (Dependent) obj;

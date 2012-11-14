@@ -48,6 +48,7 @@ public class DependentId {
 	 */
 	public DependentId(String name, Integer emp) {
 		super();
+
 		this.name = name;
 		this.emp = emp;
 	}

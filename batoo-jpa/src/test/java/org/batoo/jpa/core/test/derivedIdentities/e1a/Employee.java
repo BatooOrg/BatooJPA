@@ -71,8 +71,16 @@ public class Employee {
 		if (obj == null) {
 			return false;
 		}
+		if (!(obj instanceof Employee)) {
+			return false;
+		}
 		final Employee other = (Employee) obj;
-		if (this.empId != other.empId) {
+		if (this.empId == null) {
+			if (other.empId != null) {
+				return false;
+			}
+		}
+		else if (!this.empId.equals(other.empId)) {
 			return false;
 		}
 		if (this.empName == null) {
@@ -116,7 +124,7 @@ public class Employee {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = (prime * result) + (this.empId ^ (this.empId >>> 32));
+		result = (prime * result) + ((this.empId == null) ? 0 : this.empId.hashCode());
 		result = (prime * result) + ((this.empName == null) ? 0 : this.empName.hashCode());
 		return result;
 	}

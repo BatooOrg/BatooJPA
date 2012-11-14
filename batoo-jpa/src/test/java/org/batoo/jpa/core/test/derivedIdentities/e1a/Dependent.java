@@ -31,6 +31,7 @@ import javax.persistence.ManyToOne;
 @Entity
 @IdClass(DependentId.class)
 public class Dependent {
+
 	@Id
 	private String name;
 
@@ -58,6 +59,7 @@ public class Dependent {
 	 */
 	public Dependent(String name, Employee emp) {
 		super();
+
 		this.name = name;
 		this.emp = emp;
 	}
@@ -72,6 +74,9 @@ public class Dependent {
 			return true;
 		}
 		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof Dependent)) {
 			return false;
 		}
 		final Dependent other = (Dependent) obj;
