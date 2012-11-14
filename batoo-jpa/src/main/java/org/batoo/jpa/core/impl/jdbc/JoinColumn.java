@@ -42,13 +42,13 @@ public class JoinColumn extends AbstractColumn {
 	private String name;
 	private String referencedColumnName;
 
-	private final String columnDefinition;
 	private final String tableName;
 	private final boolean insertable;
 	private final boolean nullable;
 	private final boolean unique;
 	private final boolean updatable;
 
+	private String columnDefinition;
 	private int length;
 	private int precision;
 	private int sqlType;
@@ -85,39 +85,7 @@ public class JoinColumn extends AbstractColumn {
 		this.unique = false;
 		this.updatable = true;
 
-		this.setColumnProperties(mapping, referencedColumn);
-	}
-
-	/**
-	 * Constructor for inheritance and secondary table joins.
-	 * 
-	 * @param jdbcAdaptor
-	 *            the JDBC Adaptor
-	 * @param table
-	 *            the table
-	 * @param referencedColumn
-	 *            the referenced id column
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public JoinColumn(JdbcAdaptor jdbcAdaptor, EntityTable table, AbstractColumn referencedColumn) {
-		super(null, false);
-
-		this.jdbcAdaptor = jdbcAdaptor;
-		this.referencedColumn = referencedColumn;
-
-		this.referencedColumnName = referencedColumn.getName();
-		this.columnDefinition = referencedColumn.getColumnDefinition();
-		this.tableName = table.getName();
-		this.name = referencedColumn.getName();
-		this.insertable = referencedColumn.isInsertable();
-		this.nullable = referencedColumn.isNullable();
-		this.unique = referencedColumn.isUnique();
-		this.updatable = referencedColumn.isUnique();
-
-		this.setColumnProperties(referencedColumn);
-		this.setTable(table);
+		this.setColumnProperties(mapping, referencedColumn, id);
 	}
 
 	/**
@@ -311,11 +279,9 @@ public class JoinColumn extends AbstractColumn {
 	 */
 	@Override
 	public Object getValue(Connection connection, Object instance) {
-		if (this.mapping != null) {
-			instance = this.mapping.get(instance);
-		}
+		final Object value = this.mapping != null ? this.mapping.get(instance) : instance;
 
-		return instance != null ? this.referencedColumn.getMapping().get(instance) : null;
+		return value != null ? this.referencedColumn.getValue(connection, value) : null;
 	}
 
 	/**
@@ -374,6 +340,7 @@ public class JoinColumn extends AbstractColumn {
 		this.referencedColumn = referencedColumn;
 
 		this.referencedColumnName = referencedColumn.getName();
+		this.columnDefinition = referencedColumn.getColumnDefinition();
 		this.sqlType = referencedColumn.getSqlType();
 		this.length = referencedColumn.getLength();
 		this.precision = referencedColumn.getPrecision();
@@ -387,11 +354,13 @@ public class JoinColumn extends AbstractColumn {
 	 *            the owner mapping
 	 * @param referencedColumn
 	 *            the referenced column
+	 * @param id
+	 *            if the column is id column
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void setColumnProperties(AssociationMapping<?, ?, ?> mapping, AbstractColumn referencedColumn) {
+	public void setColumnProperties(AssociationMapping<?, ?, ?> mapping, AbstractColumn referencedColumn, boolean id) {
 		// if attribute present then the join column belongs to an entity table
 		if (mapping != null) {
 			this.mapping = mapping;
@@ -404,6 +373,10 @@ public class JoinColumn extends AbstractColumn {
 			if (StringUtils.isBlank(this.name)) {
 				this.name = this.jdbcAdaptor.escape(type.getName() + "_" + referencedColumn.getName());
 			}
+		}
+
+		if (id) {
+			super.setId();
 		}
 
 		this.setColumnProperties(referencedColumn);
@@ -429,5 +402,18 @@ public class JoinColumn extends AbstractColumn {
 		if (this.mapping != null) {
 			this.mapping.set(instance, value);
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		final String tableName = this.getTable() != null ? this.getTable().getName() : "N/A";
+		final String mapping = this.getMapping() != null ? " " + this.getMapping().toString() + " " : "";
+
+		return this.getClass().getSimpleName() + mapping + " [name=" + this.getName() + ", type=" + this.getSqlType() + ", length=" + this.getLength()
+			+ ", precision=" + this.getPrecision() + ", scale=" + this.getScale() + ", table=" + tableName + ", refrencedColumn=" + this.referencedColumn + "]";
 	}
 }

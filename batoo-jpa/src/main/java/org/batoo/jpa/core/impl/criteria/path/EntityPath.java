@@ -40,6 +40,7 @@ import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl.MapSelectType;
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
+import org.batoo.jpa.core.impl.jdbc.JoinColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
@@ -135,6 +136,28 @@ public class EntityPath<Z, X> extends ParentPath<Z, X> implements Joinable {
 	@Override
 	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		return this.getFetchRoot().generateSqlSelect(query, selected, false);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getColumnAlias(BaseQueryImpl<?> query, AbstractColumn column) {
+		if (this.mapping != null) {
+			for (final JoinColumn joinColumn : this.mapping.getForeignKey().getJoinColumns()) {
+				if (joinColumn.getReferencedColumn() == column) {
+					final String columnAlias = this.getParentPath().getColumnAlias(query, joinColumn);
+					if (columnAlias != null) {
+						return columnAlias;
+					}
+
+					return this.getParentPath().getRootPath().getTableAlias(query, joinColumn.getTable()) + "." + joinColumn.getName();
+				}
+			}
+		}
+
+		return null;
 	}
 
 	/**

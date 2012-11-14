@@ -556,7 +556,11 @@ public class SessionImpl {
 		}
 
 		final EntityTypeImpl<X> type = (EntityTypeImpl<X>) this.metamodel.entity(clazz);
-		final ManagedId<X> id = new ManagedId<X>(type, entity);
+		if (type == null) {
+			throw new PersistenceException(entity.getClass().getName() + " is not a persistence class");
+		}
+
+		final ManagedId<X> id = type.getId(entity);
 
 		return (ManagedInstance<X>) this.repository.get(id);
 	}
@@ -753,10 +757,9 @@ public class SessionImpl {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ManagedInstance<?> remove(Object entity) {
 		final EntityTypeImpl<?> type = this.metamodel.entity(entity.getClass());
-		final ManagedId<?> instanceId = new ManagedId(type, entity);
+		final ManagedId<?> instanceId = type.getId(entity);
 
 		final ManagedInstance<?> instance = this.repository.get(instanceId);
 		if (instance != null) {

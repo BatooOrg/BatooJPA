@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.core.impl.criteria.expression;
 
+import java.sql.Connection;
+
 import javax.persistence.metamodel.Type.PersistenceType;
 
 import org.apache.commons.lang.mutable.MutableInt;
@@ -149,11 +151,49 @@ public abstract class AbstractParameterExpressionImpl<T> extends AbstractExpress
 		return restrictions;
 	}
 
+	private void setParameter(Connection connection, Object[] parameters, MutableInt sqlIndex, Object value, final EmbeddableTypeImpl<?> type) {
+		final SingularAttributeImpl<?, ?>[] attributes = type.getSingularMappings();
+
+		for (final SingularAttributeImpl<?, ?> attribute : attributes) {
+			switch (attribute.getPersistentAttributeType()) {
+				case BASIC:
+					parameters[sqlIndex.intValue()] = attribute.get(value);
+					sqlIndex.increment();
+					break;
+				case MANY_TO_ONE:
+				case ONE_TO_ONE:
+					this.setParameter(connection, parameters, sqlIndex, attribute.get(value), (EntityTypeImpl<?>) attribute.getType());
+					break;
+				case EMBEDDED:
+					this.setParameter(connection, parameters, sqlIndex, attribute.get(value), (EmbeddableTypeImpl<?>) this.type);
+				case ELEMENT_COLLECTION:
+				case MANY_TO_MANY:
+				case ONE_TO_MANY:
+					// N/A
+			}
+		}
+	}
+
+	private void setParameter(Connection connection, Object[] parameters, MutableInt sqlIndex, Object value, final EntityTypeImpl<?> type) {
+		for (final AbstractColumn column : type.getPrimaryTable().getPkColumns()) {
+			if (value != null) {
+				parameters[sqlIndex.intValue()] = column.getValue(connection, value);
+			}
+			else {
+				parameters[sqlIndex.intValue()] = null;
+			}
+
+			sqlIndex.increment();
+		}
+	}
+
 	/**
 	 * Sets the parameters expanding if necessary.
 	 * 
 	 * @param metamodel
 	 *            the metamodel
+	 * @param connection
+	 *            the connection
 	 * @param parameters
 	 *            the SQL parameters
 	 * @param sqlIndex
@@ -164,7 +204,7 @@ public abstract class AbstractParameterExpressionImpl<T> extends AbstractExpress
 	 * @since $version
 	 * @author hceylan
 	 */
-	protected void setParameter(MetamodelImpl metamodel, Object[] parameters, MutableInt sqlIndex, Object value) {
+	protected void setParameter(MetamodelImpl metamodel, Connection connection, Object[] parameters, MutableInt sqlIndex, Object value) {
 		// type parameter
 		if (this.getJavaType() == Class.class) {
 			final EntityTypeImpl<?> entity = metamodel.entity((Class<?>) value);
@@ -198,50 +238,14 @@ public abstract class AbstractParameterExpressionImpl<T> extends AbstractExpress
 				else if (this.type.getPersistenceType() == PersistenceType.ENTITY) {
 					final EntityTypeImpl<?> type = (EntityTypeImpl<?>) this.type;
 
-					this.setParameter(parameters, sqlIndex, value, type);
+					this.setParameter(connection, parameters, sqlIndex, value, type);
 				}
 				else {
 					final EmbeddableTypeImpl<?> type = (EmbeddableTypeImpl<?>) this.type;
 
-					this.setParameter(parameters, sqlIndex, value, type);
+					this.setParameter(connection, parameters, sqlIndex, value, type);
 				}
 			}
-		}
-	}
-
-	private void setParameter(Object[] parameters, MutableInt sqlIndex, Object value, final EmbeddableTypeImpl<?> type) {
-		final SingularAttributeImpl<?, ?>[] attributes = type.getSingularMappings();
-
-		for (final SingularAttributeImpl<?, ?> attribute : attributes) {
-			switch (attribute.getPersistentAttributeType()) {
-				case BASIC:
-					parameters[sqlIndex.intValue()] = attribute.get(value);
-					sqlIndex.increment();
-					break;
-				case MANY_TO_ONE:
-				case ONE_TO_ONE:
-					this.setParameter(parameters, sqlIndex, attribute.get(value), (EntityTypeImpl<?>) attribute.getType());
-					break;
-				case EMBEDDED:
-					this.setParameter(parameters, sqlIndex, attribute.get(value), (EmbeddableTypeImpl<?>) this.type);
-				case ELEMENT_COLLECTION:
-				case MANY_TO_MANY:
-				case ONE_TO_MANY:
-					// N/A
-			}
-		}
-	}
-
-	private void setParameter(Object[] parameters, MutableInt sqlIndex, Object value, final EntityTypeImpl<?> type) {
-		for (final AbstractColumn column : type.getPrimaryTable().getPkColumns()) {
-			if (value != null) {
-				parameters[sqlIndex.intValue()] = column.getMapping().get(value);
-			}
-			else {
-				parameters[sqlIndex.intValue()] = null;
-			}
-
-			sqlIndex.increment();
 		}
 	}
 }

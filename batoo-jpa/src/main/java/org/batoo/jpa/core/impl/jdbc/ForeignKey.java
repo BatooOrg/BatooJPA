@@ -27,12 +27,12 @@ import java.util.List;
 import javax.persistence.criteria.JoinType;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.common.reflect.AbstractAccessor;
 import org.batoo.common.util.FinalWrapper;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
-import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
@@ -143,7 +143,7 @@ public class ForeignKey {
 			this.createJoinColumns(table, entity.getIdMapping(), metadata);
 		}
 		else {
-			for (final Pair<?, SingularAttributeImpl<?, ?>> pair : entity.getIdMappings()) {
+			for (final Pair<?, AbstractAccessor> pair : entity.getIdMappings()) {
 				this.createJoinColumns(table, (SingularMapping<?, ?>) pair.getFirst(), metadata);
 			}
 		}
@@ -473,6 +473,18 @@ public class ForeignKey {
 		return this.table;
 	}
 
+	private boolean isId(AssociationMapping<?, ?, ?> mapping) {
+		boolean id = false;
+
+		if (mapping != null) {
+			final AttributeImpl<?, ?> attribute = mapping.getAttribute();
+			if (attribute instanceof AssociatedSingularAttribute) {
+				id = ((AssociatedSingularAttribute<?, ?>) attribute).isId();
+			}
+		}
+		return id;
+	}
+
 	/**
 	 * Links the foreign key.
 	 * 
@@ -486,14 +498,17 @@ public class ForeignKey {
 	 * @author hceylan
 	 */
 	public void link(AssociationMapping<?, ?, ?> mapping, EntityTypeImpl<?> targetEntity) {
+		final boolean id = this.isId(mapping);
+
 		// single primary key
 		if (targetEntity.hasSingleIdAttribute()) {
-			this.linkJoinColumns(mapping, targetEntity.getIdMapping());
+			this.linkImpl(mapping, targetEntity.getIdMapping(), id);
 		}
+
 		// multiple id
 		else {
-			for (final Pair<?, SingularAttributeImpl<?, ?>> pair : targetEntity.getIdMappings()) {
-				this.linkJoinColumns(mapping, (SingularMapping<?, ?>) pair.getFirst());
+			for (final Pair<?, AbstractAccessor> pair : targetEntity.getIdMappings()) {
+				this.linkImpl(mapping, (SingularMapping<?, ?>) pair.getFirst(), id);
 			}
 		}
 
@@ -508,25 +523,16 @@ public class ForeignKey {
 		}
 	}
 
-	private void linkJoinColumns(AssociationMapping<?, ?, ?> mapping, final SingularMapping<?, ?> idMapping) {
-		boolean id = false;
-
-		if (mapping != null) {
-			final AttributeImpl<?, ?> attribute = mapping.getAttribute();
-			if (attribute instanceof AssociatedSingularAttribute) {
-				id = ((AssociatedSingularAttribute<?, ?>) attribute).isId();
-			}
-		}
-
+	private void linkImpl(AssociationMapping<?, ?, ?> mapping, final SingularMapping<?, ?> idMapping, final boolean id) {
 		// no definition for the join columns
 		if (!this.joinMetadataProvided) {
 			// create the join column
 			this.linkJoinColumns(mapping, idMapping, id);
 		}
+
 		// existing definition for the join column
 		else {
-			this.linkJoinColumnsImpl(mapping, idMapping);
-
+			this.linkJoinColumnsWithMetadata(mapping, idMapping, id);
 		}
 	}
 
@@ -561,7 +567,7 @@ public class ForeignKey {
 
 	}
 
-	private void linkJoinColumnsImpl(AssociationMapping<?, ?, ?> mapping, final SingularMapping<?, ?> idMapping) {
+	private void linkJoinColumnsWithMetadata(AssociationMapping<?, ?, ?> mapping, final SingularMapping<?, ?> idMapping, boolean id) {
 		// if the mapping BasicMapping then create a single join column
 		if (idMapping instanceof BasicMapping) {
 			final BasicMapping<?, ?> basicMapping = (BasicMapping<?, ?>) idMapping;
@@ -569,7 +575,7 @@ public class ForeignKey {
 			final JoinColumn joinColumn = this.locateJoinColumn(basicMapping.getColumn());
 
 			// link the join column
-			joinColumn.setColumnProperties(mapping, ((BasicMapping<?, ?>) idMapping).getColumn());
+			joinColumn.setColumnProperties(mapping, ((BasicMapping<?, ?>) idMapping).getColumn(), id);
 		}
 
 		// if the mapping SingularAssociationMapping then create a join column for each of the join columns of the mapping
@@ -580,7 +586,7 @@ public class ForeignKey {
 				final JoinColumn joinColumn = this.locateJoinColumn(referencedColumn);
 
 				// link the join column
-				joinColumn.setColumnProperties(mapping, referencedColumn);
+				joinColumn.setColumnProperties(mapping, referencedColumn, id);
 			}
 		}
 
@@ -590,7 +596,7 @@ public class ForeignKey {
 
 			for (final Mapping<?, ?, ?> child : embeddedMapping.getChildren()) {
 				if (child instanceof SingularMapping) {
-					this.linkJoinColumnsImpl(mapping, (SingularMapping<?, ?>) child);
+					this.linkJoinColumnsWithMetadata(mapping, (SingularMapping<?, ?>) child, id);
 				}
 				else {
 					throw new MappingException("EmbeddedId types cannot have plural mappings", mapping.getAttribute().getLocator());

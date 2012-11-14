@@ -71,6 +71,41 @@ public class Performance {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof Performance)) {
+			return false;
+		}
+		final Performance other = (Performance) obj;
+		if (this.event == null) {
+			if (other.event != null) {
+				return false;
+			}
+		}
+		else if (!this.event.equals(other.event)) {
+			return false;
+		}
+		if (this.performanceCode == null) {
+			if (other.performanceCode != null) {
+				return false;
+			}
+		}
+		else if (!this.performanceCode.equals(other.performanceCode)) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
 	 * Returns the event of the Performance.
 	 * 
 	 * @return the event of the Performance
@@ -104,6 +139,19 @@ public class Performance {
 	 */
 	public String getPerformanceCode() {
 		return this.performanceCode;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = (prime * result) + ((this.event == null) ? 0 : this.event.hashCode());
+		result = (prime * result) + ((this.performanceCode == null) ? 0 : this.performanceCode.hashCode());
+		return result;
 	}
 
 	/**
@@ -151,6 +199,6 @@ public class Performance {
 	 */
 	@Override
 	public String toString() {
-		return "Performance [event=" + this.event + ", eventCode=" + this.performanceCode + ", name=" + this.name + "]";
+		return "Performance [event=" + this.event + ", performanceCode=" + this.performanceCode + ", name=" + this.name + "]";
 	}
 }

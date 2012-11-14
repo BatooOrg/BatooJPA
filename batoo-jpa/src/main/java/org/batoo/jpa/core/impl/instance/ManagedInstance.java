@@ -39,13 +39,13 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
+import org.batoo.common.reflect.AbstractAccessor;
 import org.batoo.jpa.core.impl.cache.CacheImpl;
 import org.batoo.jpa.core.impl.cache.CacheInstance;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
-import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
@@ -83,9 +83,6 @@ public class ManagedInstance<X> {
 	private Status oldStatus;
 	private boolean optimisticLock;
 	private LockModeType lockMode;
-
-	private final SingularMapping<? super X, ?> idMapping;
-	private final Pair<SingularMapping<? super X, ?>, SingularAttributeImpl<?, ?>>[] idMappings;
 
 	private final HashMap<Mapping<?, ?, ?>, Object> snapshot = Maps.newHashMap();
 	private final HashSet<String> joinsLoaded;
@@ -128,15 +125,6 @@ public class ManagedInstance<X> {
 		this.collectionsChanged = Lists.newArrayList();
 		this.joinsLoaded = Sets.newHashSet();
 
-		if (type.getRootType().hasSingleIdAttribute()) {
-			this.idMapping = type.getRootType().getIdMapping();
-			this.idMappings = null;
-		}
-		else {
-			this.idMappings = this.type.getIdMappings();
-			this.idMapping = null;
-		}
-
 		this.status = Status.MANAGED;
 	}
 
@@ -156,15 +144,7 @@ public class ManagedInstance<X> {
 	public ManagedInstance(EntityTypeImpl<X> type, SessionImpl session, X instance, ManagedId<? super X> id) {
 		this(type, session, instance);
 
-		if (this.idMapping != null) {
-			this.idMapping.set(instance, id.getId());
-		}
-		else {
-			for (final Pair<SingularMapping<? super X, ?>, SingularAttributeImpl<?, ?>> pair : this.idMappings) {
-				final Object value = pair.getSecond().get(id.getId());
-				pair.getFirst().set(this.instance, value);
-			}
-		}
+		type.setId(session, instance, id.getId());
 
 		this.id = id;
 	}
@@ -501,12 +481,14 @@ public class ManagedInstance<X> {
 	}
 
 	private boolean fillValuesImpl() {
-		if (this.idMapping != null) {
-			return this.idMapping.fillValue(this.type.getRootType(), this, this.instance);
+		final EntityTypeImpl<X> _type = this.type;
+
+		if (_type.hasSingleIdAttribute()) {
+			return this.type.getRootType().getIdMapping().fillValue(_type.getRootType(), this, this.instance);
 		}
 		else {
-			for (final Pair<SingularMapping<? super X, ?>, SingularAttributeImpl<?, ?>> mapping : this.idMappings) {
-				if (!mapping.getFirst().fillValue(this.type.getRootType(), this, this.instance)) {
+			for (final Pair<SingularMapping<? super X, ?>, AbstractAccessor> mapping : _type.getIdMappings()) {
+				if (!mapping.getFirst().fillValue(_type.getRootType(), this, this.instance)) {
 					return false;
 				}
 			}
@@ -576,9 +558,7 @@ public class ManagedInstance<X> {
 			return this.id;
 		}
 
-		this.id = new ManagedId<X>(this.type, this.instance);
-
-		return this.id;
+		return this.id = this.type.getId(this.instance);
 	}
 
 	/**

@@ -53,7 +53,7 @@ import org.batoo.jpa.parser.impl.AbstractLocator;
 public abstract class AbstractColumn {
 
 	private final Class<?> javaType;
-	private final IdType idType;
+	private IdType idType;
 	private final TemporalType temporalType;
 	private final EnumType enumType;
 	private final boolean lob;
@@ -537,6 +537,17 @@ public abstract class AbstractColumn {
 		catch (final Exception e) {
 			throw new PersistenceException("Cannot read sql data", e);
 		}
+	}
+
+	/**
+	 * 
+	 * Sets the column as id column.
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setId() {
+		this.idType = IdType.MANUAL;
 	}
 
 	/**

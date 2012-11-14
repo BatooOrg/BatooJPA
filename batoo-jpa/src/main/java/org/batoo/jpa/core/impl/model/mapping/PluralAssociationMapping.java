@@ -35,6 +35,7 @@ import javax.persistence.metamodel.PluralAttribute.CollectionType;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableBoolean;
+import org.batoo.common.reflect.AbstractAccessor;
 import org.batoo.common.util.BatooUtils;
 import org.batoo.common.util.FinalWrapper;
 import org.batoo.jpa.core.impl.cache.CacheInstance;
@@ -50,10 +51,7 @@ import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.MapAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
-import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
-import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
-import org.batoo.jpa.core.impl.model.type.TypeImpl;
 import org.batoo.jpa.core.util.Pair;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
@@ -86,8 +84,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	private AssociationMapping<?, ?, ?> inverse;
 
 	private SingularMapping<? super E, ?> mapKeyMapping;
-	private Pair<SingularMapping<? super E, ?>, SingularAttributeImpl<?, ?>>[] mapKeyMappings;
-	private EmbeddableTypeImpl<?> keyClass;
+	private Pair<SingularMapping<? super E, ?>, AbstractAccessor>[] mapKeyMappings;
 	private String orderBy;
 	private FinalWrapper<Comparator<E>> comparator;
 	private ColumnMetadata orderColumn;
@@ -242,18 +239,23 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 */
 	@Override
 	public Object extractKey(Object value) {
-		Object key = null;
-
 		if (this.mapKeyMapping != null) {
 			return this.mapKeyMapping.get(value);
 		}
 
-		key = this.keyClass.newInstance();
-		for (final Pair<SingularMapping<? super E, ?>, SingularAttributeImpl<?, ?>> pair : this.mapKeyMappings) {
-			pair.getSecond().set(key, pair.getFirst().get(value));
-		}
+		try {
+			final Object key = this.type.newCompositeId();
 
-		return key;
+			for (final Pair<SingularMapping<? super E, ?>, AbstractAccessor> pair : this.mapKeyMappings) {
+				pair.getSecond().set(key, pair.getFirst().get(value));
+			}
+
+			return key;
+		}
+		catch (final Exception e) {} // cannot happen
+
+		// inaccessible
+		return null;
 	}
 
 	/**
@@ -314,19 +316,6 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	}
 
 	/**
-	 * Returns the key class of the association.
-	 * 
-	 * @return the key class of the association
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@Override
-	public TypeImpl<?> getMapKeyClass() {
-		return this.keyClass;
-	}
-
-	/**
 	 * Returns the key mapping of the association.
 	 * 
 	 * @return the key mapping of the association
@@ -346,7 +335,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Pair<SingularMapping<? super E, ?>, SingularAttributeImpl<?, ?>>[] getMapKeyIdMappings() {
+	public Pair<SingularMapping<? super E, ?>, AbstractAccessor>[] getMapKeyIdMappings() {
 		return this.mapKeyMappings;
 	}
 
@@ -505,7 +494,6 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 					}
 					else {
 						this.mapKeyMappings = this.type.getIdMappings();
-						this.keyClass = (EmbeddableTypeImpl<?>) this.type.getIdType();
 					}
 				}
 				else {
@@ -516,7 +504,6 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 					}
 				}
 			}
-
 		}
 	}
 

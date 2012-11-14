@@ -67,7 +67,6 @@ import org.batoo.jpa.core.jdbc.DDLMode;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.metadata.MetadataImpl;
-import org.batoo.jpa.parser.impl.metadata.type.EmbeddableMetadataImpl;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
 import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
@@ -121,8 +120,6 @@ public class MetamodelImpl implements Metamodel {
 	private final Map<Class<?>, EntityTypeImpl<?>> entities = Maps.newHashMap();
 	private final Map<String, EntityTypeImpl<?>> entitiesByName = Maps.newHashMap();
 	private final Map<String, NamedQueryMetadata> namedQueries = Maps.newHashMap();
-
-	private final Map<Class<?>, EmbeddableType<?>> idClasses = Maps.newHashMap();
 
 	private final CallbackManager callbackManager;
 
@@ -603,32 +600,6 @@ public class MetamodelImpl implements Metamodel {
 		catch (final InterruptedException e) {
 			throw new PersistenceException("Unable to retrieve next sequence " + generator + " in allowed " + MetamodelImpl.POLL_TIMEOUT + " seconds");
 		}
-	}
-
-	/**
-	 * Returns the id class for the <code>clazz</code>.
-	 * 
-	 * @param clazz
-	 *            the class of the idClass
-	 * @return the id class for the <code>clazz</code>
-	 * @param <X>
-	 *            the type of the idClass
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	@SuppressWarnings("unchecked")
-	public synchronized <X> EmbeddableTypeImpl<X> idClass(Class<X> clazz) {
-		EmbeddableTypeImpl<X> idType = (EmbeddableTypeImpl<X>) this.idClasses.get(clazz);
-
-		if (idType == null) {
-			final EmbeddableMetadata metadata = new EmbeddableMetadataImpl(clazz, null);
-			idType = new EmbeddableTypeImpl<X>(this, clazz, metadata);
-
-			this.idClasses.put(clazz, idType);
-		}
-
-		return idType;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })

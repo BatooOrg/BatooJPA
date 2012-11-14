@@ -18,7 +18,6 @@
  */
 package org.batoo.jpa.core.test.derivedIdentities.e2a;
 
-import javax.persistence.ManyToOne;
 
 /**
  * 
@@ -28,8 +27,6 @@ import javax.persistence.ManyToOne;
 public class DependentId {
 
 	private String name; // matches name of attribute
-
-	@ManyToOne
 	private EmployeeId emp; // matches name of attribute and type of Employee PK
 
 	/**

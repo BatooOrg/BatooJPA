@@ -286,16 +286,6 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	 * 
 	 */
 	@Override
-	public TypeImpl<?> getMapKeyClass() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public Mapping<?, ?, ?> getMapping(String path) {
 		return this.rootMapping.getMapping(path);
 	}

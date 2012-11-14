@@ -134,11 +134,13 @@ public class BasicPath<X> extends AbstractPath<X> {
 	@Override
 	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
 		final BasicColumn column = this.mapping.getColumn();
-
-		final String tableAlias = this.getRootPath().getTableAlias(query, column.getTable());
-
 		if (query.isQuery()) {
-			return new String[] { tableAlias + "." + column.getName() };
+			String columnAlias = this.getParentPath().getColumnAlias(query, column);
+			if (columnAlias == null) {
+				columnAlias = this.getRootPath().getTableAlias(query, column.getTable()) + "." + column.getName();
+			}
+
+			return new String[] { columnAlias };
 		}
 
 		return new String[] { column.getName() };

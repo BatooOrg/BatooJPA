@@ -21,8 +21,11 @@ package org.batoo.jpa.core.impl.deployment;
 import java.util.concurrent.Callable;
 
 import javax.persistence.metamodel.ManagedType;
+import javax.persistence.metamodel.SingularAttribute;
 
+import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.IdentifiableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.MappedSuperclassTypeImpl;
 import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
@@ -63,19 +66,10 @@ public final class DeploymentUnitTask implements Callable<Void>, Comparable<Depl
 	 * 
 	 */
 	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked" })
 	public final Void call() throws Exception {
-		final IdentifiableTypeImpl<?> parent = this.unit instanceof IdentifiableTypeImpl ? ((IdentifiableTypeImpl) this.unit).getSupertype() : null;
-
-		// if the super type hasn't performed yet, then wait for to finish
-		while (!this.manager.hasPerformed(parent)) {
-			try {
-				Thread.sleep(10);
-			}
-			catch (final InterruptedException e) {
-				return null;
-			}
-		}
+		this.waitForSuper();
+		this.waitforIdDependency();
 
 		try {
 			return this.manager.perform(this.unit);
@@ -186,4 +180,33 @@ public final class DeploymentUnitTask implements Callable<Void>, Comparable<Depl
 		return result;
 	}
 
+	@SuppressWarnings("unchecked")
+	private <X> void waitforIdDependency() throws InterruptedException {
+		if (this.unit instanceof EntityTypeImpl) {
+			final EntityTypeImpl<X> entity = (EntityTypeImpl<X>) this.unit;
+			if (!entity.hasSingleIdAttribute()) {
+				for (final SingularAttribute<? super X, ?> idAttribute : entity.getIdClassAttributes()) {
+					if (idAttribute instanceof AssociatedSingularAttribute) {
+						final EntityTypeImpl<?> type = ((AssociatedSingularAttribute<? super X, ?>) idAttribute).getType();
+
+						while (!this.manager.hasPerformed(type)) {
+							Thread.sleep(10);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void waitForSuper() throws InterruptedException {
+		if (this.unit instanceof IdentifiableTypeImpl) {
+			final IdentifiableTypeImpl<?> supertype = ((IdentifiableTypeImpl<?>) this.unit).getSupertype();
+
+			// if the super type hasn't performed yet, then wait for to finish
+			while (!this.manager.hasPerformed(supertype)) {
+				Thread.sleep(10);
+			}
+		}
+	}
 }

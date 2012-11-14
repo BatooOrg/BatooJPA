@@ -71,6 +71,41 @@ public class Event {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof Event)) {
+			return false;
+		}
+		final Event other = (Event) obj;
+		if (this.eventCode == null) {
+			if (other.eventCode != null) {
+				return false;
+			}
+		}
+		else if (!this.eventCode.equals(other.eventCode)) {
+			return false;
+		}
+		if (this.venue == null) {
+			if (other.venue != null) {
+				return false;
+			}
+		}
+		else if (!this.venue.equals(other.venue)) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
 	 * Returns the eventCode of the Event.
 	 * 
 	 * @return the eventCode of the Event
@@ -104,6 +139,19 @@ public class Event {
 	 */
 	public Venue getVenue() {
 		return this.venue;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = (prime * result) + ((this.eventCode == null) ? 0 : this.eventCode.hashCode());
+		result = (prime * result) + ((this.venue == null) ? 0 : this.venue.hashCode());
+		return result;
 	}
 
 	/**

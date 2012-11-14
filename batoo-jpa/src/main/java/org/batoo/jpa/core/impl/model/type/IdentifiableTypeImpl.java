@@ -27,6 +27,8 @@ import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.Type;
 
 import org.apache.commons.lang.StringUtils;
+import org.batoo.common.reflect.ConstructorAccessor;
+import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.manager.CallbackAvailability;
 import org.batoo.jpa.core.impl.manager.CallbackManager;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
@@ -59,15 +61,19 @@ import com.google.common.collect.Sets;
  */
 public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> implements IdentifiableType<X> {
 
-	private final IdentifiableTypeImpl<? super X> supertype;
-	private final EmbeddableTypeImpl<?> idType;
+	// todo move this as a check to ConstructorAccessor
+	private static final Object[] EMPTY_PARAMS = new Object[] {};
 
+	private final IdentifiableTypeImpl<? super X> supertype;
 	private final Map<String, SingularAttributeImpl<X, ?>> declaredIdAttributes = Maps.newHashMap();
 	private final Map<String, SingularAttributeImpl<? super X, ?>> idAttributes = Maps.newHashMap();
 	private EmbeddedAttribute<X, ?> declaredEmbeddedId;
 	private EmbeddedAttribute<? super X, ?> embeddedId;
+	private final Class<?> idClass;
+	private final ConstructorAccessor idConstructor;
 
 	private BasicAttribute<X, ?> declaredVersionAttribute;
+
 	private BasicAttribute<? super X, ?> versionAttribute;
 	private VersionType versionType;
 	private final CallbackManager callbackManager;
@@ -90,7 +96,8 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 		super(metamodel, javaType, metadata);
 
 		this.supertype = supertype;
-		this.idType = this.getIdClass(metadata);
+		this.idClass = this.getIdClass(metadata);
+		this.idConstructor = this.createIdConstructor();
 
 		this.addIdAttributes(metadata);
 
@@ -117,7 +124,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 						attribute.getLocator(), this.embeddedId.getLocator());
 				}
 
-				if ((this.idType == null) && (this.idAttributes.size() > 1)) {
+				if ((this.idClass == null) && (this.idAttributes.size() > 1)) {
 					throw new MappingException("Multiple id attributes are only allowed with id class declaration.", //
 						attribute.getLocator(), this.idAttributes.values().iterator().next().getLocator());
 				}
@@ -142,7 +149,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 		else if (attribute instanceof EmbeddedAttribute) {
 			final EmbeddedAttribute<? super X, ?> embeddedAttribute = (EmbeddedAttribute<? super X, ?>) attribute;
 			if (embeddedAttribute.isId()) {
-				if (this.idType != null) {
+				if (this.idClass != null) {
 					throw new MappingException("When IdClass defined, it is illegal to use embedded id attributes.", this.getLocator());
 				}
 
@@ -172,7 +179,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 						attribute.getLocator(), this.embeddedId.getLocator());
 				}
 
-				if ((this.idType == null) && (this.idAttributes.size() > 1)) {
+				if ((this.idClass == null) && (this.idAttributes.size() > 1)) {
 					throw new MappingException("Multiple id attributes are only allowed with id class declaration.", //
 						attribute.getLocator(), this.idAttributes.values().iterator().next().getLocator());
 				}
@@ -231,6 +238,15 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 		for (final VersionAttributeMetadata attribute : attributes.getVersions()) {
 			this.declaredVersionAttribute = new BasicAttribute(this, attribute);
 			this.addAttribute(this.declaredVersionAttribute);
+		}
+	}
+
+	private ConstructorAccessor createIdConstructor() {
+		try {
+			return this.idClass != null ? ReflectHelper.createConstructor(this.idClass.getConstructor()) : null;
+		}
+		catch (final Exception e) {
+			throw new MappingException("IdClass " + this.idClass.getName() + "does not declare public default constructor", this.getLocator());
 		}
 	}
 
@@ -304,8 +320,8 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 			return (SingularAttribute<X, Y>) this.declaredEmbeddedId;
 		}
 
-		if (this.idType != null) {
-			throw new IllegalArgumentException("Type defines multiple id attributes");
+		if (this.idClass != null) {
+			throw new IllegalStateException("Type defines multiple id attributes");
 		}
 
 		if (this.declaredIdAttributes.size() > 1) {
@@ -336,7 +352,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 			return (SingularAttribute<? super X, Y>) this.embeddedId;
 		}
 
-		if (this.idType != null) {
+		if (this.idClass != null) {
 			throw new IllegalArgumentException("Type defines multiple id attributes");
 		}
 
@@ -350,20 +366,37 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	}
 
 	/**
-	 * @param metadata
-	 * @return
+	 * Returns the id class of the identifiable type.
+	 * 
+	 * @return the id class of the identifiable type
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	private EmbeddableTypeImpl<?> getIdClass(IdentifiableTypeMetadata metadata) {
-		if (StringUtils.isNotBlank(metadata.getIdClass())) {
-			try {
-				final Class<?> clazz = this.getMetamodel().getEntityManagerFactory().getClassloader().loadClass(metadata.getIdClass());
+	public Class<?> getIdClass() {
+		return this.idClass;
+	}
 
-				return this.getMetamodel().idClass(clazz);
+	/**
+	 * Retrurns the id class of the entity if it is specified.
+	 * 
+	 * @param metadata
+	 *            the metadata
+	 * @return the id class of the entity if it is specified or <code>null</code>
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private Class<?> getIdClass(IdentifiableTypeMetadata metadata) {
+		final String idClass = metadata.getIdClass();
+
+		if (StringUtils.isNotBlank(idClass)) {
+			try {
+				return this.getMetamodel().getEntityManagerFactory().getClassloader().loadClass(metadata.getIdClass());
 			}
-			catch (final ClassNotFoundException e) {}
+			catch (final ClassNotFoundException e) {
+				throw new MappingException("Cannot load id class " + idClass + " for entity " + this.getJavaType().getName(), this.getLocator());
+			}
 		}
 
 		return null;
@@ -375,14 +408,13 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 */
 	@Override
 	public Set<SingularAttribute<? super X, ?>> getIdClassAttributes() {
-		if (this.idType != null) {
-			final Set<SingularAttribute<? super X, ?>> idAttributes = Sets.newHashSet();
-			idAttributes.addAll(this.idAttributes.values());
+		final Set<SingularAttribute<? super X, ?>> idAttributes = Sets.newHashSet();
 
-			return idAttributes;
+		if (this.idClass != null) {
+			idAttributes.addAll(this.idAttributes.values());
 		}
 
-		throw new IllegalArgumentException("Type does not have an id class definition");
+		return idAttributes;
 	}
 
 	/**
@@ -391,10 +423,6 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 */
 	@Override
 	public Type<?> getIdType() {
-		if (this.idType != null) {
-			return this.idType;
-		}
-
 		if (this.embeddedId != null) {
 			return this.embeddedId.getType();
 		}
@@ -473,6 +501,23 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	@Override
 	public boolean hasVersionAttribute() {
 		return this.versionAttribute != null;
+	}
+
+	/**
+	 * Returns a generated idClass instance based on the id class.
+	 * 
+	 * @return a generated idClass instance based on the id class
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Object newCompositeId() {
+		try {
+			return this.idConstructor.newInstance(IdentifiableTypeImpl.EMPTY_PARAMS);
+		}
+		catch (final Exception e) {
+			return null; // impossible at this stage
+		}
 	}
 
 	/**

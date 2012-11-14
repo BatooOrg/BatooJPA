@@ -18,7 +18,6 @@
  */
 package org.batoo.jpa.core.test.idclass;
 
-
 /**
  * @author hceylan
  * @since $version
@@ -26,7 +25,6 @@ package org.batoo.jpa.core.test.idclass;
 public class FooPk {
 
 	private String strKey;
-
 	private Integer intKey;
 
 	/**

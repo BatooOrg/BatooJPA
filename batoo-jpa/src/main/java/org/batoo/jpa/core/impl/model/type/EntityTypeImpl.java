@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.impl.model.type;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -47,6 +48,7 @@ import javax.validation.ValidatorFactory;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableBoolean;
+import org.batoo.common.reflect.AbstractAccessor;
 import org.batoo.common.reflect.ConstructorAccessor;
 import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.common.util.BatooUtils;
@@ -75,7 +77,6 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
-import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
@@ -150,7 +151,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private SingularMapping<? super X, ?> idMapping;
 	private Boolean suitableForBatchInsert;
 
-	private Pair<SingularMapping<? super X, ?>, SingularAttributeImpl<?, ?>>[] idMappings;
+	private Pair<SingularMapping<? super X, ?>, AbstractAccessor>[] idMappings;
 	private InheritanceType inheritanceType;
 
 	private final Map<String, EntityTypeImpl<? extends X>> children = Maps.newHashMap();
@@ -810,11 +811,11 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 			// has multiple id mappings
 			final List<PredicateImpl> predicates = Lists.newArrayList();
-			for (final Pair<SingularMapping<? super X, ?>, SingularAttributeImpl<?, ?>> pair : this.getIdMappings()) {
+			for (final Pair<SingularMapping<? super X, ?>, AbstractAccessor> pair : this.getIdMappings()) {
 				final SingularMapping<? super X, ?> _idMapping = pair.getFirst();
 				final ParameterExpressionImpl<?> pe = cb.parameter(_idMapping.getAttribute().getJavaType());
 
-				final Path<?> path = r.get(pair.getSecond().getName());
+				final Path<?> path = r.get(_idMapping.getAttribute().getName());
 				final PredicateImpl predicate = cb.equal(path, pe);
 
 				predicates.add(predicate);
@@ -858,11 +859,11 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 
 			// has multiple id mappings
 			final List<PredicateImpl> predicates = Lists.newArrayList();
-			for (final Pair<SingularMapping<? super X, ?>, SingularAttributeImpl<?, ?>> pair : this.getIdMappings()) {
+			for (final Pair<SingularMapping<? super X, ?>, AbstractAccessor> pair : this.getIdMappings()) {
 				final SingularMapping<? super X, ?> _idMapping = pair.getFirst();
 				final ParameterExpressionImpl<?> pe = cb.parameter(_idMapping.getAttribute().getJavaType());
 
-				final Path<?> path = r.get(pair.getSecond().getName());
+				final Path<?> path = r.get(_idMapping.getAttribute().getName());
 				final PredicateImpl predicate = cb.equal(path, pe);
 
 				predicates.add(predicate);
@@ -935,6 +936,46 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
+	 * Returns the id of the entity from the instance.
+	 * 
+	 * @param instance
+	 *            the instance
+	 * @return the managedId or null
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public ManagedId<X> getId(Object instance) {
+		Object id;
+		final MutableBoolean allNull = new MutableBoolean(true);
+
+		if (this.hasSingleIdAttribute()) {
+			id = this.getIdImpl(instance, this.getIdMapping(), allNull);
+		}
+		else {
+			// create the id class
+			id = this.newCompositeId();
+
+			for (final Pair<SingularMapping<? super X, ?>, AbstractAccessor> pair : this.getIdMappings()) {
+				final SingularMapping<? super X, ?> child = pair.getFirst();
+
+				final Object childId = this.getIdImpl(instance, child, allNull);
+				if (childId != null) {
+					allNull.setValue(false);
+				}
+
+				pair.getSecond().set(id, childId);
+			}
+		}
+
+		if (allNull.booleanValue()) {
+			return null;
+		}
+
+		return new ManagedId<X>(id, this);
+	}
+
+	/**
 	 * Returns the id of the entity from the resultset row.
 	 * 
 	 * @param row
@@ -975,9 +1016,9 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		}
 		else {
 			// create the id class
-			id = ((EmbeddableTypeImpl<?>) this.getIdType()).newInstance();
+			id = this.newCompositeId();
 
-			for (final Pair<SingularMapping<? super X, ?>, SingularAttributeImpl<?, ?>> pair : this.getIdMappings()) {
+			for (final Pair<SingularMapping<? super X, ?>, AbstractAccessor> pair : this.getIdMappings()) {
 				final SingularMapping<? super X, ?> child = pair.getFirst();
 
 				final Object childId = this.getIdImpl(row, idFields, joinFields, child, allNull);
@@ -994,6 +1035,43 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		}
 
 		return new ManagedId<X>(id, this);
+	}
+
+	private Object getIdImpl(Object instance, SingularMapping<?, ?> idMapping, MutableBoolean allNull) {
+		// handle basic mapping
+		if (idMapping instanceof BasicMapping) {
+			final Object value = idMapping.get(instance);
+			if (value != null) {
+				allNull.setValue(false);
+			}
+
+			return value;
+		}
+
+		// handle embedded id
+		if (idMapping instanceof EmbeddedMapping) {
+			final EmbeddedMapping<?, ?> embeddedMapping = (EmbeddedMapping<?, ?>) idMapping;
+			final Object id = embeddedMapping.getAttribute().newInstance();
+
+			for (final Mapping<?, ?, ?> child : embeddedMapping.getChildren()) {
+				final Object childId = this.getIdImpl(instance, (SingularMapping<?, ?>) child, allNull);
+				if (childId != null) {
+					allNull.setValue(false);
+				}
+
+				child.getAttribute().set(id, childId);
+			}
+
+			return allNull.booleanValue() ? null : id;
+		}
+
+		// handle singular associated
+		final SingularAssociationMapping<?, ?> singularAssociationMapping = (SingularAssociationMapping<?, ?>) idMapping;
+
+		final Object associate = idMapping.get(instance);
+		final ManagedId<?> id = singularAssociationMapping.getType().getId(associate);
+
+		return id != null ? id.getId() : null;
 	}
 
 	private Object getIdImpl(ResultSet row, HashMap<AbstractColumn, String> idFields, HashMap<AbstractColumn, String> joinFields,
@@ -1013,7 +1091,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		}
 
 		// handle embedded id
-		else if (idMapping instanceof EmbeddedMapping) {
+		if (idMapping instanceof EmbeddedMapping) {
 			final EmbeddedMapping<?, ?> embeddedMapping = (EmbeddedMapping<?, ?>) idMapping;
 			final Object id = embeddedMapping.getAttribute().newInstance();
 
@@ -1037,7 +1115,9 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			translatedIdFields.put(joinColumn.getReferencedColumn(), idFields.get(joinColumn));
 		}
 
-		return singularAssociationMapping.getType().getId(row, translatedIdFields, joinFields).getId();
+		final ManagedId<?> id = singularAssociationMapping.getType().getId(row, translatedIdFields, joinFields);
+
+		return id != null ? id.getId() : null;
 	}
 
 	/**
@@ -1080,7 +1160,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public Pair<SingularMapping<? super X, ?>, SingularAttributeImpl<?, ?>>[] getIdMappings() {
+	public Pair<SingularMapping<? super X, ?>, AbstractAccessor>[] getIdMappings() {
 		if (this.idMappings != null) {
 			return this.idMappings;
 		}
@@ -1091,38 +1171,49 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				return this.idMappings;
 			}
 
-			final EmbeddableTypeImpl<?> idType = (EmbeddableTypeImpl<?>) this.getIdType();
-			final List<Pair<SingularMapping<? super X, ?>, SingularAttributeImpl<?, ?>>> _idMappings = Lists.newArrayList();
-
+			final List<Pair<SingularMapping<? super X, ?>, AbstractAccessor>> _idMappings = Lists.newArrayList();
 			for (final Mapping<? super X, ?, ?> mapping : this.entityMapping.getChildren()) {
 				// only interested in id mappings
 				if (!(mapping instanceof SingularMapping) || !((SingularMapping<? super X, ?>) mapping).getAttribute().isId()) {
 					continue;
 				}
 
-				// must have a corresponding attribute
-				final AttributeImpl<?, ?> attribute = idType.getAttribute(mapping.getName());
-
-				if (attribute == null) {
-					throw new MappingException("Attribute not found: " + idType.getJavaType().getName() + "." + mapping.getName(),
+				// must have a corresponding field
+				Field field;
+				try {
+					field = this.getIdClass().getDeclaredField(mapping.getName());
+				}
+				catch (final Exception e) {
+					throw new MappingException("Attribute not found: " + this.getIdClass().getName() + "." + mapping.getName(),
 						mapping.getAttribute().getLocator());
 				}
 
-				final Class<?> javaType = mapping instanceof SingularAssociationMapping ? //
-					((SingularAssociationMapping<?, ?>) mapping).getType().getIdType().getJavaType() : mapping.getJavaType();
+				final Class<?> javaType;
+				if (mapping instanceof SingularAssociationMapping) {
+					final EntityTypeImpl<?> type = ((SingularAssociationMapping<? super X, ?>) mapping).getType();
 
-				if (attribute.getJavaType() != javaType) {
-					throw new MappingException("Attribute types mismatch: " + attribute.getJavaMember() + ", " + mapping.getJavaType(), attribute.getLocator(),
-						mapping.getAttribute().getLocator());
+					if (type.hasSingleIdAttribute()) {
+						javaType = type.getIdType().getJavaType();
+					}
+					else {
+						javaType = type.getIdClass();
+					}
+				}
+				else {
+					javaType = mapping.getJavaType();
+				}
+
+				if (field.getType() != javaType) {
+					throw new MappingException("Attribute types mismatch: " + field + ", " + mapping.getJavaType(), mapping.getAttribute().getLocator());
 				}
 
 				final SingularMapping<? super X, ?> singularMapping = (SingularMapping<? super X, ?>) mapping;
-				final SingularAttributeImpl<?, ?> singularAttribute = (SingularAttributeImpl<?, ?>) attribute;
+				final AbstractAccessor accessor = ReflectHelper.getAccessor(field);
 
-				_idMappings.add(new Pair<SingularMapping<? super X, ?>, SingularAttributeImpl<?, ?>>(singularMapping, singularAttribute));
+				_idMappings.add(new Pair<SingularMapping<? super X, ?>, AbstractAccessor>(singularMapping, accessor));
 			}
 
-			final Pair<SingularMapping<? super X, ?>, SingularAttributeImpl<?, ?>>[] idMappings0 = new Pair[_idMappings.size()];
+			final Pair<SingularMapping<? super X, ?>, AbstractAccessor>[] idMappings0 = new Pair[_idMappings.size()];
 			_idMappings.toArray(idMappings0);
 
 			this.idMappings = idMappings0;
@@ -1784,7 +1875,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		}
 		else {
 			int i = 1;
-			for (final Pair<SingularMapping<? super X, ?>, SingularAttributeImpl<?, ?>> pair : this.getIdMappings()) {
+			for (final Pair<SingularMapping<? super X, ?>, AbstractAccessor> pair : this.getIdMappings()) {
 				q.setParameter(i++, pair.getSecond().get(id));
 			}
 		}
@@ -1843,7 +1934,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		}
 		else {
 			int i = 1;
-			for (final Pair<SingularMapping<? super X, ?>, SingularAttributeImpl<?, ?>> pair : this.getIdMappings()) {
+			for (final Pair<SingularMapping<? super X, ?>, AbstractAccessor> pair : this.getIdMappings()) {
 				q.setParameter(i++, pair.getSecond().get(id));
 			}
 		}
@@ -2051,6 +2142,64 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		}
 
 		return validator.validate((Object) instance.getInstance(), groups);
+	}
+
+	/**
+	 * Sets the id of the entity from the instance.
+	 * 
+	 * @param session
+	 *            the session
+	 * @param instance
+	 *            the instance
+	 * @param id
+	 *            the id
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setId(SessionImpl session, Object instance, Object id) {
+		if (this.hasSingleIdAttribute()) {
+			this.setIdImpl(session, instance, id, this.getIdMapping());
+		}
+		else {
+			for (final Pair<SingularMapping<? super X, ?>, AbstractAccessor> pair : this.getIdMappings()) {
+				final SingularMapping<? super X, ?> child = pair.getFirst();
+				final AbstractAccessor accessor = pair.getSecond();
+
+				final Object childId = id != null ? accessor.get(id) : null;
+
+				this.setIdImpl(session, instance, childId, child);
+			}
+		}
+	}
+
+	private void setIdImpl(SessionImpl session, Object instance, Object id, SingularMapping<?, ?> idMapping) {
+		// handle basic mapping
+		if (idMapping instanceof BasicMapping) {
+			idMapping.set(instance, id);
+		}
+
+		// handle embedded id
+		else if (idMapping instanceof EmbeddedMapping) {
+			final EmbeddedMapping<?, ?> embeddedMapping = (EmbeddedMapping<?, ?>) idMapping;
+
+			if (id != null) {
+				for (final Mapping<?, ?, ?> child : embeddedMapping.getChildren()) {
+					final Object childId = child.getAttribute().get(id);
+
+					this.setIdImpl(session, instance, childId, (SingularMapping<?, ?>) child);
+				}
+			}
+		}
+
+		// handle singular associated
+		else {
+			final SingularAssociationMapping<?, ?> singularAssociationMapping = (SingularAssociationMapping<?, ?>) idMapping;
+			final EntityTypeImpl<?> type = singularAssociationMapping.getType();
+
+			final Object associate = session.getEntityManager().getReference(type.getJavaType(), id);
+			idMapping.set(instance, associate);
+		}
 	}
 
 	private synchronized void setInherited() {

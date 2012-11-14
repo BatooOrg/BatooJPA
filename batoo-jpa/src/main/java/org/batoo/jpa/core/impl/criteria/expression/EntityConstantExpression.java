@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.criteria.expression;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -111,6 +112,8 @@ public class EntityConstantExpression<T> extends AbstractParameterExpressionImpl
 	 * 
 	 * @param metamodel
 	 *            the metamodel
+	 * @param connection
+	 *            the connection
 	 * @param parameters
 	 *            the SQL parameters
 	 * @param sqlIndex
@@ -119,7 +122,7 @@ public class EntityConstantExpression<T> extends AbstractParameterExpressionImpl
 	 * @since $version
 	 * @author hceylan
 	 */
-	public void setParameter(MetamodelImpl metamodel, Object[] parameters, MutableInt sqlIndex) {
-		super.setParameter(metamodel, parameters, sqlIndex, this.value);
+	public void setParameter(MetamodelImpl metamodel, Connection connection, Object[] parameters, MutableInt sqlIndex) {
+		super.setParameter(metamodel, connection, parameters, sqlIndex, this.value);
 	}
 }

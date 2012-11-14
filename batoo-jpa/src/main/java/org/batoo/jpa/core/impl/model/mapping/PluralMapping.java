@@ -26,7 +26,6 @@ import java.util.Map;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.Joinable;
 import org.batoo.jpa.core.impl.jdbc.OrderColumn;
-import org.batoo.jpa.core.impl.model.type.TypeImpl;
 
 /**
  * The base class for {@link EmbeddedMapping} and {@link BasicMapping}.
@@ -129,16 +128,6 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @author hceylan
 	 */
 	Object get(Object instance);
-
-	/**
-	 * Returns the class of the map key.
-	 * 
-	 * @return the class of the map key
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	TypeImpl<?> getMapKeyClass();
 
 	/**
 	 * Returns child mapping of the <code>type</code>.

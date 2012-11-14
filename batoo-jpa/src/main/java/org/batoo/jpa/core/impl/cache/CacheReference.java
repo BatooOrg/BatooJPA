@@ -20,7 +20,6 @@ package org.batoo.jpa.core.impl.cache;
 
 import java.io.Serializable;
 
-import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
@@ -44,14 +43,13 @@ public class CacheReference implements Serializable {
 	 * @since $version
 	 * @author hceylan
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public CacheReference(MetamodelImpl metamodel, Object reference) {
 		super();
 
 		final EntityTypeImpl<?> entityType = metamodel.getEntity(reference.getClass());
 
 		this.type = entityType.getJavaType().getName();
-		this.id = new ManagedId(entityType, reference).getId();
+		this.id = entityType.getId(reference).getId();
 	}
 
 	/**

@@ -131,7 +131,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 		this.pmdBroken = entityManager.getJdbcAdaptor().isPmdBroken();
 	}
 
-	private Object[] applyParameters() {
+	private Object[] applyParameters(Connection connection) {
 		if ((this.startPosition != 0) || (this.maxResult != Integer.MAX_VALUE)) {
 			QueryImpl.LOG.debug("Rows restricted to {0} / {1}", this.startPosition, this.maxResult);
 
@@ -187,10 +187,10 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 			for (int i = 0; i < sqlParameters.size(); i++) {
 				final AbstractParameterExpressionImpl<?> parameter = sqlParameters.get(i);
 				if (parameter instanceof EntityConstantExpression) {
-					((EntityConstantExpression<?>) parameter).setParameter(metamodel, parameters, sqlIndex);
+					((EntityConstantExpression<?>) parameter).setParameter(metamodel, connection, parameters, sqlIndex);
 				}
 				else {
-					((ParameterExpressionImpl<?>) parameter).setParameter(metamodel, parameters, sqlIndex, this.parameters.get(parameter));
+					((ParameterExpressionImpl<?>) parameter).setParameter(metamodel, connection, parameters, sqlIndex, this.parameters.get(parameter));
 				}
 			}
 
@@ -251,10 +251,10 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 		for (int i = 0; i < sqlParameters.size(); i++) {
 			final AbstractParameterExpressionImpl<?> parameter = sqlParameters.get(i);
 			if (parameter instanceof EntityConstantExpression) {
-				((EntityConstantExpression<?>) parameter).setParameter(metamodel, parameters, sqlIndex);
+				((EntityConstantExpression<?>) parameter).setParameter(metamodel, connection, parameters, sqlIndex);
 			}
 			else {
-				((ParameterExpressionImpl<?>) parameter).setParameter(metamodel, parameters, sqlIndex, this.parameters.get(parameter));
+				((ParameterExpressionImpl<?>) parameter).setParameter(metamodel, connection, parameters, sqlIndex, this.parameters.get(parameter));
 			}
 		}
 
@@ -291,21 +291,15 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 		return this.results;
 	}
 
-	private List<X> buildResultSet(final Object[] parameters, CacheStoreMode cacheStoreMode) {
+	private List<X> buildResultSet(Connection connection, final Object[] parameters, CacheStoreMode cacheStoreMode) {
 		try {
-			final Connection connection = this.em.getConnection();
-			try {
-				this.buildResultSetImpl(connection, parameters);
+			this.buildResultSetImpl(connection, parameters);
 
-				if (((cacheStoreMode == CacheStoreMode.REFRESH) || (cacheStoreMode == CacheStoreMode.USE)) && (this.q instanceof CriteriaQueryImpl)) {
-					this.emf.getCache().put(this.sql, parameters, this.results);
-				}
+			if (((cacheStoreMode == CacheStoreMode.REFRESH) || (cacheStoreMode == CacheStoreMode.USE)) && (this.q instanceof CriteriaQueryImpl)) {
+				this.emf.getCache().put(this.sql, parameters, this.results);
+			}
 
-				return this.results;
-			}
-			finally {
-				this.em.closeConnectionIfNecessary();
-			}
+			return this.results;
 		}
 		catch (final SQLException e) {
 			QueryImpl.LOG.error(e, "Query failed" + QueryImpl.LOG.lazyBoxed(this.sql, parameters));
@@ -446,12 +440,13 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 */
 	@Override
 	public int executeUpdate() {
-		final Object[] parameters = this.applyParameters();
+		final Connection connection = this.em.getConnection();
+		final Object[] parameters = this.applyParameters(connection);
 
 		try {
 			this.em.assertTransaction();
 
-			return new QueryRunner(this.em.getJdbcAdaptor().isPmdBroken(), false).update(this.em.getConnection(), this.sql, parameters);
+			return new QueryRunner(this.em.getJdbcAdaptor().isPmdBroken(), false).update(connection, this.sql, parameters);
 		}
 		catch (final SQLException e) {
 			QueryImpl.LOG.error(e, "Query failed" + QueryImpl.LOG.lazyBoxed(this.sql, parameters));
@@ -789,6 +784,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 			cache.setCacheStoreMode(cacheStoreMode);
 		}
 
+		final Connection connection = this.em.getConnection();
 		try {
 			final LockModeType lockMode = this.getLockMode();
 			final boolean hasLock = (lockMode == LockModeType.PESSIMISTIC_READ) || (lockMode == LockModeType.PESSIMISTIC_WRITE)
@@ -797,7 +793,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 				this.sql = this.em.getJdbcAdaptor().applyLock(this.sql, lockMode);
 			}
 
-			final Object[] parameters = this.applyParameters();
+			final Object[] parameters = this.applyParameters(connection);
 
 			if ((cacheRetrieveMode == CacheRetrieveMode.USE) && !hasLock && (this.q instanceof CriteriaQueryImpl)) {
 				final CriteriaQueryImpl<X> cq = (CriteriaQueryImpl<X>) this.q;
@@ -810,9 +806,12 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 				}
 			}
 
-			return this.buildResultSet(parameters, cacheStoreMode);
+			return this.buildResultSet(connection, parameters, cacheStoreMode);
+
 		}
 		finally {
+			this.em.closeConnectionIfNecessary();
+
 			this.em.getSession().releaseLoadTracker();
 
 			if (cacheRetrieveMode != null) {

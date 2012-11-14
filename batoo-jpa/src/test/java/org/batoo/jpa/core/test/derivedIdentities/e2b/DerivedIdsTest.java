@@ -46,7 +46,7 @@ public class DerivedIdsTest extends BaseCoreTest {
 	public void test2b() {
 		final Venue venue = new Venue("IN", "Inonu Stadium");
 		final Event event = new Event(venue, "BJK12", "Beşiktaş 2012 - 2013 Season");
-		final Performance performance = new Performance(event, "001", "Veşiktaş JK - Barcelona FC");
+		final Performance performance = new Performance(event, "001", "Beşiktaş JK - Barcelona FC");
 
 		this.persist(venue);
 		this.persist(event);
@@ -55,7 +55,7 @@ public class DerivedIdsTest extends BaseCoreTest {
 		this.commit();
 		this.close();
 
-		final Performance performance2 = this.cq("select p FROM Performance p WHERE p.event.venue.code = 'IN'", Performance.class).getSingleResult();
+		final Performance performance2 = this.cq("select p FROM Performance p WHERE p.event.venue.venueCode = 'IN'", Performance.class).getSingleResult();
 
 		Assert.assertEquals(performance, performance2);
 	}

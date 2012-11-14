@@ -27,10 +27,12 @@ import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.PluralAttribute.CollectionType;
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CollectionExpression;
 import org.batoo.jpa.core.impl.criteria.expression.MapExpression;
 import org.batoo.jpa.core.impl.criteria.join.FetchParentImpl;
+import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.MapAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
@@ -186,4 +188,20 @@ public abstract class ParentPath<Z, X> extends AbstractPath<X> implements Path<X
 	 * @author hceylan
 	 */
 	protected abstract <C, Y> Mapping<? super X, C, Y> getMapping(String name);
+
+	/**
+	 * Returns the table alias for the column.
+	 * 
+	 * @param column
+	 *            the column
+	 * @param query
+	 *            the query
+	 * @return the table alias for the column
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public String getColumnAlias(BaseQueryImpl<?> query, AbstractColumn column) {
+		return null;
+	}
 }
