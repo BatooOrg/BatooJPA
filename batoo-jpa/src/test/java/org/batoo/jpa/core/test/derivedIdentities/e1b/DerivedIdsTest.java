@@ -18,6 +18,10 @@
  */
 package org.batoo.jpa.core.test.derivedIdentities.e1b;
 
+import java.util.List;
+
+import javax.persistence.TypedQuery;
+
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
@@ -63,5 +67,34 @@ public class DerivedIdsTest extends BaseCoreTest {
 		final Dependent dependent3 = this.find(Dependent.class, dependentId1);
 
 		Assert.assertEquals(dependent1, dependent3);
+	}
+
+	@Test
+	public void test2aJPQL() {
+
+		final Employee employee = new Employee("Sam");
+
+		this.persist(employee);
+		this.commit();
+
+		final DependentId dependentId1 = new DependentId("Joe", employee.getId());
+		final Dependent dependent1 = new Dependent(dependentId1, employee);
+
+		this.persist(dependent1);
+
+		this.commit();
+		this.close();
+
+		final String qstr = "SELECT d FROM Dependent d WHERE d.id.name = 'Joe' AND d.employee.empName = 'Sam'";
+
+		final TypedQuery<Dependent> q = this.cq(qstr, Dependent.class);
+		final List<Dependent> resultList = q.getResultList();
+
+		Assert.assertNotNull(resultList);
+		Assert.assertEquals(1, resultList.size());
+
+		Assert.assertEquals("Joe", resultList.get(0).getId().getName());
+		Assert.assertEquals("Sam", resultList.get(0).getEmployee().getEmpName());
+
 	}
 }

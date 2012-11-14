@@ -27,7 +27,7 @@ import javax.persistence.Embeddable;
  */
 @Embeddable
 public class DependentId {
-	String name; // matches name of @Id attribute
+	String name;
 	Integer empPK; // corresponds to PK type of Employee
 
 	/**
