@@ -18,9 +18,17 @@
  */
 package org.batoo.jpa.core.test.derivedIdentities.e1b;
 
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.persistence.TypedQuery;
+import javax.sql.DataSource;
+
 import junit.framework.Assert;
 
+import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.test.BaseCoreTest;
+import org.batoo.jpa.core.test.ColumnNameListHandler;
 import org.junit.Test;
 
 /**
@@ -43,25 +51,61 @@ public class DerivedIdsTest extends BaseCoreTest {
 	 * @since $version
 	 */
 	@Test
-	public void test1b() {
-		final Employee employee = new Employee("employee1");
+	public void test1bJPQL() {
+
+		final Employee employee = new Employee("Sam");
+
 		this.persist(employee);
 		this.commit();
 
-		final DependentId dependentId1 = new DependentId("dep-id-name1", employee.getId());
-		final DependentId dependentId2 = new DependentId("dep-id-name2", employee.getId());
-
+		final DependentId dependentId1 = new DependentId("Joe", employee.getEmpId());
 		final Dependent dependent1 = new Dependent(dependentId1, employee);
-		final Dependent dependent2 = new Dependent(dependentId2, employee);
 
 		this.persist(dependent1);
-		this.persist(dependent2);
 
 		this.commit();
 		this.close();
 
-		final Dependent dependent3 = this.find(Dependent.class, dependentId1);
+		final String qstr = "SELECT d FROM Dependent d WHERE d.id.name = 'Joe' AND d.employee.empName = 'Sam'";
 
-		Assert.assertEquals(dependent1, dependent3);
+		final TypedQuery<Dependent> q = this.cq(qstr, Dependent.class);
+		final List<Dependent> resultList = q.getResultList();
+
+		Assert.assertNotNull(resultList);
+		Assert.assertEquals(1, resultList.size());
+
+		Assert.assertEquals("Joe", resultList.get(0).getId().getName());
+		Assert.assertEquals("Sam", resultList.get(0).getEmp().getEmpName());
+
+	}
+
+	/**
+	 * Tests generated DDL column names
+	 * 
+	 * @throws SQLException
+	 * @since $version
+	 */
+	@Test
+	public void testColumnNames() throws SQLException {
+		final Employee employee = new Employee("Sam");
+
+		this.persist(employee);
+		this.commit();
+
+		final DependentId dependentId1 = new DependentId("Joe", employee.getEmpId());
+		final Dependent dependent1 = new Dependent(dependentId1, employee);
+
+		this.persist(dependent1);
+
+		this.commit();
+		this.close();
+
+		final List<String> columnNames = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT * FROM Dependent",
+			new ColumnNameListHandler<List<String>>());
+
+		Assert.assertEquals(2, columnNames.size());
+		Assert.assertTrue(columnNames.contains("NAME"));
+		Assert.assertTrue(columnNames.contains("EMPPK"));
+
 	}
 }

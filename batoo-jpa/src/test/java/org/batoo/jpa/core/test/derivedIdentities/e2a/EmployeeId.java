@@ -24,13 +24,11 @@ package org.batoo.jpa.core.test.derivedIdentities.e2a;
  * @since $version
  */
 public class EmployeeId {
-
 	String firstName;
 	String lastName;
 
 	/**
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public EmployeeId() {
@@ -38,17 +36,13 @@ public class EmployeeId {
 	}
 
 	/**
-	 * @param firstName
-	 *            the first name
-	 * @param lastName
-	 *            the last name
 	 * 
-	 * @author asimarslan
 	 * @since $version
+	 * @param firstName
+	 * @param lastName
 	 */
 	public EmployeeId(String firstName, String lastName) {
 		super();
-
 		this.firstName = firstName;
 		this.lastName = lastName;
 	}
@@ -92,7 +86,6 @@ public class EmployeeId {
 	 * 
 	 * @return the firstName
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public String getFirstName() {
@@ -103,7 +96,6 @@ public class EmployeeId {
 	 * 
 	 * @return the lastName
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public String getLastName() {
@@ -118,8 +110,8 @@ public class EmployeeId {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = (prime * result) + ((this.firstName == null) ? 0 : this.firstName.hashCode());
-		result = (prime * result) + ((this.lastName == null) ? 0 : this.lastName.hashCode());
+		result = prime * result + ((this.firstName == null) ? 0 : this.firstName.hashCode());
+		result = prime * result + ((this.lastName == null) ? 0 : this.lastName.hashCode());
 		return result;
 	}
 
@@ -128,7 +120,6 @@ public class EmployeeId {
 	 * @param firstName
 	 *            the firstName to set
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public void setFirstName(String firstName) {
@@ -140,10 +131,10 @@ public class EmployeeId {
 	 * @param lastName
 	 *            the lastName to set
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
+
 }

@@ -33,13 +33,12 @@ public class Employee {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
-	private Integer empId;
+	private Long empId;
 
 	private String empName;
 
 	/**
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public Employee() {
@@ -47,10 +46,8 @@ public class Employee {
 	}
 
 	/**
-	 * @param empName
-	 *            the employee name
 	 * 
-	 * @author asimarslan
+	 * @param empName
 	 * @since $version
 	 */
 	public Employee(String empName) {
@@ -98,10 +95,9 @@ public class Employee {
 	 * 
 	 * @return the empId
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
-	public Integer getEmpId() {
+	public Long getEmpId() {
 		return this.empId;
 	}
 
@@ -109,7 +105,6 @@ public class Employee {
 	 * 
 	 * @return the empName
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public String getEmpName() {
@@ -124,8 +119,8 @@ public class Employee {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = (prime * result) + ((this.empId == null) ? 0 : this.empId.hashCode());
-		result = (prime * result) + ((this.empName == null) ? 0 : this.empName.hashCode());
+		result = prime * result + ((this.empId == null) ? 0 : this.empId.hashCode());
+		result = prime * result + ((this.empName == null) ? 0 : this.empName.hashCode());
 		return result;
 	}
 
@@ -134,10 +129,9 @@ public class Employee {
 	 * @param empId
 	 *            the empId to set
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
-	public void setEmpId(Integer empId) {
+	public void setEmpId(Long empId) {
 		this.empId = empId;
 	}
 
@@ -146,10 +140,10 @@ public class Employee {
 	 * @param empName
 	 *            the empName to set
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public void setEmpName(String empName) {
 		this.empName = empName;
 	}
+
 }
