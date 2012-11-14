@@ -75,7 +75,7 @@ public class ElementColumn extends AbstractColumn {
 	 */
 	public ElementColumn(JdbcAdaptor jdbcAdaptor, ElementCollectionMapping<?, ?, ?> mapping, CollectionTable table, String name, Class<?> javaType,
 		EnumType enumType, TemporalType temporalType, boolean lob, ColumnMetadata metadata) {
-		super(javaType, temporalType, enumType, lob, metadata != null ? metadata.getLocator() : null);
+		super(javaType, null, temporalType, enumType, lob, metadata != null ? metadata.getLocator() : null);
 
 		this.mapping = mapping;
 

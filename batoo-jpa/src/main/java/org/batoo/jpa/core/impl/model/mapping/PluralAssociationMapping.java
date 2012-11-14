@@ -48,9 +48,9 @@ import org.batoo.jpa.core.impl.jdbc.Joinable;
 import org.batoo.jpa.core.impl.jdbc.OrderColumn;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.attribute.MapAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
+import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
@@ -86,7 +86,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	private AssociationMapping<?, ?, ?> inverse;
 
 	private SingularMapping<? super E, ?> mapKeyMapping;
-	private Pair<BasicMapping<? super E, ?>, BasicAttribute<?, ?>>[] mapKeyMappings;
+	private Pair<SingularMapping<? super E, ?>, SingularAttributeImpl<?, ?>>[] mapKeyMappings;
 	private EmbeddableTypeImpl<?> keyClass;
 	private String orderBy;
 	private FinalWrapper<Comparator<E>> comparator;
@@ -249,7 +249,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 		}
 
 		key = this.keyClass.newInstance();
-		for (final Pair<BasicMapping<? super E, ?>, BasicAttribute<?, ?>> pair : this.mapKeyMappings) {
+		for (final Pair<SingularMapping<? super E, ?>, SingularAttributeImpl<?, ?>> pair : this.mapKeyMappings) {
 			pair.getSecond().set(key, pair.getFirst().get(value));
 		}
 
@@ -346,7 +346,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Pair<BasicMapping<? super E, ?>, BasicAttribute<?, ?>>[] getMapKeyIdMappings() {
+	public Pair<SingularMapping<? super E, ?>, SingularAttributeImpl<?, ?>>[] getMapKeyIdMappings() {
 		return this.mapKeyMappings;
 	}
 
@@ -557,25 +557,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 		if (children == null) {
 			final QueryImpl<E> q = em.createQuery(this.getSelectCriteria());
 
-			final EntityTypeImpl<?> rootType = managedInstance.getType();
-
-			if (this.isOwnerSelect()) {
-				final Object id = managedInstance.getId().getId();
-
-				// if has single id then pass it on
-				if (rootType.hasSingleIdAttribute()) {
-					q.setParameter(1, id);
-				}
-				else {
-					int i = 1;
-					for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
-						q.setParameter(i++, pair.getSecond().get(id));
-					}
-				}
-			}
-			else {
-				q.setParameter(1, instance);
-			}
+			q.setParameter(1, instance);
 
 			children = q.getResultList();
 			if (this.type.isCachable()) {

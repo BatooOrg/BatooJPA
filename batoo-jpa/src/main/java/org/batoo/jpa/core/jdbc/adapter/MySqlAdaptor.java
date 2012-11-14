@@ -27,7 +27,7 @@ import javax.persistence.LockModeType;
 import javax.sql.DataSource;
 
 import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
-import org.batoo.jpa.core.impl.jdbc.PkColumn;
+import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.model.SequenceGenerator;
 import org.batoo.jpa.core.jdbc.IdType;
 
@@ -112,7 +112,7 @@ public class MySqlAdaptor extends JdbcAdaptor {
 	 */
 	@Override
 	public String createColumnDDL(AbstractColumn column) {
-		final boolean identity = (column instanceof PkColumn) && (((PkColumn) column).getIdType() == IdType.IDENTITY);
+		final boolean identity = column.getIdType() == IdType.IDENTITY;
 
 		return column.getName() + " " // name part
 			+ this.getColumnType(column, column.getSqlType()) // data type part
@@ -211,7 +211,7 @@ public class MySqlAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
-	public String getSelectLastIdentitySql(PkColumn identityColumn) {
+	public String getSelectLastIdentitySql(BasicColumn identityColumn) {
 		return "SELECT LAST_INSERT_ID()";
 	}
 

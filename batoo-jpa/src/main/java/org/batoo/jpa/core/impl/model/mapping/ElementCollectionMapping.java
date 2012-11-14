@@ -24,14 +24,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EnumType;
 import javax.persistence.FetchType;
 import javax.persistence.TemporalType;
 import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Path;
 import javax.persistence.metamodel.PluralAttribute.CollectionType;
 import javax.persistence.metamodel.Type.PersistenceType;
 
@@ -44,8 +42,6 @@ import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.RootImpl;
-import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
-import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
 import org.batoo.jpa.core.impl.criteria.join.AbstractJoin;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
@@ -55,18 +51,15 @@ import org.batoo.jpa.core.impl.jdbc.JoinableTable;
 import org.batoo.jpa.core.impl.jdbc.OrderColumn;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
-import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.attribute.MapAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
-import org.batoo.jpa.core.util.Pair;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.ElementCollectionAttributeMetadata;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
@@ -354,34 +347,14 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 				final EntityTypeImpl<?> type = (EntityTypeImpl<?>) this.getRoot().getType();
 				final RootImpl<?> r = q.from(type);
 				r.alias(BatooUtils.acronym(type.getName()).toLowerCase());
+
 				final AbstractJoin<?, E> join = r.<E> join(this.attribute.getName());
 				join.alias(BatooUtils.acronym(this.attribute.getName()));
+
 				q = q.select(join);
+				q.where(cb.equal(r, cb.parameter(type.getJavaType())));
 
-				// has single id mapping
-				if (type.hasSingleIdAttribute()) {
-					final SingularMapping<?, ?> idMapping = type.getIdMapping();
-					final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
-					final Path<?> path = r.get(idMapping.getAttribute().getName());
-					final PredicateImpl predicate = cb.equal(path, pe);
-
-					this.selectCriteria = new FinalWrapper<CriteriaQueryImpl<E>>(q.where(predicate));
-				}
-				else {
-
-					// has multiple id mappings
-					final List<PredicateImpl> predicates = Lists.newArrayList();
-					for (final Pair<?, BasicAttribute<?, ?>> pair : type.getIdMappings()) {
-						final BasicMapping<?, ?> idMapping = (BasicMapping<?, ?>) pair.getFirst();
-						final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
-						final Path<?> path = r.get(idMapping.getAttribute().getName());
-						final PredicateImpl predicate = cb.equal(path, pe);
-
-						predicates.add(predicate);
-					}
-
-					this.selectCriteria = new FinalWrapper<CriteriaQueryImpl<E>>(q.where(predicates.toArray(new PredicateImpl[predicates.size()])));
-				}
+				this.selectCriteria = new FinalWrapper<CriteriaQueryImpl<E>>(q);
 			}
 
 			wrapper = this.selectCriteria;
@@ -411,31 +384,9 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 				join.alias(BatooUtils.acronym(this.attribute.getName()));
 
 				q = q.multiselect(join.key(), join.value());
+				q = q.where(cb.equal(r, cb.parameter(type.getJavaType())));
 
-				// has single id mapping
-				if (type.hasSingleIdAttribute()) {
-					final SingularMapping<?, ?> idMapping = type.getIdMapping();
-					final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
-					final Path<?> path = r.get(idMapping.getAttribute().getName());
-					final PredicateImpl predicate = cb.equal(path, pe);
-
-					this.selectMapCriteria = new FinalWrapper<CriteriaQueryImpl<Object[]>>(q.where(predicate));
-				}
-				else {
-
-					// has multiple id mappings
-					final List<PredicateImpl> predicates = Lists.newArrayList();
-					for (final Pair<?, BasicAttribute<?, ?>> pair : type.getIdMappings()) {
-						final BasicMapping<?, ?> idMapping = (BasicMapping<?, ?>) pair.getFirst();
-						final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
-						final Path<?> path = r.get(idMapping.getAttribute().getName());
-						final PredicateImpl predicate = cb.equal(path, pe);
-
-						predicates.add(predicate);
-					}
-
-					this.selectMapCriteria = new FinalWrapper<CriteriaQueryImpl<Object[]>>(q.where(predicates.toArray(new PredicateImpl[predicates.size()])));
-				}
+				this.selectMapCriteria = new FinalWrapper<CriteriaQueryImpl<Object[]>>(q);
 			}
 
 			wrapper = this.selectMapCriteria;
@@ -585,20 +536,7 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 		final EntityManagerImpl em = instance.getSession().getEntityManager();
 		final QueryImpl<E> q = em.createQuery(this.getSelectCriteria());
 
-		final EntityTypeImpl<?> rootType = instance.getType();
-
-		final Object id = instance.getId().getId();
-
-		// if has single id then pass it on
-		if (rootType.hasSingleIdAttribute()) {
-			q.setParameter(1, id);
-		}
-		else {
-			int i = 1;
-			for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
-				q.setParameter(i++, pair.getSecond().get(id));
-			}
-		}
+		q.setParameter(1, instance.getInstance());
 
 		return q.getResultList();
 	}
@@ -613,20 +551,7 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 		final EntityManagerImpl em = instance.getSession().getEntityManager();
 		final QueryImpl<Object[]> q = em.createQuery(this.getSelectMapCriteria());
 
-		final EntityTypeImpl<?> rootType = instance.getType();
-
-		final Object id = instance.getId().getId();
-
-		// if has single id then pass it on
-		if (rootType.hasSingleIdAttribute()) {
-			q.setParameter(1, id);
-		}
-		else {
-			int i = 1;
-			for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
-				q.setParameter(i++, pair.getSecond().get(id));
-			}
-		}
+		q.setParameter(1, instance.getInstance());
 
 		final HashMap<K, E> resultMap = Maps.newHashMap();
 

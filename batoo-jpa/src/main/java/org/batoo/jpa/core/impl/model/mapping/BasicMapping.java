@@ -22,7 +22,6 @@ import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.jdbc.BasicColumn;
-import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.jdbc.TypeFactory;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
@@ -67,12 +66,7 @@ public class BasicMapping<Z, X> extends Mapping<Z, X, X> implements SingularMapp
 
 		final JdbcAdaptor jdbcAdaptor = attribute.getMetamodel().getJdbcAdaptor();
 
-		if (this.attribute.isId() || this.getParent().isId()) {
-			this.column = new PkColumn(jdbcAdaptor, this, sqlType, columnMetadata);
-		}
-		else {
-			this.column = new BasicColumn(jdbcAdaptor, this, sqlType, columnMetadata);
-		}
+		this.column = new BasicColumn(jdbcAdaptor, this, sqlType, columnMetadata);
 
 		final String tableName = this.column.getTableName();
 

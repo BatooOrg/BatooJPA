@@ -36,6 +36,7 @@ public class ManyToOneAttributeMetadataImpl extends AssociationAttributeMetadata
 
 	private final boolean optional;
 	private final String mapsId;
+	private final boolean id;
 
 	/**
 	 * @param member
@@ -51,6 +52,7 @@ public class ManyToOneAttributeMetadataImpl extends AssociationAttributeMetadata
 
 		this.optional = metadata.isOptional();
 		this.mapsId = metadata.getMapsId();
+		this.id = metadata.isId();
 	}
 
 	/**
@@ -73,6 +75,7 @@ public class ManyToOneAttributeMetadataImpl extends AssociationAttributeMetadata
 
 		this.optional = manyToOne.optional();
 		this.mapsId = this.handleMapsId(member, parsed);
+		this.id = this.handleId(member, parsed);
 	}
 
 	/**
@@ -82,6 +85,15 @@ public class ManyToOneAttributeMetadataImpl extends AssociationAttributeMetadata
 	@Override
 	public String getMapsId() {
 		return this.mapsId;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isId() {
+		return this.id;
 	}
 
 	/**

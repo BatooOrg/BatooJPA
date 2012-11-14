@@ -51,23 +51,20 @@ import org.batoo.jpa.core.impl.jdbc.CollectionTable;
 import org.batoo.jpa.core.impl.jdbc.DiscriminatorColumn;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.JoinColumn;
-import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.jdbc.SecondaryTable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.ElementCollectionMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
+import org.batoo.jpa.core.impl.model.mapping.JoinedMapping.MappingType;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
-import org.batoo.jpa.core.impl.model.mapping.JoinedMapping.MappingType;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
-import org.batoo.jpa.core.util.Pair;
 import org.batoo.jpa.parser.metadata.ColumnTransformerMetadata;
 
 import com.google.common.base.Function;
@@ -441,7 +438,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			final String fieldAlias;
 			final String field;
 
-			if (column.isPrimaryKey() && (column instanceof PkColumn)) {
+			if (column.isPrimaryKey()) {
 				fieldAlias = tableAlias + "_F" + query.getFieldAlias(tableAlias, column);
 				field = Joiner.on(".").skipNulls().join(tableAlias, column.getName());
 
@@ -537,6 +534,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		return this.alias;
 	}
 
+	// FIXME implement the same login for embedded and composite id temporarily we return null
 	private Object getAssociateId(ResultSet row, EntityTypeImpl<?> entity, SingularAssociationMapping<?, ?> mapping) throws SQLException {
 		if (entity.hasSingleIdAttribute()) {
 			final SingularMapping<?, ?> idMapping = this.entity.getIdMapping();
@@ -546,25 +544,9 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 
 				return row.getObject(field);
 			}
-
-			// FIXME implement the same login for embedded id temporarily we return null
-			return null;
 		}
 
-		final Object id = ((EmbeddableTypeImpl<?>) entity.getIdType()).newInstance();
-		for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.entity.getIdMappings()) {
-			final String referencedColumnName = pair.getFirst().getColumn().getName();
-
-			for (final JoinColumn joinColumn : mapping.getForeignKey().getJoinColumns()) {
-				if (joinColumn.getReferencedColumnName().equals(referencedColumnName)) {
-					final String field = this.joinFields.get(joinColumn);
-					pair.getSecond().set(id, row.getObject(field));
-					break;
-				}
-			}
-		}
-
-		return id;
+		return null;
 	}
 
 	/**

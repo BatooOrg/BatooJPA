@@ -107,12 +107,12 @@ public abstract class Mapping<Z, X, Y> {
 	 * @author hceylan
 	 */
 	public final X get(Object instance) {
+		if (instance == null) {
+			return null;
+		}
+
 		if (!this.root) {
 			instance = this.getParent().get(instance);
-
-			if (instance == null) {
-				return null;
-			}
 		}
 
 		return this.attribute.get(instance);

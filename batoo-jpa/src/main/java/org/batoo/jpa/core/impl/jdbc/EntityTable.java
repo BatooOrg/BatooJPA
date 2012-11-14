@@ -53,7 +53,7 @@ public class EntityTable extends AbstractTable {
 	private final Map<String, AbstractColumn> pkColumns = Maps.newHashMap();
 
 	private final JdbcAdaptor jdbcAdaptor;
-	private PkColumn identityColumn;
+	private BasicColumn identityColumn;
 	private final Map<String, BasicColumn[]> indexes = Maps.newHashMap();
 
 	private final HashMap<Integer, String> removeSqlMap = Maps.newHashMap();
@@ -85,13 +85,11 @@ public class EntityTable extends AbstractTable {
 	public void addColumn(AbstractColumn column) {
 		super.addColumn(column);
 
-		if (column instanceof PkColumn) {
-			final PkColumn pkColumn = (PkColumn) column;
+		if (column.isPrimaryKey()) {
+			this.pkColumns.put(column.getName(), column);
 
-			this.pkColumns.put(pkColumn.getName(), pkColumn);
-
-			if (pkColumn.getIdType() == IdType.IDENTITY) {
-				this.identityColumn = (PkColumn) column;
+			if (column.getIdType() == IdType.IDENTITY) {
+				this.identityColumn = (BasicColumn) column;
 			}
 		}
 		else if (column instanceof JoinColumn) {
@@ -499,7 +497,7 @@ public class EntityTable extends AbstractTable {
 			@Override
 			public String apply(AbstractColumn input) {
 				final StringBuffer out = new StringBuffer();
-				out.append(input instanceof PkColumn ? "ID [" : "COL [");
+				out.append(input.isPrimaryKey() ? "ID [" : "COL [");
 
 				out.append("name=");
 				out.append(input.getName());

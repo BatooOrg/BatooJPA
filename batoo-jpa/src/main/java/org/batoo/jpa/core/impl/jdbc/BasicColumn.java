@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
+import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 
@@ -34,6 +35,28 @@ import org.batoo.jpa.parser.metadata.ColumnMetadata;
  * @since $version
  */
 public class BasicColumn extends AbstractColumn {
+
+	/**
+	 * Infers and returns the id type of the mapping.
+	 * 
+	 * @param mapping
+	 *            the mapping
+	 * @return the IdType or <code>null</code>
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private static IdType inferIdType(BasicMapping<?, ?> mapping) {
+		if (mapping.getAttribute().getIdType() != null) {
+			return mapping.getAttribute().getIdType();
+		}
+
+		if (mapping.getAttribute().isId() || ((mapping.getParent() != null) && mapping.getParent().isId())) {
+			return IdType.MANUAL;
+		}
+
+		return null;
+	}
 
 	private AbstractTable table;
 	private final int sqlType;
@@ -49,6 +72,7 @@ public class BasicColumn extends AbstractColumn {
 	private final boolean updatable;
 	private final BasicMapping<?, ?> mapping;
 	private final JdbcAdaptor jdbcAdaptor;
+
 	private LinkedList<Mapping<?, ?, ?>> readOnlyMappings;
 
 	/**
@@ -65,8 +89,8 @@ public class BasicColumn extends AbstractColumn {
 	 * @author hceylan
 	 */
 	public BasicColumn(JdbcAdaptor jdbcAdaptor, BasicMapping<?, ?> mapping, int sqlType, ColumnMetadata metadata) {
-		super(mapping.getAttribute().getJavaType(), mapping.getAttribute().getTemporalType(), mapping.getAttribute().getEnumType(),
-			mapping.getAttribute().isLob(), mapping.getAttribute().getLocator());
+		super(mapping.getAttribute().getJavaType(), BasicColumn.inferIdType(mapping), mapping.getAttribute().getTemporalType(),
+			mapping.getAttribute().getEnumType(), mapping.getAttribute().isLob(), mapping.getAttribute().getLocator());
 
 		this.jdbcAdaptor = jdbcAdaptor;
 		this.mapping = mapping;

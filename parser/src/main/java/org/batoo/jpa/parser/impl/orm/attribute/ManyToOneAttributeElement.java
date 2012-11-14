@@ -36,6 +36,7 @@ public class ManyToOneAttributeElement extends AssociationElement implements Man
 
 	private boolean optional;
 	private String mapsId;
+	private boolean id;
 
 	/**
 	 * @param parent
@@ -63,6 +64,7 @@ public class ManyToOneAttributeElement extends AssociationElement implements Man
 
 		this.optional = this.getAttribute(ElementConstants.ATTR_OPTIONAL, Boolean.TRUE);
 		this.mapsId = this.getAttribute(ElementConstants.ATTR_MAPS_ID);
+		this.id = this.getAttribute(ElementConstants.ATTR_ID, Boolean.FALSE);
 	}
 
 	/**
@@ -72,6 +74,15 @@ public class ManyToOneAttributeElement extends AssociationElement implements Man
 	@Override
 	public String getMapsId() {
 		return this.mapsId;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isId() {
+		return this.id;
 	}
 
 	/**

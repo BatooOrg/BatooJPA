@@ -176,6 +176,15 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 					// if the member has an indicative annotation then probed
 					if ((this.indicativeAnnotation == null) || (ReflectHelper.getAnnotation(member, this.indicativeAnnotation) != null)) {
 
+						// Special case for @Id and (@ManyToOne || @OneToOne)
+						// it is possible for a ManyToOne or OneToOne association to be id attribute.
+						// Therefore if this is the case we should skip this attribute
+						if ((this.indicativeAnnotation == Id.class) && //
+							((ReflectHelper.getAnnotation(member, ManyToOne.class) != null) //
+							|| (ReflectHelper.getAnnotation(member, OneToOne.class) != null))) {
+							continue;
+						}
+
 						// remove the member as it is probed
 						i.remove();
 

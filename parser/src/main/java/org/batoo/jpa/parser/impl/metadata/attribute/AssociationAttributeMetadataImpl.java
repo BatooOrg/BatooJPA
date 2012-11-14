@@ -26,6 +26,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.EnumType;
 import javax.persistence.FetchType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.JoinTable;
@@ -39,9 +40,9 @@ import javax.persistence.OrderBy;
 import javax.persistence.OrderColumn;
 import javax.persistence.TemporalType;
 
+import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.jpa.annotations.FetchStrategy;
 import org.batoo.jpa.annotations.FetchStrategyType;
-import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.jpa.parser.impl.metadata.ColumnMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.JoinColumnMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.JoinTableMetadaImpl;
@@ -221,6 +222,29 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	@Override
 	public String getTargetEntity() {
 		return this.targetEntity;
+	}
+
+	/**
+	 * Handles the {@link Id} annotation on OneToOne and ManyToOne annotations.
+	 * 
+	 * @param member
+	 *            the member
+	 * @param parsed
+	 *            the list of annotations parsed
+	 * @return the map key value
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected boolean handleId(Member member, Set<Class<? extends Annotation>> parsed) {
+		final Id annotation = ReflectHelper.getAnnotation(member, Id.class);
+		if (annotation != null) {
+			parsed.add(Id.class);
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**

@@ -45,6 +45,7 @@ import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
+import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
@@ -84,7 +85,7 @@ public class ManagedInstance<X> {
 	private LockModeType lockMode;
 
 	private final SingularMapping<? super X, ?> idMapping;
-	private final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>>[] idMappings;
+	private final Pair<SingularMapping<? super X, ?>, SingularAttributeImpl<?, ?>>[] idMappings;
 
 	private final HashMap<Mapping<?, ?, ?>, Object> snapshot = Maps.newHashMap();
 	private final HashSet<String> joinsLoaded;
@@ -159,7 +160,7 @@ public class ManagedInstance<X> {
 			this.idMapping.set(instance, id.getId());
 		}
 		else {
-			for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> pair : this.idMappings) {
+			for (final Pair<SingularMapping<? super X, ?>, SingularAttributeImpl<?, ?>> pair : this.idMappings) {
 				final Object value = pair.getSecond().get(id.getId());
 				pair.getFirst().set(this.instance, value);
 			}
@@ -504,7 +505,7 @@ public class ManagedInstance<X> {
 			return this.idMapping.fillValue(this.type.getRootType(), this, this.instance);
 		}
 		else {
-			for (final Pair<BasicMapping<? super X, ?>, BasicAttribute<?, ?>> mapping : this.idMappings) {
+			for (final Pair<SingularMapping<? super X, ?>, SingularAttributeImpl<?, ?>> mapping : this.idMappings) {
 				if (!mapping.getFirst().fillValue(this.type.getRootType(), this, this.instance)) {
 					return false;
 				}

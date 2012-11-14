@@ -181,7 +181,6 @@ public abstract class AbstractParameterExpressionImpl<T> extends AbstractExpress
 			sqlIndex.increment();
 		}
 		else {
-
 			this.ensureTypeResolved(metamodel);
 
 			if ((this.type == null) || (this.type.getPersistenceType() == PersistenceType.BASIC)) {
@@ -189,15 +188,23 @@ public abstract class AbstractParameterExpressionImpl<T> extends AbstractExpress
 
 				sqlIndex.increment();
 			}
-			else if (this.type.getPersistenceType() == PersistenceType.ENTITY) {
-				final EntityTypeImpl<?> type = (EntityTypeImpl<?>) this.type;
-
-				this.setParameter(parameters, sqlIndex, value, type);
-			}
 			else {
-				final EmbeddableTypeImpl<?> type = (EmbeddableTypeImpl<?>) this.type;
+				final TypeImpl<? extends Object> valueType = value == null ? this.type : metamodel.type(value.getClass());
+				if ((valueType != null) && (valueType.getPersistenceType() == PersistenceType.BASIC)) {
+					parameters[sqlIndex.intValue()] = value;
 
-				this.setParameter(parameters, sqlIndex, value, type);
+					sqlIndex.increment();
+				}
+				else if (this.type.getPersistenceType() == PersistenceType.ENTITY) {
+					final EntityTypeImpl<?> type = (EntityTypeImpl<?>) this.type;
+
+					this.setParameter(parameters, sqlIndex, value, type);
+				}
+				else {
+					final EmbeddableTypeImpl<?> type = (EmbeddableTypeImpl<?>) this.type;
+
+					this.setParameter(parameters, sqlIndex, value, type);
+				}
 			}
 		}
 	}
@@ -227,7 +234,12 @@ public abstract class AbstractParameterExpressionImpl<T> extends AbstractExpress
 
 	private void setParameter(Object[] parameters, MutableInt sqlIndex, Object value, final EntityTypeImpl<?> type) {
 		for (final AbstractColumn column : type.getPrimaryTable().getPkColumns()) {
-			parameters[sqlIndex.intValue()] = column.getMapping().get(value);
+			if (value != null) {
+				parameters[sqlIndex.intValue()] = column.getMapping().get(value);
+			}
+			else {
+				parameters[sqlIndex.intValue()] = null;
+			}
 
 			sqlIndex.increment();
 		}

@@ -45,6 +45,7 @@ public class OneToOneAttributeElement extends AssociationElement implements OneT
 	private String mappedBy;
 	private String mapsId;
 	private final List<PrimaryKeyJoinColumnMetadata> primaryKeyJoinColumns = Lists.newArrayList();
+	private boolean id;
 
 	/**
 	 * @param parent
@@ -75,6 +76,7 @@ public class OneToOneAttributeElement extends AssociationElement implements OneT
 		this.optional = this.getAttribute(ElementConstants.ATTR_OPTIONAL, Boolean.TRUE);
 		this.mappedBy = this.getAttribute(ElementConstants.ATTR_MAPPED_BY, ElementConstants.EMPTY);
 		this.mapsId = this.getAttribute(ElementConstants.ATTR_MAPS_ID);
+		this.id = this.getAttribute(ElementConstants.ATTR_ID, Boolean.FALSE);
 	}
 
 	/**
@@ -115,6 +117,15 @@ public class OneToOneAttributeElement extends AssociationElement implements OneT
 		if (child instanceof PrimaryKeyJoinColumnElement) {
 			this.primaryKeyJoinColumns.add((PrimaryKeyJoinColumnMetadata) child);
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean isId() {
+		return this.id;
 	}
 
 	/**

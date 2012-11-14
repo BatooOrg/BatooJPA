@@ -30,6 +30,7 @@ import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.manager.CallbackAvailability;
 import org.batoo.jpa.core.impl.manager.CallbackManager;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
@@ -154,8 +155,29 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 					this.declaredEmbeddedId = (EmbeddedAttribute<X, ?>) embeddedAttribute;
 				}
 
-				this.idAttributes.put(attribute.getName(), (SingularAttributeImpl<? super X, ?>) attribute);
+				this.idAttributes.put(attribute.getName(), embeddedAttribute);
 				this.embeddedId = embeddedAttribute;
+			}
+		}
+		else if (attribute instanceof AssociatedSingularAttribute) {
+			final AssociatedSingularAttribute<? super X, ?> associatedSingularAttribute = (AssociatedSingularAttribute<? super X, ?>) attribute;
+
+			if (associatedSingularAttribute.isId()) {
+				if (attribute.getDeclaringType() == this) {
+					this.declaredIdAttributes.put(attribute.getName(), (SingularAttributeImpl<X, ?>) associatedSingularAttribute);
+				}
+
+				if (this.embeddedId != null) {
+					throw new MappingException("Embbeded id attributes cannot be combined with other id attributes.", //
+						attribute.getLocator(), this.embeddedId.getLocator());
+				}
+
+				if ((this.idType == null) && (this.idAttributes.size() > 1)) {
+					throw new MappingException("Multiple id attributes are only allowed with id class declaration.", //
+						attribute.getLocator(), this.idAttributes.values().iterator().next().getLocator());
+				}
+
+				this.idAttributes.put(attribute.getName(), associatedSingularAttribute);
 			}
 		}
 

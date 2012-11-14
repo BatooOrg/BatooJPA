@@ -28,7 +28,7 @@ import javax.persistence.metamodel.Type.PersistenceType;
 import org.apache.commons.lang.ObjectUtils;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
-import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
+import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.util.Pair;
 import org.batoo.jpa.parser.MappingException;
@@ -146,6 +146,15 @@ public class ListComparator<E> implements Comparator<E> {
 		}
 	}
 
+	private void createComparable(SingularMapping<?, ?> idMapping) {
+		if (idMapping instanceof BasicMapping) {
+			this.comparables.add(new ComparableMapping(true, (Mapping<?, ?, ?>) idMapping));
+		}
+		else if (idMapping instanceof SingularAssociationMapping) {
+
+		}
+	}
+
 	/**
 	 * Creates the list of comparables
 	 * 
@@ -158,11 +167,11 @@ public class ListComparator<E> implements Comparator<E> {
 			if (this.mapping.isAssociation()) {
 				final EntityTypeImpl<E> type = ((PluralAssociationMapping<?, ?, E>) this.mapping).getType();
 				if (type.hasSingleIdAttribute()) {
-					this.comparables.add(new ComparableMapping(true, (Mapping<?, ?, ?>) type.getIdMapping()));
+					this.createComparable(type.getIdMapping());
 				}
 				else {
-					for (final Pair<BasicMapping<? super E, ?>, BasicAttribute<?, ?>> pair : type.getIdMappings()) {
-						this.comparables.add(new ComparableMapping(true, pair.getFirst()));
+					for (final Pair<SingularMapping<? super E, ?>, SingularAttributeImpl<?, ?>> pair : type.getIdMappings()) {
+						this.createComparable(pair.getFirst());
 					}
 				}
 			}

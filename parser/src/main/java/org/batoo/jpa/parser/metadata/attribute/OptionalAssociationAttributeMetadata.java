@@ -20,6 +20,8 @@ package org.batoo.jpa.parser.metadata.attribute;
 
 /**
  * The commons definitions for association attributes that can be optional.
+ * <p>
+ * Typically these are OneToOne and ManyToOne attributes.
  * 
  * @author hceylan
  * @since $version
@@ -35,6 +37,16 @@ public interface OptionalAssociationAttributeMetadata {
 	 * @author hceylan
 	 */
 	String getMapsId();
+
+	/**
+	 * Returns if the attribute is an id attribute.
+	 * 
+	 * @return true if the attribute is an id attribute, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	boolean isId();
 
 	/**
 	 * Returns if the association attribute is optional.

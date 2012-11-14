@@ -43,6 +43,7 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 	private final PersistentAttributeType attributeType;
 	private final boolean optional;
 	private final String mapsId;
+	private final boolean id;
 
 	private EntityTypeImpl<T> type;
 	private final boolean owner;
@@ -66,6 +67,8 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 		final OptionalAssociationAttributeMetadata optionalAssociationMetadata = (OptionalAssociationAttributeMetadata) metadata;
 		this.optional = optionalAssociationMetadata.isOptional();
 		this.mapsId = optionalAssociationMetadata.getMapsId();
+		this.id = optionalAssociationMetadata.isId();
+
 		if (metadata instanceof OneToOneAttributeMetadata) {
 			this.owner = StringUtils.isBlank(((OneToOneAttributeMetadata) metadata).getMappedBy());
 		}
@@ -134,7 +137,7 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 	 */
 	@Override
 	public boolean isId() {
-		return false;
+		return this.id;
 	}
 
 	/**

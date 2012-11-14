@@ -665,7 +665,7 @@ public abstract class AbstractTable {
 	}
 
 	private boolean isInsertableColumn(final EntityTypeImpl<?> type, AbstractColumn input) {
-		if ((input instanceof PkColumn) && (((PkColumn) input).getIdType() == IdType.IDENTITY)) {
+		if (input.getIdType() == IdType.IDENTITY) {
 			return false;
 		}
 
@@ -680,7 +680,7 @@ public abstract class AbstractTable {
 		final EntityTypeImpl<?> root;
 
 		if ((input instanceof JoinColumn) && (input.getMapping() == null)) {
-			root = (EntityTypeImpl<?>) ((JoinColumn) input).getReferencedMapping().getRoot().getType();
+			root = (EntityTypeImpl<?>) ((JoinColumn) input).getReferencedColumn().getMapping().getRoot().getType();
 		}
 		else if ((input instanceof OrderColumn)) {
 			return input.isInsertable();
@@ -707,7 +707,7 @@ public abstract class AbstractTable {
 		final EntityTypeImpl<?> root;
 
 		if ((input instanceof JoinColumn) && (input.getMapping() == null)) {
-			root = (EntityTypeImpl<?>) ((JoinColumn) input).getReferencedMapping().getRoot().getType();
+			root = (EntityTypeImpl<?>) ((JoinColumn) input).getReferencedColumn().getMapping().getRoot().getType();
 		}
 		else {
 			root = (EntityTypeImpl<?>) input.getMapping().getRoot().getType();

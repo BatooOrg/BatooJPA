@@ -62,7 +62,6 @@ import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinColumn;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
-import org.batoo.jpa.core.impl.jdbc.PkColumn;
 import org.batoo.jpa.core.impl.jdbc.SecondaryTable;
 import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.model.SequenceGenerator;
@@ -1109,7 +1108,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since $version
 	 * @author hceylan
 	 */
-	public abstract String getSelectLastIdentitySql(PkColumn identityColumn);
+	public abstract String getSelectLastIdentitySql(BasicColumn identityColumn);
 
 	private synchronized JdbcTable getTableMetadata(DataSource datasource, AbstractTable table) throws SQLException {
 		JdbcTable tableMetadata = this.tables.get(table);

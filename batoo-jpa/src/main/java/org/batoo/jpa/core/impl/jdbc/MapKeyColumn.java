@@ -63,7 +63,7 @@ public class MapKeyColumn extends AbstractColumn {
 	 * @author hceylan
 	 */
 	public MapKeyColumn(AbstractTable table, ColumnMetadata metadata, String name, TemporalType temporalType, EnumType enumType, Class<?> javaType) {
-		super(metadata != null ? metadata.getLocator() : null);
+		super(metadata != null ? metadata.getLocator() : null, false);
 
 		this.sqlType = TypeFactory.getSqlType(javaType, temporalType, enumType, false);
 		this.table = table;

@@ -20,13 +20,11 @@ package org.batoo.jpa.core.impl.model.mapping;
 
 import java.util.IdentityHashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
 import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Selection;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 
@@ -47,12 +45,10 @@ import org.batoo.jpa.core.impl.jdbc.JoinTable;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
-import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.MappedSuperclassTypeImpl;
-import org.batoo.jpa.core.util.Pair;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
@@ -60,7 +56,6 @@ import org.batoo.jpa.parser.metadata.attribute.MappableAssociationAttributeMetad
 import org.batoo.jpa.parser.metadata.attribute.OrphanableAssociationAttributeMetadata;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
 
 /**
  * Mapping for associations.
@@ -224,7 +219,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	@SuppressWarnings("unchecked")
 	private CriteriaQueryImpl<Y> generateOwnerSelectCriteria(final MetamodelImpl metamodel, final CriteriaBuilderImpl cb, Class<Y> bindableType,
 		EntityTypeImpl<Y> entity) {
-		CriteriaQueryImpl<Y> q = cb.createQuery(bindableType);
+		final CriteriaQueryImpl<Y> q = cb.createQuery(bindableType);
 		q.internal();
 
 		final EntityTypeImpl<?> type = (EntityTypeImpl<?>) this.getRoot().getType();
@@ -242,32 +237,11 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 			join = join == null ? r.<Y> join(pathIterator.next()) : join.join(pathIterator.next());
 		}
 
-		q = q.select((Selection<? extends Y>) join);
+		q.select((Selection<? extends Y>) join);
 
 		entity.prepareEagerJoins(join, 0, this);
 
-		// has single id mapping
-		if (type.hasSingleIdAttribute()) {
-			final SingularMapping<?, ?> idMapping = type.getIdMapping();
-			final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
-			final Path<?> path = r.get(idMapping.getAttribute().getName());
-			final PredicateImpl predicate = cb.equal(path, pe);
-
-			return this.selectCriteria = q.where(predicate);
-		}
-
-		// has multiple id mappings
-		final List<PredicateImpl> predicates = Lists.newArrayList();
-		for (final Pair<?, BasicAttribute<?, ?>> pair : type.getIdMappings()) {
-			final BasicMapping<?, ?> idMapping = (BasicMapping<?, ?>) pair.getFirst();
-			final ParameterExpressionImpl<?> pe = cb.parameter(idMapping.getAttribute().getJavaType());
-			final Path<?> path = r.get(idMapping.getAttribute().getName());
-			final PredicateImpl predicate = cb.equal(path, pe);
-
-			predicates.add(predicate);
-		}
-
-		return this.selectCriteria = q.where(predicates.toArray(new PredicateImpl[predicates.size()]));
+		return this.selectCriteria = q.where(cb.equal(r, cb.parameter(type.getJavaType())));
 	}
 
 	/**

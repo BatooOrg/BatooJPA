@@ -40,6 +40,7 @@ import javax.sql.rowset.serial.SerialClob;
 import org.apache.commons.io.IOUtils;
 import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
+import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 
@@ -52,6 +53,7 @@ import org.batoo.jpa.parser.impl.AbstractLocator;
 public abstract class AbstractColumn {
 
 	private final Class<?> javaType;
+	private final IdType idType;
 	private final TemporalType temporalType;
 	private final EnumType enumType;
 	private final boolean lob;
@@ -64,14 +66,17 @@ public abstract class AbstractColumn {
 	/**
 	 * @param locator
 	 *            the locator
+	 * @param id
+	 *            if the column is id column
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public AbstractColumn(AbstractLocator locator) {
+	public AbstractColumn(AbstractLocator locator, boolean id) {
 		super();
 
 		this.javaType = null;
+		this.idType = id ? IdType.MANUAL : null;
 		this.locator = locator;
 		this.temporalType = null;
 		this.enumType = null;
@@ -84,6 +89,8 @@ public abstract class AbstractColumn {
 	/**
 	 * @param javaType
 	 *            the java type
+	 * @param idType
+	 *            the id type
 	 * @param temporalType
 	 *            the temporal type
 	 * @param enumType
@@ -97,11 +104,12 @@ public abstract class AbstractColumn {
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
-	public AbstractColumn(Class<?> javaType, TemporalType temporalType, EnumType enumType, boolean lob, AbstractLocator locator) {
+	public AbstractColumn(Class<?> javaType, IdType idType, TemporalType temporalType, EnumType enumType, boolean lob, AbstractLocator locator) {
 		super();
 
 		this.javaType = javaType;
 
+		this.idType = idType;
 		this.temporalType = temporalType;
 		this.enumType = enumType;
 		this.lob = lob;
@@ -275,6 +283,18 @@ public abstract class AbstractColumn {
 	public abstract String getColumnDefinition();
 
 	/**
+	 * Returns the idType of the column.
+	 * 
+	 * @return the idType of the column
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public IdType getIdType() {
+		return this.idType;
+	}
+
+	/**
 	 * Returns the length of the column.
 	 * 
 	 * @return the length of the column
@@ -422,7 +442,7 @@ public abstract class AbstractColumn {
 	 * @author hceylan
 	 */
 	public boolean isPrimaryKey() {
-		return false;
+		return this.idType != null;
 	}
 
 	/**

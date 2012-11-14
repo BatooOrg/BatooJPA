@@ -74,7 +74,7 @@ public class DiscriminatorColumn extends AbstractColumn {
 	 * @author hceylan
 	 */
 	public DiscriminatorColumn(EntityTypeImpl<?> entity, DiscriminatorColumnMetadata metadata) {
-		super(DiscriminatorColumn.getJavaType(metadata), null, null, false, metadata != null ? metadata.getLocator() : null);
+		super(DiscriminatorColumn.getJavaType(metadata), null, null, null, false, metadata != null ? metadata.getLocator() : null);
 
 		this.name = entity.getMetamodel().getJdbcAdaptor().escape(metadata != null ? metadata.getName() : "DTYPE");
 

@@ -36,9 +36,7 @@ import org.batoo.jpa.core.impl.jdbc.Joinable;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
-import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
-import org.batoo.jpa.core.util.Pair;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 
@@ -53,7 +51,7 @@ import org.batoo.jpa.parser.metadata.AssociationMetadata;
  * @author hceylan
  * @since $version
  */
-public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X> {
+public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X> implements SingularMapping<Z, X> {
 
 	private final AssociatedSingularAttribute<? super Z, X> attribute;
 	private final JoinTable joinTable;
@@ -115,6 +113,15 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 	@Override
 	public Object extractKey(Object value) {
 		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean fillValue(EntityTypeImpl<?> type, ManagedInstance<?> managedInstance, Object instance) {
+		return false; // noop
 	}
 
 	/**
@@ -197,25 +204,7 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 		final EntityManagerImpl em = managedInstance.getSession().getEntityManager();
 		final QueryImpl<X> q = em.createQuery(this.getSelectCriteria());
 
-		final EntityTypeImpl<?> rootType = managedInstance.getType();
-
-		if (this.isOwnerSelect()) {
-			final Object id = managedInstance.getId().getId();
-
-			// if has single id then pass it on
-			if (rootType.hasSingleIdAttribute()) {
-				q.setParameter(1, id);
-			}
-			else {
-				int i = 1;
-				for (final Pair<?, BasicAttribute<?, ?>> pair : rootType.getIdMappings()) {
-					q.setParameter(i++, pair.getSecond().get(id));
-				}
-			}
-		}
-		else {
-			q.setParameter(1, managedInstance.getInstance());
-		}
+		q.setParameter(1, managedInstance.getInstance());
 
 		try {
 			final X child = q.getSingleResult();
