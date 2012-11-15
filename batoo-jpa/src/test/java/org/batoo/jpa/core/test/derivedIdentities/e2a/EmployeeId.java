@@ -30,7 +30,6 @@ public class EmployeeId {
 
 	/**
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public EmployeeId() {
@@ -43,12 +42,10 @@ public class EmployeeId {
 	 * @param lastName
 	 *            the last name
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public EmployeeId(String firstName, String lastName) {
 		super();
-
 		this.firstName = firstName;
 		this.lastName = lastName;
 	}
@@ -92,7 +89,6 @@ public class EmployeeId {
 	 * 
 	 * @return the firstName
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public String getFirstName() {
@@ -103,7 +99,6 @@ public class EmployeeId {
 	 * 
 	 * @return the lastName
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public String getLastName() {
@@ -128,7 +123,6 @@ public class EmployeeId {
 	 * @param firstName
 	 *            the firstName to set
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public void setFirstName(String firstName) {
@@ -140,7 +134,6 @@ public class EmployeeId {
 	 * @param lastName
 	 *            the lastName to set
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public void setLastName(String lastName) {

@@ -475,9 +475,7 @@ public class ManagedInstance<X> {
 	public boolean fillIdValues() {
 		ManagedInstance.LOG.debug("Auto generating id values for {0}", this);
 
-		this.hasInitialId = this.fillValuesImpl();
-
-		return this.hasInitialId;
+		return this.hasInitialId = this.fillValuesImpl();
 	}
 
 	private boolean fillValuesImpl() {

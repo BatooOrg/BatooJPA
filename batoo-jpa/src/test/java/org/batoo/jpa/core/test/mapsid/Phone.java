@@ -34,7 +34,7 @@ public class Phone {
 	@EmbeddedId
 	private PhonePk id;
 
-	@MapsId("personId")
+	@MapsId("id.personId")
 	@ManyToOne
 	private Person person;
 
@@ -65,7 +65,7 @@ public class Phone {
 	public Phone(Person person, Integer id, String areaCode, String phoneNumber) {
 		super();
 
-		this.id = new PhonePk(id, null);
+		this.id = new PhonePk(id, person.getId());
 		this.areaCode = areaCode;
 		this.phoneNumber = phoneNumber;
 		this.person = person;

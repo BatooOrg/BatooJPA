@@ -27,6 +27,7 @@ import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.MappedSuperclassTypeImpl;
+import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
@@ -179,5 +180,22 @@ public class BasicMapping<Z, X> extends Mapping<Z, X, X> implements SingularMapp
 
 		// Clause 4: fall back to attribute's column metadata
 		return this.attribute.getMetadata().getColumn();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public IdType getIdType() {
+		if (this.attribute.getIdType() != null) {
+			return this.attribute.getIdType();
+		}
+
+		if (this.getParent() != null) {
+			return this.getParent().getIdType();
+		}
+
+		return null;
 	}
 }

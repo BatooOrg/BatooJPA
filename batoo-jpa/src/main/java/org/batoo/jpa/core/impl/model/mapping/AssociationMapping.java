@@ -421,6 +421,18 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	}
 
 	/**
+	 * Returns if the mapping is an id mapping.
+	 * 
+	 * @return true if the mapping is an id mapping, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isId() {
+		return this.getIdType() != null;
+	}
+
+	/**
 	 * Returns if the association is the owner side.
 	 * 
 	 * @return true if the association is the owner side

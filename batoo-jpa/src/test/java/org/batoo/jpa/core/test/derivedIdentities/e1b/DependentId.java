@@ -28,12 +28,11 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class DependentId {
 
-	private String name; // matches name of @Id attribute
-	private Integer empPK; // corresponds to PK type of Employee
+	private String name;
+	private Long empPk;
 
 	/**
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public DependentId() {
@@ -41,18 +40,18 @@ public class DependentId {
 	}
 
 	/**
+	 * 
 	 * @param name
 	 *            the name
-	 * @param empPK
-	 *            the employee primary key
-	 * 
-	 * @author asimarslan
+	 * @param empPk
+	 *            the employee
 	 * @since $version
 	 */
-	public DependentId(String name, Integer empPK) {
+	public DependentId(String name, Long empPk) {
 		super();
+
 		this.name = name;
-		this.empPK = empPK;
+		this.empPk = empPk;
 	}
 
 	/**
@@ -71,12 +70,12 @@ public class DependentId {
 			return false;
 		}
 		final DependentId other = (DependentId) obj;
-		if (this.empPK == null) {
-			if (other.empPK != null) {
+		if (this.empPk == null) {
+			if (other.empPk != null) {
 				return false;
 			}
 		}
-		else if (!this.empPK.equals(other.empPK)) {
+		else if (!this.empPk.equals(other.empPk)) {
 			return false;
 		}
 		if (this.name == null) {
@@ -91,21 +90,21 @@ public class DependentId {
 	}
 
 	/**
+	 * Returns the empPk of the DependentId.
 	 * 
-	 * @return the empPK
+	 * @return the empPk of the DependentId
 	 * 
-	 * @author asimarslan
 	 * @since $version
+	 * @author hceylan
 	 */
-	public Integer getEmpPK() {
-		return this.empPK;
+	public Long getEmpPk() {
+		return this.empPk;
 	}
 
 	/**
 	 * 
 	 * @return the name
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public String getName() {
@@ -120,21 +119,22 @@ public class DependentId {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = (prime * result) + ((this.empPK == null) ? 0 : this.empPK.hashCode());
+		result = (prime * result) + ((this.empPk == null) ? 0 : this.empPk.hashCode());
 		result = (prime * result) + ((this.name == null) ? 0 : this.name.hashCode());
 		return result;
 	}
 
 	/**
+	 * Sets the empPk of the DependentId.
 	 * 
-	 * @param empPK
-	 *            the empPK to set
+	 * @param empPk
+	 *            the empPk to set for DependentId
 	 * 
-	 * @author asimarslan
 	 * @since $version
+	 * @author hceylan
 	 */
-	public void setEmpPK(Integer empPK) {
-		this.empPK = empPK;
+	public void setEmpPk(Long empPk) {
+		this.empPk = empPk;
 	}
 
 	/**
@@ -142,10 +142,18 @@ public class DependentId {
 	 * @param name
 	 *            the name to set
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "DependentId [name=" + this.name + ", empPk=" + this.empPk + "]";
 	}
 }

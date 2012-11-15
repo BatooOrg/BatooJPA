@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.model.mapping;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.jdbc.IdType;
 
 /**
  * The base implementation of mappings.
@@ -111,7 +112,7 @@ public abstract class Mapping<Z, X, Y> {
 			return null;
 		}
 
-		if (!this.root) {
+		if (!this.root && !instance.getClass().isAssignableFrom(this.getParent().getAttribute().getJavaType())) {
 			instance = this.getParent().get(instance);
 		}
 
@@ -127,6 +128,18 @@ public abstract class Mapping<Z, X, Y> {
 	 * @author hceylan
 	 */
 	public abstract AttributeImpl<? super Z, X> getAttribute();
+
+	/**
+	 * Returns the id type of the mapping.
+	 * 
+	 * @return the id type of the mapping or <code>null</code>
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public IdType getIdType() {
+		return null;
+	}
 
 	/**
 	 * Returns the javaType of the mapping.

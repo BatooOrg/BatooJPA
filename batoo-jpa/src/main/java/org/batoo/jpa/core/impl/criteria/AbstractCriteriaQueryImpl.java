@@ -247,10 +247,6 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 			froms.add(root.generateSqlFrom(this));
 		}
 
-		for (final Root<?> root : this.getRoots()) {
-			((RootImpl<?>) root).generateSqlJoins(this, joins);
-		}
-
 		final String where = this.generateSqlRestriction();
 		final String groupBy = this.getGroupList().size() == 0 ? null : Joiner.on(", ").join(
 			Lists.transform(this.getGroupList(), new Function<Expression<?>, String>() {
@@ -262,6 +258,10 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 			}));
 
 		final String having = this.getGroupRestriction() != null ? this.getGroupRestriction().generateSqlRestriction(this) : null;
+
+		for (final Root<?> root : this.getRoots()) {
+			((RootImpl<?>) root).generateSqlJoins(this, joins);
+		}
 
 		final String from = "FROM " + Joiner.on(", ").join(froms);
 		final String join = Joiner.on("\n").skipNulls().join(joins.values());

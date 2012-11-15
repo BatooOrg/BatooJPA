@@ -16,48 +16,47 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.core.test.derivedIdentities.e2a;
+package org.batoo.jpa.core.test.derivedIdentities.e3b;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
+import javax.persistence.Embeddable;
+import javax.persistence.ManyToOne;
 
 /**
  * 
  * @author asimarslan
  * @since $version
  */
-@Entity
-@IdClass(EmployeeId.class)
-public class Employee {
+@Embeddable
+public class DependentId {
 
-	@Id
-	String firstName;
+	private String name;
 
-	@Id
-	String lastName;
+	@ManyToOne
+	private Employee employee;
 
 	/**
 	 * 
 	 * @since $version
+	 * @author hceylan
 	 */
-	public Employee() {
+	public DependentId() {
 		super();
 	}
 
 	/**
+	 * @param name
+	 *            the name
+	 * @param employee
+	 *            the employee
 	 * 
-	 * @param firstName
-	 *            the first name
-	 * @param lastName
-	 *            the last name
 	 * @since $version
+	 * @author hceylan
 	 */
-	public Employee(String firstName, String lastName) {
+	public DependentId(String name, Employee employee) {
 		super();
 
-		this.firstName = firstName;
-		this.lastName = lastName;
+		this.name = name;
+		this.employee = employee;
 	}
 
 	/**
@@ -72,47 +71,47 @@ public class Employee {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof Employee)) {
+		if (!(obj instanceof DependentId)) {
 			return false;
 		}
-		final Employee other = (Employee) obj;
-		if (this.firstName == null) {
-			if (other.firstName != null) {
+		final DependentId other = (DependentId) obj;
+		if (this.employee == null) {
+			if (other.employee != null) {
 				return false;
 			}
 		}
-		else if (!this.firstName.equals(other.firstName)) {
+		else if (!this.employee.equals(other.employee)) {
 			return false;
 		}
-		if (this.lastName == null) {
-			if (other.lastName != null) {
+		if (this.name == null) {
+			if (other.name != null) {
 				return false;
 			}
 		}
-		else if (!this.lastName.equals(other.lastName)) {
+		else if (!this.name.equals(other.name)) {
 			return false;
 		}
 		return true;
 	}
 
 	/**
+	 * Returns the employee of the DependentId.
 	 * 
-	 * @return the firstName
+	 * @return the employee of the DependentId
 	 * 
 	 * @since $version
+	 * @author hceylan
 	 */
-	public String getFirstName() {
-		return this.firstName;
+	public Employee getEmployee() {
+		return this.employee;
 	}
 
 	/**
-	 * 
-	 * @return the lastName
-	 * 
+	 * @return the name
 	 * @since $version
 	 */
-	public String getLastName() {
-		return this.lastName;
+	public String getName() {
+		return this.name;
 	}
 
 	/**
@@ -123,30 +122,30 @@ public class Employee {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = (prime * result) + ((this.firstName == null) ? 0 : this.firstName.hashCode());
-		result = (prime * result) + ((this.lastName == null) ? 0 : this.lastName.hashCode());
+		result = (prime * result) + ((this.employee == null) ? 0 : this.employee.hashCode());
+		result = (prime * result) + ((this.name == null) ? 0 : this.name.hashCode());
 		return result;
 	}
 
 	/**
+	 * Sets the employee of the DependentId.
 	 * 
-	 * @param firstName
-	 *            the firstName to set
+	 * @param employee
+	 *            the employee to set for DependentId
 	 * 
 	 * @since $version
+	 * @author hceylan
 	 */
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
+	public void setEmployee(Employee employee) {
+		this.employee = employee;
 	}
 
 	/**
-	 * 
-	 * @param lastName
-	 *            the lastName to set
-	 * 
+	 * @param name
+	 *            the name to set
 	 * @since $version
 	 */
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
+	public void setName(String name) {
+		this.name = name;
 	}
 }

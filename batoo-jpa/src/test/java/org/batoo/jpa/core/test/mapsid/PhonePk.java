@@ -29,8 +29,8 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class PhonePk {
 
-	Integer id;
-	Integer personId;
+	private Integer id;
+	private Integer personId;
 
 	/**
 	 * 

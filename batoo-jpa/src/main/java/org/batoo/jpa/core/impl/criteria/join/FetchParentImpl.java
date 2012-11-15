@@ -587,7 +587,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	@SuppressWarnings("unchecked")
 	private <Y extends X> ManagedInstance<Y> getInstance(SessionImpl session, ResultSet row) throws SQLException {
 		// get the id of for the instance
-		final ManagedId<X> managedId = this.entity.getId(row, this.idFields, this.joinFields);
+		final ManagedId<X> managedId = this.entity.getId(session, row, this.idFields);
 		if (managedId == null) {
 			return null;
 		}

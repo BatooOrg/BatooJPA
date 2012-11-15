@@ -16,11 +16,15 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.core.test.derivedIdentities.e2a;
+package org.batoo.jpa.core.test.derivedIdentities.e3a;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.ManyToOne;
 
 /**
  * 
@@ -28,36 +32,40 @@ import javax.persistence.IdClass;
  * @since $version
  */
 @Entity
-@IdClass(EmployeeId.class)
-public class Employee {
+@IdClass(DependentId.class)
+public class Dependent {
 
 	@Id
-	String firstName;
+	@Column(name = "dep_name")
+	private String name; // default column name is overridden String name;
 
 	@Id
-	String lastName;
+	@JoinColumns({ @JoinColumn(name = "FK1", referencedColumnName = "firstName"),//
+		@JoinColumn(name = "FK2", referencedColumnName = "lastName") })
+	@ManyToOne
+	private Employee emp;
 
 	/**
 	 * 
 	 * @since $version
 	 */
-	public Employee() {
+	public Dependent() {
 		super();
 	}
 
 	/**
+	 * @param name
+	 *            the name
+	 * @param emp
+	 *            the meployee
 	 * 
-	 * @param firstName
-	 *            the first name
-	 * @param lastName
-	 *            the last name
 	 * @since $version
 	 */
-	public Employee(String firstName, String lastName) {
+	public Dependent(String name, Employee emp) {
 		super();
 
-		this.firstName = firstName;
-		this.lastName = lastName;
+		this.name = name;
+		this.emp = emp;
 	}
 
 	/**
@@ -72,24 +80,24 @@ public class Employee {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof Employee)) {
+		if (!(obj instanceof Dependent)) {
 			return false;
 		}
-		final Employee other = (Employee) obj;
-		if (this.firstName == null) {
-			if (other.firstName != null) {
+		final Dependent other = (Dependent) obj;
+		if (this.emp == null) {
+			if (other.emp != null) {
 				return false;
 			}
 		}
-		else if (!this.firstName.equals(other.firstName)) {
+		else if (!this.emp.equals(other.emp)) {
 			return false;
 		}
-		if (this.lastName == null) {
-			if (other.lastName != null) {
+		if (this.name == null) {
+			if (other.name != null) {
 				return false;
 			}
 		}
-		else if (!this.lastName.equals(other.lastName)) {
+		else if (!this.name.equals(other.name)) {
 			return false;
 		}
 		return true;
@@ -97,22 +105,22 @@ public class Employee {
 
 	/**
 	 * 
-	 * @return the firstName
+	 * @return the emp
 	 * 
 	 * @since $version
 	 */
-	public String getFirstName() {
-		return this.firstName;
+	public Employee getEmp() {
+		return this.emp;
 	}
 
 	/**
 	 * 
-	 * @return the lastName
+	 * @return the name
 	 * 
 	 * @since $version
 	 */
-	public String getLastName() {
-		return this.lastName;
+	public String getName() {
+		return this.name;
 	}
 
 	/**
@@ -123,30 +131,30 @@ public class Employee {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = (prime * result) + ((this.firstName == null) ? 0 : this.firstName.hashCode());
-		result = (prime * result) + ((this.lastName == null) ? 0 : this.lastName.hashCode());
+		result = (prime * result) + ((this.emp == null) ? 0 : this.emp.hashCode());
+		result = (prime * result) + ((this.name == null) ? 0 : this.name.hashCode());
 		return result;
 	}
 
 	/**
 	 * 
-	 * @param firstName
-	 *            the firstName to set
+	 * @param emp
+	 *            the emp to set
 	 * 
 	 * @since $version
 	 */
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
+	public void setEmp(Employee emp) {
+		this.emp = emp;
 	}
 
 	/**
 	 * 
-	 * @param lastName
-	 *            the lastName to set
+	 * @param name
+	 *            the name to set
 	 * 
 	 * @since $version
 	 */
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
+	public void setName(String name) {
+		this.name = name;
 	}
 }

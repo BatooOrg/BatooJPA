@@ -144,16 +144,14 @@ public class EntityPath<Z, X> extends ParentPath<Z, X> implements Joinable {
 	 */
 	@Override
 	public String getColumnAlias(BaseQueryImpl<?> query, AbstractColumn column) {
-		if (this.mapping != null) {
-			for (final JoinColumn joinColumn : this.mapping.getForeignKey().getJoinColumns()) {
-				if (joinColumn.getReferencedColumn() == column) {
-					final String columnAlias = this.getParentPath().getColumnAlias(query, joinColumn);
-					if (columnAlias != null) {
-						return columnAlias;
-					}
-
-					return this.getParentPath().getRootPath().getTableAlias(query, joinColumn.getTable()) + "." + joinColumn.getName();
+		for (final JoinColumn joinColumn : this.mapping.getForeignKey().getJoinColumns()) {
+			if (joinColumn.getReferencedColumn() == column) {
+				final String columnAlias = this.getParentPath().getColumnAlias(query, joinColumn);
+				if (columnAlias != null) {
+					return columnAlias;
 				}
+
+				return this.getParentPath().getRootPath().getTableAlias(query, joinColumn.getTable()) + "." + joinColumn.getName();
 			}
 		}
 

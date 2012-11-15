@@ -59,7 +59,7 @@ import org.batoo.jpa.parser.metadata.attribute.VersionAttributeMetadata;
  * @author hceylan
  * @since $version
  */
-public final class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
+public class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 
 	private final BasicTypeImpl<T> type;
 	private final boolean optional;

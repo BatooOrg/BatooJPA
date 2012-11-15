@@ -16,44 +16,38 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.core.test.derivedIdentities.e2a;
+package org.batoo.jpa.core.test.derivedIdentities.e2b;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
+import javax.persistence.Embeddable;
 
 /**
  * 
  * @author asimarslan
  * @since $version
  */
-@Entity
-@IdClass(EmployeeId.class)
-public class Employee {
+@Embeddable
+public class EmployeeId {
 
-	@Id
-	String firstName;
-
-	@Id
-	String lastName;
+	private String firstName;
+	private String lastName;
 
 	/**
 	 * 
 	 * @since $version
 	 */
-	public Employee() {
+	public EmployeeId() {
 		super();
 	}
 
 	/**
-	 * 
 	 * @param firstName
 	 *            the first name
 	 * @param lastName
 	 *            the last name
+	 * 
 	 * @since $version
 	 */
-	public Employee(String firstName, String lastName) {
+	public EmployeeId(String firstName, String lastName) {
 		super();
 
 		this.firstName = firstName;
@@ -72,10 +66,10 @@ public class Employee {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof Employee)) {
+		if (!(obj instanceof EmployeeId)) {
 			return false;
 		}
-		final Employee other = (Employee) obj;
+		final EmployeeId other = (EmployeeId) obj;
 		if (this.firstName == null) {
 			if (other.firstName != null) {
 				return false;

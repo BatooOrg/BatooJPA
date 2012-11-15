@@ -33,13 +33,12 @@ public class Employee {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
-	private Integer empId;
+	private Long empId;
 
 	private String empName;
 
 	/**
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public Employee() {
@@ -47,10 +46,9 @@ public class Employee {
 	}
 
 	/**
-	 * @param empName
-	 *            the employee name
 	 * 
-	 * @author asimarslan
+	 * @param empName
+	 *            the name
 	 * @since $version
 	 */
 	public Employee(String empName) {
@@ -98,10 +96,9 @@ public class Employee {
 	 * 
 	 * @return the empId
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
-	public Integer getEmpId() {
+	public Long getEmpId() {
 		return this.empId;
 	}
 
@@ -109,7 +106,6 @@ public class Employee {
 	 * 
 	 * @return the empName
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public String getEmpName() {
@@ -134,10 +130,9 @@ public class Employee {
 	 * @param empId
 	 *            the empId to set
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
-	public void setEmpId(Integer empId) {
+	public void setEmpId(Long empId) {
 		this.empId = empId;
 	}
 
@@ -146,10 +141,18 @@ public class Employee {
 	 * @param empName
 	 *            the empName to set
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public void setEmpName(String empName) {
 		this.empName = empName;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "Employee [empId=" + this.empId + ", empName=" + this.empName + "]";
 	}
 }

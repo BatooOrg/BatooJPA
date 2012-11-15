@@ -31,8 +31,6 @@ import org.batoo.common.reflect.AbstractAccessor;
 import org.batoo.common.util.FinalWrapper;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
-import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
-import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
@@ -61,6 +59,8 @@ import com.google.common.collect.Lists;
  */
 public class ForeignKey {
 
+	private final JdbcAdaptor jdbcAdaptor;
+	private Mapping<?, ?, ?> masterMapping;
 	private final List<JoinColumn> joinColumns = Lists.newArrayList();
 	private final boolean joinMetadataProvided;
 	private final boolean inverseOwner;
@@ -76,8 +76,6 @@ public class ForeignKey {
 	private AbstractColumn[] singleChildUpdates;
 
 	private JoinColumn[] allChildrenRestrictions;
-	private final JdbcAdaptor jdbcAdaptor;
-	private FinalWrapper<JoinColumn[]> columns; // optimize getJoinColumns return to array
 
 	/**
 	 * Constructor to create a join foreign key
@@ -473,18 +471,6 @@ public class ForeignKey {
 		return this.table;
 	}
 
-	private boolean isId(AssociationMapping<?, ?, ?> mapping) {
-		boolean id = false;
-
-		if (mapping != null) {
-			final AttributeImpl<?, ?> attribute = mapping.getAttribute();
-			if (attribute instanceof AssociatedSingularAttribute) {
-				id = ((AssociatedSingularAttribute<?, ?>) attribute).isId();
-			}
-		}
-		return id;
-	}
-
 	/**
 	 * Links the foreign key.
 	 * 
@@ -498,17 +484,15 @@ public class ForeignKey {
 	 * @author hceylan
 	 */
 	public void link(AssociationMapping<?, ?, ?> mapping, EntityTypeImpl<?> targetEntity) {
-		final boolean id = this.isId(mapping);
-
 		// single primary key
 		if (targetEntity.hasSingleIdAttribute()) {
-			this.linkImpl(mapping, targetEntity.getIdMapping(), id);
+			this.linkImpl(mapping, targetEntity.getIdMapping());
 		}
 
 		// multiple id
 		else {
 			for (final Pair<?, AbstractAccessor> pair : targetEntity.getIdMappings()) {
-				this.linkImpl(mapping, (SingularMapping<?, ?>) pair.getFirst(), id);
+				this.linkImpl(mapping, (SingularMapping<?, ?>) pair.getFirst());
 			}
 		}
 
@@ -523,20 +507,59 @@ public class ForeignKey {
 		}
 	}
 
-	private void linkImpl(AssociationMapping<?, ?, ?> mapping, final SingularMapping<?, ?> idMapping, final boolean id) {
+	private void linkImpl(AssociationMapping<?, ?, ?> mapping, SingularMapping<?, ?> idMapping) {
+		if (mapping instanceof SingularAssociationMapping) {
+			final SingularAssociationMapping<?, ?> singularAssociationMapping = (SingularAssociationMapping<?, ?>) mapping;
+
+			final String mapsId = singularAssociationMapping.getAttribute().getMapsId();
+
+			if (StringUtils.isNotBlank(mapsId)) {
+				this.masterMapping = mapping.getRoot().getMapping(mapsId);
+				if (this.masterMapping == null) {
+					throw new MappingException("Cannot locate the mapping declared by MapsId " + mapsId, mapping.getAttribute().getLocator());
+				}
+			}
+		}
+
 		// no definition for the join columns
 		if (!this.joinMetadataProvided) {
+			// if maps id present link as virtual join columns
+			if (this.masterMapping != null) {
+				// if the mapping BasicMapping then create a single join column
+				if (!(idMapping instanceof BasicMapping)) {
+					throw new MappingException("MapsId without metadata points to composite primary key", mapping.getAttribute().getLocator());
+				}
+
+				if (idMapping.getAttribute().getJavaType() != this.masterMapping.getAttribute().getJavaType()) {
+					throw new MappingException("MapsId mapped attribute type " + this.masterMapping.getAttribute().getJavaType().getName()
+						+ "is not compatible with target entity primary key type " + idMapping.getAttribute().getJavaType().getName(),
+						mapping.getAttribute().getLocator());
+				}
+
+				final BasicMapping<?, ?> basicMapping = (BasicMapping<?, ?>) this.masterMapping;
+
+				this.joinColumns.add(new JoinColumn(this.jdbcAdaptor, mapping, ((BasicMapping<?, ?>) idMapping).getColumn(), basicMapping.getColumn()));
+			}
 			// create the join column
-			this.linkJoinColumns(mapping, idMapping, id);
+			else {
+				this.linkJoinColumns(mapping, idMapping);
+			}
 		}
 
 		// existing definition for the join column
 		else {
-			this.linkJoinColumnsWithMetadata(mapping, idMapping, id);
+			if (this.masterMapping != null) {
+				// FIXME
+			}
+			else {
+				this.linkJoinColumnsWithMetadata(mapping, idMapping);
+			}
 		}
 	}
 
-	private void linkJoinColumns(AssociationMapping<?, ?, ?> mapping, final SingularMapping<?, ?> idMapping, boolean id) {
+	private void linkJoinColumns(AssociationMapping<?, ?, ?> mapping, final SingularMapping<?, ?> idMapping) {
+		final boolean id = (mapping != null) && mapping.isId();
+
 		// if the mapping BasicMapping then create a single join column
 		if (idMapping instanceof BasicMapping) {
 			this.joinColumns.add(new JoinColumn(this.jdbcAdaptor, mapping, ((BasicMapping<?, ?>) idMapping).getColumn(), id));
@@ -557,17 +580,18 @@ public class ForeignKey {
 
 			for (final Mapping<?, ?, ?> child : embeddedMapping.getChildren()) {
 				if (child instanceof SingularMapping) {
-					this.linkJoinColumns(mapping, (SingularMapping<?, ?>) child, id);
+					this.linkJoinColumns(mapping, (SingularMapping<?, ?>) child);
 				}
 				else {
 					throw new MappingException("EmbeddedId types cannot have plural mappings", mapping.getAttribute().getLocator());
 				}
 			}
 		}
-
 	}
 
-	private void linkJoinColumnsWithMetadata(AssociationMapping<?, ?, ?> mapping, final SingularMapping<?, ?> idMapping, boolean id) {
+	private void linkJoinColumnsWithMetadata(AssociationMapping<?, ?, ?> mapping, final SingularMapping<?, ?> idMapping) {
+		final boolean id = (mapping != null) && mapping.isId();
+
 		// if the mapping BasicMapping then create a single join column
 		if (idMapping instanceof BasicMapping) {
 			final BasicMapping<?, ?> basicMapping = (BasicMapping<?, ?>) idMapping;
@@ -596,7 +620,7 @@ public class ForeignKey {
 
 			for (final Mapping<?, ?, ?> child : embeddedMapping.getChildren()) {
 				if (child instanceof SingularMapping) {
-					this.linkJoinColumnsWithMetadata(mapping, (SingularMapping<?, ?>) child, id);
+					this.linkJoinColumnsWithMetadata(mapping, (SingularMapping<?, ?>) child);
 				}
 				else {
 					throw new MappingException("EmbeddedId types cannot have plural mappings", mapping.getAttribute().getLocator());

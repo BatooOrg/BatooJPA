@@ -41,7 +41,6 @@ public class Dependent {
 
 	/**
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public Dependent() {
@@ -54,7 +53,6 @@ public class Dependent {
 	 * @param emp
 	 *            the employee
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public Dependent(String name, Employee emp) {
@@ -103,7 +101,6 @@ public class Dependent {
 	 * 
 	 * @return the emp
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public Employee getEmp() {
@@ -114,7 +111,6 @@ public class Dependent {
 	 * 
 	 * @return the name
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public String getName() {
@@ -139,7 +135,6 @@ public class Dependent {
 	 * @param emp
 	 *            the emp to set
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public void setEmp(Employee emp) {
@@ -151,11 +146,18 @@ public class Dependent {
 	 * @param name
 	 *            the name to set
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "Dependent [name=" + this.name + ", emp=" + this.emp + "]";
+	}
 }

@@ -18,45 +18,93 @@
  */
 package org.batoo.jpa.core.test.derivedIdentities.e2b;
 
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.persistence.TypedQuery;
+import javax.sql.DataSource;
+
 import junit.framework.Assert;
 
+import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.test.BaseCoreTest;
+import org.batoo.jpa.core.test.ColumnNameListHandler;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
- * JPA Spec 2.4.1.3 test.
+ * JPA Spec 2.4.1.3 test
  * 
  * @author asimarslan
  * @since $version
  */
+@Ignore
+// FIXME: Temporarily ignored
 public class DerivedIdsTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * Example-2 Case (a):
+	 * Example-2 Case (b):
 	 * <p>
-	 * The parent entity uses IdClass.
+	 * The parent entity uses IdClass
 	 * <p>
-	 * The dependent entity uses IdClass.
+	 * The dependent entity uses EmbeddedId to represent a composite key:
 	 * 
 	 * @author asimarslan
 	 * @since $version
 	 */
 	@Test
-	public void test2b() {
-		final Venue venue = new Venue("IN", "Inonu Stadium");
-		final Event event = new Event(venue, "BJK12", "Beşiktaş 2012 - 2013 Season");
-		final Performance performance = new Performance(event, "001", "Beşiktaş JK - Barcelona FC");
+	public void test2bJPQL() {
+		final Employee employee = new Employee("Sam", "Doe");
 
-		this.persist(venue);
-		this.persist(event);
-		this.persist(performance);
+		this.persist(employee);
+		this.commit();
+
+		final Dependent dependent1 = new Dependent(new DependentId("Joe", new EmployeeId(employee.getFirstName(), employee.getLastName())), employee);
+
+		this.persist(dependent1);
 
 		this.commit();
 		this.close();
 
-		final Performance performance2 = this.cq("select p FROM Performance p WHERE p.event.venue.venueCode = 'IN'", Performance.class).getSingleResult();
+		final TypedQuery<Dependent> q = this.cq("select d from Dependent d where d.id.name = 'Joe' and d.emp.firstName = 'Sam'", Dependent.class);
+		final List<Dependent> resultList = q.getResultList();
 
-		Assert.assertEquals(performance, performance2);
+		Assert.assertNotNull(resultList);
+		Assert.assertEquals(1, resultList.size());
+
+		Assert.assertEquals("Joe", resultList.get(0).getId().getName());
+		Assert.assertEquals("Sam", resultList.get(0).getEmp().getFirstName());
+		Assert.assertEquals("Doe", resultList.get(0).getEmp().getLastName());
+	}
+
+	/**
+	 * Tests generated DDL column names
+	 * 
+	 * @throws SQLException
+	 *             thrown in case of an error
+	 * @since $version
+	 */
+	@Test
+	public void testColumnNames() throws SQLException {
+		final Employee employee = new Employee("Sam", "Doe");
+
+		this.persist(employee);
+		this.commit();
+
+		final Dependent dependent1 = new Dependent(new DependentId("Joe", new EmployeeId(employee.getFirstName(), employee.getLastName())), employee);
+
+		this.persist(dependent1);
+
+		this.commit();
+		this.close();
+
+		final List<String> columnNames = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT * FROM Dependent",
+			new ColumnNameListHandler<List<String>>());
+
+		Assert.assertEquals(3, columnNames.size());
+		Assert.assertTrue(columnNames.contains("NAME"));
+		Assert.assertTrue(columnNames.contains("FK1"));
+		Assert.assertTrue(columnNames.contains("FK2"));
 	}
 }

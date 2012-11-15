@@ -16,16 +16,12 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.core.test.mapsid;
+package org.batoo.jpa.core.test.readonlycolumn;
 
-import java.util.List;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-
-import com.google.common.collect.Lists;
 
 /**
  * 
@@ -33,80 +29,61 @@ import com.google.common.collect.Lists;
  * @since $version
  */
 @Entity
-public class Person {
+public class Address {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Integer id;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "person")
-	private final List<Phone> phones = Lists.newArrayList();
-
-	private String name;
+	private String city;
 
 	/**
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Person() {
+	public Address() {
 		super();
 	}
 
 	/**
-	 * @param id
-	 *            the id
-	 * @param name
-	 *            the name
+	 * @param city
+	 *            the city
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Person(Integer id, String name) {
+	public Address(String city) {
 		super();
-
-		this.id = id;
-		this.name = name;
+		this.city = city;
 	}
 
 	/**
-	 * Returns the id.
-	 * 
+	 * @return the city
+	 */
+	public String getCity() {
+		return this.city;
+	}
+
+	/**
 	 * @return the id
-	 * @since $version
 	 */
 	public Integer getId() {
 		return this.id;
 	}
 
 	/**
-	 * Returns the name.
-	 * 
-	 * @return the name
-	 * @since $version
+	 * @param city
+	 *            the city to set
 	 */
-	public String getName() {
-		return this.name;
+	public void setCity(String city) {
+		this.city = city;
 	}
 
 	/**
-	 * Returns the phones of the Person.
-	 * 
-	 * @return the phones of the Person
-	 * 
-	 * @since $version
-	 * @author hceylan
+	 * @param id
+	 *            the id to set
 	 */
-	public List<Phone> getPhones() {
-		return this.phones;
-	}
-
-	/**
-	 * Sets the name.
-	 * 
-	 * @param name
-	 *            the name to set
-	 * @since $version
-	 */
-	public void setName(String name) {
-		this.name = name;
+	public void setId(Integer id) {
+		this.id = id;
 	}
 }

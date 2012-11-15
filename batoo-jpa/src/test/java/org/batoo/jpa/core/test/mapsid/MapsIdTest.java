@@ -33,7 +33,7 @@ import org.junit.Test;
 public class MapsIdTest extends BaseCoreTest {
 
 	private Person person() {
-		final Person person = new Person("Ceylan");
+		final Person person = new Person(1, "Ceylan");
 		new Phone(person, 1, "111", "111-1111");
 		new Phone(person, 2, "222", "222-2222");
 

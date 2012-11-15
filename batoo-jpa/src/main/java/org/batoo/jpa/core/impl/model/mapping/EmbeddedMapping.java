@@ -32,6 +32,7 @@ import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
@@ -102,7 +103,7 @@ public class EmbeddedMapping<Z, X> extends ParentMapping<Z, X> implements Singul
 				((BasicMapping<? super X, ?>) mapping).getAttribute().fillValue(type, managedInstance, value);
 			}
 			// no other mappings allowed in id classes
-			else {
+			else if (!(mapping instanceof SingularAssociationMapping)) {
 				throw new MappingException("Embbeded ids can only have basic and embedded attributes.", this.getType().getLocator());
 			}
 		}
@@ -174,6 +175,23 @@ public class EmbeddedMapping<Z, X> extends ParentMapping<Z, X> implements Singul
 		}
 
 		return this.getAttribute().getAttributeOverride(path);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public IdType getIdType() {
+		if (this.attribute.isId()) {
+			return IdType.MANUAL;
+		}
+
+		if (this.getParent() != null) {
+			return this.getParent().getIdType();
+		}
+
+		return null;
 	}
 
 	/**

@@ -216,7 +216,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		if ((attribute.getPersistentAttributeType() == PersistentAttributeType.MANY_TO_ONE)
 			|| (attribute.getPersistentAttributeType() == PersistentAttributeType.ONE_TO_ONE)) {
 			final AssociatedSingularAttribute<? super X, ?> singularAttribute = (AssociatedSingularAttribute<? super X, ?>) attribute;
-			if (singularAttribute.getMapsId() != null) {
+			if (StringUtils.isNotBlank(singularAttribute.getMapsId())) {
 				this.idMap.put(singularAttribute.getMapsId(), singularAttribute);
 			}
 		}
@@ -978,6 +978,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	/**
 	 * Returns the id of the entity from the resultset row.
 	 * 
+	 * @param session
+	 *            the session
 	 * @param row
 	 *            the row
 	 * @return the managedId or null
@@ -987,19 +989,19 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedId<X> getId(ResultSet row) throws SQLException {
-		return this.getId(row, this.getPrimaryTable().getIdFields(), null);
+	public ManagedId<X> getId(SessionImpl session, ResultSet row) throws SQLException {
+		return this.getId(session, row, this.getPrimaryTable().getIdFields());
 	}
 
 	/**
 	 * Returns the id of the entity from the resultset row.
 	 * 
+	 * @param session
+	 *            the session
 	 * @param row
 	 *            the row
 	 * @param idFields
 	 *            the id fields
-	 * @param joinFields
-	 *            the join fields
 	 * @return the managedId or null
 	 * @throws SQLException
 	 *             if an SQL error occurrs
@@ -1007,12 +1009,12 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since $version
 	 * @author hceylan
 	 */
-	public ManagedId<X> getId(ResultSet row, HashMap<AbstractColumn, String> idFields, HashMap<AbstractColumn, String> joinFields) throws SQLException {
+	public ManagedId<X> getId(SessionImpl session, ResultSet row, HashMap<AbstractColumn, String> idFields) throws SQLException {
 		Object id;
 		final MutableBoolean allNull = new MutableBoolean(true);
 
 		if (this.hasSingleIdAttribute()) {
-			id = this.getIdImpl(row, idFields, joinFields, this.getIdMapping(), allNull);
+			id = this.getIdImpl(session, row, idFields, this.getIdMapping(), allNull);
 		}
 		else {
 			// create the id class
@@ -1021,7 +1023,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			for (final Pair<SingularMapping<? super X, ?>, AbstractAccessor> pair : this.getIdMappings()) {
 				final SingularMapping<? super X, ?> child = pair.getFirst();
 
-				final Object childId = this.getIdImpl(row, idFields, joinFields, child, allNull);
+				final Object childId = this.getIdImpl(session, row, idFields, child, allNull);
 				if (childId != null) {
 					allNull.setValue(false);
 				}
@@ -1074,8 +1076,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		return id != null ? id.getId() : null;
 	}
 
-	private Object getIdImpl(ResultSet row, HashMap<AbstractColumn, String> idFields, HashMap<AbstractColumn, String> joinFields,
-		SingularMapping<?, ?> idMapping, MutableBoolean allNull) throws SQLException {
+	private Object getIdImpl(SessionImpl session, ResultSet row, HashMap<AbstractColumn, String> idFields, SingularMapping<?, ?> idMapping,
+		MutableBoolean allNull) throws SQLException {
 
 		// handle basic mapping
 		if (idMapping instanceof BasicMapping) {
@@ -1096,9 +1098,16 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			final Object id = embeddedMapping.getAttribute().newInstance();
 
 			for (final Mapping<?, ?, ?> child : embeddedMapping.getChildren()) {
-				final Object childId = this.getIdImpl(row, idFields, joinFields, (SingularMapping<?, ?>) child, allNull);
+				Object childId = this.getIdImpl(session, row, idFields, (SingularMapping<?, ?>) child, allNull);
 				if (childId != null) {
 					allNull.setValue(false);
+				}
+
+				final AttributeImpl<?, ?> attribute = child.getAttribute();
+				final PersistentAttributeType attributeType = attribute.getPersistentAttributeType();
+				if ((attributeType == PersistentAttributeType.MANY_TO_ONE) //
+					|| (attributeType == PersistentAttributeType.ONE_TO_ONE)) {
+					childId = session.getEntityManager().getReference(attribute.getJavaType(), childId);
 				}
 
 				child.getAttribute().set(id, childId);
@@ -1115,7 +1124,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			translatedIdFields.put(joinColumn.getReferencedColumn(), idFields.get(joinColumn));
 		}
 
-		final ManagedId<?> id = singularAssociationMapping.getType().getId(row, translatedIdFields, joinFields);
+		final ManagedId<?> id = singularAssociationMapping.getType().getId(session, row, translatedIdFields);
 
 		return id != null ? id.getId() : null;
 	}
@@ -2197,8 +2206,12 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			final SingularAssociationMapping<?, ?> singularAssociationMapping = (SingularAssociationMapping<?, ?>) idMapping;
 			final EntityTypeImpl<?> type = singularAssociationMapping.getType();
 
-			final Object associate = session.getEntityManager().getReference(type.getJavaType(), id);
-			idMapping.set(instance, associate);
+			if ((id == null) || type.getJavaType().isAssignableFrom(id.getClass())) {
+				idMapping.set(instance, id);
+			}
+			else {
+				idMapping.set(instance, session.getEntityManager().getReference(type.getJavaType(), id));
+			}
 		}
 	}
 

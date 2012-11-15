@@ -56,6 +56,41 @@ public class JoinColumn extends AbstractColumn {
 
 	private AssociationMapping<?, ?, ?> mapping;
 	private AbstractColumn referencedColumn;
+	private BasicColumn masterColumn;
+
+	/**
+	 * Constructor with no metadata for mappings with MapsId.
+	 * 
+	 * @param jdbcAdaptor
+	 *            the JDBC Adaptor
+	 * @param mapping
+	 *            the mapping
+	 * @param referencedColumn
+	 *            the referenced column
+	 * @param masterColumn
+	 *            the master column
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public JoinColumn(JdbcAdaptor jdbcAdaptor, AssociationMapping<?, ?, ?> mapping, AbstractColumn referencedColumn, BasicColumn masterColumn) {
+		super(null, false);
+
+		this.jdbcAdaptor = jdbcAdaptor;
+		this.mapping = mapping;
+
+		this.columnDefinition = "";
+		this.tableName = "";
+		this.insertable = true;
+		this.nullable = true;
+		this.unique = false;
+		this.updatable = true;
+
+		this.name = masterColumn.getName();
+		this.masterColumn = masterColumn;
+
+		this.setColumnProperties(mapping, referencedColumn, false);
+	}
 
 	/**
 	 * Constructor with no metadata.
@@ -336,6 +371,20 @@ public class JoinColumn extends AbstractColumn {
 		return this.updatable;
 	}
 
+	/**
+	 * Returns if this join column is a virtual join column.
+	 * <p>
+	 * Virtual join columns actually do not have their own storage, but rather references an existing id basic column.
+	 * 
+	 * @return true if this join column is a virtual join column, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isVirtual() {
+		return this.masterColumn != null;
+	}
+
 	private void setColumnProperties(AbstractColumn referencedColumn) {
 		this.referencedColumn = referencedColumn;
 
@@ -364,12 +413,14 @@ public class JoinColumn extends AbstractColumn {
 		// if attribute present then the join column belongs to an entity table
 		if (mapping != null) {
 			this.mapping = mapping;
+
 			if (StringUtils.isBlank(this.name)) {
 				this.name = this.jdbcAdaptor.escape(mapping.getName() + "_" + referencedColumn.getName());
 			}
 		}
 		else {
 			final EntityTypeImpl<?> type = (EntityTypeImpl<?>) referencedColumn.getMapping().getRoot().getType();
+
 			if (StringUtils.isBlank(this.name)) {
 				this.name = this.jdbcAdaptor.escape(type.getName() + "_" + referencedColumn.getName());
 			}
@@ -390,7 +441,9 @@ public class JoinColumn extends AbstractColumn {
 	public void setTable(AbstractTable table) {
 		this.table = table;
 
-		this.table.addColumn(this);
+		if (!this.isVirtual()) {
+			this.table.addColumn(this);
+		}
 	}
 
 	/**

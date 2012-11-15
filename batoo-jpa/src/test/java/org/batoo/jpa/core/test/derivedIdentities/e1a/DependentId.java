@@ -26,11 +26,10 @@ package org.batoo.jpa.core.test.derivedIdentities.e1a;
 public class DependentId {
 
 	private String name; // matches name of @Id attribute
-	private Integer emp; // matches name of @Id attribute and type of Employee PK
+	private Long emp; // matches name of @Id attribute and type of Employee PK
 
 	/**
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public DependentId() {
@@ -38,15 +37,14 @@ public class DependentId {
 	}
 
 	/**
+	 * 
 	 * @param name
-	 *            the name
+	 *            then name
 	 * @param emp
 	 *            the employee
-	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
-	public DependentId(String name, Integer emp) {
+	public DependentId(String name, Long emp) {
 		super();
 
 		this.name = name;
@@ -92,10 +90,9 @@ public class DependentId {
 	 * 
 	 * @return the emp
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
-	public long getEmp() {
+	public Long getEmp() {
 		return this.emp;
 	}
 
@@ -103,7 +100,6 @@ public class DependentId {
 	 * 
 	 * @return the name
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public String getName() {
@@ -128,10 +124,9 @@ public class DependentId {
 	 * @param emp
 	 *            the emp to set
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
-	public void setEmp(Integer emp) {
+	public void setEmp(Long emp) {
 		this.emp = emp;
 	}
 
@@ -140,10 +135,18 @@ public class DependentId {
 	 * @param name
 	 *            the name to set
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "DependentId [name=" + this.name + ", emp=" + this.emp + "]";
 	}
 }

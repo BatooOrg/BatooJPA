@@ -37,6 +37,7 @@ import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.jdbc.IdType;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 
@@ -157,6 +158,23 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 	@Override
 	public ForeignKey getForeignKey() {
 		return this.foreignKey;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public IdType getIdType() {
+		if (this.attribute.isId()) {
+			return IdType.MANUAL;
+		}
+
+		if (this.getParent() != null) {
+			return this.getParent().getIdType();
+		}
+
+		return null;
 	}
 
 	/**

@@ -137,6 +137,9 @@ public class BasicPath<X> extends AbstractPath<X> {
 		if (query.isQuery()) {
 			String columnAlias = this.getParentPath().getColumnAlias(query, column);
 			if (columnAlias == null) {
+				// force join
+				this.getParentPath().getFetchRoot();
+
 				columnAlias = this.getRootPath().getTableAlias(query, column.getTable()) + "." + column.getName();
 			}
 

@@ -66,8 +66,8 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 		this.attributeType = attributeType;
 		final OptionalAssociationAttributeMetadata optionalAssociationMetadata = (OptionalAssociationAttributeMetadata) metadata;
 		this.optional = optionalAssociationMetadata.isOptional();
-		this.mapsId = optionalAssociationMetadata.getMapsId();
 		this.id = optionalAssociationMetadata.isId();
+		this.mapsId = optionalAssociationMetadata.getMapsId();
 
 		if (metadata instanceof OneToOneAttributeMetadata) {
 			this.owner = StringUtils.isBlank(((OneToOneAttributeMetadata) metadata).getMappedBy());
@@ -192,10 +192,10 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 
 		if (this.getPersistentAttributeType() == PersistentAttributeType.MANY_TO_ONE) {
 			if (this.isOptional()) {
-				builder.append(" <0..*>");
+				builder.append(" <*..0>");
 			}
 			else {
-				builder.append(" <1..*>");
+				builder.append(" <*..1>");
 			}
 		}
 		else {
