@@ -484,6 +484,40 @@ public class ForeignKey {
 	 * @author hceylan
 	 */
 	public void link(AssociationMapping<?, ?, ?> mapping, EntityTypeImpl<?> targetEntity) {
+		if (mapping instanceof SingularAssociationMapping) {
+			final SingularAssociationMapping<?, ?> singularAssociationMapping = (SingularAssociationMapping<?, ?>) mapping;
+
+			final String mapsId = singularAssociationMapping.getAttribute().getMapsId();
+
+			if (mapsId != null) {
+				final EntityTypeImpl<?> type = (EntityTypeImpl<?>) singularAssociationMapping.getRoot().getType();
+
+				if (!type.hasSingleIdAttribute() || !(type.getIdMapping() instanceof EmbeddedMapping)) {
+					throw new MappingException("MapsId can only be used in combination with EmbeddedId", mapping.getAttribute().getLocator());
+				}
+
+				final EmbeddedMapping<?, ?> embeddedMapping = (EmbeddedMapping<?, ?>) type.getIdMapping();
+				if (!mapsId.isEmpty()) {
+					this.masterMapping = embeddedMapping.getChild(mapsId);
+				}
+				else {
+					this.masterMapping = embeddedMapping.getChild(mapping.getAttribute().getName());
+				}
+
+				if (this.masterMapping == null) {
+					throw new MappingException("Cannot locate the mapping declared by MapsId " + mapsId, mapping.getAttribute().getLocator());
+				}
+
+				final Class<?> idClass = targetEntity.hasSingleIdAttribute() ? targetEntity.getIdMapping().getAttribute().getJavaType()
+					: targetEntity.getIdClass();
+
+				if (idClass != this.masterMapping.getAttribute().getJavaType()) {
+					throw new MappingException("MapsId mapped attribute type " + this.masterMapping.getAttribute().getJavaType().getName()
+						+ " is not compatible with target entity primary key type " + idClass.getName(), mapping.getAttribute().getLocator());
+				}
+			}
+		}
+
 		// single primary key
 		if (targetEntity.hasSingleIdAttribute()) {
 			this.linkImpl(mapping, targetEntity.getIdMapping());
@@ -508,24 +542,6 @@ public class ForeignKey {
 	}
 
 	private void linkImpl(AssociationMapping<?, ?, ?> mapping, SingularMapping<?, ?> idMapping) {
-		if (mapping instanceof SingularAssociationMapping) {
-			final SingularAssociationMapping<?, ?> singularAssociationMapping = (SingularAssociationMapping<?, ?>) mapping;
-
-			final String mapsId = singularAssociationMapping.getAttribute().getMapsId();
-
-			if (StringUtils.isNotBlank(mapsId)) {
-				final EntityTypeImpl<?> type = (EntityTypeImpl<?>) singularAssociationMapping.getRoot().getType();
-				if (type.hasSingleIdAttribute() && (type.getIdMapping() instanceof EmbeddedMapping)) {
-					final EmbeddedMapping<?, ?> id = (EmbeddedMapping<?, ?>) type.getIdMapping();
-					this.masterMapping = id.getChild(mapsId);
-				}
-
-				if (this.masterMapping == null) {
-					throw new MappingException("Cannot locate the mapping declared by MapsId " + mapsId, mapping.getAttribute().getLocator());
-				}
-			}
-		}
-
 		// no definition for the join columns
 		if (!this.joinMetadataProvided) {
 			// if maps id present link as virtual join columns
@@ -533,12 +549,6 @@ public class ForeignKey {
 				// if the mapping BasicMapping then create a single join column
 				if (!(idMapping instanceof BasicMapping)) {
 					throw new MappingException("MapsId without metadata points to composite primary key", mapping.getAttribute().getLocator());
-				}
-
-				if (idMapping.getAttribute().getJavaType() != this.masterMapping.getAttribute().getJavaType()) {
-					throw new MappingException("MapsId mapped attribute type " + this.masterMapping.getAttribute().getJavaType().getName()
-						+ " is not compatible with target entity primary key type " + idMapping.getAttribute().getJavaType().getName(),
-						mapping.getAttribute().getLocator());
 				}
 
 				final BasicMapping<?, ?> basicMapping = (BasicMapping<?, ?>) this.masterMapping;
@@ -553,12 +563,7 @@ public class ForeignKey {
 
 		// existing definition for the join column
 		else {
-			if (this.masterMapping != null) {
-				// FIXME
-			}
-			else {
-				this.linkJoinColumnsWithMetadata(mapping, idMapping);
-			}
+			this.linkJoinColumnsWithMetadata(mapping, idMapping);
 		}
 	}
 
@@ -595,7 +600,8 @@ public class ForeignKey {
 	}
 
 	private void linkJoinColumnsWithMetadata(AssociationMapping<?, ?, ?> mapping, final SingularMapping<?, ?> idMapping) {
-		final boolean id = (mapping != null) && mapping.isId();
+		final boolean virtual = this.masterMapping != null;
+		final boolean id = !virtual && (mapping != null) && mapping.isId();
 
 		// if the mapping BasicMapping then create a single join column
 		if (idMapping instanceof BasicMapping) {
@@ -604,7 +610,12 @@ public class ForeignKey {
 			final JoinColumn joinColumn = this.locateJoinColumn(basicMapping.getColumn());
 
 			// link the join column
-			joinColumn.setColumnProperties(mapping, ((BasicMapping<?, ?>) idMapping).getColumn(), id);
+			if (virtual) {
+				joinColumn.setColumnProperties(mapping, ((BasicMapping<?, ?>) idMapping).getColumn(), this.locateMasterColumn(mapping, joinColumn));
+			}
+			else {
+				joinColumn.setColumnProperties(mapping, ((BasicMapping<?, ?>) idMapping).getColumn(), id);
+			}
 		}
 
 		// if the mapping SingularAssociationMapping then create a join column for each of the join columns of the mapping
@@ -613,6 +624,14 @@ public class ForeignKey {
 
 			for (final JoinColumn referencedColumn : foreignKey.getJoinColumns()) {
 				final JoinColumn joinColumn = this.locateJoinColumn(referencedColumn);
+
+				// link the join column
+				if (virtual) {
+					joinColumn.setColumnProperties(mapping, referencedColumn, this.locateMasterColumn(mapping, joinColumn));
+				}
+				else {
+					joinColumn.setColumnProperties(mapping, referencedColumn, id);
+				}
 
 				// link the join column
 				joinColumn.setColumnProperties(mapping, referencedColumn, id);
@@ -655,6 +674,19 @@ public class ForeignKey {
 		}
 
 		return joinColumn;
+	}
+
+	private AbstractColumn locateMasterColumn(AssociationMapping<?, ?, ?> mapping, final JoinColumn joinColumn) {
+		final EntityTypeImpl<?> type = (EntityTypeImpl<?>) mapping.getRoot().getType();
+
+		for (final AbstractColumn column : type.getPrimaryTable().getPkColumns()) {
+			if (column.getName().equals(joinColumn.getName())) {
+				return column;
+			}
+		}
+
+		throw new MappingException("Primary key column cannot be located: " + joinColumn.getName() + ". Possible columns are: "
+			+ type.getPrimaryTable().getPkColumnNames(), mapping.getAttribute().getLocator());
 	}
 
 	/**

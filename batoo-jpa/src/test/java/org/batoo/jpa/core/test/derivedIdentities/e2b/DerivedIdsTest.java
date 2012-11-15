@@ -29,7 +29,6 @@ import junit.framework.Assert;
 import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.test.BaseCoreTest;
 import org.batoo.jpa.core.test.ColumnNameListHandler;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -38,7 +37,6 @@ import org.junit.Test;
  * @author asimarslan
  * @since $version
  */
-@Ignore
 // FIXME: Temporarily ignored
 public class DerivedIdsTest extends BaseCoreTest {
 
@@ -68,14 +66,9 @@ public class DerivedIdsTest extends BaseCoreTest {
 		this.close();
 
 		final TypedQuery<Dependent> q = this.cq("select d from Dependent d where d.id.name = 'Joe' and d.emp.firstName = 'Sam'", Dependent.class);
-		final List<Dependent> resultList = q.getResultList();
+		final Dependent dependent2 = q.getSingleResult();
 
-		Assert.assertNotNull(resultList);
-		Assert.assertEquals(1, resultList.size());
-
-		Assert.assertEquals("Joe", resultList.get(0).getId().getName());
-		Assert.assertEquals("Sam", resultList.get(0).getEmp().getFirstName());
-		Assert.assertEquals("Doe", resultList.get(0).getEmp().getLastName());
+		Assert.assertEquals(dependent1, dependent2);
 	}
 
 	/**
@@ -104,7 +97,7 @@ public class DerivedIdsTest extends BaseCoreTest {
 
 		Assert.assertEquals(3, columnNames.size());
 		Assert.assertTrue(columnNames.contains("NAME"));
-		Assert.assertTrue(columnNames.contains("FK1"));
-		Assert.assertTrue(columnNames.contains("FK2"));
+		Assert.assertTrue(columnNames.contains("LASTNAME"));
+		Assert.assertTrue(columnNames.contains("FIRSTNAME"));
 	}
 }

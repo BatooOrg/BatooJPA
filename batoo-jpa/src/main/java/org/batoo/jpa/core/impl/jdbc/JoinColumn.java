@@ -56,7 +56,7 @@ public class JoinColumn extends AbstractColumn {
 
 	private AssociationMapping<?, ?, ?> mapping;
 	private AbstractColumn referencedColumn;
-	private BasicColumn masterColumn;
+	private AbstractColumn masterColumn;
 
 	/**
 	 * Constructor with no metadata for mappings with MapsId.
@@ -394,6 +394,41 @@ public class JoinColumn extends AbstractColumn {
 		this.length = referencedColumn.getLength();
 		this.precision = referencedColumn.getPrecision();
 		this.scale = referencedColumn.getScale();
+	}
+
+	/**
+	 * Sets the column definition for virtual foreign column.
+	 * 
+	 * @param mapping
+	 *            the owner mapping
+	 * @param referencedColumn
+	 *            the refernced column
+	 * @param masterColumn
+	 *            the master column
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setColumnProperties(AssociationMapping<?, ?, ?> mapping, AbstractColumn referencedColumn, AbstractColumn masterColumn) {
+		this.masterColumn = masterColumn;
+
+		// if attribute present then the join column belongs to an entity table
+		if (mapping != null) {
+			this.mapping = mapping;
+
+			if (StringUtils.isBlank(this.name)) {
+				this.name = this.jdbcAdaptor.escape(mapping.getName() + "_" + referencedColumn.getName());
+			}
+		}
+		else {
+			final EntityTypeImpl<?> type = (EntityTypeImpl<?>) referencedColumn.getMapping().getRoot().getType();
+
+			if (StringUtils.isBlank(this.name)) {
+				this.name = this.jdbcAdaptor.escape(type.getName() + "_" + referencedColumn.getName());
+			}
+		}
+
+		this.setColumnProperties(referencedColumn);
 	}
 
 	/**
