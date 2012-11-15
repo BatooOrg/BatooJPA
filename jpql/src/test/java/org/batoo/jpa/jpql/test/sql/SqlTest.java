@@ -29,6 +29,7 @@ import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
 import org.batoo.jpa.sql.SqlLexer;
 import org.batoo.jpa.sql.SqlParser;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.base.Joiner;
@@ -97,7 +98,15 @@ public class SqlTest {
 		SqlTest.LOG.debug("\n" + CommonTreePrinter.toString(this.parse("1.sql")) + "\n");
 
 		SqlTest.LOG.debug("\n" + CommonTreePrinter.toString(this.parse("2.sql")) + "\n");
+	}
 
+	/**
+	 * @since $version
+	 * @author hceylan
+	 */
+	@Test
+	@Ignore
+	public void testSqlLarge() {
 		SqlTest.LOG.debug("\n" + CommonTreePrinter.toString(this.parse("3.sql")) + "\n");
 	}
 }
