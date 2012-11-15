@@ -18,9 +18,13 @@
  */
 package org.batoo.jpa.core.impl.criteria.expression;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
+import org.batoo.jpa.core.impl.criteria.path.BasicPath;
 
 /**
  * Type for query expressions.
@@ -34,6 +38,7 @@ import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 public abstract class AbstractTypeExpression<T> extends AbstractExpression<Class<? extends T>> {
 
 	private final AbstractPath<?> path;
+	private String alias;
 
 	/**
 	 * @param path
@@ -45,6 +50,7 @@ public abstract class AbstractTypeExpression<T> extends AbstractExpression<Class
 	@SuppressWarnings("unchecked")
 	public AbstractTypeExpression(AbstractPath<T> path) {
 		super((Class<Class<? extends T>>) path.getJavaType().getClass());
+
 		this.path = path;
 	}
 
@@ -76,7 +82,17 @@ public abstract class AbstractTypeExpression<T> extends AbstractExpression<Class
 	 */
 	@Override
 	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
-		return this.path.generateSqlSelect(query, selected);
+		this.alias = query.getAlias(this);
+
+		final String innerExpression = this.path instanceof BasicPath ? //
+			this.path.getSqlRestrictionFragments(query)[0] : //
+			this.getSqlRestrictionFragments(query)[0];
+
+		if (selected) {
+			return innerExpression + " AS " + this.alias;
+		}
+
+		return innerExpression;
 	}
 
 	/**
@@ -89,5 +105,20 @@ public abstract class AbstractTypeExpression<T> extends AbstractExpression<Class
 	 */
 	public AbstractPath<?> getPath() {
 		return this.path;
+	}
+
+	/**
+	 * Returns the raw discriminator value from the resultset.
+	 * 
+	 * @param row
+	 *            the row
+	 * @return the raw discriminator value from the resultset
+	 * @throws SQLException
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected Object handle(ResultSet row) throws SQLException {
+		return row.getObject(this.alias);
 	}
 }

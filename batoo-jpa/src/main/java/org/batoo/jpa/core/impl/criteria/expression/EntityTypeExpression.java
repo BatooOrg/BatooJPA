@@ -24,8 +24,6 @@ import java.sql.SQLException;
 import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.path.ParentPath;
-import org.batoo.jpa.core.impl.instance.EnhancedInstance;
-import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.jdbc.DiscriminatorColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
@@ -42,6 +40,7 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 public class EntityTypeExpression<T> extends AbstractTypeExpression<T> {
 
 	private final DiscriminatorColumn discriminatorColumn;
+	private EntityTypeImpl<?> entity;
 
 	/**
 	 * @param path
@@ -75,19 +74,11 @@ public class EntityTypeExpression<T> extends AbstractTypeExpression<T> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public Class<? extends T> handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException {
-		final Object object = this.getPath().handle(query, session, row);
-
-		if (object == null) {
-			return null;
+		if (this.entity == null) {
+			this.entity = session.getEntityManager().getMetamodel().entity(this.getPath().getJavaType()).getRootType();
 		}
 
-		if (object instanceof EnhancedInstance) {
-			final ManagedInstance<?> managedInstance = ((EnhancedInstance) object).__enhanced__$$__getManagedInstance();
-			final EntityTypeImpl<? extends T> type = (EntityTypeImpl<? extends T>) managedInstance.getType();
-
-			return type.getJavaType();
-		}
-
-		return (Class<? extends T>) object.getClass();
+		final Object discriminatorValue = this.handle(row);
+		return (Class<? extends T>) this.entity.getChildType(discriminatorValue).getJavaType();
 	}
 }

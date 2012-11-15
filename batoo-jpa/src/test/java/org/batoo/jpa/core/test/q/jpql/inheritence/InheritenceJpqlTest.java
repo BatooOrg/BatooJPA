@@ -47,7 +47,7 @@ public class InheritenceJpqlTest extends BaseCoreTest {
 		this.commit();
 		this.close();
 
-		Assert.assertEquals("[Employee, Exempt, Exempt, Contractor]", //
+		Assert.assertEquals("[Contractor, Employee, Exempt, Exempt]", //
 			this.cq("select case type(e) \n" + //
 				"    when Exempt then 'Exempt'\n" + //
 				"    when Contractor then 'Contractor'\n" + //
@@ -70,10 +70,9 @@ public class InheritenceJpqlTest extends BaseCoreTest {
 		this.commit();
 		this.close();
 
-		TypedQuery<Employee> q;
 		TypedQuery<Class> q2;
 
-		q = this.cq("select e from Employee e where type(e) = Exempt", Employee.class);
+		TypedQuery<Employee> q = this.cq("select e from Employee e where type(e) = Exempt", Employee.class);
 		Assert.assertEquals(2, q.getResultList().size());
 
 		q = this.cq("select object(e) from Employee e where type(e) = :p", Employee.class).setParameter("p", Exempt.class);
