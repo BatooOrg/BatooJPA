@@ -34,7 +34,7 @@ public class Phone {
 	@EmbeddedId
 	private PhonePk id;
 
-	@MapsId("id.personId")
+	@MapsId("personId")
 	@ManyToOne
 	private Person person;
 
