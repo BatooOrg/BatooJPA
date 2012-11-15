@@ -221,11 +221,11 @@ public class PersistenceParserImpl implements PersistenceParser {
 	private void parseOrmXmls() {
 		if (this.ormMappingFiles.size() > 0) {
 			for (final String mappingFile : this.ormMappingFiles) {
-				this.parseOrmXml(mappingFile, true);
+				this.parseOrmXml(mappingFile, false);
 			}
 		}
 		else {
-			this.parseOrmXml(PersistenceParserImpl.ORM_XML, false);
+			this.parseOrmXml(PersistenceParserImpl.ORM_XML, true);
 		}
 	}
 }
