@@ -492,7 +492,7 @@ public class EntityTable extends AbstractTable {
 	 */
 	@Override
 	public String toString() {
-		final String columns = Joiner.on(", ").join(Collections2.transform(this.getColumns(), new Function<AbstractColumn, String>() {
+		final String columns = Joiner.on(", ").join(Collections2.transform(this.getColumnMap().values(), new Function<AbstractColumn, String>() {
 
 			@Override
 			public String apply(AbstractColumn input) {

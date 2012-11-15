@@ -58,7 +58,7 @@ public abstract class AbstractTable {
 	private final String catalog;
 	private final String schema;
 	private String name;
-	private final Map<String, AbstractColumn> columns = Maps.newHashMap();
+	private final Map<String, AbstractColumn> columnMap = Maps.newHashMap();
 	private final Map<String, String[]> uniqueConstraints = Maps.newHashMap();
 	private final List<ForeignKey> foreignKeys = Lists.newArrayList();
 
@@ -67,6 +67,7 @@ public abstract class AbstractTable {
 	private String updateSql;
 	private FinalWrapper<String> versionUpdateSql;
 	private FinalWrapper<String> versionSelectSql;
+	private FinalWrapper<AbstractColumn[]> columns;
 
 	private AbstractColumn[] updateColumns;
 	private AbstractColumn[] versionUpdateColumns;
@@ -126,10 +127,22 @@ public abstract class AbstractTable {
 	 * @author hceylan
 	 */
 	public void addColumn(AbstractColumn column) {
-		final AbstractColumn existing = this.columns.put(column.getName(), column);
+		final AbstractColumn existing = this.columnMap.get(column.getName());
+
 		if (existing != null) {
+			if (column instanceof JoinColumn) {
+				final JoinColumn joinColumn = (JoinColumn) column;
+				if (!joinColumn.isInsertable() && !joinColumn.isUpdatable()) {
+					joinColumn.setVirtual(existing);
+				}
+
+				return;
+			}
+
 			throw new MappingException("Duplicate column names " + column.getName() + " on table " + this.name, column.getLocator(), existing.getLocator());
 		}
+
+		this.columnMap.put(column.getName(), column);
 	}
 
 	/**
@@ -167,7 +180,7 @@ public abstract class AbstractTable {
 		final List<AbstractColumn> insertColumns = Lists.newArrayList();
 
 		// Filter out the identity physicalColumns
-		final Collection<AbstractColumn> filteredColumns = type == null ? this.getColumns() : Collections2.filter(this.getColumns(),
+		final Collection<AbstractColumn> filteredColumns = type == null ? this.columnMap.values() : Collections2.filter(this.columnMap.values(),
 			new Predicate<AbstractColumn>() {
 
 				@Override
@@ -246,7 +259,7 @@ public abstract class AbstractTable {
 
 		final List<AbstractColumn> updateColumns = Lists.newArrayList();
 		// Filter out the identity physicalColumns
-		final Collection<AbstractColumn> filteredColumns = type == null ? this.getColumns() : Collections2.filter(this.getColumns(),
+		final Collection<AbstractColumn> filteredColumns = type == null ? this.columnMap.values() : Collections2.filter(this.columnMap.values(),
 			new Predicate<AbstractColumn>() {
 
 				@Override
@@ -313,6 +326,18 @@ public abstract class AbstractTable {
 	}
 
 	/**
+	 * Returns the columnMap of the AbstractTable.
+	 * 
+	 * @return the columnMap of the AbstractTable
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	protected Map<String, AbstractColumn> getColumnMap() {
+		return this.columnMap;
+	}
+
+	/**
 	 * Returns the set of column names.
 	 * 
 	 * @return the set of column names
@@ -321,7 +346,7 @@ public abstract class AbstractTable {
 	 * @author hceylan
 	 */
 	public Collection<String> getColumnNames() {
-		return Collections2.transform(this.columns.values(), new Function<AbstractColumn, String>() {
+		return Collections2.transform(this.columnMap.values(), new Function<AbstractColumn, String>() {
 
 			@Override
 			public String apply(AbstractColumn input) {
@@ -331,15 +356,27 @@ public abstract class AbstractTable {
 	}
 
 	/**
-	 * Returns the collection of basicColumns of the table.
+	 * Returns the array of columns the table has
 	 * 
-	 * @return the collection of basicColumns of the table
+	 * @return the array of columns the table has
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Collection<AbstractColumn> getColumns() {
-		return this.columns.values();
+	public AbstractColumn[] getColumns() {
+		FinalWrapper<AbstractColumn[]> wrapper = this.columns;
+
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.columns == null) {
+					this.columns = new FinalWrapper<AbstractColumn[]>(this.columnMap.values().toArray(new AbstractColumn[this.columnMap.values().size()]));
+				}
+
+				wrapper = this.columns;
+			}
+		}
+
+		return wrapper.value;
 	}
 
 	/**

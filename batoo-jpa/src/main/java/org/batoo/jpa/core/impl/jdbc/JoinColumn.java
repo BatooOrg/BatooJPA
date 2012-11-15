@@ -49,12 +49,13 @@ public class JoinColumn extends AbstractColumn {
 	private final boolean updatable;
 
 	private String columnDefinition;
+
 	private int length;
 	private int precision;
 	private int sqlType;
 	private int scale;
-
 	private AssociationMapping<?, ?, ?> mapping;
+
 	private AbstractColumn referencedColumn;
 	private AbstractColumn masterColumn;
 
@@ -130,11 +131,13 @@ public class JoinColumn extends AbstractColumn {
 	 *            the JDBC adaptor
 	 * @param metadata
 	 *            the metadata for the join
+	 * @param readOnly
+	 *            if the column is readonly
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public JoinColumn(JdbcAdaptor jdbcAdaptor, JoinColumnMetadata metadata) {
+	public JoinColumn(JdbcAdaptor jdbcAdaptor, JoinColumnMetadata metadata, boolean readOnly) {
 		super(metadata.getLocator(), false);
 
 		this.jdbcAdaptor = jdbcAdaptor;
@@ -143,10 +146,10 @@ public class JoinColumn extends AbstractColumn {
 		this.columnDefinition = metadata.getColumnDefinition();
 		this.tableName = metadata.getTable();
 		this.name = metadata.getName();
-		this.insertable = metadata.isInsertable();
+		this.insertable = !readOnly && metadata.isInsertable();
 		this.nullable = metadata.isNullable();
 		this.unique = metadata.isUnique();
-		this.updatable = metadata.isUpdatable();
+		this.updatable = !readOnly && metadata.isUpdatable();
 	}
 
 	/**
@@ -212,6 +215,20 @@ public class JoinColumn extends AbstractColumn {
 	@Override
 	public Mapping<?, ?, ?> getMapping() {
 		return this.mapping;
+	}
+
+	/**
+	 * Returns the master column.
+	 * <p>
+	 * Master column is the delegate column for virtual join columns.
+	 * 
+	 * @return the master column
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public AbstractColumn getMasterColumn() {
+		return this.masterColumn;
 	}
 
 	/**
@@ -490,6 +507,20 @@ public class JoinColumn extends AbstractColumn {
 		if (this.mapping != null) {
 			this.mapping.set(instance, value);
 		}
+	}
+
+	/**
+	 * Sets the master column of the join column.
+	 * 
+	 * @param masterColumn
+	 *            the master column
+	 * 
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public void setVirtual(AbstractColumn masterColumn) {
+		this.masterColumn = masterColumn;
 	}
 
 	/**

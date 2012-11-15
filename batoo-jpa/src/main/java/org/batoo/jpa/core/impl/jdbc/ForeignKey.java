@@ -64,17 +64,18 @@ public class ForeignKey {
 	private final List<JoinColumn> joinColumns = Lists.newArrayList();
 	private final boolean joinMetadataProvided;
 	private final boolean inverseOwner;
+	private final boolean readOnly;
 	private AbstractTable table;
 
 	private String tableName;
+
 	private OrderColumn orderColumn;
-
 	private FinalWrapper<String> singleChildSql;
+
 	private AbstractColumn[] singleChildRestrictions;
-
 	private FinalWrapper<String> allChildrenSql;
-	private AbstractColumn[] singleChildUpdates;
 
+	private AbstractColumn[] singleChildUpdates;
 	private JoinColumn[] allChildrenRestrictions;
 
 	/**
@@ -110,9 +111,10 @@ public class ForeignKey {
 
 		this.jdbcAdaptor = jdbcAdaptor;
 		this.inverseOwner = inverseOwner;
+		this.readOnly = this.isReadOnly(metadata);
 
 		for (final JoinColumnMetadata columnMetadata : metadata) {
-			this.joinColumns.add(new JoinColumn(jdbcAdaptor, columnMetadata));
+			this.joinColumns.add(new JoinColumn(jdbcAdaptor, columnMetadata, this.readOnly));
 		}
 
 		this.joinMetadataProvided = this.joinColumns.size() > 0;
@@ -136,6 +138,7 @@ public class ForeignKey {
 
 		this.jdbcAdaptor = jdbcAdaptor;
 		this.inverseOwner = false;
+		this.readOnly = false;
 
 		if (entity.hasSingleIdAttribute()) {
 			this.createJoinColumns(table, entity.getIdMapping(), metadata);
@@ -469,6 +472,35 @@ public class ForeignKey {
 	 */
 	public AbstractTable getTable() {
 		return this.table;
+	}
+
+	/**
+	 * Returns if the foreign key maps to a readonly join.
+	 * 
+	 * @return true if the foreign key maps to a readonly join, false otherwise
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	public boolean isReadOnly() {
+		return this.readOnly;
+	}
+
+	/**
+	 * @param metadata
+	 * @return
+	 * 
+	 * @since $version
+	 * @author hceylan
+	 */
+	private boolean isReadOnly(List<JoinColumnMetadata> metadata) {
+		for (final JoinColumnMetadata columnMetadata : metadata) {
+			if (!columnMetadata.isUpdatable() && !columnMetadata.isInsertable()) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

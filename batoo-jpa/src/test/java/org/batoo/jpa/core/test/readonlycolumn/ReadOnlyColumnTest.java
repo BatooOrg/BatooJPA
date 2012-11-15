@@ -28,7 +28,6 @@ import junit.framework.Assert;
 import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.test.BaseCoreTest;
 import org.batoo.jpa.core.test.ColumnNameListHandler;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -36,18 +35,7 @@ import org.junit.Test;
  * @since $version
  * 
  */
-// FIXME: Temporarily ignored
-@Ignore
 public class ReadOnlyColumnTest extends BaseCoreTest {
-
-	private Person person() {
-		final Person person = new Person("Ceylan");
-
-		final Address address = new Address("Istanbul");
-		person.setHomeAddress(address);
-
-		return person;
-	}
 
 	/**
 	 * Tests generated DDL column names
@@ -58,11 +46,20 @@ public class ReadOnlyColumnTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testColumnNames() throws SQLException {
-		this.persist(this.person());
+		Person person = new Person(1, "Ceylan", new Address(1, "Istanbul"));
+		this.persist(person);
 
 		this.commit();
+		this.close();
+
 		final List<String> columnNames = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT * FROM Person",
 			new ColumnNameListHandler<List<String>>());
+
+		person = this.find(Person.class, person.getId());
+
+		Assert.assertFalse(this.emf().getPersistenceUnitUtil().isLoaded(person.getHomeAddress()));
+		person.getHomeAddress().getId();
+		Assert.assertTrue(this.emf().getPersistenceUnitUtil().isLoaded(person.getHomeAddress()));
 
 		Assert.assertEquals(3, columnNames.size());
 		Assert.assertTrue(columnNames.contains("id") || columnNames.contains("ID"));

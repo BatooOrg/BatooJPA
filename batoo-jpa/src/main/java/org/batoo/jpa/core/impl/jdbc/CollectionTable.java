@@ -153,7 +153,7 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 				if (this.removeSql == null) {
 
 					final List<String> restrictions = Lists.newArrayList();
-					this.removeColumns = new AbstractColumn[this.getColumns().size()];
+					this.removeColumns = new AbstractColumn[this.getColumns().length];
 
 					int i = 0;
 					for (final AbstractColumn column : this.getColumns()) {

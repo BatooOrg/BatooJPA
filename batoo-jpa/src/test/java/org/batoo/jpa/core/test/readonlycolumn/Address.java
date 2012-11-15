@@ -19,8 +19,6 @@
 package org.batoo.jpa.core.test.readonlycolumn;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 /**
@@ -32,7 +30,6 @@ import javax.persistence.Id;
 public class Address {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Integer id;
 
 	private String city;
@@ -46,14 +43,18 @@ public class Address {
 	}
 
 	/**
+	 * @param id
+	 *            the id
 	 * @param city
 	 *            the city
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Address(String city) {
+	public Address(Integer id, String city) {
 		super();
+
+		this.id = id;
 		this.city = city;
 	}
 

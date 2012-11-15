@@ -19,12 +19,10 @@
 package org.batoo.jpa.core.test.readonlycolumn;
 
 import static javax.persistence.CascadeType.PERSIST;
-import static javax.persistence.FetchType.LAZY;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -38,17 +36,16 @@ import javax.persistence.ManyToOne;
 public class Person {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Integer id;
 
 	@Column(name = "name")
 	private String name;
 
-	@Column(name = "address_id", insertable = false, updatable = false)
+	@Column(name = "address_id")
 	private Integer addressId;
 
-	@JoinColumn(name = "address_id")
-	@ManyToOne(cascade = PERSIST, fetch = LAZY)
+	@JoinColumn(name = "address_id", insertable = false, updatable = false)
+	@ManyToOne(cascade = PERSIST, fetch = FetchType.LAZY)
 	private Address homeAddress; // (addressId)
 
 	/**
@@ -60,16 +57,23 @@ public class Person {
 	}
 
 	/**
+	 * @param id
+	 *            the id
 	 * @param name
 	 *            the name of the person
+	 * @param address
+	 *            the address
 	 * 
 	 * @since $version
 	 * @author hceylan
 	 */
-	public Person(String name) {
+	public Person(Integer id, String name, Address address) {
 		super();
 
+		this.id = id;
 		this.name = name;
+
+		this.setHomeAddress(address);
 	}
 
 	/**
@@ -120,6 +124,8 @@ public class Person {
 	 */
 	public void setHomeAddress(Address homeAddress) {
 		this.homeAddress = homeAddress;
+
+		this.addressId = homeAddress.getId();
 	}
 
 	/**

@@ -429,7 +429,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 
 	private void generateSqlSelectForEntityTable(AbstractCriteriaQueryImpl<?> query, boolean selected, boolean root, final List<String> selects,
 		final Map<AbstractColumn, String> fieldMap, final EntityTable table) {
-
 		final List<String> fields1 = Lists.newArrayList();
 
 		final String tableAlias = this.getTableAlias(query, table);
@@ -498,6 +497,12 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			for (final EntityTable table : this.entity.getAllTables()) {
 				this.generateSqlSelectForEntityTable(query, selected, root, selects, fieldMap, table);
 			}
+
+			for (final SingularAssociationMapping<?, ?> associationMapping : this.entity.getAssociationsSingular()) {
+				if ((associationMapping.getForeignKey() != null) && associationMapping.getForeignKey().isReadOnly()) {
+					this.singularJoins.add(associationMapping);
+				}
+			}
 		}
 		else {
 			this.generateSqlSelectForElementCollection(query, selected, selects, fieldMap, selectType);
@@ -540,7 +545,21 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			final SingularMapping<?, ?> idMapping = this.entity.getIdMapping();
 			if (idMapping instanceof BasicMapping) {
 				final JoinColumn column = mapping.getForeignKey().getJoinColumns().get(0);
-				final String field = this.joinFields.get(column);
+
+				String field = null;
+
+				if (!column.isVirtual()) {
+					field = this.joinFields.get(column);
+				}
+				else {
+					final AbstractColumn masterColumn = column.getMasterColumn();
+					for (int i = 0; i < this.columns.length; i++) {
+						if (this.columns[i] == masterColumn) {
+							field = this.fields[i];
+							break;
+						}
+					}
+				}
 
 				return row.getObject(field);
 			}
@@ -992,9 +1011,9 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			if (id != null) {
 				final Object reference = session.getEntityManager().getReference(type.getJavaType(), id);
 				mapping.set(instance, reference);
-			}
 
-			managedInstance.setJoinLoaded(mapping);
+				managedInstance.setJoinLoaded(mapping);
+			}
 		}
 
 		for (final FetchImpl<X, ?> fetch : this.fetches.values()) {
