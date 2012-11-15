@@ -514,7 +514,12 @@ public class ForeignKey {
 			final String mapsId = singularAssociationMapping.getAttribute().getMapsId();
 
 			if (StringUtils.isNotBlank(mapsId)) {
-				this.masterMapping = mapping.getRoot().getMapping(mapsId);
+				final EntityTypeImpl<?> type = (EntityTypeImpl<?>) singularAssociationMapping.getRoot().getType();
+				if (type.hasSingleIdAttribute() && (type.getIdMapping() instanceof EmbeddedMapping)) {
+					final EmbeddedMapping<?, ?> id = (EmbeddedMapping<?, ?>) type.getIdMapping();
+					this.masterMapping = id.getChild(mapsId);
+				}
+
 				if (this.masterMapping == null) {
 					throw new MappingException("Cannot locate the mapping declared by MapsId " + mapsId, mapping.getAttribute().getLocator());
 				}
@@ -532,7 +537,7 @@ public class ForeignKey {
 
 				if (idMapping.getAttribute().getJavaType() != this.masterMapping.getAttribute().getJavaType()) {
 					throw new MappingException("MapsId mapped attribute type " + this.masterMapping.getAttribute().getJavaType().getName()
-						+ "is not compatible with target entity primary key type " + idMapping.getAttribute().getJavaType().getName(),
+						+ " is not compatible with target entity primary key type " + idMapping.getAttribute().getJavaType().getName(),
 						mapping.getAttribute().getLocator());
 				}
 
