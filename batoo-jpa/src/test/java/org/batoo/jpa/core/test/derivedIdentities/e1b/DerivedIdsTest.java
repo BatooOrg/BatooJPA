@@ -19,7 +19,6 @@
 package org.batoo.jpa.core.test.derivedIdentities.e1b;
 
 import java.sql.SQLException;
-import java.util.List;
 
 import javax.persistence.TypedQuery;
 import javax.sql.DataSource;
@@ -96,11 +95,6 @@ public class DerivedIdsTest extends BaseCoreTest {
 		this.commit();
 		this.close();
 
-		final List<String> columnNames = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT * FROM Dependent",
-			new ColumnNameListHandler<List<String>>());
-
-		Assert.assertEquals(2, columnNames.size());
-		Assert.assertTrue(columnNames.contains("NAME"));
-		Assert.assertTrue(columnNames.contains("EMPPK"));
+		Assert.assertEquals("[emppk, name]", new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT * FROM Dependent", new ColumnNameListHandler()));
 	}
 }

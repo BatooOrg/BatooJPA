@@ -21,13 +21,21 @@ package org.batoo.jpa.core.test;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.dbutils.ResultSetHandler;
 
 import com.google.common.collect.Lists;
 
-public class ColumnNameListHandler<T> implements ResultSetHandler<T> {
+/**
+ * A Result set handler that lists the columns in a String.
+ * 
+ * @author hceylan
+ * @since $version
+ */
+public class ColumnNameListHandler implements ResultSetHandler<String> {
 
 	/**
 	 * 
@@ -43,17 +51,18 @@ public class ColumnNameListHandler<T> implements ResultSetHandler<T> {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
-	public T handle(ResultSet rs) throws SQLException {
+	public String handle(ResultSet rs) throws SQLException {
 		final List<String> list = Lists.newArrayList();
 
 		final ResultSetMetaData metaData = rs.getMetaData();
 
 		final int columnCount = metaData.getColumnCount();
 		for (int i = 1; i <= columnCount; i++) {
-			list.add(metaData.getColumnName(i));
+			list.add(metaData.getColumnName(i).toLowerCase(Locale.ENGLISH));
 		}
 
-		return (T) list;
+		Collections.sort(list);
+
+		return list.toString();
 	}
 }

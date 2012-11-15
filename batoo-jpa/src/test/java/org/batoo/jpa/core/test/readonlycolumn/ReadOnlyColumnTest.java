@@ -19,7 +19,6 @@
 package org.batoo.jpa.core.test.readonlycolumn;
 
 import java.sql.SQLException;
-import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -52,19 +51,13 @@ public class ReadOnlyColumnTest extends BaseCoreTest {
 		this.commit();
 		this.close();
 
-		final List<String> columnNames = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT * FROM Person",
-			new ColumnNameListHandler<List<String>>());
-
 		person = this.find(Person.class, person.getId());
 
 		Assert.assertFalse(this.emf().getPersistenceUnitUtil().isLoaded(person.getHomeAddress()));
 		person.getHomeAddress().getId();
 		Assert.assertTrue(this.emf().getPersistenceUnitUtil().isLoaded(person.getHomeAddress()));
 
-		Assert.assertEquals(3, columnNames.size());
-		Assert.assertTrue(columnNames.contains("id") || columnNames.contains("ID"));
-		Assert.assertTrue(columnNames.contains("name") || columnNames.contains("NAME"));
-		Assert.assertTrue(columnNames.contains("address_id") || columnNames.contains("ADDRESS_ID"));
-		Assert.assertFalse(columnNames.contains("homeAddress") || columnNames.contains("homeaddress") || columnNames.contains("HOMEADDRESS"));
+		Assert.assertEquals("[address_id, id, name]",
+			new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT * FROM Person", new ColumnNameListHandler()));
 	}
 }

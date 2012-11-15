@@ -94,12 +94,7 @@ public class DerivedIdsTest extends BaseCoreTest {
 		this.commit();
 		this.close();
 
-		final List<String> columnNames = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT * FROM Dependent",
-			new ColumnNameListHandler<List<String>>());
-
-		Assert.assertEquals(3, columnNames.size());
-		Assert.assertTrue(columnNames.contains("NAME"));
-		Assert.assertTrue(columnNames.contains("FK1"));
-		Assert.assertTrue(columnNames.contains("FK2"));
+		Assert.assertEquals("[fk1, fk2, name]",
+			new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT * FROM Dependent", new ColumnNameListHandler()));
 	}
 }
