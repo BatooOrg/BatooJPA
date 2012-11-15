@@ -20,44 +20,40 @@ package org.batoo.jpa.core.test.derivedIdentities.e2b;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 
 /**
  * 
- * 
- * @author hceylan
+ * @author asimarslan
  * @since $version
  */
 @Entity
-public class Venue {
+@IdClass(EmployeeId.class)
+public class Employee {
 
 	@Id
-	private String venueCode;
-
-	private String name;
+	String firstName;
+	@Id
+	String lastName;
 
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
-	public Venue() {
+	public Employee() {
 		super();
 	}
 
 	/**
-	 * @param venueCode
-	 *            the code
-	 * @param name
-	 *            the name
 	 * 
+	 * @param firstName
+	 * @param lastName
 	 * @since $version
-	 * @author hceylan
 	 */
-	public Venue(String venueCode, String name) {
+	public Employee(String firstName, String lastName) {
 		super();
-
-		this.venueCode = venueCode;
-		this.name = name;
+		this.firstName = firstName;
+		this.lastName = lastName;
 	}
 
 	/**
@@ -72,43 +68,47 @@ public class Venue {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof Venue)) {
+		if (!(obj instanceof Employee)) {
 			return false;
 		}
-		final Venue other = (Venue) obj;
-		if (this.venueCode == null) {
-			if (other.venueCode != null) {
+		final Employee other = (Employee) obj;
+		if (this.firstName == null) {
+			if (other.firstName != null) {
 				return false;
 			}
 		}
-		else if (!this.venueCode.equals(other.venueCode)) {
+		else if (!this.firstName.equals(other.firstName)) {
+			return false;
+		}
+		if (this.lastName == null) {
+			if (other.lastName != null) {
+				return false;
+			}
+		}
+		else if (!this.lastName.equals(other.lastName)) {
 			return false;
 		}
 		return true;
 	}
 
 	/**
-	 * Returns the name of the Venue.
 	 * 
-	 * @return the name of the Venue
+	 * @return the firstName
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
-	public String getName() {
-		return this.name;
+	public String getFirstName() {
+		return this.firstName;
 	}
 
 	/**
-	 * Returns the venueCode of the Venue.
 	 * 
-	 * @return the venueCode of the Venue
+	 * @return the lastName
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
-	public String getVenueCode() {
-		return this.venueCode;
+	public String getLastName() {
+		return this.lastName;
 	}
 
 	/**
@@ -119,42 +119,31 @@ public class Venue {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = (prime * result) + ((this.venueCode == null) ? 0 : this.venueCode.hashCode());
+		result = prime * result + ((this.firstName == null) ? 0 : this.firstName.hashCode());
+		result = prime * result + ((this.lastName == null) ? 0 : this.lastName.hashCode());
 		return result;
 	}
 
 	/**
-	 * Sets the name of the Venue.
 	 * 
-	 * @param name
-	 *            the name to set for Venue
+	 * @param firstName
+	 *            the firstName to set
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
-	public void setName(String name) {
-		this.name = name;
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
 
 	/**
-	 * Sets the venueCode of the Venue.
 	 * 
-	 * @param venueCode
-	 *            the venueCode to set for Venue
+	 * @param lastName
+	 *            the lastName to set
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
-	public void setVenueCode(String venueCode) {
-		this.venueCode = venueCode;
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	public String toString() {
-		return "Venue [venueCode=" + this.venueCode + ", name=" + this.name + "]";
-	}
 }

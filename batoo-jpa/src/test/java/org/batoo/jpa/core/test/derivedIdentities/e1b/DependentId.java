@@ -27,13 +27,11 @@ import javax.persistence.Embeddable;
  */
 @Embeddable
 public class DependentId {
-
-	private String name; // matches name of @Id attribute
-	private Integer empPK; // corresponds to PK type of Employee
+	String name;
+	Long empPK; // corresponds to PK type of Employee
 
 	/**
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public DependentId() {
@@ -41,15 +39,12 @@ public class DependentId {
 	}
 
 	/**
-	 * @param name
-	 *            the name
-	 * @param empPK
-	 *            the employee primary key
 	 * 
-	 * @author asimarslan
+	 * @param name
+	 * @param empPK
 	 * @since $version
 	 */
-	public DependentId(String name, Integer empPK) {
+	public DependentId(String name, Long empPK) {
 		super();
 		this.name = name;
 		this.empPK = empPK;
@@ -94,10 +89,9 @@ public class DependentId {
 	 * 
 	 * @return the empPK
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
-	public Integer getEmpPK() {
+	public Long getEmpPK() {
 		return this.empPK;
 	}
 
@@ -105,7 +99,6 @@ public class DependentId {
 	 * 
 	 * @return the name
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public String getName() {
@@ -120,8 +113,8 @@ public class DependentId {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = (prime * result) + ((this.empPK == null) ? 0 : this.empPK.hashCode());
-		result = (prime * result) + ((this.name == null) ? 0 : this.name.hashCode());
+		result = prime * result + ((this.empPK == null) ? 0 : this.empPK.hashCode());
+		result = prime * result + ((this.name == null) ? 0 : this.name.hashCode());
 		return result;
 	}
 
@@ -130,10 +123,9 @@ public class DependentId {
 	 * @param empPK
 	 *            the empPK to set
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
-	public void setEmpPK(Integer empPK) {
+	public void setEmpPK(Long empPK) {
 		this.empPK = empPK;
 	}
 
@@ -142,10 +134,10 @@ public class DependentId {
 	 * @param name
 	 *            the name to set
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
+
 }

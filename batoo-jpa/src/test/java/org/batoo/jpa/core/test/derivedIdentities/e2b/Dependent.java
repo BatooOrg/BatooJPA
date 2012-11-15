@@ -16,12 +16,14 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.core.test.derivedIdentities.e1b;
+package org.batoo.jpa.core.test.derivedIdentities.e2b;
 
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.ManyToOne;
 
 /**
  * 
@@ -29,31 +31,29 @@ import javax.persistence.Id;
  * @since $version
  */
 @Entity
-public class Employee {
+public class Dependent {
+
+	@EmbeddedId
+	DependentId id;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
-	private Long empId;
-
-	private String empName;
+	@JoinColumns({ @JoinColumn(name = "FK1", referencedColumnName = "firstName"),//
+		@JoinColumn(name = "FK2", referencedColumnName = "lastName") })
+	@ManyToOne
+	private Employee emp;
 
 	/**
 	 * 
 	 * @since $version
 	 */
-	public Employee() {
+	public Dependent() {
 		super();
 	}
 
-	/**
-	 * 
-	 * @param empName
-	 * @since $version
-	 */
-	public Employee(String empName) {
+	public Dependent(DependentId id, Employee emp) {
 		super();
-
-		this.empName = empName;
+		this.id = id;
+		this.emp = emp;
 	}
 
 	/**
@@ -68,47 +68,43 @@ public class Employee {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof Employee)) {
+		if (!(obj instanceof Dependent)) {
 			return false;
 		}
-		final Employee other = (Employee) obj;
-		if (this.empId == null) {
-			if (other.empId != null) {
+		final Dependent other = (Dependent) obj;
+		if (this.emp == null) {
+			if (other.emp != null) {
 				return false;
 			}
 		}
-		else if (!this.empId.equals(other.empId)) {
+		else if (!this.emp.equals(other.emp)) {
 			return false;
 		}
-		if (this.empName == null) {
-			if (other.empName != null) {
+		if (this.id == null) {
+			if (other.id != null) {
 				return false;
 			}
 		}
-		else if (!this.empName.equals(other.empName)) {
+		else if (!this.id.equals(other.id)) {
 			return false;
 		}
 		return true;
 	}
 
 	/**
-	 * 
-	 * @return the empId
-	 * 
+	 * @return the emp
 	 * @since $version
 	 */
-	public Long getEmpId() {
-		return this.empId;
+	public Employee getEmp() {
+		return this.emp;
 	}
 
 	/**
-	 * 
-	 * @return the empName
-	 * 
+	 * @return the id
 	 * @since $version
 	 */
-	public String getEmpName() {
-		return this.empName;
+	public DependentId getId() {
+		return this.id;
 	}
 
 	/**
@@ -119,31 +115,27 @@ public class Employee {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((this.empId == null) ? 0 : this.empId.hashCode());
-		result = prime * result + ((this.empName == null) ? 0 : this.empName.hashCode());
+		result = prime * result + ((this.emp == null) ? 0 : this.emp.hashCode());
+		result = prime * result + ((this.id == null) ? 0 : this.id.hashCode());
 		return result;
 	}
 
 	/**
-	 * 
-	 * @param empId
-	 *            the empId to set
-	 * 
+	 * @param emp
+	 *            the emp to set
 	 * @since $version
 	 */
-	public void setEmpId(Long empId) {
-		this.empId = empId;
+	public void setEmp(Employee emp) {
+		this.emp = emp;
 	}
 
 	/**
-	 * 
-	 * @param empName
-	 *            the empName to set
-	 * 
+	 * @param id
+	 *            the id to set
 	 * @since $version
 	 */
-	public void setEmpName(String empName) {
-		this.empName = empName;
+	public void setId(DependentId id) {
+		this.id = id;
 	}
 
 }

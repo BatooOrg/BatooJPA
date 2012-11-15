@@ -26,9 +26,10 @@
 	<persistence-unit name="default">
 		<provider>org.batoo.jpa.core.BatooPersistenceProvider</provider>
 		
-		<class>org.batoo.jpa.core.test.derivedIdentities.e2b.Employee</class>
-		<class>org.batoo.jpa.core.test.derivedIdentities.e2b.Dependent</class>
-		<class>org.batoo.jpa.core.test.derivedIdentities.e2b.DependentId</class>
+		<class>org.batoo.jpa.core.test.derivedIdentities.e3a.Employee</class>
+		<class>org.batoo.jpa.core.test.derivedIdentities.e3a.EmployeeId</class>
+		<class>org.batoo.jpa.core.test.derivedIdentities.e3a.Dependent</class>
+
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
 			<property name="org.batoo.jpa.ddl" value="DROP" />

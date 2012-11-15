@@ -16,12 +16,10 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.core.test.derivedIdentities.e1b;
+package org.batoo.jpa.core.test.derivedIdentities.e3a;
 
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
 /**
  * 
@@ -31,11 +29,8 @@ import javax.persistence.Id;
 @Entity
 public class Employee {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
-	private Long empId;
-
-	private String empName;
+	@EmbeddedId
+	EmployeeId empId;
 
 	/**
 	 * 
@@ -47,13 +42,12 @@ public class Employee {
 
 	/**
 	 * 
-	 * @param empName
+	 * @param empId
 	 * @since $version
 	 */
-	public Employee(String empName) {
+	public Employee(EmployeeId empId) {
 		super();
-
-		this.empName = empName;
+		this.empId = empId;
 	}
 
 	/**
@@ -80,14 +74,6 @@ public class Employee {
 		else if (!this.empId.equals(other.empId)) {
 			return false;
 		}
-		if (this.empName == null) {
-			if (other.empName != null) {
-				return false;
-			}
-		}
-		else if (!this.empName.equals(other.empName)) {
-			return false;
-		}
 		return true;
 	}
 
@@ -97,18 +83,8 @@ public class Employee {
 	 * 
 	 * @since $version
 	 */
-	public Long getEmpId() {
+	public EmployeeId getEmpId() {
 		return this.empId;
-	}
-
-	/**
-	 * 
-	 * @return the empName
-	 * 
-	 * @since $version
-	 */
-	public String getEmpName() {
-		return this.empName;
 	}
 
 	/**
@@ -120,7 +96,6 @@ public class Employee {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((this.empId == null) ? 0 : this.empId.hashCode());
-		result = prime * result + ((this.empName == null) ? 0 : this.empName.hashCode());
 		return result;
 	}
 
@@ -131,19 +106,8 @@ public class Employee {
 	 * 
 	 * @since $version
 	 */
-	public void setEmpId(Long empId) {
+	public void setEmpId(EmployeeId empId) {
 		this.empId = empId;
-	}
-
-	/**
-	 * 
-	 * @param empName
-	 *            the empName to set
-	 * 
-	 * @since $version
-	 */
-	public void setEmpName(String empName) {
-		this.empName = empName;
 	}
 
 }

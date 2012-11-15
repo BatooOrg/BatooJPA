@@ -38,7 +38,7 @@ public class Dependent {
 	// id attribute mapped by join column default
 	@ManyToOne
 	// maps empPK attribute of embedded id
-	private Employee employee;
+	private Employee emp;
 
 	/**
 	 * 
@@ -59,9 +59,8 @@ public class Dependent {
 	 */
 	public Dependent(DependentId id, Employee employee) {
 		super();
-
 		this.id = id;
-		this.employee = employee;
+		this.emp = employee;
 	}
 
 	/**
@@ -76,16 +75,13 @@ public class Dependent {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof Dependent)) {
-			return false;
-		}
 		final Dependent other = (Dependent) obj;
-		if (this.employee == null) {
-			if (other.employee != null) {
+		if (this.emp == null) {
+			if (other.emp != null) {
 				return false;
 			}
 		}
-		else if (!this.employee.equals(other.employee)) {
+		else if (!this.emp.equals(other.emp)) {
 			return false;
 		}
 		if (this.id == null) {
@@ -100,12 +96,12 @@ public class Dependent {
 	}
 
 	/**
-	 * @return the employee
+	 * @return the emp
 	 * @author aarslan
 	 * @since $version
 	 */
-	public Employee getEmployee() {
-		return this.employee;
+	public Employee getEmp() {
+		return this.emp;
 	}
 
 	/**
@@ -125,19 +121,19 @@ public class Dependent {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = (prime * result) + ((this.employee == null) ? 0 : this.employee.hashCode());
+		result = (prime * result) + ((this.emp == null) ? 0 : this.emp.hashCode());
 		result = (prime * result) + ((this.id == null) ? 0 : this.id.hashCode());
 		return result;
 	}
 
 	/**
-	 * @param employee
+	 * @param emp
 	 *            the employee to set
 	 * @author aarslan
 	 * @since $version
 	 */
-	public void setEmployee(Employee employee) {
-		this.employee = employee;
+	public void setEmp(Employee emp) {
+		this.emp = emp;
 	}
 
 	/**

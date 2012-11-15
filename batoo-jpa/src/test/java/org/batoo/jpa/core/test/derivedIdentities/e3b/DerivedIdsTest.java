@@ -16,7 +16,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.core.test.derivedIdentities.e2b;
+package org.batoo.jpa.core.test.derivedIdentities.e3b;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -29,6 +29,10 @@ import junit.framework.Assert;
 import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.test.BaseCoreTest;
 import org.batoo.jpa.core.test.ColumnNameListHandler;
+import org.batoo.jpa.core.test.derivedIdentities.e2b.Dependent;
+import org.batoo.jpa.core.test.derivedIdentities.e2b.DependentId;
+import org.batoo.jpa.core.test.derivedIdentities.e2b.Employee;
+import org.batoo.jpa.core.test.derivedIdentities.e2b.EmployeeId;
 import org.junit.Test;
 
 /**
@@ -41,17 +45,16 @@ public class DerivedIdsTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * Example-2 Case (b):
+	 * Example-3 Case (b):
 	 * <p>
-	 * The parent entity uses IdClass
+	 * The parent entity uses EmbeddedId:
 	 * <p>
-	 * The dependent entity uses EmbeddedId to represent a composite key:
+	 * The dependent entity uses EmbeddedId
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	@Test
-	public void test2bJPQL() {
+	public void test3bJPQL() {
 		final Employee employee = new Employee("Sam", "Doe");
 
 		this.persist(employee);
@@ -64,7 +67,7 @@ public class DerivedIdsTest extends BaseCoreTest {
 		this.commit();
 		this.close();
 
-		final String qstr = "SELECT d FROM Dependent d WHERE d.id.name = 'Joe' AND d.emp.firstName = 'Sam'";
+		final String qstr = "SELECT d FROM Dependent d WHERE d.id.name = 'Joe' and d.emp.empId.firstName = 'Sam'";
 
 		final TypedQuery<Dependent> q = this.cq(qstr, Dependent.class);
 		final List<Dependent> resultList = q.getResultList();
@@ -102,7 +105,7 @@ public class DerivedIdsTest extends BaseCoreTest {
 			new ColumnNameListHandler<List<String>>());
 
 		Assert.assertEquals(3, columnNames.size());
-		Assert.assertTrue(columnNames.contains("NAME"));
+		Assert.assertTrue(columnNames.contains("DEP_NAME"));
 		Assert.assertTrue(columnNames.contains("FK1"));
 		Assert.assertTrue(columnNames.contains("FK2"));
 

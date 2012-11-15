@@ -16,7 +16,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.core.test.derivedIdentities.e2b;
+package org.batoo.jpa.core.test.derivedIdentities.e3a;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -41,30 +41,28 @@ public class DerivedIdsTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * Example-2 Case (b):
+	 * Example-3 Case (a):
 	 * <p>
-	 * The parent entity uses IdClass
+	 * The parent entity uses EmbeddedId:
 	 * <p>
-	 * The dependent entity uses EmbeddedId to represent a composite key:
+	 * The dependent entity uses IdClass:
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	@Test
-	public void test2bJPQL() {
-		final Employee employee = new Employee("Sam", "Doe");
+	public void test3aJPQL() {
+		final Employee employee = new Employee(new EmployeeId("Sam", "Doe"));
 
 		this.persist(employee);
-		this.commit();
 
-		final Dependent dependent1 = new Dependent(new DependentId("Joe", new EmployeeId(employee.getFirstName(), employee.getLastName())), employee);
+		final Dependent dependent1 = new Dependent("Joe", employee);
 
 		this.persist(dependent1);
 
 		this.commit();
 		this.close();
 
-		final String qstr = "SELECT d FROM Dependent d WHERE d.id.name = 'Joe' AND d.emp.firstName = 'Sam'";
+		final String qstr = "SELECT d FROM Dependent d WHERE d.name = 'Joe' and d.emp.empId.firstName = 'Sam'";
 
 		final TypedQuery<Dependent> q = this.cq(qstr, Dependent.class);
 		final List<Dependent> resultList = q.getResultList();
@@ -72,9 +70,9 @@ public class DerivedIdsTest extends BaseCoreTest {
 		Assert.assertNotNull(resultList);
 		Assert.assertEquals(1, resultList.size());
 
-		Assert.assertEquals("Joe", resultList.get(0).getId().getName());
-		Assert.assertEquals("Sam", resultList.get(0).getEmp().getFirstName());
-		Assert.assertEquals("Doe", resultList.get(0).getEmp().getLastName());
+		Assert.assertEquals("Joe", resultList.get(0).getName());
+		Assert.assertEquals("Sam", resultList.get(0).getEmp().getEmpId().getFirstName());
+		Assert.assertEquals("Doe", resultList.get(0).getEmp().getEmpId().getLastName());
 
 	}
 
@@ -86,12 +84,11 @@ public class DerivedIdsTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testColumnNames() throws SQLException {
-		final Employee employee = new Employee("Sam", "Doe");
+		final Employee employee = new Employee(new EmployeeId("Sam", "Doe"));
 
 		this.persist(employee);
-		this.commit();
 
-		final Dependent dependent1 = new Dependent(new DependentId("Joe", new EmployeeId(employee.getFirstName(), employee.getLastName())), employee);
+		final Dependent dependent1 = new Dependent("Joe", employee);
 
 		this.persist(dependent1);
 
@@ -102,7 +99,7 @@ public class DerivedIdsTest extends BaseCoreTest {
 			new ColumnNameListHandler<List<String>>());
 
 		Assert.assertEquals(3, columnNames.size());
-		Assert.assertTrue(columnNames.contains("NAME"));
+		Assert.assertTrue(columnNames.contains("DEP_NAME"));
 		Assert.assertTrue(columnNames.contains("FK1"));
 		Assert.assertTrue(columnNames.contains("FK2"));
 

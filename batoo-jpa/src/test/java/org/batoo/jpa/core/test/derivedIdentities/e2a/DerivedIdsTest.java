@@ -18,15 +18,21 @@
  */
 package org.batoo.jpa.core.test.derivedIdentities.e2a;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import javax.persistence.TypedQuery;
+import javax.sql.DataSource;
 
 import junit.framework.Assert;
 
+import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.test.BaseCoreTest;
+import org.batoo.jpa.core.test.ColumnNameListHandler;
 import org.junit.Test;
 
 /**
- * JPA Spec 2.4.1.3 test.
+ * JPA Spec 2.4.1.3 test
  * 
  * @author asimarslan
  * @since $version
@@ -37,15 +43,15 @@ public class DerivedIdsTest extends BaseCoreTest {
 	 * 
 	 * Example-2 Case (a):
 	 * <p>
-	 * The parent entity uses IdClass.
+	 * The parent entity uses IdClass
 	 * <p>
-	 * The dependent entity uses IdClass.
+	 * The dependent entity uses IdClass
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	@Test
-	public void test2a() {
+	public void test2aJPQL() {
+
 		final Employee employee = new Employee("Sam", "Doe");
 
 		final Dependent dependent1 = new Dependent("Joe", employee);
@@ -56,13 +62,45 @@ public class DerivedIdsTest extends BaseCoreTest {
 		this.commit();
 		this.close();
 
-		final TypedQuery<Dependent> q = this.cq("select d FROM Dependent d where d.name = 'Joe' AND d.emp.firstName = 'Sam'", Dependent.class);
+		final String qstr = "SELECT d FROM Dependent d WHERE d.name = 'Joe' AND d.emp.firstName = 'Sam'";
 
-		Assert.assertNotNull(q.getResultList());
-		Assert.assertEquals(1, q.getResultList().size());
+		final TypedQuery<Dependent> q = this.cq(qstr, Dependent.class);
+		final List<Dependent> resultList = q.getResultList();
 
-		Assert.assertEquals("Joe", q.getResultList().get(0).getName());
-		Assert.assertEquals("Sam", q.getResultList().get(0).getEmp().getFirstName());
-		Assert.assertEquals("Doe", q.getResultList().get(0).getEmp().getLastName());
+		Assert.assertNotNull(resultList);
+		Assert.assertEquals(1, resultList.size());
+
+		Assert.assertEquals("Joe", resultList.get(0).getName());
+		Assert.assertEquals("Sam", resultList.get(0).getEmp().getFirstName());
+		Assert.assertEquals("Doe", resultList.get(0).getEmp().getLastName());
+
+	}
+
+	/**
+	 * Tests generated DDL column names
+	 * 
+	 * @throws SQLException
+	 * @since $version
+	 */
+	@Test
+	public void testColumnNames() throws SQLException {
+		final Employee employee = new Employee("Sam", "Doe");
+
+		final Dependent dependent1 = new Dependent("Joe", employee);
+
+		this.persist(employee);
+		this.persist(dependent1);
+
+		this.commit();
+		this.close();
+
+		final List<String> columnNames = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT * FROM Dependent",
+			new ColumnNameListHandler<List<String>>());
+
+		Assert.assertEquals(3, columnNames.size());
+		Assert.assertTrue(columnNames.contains("NAME"));
+		Assert.assertTrue(columnNames.contains("FK1"));
+		Assert.assertTrue(columnNames.contains("FK2"));
+
 	}
 }

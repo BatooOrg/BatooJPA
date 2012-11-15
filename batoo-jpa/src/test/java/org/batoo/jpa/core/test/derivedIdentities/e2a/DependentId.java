@@ -18,24 +18,33 @@
  */
 package org.batoo.jpa.core.test.derivedIdentities.e2a;
 
-
 /**
  * 
  * @author asimarslan
  * @since $version
  */
 public class DependentId {
-
-	private String name; // matches name of attribute
-	private EmployeeId emp; // matches name of attribute and type of Employee PK
+	String name; // matches name of attribute
+	EmployeeId emp; // matches name of attribute and type of Employee PK
 
 	/**
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public DependentId() {
 		super();
+	}
+
+	/**
+	 * 
+	 * @param name
+	 * @param emp
+	 * @since $version
+	 */
+	public DependentId(String name, EmployeeId emp) {
+		super();
+		this.name = name;
+		this.emp = emp;
 	}
 
 	/**
@@ -74,24 +83,20 @@ public class DependentId {
 	}
 
 	/**
-	 * Returns the emp of the DependentId.
 	 * 
-	 * @return the emp of the DependentId
+	 * @return the emp
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EmployeeId getEmp() {
 		return this.emp;
 	}
 
 	/**
-	 * Returns the name of the DependentId.
 	 * 
-	 * @return the name of the DependentId
+	 * @return the name
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getName() {
 		return this.name;
@@ -105,34 +110,31 @@ public class DependentId {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = (prime * result) + ((this.emp == null) ? 0 : this.emp.hashCode());
-		result = (prime * result) + ((this.name == null) ? 0 : this.name.hashCode());
+		result = prime * result + ((this.emp == null) ? 0 : this.emp.hashCode());
+		result = prime * result + ((this.name == null) ? 0 : this.name.hashCode());
 		return result;
 	}
 
 	/**
-	 * Sets the emp of the DependentId.
 	 * 
 	 * @param emp
-	 *            the emp to set for DependentId
+	 *            the emp to set
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setEmp(EmployeeId emp) {
 		this.emp = emp;
 	}
 
 	/**
-	 * Sets the name of the DependentId.
 	 * 
 	 * @param name
-	 *            the name to set for DependentId
+	 *            the name to set
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
+
 }

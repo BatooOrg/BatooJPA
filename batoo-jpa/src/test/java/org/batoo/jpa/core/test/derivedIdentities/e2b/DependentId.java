@@ -16,44 +16,24 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.core.test.derivedIdentities.e1b;
+package org.batoo.jpa.core.test.derivedIdentities.e2b;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.Embeddable;
 
 /**
  * 
  * @author asimarslan
  * @since $version
  */
-@Entity
-public class Employee {
+@Embeddable
+public class DependentId {
+	String name;
+	EmployeeId empPK;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
-	private Long empId;
-
-	private String empName;
-
-	/**
-	 * 
-	 * @since $version
-	 */
-	public Employee() {
+	public DependentId(String name, EmployeeId empPK) {
 		super();
-	}
-
-	/**
-	 * 
-	 * @param empName
-	 * @since $version
-	 */
-	public Employee(String empName) {
-		super();
-
-		this.empName = empName;
+		this.name = name;
+		this.empPK = empPK;
 	}
 
 	/**
@@ -68,47 +48,43 @@ public class Employee {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof Employee)) {
+		if (!(obj instanceof DependentId)) {
 			return false;
 		}
-		final Employee other = (Employee) obj;
-		if (this.empId == null) {
-			if (other.empId != null) {
+		final DependentId other = (DependentId) obj;
+		if (this.empPK == null) {
+			if (other.empPK != null) {
 				return false;
 			}
 		}
-		else if (!this.empId.equals(other.empId)) {
+		else if (!this.empPK.equals(other.empPK)) {
 			return false;
 		}
-		if (this.empName == null) {
-			if (other.empName != null) {
+		if (this.name == null) {
+			if (other.name != null) {
 				return false;
 			}
 		}
-		else if (!this.empName.equals(other.empName)) {
+		else if (!this.name.equals(other.name)) {
 			return false;
 		}
 		return true;
 	}
 
 	/**
-	 * 
-	 * @return the empId
-	 * 
+	 * @return the empPK
 	 * @since $version
 	 */
-	public Long getEmpId() {
-		return this.empId;
+	public EmployeeId getEmpPK() {
+		return this.empPK;
 	}
 
 	/**
-	 * 
-	 * @return the empName
-	 * 
+	 * @return the name
 	 * @since $version
 	 */
-	public String getEmpName() {
-		return this.empName;
+	public String getName() {
+		return this.name;
 	}
 
 	/**
@@ -119,31 +95,27 @@ public class Employee {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((this.empId == null) ? 0 : this.empId.hashCode());
-		result = prime * result + ((this.empName == null) ? 0 : this.empName.hashCode());
+		result = prime * result + ((this.empPK == null) ? 0 : this.empPK.hashCode());
+		result = prime * result + ((this.name == null) ? 0 : this.name.hashCode());
 		return result;
 	}
 
 	/**
-	 * 
-	 * @param empId
-	 *            the empId to set
-	 * 
+	 * @param empPK
+	 *            the empPK to set
 	 * @since $version
 	 */
-	public void setEmpId(Long empId) {
-		this.empId = empId;
+	public void setEmpPK(EmployeeId empPK) {
+		this.empPK = empPK;
 	}
 
 	/**
-	 * 
-	 * @param empName
-	 *            the empName to set
-	 * 
+	 * @param name
+	 *            the name to set
 	 * @since $version
 	 */
-	public void setEmpName(String empName) {
-		this.empName = empName;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }

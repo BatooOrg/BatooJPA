@@ -18,10 +18,17 @@
  */
 package org.batoo.jpa.core.test.derivedIdentities.e1a;
 
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.persistence.TypedQuery;
+import javax.sql.DataSource;
+
 import junit.framework.Assert;
 
+import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.test.BaseCoreTest;
-import org.junit.Ignore;
+import org.batoo.jpa.core.test.ColumnNameListHandler;
 import org.junit.Test;
 
 /**
@@ -39,70 +46,60 @@ public class DerivedIdsTest extends BaseCoreTest {
 	 * <p>
 	 * The dependent entity uses IdClass to represent a composite key.
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	@Test
-	public void test1a() {
-		final Employee employee = new Employee("employee1");
+	public void test1aJPQL() {
+
+		final Employee employee = new Employee("Sam");
 		this.persist(employee);
 		this.commit();
 
-		final Dependent dependent1 = new Dependent("theName1", employee);
-		final Dependent dependent2 = new Dependent("theName2", employee);
+		final Dependent dependent1 = new Dependent("Joe", employee);
 
 		this.persist(dependent1);
-		this.persist(dependent2);
 
 		this.commit();
 		this.close();
 
-		final Dependent dependent3 = this.find(Dependent.class, new DependentId(dependent1.getName(), dependent1.getEmp().getEmpId()));
-		final Dependent dependent4 = this.find(Dependent.class, new DependentId(dependent1.getName(), dependent1.getEmp().getEmpId()));
+		final String qstr = "SELECT d FROM Dependent d WHERE d.name = 'Joe' AND d.emp.empName = 'Sam'";
 
-		Assert.assertEquals(dependent1, dependent3);
-		Assert.assertEquals(employee, dependent3.getEmp());
-		Assert.assertSame(dependent3, dependent4);
+		final TypedQuery<Dependent> q = this.cq(qstr, Dependent.class);
+		final List<Dependent> resultList = q.getResultList();
+
+		Assert.assertNotNull(resultList);
+		Assert.assertEquals(1, resultList.size());
+
+		Assert.assertEquals("Joe", resultList.get(0).getName());
+		Assert.assertEquals("Sam", resultList.get(0).getEmp().getEmpName());
+
 	}
 
 	/**
-	 * Example-1 Case (a) - Modified form:
-	 * <p>
-	 * The parent entity has a simple primary key.
-	 * <p>
-	 * The dependent entity uses IdClass to represent a composite key.
+	 * Tests generated DDL column names
 	 * 
-	 * @author asimarslan
+	 * @throws SQLException
 	 * @since $version
 	 */
 	@Test
-	@Ignore
-	public void test1a2() {
-		final Employee employee = new Employee("employee1");
+	public void testColumnNames() throws SQLException {
+		final Employee employee = new Employee("Sam");
 		this.persist(employee);
 		this.commit();
 
-		final Dependent dependent1 = new Dependent("theName1", employee);
-		final Dependent dependent2 = new Dependent("theName2", employee);
+		final Dependent dependent1 = new Dependent("Joe", employee);
 
 		this.persist(dependent1);
-		this.persist(dependent2);
 
 		this.commit();
 		this.close();
 
-		final Dependent dependent3 = this.cq("select d from Dependent d where d.name = ? and d.emp = ?", Dependent.class) //
-		.setParameter(1, dependent1.getName()) //
-		.setParameter(2, dependent1.getEmp())//
-		.getSingleResult();
+		final List<String> columnNames = new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT * FROM Dependent",
+			new ColumnNameListHandler<List<String>>());
 
-		final Dependent dependent4 = this.cq("select d from Dependent d where d.name = ? and d.emp = ?", Dependent.class) //
-		.setParameter(1, dependent1.getName()) //
-		.setParameter(2, dependent1.getEmp().getEmpId())//
-		.getSingleResult();
-
-		Assert.assertEquals(dependent1, dependent3);
-		Assert.assertEquals(employee, dependent3.getEmp());
-		Assert.assertSame(dependent3, dependent4);
+		Assert.assertEquals(3, columnNames.size());
+		Assert.assertTrue(columnNames.contains("NAME"));
+		Assert.assertTrue(columnNames.contains("EMPID"));
+		Assert.assertTrue(columnNames.contains("EMPNAME"));
 	}
 }
