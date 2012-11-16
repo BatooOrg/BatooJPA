@@ -34,7 +34,6 @@ public class Test7 extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Test7() {
 		super();
@@ -43,7 +42,6 @@ public class Test7 extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void test() {

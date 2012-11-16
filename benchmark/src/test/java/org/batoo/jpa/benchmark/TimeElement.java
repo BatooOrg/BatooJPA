@@ -46,7 +46,6 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	 *            the key
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public TimeElement(String key) {
 		this.key = key;
@@ -61,7 +60,6 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	 *            time is in derby stack
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void addTime(long used, boolean self, boolean inDerby) {
 		this.hits++;
@@ -91,7 +89,6 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	 *            the benchmark type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void dump0(Type type) {
 		final int nameStart = this.key.indexOf("doBenchmark");
@@ -120,7 +117,6 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	 * @return the row no
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public int dump1(int rowNo, int depth) {
 		if ((depth > 0) && (this.timeWithoutDerby > 10000000)) {
@@ -150,7 +146,6 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	 *            the row no
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void dump2(int rowNo) {
 		System.out.println(String.format("%010d", rowNo) + //
@@ -178,7 +173,6 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	 * @return self
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Long getSelf() {
 		return this.self;

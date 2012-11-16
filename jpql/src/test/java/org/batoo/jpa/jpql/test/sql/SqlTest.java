@@ -91,7 +91,6 @@ public class SqlTest {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testSql() {
@@ -102,7 +101,6 @@ public class SqlTest {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	@Ignore

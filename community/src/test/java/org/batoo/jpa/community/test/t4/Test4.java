@@ -18,7 +18,6 @@ public class Test4 extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void test() {

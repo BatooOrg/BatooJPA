@@ -40,7 +40,6 @@ public @interface Indexes {
 	 * @return the array of indexes
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	Index[] value();
 }

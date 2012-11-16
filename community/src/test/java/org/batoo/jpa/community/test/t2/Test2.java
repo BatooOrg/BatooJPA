@@ -34,7 +34,6 @@ public class Test2 extends BaseCoreTest {
 	 * Ref: http://stackoverflow.com/questions/12795407/jpa-how-to-select-objects-wich-has-no-multiple-attributes
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void test1() {
@@ -45,7 +44,6 @@ public class Test2 extends BaseCoreTest {
 	 * Ref: http://stackoverflow.com/questions/12795407/jpa-how-to-select-objects-wich-has-no-multiple-attributes
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test(expected = PersistenceException.class)
 	public void test2() {
@@ -58,7 +56,6 @@ public class Test2 extends BaseCoreTest {
 	 * Ref: http://stackoverflow.com/questions/12795407/jpa-how-to-select-objects-wich-has-no-multiple-attributes
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void test3() {

@@ -31,7 +31,6 @@ public class QueryDSLTest extends BaseCoreTest {
 	 * 
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testQueryDSL() {

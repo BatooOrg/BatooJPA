@@ -42,7 +42,6 @@ public @interface Index {
 	 * @return the names of the columns
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	String[] columns() default {};
 
@@ -52,7 +51,6 @@ public @interface Index {
 	 * @return the name of the index
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	String name();
 
@@ -62,7 +60,6 @@ public @interface Index {
 	 * @return the name of the table
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	String table() default "";
 }

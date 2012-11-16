@@ -33,7 +33,6 @@ public interface I<IDType extends Serializable> {
 	 * @return the id
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	IDType getId();
 }

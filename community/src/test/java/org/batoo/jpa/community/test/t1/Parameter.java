@@ -47,7 +47,6 @@ public class Parameter implements Serializable {
 	 * @return the name of the Parameter
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getName() {
 		return this.name;
@@ -59,7 +58,6 @@ public class Parameter implements Serializable {
 	 * @return the parameterID of the Parameter
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public long getParameterID() {
 		return this.parameterID;
@@ -72,7 +70,6 @@ public class Parameter implements Serializable {
 	 *            the name to set for Parameter
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -85,7 +82,6 @@ public class Parameter implements Serializable {
 	 *            the parameterID to set for Parameter
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setParameterID(long parameterID) {
 		this.parameterID = parameterID;

@@ -34,7 +34,6 @@ public class Test1 extends BaseCoreTest {
 	 * Ref: http://stackoverflow.com/questions/12755380/jpa-persisting-a-unidirectional-one-to-many-relationship-fails-with-eclipselin
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void test1() {

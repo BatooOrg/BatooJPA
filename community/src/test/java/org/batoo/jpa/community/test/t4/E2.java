@@ -40,7 +40,6 @@ public class E2 {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public E2() {
 		super();
@@ -51,7 +50,6 @@ public class E2 {
 	 *            the e2
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public E2(E2 e2) {
 		super();
@@ -64,7 +62,6 @@ public class E2 {
 	 *            the value
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public E2(String value) {
 		super();
@@ -78,7 +75,6 @@ public class E2 {
 	 * @return the id of the E
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Long getId() {
 		return this.id;
@@ -90,7 +86,6 @@ public class E2 {
 	 * @return the value of the E2
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getValue() {
 		return this.value;
@@ -103,7 +98,6 @@ public class E2 {
 	 *            the id to set for E
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setId(Long id) {
 		this.id = id;
@@ -116,7 +110,6 @@ public class E2 {
 	 *            the value to set for E2
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setValue(String value) {
 		this.value = value;

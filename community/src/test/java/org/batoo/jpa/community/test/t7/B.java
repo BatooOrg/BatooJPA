@@ -36,7 +36,6 @@ public class B {
 	 * @return the id
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Transient
 	public String getId() {
@@ -47,7 +46,6 @@ public class B {
 	 * @return the key
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Id
 	public long getKey() {
@@ -59,7 +57,6 @@ public class B {
 	 *            the key
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setKey(long key) {
 		this.key = key;

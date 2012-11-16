@@ -41,7 +41,6 @@ public interface AnnotatedClassLocator {
 	 * @return the array of classes located
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	Set<Class<?>> locateClasses(PersistenceUnitInfo persistenceUnitInfo, URL url);
 }

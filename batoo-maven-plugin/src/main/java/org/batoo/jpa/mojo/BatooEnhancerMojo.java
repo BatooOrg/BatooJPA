@@ -204,7 +204,6 @@ public class BatooEnhancerMojo extends AbstractMojo {
 	 * @return true if the execution should be skipped, flase otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private boolean skipMojo() {
 		if (this.skip) {

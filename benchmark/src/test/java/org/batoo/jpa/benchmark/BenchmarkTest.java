@@ -53,7 +53,6 @@ import com.google.common.collect.Maps;
 
 /**
  * @author hceylan
- * 
  * @since $version
  */
 public class BenchmarkTest {
@@ -67,7 +66,6 @@ public class BenchmarkTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@BeforeClass
 	public static void boot() {
@@ -85,7 +83,6 @@ public class BenchmarkTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@AfterClass
 	public static void finish() {
@@ -107,7 +104,6 @@ public class BenchmarkTest {
 	 * @param id
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void _measure(final long id) {
 		this.element = new TimeElement("");
@@ -137,7 +133,6 @@ public class BenchmarkTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@After
 	public void _measureAfter() {
@@ -173,7 +168,6 @@ public class BenchmarkTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Before
 	public void _measureBefore() {
@@ -302,7 +296,6 @@ public class BenchmarkTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void dobatoo() {
@@ -373,7 +366,6 @@ public class BenchmarkTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void doeclipselink() {
@@ -383,7 +375,6 @@ public class BenchmarkTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void dohibernate() {

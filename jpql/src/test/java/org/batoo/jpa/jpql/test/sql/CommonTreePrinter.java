@@ -35,7 +35,6 @@ public class CommonTreePrinter {
 	 * @return the string representation of a common tree
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public static String toString(Tree root) {
 		final StringBuilder builder = new StringBuilder();

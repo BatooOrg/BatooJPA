@@ -15,7 +15,6 @@ public class Test5 extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testQueryDSL() {

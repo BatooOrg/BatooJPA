@@ -47,7 +47,6 @@ public class E1 {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public E1() {
 		super();
@@ -58,7 +57,6 @@ public class E1 {
 	 *            the e2
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public E1(E2 e2) {
 		super();
@@ -72,7 +70,6 @@ public class E1 {
 	 * @return the e2 of the E1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public E2 getE2() {
 		return this.e2;
@@ -84,7 +81,6 @@ public class E1 {
 	 * @return the id of the E
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Long getId() {
 		return this.id;
@@ -97,7 +93,6 @@ public class E1 {
 	 *            the e2 to set for E1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setE2(E2 e2) {
 		this.e2 = e2;
@@ -110,7 +105,6 @@ public class E1 {
 	 *            the id to set for E
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setId(Long id) {
 		this.id = id;

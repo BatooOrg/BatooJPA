@@ -127,7 +127,6 @@ public class Person {
 	 * @return the version of the Person
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Integer getVersion() {
 		return this.version;

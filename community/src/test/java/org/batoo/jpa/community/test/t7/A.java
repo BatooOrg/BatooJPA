@@ -46,7 +46,6 @@ public class A implements I<String> {
 	 * @return the key
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Id
 	public long getKey() {
@@ -58,7 +57,6 @@ public class A implements I<String> {
 	 *            the key
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setKey(long key) {
 		this.key = key;

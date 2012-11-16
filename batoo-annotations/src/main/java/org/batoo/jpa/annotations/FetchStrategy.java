@@ -41,7 +41,6 @@ public @interface FetchStrategy {
 	 * @return the maximum allowed depth for the join
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	int maxDepth() default Integer.MAX_VALUE;
 
@@ -54,7 +53,6 @@ public @interface FetchStrategy {
 	 * 
 	 * @return the preferred strategy for the annotated association
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	FetchStrategyType strategy() default FetchStrategyType.AUTO;

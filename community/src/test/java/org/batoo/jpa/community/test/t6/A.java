@@ -46,7 +46,6 @@ public class A implements I<String> {
 	 *            the id to set
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setId(String id) {
 		this.id = id;

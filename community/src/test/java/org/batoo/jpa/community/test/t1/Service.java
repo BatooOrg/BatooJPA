@@ -58,7 +58,6 @@ public class Service implements Serializable {
 	 * @return the name of the Service
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getName() {
 		return this.name;
@@ -70,7 +69,6 @@ public class Service implements Serializable {
 	 * @return the parameters of the Service
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Set<Parameter> getParameters() {
 		return this.parameters;
@@ -82,7 +80,6 @@ public class Service implements Serializable {
 	 * @return the serviceID of the Service
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public long getServiceID() {
 		return this.serviceID;
@@ -95,7 +92,6 @@ public class Service implements Serializable {
 	 *            the name to set for Service
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -108,7 +104,6 @@ public class Service implements Serializable {
 	 *            the parameters to set for Service
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setParameters(Set<Parameter> parameters) {
 		this.parameters = parameters;
@@ -121,7 +116,6 @@ public class Service implements Serializable {
 	 *            the serviceID to set for Service
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setServiceID(long serviceID) {
 		this.serviceID = serviceID;

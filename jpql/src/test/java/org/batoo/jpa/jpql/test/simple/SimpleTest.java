@@ -89,7 +89,6 @@ public class SimpleTest {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testTestSimpleSelect() {
