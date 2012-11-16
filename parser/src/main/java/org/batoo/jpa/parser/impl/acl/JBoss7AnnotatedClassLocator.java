@@ -95,34 +95,37 @@ public class JBoss7AnnotatedClassLocator implements AnnotatedClassLocator {
 	 * 
 	 */
 	@Override
-	public Set<Class<?>> locateClasses(PersistenceUnitInfo persistenceUnitInfo, URL jarUrl) {
+	public Set<Class<?>> locateClasses(PersistenceUnitInfo persistenceUnitInfo, URL url) {
+		JBoss7AnnotatedClassLocator.LOG.info("Checking persistence root {0} for persistence classes...", url.getFile());
+
 		JBoss7AnnotatedClassLocator.lock.lock();
 
+		final Set<Class<?>> classes = Sets.newHashSet();
 		try {
 			final PersistenceUnitMetadata pu = (PersistenceUnitMetadata) persistenceUnitInfo;
 
 			if (pu.getAnnotationIndex() != null) {
-				final Index index = pu.getAnnotationIndex().get(jarUrl);
+				final Index index = pu.getAnnotationIndex().get(url);
 				if (index == null) {
-					JBoss7AnnotatedClassLocator.LOG.info("No classes present in the jar url {0}", jarUrl);
+					JBoss7AnnotatedClassLocator.LOG.info("No classes present in the jar url {0}", url);
 					return Collections.emptySet();
 				}
-
-				final Set<Class<?>> classes = Sets.newHashSet();
 
 				this.locateClassesFor(pu.getClassLoader(), index, Embeddable.class, classes);
 				this.locateClassesFor(pu.getClassLoader(), index, MappedSuperclass.class, classes);
 				this.locateClassesFor(pu.getClassLoader(), index, Entity.class, classes);
-				JBoss7AnnotatedClassLocator.getClassCache(pu).put(jarUrl, classes);
+				JBoss7AnnotatedClassLocator.getClassCache(pu).put(url, classes);
 
 				return classes;
 			}
 			else {
-				return JBoss7AnnotatedClassLocator.getClassCache(pu).get(jarUrl);
+				return JBoss7AnnotatedClassLocator.getClassCache(pu).get(url);
 			}
 		}
 		finally {
 			JBoss7AnnotatedClassLocator.lock.unlock();
+
+			JBoss7AnnotatedClassLocator.LOG.info("Found persistent classes {0}", classes.toString());
 		}
 	}
 

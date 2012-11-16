@@ -67,6 +67,33 @@ public class JarAnnotatedClassLocator extends BaseAnnotatedClassLocator {
 		super();
 	}
 
+	private Set<Class<?>> findClasses(PersistenceUnitInfo persistenceUnitInfo, URL url, final Set<Class<?>> classes) throws IOException {
+		final JarFile jarFile = new JarFile(url.getFile());
+
+		final Enumeration<JarEntry> entries = jarFile.entries();
+		while (entries.hasMoreElements()) {
+			final JarEntry entry = entries.nextElement();
+
+			if (entry.isDirectory()) {
+				continue;
+			}
+
+			final String className = entry.getName().replace('/', '.').replace('\\', '.');
+
+			if (className.endsWith(".class")) {
+				final Class<?> clazz = this.isPersistentClass(persistenceUnitInfo.getClassLoader(), className.substring(0, className.length() - 6));
+				if (clazz != null) {
+					JarAnnotatedClassLocator.LOG.info("Found annotated class {0}", className);
+
+					classes.add(clazz);
+				}
+			}
+
+		}
+
+		return classes;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * 
@@ -76,33 +103,15 @@ public class JarAnnotatedClassLocator extends BaseAnnotatedClassLocator {
 		final Set<Class<?>> classes = Sets.newHashSet();
 
 		try {
-			final JarFile jarFile = new JarFile(url.getFile());
+			JarAnnotatedClassLocator.LOG.info("Checking persistence root {0} for persistence classes...", url.getFile());
 
-			final Enumeration<JarEntry> entries = jarFile.entries();
-			while (entries.hasMoreElements()) {
-				final JarEntry entry = entries.nextElement();
-
-				if (entry.isDirectory()) {
-					continue;
-				}
-
-				final String className = entry.getName().replace('/', '.').replace('\\', '.');
-
-				if (className.endsWith(".class")) {
-					final Class<?> clazz = this.isPersistentClass(persistenceUnitInfo.getClassLoader(), className.substring(0, className.length() - 6));
-					if (clazz != null) {
-						JarAnnotatedClassLocator.LOG.info("Found annotated class {0}", className);
-
-						classes.add(clazz);
-					}
-				}
-
-			}
-
-			return classes;
+			return this.findClasses(persistenceUnitInfo, url, classes);
 		}
 		catch (final IOException e) {
 			throw new PersistenceException("Unable to read JAR url: " + url);
+		}
+		finally {
+			JarAnnotatedClassLocator.LOG.info("Found persistent classes {0}", classes.toString());
 		}
 	}
 }

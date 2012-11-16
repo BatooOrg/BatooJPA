@@ -19,15 +19,14 @@
 package org.batoo.jpa.parser.impl.acl;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.Locale;
+import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.PersistenceException;
 import javax.persistence.spi.PersistenceUnitInfo;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
 import org.batoo.jpa.spi.AnnotatedClassLocator;
@@ -67,33 +66,32 @@ public class ClassloaderAnnotatedClassLocator extends BaseAnnotatedClassLocator 
 		super();
 	}
 
-	private void findClasses(ClassLoader cl, Set<Class<?>> classes, int rootLength, File file) throws IOException {
+	private Set<Class<?>> findClasses(ClassLoader cl, Set<Class<?>> classes, String root, String path) {
+		final File file = new File(path);
+
 		if (file.isDirectory()) {
+			ClassloaderAnnotatedClassLocator.LOG.debug("Processing directory {0}", path);
+
 			for (final String child : file.list()) {
-				this.findClasses(cl, classes, rootLength, new File(file.getCanonicalPath() + "/" + child));
+				this.findClasses(cl, classes, root, path + "/" + child);
 			}
 		}
 		else {
-			String path = file.getPath();
+			if (FilenameUtils.isExtension(path, "class")) {
+				final String normalizedPath = FilenameUtils.separatorsToUnix(FilenameUtils.normalize(path));
 
-			if (path.endsWith(".class")) {
-				// Windows compatibility
-				if (System.getProperty("os.name").toUpperCase(Locale.ENGLISH).startsWith("WINDOWS")) {
-					rootLength--;
-				}
+				String className = normalizedPath.substring(root.length() + 1).replaceAll("/", ".");
+				className = StringUtils.left(className, className.length() - 6);
 
-				path = path.substring(rootLength, path.length() - 6).replace("/", ".").replace("\\", ".");
-				try {
-					final Class<?> clazz = this.isPersistentClass(cl, path);
-					if (clazz != null) {
-						classes.add(clazz);
-					}
-				}
-				catch (final Exception e) {
-					ClassloaderAnnotatedClassLocator.LOG.warn("Cannot load class {0} in {1}", path, file.getPath());
+				final Class<?> clazz = this.isPersistentClass(cl, className);
+				if (clazz != null) {
+					ClassloaderAnnotatedClassLocator.LOG.debug("Found persistent class {0}", className);
+					classes.add(clazz);
 				}
 			}
 		}
+
+		return classes;
 	}
 
 	/**
@@ -102,29 +100,16 @@ public class ClassloaderAnnotatedClassLocator extends BaseAnnotatedClassLocator 
 	 */
 	@Override
 	public Set<Class<?>> locateClasses(PersistenceUnitInfo persistenceUnitInfo, URL url) {
-		final Set<Class<?>> classes = Sets.newHashSet();
+		final String root = FilenameUtils.separatorsToUnix(FilenameUtils.normalize(url.getFile()));
 
-		final ClassLoader classLoader = persistenceUnitInfo.getClassLoader();
+		ClassloaderAnnotatedClassLocator.LOG.info("Checking persistence root {0} for persistence classes...", root);
 
+		final HashSet<Class<?>> classes = Sets.newHashSet();
 		try {
-			final Enumeration<URL> resources = classLoader.getResources("");
-			while (resources.hasMoreElements()) {
-				String root = resources.nextElement().getFile();
-				if (root.endsWith("WEB-INF/")) {
-					root = root + "classes/";
-				}
-
-				if (!root.endsWith(File.separator) && !root.endsWith("/")) {
-					root = root + File.separator;
-				}
-
-				this.findClasses(classLoader, classes, root.length(), new File(root));
-			}
-
-			return classes;
+			return this.findClasses(persistenceUnitInfo.getClassLoader(), classes, root, root);
 		}
-		catch (final Exception e) {
-			throw new PersistenceException("Cannot scan the classpath", e);
+		finally {
+			ClassloaderAnnotatedClassLocator.LOG.info("Found persistent classes {0}", classes.toString());
 		}
 	}
 }
