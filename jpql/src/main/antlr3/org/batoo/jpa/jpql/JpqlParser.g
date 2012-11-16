@@ -50,6 +50,8 @@ tokens {
 
 
 @members {
+	private int nextParam = 1;
+
     private List<String> errors = new ArrayList<String>();
 
     public void displayRecognitionError(String[] tokenNames,
@@ -433,7 +435,8 @@ simple_entity_expression :
 	;
 
 input_parameter :
-    Ordinal_Parameter
+	(Question_Sign  {$Question_Sign.setText('?' + Integer.toString(nextParam++));})
+	| Ordinal_Parameter
     | Named_Parameter
     ;
 

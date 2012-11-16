@@ -852,7 +852,9 @@ public class JpqlQuery {
 				final Tree leftExpr = exprDef.getChild(0);
 				final Tree rightExpr = exprDef.getChild(1);
 
-				if ((leftExpr.getType() == JpqlParser.Named_Parameter) || (leftExpr.getType() == JpqlParser.Ordinal_Parameter)) {
+				if ((leftExpr.getType() == JpqlParser.Named_Parameter) //
+					|| (leftExpr.getType() == JpqlParser.Ordinal_Parameter) //
+					|| (leftExpr.getType() == JpqlParser.Question_Sign)) {
 					left = (AbstractExpression<X>) this.getExpression(cb, q, rightExpr, null);
 					right = (AbstractExpression<X>) this.getExpression(cb, q, leftExpr, left.getJavaType());
 				}
@@ -939,14 +941,18 @@ public class JpqlQuery {
 		if (exprDef.getType() == JpqlParser.ST_IN) {
 			AbstractExpression<X> left = null;
 
-			if ((exprDef.getChild(0).getType() != JpqlParser.Named_Parameter) && (exprDef.getChild(0).getType() != JpqlParser.Ordinal_Parameter)) {
+			if ((exprDef.getChild(0).getType() != JpqlParser.Named_Parameter) //
+				&& (exprDef.getChild(0).getType() != JpqlParser.Ordinal_Parameter) //
+				&& (exprDef.getChild(0).getType() != JpqlParser.Question_Sign)) {
 				left = this.getExpression(cb, q, exprDef.getChild(0), null);
 			}
 
 			final List<AbstractExpression<X>> expressions = Lists.newArrayList();
 
 			final Tree inDefs = exprDef.getChild(1);
-			if ((inDefs.getType() == JpqlParser.Ordinal_Parameter) || (inDefs.getType() == JpqlParser.Ordinal_Parameter)) {
+			if ((inDefs.getType() == JpqlParser.Named_Parameter) //
+				|| (inDefs.getType() == JpqlParser.Ordinal_Parameter)//
+				|| (inDefs.getType() == JpqlParser.Question_Sign)) {
 				return (AbstractExpression<X>) left.in(this.getExpression(cb, q, inDefs, left.getJavaType()));
 			}
 
@@ -1013,7 +1019,8 @@ public class JpqlQuery {
 			return cb.parameter(javaType, exprDef.getText().substring(1));
 		}
 
-		if (exprDef.getType() == JpqlParser.Ordinal_Parameter) {
+		if ((exprDef.getType() == JpqlParser.Ordinal_Parameter) //
+			|| (exprDef.getType() == JpqlParser.Question_Sign)) {
 			final String strPos = exprDef.getText().substring(1);
 
 			try {

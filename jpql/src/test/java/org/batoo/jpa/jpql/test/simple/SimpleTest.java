@@ -27,15 +27,13 @@ import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.tree.CommonTree;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
-import org.batoo.common.util.BatooUtils;
 import org.batoo.jpa.jpql.JpqlLexer;
 import org.batoo.jpa.jpql.JpqlParser;
 import org.batoo.jpa.jpql.JpqlParser.ql_statement_return;
+import org.batoo.jpa.jpql.test.sql.CommonTreePrinter;
 import org.junit.Test;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 
 /**
  * 
@@ -74,31 +72,6 @@ public class SimpleTest {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private String print(CommonTree tree) {
-		final StringBuilder builder = new StringBuilder();
-		if (tree.getText() != null) {
-			builder.append(" ").append(tree.getText());
-		}
-		else {
-			builder.append("->");
-		}
-
-		final List<CommonTree> children = tree.getChildren();
-		if (children != null) {
-			builder.append("\n");
-			builder.append(Joiner.on("\n").join(Lists.transform(children, new Function<CommonTree, String>() {
-
-				@Override
-				public String apply(CommonTree input) {
-					return BatooUtils.tree(SimpleTest.this.print(input));
-				}
-			})));
-		}
-
-		return builder.toString();
-	}
-
 	private String read(String filename) throws Exception {
 		final StringBuffer fileData = new StringBuffer(1000);
 		final BufferedReader reader = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(filename)));
@@ -120,6 +93,6 @@ public class SimpleTest {
 	 */
 	@Test
 	public void testTestSimpleSelect() {
-		SimpleTest.LOG.debug(this.print(this.parse("first.jpql")));
+		SimpleTest.LOG.debug(CommonTreePrinter.toString(this.parse("first.jpql")));
 	}
 }
