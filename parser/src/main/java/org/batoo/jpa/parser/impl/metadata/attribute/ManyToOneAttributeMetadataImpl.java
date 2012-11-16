@@ -45,7 +45,6 @@ public class ManyToOneAttributeMetadataImpl extends AssociationAttributeMetadata
 	 *            the metadata definition of the one-to-one attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public ManyToOneAttributeMetadataImpl(Member member, ManyToOneAttributeMetadata metadata) {
 		super(member, metadata);
@@ -66,7 +65,6 @@ public class ManyToOneAttributeMetadataImpl extends AssociationAttributeMetadata
 	 *            set of annotations parsed
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public ManyToOneAttributeMetadataImpl(Member member, String name, ManyToOne manyToOne, Set<Class<? extends Annotation>> parsed) {
 		super(member, name, parsed, manyToOne.targetEntity().getName(), manyToOne.fetch(), manyToOne.cascade());

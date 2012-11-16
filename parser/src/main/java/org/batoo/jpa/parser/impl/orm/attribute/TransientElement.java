@@ -41,7 +41,6 @@ public class TransientElement extends AttributeElement implements TransientAttri
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public TransientElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);

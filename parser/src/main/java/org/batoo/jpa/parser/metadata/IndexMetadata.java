@@ -32,7 +32,6 @@ public interface IndexMetadata extends BindableMetadata {
 	 * @return the list of columns names that make up the unique constraint
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String[] getColumnNames();
 
@@ -42,7 +41,6 @@ public interface IndexMetadata extends BindableMetadata {
 	 * @return the name of the table
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String getTable();
 }

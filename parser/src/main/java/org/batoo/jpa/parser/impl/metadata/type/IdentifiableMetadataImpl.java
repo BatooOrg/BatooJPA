@@ -58,7 +58,6 @@ public abstract class IdentifiableMetadataImpl extends ManagedTypeMetadatImpl im
 	 *            the parent access type
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public IdentifiableMetadataImpl(Class<?> clazz, IdentifiableTypeMetadata metadata, AccessType parentAccessType) {
 		super(clazz, metadata, parentAccessType);
@@ -128,7 +127,6 @@ public abstract class IdentifiableMetadataImpl extends ManagedTypeMetadatImpl im
 	 *            the metadata
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 * @return
 	 */
 	private EntityListenerMetadata handleCallbacks(IdentifiableTypeMetadata metadata) {
@@ -148,7 +146,6 @@ public abstract class IdentifiableMetadataImpl extends ManagedTypeMetadatImpl im
 	 * @return if default listeners excluded
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private boolean handleDefaultListeners(IdentifiableTypeMetadata metadata) {
 		if ((metadata != null) && metadata.excludeDefaultListeners()) {
@@ -172,7 +169,6 @@ public abstract class IdentifiableMetadataImpl extends ManagedTypeMetadatImpl im
 	 *            the metadata
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private void handleEntityListeners(IdentifiableTypeMetadata metadata) {
 		if ((metadata != null) && (metadata.getListeners().size() > 0)) {
@@ -204,7 +200,6 @@ public abstract class IdentifiableMetadataImpl extends ManagedTypeMetadatImpl im
 	 * @return the id class attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private String handleIdClass(IdentifiableTypeMetadata metadata) {
 		if ((metadata != null) && StringUtils.isNotBlank(metadata.getIdClass())) {
@@ -229,7 +224,6 @@ public abstract class IdentifiableMetadataImpl extends ManagedTypeMetadatImpl im
 	 * @return if default listeners excluded
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private boolean handleSuperclassListeners(IdentifiableTypeMetadata metadata) {
 		if ((metadata != null) && metadata.excludeSuperclassListeners()) {

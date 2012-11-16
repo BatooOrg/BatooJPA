@@ -51,7 +51,6 @@ public class ClassloaderAnnotatedClassLocator extends BaseAnnotatedClassLocator 
 	 * @return the singleton {@link ClassloaderAnnotatedClassLocator}
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public static ClassloaderAnnotatedClassLocator getInstance() {
 		return ClassloaderAnnotatedClassLocator.INSTANCE;
@@ -60,7 +59,6 @@ public class ClassloaderAnnotatedClassLocator extends BaseAnnotatedClassLocator 
 	/**
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private ClassloaderAnnotatedClassLocator() {
 		super();

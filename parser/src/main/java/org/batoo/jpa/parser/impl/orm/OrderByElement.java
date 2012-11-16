@@ -37,7 +37,6 @@ public class OrderByElement extends ChildElement {
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public OrderByElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);
@@ -58,7 +57,6 @@ public class OrderByElement extends ChildElement {
 	 * @return the order by
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public String getOrderBy() {
 		return this.orderBy;

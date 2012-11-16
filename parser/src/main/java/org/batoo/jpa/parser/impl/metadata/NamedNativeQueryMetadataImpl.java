@@ -51,7 +51,6 @@ public class NamedNativeQueryMetadataImpl implements NamedNativeQueryMetadata {
 	 *            the annotation
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public NamedNativeQueryMetadataImpl(AbstractLocator locator, NamedNativeQuery annotation) {
 		super();

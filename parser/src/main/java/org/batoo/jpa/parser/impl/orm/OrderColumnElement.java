@@ -41,7 +41,6 @@ public class OrderColumnElement extends BaseColumnElement implements ColumnMetad
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public OrderColumnElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);

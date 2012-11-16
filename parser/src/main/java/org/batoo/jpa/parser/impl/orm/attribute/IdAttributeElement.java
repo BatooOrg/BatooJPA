@@ -50,7 +50,6 @@ public class IdAttributeElement extends PhysicalAttributeElement implements IdAt
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public IdAttributeElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, ElementConstants.ELEMENT_TEMPORAL, //

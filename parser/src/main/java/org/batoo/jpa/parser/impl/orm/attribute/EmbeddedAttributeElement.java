@@ -50,7 +50,6 @@ public class EmbeddedAttributeElement extends AttributeElement implements Embedd
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public EmbeddedAttributeElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, //

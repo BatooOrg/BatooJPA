@@ -48,7 +48,6 @@ public interface EntityMetadata extends IdentifiableTypeMetadata, BindableMetada
 	 * @return the associationOverrides of the entity
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	List<AssociationMetadata> getAssociationOverrides();
 
@@ -58,7 +57,6 @@ public interface EntityMetadata extends IdentifiableTypeMetadata, BindableMetada
 	 * @return the attributeOverrides of the entity
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	List<AttributeOverrideMetadata> getAttributeOverrides();
 
@@ -68,7 +66,6 @@ public interface EntityMetadata extends IdentifiableTypeMetadata, BindableMetada
 	 * @return true if the entity is cachable
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	Boolean getCacheable();
 
@@ -78,7 +75,6 @@ public interface EntityMetadata extends IdentifiableTypeMetadata, BindableMetada
 	 * @return the discriminator column definition of the entity
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	DiscriminatorColumnMetadata getDiscriminatorColumn();
 
@@ -88,7 +84,6 @@ public interface EntityMetadata extends IdentifiableTypeMetadata, BindableMetada
 	 * @return the discriminator value for the entity
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String getDiscriminatorValue();
 
@@ -98,7 +93,6 @@ public interface EntityMetadata extends IdentifiableTypeMetadata, BindableMetada
 	 * @return the list of indexes of the entity
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	List<IndexMetadata> getIndexes();
 
@@ -108,7 +102,6 @@ public interface EntityMetadata extends IdentifiableTypeMetadata, BindableMetada
 	 * @return the inheritance type of the entity
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	InheritanceType getInheritanceType();
 
@@ -118,7 +111,6 @@ public interface EntityMetadata extends IdentifiableTypeMetadata, BindableMetada
 	 * @return the list of named native queries
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	List<NamedNativeQueryMetadata> getNamedNativeQueries();
 
@@ -128,7 +120,6 @@ public interface EntityMetadata extends IdentifiableTypeMetadata, BindableMetada
 	 * @return the list of named queries
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	List<NamedQueryMetadata> getNamedQueries();
 
@@ -138,7 +129,6 @@ public interface EntityMetadata extends IdentifiableTypeMetadata, BindableMetada
 	 * @return the list secondary tables of the entity
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	List<SecondaryTableMetadata> getSecondaryTables();
 
@@ -148,7 +138,6 @@ public interface EntityMetadata extends IdentifiableTypeMetadata, BindableMetada
 	 * @return the sequence Generator of the entity
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	SequenceGeneratorMetadata getSequenceGenerator();
 
@@ -158,7 +147,6 @@ public interface EntityMetadata extends IdentifiableTypeMetadata, BindableMetada
 	 * @return the table of the entity
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	TableMetadata getTable();
 
@@ -168,7 +156,6 @@ public interface EntityMetadata extends IdentifiableTypeMetadata, BindableMetada
 	 * @return the table Generator of the entity
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	TableGeneratorMetadata getTableGenerator();
 }

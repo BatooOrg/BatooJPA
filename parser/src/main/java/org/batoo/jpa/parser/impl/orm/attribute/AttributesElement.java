@@ -66,7 +66,6 @@ public class AttributesElement extends ParentElement implements AttributesMetada
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public AttributesElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes,//

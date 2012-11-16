@@ -32,7 +32,6 @@ public interface EntityListenerMetadata extends LocatableMatadata {
 	 * 
 	 * Entity listener callback types.
 	 * 
-	 * @author hceylan
 	 * @since 2.0.0
 	 */
 	public enum EntityListenerType {
@@ -78,7 +77,6 @@ public interface EntityListenerMetadata extends LocatableMatadata {
 	 * @return the list of callbacks
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	List<CallbackMetadata> getCallbacks();
 
@@ -88,7 +86,6 @@ public interface EntityListenerMetadata extends LocatableMatadata {
 	 * @return the entity listener class
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String getClassName();
 }

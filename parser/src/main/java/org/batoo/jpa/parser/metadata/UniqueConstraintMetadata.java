@@ -32,7 +32,6 @@ public interface UniqueConstraintMetadata extends BindableMetadata, LocatableMat
 	 * @return the list of columns names that make up the unique constraint
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String[] getColumnNames();
 }

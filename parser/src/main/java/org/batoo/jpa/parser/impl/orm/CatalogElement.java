@@ -37,7 +37,6 @@ public class CatalogElement extends ChildElement {
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public CatalogElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);
@@ -58,7 +57,6 @@ public class CatalogElement extends ChildElement {
 	 * @return the catalog of the CatalogElement
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public String getCatalog() {
 		return this.catalog;

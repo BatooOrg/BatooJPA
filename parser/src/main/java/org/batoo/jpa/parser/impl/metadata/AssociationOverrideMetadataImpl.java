@@ -51,7 +51,6 @@ public class AssociationOverrideMetadataImpl implements AssociationMetadata {
 	 *            the annotation
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public AssociationOverrideMetadataImpl(AbstractLocator locator, AssociationOverride annotation) {
 		super();

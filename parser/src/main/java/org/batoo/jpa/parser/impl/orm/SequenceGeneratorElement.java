@@ -39,7 +39,6 @@ public class SequenceGeneratorElement extends GeneratorElement implements Sequen
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public SequenceGeneratorElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);

@@ -83,7 +83,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * @param <A>
 	 *            the type of the attribute
 	 * 
-	 * @author hceylan
 	 * @since 2.0.0
 	 */
 	private abstract class AttributesParser<A extends AttributeMetadata> extends ArrayList<A> {
@@ -101,7 +100,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 		 *            the annotation that indicates the type
 		 * 
 		 * @since 2.0.0
-		 * @author hceylan
 		 */
 		@SuppressWarnings("unchecked")
 		public AttributesParser(Map<String, Member> memberMap, List<A> metadatas, Class<? extends Annotation> indicativeAnnotation) {
@@ -135,7 +133,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 		 * @return the attribute created
 		 * 
 		 * @since 2.0.0
-		 * @author hceylan
 		 */
 		protected abstract A parseAttribute(String name, Member member, A metadata, Set<Class<? extends Annotation>> parsed);
 
@@ -233,7 +230,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 *            the metadata
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public AttributesMetadataImpl(ManagedTypeMetadata parent, Class<?> clazz, AttributesMetadata metadata) {
 		super();
@@ -272,7 +268,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * Consolidates all the ORM defined attributes into a single map.
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private void consolidateAttributes() {
 
@@ -301,7 +296,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 *            the list of attributes to consolidate
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private void consolidateAttributes(List<? extends AttributeMetadata> attributes) {
 		for (final AttributeMetadata attribute : attributes) {
@@ -420,7 +414,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * @return the list of basic attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private List<BasicAttributeMetadata> handleBasics() {
 		final List<BasicAttributeMetadata> list = this.metadata != null ? this.metadata.getBasics() : null;
@@ -446,7 +439,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * @return list of element collections attributes.
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private List<ElementCollectionAttributeMetadata> handleElementCollections() {
 		final List<ElementCollectionAttributeMetadata> list = this.metadata != null ? this.metadata.getElementCollections() : null;
@@ -474,7 +466,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * @return list of embedded ids.
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private List<EmbeddedIdAttributeMetadata> handleEmbeddedIds() {
 		final List<EmbeddedIdAttributeMetadata> list = this.metadata != null ? this.metadata.getEmbeddedIds() : null;
@@ -500,7 +491,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * @return list of embedded attributes.
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private List<EmbeddedAttributeMetadata> handleEmbeddeds() {
 		final List<EmbeddedAttributeMetadata> list = this.metadata != null ? this.metadata.getEmbeddeds() : null;
@@ -526,7 +516,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * @return list of id attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private List<IdAttributeMetadata> handleIds() {
 		final List<IdAttributeMetadata> list = this.metadata != null ? this.metadata.getIds() : null;
@@ -551,7 +540,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * @return list of many-to-many attributes.
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private List<ManyToManyAttributeMetadata> handleManyToManies() {
 		final List<ManyToManyAttributeMetadata> list = this.metadata != null ? this.metadata.getManyToManies() : null;
@@ -579,7 +567,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * @return list of many-to-one attributes.
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private List<ManyToOneAttributeMetadata> handleManyToOnes() {
 		final List<ManyToOneAttributeMetadata> list = this.metadata != null ? this.metadata.getManyToOnes() : null;
@@ -607,7 +594,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * @return list of one-to-many attributes.
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private List<OneToManyAttributeMetadata> handleOneToManies() {
 		final List<OneToManyAttributeMetadata> list = this.metadata != null ? this.metadata.getOneToManies() : null;
@@ -635,7 +621,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * @return list of one-to-one attributes.
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private List<OneToOneAttributeMetadata> handleOneToOnes() {
 		final List<OneToOneAttributeMetadata> list = this.metadata != null ? this.metadata.getOneToOnes() : null;
@@ -663,7 +648,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * @return the list of transient attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private List<TransientAttributeMetadata> handleTransients() {
 		final List<TransientAttributeMetadata> list = this.metadata != null ? this.metadata.getTransients() : null;
@@ -689,7 +673,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * @return the list of version attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private List<VersionAttributeMetadata> handleVersions() {
 		final List<VersionAttributeMetadata> list = this.metadata != null ? this.metadata.getVersions() : null;
@@ -726,7 +709,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * @return true if should parse, false otherwise
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private boolean isApplicableToAccessType(Member member, AttributeMetadata ormMetadata) {
 		AccessType effective;
@@ -793,7 +775,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * @see EntityMetadataImpl#isMetadataComplete()
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public boolean isMetadataComplete() {
 		return this.parent.isMetadataComplete();
@@ -805,7 +786,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * Based on the {@link AccessType} of the context, fields or properties is given priority.
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private void probeAttributes(Class<?> clazz) {
 		final AccessType accessType = this.parent.getAccessType();
@@ -836,7 +816,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 *            the default {@link AccessType} of the context
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private void probeFields(final Class<?> clazz, AccessType accessType) {
 		for (final Field field : clazz.getDeclaredFields()) {
@@ -872,7 +851,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 *            the default {@link AccessType} of the context
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private void probeProperties(Class<?> clazz, AccessType accessType) {
 		// get the properties of the class

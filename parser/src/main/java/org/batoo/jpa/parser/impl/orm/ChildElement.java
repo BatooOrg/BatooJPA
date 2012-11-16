@@ -40,7 +40,6 @@ public abstract class ChildElement extends Element {
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public ChildElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, ChildElement.NO_CHILDREN);

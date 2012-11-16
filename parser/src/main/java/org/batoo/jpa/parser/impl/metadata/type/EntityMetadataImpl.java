@@ -103,7 +103,6 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 *            the parent access type
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public EntityMetadataImpl(Class<?> clazz, EntityMetadata metadata, AccessType parentAccessType) {
 		super(clazz, metadata, parentAccessType);
@@ -277,8 +276,6 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 *            the set of annotations parsed
 	 * 
 	 * @since 2.0.0
-	 * @author
-	 * @param parsed
 	 */
 	private void handleAssociationOverrides(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
 		if ((metadata != null) && (metadata.getAssociationOverrides().size() > 0)) {
@@ -318,8 +315,6 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 *            the set of annotations parsed
 	 * 
 	 * @since 2.0.0
-	 * @author
-	 * @param parsed
 	 */
 	private void handleAttributeOverrides(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
 		if ((metadata != null) && (metadata.getAttributeOverrides().size() > 0)) {
@@ -361,7 +356,6 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 * @return the name
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private Boolean handleCacheable(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
 		if ((metadata != null) && (metadata.getCacheable() != null)) {
@@ -387,7 +381,6 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 *            the set of annotations parsed
 	 * 
 	 * @since 2.0.0
-	 * @author
 	 */
 	private void handleIndexes(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
 		final Indexes indexes = this.getClazz().getAnnotation(Indexes.class);
@@ -417,7 +410,6 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 *            the set of annotations parsed
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private void handleInheritance(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
 		if (metadata != null) {
@@ -470,7 +462,6 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 * @return the name
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private String handleName(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
 		if ((metadata != null) && StringUtils.isNotBlank(metadata.getName())) {
@@ -496,8 +487,6 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 *            the set of annotations parsed
 	 * 
 	 * @since 2.0.0
-	 * @author
-	 * @param parsed
 	 */
 	private void handleNamedNativeQuery(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
 		if ((metadata != null) && (metadata.getNamedNativeQueries().size() > 0)) {
@@ -531,7 +520,6 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 *            the set of annotations parsed
 	 * 
 	 * @since 2.0.0
-	 * @author
 	 */
 	private void handleNamedQuery(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
 		if ((metadata != null) && (metadata.getNamedQueries().size() > 0)) {
@@ -570,7 +558,6 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 *            the set of annotations parsed
 	 * 
 	 * @since 2.0.0
-	 * @author
 	 */
 	private void handleSecondaryTables(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
 		if ((metadata != null) && (metadata.getSecondaryTables().size() > 0)) {
@@ -612,7 +599,6 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 * @return the sequence generator metadata or null
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private SequenceGeneratorMetadata handleSequenceGenerator(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
 		if ((metadata != null) && (metadata.getSequenceGenerator() != null)) {
@@ -646,7 +632,6 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 * @return the table metadata or null
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private TableMetadata handleTable(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
 		if ((metadata != null) && (metadata.getTable() != null)) {
@@ -679,7 +664,6 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 * @return the table generator metadata or null
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private TableGeneratorMetadata handleTableGenerator(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
 		if ((metadata != null) && (metadata.getTableGenerator() != null)) {

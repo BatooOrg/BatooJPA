@@ -36,7 +36,6 @@ public interface AttributeMetadata extends BindableMetadata {
 	 * @return the access type of the attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	AccessType getAccess();
 }

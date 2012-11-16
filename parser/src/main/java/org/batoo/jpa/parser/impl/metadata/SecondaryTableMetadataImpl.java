@@ -53,7 +53,6 @@ public class SecondaryTableMetadataImpl implements SecondaryTableMetadata {
 	 *            the annotation
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public SecondaryTableMetadataImpl(AbstractLocator locator, SecondaryTable annotation) {
 		super();

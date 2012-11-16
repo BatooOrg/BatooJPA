@@ -71,7 +71,6 @@ public class ManyToManyAttributeElement extends AssociationElement implements Ma
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public ManyToManyAttributeElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, FetchType.LAZY, //

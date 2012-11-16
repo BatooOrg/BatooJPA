@@ -32,7 +32,6 @@ public interface BindableMetadata extends LocatableMatadata {
 	 * @return the name of the Bindable.
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String getName();
 }

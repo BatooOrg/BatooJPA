@@ -63,7 +63,6 @@ public class EntityMappings extends ParentElement implements Metadata {
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public EntityMappings(Map<String, String> attributes) {
 		super(null, attributes, //

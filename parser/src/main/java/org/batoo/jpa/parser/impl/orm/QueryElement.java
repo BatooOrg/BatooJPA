@@ -37,7 +37,6 @@ public class QueryElement extends ChildElement {
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public QueryElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);
@@ -58,7 +57,6 @@ public class QueryElement extends ChildElement {
 	 * @return the query
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public String getQuery() {
 		return this.query;

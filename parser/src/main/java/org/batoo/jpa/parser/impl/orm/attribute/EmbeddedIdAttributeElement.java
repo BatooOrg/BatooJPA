@@ -47,7 +47,6 @@ public class EmbeddedIdAttributeElement extends AttributeElement implements Embe
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public EmbeddedIdAttributeElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, ElementConstants.ELEMENT_ATTRIBUTE_OVERRIDE);

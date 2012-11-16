@@ -34,7 +34,6 @@ public interface GeneratedValueMetadata extends LocatableMatadata {
 	 * @return the name of the generator of the generated value
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String getGenerator();
 
@@ -44,7 +43,6 @@ public interface GeneratedValueMetadata extends LocatableMatadata {
 	 * @return the strategy of the generated value
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	GenerationType getStrategy();
 

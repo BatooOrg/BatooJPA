@@ -45,7 +45,6 @@ public class DiscriminatorColumnMetadataImpl implements DiscriminatorColumnMetad
 	 *            the discriminator column annotation
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public DiscriminatorColumnMetadataImpl(AbstractLocator locator, DiscriminatorColumn discriminatorColumn) {
 		super();

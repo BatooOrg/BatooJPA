@@ -38,7 +38,6 @@ public class PersistenceUnitMetadataElement extends ParentElement {
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public PersistenceUnitMetadataElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, //
@@ -52,7 +51,6 @@ public class PersistenceUnitMetadataElement extends ParentElement {
 	 * @return the persistence unit defaults
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public PersistenceUnitDefaults getPersistenceUnitDefaults() {
 		return this.persistenceUnitDefaults;
@@ -79,7 +77,6 @@ public class PersistenceUnitMetadataElement extends ParentElement {
 	 * @return the xmlMappingMetadataComplete
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public boolean isXmlMappingMetadataComplete() {
 		return this.xmlMappingMetadataComplete;

@@ -50,7 +50,6 @@ public class NamedQueryMetadataImpl implements NamedQueryMetadata {
 	 *            the annotation
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public NamedQueryMetadataImpl(AbstractLocator locator, NamedQuery annotation) {
 		super();

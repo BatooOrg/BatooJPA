@@ -46,7 +46,6 @@ public abstract class AttributeElement extends ParentElement implements Attribut
 	 *            the name of the elements expected
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public AttributeElement(ParentElement parent, Map<String, String> attributes, String... expectedChildElements) {
 		super(parent, attributes, expectedChildElements);

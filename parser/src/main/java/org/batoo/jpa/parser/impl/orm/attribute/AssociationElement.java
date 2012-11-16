@@ -67,7 +67,6 @@ public abstract class AssociationElement extends AttributeElement implements Ass
 	 *            the name of the elements expected
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public AssociationElement(ParentElement parent, Map<String, String> attributes, FetchType defaultFetchType, String... expectedChildElements) {
 		super(parent, attributes, ParentElement.join(expectedChildElements, //

@@ -32,8 +32,6 @@ public interface ColumnTransformerMetadata extends LocatableMatadata {
 	 * @return the custom read sql expression
 	 * 
 	 * @since version
-	 * @author asimarslan
-	 * 
 	 */
 	String getRead();
 
@@ -43,8 +41,6 @@ public interface ColumnTransformerMetadata extends LocatableMatadata {
 	 * @return the custom write sql expression
 	 * 
 	 * @since version
-	 * @author asimarslan
-	 * 
 	 */
 	String getWrite();
 }

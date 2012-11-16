@@ -32,7 +32,6 @@ public interface BaseColumnMetadata extends BindableMetadata {
 	 * @return the raw column definition of the column.
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String getColumnDefinition();
 
@@ -42,7 +41,6 @@ public interface BaseColumnMetadata extends BindableMetadata {
 	 * @return the table of the column
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String getTable();
 
@@ -52,7 +50,6 @@ public interface BaseColumnMetadata extends BindableMetadata {
 	 * @return true if the column is insertable
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	boolean isInsertable();
 
@@ -62,7 +59,6 @@ public interface BaseColumnMetadata extends BindableMetadata {
 	 * @return true if the column is nullable
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	boolean isNullable();
 
@@ -72,7 +68,6 @@ public interface BaseColumnMetadata extends BindableMetadata {
 	 * @return true if the column is unique
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	boolean isUnique();
 
@@ -82,7 +77,6 @@ public interface BaseColumnMetadata extends BindableMetadata {
 	 * @return true if the column is updatable
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	boolean isUpdatable();
 }

@@ -34,7 +34,6 @@ public interface NamedNativeQueryMetadata extends BindableMetadata {
 	 * @return the list query hints
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	Map<String, Object> getHints();
 
@@ -44,7 +43,6 @@ public interface NamedNativeQueryMetadata extends BindableMetadata {
 	 * @return the query
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String getQuery();
 
@@ -54,7 +52,6 @@ public interface NamedNativeQueryMetadata extends BindableMetadata {
 	 * @return the result class.
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String getResultClass();
 
@@ -64,7 +61,6 @@ public interface NamedNativeQueryMetadata extends BindableMetadata {
 	 * @return the resultset mapping
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String getResultSetMapping();
 }

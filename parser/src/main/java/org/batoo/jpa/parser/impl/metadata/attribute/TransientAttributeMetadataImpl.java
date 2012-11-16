@@ -43,7 +43,6 @@ public class TransientAttributeMetadataImpl extends AttributeMetadataImpl implem
 	 *            the annotations parsed
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public TransientAttributeMetadataImpl(Member member, String name, Set<Class<? extends Annotation>> parsed) {
 		super(member, name);
@@ -58,7 +57,6 @@ public class TransientAttributeMetadataImpl extends AttributeMetadataImpl implem
 	 *            the metadata definition of the transient attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public TransientAttributeMetadataImpl(Member member, TransientAttributeMetadata metadata) {
 		super(member, metadata);

@@ -32,7 +32,6 @@ public interface ColumnMetadata extends BaseColumnMetadata {
 	 * @return the length of the column
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	int getLength();
 
@@ -42,7 +41,6 @@ public interface ColumnMetadata extends BaseColumnMetadata {
 	 * @return the precision of the column
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	int getPrecision();
 
@@ -52,7 +50,6 @@ public interface ColumnMetadata extends BaseColumnMetadata {
 	 * @return the scale of the column
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	int getScale();
 

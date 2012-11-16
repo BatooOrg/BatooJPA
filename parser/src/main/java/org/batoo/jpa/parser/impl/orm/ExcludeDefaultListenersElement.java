@@ -35,7 +35,6 @@ public class ExcludeDefaultListenersElement extends ChildElement {
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public ExcludeDefaultListenersElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);

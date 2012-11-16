@@ -39,7 +39,6 @@ public class EnumeratedElement extends ChildElement {
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public EnumeratedElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);
@@ -60,7 +59,6 @@ public class EnumeratedElement extends ChildElement {
 	 * @return the enumType
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public EnumType getEnumType() {
 		return this.enumType;

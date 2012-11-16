@@ -32,7 +32,6 @@ public interface OrphanableAssociationAttributeMetadata {
 	 * @return true if the orphaned entities of the association attribute is removed
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	boolean removesOrphans();
 }

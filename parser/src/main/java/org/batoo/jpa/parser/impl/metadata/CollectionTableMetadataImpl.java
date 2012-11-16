@@ -53,7 +53,6 @@ public class CollectionTableMetadataImpl implements CollectionTableMetadata {
 	 *            the annotation
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public CollectionTableMetadataImpl(AbstractLocator locator, CollectionTable annotation) {
 		super();

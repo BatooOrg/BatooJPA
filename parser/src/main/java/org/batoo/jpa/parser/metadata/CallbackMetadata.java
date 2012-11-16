@@ -34,7 +34,6 @@ public interface CallbackMetadata extends LocatableMatadata {
 	 * @return the method name of the callback
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String getName();
 
@@ -44,7 +43,6 @@ public interface CallbackMetadata extends LocatableMatadata {
 	 * @return the type of the callback
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	EntityListenerType getType();
 }

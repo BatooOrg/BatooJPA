@@ -42,7 +42,6 @@ public class EntityListenersElement extends ParentElement {
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public EntityListenersElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, ElementConstants.ELEMENT_ENTITY_LISTENER);
@@ -54,7 +53,6 @@ public class EntityListenersElement extends ParentElement {
 	 * @return the listeners of the EntityListenersElement
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public List<EntityListenerMetadata> getListeners() {
 		return this.listeners;

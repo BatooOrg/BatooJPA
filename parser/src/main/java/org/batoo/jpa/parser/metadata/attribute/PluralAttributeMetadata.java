@@ -40,7 +40,6 @@ public interface PluralAttributeMetadata {
 	 * @return the map key
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String getMapKey();
 
@@ -50,7 +49,6 @@ public interface PluralAttributeMetadata {
 	 * @return the list of map key attribute overrides
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	List<AttributeOverrideMetadata> getMapKeyAttributeOverrides();
 
@@ -60,7 +58,6 @@ public interface PluralAttributeMetadata {
 	 * @return the class name of the map key
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String getMapKeyClassName();
 
@@ -70,7 +67,6 @@ public interface PluralAttributeMetadata {
 	 * @return the map key column definition
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	ColumnMetadata getMapKeyColumn();
 
@@ -80,7 +76,6 @@ public interface PluralAttributeMetadata {
 	 * @return the enum type of the map key
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	EnumType getMapKeyEnumType();
 
@@ -90,7 +85,6 @@ public interface PluralAttributeMetadata {
 	 * @return the temporal type of the map key
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	TemporalType getMapKeyTemporalType();
 
@@ -100,7 +94,6 @@ public interface PluralAttributeMetadata {
 	 * @return the order by
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String getOrderBy();
 
@@ -110,7 +103,6 @@ public interface PluralAttributeMetadata {
 	 * @return the order column definition
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	ColumnMetadata getOrderColumn();
 }

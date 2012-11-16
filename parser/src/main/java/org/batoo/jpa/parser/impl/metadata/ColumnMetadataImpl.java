@@ -52,7 +52,6 @@ public class ColumnMetadataImpl implements ColumnMetadata {
 	 *            the annotation
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public ColumnMetadataImpl(AbstractLocator locator, Column annotation) {
 		super();
@@ -77,7 +76,6 @@ public class ColumnMetadataImpl implements ColumnMetadata {
 	 *            the annotation
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public ColumnMetadataImpl(AbstractLocator locator, MapKeyColumn annotation) {
 		super();
@@ -102,7 +100,6 @@ public class ColumnMetadataImpl implements ColumnMetadata {
 	 *            the annotation
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public ColumnMetadataImpl(AbstractLocator locator, OrderColumn annotation) {
 		super();

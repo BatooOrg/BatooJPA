@@ -37,7 +37,6 @@ public class ColumnNameElement extends ChildElement {
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public ColumnNameElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);
@@ -58,7 +57,6 @@ public class ColumnNameElement extends ChildElement {
 	 * @return the name
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public String getName() {
 		return this.name;

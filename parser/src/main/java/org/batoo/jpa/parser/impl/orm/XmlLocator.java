@@ -43,7 +43,6 @@ public class XmlLocator extends AbstractLocator {
 	 *            the locator
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public XmlLocator(String fileName, String localName, Locator locator) {
 		super();
@@ -61,7 +60,6 @@ public class XmlLocator extends AbstractLocator {
 	 * @return the column number of the location
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public int getColumnNumber() {
 		return this.columnNumber;
@@ -73,7 +71,6 @@ public class XmlLocator extends AbstractLocator {
 	 * @return the name of the ORM XML File
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public String getFileName() {
 		return this.fileName;
@@ -85,7 +82,6 @@ public class XmlLocator extends AbstractLocator {
 	 * @return the line number of the location
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public int getLineNumber() {
 		return this.lineNumber;
@@ -97,7 +93,6 @@ public class XmlLocator extends AbstractLocator {
 	 * @return the local name of the location
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public String getLocalName() {
 		return this.localName;

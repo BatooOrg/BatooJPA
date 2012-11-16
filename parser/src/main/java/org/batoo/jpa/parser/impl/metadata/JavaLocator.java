@@ -41,7 +41,6 @@ public class JavaLocator extends AbstractLocator {
 	 *            the class
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public JavaLocator(Class<?> clazz) {
 		super();
@@ -58,7 +57,6 @@ public class JavaLocator extends AbstractLocator {
 	 *            the member
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public JavaLocator(Member member) {
 		super();

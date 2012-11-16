@@ -35,7 +35,6 @@ public class ExcludeSuperclassListenersElement extends ChildElement {
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public ExcludeSuperclassListenersElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);

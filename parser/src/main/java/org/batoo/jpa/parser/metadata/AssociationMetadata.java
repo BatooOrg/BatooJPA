@@ -34,7 +34,6 @@ public interface AssociationMetadata extends BindableMetadata {
 	 * @return the list of join column definition
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	List<JoinColumnMetadata> getJoinColumns();
 
@@ -44,7 +43,6 @@ public interface AssociationMetadata extends BindableMetadata {
 	 * @return the join table definition
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	JoinTableMetadata getJoinTable();
 }

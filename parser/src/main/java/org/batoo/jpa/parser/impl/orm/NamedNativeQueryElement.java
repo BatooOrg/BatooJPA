@@ -45,7 +45,6 @@ public class NamedNativeQueryElement extends ParentElement implements NamedNativ
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public NamedNativeQueryElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, //

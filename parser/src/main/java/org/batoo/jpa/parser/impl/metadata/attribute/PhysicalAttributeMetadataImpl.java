@@ -50,7 +50,6 @@ public class PhysicalAttributeMetadataImpl extends AttributeMetadataImpl impleme
 	 *            the metadata definition of the singular attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public PhysicalAttributeMetadataImpl(Member member, PhysicalAttributeMetadata metadata) {
 		super(member, metadata);
@@ -68,7 +67,6 @@ public class PhysicalAttributeMetadataImpl extends AttributeMetadataImpl impleme
 	 *            set of annotations parsed
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public PhysicalAttributeMetadataImpl(Member member, String name, Set<Class<? extends Annotation>> parsed) {
 		super(member, name);

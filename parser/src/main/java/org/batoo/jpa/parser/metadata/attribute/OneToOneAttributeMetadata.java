@@ -37,7 +37,6 @@ public interface OneToOneAttributeMetadata extends AssociationAttributeMetadata,
 	 * @return the primary key join columns definition of the one to one attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	List<PrimaryKeyJoinColumnMetadata> getPrimaryKeyJoinColumns();
 }

@@ -37,7 +37,6 @@ public class MapKeyElement extends ChildElement {
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public MapKeyElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);
@@ -58,7 +57,6 @@ public class MapKeyElement extends ChildElement {
 	 * @return the name of the map key
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public String getName() {
 		return this.name;

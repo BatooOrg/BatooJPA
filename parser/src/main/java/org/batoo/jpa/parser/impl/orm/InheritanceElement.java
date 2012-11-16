@@ -41,7 +41,6 @@ public class InheritanceElement extends ChildElement implements InheritanceMetad
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public InheritanceElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);

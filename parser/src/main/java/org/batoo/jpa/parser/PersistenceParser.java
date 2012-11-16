@@ -39,7 +39,6 @@ public interface PersistenceParser {
 	 * @return the classloader of the PersistenceParser
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	ClassLoader getClassloader();
 
@@ -49,7 +48,6 @@ public interface PersistenceParser {
 	 * @return the JTA datasource JNDI name
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	DataSource getJtaDataSource();
 
@@ -59,7 +57,6 @@ public interface PersistenceParser {
 	 * @return the metadata of the parser
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	MetadataImpl getMetadata();
 
@@ -69,7 +66,6 @@ public interface PersistenceParser {
 	 * @return the non-JTA datasource JNDI name
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	DataSource getNonJtaDataSource();
 
@@ -79,7 +75,6 @@ public interface PersistenceParser {
 	 * @return the properties of the persistence unit
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	Map<String, Object> getProperties();
 
@@ -89,7 +84,6 @@ public interface PersistenceParser {
 	 * @return the persistence provider
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String getProvider();
 
@@ -99,7 +93,6 @@ public interface PersistenceParser {
 	 * @return the second-level cache mode that must be used by the provider for the persistence unit
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	SharedCacheMode getSharedCacheMode();
 
@@ -109,7 +102,6 @@ public interface PersistenceParser {
 	 * @return true if the persistence unit has validators, false otherwise
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	boolean hasValidators();
 }

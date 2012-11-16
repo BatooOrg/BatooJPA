@@ -59,7 +59,6 @@ public class MappingException extends RuntimeException {
 	 *            the locators
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public MappingException(String message, AbstractLocator... locators) {
 		super(message + MappingException.getLocation(locators));
@@ -74,7 +73,6 @@ public class MappingException extends RuntimeException {
 	 *            the locators
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public MappingException(String message, Throwable cause, AbstractLocator... locators) {
 		super(message + MappingException.getLocation(locators), cause);

@@ -57,8 +57,8 @@ import com.google.common.collect.Sets;
 /**
  * The implementation for {@link AssociationAttributeMetadata}.
  * 
- * @author hceylan
  * @since 2.0.0
+ * @author hceylan
  */
 public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl implements AssociationAttributeMetadata {
 
@@ -80,7 +80,6 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	 *            the metadata definition of the association attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public AssociationAttributeMetadataImpl(Member member, AssociationAttributeMetadata metadata) {
 		super(member, metadata);
@@ -109,7 +108,6 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	 *            the cascades of the of the association attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public AssociationAttributeMetadataImpl(Member member, String name, Set<Class<? extends Annotation>> parsed, String targetEntity, FetchType fetchType,
 		CascadeType[] cascades) {
@@ -234,7 +232,6 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	 * @return the map key value
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	protected boolean handleId(Member member, Set<Class<? extends Annotation>> parsed) {
 		final Id annotation = ReflectHelper.getAnnotation(member, Id.class);
@@ -257,7 +254,6 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	 * @return the map key value
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	protected String handleMapKey(Member member, Set<Class<? extends Annotation>> parsed) {
 		final MapKey annotation = ReflectHelper.getAnnotation(member, MapKey.class);
@@ -280,7 +276,6 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	 * @return the map key value
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	protected String handleMapKeyClassName(Member member, Set<Class<? extends Annotation>> parsed) {
 		final MapKeyClass annotation = ReflectHelper.getAnnotation(member, MapKeyClass.class);
@@ -303,7 +298,6 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	 * @return the map key value
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	protected ColumnMetadata handleMapKeyColumn(Member member, Set<Class<? extends Annotation>> parsed) {
 		final MapKeyColumn annotation = ReflectHelper.getAnnotation(member, MapKeyColumn.class);
@@ -326,7 +320,6 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	 * @return the map key value
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	protected EnumType handleMapKeyEnumType(Member member, Set<Class<? extends Annotation>> parsed) {
 		final MapKeyEnumerated annotation = ReflectHelper.getAnnotation(member, MapKeyEnumerated.class);
@@ -349,7 +342,6 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	 * @return the map key value
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	protected TemporalType handleMapKeyTemporalType(Member member, Set<Class<? extends Annotation>> parsed) {
 		final MapKeyTemporal annotation = ReflectHelper.getAnnotation(member, MapKeyTemporal.class);
@@ -372,7 +364,6 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	 * @return the map key value
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	protected String handleMapsId(Member member, Set<Class<? extends Annotation>> parsed) {
 		final MapsId annotation = ReflectHelper.getAnnotation(member, MapsId.class);
@@ -395,7 +386,6 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	 * @return the map key value
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	protected String handleOrderBy(Member member, Set<Class<? extends Annotation>> parsed) {
 		final OrderBy annotation = ReflectHelper.getAnnotation(member, OrderBy.class);
@@ -418,7 +408,6 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	 * @return the map key value
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	protected ColumnMetadata handleOrderColumn(final Member member, Set<Class<? extends Annotation>> parsed) {
 		final OrderColumn annotation = ReflectHelper.getAnnotation(member, OrderColumn.class);

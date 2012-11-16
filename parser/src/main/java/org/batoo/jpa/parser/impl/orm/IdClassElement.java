@@ -37,7 +37,6 @@ public class IdClassElement extends ChildElement {
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public IdClassElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);
@@ -58,7 +57,6 @@ public class IdClassElement extends ChildElement {
 	 * @return the idClass of the IdClassElement
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public String getIdClass() {
 		return this.idClass;

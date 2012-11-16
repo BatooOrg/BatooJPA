@@ -43,7 +43,6 @@ public class AttributeOverrideMetadataImpl implements AttributeOverrideMetadata 
 	 *            the annotation
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public AttributeOverrideMetadataImpl(AbstractLocator locator, AttributeOverride annotation) {
 		super();

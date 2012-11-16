@@ -70,7 +70,6 @@ public class PersistenceParserImpl implements PersistenceParser {
 	 *            the properties of the persistence unit
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public PersistenceParserImpl(PersistenceUnitInfo puInfo, Map<String, Object> properties) {
 		super();
@@ -106,7 +105,6 @@ public class PersistenceParserImpl implements PersistenceParser {
 	 *            the properties for the entity manager
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public PersistenceParserImpl(String puName, Map<String, Object> properties) {
 		this(new PersistenceUnitInfoImpl(puName), properties);
@@ -218,7 +216,6 @@ public class PersistenceParserImpl implements PersistenceParser {
 	 *            if the file is optional
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private void parseOrmXml(final String mappingFile, boolean optional) {
 		final InputStream is = this.puInfo.getClassLoader().getResourceAsStream(mappingFile);
@@ -240,7 +237,6 @@ public class PersistenceParserImpl implements PersistenceParser {
 	 * Parses the ORM XML Files.
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private void parseOrmXmls() {
 		if (this.ormMappingFiles.size() > 0) {

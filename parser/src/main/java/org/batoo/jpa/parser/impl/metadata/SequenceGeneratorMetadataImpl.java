@@ -46,7 +46,6 @@ public class SequenceGeneratorMetadataImpl implements SequenceGeneratorMetadata 
 	 *            the annotation
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public SequenceGeneratorMetadataImpl(AbstractLocator locator, SequenceGenerator annotation) {
 		super();

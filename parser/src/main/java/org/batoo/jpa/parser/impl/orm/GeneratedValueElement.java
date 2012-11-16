@@ -42,7 +42,6 @@ public class GeneratedValueElement extends ChildElement implements GeneratedValu
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public GeneratedValueElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);

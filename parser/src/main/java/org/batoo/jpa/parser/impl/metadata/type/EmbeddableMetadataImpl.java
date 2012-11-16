@@ -35,7 +35,6 @@ public class EmbeddableMetadataImpl extends ManagedTypeMetadatImpl implements Em
 	 *            the metadata
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public EmbeddableMetadataImpl(Class<?> clazz, EmbeddableMetadata metadata) {
 		super(clazz, null, null);

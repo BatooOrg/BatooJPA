@@ -53,7 +53,6 @@ public class OrmContentHandler implements ContentHandler {
 	 *            the name of the ORM XML file
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public OrmContentHandler(String fileName) {
 		super();
@@ -116,7 +115,6 @@ public class OrmContentHandler implements ContentHandler {
 	 * @return the metadata
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public Metadata getMetadata() {
 		return this.entityMappings;

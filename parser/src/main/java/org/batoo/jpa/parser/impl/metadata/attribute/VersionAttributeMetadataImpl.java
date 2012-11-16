@@ -43,7 +43,6 @@ public class VersionAttributeMetadataImpl extends PhysicalAttributeMetadataImpl 
 	 *            set of annotations parsed
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public VersionAttributeMetadataImpl(Member member, String name, Set<Class<? extends Annotation>> parsed) {
 		super(member, name, parsed);
@@ -58,7 +57,6 @@ public class VersionAttributeMetadataImpl extends PhysicalAttributeMetadataImpl 
 	 *            the metadata definition of the version attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public VersionAttributeMetadataImpl(Member member, VersionAttributeMetadata metadata) {
 		super(member, metadata);

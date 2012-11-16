@@ -55,7 +55,6 @@ public class IdAttributeMetadataImpl extends PhysicalAttributeMetadataImpl imple
 	 *            the metadata definition of the basic attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public IdAttributeMetadataImpl(Member member, IdAttributeMetadata metadata) {
 		super(member, metadata);
@@ -74,7 +73,6 @@ public class IdAttributeMetadataImpl extends PhysicalAttributeMetadataImpl imple
 	 *            set of annotations parsed
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public IdAttributeMetadataImpl(Member member, String name, Set<Class<? extends Annotation>> parsed) {
 		super(member, name, parsed);

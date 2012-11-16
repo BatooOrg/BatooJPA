@@ -65,7 +65,6 @@ public class MappedSuperclassElementFactory extends ParentElement implements Map
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public MappedSuperclassElementFactory(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, //

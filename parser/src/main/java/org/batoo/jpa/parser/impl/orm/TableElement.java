@@ -46,7 +46,6 @@ public class TableElement extends ParentElement implements TableMetadata {
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public TableElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, ElementConstants.ELEMENT_UNIQUE_CONSTRAINT);
@@ -61,7 +60,6 @@ public class TableElement extends ParentElement implements TableMetadata {
 	 *            the name of the elements expected
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public TableElement(ParentElement parent, Map<String, String> attributes, String... expectedChildElements) {
 		super(parent, attributes, ParentElement.join(expectedChildElements, //

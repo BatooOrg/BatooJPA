@@ -56,7 +56,6 @@ public class TableGeneratorMetadataImpl implements TableGeneratorMetadata {
 	 *            the annotation
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public TableGeneratorMetadataImpl(AbstractLocator locator, TableGenerator annotation) {
 		this.locator = locator;

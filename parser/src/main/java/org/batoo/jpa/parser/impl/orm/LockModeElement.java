@@ -39,7 +39,6 @@ public class LockModeElement extends ChildElement {
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public LockModeElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);
@@ -60,7 +59,6 @@ public class LockModeElement extends ChildElement {
 	 * @return the lock mode
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public LockModeType getLockMode() {
 		return this.lockMode;

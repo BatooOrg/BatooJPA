@@ -44,7 +44,6 @@ public abstract class BaseColumnElement extends ChildElement implements BaseColu
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public BaseColumnElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);
@@ -71,7 +70,6 @@ public abstract class BaseColumnElement extends ChildElement implements BaseColu
 	 * @return the columnDefinition of the ColumnElement
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	@Override
 	public String getColumnDefinition() {

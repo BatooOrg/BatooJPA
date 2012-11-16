@@ -37,7 +37,6 @@ public class DiscriminatorValueElement extends ChildElement {
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public DiscriminatorValueElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);
@@ -58,7 +57,6 @@ public class DiscriminatorValueElement extends ChildElement {
 	 * @return the discriminator value
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public String getDiscriminatorValue() {
 		return this.discriminatorValue;

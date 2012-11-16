@@ -82,7 +82,6 @@ public class ElementCollectionAttributeElement extends AttributeElement implemen
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public ElementCollectionAttributeElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, //

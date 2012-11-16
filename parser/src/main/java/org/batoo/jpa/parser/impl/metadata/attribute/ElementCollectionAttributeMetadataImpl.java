@@ -87,7 +87,6 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 *            the metadata definition of the attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public ElementCollectionAttributeMetadataImpl(Member member, ElementCollectionAttributeMetadata metadata) {
 		super(member, metadata);
@@ -122,7 +121,6 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 *            the list of annotations parsed
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public ElementCollectionAttributeMetadataImpl(Member member, String name, ElementCollection elementCollection, Set<Class<? extends Annotation>> parsed) {
 		super(member, name);
@@ -302,7 +300,6 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 *            the list of annotations parsed
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private void handleAttributeOverrides(Member member, Set<Class<? extends Annotation>> parsed) {
 		final AttributeOverrides attributeOverrides = ReflectHelper.getAnnotation(member, AttributeOverrides.class);
@@ -332,7 +329,6 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 * @return the collection table metadata
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private CollectionTableMetadata handleCollectionTable(Member member, Set<Class<? extends Annotation>> parsed) {
 		final CollectionTable annotation = ReflectHelper.getAnnotation(member, CollectionTable.class);
@@ -354,7 +350,6 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 * @return the map key value
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private ColumnMetadata handleColumn(final Member member, Set<Class<? extends Annotation>> parsed) {
 		final Column annotation = ReflectHelper.getAnnotation(member, Column.class);
@@ -377,7 +372,6 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 * @return the map key value
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private EnumType handleEnumType(Member member, Set<Class<? extends Annotation>> parsed) {
 		final Enumerated annotation = ReflectHelper.getAnnotation(member, Enumerated.class);
@@ -402,7 +396,6 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 * @return the map key value
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private boolean handleLob(Member member, Set<Class<? extends Annotation>> parsed) {
 		final Lob annotation = ReflectHelper.getAnnotation(member, Lob.class);
@@ -425,7 +418,6 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 * @return the map key value
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private String handleMapKey(Member member, Set<Class<? extends Annotation>> parsed) {
 		final MapKey annotation = ReflectHelper.getAnnotation(member, MapKey.class);
@@ -448,7 +440,6 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 * @return the map key value
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private String handleMapKeyClassName(Member member, Set<Class<? extends Annotation>> parsed) {
 		final MapKeyClass annotation = ReflectHelper.getAnnotation(member, MapKeyClass.class);
@@ -471,7 +462,6 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 * @return the map key value
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private ColumnMetadata handleMapKeyColumn(final Member member, Set<Class<? extends Annotation>> parsed) {
 		final MapKeyColumn annotation = ReflectHelper.getAnnotation(member, MapKeyColumn.class);
@@ -494,7 +484,6 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 * @return the map key value
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private EnumType handleMapKeyEnumType(Member member, Set<Class<? extends Annotation>> parsed) {
 		final MapKeyEnumerated annotation = ReflectHelper.getAnnotation(member, MapKeyEnumerated.class);
@@ -517,7 +506,6 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 * @return the map key value
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private TemporalType handleMapKeyTemporalType(Member member, Set<Class<? extends Annotation>> parsed) {
 		final MapKeyTemporal annotation = ReflectHelper.getAnnotation(member, MapKeyTemporal.class);
@@ -540,7 +528,6 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 * @return the map key value
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private String handleOrderBy(Member member, Set<Class<? extends Annotation>> parsed) {
 		final OrderBy annotation = ReflectHelper.getAnnotation(member, OrderBy.class);
@@ -563,7 +550,6 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 * @return the map key value
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private ColumnMetadata handleOrderColumn(final Member member, Set<Class<? extends Annotation>> parsed) {
 		final OrderColumn annotation = ReflectHelper.getAnnotation(member, OrderColumn.class);
@@ -586,7 +572,6 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 * @return the map key value
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private TemporalType handleTemporalType(Member member, Set<Class<? extends Annotation>> parsed) {
 		final MapKeyTemporal annotation = ReflectHelper.getAnnotation(member, MapKeyTemporal.class);

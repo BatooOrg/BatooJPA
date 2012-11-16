@@ -34,7 +34,6 @@ public interface LocatableMatadata {
 	 * @return the locator
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	AbstractLocator getLocator();
 }

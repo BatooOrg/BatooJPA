@@ -49,7 +49,6 @@ public abstract class PhysicalAttributeElement extends AttributeElement implemen
 	 *            the name of the elements expected
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public PhysicalAttributeElement(ParentElement parent, Map<String, String> attributes, String... expectedChildElements) {
 		super(parent, attributes, expectedChildElements);

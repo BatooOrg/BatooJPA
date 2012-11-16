@@ -44,7 +44,6 @@ public class JoinTableElement extends TableElement implements JoinTableMetadata 
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public JoinTableElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, //

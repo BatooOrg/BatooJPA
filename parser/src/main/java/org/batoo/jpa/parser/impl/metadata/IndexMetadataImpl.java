@@ -42,7 +42,6 @@ public class IndexMetadataImpl implements IndexMetadata {
 	 *            the annotation
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public IndexMetadataImpl(AbstractLocator locator, Index annotation) {
 		super();
@@ -62,7 +61,6 @@ public class IndexMetadataImpl implements IndexMetadata {
 	 *            field column name
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public IndexMetadataImpl(AbstractLocator locator, Index annotation, String name) {
 		super();

@@ -50,7 +50,6 @@ public class TableMetadataImpl implements TableMetadata {
 	 *            the annotation
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public TableMetadataImpl(AbstractLocator locator, Table annotation) {
 		super();

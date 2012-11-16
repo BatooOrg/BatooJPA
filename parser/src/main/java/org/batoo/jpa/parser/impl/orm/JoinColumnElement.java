@@ -39,7 +39,6 @@ public class JoinColumnElement extends BaseColumnElement implements JoinColumnMe
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public JoinColumnElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);

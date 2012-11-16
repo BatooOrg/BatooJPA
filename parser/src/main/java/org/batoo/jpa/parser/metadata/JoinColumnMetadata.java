@@ -32,7 +32,6 @@ public interface JoinColumnMetadata extends BaseColumnMetadata {
 	 * @return the name of the referenced column of the join column
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String getReferencedColumnName();
 }

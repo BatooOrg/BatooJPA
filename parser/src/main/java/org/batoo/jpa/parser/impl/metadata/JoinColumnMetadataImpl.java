@@ -48,7 +48,6 @@ public class JoinColumnMetadataImpl implements JoinColumnMetadata {
 	 *            the annotation
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public JoinColumnMetadataImpl(AbstractLocator locator, JoinColumn annotation) {
 		super();

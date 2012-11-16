@@ -36,7 +36,6 @@ public interface IdAttributeMetadata extends PhysicalAttributeMetadata {
 	 * @return the value generation definition of the id attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	GeneratedValueMetadata getGeneratedValue();
 
@@ -46,7 +45,6 @@ public interface IdAttributeMetadata extends PhysicalAttributeMetadata {
 	 * @return the sequence generator definition of the id attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	SequenceGeneratorMetadata getSequenceGenerator();
 
@@ -56,7 +54,6 @@ public interface IdAttributeMetadata extends PhysicalAttributeMetadata {
 	 * @return the table generator definition of the id attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	TableGeneratorMetadata getTableGenerator();
 

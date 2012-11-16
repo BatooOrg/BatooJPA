@@ -48,7 +48,6 @@ public class SecondaryTableElement extends ParentElement implements TableMetadat
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public SecondaryTableElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, //

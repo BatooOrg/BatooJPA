@@ -39,7 +39,6 @@ public class TemporalElement extends ChildElement {
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public TemporalElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);
@@ -60,7 +59,6 @@ public class TemporalElement extends ChildElement {
 	 * @return the temporalType of the TemporalElement
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public TemporalType getTemporalType() {
 		return this.temporalType;

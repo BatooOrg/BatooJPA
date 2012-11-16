@@ -37,7 +37,6 @@ public interface EmbeddedAttributeMetadata extends AttributeMetadata {
 	 * @return the list of association overrides for the embedded attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	List<AssociationMetadata> getAssociationOverrides();
 
@@ -47,7 +46,6 @@ public interface EmbeddedAttributeMetadata extends AttributeMetadata {
 	 * @return the list of attribute overrides for the embedded attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	List<AttributeOverrideMetadata> getAttributeOverrides();
 }

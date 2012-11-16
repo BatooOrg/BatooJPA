@@ -41,7 +41,6 @@ public class AttributeOverrideElement extends ParentElement implements Attribute
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public AttributeOverrideElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, ElementConstants.ELEMENT_COLUMN);

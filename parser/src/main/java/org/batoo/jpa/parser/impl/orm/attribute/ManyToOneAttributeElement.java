@@ -45,7 +45,6 @@ public class ManyToOneAttributeElement extends AssociationElement implements Man
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public ManyToOneAttributeElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, FetchType.EAGER, //

@@ -49,7 +49,6 @@ public class AndroidPersistenceParserImpl implements PersistenceParser {
 	 *            the array of classes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public AndroidPersistenceParserImpl(Map<String, String> properties, String[] classes) {
 		super();
@@ -74,7 +73,6 @@ public class AndroidPersistenceParserImpl implements PersistenceParser {
 	 * @return the classloader of the PersistenceParser
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	@Override
 	public ClassLoader getClassloader() {
@@ -87,7 +85,6 @@ public class AndroidPersistenceParserImpl implements PersistenceParser {
 	 * @return the JTA datasource JNDI name
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	@Override
 	public DataSource getJtaDataSource() {
@@ -100,7 +97,6 @@ public class AndroidPersistenceParserImpl implements PersistenceParser {
 	 * @return the metadata of the parser
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	@Override
 	public MetadataImpl getMetadata() {
@@ -113,7 +109,6 @@ public class AndroidPersistenceParserImpl implements PersistenceParser {
 	 * @return the non-JTA datasource JNDI name
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	@Override
 	public DataSource getNonJtaDataSource() {
@@ -126,7 +121,6 @@ public class AndroidPersistenceParserImpl implements PersistenceParser {
 	 * @return the properties of the persistence unit
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	@Override
 	public Map<String, Object> getProperties() {
@@ -148,7 +142,6 @@ public class AndroidPersistenceParserImpl implements PersistenceParser {
 	 * @return the second-level cache mode that must be used by the provider for the persistence unit
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	@Override
 	public SharedCacheMode getSharedCacheMode() {
@@ -163,7 +156,6 @@ public class AndroidPersistenceParserImpl implements PersistenceParser {
 	 * @return true if the persistence unit has validators, false otherwise
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	@Override
 	public boolean hasValidators() {

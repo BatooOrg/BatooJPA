@@ -63,7 +63,6 @@ public abstract class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
 	 *            the parent access type
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public ManagedTypeMetadatImpl(Class<?> clazz, ManagedTypeMetadata metadata, AccessType parentAccessType) {
 		super();
@@ -101,7 +100,6 @@ public abstract class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
 	 * @return the access type
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private AccessType getAccessType(ManagedTypeMetadata metadata, AccessType parentAccessType) {
 		if ((metadata != null) && (metadata.getAccessType() != null)) {
@@ -122,7 +120,6 @@ public abstract class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
 	 * @return the set of annotations parsed
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	protected Set<Class<? extends Annotation>> getAnnotationsParsed() {
 		return this.parsed;
@@ -152,7 +149,6 @@ public abstract class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
 	 * @return the clazz of the managed type
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public Class<?> getClazz() {
 		return this.clazz;
@@ -175,7 +171,6 @@ public abstract class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
 	 * @return the inferred access type
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private AccessType inferAccessType(AccessType parentAccessType) {
 		boolean methodsHasAnnotations = false;

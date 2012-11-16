@@ -32,7 +32,6 @@ public interface AttributeOverrideMetadata extends BindableMetadata {
 	 * @return the column of the override
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	ColumnMetadata getColumn();
 }

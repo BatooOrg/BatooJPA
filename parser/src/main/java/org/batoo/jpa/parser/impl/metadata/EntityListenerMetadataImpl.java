@@ -57,7 +57,6 @@ public class EntityListenerMetadataImpl implements EntityListenerMetadata {
 	 * @param clazz
 	 *            the name of the class
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public EntityListenerMetadataImpl(AbstractLocator locator, Class<?> clazz) {
 		super();
@@ -78,7 +77,6 @@ public class EntityListenerMetadataImpl implements EntityListenerMetadata {
 	 *            the set of annotations parsed
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public EntityListenerMetadataImpl(AbstractLocator locator, Class<?> clazz, Set<Class<? extends Annotation>> annotationsParsed) {
 		super();
@@ -96,7 +94,6 @@ public class EntityListenerMetadataImpl implements EntityListenerMetadata {
 	 *            the metadata
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public EntityListenerMetadataImpl(AbstractLocator locator, EntityListenerMetadata metadata) {
 		super();
@@ -116,7 +113,6 @@ public class EntityListenerMetadataImpl implements EntityListenerMetadata {
 	 *            the name of the class
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public EntityListenerMetadataImpl(AbstractLocator locator, IdentifiableTypeMetadata metadata, String className) {
 		super();
@@ -180,7 +176,6 @@ public class EntityListenerMetadataImpl implements EntityListenerMetadata {
 	 * @param clazz
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 * @param annotationsParsed
 	 */
 	private void handleCallbacks(Class<?> clazz, Set<Class<? extends Annotation>> annotationsParsed) {
@@ -253,7 +248,6 @@ public class EntityListenerMetadataImpl implements EntityListenerMetadata {
 	 * @return true if the listeners is the entity itself, false otherwise
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public boolean self() {
 		return this.self;

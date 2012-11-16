@@ -41,7 +41,6 @@ public class ColumnElement extends BaseColumnElement implements ColumnMetadata {
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public ColumnElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);

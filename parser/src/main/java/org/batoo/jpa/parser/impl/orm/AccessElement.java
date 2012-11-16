@@ -39,7 +39,6 @@ public class AccessElement extends ChildElement {
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public AccessElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);
@@ -60,7 +59,6 @@ public class AccessElement extends ChildElement {
 	 * @return the accessType
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public AccessType getAccessType() {
 		return this.accessType;

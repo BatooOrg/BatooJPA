@@ -45,7 +45,6 @@ public class StandaloneAnnotatedClassLocator implements AnnotatedClassLocator {
 	 * @return the singleton {@link StandaloneAnnotatedClassLocator}
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public static StandaloneAnnotatedClassLocator getInstance() {
 		return StandaloneAnnotatedClassLocator.INSTANCE;
@@ -54,7 +53,6 @@ public class StandaloneAnnotatedClassLocator implements AnnotatedClassLocator {
 	/**
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private StandaloneAnnotatedClassLocator() {
 		super();

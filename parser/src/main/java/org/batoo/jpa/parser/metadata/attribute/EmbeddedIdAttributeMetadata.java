@@ -36,7 +36,6 @@ public interface EmbeddedIdAttributeMetadata extends AttributeMetadata {
 	 * @return the attribute overrides of the embedded ids
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	List<AttributeOverrideMetadata> getAttributeOverrides();
 }

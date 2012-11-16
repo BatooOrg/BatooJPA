@@ -36,7 +36,6 @@ public class CascadesElement extends ParentElement {
 	/**
 	 * Element for <code>cascade-all</code> elements.
 	 * 
-	 * @author hceylan
 	 * @since 2.0.0
 	 */
 	public static class CascadeAllElement extends CascadeElement {
@@ -48,8 +47,7 @@ public class CascadesElement extends ParentElement {
 		 *            the attributes
 		 * 
 		 * @since 2.0.0
-		 * @author hceylan
-		 */
+			 */
 		public CascadeAllElement(ParentElement parent, Map<String, String> attributes) {
 			super(parent, attributes);
 		}
@@ -68,7 +66,6 @@ public class CascadesElement extends ParentElement {
 	/**
 	 * Element for <code>cascade-detach</code> elements.
 	 * 
-	 * @author hceylan
 	 * @since 2.0.0
 	 */
 	public static class CascadeDetachElement extends CascadeElement {
@@ -80,8 +77,7 @@ public class CascadesElement extends ParentElement {
 		 *            the attributes
 		 * 
 		 * @since 2.0.0
-		 * @author hceylan
-		 */
+			 */
 		public CascadeDetachElement(ParentElement parent, Map<String, String> attributes) {
 			super(parent, attributes);
 		}
@@ -106,8 +102,7 @@ public class CascadesElement extends ParentElement {
 		 *            the attributes
 		 * 
 		 * @since 2.0.0
-		 * @author hceylan
-		 */
+			 */
 		public CascadeElement(ParentElement parent, Map<String, String> attributes) {
 			super(parent, attributes);
 		}
@@ -118,15 +113,13 @@ public class CascadesElement extends ParentElement {
 		 * @return the cascade type of the element
 		 * 
 		 * @since 2.0.0
-		 * @author hceylan
-		 */
+			 */
 		public abstract CascadeType getCascadeType();
 	}
 
 	/**
 	 * Element for <code>cascade-merge</code> elements.
 	 * 
-	 * @author hceylan
 	 * @since 2.0.0
 	 */
 	public static class CascadeMergeElement extends CascadeElement {
@@ -138,8 +131,7 @@ public class CascadesElement extends ParentElement {
 		 *            the attributes
 		 * 
 		 * @since 2.0.0
-		 * @author hceylan
-		 */
+			 */
 		public CascadeMergeElement(ParentElement parent, Map<String, String> attributes) {
 			super(parent, attributes);
 		}
@@ -158,7 +150,6 @@ public class CascadesElement extends ParentElement {
 	/**
 	 * Element for <code>cascade-persist</code> elements.
 	 * 
-	 * @author hceylan
 	 * @since 2.0.0
 	 */
 	public static class CascadePersistElement extends CascadeElement {
@@ -170,8 +161,7 @@ public class CascadesElement extends ParentElement {
 		 *            the attributes
 		 * 
 		 * @since 2.0.0
-		 * @author hceylan
-		 */
+			 */
 		public CascadePersistElement(ParentElement parent, Map<String, String> attributes) {
 			super(parent, attributes);
 		}
@@ -190,7 +180,6 @@ public class CascadesElement extends ParentElement {
 	/**
 	 * Element for <code>cascade-refresh</code> elements.
 	 * 
-	 * @author hceylan
 	 * @since 2.0.0
 	 */
 	public static class CascadeRefreshElement extends CascadeElement {
@@ -202,8 +191,7 @@ public class CascadesElement extends ParentElement {
 		 *            the attributes
 		 * 
 		 * @since 2.0.0
-		 * @author hceylan
-		 */
+			 */
 		public CascadeRefreshElement(ParentElement parent, Map<String, String> attributes) {
 			super(parent, attributes);
 		}
@@ -222,7 +210,6 @@ public class CascadesElement extends ParentElement {
 	/**
 	 * Element for <code>cascade-remove</code> elements.
 	 * 
-	 * @author hceylan
 	 * @since 2.0.0
 	 */
 	public static class CascadeRemoveElement extends CascadeElement {
@@ -234,8 +221,7 @@ public class CascadesElement extends ParentElement {
 		 *            the attributes
 		 * 
 		 * @since 2.0.0
-		 * @author hceylan
-		 */
+			 */
 		public CascadeRemoveElement(ParentElement parent, Map<String, String> attributes) {
 			super(parent, attributes);
 		}
@@ -260,7 +246,6 @@ public class CascadesElement extends ParentElement {
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public CascadesElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, ElementConstants.ELEMENT_TEMPORAL, //
@@ -273,7 +258,6 @@ public class CascadesElement extends ParentElement {
 	 * @return the cascades of the CascadesElement
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public Set<CascadeType> getCascades() {
 		return this.cascades;

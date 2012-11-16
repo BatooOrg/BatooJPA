@@ -46,7 +46,6 @@ public class NamedQueryElement extends ParentElement implements NamedQueryMetada
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public NamedQueryElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, //

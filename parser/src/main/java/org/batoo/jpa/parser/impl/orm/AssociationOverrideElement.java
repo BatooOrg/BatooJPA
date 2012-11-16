@@ -46,7 +46,6 @@ public class AssociationOverrideElement extends ParentElement implements Associa
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public AssociationOverrideElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, //

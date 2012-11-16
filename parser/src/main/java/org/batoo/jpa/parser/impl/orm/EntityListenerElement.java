@@ -48,8 +48,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 *            the attributes
 		 * 
 		 * @since 2.0.0
-		 * @author hceylan
-		 */
+			 */
 		public CallbackElement(EntityListenerType type, ParentElement parent, Map<String, String> attributes) {
 			super(parent, attributes);
 
@@ -71,8 +70,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 * @return the method name of the callback
 		 * 
 		 * @since 2.0.0
-		 * @author hceylan
-		 */
+			 */
 		@Override
 		public String getName() {
 			return this.name;
@@ -84,8 +82,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 * @return the type of the callback
 		 * 
 		 * @since 2.0.0
-		 * @author hceylan
-		 */
+			 */
 		@Override
 		public EntityListenerType getType() {
 			return this.type;
@@ -94,7 +91,6 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 
 	/**
 	 * 
-	 * @author hceylan
 	 * @since 2.0.0
 	 */
 	public static class PostLoadElement extends CallbackElement {
@@ -106,8 +102,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 *            the attributes
 		 * 
 		 * @since 2.0.0
-		 * @author hceylan
-		 */
+			 */
 		public PostLoadElement(ParentElement parent, Map<String, String> attributes) {
 			super(EntityListenerType.POST_LOAD, parent, attributes);
 		}
@@ -115,7 +110,6 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 
 	/**
 	 * 
-	 * @author hceylan
 	 * @since 2.0.0
 	 */
 	public static class PostPersistElement extends CallbackElement {
@@ -127,8 +121,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 *            the attributes
 		 * 
 		 * @since 2.0.0
-		 * @author hceylan
-		 */
+			 */
 		public PostPersistElement(ParentElement parent, Map<String, String> attributes) {
 			super(EntityListenerType.POST_PERSIST, parent, attributes);
 		}
@@ -136,7 +129,6 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 
 	/**
 	 * 
-	 * @author hceylan
 	 * @since 2.0.0
 	 */
 	public static class PostRemoveElement extends CallbackElement {
@@ -148,8 +140,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 *            the attributes
 		 * 
 		 * @since 2.0.0
-		 * @author hceylan
-		 */
+			 */
 		public PostRemoveElement(ParentElement parent, Map<String, String> attributes) {
 			super(EntityListenerType.POST_REMOVE, parent, attributes);
 		}
@@ -157,7 +148,6 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 
 	/**
 	 * 
-	 * @author hceylan
 	 * @since 2.0.0
 	 */
 	public static class PostUpdateElement extends CallbackElement {
@@ -169,8 +159,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 *            the attributes
 		 * 
 		 * @since 2.0.0
-		 * @author hceylan
-		 */
+			 */
 		public PostUpdateElement(ParentElement parent, Map<String, String> attributes) {
 			super(EntityListenerType.PRE_UPDATE, parent, attributes);
 		}
@@ -178,7 +167,6 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 
 	/**
 	 * 
-	 * @author hceylan
 	 * @since 2.0.0
 	 */
 	public static class PrePersistElement extends CallbackElement {
@@ -190,8 +178,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 *            the attributes
 		 * 
 		 * @since 2.0.0
-		 * @author hceylan
-		 */
+			 */
 		public PrePersistElement(ParentElement parent, Map<String, String> attributes) {
 			super(EntityListenerType.PRE_PERSIST, parent, attributes);
 		}
@@ -199,7 +186,6 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 
 	/**
 	 * 
-	 * @author hceylan
 	 * @since 2.0.0
 	 */
 	public static class PreRemoveElement extends CallbackElement {
@@ -211,8 +197,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 *            the attributes
 		 * 
 		 * @since 2.0.0
-		 * @author hceylan
-		 */
+			 */
 		public PreRemoveElement(ParentElement parent, Map<String, String> attributes) {
 			super(EntityListenerType.PRE_REMOVE, parent, attributes);
 		}
@@ -220,7 +205,6 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 
 	/**
 	 * 
-	 * @author hceylan
 	 * @since 2.0.0
 	 */
 	public static class PreUpdateElement extends CallbackElement {
@@ -232,8 +216,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 *            the attributes
 		 * 
 		 * @since 2.0.0
-		 * @author hceylan
-		 */
+			 */
 		public PreUpdateElement(ParentElement parent, Map<String, String> attributes) {
 			super(EntityListenerType.PRE_UPDATE, parent, attributes);
 		}
@@ -249,7 +232,6 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public EntityListenerElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, //

@@ -32,7 +32,6 @@ public interface MappableAssociationAttributeMetadata {
 	 * @return the name of the bidirectional owner association attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String getMappedBy();
 }

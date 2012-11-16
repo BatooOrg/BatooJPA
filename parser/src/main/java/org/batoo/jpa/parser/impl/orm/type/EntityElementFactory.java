@@ -95,7 +95,6 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public EntityElementFactory(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, //

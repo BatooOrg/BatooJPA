@@ -76,7 +76,6 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	 *            the name of the persistence unit
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public PersistenceUnitInfoImpl(String puName) {
 		super();
@@ -246,7 +245,6 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	 * @return
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private PersistenceUnit findPersistence(String puName, URL url) {
 		InputStream is;

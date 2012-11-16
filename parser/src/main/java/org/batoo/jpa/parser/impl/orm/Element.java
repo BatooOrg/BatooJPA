@@ -180,7 +180,6 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 * @return the element created
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public static Element forElement(Element parent, Map<String, String> attributes, XmlLocator xmlLocator) {
 		final Class<?> clazz = Element.factoryMap.get(xmlLocator.getLocalName());
@@ -214,7 +213,6 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 * @param expectedChildElements
 	 *            the name of the elements expected
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public Element(ParentElement parent, Map<String, String> attributes, String[] expectedChildElements) {
 		super();
@@ -231,7 +229,6 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 *            the character data
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public void cdata(String cdata) {
 		throw new UnsupportedOperationException();
@@ -243,7 +240,6 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 * if the parent is null, that the factory is {@link EntityMappings}, the model element is added to the metamodel.
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public void end() {
 		this.generate();
@@ -266,7 +262,6 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 *             thrown if the <code>element</code> is not expected.
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public void expected(String element, Locator locator) throws MappingException {
 		if (!this.expectedChildElements.contains(element)) {
@@ -280,7 +275,6 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 * Element factories implement the method to generate their artifacts.
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	protected void generate() {
 		// noop
@@ -294,7 +288,6 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 * @return the value or null
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	protected String getAttribute(String name) {
 		return this.attributes.get(name);
@@ -310,7 +303,6 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 * @return the integer value or default
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	protected boolean getAttribute(String name, boolean devault) {
 		final String value = this.attributes.get(name);
@@ -328,7 +320,6 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 * @return the integer value or default
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	protected int getAttribute(String name, int devault) {
 		final String value = this.attributes.get(name);
@@ -346,7 +337,6 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 * @return the value or null
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	protected String getAttribute(String name, String devault) {
 		final String value = this.attributes.get(name);
@@ -360,7 +350,6 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 * @return the expectedChildElements of the Element
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public Set<String> getExpectedChildElements() {
 		return this.expectedChildElements;
@@ -381,7 +370,6 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 * @return the parent of the Element
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public ParentElement getParent() {
 		return this.parent;
@@ -394,7 +382,6 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 *            the XML location to set
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private void setLocator(XmlLocator xmlLocator) {
 		this.locator = xmlLocator;

@@ -73,7 +73,6 @@ public class OneToManyAttributeElement extends AssociationElement implements One
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public OneToManyAttributeElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, FetchType.LAZY, //
@@ -126,7 +125,6 @@ public class OneToManyAttributeElement extends AssociationElement implements One
 	 * @return the mapKeyClass of the OneToManyAttributeElement
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public String getMapKeyClass() {
 		return this.mapKeyClassName;

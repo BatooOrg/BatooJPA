@@ -38,7 +38,6 @@ public class HintElement extends ChildElement {
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public HintElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);
@@ -60,7 +59,6 @@ public class HintElement extends ChildElement {
 	 * @return the name of the hint
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public String getName() {
 		return this.name;
@@ -72,7 +70,6 @@ public class HintElement extends ChildElement {
 	 * @return the value of the hint
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public String getValue() {
 		return this.value;

@@ -54,7 +54,6 @@ public class JoinTableMetadaImpl implements JoinTableMetadata {
 	 *            the annotation
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public JoinTableMetadaImpl(AbstractLocator locator, JoinTable annotation) {
 		super();

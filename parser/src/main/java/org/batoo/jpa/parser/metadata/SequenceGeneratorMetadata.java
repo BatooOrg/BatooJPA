@@ -32,7 +32,6 @@ public interface SequenceGeneratorMetadata extends GeneratorMetadata {
 	 * @return the name of the sequence of the sequence generator
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String getSequenceName();
 }

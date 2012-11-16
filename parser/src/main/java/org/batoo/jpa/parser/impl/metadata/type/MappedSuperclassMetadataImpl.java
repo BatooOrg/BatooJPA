@@ -40,7 +40,6 @@ public class MappedSuperclassMetadataImpl extends IdentifiableMetadataImpl imple
 	 *            the parent access type
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public MappedSuperclassMetadataImpl(Class<?> clazz, MappedSuperclassMetadata metadata, AccessType parentAccessType) {
 		super(clazz, null, parentAccessType);

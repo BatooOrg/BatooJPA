@@ -32,7 +32,6 @@ public interface PrimaryKeyJoinColumnMetadata extends BindableMetadata {
 	 * @return the raw column definition of the the primary key join column
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String getColumnDefinition();
 
@@ -42,7 +41,6 @@ public interface PrimaryKeyJoinColumnMetadata extends BindableMetadata {
 	 * @return the name of the referenced column of the the primary key join column
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String getReferencedColumnName();
 }

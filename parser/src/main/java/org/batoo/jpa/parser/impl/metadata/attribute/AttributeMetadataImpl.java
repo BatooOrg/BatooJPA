@@ -47,7 +47,6 @@ public class AttributeMetadataImpl implements AttributeMetadata {
 	 *            the metadata definition of the attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public AttributeMetadataImpl(Member member, AttributeMetadata metadata) {
 		this(member, metadata.getName(), metadata.getAccess(), metadata.getLocator());
@@ -60,7 +59,6 @@ public class AttributeMetadataImpl implements AttributeMetadata {
 	 *            the name of the attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public AttributeMetadataImpl(Member member, String name) {
 		this(member, name, member instanceof Field ? AccessType.FIELD : AccessType.PROPERTY, null);
@@ -90,7 +88,6 @@ public class AttributeMetadataImpl implements AttributeMetadata {
 	 * @return the locator of the attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	@Override
 	public AbstractLocator getLocator() {
@@ -103,7 +100,6 @@ public class AttributeMetadataImpl implements AttributeMetadata {
 	 * @return the java member of the attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public final Member getMember() {
 		return this.member;

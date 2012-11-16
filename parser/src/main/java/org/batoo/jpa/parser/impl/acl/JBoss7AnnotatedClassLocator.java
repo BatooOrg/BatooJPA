@@ -75,7 +75,6 @@ public class JBoss7AnnotatedClassLocator implements AnnotatedClassLocator {
 	 * @return the singleton {@link JBoss7AnnotatedClassLocator}
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public static AnnotatedClassLocator getInstance() {
 		return JBoss7AnnotatedClassLocator.INSTANCE;
@@ -84,7 +83,6 @@ public class JBoss7AnnotatedClassLocator implements AnnotatedClassLocator {
 	/**
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private JBoss7AnnotatedClassLocator() {
 		super();

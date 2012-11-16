@@ -52,7 +52,6 @@ public class JarAnnotatedClassLocator extends BaseAnnotatedClassLocator {
 	 * @return the singleton {@link JarAnnotatedClassLocator} instance
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public static JarAnnotatedClassLocator getInstance() {
 		return JarAnnotatedClassLocator.INSTANCE;
@@ -61,7 +60,6 @@ public class JarAnnotatedClassLocator extends BaseAnnotatedClassLocator {
 	/**
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private JarAnnotatedClassLocator() {
 		super();

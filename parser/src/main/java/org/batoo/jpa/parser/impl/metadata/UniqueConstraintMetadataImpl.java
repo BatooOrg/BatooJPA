@@ -42,7 +42,6 @@ public class UniqueConstraintMetadataImpl implements UniqueConstraintMetadata {
 	 *            the annotation
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public UniqueConstraintMetadataImpl(AbstractLocator locator, UniqueConstraint annotation) {
 		super();

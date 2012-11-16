@@ -39,7 +39,6 @@ public interface ElementCollectionAttributeMetadata extends PluralAttributeMetad
 	 * @return the collection table definition
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	CollectionTableMetadata getCollectionTable();
 
@@ -49,7 +48,6 @@ public interface ElementCollectionAttributeMetadata extends PluralAttributeMetad
 	 * @return the column definition
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	ColumnMetadata getColumn();
 
@@ -59,7 +57,6 @@ public interface ElementCollectionAttributeMetadata extends PluralAttributeMetad
 	 * @return the enum type
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	EnumType getEnumType();
 
@@ -69,7 +66,6 @@ public interface ElementCollectionAttributeMetadata extends PluralAttributeMetad
 	 * @return the fetch type
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	FetchType getFetchType();
 
@@ -79,7 +75,6 @@ public interface ElementCollectionAttributeMetadata extends PluralAttributeMetad
 	 * @return the name of the target class
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String getTargetClass();
 
@@ -89,7 +84,6 @@ public interface ElementCollectionAttributeMetadata extends PluralAttributeMetad
 	 * @return the enum type
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	TemporalType getTemporalType();
 
@@ -99,7 +93,6 @@ public interface ElementCollectionAttributeMetadata extends PluralAttributeMetad
 	 * @return true if the attribute is lob type, false othwerwise
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	boolean isLob();
 }

@@ -35,7 +35,6 @@ public class MapKeyColumnElement extends ColumnElement {
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public MapKeyColumnElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);

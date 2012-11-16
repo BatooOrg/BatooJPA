@@ -41,7 +41,6 @@ public class PrimaryKeyJoinColumnElement extends ChildElement implements Primary
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public PrimaryKeyJoinColumnElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);

@@ -44,7 +44,6 @@ public class CollectionTableElement extends TableElement implements JoinTableMet
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public CollectionTableElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, //

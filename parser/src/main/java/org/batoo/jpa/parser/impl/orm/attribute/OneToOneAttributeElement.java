@@ -54,7 +54,6 @@ public class OneToOneAttributeElement extends AssociationElement implements OneT
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public OneToOneAttributeElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, FetchType.EAGER, //

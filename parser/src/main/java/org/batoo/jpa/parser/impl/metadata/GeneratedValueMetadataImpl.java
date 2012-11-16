@@ -42,7 +42,6 @@ public class GeneratedValueMetadataImpl implements GeneratedValueMetadata {
 	 *            the {@link GeneratedValue} annotation
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public GeneratedValueMetadataImpl(AbstractLocator locator, GeneratedValue generatedValue) {
 		super();

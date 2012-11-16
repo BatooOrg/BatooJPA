@@ -76,7 +76,6 @@ public class MetadataImpl implements Metadata {
 	/**
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public MetadataImpl() {
 		super();
@@ -87,7 +86,6 @@ public class MetadataImpl implements Metadata {
 	 *            the explicit classes obtained from the Persistence XML
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public MetadataImpl(List<String> classes) {
 		super();
@@ -203,7 +201,6 @@ public class MetadataImpl implements Metadata {
 	 *            the metadata to merge
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public void merge(Metadata metadata) {
 		this.accessType = metadata.getAccessType();
@@ -236,7 +233,6 @@ public class MetadataImpl implements Metadata {
 	 *            the class loader
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public void parse(final ClassLoader classloader) {
 		// sort the emanage classes by inheritence
@@ -329,7 +325,6 @@ public class MetadataImpl implements Metadata {
 	 *            the persistence unit info
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public void parse(PersistenceUnitInfo puInfo) {
 		final ClassLoader classloader = puInfo.getClassLoader();

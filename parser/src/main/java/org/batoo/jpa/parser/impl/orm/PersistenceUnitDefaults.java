@@ -49,7 +49,6 @@ public class PersistenceUnitDefaults extends ParentElement {
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public PersistenceUnitDefaults(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, //
@@ -67,7 +66,6 @@ public class PersistenceUnitDefaults extends ParentElement {
 	 * @return the accessType
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public AccessType getAccessType() {
 		return this.accessType;
@@ -79,7 +77,6 @@ public class PersistenceUnitDefaults extends ParentElement {
 	 * @return the catalog
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public String getCatalog() {
 		return this.catalog;
@@ -91,7 +88,6 @@ public class PersistenceUnitDefaults extends ParentElement {
 	 * @return the listeners
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public List<EntityListenerMetadata> getListeners() {
 		return this.listeners;
@@ -103,7 +99,6 @@ public class PersistenceUnitDefaults extends ParentElement {
 	 * @return the schema
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public String getSchema() {
 		return this.schema;
@@ -142,7 +137,6 @@ public class PersistenceUnitDefaults extends ParentElement {
 	 * @return the cascadePersist
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public boolean isCascadePersist() {
 		return this.cascadePersist;

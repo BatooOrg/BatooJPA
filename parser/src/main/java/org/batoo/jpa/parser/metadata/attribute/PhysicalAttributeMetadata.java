@@ -36,7 +36,6 @@ public interface PhysicalAttributeMetadata extends AttributeMetadata {
 	 * @return the column definition of the singular attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	ColumnMetadata getColumn();
 
@@ -46,7 +45,6 @@ public interface PhysicalAttributeMetadata extends AttributeMetadata {
 	 * @return the temporal type of the singular attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	TemporalType getTemporalType();
 }

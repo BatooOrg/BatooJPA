@@ -34,7 +34,6 @@ public interface DiscriminatorColumnMetadata extends BindableMetadata {
 	 * @return the column definition of the discriminator column
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String getColumnDefinition();
 
@@ -44,7 +43,6 @@ public interface DiscriminatorColumnMetadata extends BindableMetadata {
 	 * @return the type of the discriminator column
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	DiscriminatorType getDiscriminatorType();
 
@@ -54,7 +52,6 @@ public interface DiscriminatorColumnMetadata extends BindableMetadata {
 	 * @return the length of the discriminator column
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	int getLength();
 }

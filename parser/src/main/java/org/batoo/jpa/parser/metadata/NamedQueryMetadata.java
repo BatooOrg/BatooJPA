@@ -36,7 +36,6 @@ public interface NamedQueryMetadata extends BindableMetadata {
 	 * @return the list query hints
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	Map<String, Object> getHints();
 
@@ -46,7 +45,6 @@ public interface NamedQueryMetadata extends BindableMetadata {
 	 * @return the lock mode
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	LockModeType getLockMode();
 
@@ -56,7 +54,6 @@ public interface NamedQueryMetadata extends BindableMetadata {
 	 * @return the query
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String getQuery();
 }

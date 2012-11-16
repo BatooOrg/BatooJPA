@@ -52,7 +52,6 @@ public class BasicAttributeElement extends PhysicalAttributeElement implements B
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public BasicAttributeElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, //

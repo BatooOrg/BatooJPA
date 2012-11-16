@@ -40,7 +40,6 @@ public abstract class ParentElement extends Element {
 	 * @return the joint array of <code>elements1</code> and <code>elements2</code>
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public static String[] join(String[] elements1, String... elements2) {
 		if ((elements1 == null) || (elements1.length == 0)) {
@@ -73,7 +72,6 @@ public abstract class ParentElement extends Element {
 	 *            the name of the elements expected
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public ParentElement(ParentElement parent, Map<String, String> attributes, String... expectedChildElements) {
 		super(parent, attributes, expectedChildElements);
@@ -88,7 +86,6 @@ public abstract class ParentElement extends Element {
 	 *            the generated child artifact
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	protected abstract void handleChild(Element child);
 

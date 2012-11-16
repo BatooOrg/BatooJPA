@@ -34,7 +34,6 @@ public interface SecondaryTableMetadata extends TableMetadata {
 	 * @return the list of primary key join columns of the secondary table
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	List<PrimaryKeyJoinColumnMetadata> getPrimaryKeyJoinColumnMetadata();
 }

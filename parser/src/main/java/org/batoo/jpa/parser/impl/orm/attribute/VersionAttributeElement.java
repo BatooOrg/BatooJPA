@@ -39,7 +39,6 @@ public class VersionAttributeElement extends PhysicalAttributeElement implements
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public VersionAttributeElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, ElementConstants.ELEMENT_TEMPORAL, //

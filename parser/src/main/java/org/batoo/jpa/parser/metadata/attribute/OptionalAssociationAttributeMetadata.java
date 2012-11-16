@@ -34,7 +34,6 @@ public interface OptionalAssociationAttributeMetadata {
 	 * @return the maps id
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	String getMapsId();
 
@@ -44,7 +43,6 @@ public interface OptionalAssociationAttributeMetadata {
 	 * @return true if the attribute is an id attribute, false otherwise
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	boolean isId();
 
@@ -54,7 +52,6 @@ public interface OptionalAssociationAttributeMetadata {
 	 * @return true if the association attribute is optional.
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	boolean isOptional();
 }

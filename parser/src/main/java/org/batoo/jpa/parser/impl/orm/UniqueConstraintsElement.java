@@ -43,7 +43,6 @@ public class UniqueConstraintsElement extends ParentElement implements UniqueCon
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public UniqueConstraintsElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes, ElementConstants.ELEMENT_COLUMN_NAME);

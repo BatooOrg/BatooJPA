@@ -43,7 +43,6 @@ public abstract class GeneratorElement extends ParentElement implements Generato
 	 *            the attributes
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public GeneratorElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);
@@ -58,7 +57,6 @@ public abstract class GeneratorElement extends ParentElement implements Generato
 	 *            the name of the element expected
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public GeneratorElement(ParentElement parent, Map<String, String> attributes, String childElement) {
 		super(parent, attributes, childElement);
@@ -101,7 +99,6 @@ public abstract class GeneratorElement extends ParentElement implements Generato
 	 * @return the initialValue of the GeneratorElement
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	@Override
 	public int getInitialValue() {

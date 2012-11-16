@@ -28,9 +28,9 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Lob;
 
+import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.jpa.annotations.ColumnTransformer;
 import org.batoo.jpa.annotations.Index;
-import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.jpa.parser.impl.metadata.ColumnTransformerMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.IndexMetadataImpl;
 import org.batoo.jpa.parser.metadata.ColumnTransformerMetadata;
@@ -59,7 +59,6 @@ public class BasicAttributeMetadataImpl extends PhysicalAttributeMetadataImpl im
 	 *            the metadata definition of the basic attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public BasicAttributeMetadataImpl(Member member, BasicAttributeMetadata metadata) {
 		super(member, metadata);
@@ -81,7 +80,6 @@ public class BasicAttributeMetadataImpl extends PhysicalAttributeMetadataImpl im
 	 *            set of annotations parsed
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public BasicAttributeMetadataImpl(Member member, String name, Set<Class<? extends Annotation>> parsed) {
 		super(member, name, parsed);

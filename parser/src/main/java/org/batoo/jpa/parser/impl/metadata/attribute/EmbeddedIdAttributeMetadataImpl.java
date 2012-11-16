@@ -51,7 +51,6 @@ public class EmbeddedIdAttributeMetadataImpl extends AttributeMetadataImpl imple
 	 *            the metadata definition of the attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public EmbeddedIdAttributeMetadataImpl(Member member, EmbeddedIdAttributeMetadata metadata) {
 		super(member, metadata);
@@ -68,7 +67,6 @@ public class EmbeddedIdAttributeMetadataImpl extends AttributeMetadataImpl imple
 	 *            set of annotations parsed
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public EmbeddedIdAttributeMetadataImpl(Member member, String name, Set<Class<? extends Annotation>> parsed) {
 		super(member, name);

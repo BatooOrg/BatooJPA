@@ -47,7 +47,6 @@ public class OrmParser {
 	 *            the name of the ORM XML file.
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public OrmParser(String fileName) {
 		super();
@@ -72,7 +71,6 @@ public class OrmParser {
 	 *            the input stream
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public void consume(InputStream is) {
 		try {
@@ -98,7 +96,6 @@ public class OrmParser {
 	 * @return the metadata
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public Metadata getMetadata() {
 		return this.handler.getMetadata();

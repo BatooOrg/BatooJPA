@@ -44,7 +44,6 @@ public class PrimaryKeyJoinColumnMetadataImpl implements PrimaryKeyJoinColumnMet
 	 *            the annotation
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public PrimaryKeyJoinColumnMetadataImpl(AbstractLocator locator, PrimaryKeyJoinColumn annotation) {
 		super();

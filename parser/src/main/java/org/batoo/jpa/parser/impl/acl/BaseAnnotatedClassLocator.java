@@ -77,7 +77,6 @@ public abstract class BaseAnnotatedClassLocator implements AnnotatedClassLocator
 	 * @return the array of classes located
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public static Set<Class<?>> locatePersistentClasses(PersistenceUnitInfo puInfo) {
 		final ClassLoader classLoader = puInfo.getClassLoader();
@@ -112,7 +111,6 @@ public abstract class BaseAnnotatedClassLocator implements AnnotatedClassLocator
 	/**
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	protected BaseAnnotatedClassLocator() {
 		super();
@@ -128,7 +126,6 @@ public abstract class BaseAnnotatedClassLocator implements AnnotatedClassLocator
 	 * @return true if the class with then name <code>className</code> is an annotated persistent class, false otherwise
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	protected Class<?> isPersistentClass(ClassLoader classloader, String className) {
 		try {
