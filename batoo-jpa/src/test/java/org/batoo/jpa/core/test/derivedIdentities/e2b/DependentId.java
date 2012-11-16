@@ -24,7 +24,7 @@ import javax.persistence.Embedded;
 /**
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.0
  */
 @Embeddable
 public class DependentId {
@@ -36,7 +36,7 @@ public class DependentId {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public DependentId() {
 		super();
@@ -48,7 +48,7 @@ public class DependentId {
 	 * @param empPK
 	 *            the employe id
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public DependentId(String name, EmployeeId empPK) {
 		super();
@@ -94,7 +94,7 @@ public class DependentId {
 
 	/**
 	 * @return the empPK
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public EmployeeId getEmpPK() {
 		return this.empPK;
@@ -102,7 +102,7 @@ public class DependentId {
 
 	/**
 	 * @return the name
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		return this.name;
@@ -124,7 +124,7 @@ public class DependentId {
 	/**
 	 * @param empPK
 	 *            the empPK to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setEmpPK(EmployeeId empPK) {
 		this.empPK = empPK;
@@ -133,7 +133,7 @@ public class DependentId {
 	/**
 	 * @param name
 	 *            the name to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setName(String name) {
 		this.name = name;

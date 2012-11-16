@@ -26,7 +26,7 @@ import javax.persistence.AccessType;
  * Element for <code>xml-mapping-metadata-complete</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class XmlMappingMetadataCompleteElement extends ChildElement {
 
@@ -38,7 +38,7 @@ public class XmlMappingMetadataCompleteElement extends ChildElement {
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public XmlMappingMetadataCompleteElement(ParentElement parent, Map<String, String> attributes) {
@@ -50,7 +50,7 @@ public class XmlMappingMetadataCompleteElement extends ChildElement {
 	 * 
 	 * @return the accessType
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public AccessType getAccessType() {

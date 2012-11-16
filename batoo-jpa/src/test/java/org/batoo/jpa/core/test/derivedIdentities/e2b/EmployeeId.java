@@ -23,7 +23,7 @@ import javax.persistence.Embeddable;
 /**
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.0
  */
 @Embeddable
 public class EmployeeId {
@@ -33,7 +33,7 @@ public class EmployeeId {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public EmployeeId() {
 		super();
@@ -45,7 +45,7 @@ public class EmployeeId {
 	 * @param lastName
 	 *            the last name
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public EmployeeId(String firstName, String lastName) {
 		super();
@@ -93,7 +93,7 @@ public class EmployeeId {
 	 * 
 	 * @return the firstName
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getFirstName() {
 		return this.firstName;
@@ -103,7 +103,7 @@ public class EmployeeId {
 	 * 
 	 * @return the lastName
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getLastName() {
 		return this.lastName;
@@ -127,7 +127,7 @@ public class EmployeeId {
 	 * @param firstName
 	 *            the firstName to set
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
@@ -138,7 +138,7 @@ public class EmployeeId {
 	 * @param lastName
 	 *            the lastName to set
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setLastName(String lastName) {
 		this.lastName = lastName;

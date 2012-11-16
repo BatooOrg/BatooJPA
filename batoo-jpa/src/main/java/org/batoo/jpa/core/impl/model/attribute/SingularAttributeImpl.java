@@ -33,7 +33,7 @@ import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
  *            The type of the represented attribute
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> implements SingularAttribute<X, T> {
 
@@ -43,7 +43,7 @@ public abstract class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> im
 	 * @param metadata
 	 *            the metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public SingularAttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata) {
 		super(declaringType, metadata);

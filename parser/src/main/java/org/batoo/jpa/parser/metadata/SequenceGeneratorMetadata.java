@@ -22,7 +22,7 @@ package org.batoo.jpa.parser.metadata;
  * The definition of the sequence generators.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface SequenceGeneratorMetadata extends GeneratorMetadata {
 
@@ -31,7 +31,7 @@ public interface SequenceGeneratorMetadata extends GeneratorMetadata {
 	 * 
 	 * @return the name of the sequence of the sequence generator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getSequenceName();

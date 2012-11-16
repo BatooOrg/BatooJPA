@@ -73,7 +73,7 @@ import com.google.common.collect.Sets;
  * Implementation of {@link AttributesMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class AttributesMetadataImpl implements AttributesMetadata {
 
@@ -84,7 +84,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 *            the type of the attribute
 	 * 
 	 * @author hceylan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private abstract class AttributesParser<A extends AttributeMetadata> extends ArrayList<A> {
 
@@ -100,7 +100,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 		 * @param indicativeAnnotation
 		 *            the annotation that indicates the type
 		 * 
-		 * @since $version
+		 * @since 2.0.0
 		 * @author hceylan
 		 */
 		@SuppressWarnings("unchecked")
@@ -134,7 +134,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 		 *            the set of annotations parsed
 		 * @return the attribute created
 		 * 
-		 * @since $version
+		 * @since 2.0.0
 		 * @author hceylan
 		 */
 		protected abstract A parseAttribute(String name, Member member, A metadata, Set<Class<? extends Annotation>> parsed);
@@ -232,7 +232,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * @param metadata
 	 *            the metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public AttributesMetadataImpl(ManagedTypeMetadata parent, Class<?> clazz, AttributesMetadata metadata) {
@@ -271,7 +271,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	/**
 	 * Consolidates all the ORM defined attributes into a single map.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private void consolidateAttributes() {
@@ -300,7 +300,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * @param attributes
 	 *            the list of attributes to consolidate
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private void consolidateAttributes(List<? extends AttributeMetadata> attributes) {
@@ -419,7 +419,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * 
 	 * @return the list of basic attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private List<BasicAttributeMetadata> handleBasics() {
@@ -445,7 +445,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * 
 	 * @return list of element collections attributes.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private List<ElementCollectionAttributeMetadata> handleElementCollections() {
@@ -473,7 +473,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * 
 	 * @return list of embedded ids.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private List<EmbeddedIdAttributeMetadata> handleEmbeddedIds() {
@@ -499,7 +499,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * 
 	 * @return list of embedded attributes.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private List<EmbeddedAttributeMetadata> handleEmbeddeds() {
@@ -525,7 +525,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * 
 	 * @return list of id attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private List<IdAttributeMetadata> handleIds() {
@@ -550,7 +550,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * 
 	 * @return list of many-to-many attributes.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private List<ManyToManyAttributeMetadata> handleManyToManies() {
@@ -578,7 +578,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * 
 	 * @return list of many-to-one attributes.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private List<ManyToOneAttributeMetadata> handleManyToOnes() {
@@ -606,7 +606,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * 
 	 * @return list of one-to-many attributes.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private List<OneToManyAttributeMetadata> handleOneToManies() {
@@ -634,7 +634,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * 
 	 * @return list of one-to-one attributes.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private List<OneToOneAttributeMetadata> handleOneToOnes() {
@@ -662,7 +662,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * 
 	 * @return the list of transient attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private List<TransientAttributeMetadata> handleTransients() {
@@ -688,7 +688,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * 
 	 * @return the list of version attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private List<VersionAttributeMetadata> handleVersions() {
@@ -725,7 +725,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 *            the optional ORM Metadata
 	 * @return true if should parse, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private boolean isApplicableToAccessType(Member member, AttributeMetadata ormMetadata) {
@@ -792,7 +792,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * 
 	 * @see EntityMetadataImpl#isMetadataComplete()
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public boolean isMetadataComplete() {
@@ -804,7 +804,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * <p>
 	 * Based on the {@link AccessType} of the context, fields or properties is given priority.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private void probeAttributes(Class<?> clazz) {
@@ -835,7 +835,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * @param accessType
 	 *            the default {@link AccessType} of the context
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private void probeFields(final Class<?> clazz, AccessType accessType) {
@@ -871,7 +871,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * @param accessType
 	 *            the default {@link AccessType} of the context
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private void probeProperties(Class<?> clazz, AccessType accessType) {

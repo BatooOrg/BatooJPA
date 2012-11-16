@@ -32,7 +32,7 @@ import com.google.common.collect.Sets;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Customer {
@@ -48,7 +48,7 @@ public class Customer {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Customer() {
 		super();
@@ -58,7 +58,7 @@ public class Customer {
 	 * @param name
 	 *            the name
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Customer(String name) {
 		super();
@@ -70,7 +70,7 @@ public class Customer {
 	 * Returns the id.
 	 * 
 	 * @return the id
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -80,7 +80,7 @@ public class Customer {
 	 * Returns the name.
 	 * 
 	 * @return the name
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		return this.name;
@@ -90,7 +90,7 @@ public class Customer {
 	 * Returns the phoneNumbers.
 	 * 
 	 * @return the phoneNumbers
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Set<PhoneNumber> getPhoneNumbers() {
 		return this.phoneNumbers;
@@ -101,7 +101,7 @@ public class Customer {
 	 * 
 	 * @param name
 	 *            the name to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setName(String name) {
 		this.name = name;

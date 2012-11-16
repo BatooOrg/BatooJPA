@@ -31,7 +31,7 @@ import com.google.common.collect.Sets;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Foo {
@@ -53,7 +53,7 @@ public class Foo {
 	 * Returns the blob.
 	 * 
 	 * @return the blob
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public byte[] getBlob() {
 		return this.blob;
@@ -64,7 +64,7 @@ public class Foo {
 	 * 
 	 * @return the clob of the Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getClob() {
 		return this.clob;
@@ -74,7 +74,7 @@ public class Foo {
 	 * Returns the key.
 	 * 
 	 * @return the key
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getKey() {
 		return this.key;
@@ -84,7 +84,7 @@ public class Foo {
 	 * Returns the values.
 	 * 
 	 * @return the values
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Set<String> getValues() {
 		return this.values;
@@ -95,7 +95,7 @@ public class Foo {
 	 * 
 	 * @param blob
 	 *            the blob to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setBlob(byte[] blob) {
 		this.blob = blob;
@@ -107,7 +107,7 @@ public class Foo {
 	 * @param clob
 	 *            the clob to set for Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setClob(String clob) {
 		this.clob = clob;

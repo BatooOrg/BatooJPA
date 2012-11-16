@@ -24,7 +24,7 @@ import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
  * Metatada for callbacks.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface CallbackMetadata extends LocatableMatadata {
 
@@ -33,7 +33,7 @@ public interface CallbackMetadata extends LocatableMatadata {
 	 * 
 	 * @return the method name of the callback
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getName();
@@ -43,7 +43,7 @@ public interface CallbackMetadata extends LocatableMatadata {
 	 * 
 	 * @return the type of the callback
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	EntityListenerType getType();

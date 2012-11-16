@@ -35,7 +35,7 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
  *            the type of the expression
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class EntityTypeExpression<T> extends AbstractTypeExpression<T> {
 
@@ -48,7 +48,7 @@ public class EntityTypeExpression<T> extends AbstractTypeExpression<T> {
 	 * @param discriminatorColumn
 	 *            the discriminator column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public EntityTypeExpression(ParentPath<?, T> path, DiscriminatorColumn discriminatorColumn) {
 		super(path);

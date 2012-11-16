@@ -25,7 +25,7 @@ import java.sql.SQLException;
  * The metadata for a column of an existing table.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class JdbcColumn {
 
@@ -47,7 +47,7 @@ public class JdbcColumn {
 	 * @throws SQLException
 	 *             thrown in case of an SQL error.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public JdbcColumn(ResultSet metadata) throws SQLException {
 		super();
@@ -64,7 +64,7 @@ public class JdbcColumn {
 	 * 
 	 * @return the decimalDigits of the column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public int getDecimalDigits() {
 		return this.decimalDigits;
@@ -75,7 +75,7 @@ public class JdbcColumn {
 	 * 
 	 * @return the name of the column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		return this.name;
@@ -86,7 +86,7 @@ public class JdbcColumn {
 	 * 
 	 * @return the size of the column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public int getSize() {
 		return this.size;
@@ -97,7 +97,7 @@ public class JdbcColumn {
 	 * 
 	 * @return the type of the column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public int getType() {
 		return this.type;
@@ -108,7 +108,7 @@ public class JdbcColumn {
 	 * 
 	 * @return true if the column is nullable, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean isNullable() {
 		return this.nullable;

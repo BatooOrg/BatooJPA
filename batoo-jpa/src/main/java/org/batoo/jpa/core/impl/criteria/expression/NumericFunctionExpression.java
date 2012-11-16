@@ -37,7 +37,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  *            the type of the expression
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class NumericFunctionExpression<N extends Number> extends AbstractExpression<N> {
 
@@ -54,7 +54,7 @@ public class NumericFunctionExpression<N extends Number> extends AbstractExpress
 	 * @param y
 	 *            the optional second parameter
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public NumericFunctionExpression(NumericFunctionType type, Expression<?> x, Expression<Integer> y) {

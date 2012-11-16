@@ -33,7 +33,7 @@ import org.batoo.jpa.parser.PersistenceParser;
  * Entity Manager factory for JTA Environments.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class JtaEntityManagerFactoryImpl extends EntityManagerFactoryImpl {
 
@@ -55,7 +55,7 @@ public class JtaEntityManagerFactoryImpl extends EntityManagerFactoryImpl {
 	 * @param parser
 	 *            the persistence parser
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public JtaEntityManagerFactoryImpl(String name, PersistenceParser parser) {
 		super(name, parser);
@@ -79,7 +79,7 @@ public class JtaEntityManagerFactoryImpl extends EntityManagerFactoryImpl {
 	 * 
 	 * @return the transaction manager
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public TransactionManager getTransactionManager() {
 		return this.transactionManager;

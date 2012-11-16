@@ -24,7 +24,7 @@ import java.util.List;
  * Element for <code>table</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface TableMetadata extends BindableMetadata {
 
@@ -33,7 +33,7 @@ public interface TableMetadata extends BindableMetadata {
 	 * 
 	 * @return the name of the catalog of the table
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getCatalog();
@@ -43,7 +43,7 @@ public interface TableMetadata extends BindableMetadata {
 	 * 
 	 * @return the name of the schema of the table
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getSchema();
@@ -53,7 +53,7 @@ public interface TableMetadata extends BindableMetadata {
 	 * 
 	 * @return the list of unique constraints of the table
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<UniqueConstraintMetadata> getUniqueConstraints();

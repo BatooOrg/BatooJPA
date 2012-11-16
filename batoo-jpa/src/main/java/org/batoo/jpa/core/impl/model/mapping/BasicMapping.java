@@ -40,7 +40,7 @@ import org.batoo.jpa.parser.metadata.ColumnMetadata;
  * @param <X>
  *            the destination type
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class BasicMapping<Z, X> extends Mapping<Z, X, X> implements SingularMapping<Z, X> {
 
@@ -53,7 +53,7 @@ public class BasicMapping<Z, X> extends Mapping<Z, X, X> implements SingularMapp
 	 * @param attribute
 	 *            the attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public BasicMapping(ParentMapping<?, Z> parent, BasicAttribute<? super Z, X> attribute) {
 		super(parent, attribute, attribute.getJavaType(), attribute.getName());
@@ -114,7 +114,7 @@ public class BasicMapping<Z, X> extends Mapping<Z, X, X> implements SingularMapp
 	 * 
 	 * @return the column of the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public BasicColumn getColumn() {
 		return this.column;
@@ -125,7 +125,7 @@ public class BasicMapping<Z, X> extends Mapping<Z, X, X> implements SingularMapp
 	 * 
 	 * @return the column metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private ColumnMetadata getColumnMetadata() {
 		ColumnMetadata metadata = null;

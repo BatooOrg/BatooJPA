@@ -31,7 +31,7 @@ import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
  * A Queue that tops up the queue by allocation size sequences when its capacity drops to 1 / 2 of allocation size.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class TableIdQueue extends IdQueue {
 
@@ -57,7 +57,7 @@ public class TableIdQueue extends IdQueue {
 	 * @param generator
 	 *            the table generator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public TableIdQueue(JdbcAdaptor jdbcAdaptor, DataSource datasource, ExecutorService idExecuter, TableGenerator generator) {
 		super(idExecuter, generator.getName(), generator.getAllocationSize());
@@ -110,7 +110,7 @@ public class TableIdQueue extends IdQueue {
 	/**
 	 * @return
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private String getUpdateSql() {
 		if (this.updateSql == null) {

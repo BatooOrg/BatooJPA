@@ -22,7 +22,7 @@ package org.batoo.jpa.parser.metadata.attribute;
  * The common definition for orphanable associations.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface OrphanableAssociationAttributeMetadata {
 
@@ -31,7 +31,7 @@ public interface OrphanableAssociationAttributeMetadata {
 	 * 
 	 * @return true if the orphaned entities of the association attribute is removed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	boolean removesOrphans();

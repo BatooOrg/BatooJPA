@@ -26,7 +26,7 @@ import org.batoo.jpa.parser.metadata.GeneratorMetadata;
  * Element for <code>sequence-generator</code> and <code>table-generator</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class GeneratorElement extends ParentElement implements GeneratorMetadata {
 
@@ -42,7 +42,7 @@ public abstract class GeneratorElement extends ParentElement implements Generato
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public GeneratorElement(ParentElement parent, Map<String, String> attributes) {
@@ -57,7 +57,7 @@ public abstract class GeneratorElement extends ParentElement implements Generato
 	 * @param childElement
 	 *            the name of the element expected
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public GeneratorElement(ParentElement parent, Map<String, String> attributes, String childElement) {
@@ -100,7 +100,7 @@ public abstract class GeneratorElement extends ParentElement implements Generato
 	 * 
 	 * @return the initialValue of the GeneratorElement
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	@Override

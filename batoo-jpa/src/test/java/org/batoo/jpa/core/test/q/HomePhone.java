@@ -25,7 +25,7 @@ import javax.persistence.ManyToOne;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class HomePhone extends Phone {
@@ -35,7 +35,7 @@ public class HomePhone extends Phone {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public HomePhone() {
 		super();
@@ -47,7 +47,7 @@ public class HomePhone extends Phone {
 	 * @param phone
 	 *            the phone
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public HomePhone(Person person, String phone) {
 		super(phone);
@@ -61,7 +61,7 @@ public class HomePhone extends Phone {
 	 * Returns the person.
 	 * 
 	 * @return the person
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Person getPerson() {
 		return this.person;
@@ -72,7 +72,7 @@ public class HomePhone extends Phone {
 	 * 
 	 * @param person
 	 *            the person to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setPerson(Person person) {
 		this.person = person;

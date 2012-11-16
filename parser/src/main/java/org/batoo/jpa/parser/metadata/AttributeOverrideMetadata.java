@@ -22,7 +22,7 @@ package org.batoo.jpa.parser.metadata;
  * The definition of the attribute overrides.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface AttributeOverrideMetadata extends BindableMetadata {
 
@@ -31,7 +31,7 @@ public interface AttributeOverrideMetadata extends BindableMetadata {
 	 * 
 	 * @return the column of the override
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	ColumnMetadata getColumn();

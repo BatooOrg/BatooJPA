@@ -28,7 +28,7 @@ import org.batoo.jpa.parser.MappingException;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Person {
@@ -38,7 +38,7 @@ public class Person {
 	 * 
 	 * @return the person
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public static Person create() {
 		return new Person();
@@ -72,7 +72,7 @@ public class Person {
 	 * Returns the booleanPropertyArray.
 	 * 
 	 * @return the booleanPropertyArray
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean[] getBooleanPropertyArray() {
 		return this.booleanPropertyArray;
@@ -82,7 +82,7 @@ public class Person {
 	 * Returns the byteProperty.
 	 * 
 	 * @return the byteProperty
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public byte getByteProperty() {
 		return this.byteProperty;
@@ -92,7 +92,7 @@ public class Person {
 	 * Returns the bytePropertyArray.
 	 * 
 	 * @return the bytePropertyArray
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public byte[] getBytePropertyArray() {
 		return this.bytePropertyArray;
@@ -102,7 +102,7 @@ public class Person {
 	 * Returns the charProperty.
 	 * 
 	 * @return the charProperty
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public char getCharProperty() {
 		return this.charProperty;
@@ -112,7 +112,7 @@ public class Person {
 	 * Returns the charPropertyArray.
 	 * 
 	 * @return the charPropertyArray
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public char[] getCharPropertyArray() {
 		return this.charPropertyArray;
@@ -122,7 +122,7 @@ public class Person {
 	 * Returns the doubleProperty.
 	 * 
 	 * @return the doubleProperty
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public double getDoubleProperty() {
 		return this.doubleProperty;
@@ -132,7 +132,7 @@ public class Person {
 	 * Returns the doublePropertyArray.
 	 * 
 	 * @return the doublePropertyArray
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public double[] getDoublePropertyArray() {
 		return this.doublePropertyArray;
@@ -142,7 +142,7 @@ public class Person {
 	 * Returns the floatProperty.
 	 * 
 	 * @return the floatProperty
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public float getFloatProperty() {
 		return this.floatProperty;
@@ -152,7 +152,7 @@ public class Person {
 	 * Returns the floatPropertyArray.
 	 * 
 	 * @return the floatPropertyArray
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public float[] getFloatPropertyArray() {
 		return this.floatPropertyArray;
@@ -162,7 +162,7 @@ public class Person {
 	 * Returns the id.
 	 * 
 	 * @return the id
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -172,7 +172,7 @@ public class Person {
 	 * Returns the intProperty.
 	 * 
 	 * @return the intProperty
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public int getIntProperty() {
 		return this.intProperty;
@@ -182,7 +182,7 @@ public class Person {
 	 * Returns the intPropertyArray.
 	 * 
 	 * @return the intPropertyArray
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public int[] getIntPropertyArray() {
 		return this.intPropertyArray;
@@ -192,7 +192,7 @@ public class Person {
 	 * Returns the longProperty.
 	 * 
 	 * @return the longProperty
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public long getLongProperty() {
 		return this.longProperty;
@@ -202,7 +202,7 @@ public class Person {
 	 * Returns the longPropertyArray.
 	 * 
 	 * @return the longPropertyArray
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public long[] getLongPropertyArray() {
 		return this.longPropertyArray;
@@ -212,7 +212,7 @@ public class Person {
 	 * Returns the shortProperty.
 	 * 
 	 * @return the shortProperty
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public short getShortProperty() {
 		return this.shortProperty;
@@ -222,7 +222,7 @@ public class Person {
 	 * Returns the shortPropertyArray.
 	 * 
 	 * @return the shortPropertyArray
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public short[] getShortPropertyArray() {
 		return this.shortPropertyArray;
@@ -232,7 +232,7 @@ public class Person {
 	 * Returns the stringProperty.
 	 * 
 	 * @return the stringProperty
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getStringProperty() {
 		return this.stringProperty;
@@ -242,7 +242,7 @@ public class Person {
 	 * Returns the stringPropertyArray.
 	 * 
 	 * @return the stringPropertyArray
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getStringPropertyArray() {
 		return this.stringPropertyArray;
@@ -252,7 +252,7 @@ public class Person {
 	 * Returns the booleanProperty.
 	 * 
 	 * @return the booleanProperty
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean isBooleanProperty() {
 		return this.booleanProperty;
@@ -263,7 +263,7 @@ public class Person {
 	 * 
 	 * @param booleanProperty
 	 *            the booleanProperty to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setBooleanProperty(boolean booleanProperty) {
 		this.booleanProperty = booleanProperty;
@@ -274,7 +274,7 @@ public class Person {
 	 * 
 	 * @param booleanPropertyArray
 	 *            the booleanPropertyArray to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setBooleanPropertyArray(boolean[] booleanPropertyArray) {
 		this.booleanPropertyArray = booleanPropertyArray;
@@ -285,7 +285,7 @@ public class Person {
 	 * 
 	 * @param byteProperty
 	 *            the byteProperty to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setByteProperty(byte byteProperty) {
 		this.byteProperty = byteProperty;
@@ -296,7 +296,7 @@ public class Person {
 	 * 
 	 * @param bytePropertyArray
 	 *            the bytePropertyArray to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setBytePropertyArray(byte[] bytePropertyArray) {
 		this.bytePropertyArray = bytePropertyArray;
@@ -307,7 +307,7 @@ public class Person {
 	 * 
 	 * @param charProperty
 	 *            the charProperty to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setCharProperty(char charProperty) {
 		this.charProperty = charProperty;
@@ -318,7 +318,7 @@ public class Person {
 	 * 
 	 * @param charPropertyArray
 	 *            the charPropertyArray to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setCharPropertyArray(char[] charPropertyArray) {
 		this.charPropertyArray = charPropertyArray;
@@ -329,7 +329,7 @@ public class Person {
 	 * 
 	 * @param doubleProperty
 	 *            the doubleProperty to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setDoubleProperty(double doubleProperty) {
 		this.doubleProperty = doubleProperty;
@@ -340,7 +340,7 @@ public class Person {
 	 * 
 	 * @param doublePropertyArray
 	 *            the doublePropertyArray to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setDoublePropertyArray(double[] doublePropertyArray) {
 		this.doublePropertyArray = doublePropertyArray;
@@ -351,7 +351,7 @@ public class Person {
 	 * 
 	 * @param floatProperty
 	 *            the floatProperty to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setFloatProperty(float floatProperty) {
 		this.floatProperty = floatProperty;
@@ -362,7 +362,7 @@ public class Person {
 	 * 
 	 * @param floatPropertyArray
 	 *            the floatPropertyArray to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setFloatPropertyArray(float[] floatPropertyArray) {
 		this.floatPropertyArray = floatPropertyArray;
@@ -373,7 +373,7 @@ public class Person {
 	 * 
 	 * @param id
 	 *            the id to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setId(Integer id) {
 		this.id = id;
@@ -384,7 +384,7 @@ public class Person {
 	 * 
 	 * @param intProperty
 	 *            the intProperty to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setIntProperty(int intProperty) {
 		this.intProperty = intProperty;
@@ -395,7 +395,7 @@ public class Person {
 	 * 
 	 * @param intPropertyArray
 	 *            the intPropertyArray to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setIntPropertyArray(int[] intPropertyArray) {
 		this.intPropertyArray = intPropertyArray;
@@ -406,7 +406,7 @@ public class Person {
 	 * 
 	 * @param longProperty
 	 *            the longProperty to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setLongProperty(long longProperty) {
 		this.longProperty = longProperty;
@@ -417,7 +417,7 @@ public class Person {
 	 * 
 	 * @param longPropertyArray
 	 *            the longPropertyArray to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setLongPropertyArray(long[] longPropertyArray) {
 		this.longPropertyArray = longPropertyArray;
@@ -428,7 +428,7 @@ public class Person {
 	 * 
 	 * @param shortProperty
 	 *            the shortProperty to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setShortProperty(short shortProperty) {
 		this.shortProperty = shortProperty;
@@ -439,7 +439,7 @@ public class Person {
 	 * 
 	 * @param shortPropertyArray
 	 *            the shortPropertyArray to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setShortPropertyArray(short[] shortPropertyArray) {
 		this.shortPropertyArray = shortPropertyArray;
@@ -450,7 +450,7 @@ public class Person {
 	 * 
 	 * @param stringProperty
 	 *            the stringProperty to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setStringProperty(String stringProperty) {
 		this.stringProperty = stringProperty;
@@ -461,7 +461,7 @@ public class Person {
 	 * 
 	 * @param stringPropertyArray
 	 *            the stringPropertyArray to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setStringPropertyArray(String stringPropertyArray) {
 		this.stringPropertyArray = stringPropertyArray;
@@ -496,7 +496,7 @@ public class Person {
 	 * @throws MappingException
 	 *             some exception
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Object someBusinessMethod(boolean arg0, char arg1, byte arg2, short arg3, int arg4, long arg5, float arg6, double arg7, String arg8, Integer[] arg9,
 		long[] arg10) throws SQLException, MappingException {

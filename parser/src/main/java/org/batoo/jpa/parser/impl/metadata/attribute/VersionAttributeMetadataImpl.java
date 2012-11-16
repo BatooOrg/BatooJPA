@@ -30,7 +30,7 @@ import org.batoo.jpa.parser.metadata.attribute.VersionAttributeMetadata;
  * The implementation of the {@link VersionAttributeMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class VersionAttributeMetadataImpl extends PhysicalAttributeMetadataImpl implements VersionAttributeMetadata {
 
@@ -42,7 +42,7 @@ public class VersionAttributeMetadataImpl extends PhysicalAttributeMetadataImpl 
 	 * @param parsed
 	 *            set of annotations parsed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public VersionAttributeMetadataImpl(Member member, String name, Set<Class<? extends Annotation>> parsed) {
@@ -57,7 +57,7 @@ public class VersionAttributeMetadataImpl extends PhysicalAttributeMetadataImpl 
 	 * @param metadata
 	 *            the metadata definition of the version attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public VersionAttributeMetadataImpl(Member member, VersionAttributeMetadata metadata) {

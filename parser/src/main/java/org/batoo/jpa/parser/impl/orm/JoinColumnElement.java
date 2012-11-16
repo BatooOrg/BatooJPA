@@ -26,7 +26,7 @@ import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
  * Element for <code>join-column</code> and elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class JoinColumnElement extends BaseColumnElement implements JoinColumnMetadata {
 
@@ -38,7 +38,7 @@ public class JoinColumnElement extends BaseColumnElement implements JoinColumnMe
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public JoinColumnElement(ParentElement parent, Map<String, String> attributes) {

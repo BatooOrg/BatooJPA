@@ -27,13 +27,13 @@ import org.junit.Test;
  * https://github.com/BatooOrg/BatooJPA/issues/76
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class Test7 extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Test7() {
 		super();
@@ -41,7 +41,7 @@ public class Test7 extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void test() {

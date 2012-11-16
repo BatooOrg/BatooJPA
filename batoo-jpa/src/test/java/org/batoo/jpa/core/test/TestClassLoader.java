@@ -28,7 +28,7 @@ import java.util.Enumeration;
  * 
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class TestClassLoader extends ClassLoader {
 
@@ -41,7 +41,7 @@ public class TestClassLoader extends ClassLoader {
 	private String root;
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public TestClassLoader() {
 		super();
@@ -53,7 +53,7 @@ public class TestClassLoader extends ClassLoader {
 	 * @param parent
 	 *            the parent class loader
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public TestClassLoader(ClassLoader parent) {
 		super(parent);
@@ -103,7 +103,7 @@ public class TestClassLoader extends ClassLoader {
 	 * @param root
 	 *            the root of the test
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setRoot(String root) {
 		this.root = root.replace('.', '/');

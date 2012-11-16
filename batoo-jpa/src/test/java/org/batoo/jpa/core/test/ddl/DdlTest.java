@@ -24,7 +24,7 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class DdlTest extends BaseCoreTest {
 
@@ -40,7 +40,7 @@ public class DdlTest extends BaseCoreTest {
 	/**
 	 * Tests the ddl drop mode.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testDdlDrop() {
@@ -51,7 +51,7 @@ public class DdlTest extends BaseCoreTest {
 	/**
 	 * Tests the ddl drop mode.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testDdlUpdate() {

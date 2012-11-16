@@ -49,7 +49,7 @@ import com.google.common.collect.Lists;
  * Element for <code>many-to-many</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ManyToManyAttributeElement extends AssociationElement implements ManyToManyAttributeMetadata {
 
@@ -70,7 +70,7 @@ public class ManyToManyAttributeElement extends AssociationElement implements Ma
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public ManyToManyAttributeElement(ParentElement parent, Map<String, String> attributes) {

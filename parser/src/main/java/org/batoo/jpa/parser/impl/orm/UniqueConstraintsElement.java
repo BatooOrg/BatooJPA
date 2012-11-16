@@ -29,7 +29,7 @@ import com.google.common.collect.Lists;
  * Element for <code>version</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class UniqueConstraintsElement extends ParentElement implements UniqueConstraintMetadata {
 
@@ -42,7 +42,7 @@ public class UniqueConstraintsElement extends ParentElement implements UniqueCon
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public UniqueConstraintsElement(ParentElement parent, Map<String, String> attributes) {

@@ -26,13 +26,13 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class ListenerTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testListener() {
@@ -59,7 +59,7 @@ public class ListenerTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testListener2() {
@@ -86,7 +86,7 @@ public class ListenerTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testListener3() {

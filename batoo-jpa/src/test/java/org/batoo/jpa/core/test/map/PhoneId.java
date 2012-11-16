@@ -23,7 +23,7 @@ import javax.persistence.Embeddable;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Embeddable
 public class PhoneId {
@@ -33,7 +33,7 @@ public class PhoneId {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public PhoneId() {
 		super();
@@ -45,7 +45,7 @@ public class PhoneId {
 	 * @param phoneNumber
 	 *            the phone number
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public PhoneId(String areaCode, String phoneNumber) {
 		super();
@@ -94,7 +94,7 @@ public class PhoneId {
 	 * 
 	 * @return the areaCode of the PhoneId
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected String getAreaCode() {
 		return this.areaCode;
@@ -105,7 +105,7 @@ public class PhoneId {
 	 * 
 	 * @return the phoneNumber of the PhoneId
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected String getPhoneNumber() {
 		return this.phoneNumber;
@@ -130,7 +130,7 @@ public class PhoneId {
 	 * @param areaCode
 	 *            the areaCode to set for PhoneId
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void setAreaCode(String areaCode) {
 		this.areaCode = areaCode;
@@ -142,7 +142,7 @@ public class PhoneId {
 	 * @param phoneNumber
 	 *            the phoneNumber to set for PhoneId
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;

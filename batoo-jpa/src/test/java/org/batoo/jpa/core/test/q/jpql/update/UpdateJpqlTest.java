@@ -29,7 +29,7 @@ import org.junit.Test;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class UpdateJpqlTest extends BaseCoreTest {
 
@@ -49,7 +49,7 @@ public class UpdateJpqlTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Before
 	public void prepareCountries() {
@@ -65,7 +65,7 @@ public class UpdateJpqlTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testDelete() {
@@ -82,7 +82,7 @@ public class UpdateJpqlTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testUpdate() {

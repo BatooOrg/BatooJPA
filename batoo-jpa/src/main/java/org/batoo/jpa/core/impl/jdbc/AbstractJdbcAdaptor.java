@@ -37,7 +37,7 @@ import com.google.common.collect.Maps;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class AbstractJdbcAdaptor {
 
@@ -52,7 +52,7 @@ public abstract class AbstractJdbcAdaptor {
 	 *            the name of the database product
 	 * 
 	 * @return the adapters
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public static JdbcAdaptor getAdapter(ClassLoader classloader, String databaseProductName) {
 		final JdbcAdaptor jdbcAdaptor = AbstractJdbcAdaptor.ADAPTERS.get(databaseProductName);
@@ -92,7 +92,7 @@ public abstract class AbstractJdbcAdaptor {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public AbstractJdbcAdaptor() {
 		super();
@@ -101,7 +101,7 @@ public abstract class AbstractJdbcAdaptor {
 	/**
 	 * @return the JDBC Driver this adapter works with
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected abstract String[] getProductNames();
 }

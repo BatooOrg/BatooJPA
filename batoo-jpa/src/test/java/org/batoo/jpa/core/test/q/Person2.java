@@ -27,7 +27,7 @@ import javax.persistence.Id;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Person2 {
@@ -42,7 +42,7 @@ public class Person2 {
 	private String name;
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Person2() {
 		super();
@@ -58,7 +58,7 @@ public class Person2 {
 	 * @param phone
 	 *            the phone
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Person2(String name, String city, Country country, String phone) {
 		super();
@@ -72,7 +72,7 @@ public class Person2 {
 	 * 
 	 * @return the contact of the Person2
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected Contact getContact() {
 		return this.contact;
@@ -82,7 +82,7 @@ public class Person2 {
 	 * Returns the id.
 	 * 
 	 * @return the id
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -92,7 +92,7 @@ public class Person2 {
 	 * Returns the name.
 	 * 
 	 * @return the name
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		return this.name;
@@ -104,7 +104,7 @@ public class Person2 {
 	 * @param contact
 	 *            the contact to set for Person2
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void setContact(Contact contact) {
 		this.contact = contact;
@@ -115,7 +115,7 @@ public class Person2 {
 	 * 
 	 * @param name
 	 *            the name to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setName(String name) {
 		this.name = name;

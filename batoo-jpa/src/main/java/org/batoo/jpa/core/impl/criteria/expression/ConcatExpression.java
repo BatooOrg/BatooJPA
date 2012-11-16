@@ -38,7 +38,7 @@ import com.google.common.collect.Lists;
  * Expression for string <code>concat</code> function.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ConcatExpression extends AbstractExpression<String> {
 
@@ -49,7 +49,7 @@ public class ConcatExpression extends AbstractExpression<String> {
 	 * @param arguments
 	 *            the argument expressions
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ConcatExpression(Expression<String>... arguments) {
 		super(String.class);

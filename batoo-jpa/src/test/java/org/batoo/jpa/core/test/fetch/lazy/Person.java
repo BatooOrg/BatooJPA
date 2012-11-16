@@ -34,7 +34,7 @@ import com.google.common.collect.Lists;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Person implements Serializable {
@@ -55,7 +55,7 @@ public class Person implements Serializable {
 	private String name;
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Person() {
 		super();
@@ -65,7 +65,7 @@ public class Person implements Serializable {
 	 * @param name
 	 *            the name
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Person(String name) {
 		super();
@@ -77,7 +77,7 @@ public class Person implements Serializable {
 	 * Returns the addresses.
 	 * 
 	 * @return the addresses
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public List<Address> getAddresses() {
 		return this.addresses;
@@ -87,7 +87,7 @@ public class Person implements Serializable {
 	 * Returns the id.
 	 * 
 	 * @return the id
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -97,7 +97,7 @@ public class Person implements Serializable {
 	 * Returns the name.
 	 * 
 	 * @return the name
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		return this.name;
@@ -107,7 +107,7 @@ public class Person implements Serializable {
 	 * Returns the phones.
 	 * 
 	 * @return the phones
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public List<HomePhone> getPhones() {
 		return this.phones;
@@ -117,7 +117,7 @@ public class Person implements Serializable {
 	 * Returns the workPhones.
 	 * 
 	 * @return the workPhones
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public List<WorkPhone> getWorkPhones() {
 		return this.workPhones;
@@ -128,7 +128,7 @@ public class Person implements Serializable {
 	 * 
 	 * @param name
 	 *            the name to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setName(String name) {
 		this.name = name;

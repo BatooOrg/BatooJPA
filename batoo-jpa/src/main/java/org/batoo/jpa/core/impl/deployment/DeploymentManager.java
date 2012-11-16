@@ -50,7 +50,7 @@ import com.google.common.collect.Sets;
  *            the base type for the operation
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class DeploymentManager<X> {
 
@@ -58,7 +58,7 @@ public abstract class DeploymentManager<X> {
 	 * The context for the operation
 	 * 
 	 * @author hceylan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected enum Context {
 		/**
@@ -90,7 +90,7 @@ public abstract class DeploymentManager<X> {
 		 * @param task
 		 *            the deployment unit task.
 		 * 
-		 * @since $version
+		 * @since 2.0.0
 		 */
 		public DeploymentUnitFuture(DeploymentUnitTask task) {
 			super(task);
@@ -170,7 +170,7 @@ public abstract class DeploymentManager<X> {
 	 * 
 	 * @param context
 	 *            the context for the operation
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings({ "unchecked" })
 	public DeploymentManager(BLogger log, String name, MetamodelImpl metamodel, Context context) {
@@ -214,7 +214,7 @@ public abstract class DeploymentManager<X> {
 	 * Returns the metamodel.
 	 * 
 	 * @return the metamodel
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public MetamodelImpl getMetamodel() {
 		return this.metamodel;
@@ -227,7 +227,7 @@ public abstract class DeploymentManager<X> {
 	 *            the exception
 	 * @throws BatooException
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void handleException(Throwable t) throws BatooException {
 		if (t instanceof BatooException) {
@@ -248,7 +248,7 @@ public abstract class DeploymentManager<X> {
 	 *            the type
 	 * @return true if the type has performed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean hasPerformed(TypeImpl<?> type) {
 		if (!this.types.contains(type)) {
@@ -265,7 +265,7 @@ public abstract class DeploymentManager<X> {
 	/**
 	 * Performs the deployment unit for all the types.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @throws BatooException
 	 */
 	protected final void perform() throws BatooException {
@@ -310,7 +310,7 @@ public abstract class DeploymentManager<X> {
 	 * @throws BatooException
 	 *             thrown in case of underlying error
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract Void perform(X type) throws BatooException;
 
@@ -320,7 +320,7 @@ public abstract class DeploymentManager<X> {
 	 * @param type
 	 *            the type to mark
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void performed(X type) {
 		if (!(type instanceof NamedQueryMetadata)) {

@@ -37,7 +37,7 @@ import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
  *            the target type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class SingularJoin<Z, X> extends AbstractJoin<Z, X> {
 
@@ -49,7 +49,7 @@ public class SingularJoin<Z, X> extends AbstractJoin<Z, X> {
 	 * @param jointType
 	 *            the join type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public SingularJoin(AbstractFrom<?, Z> parent, JoinedMapping<? super Z, ?, X> mapping, JoinType jointType) {
 		super(parent, mapping, jointType);

@@ -24,7 +24,7 @@ import javax.persistence.Entity;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class E6 extends E {
@@ -36,7 +36,7 @@ public class E6 extends E {
 	 * 
 	 * @return the transiet of the E6
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getTransiet() {
 		return this.transiet;
@@ -48,7 +48,7 @@ public class E6 extends E {
 	 * @param transiet
 	 *            the transiet to set for E6
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setTransiet(String transiet) {
 		this.transiet = transiet;

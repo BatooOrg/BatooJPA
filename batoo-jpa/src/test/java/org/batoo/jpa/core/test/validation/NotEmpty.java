@@ -36,7 +36,7 @@ import javax.validation.Payload;
  * The annotated element has to have at least one element.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Documented
 @Constraint(validatedBy = NotEmptyValidator.class)
@@ -54,7 +54,7 @@ public @interface NotEmpty {
 		/**
 		 * @return constraints
 		 * 
-		 * @since $version
+		 * @since 2.0.0
 			 */
 		NotEmpty[] value();
 	}
@@ -62,21 +62,21 @@ public @interface NotEmpty {
 	/**
 	 * @return the groups.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract Class<?>[] groups() default {};
 
 	/**
 	 * @return the message
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract String message() default "At least one entry is required";
 
 	/**
 	 * @return the payload
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract Class<? extends Payload>[] payload() default {};
 }

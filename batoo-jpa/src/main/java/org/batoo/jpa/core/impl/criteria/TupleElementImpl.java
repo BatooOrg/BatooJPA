@@ -29,7 +29,7 @@ import javax.persistence.TupleElement;
  * @see Tuple
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class TupleElementImpl<X> implements TupleElement<X> {
 
@@ -39,7 +39,7 @@ public abstract class TupleElementImpl<X> implements TupleElement<X> {
 	 * @param javaType
 	 *            the java type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")

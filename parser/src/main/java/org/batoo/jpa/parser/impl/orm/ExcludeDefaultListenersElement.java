@@ -24,7 +24,7 @@ import java.util.Map;
  * Element for <code>exclude-default-listeners</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ExcludeDefaultListenersElement extends ChildElement {
 
@@ -34,7 +34,7 @@ public class ExcludeDefaultListenersElement extends ChildElement {
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public ExcludeDefaultListenersElement(ParentElement parent, Map<String, String> attributes) {

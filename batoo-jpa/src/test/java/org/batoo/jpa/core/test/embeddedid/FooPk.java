@@ -23,7 +23,7 @@ import javax.persistence.Embeddable;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Embeddable
 public class FooPk {
@@ -70,7 +70,7 @@ public class FooPk {
 	 * Returns the intKey.
 	 * 
 	 * @return the intKey
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getIntKey() {
 		return this.intKey;
@@ -80,7 +80,7 @@ public class FooPk {
 	 * Returns the strKey.
 	 * 
 	 * @return the strKey
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getStrKey() {
 		return this.strKey;
@@ -104,7 +104,7 @@ public class FooPk {
 	 * 
 	 * @param intKey
 	 *            the intKey to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setIntKey(Integer intKey) {
 		this.intKey = intKey;
@@ -115,7 +115,7 @@ public class FooPk {
 	 * 
 	 * @param strKey
 	 *            the strKey to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setStrKey(String strKey) {
 		this.strKey = strKey;

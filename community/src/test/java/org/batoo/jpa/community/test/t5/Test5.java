@@ -8,13 +8,13 @@ import org.junit.Test;
  * Test case for QueryDSL.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class Test5 extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testQueryDSL() {

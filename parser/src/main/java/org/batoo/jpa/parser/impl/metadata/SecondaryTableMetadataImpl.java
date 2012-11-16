@@ -35,7 +35,7 @@ import com.google.common.collect.Lists;
  * The implementation of {@link SecondaryTableMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class SecondaryTableMetadataImpl implements SecondaryTableMetadata {
 
@@ -52,7 +52,7 @@ public class SecondaryTableMetadataImpl implements SecondaryTableMetadata {
 	 * @param annotation
 	 *            the annotation
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public SecondaryTableMetadataImpl(AbstractLocator locator, SecondaryTable annotation) {

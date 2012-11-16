@@ -89,7 +89,7 @@ import org.batoo.jpa.core.impl.model.type.TypeImpl;
  * fact that Java generics are not compatible with varags.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class CriteriaBuilderImpl implements CriteriaBuilder {
 
@@ -99,7 +99,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * @param metamodel
 	 *            the metamodel
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public CriteriaBuilderImpl(MetamodelImpl metamodel) {
@@ -208,7 +208,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * @param <X>
 	 *            the type of the clazz
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public <X> AbstractExpression<X> cast(AbstractExpression<?> x, Class<X> clazz) {
@@ -318,7 +318,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * @param <X>
 	 *            the type of the constant
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
@@ -400,7 +400,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 *            the inner expression
 	 * @return the date tAime function expresssion
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public DateTimeExpression dateTimeExpression(DateTimeFunctionType type, Expression<?> x) {
@@ -510,7 +510,7 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * Returns the metamodel.
 	 * 
 	 * @return the metamodel
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public MetamodelImpl getMetamodel() {
 		return this.metamodel;

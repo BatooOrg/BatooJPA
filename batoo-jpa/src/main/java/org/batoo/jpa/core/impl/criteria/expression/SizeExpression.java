@@ -40,7 +40,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  *            the type of the collection.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class SizeExpression<C> extends AbstractExpression<Integer> {
 
@@ -51,7 +51,7 @@ public class SizeExpression<C> extends AbstractExpression<Integer> {
 	 * @param collection
 	 *            the inner expression
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public SizeExpression(Expression<C> collection) {
 		super(Integer.class);

@@ -32,7 +32,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  * @param <X>
  *            the type of the selection item
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class AbstractSelection<X> extends TupleElementImpl<X> implements Selection<X> {
 
@@ -42,7 +42,7 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	 * @param javaType
 	 *            the java type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public AbstractSelection(Class<X> javaType) {
@@ -74,7 +74,7 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	 * 
 	 * @return the JPQL select fragment
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public abstract String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected);
@@ -88,7 +88,7 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	 *            if the selection is selected
 	 * @return the SQL select fragment
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public abstract String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected);
@@ -118,7 +118,7 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	 *            the query
 	 * @return the SQL restriction fragments
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public abstract String[] getSqlRestrictionFragments(BaseQueryImpl<?> query);
@@ -136,7 +136,7 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	 * @throws SQLException
 	 *             thrown in case of an underlying SQL Error
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public abstract X handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException;
@@ -155,7 +155,7 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	 * 
 	 * @return true if the selection is comprises of entities only, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public boolean isEntityList() {

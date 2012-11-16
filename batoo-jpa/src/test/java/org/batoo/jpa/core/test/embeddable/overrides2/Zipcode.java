@@ -23,7 +23,7 @@ import javax.persistence.Embeddable;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Embeddable
 public class Zipcode {
@@ -36,7 +36,7 @@ public class Zipcode {
 	 * Returns the plusfour.
 	 * 
 	 * @return the plusfour
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getPlusfour() {
 		return this.plusfour;
@@ -46,7 +46,7 @@ public class Zipcode {
 	 * Returns the zip.
 	 * 
 	 * @return the zip
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getZip() {
 		return this.zip;
@@ -57,7 +57,7 @@ public class Zipcode {
 	 * 
 	 * @param plusfour
 	 *            the plusfour to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setPlusfour(String plusfour) {
 		this.plusfour = plusfour;
@@ -68,7 +68,7 @@ public class Zipcode {
 	 * 
 	 * @param zip
 	 *            the zip to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setZip(String zip) {
 		this.zip = zip;

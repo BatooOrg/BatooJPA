@@ -27,7 +27,7 @@ import javax.persistence.OneToOne;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Embeddable
 public class Contact {
@@ -40,7 +40,7 @@ public class Contact {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Contact() {
 		super();
@@ -54,7 +54,7 @@ public class Contact {
 	 * @param phone
 	 *            the phone
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Contact(String city, Country country, String phone) {
 		super();
@@ -68,7 +68,7 @@ public class Contact {
 	 * 
 	 * @return the address of the Contact
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected Address2 getAddress() {
 		return this.address;
@@ -79,7 +79,7 @@ public class Contact {
 	 * 
 	 * @return the phone of the Contact
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected Phone getPhone() {
 		return this.phone;
@@ -91,7 +91,7 @@ public class Contact {
 	 * @param address
 	 *            the address to set for Contact
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void setAddress(Address2 address) {
 		this.address = address;
@@ -103,7 +103,7 @@ public class Contact {
 	 * @param phone
 	 *            the phone to set for Contact
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void setPhone(WorkPhone phone) {
 		this.phone = phone;

@@ -36,7 +36,7 @@ import org.batoo.jpa.parser.metadata.attribute.OptionalAssociationAttributeMetad
  * @param <T>
  *            The type of the represented attribute
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, T> implements SingularAttribute<X, T> {
 
@@ -57,7 +57,7 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 	 * @param attributeType
 	 *            the type of the attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public AssociatedSingularAttribute(ManagedTypeImpl<X> declaringType, PersistentAttributeType attributeType, AssociationAttributeMetadata metadata) {
 		super(declaringType, metadata);
@@ -83,7 +83,7 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 	 * 
 	 * @return the mapsId of the AssociatedSingularAttribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getMapsId() {
 		return this.mapsId;
@@ -143,7 +143,7 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 	 * 
 	 * @return true if the association is joined.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean isJoined() {
 		return this.joined;
@@ -163,7 +163,7 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 	 * 
 	 * @return true if the attribute is the owner, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean isOwner() {
 		return this.owner;

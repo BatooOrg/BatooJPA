@@ -38,7 +38,7 @@ import com.google.common.collect.Sets;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class ElementCollectionParent {
@@ -81,7 +81,7 @@ public class ElementCollectionParent {
 	 * Returns the codes1.
 	 * 
 	 * @return the codes1
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public List<String> getCodes1() {
 		return this.codes1;
@@ -92,7 +92,7 @@ public class ElementCollectionParent {
 	 * 
 	 * @return the codes2 of the Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Set<String> getCodes2() {
 		return this.codes2;
@@ -103,7 +103,7 @@ public class ElementCollectionParent {
 	 * 
 	 * @return the codes3 of the Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Set<FooType> getCodes3() {
 		return this.codes3;
@@ -114,7 +114,7 @@ public class ElementCollectionParent {
 	 * 
 	 * @return the codes4 of the ElementCollectionParent
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Set<FooType> getCodes4() {
 		return this.codes4;
@@ -125,7 +125,7 @@ public class ElementCollectionParent {
 	 * 
 	 * @return the codes5 of the ElementCollectionParent
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Map<String, String> getCodes5() {
 		return this.codes5;
@@ -135,7 +135,7 @@ public class ElementCollectionParent {
 	 * Returns the key.
 	 * 
 	 * @return the key
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getKey() {
 		return this.key;
@@ -145,7 +145,7 @@ public class ElementCollectionParent {
 	 * Returns the value.
 	 * 
 	 * @return the value
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getValue() {
 		return this.value;
@@ -156,7 +156,7 @@ public class ElementCollectionParent {
 	 * 
 	 * @param value
 	 *            the value to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setValue(String value) {
 		this.value = value;

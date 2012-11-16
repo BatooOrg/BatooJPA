@@ -36,7 +36,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  *            the temporal type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class CurrentTemporalExpression<T> extends AbstractExpression<T> {
 
@@ -49,7 +49,7 @@ public class CurrentTemporalExpression<T> extends AbstractExpression<T> {
 	 * @param javaType
 	 *            the java type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public CurrentTemporalExpression(TemporalType temporalType, Class<T> javaType) {
 		super(javaType);

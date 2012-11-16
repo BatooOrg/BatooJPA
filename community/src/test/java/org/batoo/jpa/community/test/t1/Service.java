@@ -34,7 +34,7 @@ import javax.persistence.Table;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 @Table(name = "tbl_service2")
@@ -57,7 +57,7 @@ public class Service implements Serializable {
 	 * 
 	 * @return the name of the Service
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		return this.name;
@@ -68,7 +68,7 @@ public class Service implements Serializable {
 	 * 
 	 * @return the parameters of the Service
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Set<Parameter> getParameters() {
 		return this.parameters;
@@ -79,7 +79,7 @@ public class Service implements Serializable {
 	 * 
 	 * @return the serviceID of the Service
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public long getServiceID() {
 		return this.serviceID;
@@ -91,7 +91,7 @@ public class Service implements Serializable {
 	 * @param name
 	 *            the name to set for Service
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -103,7 +103,7 @@ public class Service implements Serializable {
 	 * @param parameters
 	 *            the parameters to set for Service
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setParameters(Set<Parameter> parameters) {
 		this.parameters = parameters;
@@ -115,7 +115,7 @@ public class Service implements Serializable {
 	 * @param serviceID
 	 *            the serviceID to set for Service
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setServiceID(long serviceID) {
 		this.serviceID = serviceID;

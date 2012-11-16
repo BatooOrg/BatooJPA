@@ -34,7 +34,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  * Expression for list join indices.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class IndexExpression extends AbstractExpression<Integer> {
 
@@ -48,7 +48,7 @@ public class IndexExpression extends AbstractExpression<Integer> {
 	 * @param orderColumn
 	 *            the order column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public IndexExpression(ListJoinImpl<?, ?> listJoin, OrderColumn orderColumn) {
 		super(Integer.class);

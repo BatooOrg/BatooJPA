@@ -32,7 +32,7 @@ import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class Callback {
 
@@ -40,7 +40,7 @@ public class Callback {
 	 * Type of the callback
 	 * 
 	 * @author hceylan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public static enum CallbackType {
 		/**
@@ -71,7 +71,7 @@ public class Callback {
 	 * @param callbackType
 	 *            the callback type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Callback(final AbstractLocator locator, final Class<?> clazz, final String name, EntityListenerType listenerType, final CallbackType callbackType) {
 		super();
@@ -111,7 +111,7 @@ public class Callback {
 	 * @param instance
 	 *            the instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void fire(Object instance) {
 		try {
@@ -132,7 +132,7 @@ public class Callback {
 	 * 
 	 * @return the callback type of the Callback
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public CallbackType getCallbackType() {
 		return this.callbackType;
@@ -143,7 +143,7 @@ public class Callback {
 	 * 
 	 * @return the listener type of the Callback
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public EntityListenerType getListenerType() {
 		return this.listenerType;

@@ -21,7 +21,7 @@ package org.batoo.jpa.core.test.q;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class SimpleCity implements Comparable<SimpleCity> {
 
@@ -34,7 +34,7 @@ public class SimpleCity implements Comparable<SimpleCity> {
 	 * @param country
 	 *            the country
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public SimpleCity(String city, String country) {
 		super();
@@ -100,7 +100,7 @@ public class SimpleCity implements Comparable<SimpleCity> {
 	 * 
 	 * @return the city of the SimpleCity
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected String getCity() {
 		return this.city;
@@ -111,7 +111,7 @@ public class SimpleCity implements Comparable<SimpleCity> {
 	 * 
 	 * @return the country of the SimpleCity
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected String getCountry() {
 		return this.country;
@@ -136,7 +136,7 @@ public class SimpleCity implements Comparable<SimpleCity> {
 	 * @param city
 	 *            the city to set for SimpleCity
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void setCity(String city) {
 		this.city = city;
@@ -148,7 +148,7 @@ public class SimpleCity implements Comparable<SimpleCity> {
 	 * @param country
 	 *            the country to set for SimpleCity
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void setCountry(String country) {
 		this.country = country;

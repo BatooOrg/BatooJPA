@@ -22,7 +22,7 @@ package org.batoo.jpa.jpql.test;
  * Base class for JPQL Parser tests.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class BaseJpqlTest {
 

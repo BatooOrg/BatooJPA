@@ -30,7 +30,7 @@ import com.google.common.collect.Lists;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class TupleImpl implements Tuple {
 
@@ -46,7 +46,7 @@ public class TupleImpl implements Tuple {
 	 * @param values
 	 *            the values
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public TupleImpl(List<String> aliases, List<AbstractSelection<?>> selections, Object[] values) {

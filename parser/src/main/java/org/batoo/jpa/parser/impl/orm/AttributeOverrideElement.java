@@ -27,7 +27,7 @@ import org.batoo.jpa.parser.metadata.ColumnMetadata;
  * Element for <code>attribute-override</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class AttributeOverrideElement extends ParentElement implements AttributeOverrideMetadata {
 
@@ -40,7 +40,7 @@ public class AttributeOverrideElement extends ParentElement implements Attribute
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public AttributeOverrideElement(ParentElement parent, Map<String, String> attributes) {

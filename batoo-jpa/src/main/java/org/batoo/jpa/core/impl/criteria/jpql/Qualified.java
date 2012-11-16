@@ -29,7 +29,7 @@ import com.google.common.collect.Lists;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class Qualified {
 
@@ -39,7 +39,7 @@ public class Qualified {
 	 * @param tree
 	 *            the tree
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Qualified(Tree tree) {
 		super();
@@ -57,7 +57,7 @@ public class Qualified {
 	 * 
 	 * @return the segments of the Qualified
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public LinkedList<String> getSegments() {
 		return this.segments;

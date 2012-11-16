@@ -29,7 +29,7 @@ import org.apache.commons.lang.NotImplementedException;
  *            the type of the parameter.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class NativeParameter<T> implements Parameter<T> {
 
@@ -41,7 +41,7 @@ public class NativeParameter<T> implements Parameter<T> {
 	 * @param position
 	 *            the position of the parameter
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public NativeParameter(Integer position) {
 		this(null, position);
@@ -53,7 +53,7 @@ public class NativeParameter<T> implements Parameter<T> {
 	 * @param position
 	 *            the ordinal number of the parameter
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public NativeParameter(String name, Integer position) {
 		super();
@@ -67,7 +67,7 @@ public class NativeParameter<T> implements Parameter<T> {
 	 * 
 	 * @return the name number of the parameter
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Override
 	public String getName() {

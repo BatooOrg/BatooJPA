@@ -24,7 +24,7 @@ import java.util.List;
  * The definition for join tables.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface JoinTableMetadata extends TableMetadata {
 
@@ -33,7 +33,7 @@ public interface JoinTableMetadata extends TableMetadata {
 	 * 
 	 * @return the list of inverse join columns of the table.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<JoinColumnMetadata> getInverseJoinColumns();
@@ -43,7 +43,7 @@ public interface JoinTableMetadata extends TableMetadata {
 	 * 
 	 * @return the list of join columns of the table.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<JoinColumnMetadata> getJoinColumns();

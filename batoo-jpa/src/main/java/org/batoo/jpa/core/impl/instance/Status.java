@@ -22,7 +22,7 @@ package org.batoo.jpa.core.impl.instance;
  * The states for a managed instance
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public enum Status {
 	/**

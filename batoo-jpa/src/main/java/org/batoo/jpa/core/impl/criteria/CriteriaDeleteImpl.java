@@ -31,7 +31,7 @@ import org.batoo.jpa.core.impl.model.MetamodelImpl;
  *            the entity type that is the target of the delete
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class CriteriaDeleteImpl<T> extends CriteriaModify<T> {
 
@@ -39,7 +39,7 @@ public class CriteriaDeleteImpl<T> extends CriteriaModify<T> {
 	 * @param metamodel
 	 *            the metamodel
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public CriteriaDeleteImpl(MetamodelImpl metamodel) {
@@ -82,7 +82,7 @@ public class CriteriaDeleteImpl<T> extends CriteriaModify<T> {
 	 * 
 	 * @return the restriction
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private String generateSqlRestriction() {

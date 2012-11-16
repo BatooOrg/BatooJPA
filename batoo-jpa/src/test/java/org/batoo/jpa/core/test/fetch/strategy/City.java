@@ -28,7 +28,7 @@ import org.batoo.jpa.annotations.FetchStrategy;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class City {
@@ -43,7 +43,7 @@ public class City {
 	private Country country;
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public City() {
 		super();
@@ -57,7 +57,7 @@ public class City {
 	 * @param country
 	 *            the country
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public City(Integer id, String name, Country country) {
 		super();
@@ -78,7 +78,7 @@ public class City {
 	 * Returns the id.
 	 * 
 	 * @return the id
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -88,7 +88,7 @@ public class City {
 	 * Returns the name.
 	 * 
 	 * @return the name
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		return this.name;
@@ -107,7 +107,7 @@ public class City {
 	 * 
 	 * @param name
 	 *            the name to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setName(String name) {
 		this.name = name;

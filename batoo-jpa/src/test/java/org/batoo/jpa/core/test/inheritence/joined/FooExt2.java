@@ -23,7 +23,7 @@ import javax.persistence.Entity;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class FooExt2 extends Foo {
@@ -34,7 +34,7 @@ public class FooExt2 extends Foo {
 	 * Returns the valueExt2.
 	 * 
 	 * @return the valueExt2
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getValueExt2() {
 		return this.valueExt2;
@@ -45,7 +45,7 @@ public class FooExt2 extends Foo {
 	 * 
 	 * @param valueExt2
 	 *            the valueExt2 to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setValueExt2(String valueExt2) {
 		this.valueExt2 = valueExt2;

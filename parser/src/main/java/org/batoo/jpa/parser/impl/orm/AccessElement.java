@@ -26,7 +26,7 @@ import javax.persistence.AccessType;
  * Element for <code>access</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class AccessElement extends ChildElement {
 
@@ -38,7 +38,7 @@ public class AccessElement extends ChildElement {
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public AccessElement(ParentElement parent, Map<String, String> attributes) {
@@ -59,7 +59,7 @@ public class AccessElement extends ChildElement {
 	 * 
 	 * @return the accessType
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public AccessType getAccessType() {

@@ -33,7 +33,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  *            the type of the expression
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class StaticTypeExpression<T> extends AbstractTypeExpression<T> {
 
@@ -45,7 +45,7 @@ public class StaticTypeExpression<T> extends AbstractTypeExpression<T> {
 	 * @param javaType
 	 *            the java type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public StaticTypeExpression(AbstractPath<T> path, Class<T> javaType) {
 		super(path);

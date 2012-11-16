@@ -26,7 +26,7 @@ import org.batoo.common.log.ToStringBuilder;
  * Element factories that may parent child elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class ParentElement extends Element {
 
@@ -39,7 +39,7 @@ public abstract class ParentElement extends Element {
 	 *            the second array of elements
 	 * @return the joint array of <code>elements1</code> and <code>elements2</code>
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public static String[] join(String[] elements1, String... elements2) {
@@ -72,7 +72,7 @@ public abstract class ParentElement extends Element {
 	 * @param expectedChildElements
 	 *            the name of the elements expected
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public ParentElement(ParentElement parent, Map<String, String> attributes, String... expectedChildElements) {
@@ -87,7 +87,7 @@ public abstract class ParentElement extends Element {
 	 * @param child
 	 *            the generated child artifact
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	protected abstract void handleChild(Element child);

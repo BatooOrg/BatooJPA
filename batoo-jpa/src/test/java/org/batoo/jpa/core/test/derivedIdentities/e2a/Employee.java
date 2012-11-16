@@ -25,7 +25,7 @@ import javax.persistence.IdClass;
 /**
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 @IdClass(EmployeeId.class)
@@ -39,7 +39,7 @@ public class Employee {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Employee() {
 		super();
@@ -51,7 +51,7 @@ public class Employee {
 	 *            the first name
 	 * @param lastName
 	 *            the last name
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Employee(String firstName, String lastName) {
 		super();
@@ -99,7 +99,7 @@ public class Employee {
 	 * 
 	 * @return the firstName
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getFirstName() {
 		return this.firstName;
@@ -109,7 +109,7 @@ public class Employee {
 	 * 
 	 * @return the lastName
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getLastName() {
 		return this.lastName;
@@ -133,7 +133,7 @@ public class Employee {
 	 * @param firstName
 	 *            the firstName to set
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
@@ -144,7 +144,7 @@ public class Employee {
 	 * @param lastName
 	 *            the lastName to set
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setLastName(String lastName) {
 		this.lastName = lastName;

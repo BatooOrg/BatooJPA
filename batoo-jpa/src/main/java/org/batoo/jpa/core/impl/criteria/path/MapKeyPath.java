@@ -47,7 +47,7 @@ import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
  *            the type of the key
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class MapKeyPath<Z, X> extends ParentPath<Z, X> {
 
@@ -60,7 +60,7 @@ public class MapKeyPath<Z, X> extends ParentPath<Z, X> {
 	 * @param javaType
 	 *            the java type of the key
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public MapKeyPath(MapJoinImpl<Z, X, ?> mapJoin, Class<X> javaType) {
 		super(mapJoin.getParent(), javaType);

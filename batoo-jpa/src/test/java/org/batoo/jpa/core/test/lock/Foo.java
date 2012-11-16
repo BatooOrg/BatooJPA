@@ -33,7 +33,7 @@ import com.google.common.collect.Lists;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Foo {
@@ -55,7 +55,7 @@ public class Foo {
 	 * 
 	 * @return the bars of the Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public List<Bar> getBars() {
 		return this.bars;
@@ -66,7 +66,7 @@ public class Foo {
 	 * 
 	 * @return the id of the Foo1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -77,7 +77,7 @@ public class Foo {
 	 * 
 	 * @return the value of the Foo1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getValue() {
 		return this.value;
@@ -88,7 +88,7 @@ public class Foo {
 	 * 
 	 * @return the version of the Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public int getVersion() {
 		return this.version;
@@ -100,7 +100,7 @@ public class Foo {
 	 * @param value
 	 *            the value to set for Foo1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setValue(String value) {
 		this.value = value;
@@ -112,7 +112,7 @@ public class Foo {
 	 * @param version
 	 *            the version to set for Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setVersion(int version) {
 		this.version = version;

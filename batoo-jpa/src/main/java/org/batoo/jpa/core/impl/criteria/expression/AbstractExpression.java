@@ -36,7 +36,7 @@ import com.google.common.collect.Lists;
  * @param <T>
  *            the type of the expression
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class AbstractExpression<T> extends AbstractSelection<T> implements Expression<T> {
 
@@ -46,7 +46,7 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 * @param javaType
 	 *            the java type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public AbstractExpression(Class<T> javaType) {
 		super(javaType);
@@ -95,7 +95,7 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 *            the query
 	 * @return the JPQL where fragment
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract String generateJpqlRestriction(BaseQueryImpl<?> query);
 
@@ -104,7 +104,7 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 * 
 	 * @return the converter of the expression
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ExpressionConverter<?> getConverter() {
 		return this.converter;
@@ -174,7 +174,7 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 *            the type of the conversion
 	 * @return the same expression
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public <N> Expression<N> setConverter(ExpressionConverter<N> converter) {

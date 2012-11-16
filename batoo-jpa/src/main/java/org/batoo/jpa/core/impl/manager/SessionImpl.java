@@ -52,7 +52,7 @@ import com.google.common.collect.Sets;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class SessionImpl {
 
@@ -81,7 +81,7 @@ public class SessionImpl {
 	 * @param metamodel
 	 *            the metamodel
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public SessionImpl(EntityManagerImpl entityManager, MetamodelImpl metamodel) {
 		super();
@@ -98,7 +98,7 @@ public class SessionImpl {
 	 * @param instances
 	 *            array of changed instances
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void cascadeRemovals(ManagedInstance<?>[] instances) {
 		SessionImpl.LOG.debug("Cascading removals on session {0}", this);
@@ -116,7 +116,7 @@ public class SessionImpl {
 	 * @param instance
 	 *            the instance to check
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void checkTransient(Object instance) {
 		if (instance instanceof EnhancedInstance) {
@@ -136,7 +136,7 @@ public class SessionImpl {
 	/**
 	 * Clears the session.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void clear() {
 		SessionImpl.LOG.debug("Session clearing {0}", this);
@@ -157,7 +157,7 @@ public class SessionImpl {
 	 * @throws SQLException
 	 *             thrown in case of an underlying SQL error
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private void doRemoves(Connection connection, final ManagedInstance<?>[] removes) throws SQLException {
 		final ManagedInstance<?>[] batch = new ManagedInstance[this.removeBatchSize];
@@ -199,7 +199,7 @@ public class SessionImpl {
 	 * @throws SQLException
 	 *             thrown in case of an underlying SQL error
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private void doUpdates(Connection connection, final ManagedInstance<?>[] updates) throws SQLException {
 		final ManagedInstance<?>[] inserts = new ManagedInstance[this.insertBatchSize];
@@ -263,7 +263,7 @@ public class SessionImpl {
 	 * @throws SQLException
 	 *             thrown in case of an SQL error
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private void doVersionChecks(Connection connection, ManagedInstance<?>[] removals, ManagedInstance<?>[] updates) throws SQLException {
 		SessionImpl.LOG.debug("Performing version checks on session {0}", this);
@@ -287,7 +287,7 @@ public class SessionImpl {
 	 * @throws SQLException
 	 *             thrown in case of an SQL error
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private void doVersionUpgrades(Connection connection, ManagedInstance<?>[] updates) throws SQLException {
 		SessionImpl.LOG.debug("Performing version upgrades on session {0}", this);
@@ -307,7 +307,7 @@ public class SessionImpl {
 	 * @param callbackAvailability
 	 *            the callback availability
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private void firePostCallbacks(final ManagedInstance<?>[] updates, final ManagedInstance<?>[] removals, final CallbackAvailability callbackAvailability) {
 		if (callbackAvailability.postRemove()) {
@@ -333,7 +333,7 @@ public class SessionImpl {
 	 * @param callbackAvailability
 	 *            the callback availability
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private void firePreCallbacks(final ManagedInstance<?>[] sortedUpdates, final ManagedInstance<?>[] sortedRemovals,
 		final CallbackAvailability callbackAvailability) {
@@ -358,7 +358,7 @@ public class SessionImpl {
 	 * @throws SQLException
 	 *             thrown in case of an SQL error
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void flush(Connection connection) throws SQLException {
 		SessionImpl.LOG.debug("Flushing session {0}", this);
@@ -471,7 +471,7 @@ public class SessionImpl {
 	 *            the actual type of the instance
 	 * @return the managed instance or null
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public <Y, X> ManagedInstance<Y> get(ManagedId<X> id) {
@@ -523,7 +523,7 @@ public class SessionImpl {
 	 *            the type of the instance
 	 * @return the managed instance or null
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public <X> ManagedInstance<X> get(X entity) {
@@ -557,7 +557,7 @@ public class SessionImpl {
 	 * 
 	 * @return the entity manager
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public EntityManagerImpl getEntityManager() {
 		return this.em;
@@ -568,7 +568,7 @@ public class SessionImpl {
 	 * 
 	 * @return the array of changed instances
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ManagedInstance<?>[] handleAdditions() {
 		SessionImpl.LOG.debug("Processing additions to the session {0}", this);
@@ -584,7 +584,7 @@ public class SessionImpl {
 	/**
 	 * Handles the external entities that are updated
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void handleExternals() {
 		SessionImpl.LOG.debug("Inspecting updated external entities on session {0}", this);
@@ -600,7 +600,7 @@ public class SessionImpl {
 	 * @param instances
 	 *            the array of changed instances
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void handleOrphans(ManagedInstance<?>[] instances) {
 		SessionImpl.LOG.debug("Inspecting orphan on session {0}", this);
@@ -618,7 +618,7 @@ public class SessionImpl {
 	 * @param instance
 	 *            the instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void lazyInstanceLoading(ManagedInstance<?> instance) {
 		SessionImpl.LOG.debug("Lazy instance is being loaded {0}", instance);
@@ -634,7 +634,7 @@ public class SessionImpl {
 	 * @param instance
 	 *            the instance to put into the session
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public <X> void put(ManagedInstance<X> instance) {
 		this.repository.put(instance.getId(), instance);
@@ -654,7 +654,7 @@ public class SessionImpl {
 	 * @param instance
 	 *            the instance to put into the session
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public <X> void putExternal(ManagedInstance<X> instance) {
 		if (instance.hasInitialId()) {
@@ -684,7 +684,7 @@ public class SessionImpl {
 	 * Releases the load tracker, so that the entities loaded are processed for associations and <code>PostLoad</code> listeners are
 	 * invoked.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void releaseLoadTracker() {
 		this.loadTracker--;
@@ -733,7 +733,7 @@ public class SessionImpl {
 	 *            the entity to remove
 	 * @return returns the entity
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ManagedInstance<?> remove(Object entity) {
 		final EntityTypeImpl<?> type = this.metamodel.entity(entity.getClass());
@@ -756,7 +756,7 @@ public class SessionImpl {
 	 * @param instance
 	 *            the instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setChanged(ManagedInstance<?> instance) {
 		this.changedEntities.add(instance);
@@ -769,7 +769,7 @@ public class SessionImpl {
 	/**
 	 * Sets the load tracker so that the insertions into session is tracked.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setLoadTracker() {
 		this.loadTracker++;

@@ -28,7 +28,7 @@ import javax.persistence.Id;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 @Access(AccessType.PROPERTY)
@@ -41,7 +41,7 @@ public class Phone {
 	private String phoneNumber;
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Phone() {
 		super();
@@ -55,7 +55,7 @@ public class Phone {
 	 * @param phoneNumber
 	 *            the phone number
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Phone(Person person, String areaCode, String phoneNumber) {
 		super();
@@ -71,7 +71,7 @@ public class Phone {
 	 * 
 	 * @return the areaCode of the Phone
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getAreaCode() {
 		return this.areaCode;
@@ -82,7 +82,7 @@ public class Phone {
 	 * 
 	 * @return the id of the Phone
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -95,7 +95,7 @@ public class Phone {
 	 * 
 	 * @return the phoneNumber of the Phone
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getPhoneNumber() {
 		return this.phoneNumber;
@@ -107,7 +107,7 @@ public class Phone {
 	 * @param areaCode
 	 *            the areaCode to set for Phone
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setAreaCode(String areaCode) {
 		this.areaCode = areaCode;
@@ -119,7 +119,7 @@ public class Phone {
 	 * @param id
 	 *            the id to set for Phone
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setId(Integer id) {
 		this.id = id;
@@ -131,7 +131,7 @@ public class Phone {
 	 * @param phoneNumber
 	 *            the phoneNumber to set for Phone
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;

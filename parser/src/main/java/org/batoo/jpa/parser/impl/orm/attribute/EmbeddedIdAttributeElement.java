@@ -34,7 +34,7 @@ import com.google.common.collect.Lists;
  * Element for <code>embedded-id</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class EmbeddedIdAttributeElement extends AttributeElement implements EmbeddedIdAttributeMetadata {
 
@@ -46,7 +46,7 @@ public class EmbeddedIdAttributeElement extends AttributeElement implements Embe
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public EmbeddedIdAttributeElement(ParentElement parent, Map<String, String> attributes) {

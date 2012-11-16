@@ -28,7 +28,7 @@ import javax.persistence.MappedSuperclass;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @MappedSuperclass
 public class Phone implements Serializable {
@@ -40,7 +40,7 @@ public class Phone implements Serializable {
 	private String phoneNo;
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Phone() {
 		super();
@@ -50,7 +50,7 @@ public class Phone implements Serializable {
 	 * @param phone
 	 *            the phone number
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Phone(String phone) {
 		super();
@@ -62,7 +62,7 @@ public class Phone implements Serializable {
 	 * Returns the id.
 	 * 
 	 * @return the id
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -72,7 +72,7 @@ public class Phone implements Serializable {
 	 * Returns the phoneNo.
 	 * 
 	 * @return the phoneNo
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getPhoneNo() {
 		return this.phoneNo;
@@ -83,7 +83,7 @@ public class Phone implements Serializable {
 	 * 
 	 * @param phoneNo
 	 *            the phoneNo to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setPhoneNo(String phoneNo) {
 		this.phoneNo = phoneNo;

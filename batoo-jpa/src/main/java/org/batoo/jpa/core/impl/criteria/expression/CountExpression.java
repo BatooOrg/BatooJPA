@@ -33,7 +33,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  * The expression for count function.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class CountExpression extends AbstractExpression<Long> {
 
@@ -48,7 +48,7 @@ public class CountExpression extends AbstractExpression<Long> {
 	 * @param distinct
 	 *            if the count is distinct
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public CountExpression(Expression<?> inner, boolean distinct) {
 		super(Long.class);

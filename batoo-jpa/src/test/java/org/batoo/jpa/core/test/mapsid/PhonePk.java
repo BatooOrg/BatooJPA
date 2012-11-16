@@ -24,7 +24,7 @@ import javax.persistence.Embeddable;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Embeddable
 public class PhonePk {
@@ -34,7 +34,7 @@ public class PhonePk {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public PhonePk() {
 		super();
@@ -46,7 +46,7 @@ public class PhonePk {
 	 * @param personId
 	 *            the personId
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public PhonePk(Integer id, Integer personId) {
 		super();
@@ -96,7 +96,7 @@ public class PhonePk {
 	 * 
 	 * @return the id of the PhonePk
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected Integer getId() {
 		return this.id;
@@ -107,7 +107,7 @@ public class PhonePk {
 	 * 
 	 * @return the personId of the PhonePk
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected Integer getPersonId() {
 		return this.personId;
@@ -132,7 +132,7 @@ public class PhonePk {
 	 * @param id
 	 *            the id to set for PhonePk
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void setId(Integer id) {
 		this.id = id;
@@ -144,7 +144,7 @@ public class PhonePk {
 	 * @param personId
 	 *            the personId to set for PhonePk
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void setPersonId(Integer personId) {
 		this.personId = personId;

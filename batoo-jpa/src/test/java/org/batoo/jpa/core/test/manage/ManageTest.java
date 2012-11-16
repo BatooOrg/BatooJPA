@@ -25,7 +25,7 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class ManageTest extends BaseCoreTest {
 
@@ -41,7 +41,7 @@ public class ManageTest extends BaseCoreTest {
 	/**
 	 * Tests that a basic type changed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testAdditionsCommitted() {
@@ -66,7 +66,7 @@ public class ManageTest extends BaseCoreTest {
 	/**
 	 * Tests that a basic type changed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testAssociationsCommitted() {
@@ -100,7 +100,7 @@ public class ManageTest extends BaseCoreTest {
 	/**
 	 * Tests that a basic type changed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testLazyInitialize() {

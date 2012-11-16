@@ -30,7 +30,7 @@ import javax.persistence.TemporalType;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class TypeFactory {
 
@@ -47,7 +47,7 @@ public class TypeFactory {
 	 *            if is a lob type
 	 * @return the corresponding SQL Type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public static int getSqlType(Class<?> javaType, TemporalType temporal, EnumType enumType, boolean isLob) {
 		if (isLob) {

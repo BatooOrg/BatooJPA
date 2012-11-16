@@ -33,7 +33,7 @@ import org.batoo.jpa.core.impl.criteria.path.BasicPath;
  *            the type of the expression
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class AbstractTypeExpression<T> extends AbstractExpression<Class<? extends T>> {
 
@@ -44,7 +44,7 @@ public abstract class AbstractTypeExpression<T> extends AbstractExpression<Class
 	 * @param path
 	 *            the path
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public AbstractTypeExpression(AbstractPath<T> path) {
@@ -99,7 +99,7 @@ public abstract class AbstractTypeExpression<T> extends AbstractExpression<Class
 	 * 
 	 * @return the path of the type expression
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public AbstractPath<?> getPath() {
 		return this.path;
@@ -113,7 +113,7 @@ public abstract class AbstractTypeExpression<T> extends AbstractExpression<Class
 	 * @return the raw discriminator value from the resultset
 	 * @throws SQLException
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected Object handle(ResultSet row) throws SQLException {
 		return row.getObject(this.alias);

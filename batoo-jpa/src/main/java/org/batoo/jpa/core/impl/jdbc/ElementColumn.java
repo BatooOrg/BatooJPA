@@ -32,7 +32,7 @@ import org.batoo.jpa.parser.metadata.ColumnMetadata;
  * Columns for list type attributes.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ElementColumn extends AbstractColumn {
 
@@ -70,7 +70,7 @@ public class ElementColumn extends AbstractColumn {
 	 * @param metadata
 	 *            the column metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ElementColumn(JdbcAdaptor jdbcAdaptor, ElementCollectionMapping<?, ?, ?> mapping, CollectionTable table, String name, Class<?> javaType,
 		EnumType enumType, TemporalType temporalType, boolean lob, ColumnMetadata metadata) {

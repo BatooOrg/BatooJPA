@@ -25,7 +25,7 @@ import java.sql.SQLException;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface JoinableTable {
 
@@ -44,7 +44,7 @@ public interface JoinableTable {
 	 * @throws SQLException
 	 *             thrown if there is an underlying SQL Exception
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	void performInsert(Connection connection, Object source, Joinable[] batch, int size) throws SQLException;
 
@@ -63,7 +63,7 @@ public interface JoinableTable {
 	 * @throws SQLException
 	 *             thrown if there is an underlying SQL Exception
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	void performRemove(Connection connection, Object source, Object key, Object destination) throws SQLException;
 
@@ -78,7 +78,7 @@ public interface JoinableTable {
 	 * @throws SQLException
 	 *             thrown if there is an underlying SQL Exception
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	void performRemoveAll(Connection connection, Object source) throws SQLException;
 }

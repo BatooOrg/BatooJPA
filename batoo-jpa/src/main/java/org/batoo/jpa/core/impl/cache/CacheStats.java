@@ -28,7 +28,7 @@ import org.batoo.common.log.BLoggerFactory;
  * The statistics repository for the class.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class CacheStats implements Serializable {
 
@@ -46,7 +46,7 @@ public class CacheStats implements Serializable {
 	 * @param name
 	 *            the name of the stats
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	/* package */CacheStats(String name) {
 		super();
@@ -60,7 +60,7 @@ public class CacheStats implements Serializable {
 	 * @param primaryKey
 	 *            the primary key
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	/* package */void evict(Object primaryKey) {
 		this.evicts++;
@@ -73,7 +73,7 @@ public class CacheStats implements Serializable {
 	 * 
 	 * @return the number of evicts
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public int evicts() {
 		return this.evicts;
@@ -85,7 +85,7 @@ public class CacheStats implements Serializable {
 	 * @param primaryKey
 	 *            the primary key
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	/* package */void hit(Object primaryKey) {
 		this.hits++;
@@ -98,7 +98,7 @@ public class CacheStats implements Serializable {
 	 * 
 	 * @return the number of hits
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public int hits() {
 		return this.hits;
@@ -111,7 +111,7 @@ public class CacheStats implements Serializable {
 	 *            the primary key
 	 * 
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	/* package */void miss(Object primaryKey) {
 		this.misses++;
@@ -124,7 +124,7 @@ public class CacheStats implements Serializable {
 	 * 
 	 * @return the number of misses
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public int misses() {
 		return this.misses;
@@ -136,7 +136,7 @@ public class CacheStats implements Serializable {
 	 * @param primaryKey
 	 *            the primary key
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	/* package */void put(Object primaryKey) {
 		this.puts++;
@@ -149,7 +149,7 @@ public class CacheStats implements Serializable {
 	 * 
 	 * @return the number of puts
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public int puts() {
 		return this.puts;
@@ -162,7 +162,7 @@ public class CacheStats implements Serializable {
 	 *            the sql
 	 * 
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	/* package */void qhit(String sql) {
 		this.qhits++;
@@ -175,7 +175,7 @@ public class CacheStats implements Serializable {
 	 * 
 	 * @return the number of query hits
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public int qhits() {
 		return this.qhits;
@@ -188,7 +188,7 @@ public class CacheStats implements Serializable {
 	 *            the primary key
 	 * 
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	/* package */void qmiss(String sql) {
 		this.qmisses++;
@@ -201,7 +201,7 @@ public class CacheStats implements Serializable {
 	 * 
 	 * @return the number of query misses
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public int qmisses() {
 		return this.qmisses;

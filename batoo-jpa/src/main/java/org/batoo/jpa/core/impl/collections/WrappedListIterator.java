@@ -27,7 +27,7 @@ import java.util.ListIterator;
  *            the type of elements returned by this iterator
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class WrappedListIterator<E> extends WrappedIterator<E> implements ListIterator<E> {
 
@@ -37,7 +37,7 @@ public class WrappedListIterator<E> extends WrappedIterator<E> implements ListIt
 	 * @param delegate
 	 *            the delegate
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public WrappedListIterator(ListIterator<E> delegate) {
 		super(delegate);

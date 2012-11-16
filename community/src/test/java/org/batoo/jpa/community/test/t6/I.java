@@ -25,14 +25,14 @@ import java.io.Serializable;
  *            the id type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface I<IDType extends Serializable> {
 
 	/**
 	 * @return the id
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	IDType getId();
 }

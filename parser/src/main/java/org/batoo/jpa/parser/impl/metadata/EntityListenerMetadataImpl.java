@@ -42,7 +42,7 @@ import com.google.common.collect.Lists;
  * Implementation of {@link EntityListenerMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class EntityListenerMetadataImpl implements EntityListenerMetadata {
 
@@ -56,7 +56,7 @@ public class EntityListenerMetadataImpl implements EntityListenerMetadata {
 	 *            the locator
 	 * @param clazz
 	 *            the name of the class
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public EntityListenerMetadataImpl(AbstractLocator locator, Class<?> clazz) {
@@ -77,7 +77,7 @@ public class EntityListenerMetadataImpl implements EntityListenerMetadata {
 	 * @param annotationsParsed
 	 *            the set of annotations parsed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public EntityListenerMetadataImpl(AbstractLocator locator, Class<?> clazz, Set<Class<? extends Annotation>> annotationsParsed) {
@@ -95,7 +95,7 @@ public class EntityListenerMetadataImpl implements EntityListenerMetadata {
 	 * @param metadata
 	 *            the metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public EntityListenerMetadataImpl(AbstractLocator locator, EntityListenerMetadata metadata) {
@@ -115,7 +115,7 @@ public class EntityListenerMetadataImpl implements EntityListenerMetadata {
 	 * @param className
 	 *            the name of the class
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public EntityListenerMetadataImpl(AbstractLocator locator, IdentifiableTypeMetadata metadata, String className) {
@@ -179,7 +179,7 @@ public class EntityListenerMetadataImpl implements EntityListenerMetadata {
 	 * 
 	 * @param clazz
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 * @param annotationsParsed
 	 */
@@ -252,7 +252,7 @@ public class EntityListenerMetadataImpl implements EntityListenerMetadata {
 	 * 
 	 * @return true if the listeners is the entity itself, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public boolean self() {

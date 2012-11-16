@@ -54,7 +54,7 @@ import com.google.common.collect.Lists;
  *            the type referenced by the path
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class EmbeddedAttributePath<Z, X> extends ParentPath<Z, X> {
 
@@ -67,7 +67,7 @@ public class EmbeddedAttributePath<Z, X> extends ParentPath<Z, X> {
 	 * @param mapping
 	 *            the embedded mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public EmbeddedAttributePath(ParentPath<?, Z> parent, EmbeddedMapping<? super Z, X> mapping) {
 		super(parent, mapping.getType().getJavaType());

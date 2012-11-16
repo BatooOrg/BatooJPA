@@ -27,7 +27,7 @@ import javax.persistence.spi.PersistenceUnitInfo;
  * The Application server integration interface.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface AnnotatedClassLocator {
 
@@ -40,7 +40,7 @@ public interface AnnotatedClassLocator {
 	 *            the url to use to locate the classes
 	 * @return the array of classes located
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	Set<Class<?>> locateClasses(PersistenceUnitInfo persistenceUnitInfo, URL url);
 }

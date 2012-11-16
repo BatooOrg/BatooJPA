@@ -28,7 +28,7 @@ import org.batoo.jpa.parser.metadata.attribute.TransientAttributeMetadata;
  * Element for <code>transient</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class TransientElement extends AttributeElement implements TransientAttributeMetadata {
 
@@ -40,7 +40,7 @@ public class TransientElement extends AttributeElement implements TransientAttri
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public TransientElement(ParentElement parent, Map<String, String> attributes) {

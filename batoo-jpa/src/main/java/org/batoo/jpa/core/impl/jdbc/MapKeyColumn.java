@@ -30,7 +30,7 @@ import org.batoo.jpa.parser.metadata.ColumnMetadata;
  * Columns for map key type attributes.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class MapKeyColumn extends AbstractColumn {
 
@@ -59,7 +59,7 @@ public class MapKeyColumn extends AbstractColumn {
 	 * @param javaType
 	 *            the java type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public MapKeyColumn(AbstractTable table, ColumnMetadata metadata, String name, TemporalType temporalType, EnumType enumType, Class<?> javaType) {
 		super(metadata != null ? metadata.getLocator() : null, false);

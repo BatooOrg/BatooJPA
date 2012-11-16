@@ -33,7 +33,7 @@ import org.batoo.jpa.parser.metadata.type.EmbeddableMetadata;
  * Element for <code>embeddable</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class EmbeddableElementFactory extends ParentElement implements EmbeddableMetadata {
 
@@ -50,7 +50,7 @@ public class EmbeddableElementFactory extends ParentElement implements Embeddabl
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public EmbeddableElementFactory(ParentElement parent, Map<String, String> attributes) {

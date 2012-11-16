@@ -25,7 +25,7 @@ import org.batoo.jpa.parser.metadata.BaseColumnMetadata;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class BaseColumnElement extends ChildElement implements BaseColumnMetadata {
 
@@ -43,7 +43,7 @@ public abstract class BaseColumnElement extends ChildElement implements BaseColu
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public BaseColumnElement(ParentElement parent, Map<String, String> attributes) {
@@ -70,7 +70,7 @@ public abstract class BaseColumnElement extends ChildElement implements BaseColu
 	 * 
 	 * @return the columnDefinition of the ColumnElement
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	@Override

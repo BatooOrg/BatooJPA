@@ -28,7 +28,7 @@ import org.batoo.jpa.parser.metadata.attribute.VersionAttributeMetadata;
  * Element for <code>version</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class VersionAttributeElement extends PhysicalAttributeElement implements VersionAttributeMetadata {
 
@@ -38,7 +38,7 @@ public class VersionAttributeElement extends PhysicalAttributeElement implements
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public VersionAttributeElement(ParentElement parent, Map<String, String> attributes) {

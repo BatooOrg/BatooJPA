@@ -27,7 +27,7 @@ import javax.persistence.ManyToOne;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Quux {
@@ -42,7 +42,7 @@ public class Quux {
 	private Foo foo;
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Quux() {
 		super();
@@ -52,7 +52,7 @@ public class Quux {
 	 * Returns the foo.
 	 * 
 	 * @return the foo
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Foo getFoo() {
 		return this.foo;
@@ -62,7 +62,7 @@ public class Quux {
 	 * Returns the key.
 	 * 
 	 * @return the key
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getKey() {
 		return this.key;
@@ -72,7 +72,7 @@ public class Quux {
 	 * Returns the quuxValue.
 	 * 
 	 * @return the quuxValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getQuuxValue() {
 		return this.quuxValue;
@@ -83,7 +83,7 @@ public class Quux {
 	 * 
 	 * @param foo
 	 *            the foo to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setFoo(Foo foo) {
 		this.foo = foo;
@@ -94,7 +94,7 @@ public class Quux {
 	 * 
 	 * @param quuxValue
 	 *            the quuxValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setQuuxValue(Integer quuxValue) {
 		this.quuxValue = quuxValue;

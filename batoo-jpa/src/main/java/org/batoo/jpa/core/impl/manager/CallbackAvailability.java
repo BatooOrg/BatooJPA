@@ -21,7 +21,7 @@ package org.batoo.jpa.core.impl.manager;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class CallbackAvailability {
 
@@ -36,7 +36,7 @@ public class CallbackAvailability {
 	 * 
 	 * @return true if there is PreRemove callbacks, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean postRemove() {
 		return this.preRemove;
@@ -47,7 +47,7 @@ public class CallbackAvailability {
 	 * 
 	 * @return true if there is PostWrite callbacks, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean postWrite() {
 		return this.postWrite;
@@ -58,7 +58,7 @@ public class CallbackAvailability {
 	 * 
 	 * @return true if there is PreRemove callbacks, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean preRemove() {
 		return this.preRemove;
@@ -69,7 +69,7 @@ public class CallbackAvailability {
 	 * 
 	 * @return true if there is PreWrite callbacks, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean preWrite() {
 		return this.preWrite;
@@ -81,7 +81,7 @@ public class CallbackAvailability {
 	 * @param forUpdates
 	 *            true if for updates or false for removals
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void updateAvailability(CallbackAvailability availability, Boolean forUpdates) {
 		if ((forUpdates == null) || forUpdates) {
@@ -106,7 +106,7 @@ public class CallbackAvailability {
 	 *            the callback manager
 	 * @return the updated availability
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public CallbackAvailability updateAvailability(CallbackManager callbackManager) {
 		this.preRemove |= callbackManager.preRemove() != null;

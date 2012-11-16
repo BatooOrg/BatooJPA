@@ -12,7 +12,7 @@ public interface Predicate extends Expression<Boolean> {
 	 * The operator for the predicates.
 	 * 
 	 * @author hceylan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public static enum BooleanOperator {
 

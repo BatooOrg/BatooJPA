@@ -26,14 +26,14 @@ import org.junit.Test;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class Test2 extends BaseCoreTest {
 
 	/**
 	 * Ref: http://stackoverflow.com/questions/12795407/jpa-how-to-select-objects-wich-has-no-multiple-attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void test1() {
@@ -43,7 +43,7 @@ public class Test2 extends BaseCoreTest {
 	/**
 	 * Ref: http://stackoverflow.com/questions/12795407/jpa-how-to-select-objects-wich-has-no-multiple-attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test(expected = PersistenceException.class)
 	public void test2() {
@@ -55,7 +55,7 @@ public class Test2 extends BaseCoreTest {
 	/**
 	 * Ref: http://stackoverflow.com/questions/12795407/jpa-how-to-select-objects-wich-has-no-multiple-attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void test3() {

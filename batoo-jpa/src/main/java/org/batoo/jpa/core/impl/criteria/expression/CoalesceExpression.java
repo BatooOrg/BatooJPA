@@ -42,7 +42,7 @@ import com.google.common.collect.Lists;
  *            the type of the expression
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class CoalesceExpression<T> extends AbstractExpression<T> implements Coalesce<T> {
 
@@ -51,7 +51,7 @@ public class CoalesceExpression<T> extends AbstractExpression<T> implements Coal
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public CoalesceExpression() {
@@ -64,7 +64,7 @@ public class CoalesceExpression<T> extends AbstractExpression<T> implements Coal
 	 * @param y
 	 *            the y expression
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public CoalesceExpression(Expression<? extends T> x, Expression<? extends T> y) {
 		this();

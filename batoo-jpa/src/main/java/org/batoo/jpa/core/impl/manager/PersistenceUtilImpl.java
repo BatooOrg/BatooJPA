@@ -27,13 +27,13 @@ import org.batoo.jpa.core.impl.instance.EnhancedInstance;
  * Implementation of persistence util.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class PersistenceUtilImpl implements ProviderUtil {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public PersistenceUtilImpl() {
 		super();

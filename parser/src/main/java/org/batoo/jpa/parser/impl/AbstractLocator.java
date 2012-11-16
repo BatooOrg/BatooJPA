@@ -21,7 +21,7 @@ package org.batoo.jpa.parser.impl;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class AbstractLocator {
 

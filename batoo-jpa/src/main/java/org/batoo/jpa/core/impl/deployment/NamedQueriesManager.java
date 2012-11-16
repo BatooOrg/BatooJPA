@@ -30,7 +30,7 @@ import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
  * Deployment manager to deploy named queries.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class NamedQueriesManager extends DeploymentManager<NamedQueryMetadata> {
 
@@ -46,7 +46,7 @@ public class NamedQueriesManager extends DeploymentManager<NamedQueryMetadata> {
 	 * @throws BatooException
 	 *             thrown in case of an underlying exception
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public static void perform(MetamodelImpl metamodel, CriteriaBuilderImpl criteriaBuilder) throws BatooException {
 		new NamedQueriesManager(metamodel, criteriaBuilder).perform();

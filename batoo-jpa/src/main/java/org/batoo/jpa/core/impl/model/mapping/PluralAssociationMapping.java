@@ -71,7 +71,7 @@ import com.google.common.collect.Lists;
  *            the collection type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, E> implements PluralMapping<Z, C, E> {
 
@@ -98,7 +98,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * @param attribute
 	 *            the attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public PluralAssociationMapping(ParentMapping<?, Z> parent, PluralAttributeImpl<? super Z, C, E> attribute) {
 		super(parent, (AssociationAttributeMetadata) attribute.getMetadata(), attribute);
@@ -319,7 +319,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * 
 	 * @return the key mapping of the association
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public SingularMapping<? super E, ?> getMapKeyIdMapping() {
 		return this.mapKeyMapping;
@@ -330,7 +330,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * 
 	 * @return the map key id mappings of the association
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Pair<SingularMapping<? super E, ?>, AbstractAccessor>[] getMapKeyIdMappings() {
 		return this.mapKeyMappings;
@@ -601,7 +601,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * @param instance
 	 *            the managed instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public void persistAdditions(EntityManagerImpl entityManager, ManagedInstance<?> instance) {
@@ -678,7 +678,7 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * @param instance
 	 *            the managed instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public void removeOrphans(EntityManagerImpl entityManager, ManagedInstance<?> instance) {

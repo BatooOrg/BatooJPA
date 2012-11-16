@@ -30,7 +30,7 @@ import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
  * Common implementation of attribute element factories.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class AttributeElement extends ParentElement implements AttributeMetadata {
 
@@ -45,7 +45,7 @@ public abstract class AttributeElement extends ParentElement implements Attribut
 	 * @param expectedChildElements
 	 *            the name of the elements expected
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public AttributeElement(ParentElement parent, Map<String, String> attributes, String... expectedChildElements) {

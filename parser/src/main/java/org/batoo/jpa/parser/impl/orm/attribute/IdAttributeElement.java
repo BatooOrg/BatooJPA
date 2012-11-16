@@ -35,7 +35,7 @@ import org.batoo.jpa.parser.metadata.attribute.IdAttributeMetadata;
  * Element for <code>id</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class IdAttributeElement extends PhysicalAttributeElement implements IdAttributeMetadata {
 
@@ -49,7 +49,7 @@ public class IdAttributeElement extends PhysicalAttributeElement implements IdAt
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public IdAttributeElement(ParentElement parent, Map<String, String> attributes) {

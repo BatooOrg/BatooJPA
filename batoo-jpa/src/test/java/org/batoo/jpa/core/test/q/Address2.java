@@ -24,7 +24,7 @@ import javax.persistence.ManyToOne;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Embeddable
 public class Address2 {
@@ -35,7 +35,7 @@ public class Address2 {
 	private Country country;
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Address2() {
 		super();
@@ -47,7 +47,7 @@ public class Address2 {
 	 * @param country
 	 *            the country
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Address2(String city, Country country) {
 		super();
@@ -60,7 +60,7 @@ public class Address2 {
 	 * Returns the city.
 	 * 
 	 * @return the city
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getCity() {
 		return this.city;
@@ -70,7 +70,7 @@ public class Address2 {
 	 * Returns the country.
 	 * 
 	 * @return the country
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Country getCountry() {
 		return this.country;
@@ -81,7 +81,7 @@ public class Address2 {
 	 * 
 	 * @param city
 	 *            the city to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setCity(String city) {
 		this.city = city;
@@ -92,7 +92,7 @@ public class Address2 {
 	 * 
 	 * @param country
 	 *            the country to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setCountry(Country country) {
 		this.country = country;

@@ -26,14 +26,14 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class ElementCollectionTest2 extends BaseCoreTest {
 
 	/**
 	 * Tests the element collections
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testElementCollection() {

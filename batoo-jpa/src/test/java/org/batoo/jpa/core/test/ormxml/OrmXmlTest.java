@@ -30,7 +30,7 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class OrmXmlTest extends BaseCoreTest {
 
@@ -40,7 +40,7 @@ public class OrmXmlTest extends BaseCoreTest {
 	 * @throws SQLException
 	 *             thrown in case of an error
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testOrmXmlProcessed() throws SQLException {

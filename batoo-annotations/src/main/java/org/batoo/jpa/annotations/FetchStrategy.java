@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
 /**
  * The annotation to specify the behavior for fetch joins.
  * 
- * @since $version
+ * @since 2.0.0
  * @author asimarslan
  */
 @Target({ ElementType.METHOD, ElementType.FIELD })
@@ -40,7 +40,7 @@ public @interface FetchStrategy {
 	 * 
 	 * @return the maximum allowed depth for the join
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	int maxDepth() default Integer.MAX_VALUE;
 
@@ -53,7 +53,7 @@ public @interface FetchStrategy {
 	 * 
 	 * @return the preferred strategy for the annotated association
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	FetchStrategyType strategy() default FetchStrategyType.AUTO;
 }

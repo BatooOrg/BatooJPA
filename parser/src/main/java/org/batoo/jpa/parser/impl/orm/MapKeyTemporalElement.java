@@ -26,7 +26,7 @@ import javax.persistence.TemporalType;
  * Element for <code>map-key-temporal</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class MapKeyTemporalElement extends ChildElement {
 
@@ -38,7 +38,7 @@ public class MapKeyTemporalElement extends ChildElement {
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public MapKeyTemporalElement(ParentElement parent, Map<String, String> attributes) {
@@ -59,7 +59,7 @@ public class MapKeyTemporalElement extends ChildElement {
 	 * 
 	 * @return the temporalType of the TemporalElement
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public TemporalType getTemporalType() {

@@ -28,7 +28,7 @@ import org.batoo.jpa.parser.metadata.GeneratedValueMetadata;
  * Annotated definition of generated values.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class GeneratedValueMetadataImpl implements GeneratedValueMetadata {
 
@@ -41,7 +41,7 @@ public class GeneratedValueMetadataImpl implements GeneratedValueMetadata {
 	 * @param generatedValue
 	 *            the {@link GeneratedValue} annotation
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public GeneratedValueMetadataImpl(AbstractLocator locator, GeneratedValue generatedValue) {

@@ -37,7 +37,7 @@ import com.google.common.base.Joiner;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class SqlTest {
 
@@ -90,7 +90,7 @@ public class SqlTest {
 	}
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testSql() {
@@ -100,7 +100,7 @@ public class SqlTest {
 	}
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	@Ignore

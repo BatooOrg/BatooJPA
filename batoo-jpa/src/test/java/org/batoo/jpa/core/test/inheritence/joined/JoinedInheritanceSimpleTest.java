@@ -28,14 +28,14 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class JoinedInheritanceSimpleTest extends BaseCoreTest {
 
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with root type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testSimpleInheritance0() {
@@ -57,7 +57,7 @@ public class JoinedInheritanceSimpleTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with extending type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testSimpleInheritance1() {
@@ -81,7 +81,7 @@ public class JoinedInheritanceSimpleTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with further extending type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testSimpleInheritance11() {
@@ -107,7 +107,7 @@ public class JoinedInheritanceSimpleTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with root type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testSimpleInheritance3() {

@@ -63,7 +63,7 @@ import com.google.common.collect.Sets;
  * Base class for element factories.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 // FIXME: ORM.xml registry clean up
 public abstract class Element extends ElementConstants implements LocatableMatadata {
@@ -179,7 +179,7 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 *            the XML locator of the element
 	 * @return the element created
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public static Element forElement(Element parent, Map<String, String> attributes, XmlLocator xmlLocator) {
@@ -213,7 +213,7 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 *            the attributes
 	 * @param expectedChildElements
 	 *            the name of the elements expected
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public Element(ParentElement parent, Map<String, String> attributes, String[] expectedChildElements) {
@@ -230,7 +230,7 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 * @param cdata
 	 *            the character data
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public void cdata(String cdata) {
@@ -242,7 +242,7 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 * <p>
 	 * if the parent is null, that the factory is {@link EntityMappings}, the model element is added to the metamodel.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public void end() {
@@ -265,7 +265,7 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 * @throws MappingException
 	 *             thrown if the <code>element</code> is not expected.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public void expected(String element, Locator locator) throws MappingException {
@@ -279,7 +279,7 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 * <p>
 	 * Element factories implement the method to generate their artifacts.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	protected void generate() {
@@ -293,7 +293,7 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 *            the name of the attribute
 	 * @return the value or null
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	protected String getAttribute(String name) {
@@ -309,7 +309,7 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 *            the default value
 	 * @return the integer value or default
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	protected boolean getAttribute(String name, boolean devault) {
@@ -327,7 +327,7 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 *            the default value
 	 * @return the integer value or default
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	protected int getAttribute(String name, int devault) {
@@ -345,7 +345,7 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 *            the default value
 	 * @return the value or null
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	protected String getAttribute(String name, String devault) {
@@ -359,7 +359,7 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 * 
 	 * @return the expectedChildElements of the Element
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public Set<String> getExpectedChildElements() {
@@ -380,7 +380,7 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 * 
 	 * @return the parent of the Element
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public ParentElement getParent() {
@@ -393,7 +393,7 @@ public abstract class Element extends ElementConstants implements LocatableMatad
 	 * @param xmlLocator
 	 *            the XML location to set
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private void setLocator(XmlLocator xmlLocator) {

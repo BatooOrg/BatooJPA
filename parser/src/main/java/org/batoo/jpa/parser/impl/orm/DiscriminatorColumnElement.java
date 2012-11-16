@@ -28,7 +28,7 @@ import org.batoo.jpa.parser.metadata.DiscriminatorColumnMetadata;
  * Element for <code>discriminator-column</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class DiscriminatorColumnElement extends ChildElement implements DiscriminatorColumnMetadata {
 
@@ -43,7 +43,7 @@ public class DiscriminatorColumnElement extends ChildElement implements Discrimi
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public DiscriminatorColumnElement(ParentElement parent, Map<String, String> attributes) {

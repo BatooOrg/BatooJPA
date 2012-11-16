@@ -29,7 +29,7 @@ import org.batoo.jpa.parser.impl.metadata.MetadataImpl;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface PersistenceParser {
 
@@ -38,7 +38,7 @@ public interface PersistenceParser {
 	 * 
 	 * @return the classloader of the PersistenceParser
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	ClassLoader getClassloader();
@@ -48,7 +48,7 @@ public interface PersistenceParser {
 	 * 
 	 * @return the JTA datasource JNDI name
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	DataSource getJtaDataSource();
@@ -58,7 +58,7 @@ public interface PersistenceParser {
 	 * 
 	 * @return the metadata of the parser
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	MetadataImpl getMetadata();
@@ -68,7 +68,7 @@ public interface PersistenceParser {
 	 * 
 	 * @return the non-JTA datasource JNDI name
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	DataSource getNonJtaDataSource();
@@ -78,7 +78,7 @@ public interface PersistenceParser {
 	 * 
 	 * @return the properties of the persistence unit
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	Map<String, Object> getProperties();
@@ -88,7 +88,7 @@ public interface PersistenceParser {
 	 * 
 	 * @return the persistence provider
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getProvider();
@@ -98,7 +98,7 @@ public interface PersistenceParser {
 	 * 
 	 * @return the second-level cache mode that must be used by the provider for the persistence unit
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	SharedCacheMode getSharedCacheMode();
@@ -108,7 +108,7 @@ public interface PersistenceParser {
 	 * 
 	 * @return true if the persistence unit has validators, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	boolean hasValidators();

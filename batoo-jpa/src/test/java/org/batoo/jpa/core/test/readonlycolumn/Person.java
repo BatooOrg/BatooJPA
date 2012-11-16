@@ -30,7 +30,7 @@ import javax.persistence.ManyToOne;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Person {
@@ -49,7 +49,7 @@ public class Person {
 	private Address homeAddress; // (addressId)
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Person() {
 		super();
@@ -63,7 +63,7 @@ public class Person {
 	 * @param address
 	 *            the address
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Person(Integer id, String name, Address address) {
 		super();
@@ -76,7 +76,7 @@ public class Person {
 
 	/**
 	 * @return the addressId
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getAddressId() {
 		return this.addressId;
@@ -107,7 +107,7 @@ public class Person {
 	/**
 	 * @param addressId
 	 *            the addressId to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setAddressId(Integer addressId) {
 		this.addressId = addressId;

@@ -27,7 +27,7 @@ import javax.persistence.ManyToOne;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @IdClass(PhoneId.class)
 @Entity
@@ -46,7 +46,7 @@ public class Phone {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Phone() {
 		super();
@@ -58,7 +58,7 @@ public class Phone {
 	 * @param phoneId
 	 *            the phone id
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Phone(Person person, PhoneId phoneId) {
 		super();
@@ -75,7 +75,7 @@ public class Phone {
 	 * 
 	 * @return the areaCode of the Phone
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected String getAreaCode() {
 		return this.areaCode;
@@ -86,7 +86,7 @@ public class Phone {
 	 * 
 	 * @return the person of the Phone
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected Person getPerson() {
 		return this.person;
@@ -97,7 +97,7 @@ public class Phone {
 	 * 
 	 * @return the phoneNumber of the Phone
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected String getPhoneNumber() {
 		return this.phoneNumber;
@@ -108,7 +108,7 @@ public class Phone {
 	 * 
 	 * @return the active of the Phone
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected boolean isActive() {
 		return this.active;
@@ -120,7 +120,7 @@ public class Phone {
 	 * @param active
 	 *            the active to set for Phone
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void setActive(boolean active) {
 		this.active = active;
@@ -132,7 +132,7 @@ public class Phone {
 	 * @param areaCode
 	 *            the areaCode to set for Phone
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void setAreaCode(String areaCode) {
 		this.areaCode = areaCode;
@@ -144,7 +144,7 @@ public class Phone {
 	 * @param person
 	 *            the person to set for Phone
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void setPerson(Person person) {
 		this.person = person;
@@ -156,7 +156,7 @@ public class Phone {
 	 * @param phoneNumber
 	 *            the phoneNumber to set for Phone
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;

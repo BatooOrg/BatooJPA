@@ -35,7 +35,7 @@ import com.google.common.collect.Maps;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Person {
@@ -58,7 +58,7 @@ public class Person {
 	private String name;
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Person() {
 		super();
@@ -68,7 +68,7 @@ public class Person {
 	 * @param name
 	 *            the name
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Person(String name) {
 		super();
@@ -81,7 +81,7 @@ public class Person {
 	 * 
 	 * @return the addresses1 of the Person
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Map<Integer, Address> getAddresses1() {
 		return this.addresses1;
@@ -92,7 +92,7 @@ public class Person {
 	 * 
 	 * @return the addresses2 of the Person
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected Map<String, Address> getAddresses2() {
 		return this.addresses2;
@@ -102,7 +102,7 @@ public class Person {
 	 * Returns the id.
 	 * 
 	 * @return the id
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -112,7 +112,7 @@ public class Person {
 	 * Returns the name.
 	 * 
 	 * @return the name
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		return this.name;
@@ -123,7 +123,7 @@ public class Person {
 	 * 
 	 * @return the phones of the Person
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected Map<PhoneId, Phone> getPhones() {
 		return this.phones;
@@ -134,7 +134,7 @@ public class Person {
 	 * 
 	 * @param name
 	 *            the name to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setName(String name) {
 		this.name = name;

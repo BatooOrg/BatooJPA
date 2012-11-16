@@ -24,7 +24,7 @@ import java.util.Map;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class MapKeyAttributeOverrideElement extends AttributeOverrideElement {
 
@@ -34,7 +34,7 @@ public class MapKeyAttributeOverrideElement extends AttributeOverrideElement {
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public MapKeyAttributeOverrideElement(ParentElement parent, Map<String, String> attributes) {

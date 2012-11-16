@@ -48,20 +48,20 @@ import com.google.common.collect.Sets;
  * @param <E>
  *            The element type of the represented collection
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private final class ManagedListIterator extends WrappedListIterator<E> {
 		private E last;
 
 		/**
 		 * 
-		 * @since $version
+		 * @since 2.0.0
 		 */
 		private ManagedListIterator(ListIterator<E> delegate) {
 			super(delegate);
@@ -136,7 +136,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ManagedList() {
 		super();
@@ -152,7 +152,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 * @param lazy
 	 *            if the collection is lazy
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ManagedList(PluralMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
 		super(mapping, managedInstance);
@@ -172,7 +172,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 * @param values
 	 *            the initial values
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ManagedList(PluralMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
 		super(mapping, managedInstance);
@@ -553,7 +553,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 * 
 	 * @return true if the list is initialized, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Override
 	public boolean isInitialized() {

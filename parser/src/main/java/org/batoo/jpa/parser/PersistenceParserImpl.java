@@ -38,7 +38,7 @@ import com.google.common.collect.Maps;
  * The main entry point to parse the persistence units.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class PersistenceParserImpl implements PersistenceParser {
 
@@ -69,7 +69,7 @@ public class PersistenceParserImpl implements PersistenceParser {
 	 * @param properties
 	 *            the properties of the persistence unit
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public PersistenceParserImpl(PersistenceUnitInfo puInfo, Map<String, Object> properties) {
@@ -105,7 +105,7 @@ public class PersistenceParserImpl implements PersistenceParser {
 	 * @param properties
 	 *            the properties for the entity manager
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public PersistenceParserImpl(String puName, Map<String, Object> properties) {
@@ -217,7 +217,7 @@ public class PersistenceParserImpl implements PersistenceParser {
 	 * @param optional
 	 *            if the file is optional
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private void parseOrmXml(final String mappingFile, boolean optional) {
@@ -239,7 +239,7 @@ public class PersistenceParserImpl implements PersistenceParser {
 	/**
 	 * Parses the ORM XML Files.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private void parseOrmXmls() {

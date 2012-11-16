@@ -46,7 +46,7 @@ import org.junit.runner.Description;
 
 /**
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class BaseCoreTest { // extends BaseTest {
 
@@ -57,7 +57,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	/**
 	 * Rule to get Persistence XML File name.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	@Rule
@@ -90,7 +90,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	/**
 	 * Begins transaction.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void begin() {
 		this.tx().begin();
@@ -120,7 +120,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	/**
 	 * Closes the Entity Manager.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void close() {
 		this.cleanupTx();
@@ -132,7 +132,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 * 
 	 * Commits the transaction.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void commit() {
 		this.tx().commit();
@@ -146,7 +146,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 * @param entity
 	 * @return true if entity is contained in the session
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected boolean contains(Object entity) {
 		return this.em().contains(entity);
@@ -161,7 +161,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 *            the result class
 	 * @return the query
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected Query cq(String qlString) {
 		return this.em().createQuery(qlString);
@@ -178,7 +178,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 *            the result ype
 	 * @return the query
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected <T> TypedQuery<T> cq(String qlString, Class<T> resultClass) {
 		return this.em().createQuery(qlString, resultClass);
@@ -191,7 +191,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 *            the query string
 	 * @return the query
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected Query cu(String qlString) {
 		return this.em().createQuery(qlString);
@@ -202,7 +202,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 * 
 	 * @param entity
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void detach(Object entity) {
 		this.em().detach(entity);
@@ -213,7 +213,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 * 
 	 * @return the Entity Manager
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected EntityManagerImpl em() {
 		if (this.em != null) {
@@ -227,7 +227,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 * Returns the Entity Manager Factory.
 	 * 
 	 * @return the Entity Manager Factory
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected EntityManagerFactoryImpl emf() {
 		if (this.emf == null) {
@@ -238,7 +238,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	}
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private void ensureTx() {
 		if ((this.tx == null) || !this.tx.isActive()) {
@@ -272,7 +272,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 *            the type of entity
 	 * @return entity or null
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected <T> T find(Class<T> cls, Object pk) {
 		return this.find(cls, pk, null);
@@ -290,7 +290,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 * @param lockMode
 	 * @return entity or null
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected <T> T find(Class<T> cls, Object pk, LockModeType lockMode) {
 		return this.em().find(cls, pk, lockMode);
@@ -299,7 +299,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	/**
 	 * Flushes the Entity Manager
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void flush() {
 		this.em().flush();
@@ -308,7 +308,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	/**
 	 * @return the name of the persistence unit name
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected String getPersistenceUnitName() {
 		return this.getRootPackage();
@@ -325,7 +325,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 * 
 	 * @return false to lazy setup the entity manager factory
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected boolean lazySetup() {
 		return false;
@@ -338,7 +338,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 * @param <T>
 	 *            the type of the entity
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @return
 	 */
 	protected <T> T merge(T entity) {
@@ -352,7 +352,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 * 
 	 * @param entity
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void persist(Object entity) {
 		this.ensureTx();
@@ -371,7 +371,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 *            the type of entity
 	 * @return entity or null
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected <T> T reference(Class<T> cls, Object pk) {
 		return this.em().getReference(cls, pk);
@@ -382,7 +382,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 * 
 	 * @param entity
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void refresh(Object entity) {
 		this.em().refresh(entity);
@@ -393,7 +393,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 * 
 	 * @param entity
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void remove(Object entity) {
 		this.ensureTx();
@@ -404,7 +404,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	/**
 	 * Rolls the transaction back.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void rollback() {
 		this.tx().rollback();
@@ -418,7 +418,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 * @throws SQLException
 	 *             th
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Before
 	public void setup() throws SQLException {
@@ -479,7 +479,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 * 
 	 * @return the entity manager factory
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected EntityManagerFactoryImpl setupEmf() {
 		return this.setupEmf(this.persistenceUnitName);
@@ -492,7 +492,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 *            the persistence unit name
 	 * @return the entity manager factory
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected EntityManagerFactoryImpl setupEmf(String puName) {
 		final Thread currentThread = Thread.currentThread();
@@ -516,7 +516,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 * @throws SQLException
 	 *             thrown if the tear down fails
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@After
 	public void teardown() throws SQLException {
@@ -584,7 +584,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 * 
 	 * @return the active transaction
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected EntityTransaction tx() {
 		if (this.tx != null) {

@@ -32,14 +32,14 @@ import com.google.common.collect.Sets;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class JoinedInheritanceTest extends BaseCoreTest {
 
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with root type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testSimpleInheritence0() {
@@ -70,7 +70,7 @@ public class JoinedInheritanceTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with root type with mixed classes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testSimpleInheritence1() {
@@ -102,7 +102,7 @@ public class JoinedInheritanceTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with root type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testSimpleInheritence2() {

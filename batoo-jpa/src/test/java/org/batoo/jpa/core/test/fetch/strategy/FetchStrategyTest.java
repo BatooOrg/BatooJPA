@@ -30,7 +30,7 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class FetchStrategyTest extends BaseCoreTest {
 
@@ -43,7 +43,7 @@ public class FetchStrategyTest extends BaseCoreTest {
 	private static City LONDON;
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@BeforeClass
 	public static void init() {
@@ -71,7 +71,7 @@ public class FetchStrategyTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Before
 	public void prepareCountries() {
@@ -87,7 +87,7 @@ public class FetchStrategyTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#find(Class, Object)} person.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testFind() {

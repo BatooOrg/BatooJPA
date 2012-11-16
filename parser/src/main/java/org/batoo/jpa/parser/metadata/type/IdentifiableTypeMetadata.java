@@ -27,7 +27,7 @@ import org.batoo.jpa.parser.metadata.EntityListenerMetadata;
  * The definition for identifiable types.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface IdentifiableTypeMetadata extends ManagedTypeMetadata {
 
@@ -36,7 +36,7 @@ public interface IdentifiableTypeMetadata extends ManagedTypeMetadata {
 	 * 
 	 * @return true the default listeners are excluded, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	boolean excludeDefaultListeners();
@@ -46,7 +46,7 @@ public interface IdentifiableTypeMetadata extends ManagedTypeMetadata {
 	 * 
 	 * @return true the super class listeners are excluded, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	boolean excludeSuperclassListeners();
@@ -56,7 +56,7 @@ public interface IdentifiableTypeMetadata extends ManagedTypeMetadata {
 	 * 
 	 * @return the callbacks of the identifiable type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<CallbackMetadata> getCallbacks();
@@ -66,7 +66,7 @@ public interface IdentifiableTypeMetadata extends ManagedTypeMetadata {
 	 * 
 	 * @return the id class of the identifiable type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getIdClass();
@@ -76,7 +76,7 @@ public interface IdentifiableTypeMetadata extends ManagedTypeMetadata {
 	 * 
 	 * @return the entity listeners of the identifiable type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<EntityListenerMetadata> getListeners();

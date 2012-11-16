@@ -35,7 +35,7 @@ import com.google.common.collect.Lists;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 @TableGenerator(name = "person_id", allocationSize = 1000)
@@ -85,7 +85,7 @@ public class Person {
 	 * Returns the addresses.
 	 * 
 	 * @return the addresses
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public List<Address> getAddresses() {
 		return this.addresses;
@@ -95,7 +95,7 @@ public class Person {
 	 * Returns the id.
 	 * 
 	 * @return the id
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -105,7 +105,7 @@ public class Person {
 	 * Returns the name.
 	 * 
 	 * @return the name
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		return this.name;
@@ -115,7 +115,7 @@ public class Person {
 	 * Returns the phones.
 	 * 
 	 * @return the phones
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public List<Phone> getPhones() {
 		return this.phones;
@@ -126,7 +126,7 @@ public class Person {
 	 * 
 	 * @return the version of the Person
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getVersion() {
 		return this.version;
@@ -149,7 +149,7 @@ public class Person {
 	 * 
 	 * @param name
 	 *            the name to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setName(String name) {
 		this.name = name;

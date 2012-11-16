@@ -38,7 +38,7 @@ import org.batoo.jpa.core.impl.model.type.TypeImpl;
  *            the type of the constant expression
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class EntityConstantExpression<T> extends AbstractParameterExpressionImpl<T> {
 
@@ -51,7 +51,7 @@ public class EntityConstantExpression<T> extends AbstractParameterExpressionImpl
 	 * @param value
 	 *            the value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public EntityConstantExpression(TypeImpl<T> type, T value) {
@@ -118,7 +118,7 @@ public class EntityConstantExpression<T> extends AbstractParameterExpressionImpl
 	 * @param sqlIndex
 	 *            the index corresponding to expanded SQL parameter
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setParameter(MetamodelImpl metamodel, Connection connection, Object[] parameters, MutableInt sqlIndex) {
 		super.setParameter(metamodel, connection, parameters, sqlIndex, this.value);

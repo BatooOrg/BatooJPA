@@ -27,7 +27,7 @@ import javax.persistence.ManyToOne;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class E5 {
@@ -42,7 +42,7 @@ public class E5 {
 	 * 
 	 * @return the e1 of the E3
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@ManyToOne
 	@Access(AccessType.PROPERTY)
@@ -55,7 +55,7 @@ public class E5 {
 	 * 
 	 * @return the e12 of the E5
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public E1 getE12() {
 		return this.e12;
@@ -67,7 +67,7 @@ public class E5 {
 	 * @param e1
 	 *            the e1 to set for E3
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setE1(E1 e1) {
 		this.e1 = e1;
@@ -79,7 +79,7 @@ public class E5 {
 	 * @param e12
 	 *            the e12 to set for E5
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setE12(E1 e12) {
 		this.e12 = e12;

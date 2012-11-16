@@ -51,7 +51,7 @@ import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
  *            The element type of the represented collection
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> implements PluralAttribute<X, C, E> {
 
@@ -68,7 +68,7 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 *            the type of the managed type
 	 * @return the attribute created
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <X> PluralAttributeImpl<X, ?, ?> create(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata, PersistentAttributeType attributeType) {
@@ -114,7 +114,7 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 *            the index of the generic value parameter, typically 0 for {@link Collection}, {@link List} and {@link Set} attributes and
 	 *            1 for {@link Map} attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public PluralAttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata, PersistentAttributeType attributeType, int valueIndexNo) {
@@ -142,7 +142,7 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 * 
 	 * @return the attributeType of the PluralAttributeImpl
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public javax.persistence.metamodel.Attribute.PersistentAttributeType getAttributeType() {
 		return this.attributeType;
@@ -226,7 +226,7 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 *            if the collection is lazy
 	 * @return the lazy initialized managed collection
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract C newCollection(PluralMapping<?, C, E> mapping, ManagedInstance<?> managedInstance, boolean lazy);
 
@@ -241,7 +241,7 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 *            the values
 	 * @return the managed collection
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract C newCollection(PluralMapping<?, C, E> mapping, ManagedInstance<?> managedInstance, Object values);
 

@@ -38,7 +38,7 @@ import com.google.common.base.Joiner;
  * JDBC Adapter for Derby.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class DerbyAdaptor extends JdbcAdaptor {
 
@@ -46,7 +46,7 @@ public class DerbyAdaptor extends JdbcAdaptor {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public DerbyAdaptor() {
 		super();

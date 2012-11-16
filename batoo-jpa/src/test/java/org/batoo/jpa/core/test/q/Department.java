@@ -27,7 +27,7 @@ import javax.persistence.Id;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Department {
@@ -40,7 +40,7 @@ public class Department {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Department() {
 		super();
@@ -50,7 +50,7 @@ public class Department {
 	 * @param name
 	 *            the name
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Department(String name) {
 		super();
@@ -63,7 +63,7 @@ public class Department {
 	 * 
 	 * @return the id of the Employee
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -74,7 +74,7 @@ public class Department {
 	 * 
 	 * @return the name of the Department
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		return this.name;
@@ -86,7 +86,7 @@ public class Department {
 	 * @param name
 	 *            the name to set for Department
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setName(String name) {
 		this.name = name;

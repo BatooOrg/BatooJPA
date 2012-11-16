@@ -24,7 +24,7 @@ import java.util.List;
  * The definition for entity listeners.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface EntityListenerMetadata extends LocatableMatadata {
 
@@ -33,7 +33,7 @@ public interface EntityListenerMetadata extends LocatableMatadata {
 	 * Entity listener callback types.
 	 * 
 	 * @author hceylan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public enum EntityListenerType {
 		/**
@@ -77,7 +77,7 @@ public interface EntityListenerMetadata extends LocatableMatadata {
 	 * 
 	 * @return the list of callbacks
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<CallbackMetadata> getCallbacks();
@@ -87,7 +87,7 @@ public interface EntityListenerMetadata extends LocatableMatadata {
 	 * 
 	 * @return the entity listener class
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getClassName();

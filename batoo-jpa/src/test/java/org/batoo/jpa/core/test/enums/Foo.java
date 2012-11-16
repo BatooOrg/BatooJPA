@@ -28,7 +28,7 @@ import javax.persistence.Id;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Foo {
@@ -54,7 +54,7 @@ public class Foo {
 	 * 
 	 * @return the footype of the Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected FooType getFootype() {
 		return this.footype;
@@ -65,7 +65,7 @@ public class Foo {
 	 * 
 	 * @return the footype2 of the Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected FooType getFootype2() {
 		return this.footype2;
@@ -76,7 +76,7 @@ public class Foo {
 	 * 
 	 * @return the id of the Foo1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -88,7 +88,7 @@ public class Foo {
 	 * @param footype
 	 *            the footype to set for Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void setFootype(FooType footype) {
 		this.footype = footype;
@@ -100,7 +100,7 @@ public class Foo {
 	 * @param footype2
 	 *            the footype2 to set for Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void setFootype2(FooType footype2) {
 		this.footype2 = footype2;

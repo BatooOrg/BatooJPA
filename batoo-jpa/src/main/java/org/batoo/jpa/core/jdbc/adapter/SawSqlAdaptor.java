@@ -43,7 +43,7 @@ import com.google.common.base.Joiner;
  * JDBC Adapter for MySQL.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class SawSqlAdaptor extends JdbcAdaptor {
 
@@ -51,7 +51,7 @@ public class SawSqlAdaptor extends JdbcAdaptor {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public SawSqlAdaptor() {
 		super();

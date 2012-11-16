@@ -39,7 +39,7 @@ import org.batoo.jpa.core.impl.model.mapping.Mapping;
  *            the type of the element
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class CollectionExpression<C extends Collection<E>, E> extends AbstractExpression<C> {
 
@@ -52,7 +52,7 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	 * @param mapping
 	 *            the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public CollectionExpression(ParentPath<?, ?> parentPath, Mapping<?, Collection<E>, E> mapping) {
@@ -94,7 +94,7 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	 * 
 	 * @return the mapping of the CollectionExpression
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Mapping<?, Collection<E>, E> getMapping() {
 		return this.mapping;
@@ -105,7 +105,7 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	 * 
 	 * @return the parentPath of the CollectionExpression
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ParentPath<?, ?> getParentPath() {
 		return this.parentPath;

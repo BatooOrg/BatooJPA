@@ -39,7 +39,7 @@ import com.google.common.collect.Lists;
  * Implementation of {@link Predicate}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class PredicateImpl extends BooleanExpression implements Predicate {
 
@@ -52,7 +52,7 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	 * @param expression
 	 *            the expressions
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public PredicateImpl(AbstractExpression<Boolean> expression) {
@@ -63,7 +63,7 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	 * @param expressions
 	 *            the expressions
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public PredicateImpl(AbstractExpression<Boolean>... expressions) {
 		this(false, BooleanOperator.AND, expressions);
@@ -77,7 +77,7 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	 * @param expressions
 	 *            the expressions
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public PredicateImpl(boolean negated, BooleanOperator operator, Expression<Boolean>... expressions) {
 		super(null);
@@ -103,7 +103,7 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	 * @param predicates
 	 *            the predicates
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public PredicateImpl(boolean negated, BooleanOperator operator, Predicate... predicates) {
 		super(null);

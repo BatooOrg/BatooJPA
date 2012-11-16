@@ -33,7 +33,7 @@ import java.lang.annotation.Target;
  * For example:
  * <code>@ColumnTransformer(read="sqlExpression" write="sqlExpressionWithCustomParam(?)")</code>
  * 
- * @since $version
+ * @since 2.0.0
  * @author asimarslan
  */
 @Target({ FIELD, METHOD })

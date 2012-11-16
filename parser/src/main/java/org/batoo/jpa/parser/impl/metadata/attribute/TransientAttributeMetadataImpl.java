@@ -30,7 +30,7 @@ import org.batoo.jpa.parser.metadata.attribute.TransientAttributeMetadata;
  * The implementation of the {@link TransientAttributeMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class TransientAttributeMetadataImpl extends AttributeMetadataImpl implements TransientAttributeMetadata {
 
@@ -42,7 +42,7 @@ public class TransientAttributeMetadataImpl extends AttributeMetadataImpl implem
 	 * @param parsed
 	 *            the annotations parsed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public TransientAttributeMetadataImpl(Member member, String name, Set<Class<? extends Annotation>> parsed) {
@@ -57,7 +57,7 @@ public class TransientAttributeMetadataImpl extends AttributeMetadataImpl implem
 	 * @param metadata
 	 *            the metadata definition of the transient attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public TransientAttributeMetadataImpl(Member member, TransientAttributeMetadata metadata) {

@@ -43,7 +43,7 @@ import com.google.common.collect.Lists;
  *            the type of the case expression
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class CaseImpl<T> extends AbstractExpression<T> implements Case<T> {
 
@@ -53,7 +53,7 @@ public class CaseImpl<T> extends AbstractExpression<T> implements Case<T> {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public CaseImpl() {

@@ -37,7 +37,7 @@ import com.google.common.collect.Lists;
  * Implementation of {@link ManyToManyAttributeMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ManyToManyAttributeMetadataImpl extends AssociationAttributeMetadataImpl implements ManyToManyAttributeMetadata {
 
@@ -57,7 +57,7 @@ public class ManyToManyAttributeMetadataImpl extends AssociationAttributeMetadat
 	 * @param metadata
 	 *            the metadata definition of the one-to-one attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public ManyToManyAttributeMetadataImpl(Member member, ManyToManyAttributeMetadata metadata) {
@@ -84,7 +84,7 @@ public class ManyToManyAttributeMetadataImpl extends AssociationAttributeMetadat
 	 * @param parsed
 	 *            set of annotations parsed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public ManyToManyAttributeMetadataImpl(Member member, String name, ManyToMany manyToMany, Set<Class<? extends Annotation>> parsed) {

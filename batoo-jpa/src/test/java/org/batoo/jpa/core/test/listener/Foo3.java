@@ -26,7 +26,7 @@ import javax.persistence.Transient;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 @EntityListeners(value = FooListener.class)
@@ -42,7 +42,7 @@ public class Foo3 extends Foo implements FooType {
 	 * 
 	 * @return the fooValue of the Foo3
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected String getFooValue() {
 		return this.fooValue;
@@ -53,7 +53,7 @@ public class Foo3 extends Foo implements FooType {
 	 * 
 	 * @return the value of the Foo3
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Override
 	public String getValue() {
@@ -62,7 +62,7 @@ public class Foo3 extends Foo implements FooType {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@PostPersist
 	public void postPersist() {
@@ -75,7 +75,7 @@ public class Foo3 extends Foo implements FooType {
 	 * @param fooValue
 	 *            the fooValue to set for Foo3
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void setFooValue(String fooValue) {
 		this.fooValue = fooValue;
@@ -87,7 +87,7 @@ public class Foo3 extends Foo implements FooType {
 	 * @param value
 	 *            the value to set for Foo3
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Override
 	public void setValue(String value) {

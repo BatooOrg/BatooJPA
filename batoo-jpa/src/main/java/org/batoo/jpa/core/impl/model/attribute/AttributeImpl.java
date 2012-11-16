@@ -39,7 +39,7 @@ import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
  *            The type of the represented attribute
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class AttributeImpl<X, Y> implements Attribute<X, Y> {
 
@@ -65,7 +65,7 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y> {
 	 * @param metadata
 	 *            the metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public AttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata) {
@@ -89,7 +89,7 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y> {
 	 *            the instance of which the value to be returned
 	 * @return the attribute value of instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public Y get(Object instance) {
@@ -105,7 +105,7 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y> {
 	 * 
 	 * @return the ordinal id of the attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getAttributeId() {
 		return this.attributeId;
@@ -143,7 +143,7 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y> {
 	 * 
 	 * @return the locator of the AttributeImpl
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public AbstractLocator getLocator() {
 		return this.metadata.getLocator();
@@ -154,7 +154,7 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y> {
 	 * 
 	 * @return the metadata of the attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public AttributeMetadata getMetadata() {
 		return this.metadata;
@@ -165,7 +165,7 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y> {
 	 * 
 	 * @return the metamodel
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public MetamodelImpl getMetamodel() {
 		return this.metamodel;
@@ -188,7 +188,7 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y> {
 	 * @param value
 	 *            the value to set
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void set(Object instance, Object value) {
 		this.accessor.set(instance, value);

@@ -23,7 +23,7 @@ package org.batoo.jpa.parser.metadata.attribute;
  * The definition of version attributes.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface VersionAttributeMetadata extends PhysicalAttributeMetadata {
 

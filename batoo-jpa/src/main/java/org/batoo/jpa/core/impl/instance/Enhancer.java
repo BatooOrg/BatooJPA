@@ -23,7 +23,7 @@ import com.google.common.collect.Sets;
  * The helper class to enhance a persistent class.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public final class Enhancer {
 
@@ -82,7 +82,7 @@ public final class Enhancer {
 	 * @throws Exception
 	 *             thrown in case of an error
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	//@formatter:off
 	public static byte[] create(Class<?> clazz) throws Exception {
@@ -435,7 +435,7 @@ public final class Enhancer {
 	 * @throws Exception
 	 *             thrown if the enhancement fails
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> Class<T> enhance(EntityType<T> type) throws Exception {
@@ -568,7 +568,7 @@ public final class Enhancer {
 	 * @throws Exception
 	 *             if class cannot be loaded
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> Class<T> loadClass(ClassLoader classLoader, byte[] byteCode, String className) throws Exception {

@@ -34,7 +34,7 @@ import javax.persistence.Transient;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @MappedSuperclass
 public class Foo {
@@ -51,7 +51,7 @@ public class Foo {
 	 * 
 	 * @return the id of the Foo1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -62,7 +62,7 @@ public class Foo {
 	 * 
 	 * @return the parentValue of the Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getParentValue() {
 		return this.parentValue;
@@ -70,7 +70,7 @@ public class Foo {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@PostLoad
 	public void postLoadFoo() {
@@ -79,7 +79,7 @@ public class Foo {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@PostPersist
 	public void postPersistFoo() {
@@ -88,7 +88,7 @@ public class Foo {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@PostRemove
 	public void postRemoveFoo() {
@@ -97,7 +97,7 @@ public class Foo {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@PostUpdate
 	public void postUpdateFoo() {
@@ -106,7 +106,7 @@ public class Foo {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@PrePersist
 	public void prePersistFoo() {
@@ -115,7 +115,7 @@ public class Foo {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@PreRemove
 	public void preRemoveFoo() {
@@ -124,7 +124,7 @@ public class Foo {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@PreUpdate
 	public void preUpdateFoo() {
@@ -137,7 +137,7 @@ public class Foo {
 	 * @param parentValue
 	 *            the parenValue to set for Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setParentValue(String parentValue) {
 		this.parentValue = parentValue;

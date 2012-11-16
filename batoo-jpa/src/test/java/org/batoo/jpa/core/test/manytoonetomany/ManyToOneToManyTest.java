@@ -34,7 +34,7 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class ManyToOneToManyTest extends BaseCoreTest {
 
@@ -53,7 +53,7 @@ public class ManyToOneToManyTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#find(Class, Object)} person.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testFind() {
@@ -71,7 +71,7 @@ public class ManyToOneToManyTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#find(Class, Object)} person.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testFind2() {
@@ -90,7 +90,7 @@ public class ManyToOneToManyTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#find(Class, Object)} person.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testFind3() {
@@ -109,7 +109,7 @@ public class ManyToOneToManyTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#find(Class, Object)} person that is in the session.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testFindInSession() {
@@ -126,7 +126,7 @@ public class ManyToOneToManyTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#persist(Object)} address which does not cascade to Parent. PersistenceException expected.
 	 * 
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test(expected = PersistenceException.class)
 	public void testPersistAddress() {
@@ -141,7 +141,7 @@ public class ManyToOneToManyTest extends BaseCoreTest {
 	 * @throws SQLException
 	 *             ins case of an underlying SQL Exception
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testPersistPerson() throws SQLException {

@@ -24,7 +24,7 @@ import javax.persistence.InheritanceType;
  * The definition for inheritances.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface InheritanceMetadata {
 
@@ -33,7 +33,7 @@ public interface InheritanceMetadata {
 	 * 
 	 * @return the inheritance type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	InheritanceType getInheritanceType();

@@ -32,7 +32,7 @@ import com.google.common.collect.Lists;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class PersistenceUnitDefaults extends ParentElement {
 
@@ -48,7 +48,7 @@ public class PersistenceUnitDefaults extends ParentElement {
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public PersistenceUnitDefaults(ParentElement parent, Map<String, String> attributes) {
@@ -66,7 +66,7 @@ public class PersistenceUnitDefaults extends ParentElement {
 	 * 
 	 * @return the accessType
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public AccessType getAccessType() {
@@ -78,7 +78,7 @@ public class PersistenceUnitDefaults extends ParentElement {
 	 * 
 	 * @return the catalog
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public String getCatalog() {
@@ -90,7 +90,7 @@ public class PersistenceUnitDefaults extends ParentElement {
 	 * 
 	 * @return the listeners
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public List<EntityListenerMetadata> getListeners() {
@@ -102,7 +102,7 @@ public class PersistenceUnitDefaults extends ParentElement {
 	 * 
 	 * @return the schema
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public String getSchema() {
@@ -141,7 +141,7 @@ public class PersistenceUnitDefaults extends ParentElement {
 	 * 
 	 * @return the cascadePersist
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public boolean isCascadePersist() {

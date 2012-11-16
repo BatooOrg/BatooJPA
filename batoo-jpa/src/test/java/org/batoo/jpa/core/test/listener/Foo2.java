@@ -27,7 +27,7 @@ import javax.persistence.Transient;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 @ExcludeSuperclassListeners
@@ -41,7 +41,7 @@ public class Foo2 extends Foo implements FooType {
 	 * 
 	 * @return the value of the Foo2
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Override
 	public String getValue() {
@@ -51,7 +51,7 @@ public class Foo2 extends Foo implements FooType {
 	/**
 	 * 
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@PostLoad
 	public void postLoad() {
@@ -60,7 +60,7 @@ public class Foo2 extends Foo implements FooType {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@PostPersist
 	public void postPersist() {
@@ -73,7 +73,7 @@ public class Foo2 extends Foo implements FooType {
 	 * @param value
 	 *            the value to set for Foo2
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Override
 	public void setValue(String value) {

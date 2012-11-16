@@ -22,7 +22,7 @@ package org.batoo.jpa.core.impl.jdbc;
  * The data representing a single join.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class Joinable {
 
@@ -38,7 +38,7 @@ public class Joinable {
 	 * @param index
 	 *            the index
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Joinable(Object key, Object value, int index) {
 		super();
@@ -53,7 +53,7 @@ public class Joinable {
 	 * 
 	 * @return the index of the Joinable
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public int getIndex() {
 		return this.index;
@@ -64,7 +64,7 @@ public class Joinable {
 	 * 
 	 * @return the key of the Joinable
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Object getKey() {
 		return this.key;
@@ -75,7 +75,7 @@ public class Joinable {
 	 * 
 	 * @return the value of the Joinable
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Object getValue() {
 		return this.value;

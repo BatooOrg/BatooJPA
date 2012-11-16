@@ -28,7 +28,7 @@ import javax.persistence.Version;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Bar {
@@ -47,7 +47,7 @@ public class Bar {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Bar() {
 		super();
@@ -59,7 +59,7 @@ public class Bar {
 	 * @param value
 	 *            the value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Bar(Foo foo, String value) {
 		super();
@@ -75,7 +75,7 @@ public class Bar {
 	 * 
 	 * @return the foo of the Bar
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Foo getFoo() {
 		return this.foo;
@@ -86,7 +86,7 @@ public class Bar {
 	 * 
 	 * @return the id of the Foo1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -97,7 +97,7 @@ public class Bar {
 	 * 
 	 * @return the value of the Foo1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getValue() {
 		return this.value;
@@ -108,7 +108,7 @@ public class Bar {
 	 * 
 	 * @return the version of the Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public int getVersion() {
 		return this.version;
@@ -120,7 +120,7 @@ public class Bar {
 	 * @param foo
 	 *            the foo to set for Bar
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setFoo(Foo foo) {
 		this.foo = foo;
@@ -132,7 +132,7 @@ public class Bar {
 	 * @param value
 	 *            the value to set for Foo1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setValue(String value) {
 		this.value = value;
@@ -144,7 +144,7 @@ public class Bar {
 	 * @param version
 	 *            the version to set for Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setVersion(int version) {
 		this.version = version;

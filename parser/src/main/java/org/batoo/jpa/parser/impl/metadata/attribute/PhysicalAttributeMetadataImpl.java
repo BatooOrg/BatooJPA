@@ -36,7 +36,7 @@ import org.batoo.jpa.parser.metadata.attribute.PhysicalAttributeMetadata;
  * The implementation of the {@link PhysicalAttributeMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class PhysicalAttributeMetadataImpl extends AttributeMetadataImpl implements PhysicalAttributeMetadata {
 
@@ -49,7 +49,7 @@ public class PhysicalAttributeMetadataImpl extends AttributeMetadataImpl impleme
 	 * @param metadata
 	 *            the metadata definition of the singular attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public PhysicalAttributeMetadataImpl(Member member, PhysicalAttributeMetadata metadata) {
@@ -67,7 +67,7 @@ public class PhysicalAttributeMetadataImpl extends AttributeMetadataImpl impleme
 	 * @param parsed
 	 *            set of annotations parsed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public PhysicalAttributeMetadataImpl(Member member, String name, Set<Class<? extends Annotation>> parsed) {

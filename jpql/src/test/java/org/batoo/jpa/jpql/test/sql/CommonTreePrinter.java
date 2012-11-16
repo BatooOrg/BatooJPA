@@ -5,7 +5,7 @@ import org.antlr.runtime.tree.Tree;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class CommonTreePrinter {
 
@@ -34,7 +34,7 @@ public class CommonTreePrinter {
 	 *            the root of the tree
 	 * @return the string representation of a common tree
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public static String toString(Tree root) {
 		final StringBuilder builder = new StringBuilder();

@@ -38,7 +38,7 @@ import com.google.common.collect.Lists;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class EmbeddedIdAttributeMetadataImpl extends AttributeMetadataImpl implements EmbeddedIdAttributeMetadata {
 
@@ -50,7 +50,7 @@ public class EmbeddedIdAttributeMetadataImpl extends AttributeMetadataImpl imple
 	 * @param metadata
 	 *            the metadata definition of the attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public EmbeddedIdAttributeMetadataImpl(Member member, EmbeddedIdAttributeMetadata metadata) {
@@ -67,7 +67,7 @@ public class EmbeddedIdAttributeMetadataImpl extends AttributeMetadataImpl imple
 	 * @param parsed
 	 *            set of annotations parsed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public EmbeddedIdAttributeMetadataImpl(Member member, String name, Set<Class<? extends Annotation>> parsed) {

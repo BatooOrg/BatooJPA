@@ -38,7 +38,7 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class SecondaryTableTest extends BaseCoreTest {
 
@@ -57,7 +57,7 @@ public class SecondaryTableTest extends BaseCoreTest {
 	 * @throws SQLException
 	 *             thrown if underlying SQL fails
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testCreateTable() throws SQLException {
@@ -77,7 +77,7 @@ public class SecondaryTableTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#find(Class, Object)}
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testFind() {
@@ -101,7 +101,7 @@ public class SecondaryTableTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#find(Class, Object)} with {@link SecondaryTables}
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testFind2() {
@@ -125,7 +125,7 @@ public class SecondaryTableTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#find(Class, Object)} with one-many-one.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testFindOneToManyToOne() {
@@ -149,7 +149,7 @@ public class SecondaryTableTest extends BaseCoreTest {
 	 * @throws SQLException
 	 *             thrown if underlying SQL fails
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testPersist() throws SQLException {
@@ -171,7 +171,7 @@ public class SecondaryTableTest extends BaseCoreTest {
 	 * @throws SQLException
 	 *             thrown if underlying SQL fails
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testPersistOneToManyToOne() throws SQLException {

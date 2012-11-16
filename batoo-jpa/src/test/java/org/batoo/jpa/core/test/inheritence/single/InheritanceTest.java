@@ -29,14 +29,14 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class InheritanceTest extends BaseCoreTest {
 
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with identity value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testInheritance() {
@@ -59,7 +59,7 @@ public class InheritanceTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with identity value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testSimpleInheritance2() {
@@ -81,7 +81,7 @@ public class InheritanceTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with identity value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test(expected = NoResultException.class)
 	public void testSimpleInheritance3() {

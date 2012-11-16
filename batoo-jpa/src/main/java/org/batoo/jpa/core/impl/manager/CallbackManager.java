@@ -37,7 +37,7 @@ import com.google.common.collect.Maps;
  * Manager for callbacks
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class CallbackManager {
 
@@ -60,7 +60,7 @@ public class CallbackManager {
 	 * @param javaType
 	 *            the java type of the identifiable
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public CallbackManager(IdentifiableTypeMetadata metadata, Class<?> javaType) {
 		super();
@@ -85,7 +85,7 @@ public class CallbackManager {
 	 * @param defaultListeners
 	 *            the list of default listeners
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public CallbackManager(List<EntityListenerMetadata> defaultListeners) {
 		super();
@@ -110,7 +110,7 @@ public class CallbackManager {
 	 * 
 	 * @return true the default listeners are excluded, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean excludeDefaultListeners() {
 		return this.excludeDefaultListeners;
@@ -121,7 +121,7 @@ public class CallbackManager {
 	 * 
 	 * @return true the super class listeners are excluded, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean excludeSuperclassListeners() {
 		return this.excludeSuperclassListeners;
@@ -135,7 +135,7 @@ public class CallbackManager {
 	 * @param type
 	 *            the type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void fireCallbacks(Object instance, EntityListenerType type) {
 		Callback[] callbacks = null;
@@ -180,7 +180,7 @@ public class CallbackManager {
 	 *            the super type, may be <code>null</code>
 	 * @return the availability
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public CallbackAvailability getAvailibility(MetamodelImpl metamodel, IdentifiableTypeImpl<?> superType) {
 		final CallbackAvailability availability = new CallbackAvailability();
@@ -211,7 +211,7 @@ public class CallbackManager {
 	 * 
 	 * @return true if the default listeners are excluded, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean isExcludeDefaultListeners() {
 		return this.excludeDefaultListeners;
@@ -222,7 +222,7 @@ public class CallbackManager {
 	 * 
 	 * @return true if the super type listeners are excluded, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean isExcludeSuperclassListeners() {
 		return this.excludeSuperclassListeners;
@@ -283,7 +283,7 @@ public class CallbackManager {
 	 * 
 	 * @return the PostLoad callbacks
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Callback[] postLoad() {
 		return this.postLoad;
@@ -294,7 +294,7 @@ public class CallbackManager {
 	 * 
 	 * @return the PostPersist callbacks
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Callback[] postPersist() {
 		return this.postPersist;
@@ -305,7 +305,7 @@ public class CallbackManager {
 	 * 
 	 * @return the PostRemove callbacks
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Callback[] postRemove() {
 		return this.postRemove;
@@ -316,7 +316,7 @@ public class CallbackManager {
 	 * 
 	 * @return the PostUpdate callbacks
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Callback[] postUpdate() {
 		return this.postUpdate;
@@ -327,7 +327,7 @@ public class CallbackManager {
 	 * 
 	 * @return the PrePersist callbacks
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Callback[] prePersist() {
 		return this.prePersist;
@@ -338,7 +338,7 @@ public class CallbackManager {
 	 * 
 	 * @return the PreRemove callbacks
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Callback[] preRemove() {
 		return this.preRemove;
@@ -349,7 +349,7 @@ public class CallbackManager {
 	 * 
 	 * @return the PreUpdate callbacks
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Callback[] preUpdate() {
 		return this.preUpdate;

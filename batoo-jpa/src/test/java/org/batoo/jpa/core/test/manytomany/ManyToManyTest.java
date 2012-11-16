@@ -28,14 +28,14 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class ManyToManyTest extends BaseCoreTest {
 
 	/**
 	 * Tests to persist {@link ManyToMany} relations.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testPersist() {

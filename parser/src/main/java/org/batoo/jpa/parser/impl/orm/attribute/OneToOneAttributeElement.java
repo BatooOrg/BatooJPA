@@ -36,7 +36,7 @@ import com.google.common.collect.Lists;
  * Element for <code>one-to-one</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class OneToOneAttributeElement extends AssociationElement implements OneToOneAttributeMetadata {
 
@@ -53,7 +53,7 @@ public class OneToOneAttributeElement extends AssociationElement implements OneT
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public OneToOneAttributeElement(ParentElement parent, Map<String, String> attributes) {

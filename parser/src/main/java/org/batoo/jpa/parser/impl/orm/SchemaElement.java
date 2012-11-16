@@ -24,7 +24,7 @@ import java.util.Map;
  * Element for <code>schema</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class SchemaElement extends ChildElement {
 
@@ -36,7 +36,7 @@ public class SchemaElement extends ChildElement {
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public SchemaElement(ParentElement parent, Map<String, String> attributes) {
@@ -57,7 +57,7 @@ public class SchemaElement extends ChildElement {
 	 * 
 	 * @return the schema of the SchemaElement
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public String getSchema() {

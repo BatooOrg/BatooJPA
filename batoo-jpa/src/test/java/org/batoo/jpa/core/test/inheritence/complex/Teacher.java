@@ -10,7 +10,7 @@ import javax.persistence.OneToMany;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 @DiscriminatorValue("TEA")
@@ -21,7 +21,7 @@ public class Teacher extends Person {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Teacher() {
 		super();
@@ -33,7 +33,7 @@ public class Teacher extends Person {
 	 * @param lastName
 	 *            the last name
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Teacher(String firstName, String lastName) {
 		super(firstName, lastName);
@@ -44,7 +44,7 @@ public class Teacher extends Person {
 	 * 
 	 * @return the coursesTaught of the Teacher
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public List<Course> getCoursesTaught() {
 		return this.coursesTaught;
@@ -56,7 +56,7 @@ public class Teacher extends Person {
 	 * @param coursesTaught
 	 *            the coursesTaught to set for Teacher
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setCoursesTaught(List<Course> coursesTaught) {
 		this.coursesTaught = coursesTaught;

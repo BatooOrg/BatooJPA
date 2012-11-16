@@ -30,7 +30,7 @@ import org.junit.Test;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class EnhanceTest extends BaseCoreTest {
 
@@ -40,7 +40,7 @@ public class EnhanceTest extends BaseCoreTest {
 	 * @throws Exception
 	 *             thrown in case of failure
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testEnhance() throws Exception {

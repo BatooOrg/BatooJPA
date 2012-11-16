@@ -37,14 +37,14 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class TableGeneratorTest extends BaseCoreTest {
 
 	/**
 	 * Tests {@link EntityManager#contains(Object)}.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testContains() {
@@ -63,7 +63,7 @@ public class TableGeneratorTest extends BaseCoreTest {
 	 * @throws SQLException
 	 *             thrown if SQL fails
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testCreateTables() throws SQLException {
@@ -78,7 +78,7 @@ public class TableGeneratorTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#find(Class, Object)}
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testFind() {
@@ -99,7 +99,7 @@ public class TableGeneratorTest extends BaseCoreTest {
 	 * @throws SQLException
 	 *             thrown if SQL fails
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testPersist() throws SQLException {

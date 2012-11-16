@@ -39,7 +39,7 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class ElementCollectionCriteriaTest extends BaseCoreTest {
 
@@ -65,7 +65,7 @@ public class ElementCollectionCriteriaTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testCollection() {
@@ -93,7 +93,7 @@ public class ElementCollectionCriteriaTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	@SuppressWarnings("rawtypes")
@@ -126,7 +126,7 @@ public class ElementCollectionCriteriaTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testMapKey() {
@@ -152,7 +152,7 @@ public class ElementCollectionCriteriaTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testMapValues() {

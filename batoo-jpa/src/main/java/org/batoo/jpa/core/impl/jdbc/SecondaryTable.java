@@ -31,7 +31,7 @@ import org.batoo.jpa.parser.metadata.TableMetadata;
  * Table representing an secondary table for entity persistent storage.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class SecondaryTable extends EntityTable {
 
@@ -46,7 +46,7 @@ public class SecondaryTable extends EntityTable {
 	 * @param metadata
 	 *            the table metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public SecondaryTable(EntityTypeImpl<?> entity, SecondaryTableMetadata metadata) {
 		super(entity, metadata);
@@ -62,7 +62,7 @@ public class SecondaryTable extends EntityTable {
 	 * @param metadata
 	 *            the metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public SecondaryTable(EntityTypeImpl<?> entity, TableMetadata metadata) {
 		super(entity, metadata);
@@ -75,7 +75,7 @@ public class SecondaryTable extends EntityTable {
 	 *            the table alias
 	 * @return the join SQL fragment
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String joinPrimary(String primaryTableAlias, String alias) {
 		return this.foreignKey.createSourceJoin(JoinType.LEFT, primaryTableAlias, alias);
@@ -84,7 +84,7 @@ public class SecondaryTable extends EntityTable {
 	/**
 	 * Links the secondary table to the primary table
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void link() {
 		if (this.foreignKey == null) {

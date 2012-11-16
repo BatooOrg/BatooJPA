@@ -22,7 +22,7 @@ package org.batoo.jpa.parser.metadata;
  * The definition for unique constraints.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface IndexMetadata extends BindableMetadata {
 
@@ -31,7 +31,7 @@ public interface IndexMetadata extends BindableMetadata {
 	 * 
 	 * @return the list of columns names that make up the unique constraint
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String[] getColumnNames();
@@ -41,7 +41,7 @@ public interface IndexMetadata extends BindableMetadata {
 	 * 
 	 * @return the name of the table
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getTable();

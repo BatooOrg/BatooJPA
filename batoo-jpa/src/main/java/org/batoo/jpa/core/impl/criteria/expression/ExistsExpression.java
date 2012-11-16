@@ -33,7 +33,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  * Expression exists function.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ExistsExpression extends AbstractExpression<Boolean> {
 
@@ -43,7 +43,7 @@ public class ExistsExpression extends AbstractExpression<Boolean> {
 	 * @param subquery
 	 *            the sub query
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ExistsExpression(Subquery<?> subquery) {
 		super(Boolean.class);

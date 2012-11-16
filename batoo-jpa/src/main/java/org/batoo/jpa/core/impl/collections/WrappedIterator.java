@@ -27,7 +27,7 @@ import java.util.Iterator;
  *            the type of elements returned by this iterator
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class WrappedIterator<E> implements Iterator<E> {
 
@@ -37,7 +37,7 @@ public class WrappedIterator<E> implements Iterator<E> {
 	 * @param delegate
 	 *            the delegate
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public WrappedIterator(Iterator<E> delegate) {
 		super();

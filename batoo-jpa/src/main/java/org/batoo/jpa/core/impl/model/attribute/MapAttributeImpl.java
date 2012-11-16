@@ -46,7 +46,7 @@ import org.batoo.jpa.parser.metadata.attribute.PluralAttributeMetadata;
  *            The value element type of the represented collection
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class MapAttributeImpl<X, K, V> extends PluralAttributeImpl<X, Map<K, V>, V> implements MapAttribute<X, K, V> {
 
@@ -60,7 +60,7 @@ public class MapAttributeImpl<X, K, V> extends PluralAttributeImpl<X, Map<K, V>,
 	 *            the metadata
 	 * @param attributeType
 	 *            attribute type
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public MapAttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata, PersistentAttributeType attributeType) {

@@ -25,7 +25,7 @@ import org.xml.sax.Locator;
  * The placemark to remember where the ORM Metadata is obtained from.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class XmlLocator extends AbstractLocator {
 
@@ -42,7 +42,7 @@ public class XmlLocator extends AbstractLocator {
 	 * @param locator
 	 *            the locator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public XmlLocator(String fileName, String localName, Locator locator) {
@@ -60,7 +60,7 @@ public class XmlLocator extends AbstractLocator {
 	 * 
 	 * @return the column number of the location
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public int getColumnNumber() {
@@ -72,7 +72,7 @@ public class XmlLocator extends AbstractLocator {
 	 * 
 	 * @return the name of the ORM XML File
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public String getFileName() {
@@ -84,7 +84,7 @@ public class XmlLocator extends AbstractLocator {
 	 * 
 	 * @return the line number of the location
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public int getLineNumber() {
@@ -96,7 +96,7 @@ public class XmlLocator extends AbstractLocator {
 	 * 
 	 * @return the local name of the location
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public String getLocalName() {

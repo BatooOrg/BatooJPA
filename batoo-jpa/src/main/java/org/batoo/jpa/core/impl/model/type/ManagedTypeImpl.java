@@ -59,7 +59,7 @@ import com.google.common.collect.Sets;
  *            The represented type.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedType<X> {
 
@@ -79,7 +79,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * @param metadata
 	 *            the metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ManagedTypeImpl(MetamodelImpl metamodel, Class<X> clazz, ManagedTypeMetadata metadata) {
 		super(metamodel, clazz);
@@ -93,7 +93,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * @param attribute
 	 *            the declared attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	protected void addAttribute(AttributeImpl<? super X, ?> attribute) {
@@ -125,7 +125,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * @param typeMetadata
 	 *            the metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected void addAttributes(ManagedTypeMetadata typeMetadata) {
@@ -377,7 +377,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * 
 	 * @return the locator of the managed type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public AbstractLocator getLocator() {
 		return this.locator;
@@ -408,7 +408,7 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * 
 	 * @return the name of the type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		return this.getJavaType().getSimpleName();

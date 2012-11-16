@@ -30,7 +30,7 @@ import javax.persistence.ManyToOne;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 @Inheritance
@@ -47,7 +47,7 @@ public class BaseFoo {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public BaseFoo() {
 		super();
@@ -57,7 +57,7 @@ public class BaseFoo {
 	 * @param bar
 	 *            the bar
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public BaseFoo(Bar bar) {
 		super();
@@ -72,7 +72,7 @@ public class BaseFoo {
 	 * 
 	 * @return the bar of the BaseFoo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Bar getBar() {
 		return this.bar;
@@ -83,7 +83,7 @@ public class BaseFoo {
 	 * 
 	 * @return the id of the BaseFoo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -95,7 +95,7 @@ public class BaseFoo {
 	 * @param bar
 	 *            the bar to set for BaseFoo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setBar(Bar bar) {
 		this.bar = bar;

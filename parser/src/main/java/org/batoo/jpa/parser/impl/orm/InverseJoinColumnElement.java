@@ -26,7 +26,7 @@ import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
  * Element for <code>inverse-join-column</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class InverseJoinColumnElement extends BaseColumnElement implements JoinColumnMetadata {
 
@@ -38,7 +38,7 @@ public class InverseJoinColumnElement extends BaseColumnElement implements JoinC
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public InverseJoinColumnElement(ParentElement parent, Map<String, String> attributes) {

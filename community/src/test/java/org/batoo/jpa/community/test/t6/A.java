@@ -24,7 +24,7 @@ import javax.persistence.Id;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class A implements I<String> {
@@ -45,7 +45,7 @@ public class A implements I<String> {
 	 * @param id
 	 *            the id to set
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setId(String id) {
 		this.id = id;

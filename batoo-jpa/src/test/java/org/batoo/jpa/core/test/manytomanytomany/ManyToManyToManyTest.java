@@ -28,14 +28,14 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class ManyToManyToManyTest extends BaseCoreTest {
 
 	/**
 	 * Tests to persist {@link ManyToMany} relations.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testPersist() {
@@ -69,7 +69,7 @@ public class ManyToManyToManyTest extends BaseCoreTest {
 	/**
 	 * Tests to persist {@link ManyToMany} relations and find with inverse.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testPersistInverse() {

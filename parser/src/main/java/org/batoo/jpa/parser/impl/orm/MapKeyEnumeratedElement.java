@@ -26,7 +26,7 @@ import javax.persistence.EnumType;
  * Element for <code>enumerated</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class MapKeyEnumeratedElement extends ChildElement {
 
@@ -38,7 +38,7 @@ public class MapKeyEnumeratedElement extends ChildElement {
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public MapKeyEnumeratedElement(ParentElement parent, Map<String, String> attributes) {
@@ -59,7 +59,7 @@ public class MapKeyEnumeratedElement extends ChildElement {
 	 * 
 	 * @return the enumType
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public EnumType getEnumType() {

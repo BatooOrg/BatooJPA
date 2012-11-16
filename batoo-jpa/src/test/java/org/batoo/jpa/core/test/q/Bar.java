@@ -32,7 +32,7 @@ import com.google.common.collect.Sets;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Bar {
@@ -46,7 +46,7 @@ public class Bar {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Bar() {
 		super();
@@ -57,7 +57,7 @@ public class Bar {
 	 * 
 	 * @return the foos of the Bar
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Set<BaseFoo> getFoos() {
 		return this.foos;
@@ -68,7 +68,7 @@ public class Bar {
 	 * 
 	 * @return the id of the Bar
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;

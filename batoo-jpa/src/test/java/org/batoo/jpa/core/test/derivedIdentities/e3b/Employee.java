@@ -24,7 +24,7 @@ import javax.persistence.Entity;
 /**
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Employee {
@@ -34,7 +34,7 @@ public class Employee {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Employee() {
 		super();
@@ -44,7 +44,7 @@ public class Employee {
 	 * @param empId
 	 *            the employee id
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Employee(EmployeeId empId) {
 		super();
@@ -83,7 +83,7 @@ public class Employee {
 	 * 
 	 * @return the empId
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public EmployeeId getEmpId() {
 		return this.empId;
@@ -106,7 +106,7 @@ public class Employee {
 	 * @param empId
 	 *            the empId to set
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setEmpId(EmployeeId empId) {
 		this.empId = empId;

@@ -33,7 +33,7 @@ import com.google.common.collect.Lists;
  * Implementation of {@link TableGeneratorMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class TableGeneratorMetadataImpl implements TableGeneratorMetadata {
 
@@ -55,7 +55,7 @@ public class TableGeneratorMetadataImpl implements TableGeneratorMetadata {
 	 * @param annotation
 	 *            the annotation
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public TableGeneratorMetadataImpl(AbstractLocator locator, TableGenerator annotation) {

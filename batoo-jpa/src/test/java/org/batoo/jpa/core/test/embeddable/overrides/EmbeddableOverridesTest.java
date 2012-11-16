@@ -33,7 +33,7 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class EmbeddableOverridesTest extends BaseCoreTest {
 
@@ -57,7 +57,7 @@ public class EmbeddableOverridesTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#find(Class, Object)}
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testFind() {
@@ -83,7 +83,7 @@ public class EmbeddableOverridesTest extends BaseCoreTest {
 	 * @throws SQLException
 	 *             thrown if SQL fails
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testPersist() throws SQLException {

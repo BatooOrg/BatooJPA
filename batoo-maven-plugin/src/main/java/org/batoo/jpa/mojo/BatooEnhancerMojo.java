@@ -43,7 +43,7 @@ import org.codehaus.plexus.util.FileUtils;
  * @requiresDependencyResolution compile
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class BatooEnhancerMojo extends AbstractMojo {
@@ -203,7 +203,7 @@ public class BatooEnhancerMojo extends AbstractMojo {
 	 * 
 	 * @return true if the execution should be skipped, flase otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private boolean skipMojo() {
 		if (this.skip) {

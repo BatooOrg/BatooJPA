@@ -52,7 +52,7 @@ import org.batoo.jpa.core.impl.manager.OperationTookLongTimeWarning;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class PreparedStatementProxy implements PreparedStatement {
 
@@ -60,7 +60,7 @@ public class PreparedStatementProxy implements PreparedStatement {
 	 * The configuration type indicating how sql printing should be.
 	 * 
 	 * @author hceylan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public static enum SqlLoggingType {
 		/**
@@ -105,7 +105,7 @@ public class PreparedStatementProxy implements PreparedStatement {
 	 * @param sqlLoggingType
 	 *            the type of the sql logging
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public PreparedStatementProxy(String sql, PreparedStatement statement, long slowSqlThreshold, SqlLoggingType sqlLoggingType) {
 		super();
@@ -629,7 +629,7 @@ public class PreparedStatementProxy implements PreparedStatement {
 	 * 
 	 * @return self
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public PreparedStatement reset() {
 		this.debug = PreparedStatementProxy.LOG.isDebugEnabled();

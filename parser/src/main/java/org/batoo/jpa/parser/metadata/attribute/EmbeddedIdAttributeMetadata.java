@@ -26,7 +26,7 @@ import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
  * The definition of the embedded ids.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface EmbeddedIdAttributeMetadata extends AttributeMetadata {
 
@@ -35,7 +35,7 @@ public interface EmbeddedIdAttributeMetadata extends AttributeMetadata {
 	 * 
 	 * @return the attribute overrides of the embedded ids
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<AttributeOverrideMetadata> getAttributeOverrides();

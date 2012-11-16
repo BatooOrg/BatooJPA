@@ -24,7 +24,7 @@ import java.util.Arrays;
  * Cache reference for query result lists.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ResultListReference {
 
@@ -37,7 +37,7 @@ public class ResultListReference {
 	 * @param parameters
 	 *            the parameters
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ResultListReference(String sql, Object[] parameters) {
 		super();

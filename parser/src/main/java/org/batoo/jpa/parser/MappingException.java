@@ -32,7 +32,7 @@ import com.google.common.collect.Collections2;
  * Thrown when ORM XML or annotations' parsing encountered an error.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class MappingException extends RuntimeException {
 
@@ -58,7 +58,7 @@ public class MappingException extends RuntimeException {
 	 * @param locators
 	 *            the locators
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public MappingException(String message, AbstractLocator... locators) {
@@ -73,7 +73,7 @@ public class MappingException extends RuntimeException {
 	 * @param locators
 	 *            the locators
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public MappingException(String message, Throwable cause, AbstractLocator... locators) {

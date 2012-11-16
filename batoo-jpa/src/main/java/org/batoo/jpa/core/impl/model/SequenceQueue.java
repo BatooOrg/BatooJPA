@@ -29,7 +29,7 @@ import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
  * A Queue that tops up the queue by allocation size sequences when its capacity drops to 1 / 2 of allocation size.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class SequenceQueue extends IdQueue {
 
@@ -50,7 +50,7 @@ public class SequenceQueue extends IdQueue {
 	 * @param allocationSize
 	 *            the allocations size
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public SequenceQueue(JdbcAdaptor jdbcAdaptor, DataSource datasource, ExecutorService idExecuter, String sequenceName, int allocationSize) {
 		super(idExecuter, sequenceName, allocationSize);

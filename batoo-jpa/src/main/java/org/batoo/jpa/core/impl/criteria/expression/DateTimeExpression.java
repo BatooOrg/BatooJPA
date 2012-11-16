@@ -35,7 +35,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class DateTimeExpression extends AbstractExpression<Integer> {
 
@@ -49,7 +49,7 @@ public class DateTimeExpression extends AbstractExpression<Integer> {
 	 * @param x
 	 *            the first parameter
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public DateTimeExpression(DateTimeFunctionType type, Expression<?> x) {
 		super(Integer.class);

@@ -57,7 +57,7 @@ import com.google.common.collect.Sets;
  *            The represented entity or mapped superclass type.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> implements IdentifiableType<X> {
 
@@ -89,7 +89,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * @param metadata
 	 *            the metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public IdentifiableTypeImpl(MetamodelImpl metamodel, IdentifiableTypeImpl<? super X> supertype, Class<X> javaType, IdentifiableTypeMetadata metadata) {
 		super(metamodel, javaType, metadata);
@@ -216,7 +216,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * @param metadata
 	 *            the metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void addIdAttributes(ManagedTypeMetadata metadata) {
@@ -258,7 +258,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * @param self
 	 *            if the object belongs to this type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void fireCallbacks(boolean self, Object instance, EntityListenerType type) {
 		if (!this.callbackManager.excludeDefaultListeners() && self) {
@@ -277,7 +277,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * 
 	 * @return the callback availability
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public CallbackAvailability getAvailability() {
 		if (this.callbackAvailability != null) {
@@ -298,7 +298,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * 
 	 * @return the callbackManager
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected CallbackManager getCallbackManager() {
 		return this.callbackManager;
@@ -365,7 +365,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * 
 	 * @return the id class of the identifiable type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Class<?> getIdClass() {
 		return this.idClass;
@@ -378,7 +378,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 *            the metadata
 	 * @return the id class of the entity if it is specified or <code>null</code>
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private Class<?> getIdClass(IdentifiableTypeMetadata metadata) {
 		final String idClass = metadata.getIdClass();
@@ -459,7 +459,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * 
 	 * @return the version attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public BasicAttribute<? super X, ?> getVersionAttribute() {
 		return this.versionAttribute;
@@ -470,7 +470,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * 
 	 * @return the type of the version attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public VersionType getVersionType() {
 		return this.versionType;
@@ -499,7 +499,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * 
 	 * @return a generated idClass instance based on the id class
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Object newCompositeId() {
 		try {
@@ -518,7 +518,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * @param forUpdates
 	 *            true if for updates or false for removals
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void updateAvailability(CallbackAvailability availability, Boolean forUpdates) {
 		availability.updateAvailability(this.getAvailability(), forUpdates);

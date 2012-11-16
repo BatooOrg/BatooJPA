@@ -29,7 +29,7 @@ import javax.persistence.TransactionRequiredException;
  * Implementation of {@link EntityTransaction}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class EntityTransactionImpl implements EntityTransaction {
 
@@ -44,7 +44,7 @@ public class EntityTransactionImpl implements EntityTransaction {
 	 * @param connection
 	 *            the active connection
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public EntityTransactionImpl(EntityManagerImpl entityManager, Connection connection) {
 		super();
@@ -56,7 +56,7 @@ public class EntityTransactionImpl implements EntityTransaction {
 	/**
 	 * 
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private void assertValid() {
 		if (this.rollbackOnly) {

@@ -24,7 +24,7 @@ import java.util.List;
  * The definition of association overrides.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface AssociationMetadata extends BindableMetadata {
 
@@ -33,7 +33,7 @@ public interface AssociationMetadata extends BindableMetadata {
 	 * 
 	 * @return the list of join column definition
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<JoinColumnMetadata> getJoinColumns();
@@ -43,7 +43,7 @@ public interface AssociationMetadata extends BindableMetadata {
 	 * 
 	 * @return the join table definition
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	JoinTableMetadata getJoinTable();

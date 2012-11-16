@@ -55,7 +55,7 @@ import com.google.common.collect.Maps;
  * Implementation of {@link Metadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class MetadataImpl implements Metadata {
 
@@ -75,7 +75,7 @@ public class MetadataImpl implements Metadata {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public MetadataImpl() {
@@ -86,7 +86,7 @@ public class MetadataImpl implements Metadata {
 	 * @param classes
 	 *            the explicit classes obtained from the Persistence XML
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public MetadataImpl(List<String> classes) {
@@ -202,7 +202,7 @@ public class MetadataImpl implements Metadata {
 	 * @param metadata
 	 *            the metadata to merge
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public void merge(Metadata metadata) {
@@ -235,7 +235,7 @@ public class MetadataImpl implements Metadata {
 	 * @param classloader
 	 *            the class loader
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public void parse(final ClassLoader classloader) {
@@ -328,7 +328,7 @@ public class MetadataImpl implements Metadata {
 	 * @param puInfo
 	 *            the persistence unit info
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public void parse(PersistenceUnitInfo puInfo) {

@@ -26,7 +26,7 @@ import javax.persistence.Id;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Child3 {
@@ -38,7 +38,7 @@ public class Child3 {
 	private String value;
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Child3() {
 		super();
@@ -50,7 +50,7 @@ public class Child3 {
 	 * @param value
 	 *            the value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Child3(Parent parent, String value) {
 		super();
@@ -65,7 +65,7 @@ public class Child3 {
 	 * 
 	 * @return the id of the Child1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -76,7 +76,7 @@ public class Child3 {
 	 * 
 	 * @return the value of the Child1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getValue() {
 		return this.value;
@@ -88,7 +88,7 @@ public class Child3 {
 	 * @param value
 	 *            the value to set for Child1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setValue(String value) {
 		this.value = value;

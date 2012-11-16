@@ -30,7 +30,7 @@ import org.batoo.jpa.parser.metadata.attribute.ManyToOneAttributeMetadata;
  * Implementation of {@link ManyToOneAttributeMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ManyToOneAttributeMetadataImpl extends AssociationAttributeMetadataImpl implements ManyToOneAttributeMetadata {
 
@@ -44,7 +44,7 @@ public class ManyToOneAttributeMetadataImpl extends AssociationAttributeMetadata
 	 * @param metadata
 	 *            the metadata definition of the one-to-one attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public ManyToOneAttributeMetadataImpl(Member member, ManyToOneAttributeMetadata metadata) {
@@ -65,7 +65,7 @@ public class ManyToOneAttributeMetadataImpl extends AssociationAttributeMetadata
 	 * @param parsed
 	 *            set of annotations parsed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public ManyToOneAttributeMetadataImpl(Member member, String name, ManyToOne manyToOne, Set<Class<? extends Annotation>> parsed) {

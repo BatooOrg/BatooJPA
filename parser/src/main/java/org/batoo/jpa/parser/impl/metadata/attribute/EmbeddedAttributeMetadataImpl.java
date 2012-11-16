@@ -42,7 +42,7 @@ import com.google.common.collect.Lists;
  * The implementation of the {@link EmbeddedAttributeMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class EmbeddedAttributeMetadataImpl extends AttributeMetadataImpl implements EmbeddedAttributeMetadata {
 
@@ -55,7 +55,7 @@ public class EmbeddedAttributeMetadataImpl extends AttributeMetadataImpl impleme
 	 * @param metadata
 	 *            the metadata definition of the attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public EmbeddedAttributeMetadataImpl(Member member, EmbeddedAttributeMetadata metadata) {
@@ -73,7 +73,7 @@ public class EmbeddedAttributeMetadataImpl extends AttributeMetadataImpl impleme
 	 * @param parsed
 	 *            set of annotations parsed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public EmbeddedAttributeMetadataImpl(Member member, String name, Set<Class<? extends Annotation>> parsed) {

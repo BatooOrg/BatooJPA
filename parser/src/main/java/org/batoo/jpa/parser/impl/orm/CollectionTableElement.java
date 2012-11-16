@@ -30,7 +30,7 @@ import com.google.common.collect.Lists;
  * Element for <code>collection-table</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class CollectionTableElement extends TableElement implements JoinTableMetadata {
 
@@ -43,7 +43,7 @@ public class CollectionTableElement extends TableElement implements JoinTableMet
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public CollectionTableElement(ParentElement parent, Map<String, String> attributes) {

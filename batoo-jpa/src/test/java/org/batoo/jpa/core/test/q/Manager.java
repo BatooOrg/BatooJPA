@@ -33,7 +33,7 @@ import com.google.common.collect.Sets;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Manager {
@@ -54,7 +54,7 @@ public class Manager {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Manager() {
 		super();
@@ -68,7 +68,7 @@ public class Manager {
 	 * @param salary
 	 *            the salary
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Manager(String name, Department department, double salary) {
 		super();
@@ -83,7 +83,7 @@ public class Manager {
 	 * 
 	 * @return the department of the Manager
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Department getDepartment() {
 		return this.department;
@@ -94,7 +94,7 @@ public class Manager {
 	 * 
 	 * @return the employees of the Manager
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Set<Employee> getEmployees() {
 		return this.employees;
@@ -105,7 +105,7 @@ public class Manager {
 	 * 
 	 * @return the id of the Manager
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -116,7 +116,7 @@ public class Manager {
 	 * 
 	 * @return the name of the Manager
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		return this.name;
@@ -127,7 +127,7 @@ public class Manager {
 	 * 
 	 * @return the salary of the Manager
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public double getSalary() {
 		return this.salary;
@@ -139,7 +139,7 @@ public class Manager {
 	 * @param department
 	 *            the department to set for Manager
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setDepartment(Department department) {
 		this.department = department;
@@ -151,7 +151,7 @@ public class Manager {
 	 * @param name
 	 *            the name to set for Manager
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -163,7 +163,7 @@ public class Manager {
 	 * @param salary
 	 *            the salary to set for Manager
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setSalary(double salary) {
 		this.salary = salary;

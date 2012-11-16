@@ -11,7 +11,7 @@ import javax.persistence.ManyToMany;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 @DiscriminatorValue("STU")
@@ -24,7 +24,7 @@ public class Student extends Person {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Student() {
 		super();
@@ -36,7 +36,7 @@ public class Student extends Person {
 	 * @param lastName
 	 *            the last name
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Student(String firstName, String lastName) {
 		super(firstName, lastName);
@@ -47,7 +47,7 @@ public class Student extends Person {
 	 * 
 	 * @return the enrolled of the Student
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public List<Course> getEnrolled() {
 		return this.enrolled;
@@ -58,7 +58,7 @@ public class Student extends Person {
 	 * 
 	 * @return the gpa of the Student
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Float getGpa() {
 		return this.gpa;
@@ -70,7 +70,7 @@ public class Student extends Person {
 	 * @param gpa
 	 *            the gpa to set for Student
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setGpa(Float gpa) {
 		this.gpa = gpa;

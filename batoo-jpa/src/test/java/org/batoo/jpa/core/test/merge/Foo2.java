@@ -27,7 +27,7 @@ import javax.persistence.OneToOne;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Foo2 {
@@ -43,7 +43,7 @@ public class Foo2 {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Foo2() {
 		super();
@@ -57,7 +57,7 @@ public class Foo2 {
 	 * @param foo1
 	 *            the foo1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Foo2(Integer id, String value, Foo1 foo1) {
 		super();
@@ -76,7 +76,7 @@ public class Foo2 {
 	 * 
 	 * @return the foo1 of the Foo2
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Foo1 getFoo1() {
 		return this.foo1;
@@ -87,7 +87,7 @@ public class Foo2 {
 	 * 
 	 * @return the id of the Foo1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -98,7 +98,7 @@ public class Foo2 {
 	 * 
 	 * @return the value of the Foo1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getValue() {
 		return this.value;
@@ -110,7 +110,7 @@ public class Foo2 {
 	 * @param foo1
 	 *            the foo1 to set for Foo2
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setFoo1(Foo1 foo1) {
 		this.foo1 = foo1;
@@ -122,7 +122,7 @@ public class Foo2 {
 	 * @param value
 	 *            the value to set for Foo1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setValue(String value) {
 		this.value = value;

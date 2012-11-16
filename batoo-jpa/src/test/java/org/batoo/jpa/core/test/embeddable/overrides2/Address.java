@@ -24,7 +24,7 @@ import javax.persistence.Embedded;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Embeddable
 public class Address {
@@ -38,7 +38,7 @@ public class Address {
 	 * Returns the city.
 	 * 
 	 * @return the city
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getCity() {
 		return this.city;
@@ -48,7 +48,7 @@ public class Address {
 	 * Returns the zipcode.
 	 * 
 	 * @return the zipcode
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Zipcode getZipcode() {
 		return this.zipcode;
@@ -59,7 +59,7 @@ public class Address {
 	 * 
 	 * @param city
 	 *            the city to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setCity(String city) {
 		this.city = city;
@@ -70,7 +70,7 @@ public class Address {
 	 * 
 	 * @param zipcode
 	 *            the zipcode to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setZipcode(Zipcode zipcode) {
 		this.zipcode = zipcode;

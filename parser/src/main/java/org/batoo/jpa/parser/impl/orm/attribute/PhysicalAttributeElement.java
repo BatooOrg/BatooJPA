@@ -33,7 +33,7 @@ import org.batoo.jpa.parser.metadata.attribute.PhysicalAttributeMetadata;
  * Common implementation of singular attribute element factories.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class PhysicalAttributeElement extends AttributeElement implements PhysicalAttributeMetadata {
 
@@ -48,7 +48,7 @@ public abstract class PhysicalAttributeElement extends AttributeElement implemen
 	 * @param expectedChildElements
 	 *            the name of the elements expected
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public PhysicalAttributeElement(ParentElement parent, Map<String, String> attributes, String... expectedChildElements) {

@@ -27,7 +27,7 @@ import org.batoo.jpa.parser.metadata.UniqueConstraintMetadata;
  * Implementation of {@link UniqueConstraintMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class UniqueConstraintMetadataImpl implements UniqueConstraintMetadata {
 
@@ -41,7 +41,7 @@ public class UniqueConstraintMetadataImpl implements UniqueConstraintMetadata {
 	 * @param annotation
 	 *            the annotation
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public UniqueConstraintMetadataImpl(AbstractLocator locator, UniqueConstraint annotation) {

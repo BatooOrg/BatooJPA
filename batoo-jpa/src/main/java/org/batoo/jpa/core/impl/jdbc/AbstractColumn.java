@@ -48,7 +48,7 @@ import org.batoo.jpa.parser.impl.AbstractLocator;
  * Abstract base implementation for columns
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class AbstractColumn {
 
@@ -69,7 +69,7 @@ public abstract class AbstractColumn {
 	 * @param id
 	 *            if the column is id column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public AbstractColumn(AbstractLocator locator, boolean id) {
 		super();
@@ -99,7 +99,7 @@ public abstract class AbstractColumn {
 	 * @param locator
 	 *            the locator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public AbstractColumn(Class<?> javaType, IdType idType, TemporalType temporalType, EnumType enumType, boolean lob, AbstractLocator locator) {
@@ -147,7 +147,7 @@ public abstract class AbstractColumn {
 	 *            the raw value
 	 * @return the converted value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Object convertValue(Connection connection, final Object value) {
 		if (value == null) {
@@ -242,7 +242,7 @@ public abstract class AbstractColumn {
 	 *            the raw value
 	 * @return the converted value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected Object convertValueForSet(Object value) {
 		if (value == null) {
@@ -273,7 +273,7 @@ public abstract class AbstractColumn {
 	 * 
 	 * @return the static definition of the column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract String getColumnDefinition();
 
@@ -282,7 +282,7 @@ public abstract class AbstractColumn {
 	 * 
 	 * @return the idType of the column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public IdType getIdType() {
 		return this.idType;
@@ -293,7 +293,7 @@ public abstract class AbstractColumn {
 	 * 
 	 * @return the length of the column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract int getLength();
 
@@ -302,7 +302,7 @@ public abstract class AbstractColumn {
 	 * 
 	 * @return the locator of the column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public final AbstractLocator getLocator() {
 		return this.locator;
@@ -313,7 +313,7 @@ public abstract class AbstractColumn {
 	 * 
 	 * @return the mapping of the BasicColumn
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract Mapping<?, ?, ?> getMapping();
 
@@ -322,7 +322,7 @@ public abstract class AbstractColumn {
 	 * 
 	 * @return the name of the column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract String getName();
 
@@ -331,7 +331,7 @@ public abstract class AbstractColumn {
 	 * 
 	 * @return the precision of the column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract int getPrecision();
 
@@ -340,7 +340,7 @@ public abstract class AbstractColumn {
 	 * 
 	 * @return the scale of the column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract int getScale();
 
@@ -349,7 +349,7 @@ public abstract class AbstractColumn {
 	 * 
 	 * @return the SQL Type of the column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract int getSqlType();
 
@@ -358,7 +358,7 @@ public abstract class AbstractColumn {
 	 * 
 	 * @return the table
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract AbstractTable getTable();
 
@@ -367,7 +367,7 @@ public abstract class AbstractColumn {
 	 * 
 	 * @return the table name of the column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract String getTableName();
 
@@ -381,7 +381,7 @@ public abstract class AbstractColumn {
 	 * 
 	 * @return the value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract Object getValue(Connection connection, Object instance);
 
@@ -390,7 +390,7 @@ public abstract class AbstractColumn {
 	 * 
 	 * @return the insertable of the column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract boolean isInsertable();
 
@@ -399,7 +399,7 @@ public abstract class AbstractColumn {
 	 * 
 	 * @return true if the column is lob type, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean isLob() {
 		return this.lob;
@@ -410,7 +410,7 @@ public abstract class AbstractColumn {
 	 * 
 	 * @return the nullable of the column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract boolean isNullable();
 
@@ -419,7 +419,7 @@ public abstract class AbstractColumn {
 	 * 
 	 * @return true if the column is a primary key column false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean isPrimaryKey() {
 		return this.idType != null;
@@ -430,7 +430,7 @@ public abstract class AbstractColumn {
 	 * 
 	 * @return the unique of the column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract boolean isUnique();
 
@@ -439,7 +439,7 @@ public abstract class AbstractColumn {
 	 * 
 	 * @return the updatable of the column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract boolean isUpdatable();
 
@@ -521,7 +521,7 @@ public abstract class AbstractColumn {
 	 * 
 	 * Sets the column as id column.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setId() {
 		this.idType = IdType.MANUAL;
@@ -533,7 +533,7 @@ public abstract class AbstractColumn {
 	 * @param table
 	 *            the owning table
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract void setTable(AbstractTable table);
 
@@ -545,7 +545,7 @@ public abstract class AbstractColumn {
 	 * @param value
 	 *            the value to set
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract void setValue(Object instance, Object value);
 

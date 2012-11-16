@@ -22,7 +22,7 @@ package org.batoo.jpa.annotations;
  * Fetch Strategy Types for joins
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.0
  */
 public enum FetchStrategyType {
 

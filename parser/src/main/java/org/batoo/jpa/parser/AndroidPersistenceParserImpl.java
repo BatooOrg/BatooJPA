@@ -33,7 +33,7 @@ import com.google.common.collect.Maps;
  * The main entry point to parse the persistence units for Android platforms.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class AndroidPersistenceParserImpl implements PersistenceParser {
 
@@ -48,7 +48,7 @@ public class AndroidPersistenceParserImpl implements PersistenceParser {
 	 * @param classes
 	 *            the array of classes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public AndroidPersistenceParserImpl(Map<String, String> properties, String[] classes) {
@@ -73,7 +73,7 @@ public class AndroidPersistenceParserImpl implements PersistenceParser {
 	 * 
 	 * @return the classloader of the PersistenceParser
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	@Override
@@ -86,7 +86,7 @@ public class AndroidPersistenceParserImpl implements PersistenceParser {
 	 * 
 	 * @return the JTA datasource JNDI name
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	@Override
@@ -99,7 +99,7 @@ public class AndroidPersistenceParserImpl implements PersistenceParser {
 	 * 
 	 * @return the metadata of the parser
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	@Override
@@ -112,7 +112,7 @@ public class AndroidPersistenceParserImpl implements PersistenceParser {
 	 * 
 	 * @return the non-JTA datasource JNDI name
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	@Override
@@ -125,7 +125,7 @@ public class AndroidPersistenceParserImpl implements PersistenceParser {
 	 * 
 	 * @return the properties of the persistence unit
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	@Override
@@ -147,7 +147,7 @@ public class AndroidPersistenceParserImpl implements PersistenceParser {
 	 * 
 	 * @return the second-level cache mode that must be used by the provider for the persistence unit
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	@Override
@@ -162,7 +162,7 @@ public class AndroidPersistenceParserImpl implements PersistenceParser {
 	 * 
 	 * @return true if the persistence unit has validators, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	@Override

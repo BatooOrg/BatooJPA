@@ -29,7 +29,7 @@ import org.batoo.jpa.annotations.ColumnTransformer;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class FooWrite {
@@ -47,7 +47,7 @@ public class FooWrite {
 	 * 
 	 * @return the id of the Foo1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -58,7 +58,7 @@ public class FooWrite {
 	 * 
 	 * @return the value of the Foo1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getValue() {
 		return this.value;
@@ -70,7 +70,7 @@ public class FooWrite {
 	 * @param value
 	 *            the value to set for Foo1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setValue(String value) {
 		this.value = value;

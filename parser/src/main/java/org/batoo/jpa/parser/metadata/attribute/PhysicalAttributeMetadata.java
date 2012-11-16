@@ -26,7 +26,7 @@ import org.batoo.jpa.parser.metadata.ColumnMetadata;
  * The definition of the physical singular attributes.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface PhysicalAttributeMetadata extends AttributeMetadata {
 
@@ -35,7 +35,7 @@ public interface PhysicalAttributeMetadata extends AttributeMetadata {
 	 * 
 	 * @return the column definition of the singular attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	ColumnMetadata getColumn();
@@ -45,7 +45,7 @@ public interface PhysicalAttributeMetadata extends AttributeMetadata {
 	 * 
 	 * @return the temporal type of the singular attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	TemporalType getTemporalType();

@@ -48,7 +48,7 @@ import com.google.common.collect.Sets;
  * Annotated class locator for JBoss 7.x series.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class JBoss7AnnotatedClassLocator implements AnnotatedClassLocator {
 
@@ -74,7 +74,7 @@ public class JBoss7AnnotatedClassLocator implements AnnotatedClassLocator {
 	 * 
 	 * @return the singleton {@link JBoss7AnnotatedClassLocator}
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public static AnnotatedClassLocator getInstance() {
@@ -83,7 +83,7 @@ public class JBoss7AnnotatedClassLocator implements AnnotatedClassLocator {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private JBoss7AnnotatedClassLocator() {

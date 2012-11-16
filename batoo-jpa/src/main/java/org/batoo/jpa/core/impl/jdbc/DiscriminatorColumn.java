@@ -31,7 +31,7 @@ import org.batoo.jpa.parser.metadata.DiscriminatorColumnMetadata;
  * Column implementation for discriminator columns.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class DiscriminatorColumn extends AbstractColumn {
 
@@ -39,7 +39,7 @@ public class DiscriminatorColumn extends AbstractColumn {
 	 * @param metadata
 	 * @return
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private static Class<?> getJavaType(DiscriminatorColumnMetadata metadata) {
 		if (metadata == null) {
@@ -69,7 +69,7 @@ public class DiscriminatorColumn extends AbstractColumn {
 	 * @param metadata
 	 *            the metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public DiscriminatorColumn(EntityTypeImpl<?> entity, DiscriminatorColumnMetadata metadata) {
 		super(DiscriminatorColumn.getJavaType(metadata), null, null, null, false, metadata != null ? metadata.getLocator() : null);

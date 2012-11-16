@@ -28,7 +28,7 @@ import org.batoo.jpa.parser.metadata.UniqueConstraintMetadata;
  * Implementation of {@link UniqueConstraintMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class PrimaryKeyJoinColumnMetadataImpl implements PrimaryKeyJoinColumnMetadata {
 
@@ -43,7 +43,7 @@ public class PrimaryKeyJoinColumnMetadataImpl implements PrimaryKeyJoinColumnMet
 	 * @param annotation
 	 *            the annotation
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public PrimaryKeyJoinColumnMetadataImpl(AbstractLocator locator, PrimaryKeyJoinColumn annotation) {

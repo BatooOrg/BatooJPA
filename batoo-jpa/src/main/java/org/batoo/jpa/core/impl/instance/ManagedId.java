@@ -27,7 +27,7 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
  *            the type of the id
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ManagedId<X> {
 
@@ -44,7 +44,7 @@ public class ManagedId<X> {
 	 * @param type
 	 *            the type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ManagedId(Object id, EntityTypeImpl<X> type) {
 		super();
@@ -84,7 +84,7 @@ public class ManagedId<X> {
 	 * 
 	 * @return the id
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Object getId() {
 		return this.id;
@@ -95,7 +95,7 @@ public class ManagedId<X> {
 	 * 
 	 * @return the type of the managed id
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public EntityTypeImpl<? super X> getType() {
 		return this.type;

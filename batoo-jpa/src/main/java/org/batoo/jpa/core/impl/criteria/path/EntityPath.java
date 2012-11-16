@@ -57,7 +57,7 @@ import com.google.common.collect.Lists;
  *            the target type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class EntityPath<Z, X> extends ParentPath<Z, X> implements Joinable {
 
@@ -75,7 +75,7 @@ public class EntityPath<Z, X> extends ParentPath<Z, X> implements Joinable {
 	 * @param entity
 	 *            the entity
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public EntityPath(ParentPath<?, Z> parent, SingularAssociationMapping<?, Z> mapping, EntityTypeImpl<X> entity) {

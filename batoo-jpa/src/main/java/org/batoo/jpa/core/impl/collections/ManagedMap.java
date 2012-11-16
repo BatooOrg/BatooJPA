@@ -49,7 +49,7 @@ import com.google.common.collect.Maps;
  *            The value type of the represented map
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, V> {
 
@@ -60,7 +60,7 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ManagedMap() {
 		super();
@@ -76,7 +76,7 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	 * @param lazy
 	 *            if the collection is lazy
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ManagedMap(PluralMapping<?, ?, V> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
 		super(mapping, managedInstance);
@@ -96,7 +96,7 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	 * @param values
 	 *            the initial values
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ManagedMap(PluralMapping<?, ?, V> mapping, ManagedInstance<?> managedInstance, Map<? extends K, ? extends V> values) {
 		this(mapping, managedInstance, false);

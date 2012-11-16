@@ -33,7 +33,7 @@ import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
  *            the type of the expression
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class InPredicate<T> extends PredicateImpl implements In<T> {
 
@@ -44,7 +44,7 @@ public class InPredicate<T> extends PredicateImpl implements In<T> {
 	 * @param inner
 	 *            the inner expression
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")

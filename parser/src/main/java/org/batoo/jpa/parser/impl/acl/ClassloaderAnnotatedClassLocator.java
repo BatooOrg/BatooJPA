@@ -37,7 +37,7 @@ import com.google.common.collect.Sets;
  * {@link AnnotatedClassLocator} implementation for context classloader.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ClassloaderAnnotatedClassLocator extends BaseAnnotatedClassLocator {
 
@@ -50,7 +50,7 @@ public class ClassloaderAnnotatedClassLocator extends BaseAnnotatedClassLocator 
 	 * 
 	 * @return the singleton {@link ClassloaderAnnotatedClassLocator}
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public static ClassloaderAnnotatedClassLocator getInstance() {
@@ -59,7 +59,7 @@ public class ClassloaderAnnotatedClassLocator extends BaseAnnotatedClassLocator 
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private ClassloaderAnnotatedClassLocator() {

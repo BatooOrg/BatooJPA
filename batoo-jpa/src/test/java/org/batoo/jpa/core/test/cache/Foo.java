@@ -33,7 +33,7 @@ import com.google.common.collect.Lists;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 @Cacheable
@@ -53,7 +53,7 @@ public class Foo {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Foo() {
 		super();
@@ -63,7 +63,7 @@ public class Foo {
 	 * @param value
 	 *            the value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Foo(String value) {
 		super();
@@ -75,7 +75,7 @@ public class Foo {
 	 * 
 	 * @return the bars of the Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public List<Bar> getBars() {
 		return this.bars;
@@ -86,7 +86,7 @@ public class Foo {
 	 * 
 	 * @return the bars2 of the Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public List<Bar2> getBars2() {
 		return this.bars2;
@@ -97,7 +97,7 @@ public class Foo {
 	 * 
 	 * @return the id of the Foo1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -108,7 +108,7 @@ public class Foo {
 	 * 
 	 * @return the value of the Foo1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getValue() {
 		return this.value;
@@ -120,7 +120,7 @@ public class Foo {
 	 * @param value
 	 *            the value to set for Foo1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setValue(String value) {
 		this.value = value;

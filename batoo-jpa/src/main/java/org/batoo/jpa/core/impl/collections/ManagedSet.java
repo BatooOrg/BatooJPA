@@ -43,7 +43,7 @@ import com.google.common.collect.Sets;
  *            The type the represented collection belongs to
  * @param <E>
  *            The element type of the represented collection
- * @since $version
+ * @since 2.0.0
  */
 public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 
@@ -54,7 +54,7 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ManagedSet() {
 		super();
@@ -70,7 +70,7 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 * @param lazy
 	 *            if the collection is lazy
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ManagedSet(PluralMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
 		super(mapping, managedInstance);
@@ -90,7 +90,7 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 * @param values
 	 *            the initial values
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ManagedSet(PluralMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
 		super(mapping, managedInstance);

@@ -24,7 +24,7 @@ import java.util.Map;
  * Element for <code>query</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class QueryElement extends ChildElement {
 
@@ -36,7 +36,7 @@ public class QueryElement extends ChildElement {
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public QueryElement(ParentElement parent, Map<String, String> attributes) {
@@ -57,7 +57,7 @@ public class QueryElement extends ChildElement {
 	 * 
 	 * @return the query
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public String getQuery() {

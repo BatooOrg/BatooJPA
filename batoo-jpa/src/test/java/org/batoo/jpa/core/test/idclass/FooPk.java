@@ -20,7 +20,7 @@ package org.batoo.jpa.core.test.idclass;
 
 /**
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class FooPk {
 
@@ -28,7 +28,7 @@ public class FooPk {
 	private Integer intKey;
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public FooPk() {
 		super();
@@ -40,7 +40,7 @@ public class FooPk {
 	 * @param strKey
 	 *            the string key
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public FooPk(Integer intKey, String strKey) {
 		super();
@@ -88,7 +88,7 @@ public class FooPk {
 	 * Returns the intKey.
 	 * 
 	 * @return the intKey
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getIntKey() {
 		return this.intKey;
@@ -98,7 +98,7 @@ public class FooPk {
 	 * Returns the strKey.
 	 * 
 	 * @return the strKey
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getStrKey() {
 		return this.strKey;
@@ -122,7 +122,7 @@ public class FooPk {
 	 * 
 	 * @param intKey
 	 *            the intKey to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setIntKey(Integer intKey) {
 		this.intKey = intKey;
@@ -133,7 +133,7 @@ public class FooPk {
 	 * 
 	 * @param strKey
 	 *            the strKey to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setStrKey(String strKey) {
 		this.strKey = strKey;

@@ -34,7 +34,7 @@ import org.batoo.jpa.core.impl.model.type.TypeImpl;
  *            the type of the constant expression
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class SimpleConstantExpression<T> extends AbstractExpression<T> {
 
@@ -46,7 +46,7 @@ public class SimpleConstantExpression<T> extends AbstractExpression<T> {
 	 * @param value
 	 *            the value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public SimpleConstantExpression(TypeImpl<T> type, T value) {

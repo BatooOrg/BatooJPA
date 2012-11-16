@@ -23,7 +23,7 @@ import javax.persistence.Embeddable;
 /**
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.0
  */
 @Embeddable
 public class DependentId {
@@ -33,7 +33,7 @@ public class DependentId {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public DependentId() {
 		super();
@@ -45,7 +45,7 @@ public class DependentId {
 	 *            the name
 	 * @param empPk
 	 *            the employee
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public DependentId(String name, Long empPk) {
 		super();
@@ -94,7 +94,7 @@ public class DependentId {
 	 * 
 	 * @return the empPk of the DependentId
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Long getEmpPk() {
 		return this.empPk;
@@ -104,7 +104,7 @@ public class DependentId {
 	 * 
 	 * @return the name
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		return this.name;
@@ -129,7 +129,7 @@ public class DependentId {
 	 * @param empPk
 	 *            the empPk to set for DependentId
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setEmpPk(Long empPk) {
 		this.empPk = empPk;
@@ -140,7 +140,7 @@ public class DependentId {
 	 * @param name
 	 *            the name to set
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setName(String name) {
 		this.name = name;

@@ -28,7 +28,7 @@ import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface RootMapping<X> {
 
@@ -39,7 +39,7 @@ public interface RootMapping<X> {
 	 *            the name of the child mapping
 	 * @return the mapping or null
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	Mapping<? super X, ?, ?> getChild(String name);
 
@@ -50,7 +50,7 @@ public interface RootMapping<X> {
 	 *            the path of the mapping
 	 * @return the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	Mapping<?, ?, ?> getMapping(String path);
 
@@ -59,7 +59,7 @@ public interface RootMapping<X> {
 	 * 
 	 * @return the type of the root mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	ManagedTypeImpl<?> getType();
 
@@ -68,7 +68,7 @@ public interface RootMapping<X> {
 	 * 
 	 * @return true if the root is an entity, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	boolean isEntity();
 }

@@ -31,7 +31,7 @@ import com.google.common.collect.Lists;
  * Element for <code>association-override</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class AssociationOverrideElement extends ParentElement implements AssociationMetadata {
 
@@ -45,7 +45,7 @@ public class AssociationOverrideElement extends ParentElement implements Associa
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public AssociationOverrideElement(ParentElement parent, Map<String, String> attributes) {

@@ -44,7 +44,7 @@ import com.google.common.collect.Sets;
  * Implementation of {@link ManagedTypeMetadatImpl}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
 
@@ -62,7 +62,7 @@ public abstract class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
 	 * @param parentAccessType
 	 *            the parent access type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public ManagedTypeMetadatImpl(Class<?> clazz, ManagedTypeMetadata metadata, AccessType parentAccessType) {
@@ -100,7 +100,7 @@ public abstract class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
 	 *            the parent access type
 	 * @return the access type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private AccessType getAccessType(ManagedTypeMetadata metadata, AccessType parentAccessType) {
@@ -121,7 +121,7 @@ public abstract class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
 	 * 
 	 * @return the set of annotations parsed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	protected Set<Class<? extends Annotation>> getAnnotationsParsed() {
@@ -151,7 +151,7 @@ public abstract class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
 	 * 
 	 * @return the clazz of the managed type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public Class<?> getClazz() {
@@ -174,7 +174,7 @@ public abstract class ManagedTypeMetadatImpl implements ManagedTypeMetadata {
 	 *            the parent access type
 	 * @return the inferred access type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private AccessType inferAccessType(AccessType parentAccessType) {

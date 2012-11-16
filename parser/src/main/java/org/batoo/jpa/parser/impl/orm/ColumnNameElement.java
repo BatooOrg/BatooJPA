@@ -24,7 +24,7 @@ import java.util.Map;
  * Element for <code>column</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ColumnNameElement extends ChildElement {
 
@@ -36,7 +36,7 @@ public class ColumnNameElement extends ChildElement {
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public ColumnNameElement(ParentElement parent, Map<String, String> attributes) {
@@ -57,7 +57,7 @@ public class ColumnNameElement extends ChildElement {
 	 * 
 	 * @return the name
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public String getName() {

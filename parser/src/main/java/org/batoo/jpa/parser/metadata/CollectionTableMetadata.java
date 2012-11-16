@@ -24,7 +24,7 @@ import java.util.List;
  * The definition for collection tables.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface CollectionTableMetadata extends TableMetadata {
 
@@ -33,7 +33,7 @@ public interface CollectionTableMetadata extends TableMetadata {
 	 * 
 	 * @return the list of join columns of the table.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<JoinColumnMetadata> getJoinColumns();

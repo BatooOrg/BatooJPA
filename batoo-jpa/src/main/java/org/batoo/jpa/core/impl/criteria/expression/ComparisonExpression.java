@@ -39,7 +39,7 @@ import com.google.common.collect.Lists;
  * Expression for comparisons.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ComparisonExpression extends AbstractExpression<Boolean> {
 
@@ -47,7 +47,7 @@ public class ComparisonExpression extends AbstractExpression<Boolean> {
 	 * The comparison types
 	 * 
 	 * @author hceylan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("javadoc")
 	public enum Comparison {
@@ -87,7 +87,7 @@ public class ComparisonExpression extends AbstractExpression<Boolean> {
 	 * @param y
 	 *            the right side expression
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ComparisonExpression(Comparison comparison, Expression<?> x, Expression<?> y) {
 		this(comparison, x, y, null);
@@ -103,7 +103,7 @@ public class ComparisonExpression extends AbstractExpression<Boolean> {
 	 * @param z
 	 *            the second right side expression
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ComparisonExpression(Comparison comparison, Expression<?> x, Expression<?> y, Expression<?> z) {
 		super(Boolean.class);

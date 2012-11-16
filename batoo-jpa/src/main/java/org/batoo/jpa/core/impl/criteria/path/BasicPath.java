@@ -42,7 +42,7 @@ import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
  *            the type referenced by the path
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class BasicPath<X> extends AbstractPath<X> {
 
@@ -55,7 +55,7 @@ public class BasicPath<X> extends AbstractPath<X> {
 	 * @param mapping
 	 *            the physical mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public BasicPath(ParentPath<?, ?> parent, BasicMapping<?, X> mapping) {
 		super(parent, mapping.getJavaType());

@@ -30,7 +30,7 @@ import org.batoo.jpa.parser.metadata.type.MappedSuperclassMetadata;
  *            The represented entity type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class MappedSuperclassTypeImpl<X> extends IdentifiableTypeImpl<X> implements MappedSuperclassType<X> {
 
@@ -44,7 +44,7 @@ public class MappedSuperclassTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 	 * @param metadata
 	 *            the metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public MappedSuperclassTypeImpl(MetamodelImpl metamodel, MappedSuperclassTypeImpl<? super X> parent, Class<X> javaType, MappedSuperclassMetadata metadata) {
 

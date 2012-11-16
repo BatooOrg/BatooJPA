@@ -38,7 +38,7 @@ import org.batoo.jpa.core.impl.jdbc.OrderColumn;
  *            the destination type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 
@@ -58,7 +58,7 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @throws SQLException
 	 *             thrown in case of an SQL error
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	void attach(Connection connection, ManagedInstance<?> instance, Joinable[] batch, int size) throws SQLException;
 
@@ -67,7 +67,7 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * 
 	 * @return true if merges are cascaded, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	boolean cascadesMerge();
 
@@ -85,7 +85,7 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @throws SQLException
 	 *             thrown in case of an SQL error
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	void detach(Connection connection, ManagedInstance<?> instance, Object key, Object child) throws SQLException;
 
@@ -99,7 +99,7 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @throws SQLException
 	 *             thrown in case of an SQL error
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	void detachAll(Connection connection, ManagedInstance<?> instance) throws SQLException;
 
@@ -109,7 +109,7 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @param instance
 	 *            the managed instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	void enhance(ManagedInstance<?> instance);
 
@@ -119,7 +119,7 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @param instance
 	 * @return the value of the instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	Object get(Object instance);
 
@@ -130,7 +130,7 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 *            the path
 	 * @return the child mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	Mapping<?, ?, ?> getMapping(String path);
 
@@ -139,7 +139,7 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * 
 	 * @return the order by of the association
 	 * 
-	 * @since $versionpublic RootMapping<?> getRoot()
+	 * @since 2.0.0public RootMapping<?> getRoot()
 	 */
 	String getOrderBy();
 
@@ -148,7 +148,7 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * 
 	 * @return the order column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	OrderColumn getOrderColumn();
 
@@ -157,7 +157,7 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * 
 	 * @return the root mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	RootMapping<?> getRoot();
 
@@ -167,7 +167,7 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @param instance
 	 *            the managed instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	void load(ManagedInstance<?> instance);
 
@@ -178,7 +178,7 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 *            the managed instance owning the collection
 	 * @return the loaded collection
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	Collection<? extends E> loadCollection(ManagedInstance<?> instance);
 
@@ -190,7 +190,7 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @param <K>
 	 *            the key type of the map
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	<K> Map<? extends K, ? extends E> loadMap(ManagedInstance<?> instance);
 
@@ -202,7 +202,7 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @param children
 	 *            the collection of children
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setCollection(ManagedInstance<?> instance, Collection<? extends E> children);
 
@@ -212,7 +212,7 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @param instance
 	 *            the managed instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	void setLazy(ManagedInstance<?> instance);
 
@@ -222,7 +222,7 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @param instance
 	 *            the owner instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	void sortList(Object instance);
 }

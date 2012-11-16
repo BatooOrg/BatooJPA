@@ -26,7 +26,7 @@ import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
  * The definition of the id attributes.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface IdAttributeMetadata extends PhysicalAttributeMetadata {
 
@@ -35,7 +35,7 @@ public interface IdAttributeMetadata extends PhysicalAttributeMetadata {
 	 * 
 	 * @return the value generation definition of the id attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	GeneratedValueMetadata getGeneratedValue();
@@ -45,7 +45,7 @@ public interface IdAttributeMetadata extends PhysicalAttributeMetadata {
 	 * 
 	 * @return the sequence generator definition of the id attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	SequenceGeneratorMetadata getSequenceGenerator();
@@ -55,7 +55,7 @@ public interface IdAttributeMetadata extends PhysicalAttributeMetadata {
 	 * 
 	 * @return the table generator definition of the id attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	TableGeneratorMetadata getTableGenerator();

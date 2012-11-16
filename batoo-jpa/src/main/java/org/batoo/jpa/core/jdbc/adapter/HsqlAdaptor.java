@@ -40,7 +40,7 @@ import com.google.common.base.Joiner;
  * JDBC Adapter for HSQLDB.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class HsqlAdaptor extends JdbcAdaptor {
 
@@ -48,7 +48,7 @@ public class HsqlAdaptor extends JdbcAdaptor {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public HsqlAdaptor() {
 		super();

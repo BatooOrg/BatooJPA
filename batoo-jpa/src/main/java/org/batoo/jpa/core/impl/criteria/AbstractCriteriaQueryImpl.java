@@ -65,7 +65,7 @@ import com.google.common.collect.Sets;
  *            the type of the result
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @SuppressWarnings("unchecked")
 public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> implements AbstractQuery<T> {
@@ -90,7 +90,7 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 	 * @param resultType
 	 *            the result type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public AbstractCriteriaQueryImpl(MetamodelImpl metamodel, Class<T> resultType) {
 		super(metamodel);
@@ -114,7 +114,7 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 	 * 
 	 * @return the selection
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected AbstractSelection<T> ensureSelection() {
 		if (this.selection == null) {
@@ -278,7 +278,7 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 	 * 
 	 * @return the restriction
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private String generateSqlRestriction() {
 		final String[] restrictions = new String[this.getRoots().size() + 1];
@@ -422,7 +422,7 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 	 * 
 	 * @return self
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public AbstractCriteriaQueryImpl<T> internal() {
 		this.internal = true;
@@ -455,7 +455,7 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 	 * @param parameter
 	 *            the parameter to register
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void registerParameter(ParameterExpressionImpl<?> parameter) {
 		this.parameterOrder.add(parameter);
@@ -468,7 +468,7 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 	 *            the selection
 	 * @return the modified query
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected AbstractCriteriaQueryImpl<T> select(Selection<? extends T> selection) {
 		this.selection = (AbstractSelection<T>) selection;
@@ -489,7 +489,7 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 	 * @param selections
 	 *            the selections
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void updateResultClass(List<Selection<?>> selections) {
 		if (selections.size() == 1) {

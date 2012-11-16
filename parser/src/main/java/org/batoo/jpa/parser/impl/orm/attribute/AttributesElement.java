@@ -43,7 +43,7 @@ import com.google.common.collect.Lists;
  * Element for <code>attributes</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class AttributesElement extends ParentElement implements AttributesMetadata {
 
@@ -65,7 +65,7 @@ public class AttributesElement extends ParentElement implements AttributesMetada
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public AttributesElement(ParentElement parent, Map<String, String> attributes) {

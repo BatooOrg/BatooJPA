@@ -27,7 +27,7 @@ import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
  * Implementation of {@link SequenceGeneratorMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class SequenceGeneratorMetadataImpl implements SequenceGeneratorMetadata {
 
@@ -45,7 +45,7 @@ public class SequenceGeneratorMetadataImpl implements SequenceGeneratorMetadata 
 	 * @param annotation
 	 *            the annotation
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public SequenceGeneratorMetadataImpl(AbstractLocator locator, SequenceGenerator annotation) {

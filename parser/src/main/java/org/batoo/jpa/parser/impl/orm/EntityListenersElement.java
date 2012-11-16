@@ -29,7 +29,7 @@ import com.google.common.collect.Lists;
  * Element for <code>entity-listeners</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class EntityListenersElement extends ParentElement {
 
@@ -41,7 +41,7 @@ public class EntityListenersElement extends ParentElement {
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public EntityListenersElement(ParentElement parent, Map<String, String> attributes) {
@@ -53,7 +53,7 @@ public class EntityListenersElement extends ParentElement {
 	 * 
 	 * @return the listeners of the EntityListenersElement
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public List<EntityListenerMetadata> getListeners() {

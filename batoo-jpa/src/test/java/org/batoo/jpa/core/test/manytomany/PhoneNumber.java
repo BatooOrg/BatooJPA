@@ -30,7 +30,7 @@ import com.google.common.collect.Lists;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class PhoneNumber {
@@ -45,7 +45,7 @@ public class PhoneNumber {
 	private final List<Customer> customers = Lists.newArrayList();
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public PhoneNumber() {
 		super();
@@ -55,7 +55,7 @@ public class PhoneNumber {
 	 * @param number
 	 *            the number
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public PhoneNumber(String number) {
 		super();
@@ -67,7 +67,7 @@ public class PhoneNumber {
 	 * Returns the customers.
 	 * 
 	 * @return the customers
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public List<Customer> getCustomers() {
 		return this.customers;
@@ -77,7 +77,7 @@ public class PhoneNumber {
 	 * Returns the id.
 	 * 
 	 * @return the id
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -87,7 +87,7 @@ public class PhoneNumber {
 	 * Returns the number.
 	 * 
 	 * @return the number
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getNumber() {
 		return this.number;
@@ -98,7 +98,7 @@ public class PhoneNumber {
 	 * 
 	 * @param number
 	 *            the number to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setNumber(String number) {
 		this.number = number;

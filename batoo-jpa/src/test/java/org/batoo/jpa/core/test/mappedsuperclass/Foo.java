@@ -31,7 +31,7 @@ import com.google.common.collect.Lists;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 @AssociationOverride(joinTable = @JoinTable(name = "Bar_Quux"), name = "quuxes")
@@ -46,7 +46,7 @@ public class Foo extends Bar {
 	 * Returns the fooQuuxes.
 	 * 
 	 * @return the fooQuuxes
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public List<Quux> getFooQuuxes() {
 		return this.fooQuuxes;
@@ -56,7 +56,7 @@ public class Foo extends Bar {
 	 * Returns the fooValue.
 	 * 
 	 * @return the fooValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getFooValue() {
 		return this.fooValue;
@@ -67,7 +67,7 @@ public class Foo extends Bar {
 	 * 
 	 * @param fooValue
 	 *            the fooValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setFooValue(String fooValue) {
 		this.fooValue = fooValue;

@@ -27,7 +27,7 @@ import javax.persistence.MappedSuperclass;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @MappedSuperclass
 public class E {
@@ -38,7 +38,7 @@ public class E {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public E() {
 		super();
@@ -49,7 +49,7 @@ public class E {
 	 * 
 	 * @return the id of the E
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Long getId() {
 		return this.id;
@@ -61,7 +61,7 @@ public class E {
 	 * @param id
 	 *            the id to set for E
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setId(Long id) {
 		this.id = id;

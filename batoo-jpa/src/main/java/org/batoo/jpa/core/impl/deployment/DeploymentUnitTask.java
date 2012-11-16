@@ -36,7 +36,7 @@ import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
  * Implements common behavior like ordering and waiting for the super type to perform first.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public final class DeploymentUnitTask implements Callable<Void>, Comparable<DeploymentUnitTask> {
 
@@ -51,7 +51,7 @@ public final class DeploymentUnitTask implements Callable<Void>, Comparable<Depl
 	 * @param unit
 	 *            the type of this task
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public DeploymentUnitTask(@SuppressWarnings("rawtypes") DeploymentManager manager, Object unit) {
 		super();

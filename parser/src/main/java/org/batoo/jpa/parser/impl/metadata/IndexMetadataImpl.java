@@ -26,7 +26,7 @@ import org.batoo.jpa.parser.metadata.IndexMetadata;
  * Implementation of {@link IndexMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class IndexMetadataImpl implements IndexMetadata {
 
@@ -41,7 +41,7 @@ public class IndexMetadataImpl implements IndexMetadata {
 	 * @param annotation
 	 *            the annotation
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public IndexMetadataImpl(AbstractLocator locator, Index annotation) {
@@ -61,7 +61,7 @@ public class IndexMetadataImpl implements IndexMetadata {
 	 * @param name
 	 *            field column name
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public IndexMetadataImpl(AbstractLocator locator, Index annotation, String name) {

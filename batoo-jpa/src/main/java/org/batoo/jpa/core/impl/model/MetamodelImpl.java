@@ -84,7 +84,7 @@ import com.google.common.collect.Sets;
  * The root of the persistence model.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class MetamodelImpl implements Metamodel {
 
@@ -139,7 +139,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @param metadata
 	 *            the metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public MetamodelImpl(EntityManagerFactoryImpl entityManagerFactory, JdbcAdaptor jdbcAdaptor, MetadataImpl metadata) {
@@ -262,7 +262,7 @@ public class MetamodelImpl implements Metamodel {
 	 * 
 	 * @param namedQueries
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private void addNamedQueries(List<NamedQueryMetadata> namedQueries) {
 		for (final NamedQueryMetadata namedQuery : namedQueries) {
@@ -279,7 +279,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @param metadata
 	 *            the generator metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public synchronized void addSequenceGenerator(SequenceGeneratorMetadata metadata) {
 		final SequenceGenerator sequenceGenerator = new SequenceGenerator(metadata);
@@ -292,7 +292,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @param metadata
 	 *            the generator metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public synchronized void addTableGenerator(TableGeneratorMetadata metadata) {
 		final TableGenerator tableGenerator = new TableGenerator(metadata);
@@ -310,7 +310,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @param <T>
 	 *            the java type of the basic type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> BasicTypeImpl<T> createBasicType(Class<T> clazz) {
@@ -328,7 +328,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @param datasource
 	 *            the datasource
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void dropAllTables(DataSource datasource) {
 		final Set<AbstractTable> tableSet = Sets.newHashSet();
@@ -407,7 +407,7 @@ public class MetamodelImpl implements Metamodel {
 	 *            the type of the entity
 	 * @return the entity or null
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public <X> EntityTypeImpl<X> entity(String name) {
@@ -422,7 +422,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @param type
 	 *            the type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void fireCallbacks(Object instance, EntityListenerType type) {
 		this.callbackManager.fireCallbacks(instance, type);
@@ -433,7 +433,7 @@ public class MetamodelImpl implements Metamodel {
 	 * 
 	 * @return the callback manager of the metamodel
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public CallbackManager getCallbackManager() {
 		return this.callbackManager;
@@ -470,7 +470,7 @@ public class MetamodelImpl implements Metamodel {
 	 *            the class
 	 * @return the entity
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public EntityTypeImpl<?> getEntity(Class<?> clazz) {
 		EntityTypeImpl<?> entity = null;
@@ -491,7 +491,7 @@ public class MetamodelImpl implements Metamodel {
 	 * 
 	 * @return the entity manager factory
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public EntityManagerFactoryImpl getEntityManagerFactory() {
 		return this.emf;
@@ -502,7 +502,7 @@ public class MetamodelImpl implements Metamodel {
 	 * 
 	 * @return the identifiable types
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Set<IdentifiableType<?>> getIdentifiables() {
 		final Set<IdentifiableType<?>> identifiables = Sets.newHashSet();
@@ -518,7 +518,7 @@ public class MetamodelImpl implements Metamodel {
 	 * 
 	 * @return the JDBC Adaptor
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public JdbcAdaptor getJdbcAdaptor() {
 		return this.jdbcAdaptor;
@@ -544,7 +544,7 @@ public class MetamodelImpl implements Metamodel {
 	 * 
 	 * @return the set of named queries
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Collection<NamedQueryMetadata> getNamedQueries() {
 		return this.namedQueries.values();
@@ -557,7 +557,7 @@ public class MetamodelImpl implements Metamodel {
 	 *            the generator
 	 * @return the next sequence for the generator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Long getNextSequence(String generator) {
 		try {
@@ -575,7 +575,7 @@ public class MetamodelImpl implements Metamodel {
 	 *            the generator
 	 * @return the next table value for the generator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Long getNextTableValue(String generator) {
 		try {
@@ -638,7 +638,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @throws BatooException
 	 *             thrown in case of an underlying exception
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void performForeignKeysDdl(DataSource datasource, DDLMode ddlMode, EntityTypeImpl<?> entity) {
 		if ((ddlMode == DDLMode.NONE)) {
@@ -694,7 +694,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @param ddlMode
 	 *            the DDL Mode
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void performSequencesDdl(DataSource datasource, DDLMode ddlMode) {
 		for (final SequenceGenerator sequenceGenerator : this.sequenceGenerators.values()) {
@@ -712,7 +712,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @param ddlMode
 	 *            the DDL Mode
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void performTableGeneratorsDdl(DataSource datasource, DDLMode ddlMode) {
 		for (final TableGenerator tableGenerator : this.tableGenerators.values()) {
@@ -734,7 +734,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @throws BatooException
 	 *             thrown in case of an underlying exception
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void performTablesDdl(DataSource datasource, DDLMode ddlMode, EntityTypeImpl<?> entity) {
 		MetamodelImpl.LOG.info("Performing DDL operations for entity {0}, mode {1}", entity.getName(), ddlMode);
@@ -779,7 +779,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @param datasource
 	 *            the datasource to use
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void preFillGenerators(DataSource datasource) {
 		final int nThreads = Runtime.getRuntime().availableProcessors();
@@ -802,7 +802,7 @@ public class MetamodelImpl implements Metamodel {
 	/**
 	 * Stops the id generators.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void stopIdGenerators() {
 		this.idGeneratorExecuter.shutdownNow();
@@ -821,7 +821,7 @@ public class MetamodelImpl implements Metamodel {
 	 *            the expected type of the type
 	 * @return the type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public <X> TypeImpl<X> type(Class<X> clazz) {
@@ -840,7 +840,7 @@ public class MetamodelImpl implements Metamodel {
 	 *            the callback availability
 	 * @return the callback availability
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public CallbackAvailability updateAvailability(CallbackAvailability availability) {
 		return availability.updateAvailability(this.callbackManager);

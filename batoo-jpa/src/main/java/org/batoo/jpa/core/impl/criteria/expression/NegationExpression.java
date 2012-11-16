@@ -37,7 +37,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  *            the type of the number
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class NegationExpression<N extends Number> extends AbstractExpression<N> {
 
@@ -48,7 +48,7 @@ public class NegationExpression<N extends Number> extends AbstractExpression<N> 
 	 * @param inner
 	 *            the inner expression
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public NegationExpression(Expression<N> inner) {

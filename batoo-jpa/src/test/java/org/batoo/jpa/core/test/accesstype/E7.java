@@ -26,7 +26,7 @@ import javax.persistence.Transient;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class E7 {
@@ -39,7 +39,7 @@ public class E7 {
 	 * 
 	 * @return the id of the E7
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Id
 	public Long getId() {
@@ -51,7 +51,7 @@ public class E7 {
 	 * 
 	 * @return the transiet of the E6
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Transient
 	public String getTransiet() {
@@ -64,7 +64,7 @@ public class E7 {
 	 * @param id
 	 *            the id to set for E7
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setId(Long id) {
 		this.id = id;
@@ -76,7 +76,7 @@ public class E7 {
 	 * @param transiet
 	 *            the transiet to set for E6
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setTransiet(String transiet) {
 		this.transiet = transiet;

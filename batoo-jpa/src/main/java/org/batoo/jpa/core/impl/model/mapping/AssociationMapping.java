@@ -68,7 +68,7 @@ import com.google.common.base.Splitter;
  *            the attribute type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> implements JoinedMapping<Z, X, Y> {
 
@@ -96,7 +96,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * @param attribute
 	 *            the attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public AssociationMapping(ParentMapping<?, Z> parent, AssociationAttributeMetadata metadata, AttributeImpl<? super Z, X> attribute) {
 		super(parent, attribute, attribute.getJavaType(), attribute.getName());
@@ -132,7 +132,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * Returns if the type cascades detach operations.
 	 * 
 	 * @return true if the type cascades detach operations, false otherwise.
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public final boolean cascadesDetach() {
 		return this.cascadesDetach;
@@ -142,7 +142,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * Returns if the type cascades merge operations.
 	 * 
 	 * @return true if the type cascades merge operations, false otherwise.
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public final boolean cascadesMerge() {
 		return this.cascadesMerge;
@@ -152,7 +152,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * Returns if the type cascades persist operations.
 	 * 
 	 * @return true if the type cascades persist operations, false otherwise.
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public final boolean cascadesPersist() {
 		return this.cascadesPersist;
@@ -162,7 +162,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * Returns if the type cascades refresh operations.
 	 * 
 	 * @return true if the type cascades refresh operations, false otherwise.
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public final boolean cascadesRefresh() {
 		return this.cascadesRefresh;
@@ -172,7 +172,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * Returns if the type cascades remove operations.
 	 * 
 	 * @return true if the type cascades remove operations, false otherwise.
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public final boolean cascadesRemove() {
 		return this.cascadesRemove;
@@ -184,7 +184,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * @param managedInstance
 	 *            the managed instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract void checkTransient(ManagedInstance<?> managedInstance);
 
@@ -247,7 +247,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * 
 	 * @return the column metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	protected AssociationMetadata getAssociationMetadata() {
@@ -299,7 +299,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * 
 	 * @return the Fetching strategy of the association
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public FetchStrategyType getFetchStrategy() {
 		return this.fetchStrategy;
@@ -310,7 +310,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * 
 	 * @return the foreign key of the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract ForeignKey getForeignKey();
 
@@ -320,7 +320,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * @return the inverse attribute or null
 	 * 
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract AssociationMapping<?, ?, ?> getInverse();
 
@@ -329,7 +329,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * 
 	 * @return the mappedBy of the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getMappedBy() {
 		return this.mappedBy;
@@ -340,7 +340,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * 
 	 * @return the max allowed depth for the fetch join
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public int getMaxFetchJoinDepth() {
 		return this.maxFetchDepth;
@@ -351,7 +351,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * 
 	 * @return the select criteria
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected CriteriaQueryImpl<Y> getSelectCriteria() {
 		if (this.selectCriteria != null) {
@@ -389,7 +389,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * 
 	 * @return the join table of the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Override
 	public abstract JoinTable getTable();
@@ -415,7 +415,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * 
 	 * @return true if the mapping is an id mapping, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean isId() {
 		return this.getIdType() != null;
@@ -426,7 +426,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * 
 	 * @return true if the association is the owner side
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public final boolean isOwner() {
 		return this.mappedBy == null;
@@ -437,7 +437,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * 
 	 * @return true if the selection is owned, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected boolean isOwnerSelect() {
 		return this.ownerSelect;
@@ -469,7 +469,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * @throws MappingException
 	 *             thrown in case of a linkage error
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract void link() throws MappingException;
 
@@ -487,7 +487,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * @param processed
 	 *            registry of processed entities
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract void mergeWith(EntityManagerImpl entityManager, ManagedInstance<?> instance, Object entity, MutableBoolean requiresFlush,
 		IdentityHashMap<Object, Object> processed);
@@ -499,7 +499,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 *            the associate instance
 	 * @return true if source contains reference to the associate, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract boolean references(Object instance, Object reference);
 
@@ -511,7 +511,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * @param processed
 	 *            the set of processed instances
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract void refresh(ManagedInstance<?> instance, Set<Object> processed);
 
@@ -520,7 +520,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * 
 	 * @return true if the mapping removes orphans, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean removesOrphans() {
 		return this.removesOrphans;
@@ -532,7 +532,7 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * @param inverse
 	 *            the inverse association
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract void setInverse(AssociationMapping<?, ?, ?> inverse);
 }

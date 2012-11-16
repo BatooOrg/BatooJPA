@@ -26,7 +26,7 @@ import org.batoo.jpa.parser.metadata.BindableMetadata;
  * The common definition of the attributes.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface AttributeMetadata extends BindableMetadata {
 
@@ -35,7 +35,7 @@ public interface AttributeMetadata extends BindableMetadata {
 	 * 
 	 * @return the access type of the attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	AccessType getAccess();

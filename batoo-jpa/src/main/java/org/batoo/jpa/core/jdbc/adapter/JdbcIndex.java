@@ -26,7 +26,7 @@ import com.google.common.collect.Lists;
  * The metadata for an index of an existing table.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class JdbcIndex {
 
@@ -37,7 +37,7 @@ public class JdbcIndex {
 	 * @param name
 	 *            the name of the index
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public JdbcIndex(String name) {
 		super();
@@ -51,7 +51,7 @@ public class JdbcIndex {
 	 * @param columnName
 	 *            the name of the column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void addColumn(String columnName) {
 		this.columns.add(columnName);
@@ -62,7 +62,7 @@ public class JdbcIndex {
 	 * 
 	 * @return the name of the index
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		return this.name;

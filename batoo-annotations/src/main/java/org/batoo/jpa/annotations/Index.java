@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
 /**
  * Defines an index on one or more columns.
  * 
- * @since $version
+ * @since 2.0.0
  * @author hceylan
  */
 @Target({ TYPE, FIELD, METHOD })
@@ -41,7 +41,7 @@ public @interface Index {
 	 * 
 	 * @return the names of the columns
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	String[] columns() default {};
 
@@ -50,7 +50,7 @@ public @interface Index {
 	 * 
 	 * @return the name of the index
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	String name();
 
@@ -59,7 +59,7 @@ public @interface Index {
 	 * 
 	 * @return the name of the table
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	String table() default "";
 }

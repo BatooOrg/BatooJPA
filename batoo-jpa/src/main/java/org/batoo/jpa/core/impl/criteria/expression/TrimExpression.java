@@ -35,7 +35,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  * Expression for trim function.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class TrimExpression extends AbstractExpression<String> {
 
@@ -53,7 +53,7 @@ public class TrimExpression extends AbstractExpression<String> {
 	 * @param inner
 	 *            the inner expression
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public TrimExpression(Trimspec trimspec, Expression<Character> trimChar, Expression<String> inner) {
 		super(String.class);

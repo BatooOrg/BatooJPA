@@ -4,7 +4,7 @@ package javax.persistence.spi;
  * Loaded states.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public enum LoadState {
 

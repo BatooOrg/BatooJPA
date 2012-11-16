@@ -35,7 +35,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  *            the type of the expression
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class CastExpression<T> extends AbstractExpression<T> {
 
@@ -48,7 +48,7 @@ public class CastExpression<T> extends AbstractExpression<T> {
 	 * @param javaType
 	 *            the cast return type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public CastExpression(AbstractExpression<?> inner, Class<T> javaType) {
 		super(javaType);

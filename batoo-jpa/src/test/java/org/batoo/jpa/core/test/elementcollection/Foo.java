@@ -37,7 +37,7 @@ import com.google.common.collect.Sets;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Foo {
@@ -72,7 +72,7 @@ public class Foo {
 	 * Returns the codes.
 	 * 
 	 * @return the codes
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public List<String> getCodes() {
 		return this.codes;
@@ -83,7 +83,7 @@ public class Foo {
 	 * 
 	 * @return the codes2 of the Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected Set<String> getCodes2() {
 		return this.codes2;
@@ -94,7 +94,7 @@ public class Foo {
 	 * 
 	 * @return the codes3 of the Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected Set<FooType> getCodes3() {
 		return this.codes3;
@@ -105,7 +105,7 @@ public class Foo {
 	 * 
 	 * @return the codes4 of the Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected Set<FooType> getCodes4() {
 		return this.codes4;
@@ -115,7 +115,7 @@ public class Foo {
 	 * Returns the key.
 	 * 
 	 * @return the key
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getKey() {
 		return this.key;
@@ -125,7 +125,7 @@ public class Foo {
 	 * Returns the value.
 	 * 
 	 * @return the value
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getValue() {
 		return this.value;
@@ -136,7 +136,7 @@ public class Foo {
 	 * 
 	 * @param value
 	 *            the value to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setValue(String value) {
 		this.value = value;

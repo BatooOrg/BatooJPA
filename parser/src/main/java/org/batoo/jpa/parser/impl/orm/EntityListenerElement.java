@@ -30,7 +30,7 @@ import com.google.common.collect.Lists;
  * Element for <code>entity-listener</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class EntityListenerElement extends ParentElement implements EntityListenerMetadata {
 
@@ -47,7 +47,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 * @param attributes
 		 *            the attributes
 		 * 
-		 * @since $version
+		 * @since 2.0.0
 		 * @author hceylan
 		 */
 		public CallbackElement(EntityListenerType type, ParentElement parent, Map<String, String> attributes) {
@@ -70,7 +70,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 * 
 		 * @return the method name of the callback
 		 * 
-		 * @since $version
+		 * @since 2.0.0
 		 * @author hceylan
 		 */
 		@Override
@@ -83,7 +83,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 * 
 		 * @return the type of the callback
 		 * 
-		 * @since $version
+		 * @since 2.0.0
 		 * @author hceylan
 		 */
 		@Override
@@ -95,7 +95,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 	/**
 	 * 
 	 * @author hceylan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public static class PostLoadElement extends CallbackElement {
 
@@ -105,7 +105,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 * @param attributes
 		 *            the attributes
 		 * 
-		 * @since $version
+		 * @since 2.0.0
 		 * @author hceylan
 		 */
 		public PostLoadElement(ParentElement parent, Map<String, String> attributes) {
@@ -116,7 +116,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 	/**
 	 * 
 	 * @author hceylan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public static class PostPersistElement extends CallbackElement {
 
@@ -126,7 +126,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 * @param attributes
 		 *            the attributes
 		 * 
-		 * @since $version
+		 * @since 2.0.0
 		 * @author hceylan
 		 */
 		public PostPersistElement(ParentElement parent, Map<String, String> attributes) {
@@ -137,7 +137,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 	/**
 	 * 
 	 * @author hceylan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public static class PostRemoveElement extends CallbackElement {
 
@@ -147,7 +147,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 * @param attributes
 		 *            the attributes
 		 * 
-		 * @since $version
+		 * @since 2.0.0
 		 * @author hceylan
 		 */
 		public PostRemoveElement(ParentElement parent, Map<String, String> attributes) {
@@ -158,7 +158,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 	/**
 	 * 
 	 * @author hceylan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public static class PostUpdateElement extends CallbackElement {
 
@@ -168,7 +168,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 * @param attributes
 		 *            the attributes
 		 * 
-		 * @since $version
+		 * @since 2.0.0
 		 * @author hceylan
 		 */
 		public PostUpdateElement(ParentElement parent, Map<String, String> attributes) {
@@ -179,7 +179,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 	/**
 	 * 
 	 * @author hceylan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public static class PrePersistElement extends CallbackElement {
 
@@ -189,7 +189,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 * @param attributes
 		 *            the attributes
 		 * 
-		 * @since $version
+		 * @since 2.0.0
 		 * @author hceylan
 		 */
 		public PrePersistElement(ParentElement parent, Map<String, String> attributes) {
@@ -200,7 +200,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 	/**
 	 * 
 	 * @author hceylan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public static class PreRemoveElement extends CallbackElement {
 
@@ -210,7 +210,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 * @param attributes
 		 *            the attributes
 		 * 
-		 * @since $version
+		 * @since 2.0.0
 		 * @author hceylan
 		 */
 		public PreRemoveElement(ParentElement parent, Map<String, String> attributes) {
@@ -221,7 +221,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 	/**
 	 * 
 	 * @author hceylan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public static class PreUpdateElement extends CallbackElement {
 
@@ -231,7 +231,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 		 * @param attributes
 		 *            the attributes
 		 * 
-		 * @since $version
+		 * @since 2.0.0
 		 * @author hceylan
 		 */
 		public PreUpdateElement(ParentElement parent, Map<String, String> attributes) {
@@ -248,7 +248,7 @@ public class EntityListenerElement extends ParentElement implements EntityListen
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public EntityListenerElement(ParentElement parent, Map<String, String> attributes) {

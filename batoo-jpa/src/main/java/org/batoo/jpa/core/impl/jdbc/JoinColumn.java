@@ -32,7 +32,7 @@ import org.batoo.jpa.parser.metadata.PrimaryKeyJoinColumnMetadata;
  * Mapping of two {@link BasicColumn}s.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class JoinColumn extends AbstractColumn {
 
@@ -71,7 +71,7 @@ public class JoinColumn extends AbstractColumn {
 	 * @param masterColumn
 	 *            the master column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public JoinColumn(JdbcAdaptor jdbcAdaptor, AssociationMapping<?, ?, ?> mapping, AbstractColumn referencedColumn, BasicColumn masterColumn) {
 		super(null, false);
@@ -104,7 +104,7 @@ public class JoinColumn extends AbstractColumn {
 	 * @param id
 	 *            if the column is id
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public JoinColumn(JdbcAdaptor jdbcAdaptor, AssociationMapping<?, ?, ?> mapping, AbstractColumn referencedColumn, boolean id) {
 		super(null, id);
@@ -132,7 +132,7 @@ public class JoinColumn extends AbstractColumn {
 	 * @param readOnly
 	 *            if the column is readonly
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public JoinColumn(JdbcAdaptor jdbcAdaptor, JoinColumnMetadata metadata, boolean readOnly) {
 		super(metadata.getLocator(), false);
@@ -161,7 +161,7 @@ public class JoinColumn extends AbstractColumn {
 	 * @param referencedColumn
 	 *            the referenced column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public JoinColumn(JdbcAdaptor jdbcAdaptor, PrimaryKeyJoinColumnMetadata metadata, SecondaryTable table, AbstractColumn referencedColumn) {
 		super(metadata != null ? metadata.getLocator() : null, false);
@@ -187,7 +187,7 @@ public class JoinColumn extends AbstractColumn {
 	 * 
 	 * @return the columnDefinition of the JoinColumn
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Override
 	public String getColumnDefinition() {
@@ -219,7 +219,7 @@ public class JoinColumn extends AbstractColumn {
 	 * 
 	 * @return the master column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public AbstractColumn getMasterColumn() {
 		return this.masterColumn;
@@ -230,7 +230,7 @@ public class JoinColumn extends AbstractColumn {
 	 * 
 	 * @return the name of the JoinColumn
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Override
 	public String getName() {
@@ -251,7 +251,7 @@ public class JoinColumn extends AbstractColumn {
 	 * 
 	 * @return the referenced column of the join column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public AbstractColumn getReferencedColumn() {
 		return this.referencedColumn;
@@ -262,7 +262,7 @@ public class JoinColumn extends AbstractColumn {
 	 * 
 	 * @return the name of the referenced column of the join column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getReferencedColumnName() {
 		return this.referencedColumnName;
@@ -273,7 +273,7 @@ public class JoinColumn extends AbstractColumn {
 	 * 
 	 * @return the referenced table
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public AbstractTable getReferencedTable() {
 		return this.referencedColumn.getTable();
@@ -331,7 +331,7 @@ public class JoinColumn extends AbstractColumn {
 	 * 
 	 * @return the insertable of the JoinColumn
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Override
 	public boolean isInsertable() {
@@ -343,7 +343,7 @@ public class JoinColumn extends AbstractColumn {
 	 * 
 	 * @return the nullable of the JoinColumn
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Override
 	public boolean isNullable() {
@@ -355,7 +355,7 @@ public class JoinColumn extends AbstractColumn {
 	 * 
 	 * @return the unique of the JoinColumn
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Override
 	public boolean isUnique() {
@@ -367,7 +367,7 @@ public class JoinColumn extends AbstractColumn {
 	 * 
 	 * @return the updatable of the JoinColumn
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Override
 	public boolean isUpdatable() {
@@ -381,7 +381,7 @@ public class JoinColumn extends AbstractColumn {
 	 * 
 	 * @return true if this join column is a virtual join column, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean isVirtual() {
 		return this.masterColumn != null;
@@ -408,7 +408,7 @@ public class JoinColumn extends AbstractColumn {
 	 * @param masterColumn
 	 *            the master column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setColumnProperties(AssociationMapping<?, ?, ?> mapping, AbstractColumn referencedColumn, AbstractColumn masterColumn) {
 		this.masterColumn = masterColumn;
@@ -442,7 +442,7 @@ public class JoinColumn extends AbstractColumn {
 	 * @param id
 	 *            if the column is id column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setColumnProperties(AssociationMapping<?, ?, ?> mapping, AbstractColumn referencedColumn, boolean id) {
 		// if attribute present then the join column belongs to an entity table
@@ -499,7 +499,7 @@ public class JoinColumn extends AbstractColumn {
 	 *            the master column
 	 * 
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setVirtual(AbstractColumn masterColumn) {
 		this.masterColumn = masterColumn;

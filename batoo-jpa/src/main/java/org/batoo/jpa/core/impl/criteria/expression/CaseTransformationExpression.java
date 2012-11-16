@@ -34,7 +34,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  * Expression for string <code>upper</code> and <code>lower</code> functions.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class CaseTransformationExpression extends AbstractExpression<String> {
 
@@ -63,7 +63,7 @@ public class CaseTransformationExpression extends AbstractExpression<String> {
 	 * @param function
 	 *            the string function
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public CaseTransformationExpression(Expression<String> inner, CaseTransformationType function) {
 		super(String.class);

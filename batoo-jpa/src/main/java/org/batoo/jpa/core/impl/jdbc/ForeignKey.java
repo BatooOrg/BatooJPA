@@ -55,7 +55,7 @@ import com.google.common.collect.Lists;
  * Foreign key definition.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ForeignKey {
 
@@ -86,7 +86,7 @@ public class ForeignKey {
 	 * @param metadata
 	 *            the metadata for join column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ForeignKey(JdbcAdaptor jdbcAdaptor, List<JoinColumnMetadata> metadata) {
 		this(jdbcAdaptor, metadata, false);
@@ -102,7 +102,7 @@ public class ForeignKey {
 	 * @param inverseOwner
 	 *            true if the foreign key is inverse owner
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ForeignKey(JdbcAdaptor jdbcAdaptor, List<JoinColumnMetadata> metadata, boolean inverseOwner) {
 		super();
@@ -128,7 +128,7 @@ public class ForeignKey {
 	 * @param metadata
 	 *            the metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ForeignKey(JdbcAdaptor jdbcAdaptor, SecondaryTable table, EntityTypeImpl<?> entity, List<PrimaryKeyJoinColumnMetadata> metadata) {
 		super();
@@ -162,7 +162,7 @@ public class ForeignKey {
 	 *            the alias of the table
 	 * @return the join SQL fragment
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String createDestinationJoin(JoinType joinType, String parentAlias, String alias) {
 		if (this.inverseOwner) {
@@ -243,7 +243,7 @@ public class ForeignKey {
 	 *            the alias of the table
 	 * @return the join SQL fragment
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String createSourceJoin(JoinType joinType, String parentAlias, String alias) {
 		return this.createJoin(joinType, parentAlias, alias, this.joinColumns.get(0).getTable().getQName(), true);
@@ -254,7 +254,7 @@ public class ForeignKey {
 	 * 
 	 * @return the single child SQL
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private String getAllChildrenSql() {
 		FinalWrapper<String> wrapper = this.allChildrenSql;
@@ -321,7 +321,7 @@ public class ForeignKey {
 	 * 
 	 * @return the list of join columns of the foreign key.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public List<JoinColumn> getJoinColumns() {
 		return this.joinColumns;
@@ -332,7 +332,7 @@ public class ForeignKey {
 	 * 
 	 * @return the name of the foreign key
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		final List<JoinColumn> columns = Lists.newArrayList(this.joinColumns);
@@ -361,7 +361,7 @@ public class ForeignKey {
 	 * 
 	 * @return the order column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public OrderColumn getOrderColumn() {
 		return this.orderColumn;
@@ -372,7 +372,7 @@ public class ForeignKey {
 	 * 
 	 * @return the referenced table of the foreign key
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getReferencedTableName() {
 		return this.joinColumns.get(0).getReferencedTable().getName();
@@ -383,7 +383,7 @@ public class ForeignKey {
 	 * 
 	 * @return the qualified referenced table of the foreign key
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getReferencedTableQName() {
 		return this.joinColumns.get(0).getReferencedTable().getQName();
@@ -394,7 +394,7 @@ public class ForeignKey {
 	 * 
 	 * @return the single child SQL
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private String getSingleChildSql() {
 		FinalWrapper<String> wrapper = this.singleChildSql;
@@ -455,7 +455,7 @@ public class ForeignKey {
 	 * 
 	 * @return the table of the ForeignKey
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public AbstractTable getTable() {
 		return this.table;
@@ -466,7 +466,7 @@ public class ForeignKey {
 	 * 
 	 * @return true if the foreign key maps to a readonly join, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean isReadOnly() {
 		return this.readOnly;
@@ -476,7 +476,7 @@ public class ForeignKey {
 	 * @param metadata
 	 * @return
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private boolean isReadOnly(List<JoinColumnMetadata> metadata) {
 		for (final JoinColumnMetadata columnMetadata : metadata) {
@@ -497,7 +497,7 @@ public class ForeignKey {
 	 *            the target entity
 	 * 
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void link(AssociationMapping<?, ?, ?> mapping, EntityTypeImpl<?> targetEntity) {
 		if (mapping instanceof SingularAssociationMapping) {
@@ -719,7 +719,7 @@ public class ForeignKey {
 	 * @throws SQLException
 	 *             thrown in case of an SQL error
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void performAttachChild(Connection connection, ManagedInstance<?> instance, Joinable[] batch, int size) throws SQLException {
 		final String sql = this.getSingleChildSql();
@@ -761,7 +761,7 @@ public class ForeignKey {
 	 * @throws SQLException
 	 *             thrown in case of an SQL error
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void performDetachAll(Connection connection, ManagedInstance<?> instance) throws SQLException {
 		final String sql = this.getAllChildrenSql();
@@ -788,7 +788,7 @@ public class ForeignKey {
 	 * @throws SQLException
 	 *             thrown in case of an SQL error
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void performDetachChild(Connection connection, Object key, Object child) throws SQLException {
 		final String sql = this.getSingleChildSql();
@@ -822,7 +822,7 @@ public class ForeignKey {
 	 * @param locator
 	 *            the locator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setOrderColumn(ColumnMetadata orderColumn, String name, AbstractLocator locator) {
 		this.orderColumn = new OrderColumn(this.table, orderColumn, name, locator);
@@ -834,7 +834,7 @@ public class ForeignKey {
 	 * @param table
 	 *            the table
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setTable(AbstractTable table) {
 		this.table = table;

@@ -45,7 +45,7 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
  *            the type of the elemenet
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class MemberOfExpression<C extends Collection<E>, E> extends AbstractExpression<Boolean> {
 
@@ -61,7 +61,7 @@ public class MemberOfExpression<C extends Collection<E>, E> extends AbstractExpr
 	 * @param values
 	 *            the values expression
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public MemberOfExpression(boolean not, Expression<E> value, Expression<C> values) {
 		super(Boolean.class);

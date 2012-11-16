@@ -34,7 +34,7 @@ import org.batoo.jpa.core.jdbc.IdType;
  *            the attribute type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class Mapping<Z, X, Y> {
 
@@ -60,7 +60,7 @@ public abstract class Mapping<Z, X, Y> {
 	 * @param name
 	 *            the name of the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Mapping(ParentMapping<?, Z> parent, AttributeImpl<? super Z, X> attribute, Class<X> javaType, String name) {
 		super();
@@ -103,7 +103,7 @@ public abstract class Mapping<Z, X, Y> {
 	 *            the instance of which the value to be returned
 	 * @return the mapping value of instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public final X get(Object instance) {
 		if (instance == null) {
@@ -122,7 +122,7 @@ public abstract class Mapping<Z, X, Y> {
 	 * 
 	 * @return the attribute of the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract AttributeImpl<? super Z, X> getAttribute();
 
@@ -131,7 +131,7 @@ public abstract class Mapping<Z, X, Y> {
 	 * 
 	 * @return the id type of the mapping or <code>null</code>
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public IdType getIdType() {
 		return null;
@@ -142,7 +142,7 @@ public abstract class Mapping<Z, X, Y> {
 	 * 
 	 * @return the javaType of the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Class<X> getJavaType() {
 		return this.javaType;
@@ -153,7 +153,7 @@ public abstract class Mapping<Z, X, Y> {
 	 * 
 	 * @return the name of the Mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		return this.name;
@@ -164,7 +164,7 @@ public abstract class Mapping<Z, X, Y> {
 	 * 
 	 * @return the parent of the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ParentMapping<?, Z> getParent() {
 		return this.parent;
@@ -175,7 +175,7 @@ public abstract class Mapping<Z, X, Y> {
 	 * 
 	 * @return the path of the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getPath() {
 		return this.path;
@@ -186,7 +186,7 @@ public abstract class Mapping<Z, X, Y> {
 	 * 
 	 * @return the root of the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public RootMapping<?> getRoot() {
 		return this.parent.getRoot();
@@ -220,7 +220,7 @@ public abstract class Mapping<Z, X, Y> {
 	 * @param value
 	 *            the value to set
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public final void set(Object instance, Object value) {
 		if (!this.root) {

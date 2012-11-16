@@ -24,7 +24,7 @@ import org.batoo.jpa.parser.metadata.type.EmbeddableMetadata;
  * Implementation {@link EmbeddableMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class EmbeddableMetadataImpl extends ManagedTypeMetadatImpl implements EmbeddableMetadata {
 
@@ -34,7 +34,7 @@ public class EmbeddableMetadataImpl extends ManagedTypeMetadatImpl implements Em
 	 * @param metadata
 	 *            the metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public EmbeddableMetadataImpl(Class<?> clazz, EmbeddableMetadata metadata) {

@@ -44,7 +44,7 @@ import com.google.common.collect.Maps;
  * The implementation of {@link Cache}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class CacheImpl implements Cache {
 
@@ -68,7 +68,7 @@ public class CacheImpl implements Cache {
 	 *            the entity manager factory
 	 * @param cacheMode
 	 *            the cache mode
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public CacheImpl(EntityManagerFactoryImpl emf, SharedCacheMode cacheMode) {
 		super();
@@ -140,7 +140,7 @@ public class CacheImpl implements Cache {
 	 *            the managed id of the instance
 	 * @return the cached instance or <code>null</code>
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public CacheInstance get(ManagedId<?> id) {
 		final Class<?> clazz = id.getType().getRootMapping().getJavaType();
@@ -167,7 +167,7 @@ public class CacheImpl implements Cache {
 	 *            the parameters
 	 * @return the cached instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public List<CacheReference[]> get(String sql, Object[] parameters) {
 		final ResultListReference reference = new ResultListReference(sql, parameters);
@@ -188,7 +188,7 @@ public class CacheImpl implements Cache {
 	 * 
 	 * @return the cache mode of the cache
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public SharedCacheMode getCacheMode() {
 		return this.cacheMode;
@@ -201,7 +201,7 @@ public class CacheImpl implements Cache {
 	 *            the type
 	 * @return the cache retrieve mode
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public CacheRetrieveMode getCacheRetrieveMode(EntityTypeImpl<?> type) {
 		if (!this.on) {
@@ -220,7 +220,7 @@ public class CacheImpl implements Cache {
 	 *            the type
 	 * @return the cache store mode
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public CacheStoreMode getCacheStoreMode(EntityTypeImpl<?> type) {
 		if (!this.on) {
@@ -258,7 +258,7 @@ public class CacheImpl implements Cache {
 	 * 
 	 * @return the global cache stats
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public CacheStats getStats() {
 		return this.stats;
@@ -271,7 +271,7 @@ public class CacheImpl implements Cache {
 	 *            the class
 	 * @return the stats
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public CacheStats getStats(Class<?> clazz) {
 		CacheStats cacheStats = this.statsDelegate.get(clazz);
@@ -294,7 +294,7 @@ public class CacheImpl implements Cache {
 	 * 
 	 * @return true if the cache is on, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean isOn() {
 		return this.on;
@@ -303,7 +303,7 @@ public class CacheImpl implements Cache {
 	/**
 	 * @param clazz
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private void lockEntityMap(Class<?> clazz) {
 		// TODO Auto-generated method stub
@@ -315,7 +315,7 @@ public class CacheImpl implements Cache {
 	 * @param instance
 	 *            the instance to put
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void put(ManagedInstance<?> instance) {
 		final Class<?> clazz = instance.getType().getRootType().getJavaType();
@@ -345,7 +345,7 @@ public class CacheImpl implements Cache {
 	 * @param results
 	 *            the results
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void put(String sql, Object[] parameters, List<?> results) {
 		final MetamodelImpl metamodel = this.emf.getMetamodel();
@@ -386,7 +386,7 @@ public class CacheImpl implements Cache {
 	 * @param mode
 	 *            the mode or null to set
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setCacheRetrieveMode(CacheRetrieveMode mode) {
 		if (!this.on) {
@@ -404,7 +404,7 @@ public class CacheImpl implements Cache {
 	 * @param mode
 	 *            the mode or null to set
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setCacheStoreMode(CacheStoreMode mode) {
 		if (!this.on) {
@@ -419,7 +419,7 @@ public class CacheImpl implements Cache {
 	/**
 	 * @param clazz
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private void unlockEntityMap(Class<?> clazz) {
 		// TODO Auto-generated method stub

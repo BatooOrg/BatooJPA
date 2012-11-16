@@ -30,7 +30,7 @@ import java.util.Map.Entry;
  *            the value type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class EntryImpl<K, V> implements Entry<K, V> {
 
@@ -43,7 +43,7 @@ public class EntryImpl<K, V> implements Entry<K, V> {
 	 * @param value
 	 *            the value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public EntryImpl(K key, V value) {

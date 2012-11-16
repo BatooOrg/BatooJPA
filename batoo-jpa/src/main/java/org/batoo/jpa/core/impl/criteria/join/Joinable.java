@@ -26,7 +26,7 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
  * Interface for joinable types.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface Joinable {
 
@@ -35,7 +35,7 @@ public interface Joinable {
 	 * 
 	 * @return the entity of the joinable
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	EntityTypeImpl<?> getEntity();
 
@@ -50,7 +50,7 @@ public interface Joinable {
 	 *            the table
 	 * @return the alias for the table
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	String getTableAlias(BaseQueryImpl<?> query, AbstractTable table);
 }

@@ -43,7 +43,7 @@ import com.google.common.collect.Lists;
  *            the type of the element
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ListComparator<E> implements Comparator<E> {
 
@@ -58,7 +58,7 @@ public class ListComparator<E> implements Comparator<E> {
 		 * @param mapping
 		 *            the mapping
 		 * 
-		 * @since $version
+		 * @since 2.0.0
 		 */
 		public ComparableMapping(boolean ascending, Mapping<?, ?, ?> mapping) {
 			super();
@@ -71,7 +71,7 @@ public class ListComparator<E> implements Comparator<E> {
 		 * 
 		 * @return the mapping
 		 * 
-		 * @since $version
+		 * @since 2.0.0
 		 */
 		protected Mapping<?, ?, ?> getMapping() {
 			return this.mapping;
@@ -82,7 +82,7 @@ public class ListComparator<E> implements Comparator<E> {
 		 * 
 		 * @return true if the order is ascending, false otherwise
 		 * 
-		 * @since $version
+		 * @since 2.0.0
 		 */
 		public boolean isAscending() {
 			return this.ascending;
@@ -98,7 +98,7 @@ public class ListComparator<E> implements Comparator<E> {
 	 * @param mapping
 	 *            the owner mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ListComparator(PluralMapping<?, ?, E> mapping) {
 		super();
@@ -154,7 +154,7 @@ public class ListComparator<E> implements Comparator<E> {
 	/**
 	 * Creates the list of comparables
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private void createComparables() {
 		// order on id

@@ -33,7 +33,7 @@ import com.google.common.collect.Maps;
  * Implementation of {@link NamedQueryMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class NamedNativeQueryMetadataImpl implements NamedNativeQueryMetadata {
 
@@ -50,7 +50,7 @@ public class NamedNativeQueryMetadataImpl implements NamedNativeQueryMetadata {
 	 * @param annotation
 	 *            the annotation
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public NamedNativeQueryMetadataImpl(AbstractLocator locator, NamedNativeQuery annotation) {

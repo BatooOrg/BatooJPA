@@ -26,7 +26,7 @@ import javax.persistence.TemporalType;
  * Element for <code>temporal</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class TemporalElement extends ChildElement {
 
@@ -38,7 +38,7 @@ public class TemporalElement extends ChildElement {
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public TemporalElement(ParentElement parent, Map<String, String> attributes) {
@@ -59,7 +59,7 @@ public class TemporalElement extends ChildElement {
 	 * 
 	 * @return the temporalType of the TemporalElement
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public TemporalType getTemporalType() {

@@ -33,7 +33,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  * Wrapper expression for boolean expressions.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class BooleanExpression extends AbstractExpression<Boolean> {
 
@@ -43,7 +43,7 @@ public class BooleanExpression extends AbstractExpression<Boolean> {
 	 * @param inner
 	 *            the inner expression
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public BooleanExpression(Expression<Boolean> inner) {
 		super(Boolean.class);
@@ -75,7 +75,7 @@ public class BooleanExpression extends AbstractExpression<Boolean> {
 	 *            the query
 	 * @return the SQL select fragment
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String generateSqlRestriction(final BaseQueryImpl<?> query) {
 		if (this.inner instanceof BasicPath) {

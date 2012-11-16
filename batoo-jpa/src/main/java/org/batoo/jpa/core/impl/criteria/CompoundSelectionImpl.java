@@ -43,7 +43,7 @@ import com.google.common.collect.Lists;
  *            the type of the selection
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class CompoundSelectionImpl<X> extends AbstractSelection<X> implements CompoundSelection<X> {
 
@@ -57,7 +57,7 @@ public class CompoundSelectionImpl<X> extends AbstractSelection<X> implements Co
 	 * @param selections
 	 *            the selections
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public CompoundSelectionImpl(Class<X> javaType, List<Selection<?>> selections) {
@@ -90,7 +90,7 @@ public class CompoundSelectionImpl<X> extends AbstractSelection<X> implements Co
 	 * @param selections
 	 *            the selections
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public CompoundSelectionImpl(Class<X> javaType, Selection<?>... selections) {
@@ -130,7 +130,7 @@ public class CompoundSelectionImpl<X> extends AbstractSelection<X> implements Co
 	/**
 	 * @return
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private List<String> getAliases() {

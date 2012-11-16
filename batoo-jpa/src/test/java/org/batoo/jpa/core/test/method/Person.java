@@ -36,7 +36,7 @@ import com.google.common.collect.Lists;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 @Access(AccessType.PROPERTY)
@@ -50,7 +50,7 @@ public class Person {
 	private String name;
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Person() {
 		super();
@@ -60,7 +60,7 @@ public class Person {
 	 * @param name
 	 *            the name
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Person(String name) {
 		super();
@@ -72,7 +72,7 @@ public class Person {
 	 * Returns the addresses.
 	 * 
 	 * @return the addresses
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	public List<Address> getAddresses() {
@@ -83,7 +83,7 @@ public class Person {
 	 * Returns the id.
 	 * 
 	 * @return the id
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -95,7 +95,7 @@ public class Person {
 	 * Returns the name.
 	 * 
 	 * @return the name
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		return this.name;
@@ -106,7 +106,7 @@ public class Person {
 	 * 
 	 * @return the phones of the Person
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@OneToMany(cascade = CascadeType.ALL)
 	@JoinColumn(name = "person")
@@ -120,7 +120,7 @@ public class Person {
 	 * @param addresses
 	 *            the addresses to set for Person
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setAddresses(List<Address> addresses) {
 		this.addresses = addresses;
@@ -132,7 +132,7 @@ public class Person {
 	 * @param id
 	 *            the id to set for Person
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setId(Integer id) {
 		this.id = id;
@@ -143,7 +143,7 @@ public class Person {
 	 * 
 	 * @param name
 	 *            the name to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -155,7 +155,7 @@ public class Person {
 	 * @param phones
 	 *            the phones to set for Person
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setPhones(List<Phone> phones) {
 		this.phones = phones;

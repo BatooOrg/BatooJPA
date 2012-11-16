@@ -29,7 +29,7 @@ import javax.persistence.SecondaryTable;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 @SecondaryTable(name = "AddressExtra")
@@ -46,7 +46,7 @@ public class Address {
 	private String city;
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Address() {
 		super();
@@ -58,7 +58,7 @@ public class Address {
 	 * @param city
 	 *            the city
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Address(Person person, String city) {
 		super();
@@ -73,7 +73,7 @@ public class Address {
 	 * Returns the city.
 	 * 
 	 * @return the city
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getCity() {
 		return this.city;
@@ -83,7 +83,7 @@ public class Address {
 	 * Returns the id.
 	 * 
 	 * @return the id
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -93,7 +93,7 @@ public class Address {
 	 * Returns the person.
 	 * 
 	 * @return the person
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Person getPerson() {
 		return this.person;
@@ -104,7 +104,7 @@ public class Address {
 	 * 
 	 * @param city
 	 *            the city to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setCity(String city) {
 		this.city = city;
@@ -115,7 +115,7 @@ public class Address {
 	 * 
 	 * @param person
 	 *            the person to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setPerson(Person person) {
 		this.person = person;

@@ -29,7 +29,7 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
  * Implementation of persistence unit util.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class PersistenceUnitUtilImpl implements PersistenceUnitUtil {
 
@@ -39,7 +39,7 @@ public class PersistenceUnitUtilImpl implements PersistenceUnitUtil {
 	 * @param entityManagerFactory
 	 *            the entity manager factory
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public PersistenceUnitUtilImpl(EntityManagerFactoryImpl entityManagerFactory) {
 		super();

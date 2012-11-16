@@ -30,12 +30,12 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class InheritenceJpqlTest extends BaseCoreTest {
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testCaseType() {
@@ -56,7 +56,7 @@ public class InheritenceJpqlTest extends BaseCoreTest {
 	}
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	@SuppressWarnings("rawtypes")

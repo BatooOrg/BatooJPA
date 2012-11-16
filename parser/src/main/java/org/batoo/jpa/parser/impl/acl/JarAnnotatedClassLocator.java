@@ -38,7 +38,7 @@ import com.google.common.collect.Sets;
  * {@link AnnotatedClassLocator} implementation for JAR archives.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class JarAnnotatedClassLocator extends BaseAnnotatedClassLocator {
 
@@ -51,7 +51,7 @@ public class JarAnnotatedClassLocator extends BaseAnnotatedClassLocator {
 	 * 
 	 * @return the singleton {@link JarAnnotatedClassLocator} instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public static JarAnnotatedClassLocator getInstance() {
@@ -60,7 +60,7 @@ public class JarAnnotatedClassLocator extends BaseAnnotatedClassLocator {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private JarAnnotatedClassLocator() {

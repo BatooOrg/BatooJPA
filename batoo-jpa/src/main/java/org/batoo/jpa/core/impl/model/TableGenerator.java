@@ -27,7 +27,7 @@ import com.google.common.base.Joiner;
  * Table based generator.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class TableGenerator extends AbstractGenerator {
 
@@ -44,7 +44,7 @@ public class TableGenerator extends AbstractGenerator {
 	 * @param metadata
 	 *            the metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public TableGenerator(TableGeneratorMetadata metadata) {
 		super(metadata);
@@ -78,7 +78,7 @@ public class TableGenerator extends AbstractGenerator {
 	 * 
 	 * @return the pkColumnName of the table generator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getPkColumnName() {
 		return this.pkColumnName;
@@ -89,7 +89,7 @@ public class TableGenerator extends AbstractGenerator {
 	 * 
 	 * @return the pkColumnValue of the table generator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getPkColumnValue() {
 		return this.pkColumnValue;
@@ -109,7 +109,7 @@ public class TableGenerator extends AbstractGenerator {
 	 * 
 	 * @return the table of the table generator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getTable() {
 		return this.table;
@@ -120,7 +120,7 @@ public class TableGenerator extends AbstractGenerator {
 	 * 
 	 * @return the valueColumnName of the table generator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getValueColumnName() {
 		return this.valueColumnName;

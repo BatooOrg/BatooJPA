@@ -28,7 +28,7 @@ import org.batoo.jpa.parser.metadata.InheritanceMetadata;
  * Element for <code>inheritance</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class InheritanceElement extends ChildElement implements InheritanceMetadata {
 
@@ -40,7 +40,7 @@ public class InheritanceElement extends ChildElement implements InheritanceMetad
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public InheritanceElement(ParentElement parent, Map<String, String> attributes) {

@@ -24,7 +24,7 @@ import java.util.Map;
  * Element for <code>persistence-unit-metadata</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class PersistenceUnitMetadataElement extends ParentElement {
 
@@ -37,7 +37,7 @@ public class PersistenceUnitMetadataElement extends ParentElement {
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public PersistenceUnitMetadataElement(ParentElement parent, Map<String, String> attributes) {
@@ -51,7 +51,7 @@ public class PersistenceUnitMetadataElement extends ParentElement {
 	 * 
 	 * @return the persistence unit defaults
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public PersistenceUnitDefaults getPersistenceUnitDefaults() {
@@ -78,7 +78,7 @@ public class PersistenceUnitMetadataElement extends ParentElement {
 	 * 
 	 * @return the xmlMappingMetadataComplete
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public boolean isXmlMappingMetadataComplete() {

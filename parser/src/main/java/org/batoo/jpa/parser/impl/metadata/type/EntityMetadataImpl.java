@@ -74,7 +74,7 @@ import com.google.common.collect.Lists;
  * Implementation {@link EntityMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class EntityMetadataImpl extends IdentifiableMetadataImpl implements EntityMetadata {
 
@@ -102,7 +102,7 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 * @param parentAccessType
 	 *            the parent access type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public EntityMetadataImpl(Class<?> clazz, EntityMetadata metadata, AccessType parentAccessType) {
@@ -276,7 +276,7 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 * @param parsed
 	 *            the set of annotations parsed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author
 	 * @param parsed
 	 */
@@ -317,7 +317,7 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 * @param parsed
 	 *            the set of annotations parsed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author
 	 * @param parsed
 	 */
@@ -360,7 +360,7 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 *            the set of annotation parsed
 	 * @return the name
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private Boolean handleCacheable(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
@@ -386,7 +386,7 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 * @param parsed
 	 *            the set of annotations parsed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author
 	 */
 	private void handleIndexes(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
@@ -416,7 +416,7 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 * @param parsed
 	 *            the set of annotations parsed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private void handleInheritance(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
@@ -469,7 +469,7 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 *            the set of annotation parsed
 	 * @return the name
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private String handleName(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
@@ -495,7 +495,7 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 * @param parsed
 	 *            the set of annotations parsed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author
 	 * @param parsed
 	 */
@@ -530,7 +530,7 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 * @param parsed
 	 *            the set of annotations parsed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author
 	 */
 	private void handleNamedQuery(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
@@ -569,7 +569,7 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 * @param parsed
 	 *            the set of annotations parsed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author
 	 */
 	private void handleSecondaryTables(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
@@ -611,7 +611,7 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 *            the set of annotation parsed
 	 * @return the sequence generator metadata or null
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private SequenceGeneratorMetadata handleSequenceGenerator(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
@@ -645,7 +645,7 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 *            the set of annotation parsed
 	 * @return the table metadata or null
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private TableMetadata handleTable(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
@@ -678,7 +678,7 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 *            the set of annotation parsed
 	 * @return the table generator metadata or null
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private TableGeneratorMetadata handleTableGenerator(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {

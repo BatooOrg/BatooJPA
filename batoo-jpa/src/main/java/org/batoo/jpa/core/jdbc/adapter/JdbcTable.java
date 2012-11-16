@@ -36,7 +36,7 @@ import com.google.common.collect.Sets;
  * The metadata for an existing table in the database.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class JdbcTable {
 
@@ -74,7 +74,7 @@ public class JdbcTable {
 	 * @throws SQLException
 	 *             thrown in case of an SQL error.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public JdbcTable(DatabaseMetaData dbMetadata, ResultSet metadata) throws SQLException {
 		super();
@@ -96,7 +96,7 @@ public class JdbcTable {
 	 *            the name of the column
 	 * @return the column metadta or null
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public JdbcColumn getColumn(String name) {
 		return this.columns.get(name.toUpperCase());
@@ -109,7 +109,7 @@ public class JdbcTable {
 	 *            the name of the foreign key
 	 * @return the foreign key or null if there is no existing foreign key with the name
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public JdbcForeignKey getForeignKey(String name) {
 		return this.foreignKeys.get(name.toUpperCase());
@@ -120,7 +120,7 @@ public class JdbcTable {
 	 * 
 	 * @return the foreign keys of the table
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Collection<JdbcForeignKey> getForeignKeys() {
 		return this.foreignKeys.values();
@@ -133,7 +133,7 @@ public class JdbcTable {
 	 *            the name of the index
 	 * @return the index or null if there is no existing index with the name
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public JdbcIndex getIndex(String name) {
 		return this.indexes.get(name.toUpperCase());
@@ -144,7 +144,7 @@ public class JdbcTable {
 	 * 
 	 * @return the name of the table
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		return this.name;
@@ -155,7 +155,7 @@ public class JdbcTable {
 	 * 
 	 * @return the primary key name of the table
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getPkName() {
 		return this.pkName;
@@ -166,7 +166,7 @@ public class JdbcTable {
 	 * 
 	 * @return the schema of the table
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getSchema() {
 		return this.schema;
@@ -178,7 +178,7 @@ public class JdbcTable {
 	 * @param columns
 	 *            the set of columns
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void logNotNullExtraColumns(Collection<String> columns) {
 		final Set<String> nonNullColumns = Sets.newHashSet();
@@ -283,7 +283,7 @@ public class JdbcTable {
 	 *            the set of required primary keys
 	 * @return true if primary key drop is required, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean requiresPkDrop(Set<String> pkColumnNames) {
 		if (this.pkColumns.isEmpty()) {

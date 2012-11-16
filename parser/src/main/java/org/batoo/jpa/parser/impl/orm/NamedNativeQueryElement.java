@@ -28,7 +28,7 @@ import com.google.common.collect.Maps;
  * Element for <code>named-query</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class NamedNativeQueryElement extends ParentElement implements NamedNativeQueryMetadata {
 
@@ -44,7 +44,7 @@ public class NamedNativeQueryElement extends ParentElement implements NamedNativ
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public NamedNativeQueryElement(ParentElement parent, Map<String, String> attributes) {

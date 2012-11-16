@@ -27,14 +27,14 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class ElementCollectionTest extends BaseCoreTest {
 
 	/**
 	 * Tests the element collections
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testElementCollection1() {
@@ -63,7 +63,7 @@ public class ElementCollectionTest extends BaseCoreTest {
 	/**
 	 * Tests the element collections
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testElementCollection2() {
@@ -92,7 +92,7 @@ public class ElementCollectionTest extends BaseCoreTest {
 	/**
 	 * Tests the element collections
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testElementCollection3() {
@@ -121,7 +121,7 @@ public class ElementCollectionTest extends BaseCoreTest {
 	/**
 	 * Tests the element collections
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testElementCollection4() {

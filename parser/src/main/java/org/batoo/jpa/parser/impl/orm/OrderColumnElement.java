@@ -26,7 +26,7 @@ import org.batoo.jpa.parser.metadata.ColumnMetadata;
  * Element for <code>column</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class OrderColumnElement extends BaseColumnElement implements ColumnMetadata {
 
@@ -40,7 +40,7 @@ public class OrderColumnElement extends BaseColumnElement implements ColumnMetad
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public OrderColumnElement(ParentElement parent, Map<String, String> attributes) {

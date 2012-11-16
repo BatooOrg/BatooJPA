@@ -70,7 +70,7 @@ import com.google.common.collect.Sets;
  * The implementation of the native query interface.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 
@@ -98,7 +98,7 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 * @param query
 	 *            the native SQL query
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public NativeQuery(EntityManagerImpl entityManager, String query) {
 		super();
@@ -116,7 +116,7 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 * @param resultClass
 	 *            the result class
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public NativeQuery(EntityManagerImpl entityManager, String sqlString, Class<?> resultClass) {
 		super();
@@ -514,7 +514,7 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 * @param query
 	 *            the original query
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private String parseParameters(String query) {
 		final CommonTree tree = this.parse(query);

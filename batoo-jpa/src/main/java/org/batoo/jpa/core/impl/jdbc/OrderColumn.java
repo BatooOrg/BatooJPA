@@ -29,7 +29,7 @@ import org.batoo.jpa.parser.metadata.ColumnMetadata;
  * Columns for list type attributes.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class OrderColumn extends AbstractColumn {
 
@@ -50,7 +50,7 @@ public class OrderColumn extends AbstractColumn {
 	 * @param locator
 	 *            the locator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public OrderColumn(AbstractTable table, ColumnMetadata orderColumn, String name, AbstractLocator locator) {
 		super(orderColumn != null ? orderColumn.getLocator() : locator, false);

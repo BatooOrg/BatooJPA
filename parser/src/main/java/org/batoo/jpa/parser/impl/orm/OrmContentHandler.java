@@ -37,7 +37,7 @@ import com.google.common.collect.Maps;
  * The content handler for ORM XML Files.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class OrmContentHandler implements ContentHandler {
 
@@ -52,7 +52,7 @@ public class OrmContentHandler implements ContentHandler {
 	 * @param fileName
 	 *            the name of the ORM XML file
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public OrmContentHandler(String fileName) {
@@ -115,7 +115,7 @@ public class OrmContentHandler implements ContentHandler {
 	 * 
 	 * @return the metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public Metadata getMetadata() {

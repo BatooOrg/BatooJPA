@@ -27,7 +27,7 @@ import javax.persistence.Id;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Country {
@@ -40,7 +40,7 @@ public class Country {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Country() {
 		super();
@@ -51,7 +51,7 @@ public class Country {
 	 * 
 	 * @return the id of the Country
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -62,7 +62,7 @@ public class Country {
 	 * 
 	 * @return the name of the Country
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		return this.name;
@@ -74,7 +74,7 @@ public class Country {
 	 * @param name
 	 *            the name to set for Country
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setName(String name) {
 		this.name = name;

@@ -23,7 +23,7 @@ import javax.persistence.Embeddable;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Embeddable
 public class Address {
@@ -35,7 +35,7 @@ public class Address {
 	 * Returns the city.
 	 * 
 	 * @return the city
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getCity() {
 		return this.city;
@@ -45,7 +45,7 @@ public class Address {
 	 * Returns the street.
 	 * 
 	 * @return the street
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getStreet() {
 		return this.street;
@@ -56,7 +56,7 @@ public class Address {
 	 * 
 	 * @param city
 	 *            the city to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setCity(String city) {
 		this.city = city;
@@ -67,7 +67,7 @@ public class Address {
 	 * 
 	 * @param street
 	 *            the street to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setStreet(String street) {
 		this.street = street;

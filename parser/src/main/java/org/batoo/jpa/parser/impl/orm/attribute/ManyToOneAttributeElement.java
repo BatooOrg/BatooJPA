@@ -30,7 +30,7 @@ import org.batoo.jpa.parser.metadata.attribute.ManyToOneAttributeMetadata;
  * Element for <code>many-to-one</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ManyToOneAttributeElement extends AssociationElement implements ManyToOneAttributeMetadata {
 
@@ -44,7 +44,7 @@ public class ManyToOneAttributeElement extends AssociationElement implements Man
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public ManyToOneAttributeElement(ParentElement parent, Map<String, String> attributes) {

@@ -27,7 +27,7 @@ package org.batoo.jpa.core.util;
  *            the second type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class Pair<F, S> {
 
@@ -44,7 +44,7 @@ public class Pair<F, S> {
 	 *            the second type
 	 * @return the pair created
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public static <F, S> Pair<F, S> create(F first, S second) {
 		return new Pair<F, S>(first, second);
@@ -60,7 +60,7 @@ public class Pair<F, S> {
 	 * @param second
 	 *            the second
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Pair(F first, S second) {
 		super();
@@ -108,7 +108,7 @@ public class Pair<F, S> {
 	 * Returns the first.
 	 * 
 	 * @return the first
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public F getFirst() {
 		return this.first;
@@ -118,7 +118,7 @@ public class Pair<F, S> {
 	 * Returns the second.
 	 * 
 	 * @return the second
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public S getSecond() {
 		return this.second;

@@ -24,7 +24,7 @@ import java.util.concurrent.ThreadFactory;
  * Thread factory that names the threads in the form of "name [no]".
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class IncrementalNamingThreadFactory implements ThreadFactory {
 
@@ -36,7 +36,7 @@ public class IncrementalNamingThreadFactory implements ThreadFactory {
 	 * @param name
 	 *            the common name for the threads
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public IncrementalNamingThreadFactory(String name) {
 		super();

@@ -27,7 +27,7 @@ import javax.persistence.ManyToOne;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Address2 {
@@ -44,7 +44,7 @@ public class Address2 {
 	private String city;
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Address2() {
 		super();
@@ -58,7 +58,7 @@ public class Address2 {
 	 * @param street
 	 *            the street
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Address2(Person person, String city, String street) {
 		super();
@@ -73,7 +73,7 @@ public class Address2 {
 	 * Returns the city.
 	 * 
 	 * @return the city
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getCity() {
 		return this.city;
@@ -83,7 +83,7 @@ public class Address2 {
 	 * Returns the id.
 	 * 
 	 * @return the id
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -94,7 +94,7 @@ public class Address2 {
 	 * 
 	 * @return the person of the Address
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected Person getPerson() {
 		return this.person;
@@ -105,7 +105,7 @@ public class Address2 {
 	 * 
 	 * @return the street of the Address2
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected String getStreet() {
 		return this.street;
@@ -116,7 +116,7 @@ public class Address2 {
 	 * 
 	 * @param city
 	 *            the city to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setCity(String city) {
 		this.city = city;
@@ -128,7 +128,7 @@ public class Address2 {
 	 * @param person
 	 *            the person to set for Address
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void setPerson(Person person) {
 		if (this.person != null) {
@@ -148,7 +148,7 @@ public class Address2 {
 	 * @param street
 	 *            the street to set for Address2
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void setStreet(String street) {
 		this.street = street;

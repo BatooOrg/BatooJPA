@@ -34,7 +34,7 @@ import org.xml.sax.XMLReader;
  * PersistenceParser for ORM Files.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class OrmParser {
 
@@ -46,7 +46,7 @@ public class OrmParser {
 	 * @param fileName
 	 *            the name of the ORM XML file.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public OrmParser(String fileName) {
@@ -71,7 +71,7 @@ public class OrmParser {
 	 * @param is
 	 *            the input stream
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public void consume(InputStream is) {
@@ -97,7 +97,7 @@ public class OrmParser {
 	 * 
 	 * @return the metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public Metadata getMetadata() {

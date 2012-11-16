@@ -31,7 +31,7 @@ import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
  * The implementation of {@link AttributeMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class AttributeMetadataImpl implements AttributeMetadata {
 
@@ -46,7 +46,7 @@ public class AttributeMetadataImpl implements AttributeMetadata {
 	 * @param metadata
 	 *            the metadata definition of the attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public AttributeMetadataImpl(Member member, AttributeMetadata metadata) {
@@ -59,7 +59,7 @@ public class AttributeMetadataImpl implements AttributeMetadata {
 	 * @param name
 	 *            the name of the attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public AttributeMetadataImpl(Member member, String name) {
@@ -89,7 +89,7 @@ public class AttributeMetadataImpl implements AttributeMetadata {
 	 * 
 	 * @return the locator of the attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	@Override
@@ -102,7 +102,7 @@ public class AttributeMetadataImpl implements AttributeMetadata {
 	 * 
 	 * @return the java member of the attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public final Member getMember() {

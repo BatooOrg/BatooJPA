@@ -31,7 +31,7 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class EagerTest extends BaseCoreTest {
 
@@ -40,7 +40,7 @@ public class EagerTest extends BaseCoreTest {
 	private static Country UK;
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@BeforeClass
 	public static void initCountries() {
@@ -64,7 +64,7 @@ public class EagerTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Before
 	public void prepareCountries() {
@@ -76,7 +76,7 @@ public class EagerTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#find(Class, Object)} person.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testFind() {
@@ -101,7 +101,7 @@ public class EagerTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#find(Class, Object)} person that is in the session.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testFindInSession() {
@@ -121,7 +121,7 @@ public class EagerTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} address which does not cascade to Parent. PersistenceException expected.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test(expected = PersistenceException.class)
 	public void testPersistAddress() {
@@ -133,7 +133,7 @@ public class EagerTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} Parent which cascades to Child1.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testPersistPerson() {

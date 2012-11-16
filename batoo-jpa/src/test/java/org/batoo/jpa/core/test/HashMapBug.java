@@ -12,14 +12,14 @@ import org.junit.Test;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class HashMapBug {
 
 	/**
 	 * Test to demonstrate the hash map bug
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	@Ignore

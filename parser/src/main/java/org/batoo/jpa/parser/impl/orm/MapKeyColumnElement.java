@@ -24,7 +24,7 @@ import java.util.Map;
  * Element for <code>map-key-column</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class MapKeyColumnElement extends ColumnElement {
 
@@ -34,7 +34,7 @@ public class MapKeyColumnElement extends ColumnElement {
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public MapKeyColumnElement(ParentElement parent, Map<String, String> attributes) {

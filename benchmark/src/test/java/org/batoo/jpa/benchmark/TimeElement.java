@@ -29,7 +29,7 @@ import com.google.common.collect.Lists;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class TimeElement extends HashMap<String, TimeElement> implements Comparable<TimeElement> {
 
@@ -45,7 +45,7 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	 * @param key
 	 *            the key
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public TimeElement(String key) {
 		this.key = key;
@@ -59,7 +59,7 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	 * @param inDerby
 	 *            time is in derby stack
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void addTime(long used, boolean self, boolean inDerby) {
 		this.hits++;
@@ -88,7 +88,7 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	 * @param type
 	 *            the benchmark type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void dump0(Type type) {
 		final int nameStart = this.key.indexOf("doBenchmark");
@@ -116,7 +116,7 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	 *            the depth
 	 * @return the row no
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public int dump1(int rowNo, int depth) {
 		if ((depth > 0) && (this.timeWithoutDerby > 10000000)) {
@@ -145,7 +145,7 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	 * @param rowNo
 	 *            the row no
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void dump2(int rowNo) {
 		System.out.println(String.format("%010d", rowNo) + //
@@ -172,7 +172,7 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	/**
 	 * @return self
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Long getSelf() {
 		return this.self;

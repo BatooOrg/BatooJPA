@@ -11,13 +11,13 @@ import org.junit.Test;
  * Test case for https://github.com/BatooOrg/BatooJPA/issues/70
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class Test4 extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void test() {

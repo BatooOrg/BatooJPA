@@ -27,7 +27,7 @@ import com.google.common.base.Joiner;
  * Sequence based generator.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class SequenceGenerator extends AbstractGenerator {
 
@@ -39,7 +39,7 @@ public class SequenceGenerator extends AbstractGenerator {
 	 * @param metadata
 	 *            the metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public SequenceGenerator(SequenceGeneratorMetadata metadata) {
 		super(metadata);
@@ -61,7 +61,7 @@ public class SequenceGenerator extends AbstractGenerator {
 	 * 
 	 * @return the sequenceName of the sequence generator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getSequenceName() {
 		return this.sequenceName;

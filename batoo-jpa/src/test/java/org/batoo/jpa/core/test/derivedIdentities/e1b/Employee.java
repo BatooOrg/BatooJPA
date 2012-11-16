@@ -26,7 +26,7 @@ import javax.persistence.Id;
 /**
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Employee {
@@ -39,7 +39,7 @@ public class Employee {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Employee() {
 		super();
@@ -49,7 +49,7 @@ public class Employee {
 	 * 
 	 * @param empName
 	 *            the name
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Employee(String empName) {
 		super();
@@ -96,7 +96,7 @@ public class Employee {
 	 * 
 	 * @return the empId
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Long getEmpId() {
 		return this.empId;
@@ -106,7 +106,7 @@ public class Employee {
 	 * 
 	 * @return the empName
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getEmpName() {
 		return this.empName;
@@ -130,7 +130,7 @@ public class Employee {
 	 * @param empId
 	 *            the empId to set
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setEmpId(Long empId) {
 		this.empId = empId;
@@ -141,7 +141,7 @@ public class Employee {
 	 * @param empName
 	 *            the empName to set
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setEmpName(String empName) {
 		this.empName = empName;

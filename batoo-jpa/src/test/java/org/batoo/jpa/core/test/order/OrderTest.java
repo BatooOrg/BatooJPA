@@ -29,7 +29,7 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class OrderTest extends BaseCoreTest {
 
@@ -45,7 +45,7 @@ public class OrderTest extends BaseCoreTest {
 	/**
 	 * Tests list order is maintained.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testOrder1() {
@@ -67,7 +67,7 @@ public class OrderTest extends BaseCoreTest {
 	/**
 	 * Tests list is sorted
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testOrder2() {

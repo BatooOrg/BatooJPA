@@ -31,7 +31,7 @@ import org.junit.Test;
 
 /**
  * @author asimarslan
- * @since $version
+ * @since 2.0.0
  * 
  */
 public class ReadOnlyColumnTest extends BaseCoreTest {
@@ -41,7 +41,7 @@ public class ReadOnlyColumnTest extends BaseCoreTest {
 	 * 
 	 * @throws SQLException
 	 *             thrown in case of an error
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testColumnNames() throws SQLException {

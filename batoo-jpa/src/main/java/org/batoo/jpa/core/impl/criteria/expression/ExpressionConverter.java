@@ -28,7 +28,7 @@ import java.math.BigInteger;
  *            the to type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class ExpressionConverter<N> {
 
@@ -200,7 +200,7 @@ public abstract class ExpressionConverter<N> {
 	 *            the from value
 	 * @return the converted <code>T</code> value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public N convert(Object value) {
 		if (value == null) {

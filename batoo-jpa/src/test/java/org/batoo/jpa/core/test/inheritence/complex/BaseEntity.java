@@ -16,7 +16,7 @@ import javax.persistence.Transient;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @MappedSuperclass
 public abstract class BaseEntity {
@@ -63,7 +63,7 @@ public abstract class BaseEntity {
 	 * 
 	 * @return the createdOn of the BaseEntity
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Date getCreatedOn() {
 		return this.createdOn;
@@ -72,7 +72,7 @@ public abstract class BaseEntity {
 	/**
 	 * @return the display text
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Transient
 	@Access(AccessType.PROPERTY)
@@ -83,7 +83,7 @@ public abstract class BaseEntity {
 	 * 
 	 * @return the id of the BaseEntity
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Long getId() {
 		return this.id;
@@ -94,7 +94,7 @@ public abstract class BaseEntity {
 	 * 
 	 * @return the modifiedOn of the BaseEntity
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Date getModifiedOn() {
 		return this.modifiedOn;
@@ -115,7 +115,7 @@ public abstract class BaseEntity {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@PrePersist
 	public void initTimeStamps() {
@@ -132,7 +132,7 @@ public abstract class BaseEntity {
 	 * @param createdOn
 	 *            the createdOn to set for BaseEntity
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setCreatedOn(Date createdOn) {
 		this.createdOn = createdOn;
@@ -144,7 +144,7 @@ public abstract class BaseEntity {
 	 * @param id
 	 *            the id to set for BaseEntity
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setId(Long id) {
 		this.id = id;
@@ -156,7 +156,7 @@ public abstract class BaseEntity {
 	 * @param modifiedOn
 	 *            the modifiedOn to set for BaseEntity
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setModifiedOn(Date modifiedOn) {
 		this.modifiedOn = modifiedOn;

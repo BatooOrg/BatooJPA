@@ -39,7 +39,7 @@ import org.batoo.jpa.core.impl.model.type.TypeImpl;
  *            the attribute type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface JoinedMapping<Z, X, Y> {
 
@@ -47,7 +47,7 @@ public interface JoinedMapping<Z, X, Y> {
 	 * Type of the mapping
 	 * 
 	 * @author hceylan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public enum MappingType {
 		/**
@@ -78,7 +78,7 @@ public interface JoinedMapping<Z, X, Y> {
 	 *            the value
 	 * @return the key of the value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Object extractKey(Object value);
 
@@ -96,7 +96,7 @@ public interface JoinedMapping<Z, X, Y> {
 	 * @throws SQLException
 	 *             thrown if there is an underlying SQL Exception
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	void flush(Connection connection, ManagedInstance<?> managedInstance, boolean removals, boolean force) throws SQLException;
 
@@ -105,7 +105,7 @@ public interface JoinedMapping<Z, X, Y> {
 	 * 
 	 * @return the attribute of the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	AttributeImpl<? super Z, X> getAttribute();
 
@@ -114,7 +114,7 @@ public interface JoinedMapping<Z, X, Y> {
 	 * 
 	 * @return the type of the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	MappingType getMappingType();
 
@@ -123,7 +123,7 @@ public interface JoinedMapping<Z, X, Y> {
 	 * 
 	 * @return the path of the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	String getPath();
 
@@ -134,7 +134,7 @@ public interface JoinedMapping<Z, X, Y> {
 	 * 
 	 * @return the table
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	JoinableTable getTable();
 
@@ -143,7 +143,7 @@ public interface JoinedMapping<Z, X, Y> {
 	 * 
 	 * @return the bindable entity type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	TypeImpl<Y> getType();
 
@@ -153,7 +153,7 @@ public interface JoinedMapping<Z, X, Y> {
 	 * @param instance
 	 *            the instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	void initialize(ManagedInstance<?> instance);
 
@@ -162,7 +162,7 @@ public interface JoinedMapping<Z, X, Y> {
 	 * 
 	 * @return true if the mapping is an association, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	boolean isAssociation();
 
@@ -171,7 +171,7 @@ public interface JoinedMapping<Z, X, Y> {
 	 * 
 	 * @return true if the association should be eagerly fetched
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	boolean isEager();
 
@@ -180,7 +180,7 @@ public interface JoinedMapping<Z, X, Y> {
 	 * 
 	 * @return true if the mapping is a joined mapping, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	boolean isJoined();
 
@@ -189,7 +189,7 @@ public interface JoinedMapping<Z, X, Y> {
 	 * 
 	 * @return true if the mapping is a map collection, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	boolean isMap();
 
@@ -205,7 +205,7 @@ public interface JoinedMapping<Z, X, Y> {
 	 * @param joinType
 	 *            the join type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	String join(String parentAlias, String alias, JoinType joinType);
 }

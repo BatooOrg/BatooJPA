@@ -24,7 +24,7 @@ package org.batoo.jpa.parser.metadata.attribute;
  * Typically these are OneToOne and ManyToOne attributes.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface OptionalAssociationAttributeMetadata {
 
@@ -33,7 +33,7 @@ public interface OptionalAssociationAttributeMetadata {
 	 * 
 	 * @return the maps id
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getMapsId();
@@ -43,7 +43,7 @@ public interface OptionalAssociationAttributeMetadata {
 	 * 
 	 * @return true if the attribute is an id attribute, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	boolean isId();
@@ -53,7 +53,7 @@ public interface OptionalAssociationAttributeMetadata {
 	 * 
 	 * @return true if the association attribute is optional.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	boolean isOptional();

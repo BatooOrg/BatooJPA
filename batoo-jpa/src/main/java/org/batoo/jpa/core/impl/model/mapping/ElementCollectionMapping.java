@@ -73,7 +73,7 @@ import com.google.common.collect.Maps;
  *            the collection type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implements PluralMapping<Z, C, E> {
 
@@ -106,7 +106,7 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	 * @param attribute
 	 *            the attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ElementCollectionMapping(ParentMapping<?, Z> parent, PluralAttributeImpl<? super Z, C, E> attribute) {
 		super(parent, attribute, attribute.getJavaType(), attribute.getName());
@@ -233,7 +233,7 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	 * 
 	 * @return the collection table
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public CollectionTable getCollectionTable() {
 		return this.collectionTable;
@@ -260,7 +260,7 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	 * 
 	 * @return the key mapping of the element collection mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public SingularMapping<? super E, ?> getKeyMapping() {
 		return this.keyMapping;
@@ -271,7 +271,7 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	 * 
 	 * @return the map key of the element collection mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getMapKey() {
 		return this.mapKey;
@@ -459,7 +459,7 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	 * @throws MappingException
 	 *             thrown in case of a linkage error
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public void link() {

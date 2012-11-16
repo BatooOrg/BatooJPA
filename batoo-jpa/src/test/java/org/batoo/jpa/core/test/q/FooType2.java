@@ -25,7 +25,7 @@ import javax.persistence.Entity;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 @DiscriminatorValue("FOO_TYPE_2")
@@ -35,7 +35,7 @@ public class FooType2 extends BaseFoo {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public FooType2() {
 		super();
@@ -47,7 +47,7 @@ public class FooType2 extends BaseFoo {
 	 * @param valueType2
 	 *            the value type 2
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public FooType2(Bar bar, int valueType2) {
 		super(bar);
@@ -60,7 +60,7 @@ public class FooType2 extends BaseFoo {
 	 * 
 	 * @return the valueType2 of the FooType2
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected int getValueType2() {
 		return this.valueType2;
@@ -72,7 +72,7 @@ public class FooType2 extends BaseFoo {
 	 * @param valueType2
 	 *            the valueType2 to set for FooType2
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void setValueType2(int valueType2) {
 		this.valueType2 = valueType2;

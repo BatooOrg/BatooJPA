@@ -45,7 +45,7 @@ import com.google.common.collect.Maps;
  * Table representing an entity persistent storage.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class EntityTable extends AbstractTable {
 
@@ -66,7 +66,7 @@ public class EntityTable extends AbstractTable {
 	 * @param metadata
 	 *            the table metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public EntityTable(EntityTypeImpl<?> entity, TableMetadata metadata) {
 		super(entity.getName(), metadata);
@@ -108,7 +108,7 @@ public class EntityTable extends AbstractTable {
 	 *            the columns
 	 * @return true if an index with the <code>name</code> already existed, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean addIndex(String name, BasicColumn... columns) {
 		if (this.indexes.containsKey(name)) {
@@ -125,7 +125,7 @@ public class EntityTable extends AbstractTable {
 	 * 
 	 * @return the entity of the EntityTable
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public EntityTypeImpl<?> getEntity() {
 		return this.entity;
@@ -136,7 +136,7 @@ public class EntityTable extends AbstractTable {
 	 * 
 	 * @return the id fields of the table
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public HashMap<AbstractColumn, String> getIdFields() {
 		if (this.idColumns != null) {
@@ -164,7 +164,7 @@ public class EntityTable extends AbstractTable {
 	 * 
 	 * @return the indexes of the table
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Map<String, BasicColumn[]> getIndexes() {
 		return this.indexes;
@@ -175,7 +175,7 @@ public class EntityTable extends AbstractTable {
 	 * 
 	 * @return the jdbcAdaptor of the EntityTable
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected JdbcAdaptor getJdbcAdaptor() {
 		return this.jdbcAdaptor;
@@ -195,7 +195,7 @@ public class EntityTable extends AbstractTable {
 	 * 
 	 * @return the pkColumns of the EntityTable
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Collection<AbstractColumn> getPkColumns() {
 		return this.pkColumns.values();
@@ -254,7 +254,7 @@ public class EntityTable extends AbstractTable {
 	 * @throws SQLException
 	 *             thrown in case of underlying SQLException
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void performInsert(Connection connection, final ManagedInstance<?>[] managedInstances, int size) throws SQLException {
 		final EntityTypeImpl<?> entityType = managedInstances[0].getType();
@@ -310,7 +310,7 @@ public class EntityTable extends AbstractTable {
 	 * @throws SQLException
 	 *             thrown in case of underlying SQLException
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void performRemove(Connection connection, final ManagedInstance<?>[] managedInstances, int size) throws SQLException {
 		final String removeSql = this.getRemoveSql(size);
@@ -341,7 +341,7 @@ public class EntityTable extends AbstractTable {
 	 * @throws SQLException
 	 *             thrown in case of underlying SQLException
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Object performSelectVersion(Connection connection, final ManagedInstance<?> managedInstance) throws SQLException {
 		final Object instance = managedInstance.getInstance();
@@ -373,7 +373,7 @@ public class EntityTable extends AbstractTable {
 	 * @throws SQLException
 	 *             thrown in case of underlying SQLException
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void performUpdate(Connection connection, final ManagedInstance<?> managedInstance) throws SQLException {
 		final EntityTypeImpl<?> entityType = managedInstance.getType();
@@ -409,7 +409,7 @@ public class EntityTable extends AbstractTable {
 	 * @throws SQLException
 	 *             thrown in case of underlying SQLException
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean performUpdateWithUpdatability(Connection connection, final ManagedInstance<?> managedInstance) throws SQLException {
 		final EntityTypeImpl<?> entityType = managedInstance.getType();
@@ -453,7 +453,7 @@ public class EntityTable extends AbstractTable {
 	 * @throws SQLException
 	 *             thrown in case of underlying SQLException
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void performVersionUpdate(Connection connection, final ManagedInstance<?> managedInstance) throws SQLException {
 		final Object instance = managedInstance.getInstance();

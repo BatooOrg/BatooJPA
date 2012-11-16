@@ -39,7 +39,7 @@ import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
  *            the element type of the collection
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class AbstractPluralJoin<Z, C, E> extends AbstractJoin<Z, E> implements PluralJoin<Z, C, E> {
 
@@ -51,7 +51,7 @@ public abstract class AbstractPluralJoin<Z, C, E> extends AbstractJoin<Z, E> imp
 	 * @param jointType
 	 *            the join type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public AbstractPluralJoin(AbstractFrom<?, Z> parent, JoinedMapping<? super Z, ?, E> mapping, JoinType jointType) {
 		super(parent, mapping, jointType);

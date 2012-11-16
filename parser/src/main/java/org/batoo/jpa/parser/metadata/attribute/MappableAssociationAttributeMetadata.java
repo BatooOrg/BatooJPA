@@ -22,7 +22,7 @@ package org.batoo.jpa.parser.metadata.attribute;
  * The common definition of the mappable association attributes.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface MappableAssociationAttributeMetadata {
 
@@ -31,7 +31,7 @@ public interface MappableAssociationAttributeMetadata {
 	 * 
 	 * @return the name of the bidirectional owner association attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getMappedBy();

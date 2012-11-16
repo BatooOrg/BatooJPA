@@ -32,7 +32,7 @@ import com.google.common.collect.Lists;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Customer {
@@ -50,7 +50,7 @@ public class Customer {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Customer() {
 		super();
@@ -61,7 +61,7 @@ public class Customer {
 	 * 
 	 * @return the addresses of the Customer
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public List<Address> getAddresses() {
 		return this.addresses;
@@ -72,7 +72,7 @@ public class Customer {
 	 * 
 	 * @return the id of the Customer
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -83,7 +83,7 @@ public class Customer {
 	 * 
 	 * @return the name of the Customer
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		return this.name;
@@ -94,7 +94,7 @@ public class Customer {
 	 * 
 	 * @return the surname of the Customer
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getSurname() {
 		return this.surname;
@@ -106,7 +106,7 @@ public class Customer {
 	 * @param name
 	 *            the name to set for Customer
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -118,7 +118,7 @@ public class Customer {
 	 * @param surname
 	 *            the surname to set for Customer
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setSurname(String surname) {
 		this.surname = surname;

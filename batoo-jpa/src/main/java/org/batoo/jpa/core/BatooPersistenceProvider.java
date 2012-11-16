@@ -38,7 +38,7 @@ import org.batoo.jpa.parser.PersistenceParser;
  * Implementation of {@link PersistenceProvider}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class BatooPersistenceProvider implements PersistenceProvider {
 
@@ -50,7 +50,7 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public BatooPersistenceProvider() {
 		super();
@@ -143,7 +143,7 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 	 *            the list of classes
 	 * @return the entity manager factory
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public EntityManagerFactory createEntityManagerFactory(String emName, Map<String, String> map, String[] classes) {
 		try {

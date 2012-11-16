@@ -28,7 +28,7 @@ import org.batoo.jpa.parser.metadata.ColumnMetadata;
  * Implementation of {@link AttributeOverrideMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class AttributeOverrideMetadataImpl implements AttributeOverrideMetadata {
 
@@ -42,7 +42,7 @@ public class AttributeOverrideMetadataImpl implements AttributeOverrideMetadata 
 	 * @param annotation
 	 *            the annotation
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public AttributeOverrideMetadataImpl(AbstractLocator locator, AttributeOverride annotation) {

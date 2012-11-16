@@ -42,7 +42,7 @@ import com.google.common.collect.Maps;
  *            the entity type that is the target of the update
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class CriteriaUpdateImpl<T> extends CriteriaModify<T> {
 
@@ -52,7 +52,7 @@ public class CriteriaUpdateImpl<T> extends CriteriaModify<T> {
 	 * @param metamodel
 	 *            the metamodel
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public CriteriaUpdateImpl(MetamodelImpl metamodel) {
@@ -103,7 +103,7 @@ public class CriteriaUpdateImpl<T> extends CriteriaModify<T> {
 	 * 
 	 * @return the restriction
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private String generateSqlRestriction() {
@@ -140,7 +140,7 @@ public class CriteriaUpdateImpl<T> extends CriteriaModify<T> {
 	 * @param <Y>
 	 *            the typ of the attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public <Y> CriteriaUpdateImpl<T> set(Path<Y> attribute, Expression<? extends Y> value) {

@@ -32,7 +32,7 @@ import javax.persistence.ManyToOne;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Person {
@@ -49,7 +49,7 @@ public class Person {
 	private Address homeAddress; // (addressId)
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Person() {
 		super();
@@ -59,7 +59,7 @@ public class Person {
 	 * @param name
 	 *            the name of the person
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Person(String name) {
 		super();

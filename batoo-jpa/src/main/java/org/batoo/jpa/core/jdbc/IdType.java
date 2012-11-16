@@ -22,7 +22,7 @@ package org.batoo.jpa.core.jdbc;
  * The type of the id attributes
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public enum IdType {
 

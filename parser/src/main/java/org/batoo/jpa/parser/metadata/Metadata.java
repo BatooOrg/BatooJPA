@@ -28,7 +28,7 @@ import org.batoo.jpa.parser.metadata.type.ManagedTypeMetadata;
  * The root of the meta model.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface Metadata {
 
@@ -37,7 +37,7 @@ public interface Metadata {
 	 * 
 	 * @return true if persists should be cascaded by default, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	boolean cascadePersists();
@@ -47,7 +47,7 @@ public interface Metadata {
 	 * 
 	 * @return the default access type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	AccessType getAccessType();
@@ -57,7 +57,7 @@ public interface Metadata {
 	 * 
 	 * @return the catalog
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getCatalog();
@@ -67,7 +67,7 @@ public interface Metadata {
 	 * 
 	 * @return the list of entity Listeners
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<EntityListenerMetadata> getEntityListeners();
@@ -77,7 +77,7 @@ public interface Metadata {
 	 * 
 	 * @return the entity mappings
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<ManagedTypeMetadata> getEntityMappings();
@@ -87,7 +87,7 @@ public interface Metadata {
 	 * 
 	 * @return the list of named native queries
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<NamedNativeQueryMetadata> getNamedNativeQueries();
@@ -97,7 +97,7 @@ public interface Metadata {
 	 * 
 	 * @return the list of named queries
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<NamedQueryMetadata> getNamedQueries();
@@ -107,7 +107,7 @@ public interface Metadata {
 	 * 
 	 * @return the schema
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getSchema();
@@ -117,7 +117,7 @@ public interface Metadata {
 	 * 
 	 * @return the list of sequence generators
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<SequenceGeneratorMetadata> getSequenceGenerators();
@@ -127,7 +127,7 @@ public interface Metadata {
 	 * 
 	 * @return the list of table generators
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<TableGeneratorMetadata> getTableGenerators();
@@ -137,7 +137,7 @@ public interface Metadata {
 	 * 
 	 * @return true if the xml mapping metadata is complete, false otherwise.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	boolean isXmlMappingMetadataComplete();

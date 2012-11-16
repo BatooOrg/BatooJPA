@@ -25,7 +25,7 @@ import org.batoo.jpa.parser.metadata.ColumnTransformerMetadata;
 /**
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.0
  */
 public class ColumnTransformerMetadataImpl implements ColumnTransformerMetadata {
 
@@ -38,7 +38,7 @@ public class ColumnTransformerMetadataImpl implements ColumnTransformerMetadata 
 	 * @param columnTransformer the column transformer
 	 * 
 	 * @author asimarslan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ColumnTransformerMetadataImpl(AbstractLocator locator, ColumnTransformer columnTransformer) {
 		super();

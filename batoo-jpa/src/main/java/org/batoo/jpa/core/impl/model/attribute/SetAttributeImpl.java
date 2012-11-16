@@ -38,7 +38,7 @@ import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
  *            The element type of the represented collection
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>, E> implements SetAttribute<X, E> {
 
@@ -49,7 +49,7 @@ public class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>, E> im
 	 *            the metadata
 	 * @param attributeType
 	 *            attribute type
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public SetAttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata, PersistentAttributeType attributeType) {
 		super(declaringType, metadata, attributeType, 0);

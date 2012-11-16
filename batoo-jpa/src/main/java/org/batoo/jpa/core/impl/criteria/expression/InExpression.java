@@ -39,7 +39,7 @@ import com.google.common.collect.Lists;
  * Expression for in predicates.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class InExpression extends AbstractExpression<Boolean> {
 
@@ -53,7 +53,7 @@ public class InExpression extends AbstractExpression<Boolean> {
 	 * @param values
 	 *            the values
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public InExpression(AbstractExpression<?> inner, Expression<?>[] values) {
 		super(Boolean.class);
@@ -70,7 +70,7 @@ public class InExpression extends AbstractExpression<Boolean> {
 	 * @param values
 	 *            the values
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public InExpression(Expression<?> inner, Collection<?> values) {
 		super(Boolean.class);
@@ -92,7 +92,7 @@ public class InExpression extends AbstractExpression<Boolean> {
 	 * @param expression
 	 *            the expression to add
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void add(AbstractExpression<?> expression) {
 		this.values.add(expression);

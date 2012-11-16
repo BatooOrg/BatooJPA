@@ -32,7 +32,7 @@ import java.io.Reader;
  * An un-synchronised version of BufferedReader.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class SqlReader {
 
@@ -70,7 +70,7 @@ public class SqlReader {
 	 * 
 	 * @throws IOException
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private void fill() throws IOException {
 		int dst;
@@ -130,7 +130,7 @@ public class SqlReader {
 	 * 
 	 * @see java.nio.file.Files#readAllLines
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String readLine() throws IOException {
 		StringBuilder s = null;

@@ -36,7 +36,7 @@ import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
  * Element for <code>basic</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class BasicAttributeElement extends PhysicalAttributeElement implements BasicAttributeMetadata {
 
@@ -51,7 +51,7 @@ public class BasicAttributeElement extends PhysicalAttributeElement implements B
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public BasicAttributeElement(ParentElement parent, Map<String, String> attributes) {

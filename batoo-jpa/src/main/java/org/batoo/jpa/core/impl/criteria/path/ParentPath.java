@@ -54,7 +54,7 @@ import com.google.common.collect.Maps;
  *            the type referenced by the path
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class ParentPath<Z, X> extends AbstractPath<X> implements Path<X> {
 
@@ -66,7 +66,7 @@ public abstract class ParentPath<Z, X> extends AbstractPath<X> implements Path<X
 	 * @param javaType
 	 *            the java type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ParentPath(ParentPath<?, Z> parent, Class<X> javaType) {
 		super(parent, javaType);
@@ -142,7 +142,7 @@ public abstract class ParentPath<Z, X> extends AbstractPath<X> implements Path<X
 	 *            the query
 	 * @return the table alias for the column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getColumnAlias(BaseQueryImpl<?> query, AbstractColumn column) {
 		return null;
@@ -159,7 +159,7 @@ public abstract class ParentPath<Z, X> extends AbstractPath<X> implements Path<X
 	 * @param <C>
 	 *            the element type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public <Y, C extends Collection<Y>> AbstractExpression<Y> getExpression(String attributeName) {
@@ -181,7 +181,7 @@ public abstract class ParentPath<Z, X> extends AbstractPath<X> implements Path<X
 	 * 
 	 * @return the fetch root
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract FetchParentImpl<?, X> getFetchRoot();
 
@@ -196,7 +196,7 @@ public abstract class ParentPath<Z, X> extends AbstractPath<X> implements Path<X
 	 *            the type of the child mapping
 	 * @return the child mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected abstract <C, Y> Mapping<? super X, C, Y> getMapping(String name);
 }

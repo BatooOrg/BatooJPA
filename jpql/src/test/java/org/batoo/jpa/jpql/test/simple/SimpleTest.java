@@ -38,7 +38,7 @@ import com.google.common.base.Joiner;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class SimpleTest {
 
@@ -88,7 +88,7 @@ public class SimpleTest {
 	}
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testTestSimpleSelect() {

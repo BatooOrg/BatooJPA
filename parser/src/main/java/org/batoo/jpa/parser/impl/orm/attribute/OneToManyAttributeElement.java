@@ -49,7 +49,7 @@ import com.google.common.collect.Lists;
  * Element for <code>one-to-many</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class OneToManyAttributeElement extends AssociationElement implements OneToManyAttributeMetadata {
 
@@ -72,7 +72,7 @@ public class OneToManyAttributeElement extends AssociationElement implements One
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public OneToManyAttributeElement(ParentElement parent, Map<String, String> attributes) {
@@ -125,7 +125,7 @@ public class OneToManyAttributeElement extends AssociationElement implements One
 	 * 
 	 * @return the mapKeyClass of the OneToManyAttributeElement
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public String getMapKeyClass() {

@@ -32,7 +32,7 @@ import com.google.common.base.Splitter;
  *            the type of the entity
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class EntityMapping<X> extends ParentMapping<X, X> implements RootMapping<X> {
 
@@ -42,7 +42,7 @@ public class EntityMapping<X> extends ParentMapping<X, X> implements RootMapping
 	 * @param entity
 	 *            the entity
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public EntityMapping(EntityTypeImpl<X> entity) {
@@ -70,7 +70,7 @@ public class EntityMapping<X> extends ParentMapping<X, X> implements RootMapping
 	 * 
 	 * @return the entity of the root mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public EntityTypeImpl<X> getEntity() {
 		return this.entity;

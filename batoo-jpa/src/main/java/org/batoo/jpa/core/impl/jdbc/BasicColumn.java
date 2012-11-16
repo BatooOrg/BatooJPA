@@ -29,7 +29,7 @@ import org.batoo.jpa.parser.metadata.ColumnMetadata;
  * BasicColumn to persist basic attributes of the entity.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class BasicColumn extends AbstractColumn {
 
@@ -58,7 +58,7 @@ public class BasicColumn extends AbstractColumn {
 	 * @param metadata
 	 *            the metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public BasicColumn(JdbcAdaptor jdbcAdaptor, BasicMapping<?, ?> mapping, int sqlType, ColumnMetadata metadata) {
 		super(mapping.getAttribute().getJavaType(), mapping.getIdType(), mapping.getAttribute().getTemporalType(), mapping.getAttribute().getEnumType(),
@@ -105,7 +105,7 @@ public class BasicColumn extends AbstractColumn {
 	 * 
 	 * @return the mapping of the BasicColumn
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Override
 	public BasicMapping<?, ?> getMapping() {
@@ -217,7 +217,7 @@ public class BasicColumn extends AbstractColumn {
 	 * @param table
 	 *            the owning table
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Override
 	public void setTable(AbstractTable table) {
@@ -234,7 +234,7 @@ public class BasicColumn extends AbstractColumn {
 	 * @param value
 	 *            the value to set
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Override
 	public void setValue(Object instance, Object value) {

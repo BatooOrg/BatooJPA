@@ -33,7 +33,7 @@ import com.google.common.collect.Sets;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Foo3 {
@@ -53,7 +53,7 @@ public class Foo3 {
 	 * 
 	 * @return the images of the Foo3
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Set<Bar3> getImages() {
 		return this.images;
@@ -64,7 +64,7 @@ public class Foo3 {
 	 * 
 	 * @return the images2 of the Foo3
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Map<Integer, Bar3> getImages2() {
 		return this.images2;
@@ -75,7 +75,7 @@ public class Foo3 {
 	 * 
 	 * @return the key of the Foo3
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getKey() {
 		return this.key;

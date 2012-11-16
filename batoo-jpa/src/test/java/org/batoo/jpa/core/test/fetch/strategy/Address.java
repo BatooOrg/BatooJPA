@@ -28,7 +28,7 @@ import javax.persistence.ManyToOne;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Address {
@@ -44,7 +44,7 @@ public class Address {
 	private City city;
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Address() {
 		super();
@@ -56,7 +56,7 @@ public class Address {
 	 * @param city
 	 *            the city
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Address(Person person, City city) {
 		super();
@@ -72,7 +72,7 @@ public class Address {
 	 * 
 	 * @return the city of the Address
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public City getCity() {
 		return this.city;
@@ -82,7 +82,7 @@ public class Address {
 	 * Returns the id.
 	 * 
 	 * @return the id
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -92,7 +92,7 @@ public class Address {
 	 * Returns the person.
 	 * 
 	 * @return the person
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Person getPerson() {
 		return this.person;
@@ -104,7 +104,7 @@ public class Address {
 	 * @param city
 	 *            the city to set for Address
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setCity(City city) {
 		this.city = city;
@@ -115,7 +115,7 @@ public class Address {
 	 * 
 	 * @param person
 	 *            the person to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setPerson(Person person) {
 		this.person = person;

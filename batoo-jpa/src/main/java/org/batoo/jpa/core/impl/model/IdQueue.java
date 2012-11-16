@@ -29,14 +29,14 @@ import org.batoo.common.log.BLoggerFactory;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class IdQueue extends LinkedBlockingQueue<Long> {
 
 	/**
 	 * 
 	 * @author hceylan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private final class TopUpTask implements Runnable {
 
@@ -63,7 +63,7 @@ public abstract class IdQueue extends LinkedBlockingQueue<Long> {
 	 * @param allocationSize
 	 *            the allocations size
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public IdQueue(ExecutorService idExecuter, String name, int allocationSize) {
 		super();
@@ -81,7 +81,7 @@ public abstract class IdQueue extends LinkedBlockingQueue<Long> {
 	 * @param runnable
 	 *            the runnable to run to top-up
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void doTopUp(Runnable runnable) {
 		if (this.idExecuter.isShutdown()) {
@@ -129,7 +129,7 @@ public abstract class IdQueue extends LinkedBlockingQueue<Long> {
 	 * @return the next id
 	 * @throws SQLException
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected abstract Long getNextId() throws SQLException;
 

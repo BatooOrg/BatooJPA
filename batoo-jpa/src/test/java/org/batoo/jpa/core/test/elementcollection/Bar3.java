@@ -23,7 +23,7 @@ import javax.persistence.Embeddable;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Embeddable
 public class Bar3 {
@@ -33,7 +33,7 @@ public class Bar3 {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Bar3() {
 		super();
@@ -45,7 +45,7 @@ public class Bar3 {
 	 * @param strValue
 	 *            str value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Bar3(int intValue, String strValue) {
 		super();
@@ -89,7 +89,7 @@ public class Bar3 {
 	 * 
 	 * @return the intValue of the Bar3
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public int getIntValue() {
 		return this.intValue;
@@ -100,7 +100,7 @@ public class Bar3 {
 	 * 
 	 * @return the strValue of the Bar3
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getStrValue() {
 		return this.strValue;
@@ -125,7 +125,7 @@ public class Bar3 {
 	 * @param intValue
 	 *            the intValue to set for Bar3
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setIntValue(int intValue) {
 		this.intValue = intValue;
@@ -137,7 +137,7 @@ public class Bar3 {
 	 * @param strValue
 	 *            the strValue to set for Bar3
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setStrValue(String strValue) {
 		this.strValue = strValue;

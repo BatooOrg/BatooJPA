@@ -24,7 +24,7 @@ import java.util.List;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface AttributesMetadata {
 
@@ -33,7 +33,7 @@ public interface AttributesMetadata {
 	 * 
 	 * @return the basic attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<BasicAttributeMetadata> getBasics();
@@ -43,7 +43,7 @@ public interface AttributesMetadata {
 	 * 
 	 * @return the element collection attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<ElementCollectionAttributeMetadata> getElementCollections();
@@ -53,7 +53,7 @@ public interface AttributesMetadata {
 	 * 
 	 * @return the embedded id attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<EmbeddedIdAttributeMetadata> getEmbeddedIds();
@@ -63,7 +63,7 @@ public interface AttributesMetadata {
 	 * 
 	 * @return the embedded attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<EmbeddedAttributeMetadata> getEmbeddeds();
@@ -73,7 +73,7 @@ public interface AttributesMetadata {
 	 * 
 	 * @return the id attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<IdAttributeMetadata> getIds();
@@ -83,7 +83,7 @@ public interface AttributesMetadata {
 	 * 
 	 * @return the many-to-many attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<ManyToManyAttributeMetadata> getManyToManies();
@@ -93,7 +93,7 @@ public interface AttributesMetadata {
 	 * 
 	 * @return the many-to-one attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<ManyToOneAttributeMetadata> getManyToOnes();
@@ -103,7 +103,7 @@ public interface AttributesMetadata {
 	 * 
 	 * @return the one-to-many attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<OneToManyAttributeMetadata> getOneToManies();
@@ -113,7 +113,7 @@ public interface AttributesMetadata {
 	 * 
 	 * @return the one-to-one attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<OneToOneAttributeMetadata> getOneToOnes();
@@ -123,7 +123,7 @@ public interface AttributesMetadata {
 	 * 
 	 * @return the transient attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<TransientAttributeMetadata> getTransients();
@@ -133,7 +133,7 @@ public interface AttributesMetadata {
 	 * 
 	 * @return the version attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<VersionAttributeMetadata> getVersions();

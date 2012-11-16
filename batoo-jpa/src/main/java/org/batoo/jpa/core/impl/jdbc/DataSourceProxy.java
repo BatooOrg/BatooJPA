@@ -32,7 +32,7 @@ import org.batoo.jpa.core.impl.jdbc.PreparedStatementProxy.SqlLoggingType;
  * Proxy class to proxy datasources. Main purpose is to cache and wrap the prepared statements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class DataSourceProxy implements DataSource {
 
@@ -51,7 +51,7 @@ public class DataSourceProxy implements DataSource {
 	 * @param jdbcFetchSize
 	 *            the size of the jdbc fetch
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public DataSourceProxy(DataSource datasource, SqlLoggingType sqlLogging, long slowSqlThreshold, int jdbcFetchSize) {
 		super();
@@ -94,7 +94,7 @@ public class DataSourceProxy implements DataSource {
 	 * 
 	 * @return the delegate datasource
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public DataSource getDelegate() {
 		return this.datasource;

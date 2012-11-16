@@ -24,7 +24,7 @@ import org.batoo.jpa.parser.impl.AbstractLocator;
  * The interface to obtain the location metadata.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface LocatableMatadata {
 
@@ -33,7 +33,7 @@ public interface LocatableMatadata {
 	 * 
 	 * @return the locator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	AbstractLocator getLocator();

@@ -22,7 +22,7 @@ package org.batoo.jpa.core.test.listener;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface FooType {
 
@@ -31,7 +31,7 @@ public interface FooType {
 	 * 
 	 * @return the value of the Foo1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	String getValue();
 
@@ -41,7 +41,7 @@ public interface FooType {
 	 * @param value
 	 *            the value to set for Foo1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	void setValue(String value);
 }

@@ -33,7 +33,7 @@ import com.google.common.base.Splitter;
  *            the embeddable type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ElementMapping<X> extends ParentMapping<X, X> implements RootMapping<X> {
 
@@ -46,7 +46,7 @@ public class ElementMapping<X> extends ParentMapping<X, X> implements RootMappin
 	 * @param embeddable
 	 *            the embeddable
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ElementMapping(ElementCollectionMapping<?, ?, X> mapping, EmbeddableTypeImpl<X> embeddable) {
 		super(null, null, embeddable.getJavaType(), null);
@@ -71,7 +71,7 @@ public class ElementMapping<X> extends ParentMapping<X, X> implements RootMappin
 	 * 
 	 * @return the collection table
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public AbstractTable getCollectionTable() {
 		return this.mapping.getCollectionTable();
@@ -84,7 +84,7 @@ public class ElementMapping<X> extends ParentMapping<X, X> implements RootMappin
 	 *            the path of the mapping
 	 * @return the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Override
 	public Mapping<?, ?, ?> getMapping(String path) {

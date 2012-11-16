@@ -22,7 +22,7 @@ package org.batoo.jpa.core.impl.criteria.expression;
  * The types for the numberic functions.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public enum NumericFunctionType {
 	/**

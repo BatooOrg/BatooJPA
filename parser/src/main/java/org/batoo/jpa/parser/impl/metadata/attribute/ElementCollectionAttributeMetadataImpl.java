@@ -58,7 +58,7 @@ import com.google.common.collect.Lists;
  * Implementation element collection attributes.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImpl implements ElementCollectionAttributeMetadata {
 
@@ -86,7 +86,7 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 * @param metadata
 	 *            the metadata definition of the attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public ElementCollectionAttributeMetadataImpl(Member member, ElementCollectionAttributeMetadata metadata) {
@@ -121,7 +121,7 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 * @param parsed
 	 *            the list of annotations parsed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public ElementCollectionAttributeMetadataImpl(Member member, String name, ElementCollection elementCollection, Set<Class<? extends Annotation>> parsed) {
@@ -301,7 +301,7 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 * @param parsed
 	 *            the list of annotations parsed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private void handleAttributeOverrides(Member member, Set<Class<? extends Annotation>> parsed) {
@@ -331,7 +331,7 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 *            the list of annotations parsed
 	 * @return the collection table metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private CollectionTableMetadata handleCollectionTable(Member member, Set<Class<? extends Annotation>> parsed) {
@@ -353,7 +353,7 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 *            the list of annotations parsed
 	 * @return the map key value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private ColumnMetadata handleColumn(final Member member, Set<Class<? extends Annotation>> parsed) {
@@ -376,7 +376,7 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 *            the list of annotations parsed
 	 * @return the map key value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private EnumType handleEnumType(Member member, Set<Class<? extends Annotation>> parsed) {
@@ -401,7 +401,7 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 *            the list of annotations parsed
 	 * @return the map key value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private boolean handleLob(Member member, Set<Class<? extends Annotation>> parsed) {
@@ -424,7 +424,7 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 *            the list of annotations parsed
 	 * @return the map key value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private String handleMapKey(Member member, Set<Class<? extends Annotation>> parsed) {
@@ -447,7 +447,7 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 *            the list of annotations parsed
 	 * @return the map key value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private String handleMapKeyClassName(Member member, Set<Class<? extends Annotation>> parsed) {
@@ -470,7 +470,7 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 *            the list of annotations parsed
 	 * @return the map key value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private ColumnMetadata handleMapKeyColumn(final Member member, Set<Class<? extends Annotation>> parsed) {
@@ -493,7 +493,7 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 *            the list of annotations parsed
 	 * @return the map key value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private EnumType handleMapKeyEnumType(Member member, Set<Class<? extends Annotation>> parsed) {
@@ -516,7 +516,7 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 *            the list of annotations parsed
 	 * @return the map key value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private TemporalType handleMapKeyTemporalType(Member member, Set<Class<? extends Annotation>> parsed) {
@@ -539,7 +539,7 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 *            the list of annotations parsed
 	 * @return the map key value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private String handleOrderBy(Member member, Set<Class<? extends Annotation>> parsed) {
@@ -562,7 +562,7 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 *            the list of annotations parsed
 	 * @return the map key value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private ColumnMetadata handleOrderColumn(final Member member, Set<Class<? extends Annotation>> parsed) {
@@ -585,7 +585,7 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 	 *            the list of annotations parsed
 	 * @return the map key value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private TemporalType handleTemporalType(Member member, Set<Class<? extends Annotation>> parsed) {

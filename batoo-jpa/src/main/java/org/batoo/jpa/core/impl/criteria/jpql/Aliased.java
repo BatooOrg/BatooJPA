@@ -24,7 +24,7 @@ import org.antlr.runtime.tree.Tree;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class Aliased {
 
@@ -35,7 +35,7 @@ public class Aliased {
 	 * @param aliased
 	 *            aliased tree
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Aliased(Tree aliased) {
 		super();
@@ -55,7 +55,7 @@ public class Aliased {
 	 * 
 	 * @return the alias of the Aliased
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected String getAlias() {
 		return this.alias;
@@ -66,7 +66,7 @@ public class Aliased {
 	 * 
 	 * @return the qualified of the Aliased
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected Qualified getQualified() {
 		return this.qualified;

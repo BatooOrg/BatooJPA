@@ -27,7 +27,7 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
  * Reference to another cachable entity
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class CacheReference implements Serializable {
 
@@ -40,7 +40,7 @@ public class CacheReference implements Serializable {
 	 * @param reference
 	 *            the child
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public CacheReference(MetamodelImpl metamodel, Object reference) {
 		super();
@@ -56,7 +56,7 @@ public class CacheReference implements Serializable {
 	 * 
 	 * @return the id of the reference
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Object getId() {
 		return this.id;
@@ -67,7 +67,7 @@ public class CacheReference implements Serializable {
 	 * 
 	 * @return the type of the reference
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getType() {
 		return this.type;

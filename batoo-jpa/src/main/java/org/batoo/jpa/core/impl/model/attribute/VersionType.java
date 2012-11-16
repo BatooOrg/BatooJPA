@@ -24,7 +24,7 @@ import java.sql.Timestamp;
  * Possible types for the version attributes.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @SuppressWarnings("javadoc")
 public enum VersionType {
@@ -49,7 +49,7 @@ public enum VersionType {
 	 * @param clazz
 	 *            the class of the version attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public static VersionType versionType(Class<?> clazz) {
 		for (final VersionType versionType : VersionType.values()) {

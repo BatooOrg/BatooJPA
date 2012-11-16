@@ -41,7 +41,7 @@ import org.batoo.jpa.parser.metadata.attribute.BasicAttributeMetadata;
  * The implementation of the {@link BasicAttributeMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class BasicAttributeMetadataImpl extends PhysicalAttributeMetadataImpl implements BasicAttributeMetadata {
 
@@ -58,7 +58,7 @@ public class BasicAttributeMetadataImpl extends PhysicalAttributeMetadataImpl im
 	 * @param metadata
 	 *            the metadata definition of the basic attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public BasicAttributeMetadataImpl(Member member, BasicAttributeMetadata metadata) {
@@ -80,7 +80,7 @@ public class BasicAttributeMetadataImpl extends PhysicalAttributeMetadataImpl im
 	 * @param parsed
 	 *            set of annotations parsed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public BasicAttributeMetadataImpl(Member member, String name, Set<Class<? extends Annotation>> parsed) {

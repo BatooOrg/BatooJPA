@@ -39,7 +39,7 @@ import com.google.common.collect.Sets;
  * The abstract implementation of {@link AnnotatedClassLocator}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class BaseAnnotatedClassLocator implements AnnotatedClassLocator {
 
@@ -76,7 +76,7 @@ public abstract class BaseAnnotatedClassLocator implements AnnotatedClassLocator
 	 *            the persistence unit info
 	 * @return the array of classes located
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public static Set<Class<?>> locatePersistentClasses(PersistenceUnitInfo puInfo) {
@@ -111,7 +111,7 @@ public abstract class BaseAnnotatedClassLocator implements AnnotatedClassLocator
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	protected BaseAnnotatedClassLocator() {
@@ -127,7 +127,7 @@ public abstract class BaseAnnotatedClassLocator implements AnnotatedClassLocator
 	 *            the name of the class
 	 * @return true if the class with then name <code>className</code> is an annotated persistent class, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	protected Class<?> isPersistentClass(ClassLoader classloader, String className) {

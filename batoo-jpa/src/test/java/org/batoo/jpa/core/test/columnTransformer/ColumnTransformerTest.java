@@ -33,7 +33,7 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class ColumnTransformerTest extends BaseCoreTest {
 
@@ -60,7 +60,7 @@ public class ColumnTransformerTest extends BaseCoreTest {
 	 * 
 	 * @throws SQLException
 	 *             thrown if fails
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testPersist() throws SQLException {
@@ -80,7 +80,7 @@ public class ColumnTransformerTest extends BaseCoreTest {
 
 	/**
 	 *
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testRead() {
@@ -99,7 +99,7 @@ public class ColumnTransformerTest extends BaseCoreTest {
 	/**
 	 *
 	 * @throws SQLException  	            thrown if fails
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testWrite() throws SQLException {
@@ -115,7 +115,7 @@ public class ColumnTransformerTest extends BaseCoreTest {
 	}
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testWrite2() {

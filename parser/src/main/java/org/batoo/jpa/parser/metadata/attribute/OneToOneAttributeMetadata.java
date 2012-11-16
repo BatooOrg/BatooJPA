@@ -26,7 +26,7 @@ import org.batoo.jpa.parser.metadata.PrimaryKeyJoinColumnMetadata;
  * The definition of the one to one attributes.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface OneToOneAttributeMetadata extends AssociationAttributeMetadata, OrphanableAssociationAttributeMetadata, OptionalAssociationAttributeMetadata,
 	MappableAssociationAttributeMetadata {
@@ -36,7 +36,7 @@ public interface OneToOneAttributeMetadata extends AssociationAttributeMetadata,
 	 * 
 	 * @return the primary key join columns definition of the one to one attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<PrimaryKeyJoinColumnMetadata> getPrimaryKeyJoinColumns();

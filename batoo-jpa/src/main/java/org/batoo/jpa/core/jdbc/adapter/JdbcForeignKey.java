@@ -31,7 +31,7 @@ import com.google.common.collect.Maps;
  * The metadata for a foreign of an existing table.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class JdbcForeignKey {
 
@@ -52,7 +52,7 @@ public class JdbcForeignKey {
 	 * @throws SQLException
 	 *             thrown in case of an SQL error.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public JdbcForeignKey(ResultSet metadata) throws SQLException {
 		super();
@@ -69,7 +69,7 @@ public class JdbcForeignKey {
 	 * @throws SQLException
 	 *             thrown in case of an SQL error.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void addColumn(ResultSet metadata) throws SQLException {
 		final String columnName = metadata.getString(JdbcForeignKey.FKCOLUMN_NAME);
@@ -83,7 +83,7 @@ public class JdbcForeignKey {
 	 * 
 	 * @return the name of the foreign key
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		return this.name;
@@ -94,7 +94,7 @@ public class JdbcForeignKey {
 	 * 
 	 * @return the refTable of the foreign key
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getRefTable() {
 		return this.refTable;
@@ -107,7 +107,7 @@ public class JdbcForeignKey {
 	 *            the foreign key definition
 	 * @return true if it matches, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean matches(ForeignKey foreignKey) {
 		// referenced table name must match

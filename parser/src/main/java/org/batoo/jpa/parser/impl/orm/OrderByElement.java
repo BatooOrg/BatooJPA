@@ -24,7 +24,7 @@ import java.util.Map;
  * Element for <code>order-by</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class OrderByElement extends ChildElement {
 
@@ -36,7 +36,7 @@ public class OrderByElement extends ChildElement {
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public OrderByElement(ParentElement parent, Map<String, String> attributes) {
@@ -57,7 +57,7 @@ public class OrderByElement extends ChildElement {
 	 * 
 	 * @return the order by
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public String getOrderBy() {

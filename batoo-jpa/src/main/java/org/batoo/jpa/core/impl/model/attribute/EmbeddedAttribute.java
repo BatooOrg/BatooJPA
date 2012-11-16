@@ -43,7 +43,7 @@ import com.google.common.collect.Lists;
  *            The type of the represented attribute
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class EmbeddedAttribute<X, T> extends SingularAttributeImpl<X, T> implements SingularAttribute<X, T> {
 
@@ -60,7 +60,7 @@ public class EmbeddedAttribute<X, T> extends SingularAttributeImpl<X, T> impleme
 	 * @param metadata
 	 *            the metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public EmbeddedAttribute(IdentifiableTypeImpl<X> declaringType, EmbeddedIdAttributeMetadata metadata) {
 		super(declaringType, metadata);
@@ -79,7 +79,7 @@ public class EmbeddedAttribute<X, T> extends SingularAttributeImpl<X, T> impleme
 	 * @param metadata
 	 *            the metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public EmbeddedAttribute(ManagedTypeImpl<X> declaringType, EmbeddedAttributeMetadata metadata) {
 		super(declaringType, metadata);
@@ -97,7 +97,7 @@ public class EmbeddedAttribute<X, T> extends SingularAttributeImpl<X, T> impleme
 	 *            the path
 	 * @return the association override if one exists for the path, otherwise <code>null</code>
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public AssociationMetadata getAssociationOverride(String path) {
 		for (final AssociationMetadata override : this.associationOverrides) {
@@ -116,7 +116,7 @@ public class EmbeddedAttribute<X, T> extends SingularAttributeImpl<X, T> impleme
 	 *            the path
 	 * @return the attribute override if one exists for the path, otherwise <code>null</code>
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ColumnMetadata getAttributeOverride(String path) {
 		for (final AttributeOverrideMetadata override : this.attributeOverrides) {
@@ -191,7 +191,7 @@ public class EmbeddedAttribute<X, T> extends SingularAttributeImpl<X, T> impleme
 	 * 
 	 * @return the instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public T newInstance() {
 		return this.getType().newInstance();

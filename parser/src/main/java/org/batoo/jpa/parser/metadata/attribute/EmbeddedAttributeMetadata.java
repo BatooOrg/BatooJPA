@@ -27,7 +27,7 @@ import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
  * The definition of embedded attributes.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface EmbeddedAttributeMetadata extends AttributeMetadata {
 
@@ -36,7 +36,7 @@ public interface EmbeddedAttributeMetadata extends AttributeMetadata {
 	 * 
 	 * @return the list of association overrides for the embedded attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<AssociationMetadata> getAssociationOverrides();
@@ -46,7 +46,7 @@ public interface EmbeddedAttributeMetadata extends AttributeMetadata {
 	 * 
 	 * @return the list of attribute overrides for the embedded attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<AttributeOverrideMetadata> getAttributeOverrides();

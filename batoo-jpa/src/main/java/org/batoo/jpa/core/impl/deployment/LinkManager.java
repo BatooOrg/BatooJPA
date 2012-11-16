@@ -33,7 +33,7 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
  * A Manager that performs the association linking operations.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class LinkManager extends DeploymentManager<EntityTypeImpl<?>> {
 
@@ -41,7 +41,7 @@ public class LinkManager extends DeploymentManager<EntityTypeImpl<?>> {
 	 * The linking phase
 	 * 
 	 * @author hceylan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public static enum Phase {
 
@@ -71,7 +71,7 @@ public class LinkManager extends DeploymentManager<EntityTypeImpl<?>> {
 	 * @throws BatooException
 	 *             thrown in case of an underlying exception
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public static void perform(MetamodelImpl metamodel) throws BatooException {
 		new LinkManager(metamodel, Phase.LINK_ASSOCIATIONS).perform();

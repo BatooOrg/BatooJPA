@@ -35,7 +35,7 @@ import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
  *            the element type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class CollectionJoinImpl<Z, E> extends AbstractPluralJoin<Z, Collection<E>, E> implements CollectionJoin<Z, E> {
 
@@ -47,7 +47,7 @@ public class CollectionJoinImpl<Z, E> extends AbstractPluralJoin<Z, Collection<E
 	 * @param jointType
 	 *            the join type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public CollectionJoinImpl(AbstractFrom<?, Z> parent, PluralMapping<? super Z, Collection<E>, E> mapping, JoinType jointType) {
 		super(parent, mapping, jointType);

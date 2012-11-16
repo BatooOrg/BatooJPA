@@ -24,7 +24,7 @@ import java.io.Serializable;
  * Interface implemented by enhanced managed instances.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface EnhancedInstance extends Serializable {
 
@@ -33,7 +33,7 @@ public interface EnhancedInstance extends Serializable {
 	 * 
 	 * @return the managed instance of the instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	ManagedInstance<?> __enhanced__$$__getManagedInstance();
 
@@ -42,14 +42,14 @@ public interface EnhancedInstance extends Serializable {
 	 * 
 	 * @return true if the instance has been initialized
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	boolean __enhanced__$$__isInitialized();
 
 	/**
 	 * Marks the instance as initialized.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	void __enhanced__$$__setInitialized();
 
@@ -59,7 +59,7 @@ public interface EnhancedInstance extends Serializable {
 	 * @param instance
 	 *            the instance to set
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	void __enhanced__$$__setManagedInstance(ManagedInstance<?> instance);
 }

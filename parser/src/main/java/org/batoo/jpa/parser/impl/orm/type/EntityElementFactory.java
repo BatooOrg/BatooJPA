@@ -59,7 +59,7 @@ import com.google.common.collect.Lists;
  * Element for <code>entity</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class EntityElementFactory extends ParentElement implements EntityMetadata {
 
@@ -94,7 +94,7 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public EntityElementFactory(ParentElement parent, Map<String, String> attributes) {

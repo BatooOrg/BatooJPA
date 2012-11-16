@@ -77,7 +77,7 @@ import com.google.common.collect.Sets;
  * @param <X>
  *            query result type
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class QueryImpl<X> implements TypedQuery<X>, Query {
 
@@ -113,7 +113,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 * @param entityManager
 	 *            the entity manager
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public QueryImpl(BaseQuery<X> q, EntityManagerImpl entityManager) {
@@ -320,7 +320,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 * @throws SQLException
 	 *             thrown by the underlying database in case of an error
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private void buildResultSetImpl(final Connection connection, final Object[] parameters) throws SQLException {
@@ -466,7 +466,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 *            the repeat map
 	 * @return the expanded SQL
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private String expandParams(String _sql, Map<Integer, Integer> repeat) {
@@ -526,7 +526,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 * @throws SQLException
 	 *             thrown in case of an underlying SQL Exception
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private void fillStatement(PreparedStatement statement, Object[] parameters, Map<Integer, Integer> repeat) throws SQLException {
@@ -600,7 +600,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 * 
 	 * @return the criteria query of the typed query
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public BaseQuery<X> getCriteriaQuery() {
@@ -848,7 +848,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 * @return
 	 * @throws SQLException
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private List<X> handle(ResultSet rs) throws SQLException {
@@ -1080,7 +1080,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 * @throws SQLException
 	 *             thrown in case of an underlying SQL Exception
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public void storeData(ResultSet rs) throws SQLException {

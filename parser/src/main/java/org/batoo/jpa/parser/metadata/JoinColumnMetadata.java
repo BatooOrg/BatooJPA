@@ -22,7 +22,7 @@ package org.batoo.jpa.parser.metadata;
  * The definition of join columns.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface JoinColumnMetadata extends BaseColumnMetadata {
 
@@ -31,7 +31,7 @@ public interface JoinColumnMetadata extends BaseColumnMetadata {
 	 * 
 	 * @return the name of the referenced column of the join column
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getReferencedColumnName();

@@ -27,7 +27,7 @@ import javax.persistence.OneToOne;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Cubicle {
@@ -43,7 +43,7 @@ public class Cubicle {
 	 * Returns the id.
 	 * 
 	 * @return the id
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -53,7 +53,7 @@ public class Cubicle {
 	 * Returns the manager.
 	 * 
 	 * @return the manager
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Employee getManager() {
 		return this.manager;
@@ -64,7 +64,7 @@ public class Cubicle {
 	 * 
 	 * @param manager
 	 *            the manager to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setManager(Employee manager) {
 		this.manager = manager;

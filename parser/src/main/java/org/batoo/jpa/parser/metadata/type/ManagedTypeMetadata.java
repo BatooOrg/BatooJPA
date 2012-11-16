@@ -27,7 +27,7 @@ import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
  * The definition of the managed types.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface ManagedTypeMetadata extends LocatableMatadata {
 
@@ -36,7 +36,7 @@ public interface ManagedTypeMetadata extends LocatableMatadata {
 	 * 
 	 * @return the access type of the entity
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	AccessType getAccessType();
@@ -46,7 +46,7 @@ public interface ManagedTypeMetadata extends LocatableMatadata {
 	 * 
 	 * @return the attributes of the entity
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	AttributesMetadata getAttributes();
@@ -56,7 +56,7 @@ public interface ManagedTypeMetadata extends LocatableMatadata {
 	 * 
 	 * @return the name of the class of the entity
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getClassName();
@@ -66,7 +66,7 @@ public interface ManagedTypeMetadata extends LocatableMatadata {
 	 * 
 	 * @return true if the entity's metadata is complete
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	boolean isMetadataComplete();

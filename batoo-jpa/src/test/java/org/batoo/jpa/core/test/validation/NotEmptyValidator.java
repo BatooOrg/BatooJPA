@@ -33,7 +33,7 @@ public class NotEmptyValidator implements ConstraintValidator<NotEmpty, Collecti
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public NotEmptyValidator() {
 		super();

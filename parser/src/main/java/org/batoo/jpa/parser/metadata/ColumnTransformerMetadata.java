@@ -22,7 +22,7 @@ package org.batoo.jpa.parser.metadata;
  * Definition for ColumnTransformer
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.0
  */
 public interface ColumnTransformerMetadata extends LocatableMatadata {
 

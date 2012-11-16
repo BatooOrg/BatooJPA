@@ -26,7 +26,7 @@ import org.batoo.jpa.parser.metadata.PrimaryKeyJoinColumnMetadata;
  * Element for <code>primary-key-join-column</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class PrimaryKeyJoinColumnElement extends ChildElement implements PrimaryKeyJoinColumnMetadata {
 
@@ -40,7 +40,7 @@ public class PrimaryKeyJoinColumnElement extends ChildElement implements Primary
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public PrimaryKeyJoinColumnElement(ParentElement parent, Map<String, String> attributes) {

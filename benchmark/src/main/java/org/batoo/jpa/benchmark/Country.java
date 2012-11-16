@@ -27,7 +27,7 @@ import javax.persistence.TableGenerator;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 @TableGenerator(name = "country_id", allocationSize = 1000)
@@ -68,7 +68,7 @@ public class Country {
 	 * Returns the id.
 	 * 
 	 * @return the id
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -78,7 +78,7 @@ public class Country {
 	 * Returns the name.
 	 * 
 	 * @return the name
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		return this.name;
@@ -101,7 +101,7 @@ public class Country {
 	 * 
 	 * @param id
 	 *            the id to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setId(Integer id) {
 		this.id = id;
@@ -112,7 +112,7 @@ public class Country {
 	 * 
 	 * @param name
 	 *            the name to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setName(String name) {
 		this.name = name;

@@ -52,7 +52,7 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class SimpleCriteriaTest extends BaseCoreTest {
 
@@ -95,7 +95,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Before
 	public void prepareCountries() {
@@ -110,7 +110,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testArithmeticExpression1() {
@@ -136,7 +136,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testArithmeticExpression2() {
@@ -162,7 +162,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testAssociation() {
@@ -183,7 +183,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testAssociationJoin() {
@@ -207,7 +207,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testBooleanExpression() {
@@ -231,7 +231,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 	}
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testConstructor() {
@@ -256,7 +256,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testRestriction() {
@@ -290,7 +290,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author asimarslan
 	 */
 	@Test
@@ -312,7 +312,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testRootDistinct() {
@@ -337,7 +337,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testRootFetch() {
@@ -362,7 +362,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testRootJoin() {
@@ -386,7 +386,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 	}
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testSimple() {
@@ -402,7 +402,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 	}
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testSimple2() {
@@ -425,7 +425,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testSimple3() {
@@ -454,7 +454,7 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 	/**
 	 * Test the empty predicates.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testSimple4() {

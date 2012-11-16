@@ -25,7 +25,7 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class DuplicateColumnTest extends BaseCoreTest {
 
@@ -41,7 +41,7 @@ public class DuplicateColumnTest extends BaseCoreTest {
 	/**
 	 * Tests the duplicate columns in the same entity.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test(expected = MappingException.class)
 	public void testDuplicateColumn() {

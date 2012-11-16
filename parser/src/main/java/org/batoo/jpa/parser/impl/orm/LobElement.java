@@ -24,7 +24,7 @@ import java.util.Map;
  * Element for <code>lob</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class LobElement extends ChildElement {
 
@@ -34,7 +34,7 @@ public class LobElement extends ChildElement {
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public LobElement(ParentElement parent, Map<String, String> attributes) {

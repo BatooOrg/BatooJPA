@@ -24,7 +24,7 @@ import java.util.Map;
  * The definition for named native queries.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface NamedNativeQueryMetadata extends BindableMetadata {
 
@@ -33,7 +33,7 @@ public interface NamedNativeQueryMetadata extends BindableMetadata {
 	 * 
 	 * @return the list query hints
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	Map<String, Object> getHints();
@@ -43,7 +43,7 @@ public interface NamedNativeQueryMetadata extends BindableMetadata {
 	 * 
 	 * @return the query
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getQuery();
@@ -53,7 +53,7 @@ public interface NamedNativeQueryMetadata extends BindableMetadata {
 	 * 
 	 * @return the result class.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getResultClass();
@@ -63,7 +63,7 @@ public interface NamedNativeQueryMetadata extends BindableMetadata {
 	 * 
 	 * @return the resultset mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getResultSetMapping();

@@ -33,7 +33,7 @@ import com.google.common.collect.Sets;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public final class Prioritizer {
 
@@ -59,7 +59,7 @@ public final class Prioritizer {
 	 * @param callbackAvailability
 	 *            array of callbacks
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public static void sort(ArrayList<ManagedInstance<?>> updates, ArrayList<ManagedInstance<?>> removals, ManagedInstance<?>[] sortedUpdates,
 		ManagedInstance<?>[] sortedRemovals, CallbackAvailability callbackAvailability) {
@@ -173,7 +173,7 @@ public final class Prioritizer {
 	/**
 	 * No instantiation.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private Prioritizer() {
 		super();

@@ -11,7 +11,7 @@ import javax.persistence.InheritanceType;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -26,7 +26,7 @@ public abstract class Person extends BaseEntity {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Person() {
 		super();
@@ -38,7 +38,7 @@ public abstract class Person extends BaseEntity {
 	 * @param lastName
 	 *            the last name
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Person(String firstName, String lastName) {
 		super();
@@ -61,7 +61,7 @@ public abstract class Person extends BaseEntity {
 	 * 
 	 * @return the firstName of the Person
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getFirstName() {
 		return this.firstName;
@@ -72,7 +72,7 @@ public abstract class Person extends BaseEntity {
 	 * 
 	 * @return the lastName of the Person
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getLastName() {
 		return this.lastName;
@@ -84,7 +84,7 @@ public abstract class Person extends BaseEntity {
 	 * @param firstName
 	 *            the firstName to set for Person
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
@@ -96,7 +96,7 @@ public abstract class Person extends BaseEntity {
 	 * @param lastName
 	 *            the lastName to set for Person
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setLastName(String lastName) {
 		this.lastName = lastName;

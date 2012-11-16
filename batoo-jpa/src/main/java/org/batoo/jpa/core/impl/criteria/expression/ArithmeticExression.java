@@ -37,14 +37,14 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ArithmeticExression<N extends Number> extends AbstractExpression<N> {
 
 	/**
 	 * The types of the arithmetic operations.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("javadoc")
 	public enum ArithmeticOperation {
@@ -80,7 +80,7 @@ public class ArithmeticExression<N extends Number> extends AbstractExpression<N>
 	 * @param y
 	 *            the right side expression
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public ArithmeticExression(ArithmeticOperation operation, Expression<? extends N> x, Expression<? extends N> y) {

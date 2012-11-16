@@ -35,7 +35,7 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
  *            the type of the modify criteria.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class CriteriaModify<T> extends BaseQueryImpl<T> {
 
@@ -47,7 +47,7 @@ public abstract class CriteriaModify<T> extends BaseQueryImpl<T> {
 	 * @param metamodel
 	 *            the metamodel
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public CriteriaModify(MetamodelImpl metamodel) {
@@ -62,7 +62,7 @@ public abstract class CriteriaModify<T> extends BaseQueryImpl<T> {
 	 *            the entity class
 	 * @return query root corresponding to the given entity
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
@@ -82,7 +82,7 @@ public abstract class CriteriaModify<T> extends BaseQueryImpl<T> {
 	 *            metamodel entity representing the entity of type X
 	 * @return query root corresponding to the given entity
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public Root<T> from(EntityType<T> entity) {
@@ -98,7 +98,7 @@ public abstract class CriteriaModify<T> extends BaseQueryImpl<T> {
 	 * 
 	 * @return the the JPQL
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	@Override
@@ -121,7 +121,7 @@ public abstract class CriteriaModify<T> extends BaseQueryImpl<T> {
 	 * 
 	 * @return where clause predicate
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public PredicateImpl getRestriction() {
@@ -155,7 +155,7 @@ public abstract class CriteriaModify<T> extends BaseQueryImpl<T> {
 	 *            type of the sub query
 	 * @return subquery
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	@Override
@@ -171,7 +171,7 @@ public abstract class CriteriaModify<T> extends BaseQueryImpl<T> {
 	 *            a simple or compound boolean expression
 	 * @return the modified query
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public CriteriaModify<T> where(Expression<Boolean> restriction) {
@@ -189,7 +189,7 @@ public abstract class CriteriaModify<T> extends BaseQueryImpl<T> {
 	 *            zero or more restriction predicates
 	 * @return the modified query
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public CriteriaModify<T> where(Predicate... restrictions) {

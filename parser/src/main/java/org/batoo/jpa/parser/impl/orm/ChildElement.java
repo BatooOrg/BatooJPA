@@ -27,7 +27,7 @@ import org.batoo.common.log.ToStringBuilder.DetailLevel;
  * Element factories that have no children elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class ChildElement extends Element {
 
@@ -39,7 +39,7 @@ public abstract class ChildElement extends Element {
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public ChildElement(ParentElement parent, Map<String, String> attributes) {

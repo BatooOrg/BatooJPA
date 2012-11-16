@@ -27,7 +27,7 @@ import org.batoo.jpa.parser.impl.AbstractLocator;
  * Locator for the java locations.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class JavaLocator extends AbstractLocator {
 
@@ -40,7 +40,7 @@ public class JavaLocator extends AbstractLocator {
 	 * @param clazz
 	 *            the class
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public JavaLocator(Class<?> clazz) {
@@ -57,7 +57,7 @@ public class JavaLocator extends AbstractLocator {
 	 * @param member
 	 *            the member
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public JavaLocator(Member member) {

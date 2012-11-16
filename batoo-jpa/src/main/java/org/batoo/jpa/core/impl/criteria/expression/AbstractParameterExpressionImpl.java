@@ -38,7 +38,7 @@ import org.batoo.jpa.core.impl.model.type.TypeImpl;
  * @param <T>
  *            the type of the parameter expression
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class AbstractParameterExpressionImpl<T> extends AbstractExpression<T> {
 
@@ -50,7 +50,7 @@ public abstract class AbstractParameterExpressionImpl<T> extends AbstractExpress
 	 * @param paramClass
 	 *            the class of the parameter
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public AbstractParameterExpressionImpl(TypeImpl<T> type, Class<T> paramClass) {
 		super(paramClass);
@@ -64,7 +64,7 @@ public abstract class AbstractParameterExpressionImpl<T> extends AbstractExpress
 	 * @param query
 	 *            the query
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected abstract void ensureAlias(BaseQueryImpl<?> query);
 
@@ -74,7 +74,7 @@ public abstract class AbstractParameterExpressionImpl<T> extends AbstractExpress
 	 * @param metamodel
 	 *            the metamodel
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void ensureTypeResolved(MetamodelImpl metamodel) {
 		if (this.type == null) {
@@ -109,7 +109,7 @@ public abstract class AbstractParameterExpressionImpl<T> extends AbstractExpress
 	 *            the metamodel
 	 * @return the number of SQL parameters when expanded
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public int getExpandedCount(MetamodelImpl metamodelImpl) {
 		if (this.getJavaType() == Class.class) {
@@ -197,7 +197,7 @@ public abstract class AbstractParameterExpressionImpl<T> extends AbstractExpress
 	 * @param value
 	 *            the value to set to the parameter
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected void setParameter(MetamodelImpl metamodel, Connection connection, Object[] parameters, MutableInt sqlIndex, Object value) {
 		// type parameter

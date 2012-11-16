@@ -26,7 +26,7 @@ import javax.persistence.Id;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class E2 {
@@ -39,7 +39,7 @@ public class E2 {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public E2() {
 		super();
@@ -49,7 +49,7 @@ public class E2 {
 	 * @param e2
 	 *            the e2
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public E2(E2 e2) {
 		super();
@@ -61,7 +61,7 @@ public class E2 {
 	 * @param value
 	 *            the value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public E2(String value) {
 		super();
@@ -74,7 +74,7 @@ public class E2 {
 	 * 
 	 * @return the id of the E
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Long getId() {
 		return this.id;
@@ -85,7 +85,7 @@ public class E2 {
 	 * 
 	 * @return the value of the E2
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getValue() {
 		return this.value;
@@ -97,7 +97,7 @@ public class E2 {
 	 * @param id
 	 *            the id to set for E
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setId(Long id) {
 		this.id = id;
@@ -109,7 +109,7 @@ public class E2 {
 	 * @param value
 	 *            the value to set for E2
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setValue(String value) {
 		this.value = value;

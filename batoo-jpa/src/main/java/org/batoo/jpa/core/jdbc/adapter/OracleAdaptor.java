@@ -42,7 +42,7 @@ import com.google.common.base.Joiner;
  * JDBC Adapter for H2DB.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class OracleAdaptor extends JdbcAdaptor {
 
@@ -50,7 +50,7 @@ public class OracleAdaptor extends JdbcAdaptor {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public OracleAdaptor() {
 		super();

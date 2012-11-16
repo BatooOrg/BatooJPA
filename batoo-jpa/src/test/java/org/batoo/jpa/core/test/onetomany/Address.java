@@ -26,7 +26,7 @@ import javax.persistence.Id;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Address {
@@ -38,7 +38,7 @@ public class Address {
 	private String city;
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Address() {
 		super();
@@ -50,7 +50,7 @@ public class Address {
 	 * @param city
 	 *            the city
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Address(Person person, String city) {
 		super();
@@ -64,7 +64,7 @@ public class Address {
 	 * Returns the city.
 	 * 
 	 * @return the city
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getCity() {
 		return this.city;
@@ -74,7 +74,7 @@ public class Address {
 	 * Returns the id.
 	 * 
 	 * @return the id
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -85,7 +85,7 @@ public class Address {
 	 * 
 	 * @param city
 	 *            the city to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setCity(String city) {
 		this.city = city;

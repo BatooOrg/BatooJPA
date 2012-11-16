@@ -27,7 +27,7 @@ import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
  * Implementation of {@link Order}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class OrderImpl implements Order {
 
@@ -40,7 +40,7 @@ public class OrderImpl implements Order {
 	 * @param reverse
 	 *            if the ordering is in reverse order
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public OrderImpl(Expression<?> inner, boolean reverse) {

@@ -26,7 +26,7 @@ import javax.persistence.Id;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Address {
@@ -38,7 +38,7 @@ public class Address {
 	private String city;
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Address() {
 		super();
@@ -48,7 +48,7 @@ public class Address {
 	 * @param city
 	 *            the city
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Address(String city) {
 		super();

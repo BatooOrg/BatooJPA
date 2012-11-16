@@ -37,7 +37,7 @@ import org.junit.Test;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class AggregationTest extends BaseCoreTest {
 
@@ -86,7 +86,7 @@ public class AggregationTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Before
 	public void prepareCountries() {
@@ -102,7 +102,7 @@ public class AggregationTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	@Ignore
@@ -139,7 +139,7 @@ public class AggregationTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testAgregation2() {
@@ -157,7 +157,7 @@ public class AggregationTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testCount() {
@@ -176,7 +176,7 @@ public class AggregationTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testHaving() {

@@ -30,12 +30,12 @@ import org.junit.Test;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class SubQueryJpqlTest extends BaseCoreTest {
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testAllAnySome() {
@@ -78,7 +78,7 @@ public class SubQueryJpqlTest extends BaseCoreTest {
 	}
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testEmpty() {
@@ -108,7 +108,7 @@ public class SubQueryJpqlTest extends BaseCoreTest {
 	}
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testExists() {
@@ -148,7 +148,7 @@ public class SubQueryJpqlTest extends BaseCoreTest {
 	}
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testMemberOf() {
@@ -185,7 +185,7 @@ public class SubQueryJpqlTest extends BaseCoreTest {
 	}
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testSize() {
@@ -220,7 +220,7 @@ public class SubQueryJpqlTest extends BaseCoreTest {
 	}
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testSubQuery() {

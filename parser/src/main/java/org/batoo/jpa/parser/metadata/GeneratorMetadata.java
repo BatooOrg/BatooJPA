@@ -22,7 +22,7 @@ package org.batoo.jpa.parser.metadata;
  * The common definition of the generators.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface GeneratorMetadata extends BindableMetadata {
 
@@ -31,7 +31,7 @@ public interface GeneratorMetadata extends BindableMetadata {
 	 * 
 	 * @return the allocation size of the generator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	int getAllocationSize();
@@ -41,7 +41,7 @@ public interface GeneratorMetadata extends BindableMetadata {
 	 * 
 	 * @return the catalog of the generator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getCatalog();
@@ -51,7 +51,7 @@ public interface GeneratorMetadata extends BindableMetadata {
 	 * 
 	 * @return the initial Value of the generator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	int getInitialValue();
@@ -61,7 +61,7 @@ public interface GeneratorMetadata extends BindableMetadata {
 	 * 
 	 * @return the name of the schema of the generator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getSchema();

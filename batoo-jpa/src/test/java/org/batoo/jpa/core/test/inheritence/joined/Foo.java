@@ -29,7 +29,7 @@ import javax.persistence.InheritanceType;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -74,7 +74,7 @@ public class Foo {
 	 * Returns the key.
 	 * 
 	 * @return the key
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getKey() {
 		return this.key;
@@ -84,7 +84,7 @@ public class Foo {
 	 * Returns the value.
 	 * 
 	 * @return the value
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getValue() {
 		return this.value;
@@ -107,7 +107,7 @@ public class Foo {
 	 * 
 	 * @param value
 	 *            the value to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setValue(String value) {
 		this.value = value;

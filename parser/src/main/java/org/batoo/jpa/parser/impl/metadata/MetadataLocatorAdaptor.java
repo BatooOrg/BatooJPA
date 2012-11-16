@@ -22,7 +22,7 @@ package org.batoo.jpa.parser.impl.metadata;
  * 
  *
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class MetadataLocatorAdaptor {
 

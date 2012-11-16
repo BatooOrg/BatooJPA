@@ -35,7 +35,7 @@ import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
  *            the target type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class AbstractJoin<Z, X> extends AbstractFrom<Z, X> implements Join<Z, X> {
 
@@ -51,7 +51,7 @@ public abstract class AbstractJoin<Z, X> extends AbstractFrom<Z, X> implements J
 	 * @param jointType
 	 *            the join type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public AbstractJoin(AbstractFrom<?, Z> parent, JoinedMapping<? super Z, ?, X> mapping, JoinType jointType) {
 		super(parent, mapping.getType(), mapping, jointType);
@@ -126,7 +126,7 @@ public abstract class AbstractJoin<Z, X> extends AbstractFrom<Z, X> implements J
 	 * 
 	 * @return the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected JoinedMapping<? super Z, ?, X> getMapping() {
 		return this.mapping;
@@ -146,7 +146,7 @@ public abstract class AbstractJoin<Z, X> extends AbstractFrom<Z, X> implements J
 	 * 
 	 * @return the exception
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected UnsupportedOperationException notSupported() {
 		return new UnsupportedOperationException("on() operations not supported");

@@ -26,7 +26,7 @@ import javax.persistence.LockModeType;
  * Element for <code>lock-mode</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class LockModeElement extends ChildElement {
 
@@ -38,7 +38,7 @@ public class LockModeElement extends ChildElement {
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public LockModeElement(ParentElement parent, Map<String, String> attributes) {
@@ -59,7 +59,7 @@ public class LockModeElement extends ChildElement {
 	 * 
 	 * @return the lock mode
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public LockModeType getLockMode() {

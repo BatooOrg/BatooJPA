@@ -28,7 +28,7 @@ import org.batoo.jpa.core.impl.model.MetamodelImpl;
  *            the type of the sub query.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class SubQueryStub<T> extends AbstractCriteriaQueryImpl<T> {
 
@@ -42,7 +42,7 @@ public class SubQueryStub<T> extends AbstractCriteriaQueryImpl<T> {
 	 * @param resultType
 	 *            the result type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public SubQueryStub(BaseQueryImpl<?> parent, MetamodelImpl metamodel, Class<T> resultType) {

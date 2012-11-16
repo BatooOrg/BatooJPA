@@ -31,7 +31,7 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
  *            the destination type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface SingularMapping<Z, X> {
 
@@ -48,7 +48,7 @@ public interface SingularMapping<Z, X> {
 	 *            the instance to fill ids.
 	 * @return false if all OK, true if if at least one entity needs to obtain identity from the database
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	boolean fillValue(EntityTypeImpl<?> type, ManagedInstance<?> managedInstance, Object instance);
 
@@ -59,7 +59,7 @@ public interface SingularMapping<Z, X> {
 	 *            the instance of which the value to be returned
 	 * @return the mapping value of instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	X get(Object instance);
 
@@ -68,7 +68,7 @@ public interface SingularMapping<Z, X> {
 	 * 
 	 * @return the attribute of the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	SingularAttributeImpl<? super Z, X> getAttribute();
 
@@ -80,7 +80,7 @@ public interface SingularMapping<Z, X> {
 	 * @param value
 	 *            the value to set
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	void set(Object instance, Object value);
 }

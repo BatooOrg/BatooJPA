@@ -58,7 +58,7 @@ import com.google.common.collect.Sets;
  * The implementation for {@link AssociationAttributeMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl implements AssociationAttributeMetadata {
 
@@ -79,7 +79,7 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	 * @param metadata
 	 *            the metadata definition of the association attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public AssociationAttributeMetadataImpl(Member member, AssociationAttributeMetadata metadata) {
@@ -108,7 +108,7 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	 * @param cascades
 	 *            the cascades of the of the association attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public AssociationAttributeMetadataImpl(Member member, String name, Set<Class<? extends Annotation>> parsed, String targetEntity, FetchType fetchType,
@@ -233,7 +233,7 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	 *            the list of annotations parsed
 	 * @return the map key value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	protected boolean handleId(Member member, Set<Class<? extends Annotation>> parsed) {
@@ -256,7 +256,7 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	 *            the list of annotations parsed
 	 * @return the map key value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	protected String handleMapKey(Member member, Set<Class<? extends Annotation>> parsed) {
@@ -279,7 +279,7 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	 *            the list of annotations parsed
 	 * @return the map key value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	protected String handleMapKeyClassName(Member member, Set<Class<? extends Annotation>> parsed) {
@@ -302,7 +302,7 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	 *            the list of annotations parsed
 	 * @return the map key value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	protected ColumnMetadata handleMapKeyColumn(Member member, Set<Class<? extends Annotation>> parsed) {
@@ -325,7 +325,7 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	 *            the list of annotations parsed
 	 * @return the map key value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	protected EnumType handleMapKeyEnumType(Member member, Set<Class<? extends Annotation>> parsed) {
@@ -348,7 +348,7 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	 *            the list of annotations parsed
 	 * @return the map key value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	protected TemporalType handleMapKeyTemporalType(Member member, Set<Class<? extends Annotation>> parsed) {
@@ -371,7 +371,7 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	 *            the list of annotations parsed
 	 * @return the map key value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	protected String handleMapsId(Member member, Set<Class<? extends Annotation>> parsed) {
@@ -394,7 +394,7 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	 *            the list of annotations parsed
 	 * @return the map key value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	protected String handleOrderBy(Member member, Set<Class<? extends Annotation>> parsed) {
@@ -417,7 +417,7 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	 *            the list of annotations parsed
 	 * @return the map key value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	protected ColumnMetadata handleOrderColumn(final Member member, Set<Class<? extends Annotation>> parsed) {

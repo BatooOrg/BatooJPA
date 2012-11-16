@@ -22,7 +22,7 @@ package org.batoo.jpa.core.impl.manager;
  * A dummy class to print stack trace.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class OperationTookLongTimeWarning extends Throwable {
 
@@ -30,7 +30,7 @@ public class OperationTookLongTimeWarning extends Throwable {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public OperationTookLongTimeWarning() {
 		super("Operation took long time");

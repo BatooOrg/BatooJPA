@@ -30,7 +30,7 @@ import com.google.common.collect.Lists;
  * Base Element for <code>table</code>, <code>join-table</code> and <code>secondary-table</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class TableElement extends ParentElement implements TableMetadata {
 
@@ -45,7 +45,7 @@ public class TableElement extends ParentElement implements TableMetadata {
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public TableElement(ParentElement parent, Map<String, String> attributes) {
@@ -60,7 +60,7 @@ public class TableElement extends ParentElement implements TableMetadata {
 	 * @param expectedChildElements
 	 *            the name of the elements expected
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public TableElement(ParentElement parent, Map<String, String> attributes, String... expectedChildElements) {

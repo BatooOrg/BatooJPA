@@ -21,7 +21,7 @@ package org.batoo.jpa.core.test.derivedIdentities.e1a;
 /**
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.0
  */
 public class DependentId {
 
@@ -30,7 +30,7 @@ public class DependentId {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public DependentId() {
 		super();
@@ -42,7 +42,7 @@ public class DependentId {
 	 *            then name
 	 * @param emp
 	 *            the employee
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public DependentId(String name, Long emp) {
 		super();
@@ -90,7 +90,7 @@ public class DependentId {
 	 * 
 	 * @return the emp
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Long getEmp() {
 		return this.emp;
@@ -100,7 +100,7 @@ public class DependentId {
 	 * 
 	 * @return the name
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		return this.name;
@@ -124,7 +124,7 @@ public class DependentId {
 	 * @param emp
 	 *            the emp to set
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setEmp(Long emp) {
 		this.emp = emp;
@@ -135,7 +135,7 @@ public class DependentId {
 	 * @param name
 	 *            the name to set
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setName(String name) {
 		this.name = name;

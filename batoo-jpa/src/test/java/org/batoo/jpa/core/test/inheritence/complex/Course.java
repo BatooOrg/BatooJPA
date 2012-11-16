@@ -34,7 +34,7 @@ public class Course extends BaseEntity {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Course() {
 		super();
@@ -45,7 +45,7 @@ public class Course extends BaseEntity {
 	 * 
 	 * @return the code of the Course
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getCode() {
 		return this.code;
@@ -65,7 +65,7 @@ public class Course extends BaseEntity {
 	 * 
 	 * @return the students of the Course
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public List<Student> getStudents() {
 		return this.students;
@@ -76,7 +76,7 @@ public class Course extends BaseEntity {
 	 * 
 	 * @return the teacher of the Course
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Teacher getTeacher() {
 		return this.teacher;
@@ -87,7 +87,7 @@ public class Course extends BaseEntity {
 	 * 
 	 * @return the title of the Course
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getTitle() {
 		return this.title;
@@ -99,7 +99,7 @@ public class Course extends BaseEntity {
 	 * @param code
 	 *            the code to set for Course
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setCode(String code) {
 		this.code = code;
@@ -111,7 +111,7 @@ public class Course extends BaseEntity {
 	 * @param students
 	 *            the students to set for Course
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setStudents(List<Student> students) {
 		this.students = students;
@@ -123,7 +123,7 @@ public class Course extends BaseEntity {
 	 * @param teacher
 	 *            the teacher to set for Course
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setTeacher(Teacher teacher) {
 		this.teacher = teacher;
@@ -135,7 +135,7 @@ public class Course extends BaseEntity {
 	 * @param title
 	 *            the title to set for Course
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setTitle(String title) {
 		this.title = title;

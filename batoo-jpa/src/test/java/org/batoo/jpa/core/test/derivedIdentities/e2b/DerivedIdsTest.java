@@ -34,7 +34,7 @@ import org.junit.Test;
  * JPA Spec 2.4.1.3 test
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.0
  */
 // FIXME: Temporarily ignored
 public class DerivedIdsTest extends BaseCoreTest {
@@ -48,7 +48,7 @@ public class DerivedIdsTest extends BaseCoreTest {
 	 * The dependent entity uses EmbeddedId to represent a composite key:
 	 * 
 	 * @author asimarslan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void test2bJPQL() {
@@ -75,7 +75,7 @@ public class DerivedIdsTest extends BaseCoreTest {
 	 * 
 	 * @throws SQLException
 	 *             thrown in case of an error
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testColumnNames() throws SQLException {

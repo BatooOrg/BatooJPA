@@ -40,7 +40,7 @@ import org.batoo.jpa.parser.metadata.attribute.IdAttributeMetadata;
  * The implementation of the {@link IdAttributeMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class IdAttributeMetadataImpl extends PhysicalAttributeMetadataImpl implements IdAttributeMetadata {
 
@@ -54,7 +54,7 @@ public class IdAttributeMetadataImpl extends PhysicalAttributeMetadataImpl imple
 	 * @param metadata
 	 *            the metadata definition of the basic attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public IdAttributeMetadataImpl(Member member, IdAttributeMetadata metadata) {
@@ -73,7 +73,7 @@ public class IdAttributeMetadataImpl extends PhysicalAttributeMetadataImpl imple
 	 * @param parsed
 	 *            set of annotations parsed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public IdAttributeMetadataImpl(Member member, String name, Set<Class<? extends Annotation>> parsed) {

@@ -44,7 +44,7 @@ import com.google.common.collect.Sets;
  *            the type of the query
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class BaseQueryImpl<T> implements BaseQuery<T> {
 
@@ -67,7 +67,7 @@ public abstract class BaseQueryImpl<T> implements BaseQuery<T> {
 	 * @param metamodel
 	 *            the metamodel
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public BaseQueryImpl(MetamodelImpl metamodel) {
@@ -244,7 +244,7 @@ public abstract class BaseQueryImpl<T> implements BaseQuery<T> {
 	 * 
 	 * @return true if the query is a select query, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public abstract boolean isQuery();

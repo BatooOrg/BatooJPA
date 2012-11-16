@@ -27,7 +27,7 @@ import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
  * Implementation of {@link JoinColumnMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class JoinColumnMetadataImpl implements JoinColumnMetadata {
 
@@ -47,7 +47,7 @@ public class JoinColumnMetadataImpl implements JoinColumnMetadata {
 	 * @param annotation
 	 *            the annotation
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public JoinColumnMetadataImpl(AbstractLocator locator, JoinColumn annotation) {

@@ -26,7 +26,7 @@ import javax.persistence.MapsId;
 /**
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Dependent {
@@ -41,7 +41,7 @@ public class Dependent {
 	/**
 	 * 
 	 * @author aarslan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Dependent() {
 		super();
@@ -53,7 +53,7 @@ public class Dependent {
 	 * @param employee
 	 *            the employee id
 	 * @author aarslan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Dependent(DependentId id, Employee employee) {
 		super();
@@ -100,7 +100,7 @@ public class Dependent {
 	/**
 	 * @return the emp
 	 * @author aarslan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Employee getEmp() {
 		return this.emp;
@@ -109,7 +109,7 @@ public class Dependent {
 	/**
 	 * @return the id
 	 * @author aarslan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public DependentId getId() {
 		return this.id;
@@ -132,7 +132,7 @@ public class Dependent {
 	 * @param emp
 	 *            the employee to set
 	 * @author aarslan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setEmp(Employee emp) {
 		this.emp = emp;
@@ -142,7 +142,7 @@ public class Dependent {
 	 * @param id
 	 *            the id to set
 	 * @author aarslan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setId(DependentId id) {
 		this.id = id;

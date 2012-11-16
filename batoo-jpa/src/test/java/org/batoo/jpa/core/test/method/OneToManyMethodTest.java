@@ -28,7 +28,7 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class OneToManyMethodTest extends BaseCoreTest {
 
@@ -47,7 +47,7 @@ public class OneToManyMethodTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#find(Class, Object)} person.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testFind() {
@@ -66,7 +66,7 @@ public class OneToManyMethodTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#find(Class, Object)} person that is in the session.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testFindInSession() {
@@ -82,7 +82,7 @@ public class OneToManyMethodTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#find(Class, Object)} person.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testRemove() {

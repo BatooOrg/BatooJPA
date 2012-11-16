@@ -36,7 +36,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  *            the type of the expression
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class AllAnyExpression<T> extends AbstractExpression<T> {
 
@@ -49,7 +49,7 @@ public class AllAnyExpression<T> extends AbstractExpression<T> {
 	 * @param subquery
 	 *            the sub query
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public AllAnyExpression(boolean all, Subquery<T> subquery) {

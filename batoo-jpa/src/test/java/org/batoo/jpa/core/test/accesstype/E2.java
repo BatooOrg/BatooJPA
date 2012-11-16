@@ -25,7 +25,7 @@ import javax.persistence.ManyToOne;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class E2 extends E {
@@ -39,7 +39,7 @@ public class E2 extends E {
 	 * 
 	 * @return the e1 of the E2
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public E1 getE1() {
 		return this.e1;
@@ -50,7 +50,7 @@ public class E2 extends E {
 	 * 
 	 * @return the s of the E2
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getS() {
 		return this.s;
@@ -62,7 +62,7 @@ public class E2 extends E {
 	 * @param e1
 	 *            the e1 to set for E2
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setE1(E1 e1) {
 		this.e1 = e1;
@@ -74,7 +74,7 @@ public class E2 extends E {
 	 * @param s
 	 *            the s to set for E2
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setS(String s) {
 		this.s = s;

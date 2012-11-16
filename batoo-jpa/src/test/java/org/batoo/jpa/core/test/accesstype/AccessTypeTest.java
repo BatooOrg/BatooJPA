@@ -24,13 +24,13 @@ import org.junit.Test;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class AccessTypeTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public AccessTypeTest() {
 		super();
@@ -40,7 +40,7 @@ public class AccessTypeTest extends BaseCoreTest {
 	 * 
 	 * Tests deployment when then there is no explicit access type set.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testAccessType() {

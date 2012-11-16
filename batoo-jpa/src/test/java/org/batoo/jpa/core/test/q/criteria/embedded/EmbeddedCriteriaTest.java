@@ -38,7 +38,7 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class EmbeddedCriteriaTest extends BaseCoreTest {
 
@@ -72,7 +72,7 @@ public class EmbeddedCriteriaTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Before
 	public void prepareCountries() {
@@ -87,7 +87,7 @@ public class EmbeddedCriteriaTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testEmbedded() {
@@ -117,7 +117,7 @@ public class EmbeddedCriteriaTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testEmbedded0() {

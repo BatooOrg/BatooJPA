@@ -24,7 +24,7 @@ import java.util.Map;
  * Element for <code>catalog</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class CatalogElement extends ChildElement {
 
@@ -36,7 +36,7 @@ public class CatalogElement extends ChildElement {
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public CatalogElement(ParentElement parent, Map<String, String> attributes) {
@@ -57,7 +57,7 @@ public class CatalogElement extends ChildElement {
 	 * 
 	 * @return the catalog of the CatalogElement
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public String getCatalog() {

@@ -31,7 +31,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  * Expression for null checks.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class IsNullExpression extends AbstractExpression<Boolean> {
 
@@ -45,7 +45,7 @@ public class IsNullExpression extends AbstractExpression<Boolean> {
 	 * @param inner
 	 *            the inner expression
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public IsNullExpression(boolean not, AbstractExpression<?> inner) {
 		super(Boolean.class);

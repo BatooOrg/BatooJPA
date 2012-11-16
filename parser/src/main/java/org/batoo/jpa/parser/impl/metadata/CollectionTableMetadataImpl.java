@@ -35,7 +35,7 @@ import com.google.common.collect.Lists;
  * The implementation of {@link CollectionTableMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class CollectionTableMetadataImpl implements CollectionTableMetadata {
 
@@ -52,7 +52,7 @@ public class CollectionTableMetadataImpl implements CollectionTableMetadata {
 	 * @param annotation
 	 *            the annotation
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public CollectionTableMetadataImpl(AbstractLocator locator, CollectionTable annotation) {

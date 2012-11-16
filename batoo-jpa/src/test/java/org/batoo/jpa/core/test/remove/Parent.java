@@ -33,7 +33,7 @@ import com.google.common.collect.Lists;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Parent {
@@ -57,7 +57,7 @@ public class Parent {
 	private String value;
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Parent() {
 		super();
@@ -67,7 +67,7 @@ public class Parent {
 	 * @param value
 	 *            the value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Parent(String value) {
 		super();
@@ -80,7 +80,7 @@ public class Parent {
 	 * 
 	 * @return the children1 of the Parent
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public List<Child1> getChildren1() {
 		return this.children1;
@@ -91,7 +91,7 @@ public class Parent {
 	 * 
 	 * @return the children2 of the Parent
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public List<Child2> getChildren2() {
 		return this.children2;
@@ -102,7 +102,7 @@ public class Parent {
 	 * 
 	 * @return the children3 of the Parent
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public List<Child3> getChildren3() {
 		return this.children3;
@@ -113,7 +113,7 @@ public class Parent {
 	 * 
 	 * @return the children4 of the Parent
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public List<Child4> getChildren4() {
 		return this.children4;
@@ -124,7 +124,7 @@ public class Parent {
 	 * 
 	 * @return the id of the Parent
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -135,7 +135,7 @@ public class Parent {
 	 * 
 	 * @return the value of the Parent
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getValue() {
 		return this.value;
@@ -147,7 +147,7 @@ public class Parent {
 	 * @param value
 	 *            the value to set for Parent
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setValue(String value) {
 		this.value = value;

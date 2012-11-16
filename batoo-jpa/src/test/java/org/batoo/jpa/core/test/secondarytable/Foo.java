@@ -28,7 +28,7 @@ import javax.persistence.SecondaryTable;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 @SecondaryTable(name = "FooExtra")
@@ -47,7 +47,7 @@ public class Foo {
 	 * Returns the key.
 	 * 
 	 * @return the key
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getKey() {
 		return this.key;
@@ -57,7 +57,7 @@ public class Foo {
 	 * Returns the value1.
 	 * 
 	 * @return the value1
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getValue1() {
 		return this.value1;
@@ -67,7 +67,7 @@ public class Foo {
 	 * Returns the value2.
 	 * 
 	 * @return the value2
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getValue2() {
 		return this.value2;
@@ -78,7 +78,7 @@ public class Foo {
 	 * 
 	 * @param value1
 	 *            the value1 to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setValue1(String value1) {
 		this.value1 = value1;
@@ -89,7 +89,7 @@ public class Foo {
 	 * 
 	 * @param value2
 	 *            the value2 to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setValue2(String value2) {
 		this.value2 = value2;

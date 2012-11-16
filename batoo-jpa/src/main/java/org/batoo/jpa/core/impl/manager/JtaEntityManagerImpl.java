@@ -36,7 +36,7 @@ import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
  * Entity Manager for JTA Environments.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class JtaEntityManagerImpl extends EntityManagerImpl {
 
@@ -56,7 +56,7 @@ public class JtaEntityManagerImpl extends EntityManagerImpl {
 	 *            properties for the entity manager
 	 * @param jdbcAdaptor
 	 *            the JDBC adaptor
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public JtaEntityManagerImpl(JtaEntityManagerFactoryImpl entityManagerFactory, MetamodelImpl metamodel, DataSource datasource,
 		Map<String, Object> properties, JdbcAdaptor jdbcAdaptor) {

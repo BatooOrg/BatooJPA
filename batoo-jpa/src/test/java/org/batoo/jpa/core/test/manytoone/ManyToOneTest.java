@@ -33,7 +33,7 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class ManyToOneTest extends BaseCoreTest {
 
@@ -49,7 +49,7 @@ public class ManyToOneTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#find(Class, Object)} person.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testFind() {
@@ -66,7 +66,7 @@ public class ManyToOneTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#find(Class, Object)} person that is in the session.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testFindInSession() {
@@ -82,7 +82,7 @@ public class ManyToOneTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#find(Class, Object)} person.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testJoinColumn() {
@@ -103,7 +103,7 @@ public class ManyToOneTest extends BaseCoreTest {
 	 * @throws SQLException
 	 *             ins case of an underlying SQL Exception
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testJoinColumnName() throws SQLException {

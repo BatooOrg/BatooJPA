@@ -22,6 +22,6 @@ package org.batoo.jpa.parser.metadata.type;
  * The definition of the embeddable classes.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface EmbeddableMetadata extends ManagedTypeMetadata {}

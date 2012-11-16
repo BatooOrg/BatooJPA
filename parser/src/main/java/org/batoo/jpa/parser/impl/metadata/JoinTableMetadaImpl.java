@@ -35,7 +35,7 @@ import com.google.common.collect.Lists;
  * Implementation of {@link JoinTableMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class JoinTableMetadaImpl implements JoinTableMetadata {
 
@@ -53,7 +53,7 @@ public class JoinTableMetadaImpl implements JoinTableMetadata {
 	 * @param annotation
 	 *            the annotation
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public JoinTableMetadaImpl(AbstractLocator locator, JoinTable annotation) {

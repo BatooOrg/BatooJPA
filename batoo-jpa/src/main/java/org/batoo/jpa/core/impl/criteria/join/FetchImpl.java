@@ -39,7 +39,7 @@ import org.batoo.jpa.core.impl.model.mapping.JoinedMapping.MappingType;
  *            the target type of the fetch
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X> {
 
@@ -55,7 +55,7 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	 * @param joinType
 	 *            the join type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public FetchImpl(FetchParentImpl<?, Z> parent, JoinedMapping<? super Z, ?, X> mapping, JoinType joinType) {
 		super(mapping);
@@ -72,7 +72,7 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	 *            the parent
 	 * @return the description of the fetch
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Override
 	public String generateJpqlFetches(String parent) {

@@ -33,7 +33,7 @@ import com.google.common.collect.Sets;
  * Implementation of {@link AnnotatedClassLocator} that utilizes the {@link JarAnnotatedClassLocator} and
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class StandaloneAnnotatedClassLocator implements AnnotatedClassLocator {
 
@@ -44,7 +44,7 @@ public class StandaloneAnnotatedClassLocator implements AnnotatedClassLocator {
 	 * 
 	 * @return the singleton {@link StandaloneAnnotatedClassLocator}
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public static StandaloneAnnotatedClassLocator getInstance() {
@@ -53,7 +53,7 @@ public class StandaloneAnnotatedClassLocator implements AnnotatedClassLocator {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private StandaloneAnnotatedClassLocator() {

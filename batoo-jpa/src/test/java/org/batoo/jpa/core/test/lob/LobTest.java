@@ -32,7 +32,7 @@ import com.google.common.collect.Sets;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class LobTest extends BaseCoreTest {
 
@@ -44,7 +44,7 @@ public class LobTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with lob values
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testLob() {

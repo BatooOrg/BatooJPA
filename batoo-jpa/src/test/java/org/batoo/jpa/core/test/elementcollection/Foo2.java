@@ -33,7 +33,7 @@ import com.google.common.collect.Maps;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Foo2 {
@@ -53,7 +53,7 @@ public class Foo2 {
 	 * 
 	 * @return the images of the Foo2
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected Map<String, String> getImages() {
 		return this.images;
@@ -64,7 +64,7 @@ public class Foo2 {
 	 * 
 	 * @return the key of the Foo2
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected Integer getKey() {
 		return this.key;

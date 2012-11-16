@@ -30,7 +30,7 @@ import javax.persistence.ManyToOne;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Address implements Serializable {
@@ -48,7 +48,7 @@ public class Address implements Serializable {
 	private Country country;
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Address() {
 		super();
@@ -62,7 +62,7 @@ public class Address implements Serializable {
 	 * @param country
 	 *            the country
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Address(Person person, String city, Country country) {
 		super();
@@ -78,7 +78,7 @@ public class Address implements Serializable {
 	 * Returns the city.
 	 * 
 	 * @return the city
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getCity() {
 		return this.city;
@@ -88,7 +88,7 @@ public class Address implements Serializable {
 	 * Returns the country.
 	 * 
 	 * @return the country
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Country getCountry() {
 		return this.country;
@@ -98,7 +98,7 @@ public class Address implements Serializable {
 	 * Returns the id.
 	 * 
 	 * @return the id
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -108,7 +108,7 @@ public class Address implements Serializable {
 	 * Returns the person.
 	 * 
 	 * @return the person
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Person getPerson() {
 		return this.person;
@@ -119,7 +119,7 @@ public class Address implements Serializable {
 	 * 
 	 * @param city
 	 *            the city to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setCity(String city) {
 		this.city = city;
@@ -130,7 +130,7 @@ public class Address implements Serializable {
 	 * 
 	 * @param country
 	 *            the country to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setCountry(Country country) {
 		this.country = country;
@@ -141,7 +141,7 @@ public class Address implements Serializable {
 	 * 
 	 * @param person
 	 *            the person to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setPerson(Person person) {
 		this.person = person;

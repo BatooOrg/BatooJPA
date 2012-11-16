@@ -34,7 +34,7 @@ import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
  *            type of the query
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface BaseQuery<T> {
 
@@ -43,7 +43,7 @@ public interface BaseQuery<T> {
 	 * 
 	 * @return the generated JPQL
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String generateJpql();
@@ -53,7 +53,7 @@ public interface BaseQuery<T> {
 	 * 
 	 * @return the generated SQL
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String generateSql();
@@ -65,7 +65,7 @@ public interface BaseQuery<T> {
 	 *            true if the table is an entity table, false for element collections
 	 * @return the generated entity alias
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String generateTableAlias(boolean entity);
@@ -77,7 +77,7 @@ public interface BaseQuery<T> {
 	 *            the parameter
 	 * @return the alias
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	Integer getAlias(AbstractParameterExpressionImpl<?> parameter);
@@ -89,7 +89,7 @@ public interface BaseQuery<T> {
 	 *            the selection
 	 * @return the alias
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getAlias(AbstractSelection<?> selection);
@@ -101,7 +101,7 @@ public interface BaseQuery<T> {
 	 *            the column
 	 * @return the field alias
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getFieldAlias(String tableAlias, AbstractColumn column);
@@ -111,7 +111,7 @@ public interface BaseQuery<T> {
 	 * 
 	 * @return the JDBC Adaptor
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	JdbcAdaptor getJdbcAdaptor();
@@ -121,7 +121,7 @@ public interface BaseQuery<T> {
 	 * 
 	 * @return the the JPQL
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getJpql();
@@ -130,7 +130,7 @@ public interface BaseQuery<T> {
 	 * Returns the metamodel.
 	 * 
 	 * @return the metamodel
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	MetamodelImpl getMetamodel();
 
@@ -141,7 +141,7 @@ public interface BaseQuery<T> {
 	 *            the position
 	 * @return the parameter at position
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	AbstractParameterExpressionImpl<?> getParameter(int position);
@@ -153,7 +153,7 @@ public interface BaseQuery<T> {
 	 * 
 	 * @return the query parameters
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	Set<ParameterExpression<?>> getParameters();
@@ -163,7 +163,7 @@ public interface BaseQuery<T> {
 	 * 
 	 * @return the the SQL
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getSql();
@@ -173,7 +173,7 @@ public interface BaseQuery<T> {
 	 * 
 	 * @return the SQL Parameters of the query
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<AbstractParameterExpressionImpl<?>> getSqlParameters();
@@ -183,7 +183,7 @@ public interface BaseQuery<T> {
 	 * 
 	 * @return true if the query is internal, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	boolean isInternal();
@@ -195,7 +195,7 @@ public interface BaseQuery<T> {
 	 *            the parameter to add
 	 * @return the positional number of the parameter
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	int setNextSqlParam(AbstractParameterExpressionImpl<?> parameter);
@@ -209,7 +209,7 @@ public interface BaseQuery<T> {
 	 *            The type of the represented object
 	 * @return subquery
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	<U> SubqueryImpl<U> subquery(Class<U> type);

@@ -28,7 +28,7 @@ import org.batoo.jpa.parser.metadata.IndexMetadata;
  * Metadata for basic attributes.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface BasicAttributeMetadata extends PhysicalAttributeMetadata {
 
@@ -38,7 +38,7 @@ public interface BasicAttributeMetadata extends PhysicalAttributeMetadata {
 	 * @return columnTransformer
 	 * 
 	 * @author asimarslan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	ColumnTransformerMetadata getColumnTransformer();
 
@@ -47,7 +47,7 @@ public interface BasicAttributeMetadata extends PhysicalAttributeMetadata {
 	 * 
 	 * @return the enumType of the basic attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	EnumType getEnumType();
@@ -57,7 +57,7 @@ public interface BasicAttributeMetadata extends PhysicalAttributeMetadata {
 	 * 
 	 * @return the fetch type of the attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	FetchType getFetchType();
@@ -67,7 +67,7 @@ public interface BasicAttributeMetadata extends PhysicalAttributeMetadata {
 	 * 
 	 * @return the index definition
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	IndexMetadata getIndex();
@@ -77,7 +77,7 @@ public interface BasicAttributeMetadata extends PhysicalAttributeMetadata {
 	 * 
 	 * @return true if the basic attribute is lob
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	boolean isLob();
@@ -87,7 +87,7 @@ public interface BasicAttributeMetadata extends PhysicalAttributeMetadata {
 	 * 
 	 * @return true if the basic attribute is optional, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	boolean isOptional();

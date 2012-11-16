@@ -33,7 +33,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  * The expression for like operation.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class LikeExpression extends AbstractExpression<Boolean> {
 
@@ -53,7 +53,7 @@ public class LikeExpression extends AbstractExpression<Boolean> {
 	 * @param not
 	 *            true if not
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public LikeExpression(Expression<String> inner, Expression<String> pattern, Expression<Character> escape, boolean not) {
 		super(Boolean.class);

@@ -35,7 +35,7 @@ import com.google.common.collect.Lists;
  * Implementation of {@link AttributeOverrideMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class AssociationOverrideMetadataImpl implements AssociationMetadata {
 
@@ -50,7 +50,7 @@ public class AssociationOverrideMetadataImpl implements AssociationMetadata {
 	 * @param annotation
 	 *            the annotation
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public AssociationOverrideMetadataImpl(AbstractLocator locator, AssociationOverride annotation) {

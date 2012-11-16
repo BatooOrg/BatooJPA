@@ -24,7 +24,7 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class ManagedCollectionTest extends BaseCoreTest {
 
@@ -40,7 +40,7 @@ public class ManagedCollectionTest extends BaseCoreTest {
 	/**
 	 * Tests that additions to managed collection that are committed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testAdditionsCommitted() {
@@ -59,7 +59,7 @@ public class ManagedCollectionTest extends BaseCoreTest {
 	/**
 	 * Tests that additions to existing managed collection
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testAdditionsExisting() {
@@ -79,7 +79,7 @@ public class ManagedCollectionTest extends BaseCoreTest {
 	/**
 	 * Tests that additions to managed collection that are committed
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testAdditionsPersist() {
@@ -95,7 +95,7 @@ public class ManagedCollectionTest extends BaseCoreTest {
 	/**
 	 * Tests that managed collection does not allow duplicates.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test(expected = UnsupportedOperationException.class)
 	public void testNoDuplicates() {
@@ -108,7 +108,7 @@ public class ManagedCollectionTest extends BaseCoreTest {
 	/**
 	 * Tests that managed collection does not allow duplicates.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test(expected = UnsupportedOperationException.class)
 	public void testNoDuplicatesAfterPersist() {

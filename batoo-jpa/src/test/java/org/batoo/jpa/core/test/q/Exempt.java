@@ -24,14 +24,14 @@ import javax.persistence.Entity;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Exempt extends Employee {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Exempt() {
 		super();

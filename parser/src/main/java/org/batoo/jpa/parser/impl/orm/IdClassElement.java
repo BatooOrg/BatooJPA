@@ -24,7 +24,7 @@ import java.util.Map;
  * Element for <code>id-class</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class IdClassElement extends ChildElement {
 
@@ -36,7 +36,7 @@ public class IdClassElement extends ChildElement {
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public IdClassElement(ParentElement parent, Map<String, String> attributes) {
@@ -57,7 +57,7 @@ public class IdClassElement extends ChildElement {
 	 * 
 	 * @return the idClass of the IdClassElement
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public String getIdClass() {

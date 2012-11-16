@@ -25,7 +25,7 @@ import javax.persistence.IdClass;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 @IdClass(FooPk.class)
@@ -78,7 +78,7 @@ public class Foo {
 	 * Returns the intKey.
 	 * 
 	 * @return the intKey
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getIntKey() {
 		return this.intKey;
@@ -88,7 +88,7 @@ public class Foo {
 	 * Returns the strKey.
 	 * 
 	 * @return the strKey
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getStrKey() {
 		return this.strKey;
@@ -98,7 +98,7 @@ public class Foo {
 	 * Returns the value.
 	 * 
 	 * @return the value
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getValue() {
 		return this.value;
@@ -122,7 +122,7 @@ public class Foo {
 	 * 
 	 * @param intKey
 	 *            the intKey to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setIntKey(Integer intKey) {
 		this.intKey = intKey;
@@ -133,7 +133,7 @@ public class Foo {
 	 * 
 	 * @param strKey
 	 *            the strKey to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setStrKey(String strKey) {
 		this.strKey = strKey;
@@ -144,7 +144,7 @@ public class Foo {
 	 * 
 	 * @param value
 	 *            the value to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setValue(String value) {
 		this.value = value;

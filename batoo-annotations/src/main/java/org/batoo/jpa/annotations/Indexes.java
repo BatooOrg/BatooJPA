@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
 /**
  * Defines multiple indexes.
  * 
- * @since $version
+ * @since 2.0.0
  * @author hceylan
  */
 @Target({ TYPE })
@@ -39,7 +39,7 @@ public @interface Indexes {
 	 * 
 	 * @return the array of indexes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	Index[] value();
 }

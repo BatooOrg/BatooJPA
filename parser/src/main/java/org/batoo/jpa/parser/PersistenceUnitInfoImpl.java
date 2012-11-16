@@ -50,7 +50,7 @@ import com.google.common.collect.Lists;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 
@@ -75,7 +75,7 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	 * @param puName
 	 *            the name of the persistence unit
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public PersistenceUnitInfoImpl(String puName) {
@@ -245,7 +245,7 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	 * @param persistenceXmlUrl
 	 * @return
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private PersistenceUnit findPersistence(String puName, URL url) {

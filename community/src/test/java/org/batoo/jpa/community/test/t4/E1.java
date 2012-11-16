@@ -30,7 +30,7 @@ import javax.validation.constraints.NotNull;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class E1 {
@@ -46,7 +46,7 @@ public class E1 {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public E1() {
 		super();
@@ -56,7 +56,7 @@ public class E1 {
 	 * @param e2
 	 *            the e2
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public E1(E2 e2) {
 		super();
@@ -69,7 +69,7 @@ public class E1 {
 	 * 
 	 * @return the e2 of the E1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public E2 getE2() {
 		return this.e2;
@@ -80,7 +80,7 @@ public class E1 {
 	 * 
 	 * @return the id of the E
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Long getId() {
 		return this.id;
@@ -92,7 +92,7 @@ public class E1 {
 	 * @param e2
 	 *            the e2 to set for E1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setE2(E2 e2) {
 		this.e2 = e2;
@@ -104,7 +104,7 @@ public class E1 {
 	 * @param id
 	 *            the id to set for E
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setId(Long id) {
 		this.id = id;

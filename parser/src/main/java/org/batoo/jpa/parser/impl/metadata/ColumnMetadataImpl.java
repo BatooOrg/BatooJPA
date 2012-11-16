@@ -29,7 +29,7 @@ import org.batoo.jpa.parser.metadata.ColumnMetadata;
  * Implementation of {@link ColumnMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ColumnMetadataImpl implements ColumnMetadata {
 
@@ -51,7 +51,7 @@ public class ColumnMetadataImpl implements ColumnMetadata {
 	 * @param annotation
 	 *            the annotation
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public ColumnMetadataImpl(AbstractLocator locator, Column annotation) {
@@ -76,7 +76,7 @@ public class ColumnMetadataImpl implements ColumnMetadata {
 	 * @param annotation
 	 *            the annotation
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public ColumnMetadataImpl(AbstractLocator locator, MapKeyColumn annotation) {
@@ -101,7 +101,7 @@ public class ColumnMetadataImpl implements ColumnMetadata {
 	 * @param annotation
 	 *            the annotation
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public ColumnMetadataImpl(AbstractLocator locator, OrderColumn annotation) {

@@ -22,7 +22,7 @@ package org.batoo.jpa.core.test.validation;
  * 
  *
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface Remove {
 

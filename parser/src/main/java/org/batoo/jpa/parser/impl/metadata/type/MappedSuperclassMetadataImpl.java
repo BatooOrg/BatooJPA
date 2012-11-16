@@ -27,7 +27,7 @@ import org.batoo.jpa.parser.metadata.type.MappedSuperclassMetadata;
  * Implementation {@link MappedSuperclassMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class MappedSuperclassMetadataImpl extends IdentifiableMetadataImpl implements MappedSuperclassMetadata {
 
@@ -39,7 +39,7 @@ public class MappedSuperclassMetadataImpl extends IdentifiableMetadataImpl imple
 	 * @param parentAccessType
 	 *            the parent access type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public MappedSuperclassMetadataImpl(Class<?> clazz, MappedSuperclassMetadata metadata, AccessType parentAccessType) {

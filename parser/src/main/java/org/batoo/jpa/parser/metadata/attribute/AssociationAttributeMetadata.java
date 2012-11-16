@@ -30,7 +30,7 @@ import org.batoo.jpa.parser.metadata.AssociationMetadata;
  * The common definition of association attributes.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface AssociationAttributeMetadata extends AttributeMetadata, AssociationMetadata {
 
@@ -39,7 +39,7 @@ public interface AssociationAttributeMetadata extends AttributeMetadata, Associa
 	 * 
 	 * @return the cascades of the association attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	Set<CascadeType> getCascades();
@@ -50,7 +50,7 @@ public interface AssociationAttributeMetadata extends AttributeMetadata, Associa
 	 * @return the fetching strategy for eager joins
 	 * 
 	 * @author asimarslan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	FetchStrategyType getFetchStrategy();
 
@@ -59,7 +59,7 @@ public interface AssociationAttributeMetadata extends AttributeMetadata, Associa
 	 * 
 	 * @return the fetch type of the association attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	FetchType getFetchType();
@@ -70,7 +70,7 @@ public interface AssociationAttributeMetadata extends AttributeMetadata, Associa
 	 * @return the max fetch depth for eager joins
 	 * 
 	 * @author asimarslan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	int getMaxFetchDepth();
 
@@ -79,7 +79,7 @@ public interface AssociationAttributeMetadata extends AttributeMetadata, Associa
 	 * 
 	 * @return the name of the target entity of the association attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getTargetEntity();

@@ -36,7 +36,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  *            the type of the expression
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class NullIfExpression<T> extends AbstractExpression<T> {
 
@@ -50,7 +50,7 @@ public class NullIfExpression<T> extends AbstractExpression<T> {
 	 * @param y
 	 *            the expression
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public NullIfExpression(Expression<? extends T> x, Expression<?> y) {

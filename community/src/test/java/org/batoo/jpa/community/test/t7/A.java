@@ -25,7 +25,7 @@ import javax.persistence.Transient;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class A implements I<String> {
@@ -45,7 +45,7 @@ public class A implements I<String> {
 	/**
 	 * @return the key
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Id
 	public long getKey() {
@@ -56,7 +56,7 @@ public class A implements I<String> {
 	 * @param key
 	 *            the key
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setKey(long key) {
 		this.key = key;

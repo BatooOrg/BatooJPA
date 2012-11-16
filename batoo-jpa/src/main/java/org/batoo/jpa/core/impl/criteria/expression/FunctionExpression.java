@@ -41,7 +41,7 @@ import com.google.common.collect.Lists;
  *            the type of the expression
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class FunctionExpression<T> extends AbstractExpression<T> {
 
@@ -57,7 +57,7 @@ public class FunctionExpression<T> extends AbstractExpression<T> {
 	 * @param arguments
 	 *            the expressions as arguments
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public FunctionExpression(Class<T> javaType, String function, Expression<?>... arguments) {
 		super(javaType);

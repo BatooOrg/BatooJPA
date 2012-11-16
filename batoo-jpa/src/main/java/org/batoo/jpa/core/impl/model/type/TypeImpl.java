@@ -29,7 +29,7 @@ import org.batoo.jpa.core.impl.model.MetamodelImpl;
  *            The type of the represented object or attribute
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class TypeImpl<X> implements Type<X> {
 
@@ -42,7 +42,7 @@ public abstract class TypeImpl<X> implements Type<X> {
 	 * @param javaType
 	 *            the java type of the type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public TypeImpl(MetamodelImpl metamodel, Class<X> javaType) {
 		super();
@@ -65,7 +65,7 @@ public abstract class TypeImpl<X> implements Type<X> {
 	 * 
 	 * @return the metamodel
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public final MetamodelImpl getMetamodel() {
 		return this.metamodel;

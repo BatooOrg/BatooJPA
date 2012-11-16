@@ -31,7 +31,7 @@ import org.batoo.jpa.core.jdbc.DDLMode;
  * A Manager that performs the DDL operations.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class DdlManager extends DeploymentManager<EntityTypeImpl<?>> {
 
@@ -39,7 +39,7 @@ public class DdlManager extends DeploymentManager<EntityTypeImpl<?>> {
 	 * The phase of the DDL Operation
 	 * 
 	 * @author hceylan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public enum DdlPhase {
 		/**
@@ -67,7 +67,7 @@ public class DdlManager extends DeploymentManager<EntityTypeImpl<?>> {
 	 * @throws BatooException
 	 *             thrown in case of an underlying exception
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public static void perform(DataSource datasource, MetamodelImpl metamodel, DDLMode ddlMode) throws BatooException {
 		new DdlManager(datasource, metamodel, ddlMode, DdlPhase.TABLES).perform();

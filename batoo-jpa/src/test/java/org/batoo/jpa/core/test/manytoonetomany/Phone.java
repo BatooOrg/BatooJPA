@@ -28,7 +28,7 @@ import javax.persistence.ManyToOne;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Phone {
@@ -45,7 +45,7 @@ public class Phone {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Phone() {
 		super();
@@ -57,7 +57,7 @@ public class Phone {
 	 * @param phone
 	 *            the phone
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Phone(Person person, String phone) {
 		super();
@@ -73,7 +73,7 @@ public class Phone {
 	 * 
 	 * @return the id of the Phone
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -84,7 +84,7 @@ public class Phone {
 	 * 
 	 * @return the person of the Phone
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Person getPerson() {
 		return this.person;
@@ -95,7 +95,7 @@ public class Phone {
 	 * 
 	 * @return the phone of the Phone
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getPhone() {
 		return this.phone;
@@ -107,7 +107,7 @@ public class Phone {
 	 * @param person
 	 *            the person to set for Phone
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setPerson(Person person) {
 		this.person = person;
@@ -119,7 +119,7 @@ public class Phone {
 	 * @param phone
 	 *            the phone to set for Phone
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setPhone(String phone) {
 		this.phone = phone;

@@ -39,7 +39,7 @@ import org.batoo.jpa.core.impl.model.mapping.Mapping;
  *            the valur type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class MapExpression<M extends Map<K, V>, K, V> extends AbstractExpression<M> {
 
@@ -47,7 +47,7 @@ public class MapExpression<M extends Map<K, V>, K, V> extends AbstractExpression
 	 * @param mapping
 	 *            the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public MapExpression(Mapping<?, Map<K, V>, V> mapping) {
@@ -107,7 +107,7 @@ public class MapExpression<M extends Map<K, V>, K, V> extends AbstractExpression
 	/**
 	 * @return the xpression
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public CollectionExpression<Collection<V>, V> values() {
 		// TODO Auto-generated method stub

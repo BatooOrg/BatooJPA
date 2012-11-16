@@ -34,7 +34,7 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class RemoveTest extends BaseCoreTest {
 
@@ -47,7 +47,7 @@ public class RemoveTest extends BaseCoreTest {
 	 * 
 	 * @return
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected Parent createParent() {
 		final Parent parent = new Parent(RemoveTest.VALUE);
@@ -72,7 +72,7 @@ public class RemoveTest extends BaseCoreTest {
 	 * 
 	 * @return counts
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private int[] getCounts() {
 		final int[] counts = new int[4];
@@ -95,7 +95,7 @@ public class RemoveTest extends BaseCoreTest {
 	/**
 	 * Tests the orphans removed correctly.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testFlushRemoval() {
@@ -113,7 +113,7 @@ public class RemoveTest extends BaseCoreTest {
 	/**
 	 * Tests the orphans removed correctly.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testOrphanPersistCommitThenRemove() {
@@ -133,7 +133,7 @@ public class RemoveTest extends BaseCoreTest {
 	/**
 	 * Tests the orphans removed correctly.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testOrphanPersistThenRemove() {
@@ -151,7 +151,7 @@ public class RemoveTest extends BaseCoreTest {
 	/**
 	 * Tests the orphans removed correctly.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testOrphanRemoval() {
@@ -171,7 +171,7 @@ public class RemoveTest extends BaseCoreTest {
 	/**
 	 * Tests the orphans removed correctly.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testOrphanRemovalPersist() {
@@ -195,7 +195,7 @@ public class RemoveTest extends BaseCoreTest {
 	/**
 	 * Tests the orphans removed correctly.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testRemoval() {

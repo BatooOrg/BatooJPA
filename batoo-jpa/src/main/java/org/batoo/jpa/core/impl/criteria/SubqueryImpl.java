@@ -54,7 +54,7 @@ import com.google.common.collect.Sets;
  *            the type of the sub query.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class SubqueryImpl<T> extends AbstractExpression<T> implements Subquery<T>, BaseQuery<T> {
 
@@ -70,7 +70,7 @@ public class SubqueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 	 * @param javaType
 	 *            the java type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public SubqueryImpl(MetamodelImpl metamodel, BaseQueryImpl<?> parent, Class<T> javaType) {

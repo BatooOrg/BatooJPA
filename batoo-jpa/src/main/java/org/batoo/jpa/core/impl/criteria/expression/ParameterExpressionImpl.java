@@ -39,7 +39,7 @@ import org.batoo.jpa.core.impl.model.type.TypeImpl;
  * @param <T>
  *            the type of the parameter expression
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ParameterExpressionImpl<T> extends AbstractParameterExpressionImpl<T> implements ParameterExpression<T> {
 
@@ -55,7 +55,7 @@ public class ParameterExpressionImpl<T> extends AbstractParameterExpressionImpl<
 	 * @param position
 	 *            the ordinal position of the parameter
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ParameterExpressionImpl(BaseQueryImpl<?> q, TypeImpl<T> type, Class<T> paramClass, int position) {
 		super(type, paramClass);
@@ -74,7 +74,7 @@ public class ParameterExpressionImpl<T> extends AbstractParameterExpressionImpl<
 	 * @param name
 	 *            the name of the parameter
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ParameterExpressionImpl(TypeImpl<T> type, Class<T> paramClass, String name) {
 		super(type, paramClass);

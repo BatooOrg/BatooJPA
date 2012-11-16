@@ -43,7 +43,7 @@ import org.batoo.jpa.core.impl.jdbc.PreparedStatementProxy.SqlLoggingType;
  * Proxy class to proxy connections. Main purpose is to cache and wrap the prepared statements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ConnectionProxy implements Connection {
 
@@ -63,7 +63,7 @@ public class ConnectionProxy implements Connection {
 	 * @param jdbcFetchSize
 	 *            the size of the jdbc fetch
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ConnectionProxy(Connection connection, long slowSqlThreshold, SqlLoggingType sqlLogging, int jdbcFetchSize) {
 		super();

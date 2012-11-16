@@ -28,7 +28,7 @@ import javax.persistence.ManyToOne;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Address {
@@ -49,7 +49,7 @@ public class Address {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Address() {
 		super();
@@ -60,7 +60,7 @@ public class Address {
 	 * 
 	 * @return the address of the Address
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getAddress() {
 		return this.address;
@@ -71,7 +71,7 @@ public class Address {
 	 * 
 	 * @return the city of the Address
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getCity() {
 		return this.city;
@@ -82,7 +82,7 @@ public class Address {
 	 * 
 	 * @return the countryName of the Address
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getCountryName() {
 		return this.countryName;
@@ -93,7 +93,7 @@ public class Address {
 	 * 
 	 * @return the customer of the Address
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Customer getCustomer() {
 		return this.customer;
@@ -104,7 +104,7 @@ public class Address {
 	 * 
 	 * @return the id of the Address
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -115,7 +115,7 @@ public class Address {
 	 * 
 	 * @return the postalCode of the Address
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getPostalCode() {
 		return this.postalCode;
@@ -127,7 +127,7 @@ public class Address {
 	 * @param address
 	 *            the address to set for Address
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setAddress(String address) {
 		this.address = address;
@@ -139,7 +139,7 @@ public class Address {
 	 * @param city
 	 *            the city to set for Address
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setCity(String city) {
 		this.city = city;
@@ -151,7 +151,7 @@ public class Address {
 	 * @param countryName
 	 *            the countryName to set for Address
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setCountryName(String countryName) {
 		this.countryName = countryName;
@@ -163,7 +163,7 @@ public class Address {
 	 * @param customer
 	 *            the customer to set for Address
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setCustomer(Customer customer) {
 		this.customer = customer;
@@ -175,7 +175,7 @@ public class Address {
 	 * @param postalCode
 	 *            the postalCode to set for Address
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setPostalCode(String postalCode) {
 		this.postalCode = postalCode;

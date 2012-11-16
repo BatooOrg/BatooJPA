@@ -26,7 +26,7 @@ import org.apache.commons.dbutils.ResultSetHandler;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class NullResultSetHandler implements ResultSetHandler<Object> {
 

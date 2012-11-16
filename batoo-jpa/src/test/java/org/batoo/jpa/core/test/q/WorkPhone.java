@@ -23,14 +23,14 @@ import javax.persistence.Entity;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class WorkPhone extends Phone {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public WorkPhone() {
 		super();
@@ -42,7 +42,7 @@ public class WorkPhone extends Phone {
 	 * @param phone
 	 *            the phone
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public WorkPhone(Person person, String phone) {
 		super(phone);
@@ -54,7 +54,7 @@ public class WorkPhone extends Phone {
 	 * @param phone
 	 *            the phone
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public WorkPhone(String phone) {
 		super(phone);

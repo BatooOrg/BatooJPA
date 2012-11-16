@@ -26,14 +26,14 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class ElementCollectionTest3 extends BaseCoreTest {
 
 	/**
 	 * Tests the embeddable element collections
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testElementCollection1() {
@@ -62,7 +62,7 @@ public class ElementCollectionTest3 extends BaseCoreTest {
 	/**
 	 * Tests the embeddable element collections
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testElementCollection2() {

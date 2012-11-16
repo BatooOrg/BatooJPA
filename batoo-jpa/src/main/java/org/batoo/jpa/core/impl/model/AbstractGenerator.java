@@ -26,7 +26,7 @@ import org.batoo.jpa.parser.metadata.GeneratorMetadata;
  * Abstract base implementation of Sequence and Table generators.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class AbstractGenerator {
 
@@ -46,7 +46,7 @@ public abstract class AbstractGenerator {
 	 * @param metadata
 	 *            the metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public AbstractGenerator(GeneratorMetadata metadata) {
 		super();
@@ -64,7 +64,7 @@ public abstract class AbstractGenerator {
 	 * 
 	 * @return the allocationSize of the generator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public int getAllocationSize() {
 		return this.allocationSize;
@@ -75,7 +75,7 @@ public abstract class AbstractGenerator {
 	 * 
 	 * @return the catalog of the generator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getCatalog() {
 		return this.catalog;
@@ -86,7 +86,7 @@ public abstract class AbstractGenerator {
 	 * 
 	 * @return the initialValue of the generator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public int getInitialValue() {
 		return this.initialValue;
@@ -97,7 +97,7 @@ public abstract class AbstractGenerator {
 	 * 
 	 * @return the locator of the generator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public AbstractLocator getLocator() {
 		return this.locator;
@@ -108,7 +108,7 @@ public abstract class AbstractGenerator {
 	 * 
 	 * @return the name of the generator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		return this.name;
@@ -119,7 +119,7 @@ public abstract class AbstractGenerator {
 	 * 
 	 * @return the qualified name of the table or sequence
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public abstract String getQName();
 
@@ -128,7 +128,7 @@ public abstract class AbstractGenerator {
 	 * 
 	 * @return the schema of the generator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getSchema() {
 		return this.schema;

@@ -24,7 +24,7 @@ import java.util.Map;
  * Element for <code>map-key-class</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class MapKeyClassElement extends ChildElement {
 
@@ -36,7 +36,7 @@ public class MapKeyClassElement extends ChildElement {
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public MapKeyClassElement(ParentElement parent, Map<String, String> attributes) {
@@ -59,7 +59,7 @@ public class MapKeyClassElement extends ChildElement {
 	 * 
 	 * @return the class Name
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public String getClazz() {

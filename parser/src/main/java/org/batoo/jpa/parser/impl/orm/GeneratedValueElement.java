@@ -28,7 +28,7 @@ import org.batoo.jpa.parser.metadata.GeneratedValueMetadata;
  * Element for <code>generated-value</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class GeneratedValueElement extends ChildElement implements GeneratedValueMetadata {
 
@@ -41,7 +41,7 @@ public class GeneratedValueElement extends ChildElement implements GeneratedValu
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public GeneratedValueElement(ParentElement parent, Map<String, String> attributes) {

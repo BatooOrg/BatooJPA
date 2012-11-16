@@ -30,7 +30,7 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 @Ignore
 public class PessimisticLockTest extends BaseCoreTest {
@@ -51,7 +51,7 @@ public class PessimisticLockTest extends BaseCoreTest {
 	/**
 	 * Tests the pessimistic lock.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testPessimisticLockRemove() {
@@ -85,7 +85,7 @@ public class PessimisticLockTest extends BaseCoreTest {
 	/**
 	 * Tests the optimistic lock.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test(expected = PersistenceException.class)
 	public void testPessimisticLockUpdate() {
@@ -115,7 +115,7 @@ public class PessimisticLockTest extends BaseCoreTest {
 	/**
 	 * Tests the optimistic lock.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test(expected = PersistenceException.class)
 	public void testPessimisticLockUpdateChild() {
@@ -145,7 +145,7 @@ public class PessimisticLockTest extends BaseCoreTest {
 	/**
 	 * Tests the optimistic lock.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test(expected = PersistenceException.class)
 	public void testPessimisticLockUpdateChildren() {

@@ -40,7 +40,7 @@ import com.google.common.collect.Lists;
  * Element for <code>entity-mappings</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class EntityMappings extends ParentElement implements Metadata {
 
@@ -62,7 +62,7 @@ public class EntityMappings extends ParentElement implements Metadata {
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public EntityMappings(Map<String, String> attributes) {

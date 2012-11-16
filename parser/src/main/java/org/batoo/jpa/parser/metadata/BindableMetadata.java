@@ -22,7 +22,7 @@ package org.batoo.jpa.parser.metadata;
  * The definition of bindables.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface BindableMetadata extends LocatableMatadata {
 
@@ -31,7 +31,7 @@ public interface BindableMetadata extends LocatableMatadata {
 	 * 
 	 * @return the name of the Bindable.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getName();

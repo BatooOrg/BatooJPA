@@ -38,7 +38,7 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class SimpleTest extends BaseCoreTest {
 
@@ -53,7 +53,7 @@ public class SimpleTest extends BaseCoreTest {
 	/**
 	 * Tests {@link EntityManager#contains(Object)}.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testContains() {
@@ -72,7 +72,7 @@ public class SimpleTest extends BaseCoreTest {
 	 * @throws SQLException
 	 *             thrown if fails
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testCreateTable() throws SQLException {
@@ -87,7 +87,7 @@ public class SimpleTest extends BaseCoreTest {
 	/**
 	 * Tests {@link EntityManager#detach(Object)}.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testDetach() {
@@ -107,7 +107,7 @@ public class SimpleTest extends BaseCoreTest {
 	 * @throws SQLException
 	 *             thrown if fails
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testDetachThenCommit() throws SQLException {
@@ -125,7 +125,7 @@ public class SimpleTest extends BaseCoreTest {
 	/**
 	 * Tests to {@link EntityManager#find(Class, Object)}
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testFind() {
@@ -146,7 +146,7 @@ public class SimpleTest extends BaseCoreTest {
 	 * @throws SQLException
 	 *             thrown if test fails.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testFlushThenDetach() throws SQLException {
@@ -168,7 +168,7 @@ public class SimpleTest extends BaseCoreTest {
 	 * 
 	 * @throws SQLException
 	 *             thrown if fails
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testPersist() throws SQLException {

@@ -40,7 +40,7 @@ import com.google.common.collect.Lists;
  *            the type of the result
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class CriteriaQueryImpl<T> extends AbstractCriteriaQueryImpl<T> implements CriteriaQuery<T> {
 
@@ -50,7 +50,7 @@ public class CriteriaQueryImpl<T> extends AbstractCriteriaQueryImpl<T> implement
 	 * @param metamodel
 	 *            the metamodel;
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public CriteriaQueryImpl(MetamodelImpl metamodel) {
@@ -63,7 +63,7 @@ public class CriteriaQueryImpl<T> extends AbstractCriteriaQueryImpl<T> implement
 	 * @param resultType
 	 *            the result type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public CriteriaQueryImpl(MetamodelImpl metamodel, Class<T> resultType) {

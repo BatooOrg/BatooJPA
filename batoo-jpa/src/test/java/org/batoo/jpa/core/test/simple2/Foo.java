@@ -31,7 +31,7 @@ import javax.persistence.Id;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Foo {
@@ -83,7 +83,7 @@ public class Foo {
 	 * Returns the bigDecimalValue.
 	 * 
 	 * @return the bigDecimalValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public BigDecimal getBigDecimalValue() {
 		return this.bigDecimalValue;
@@ -93,7 +93,7 @@ public class Foo {
 	 * Returns the bigIntegerValue.
 	 * 
 	 * @return the bigIntegerValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public BigInteger getBigIntegerValue() {
 		return this.bigIntegerValue;
@@ -103,7 +103,7 @@ public class Foo {
 	 * Returns the booleanObjectValue.
 	 * 
 	 * @return the booleanObjectValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Boolean getBooleanObjectValue() {
 		return this.booleanObjectValue;
@@ -113,7 +113,7 @@ public class Foo {
 	 * Returns the byteObjectValue.
 	 * 
 	 * @return the byteObjectValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Byte getByteObjectValue() {
 		return this.byteObjectValue;
@@ -123,7 +123,7 @@ public class Foo {
 	 * Returns the byteValue.
 	 * 
 	 * @return the byteValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public byte getByteValue() {
 		return this.byteValue;
@@ -133,7 +133,7 @@ public class Foo {
 	 * Returns the calendarValue.
 	 * 
 	 * @return the calendarValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Calendar getCalendarValue() {
 		return this.calendarValue;
@@ -143,7 +143,7 @@ public class Foo {
 	 * Returns the dateValue.
 	 * 
 	 * @return the dateValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Date getDateValue() {
 		return this.dateValue;
@@ -153,7 +153,7 @@ public class Foo {
 	 * Returns the doubleObjectValue.
 	 * 
 	 * @return the doubleObjectValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Double getDoubleObjectValue() {
 		return this.doubleObjectValue;
@@ -163,7 +163,7 @@ public class Foo {
 	 * Returns the doubleValue.
 	 * 
 	 * @return the doubleValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public double getDoubleValue() {
 		return this.doubleValue;
@@ -173,7 +173,7 @@ public class Foo {
 	 * Returns the enumValue.
 	 * 
 	 * @return the enumValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Enum<E> getEnumValue() {
 		return this.enumValue;
@@ -183,7 +183,7 @@ public class Foo {
 	 * Returns the floatObjectValue.
 	 * 
 	 * @return the floatObjectValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Float getFloatObjectValue() {
 		return this.floatObjectValue;
@@ -193,7 +193,7 @@ public class Foo {
 	 * Returns the floatValue.
 	 * 
 	 * @return the floatValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public float getFloatValue() {
 		return this.floatValue;
@@ -203,7 +203,7 @@ public class Foo {
 	 * Returns the intObjectValue.
 	 * 
 	 * @return the intObjectValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getIntObjectValue() {
 		return this.intObjectValue;
@@ -213,7 +213,7 @@ public class Foo {
 	 * Returns the intValue.
 	 * 
 	 * @return the intValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public int getIntValue() {
 		return this.intValue;
@@ -223,7 +223,7 @@ public class Foo {
 	 * Returns the key.
 	 * 
 	 * @return the key
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getKey() {
 		return this.key;
@@ -233,7 +233,7 @@ public class Foo {
 	 * Returns the longObjectValue.
 	 * 
 	 * @return the longObjectValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Long getLongObjectValue() {
 		return this.longObjectValue;
@@ -243,7 +243,7 @@ public class Foo {
 	 * Returns the longValue.
 	 * 
 	 * @return the longValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public long getLongValue() {
 		return this.longValue;
@@ -253,7 +253,7 @@ public class Foo {
 	 * Returns the shortObjectValue.
 	 * 
 	 * @return the shortObjectValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Short getShortObjectValue() {
 		return this.shortObjectValue;
@@ -263,7 +263,7 @@ public class Foo {
 	 * Returns the shortValue.
 	 * 
 	 * @return the shortValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public short getShortValue() {
 		return this.shortValue;
@@ -273,7 +273,7 @@ public class Foo {
 	 * Returns the sqlDateValue.
 	 * 
 	 * @return the sqlDateValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public java.sql.Date getSqlDateValue() {
 		return this.sqlDateValue;
@@ -283,7 +283,7 @@ public class Foo {
 	 * Returns the sqlTimeStampValue.
 	 * 
 	 * @return the sqlTimeStampValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public java.sql.Timestamp getSqlTimeStampValue() {
 		return this.sqlTimeStampValue;
@@ -293,7 +293,7 @@ public class Foo {
 	 * Returns the sqlTimeValue.
 	 * 
 	 * @return the sqlTimeValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public java.sql.Time getSqlTimeValue() {
 		return this.sqlTimeValue;
@@ -303,7 +303,7 @@ public class Foo {
 	 * Returns the stringValue.
 	 * 
 	 * @return the stringValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getStringValue() {
 		return this.stringValue;
@@ -313,7 +313,7 @@ public class Foo {
 	 * Returns the booleanValue.
 	 * 
 	 * @return the booleanValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean isBooleanValue() {
 		return this.booleanValue;
@@ -324,7 +324,7 @@ public class Foo {
 	 * 
 	 * @param bigDecimalValue
 	 *            the bigDecimalValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setBigDecimalValue(BigDecimal bigDecimalValue) {
 		this.bigDecimalValue = bigDecimalValue;
@@ -335,7 +335,7 @@ public class Foo {
 	 * 
 	 * @param bigIntegerValue
 	 *            the bigIntegerValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setBigIntegerValue(BigInteger bigIntegerValue) {
 		this.bigIntegerValue = bigIntegerValue;
@@ -346,7 +346,7 @@ public class Foo {
 	 * 
 	 * @param booleanObjectValue
 	 *            the booleanObjectValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setBooleanObjectValue(Boolean booleanObjectValue) {
 		this.booleanObjectValue = booleanObjectValue;
@@ -357,7 +357,7 @@ public class Foo {
 	 * 
 	 * @param booleanValue
 	 *            the booleanValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setBooleanValue(boolean booleanValue) {
 		this.booleanValue = booleanValue;
@@ -368,7 +368,7 @@ public class Foo {
 	 * 
 	 * @param byteObjectValue
 	 *            the byteObjectValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setByteObjectValue(Byte byteObjectValue) {
 		this.byteObjectValue = byteObjectValue;
@@ -379,7 +379,7 @@ public class Foo {
 	 * 
 	 * @param byteValue
 	 *            the byteValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setByteValue(byte byteValue) {
 		this.byteValue = byteValue;
@@ -390,7 +390,7 @@ public class Foo {
 	 * 
 	 * @param calendarValue
 	 *            the calendarValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setCalendarValue(Calendar calendarValue) {
 		this.calendarValue = calendarValue;
@@ -401,7 +401,7 @@ public class Foo {
 	 * 
 	 * @param dateValue
 	 *            the dateValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setDateValue(Date dateValue) {
 		this.dateValue = dateValue;
@@ -412,7 +412,7 @@ public class Foo {
 	 * 
 	 * @param doubleObjectValue
 	 *            the doubleObjectValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setDoubleObjectValue(Double doubleObjectValue) {
 		this.doubleObjectValue = doubleObjectValue;
@@ -423,7 +423,7 @@ public class Foo {
 	 * 
 	 * @param doubleValue
 	 *            the doubleValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setDoubleValue(double doubleValue) {
 		this.doubleValue = doubleValue;
@@ -434,7 +434,7 @@ public class Foo {
 	 * 
 	 * @param enumValue
 	 *            the enumValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setEnumValue(Enum<E> enumValue) {
 		this.enumValue = enumValue;
@@ -445,7 +445,7 @@ public class Foo {
 	 * 
 	 * @param floatObjectValue
 	 *            the floatObjectValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setFloatObjectValue(Float floatObjectValue) {
 		this.floatObjectValue = floatObjectValue;
@@ -456,7 +456,7 @@ public class Foo {
 	 * 
 	 * @param floatValue
 	 *            the floatValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setFloatValue(float floatValue) {
 		this.floatValue = floatValue;
@@ -467,7 +467,7 @@ public class Foo {
 	 * 
 	 * @param intObjectValue
 	 *            the intObjectValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setIntObjectValue(Integer intObjectValue) {
 		this.intObjectValue = intObjectValue;
@@ -478,7 +478,7 @@ public class Foo {
 	 * 
 	 * @param intValue
 	 *            the intValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setIntValue(int intValue) {
 		this.intValue = intValue;
@@ -489,7 +489,7 @@ public class Foo {
 	 * 
 	 * @param key
 	 *            the key to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setKey(Integer key) {
 		this.key = key;
@@ -500,7 +500,7 @@ public class Foo {
 	 * 
 	 * @param longObjectValue
 	 *            the longObjectValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setLongObjectValue(Long longObjectValue) {
 		this.longObjectValue = longObjectValue;
@@ -511,7 +511,7 @@ public class Foo {
 	 * 
 	 * @param longValue
 	 *            the longValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setLongValue(long longValue) {
 		this.longValue = longValue;
@@ -522,7 +522,7 @@ public class Foo {
 	 * 
 	 * @param shortObjectValue
 	 *            the shortObjectValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setShortObjectValue(Short shortObjectValue) {
 		this.shortObjectValue = shortObjectValue;
@@ -533,7 +533,7 @@ public class Foo {
 	 * 
 	 * @param shortValue
 	 *            the shortValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setShortValue(short shortValue) {
 		this.shortValue = shortValue;
@@ -544,7 +544,7 @@ public class Foo {
 	 * 
 	 * @param sqlDateValue
 	 *            the sqlDateValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setSqlDateValue(java.sql.Date sqlDateValue) {
 		this.sqlDateValue = sqlDateValue;
@@ -555,7 +555,7 @@ public class Foo {
 	 * 
 	 * @param sqlTimeStampValue
 	 *            the sqlTimeStampValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setSqlTimeStampValue(java.sql.Timestamp sqlTimeStampValue) {
 		this.sqlTimeStampValue = sqlTimeStampValue;
@@ -566,7 +566,7 @@ public class Foo {
 	 * 
 	 * @param sqlTimeValue
 	 *            the sqlTimeValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setSqlTimeValue(java.sql.Time sqlTimeValue) {
 		this.sqlTimeValue = sqlTimeValue;
@@ -577,7 +577,7 @@ public class Foo {
 	 * 
 	 * @param stringValue
 	 *            the stringValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setStringValue(String stringValue) {
 		this.stringValue = stringValue;

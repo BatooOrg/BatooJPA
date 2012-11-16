@@ -30,7 +30,7 @@ import javax.persistence.PreUpdate;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class FooListener {
 
@@ -38,7 +38,7 @@ public class FooListener {
 	 * @param instance
 	 *            the instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@PostLoad
 	public void postLoad(Object instance) {
@@ -50,7 +50,7 @@ public class FooListener {
 	 * @param instance
 	 *            the instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@PostPersist
 	public void postPersist(Object instance) {
@@ -62,7 +62,7 @@ public class FooListener {
 	 * @param instance
 	 *            the instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@PostRemove
 	public void postRemove(Object instance) {
@@ -74,7 +74,7 @@ public class FooListener {
 	 * @param instance
 	 *            the instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@PostUpdate
 	public void preLoad(Object instance) {
@@ -86,7 +86,7 @@ public class FooListener {
 	 * @param instance
 	 *            the instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@PrePersist
 	public void prePersist(Object instance) {
@@ -98,7 +98,7 @@ public class FooListener {
 	 * @param instance
 	 *            the instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@PreRemove
 	public void preRemove(Object instance) {
@@ -110,7 +110,7 @@ public class FooListener {
 	 * @param instance
 	 *            the instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@PreUpdate
 	public void preUpdate(Object instance) {

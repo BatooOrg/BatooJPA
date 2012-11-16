@@ -36,7 +36,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  * Expression for empty
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class IsEmptyExpression extends AbstractExpression<Boolean> {
 
@@ -49,7 +49,7 @@ public class IsEmptyExpression extends AbstractExpression<Boolean> {
 	 * @param not
 	 *            if not empty
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public IsEmptyExpression(Expression<?> inner, boolean not) {
 		super(Boolean.class);

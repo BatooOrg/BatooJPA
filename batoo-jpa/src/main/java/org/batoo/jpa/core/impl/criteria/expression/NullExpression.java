@@ -33,7 +33,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  *            the type of the null
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class NullExpression<T> extends AbstractExpression<T> {
 
@@ -41,7 +41,7 @@ public class NullExpression<T> extends AbstractExpression<T> {
 	 * @param clazz
 	 *            the class type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public NullExpression(Class<T> clazz) {
 		super(clazz);

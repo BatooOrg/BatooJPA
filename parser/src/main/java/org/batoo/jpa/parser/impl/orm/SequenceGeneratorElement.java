@@ -26,7 +26,7 @@ import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
  * Element for <code>sequence-generator</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class SequenceGeneratorElement extends GeneratorElement implements SequenceGeneratorMetadata {
 
@@ -38,7 +38,7 @@ public class SequenceGeneratorElement extends GeneratorElement implements Sequen
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public SequenceGeneratorElement(ParentElement parent, Map<String, String> attributes) {

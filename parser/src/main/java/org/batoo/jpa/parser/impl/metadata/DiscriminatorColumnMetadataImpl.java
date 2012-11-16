@@ -28,7 +28,7 @@ import org.batoo.jpa.parser.metadata.DiscriminatorColumnMetadata;
  * Implementation of {@link DiscriminatorColumnMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class DiscriminatorColumnMetadataImpl implements DiscriminatorColumnMetadata {
 
@@ -44,7 +44,7 @@ public class DiscriminatorColumnMetadataImpl implements DiscriminatorColumnMetad
 	 * @param discriminatorColumn
 	 *            the discriminator column annotation
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public DiscriminatorColumnMetadataImpl(AbstractLocator locator, DiscriminatorColumn discriminatorColumn) {

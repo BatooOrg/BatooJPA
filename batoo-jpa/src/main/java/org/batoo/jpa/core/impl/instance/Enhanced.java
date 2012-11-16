@@ -26,7 +26,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  * A Sample class for the enhanced type. Only exists as a reference
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @SuppressWarnings("javadoc")
 public class Enhanced implements EnhancedInstance {

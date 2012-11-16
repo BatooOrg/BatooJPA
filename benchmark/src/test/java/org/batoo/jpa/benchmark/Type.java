@@ -22,7 +22,7 @@ package org.batoo.jpa.benchmark;
  * Benchmark type.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public enum Type {
 	/**

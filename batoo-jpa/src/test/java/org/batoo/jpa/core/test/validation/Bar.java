@@ -28,7 +28,7 @@ import javax.validation.constraints.NotNull;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Bar {
@@ -49,7 +49,7 @@ public class Bar {
 	 * 
 	 * @return the foo of the Bar
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Foo getFoo() {
 		return this.foo;
@@ -60,7 +60,7 @@ public class Bar {
 	 * 
 	 * @return the id of the Bar
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -71,7 +71,7 @@ public class Bar {
 	 * 
 	 * @return the value of the Bar
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getValue() {
 		return this.value;
@@ -83,7 +83,7 @@ public class Bar {
 	 * @param foo
 	 *            the foo to set for Bar
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setFoo(Foo foo) {
 		this.foo = foo;
@@ -95,7 +95,7 @@ public class Bar {
 	 * @param value
 	 *            the value to set for Bar
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setValue(String value) {
 		this.value = value;

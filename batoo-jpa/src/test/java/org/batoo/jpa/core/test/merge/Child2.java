@@ -27,7 +27,7 @@ import javax.persistence.ManyToOne;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Child2 {
@@ -42,7 +42,7 @@ public class Child2 {
 	private Parent parent;
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Child2() {
 		super();
@@ -56,7 +56,7 @@ public class Child2 {
 	 * @param value
 	 *            the value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Child2(Integer id, Parent parent, String value) {
 		super();
@@ -73,7 +73,7 @@ public class Child2 {
 	 * 
 	 * @return the id of the Child1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -84,7 +84,7 @@ public class Child2 {
 	 * 
 	 * @return the parent of the Child2
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Parent getParent() {
 		return this.parent;
@@ -95,7 +95,7 @@ public class Child2 {
 	 * 
 	 * @return the value of the Child1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getValue() {
 		return this.value;
@@ -107,7 +107,7 @@ public class Child2 {
 	 * @param parent
 	 *            the parent to set for Child2
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setParent(Parent parent) {
 		this.parent = parent;
@@ -119,7 +119,7 @@ public class Child2 {
 	 * @param value
 	 *            the value to set for Child1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setValue(String value) {
 		this.value = value;

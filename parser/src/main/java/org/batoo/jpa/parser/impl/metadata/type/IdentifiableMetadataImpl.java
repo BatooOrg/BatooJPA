@@ -39,7 +39,7 @@ import com.google.common.collect.Lists;
  * Implementation {@link IdentifiableTypeMetadata}.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class IdentifiableMetadataImpl extends ManagedTypeMetadatImpl implements IdentifiableTypeMetadata {
 
@@ -57,7 +57,7 @@ public abstract class IdentifiableMetadataImpl extends ManagedTypeMetadatImpl im
 	 * @param parentAccessType
 	 *            the parent access type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public IdentifiableMetadataImpl(Class<?> clazz, IdentifiableTypeMetadata metadata, AccessType parentAccessType) {
@@ -127,7 +127,7 @@ public abstract class IdentifiableMetadataImpl extends ManagedTypeMetadatImpl im
 	 * @param metadata
 	 *            the metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 * @return
 	 */
@@ -147,7 +147,7 @@ public abstract class IdentifiableMetadataImpl extends ManagedTypeMetadatImpl im
 	 *            the metadata
 	 * @return if default listeners excluded
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private boolean handleDefaultListeners(IdentifiableTypeMetadata metadata) {
@@ -171,7 +171,7 @@ public abstract class IdentifiableMetadataImpl extends ManagedTypeMetadatImpl im
 	 * @param metadata
 	 *            the metadata
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private void handleEntityListeners(IdentifiableTypeMetadata metadata) {
@@ -203,7 +203,7 @@ public abstract class IdentifiableMetadataImpl extends ManagedTypeMetadatImpl im
 	 *            the set of annotations parsed
 	 * @return the id class attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private String handleIdClass(IdentifiableTypeMetadata metadata) {
@@ -228,7 +228,7 @@ public abstract class IdentifiableMetadataImpl extends ManagedTypeMetadatImpl im
 	 *            the metadata
 	 * @return if default listeners excluded
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	private boolean handleSuperclassListeners(IdentifiableTypeMetadata metadata) {

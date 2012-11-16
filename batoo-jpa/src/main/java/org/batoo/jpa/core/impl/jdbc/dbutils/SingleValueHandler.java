@@ -30,13 +30,13 @@ import org.apache.commons.dbutils.ResultSetHandler;
  *            the target type the input ResultSet will be converted to.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class SingleValueHandler<T> implements ResultSetHandler<T> {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public SingleValueHandler() {
 		super();

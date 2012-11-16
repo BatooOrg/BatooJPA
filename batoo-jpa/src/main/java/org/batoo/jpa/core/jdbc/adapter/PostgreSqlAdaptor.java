@@ -40,7 +40,7 @@ import com.google.common.base.Joiner;
  * JDBC Adapter for PostgreSQL.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class PostgreSqlAdaptor extends JdbcAdaptor {
 
@@ -48,7 +48,7 @@ public class PostgreSqlAdaptor extends JdbcAdaptor {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public PostgreSqlAdaptor() {
 		super();
@@ -158,7 +158,7 @@ public class PostgreSqlAdaptor extends JdbcAdaptor {
 	 *            the sql type
 	 * @return the data type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Override
 	protected String getColumnType(AbstractColumn cd, int sqlType) {

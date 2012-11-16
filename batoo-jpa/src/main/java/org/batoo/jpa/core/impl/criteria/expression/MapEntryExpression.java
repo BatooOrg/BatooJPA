@@ -39,7 +39,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  *            the value type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class MapEntryExpression<K, V> extends AbstractExpression<Entry<K, V>> {
 
@@ -51,7 +51,7 @@ public class MapEntryExpression<K, V> extends AbstractExpression<Entry<K, V>> {
 	 * @param javaType
 	 *            the java type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public MapEntryExpression(MapJoinImpl<?, K, V> mapJoin, Class<Entry<K, V>> javaType) {
 		super(javaType);

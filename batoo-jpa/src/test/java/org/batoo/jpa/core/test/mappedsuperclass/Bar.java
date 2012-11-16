@@ -32,7 +32,7 @@ import com.google.common.collect.Lists;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @MappedSuperclass
 public class Bar {
@@ -50,7 +50,7 @@ public class Bar {
 	 * Returns the barValue.
 	 * 
 	 * @return the barValue
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getBarValue() {
 		return this.barValue;
@@ -60,7 +60,7 @@ public class Bar {
 	 * Returns the key.
 	 * 
 	 * @return the key
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getKey() {
 		return this.key;
@@ -70,7 +70,7 @@ public class Bar {
 	 * Returns the quuxes.
 	 * 
 	 * @return the quuxes
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public List<Quux> getQuuxes() {
 		return this.quuxes;
@@ -81,7 +81,7 @@ public class Bar {
 	 * 
 	 * @param barValue
 	 *            the barValue to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setBarValue(String barValue) {
 		this.barValue = barValue;

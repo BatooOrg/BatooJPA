@@ -24,7 +24,7 @@ import javax.persistence.ManyToOne;
 /**
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.0
  */
 @Embeddable
 public class DependentId {
@@ -36,7 +36,7 @@ public class DependentId {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public DependentId() {
 		super();
@@ -48,7 +48,7 @@ public class DependentId {
 	 * @param employee
 	 *            the employee
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public DependentId(String name, Employee employee) {
 		super();
@@ -97,7 +97,7 @@ public class DependentId {
 	 * 
 	 * @return the employee of the DependentId
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Employee getEmployee() {
 		return this.employee;
@@ -105,7 +105,7 @@ public class DependentId {
 
 	/**
 	 * @return the name
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		return this.name;
@@ -130,7 +130,7 @@ public class DependentId {
 	 * @param employee
 	 *            the employee to set for DependentId
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setEmployee(Employee employee) {
 		this.employee = employee;
@@ -139,7 +139,7 @@ public class DependentId {
 	/**
 	 * @param name
 	 *            the name to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setName(String name) {
 		this.name = name;

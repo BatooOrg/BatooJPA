@@ -29,7 +29,7 @@ import org.batoo.jpa.core.impl.model.MetamodelImpl;
  *            The type of the represented basic type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public final class BasicTypeImpl<X> extends TypeImpl<X> implements BasicType<X> {
 
@@ -39,7 +39,7 @@ public final class BasicTypeImpl<X> extends TypeImpl<X> implements BasicType<X> 
 	 * @param javaType
 	 *            the java type of the type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public BasicTypeImpl(MetamodelImpl metamodel, Class<X> javaType) {
 		super(metamodel, javaType);

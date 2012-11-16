@@ -47,7 +47,7 @@ import com.google.common.collect.Maps;
  * The serializable cache information of the instance.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class CacheInstance implements Serializable {
 
@@ -64,7 +64,7 @@ public class CacheInstance implements Serializable {
 	 * @param managedInstance
 	 *            the managed instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public CacheInstance(CacheImpl cache, ManagedInstance<?> managedInstance) {
 		super();
@@ -114,7 +114,7 @@ public class CacheInstance implements Serializable {
 	 * @param managedInstance
 	 *            the managed instance to copy to
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void copyTo(CacheImpl cache, ManagedInstance<?> managedInstance) {
 		final EntityTypeImpl<?> type = managedInstance.getType();
@@ -145,7 +145,7 @@ public class CacheInstance implements Serializable {
 	 *            the mapping
 	 * @return the collection of children or null
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Collection<?> getCollection(ManagedInstance<?> managedInstance, PluralAssociationMapping<?, ?, ?> mapping) {
@@ -193,7 +193,7 @@ public class CacheInstance implements Serializable {
 	 * 
 	 * @return the name of the entity of the cache instance
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getEntityName() {
 		return this.entityName;
@@ -208,7 +208,7 @@ public class CacheInstance implements Serializable {
 	 *            the managed instance
 	 * @return the null collection
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	private Collection<?> handleStale(CacheImpl cache, PluralMapping<?, ?, ?> mapping, ManagedInstance<?> managedInstance) {
 		this.pluralMappings.remove(mapping.getPath());
@@ -240,7 +240,7 @@ public class CacheInstance implements Serializable {
 	 *            the instance
 	 * @return true if cache update is necessar, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public boolean updateCollection(MetamodelImpl metamodel, CacheImpl cache, PluralMapping<?, ?, ?> mapping, Object instance) {
 		// if this is not a cachable type then skip

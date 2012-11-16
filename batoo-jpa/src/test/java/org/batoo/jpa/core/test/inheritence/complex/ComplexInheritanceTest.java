@@ -23,14 +23,14 @@ import org.junit.Test;
 
 /**
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ComplexInheritanceTest extends BaseCoreTest {
 
 	/**
 	 * Tests the complex select
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testComplex1() {

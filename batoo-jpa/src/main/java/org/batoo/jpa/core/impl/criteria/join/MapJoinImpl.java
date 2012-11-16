@@ -51,7 +51,7 @@ import org.batoo.jpa.core.util.Pair;
  *            the value type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class MapJoinImpl<Z, K, V> extends AbstractPluralJoin<Z, Map<K, V>, V> implements MapJoin<Z, K, V> {
 
@@ -59,7 +59,7 @@ public class MapJoinImpl<Z, K, V> extends AbstractPluralJoin<Z, Map<K, V>, V> im
 	 * The select type for the map join
 	 * 
 	 * @author hceylan
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public enum MapSelectType {
 		/**
@@ -86,7 +86,7 @@ public class MapJoinImpl<Z, K, V> extends AbstractPluralJoin<Z, Map<K, V>, V> im
 	 * @param jointType
 	 *            the join type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public MapJoinImpl(AbstractFrom<?, Z> parent, PluralMapping<? super Z, Map<K, V>, V> mapping, JoinType jointType) {
 		super(parent, mapping, jointType);
@@ -122,7 +122,7 @@ public class MapJoinImpl<Z, K, V> extends AbstractPluralJoin<Z, Map<K, V>, V> im
 	 *            the select type
 	 * @return the SQL select fragment
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected, MapSelectType selectType) {
 		this.select(selected);
@@ -165,7 +165,7 @@ public class MapJoinImpl<Z, K, V> extends AbstractPluralJoin<Z, Map<K, V>, V> im
 	 * @param <R>
 	 *            the type of the return either K or V
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @param <R>
 	 */
 	@SuppressWarnings("unchecked")
@@ -210,7 +210,7 @@ public class MapJoinImpl<Z, K, V> extends AbstractPluralJoin<Z, Map<K, V>, V> im
 	 *            the select type
 	 * @return expression corresponding to the type of the path
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Expression<Class<?>> type(MapSelectType selectType) {
 		// TODO Auto-generated method stub

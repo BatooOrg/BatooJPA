@@ -45,7 +45,7 @@ import com.google.common.collect.Lists;
  *            the type of the result expression
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class SimpleCaseImpl<C, R> extends AbstractExpression<R> implements SimpleCase<C, R> {
 
@@ -58,7 +58,7 @@ public class SimpleCaseImpl<C, R> extends AbstractExpression<R> implements Simpl
 	 * @param inner
 	 *            the inner expression
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
 	public SimpleCaseImpl(Expression<? extends C> inner) {
@@ -194,7 +194,7 @@ public class SimpleCaseImpl<C, R> extends AbstractExpression<R> implements Simpl
 	 *            "then" result expression
 	 * @return simple case expression
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public SimpleCaseImpl<C, R> when(AbstractExpression<C> condition, AbstractExpression<R> result) {
 		this.conditions.add(new Pair<Expression<C>, Expression<? extends R>>(condition, result));

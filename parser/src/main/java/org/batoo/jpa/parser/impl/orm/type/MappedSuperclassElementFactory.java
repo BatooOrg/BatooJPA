@@ -42,7 +42,7 @@ import com.google.common.collect.Lists;
  * Element for <code>mapped-superclass</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class MappedSuperclassElementFactory extends ParentElement implements MappedSuperclassMetadata {
 
@@ -64,7 +64,7 @@ public class MappedSuperclassElementFactory extends ParentElement implements Map
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public MappedSuperclassElementFactory(ParentElement parent, Map<String, String> attributes) {

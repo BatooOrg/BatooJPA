@@ -33,13 +33,13 @@ import com.google.common.collect.Lists;
  * A Result set handler that lists the columns in a String.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class ColumnNameListHandler implements ResultSetHandler<String> {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public ColumnNameListHandler() {
 		super();

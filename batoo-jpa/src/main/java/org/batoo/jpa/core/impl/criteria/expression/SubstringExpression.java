@@ -33,7 +33,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  * Expression for substring function.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class SubstringExpression extends AbstractExpression<String> {
 
@@ -50,7 +50,7 @@ public class SubstringExpression extends AbstractExpression<String> {
 	 * @param end
 	 *            the end expression
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public SubstringExpression(Expression<String> inner, Expression<Integer> start, Expression<Integer> end) {
 		super(String.class);

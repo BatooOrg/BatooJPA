@@ -22,7 +22,7 @@ package org.batoo.jpa.parser.impl.orm;
  * Constants
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @SuppressWarnings("javadoc")
 public class ElementConstants {

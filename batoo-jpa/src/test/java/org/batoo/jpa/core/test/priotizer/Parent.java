@@ -33,7 +33,7 @@ import com.google.common.collect.Lists;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Parent {
@@ -53,7 +53,7 @@ public class Parent {
 	 * 
 	 * @return the children1 of the Parent
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public List<Child> getChildren1() {
 		return this.children1;
@@ -64,7 +64,7 @@ public class Parent {
 	 * 
 	 * @return the children2 of the Parent
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public List<Child> getChildren2() {
 		return this.children2;
@@ -75,7 +75,7 @@ public class Parent {
 	 * 
 	 * @return the id of the Parent
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;

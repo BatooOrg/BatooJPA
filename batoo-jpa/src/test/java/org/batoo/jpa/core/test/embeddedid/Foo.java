@@ -24,7 +24,7 @@ import javax.persistence.Entity;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Foo {
@@ -38,7 +38,7 @@ public class Foo {
 	 * Returns the id.
 	 * 
 	 * @return the id
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public FooPk getId() {
 		return this.id;
@@ -48,7 +48,7 @@ public class Foo {
 	 * Returns the value.
 	 * 
 	 * @return the value
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getValue() {
 		return this.value;
@@ -59,7 +59,7 @@ public class Foo {
 	 * 
 	 * @param id
 	 *            the id to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setId(FooPk id) {
 		this.id = id;
@@ -70,7 +70,7 @@ public class Foo {
 	 * 
 	 * @param value
 	 *            the value to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setValue(String value) {
 		this.value = value;

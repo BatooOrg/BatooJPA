@@ -30,7 +30,7 @@ import javax.persistence.Id;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Foo {
@@ -55,7 +55,7 @@ public class Foo {
 	 * Returns the homeAddress.
 	 * 
 	 * @return the homeAddress
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Address getHomeAddress() {
 		return this.homeAddress;
@@ -65,7 +65,7 @@ public class Foo {
 	 * Returns the id.
 	 * 
 	 * @return the id
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -75,7 +75,7 @@ public class Foo {
 	 * Returns the value.
 	 * 
 	 * @return the value
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getValue() {
 		return this.value;
@@ -85,7 +85,7 @@ public class Foo {
 	 * Returns the workAddress.
 	 * 
 	 * @return the workAddress
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Address getWorkAddress() {
 		return this.workAddress;
@@ -96,7 +96,7 @@ public class Foo {
 	 * 
 	 * @param homeAddress
 	 *            the homeAddress to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setHomeAddress(Address homeAddress) {
 		this.homeAddress = homeAddress;
@@ -107,7 +107,7 @@ public class Foo {
 	 * 
 	 * @param value
 	 *            the value to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setValue(String value) {
 		this.value = value;
@@ -118,7 +118,7 @@ public class Foo {
 	 * 
 	 * @param workAddress
 	 *            the workAddress to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setWorkAddress(Address workAddress) {
 		this.workAddress = workAddress;

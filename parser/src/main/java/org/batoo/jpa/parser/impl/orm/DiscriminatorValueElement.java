@@ -24,7 +24,7 @@ import java.util.Map;
  * Element for <code>discriminator-value</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class DiscriminatorValueElement extends ChildElement {
 
@@ -36,7 +36,7 @@ public class DiscriminatorValueElement extends ChildElement {
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public DiscriminatorValueElement(ParentElement parent, Map<String, String> attributes) {
@@ -57,7 +57,7 @@ public class DiscriminatorValueElement extends ChildElement {
 	 * 
 	 * @return the discriminator value
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public String getDiscriminatorValue() {

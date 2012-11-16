@@ -24,7 +24,7 @@ import java.util.List;
  * The definition of the table generators.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface TableGeneratorMetadata extends GeneratorMetadata {
 
@@ -33,7 +33,7 @@ public interface TableGeneratorMetadata extends GeneratorMetadata {
 	 * 
 	 * @return the name of the primary key column of the table generator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getPkColumnName();
@@ -43,7 +43,7 @@ public interface TableGeneratorMetadata extends GeneratorMetadata {
 	 * 
 	 * @return the primary key value of the table generator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getPkColumnValue();
@@ -53,7 +53,7 @@ public interface TableGeneratorMetadata extends GeneratorMetadata {
 	 * 
 	 * @return the table name of the table generator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getTable();
@@ -63,7 +63,7 @@ public interface TableGeneratorMetadata extends GeneratorMetadata {
 	 * 
 	 * @return the list of unique constraints of the table generator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<UniqueConstraintMetadata> getUniqueConstraints();
@@ -73,7 +73,7 @@ public interface TableGeneratorMetadata extends GeneratorMetadata {
 	 * 
 	 * @return the name of the value column of the table generator
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	String getValueColumnName();

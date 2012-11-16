@@ -33,7 +33,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  * Expression for trim function.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class LocateExpression extends AbstractExpression<Integer> {
 
@@ -50,7 +50,7 @@ public class LocateExpression extends AbstractExpression<Integer> {
 	 * @param start
 	 *            the start index
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public LocateExpression(Expression<String> find, Expression<String> in, Expression<Integer> start) {
 		super(Integer.class);

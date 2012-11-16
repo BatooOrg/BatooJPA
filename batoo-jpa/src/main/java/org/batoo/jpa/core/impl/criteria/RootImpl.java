@@ -33,7 +33,7 @@ import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
  * @param <X>
  *            the entity type referenced by the root
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class RootImpl<X> extends AbstractFrom<X, X> implements Root<X> {
 
@@ -43,7 +43,7 @@ public class RootImpl<X> extends AbstractFrom<X, X> implements Root<X> {
 	 * @param entity
 	 *            the entity
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public RootImpl(EntityTypeImpl<X> entity) {
@@ -74,7 +74,7 @@ public class RootImpl<X> extends AbstractFrom<X, X> implements Root<X> {
 	 *            the query
 	 * @return the generated from SQL fragment
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public String generateSqlFrom(BaseQueryImpl<?> query) {

@@ -26,14 +26,14 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class ImportTest extends BaseCoreTest {
 
 	/**
 	 * Tests the index creation.
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testIndex() {

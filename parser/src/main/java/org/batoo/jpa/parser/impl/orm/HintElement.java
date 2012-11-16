@@ -24,7 +24,7 @@ import java.util.Map;
  * Element for <code>hint</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class HintElement extends ChildElement {
 
@@ -37,7 +37,7 @@ public class HintElement extends ChildElement {
 	 * @param attributes
 	 *            the attributes
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public HintElement(ParentElement parent, Map<String, String> attributes) {
@@ -59,7 +59,7 @@ public class HintElement extends ChildElement {
 	 * 
 	 * @return the name of the hint
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public String getName() {
@@ -71,7 +71,7 @@ public class HintElement extends ChildElement {
 	 * 
 	 * @return the value of the hint
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	public String getValue() {

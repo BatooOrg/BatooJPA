@@ -50,7 +50,7 @@ import org.batoo.jpa.parser.metadata.AssociationMetadata;
  *            the destination type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X> implements SingularMapping<Z, X> {
 
@@ -66,7 +66,7 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 	 * @param attribute
 	 *            the attribute
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public SingularAssociationMapping(ParentMapping<?, Z> parent, AssociatedSingularAttribute<? super Z, X> attribute) {
 		super(parent, attribute.getMetadata(), attribute);

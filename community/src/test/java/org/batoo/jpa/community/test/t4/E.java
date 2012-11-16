@@ -28,7 +28,7 @@ import javax.persistence.ManyToOne;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class E {
@@ -42,7 +42,7 @@ public class E {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public E() {
 		super();
@@ -52,7 +52,7 @@ public class E {
 	 * @param e2
 	 *            the e2
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public E(E2 e2) {
 		super();
@@ -65,7 +65,7 @@ public class E {
 	 * 
 	 * @return the e2 of the E1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public E2 getE2() {
 		return this.e2;
@@ -76,7 +76,7 @@ public class E {
 	 * 
 	 * @return the id of the E
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Long getId() {
 		return this.id;
@@ -88,7 +88,7 @@ public class E {
 	 * @param e2
 	 *            the e2 to set for E1
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setE2(E2 e2) {
 		this.e2 = e2;
@@ -100,7 +100,7 @@ public class E {
 	 * @param id
 	 *            the id to set for E
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setId(Long id) {
 		this.id = id;

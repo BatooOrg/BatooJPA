@@ -37,7 +37,7 @@ import com.google.common.base.Joiner;
  * JDBC Adapter for MySQL.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public class MySqlAdaptor extends JdbcAdaptor {
 
@@ -45,7 +45,7 @@ public class MySqlAdaptor extends JdbcAdaptor {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public MySqlAdaptor() {
 		super();

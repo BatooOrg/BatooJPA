@@ -28,7 +28,7 @@ import javax.persistence.OneToOne;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Employee {
@@ -43,7 +43,7 @@ public class Employee {
 	private String name;
 
 	/**
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Employee() {
 		super();
@@ -53,7 +53,7 @@ public class Employee {
 	 * @param name
 	 *            the name
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Employee(String name) {
 		super();
@@ -65,7 +65,7 @@ public class Employee {
 	 * Returns the assignedCubicle.
 	 * 
 	 * @return the assignedCubicle
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Cubicle getAssignedCubicle() {
 		return this.assignedCubicle;
@@ -75,7 +75,7 @@ public class Employee {
 	 * Returns the id.
 	 * 
 	 * @return the id
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -85,7 +85,7 @@ public class Employee {
 	 * Returns the name.
 	 * 
 	 * @return the name
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getName() {
 		return this.name;
@@ -96,7 +96,7 @@ public class Employee {
 	 * 
 	 * @param assignedCubicle
 	 *            the assignedCubicle to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setAssignedCubicle(Cubicle assignedCubicle) {
 		this.assignedCubicle = assignedCubicle;
@@ -107,7 +107,7 @@ public class Employee {
 	 * 
 	 * @param name
 	 *            the name to set
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setName(String name) {
 		this.name = name;

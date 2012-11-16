@@ -26,7 +26,7 @@ import javax.persistence.Id;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 @Entity
 public class Foo {
@@ -49,7 +49,7 @@ public class Foo {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Foo() {
 		super();
@@ -61,7 +61,7 @@ public class Foo {
 	 * @param number2
 	 *            the number 2
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Foo(Integer number, Integer number2) {
 		super();
@@ -78,7 +78,7 @@ public class Foo {
 	 * @param type
 	 *            the type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Foo(Integer number, String string, FooType type) {
 		super();
@@ -93,7 +93,7 @@ public class Foo {
 	 * 
 	 * @return the id of the Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getId() {
 		return this.id;
@@ -104,7 +104,7 @@ public class Foo {
 	 * 
 	 * @return the number of the Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getNumber() {
 		return this.number;
@@ -115,7 +115,7 @@ public class Foo {
 	 * 
 	 * @return the number2 of the Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Integer getNumber2() {
 		return this.number2;
@@ -126,7 +126,7 @@ public class Foo {
 	 * 
 	 * @return the string of the Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public String getString() {
 		return this.string;
@@ -137,7 +137,7 @@ public class Foo {
 	 * 
 	 * @return the type of the Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public FooType getType() {
 		return this.type;
@@ -149,7 +149,7 @@ public class Foo {
 	 * @param number
 	 *            the number to set for Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setNumber(Integer number) {
 		this.number = number;
@@ -161,7 +161,7 @@ public class Foo {
 	 * @param number2
 	 *            the number2 to set for Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setNumber2(Integer number2) {
 		this.number2 = number2;
@@ -173,7 +173,7 @@ public class Foo {
 	 * @param string
 	 *            the string to set for Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setString(String string) {
 		this.string = string;
@@ -185,7 +185,7 @@ public class Foo {
 	 * @param type
 	 *            the type to set for Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public void setType(FooType type) {
 		this.type = type;

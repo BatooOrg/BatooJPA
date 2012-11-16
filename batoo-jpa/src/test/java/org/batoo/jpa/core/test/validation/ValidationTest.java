@@ -26,14 +26,14 @@ import org.junit.Test;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.0
  */
 public class ValidationTest extends BaseCoreTest {
 
 	/**
 	 * Tests the validation persist
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test(expected = ConstraintViolationException.class)
 	public void testPersist() {
@@ -48,7 +48,7 @@ public class ValidationTest extends BaseCoreTest {
 	/**
 	 * Tests the validation persist
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test(expected = ConstraintViolationException.class)
 	public void testRemove() {
@@ -77,7 +77,7 @@ public class ValidationTest extends BaseCoreTest {
 	/**
 	 * Tests the validation persist
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testRemoveOk() {
@@ -105,7 +105,7 @@ public class ValidationTest extends BaseCoreTest {
 	/**
 	 * Tests the validation persist
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test(expected = ConstraintViolationException.class)
 	public void testUpdate() {
@@ -133,7 +133,7 @@ public class ValidationTest extends BaseCoreTest {
 	/**
 	 * Tests the validation persist
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	@Test
 	public void testUpdateOk() {

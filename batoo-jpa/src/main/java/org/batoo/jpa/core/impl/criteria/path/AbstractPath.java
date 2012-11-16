@@ -37,7 +37,7 @@ import org.batoo.jpa.core.impl.criteria.join.Joinable;
  *            the type of the path
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public abstract class AbstractPath<X> extends AbstractExpression<X> implements Path<X> {
 
@@ -49,7 +49,7 @@ public abstract class AbstractPath<X> extends AbstractExpression<X> implements P
 	 * @param javaType
 	 *            the java type
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public AbstractPath(ParentPath<?, ?> parent, Class<X> javaType) {
 		super(javaType);
@@ -64,7 +64,7 @@ public abstract class AbstractPath<X> extends AbstractExpression<X> implements P
 	 *            the attribute name
 	 * @return the exception
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	protected IllegalArgumentException cannotDereference(String name) {
 		return new IllegalArgumentException("Cannot dereference: " + name);
@@ -120,7 +120,7 @@ public abstract class AbstractPath<X> extends AbstractExpression<X> implements P
 	 * 
 	 * @return the root of the path
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 */
 	public Joinable getRootPath() {
 		AbstractPath<?> root = this;

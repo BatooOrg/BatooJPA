@@ -24,7 +24,7 @@ import java.util.List;
  * Element for <code>secondary-table</code> elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.0
  */
 public interface SecondaryTableMetadata extends TableMetadata {
 
@@ -33,7 +33,7 @@ public interface SecondaryTableMetadata extends TableMetadata {
 	 * 
 	 * @return the list of primary key join columns of the secondary table
 	 * 
-	 * @since $version
+	 * @since 2.0.0
 	 * @author hceylan
 	 */
 	List<PrimaryKeyJoinColumnMetadata> getPrimaryKeyJoinColumnMetadata();
