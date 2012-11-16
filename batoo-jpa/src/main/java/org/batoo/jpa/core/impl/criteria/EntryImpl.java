@@ -44,7 +44,6 @@ public class EntryImpl<K, V> implements Entry<K, V> {
 	 *            the value
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public EntryImpl(K key, V value) {
 		super();

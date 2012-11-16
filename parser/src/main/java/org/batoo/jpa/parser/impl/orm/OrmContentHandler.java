@@ -148,7 +148,7 @@ public class OrmContentHandler implements ContentHandler {
 	}
 
 	/**
-	 * {@inheritedDoc}
+	 * {@inheritDoc}
 	 * 
 	 */
 	@Override

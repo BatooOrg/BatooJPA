@@ -42,7 +42,6 @@ import com.google.common.collect.Lists;
  * @param <X>
  *            the type of the selection
  * 
- * @author hceylan
  * @since 2.0.0
  */
 public class CompoundSelectionImpl<X> extends AbstractSelection<X> implements CompoundSelection<X> {
@@ -58,7 +57,6 @@ public class CompoundSelectionImpl<X> extends AbstractSelection<X> implements Co
 	 *            the selections
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public CompoundSelectionImpl(Class<X> javaType, List<Selection<?>> selections) {
 		super(javaType);
@@ -91,7 +89,6 @@ public class CompoundSelectionImpl<X> extends AbstractSelection<X> implements Co
 	 *            the selections
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public CompoundSelectionImpl(Class<X> javaType, Selection<?>... selections) {
 		this(javaType, Lists.newArrayList(selections));
@@ -128,10 +125,11 @@ public class CompoundSelectionImpl<X> extends AbstractSelection<X> implements Co
 	}
 
 	/**
-	 * @return
+	 * Returns the alias.
+	 * 
+	 * @return the alias
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private List<String> getAliases() {
 		if (this.aliases != null) {

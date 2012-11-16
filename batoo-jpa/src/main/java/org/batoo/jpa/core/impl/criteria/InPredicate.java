@@ -45,7 +45,6 @@ public class InPredicate<T> extends PredicateImpl implements In<T> {
 	 *            the inner expression
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public InPredicate(Expression<? extends T> inner) {

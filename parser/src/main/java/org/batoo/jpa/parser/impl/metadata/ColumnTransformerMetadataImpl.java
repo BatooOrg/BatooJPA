@@ -34,10 +34,11 @@ public class ColumnTransformerMetadataImpl implements ColumnTransformerMetadata 
 	private final AbstractLocator locator;
 
 	/**
-	 * @param locator the locator
-	 * @param columnTransformer the column transformer
+	 * @param locator
+	 *            the locator
+	 * @param columnTransformer
+	 *            the column transformer
 	 * 
-	 * @author asimarslan
 	 * @since 2.0.0
 	 */
 	public ColumnTransformerMetadataImpl(AbstractLocator locator, ColumnTransformer columnTransformer) {

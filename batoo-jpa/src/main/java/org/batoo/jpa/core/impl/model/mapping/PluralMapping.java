@@ -49,8 +49,6 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 *            the connection
 	 * @param instance
 	 *            the instance
-	 * @param key
-	 *            the key, may be null
 	 * @param batch
 	 *            the batch of children
 	 * @param size

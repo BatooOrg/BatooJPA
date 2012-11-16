@@ -43,7 +43,6 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	 *            the java type
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public AbstractSelection(Class<X> javaType) {
 		super(javaType);
@@ -75,7 +74,6 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	 * @return the JPQL select fragment
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public abstract String generateJpqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected);
 
@@ -89,7 +87,6 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	 * @return the SQL select fragment
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public abstract String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected);
 
@@ -119,7 +116,6 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	 * @return the SQL restriction fragments
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public abstract String[] getSqlRestrictionFragments(BaseQueryImpl<?> query);
 
@@ -137,7 +133,6 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	 *             thrown in case of an underlying SQL Error
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public abstract X handle(QueryImpl<?> query, SessionImpl session, ResultSet row) throws SQLException;
 
@@ -156,7 +151,6 @@ public abstract class AbstractSelection<X> extends TupleElementImpl<X> implement
 	 * @return true if the selection is comprises of entities only, false otherwise
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public boolean isEntityList() {
 		return false;

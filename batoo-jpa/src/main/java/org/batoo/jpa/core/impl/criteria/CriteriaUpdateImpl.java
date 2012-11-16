@@ -53,7 +53,6 @@ public class CriteriaUpdateImpl<T> extends CriteriaModify<T> {
 	 *            the metamodel
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public CriteriaUpdateImpl(MetamodelImpl metamodel) {
 		super(metamodel);
@@ -104,7 +103,6 @@ public class CriteriaUpdateImpl<T> extends CriteriaModify<T> {
 	 * @return the restriction
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private String generateSqlRestriction() {
 		if ((this.getRestriction() == null) && (this.getRoot().getEntity().getRootType().getInheritanceType() == null)) {
@@ -141,7 +139,6 @@ public class CriteriaUpdateImpl<T> extends CriteriaModify<T> {
 	 *            the typ of the attribute
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public <Y> CriteriaUpdateImpl<T> set(Path<Y> attribute, Expression<? extends Y> value) {
 		this.updates.put((AbstractPath<?>) attribute, (AbstractExpression<?>) value);

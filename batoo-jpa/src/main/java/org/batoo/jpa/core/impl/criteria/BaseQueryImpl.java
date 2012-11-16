@@ -68,7 +68,6 @@ public abstract class BaseQueryImpl<T> implements BaseQuery<T> {
 	 *            the metamodel
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public BaseQueryImpl(MetamodelImpl metamodel) {
 		this.metamodel = metamodel;
@@ -245,7 +244,6 @@ public abstract class BaseQueryImpl<T> implements BaseQuery<T> {
 	 * @return true if the query is a select query, false otherwise
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public abstract boolean isQuery();
 

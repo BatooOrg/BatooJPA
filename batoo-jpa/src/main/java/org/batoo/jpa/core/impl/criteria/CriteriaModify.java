@@ -48,7 +48,6 @@ public abstract class CriteriaModify<T> extends BaseQueryImpl<T> {
 	 *            the metamodel
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public CriteriaModify(MetamodelImpl metamodel) {
 		super(metamodel);
@@ -63,7 +62,6 @@ public abstract class CriteriaModify<T> extends BaseQueryImpl<T> {
 	 * @return query root corresponding to the given entity
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public Root<T> from(Class<T> entityClass) {
@@ -83,7 +81,6 @@ public abstract class CriteriaModify<T> extends BaseQueryImpl<T> {
 	 * @return query root corresponding to the given entity
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public Root<T> from(EntityType<T> entity) {
 		if (this.root != null) {
@@ -99,7 +96,6 @@ public abstract class CriteriaModify<T> extends BaseQueryImpl<T> {
 	 * @return the the JPQL
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	@Override
 	public String getJpql() {
@@ -122,7 +118,6 @@ public abstract class CriteriaModify<T> extends BaseQueryImpl<T> {
 	 * @return where clause predicate
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public PredicateImpl getRestriction() {
 		return this.restriction;
@@ -156,7 +151,6 @@ public abstract class CriteriaModify<T> extends BaseQueryImpl<T> {
 	 * @return subquery
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	@Override
 	public <U> SubqueryImpl<U> subquery(Class<U> type) {
@@ -172,7 +166,6 @@ public abstract class CriteriaModify<T> extends BaseQueryImpl<T> {
 	 * @return the modified query
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public CriteriaModify<T> where(Expression<Boolean> restriction) {
 		this.restriction = new PredicateImpl((AbstractExpression<Boolean>) restriction);
@@ -190,7 +183,6 @@ public abstract class CriteriaModify<T> extends BaseQueryImpl<T> {
 	 * @return the modified query
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public CriteriaModify<T> where(Predicate... restrictions) {
 		this.restriction = new PredicateImpl(this.restriction);

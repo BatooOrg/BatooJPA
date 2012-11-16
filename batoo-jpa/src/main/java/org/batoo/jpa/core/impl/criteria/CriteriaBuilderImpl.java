@@ -41,13 +41,17 @@ import javax.persistence.metamodel.Type.PersistenceType;
 
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.AggregationExpression;
+import org.batoo.jpa.core.impl.criteria.expression.AggregationExpression.AggregationFunctionType;
 import org.batoo.jpa.core.impl.criteria.expression.AllAnyExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ArithmeticExression;
+import org.batoo.jpa.core.impl.criteria.expression.ArithmeticExression.ArithmeticOperation;
 import org.batoo.jpa.core.impl.criteria.expression.CaseImpl;
 import org.batoo.jpa.core.impl.criteria.expression.CaseTransformationExpression;
+import org.batoo.jpa.core.impl.criteria.expression.CaseTransformationExpression.CaseTransformationType;
 import org.batoo.jpa.core.impl.criteria.expression.CastExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CoalesceExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ComparisonExpression;
+import org.batoo.jpa.core.impl.criteria.expression.ComparisonExpression.Comparison;
 import org.batoo.jpa.core.impl.criteria.expression.ConcatExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CountExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CurrentTemporalExpression;
@@ -73,10 +77,6 @@ import org.batoo.jpa.core.impl.criteria.expression.SimpleConstantExpression;
 import org.batoo.jpa.core.impl.criteria.expression.SizeExpression;
 import org.batoo.jpa.core.impl.criteria.expression.SubstringExpression;
 import org.batoo.jpa.core.impl.criteria.expression.TrimExpression;
-import org.batoo.jpa.core.impl.criteria.expression.AggregationExpression.AggregationFunctionType;
-import org.batoo.jpa.core.impl.criteria.expression.ArithmeticExression.ArithmeticOperation;
-import org.batoo.jpa.core.impl.criteria.expression.CaseTransformationExpression.CaseTransformationType;
-import org.batoo.jpa.core.impl.criteria.expression.ComparisonExpression.Comparison;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
@@ -100,7 +100,6 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 *            the metamodel
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public CriteriaBuilderImpl(MetamodelImpl metamodel) {
 		this.metamodel = metamodel;
@@ -209,7 +208,6 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 *            the type of the clazz
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public <X> AbstractExpression<X> cast(AbstractExpression<?> x, Class<X> clazz) {
 		return new CastExpression<X>(x, clazz);
@@ -319,7 +317,6 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 *            the type of the constant
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	private <X> AbstractExpression<X> createConstant(X x) {
@@ -401,7 +398,6 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * @return the date tAime function expresssion
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public DateTimeExpression dateTimeExpression(DateTimeFunctionType type, Expression<?> x) {
 		return new DateTimeExpression(type, x);

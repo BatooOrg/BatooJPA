@@ -146,7 +146,7 @@ public class BatooEnhancerMojo extends AbstractMojo {
 	/**
 	 * This will prepare the current ClassLoader and add all jars and local classpaths (e.g. target/classes) needed by the OpenJPA task.
 	 * 
-	 * @return
+	 * @return the class loader
 	 * 
 	 * @throws MojoExecutionException
 	 *             on any error inside the mojo

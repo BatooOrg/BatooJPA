@@ -43,7 +43,6 @@ public class SubQueryStub<T> extends AbstractCriteriaQueryImpl<T> {
 	 *            the result type
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public SubQueryStub(BaseQueryImpl<?> parent, MetamodelImpl metamodel, Class<T> resultType) {
 		super(metamodel, resultType);

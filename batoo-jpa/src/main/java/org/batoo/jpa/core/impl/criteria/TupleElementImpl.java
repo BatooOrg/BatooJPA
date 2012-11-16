@@ -40,7 +40,6 @@ public abstract class TupleElementImpl<X> implements TupleElement<X> {
 	 *            the java type
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public TupleElementImpl(Class<X> javaType) {

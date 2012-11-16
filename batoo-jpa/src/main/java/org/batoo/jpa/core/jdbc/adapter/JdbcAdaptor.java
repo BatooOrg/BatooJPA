@@ -886,7 +886,9 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	}
 
 	/**
-	 * @return
+	 * Returns the name of the database.
+	 * 
+	 * @return the name of the database
 	 * 
 	 * @since 2.0.0
 	 */

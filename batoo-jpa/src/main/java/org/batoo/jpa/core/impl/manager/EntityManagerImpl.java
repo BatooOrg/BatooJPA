@@ -346,10 +346,15 @@ public class EntityManagerImpl implements EntityManager {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Creates and returns the query for delete operation.
 	 * 
+	 * @param deleteQuery
+	 *            the delete criteria query
+	 * @return the query for delete operation
+	 * 
+	 * @since $version
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes", "javadoc" })
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Query createQuery(CriteriaDeleteImpl<?> deleteQuery) {
 		return new QueryImpl(deleteQuery, this);
 	}
@@ -364,10 +369,15 @@ public class EntityManagerImpl implements EntityManager {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Creates and returns a query for the update operation.
 	 * 
+	 * @param updateQuery
+	 *            the upate criteria query
+	 * @return query for the update operation
+	 * 
+	 * @since $version
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes", "javadoc" })
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Query createQuery(CriteriaUpdateImpl<?> updateQuery) {
 		return new QueryImpl(updateQuery, this);
 	}

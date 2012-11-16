@@ -44,7 +44,6 @@ public class RootImpl<X> extends AbstractFrom<X, X> implements Root<X> {
 	 *            the entity
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public RootImpl(EntityTypeImpl<X> entity) {
 		super(entity);
@@ -75,7 +74,6 @@ public class RootImpl<X> extends AbstractFrom<X, X> implements Root<X> {
 	 * @return the generated from SQL fragment
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public String generateSqlFrom(BaseQueryImpl<?> query) {
 		final EntityTable primaryTable = this.entity.getRootType().getPrimaryTable();

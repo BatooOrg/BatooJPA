@@ -40,7 +40,6 @@ public class CriteriaDeleteImpl<T> extends CriteriaModify<T> {
 	 *            the metamodel
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public CriteriaDeleteImpl(MetamodelImpl metamodel) {
 		super(metamodel);
@@ -83,7 +82,6 @@ public class CriteriaDeleteImpl<T> extends CriteriaModify<T> {
 	 * @return the restriction
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private String generateSqlRestriction() {
 		if ((this.getRestriction() == null) && (this.getRoot().getEntity().getRootType().getInheritanceType() == null)) {

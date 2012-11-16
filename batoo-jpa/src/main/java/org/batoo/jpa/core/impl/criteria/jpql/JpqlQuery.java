@@ -206,9 +206,9 @@ public class JpqlQuery {
 	 *            the criteria builder
 	 * @param tree
 	 *            the tree
+	 * @return the query constructed
 	 * 
 	 * @since 2.0.0
-	 * @return
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private CriteriaDeleteImpl constructDeleteQuery(CriteriaBuilderImpl cb, CommonTree tree) {
@@ -481,9 +481,9 @@ public class JpqlQuery {
 	 *            the query
 	 * @param from
 	 *            the from metadata
+	 * @return the select constructed
 	 * 
 	 * @since 2.0.0
-	 * @return
 	 */
 	private List<Selection<?>> constructSelect(CriteriaBuilderImpl cb, CriteriaQueryImpl<?> q, Tree selects) {
 		final List<Selection<?>> selections = Lists.newArrayList();
@@ -690,9 +690,9 @@ public class JpqlQuery {
 	 *            the criteria builder
 	 * @param tree
 	 *            the tree
+	 * @return the update query constructed
 	 * 
 	 * @since 2.0.0
-	 * @return
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private CriteriaUpdateImpl<?> constructUpdateQuery(CriteriaBuilderImpl cb, CommonTree tree) {

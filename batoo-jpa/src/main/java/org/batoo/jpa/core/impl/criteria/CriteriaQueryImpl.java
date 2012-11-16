@@ -51,7 +51,6 @@ public class CriteriaQueryImpl<T> extends AbstractCriteriaQueryImpl<T> implement
 	 *            the metamodel;
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public CriteriaQueryImpl(MetamodelImpl metamodel) {
 		super(metamodel, null);
@@ -64,7 +63,6 @@ public class CriteriaQueryImpl<T> extends AbstractCriteriaQueryImpl<T> implement
 	 *            the result type
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public CriteriaQueryImpl(MetamodelImpl metamodel, Class<T> resultType) {
 		super(metamodel, resultType);

@@ -47,7 +47,6 @@ public class TupleImpl implements Tuple {
 	 *            the values
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public TupleImpl(List<String> aliases, List<AbstractSelection<?>> selections, Object[] values) {
 		super();

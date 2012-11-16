@@ -162,11 +162,8 @@ public class MapJoinImpl<Z, K, V> extends AbstractPluralJoin<Z, Map<K, V>, V> im
 	 * @return the managed instance
 	 * @throws SQLException
 	 *             thrown in case of an underlying SQL Error
-	 * @param <R>
-	 *            the type of the return either K or V
 	 * 
 	 * @since 2.0.0
-	 * @param <R>
 	 */
 	@SuppressWarnings("unchecked")
 	public Object handle(SessionImpl session, ResultSet row, MapSelectType selectType) throws SQLException {

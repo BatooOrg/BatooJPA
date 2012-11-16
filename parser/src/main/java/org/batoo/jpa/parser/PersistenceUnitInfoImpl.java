@@ -240,9 +240,11 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	}
 
 	/**
+	 * Finds and returns the persistence unit.
+	 * 
 	 * @param puName
 	 * @param persistenceXmlUrl
-	 * @return
+	 * @return the persistence unit
 	 * 
 	 * @since 2.0.0
 	 */

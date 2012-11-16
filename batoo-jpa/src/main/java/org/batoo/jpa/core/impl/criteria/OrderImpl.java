@@ -41,7 +41,6 @@ public class OrderImpl implements Order {
 	 *            if the ordering is in reverse order
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public OrderImpl(Expression<?> inner, boolean reverse) {
 		super();

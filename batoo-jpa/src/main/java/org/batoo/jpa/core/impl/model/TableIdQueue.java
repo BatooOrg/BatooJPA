@@ -108,7 +108,9 @@ public class TableIdQueue extends IdQueue {
 	}
 
 	/**
-	 * @return
+	 * Returns the query to update the id table.
+	 * 
+	 * @return the query to update the id table
 	 * 
 	 * @since 2.0.0
 	 */

@@ -114,7 +114,6 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 *            the entity manager
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public QueryImpl(BaseQuery<X> q, EntityManagerImpl entityManager) {
 		super();
@@ -321,7 +320,6 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 *             thrown by the underlying database in case of an error
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private void buildResultSetImpl(final Connection connection, final Object[] parameters) throws SQLException {
 		PreparedStatement statement = null;
@@ -467,7 +465,6 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 * @return the expanded SQL
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private String expandParams(String _sql, Map<Integer, Integer> repeat) {
 		final StringBuffer outSql = new StringBuffer();
@@ -527,7 +524,6 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 *             thrown in case of an underlying SQL Exception
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private void fillStatement(PreparedStatement statement, Object[] parameters, Map<Integer, Integer> repeat) throws SQLException {
 		// the following code has been adopted from Apache Commons DBUtils.
@@ -601,7 +597,6 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 * @return the criteria query of the typed query
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public BaseQuery<X> getCriteriaQuery() {
 		return this.q;
@@ -844,12 +839,14 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	}
 
 	/**
+	 * Handles and returns the value created from the result set.
+	 * 
 	 * @param rs
-	 * @return
+	 *            the result set
+	 * @return the value created from the result set
 	 * @throws SQLException
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	private List<X> handle(ResultSet rs) throws SQLException {
 		this.md = rs.getMetaData();
@@ -1081,7 +1078,6 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 *             thrown in case of an underlying SQL Exception
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public void storeData(ResultSet rs) throws SQLException {
 		final Object[] data = new Object[this.md.getColumnCount()];

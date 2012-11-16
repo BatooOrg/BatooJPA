@@ -473,8 +473,11 @@ public class ForeignKey {
 	}
 
 	/**
+	 * Returns if the foreign key is read only.
+	 * 
 	 * @param metadata
-	 * @return
+	 *            the metadata
+	 * @return if the foreign key is read only
 	 * 
 	 * @since 2.0.0
 	 */

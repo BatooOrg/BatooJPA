@@ -36,8 +36,10 @@ import org.batoo.jpa.parser.metadata.DiscriminatorColumnMetadata;
 public class DiscriminatorColumn extends AbstractColumn {
 
 	/**
+	 * Returns the java type of the discriminator column.
+	 * 
 	 * @param metadata
-	 * @return
+	 * @return the java type of the discriminator column
 	 * 
 	 * @since 2.0.0
 	 */

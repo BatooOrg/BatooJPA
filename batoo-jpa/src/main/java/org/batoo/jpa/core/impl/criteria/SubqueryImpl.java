@@ -71,7 +71,6 @@ public class SubqueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 	 *            the java type
 	 * 
 	 * @since 2.0.0
-	 * @author hceylan
 	 */
 	public SubqueryImpl(MetamodelImpl metamodel, BaseQueryImpl<?> parent, Class<T> javaType) {
 		super(javaType);

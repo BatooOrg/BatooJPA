@@ -125,9 +125,9 @@ public abstract class IdentifiableMetadataImpl extends ManagedTypeMetadatImpl im
 	 * 
 	 * @param metadata
 	 *            the metadata
+	 * @return the entity listener metadata
 	 * 
 	 * @since 2.0.0
-	 * @return
 	 */
 	private EntityListenerMetadata handleCallbacks(IdentifiableTypeMetadata metadata) {
 		if ((metadata != null) && (metadata.getCallbacks().size() > 0)) {
