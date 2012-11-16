@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.persistence.SharedCacheMode;
-import javax.persistence.ValidationMode;
 import javax.persistence.spi.PersistenceUnitInfo;
 import javax.sql.DataSource;
 
@@ -91,7 +90,7 @@ public class PersistenceParserImpl implements PersistenceParser {
 			}
 		}
 
-		this.hasValidators = (puInfo.getValidationMode() == ValidationMode.AUTO) || (puInfo.getValidationMode() == ValidationMode.CALLBACK);
+		this.hasValidators = this.createHasValidators(puInfo);
 		this.metadata = new MetadataImpl();
 		this.ormMappingFiles = puInfo.getMappingFileNames();
 
@@ -111,6 +110,31 @@ public class PersistenceParserImpl implements PersistenceParser {
 	 */
 	public PersistenceParserImpl(String puName, Map<String, Object> properties) {
 		this(new PersistenceUnitInfoImpl(puName), properties);
+	}
+
+	private boolean createHasValidators(PersistenceUnitInfo puInfo) {
+		switch (puInfo.getValidationMode()) {
+			case CALLBACK:
+				return true;
+			case NONE:
+				return false;
+			default:
+				try {
+					javax.validation.Validation.buildDefaultValidatorFactory();
+
+					return true;
+				}
+				catch (final Exception e) {
+					PersistenceParserImpl.LOG.debug(e, "Validation cannot be enabled");
+
+					PersistenceParserImpl.LOG.warn("Validation mode is set to AUTO, yet no validation implementation seems to be available!" + //
+						"\n\tValidation is being turned off." + //
+						"\n\tTo avoid this warning set validation-mode in your persistence.xml to NONE." + //
+						"\n\tExtra information can be obtained by turning debug log on...");
+
+					return false;
+				}
+		}
 	}
 
 	/**
