@@ -79,7 +79,6 @@ public interface JoinedMapping<Z, X, Y> {
 	 * @return the key of the value
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Object extractKey(Object value);
 
@@ -98,7 +97,6 @@ public interface JoinedMapping<Z, X, Y> {
 	 *             thrown if there is an underlying SQL Exception
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	void flush(Connection connection, ManagedInstance<?> managedInstance, boolean removals, boolean force) throws SQLException;
 
@@ -108,7 +106,6 @@ public interface JoinedMapping<Z, X, Y> {
 	 * @return the attribute of the mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	AttributeImpl<? super Z, X> getAttribute();
 
@@ -118,7 +115,6 @@ public interface JoinedMapping<Z, X, Y> {
 	 * @return the type of the mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	MappingType getMappingType();
 
@@ -128,7 +124,6 @@ public interface JoinedMapping<Z, X, Y> {
 	 * @return the path of the mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	String getPath();
 
@@ -140,7 +135,6 @@ public interface JoinedMapping<Z, X, Y> {
 	 * @return the table
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	JoinableTable getTable();
 
@@ -150,7 +144,6 @@ public interface JoinedMapping<Z, X, Y> {
 	 * @return the bindable entity type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	TypeImpl<Y> getType();
 
@@ -161,7 +154,6 @@ public interface JoinedMapping<Z, X, Y> {
 	 *            the instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	void initialize(ManagedInstance<?> instance);
 
@@ -171,7 +163,6 @@ public interface JoinedMapping<Z, X, Y> {
 	 * @return true if the mapping is an association, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	boolean isAssociation();
 
@@ -181,7 +172,6 @@ public interface JoinedMapping<Z, X, Y> {
 	 * @return true if the association should be eagerly fetched
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	boolean isEager();
 
@@ -191,7 +181,6 @@ public interface JoinedMapping<Z, X, Y> {
 	 * @return true if the mapping is a joined mapping, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	boolean isJoined();
 
@@ -201,7 +190,6 @@ public interface JoinedMapping<Z, X, Y> {
 	 * @return true if the mapping is a map collection, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	boolean isMap();
 
@@ -218,7 +206,6 @@ public interface JoinedMapping<Z, X, Y> {
 	 *            the join type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	String join(String parentAlias, String alias, JoinType joinType);
 }

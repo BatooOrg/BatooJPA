@@ -50,7 +50,6 @@ public class ConcatExpression extends AbstractExpression<String> {
 	 *            the argument expressions
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ConcatExpression(Expression<String>... arguments) {
 		super(String.class);

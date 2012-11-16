@@ -48,7 +48,6 @@ public class SetJoinImpl<Z, E> extends AbstractPluralJoin<Z, Set<E>, E> implemen
 	 *            the join type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public SetJoinImpl(AbstractFrom<?, Z> parent, PluralMapping<? super Z, Set<E>, E> mapping, JoinType jointType) {
 		super(parent, mapping, jointType);

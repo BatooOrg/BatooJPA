@@ -40,7 +40,6 @@ public class JoinedInheritanceTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with root type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testSimpleInheritence0() {
@@ -72,7 +71,6 @@ public class JoinedInheritanceTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with root type with mixed classes
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testSimpleInheritence1() {
@@ -105,7 +103,6 @@ public class JoinedInheritanceTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with root type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testSimpleInheritence2() {

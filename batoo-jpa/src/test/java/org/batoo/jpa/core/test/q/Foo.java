@@ -50,7 +50,6 @@ public class Foo {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Foo() {
 		super();
@@ -63,7 +62,6 @@ public class Foo {
 	 *            the number 2
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Foo(Integer number, Integer number2) {
 		super();
@@ -81,7 +79,6 @@ public class Foo {
 	 *            the type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Foo(Integer number, String string, FooType type) {
 		super();
@@ -97,7 +94,6 @@ public class Foo {
 	 * @return the id of the Foo
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Integer getId() {
 		return this.id;
@@ -109,7 +105,6 @@ public class Foo {
 	 * @return the number of the Foo
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Integer getNumber() {
 		return this.number;
@@ -121,7 +116,6 @@ public class Foo {
 	 * @return the number2 of the Foo
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Integer getNumber2() {
 		return this.number2;
@@ -133,7 +127,6 @@ public class Foo {
 	 * @return the string of the Foo
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getString() {
 		return this.string;
@@ -145,7 +138,6 @@ public class Foo {
 	 * @return the type of the Foo
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public FooType getType() {
 		return this.type;
@@ -158,7 +150,6 @@ public class Foo {
 	 *            the number to set for Foo
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setNumber(Integer number) {
 		this.number = number;
@@ -171,7 +162,6 @@ public class Foo {
 	 *            the number2 to set for Foo
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setNumber2(Integer number2) {
 		this.number2 = number2;
@@ -184,7 +174,6 @@ public class Foo {
 	 *            the string to set for Foo
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setString(String string) {
 		this.string = string;
@@ -197,7 +186,6 @@ public class Foo {
 	 *            the type to set for Foo
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setType(FooType type) {
 		this.type = type;

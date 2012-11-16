@@ -40,7 +40,6 @@ public class Qualified {
 	 *            the tree
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Qualified(Tree tree) {
 		super();
@@ -59,7 +58,6 @@ public class Qualified {
 	 * @return the segments of the Qualified
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public LinkedList<String> getSegments() {
 		return this.segments;

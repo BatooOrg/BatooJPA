@@ -61,7 +61,6 @@ public class CallbackManager {
 	 *            the java type of the identifiable
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public CallbackManager(IdentifiableTypeMetadata metadata, Class<?> javaType) {
 		super();
@@ -87,7 +86,6 @@ public class CallbackManager {
 	 *            the list of default listeners
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public CallbackManager(List<EntityListenerMetadata> defaultListeners) {
 		super();
@@ -113,7 +111,6 @@ public class CallbackManager {
 	 * @return true the default listeners are excluded, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean excludeDefaultListeners() {
 		return this.excludeDefaultListeners;
@@ -125,7 +122,6 @@ public class CallbackManager {
 	 * @return true the super class listeners are excluded, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean excludeSuperclassListeners() {
 		return this.excludeSuperclassListeners;
@@ -140,7 +136,6 @@ public class CallbackManager {
 	 *            the type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void fireCallbacks(Object instance, EntityListenerType type) {
 		Callback[] callbacks = null;
@@ -186,7 +181,6 @@ public class CallbackManager {
 	 * @return the availability
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public CallbackAvailability getAvailibility(MetamodelImpl metamodel, IdentifiableTypeImpl<?> superType) {
 		final CallbackAvailability availability = new CallbackAvailability();
@@ -218,7 +212,6 @@ public class CallbackManager {
 	 * @return true if the default listeners are excluded, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean isExcludeDefaultListeners() {
 		return this.excludeDefaultListeners;
@@ -230,7 +223,6 @@ public class CallbackManager {
 	 * @return true if the super type listeners are excluded, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean isExcludeSuperclassListeners() {
 		return this.excludeSuperclassListeners;
@@ -292,7 +284,6 @@ public class CallbackManager {
 	 * @return the PostLoad callbacks
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Callback[] postLoad() {
 		return this.postLoad;
@@ -304,7 +295,6 @@ public class CallbackManager {
 	 * @return the PostPersist callbacks
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Callback[] postPersist() {
 		return this.postPersist;
@@ -316,7 +306,6 @@ public class CallbackManager {
 	 * @return the PostRemove callbacks
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Callback[] postRemove() {
 		return this.postRemove;
@@ -328,7 +317,6 @@ public class CallbackManager {
 	 * @return the PostUpdate callbacks
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Callback[] postUpdate() {
 		return this.postUpdate;
@@ -340,7 +328,6 @@ public class CallbackManager {
 	 * @return the PrePersist callbacks
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Callback[] prePersist() {
 		return this.prePersist;
@@ -352,7 +339,6 @@ public class CallbackManager {
 	 * @return the PreRemove callbacks
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Callback[] preRemove() {
 		return this.preRemove;
@@ -364,7 +350,6 @@ public class CallbackManager {
 	 * @return the PreUpdate callbacks
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Callback[] preUpdate() {
 		return this.preUpdate;

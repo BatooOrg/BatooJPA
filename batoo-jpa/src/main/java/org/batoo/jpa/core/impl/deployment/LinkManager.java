@@ -72,7 +72,6 @@ public class LinkManager extends DeploymentManager<EntityTypeImpl<?>> {
 	 *             thrown in case of an underlying exception
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public static void perform(MetamodelImpl metamodel) throws BatooException {
 		new LinkManager(metamodel, Phase.LINK_ASSOCIATIONS).perform();

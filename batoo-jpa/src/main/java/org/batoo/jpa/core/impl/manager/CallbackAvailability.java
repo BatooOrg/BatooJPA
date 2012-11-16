@@ -37,7 +37,6 @@ public class CallbackAvailability {
 	 * @return true if there is PreRemove callbacks, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean postRemove() {
 		return this.preRemove;
@@ -49,7 +48,6 @@ public class CallbackAvailability {
 	 * @return true if there is PostWrite callbacks, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean postWrite() {
 		return this.postWrite;
@@ -61,7 +59,6 @@ public class CallbackAvailability {
 	 * @return true if there is PreRemove callbacks, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean preRemove() {
 		return this.preRemove;
@@ -73,7 +70,6 @@ public class CallbackAvailability {
 	 * @return true if there is PreWrite callbacks, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean preWrite() {
 		return this.preWrite;
@@ -86,7 +82,6 @@ public class CallbackAvailability {
 	 *            true if for updates or false for removals
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void updateAvailability(CallbackAvailability availability, Boolean forUpdates) {
 		if ((forUpdates == null) || forUpdates) {
@@ -112,7 +107,6 @@ public class CallbackAvailability {
 	 * @return the updated availability
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public CallbackAvailability updateAvailability(CallbackManager callbackManager) {
 		this.preRemove |= callbackManager.preRemove() != null;

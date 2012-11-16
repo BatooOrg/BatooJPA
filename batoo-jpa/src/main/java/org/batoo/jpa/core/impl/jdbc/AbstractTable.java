@@ -82,7 +82,6 @@ public abstract class AbstractTable {
 	 *            the metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AbstractTable(String defaultName, TableMetadata metadata) {
 		this(metadata);
@@ -97,7 +96,6 @@ public abstract class AbstractTable {
 	 *            the metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AbstractTable(TableMetadata metadata) {
 		super();
@@ -124,7 +122,6 @@ public abstract class AbstractTable {
 	 *            the column to add
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void addColumn(AbstractColumn column) {
 		final AbstractColumn existing = this.columnMap.get(column.getName());
@@ -152,7 +149,6 @@ public abstract class AbstractTable {
 	 *            the foreign key to add
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void addForeignKey(ForeignKey foreignKey) {
 		this.foreignKeys.add(foreignKey);
@@ -167,7 +163,6 @@ public abstract class AbstractTable {
 	 *            the primary key columns
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private synchronized void generateInsertSql(final EntityTypeImpl<?> type, int size) {
 		final String sqlKey = type != null ? type.getName() + size : "" + size;
@@ -248,7 +243,6 @@ public abstract class AbstractTable {
 	 *            the type to generate the update statement for
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 * @param pkColumns
 	 */
 	private synchronized void generateUpdateSql(final EntityTypeImpl<?> type, Map<String, AbstractColumn> pkColumns) {
@@ -319,7 +313,6 @@ public abstract class AbstractTable {
 	 * @return the catalog
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getCatalog() {
 		return this.catalog;
@@ -331,7 +324,6 @@ public abstract class AbstractTable {
 	 * @return the columnMap of the AbstractTable
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected Map<String, AbstractColumn> getColumnMap() {
 		return this.columnMap;
@@ -343,7 +335,6 @@ public abstract class AbstractTable {
 	 * @return the set of column names
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Collection<String> getColumnNames() {
 		return Collections2.transform(this.columnMap.values(), new Function<AbstractColumn, String>() {
@@ -361,7 +352,6 @@ public abstract class AbstractTable {
 	 * @return the array of columns the table has
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AbstractColumn[] getColumns() {
 		FinalWrapper<AbstractColumn[]> wrapper = this.columns;
@@ -385,7 +375,6 @@ public abstract class AbstractTable {
 	 * @return the foreign keys of the table
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public List<ForeignKey> getForeignKeys() {
 		return this.foreignKeys;
@@ -401,7 +390,6 @@ public abstract class AbstractTable {
 	 * @return the insert columns
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected AbstractColumn[] getInsertColumns(final EntityTypeImpl<?> entity, int size) {
 		return this.insertColumnsMap.get(entity != null ? entity.getName() + size : "" + size);
@@ -417,7 +405,6 @@ public abstract class AbstractTable {
 	 * @return the insert statement
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected String getInsertSql(EntityTypeImpl<?> entity, int size) {
 		final String sqlKey = entity != null ? entity.getName() + size : "" + size;
@@ -438,7 +425,6 @@ public abstract class AbstractTable {
 	 * @return the locator
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AbstractLocator getLocator() {
 		return this.locator;
@@ -450,7 +436,6 @@ public abstract class AbstractTable {
 	 * @return the name
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getName() {
 		return this.name;
@@ -462,7 +447,6 @@ public abstract class AbstractTable {
 	 * @return the set of primary column names
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Set<String> getPkColumnNames() {
 		return Collections.emptySet();
@@ -474,7 +458,6 @@ public abstract class AbstractTable {
 	 * @return the qualified name of the table
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getQName() {
 		return Joiner.on(".").skipNulls().join(this.schema, this.name);
@@ -486,7 +469,6 @@ public abstract class AbstractTable {
 	 * @return the schema
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getSchema() {
 		return this.schema;
@@ -498,7 +480,6 @@ public abstract class AbstractTable {
 	 * @return the select version columns
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AbstractColumn[] getSelectVersionColumns() {
 		return this.selectVersionColumns;
@@ -512,7 +493,6 @@ public abstract class AbstractTable {
 	 * @return the select statement
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected String getSelectVersionSql(Map<String, AbstractColumn> pkColumns) {
 		FinalWrapper<String> wrapper = this.versionSelectSql;
@@ -575,7 +555,6 @@ public abstract class AbstractTable {
 	 * @return the unique constraints
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Map<String, String[]> getUniqueConstraints() {
 		return this.uniqueConstraints;
@@ -589,7 +568,6 @@ public abstract class AbstractTable {
 	 * @return the insert columns
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected AbstractColumn[] getUpdateColumns(final EntityTypeImpl<?> entity) {
 		if (entity == null) {
@@ -609,7 +587,6 @@ public abstract class AbstractTable {
 	 * @return the insert statement
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected String getUpdateSql(EntityTypeImpl<?> entity, Map<String, AbstractColumn> pkColumns) {
 		if (entity == null) {
@@ -636,7 +613,6 @@ public abstract class AbstractTable {
 	 * @return the version update columns
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AbstractColumn[] getVersionUpdateColumns() {
 		return this.versionUpdateColumns;
@@ -650,7 +626,6 @@ public abstract class AbstractTable {
 	 * @return the update statement
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected String getVersionUpdateSql(Map<String, AbstractColumn> pkColumns) {
 		FinalWrapper<String> wrapper = this.versionUpdateSql;
@@ -763,7 +738,6 @@ public abstract class AbstractTable {
 	 *            the name of the table
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void setName(String name) {
 		this.name = name;

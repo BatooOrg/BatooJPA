@@ -49,7 +49,6 @@ public class CastExpression<T> extends AbstractExpression<T> {
 	 *            the cast return type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public CastExpression(AbstractExpression<?> inner, Class<T> javaType) {
 		super(javaType);

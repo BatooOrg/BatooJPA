@@ -50,7 +50,6 @@ public abstract class AbstractPath<X> extends AbstractExpression<X> implements P
 	 *            the java type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AbstractPath(ParentPath<?, ?> parent, Class<X> javaType) {
 		super(javaType);
@@ -66,7 +65,6 @@ public abstract class AbstractPath<X> extends AbstractExpression<X> implements P
 	 * @return the exception
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected IllegalArgumentException cannotDereference(String name) {
 		return new IllegalArgumentException("Cannot dereference: " + name);
@@ -123,7 +121,6 @@ public abstract class AbstractPath<X> extends AbstractExpression<X> implements P
 	 * @return the root of the path
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Joinable getRootPath() {
 		AbstractPath<?> root = this;

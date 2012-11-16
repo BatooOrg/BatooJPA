@@ -38,7 +38,6 @@ public class JdbcIndex {
 	 *            the name of the index
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public JdbcIndex(String name) {
 		super();
@@ -53,7 +52,6 @@ public class JdbcIndex {
 	 *            the name of the column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void addColumn(String columnName) {
 		this.columns.add(columnName);
@@ -65,7 +63,6 @@ public class JdbcIndex {
 	 * @return the name of the index
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getName() {
 		return this.name;

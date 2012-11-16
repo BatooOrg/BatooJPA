@@ -41,7 +41,6 @@ public class Department {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Department() {
 		super();
@@ -52,7 +51,6 @@ public class Department {
 	 *            the name
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Department(String name) {
 		super();
@@ -66,7 +64,6 @@ public class Department {
 	 * @return the id of the Employee
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Integer getId() {
 		return this.id;
@@ -78,7 +75,6 @@ public class Department {
 	 * @return the name of the Department
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getName() {
 		return this.name;
@@ -91,7 +87,6 @@ public class Department {
 	 *            the name to set for Department
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setName(String name) {
 		this.name = name;

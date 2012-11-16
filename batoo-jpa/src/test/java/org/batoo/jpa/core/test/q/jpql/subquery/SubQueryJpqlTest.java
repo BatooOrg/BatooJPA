@@ -36,7 +36,6 @@ public class SubQueryJpqlTest extends BaseCoreTest {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testAllAnySome() {
@@ -80,7 +79,6 @@ public class SubQueryJpqlTest extends BaseCoreTest {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testEmpty() {
@@ -111,7 +109,6 @@ public class SubQueryJpqlTest extends BaseCoreTest {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testExists() {
@@ -152,7 +149,6 @@ public class SubQueryJpqlTest extends BaseCoreTest {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testMemberOf() {
@@ -190,7 +186,6 @@ public class SubQueryJpqlTest extends BaseCoreTest {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testSize() {
@@ -226,7 +221,6 @@ public class SubQueryJpqlTest extends BaseCoreTest {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testSubQuery() {

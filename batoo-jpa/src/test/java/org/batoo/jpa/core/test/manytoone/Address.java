@@ -39,7 +39,6 @@ public class Address {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Address() {
 		super();
@@ -50,7 +49,6 @@ public class Address {
 	 *            the city
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Address(String city) {
 		super();

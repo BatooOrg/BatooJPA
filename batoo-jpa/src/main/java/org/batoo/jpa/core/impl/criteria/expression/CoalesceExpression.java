@@ -52,7 +52,6 @@ public class CoalesceExpression<T> extends AbstractExpression<T> implements Coal
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public CoalesceExpression() {
@@ -66,7 +65,6 @@ public class CoalesceExpression<T> extends AbstractExpression<T> implements Coal
 	 *            the y expression
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public CoalesceExpression(Expression<? extends T> x, Expression<? extends T> y) {
 		this();

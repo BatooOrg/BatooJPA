@@ -50,7 +50,6 @@ public enum VersionType {
 	 *            the class of the version attribute
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public static VersionType versionType(Class<?> clazz) {
 		for (final VersionType versionType : VersionType.values()) {

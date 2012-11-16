@@ -40,7 +40,6 @@ public class ColumnNameListHandler implements ResultSetHandler<String> {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ColumnNameListHandler() {
 		super();

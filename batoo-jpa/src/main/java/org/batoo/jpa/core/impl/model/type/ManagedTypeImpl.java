@@ -80,7 +80,6 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 *            the metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ManagedTypeImpl(MetamodelImpl metamodel, Class<X> clazz, ManagedTypeMetadata metadata) {
 		super(metamodel, clazz);
@@ -95,7 +94,6 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 *            the declared attribute
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	protected void addAttribute(AttributeImpl<? super X, ?> attribute) {
@@ -128,7 +126,6 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 *            the metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected void addAttributes(ManagedTypeMetadata typeMetadata) {
@@ -381,7 +378,6 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * @return the locator of the managed type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AbstractLocator getLocator() {
 		return this.locator;
@@ -413,7 +409,6 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	 * @return the name of the type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getName() {
 		return this.getJavaType().getSimpleName();

@@ -34,7 +34,6 @@ public class NotEmptyValidator implements ConstraintValidator<NotEmpty, Collecti
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public NotEmptyValidator() {
 		super();

@@ -91,7 +91,6 @@ public abstract class DeploymentManager<X> {
 		 *            the deployment unit task.
 		 * 
 		 * @since $version
-		 * @author hceylan
 		 */
 		public DeploymentUnitFuture(DeploymentUnitTask task) {
 			super(task);
@@ -172,7 +171,6 @@ public abstract class DeploymentManager<X> {
 	 * @param context
 	 *            the context for the operation
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings({ "unchecked" })
 	public DeploymentManager(BLogger log, String name, MetamodelImpl metamodel, Context context) {
@@ -230,7 +228,6 @@ public abstract class DeploymentManager<X> {
 	 * @throws BatooException
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void handleException(Throwable t) throws BatooException {
 		if (t instanceof BatooException) {
@@ -252,7 +249,6 @@ public abstract class DeploymentManager<X> {
 	 * @return true if the type has performed
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean hasPerformed(TypeImpl<?> type) {
 		if (!this.types.contains(type)) {
@@ -270,7 +266,6 @@ public abstract class DeploymentManager<X> {
 	 * Performs the deployment unit for all the types.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 * @throws BatooException
 	 */
 	protected final void perform() throws BatooException {
@@ -316,7 +311,6 @@ public abstract class DeploymentManager<X> {
 	 *             thrown in case of underlying error
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract Void perform(X type) throws BatooException;
 
@@ -327,7 +321,6 @@ public abstract class DeploymentManager<X> {
 	 *            the type to mark
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void performed(X type) {
 		if (!(type instanceof NamedQueryMetadata)) {

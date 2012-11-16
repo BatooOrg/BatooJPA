@@ -32,7 +32,6 @@ public interface FooType {
 	 * @return the value of the Foo1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	String getValue();
 
@@ -43,7 +42,6 @@ public interface FooType {
 	 *            the value to set for Foo1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	void setValue(String value);
 }

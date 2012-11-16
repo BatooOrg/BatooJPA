@@ -99,7 +99,6 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 *            the attribute
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public PluralAssociationMapping(ParentMapping<?, Z> parent, PluralAttributeImpl<? super Z, C, E> attribute) {
 		super(parent, (AssociationAttributeMetadata) attribute.getMetadata(), attribute);
@@ -321,7 +320,6 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * @return the key mapping of the association
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public SingularMapping<? super E, ?> getMapKeyIdMapping() {
 		return this.mapKeyMapping;
@@ -333,7 +331,6 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 * @return the map key id mappings of the association
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Pair<SingularMapping<? super E, ?>, AbstractAccessor>[] getMapKeyIdMappings() {
 		return this.mapKeyMappings;
@@ -605,7 +602,6 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 *            the managed instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public void persistAdditions(EntityManagerImpl entityManager, ManagedInstance<?> instance) {
@@ -683,7 +679,6 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	 *            the managed instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public void removeOrphans(EntityManagerImpl entityManager, ManagedInstance<?> instance) {

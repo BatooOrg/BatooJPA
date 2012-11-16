@@ -99,7 +99,6 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 *            the native SQL query
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public NativeQuery(EntityManagerImpl entityManager, String query) {
 		super();
@@ -118,7 +117,6 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 *            the result class
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public NativeQuery(EntityManagerImpl entityManager, String sqlString, Class<?> resultClass) {
 		super();
@@ -517,7 +515,6 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 *            the original query
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private String parseParameters(String query) {
 		final CommonTree tree = this.parse(query);

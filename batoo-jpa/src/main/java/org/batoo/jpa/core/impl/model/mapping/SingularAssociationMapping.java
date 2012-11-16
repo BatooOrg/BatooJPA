@@ -67,7 +67,6 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 	 *            the attribute
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public SingularAssociationMapping(ParentMapping<?, Z> parent, AssociatedSingularAttribute<? super Z, X> attribute) {
 		super(parent, attribute.getMetadata(), attribute);

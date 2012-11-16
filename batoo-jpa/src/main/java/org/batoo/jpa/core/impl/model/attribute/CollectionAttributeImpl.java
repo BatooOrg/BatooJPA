@@ -49,7 +49,6 @@ public class CollectionAttributeImpl<X, E> extends PluralAttributeImpl<X, Collec
 	 * @param attributeType
 	 *            attribute type
 	 * @since $version
-	 * @author hceylan
 	 */
 	public CollectionAttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata, PersistentAttributeType attributeType) {
 		super(declaringType, metadata, attributeType, 0);

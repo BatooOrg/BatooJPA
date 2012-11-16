@@ -174,7 +174,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 *            the metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EntityTypeImpl(MetamodelImpl metamodel, IdentifiableTypeImpl<? super X> parent, Class<X> javaType, EntityMetadata metadata) {
 		super(metamodel, parent, javaType, metadata);
@@ -245,7 +244,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return true if this entity extends the parent entity, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean extendz(EntityTypeImpl<?> parent) {
 		IdentifiableTypeImpl<? super X> supertype = this;
@@ -270,7 +268,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 *            the type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void fireCallbacks(Object instance, EntityListenerType type) {
 		this.fireCallbacks(true, instance, type);
@@ -282,7 +279,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the array of tables
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EntityTable[] getAllTables() {
 		FinalWrapper<EntityTable[]> wrapper = this.allTables;
@@ -342,7 +338,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the association metadata or <code>null</code>
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AssociationMetadata getAssociationOverride(String path) {
 		for (final AssociationMetadata override : this.metadata.getAssociationOverrides()) {
@@ -360,7 +355,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the associations of the type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AssociationMapping<?, ?, ?>[] getAssociations() {
 		FinalWrapper<AssociationMapping<?, ?, ?>[]> wrapper = this.associations;
@@ -392,7 +386,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the associated attributes that are detachable by the type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AssociationMapping<?, ?, ?>[] getAssociationsDetachable() {
 		FinalWrapper<AssociationMapping<?, ?, ?>[]> wrapper = this.associationsDetachable;
@@ -428,7 +421,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the associated attributes that are joined
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AssociationMapping<?, ?, ?>[] getAssociationsJoined() {
 		final FinalWrapper<AssociationMapping<?, ?, ?>[]> wrapper = this.associationsJoined;
@@ -462,7 +454,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the plural associations that are not persistable
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AssociationMapping<?, ?, ?>[] getAssociationsNotPersistable() {
 		FinalWrapper<AssociationMapping<?, ?, ?>[]> wrapper = this.associationsNotPersistable;
@@ -500,7 +491,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the associated attributes that are persistable by the type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AssociationMapping<?, ?, ?>[] getAssociationsPersistable() {
 		FinalWrapper<AssociationMapping<?, ?, ?>[]> wrapper = this.associationsPersistable;
@@ -536,7 +526,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the plural associations
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public PluralAssociationMapping<?, ?, ?>[] getAssociationsPlural() {
 		FinalWrapper<PluralAssociationMapping<?, ?, ?>[]> wrapper = this.associationsPlural;
@@ -571,7 +560,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the associated mappings that are removable by the type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AssociationMapping<?, ?, ?>[] getAssociationsRemovable() {
 		FinalWrapper<AssociationMapping<?, ?, ?>[]> wrapper = this.associationsRemovable;
@@ -607,7 +595,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the singular associated mappings
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public SingularAssociationMapping<?, ?>[] getAssociationsSingular() {
 		FinalWrapper<SingularAssociationMapping<?, ?>[]> wrapper = this.associationsSingular;
@@ -643,7 +630,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the array of singular owner lazy associations of the type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public SingularAssociationMapping<?, ?>[] getAssociationsSingularOwnerLazy() {
 		FinalWrapper<SingularAssociationMapping<?, ?>[]> wrapper = this.associationsSingularLazy;
@@ -683,7 +669,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the column metadata or <code>null</code>
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ColumnMetadata getAttributeOverride(String path) {
 		for (final AttributeOverrideMetadata override : this.metadata.getAttributeOverrides()) {
@@ -701,7 +686,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the basic mappings of the type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public BasicMapping<?, ?>[] getBasicMappings() {
 		FinalWrapper<BasicMapping<?, ?>[]> wrapper = this.basicMappings;
@@ -775,7 +759,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the child type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EntityTypeImpl<? extends X> getChildType(Object discriminatorValue) {
 		return this.children.get(discriminatorValue);
@@ -883,7 +866,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the array of associations for the associate
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AssociationMapping<?, ?, ?>[] getDependenciesFor(EntityTypeImpl<?> associate) {
 		return this.dependencyMap.get(associate);
@@ -905,7 +887,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the discriminator column of the entity
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public DiscriminatorColumn getDiscriminatorColumn() {
 		return this.discriminatorColumn;
@@ -917,7 +898,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the set of discriminator values
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Set<String> getDiscriminators() {
 		return this.children.keySet();
@@ -929,7 +909,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the discriminatorValue of the EntityTypeImpl
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getDiscriminatorValue() {
 		return this.discriminatorValue;
@@ -943,7 +922,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the managedId or null
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ManagedId<X> getId(Object instance) {
 		Object id;
@@ -987,7 +965,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 *             if an SQL error occurrs
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ManagedId<X> getId(SessionImpl session, ResultSet row) throws SQLException {
 		return this.getId(session, row, this.getPrimaryTable().getIdFields());
@@ -1007,7 +984,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 *             if an SQL error occurrs
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ManagedId<X> getId(SessionImpl session, ResultSet row, HashMap<AbstractColumn, String> idFields) throws SQLException {
 		Object id;
@@ -1135,7 +1111,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the single id mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public SingularMapping<? super X, ?> getIdMapping() {
@@ -1166,7 +1141,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return an array of id attributes
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public Pair<SingularMapping<? super X, ?>, AbstractAccessor>[] getIdMappings() {
@@ -1237,7 +1211,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the inheritance type of the entity or <code>null</code>
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public InheritanceType getInheritanceType() {
 		return this.inheritanceType;
@@ -1251,7 +1224,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the id of the instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Object getInstanceId(X instance) {
 		return this.getIdMapping().get(instance);
@@ -1269,7 +1241,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 *             thrown if the instance is null
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ManagedInstance<X> getManagedInstance(SessionImpl session, X instance) {
 		if (instance == null) {
@@ -1291,7 +1262,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the managed instance created
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings({ "unchecked" })
 	public ManagedInstance<X> getManagedInstanceById(SessionImpl session, ManagedId<X> id, boolean lazy) {
@@ -1319,7 +1289,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the id
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Object getMappedId(String name, Object instance) {
 		final AssociatedSingularAttribute<? super X, ?> attribute = this.idMap.get(name);
@@ -1346,7 +1315,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the element collection mappings
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public JoinedMapping<?, ?, ?>[] getMappingsJoined() {
 		FinalWrapper<JoinedMapping<?, ?, ?>[]> wrapper = this.mappingsJoined;
@@ -1377,7 +1345,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the element collection mappings
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public PluralMapping<?, ?, ?>[] getMappingsPlural() {
 		FinalWrapper<PluralMapping<?, ?, ?>[]> wrapper = this.mappingsPlural;
@@ -1408,7 +1375,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the sorted plural associations
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public PluralMapping<?, ?, ?>[] getMappingsPluralSorted() {
 		FinalWrapper<PluralMapping<?, ?, ?>[]> wrapper = this.mappingsPluralSorted;
@@ -1443,7 +1409,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the singular mappings
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Mapping<?, ?, ?>[] getMappingsSingular() {
 		FinalWrapper<Mapping<?, ?, ?>[]> wrapper = this.singularMappings;
@@ -1484,7 +1449,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the parent entity or <code>null</code>
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EntityTypeImpl<? super X> getParent() {
 		if (this.isRoot()) {
@@ -1509,7 +1473,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the primary table
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EntityTable getPrimaryTable() {
 		return this.primaryTable;
@@ -1521,7 +1484,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the entityMapping of the EntityTypeImpl
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EntityMapping<X> getRootMapping() {
 		return this.entityMapping;
@@ -1533,7 +1495,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the root type of the hierarchy
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EntityTypeImpl<? super X> getRootType() {
 		if (this.rootType != null) {
@@ -1561,7 +1522,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the table or null if not found
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AbstractTable getTable(String tableName) {
 		if (StringUtils.isBlank(tableName)) {
@@ -1577,7 +1537,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the tables of the type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EntityTable[] getTables() {
 		FinalWrapper<EntityTable[]> wrapper = this.tables;
@@ -1619,7 +1578,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * Initializes the custom indexes
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private void initCustomIndexes() {
 		for (final IndexMetadata index : this.indexes) {
@@ -1646,7 +1604,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * Initializes the indexes
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private void initIndexes() {
 		for (final BasicMapping<?, ?> basicMapping : this.getBasicMappings()) {
@@ -1670,7 +1627,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * Initializes the tables.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 * @param metadata
 	 */
 	private void initTables(EntityMetadata metadata) {
@@ -1734,7 +1690,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return true if the entity is cachable, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean isCachable() {
 		return this.cachable;
@@ -1748,7 +1703,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return if the method is an id method
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean isIdMethod(Method method) {
 		if (this.idMethods.containsKey(method)) { // if known id method, let go
@@ -1775,7 +1729,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return true if the entity is the root of the hierarchy, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean isRoot() {
 		return this.getRootType() == this;
@@ -1787,7 +1740,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return true if the entity is suitable for batch insert, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean isSuitableForBatchInsert() {
 		if (this.suitableForBatchInsert != null) {
@@ -1802,7 +1754,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * Links the entity's attribute mappings.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private void linkMappings() {
 		if (this.getRootType().getInheritanceType() != null) {
@@ -1844,7 +1795,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 *             thrown in case of an SQL Error
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void performInsert(Connection connection, ManagedInstance<?>[] instances, int size) throws SQLException {
 		for (final EntityTable table : this.getTables()) {
@@ -1865,7 +1815,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 *            the set of processed instances
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void performRefresh(Connection connection, ManagedInstance<X> instance, LockModeType lockMode, Set<Object> processed) {
 		final SessionImpl session = instance.getSession();
@@ -1910,7 +1859,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 *             thrown in case of an SQL Error
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void performRemove(Connection connection, ManagedInstance<?>[] instances, int size) throws SQLException {
 		for (final EntityTable table : this.getTables()) {
@@ -1930,7 +1878,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the instance found or null
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public X performSelect(EntityManagerImpl entityManager, Object id, LockModeType lockMode) {
 		final QueryImpl<X> q = entityManager.createQuery(this.getCriteriaSelect());
@@ -1963,7 +1910,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return returns the current version
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Object performSelectVersion(Connection connection, ManagedInstance<? extends X> instance) throws SQLException {
 		return this.getTables()[0].performSelectVersion(connection, instance);
@@ -1980,7 +1926,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 *             thrown in case of an SQL Error
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void performUpdate(Connection connection, ManagedInstance<?> instance) throws SQLException {
 		FinalWrapper<EntityTable[]> wrapper = this.updateTables;
@@ -2018,7 +1963,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 *             thrown in case of an SQL Error
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void performVersionUpdate(Connection connection, ManagedInstance<? extends X> instance) throws SQLException {
 		this.getTables()[0].performVersionUpdate(connection, instance);
@@ -2031,7 +1975,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 *            the associate
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void prepareDependenciesFor(EntityTypeImpl<?> associate) {
 		// prepare the related associations
@@ -2074,7 +2017,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 *            the parent
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void prepareEagerJoins(FetchParent<?, ?> r, int depth, AssociationMapping<?, ?, ?> parent) {
 		if (depth < this.maxFetchJoinDepth) {
@@ -2129,7 +2071,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @return the set of validation errors
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Set<ConstraintViolation<Object>> runValidators(EntityManagerFactoryImpl entityManagerFactory, ManagedInstance<?> instance) {
 		final ValidatorFactory factory = entityManagerFactory.getValidationFactory();
@@ -2164,7 +2105,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 *            the id
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setId(SessionImpl session, Object instance, Object id) {
 		if (this.hasSingleIdAttribute()) {

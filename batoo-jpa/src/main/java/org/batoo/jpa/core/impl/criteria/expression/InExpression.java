@@ -54,7 +54,6 @@ public class InExpression extends AbstractExpression<Boolean> {
 	 *            the values
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public InExpression(AbstractExpression<?> inner, Expression<?>[] values) {
 		super(Boolean.class);
@@ -72,7 +71,6 @@ public class InExpression extends AbstractExpression<Boolean> {
 	 *            the values
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public InExpression(Expression<?> inner, Collection<?> values) {
 		super(Boolean.class);
@@ -95,7 +93,6 @@ public class InExpression extends AbstractExpression<Boolean> {
 	 *            the expression to add
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void add(AbstractExpression<?> expression) {
 		this.values.add(expression);

@@ -68,7 +68,6 @@ public class DdlManager extends DeploymentManager<EntityTypeImpl<?>> {
 	 *             thrown in case of an underlying exception
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public static void perform(DataSource datasource, MetamodelImpl metamodel, DDLMode ddlMode) throws BatooException {
 		new DdlManager(datasource, metamodel, ddlMode, DdlPhase.TABLES).perform();

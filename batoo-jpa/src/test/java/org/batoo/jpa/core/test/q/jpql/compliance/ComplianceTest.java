@@ -88,7 +88,6 @@ public class ComplianceTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Before
 	public void prepareCountries() {
@@ -105,7 +104,6 @@ public class ComplianceTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testCast() {
@@ -128,7 +126,6 @@ public class ComplianceTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFetchAllProperties() {

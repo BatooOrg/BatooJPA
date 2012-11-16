@@ -49,7 +49,6 @@ public class NegationExpression<N extends Number> extends AbstractExpression<N> 
 	 *            the inner expression
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public NegationExpression(Expression<N> inner) {

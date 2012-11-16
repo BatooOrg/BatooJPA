@@ -49,7 +49,6 @@ public class HsqlAdaptor extends JdbcAdaptor {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public HsqlAdaptor() {
 		super();

@@ -51,7 +51,6 @@ public class OrderColumn extends AbstractColumn {
 	 *            the locator
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public OrderColumn(AbstractTable table, ColumnMetadata orderColumn, String name, AbstractLocator locator) {
 		super(orderColumn != null ? orderColumn.getLocator() : locator, false);

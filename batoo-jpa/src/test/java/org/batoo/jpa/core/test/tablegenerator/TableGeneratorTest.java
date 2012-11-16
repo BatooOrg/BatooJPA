@@ -45,7 +45,6 @@ public class TableGeneratorTest extends BaseCoreTest {
 	 * Tests {@link EntityManager#contains(Object)}.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testContains() {
@@ -65,7 +64,6 @@ public class TableGeneratorTest extends BaseCoreTest {
 	 *             thrown if SQL fails
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testCreateTables() throws SQLException {
@@ -81,7 +79,6 @@ public class TableGeneratorTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)}
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFind() {
@@ -103,7 +100,6 @@ public class TableGeneratorTest extends BaseCoreTest {
 	 *             thrown if SQL fails
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testPersist() throws SQLException {

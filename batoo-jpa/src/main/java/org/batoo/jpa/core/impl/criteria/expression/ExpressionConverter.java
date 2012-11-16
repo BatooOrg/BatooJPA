@@ -201,7 +201,6 @@ public abstract class ExpressionConverter<N> {
 	 * @return the converted <code>T</code> value
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public N convert(Object value) {
 		if (value == null) {

@@ -62,7 +62,6 @@ public class MemberOfExpression<C extends Collection<E>, E> extends AbstractExpr
 	 *            the values expression
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public MemberOfExpression(boolean not, Expression<E> value, Expression<C> values) {
 		super(Boolean.class);

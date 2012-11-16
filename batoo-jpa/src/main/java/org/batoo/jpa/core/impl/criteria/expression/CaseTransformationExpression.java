@@ -64,7 +64,6 @@ public class CaseTransformationExpression extends AbstractExpression<String> {
 	 *            the string function
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public CaseTransformationExpression(Expression<String> inner, CaseTransformationType function) {
 		super(String.class);

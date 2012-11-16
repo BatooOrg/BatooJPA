@@ -43,7 +43,6 @@ public class Person2 {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Person2() {
 		super();
@@ -60,7 +59,6 @@ public class Person2 {
 	 *            the phone
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Person2(String name, String city, Country country, String phone) {
 		super();
@@ -75,7 +73,6 @@ public class Person2 {
 	 * @return the contact of the Person2
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected Contact getContact() {
 		return this.contact;
@@ -108,7 +105,6 @@ public class Person2 {
 	 *            the contact to set for Person2
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void setContact(Contact contact) {
 		this.contact = contact;

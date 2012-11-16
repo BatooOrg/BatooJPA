@@ -46,7 +46,6 @@ public class Address {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Address() {
 		super();
@@ -58,7 +57,6 @@ public class Address {
 	 * @return the address of the Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getAddress() {
 		return this.address;
@@ -70,7 +68,6 @@ public class Address {
 	 * @return the city of the Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getCity() {
 		return this.city;
@@ -82,7 +79,6 @@ public class Address {
 	 * @return the country of the Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Country getCountry() {
 		return this.country;
@@ -94,7 +90,6 @@ public class Address {
 	 * @return the id of the Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Integer getId() {
 		return this.id;
@@ -106,7 +101,6 @@ public class Address {
 	 * @return the postalCode of the Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getPostalCode() {
 		return this.postalCode;
@@ -119,7 +113,6 @@ public class Address {
 	 *            the address to set for Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setAddress(String address) {
 		this.address = address;
@@ -132,7 +125,6 @@ public class Address {
 	 *            the city to set for Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setCity(String city) {
 		this.city = city;
@@ -145,7 +137,6 @@ public class Address {
 	 *            the country to set for Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setCountry(Country country) {
 		this.country = country;
@@ -158,7 +149,6 @@ public class Address {
 	 *            the postalCode to set for Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setPostalCode(String postalCode) {
 		this.postalCode = postalCode;

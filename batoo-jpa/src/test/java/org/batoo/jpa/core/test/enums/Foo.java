@@ -55,7 +55,6 @@ public class Foo {
 	 * @return the footype of the Foo
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected FooType getFootype() {
 		return this.footype;
@@ -67,7 +66,6 @@ public class Foo {
 	 * @return the footype2 of the Foo
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected FooType getFootype2() {
 		return this.footype2;
@@ -79,7 +77,6 @@ public class Foo {
 	 * @return the id of the Foo1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Integer getId() {
 		return this.id;
@@ -92,7 +89,6 @@ public class Foo {
 	 *            the footype to set for Foo
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void setFootype(FooType footype) {
 		this.footype = footype;
@@ -105,7 +101,6 @@ public class Foo {
 	 *            the footype2 to set for Foo
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void setFootype2(FooType footype2) {
 		this.footype2 = footype2;

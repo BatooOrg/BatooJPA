@@ -40,7 +40,6 @@ public class PersistenceUnitUtilImpl implements PersistenceUnitUtil {
 	 *            the entity manager factory
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public PersistenceUnitUtilImpl(EntityManagerFactoryImpl entityManagerFactory) {
 		super();

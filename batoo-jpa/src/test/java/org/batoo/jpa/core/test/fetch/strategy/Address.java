@@ -45,7 +45,6 @@ public class Address {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Address() {
 		super();
@@ -58,7 +57,6 @@ public class Address {
 	 *            the city
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Address(Person person, City city) {
 		super();

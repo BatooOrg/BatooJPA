@@ -47,7 +47,6 @@ public class SecondaryTable extends EntityTable {
 	 *            the table metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public SecondaryTable(EntityTypeImpl<?> entity, SecondaryTableMetadata metadata) {
 		super(entity, metadata);
@@ -64,7 +63,6 @@ public class SecondaryTable extends EntityTable {
 	 *            the metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public SecondaryTable(EntityTypeImpl<?> entity, TableMetadata metadata) {
 		super(entity, metadata);
@@ -78,7 +76,6 @@ public class SecondaryTable extends EntityTable {
 	 * @return the join SQL fragment
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String joinPrimary(String primaryTableAlias, String alias) {
 		return this.foreignKey.createSourceJoin(JoinType.LEFT, primaryTableAlias, alias);
@@ -88,7 +85,6 @@ public class SecondaryTable extends EntityTable {
 	 * Links the secondary table to the primary table
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void link() {
 		if (this.foreignKey == null) {

@@ -42,7 +42,6 @@ public class TestClassLoader extends ClassLoader {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public TestClassLoader() {
 		super();
@@ -55,7 +54,6 @@ public class TestClassLoader extends ClassLoader {
 	 *            the parent class loader
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public TestClassLoader(ClassLoader parent) {
 		super(parent);
@@ -106,7 +104,6 @@ public class TestClassLoader extends ClassLoader {
 	 *            the root of the test
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setRoot(String root) {
 		this.root = root.replace('.', '/');

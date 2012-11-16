@@ -20,7 +20,6 @@ public class HashMapBug {
 	 * Test to demonstrate the hash map bug
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	@Ignore

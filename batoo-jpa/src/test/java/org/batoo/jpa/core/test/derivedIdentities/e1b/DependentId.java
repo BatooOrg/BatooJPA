@@ -95,7 +95,6 @@ public class DependentId {
 	 * @return the empPk of the DependentId
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Long getEmpPk() {
 		return this.empPk;
@@ -131,7 +130,6 @@ public class DependentId {
 	 *            the empPk to set for DependentId
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setEmpPk(Long empPk) {
 		this.empPk = empPk;

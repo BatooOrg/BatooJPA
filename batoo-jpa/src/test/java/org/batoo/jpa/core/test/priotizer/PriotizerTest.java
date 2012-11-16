@@ -43,7 +43,6 @@ public class PriotizerTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testPersist() {
@@ -55,7 +54,6 @@ public class PriotizerTest extends BaseCoreTest {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testPersistAndRemove() {

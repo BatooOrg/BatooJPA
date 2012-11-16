@@ -52,7 +52,6 @@ public class PessimisticLockTest extends BaseCoreTest {
 	 * Tests the pessimistic lock.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testPessimisticLockRemove() {
@@ -87,7 +86,6 @@ public class PessimisticLockTest extends BaseCoreTest {
 	 * Tests the optimistic lock.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test(expected = PersistenceException.class)
 	public void testPessimisticLockUpdate() {
@@ -118,7 +116,6 @@ public class PessimisticLockTest extends BaseCoreTest {
 	 * Tests the optimistic lock.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test(expected = PersistenceException.class)
 	public void testPessimisticLockUpdateChild() {
@@ -149,7 +146,6 @@ public class PessimisticLockTest extends BaseCoreTest {
 	 * Tests the optimistic lock.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test(expected = PersistenceException.class)
 	public void testPessimisticLockUpdateChildren() {

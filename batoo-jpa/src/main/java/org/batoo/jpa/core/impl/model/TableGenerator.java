@@ -45,7 +45,6 @@ public class TableGenerator extends AbstractGenerator {
 	 *            the metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public TableGenerator(TableGeneratorMetadata metadata) {
 		super(metadata);
@@ -80,7 +79,6 @@ public class TableGenerator extends AbstractGenerator {
 	 * @return the pkColumnName of the table generator
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getPkColumnName() {
 		return this.pkColumnName;
@@ -92,7 +90,6 @@ public class TableGenerator extends AbstractGenerator {
 	 * @return the pkColumnValue of the table generator
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getPkColumnValue() {
 		return this.pkColumnValue;
@@ -113,7 +110,6 @@ public class TableGenerator extends AbstractGenerator {
 	 * @return the table of the table generator
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getTable() {
 		return this.table;
@@ -125,7 +121,6 @@ public class TableGenerator extends AbstractGenerator {
 	 * @return the valueColumnName of the table generator
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getValueColumnName() {
 		return this.valueColumnName;

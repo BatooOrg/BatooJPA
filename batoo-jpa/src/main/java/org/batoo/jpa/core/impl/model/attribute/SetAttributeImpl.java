@@ -50,7 +50,6 @@ public class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>, E> im
 	 * @param attributeType
 	 *            attribute type
 	 * @since $version
-	 * @author hceylan
 	 */
 	public SetAttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata, PersistentAttributeType attributeType) {
 		super(declaringType, metadata, attributeType, 0);

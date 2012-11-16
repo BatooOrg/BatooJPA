@@ -52,7 +52,6 @@ public class Employee {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Employee() {
 		super();
@@ -69,7 +68,6 @@ public class Employee {
 	 *            the salary
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Employee(String name, Manager manager, Department department, double salary) {
 		super();
@@ -87,7 +85,6 @@ public class Employee {
 	 * @return the department of the Employee
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Department getDepartment() {
 		return this.department;
@@ -99,7 +96,6 @@ public class Employee {
 	 * @return the id of the Employee
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Integer getId() {
 		return this.id;
@@ -111,7 +107,6 @@ public class Employee {
 	 * @return the manager of the Employee
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Manager getManager() {
 		return this.manager;
@@ -123,7 +118,6 @@ public class Employee {
 	 * @return the name of the Employee
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getName() {
 		return this.name;
@@ -135,7 +129,6 @@ public class Employee {
 	 * @return the salary of the Employee
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public double getSalary() {
 		return this.salary;
@@ -148,7 +141,6 @@ public class Employee {
 	 *            the department to set for Employee
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setDepartment(Department department) {
 		this.department = department;
@@ -161,7 +153,6 @@ public class Employee {
 	 *            the manager to set for Employee
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setManager(Manager manager) {
 		if (this.manager != null) {
@@ -182,7 +173,6 @@ public class Employee {
 	 *            the name to set for Employee
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -195,7 +185,6 @@ public class Employee {
 	 *            the salary to set for Employee
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setSalary(double salary) {
 		this.salary = salary;

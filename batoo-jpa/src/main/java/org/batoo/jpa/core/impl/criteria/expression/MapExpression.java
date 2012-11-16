@@ -48,7 +48,6 @@ public class MapExpression<M extends Map<K, V>, K, V> extends AbstractExpression
 	 *            the mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public MapExpression(Mapping<?, Map<K, V>, V> mapping) {
@@ -109,7 +108,6 @@ public class MapExpression<M extends Map<K, V>, K, V> extends AbstractExpression
 	 * @return the xpression
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public CollectionExpression<Collection<V>, V> values() {
 		// TODO Auto-generated method stub

@@ -40,7 +40,6 @@ public class Foo1 extends Foo implements FooType {
 	 * @return the value of the Foo1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Override
 	public String getValue() {
@@ -50,7 +49,6 @@ public class Foo1 extends Foo implements FooType {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@PostPersist
 	public void postPersist() {
@@ -60,7 +58,6 @@ public class Foo1 extends Foo implements FooType {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@PrePersist
 	public void prePersist() {
@@ -74,7 +71,6 @@ public class Foo1 extends Foo implements FooType {
 	 *            the value to set for Foo1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setValue(String value) {
 		this.value = value;

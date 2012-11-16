@@ -59,7 +59,6 @@ public class ListComparator<E> implements Comparator<E> {
 		 *            the mapping
 		 * 
 		 * @since $version
-		 * @author hceylan
 		 */
 		public ComparableMapping(boolean ascending, Mapping<?, ?, ?> mapping) {
 			super();
@@ -73,7 +72,6 @@ public class ListComparator<E> implements Comparator<E> {
 		 * @return the mapping
 		 * 
 		 * @since $version
-		 * @author hceylan
 		 */
 		protected Mapping<?, ?, ?> getMapping() {
 			return this.mapping;
@@ -85,7 +83,6 @@ public class ListComparator<E> implements Comparator<E> {
 		 * @return true if the order is ascending, false otherwise
 		 * 
 		 * @since $version
-		 * @author hceylan
 		 */
 		public boolean isAscending() {
 			return this.ascending;
@@ -102,7 +99,6 @@ public class ListComparator<E> implements Comparator<E> {
 	 *            the owner mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ListComparator(PluralMapping<?, ?, E> mapping) {
 		super();
@@ -159,7 +155,6 @@ public class ListComparator<E> implements Comparator<E> {
 	 * Creates the list of comparables
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private void createComparables() {
 		// order on id

@@ -31,7 +31,6 @@ public class OperationTookLongTimeWarning extends Throwable {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public OperationTookLongTimeWarning() {
 		super("Operation took long time");

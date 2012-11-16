@@ -57,7 +57,6 @@ public class JtaEntityManagerImpl extends EntityManagerImpl {
 	 * @param jdbcAdaptor
 	 *            the JDBC adaptor
 	 * @since $version
-	 * @author hceylan
 	 */
 	public JtaEntityManagerImpl(JtaEntityManagerFactoryImpl entityManagerFactory, MetamodelImpl metamodel, DataSource datasource,
 		Map<String, Object> properties, JdbcAdaptor jdbcAdaptor) {

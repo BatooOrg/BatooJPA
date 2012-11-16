@@ -37,7 +37,6 @@ public class DependentId {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public DependentId() {
 		super();
@@ -50,7 +49,6 @@ public class DependentId {
 	 *            the employe id
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public DependentId(String name, EmployeeId empPK) {
 		super();

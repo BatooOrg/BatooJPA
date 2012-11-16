@@ -53,7 +53,6 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	 *            the mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public CollectionExpression(ParentPath<?, ?> parentPath, Mapping<?, Collection<E>, E> mapping) {
@@ -96,7 +95,6 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	 * @return the mapping of the CollectionExpression
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Mapping<?, Collection<E>, E> getMapping() {
 		return this.mapping;
@@ -108,7 +106,6 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	 * @return the parentPath of the CollectionExpression
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ParentPath<?, ?> getParentPath() {
 		return this.parentPath;

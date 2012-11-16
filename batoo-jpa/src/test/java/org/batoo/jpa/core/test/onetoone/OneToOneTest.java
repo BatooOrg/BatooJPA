@@ -36,7 +36,6 @@ public class OneToOneTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)} person.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFind() {
@@ -55,7 +54,6 @@ public class OneToOneTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)} person that is in the session.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFindInSession() {
@@ -72,7 +70,6 @@ public class OneToOneTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#persist(Object)} Parent which cascades to Cubicle.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testPersist() {

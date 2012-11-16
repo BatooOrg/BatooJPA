@@ -53,7 +53,6 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	 *            the expressions
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public PredicateImpl(AbstractExpression<Boolean> expression) {
@@ -65,7 +64,6 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	 *            the expressions
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public PredicateImpl(AbstractExpression<Boolean>... expressions) {
 		this(false, BooleanOperator.AND, expressions);
@@ -80,7 +78,6 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	 *            the expressions
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public PredicateImpl(boolean negated, BooleanOperator operator, Expression<Boolean>... expressions) {
 		super(null);
@@ -107,7 +104,6 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 	 *            the predicates
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public PredicateImpl(boolean negated, BooleanOperator operator, Predicate... predicates) {
 		super(null);

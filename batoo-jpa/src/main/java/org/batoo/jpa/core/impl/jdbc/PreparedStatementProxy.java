@@ -106,7 +106,6 @@ public class PreparedStatementProxy implements PreparedStatement {
 	 *            the type of the sql logging
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public PreparedStatementProxy(String sql, PreparedStatement statement, long slowSqlThreshold, SqlLoggingType sqlLoggingType) {
 		super();
@@ -631,7 +630,6 @@ public class PreparedStatementProxy implements PreparedStatement {
 	 * @return self
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public PreparedStatement reset() {
 		this.debug = PreparedStatementProxy.LOG.isDebugEnabled();

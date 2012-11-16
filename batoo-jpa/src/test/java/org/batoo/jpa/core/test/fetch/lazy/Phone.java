@@ -41,7 +41,6 @@ public class Phone implements Serializable {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Phone() {
 		super();
@@ -52,7 +51,6 @@ public class Phone implements Serializable {
 	 *            the phone number
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Phone(String phone) {
 		super();

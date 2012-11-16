@@ -49,7 +49,6 @@ public class MergeTest extends BaseCoreTest {
 	 * @return
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private Foo1 createFoo(int baseId) {
 		final Foo1 foo1 = new Foo1(baseId, MergeTest.VALUE);
@@ -67,7 +66,6 @@ public class MergeTest extends BaseCoreTest {
 	 * @return
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected Parent createParent(int baseId) {
 		final Parent parent = new Parent(baseId, MergeTest.VALUE);
@@ -93,7 +91,6 @@ public class MergeTest extends BaseCoreTest {
 	 * @return counts
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private int[] getCounts1() {
 		final int[] counts = new int[2];
@@ -119,7 +116,6 @@ public class MergeTest extends BaseCoreTest {
 	 * @return counts
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private int[] getCounts2() {
 		final int[] counts = new int[4];
@@ -143,7 +139,6 @@ public class MergeTest extends BaseCoreTest {
 	 * Tests the simple merge
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testMerge() {
@@ -158,7 +153,6 @@ public class MergeTest extends BaseCoreTest {
 	 * Tests the simple merge
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testMergeOneToOne() {
@@ -173,7 +167,6 @@ public class MergeTest extends BaseCoreTest {
 	 * Tests the simple merge
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testMergeOneToOne1() {
@@ -193,7 +186,6 @@ public class MergeTest extends BaseCoreTest {
 	 * Tests the simple merge
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testMergeOneToOne2() {
@@ -216,7 +208,6 @@ public class MergeTest extends BaseCoreTest {
 	 * Tests the simple merge
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testMergeOneToOne3() {
@@ -242,7 +233,6 @@ public class MergeTest extends BaseCoreTest {
 	 * Tests the simple merge
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testMergeOneToOne4() {
@@ -268,7 +258,6 @@ public class MergeTest extends BaseCoreTest {
 	 * Tests the simple merge
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testPersistDifferentMerge1() {
@@ -289,7 +278,6 @@ public class MergeTest extends BaseCoreTest {
 	 * Tests the simple merge
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testPersistDifferentMerge2() {
@@ -315,7 +303,6 @@ public class MergeTest extends BaseCoreTest {
 	 * Tests the simple merge
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testPersistDifferentMerge3() {
@@ -341,7 +328,6 @@ public class MergeTest extends BaseCoreTest {
 	 * Tests the simple merge
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testPersistDifferentMerge4() {
@@ -364,7 +350,6 @@ public class MergeTest extends BaseCoreTest {
 	 * Tests the simple merge
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testPersistMerge() {
@@ -382,7 +367,6 @@ public class MergeTest extends BaseCoreTest {
 	 * Tests the simple merge
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testPersistOneToOne() {

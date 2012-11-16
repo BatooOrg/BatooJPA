@@ -69,7 +69,6 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 * @return the attribute created
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static <X> PluralAttributeImpl<X, ?, ?> create(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata, PersistentAttributeType attributeType) {
@@ -116,7 +115,6 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 *            1 for {@link Map} attributes
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public PluralAttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata, PersistentAttributeType attributeType, int valueIndexNo) {
@@ -145,7 +143,6 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 * @return the attributeType of the PluralAttributeImpl
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public javax.persistence.metamodel.Attribute.PersistentAttributeType getAttributeType() {
 		return this.attributeType;
@@ -230,7 +227,6 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 * @return the lazy initialized managed collection
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract C newCollection(PluralMapping<?, C, E> mapping, ManagedInstance<?> managedInstance, boolean lazy);
 
@@ -246,7 +242,6 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 * @return the managed collection
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract C newCollection(PluralMapping<?, C, E> mapping, ManagedInstance<?> managedInstance, Object values);
 

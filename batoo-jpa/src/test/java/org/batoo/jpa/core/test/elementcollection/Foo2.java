@@ -54,7 +54,6 @@ public class Foo2 {
 	 * @return the images of the Foo2
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected Map<String, String> getImages() {
 		return this.images;
@@ -66,7 +65,6 @@ public class Foo2 {
 	 * @return the key of the Foo2
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected Integer getKey() {
 		return this.key;

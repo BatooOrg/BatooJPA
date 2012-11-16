@@ -46,7 +46,6 @@ public class OrderTest extends BaseCoreTest {
 	 * Tests list order is maintained.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testOrder1() {
@@ -69,7 +68,6 @@ public class OrderTest extends BaseCoreTest {
 	 * Tests list is sorted
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testOrder2() {

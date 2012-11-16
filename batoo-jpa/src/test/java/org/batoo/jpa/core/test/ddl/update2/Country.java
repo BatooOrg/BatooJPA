@@ -41,7 +41,6 @@ public class Country {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Country() {
 		super();
@@ -53,7 +52,6 @@ public class Country {
 	 * @return the id of the Country
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Integer getId() {
 		return this.id;
@@ -65,7 +63,6 @@ public class Country {
 	 * @return the name of the Country
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getName() {
 		return this.name;
@@ -78,7 +75,6 @@ public class Country {
 	 *            the name to set for Country
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setName(String name) {
 		this.name = name;

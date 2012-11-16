@@ -38,7 +38,6 @@ public class ResultListReference {
 	 *            the parameters
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ResultListReference(String sql, Object[] parameters) {
 		super();

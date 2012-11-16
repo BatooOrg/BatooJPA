@@ -59,7 +59,6 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 *             thrown in case of an SQL error
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	void attach(Connection connection, ManagedInstance<?> instance, Joinable[] batch, int size) throws SQLException;
 
@@ -69,7 +68,6 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @return true if merges are cascaded, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	boolean cascadesMerge();
 
@@ -88,7 +86,6 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 *             thrown in case of an SQL error
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	void detach(Connection connection, ManagedInstance<?> instance, Object key, Object child) throws SQLException;
 
@@ -103,7 +100,6 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 *             thrown in case of an SQL error
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	void detachAll(Connection connection, ManagedInstance<?> instance) throws SQLException;
 
@@ -114,7 +110,6 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 *            the managed instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	void enhance(ManagedInstance<?> instance);
 
@@ -125,7 +120,6 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @return the value of the instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	Object get(Object instance);
 
@@ -137,7 +131,6 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @return the child mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	Mapping<?, ?, ?> getMapping(String path);
 
@@ -147,7 +140,6 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @return the order by of the association
 	 * 
 	 * @since $versionpublic RootMapping<?> getRoot()
-	 * @author hceylan
 	 */
 	String getOrderBy();
 
@@ -157,7 +149,6 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @return the order column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	OrderColumn getOrderColumn();
 
@@ -167,7 +158,6 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @return the root mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	RootMapping<?> getRoot();
 
@@ -178,7 +168,6 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 *            the managed instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	void load(ManagedInstance<?> instance);
 
@@ -190,7 +179,6 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 * @return the loaded collection
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	Collection<? extends E> loadCollection(ManagedInstance<?> instance);
 
@@ -203,7 +191,6 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 *            the key type of the map
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	<K> Map<? extends K, ? extends E> loadMap(ManagedInstance<?> instance);
 
@@ -216,7 +203,6 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 *            the collection of children
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setCollection(ManagedInstance<?> instance, Collection<? extends E> children);
 
@@ -227,7 +213,6 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 *            the managed instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	void setLazy(ManagedInstance<?> instance);
 
@@ -238,7 +223,6 @@ public interface PluralMapping<Z, C, E> extends JoinedMapping<Z, C, E> {
 	 *            the owner instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	void sortList(Object instance);
 }

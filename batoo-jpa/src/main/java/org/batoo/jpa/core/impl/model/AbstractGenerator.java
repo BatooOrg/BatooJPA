@@ -47,7 +47,6 @@ public abstract class AbstractGenerator {
 	 *            the metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AbstractGenerator(GeneratorMetadata metadata) {
 		super();
@@ -66,7 +65,6 @@ public abstract class AbstractGenerator {
 	 * @return the allocationSize of the generator
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public int getAllocationSize() {
 		return this.allocationSize;
@@ -78,7 +76,6 @@ public abstract class AbstractGenerator {
 	 * @return the catalog of the generator
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getCatalog() {
 		return this.catalog;
@@ -90,7 +87,6 @@ public abstract class AbstractGenerator {
 	 * @return the initialValue of the generator
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public int getInitialValue() {
 		return this.initialValue;
@@ -102,7 +98,6 @@ public abstract class AbstractGenerator {
 	 * @return the locator of the generator
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AbstractLocator getLocator() {
 		return this.locator;
@@ -114,7 +109,6 @@ public abstract class AbstractGenerator {
 	 * @return the name of the generator
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getName() {
 		return this.name;
@@ -126,7 +120,6 @@ public abstract class AbstractGenerator {
 	 * @return the qualified name of the table or sequence
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract String getQName();
 
@@ -136,7 +129,6 @@ public abstract class AbstractGenerator {
 	 * @return the schema of the generator
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getSchema() {
 		return this.schema;

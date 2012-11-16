@@ -55,8 +55,7 @@ public @interface NotEmpty {
 		 * @return constraints
 		 * 
 		 * @since $version
-		 * @author hceylan
-		 */
+			 */
 		NotEmpty[] value();
 	}
 
@@ -64,7 +63,6 @@ public @interface NotEmpty {
 	 * @return the groups.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract Class<?>[] groups() default {};
 
@@ -72,7 +70,6 @@ public @interface NotEmpty {
 	 * @return the message
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract String message() default "At least one entry is required";
 
@@ -80,7 +77,6 @@ public @interface NotEmpty {
 	 * @return the payload
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract Class<? extends Payload>[] payload() default {};
 }

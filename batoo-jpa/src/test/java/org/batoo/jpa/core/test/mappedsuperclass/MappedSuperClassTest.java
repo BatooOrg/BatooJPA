@@ -46,7 +46,6 @@ public class MappedSuperClassTest extends BaseCoreTest {
 	 * @return new Foo
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private Foo newFoo() {
 		final Foo foo = new Foo();
@@ -83,7 +82,6 @@ public class MappedSuperClassTest extends BaseCoreTest {
 	 * Tests {@link EntityManager#contains(Object)}.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testContains() {
@@ -103,7 +101,6 @@ public class MappedSuperClassTest extends BaseCoreTest {
 	 *             thrown if test fails.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testCreateTable() throws SQLException {
@@ -119,7 +116,6 @@ public class MappedSuperClassTest extends BaseCoreTest {
 	 * Tests {@link EntityManager#detach(Object)}.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testDetach() {
@@ -139,7 +135,6 @@ public class MappedSuperClassTest extends BaseCoreTest {
 	 *             thrown if test fails.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testDetachThenCommit() throws SQLException {
@@ -158,7 +153,6 @@ public class MappedSuperClassTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)}
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFind() {
@@ -181,7 +175,6 @@ public class MappedSuperClassTest extends BaseCoreTest {
 	 *             thrown if test fails.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFlushThenDetach() throws SQLException {
@@ -205,7 +198,6 @@ public class MappedSuperClassTest extends BaseCoreTest {
 	 *             thrown if test fails.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testPersist() throws SQLException {

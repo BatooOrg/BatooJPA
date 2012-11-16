@@ -45,7 +45,6 @@ public class LobTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with lob values
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testLob() {

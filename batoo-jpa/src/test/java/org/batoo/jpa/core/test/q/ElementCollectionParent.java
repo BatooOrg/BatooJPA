@@ -93,7 +93,6 @@ public class ElementCollectionParent {
 	 * @return the codes2 of the Foo
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Set<String> getCodes2() {
 		return this.codes2;
@@ -105,7 +104,6 @@ public class ElementCollectionParent {
 	 * @return the codes3 of the Foo
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Set<FooType> getCodes3() {
 		return this.codes3;
@@ -117,7 +115,6 @@ public class ElementCollectionParent {
 	 * @return the codes4 of the ElementCollectionParent
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Set<FooType> getCodes4() {
 		return this.codes4;
@@ -129,7 +126,6 @@ public class ElementCollectionParent {
 	 * @return the codes5 of the ElementCollectionParent
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Map<String, String> getCodes5() {
 		return this.codes5;

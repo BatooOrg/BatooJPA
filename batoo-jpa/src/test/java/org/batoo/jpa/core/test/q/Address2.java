@@ -36,7 +36,6 @@ public class Address2 {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Address2() {
 		super();
@@ -49,7 +48,6 @@ public class Address2 {
 	 *            the country
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Address2(String city, Country country) {
 		super();

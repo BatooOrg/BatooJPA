@@ -69,7 +69,6 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 	 *            the metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public JoinTable(EntityTypeImpl<?> entity, JoinTableMetadata metadata) {
 		super(metadata);
@@ -97,7 +96,6 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 	 * @return the join SQL fragment
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String createJoin(JoinType joinType, String parentAlias, String alias, boolean forward) {
 		String sourceJoin, destinationJoin;
@@ -120,7 +118,6 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 	 * @return the destinationKey of the JoinTable
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ForeignKey getDestinationKey() {
 		return this.destinationKey;
@@ -132,7 +129,6 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 	 * @return the oner entity of the table
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EntityTypeImpl<?> getEntity() {
 		return this.entity;
@@ -144,7 +140,6 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 	 * @return the order column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public OrderColumn getOrderColumn() {
 		return this.orderColumn;
@@ -215,7 +210,6 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 	 * @return the sourceKey of the JoinTable
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ForeignKey getSourceKey() {
 		return this.sourceKey;
@@ -228,7 +222,6 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 	 *            the destination entity
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void link(EntityTypeImpl<?> source, EntityTypeImpl<?> destination) {
 		if (this.getName() == null) {
@@ -329,7 +322,6 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 	 *            the java type of the map's key
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setKeyColumn(ColumnMetadata mapKeyColumn, String name, TemporalType mapKeyTemporalType, EnumType mapKeyEnumType, Class<?> mapKeyJavaType) {
 		new MapKeyColumn(this, mapKeyColumn, name, mapKeyTemporalType, mapKeyEnumType, mapKeyJavaType);
@@ -346,7 +338,6 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 	 *            the locator
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setOrderColumn(ColumnMetadata orderColumn, String name, AbstractLocator locator) {
 		this.orderColumn = new OrderColumn(this, orderColumn, name, locator);

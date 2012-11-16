@@ -35,7 +35,6 @@ public class ElementCollectionTest extends BaseCoreTest {
 	 * Tests the element collections
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testElementCollection1() {
@@ -65,7 +64,6 @@ public class ElementCollectionTest extends BaseCoreTest {
 	 * Tests the element collections
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testElementCollection2() {
@@ -95,7 +93,6 @@ public class ElementCollectionTest extends BaseCoreTest {
 	 * Tests the element collections
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testElementCollection3() {
@@ -125,7 +122,6 @@ public class ElementCollectionTest extends BaseCoreTest {
 	 * Tests the element collections
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testElementCollection4() {

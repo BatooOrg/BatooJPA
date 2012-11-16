@@ -50,7 +50,6 @@ public class UpdateJpqlTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Before
 	public void prepareCountries() {
@@ -67,7 +66,6 @@ public class UpdateJpqlTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testDelete() {
@@ -85,7 +83,6 @@ public class UpdateJpqlTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testUpdate() {

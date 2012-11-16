@@ -36,7 +36,6 @@ public class HomePhone extends Phone {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public HomePhone() {
 		super();
@@ -49,7 +48,6 @@ public class HomePhone extends Phone {
 	 *            the phone
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public HomePhone(Person person, String phone) {
 		super(phone);

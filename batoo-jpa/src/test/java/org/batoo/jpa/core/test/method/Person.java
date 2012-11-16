@@ -51,7 +51,6 @@ public class Person {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Person() {
 		super();
@@ -62,7 +61,6 @@ public class Person {
 	 *            the name
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Person(String name) {
 		super();
@@ -109,7 +107,6 @@ public class Person {
 	 * @return the phones of the Person
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@OneToMany(cascade = CascadeType.ALL)
 	@JoinColumn(name = "person")
@@ -124,7 +121,6 @@ public class Person {
 	 *            the addresses to set for Person
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setAddresses(List<Address> addresses) {
 		this.addresses = addresses;
@@ -137,7 +133,6 @@ public class Person {
 	 *            the id to set for Person
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setId(Integer id) {
 		this.id = id;
@@ -161,7 +156,6 @@ public class Person {
 	 *            the phones to set for Person
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setPhones(List<Phone> phones) {
 		this.phones = phones;

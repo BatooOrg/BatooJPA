@@ -75,7 +75,6 @@ public class JdbcTable {
 	 *             thrown in case of an SQL error.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public JdbcTable(DatabaseMetaData dbMetadata, ResultSet metadata) throws SQLException {
 		super();
@@ -98,7 +97,6 @@ public class JdbcTable {
 	 * @return the column metadta or null
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public JdbcColumn getColumn(String name) {
 		return this.columns.get(name.toUpperCase());
@@ -112,7 +110,6 @@ public class JdbcTable {
 	 * @return the foreign key or null if there is no existing foreign key with the name
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public JdbcForeignKey getForeignKey(String name) {
 		return this.foreignKeys.get(name.toUpperCase());
@@ -124,7 +121,6 @@ public class JdbcTable {
 	 * @return the foreign keys of the table
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Collection<JdbcForeignKey> getForeignKeys() {
 		return this.foreignKeys.values();
@@ -138,7 +134,6 @@ public class JdbcTable {
 	 * @return the index or null if there is no existing index with the name
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public JdbcIndex getIndex(String name) {
 		return this.indexes.get(name.toUpperCase());
@@ -150,7 +145,6 @@ public class JdbcTable {
 	 * @return the name of the table
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getName() {
 		return this.name;
@@ -162,7 +156,6 @@ public class JdbcTable {
 	 * @return the primary key name of the table
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getPkName() {
 		return this.pkName;
@@ -174,7 +167,6 @@ public class JdbcTable {
 	 * @return the schema of the table
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getSchema() {
 		return this.schema;
@@ -187,7 +179,6 @@ public class JdbcTable {
 	 *            the set of columns
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void logNotNullExtraColumns(Collection<String> columns) {
 		final Set<String> nonNullColumns = Sets.newHashSet();
@@ -293,7 +284,6 @@ public class JdbcTable {
 	 * @return true if primary key drop is required, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean requiresPkDrop(Set<String> pkColumnNames) {
 		if (this.pkColumns.isEmpty()) {

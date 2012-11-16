@@ -72,7 +72,6 @@ public class Callback {
 	 *            the callback type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Callback(final AbstractLocator locator, final Class<?> clazz, final String name, EntityListenerType listenerType, final CallbackType callbackType) {
 		super();
@@ -113,7 +112,6 @@ public class Callback {
 	 *            the instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void fire(Object instance) {
 		try {
@@ -135,7 +133,6 @@ public class Callback {
 	 * @return the callback type of the Callback
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public CallbackType getCallbackType() {
 		return this.callbackType;
@@ -147,7 +144,6 @@ public class Callback {
 	 * @return the listener type of the Callback
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EntityListenerType getListenerType() {
 		return this.listenerType;

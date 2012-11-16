@@ -36,7 +36,6 @@ public class FooType1 extends BaseFoo {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public FooType1() {
 		super();
@@ -49,7 +48,6 @@ public class FooType1 extends BaseFoo {
 	 *            the value type 1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public FooType1(Bar bar, String valueType1) {
 		super(bar);
@@ -63,7 +61,6 @@ public class FooType1 extends BaseFoo {
 	 * @return the valueType1 of the FooType1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getValueType1() {
 		return this.valueType1;
@@ -76,7 +73,6 @@ public class FooType1 extends BaseFoo {
 	 *            the valueType1 to set for FooType1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setValueType1(String valueType1) {
 		this.valueType1 = valueType1;

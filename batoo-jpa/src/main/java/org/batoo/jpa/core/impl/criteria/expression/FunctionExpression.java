@@ -58,7 +58,6 @@ public class FunctionExpression<T> extends AbstractExpression<T> {
 	 *            the expressions as arguments
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public FunctionExpression(Class<T> javaType, String function, Expression<?>... arguments) {
 		super(javaType);

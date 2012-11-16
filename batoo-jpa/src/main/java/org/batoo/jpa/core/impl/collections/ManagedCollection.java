@@ -61,7 +61,6 @@ public abstract class ManagedCollection<E> implements Serializable {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ManagedCollection() {
 		super();
@@ -81,7 +80,6 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 *            the managed instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ManagedCollection(PluralMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance) {
 		super();
@@ -103,7 +101,6 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 * @return if the child is added
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract boolean addChild(EntryImpl<Object, ManagedInstance<?>> child);
 
@@ -115,7 +112,6 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 * @return if the child is added
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract boolean addElement(EntryImpl<Object, ?> child);
 
@@ -123,7 +119,6 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 * Marks the collection as changed.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected final void changed() {
 		if (!this.changed && (this.managedInstance != null)) {
@@ -146,7 +141,6 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 *             thrown in case of an SQL error
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract void flush(Connection connection, boolean removals, boolean force) throws SQLException;
 
@@ -156,7 +150,6 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 * @return the delegate collection
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract Collection<E> getDelegate();
 
@@ -166,7 +159,6 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 * @return the insertBatchSize of the ManagedCollection
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected int getInsertBatchSize() {
 		return this.insertBatchSize;
@@ -178,7 +170,6 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 * @return the managed instance of the managed collection
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ManagedInstance<?> getManagedInstance() {
 		return this.managedInstance;
@@ -190,7 +181,6 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 * @return the mapping of the managed collection
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected PluralMapping<?, ?, E> getMapping() {
 		return this.mapping;
@@ -202,7 +192,6 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 * @return the items that are added
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected abstract Collection<E> getSnapshot();
 
@@ -210,7 +199,6 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 * Initializes the managed collection.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract void initialize();
 
@@ -220,7 +208,6 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 * @return true if the list is initialized, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract boolean isInitialized();
 
@@ -237,7 +224,6 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 *            registry of processed entities
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void mergeWith(EntityManagerImpl entityManager, Object instance, MutableBoolean requiresFlush, IdentityHashMap<Object, Object> processed) {
@@ -330,7 +316,6 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 *            the entity manager
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void persistAdditions(EntityManagerImpl entityManager) {
 		final Collection<E> added = BatooUtils.subtract(this.getDelegate(), this.getSnapshot());
@@ -343,7 +328,6 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 * Refreshes the children of the managed collection.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract void refreshChildren();
 
@@ -354,7 +338,6 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 *            the child to add
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected abstract void removeChild(E child);
 
@@ -368,7 +351,6 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 *             thrown in case of an SQL error
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected boolean removed(Connection connection, boolean removals) throws SQLException {
 		// if the instance removed remove all the relations
@@ -388,7 +370,6 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 *            the entity manager
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void removeOrphans(EntityManagerImpl entityManager) {
 		final List<E> removed = BatooUtils.subtract(this.getSnapshot(), this.getDelegate());
@@ -401,7 +382,6 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 * Clears the changed status.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void reset() {
 		this.changed = false;
@@ -411,7 +391,6 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 * Makes a snapshot of the collection
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected abstract void snapshot();
 }

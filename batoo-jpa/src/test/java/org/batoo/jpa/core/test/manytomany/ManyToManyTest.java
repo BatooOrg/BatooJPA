@@ -36,7 +36,6 @@ public class ManyToManyTest extends BaseCoreTest {
 	 * Tests to persist {@link ManyToMany} relations.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testPersist() {

@@ -54,7 +54,6 @@ public class Person {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Person() {
 		super();
@@ -65,7 +64,6 @@ public class Person {
 	 *            the name
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Person(String name) {
 		super();
@@ -89,7 +87,6 @@ public class Person {
 	 * @return the addresses2 of the Person
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected List<Address2> getAddresses2() {
 		return this.addresses2;

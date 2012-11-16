@@ -44,7 +44,6 @@ public class BooleanExpression extends AbstractExpression<Boolean> {
 	 *            the inner expression
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public BooleanExpression(Expression<Boolean> inner) {
 		super(Boolean.class);
@@ -77,7 +76,6 @@ public class BooleanExpression extends AbstractExpression<Boolean> {
 	 * @return the SQL select fragment
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String generateSqlRestriction(final BaseQueryImpl<?> query) {
 		if (this.inner instanceof BasicPath) {

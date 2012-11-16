@@ -41,7 +41,6 @@ public class Contact {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Contact() {
 		super();
@@ -56,7 +55,6 @@ public class Contact {
 	 *            the phone
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Contact(String city, Country country, String phone) {
 		super();
@@ -71,7 +69,6 @@ public class Contact {
 	 * @return the address of the Contact
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected Address2 getAddress() {
 		return this.address;
@@ -83,7 +80,6 @@ public class Contact {
 	 * @return the phone of the Contact
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected Phone getPhone() {
 		return this.phone;
@@ -96,7 +92,6 @@ public class Contact {
 	 *            the address to set for Contact
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void setAddress(Address2 address) {
 		this.address = address;
@@ -109,7 +104,6 @@ public class Contact {
 	 *            the phone to set for Contact
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void setPhone(WorkPhone phone) {
 		this.phone = phone;

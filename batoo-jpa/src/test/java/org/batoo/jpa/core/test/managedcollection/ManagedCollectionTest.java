@@ -41,7 +41,6 @@ public class ManagedCollectionTest extends BaseCoreTest {
 	 * Tests that additions to managed collection that are committed
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testAdditionsCommitted() {
@@ -61,7 +60,6 @@ public class ManagedCollectionTest extends BaseCoreTest {
 	 * Tests that additions to existing managed collection
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testAdditionsExisting() {
@@ -82,7 +80,6 @@ public class ManagedCollectionTest extends BaseCoreTest {
 	 * Tests that additions to managed collection that are committed
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testAdditionsPersist() {
@@ -99,7 +96,6 @@ public class ManagedCollectionTest extends BaseCoreTest {
 	 * Tests that managed collection does not allow duplicates.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test(expected = UnsupportedOperationException.class)
 	public void testNoDuplicates() {
@@ -113,7 +109,6 @@ public class ManagedCollectionTest extends BaseCoreTest {
 	 * Tests that managed collection does not allow duplicates.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test(expected = UnsupportedOperationException.class)
 	public void testNoDuplicatesAfterPersist() {

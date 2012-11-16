@@ -34,7 +34,6 @@ public class Bar3 {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Bar3() {
 		super();
@@ -47,7 +46,6 @@ public class Bar3 {
 	 *            str value
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Bar3(int intValue, String strValue) {
 		super();
@@ -92,7 +90,6 @@ public class Bar3 {
 	 * @return the intValue of the Bar3
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public int getIntValue() {
 		return this.intValue;
@@ -104,7 +101,6 @@ public class Bar3 {
 	 * @return the strValue of the Bar3
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getStrValue() {
 		return this.strValue;
@@ -130,7 +126,6 @@ public class Bar3 {
 	 *            the intValue to set for Bar3
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setIntValue(int intValue) {
 		this.intValue = intValue;
@@ -143,7 +138,6 @@ public class Bar3 {
 	 *            the strValue to set for Bar3
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setStrValue(String strValue) {
 		this.strValue = strValue;

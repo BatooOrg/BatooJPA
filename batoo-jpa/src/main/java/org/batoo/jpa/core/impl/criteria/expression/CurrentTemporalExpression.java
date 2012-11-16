@@ -50,7 +50,6 @@ public class CurrentTemporalExpression<T> extends AbstractExpression<T> {
 	 *            the java type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public CurrentTemporalExpression(TemporalType temporalType, Class<T> javaType) {
 		super(javaType);

@@ -48,7 +48,6 @@ public class BaseFoo {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public BaseFoo() {
 		super();
@@ -59,7 +58,6 @@ public class BaseFoo {
 	 *            the bar
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public BaseFoo(Bar bar) {
 		super();
@@ -75,7 +73,6 @@ public class BaseFoo {
 	 * @return the bar of the BaseFoo
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Bar getBar() {
 		return this.bar;
@@ -87,7 +84,6 @@ public class BaseFoo {
 	 * @return the id of the BaseFoo
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Integer getId() {
 		return this.id;
@@ -100,7 +96,6 @@ public class BaseFoo {
 	 *            the bar to set for BaseFoo
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setBar(Bar bar) {
 		this.bar = bar;

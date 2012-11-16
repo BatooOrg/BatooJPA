@@ -47,7 +47,6 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 *            the java type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AbstractExpression(Class<T> javaType) {
 		super(javaType);
@@ -97,7 +96,6 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 * @return the JPQL where fragment
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract String generateJpqlRestriction(BaseQueryImpl<?> query);
 
@@ -107,7 +105,6 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 * @return the converter of the expression
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ExpressionConverter<?> getConverter() {
 		return this.converter;
@@ -178,7 +175,6 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 * @return the same expression
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public <N> Expression<N> setConverter(ExpressionConverter<N> converter) {

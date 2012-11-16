@@ -83,7 +83,6 @@ public final class Enhancer {
 	 *             thrown in case of an error
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	//@formatter:off
 	public static byte[] create(Class<?> clazz) throws Exception {
@@ -437,7 +436,6 @@ public final class Enhancer {
 	 *             thrown if the enhancement fails
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> Class<T> enhance(EntityType<T> type) throws Exception {
@@ -571,7 +569,6 @@ public final class Enhancer {
 	 *             if class cannot be loaded
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> Class<T> loadClass(ClassLoader classLoader, byte[] byteCode, String className) throws Exception {

@@ -36,7 +36,6 @@ public class Country {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Country() {
 		super();
@@ -49,7 +48,6 @@ public class Country {
 	 *            the name
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Country(String code, String name) {
 		super();
@@ -64,7 +62,6 @@ public class Country {
 	 * @return the code of the Country
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getCode() {
 		return this.code;

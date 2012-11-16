@@ -47,7 +47,6 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public DerbyAdaptor() {
 		super();

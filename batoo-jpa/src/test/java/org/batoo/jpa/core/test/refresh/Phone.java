@@ -43,7 +43,6 @@ public class Phone {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Phone() {
 		super();
@@ -56,7 +55,6 @@ public class Phone {
 	 *            the phone number
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Phone(Person person, String phoneNo) {
 		super();

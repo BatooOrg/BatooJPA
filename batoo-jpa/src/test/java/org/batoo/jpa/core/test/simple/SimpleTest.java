@@ -54,7 +54,6 @@ public class SimpleTest extends BaseCoreTest {
 	 * Tests {@link EntityManager#contains(Object)}.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testContains() {
@@ -74,7 +73,6 @@ public class SimpleTest extends BaseCoreTest {
 	 *             thrown if fails
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testCreateTable() throws SQLException {
@@ -90,7 +88,6 @@ public class SimpleTest extends BaseCoreTest {
 	 * Tests {@link EntityManager#detach(Object)}.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testDetach() {
@@ -111,7 +108,6 @@ public class SimpleTest extends BaseCoreTest {
 	 *             thrown if fails
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testDetachThenCommit() throws SQLException {
@@ -130,7 +126,6 @@ public class SimpleTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)}
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFind() {
@@ -152,7 +147,6 @@ public class SimpleTest extends BaseCoreTest {
 	 *             thrown if test fails.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFlushThenDetach() throws SQLException {
@@ -175,7 +169,6 @@ public class SimpleTest extends BaseCoreTest {
 	 * @throws SQLException
 	 *             thrown if fails
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testPersist() throws SQLException {

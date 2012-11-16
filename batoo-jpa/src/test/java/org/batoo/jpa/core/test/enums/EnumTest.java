@@ -42,7 +42,6 @@ public class EnumTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)}.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFind() {
@@ -61,7 +60,6 @@ public class EnumTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)}.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFind2() {
@@ -84,7 +82,6 @@ public class EnumTest extends BaseCoreTest {
 	 * @throws SQLException
 	 *             thrown if fails
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testPersist() throws SQLException {
@@ -103,7 +100,6 @@ public class EnumTest extends BaseCoreTest {
 	 * @throws SQLException
 	 *             thrown if fails
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testPersist2() throws SQLException {
@@ -124,7 +120,6 @@ public class EnumTest extends BaseCoreTest {
 	 * Tests to update.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testUpdate() {
@@ -153,7 +148,6 @@ public class EnumTest extends BaseCoreTest {
 	 * Tests to update.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testUpdate2() {

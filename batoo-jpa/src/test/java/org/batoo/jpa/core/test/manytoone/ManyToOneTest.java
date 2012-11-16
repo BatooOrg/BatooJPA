@@ -50,7 +50,6 @@ public class ManyToOneTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)} person.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFind() {
@@ -68,7 +67,6 @@ public class ManyToOneTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)} person that is in the session.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFindInSession() {
@@ -85,7 +83,6 @@ public class ManyToOneTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)} person.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testJoinColumn() {
@@ -107,7 +104,6 @@ public class ManyToOneTest extends BaseCoreTest {
 	 *             ins case of an underlying SQL Exception
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testJoinColumnName() throws SQLException {

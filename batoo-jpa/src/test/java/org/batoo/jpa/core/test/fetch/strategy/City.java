@@ -44,7 +44,6 @@ public class City {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public City() {
 		super();
@@ -59,7 +58,6 @@ public class City {
 	 *            the country
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public City(Integer id, String name, Country country) {
 		super();

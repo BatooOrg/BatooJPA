@@ -52,7 +52,6 @@ public class Foo {
 	 * @return the id of the Foo1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Integer getId() {
 		return this.id;
@@ -64,7 +63,6 @@ public class Foo {
 	 * @return the parentValue of the Foo
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getParentValue() {
 		return this.parentValue;
@@ -73,7 +71,6 @@ public class Foo {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@PostLoad
 	public void postLoadFoo() {
@@ -83,7 +80,6 @@ public class Foo {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@PostPersist
 	public void postPersistFoo() {
@@ -93,7 +89,6 @@ public class Foo {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@PostRemove
 	public void postRemoveFoo() {
@@ -103,7 +98,6 @@ public class Foo {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@PostUpdate
 	public void postUpdateFoo() {
@@ -113,7 +107,6 @@ public class Foo {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@PrePersist
 	public void prePersistFoo() {
@@ -123,7 +116,6 @@ public class Foo {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@PreRemove
 	public void preRemoveFoo() {
@@ -133,7 +125,6 @@ public class Foo {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@PreUpdate
 	public void preUpdateFoo() {
@@ -147,7 +138,6 @@ public class Foo {
 	 *            the parenValue to set for Foo
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setParentValue(String parentValue) {
 		this.parentValue = parentValue;

@@ -40,7 +40,6 @@ public interface RootMapping<X> {
 	 * @return the mapping or null
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	Mapping<? super X, ?, ?> getChild(String name);
 
@@ -52,7 +51,6 @@ public interface RootMapping<X> {
 	 * @return the mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	Mapping<?, ?, ?> getMapping(String path);
 
@@ -62,7 +60,6 @@ public interface RootMapping<X> {
 	 * @return the type of the root mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	ManagedTypeImpl<?> getType();
 
@@ -72,7 +69,6 @@ public interface RootMapping<X> {
 	 * @return true if the root is an entity, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	boolean isEntity();
 }

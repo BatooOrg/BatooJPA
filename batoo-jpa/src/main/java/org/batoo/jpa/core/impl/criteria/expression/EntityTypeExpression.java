@@ -49,7 +49,6 @@ public class EntityTypeExpression<T> extends AbstractTypeExpression<T> {
 	 *            the discriminator column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EntityTypeExpression(ParentPath<?, T> path, DiscriminatorColumn discriminatorColumn) {
 		super(path);

@@ -39,7 +39,6 @@ public class Child4 {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Child4() {
 		super();
@@ -52,7 +51,6 @@ public class Child4 {
 	 *            the value
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Child4(Parent parent, String value) {
 		super();
@@ -68,7 +66,6 @@ public class Child4 {
 	 * @return the id of the Child1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Integer getId() {
 		return this.id;
@@ -80,7 +77,6 @@ public class Child4 {
 	 * @return the value of the Child1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getValue() {
 		return this.value;
@@ -93,7 +89,6 @@ public class Child4 {
 	 *            the value to set for Child1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setValue(String value) {
 		this.value = value;

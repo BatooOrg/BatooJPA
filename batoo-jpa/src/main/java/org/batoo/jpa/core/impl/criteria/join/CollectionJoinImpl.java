@@ -48,7 +48,6 @@ public class CollectionJoinImpl<Z, E> extends AbstractPluralJoin<Z, Collection<E
 	 *            the join type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public CollectionJoinImpl(AbstractFrom<?, Z> parent, PluralMapping<? super Z, Collection<E>, E> mapping, JoinType jointType) {
 		super(parent, mapping, jointType);

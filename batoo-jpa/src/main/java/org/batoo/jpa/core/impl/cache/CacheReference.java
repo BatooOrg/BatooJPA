@@ -41,7 +41,6 @@ public class CacheReference implements Serializable {
 	 *            the child
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public CacheReference(MetamodelImpl metamodel, Object reference) {
 		super();
@@ -58,7 +57,6 @@ public class CacheReference implements Serializable {
 	 * @return the id of the reference
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Object getId() {
 		return this.id;
@@ -70,7 +68,6 @@ public class CacheReference implements Serializable {
 	 * @return the type of the reference
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getType() {
 		return this.type;

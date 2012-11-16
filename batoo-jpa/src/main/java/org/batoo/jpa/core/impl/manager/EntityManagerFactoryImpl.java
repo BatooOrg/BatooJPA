@@ -117,7 +117,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 *            the persistence parser
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EntityManagerFactoryImpl(String name, PersistenceParser parser) {
 		super();
@@ -189,7 +188,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 *            the compiled query
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void addNamedQuery(String name, JpqlQuery jpqlQuery) {
 		if (this.namedQueries.containsKey(name)) {
@@ -208,7 +206,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 *            the query
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void addNamedQuery(final String name, Query query) {
 		final QueryImpl<?> typedQuery = (QueryImpl<?>) query;
@@ -247,7 +244,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * Checks if the entity manager factory is open.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void assertOpen() {
 		if (!this.open) {
@@ -391,7 +387,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * @return the JDBC Adaptor
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private JdbcAdaptor createJdbcAdaptor() {
 		int insertBatchSize;
@@ -465,7 +460,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * @return the classloader of the entity manager factory
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ClassLoader getClassloader() {
 		return this.classloader;
@@ -488,7 +482,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * @return the datasource of the entity manager
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected DataSource getDatasource() {
 		return this.dataSource;
@@ -500,7 +493,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * @return the JDBC Adaptor of the entity manager
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected JdbcAdaptor getJdbcAdaptor() {
 		return this.jdbcAdaptor;
@@ -514,7 +506,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * @return the Jpql Query object
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public JpqlQuery getJpqlQuery(String qlString) {
 		try {
@@ -571,7 +562,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * @return the global max fetch join depth
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public int getMaxFetchJoinDepth() {
 		return this.maxFetchJoinDepth;
@@ -594,7 +584,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * @return the named query
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public JpqlQuery getNamedQuery(String name) {
 		return this.namedQueries.get(name);
@@ -615,7 +604,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * @return the set of persist validators.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Class<?>[] getPersistValidators() {
 		return this.persistValidators;
@@ -638,7 +626,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * @return the value of the property or null
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Object getProperty(String key) {
 		return this.properties.get(key);
@@ -650,7 +637,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * @return the set of remove validators.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Class<?>[] getRemoveValidators() {
 		return this.removeValidators;
@@ -662,7 +648,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * @return the set of update validators.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Class<?>[] getUpdateValidators() {
 		return this.updateValidators;
@@ -674,7 +659,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * @return the validation factory.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ValidatorFactory getValidationFactory() {
 		return this.validationFactory;
@@ -708,7 +692,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 	 * @return true if the persistence unit has validators, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean hasValidators() {
 		return this.validationFactory != null;

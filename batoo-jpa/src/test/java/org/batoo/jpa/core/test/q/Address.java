@@ -49,7 +49,6 @@ public class Address {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Address() {
 		super();
@@ -66,7 +65,6 @@ public class Address {
 	 *            if the address is primary
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Address(Person person, String city, Country country, boolean primary) {
 		super();
@@ -125,7 +123,6 @@ public class Address {
 	 * @return the primary of the Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected boolean isPrimary() {
 		return this.primary;
@@ -171,7 +168,6 @@ public class Address {
 	 *            the primary to set for Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void setPrimary(boolean primary) {
 		this.primary = primary;

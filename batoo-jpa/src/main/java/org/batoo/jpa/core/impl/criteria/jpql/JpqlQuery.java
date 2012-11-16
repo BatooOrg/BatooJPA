@@ -129,7 +129,6 @@ public class JpqlQuery {
 	 * @param metadata
 	 *            the named query metadata
 	 * @since $version
-	 * @author hceylan
 	 */
 	public JpqlQuery(EntityManagerFactoryImpl entityManagerFactory, CriteriaBuilderImpl cb, NamedQueryMetadata metadata) {
 		this(entityManagerFactory, metadata.getQuery(), cb);
@@ -155,7 +154,6 @@ public class JpqlQuery {
 	 *            the query string
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public JpqlQuery(EntityManagerFactoryImpl entityManagerFactory, String qlString) {
 		this(entityManagerFactory, qlString, null);
@@ -187,7 +185,6 @@ public class JpqlQuery {
 	 * @return the constructed criteria query
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private BaseQueryImpl<?> construct(CriteriaBuilderImpl cb, CommonTree tree) {
 		final Tree type = tree.getChild(0);
@@ -211,7 +208,6 @@ public class JpqlQuery {
 	 *            the tree
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 * @return
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -245,7 +241,6 @@ public class JpqlQuery {
 	 *            the from metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private void constructFrom(CriteriaBuilderImpl cb, AbstractQuery<?> q, Tree froms) {
 		for (int i = 0; i < froms.getChildCount(); i++) {
@@ -328,7 +323,6 @@ public class JpqlQuery {
 	 * @return the list of group by expressions
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private List<Expression<?>> constructGroupBy(CriteriaBuilderImpl cb, AbstractQuery<?> q, Tree groupByDef) {
 		final List<Expression<?>> groupBy = Lists.newArrayList();
@@ -353,7 +347,6 @@ public class JpqlQuery {
 	 *            the joins metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private void constructJoins(CriteriaBuilderImpl cb, AbstractCriteriaQueryImpl<?> q, RootImpl<Object> r, Tree joins) {
 		for (int i = 0; i < joins.getChildCount(); i++) {
@@ -415,7 +408,6 @@ public class JpqlQuery {
 	 *            the junction definition
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private AbstractExpression<Boolean> constructJunction(CriteriaBuilderImpl cb, Object q, Tree junctionDef) {
 		final List<AbstractExpression<Boolean>> predictions = Lists.newArrayList();
@@ -464,7 +456,6 @@ public class JpqlQuery {
 	 *            the order by definitions
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private void constructOrder(CriteriaBuilderImpl cb, CriteriaQueryImpl<?> q, Tree orderBy) {
 		final List<Order> orders = Lists.newArrayList();
@@ -492,7 +483,6 @@ public class JpqlQuery {
 	 *            the from metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 * @return
 	 */
 	private List<Selection<?>> constructSelect(CriteriaBuilderImpl cb, CriteriaQueryImpl<?> q, Tree selects) {
@@ -525,7 +515,6 @@ public class JpqlQuery {
 	 * @return the constructed query
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private CriteriaQueryImpl constructSelectQuery(CriteriaBuilderImpl cb, CommonTree tree) {
@@ -594,7 +583,6 @@ public class JpqlQuery {
 	 *            the select definition
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private AbstractSelection<?> constructSingleSelect(CriteriaBuilderImpl cb, CriteriaQueryImpl<?> q, Tree selectDef) {
 		// constructor select
@@ -637,7 +625,6 @@ public class JpqlQuery {
 	 * @return the sub query
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private <T> SubqueryImpl<T> constructSubquery(CriteriaBuilderImpl cb, Object q, Tree subQueryDef, Class<T> javaType) {
 		final SubqueryImpl<T> s;
@@ -705,7 +692,6 @@ public class JpqlQuery {
 	 *            the tree
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 * @return
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -748,7 +734,6 @@ public class JpqlQuery {
 	 * @return the typed query
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> QueryImpl<T> createTypedQuery(EntityManagerImpl entityManager) {
@@ -816,7 +801,6 @@ public class JpqlQuery {
 	 * @return the expression
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private <X, C extends Collection<E>, E> AbstractExpression<X> getExpression(CriteriaBuilderImpl cb, Object q, Tree exprDef, Class<X> javaType) {
@@ -1496,7 +1480,6 @@ public class JpqlQuery {
 	 * @return the the time query last used
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public long getLastUsed() {
 		return this.lastUsed;
@@ -1508,7 +1491,6 @@ public class JpqlQuery {
 	 * @return the query
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getQueryString() {
 		return this.qlString;
@@ -1522,7 +1504,6 @@ public class JpqlQuery {
 	 * @return the criteria constructed
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private BaseQueryImpl<?> parse(CriteriaBuilderImpl cb) {
 		final CommonTree tree = this.parse(this.qlString);

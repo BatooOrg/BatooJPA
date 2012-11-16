@@ -46,7 +46,6 @@ public class Phone {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Phone() {
 		super();
@@ -59,7 +58,6 @@ public class Phone {
 	 *            the phone
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Phone(Person person, String phone) {
 		super();
@@ -76,7 +74,6 @@ public class Phone {
 	 * @return the id of the Phone
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Integer getId() {
 		return this.id;
@@ -88,7 +85,6 @@ public class Phone {
 	 * @return the person of the Phone
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Person getPerson() {
 		return this.person;
@@ -100,7 +96,6 @@ public class Phone {
 	 * @return the phone of the Phone
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getPhone() {
 		return this.phone;
@@ -113,7 +108,6 @@ public class Phone {
 	 *            the person to set for Phone
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setPerson(Person person) {
 		this.person = person;
@@ -126,7 +120,6 @@ public class Phone {
 	 *            the phone to set for Phone
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setPhone(String phone) {
 		this.phone = phone;

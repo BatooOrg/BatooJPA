@@ -43,7 +43,6 @@ public class Phone {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Phone() {
 		super();
@@ -56,7 +55,6 @@ public class Phone {
 	 *            the number
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Phone(Person person, String number) {
 		super();
@@ -83,7 +81,6 @@ public class Phone {
 	 * @return the number of the Phone
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getNumber() {
 		return this.number;
@@ -106,7 +103,6 @@ public class Phone {
 	 *            the number to set for Phone
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setNumber(String number) {
 		this.number = number;

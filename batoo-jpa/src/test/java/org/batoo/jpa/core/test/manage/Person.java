@@ -49,7 +49,6 @@ public class Person {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Person() {
 		super();
@@ -60,7 +59,6 @@ public class Person {
 	 *            the name
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Person(String name) {
 		super();

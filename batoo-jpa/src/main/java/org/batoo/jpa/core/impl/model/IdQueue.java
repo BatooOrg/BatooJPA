@@ -64,7 +64,6 @@ public abstract class IdQueue extends LinkedBlockingQueue<Long> {
 	 *            the allocations size
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public IdQueue(ExecutorService idExecuter, String name, int allocationSize) {
 		super();
@@ -83,7 +82,6 @@ public abstract class IdQueue extends LinkedBlockingQueue<Long> {
 	 *            the runnable to run to top-up
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void doTopUp(Runnable runnable) {
 		if (this.idExecuter.isShutdown()) {
@@ -132,7 +130,6 @@ public abstract class IdQueue extends LinkedBlockingQueue<Long> {
 	 * @throws SQLException
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected abstract Long getNextId() throws SQLException;
 

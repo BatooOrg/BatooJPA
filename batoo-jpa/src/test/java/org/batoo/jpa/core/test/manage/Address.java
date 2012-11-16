@@ -43,7 +43,6 @@ public class Address {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Address() {
 		super();
@@ -56,7 +55,6 @@ public class Address {
 	 *            the city
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Address(Person person, String city) {
 		super();
@@ -94,7 +92,6 @@ public class Address {
 	 * @return the person of the Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Person getPerson() {
 		return this.person;
@@ -118,7 +115,6 @@ public class Address {
 	 *            the person to set for Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setPerson(Person person) {
 		if (this.person != null) {

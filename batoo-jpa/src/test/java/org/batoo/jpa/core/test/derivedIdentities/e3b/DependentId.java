@@ -37,7 +37,6 @@ public class DependentId {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public DependentId() {
 		super();
@@ -50,7 +49,6 @@ public class DependentId {
 	 *            the employee
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public DependentId(String name, Employee employee) {
 		super();
@@ -100,7 +98,6 @@ public class DependentId {
 	 * @return the employee of the DependentId
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Employee getEmployee() {
 		return this.employee;
@@ -134,7 +131,6 @@ public class DependentId {
 	 *            the employee to set for DependentId
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setEmployee(Employee employee) {
 		this.employee = employee;

@@ -40,7 +40,6 @@ public class E3 extends E {
 	 * @return the e1 of the E3
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@ManyToOne
 	@Access(AccessType.PROPERTY)
@@ -55,7 +54,6 @@ public class E3 extends E {
 	 *            the e1 to set for E3
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setE1(E1 e1) {
 		this.e1 = e1;

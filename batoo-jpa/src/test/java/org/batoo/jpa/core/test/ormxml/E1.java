@@ -34,7 +34,6 @@ public class E1 extends E {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public E1() {
 		super();
@@ -46,7 +45,6 @@ public class E1 extends E {
 	 * @return the value of the E1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getValue() {
 		return this.value;
@@ -59,7 +57,6 @@ public class E1 extends E {
 	 *            the value to set for E1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setValue(String value) {
 		this.value = value;

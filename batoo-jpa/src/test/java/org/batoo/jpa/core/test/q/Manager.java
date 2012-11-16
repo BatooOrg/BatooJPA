@@ -55,7 +55,6 @@ public class Manager {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Manager() {
 		super();
@@ -70,7 +69,6 @@ public class Manager {
 	 *            the salary
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Manager(String name, Department department, double salary) {
 		super();
@@ -86,7 +84,6 @@ public class Manager {
 	 * @return the department of the Manager
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Department getDepartment() {
 		return this.department;
@@ -98,7 +95,6 @@ public class Manager {
 	 * @return the employees of the Manager
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Set<Employee> getEmployees() {
 		return this.employees;
@@ -110,7 +106,6 @@ public class Manager {
 	 * @return the id of the Manager
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Integer getId() {
 		return this.id;
@@ -122,7 +117,6 @@ public class Manager {
 	 * @return the name of the Manager
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getName() {
 		return this.name;
@@ -134,7 +128,6 @@ public class Manager {
 	 * @return the salary of the Manager
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public double getSalary() {
 		return this.salary;
@@ -147,7 +140,6 @@ public class Manager {
 	 *            the department to set for Manager
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setDepartment(Department department) {
 		this.department = department;
@@ -160,7 +152,6 @@ public class Manager {
 	 *            the name to set for Manager
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -173,7 +164,6 @@ public class Manager {
 	 *            the salary to set for Manager
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setSalary(double salary) {
 		this.salary = salary;

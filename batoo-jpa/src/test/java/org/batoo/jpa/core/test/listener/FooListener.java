@@ -39,7 +39,6 @@ public class FooListener {
 	 *            the instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@PostLoad
 	public void postLoad(Object instance) {
@@ -52,7 +51,6 @@ public class FooListener {
 	 *            the instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@PostPersist
 	public void postPersist(Object instance) {
@@ -65,7 +63,6 @@ public class FooListener {
 	 *            the instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@PostRemove
 	public void postRemove(Object instance) {
@@ -78,7 +75,6 @@ public class FooListener {
 	 *            the instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@PostUpdate
 	public void preLoad(Object instance) {
@@ -91,7 +87,6 @@ public class FooListener {
 	 *            the instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@PrePersist
 	public void prePersist(Object instance) {
@@ -104,7 +99,6 @@ public class FooListener {
 	 *            the instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@PreRemove
 	public void preRemove(Object instance) {
@@ -117,7 +111,6 @@ public class FooListener {
 	 *            the instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@PreUpdate
 	public void preUpdate(Object instance) {

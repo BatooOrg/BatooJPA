@@ -54,7 +54,6 @@ public class Parent {
 	 * @return the children1 of the Parent
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public List<Child> getChildren1() {
 		return this.children1;
@@ -66,7 +65,6 @@ public class Parent {
 	 * @return the children2 of the Parent
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public List<Child> getChildren2() {
 		return this.children2;
@@ -78,7 +76,6 @@ public class Parent {
 	 * @return the id of the Parent
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Integer getId() {
 		return this.id;

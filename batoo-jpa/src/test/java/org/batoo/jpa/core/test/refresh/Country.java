@@ -36,7 +36,6 @@ public class Country {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Country() {
 		super();
@@ -49,7 +48,6 @@ public class Country {
 	 *            the name
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Country(Integer id, String name) {
 		super();

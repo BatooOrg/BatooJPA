@@ -35,7 +35,6 @@ public class SimpleCity implements Comparable<SimpleCity> {
 	 *            the country
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public SimpleCity(String city, String country) {
 		super();
@@ -102,7 +101,6 @@ public class SimpleCity implements Comparable<SimpleCity> {
 	 * @return the city of the SimpleCity
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected String getCity() {
 		return this.city;
@@ -114,7 +112,6 @@ public class SimpleCity implements Comparable<SimpleCity> {
 	 * @return the country of the SimpleCity
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected String getCountry() {
 		return this.country;
@@ -140,7 +137,6 @@ public class SimpleCity implements Comparable<SimpleCity> {
 	 *            the city to set for SimpleCity
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void setCity(String city) {
 		this.city = city;
@@ -153,7 +149,6 @@ public class SimpleCity implements Comparable<SimpleCity> {
 	 *            the country to set for SimpleCity
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void setCountry(String country) {
 		this.country = country;

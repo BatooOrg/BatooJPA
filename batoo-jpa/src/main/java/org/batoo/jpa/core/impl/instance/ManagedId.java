@@ -45,7 +45,6 @@ public class ManagedId<X> {
 	 *            the type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ManagedId(Object id, EntityTypeImpl<X> type) {
 		super();
@@ -86,7 +85,6 @@ public class ManagedId<X> {
 	 * @return the id
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Object getId() {
 		return this.id;
@@ -98,7 +96,6 @@ public class ManagedId<X> {
 	 * @return the type of the managed id
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EntityTypeImpl<? super X> getType() {
 		return this.type;

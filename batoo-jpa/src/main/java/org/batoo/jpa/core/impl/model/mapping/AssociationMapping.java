@@ -97,7 +97,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 *            the attribute
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AssociationMapping(ParentMapping<?, Z> parent, AssociationAttributeMetadata metadata, AttributeImpl<? super Z, X> attribute) {
 		super(parent, attribute, attribute.getJavaType(), attribute.getName());
@@ -186,7 +185,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 *            the managed instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract void checkTransient(ManagedInstance<?> managedInstance);
 
@@ -250,7 +248,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * @return the column metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	protected AssociationMetadata getAssociationMetadata() {
@@ -302,7 +299,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * 
 	 * @return the Fetching strategy of the association
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public FetchStrategyType getFetchStrategy() {
@@ -315,7 +311,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * @return the foreign key of the mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract ForeignKey getForeignKey();
 
@@ -326,7 +321,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * 
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract AssociationMapping<?, ?, ?> getInverse();
 
@@ -336,7 +330,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * @return the mappedBy of the mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getMappedBy() {
 		return this.mappedBy;
@@ -348,7 +341,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * @return the max allowed depth for the fetch join
 	 * 
 	 * @since $version
-	 * @author asimarslan
 	 */
 	public int getMaxFetchJoinDepth() {
 		return this.maxFetchDepth;
@@ -360,7 +352,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * @return the select criteria
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected CriteriaQueryImpl<Y> getSelectCriteria() {
 		if (this.selectCriteria != null) {
@@ -399,7 +390,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * @return the join table of the mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Override
 	public abstract JoinTable getTable();
@@ -426,7 +416,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * @return true if the mapping is an id mapping, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean isId() {
 		return this.getIdType() != null;
@@ -438,7 +427,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * @return true if the association is the owner side
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public final boolean isOwner() {
 		return this.mappedBy == null;
@@ -482,7 +470,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 *             thrown in case of a linkage error
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract void link() throws MappingException;
 
@@ -501,7 +488,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 *            registry of processed entities
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract void mergeWith(EntityManagerImpl entityManager, ManagedInstance<?> instance, Object entity, MutableBoolean requiresFlush,
 		IdentityHashMap<Object, Object> processed);
@@ -514,7 +500,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * @return true if source contains reference to the associate, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract boolean references(Object instance, Object reference);
 
@@ -527,7 +512,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 *            the set of processed instances
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract void refresh(ManagedInstance<?> instance, Set<Object> processed);
 
@@ -537,7 +521,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 * @return true if the mapping removes orphans, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean removesOrphans() {
 		return this.removesOrphans;
@@ -550,7 +533,6 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 *            the inverse association
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract void setInverse(AssociationMapping<?, ?, ?> inverse);
 }

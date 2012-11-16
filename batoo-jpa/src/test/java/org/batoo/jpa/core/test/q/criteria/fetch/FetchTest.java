@@ -41,7 +41,6 @@ public class FetchTest extends BaseCoreTest {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testEmpty() {
@@ -72,7 +71,6 @@ public class FetchTest extends BaseCoreTest {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testExists() {
@@ -113,7 +111,6 @@ public class FetchTest extends BaseCoreTest {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testfetche() {
@@ -167,7 +164,6 @@ public class FetchTest extends BaseCoreTest {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testMemberOf() {
@@ -205,7 +201,6 @@ public class FetchTest extends BaseCoreTest {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testSize() {
@@ -241,7 +236,6 @@ public class FetchTest extends BaseCoreTest {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testSubQuery() {

@@ -50,7 +50,6 @@ public class MsSqlAdaptor extends JdbcAdaptor {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public MsSqlAdaptor() {
 		super();

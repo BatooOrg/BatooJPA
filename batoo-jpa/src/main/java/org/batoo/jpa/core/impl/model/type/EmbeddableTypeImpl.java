@@ -63,7 +63,6 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	 *            the metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EmbeddableTypeImpl(MetamodelImpl metamodel, Class<X> javaType, EmbeddableMetadata metadata) {
 		super(metamodel, javaType, metadata);
@@ -84,7 +83,6 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	 * @return the attribute count of the embeddable
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public int getAttributeCount() {
 		FinalWrapper<Integer> wrapper = this.attributeCount;
@@ -138,7 +136,6 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	 * @return the list of sorted singular attributes
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public SingularAttributeImpl<?, ?>[] getSingularMappings() {
 		FinalWrapper<SingularAttributeImpl<?, ?>[]> wrapper = this.singularMappings;
@@ -194,7 +191,6 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 	 * @return a new instance of the type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public X newInstance() {
@@ -205,5 +201,4 @@ public class EmbeddableTypeImpl<X> extends ManagedTypeImpl<X> implements Embedda
 
 		return null;
 	}
-
 }

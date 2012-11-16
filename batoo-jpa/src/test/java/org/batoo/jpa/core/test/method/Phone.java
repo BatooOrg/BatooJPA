@@ -42,7 +42,6 @@ public class Phone {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Phone() {
 		super();
@@ -57,7 +56,6 @@ public class Phone {
 	 *            the phone number
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Phone(Person person, String areaCode, String phoneNumber) {
 		super();
@@ -74,7 +72,6 @@ public class Phone {
 	 * @return the areaCode of the Phone
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getAreaCode() {
 		return this.areaCode;
@@ -86,7 +83,6 @@ public class Phone {
 	 * @return the id of the Phone
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -100,7 +96,6 @@ public class Phone {
 	 * @return the phoneNumber of the Phone
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getPhoneNumber() {
 		return this.phoneNumber;
@@ -113,7 +108,6 @@ public class Phone {
 	 *            the areaCode to set for Phone
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setAreaCode(String areaCode) {
 		this.areaCode = areaCode;
@@ -126,7 +120,6 @@ public class Phone {
 	 *            the id to set for Phone
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setId(Integer id) {
 		this.id = id;
@@ -139,7 +132,6 @@ public class Phone {
 	 *            the phoneNumber to set for Phone
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;

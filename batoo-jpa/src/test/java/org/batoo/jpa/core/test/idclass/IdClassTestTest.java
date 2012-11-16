@@ -36,7 +36,6 @@ public class IdClassTestTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with IdClass
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testIdClass() {

@@ -45,7 +45,6 @@ public class Person {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Person() {
 		super();
@@ -58,7 +57,6 @@ public class Person {
 	 *            the name
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Person(Integer id, String name) {
 		super();
@@ -93,7 +91,6 @@ public class Person {
 	 * @return the phones of the Person
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public List<Phone> getPhones() {
 		return this.phones;

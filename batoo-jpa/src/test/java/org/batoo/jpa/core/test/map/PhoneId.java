@@ -34,7 +34,6 @@ public class PhoneId {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public PhoneId() {
 		super();
@@ -47,7 +46,6 @@ public class PhoneId {
 	 *            the phone number
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public PhoneId(String areaCode, String phoneNumber) {
 		super();
@@ -97,7 +95,6 @@ public class PhoneId {
 	 * @return the areaCode of the PhoneId
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected String getAreaCode() {
 		return this.areaCode;
@@ -109,7 +106,6 @@ public class PhoneId {
 	 * @return the phoneNumber of the PhoneId
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected String getPhoneNumber() {
 		return this.phoneNumber;
@@ -135,7 +131,6 @@ public class PhoneId {
 	 *            the areaCode to set for PhoneId
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void setAreaCode(String areaCode) {
 		this.areaCode = areaCode;
@@ -148,7 +143,6 @@ public class PhoneId {
 	 *            the phoneNumber to set for PhoneId
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;

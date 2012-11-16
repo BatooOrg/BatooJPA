@@ -31,7 +31,6 @@ public class WorkPhone extends Phone {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public WorkPhone() {
 		super();
@@ -44,7 +43,6 @@ public class WorkPhone extends Phone {
 	 *            the phone
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public WorkPhone(Person person, String phone) {
 		super(phone);
@@ -57,7 +55,6 @@ public class WorkPhone extends Phone {
 	 *            the phone
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public WorkPhone(String phone) {
 		super(phone);

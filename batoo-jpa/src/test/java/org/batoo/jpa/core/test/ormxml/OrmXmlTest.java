@@ -41,7 +41,6 @@ public class OrmXmlTest extends BaseCoreTest {
 	 *             thrown in case of an error
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testOrmXmlProcessed() throws SQLException {

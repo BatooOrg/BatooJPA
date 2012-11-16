@@ -53,7 +53,6 @@ public class JdbcForeignKey {
 	 *             thrown in case of an SQL error.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public JdbcForeignKey(ResultSet metadata) throws SQLException {
 		super();
@@ -71,7 +70,6 @@ public class JdbcForeignKey {
 	 *             thrown in case of an SQL error.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void addColumn(ResultSet metadata) throws SQLException {
 		final String columnName = metadata.getString(JdbcForeignKey.FKCOLUMN_NAME);
@@ -86,7 +84,6 @@ public class JdbcForeignKey {
 	 * @return the name of the foreign key
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getName() {
 		return this.name;
@@ -98,7 +95,6 @@ public class JdbcForeignKey {
 	 * @return the refTable of the foreign key
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getRefTable() {
 		return this.refTable;
@@ -112,7 +108,6 @@ public class JdbcForeignKey {
 	 * @return true if it matches, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean matches(ForeignKey foreignKey) {
 		// referenced table name must match

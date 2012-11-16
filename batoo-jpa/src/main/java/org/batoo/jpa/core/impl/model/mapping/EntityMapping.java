@@ -43,7 +43,6 @@ public class EntityMapping<X> extends ParentMapping<X, X> implements RootMapping
 	 *            the entity
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public EntityMapping(EntityTypeImpl<X> entity) {
@@ -72,7 +71,6 @@ public class EntityMapping<X> extends ParentMapping<X, X> implements RootMapping
 	 * @return the entity of the root mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EntityTypeImpl<X> getEntity() {
 		return this.entity;

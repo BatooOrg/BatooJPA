@@ -43,7 +43,6 @@ public class Quux {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Quux() {
 		super();

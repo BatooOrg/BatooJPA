@@ -65,7 +65,6 @@ public class CacheInstance implements Serializable {
 	 *            the managed instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public CacheInstance(CacheImpl cache, ManagedInstance<?> managedInstance) {
 		super();
@@ -116,7 +115,6 @@ public class CacheInstance implements Serializable {
 	 *            the managed instance to copy to
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void copyTo(CacheImpl cache, ManagedInstance<?> managedInstance) {
 		final EntityTypeImpl<?> type = managedInstance.getType();
@@ -148,7 +146,6 @@ public class CacheInstance implements Serializable {
 	 * @return the collection of children or null
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Collection<?> getCollection(ManagedInstance<?> managedInstance, PluralAssociationMapping<?, ?, ?> mapping) {
@@ -197,7 +194,6 @@ public class CacheInstance implements Serializable {
 	 * @return the name of the entity of the cache instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getEntityName() {
 		return this.entityName;
@@ -213,7 +209,6 @@ public class CacheInstance implements Serializable {
 	 * @return the null collection
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private Collection<?> handleStale(CacheImpl cache, PluralMapping<?, ?, ?> mapping, ManagedInstance<?> managedInstance) {
 		this.pluralMappings.remove(mapping.getPath());
@@ -246,7 +241,6 @@ public class CacheInstance implements Serializable {
 	 * @return true if cache update is necessar, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean updateCollection(MetamodelImpl metamodel, CacheImpl cache, PluralMapping<?, ?, ?> mapping, Object instance) {
 		// if this is not a cachable type then skip

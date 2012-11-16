@@ -40,7 +40,6 @@ public class SequenceGenerator extends AbstractGenerator {
 	 *            the metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public SequenceGenerator(SequenceGeneratorMetadata metadata) {
 		super(metadata);
@@ -63,7 +62,6 @@ public class SequenceGenerator extends AbstractGenerator {
 	 * @return the sequenceName of the sequence generator
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getSequenceName() {
 		return this.sequenceName;

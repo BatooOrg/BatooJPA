@@ -49,7 +49,6 @@ public class Address implements Serializable {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Address() {
 		super();
@@ -64,7 +63,6 @@ public class Address implements Serializable {
 	 *            the country
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Address(Person person, String city, Country country) {
 		super();

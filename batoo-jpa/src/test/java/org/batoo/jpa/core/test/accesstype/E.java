@@ -39,7 +39,6 @@ public class E {
 	 * @return the id of the E
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Id
 	@GeneratedValue
@@ -54,7 +53,6 @@ public class E {
 	 *            the id to set for E
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setId(Long id) {
 		this.id = id;

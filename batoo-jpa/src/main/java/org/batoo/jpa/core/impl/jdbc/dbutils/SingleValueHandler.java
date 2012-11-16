@@ -37,7 +37,6 @@ public class SingleValueHandler<T> implements ResultSetHandler<T> {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public SingleValueHandler() {
 		super();

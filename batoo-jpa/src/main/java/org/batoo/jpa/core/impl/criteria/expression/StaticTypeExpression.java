@@ -46,7 +46,6 @@ public class StaticTypeExpression<T> extends AbstractTypeExpression<T> {
 	 *            the java type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public StaticTypeExpression(AbstractPath<T> path, Class<T> javaType) {
 		super(path);

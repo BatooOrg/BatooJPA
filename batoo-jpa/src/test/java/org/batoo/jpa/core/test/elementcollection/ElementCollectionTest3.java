@@ -34,7 +34,6 @@ public class ElementCollectionTest3 extends BaseCoreTest {
 	 * Tests the embeddable element collections
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testElementCollection1() {
@@ -64,7 +63,6 @@ public class ElementCollectionTest3 extends BaseCoreTest {
 	 * Tests the embeddable element collections
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testElementCollection2() {

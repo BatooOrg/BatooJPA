@@ -52,7 +52,6 @@ public abstract class AbstractJoin<Z, X> extends AbstractFrom<Z, X> implements J
 	 *            the join type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AbstractJoin(AbstractFrom<?, Z> parent, JoinedMapping<? super Z, ?, X> mapping, JoinType jointType) {
 		super(parent, mapping.getType(), mapping, jointType);
@@ -128,7 +127,6 @@ public abstract class AbstractJoin<Z, X> extends AbstractFrom<Z, X> implements J
 	 * @return the mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected JoinedMapping<? super Z, ?, X> getMapping() {
 		return this.mapping;
@@ -149,7 +147,6 @@ public abstract class AbstractJoin<Z, X> extends AbstractFrom<Z, X> implements J
 	 * @return the exception
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected UnsupportedOperationException notSupported() {
 		return new UnsupportedOperationException("on() operations not supported");

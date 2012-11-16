@@ -35,7 +35,6 @@ public class PhonePk {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public PhonePk() {
 		super();
@@ -48,7 +47,6 @@ public class PhonePk {
 	 *            the personId
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public PhonePk(Integer id, Integer personId) {
 		super();
@@ -99,7 +97,6 @@ public class PhonePk {
 	 * @return the id of the PhonePk
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected Integer getId() {
 		return this.id;
@@ -111,7 +108,6 @@ public class PhonePk {
 	 * @return the personId of the PhonePk
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected Integer getPersonId() {
 		return this.personId;
@@ -137,7 +133,6 @@ public class PhonePk {
 	 *            the id to set for PhonePk
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void setId(Integer id) {
 		this.id = id;
@@ -150,7 +145,6 @@ public class PhonePk {
 	 *            the personId to set for PhonePk
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void setPersonId(Integer personId) {
 		this.personId = personId;

@@ -45,7 +45,6 @@ public interface JoinableTable {
 	 *             thrown if there is an underlying SQL Exception
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	void performInsert(Connection connection, Object source, Joinable[] batch, int size) throws SQLException;
 
@@ -65,7 +64,6 @@ public interface JoinableTable {
 	 *             thrown if there is an underlying SQL Exception
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	void performRemove(Connection connection, Object source, Object key, Object destination) throws SQLException;
 
@@ -81,7 +79,6 @@ public interface JoinableTable {
 	 *             thrown if there is an underlying SQL Exception
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	void performRemoveAll(Connection connection, Object source) throws SQLException;
 }

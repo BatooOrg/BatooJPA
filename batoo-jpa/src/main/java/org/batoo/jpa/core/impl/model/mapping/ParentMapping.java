@@ -62,7 +62,6 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	 *            the name of the mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ParentMapping(ParentMapping<?, Z> parent, EmbeddedAttribute<? super Z, X> attribute, Class<X> javaType, String name) {
 		super(parent, attribute, javaType, name);
@@ -75,7 +74,6 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	 *            the list of associations
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void addAssociations(List<AssociationMapping<?, ?, ?>> associations) {
 		for (final Mapping<? super X, ?, ?> mapping : this.children.values()) {
@@ -95,7 +93,6 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	 *            the list of mappings
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void addBasicMappings(List<BasicMapping<?, ?>> mappings) {
 		for (final Mapping<? super X, ?, ?> mapping : this.children.values()) {
@@ -115,7 +112,6 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	 *            the list of mappings
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void addJoinedMappings(List<JoinedMapping<?, ?, ?>> mappingsJoined) {
 		for (final Mapping<? super X, ?, ?> mapping : this.children.values()) {
@@ -139,7 +135,6 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	 *            the list of element collections
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void addPluralMappings(List<PluralMapping<?, ?, ?>> elementCollections) {
 		for (final Mapping<? super X, ?, ?> mapping : this.children.values()) {
@@ -159,7 +154,6 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	 *            the list of mappings
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void addSingularMappings(List<Mapping<?, ?, ?>> mappings) {
 		for (final Mapping<? super X, ?, ?> mapping : this.children.values()) {
@@ -181,7 +175,6 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	 *            the type of the attribute
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private <Y> void createBasicMapping(BasicAttribute<? super X, Y> attribute) {
 		this.children.put(attribute.getName(), new BasicMapping<X, Y>(this, attribute));
@@ -196,7 +189,6 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	 *            the type of the attribute
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private <C, E> void createElementCollectionMapping(PluralAttributeImpl<? super X, C, E> attribute) {
 		this.children.put(attribute.getName(), new ElementCollectionMapping<X, C, E>(this, attribute));
@@ -211,7 +203,6 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	 *            the type of the attribute
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private <Y> void createEmbeddedMapping(EmbeddedAttribute<? super X, Y> attribute) {
 		final EmbeddedMapping<X, Y> mapping = new EmbeddedMapping<X, Y>(this, attribute);
@@ -247,7 +238,6 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	 * Creates the mappings.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public void createMappings() {
@@ -281,7 +271,6 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	 *            the type of the attribute
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private <C, E> void createPluralAssociationMapping(PluralAttributeImpl<? super X, C, E> attribute) {
 		this.children.put(attribute.getName(), new PluralAssociationMapping<X, C, E>(this, attribute));
@@ -296,7 +285,6 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	 *            the type of the attribute
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private <Y> void createSingularAssociationMapping(AssociatedSingularAttribute<? super X, Y> attribute) {
 		this.children.put(attribute.getName(), new SingularAssociationMapping<X, Y>(this, attribute));
@@ -310,7 +298,6 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	 * @return the mapping or null
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Mapping<? super X, ?, ?> getChild(String name) {
 		return this.children.get(name);
@@ -322,7 +309,6 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	 * @return the children of the mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Collection<Mapping<? super X, ?, ?>> getChildren() {
 		return this.children.values();
@@ -334,7 +320,6 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	 * @return the array of mappings eager
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public JoinedMapping<?, ?, ?>[] getEagerMappings() {
 		if (this.eagerMappings != null) {
@@ -373,7 +358,6 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	 * @return the root attribute
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AttributeImpl<?, ?> getRootAttribute(AttributeImpl<?, ?> attribute) {
 		return this.getParent() instanceof EmbeddedMapping ? this.getParent().getAttribute() : attribute;
@@ -387,7 +371,6 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	 * @return the root path
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getRootPath(String path) {
 		return this.getParent() instanceof EmbeddedMapping ? this.getParent().getAttribute().getName() + "." + path : path;
@@ -399,7 +382,6 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	 * @return the entity or embeddable type of the mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract ManagedTypeImpl<? super X> getType();
 
@@ -410,7 +392,6 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	 *            the children to inherit
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void inherit(Collection<Mapping<? super X, ?, ?>> children) {
 		for (final Mapping<? super X, ?, ?> mapping : children) {
@@ -424,7 +405,6 @@ public abstract class ParentMapping<Z, X> extends Mapping<Z, X, X> {
 	 * @return true if the mapping is part of an id attribute, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract boolean isId();
 }

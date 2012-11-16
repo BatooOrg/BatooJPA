@@ -22,7 +22,6 @@ public class Teacher extends Person {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Teacher() {
 		super();
@@ -35,7 +34,6 @@ public class Teacher extends Person {
 	 *            the last name
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Teacher(String firstName, String lastName) {
 		super(firstName, lastName);
@@ -47,7 +45,6 @@ public class Teacher extends Person {
 	 * @return the coursesTaught of the Teacher
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public List<Course> getCoursesTaught() {
 		return this.coursesTaught;
@@ -60,7 +57,6 @@ public class Teacher extends Person {
 	 *            the coursesTaught to set for Teacher
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setCoursesTaught(List<Course> coursesTaught) {
 		this.coursesTaught = coursesTaught;

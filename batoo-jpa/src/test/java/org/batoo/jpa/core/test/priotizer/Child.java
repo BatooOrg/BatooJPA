@@ -42,7 +42,6 @@ public class Child {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Child() {
 		super();
@@ -53,7 +52,6 @@ public class Child {
 	 *            the parent
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Child(Parent parent) {
 		super();
@@ -67,7 +65,6 @@ public class Child {
 	 * @return the id of the Child
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Integer getId() {
 		return this.id;
@@ -79,7 +76,6 @@ public class Child {
 	 * @return the parent of the Child
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Parent getParent() {
 		return this.parent;
@@ -92,7 +88,6 @@ public class Child {
 	 *            the parent to set for Child
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setParent(Parent parent) {
 		this.parent = parent;

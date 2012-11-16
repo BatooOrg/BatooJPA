@@ -32,7 +32,6 @@ public class Exempt extends Employee {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Exempt() {
 		super();

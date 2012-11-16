@@ -51,7 +51,6 @@ public class OracleAdaptor extends JdbcAdaptor {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public OracleAdaptor() {
 		super();

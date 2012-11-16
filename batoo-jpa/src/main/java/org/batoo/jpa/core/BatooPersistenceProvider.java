@@ -51,7 +51,6 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public BatooPersistenceProvider() {
 		super();
@@ -145,7 +144,6 @@ public class BatooPersistenceProvider implements PersistenceProvider {
 	 * @return the entity manager factory
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EntityManagerFactory createEntityManagerFactory(String emName, Map<String, String> map, String[] classes) {
 		try {

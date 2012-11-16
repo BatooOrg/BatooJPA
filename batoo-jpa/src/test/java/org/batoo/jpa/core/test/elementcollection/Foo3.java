@@ -54,7 +54,6 @@ public class Foo3 {
 	 * @return the images of the Foo3
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Set<Bar3> getImages() {
 		return this.images;
@@ -66,7 +65,6 @@ public class Foo3 {
 	 * @return the images2 of the Foo3
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Map<Integer, Bar3> getImages2() {
 		return this.images2;
@@ -78,7 +76,6 @@ public class Foo3 {
 	 * @return the key of the Foo3
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Integer getKey() {
 		return this.key;

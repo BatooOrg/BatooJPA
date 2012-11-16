@@ -29,7 +29,6 @@ public class FooPk {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public FooPk() {
 		super();
@@ -42,7 +41,6 @@ public class FooPk {
 	 *            the string key
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public FooPk(Integer intKey, String strKey) {
 		super();

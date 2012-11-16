@@ -40,7 +40,6 @@ public class E7 {
 	 * @return the id of the E7
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Id
 	public Long getId() {
@@ -53,7 +52,6 @@ public class E7 {
 	 * @return the transiet of the E6
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Transient
 	public String getTransiet() {
@@ -67,7 +65,6 @@ public class E7 {
 	 *            the id to set for E7
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setId(Long id) {
 		this.id = id;
@@ -80,7 +77,6 @@ public class E7 {
 	 *            the transiet to set for E6
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setTransiet(String transiet) {
 		this.transiet = transiet;

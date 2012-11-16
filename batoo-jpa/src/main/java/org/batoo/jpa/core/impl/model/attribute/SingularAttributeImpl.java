@@ -44,7 +44,6 @@ public abstract class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> im
 	 *            the metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public SingularAttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata) {
 		super(declaringType, metadata);

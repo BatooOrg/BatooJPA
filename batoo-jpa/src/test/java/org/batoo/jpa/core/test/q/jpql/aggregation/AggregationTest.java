@@ -87,7 +87,6 @@ public class AggregationTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Before
 	public void prepareCountries() {
@@ -104,7 +103,6 @@ public class AggregationTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	@Ignore
@@ -142,7 +140,6 @@ public class AggregationTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testAgregation2() {
@@ -161,7 +158,6 @@ public class AggregationTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testCount() {
@@ -181,7 +177,6 @@ public class AggregationTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testHaving() {

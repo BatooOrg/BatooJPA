@@ -47,7 +47,6 @@ public class PhoneNumber {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public PhoneNumber() {
 		super();
@@ -58,7 +57,6 @@ public class PhoneNumber {
 	 *            the number
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public PhoneNumber(String number) {
 		super();

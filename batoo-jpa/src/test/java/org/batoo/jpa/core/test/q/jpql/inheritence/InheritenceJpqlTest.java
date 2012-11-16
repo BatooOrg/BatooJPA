@@ -36,7 +36,6 @@ public class InheritenceJpqlTest extends BaseCoreTest {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testCaseType() {
@@ -58,7 +57,6 @@ public class InheritenceJpqlTest extends BaseCoreTest {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	@SuppressWarnings("rawtypes")

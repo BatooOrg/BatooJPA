@@ -49,7 +49,6 @@ public class PostgreSqlAdaptor extends JdbcAdaptor {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public PostgreSqlAdaptor() {
 		super();
@@ -160,7 +159,6 @@ public class PostgreSqlAdaptor extends JdbcAdaptor {
 	 * @return the data type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Override
 	protected String getColumnType(AbstractColumn cd, int sqlType) {

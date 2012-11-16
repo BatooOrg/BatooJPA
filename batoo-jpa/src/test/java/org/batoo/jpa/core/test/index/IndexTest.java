@@ -32,7 +32,6 @@ public class IndexTest extends BaseCoreTest {
 	 * Tests the index creation.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testIndex() {

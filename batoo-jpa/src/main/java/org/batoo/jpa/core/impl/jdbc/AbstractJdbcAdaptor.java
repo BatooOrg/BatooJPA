@@ -93,7 +93,6 @@ public abstract class AbstractJdbcAdaptor {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AbstractJdbcAdaptor() {
 		super();
@@ -103,7 +102,6 @@ public abstract class AbstractJdbcAdaptor {
 	 * @return the JDBC Driver this adapter works with
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected abstract String[] getProductNames();
 }

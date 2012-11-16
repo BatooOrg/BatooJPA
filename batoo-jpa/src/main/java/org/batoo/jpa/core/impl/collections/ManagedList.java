@@ -54,7 +54,6 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 
 	/**
 	 * 
-	 * @author hceylan
 	 * @since $version
 	 */
 	private final class ManagedListIterator extends WrappedListIterator<E> {
@@ -63,7 +62,6 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 		/**
 		 * 
 		 * @since $version
-		 * @author hceylan
 		 */
 		private ManagedListIterator(ListIterator<E> delegate) {
 			super(delegate);
@@ -139,7 +137,6 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ManagedList() {
 		super();
@@ -156,7 +153,6 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 *            if the collection is lazy
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ManagedList(PluralMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
 		super(mapping, managedInstance);
@@ -177,7 +173,6 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 *            the initial values
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ManagedList(PluralMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
 		super(mapping, managedInstance);
@@ -559,7 +554,6 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 * @return true if the list is initialized, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Override
 	public boolean isInitialized() {

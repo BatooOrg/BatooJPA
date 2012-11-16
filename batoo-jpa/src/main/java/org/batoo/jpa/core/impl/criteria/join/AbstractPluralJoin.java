@@ -24,9 +24,9 @@ import javax.persistence.metamodel.Type.PersistenceType;
 
 import org.batoo.jpa.core.impl.model.mapping.ElementCollectionMapping;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
+import org.batoo.jpa.core.impl.model.mapping.JoinedMapping.MappingType;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
-import org.batoo.jpa.core.impl.model.mapping.JoinedMapping.MappingType;
 
 /**
  * The implementation of {@link PluralJoin}.
@@ -52,7 +52,6 @@ public abstract class AbstractPluralJoin<Z, C, E> extends AbstractJoin<Z, E> imp
 	 *            the join type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AbstractPluralJoin(AbstractFrom<?, Z> parent, JoinedMapping<? super Z, ?, E> mapping, JoinType jointType) {
 		super(parent, mapping, jointType);

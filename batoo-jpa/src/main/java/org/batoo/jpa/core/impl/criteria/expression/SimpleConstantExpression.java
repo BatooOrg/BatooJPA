@@ -47,7 +47,6 @@ public class SimpleConstantExpression<T> extends AbstractExpression<T> {
 	 *            the value
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public SimpleConstantExpression(TypeImpl<T> type, T value) {

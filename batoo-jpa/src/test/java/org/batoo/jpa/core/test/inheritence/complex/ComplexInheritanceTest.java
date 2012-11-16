@@ -31,7 +31,6 @@ public class ComplexInheritanceTest extends BaseCoreTest {
 	 * Tests the complex select
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testComplex1() {

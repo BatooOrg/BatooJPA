@@ -46,7 +46,6 @@ public class E1 extends E {
 	 * @return the e2 of the E1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@OneToMany
 	public List<E2> getE2() {
@@ -59,7 +58,6 @@ public class E1 extends E {
 	 * @return the transiet of the E1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Transient
 	public String getTransiet() {
@@ -72,7 +70,6 @@ public class E1 extends E {
 	 * @return the v1 of the E1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Basic
 	public String getV1() {
@@ -85,7 +82,6 @@ public class E1 extends E {
 	 * @return the v2 of the E1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public int getV2() {
 		return this.v2;
@@ -98,7 +94,6 @@ public class E1 extends E {
 	 *            the e2 to set for E1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setE2(List<E2> e2) {
 		this.e2 = e2;
@@ -111,7 +106,6 @@ public class E1 extends E {
 	 *            the transiet to set for E1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setTransiet(String transiet) {
 		this.transiet = transiet;
@@ -124,7 +118,6 @@ public class E1 extends E {
 	 *            the v1 to set for E1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setV1(String v1) {
 		this.v1 = v1;
@@ -137,7 +130,6 @@ public class E1 extends E {
 	 *            the v2 to set for E1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setV2(int v2) {
 		this.v2 = v2;

@@ -56,7 +56,6 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	 *            the join type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public FetchImpl(FetchParentImpl<?, Z> parent, JoinedMapping<? super Z, ?, X> mapping, JoinType joinType) {
 		super(mapping);
@@ -74,7 +73,6 @@ public class FetchImpl<Z, X> extends FetchParentImpl<Z, X> implements Fetch<Z, X
 	 * @return the description of the fetch
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Override
 	public String generateJpqlFetches(String parent) {

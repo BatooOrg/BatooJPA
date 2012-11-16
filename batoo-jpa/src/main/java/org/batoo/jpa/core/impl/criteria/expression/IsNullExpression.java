@@ -46,7 +46,6 @@ public class IsNullExpression extends AbstractExpression<Boolean> {
 	 *            the inner expression
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public IsNullExpression(boolean not, AbstractExpression<?> inner) {
 		super(Boolean.class);

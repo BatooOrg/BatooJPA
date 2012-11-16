@@ -43,7 +43,6 @@ public class E5 {
 	 * @return the e1 of the E3
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@ManyToOne
 	@Access(AccessType.PROPERTY)
@@ -57,7 +56,6 @@ public class E5 {
 	 * @return the e12 of the E5
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public E1 getE12() {
 		return this.e12;
@@ -70,7 +68,6 @@ public class E5 {
 	 *            the e1 to set for E3
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setE1(E1 e1) {
 		this.e1 = e1;
@@ -83,7 +80,6 @@ public class E5 {
 	 *            the e12 to set for E5
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setE12(E1 e12) {
 		this.e12 = e12;

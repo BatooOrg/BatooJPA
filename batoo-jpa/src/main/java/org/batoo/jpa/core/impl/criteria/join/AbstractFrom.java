@@ -52,9 +52,9 @@ import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.ElementCollectionMapping;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
+import org.batoo.jpa.core.impl.model.mapping.JoinedMapping.MappingType;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
-import org.batoo.jpa.core.impl.model.mapping.JoinedMapping.MappingType;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.TypeImpl;
 
@@ -98,7 +98,6 @@ public abstract class AbstractFrom<Z, X> extends ParentPath<Z, X> implements Fro
 	 *            the join type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AbstractFrom(AbstractFrom<?, Z> parent, TypeImpl<X> type, JoinedMapping<? super Z, ?, X> mapping, JoinType joinType) {
 		super(parent, type.getJavaType());
@@ -122,7 +121,6 @@ public abstract class AbstractFrom<Z, X> extends ParentPath<Z, X> implements Fro
 	 *            the entity
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AbstractFrom(EntityTypeImpl<X> entity) {
 		super(null, entity.getJavaType());
@@ -139,7 +137,6 @@ public abstract class AbstractFrom<Z, X> extends ParentPath<Z, X> implements Fro
 	 *            the criteria query
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void ensureAlias(BaseQueryImpl<?> query) {
 		if (StringUtils.isBlank(this.getAlias())) {
@@ -209,7 +206,6 @@ public abstract class AbstractFrom<Z, X> extends ParentPath<Z, X> implements Fro
 	 * @return the restriction based on discrimination, <code>null</code>
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String generateDiscrimination(boolean noQualification) {
 		return this.fetchRoot.generateDiscrimination(noQualification);
@@ -223,7 +219,6 @@ public abstract class AbstractFrom<Z, X> extends ParentPath<Z, X> implements Fro
 	 * @return the JPQL joins fragment
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String generateJpqlJoins(AbstractCriteriaQueryImpl<?> criteriaQuery) {
 		this.ensureAlias(criteriaQuery);
@@ -274,7 +269,6 @@ public abstract class AbstractFrom<Z, X> extends ParentPath<Z, X> implements Fro
 	 *            the map of joins
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void generateSqlJoins(AbstractCriteriaQueryImpl<?> query, Map<Joinable, String> joins) {
 		this.fetchRoot.generateSqlJoins(query, joins, this.selected);
@@ -311,7 +305,6 @@ public abstract class AbstractFrom<Z, X> extends ParentPath<Z, X> implements Fro
 	 * @return the entity of the from
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Override
 	public EntityTypeImpl<X> getEntity() {
@@ -333,7 +326,6 @@ public abstract class AbstractFrom<Z, X> extends ParentPath<Z, X> implements Fro
 	 * @return the fetchRoot of the AbstractFrom
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Override
 	public FetchParentImpl<Z, X> getFetchRoot() {
@@ -370,7 +362,6 @@ public abstract class AbstractFrom<Z, X> extends ParentPath<Z, X> implements Fro
 	 * @return the SQL restriction in pairs of table alias and column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query, MapSelectType selectType) {
 		return this.fetchRoot.getSqlRestrictionFragments(query, selectType);
@@ -388,7 +379,6 @@ public abstract class AbstractFrom<Z, X> extends ParentPath<Z, X> implements Fro
 	 * @return the alias for the table
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Override
 	public String getTableAlias(BaseQueryImpl<?> query, AbstractTable table) {
@@ -667,7 +657,6 @@ public abstract class AbstractFrom<Z, X> extends ParentPath<Z, X> implements Fro
 	 *            if selected
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void select(boolean selected) {
 		this.selected |= selected;

@@ -54,7 +54,6 @@ public class CaseImpl<T> extends AbstractExpression<T> implements Case<T> {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public CaseImpl() {

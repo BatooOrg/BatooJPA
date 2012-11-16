@@ -34,7 +34,6 @@ public class PersistenceUtilImpl implements ProviderUtil {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public PersistenceUtilImpl() {
 		super();

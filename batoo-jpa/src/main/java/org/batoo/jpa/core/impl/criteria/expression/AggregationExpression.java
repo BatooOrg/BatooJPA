@@ -36,7 +36,6 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
  * @param <T>
  *            the type of the expression
  * 
- * @author hceylan
  * @since $version
  */
 public class AggregationExpression<T> extends AbstractExpression<T> {
@@ -71,7 +70,6 @@ public class AggregationExpression<T> extends AbstractExpression<T> {
 	 *            the first parameter
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public AggregationExpression(AggregationFunctionType type, Expression<?> x) {

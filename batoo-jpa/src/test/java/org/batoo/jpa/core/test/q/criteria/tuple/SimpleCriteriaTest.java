@@ -70,7 +70,6 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Before
 	public void prepareCountries() {
@@ -86,7 +85,6 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testArithmeticExpression1() {

@@ -72,7 +72,6 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	 *            the metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public CollectionTable(EntityTypeImpl<?> entity, CollectionTableMetadata metadata) {
 		super(metadata);
@@ -89,7 +88,6 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	 * @return the key
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ForeignKey getKey() {
 		return this.key;
@@ -101,7 +99,6 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	 * @return the key column of the collection table
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public MapKeyColumn getKeyColumn() {
 		return this.keyColumn;
@@ -113,7 +110,6 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	 * @return the order column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public OrderColumn getOrderColumn() {
 		return this.orderColumn;
@@ -189,7 +185,6 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	 *            the enum type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void link(ElementCollectionMapping<?, ?, ?> mapping, TypeImpl<?> type, String defaultName, ColumnMetadata metadata, EnumType enumType,
 		TemporalType temporalType, boolean lob) {
@@ -222,7 +217,6 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	 *            the element mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void link(EmbeddableTypeImpl<?> type, String defaultName, ElementMapping<?> elementMapping) {
 		if (StringUtils.isBlank(this.getName())) {
@@ -337,7 +331,6 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	 *            the java type of the map's key
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setKeyColumn(ColumnMetadata mapKeyColumn, String name, TemporalType mapKeyTemporalType, EnumType mapKeyEnumType, Class<?> mapKeyJavaType) {
 		this.keyColumn = new MapKeyColumn(this, mapKeyColumn, name, mapKeyTemporalType, mapKeyEnumType, mapKeyJavaType);
@@ -354,7 +347,6 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	 *            the locator
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setOrderColumn(ColumnMetadata orderColumn, String name, AbstractLocator locator) {
 		this.orderColumn = new OrderColumn(this, orderColumn, name, locator);

@@ -24,9 +24,9 @@ import javax.persistence.metamodel.SingularAttribute;
 import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
+import org.batoo.jpa.core.impl.model.mapping.JoinedMapping.MappingType;
 import org.batoo.jpa.core.impl.model.mapping.Mapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
-import org.batoo.jpa.core.impl.model.mapping.JoinedMapping.MappingType;
 
 /**
  * Joins for singular attributes.
@@ -50,7 +50,6 @@ public class SingularJoin<Z, X> extends AbstractJoin<Z, X> {
 	 *            the join type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public SingularJoin(AbstractFrom<?, Z> parent, JoinedMapping<? super Z, ?, X> mapping, JoinType jointType) {
 		super(parent, mapping, jointType);

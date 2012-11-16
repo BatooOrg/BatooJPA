@@ -64,7 +64,6 @@ public class ConnectionProxy implements Connection {
 	 *            the size of the jdbc fetch
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ConnectionProxy(Connection connection, long slowSqlThreshold, SqlLoggingType sqlLogging, int jdbcFetchSize) {
 		super();

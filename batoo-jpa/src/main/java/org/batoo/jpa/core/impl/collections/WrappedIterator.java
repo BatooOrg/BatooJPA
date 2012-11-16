@@ -38,7 +38,6 @@ public class WrappedIterator<E> implements Iterator<E> {
 	 *            the delegate
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public WrappedIterator(Iterator<E> delegate) {
 		super();

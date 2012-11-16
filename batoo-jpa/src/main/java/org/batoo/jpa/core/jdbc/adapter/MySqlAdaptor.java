@@ -46,7 +46,6 @@ public class MySqlAdaptor extends JdbcAdaptor {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public MySqlAdaptor() {
 		super();

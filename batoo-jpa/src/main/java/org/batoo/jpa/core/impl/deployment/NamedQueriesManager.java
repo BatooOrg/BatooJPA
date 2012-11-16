@@ -47,7 +47,6 @@ public class NamedQueriesManager extends DeploymentManager<NamedQueryMetadata> {
 	 *             thrown in case of an underlying exception
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public static void perform(MetamodelImpl metamodel, CriteriaBuilderImpl criteriaBuilder) throws BatooException {
 		new NamedQueriesManager(metamodel, criteriaBuilder).perform();

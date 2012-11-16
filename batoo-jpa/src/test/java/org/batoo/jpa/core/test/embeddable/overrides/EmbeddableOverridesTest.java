@@ -58,7 +58,6 @@ public class EmbeddableOverridesTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)}
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFind() {
@@ -85,7 +84,6 @@ public class EmbeddableOverridesTest extends BaseCoreTest {
 	 *             thrown if SQL fails
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testPersist() throws SQLException {

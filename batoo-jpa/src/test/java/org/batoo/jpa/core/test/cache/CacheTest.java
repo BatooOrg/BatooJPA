@@ -34,7 +34,6 @@ public class CacheTest extends BaseCoreTest {
 	 * Tests the mix of cacheable and non-cachable puts
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testMany1() {
@@ -56,7 +55,6 @@ public class CacheTest extends BaseCoreTest {
 	 * Tests the one to many cachables
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testMany2() {
@@ -78,7 +76,6 @@ public class CacheTest extends BaseCoreTest {
 	 * Tests the one to many cachables
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testMany3() {
@@ -107,7 +104,6 @@ public class CacheTest extends BaseCoreTest {
 	 * Tests the one to many cachables
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testMany4() {
@@ -139,7 +135,6 @@ public class CacheTest extends BaseCoreTest {
 	 * Tests the one to many cachables
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testRemoval() {
@@ -166,7 +161,6 @@ public class CacheTest extends BaseCoreTest {
 	 * Tests the simple cache put
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testSimple() {

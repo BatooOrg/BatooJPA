@@ -63,7 +63,6 @@ public class EmbeddedMapping<Z, X> extends ParentMapping<Z, X> implements Singul
 	 *            the attribute
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EmbeddedMapping(ParentMapping<?, Z> parent, EmbeddedAttribute<? super Z, X> attribute) {
 		super(parent, attribute, attribute.getBindableJavaType(), attribute.getName());
@@ -128,7 +127,6 @@ public class EmbeddedMapping<Z, X> extends ParentMapping<Z, X> implements Singul
 	 * @return the association override or <code>null</code>
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AssociationMetadata getAssociationOverride(String path) {
 		AssociationMetadata metadata = null;
@@ -161,7 +159,6 @@ public class EmbeddedMapping<Z, X> extends ParentMapping<Z, X> implements Singul
 	 * @return the attribute override or <code>null</code>
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ColumnMetadata getAttributeOverride(String path) {
 		ColumnMetadata metadata = null;
@@ -218,7 +215,6 @@ public class EmbeddedMapping<Z, X> extends ParentMapping<Z, X> implements Singul
 	 * @return the list of sorted singular attributes
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public Mapping<? super X, ?, ?>[] getSingularMappings() {

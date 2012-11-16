@@ -51,7 +51,6 @@ public class SubstringExpression extends AbstractExpression<String> {
 	 *            the end expression
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public SubstringExpression(Expression<String> inner, Expression<Integer> start, Expression<Integer> end) {
 		super(String.class);

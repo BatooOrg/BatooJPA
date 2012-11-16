@@ -50,7 +50,6 @@ public class Address {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Address() {
 		super();
@@ -62,7 +61,6 @@ public class Address {
 	 * @return the address of the Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getAddress() {
 		return this.address;
@@ -74,7 +72,6 @@ public class Address {
 	 * @return the city of the Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getCity() {
 		return this.city;
@@ -86,7 +83,6 @@ public class Address {
 	 * @return the countryName of the Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getCountryName() {
 		return this.countryName;
@@ -98,7 +94,6 @@ public class Address {
 	 * @return the customer of the Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Customer getCustomer() {
 		return this.customer;
@@ -110,7 +105,6 @@ public class Address {
 	 * @return the id of the Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Integer getId() {
 		return this.id;
@@ -122,7 +116,6 @@ public class Address {
 	 * @return the postalCode of the Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getPostalCode() {
 		return this.postalCode;
@@ -135,7 +128,6 @@ public class Address {
 	 *            the address to set for Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setAddress(String address) {
 		this.address = address;
@@ -148,7 +140,6 @@ public class Address {
 	 *            the city to set for Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setCity(String city) {
 		this.city = city;
@@ -161,7 +152,6 @@ public class Address {
 	 *            the countryName to set for Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setCountryName(String countryName) {
 		this.countryName = countryName;
@@ -174,7 +164,6 @@ public class Address {
 	 *            the customer to set for Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setCustomer(Customer customer) {
 		this.customer = customer;
@@ -187,7 +176,6 @@ public class Address {
 	 *            the postalCode to set for Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setPostalCode(String postalCode) {
 		this.postalCode = postalCode;

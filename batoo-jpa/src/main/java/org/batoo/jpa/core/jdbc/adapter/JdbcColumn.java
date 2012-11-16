@@ -48,7 +48,6 @@ public class JdbcColumn {
 	 *             thrown in case of an SQL error.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public JdbcColumn(ResultSet metadata) throws SQLException {
 		super();
@@ -66,7 +65,6 @@ public class JdbcColumn {
 	 * @return the decimalDigits of the column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public int getDecimalDigits() {
 		return this.decimalDigits;
@@ -78,7 +76,6 @@ public class JdbcColumn {
 	 * @return the name of the column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getName() {
 		return this.name;
@@ -90,7 +87,6 @@ public class JdbcColumn {
 	 * @return the size of the column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public int getSize() {
 		return this.size;
@@ -102,7 +98,6 @@ public class JdbcColumn {
 	 * @return the type of the column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public int getType() {
 		return this.type;
@@ -114,7 +109,6 @@ public class JdbcColumn {
 	 * @return true if the column is nullable, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean isNullable() {
 		return this.nullable;

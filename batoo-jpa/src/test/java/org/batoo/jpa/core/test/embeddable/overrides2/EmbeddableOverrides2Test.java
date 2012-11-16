@@ -59,7 +59,6 @@ public class EmbeddableOverrides2Test extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)} with two level deep override.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFind() {
@@ -85,7 +84,6 @@ public class EmbeddableOverrides2Test extends BaseCoreTest {
 	 *             thrown if SQL fails
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testPersist() throws SQLException {

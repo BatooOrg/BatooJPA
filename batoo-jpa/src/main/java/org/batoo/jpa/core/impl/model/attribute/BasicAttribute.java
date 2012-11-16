@@ -81,7 +81,6 @@ public class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 	 *            the metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public BasicAttribute(IdentifiableTypeImpl<X> declaringType, VersionAttributeMetadata metadata) {
 		super(declaringType, metadata);
@@ -123,7 +122,6 @@ public class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 	 *            the metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public BasicAttribute(ManagedTypeImpl<X> declaringType, BasicAttributeMetadata metadata) {
 		super(declaringType, metadata);
@@ -173,7 +171,6 @@ public class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 	 *            the metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public BasicAttribute(ManagedTypeImpl<X> declaringType, IdAttributeMetadata metadata) {
 		super(declaringType, metadata);
@@ -240,7 +237,6 @@ public class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 	 * @return false if all OK, true if if at least one entity needs to obtain identity from the database
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public boolean fillValue(EntityTypeImpl<?> type, ManagedInstance<?> managedInstance, Object instance) {
@@ -294,7 +290,6 @@ public class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 	 * 
 	 * @return the columnTransformer
 	 * 
-	 * @author asimarslan
 	 * @since $version
 	 */
 	public ColumnTransformerMetadata getColumnTransformer() {
@@ -307,7 +302,6 @@ public class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 	 * @return the enum type of the attribute
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EnumType getEnumType() {
 		return this.enumType;
@@ -319,7 +313,6 @@ public class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 	 * @return the id type of the attribute
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public IdType getIdType() {
 		return this.idType;
@@ -331,7 +324,6 @@ public class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 	 * @return the index of the basic attribute
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public IndexMetadata getIndex() {
 		return this.index;
@@ -361,7 +353,6 @@ public class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 	 * @return the temporal type of the attribute
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public TemporalType getTemporalType() {
 		return this.temporalType;
@@ -419,7 +410,6 @@ public class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 	 * @return true if the attribute is lob, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean isLob() {
 		return this.lob;

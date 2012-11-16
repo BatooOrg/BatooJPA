@@ -41,7 +41,6 @@ public class EnhanceTest extends BaseCoreTest {
 	 *             thrown in case of failure
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testEnhance() throws Exception {

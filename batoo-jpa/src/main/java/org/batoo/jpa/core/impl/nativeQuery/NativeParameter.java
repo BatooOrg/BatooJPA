@@ -42,7 +42,6 @@ public class NativeParameter<T> implements Parameter<T> {
 	 *            the position of the parameter
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public NativeParameter(Integer position) {
 		this(null, position);
@@ -55,7 +54,6 @@ public class NativeParameter<T> implements Parameter<T> {
 	 *            the ordinal number of the parameter
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public NativeParameter(String name, Integer position) {
 		super();
@@ -70,7 +68,6 @@ public class NativeParameter<T> implements Parameter<T> {
 	 * @return the name number of the parameter
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Override
 	public String getName() {

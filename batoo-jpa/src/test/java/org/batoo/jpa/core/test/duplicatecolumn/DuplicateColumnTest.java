@@ -42,7 +42,6 @@ public class DuplicateColumnTest extends BaseCoreTest {
 	 * Tests the duplicate columns in the same entity.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test(expected = MappingException.class)
 	public void testDuplicateColumn() {

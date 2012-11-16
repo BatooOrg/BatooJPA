@@ -52,7 +52,6 @@ public class SizeExpression<C> extends AbstractExpression<Integer> {
 	 *            the inner expression
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public SizeExpression(Expression<C> collection) {
 		super(Integer.class);

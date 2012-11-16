@@ -54,7 +54,6 @@ public class LikeExpression extends AbstractExpression<Boolean> {
 	 *            true if not
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public LikeExpression(Expression<String> inner, Expression<String> pattern, Expression<Character> escape, boolean not) {
 		super(Boolean.class);

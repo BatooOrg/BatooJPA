@@ -37,7 +37,6 @@ public class E6 extends E {
 	 * @return the transiet of the E6
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getTransiet() {
 		return this.transiet;
@@ -50,7 +49,6 @@ public class E6 extends E {
 	 *            the transiet to set for E6
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setTransiet(String transiet) {
 		this.transiet = transiet;

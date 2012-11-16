@@ -32,7 +32,6 @@ public class Contractor extends Employee {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Contractor() {
 		super();

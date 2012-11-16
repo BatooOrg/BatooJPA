@@ -61,7 +61,6 @@ public class EmbeddedAttribute<X, T> extends SingularAttributeImpl<X, T> impleme
 	 *            the metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EmbeddedAttribute(IdentifiableTypeImpl<X> declaringType, EmbeddedIdAttributeMetadata metadata) {
 		super(declaringType, metadata);
@@ -81,7 +80,6 @@ public class EmbeddedAttribute<X, T> extends SingularAttributeImpl<X, T> impleme
 	 *            the metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EmbeddedAttribute(ManagedTypeImpl<X> declaringType, EmbeddedAttributeMetadata metadata) {
 		super(declaringType, metadata);
@@ -100,7 +98,6 @@ public class EmbeddedAttribute<X, T> extends SingularAttributeImpl<X, T> impleme
 	 * @return the association override if one exists for the path, otherwise <code>null</code>
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AssociationMetadata getAssociationOverride(String path) {
 		for (final AssociationMetadata override : this.associationOverrides) {
@@ -120,7 +117,6 @@ public class EmbeddedAttribute<X, T> extends SingularAttributeImpl<X, T> impleme
 	 * @return the attribute override if one exists for the path, otherwise <code>null</code>
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ColumnMetadata getAttributeOverride(String path) {
 		for (final AttributeOverrideMetadata override : this.attributeOverrides) {
@@ -196,7 +192,6 @@ public class EmbeddedAttribute<X, T> extends SingularAttributeImpl<X, T> impleme
 	 * @return the instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public T newInstance() {
 		return this.getType().newInstance();

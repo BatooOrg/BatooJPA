@@ -67,7 +67,6 @@ public abstract class ParentPath<Z, X> extends AbstractPath<X> implements Path<X
 	 *            the java type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ParentPath(ParentPath<?, Z> parent, Class<X> javaType) {
 		super(parent, javaType);
@@ -135,6 +134,21 @@ public abstract class ParentPath<Z, X> extends AbstractPath<X> implements Path<X
 	}
 
 	/**
+	 * Returns the table alias for the column.
+	 * 
+	 * @param column
+	 *            the column
+	 * @param query
+	 *            the query
+	 * @return the table alias for the column
+	 * 
+	 * @since $version
+	 */
+	public String getColumnAlias(BaseQueryImpl<?> query, AbstractColumn column) {
+		return null;
+	}
+
+	/**
 	 * Returns the expression corresponding to the attribute name.
 	 * 
 	 * @param attributeName
@@ -146,7 +160,6 @@ public abstract class ParentPath<Z, X> extends AbstractPath<X> implements Path<X
 	 *            the element type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public <Y, C extends Collection<Y>> AbstractExpression<Y> getExpression(String attributeName) {
@@ -169,7 +182,6 @@ public abstract class ParentPath<Z, X> extends AbstractPath<X> implements Path<X
 	 * @return the fetch root
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract FetchParentImpl<?, X> getFetchRoot();
 
@@ -185,23 +197,6 @@ public abstract class ParentPath<Z, X> extends AbstractPath<X> implements Path<X
 	 * @return the child mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected abstract <C, Y> Mapping<? super X, C, Y> getMapping(String name);
-
-	/**
-	 * Returns the table alias for the column.
-	 * 
-	 * @param column
-	 *            the column
-	 * @param query
-	 *            the query
-	 * @return the table alias for the column
-	 * 
-	 * @since $version
-	 * @author hceylan
-	 */
-	public String getColumnAlias(BaseQueryImpl<?> query, AbstractColumn column) {
-		return null;
-	}
 }

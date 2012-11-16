@@ -41,7 +41,6 @@ public class DdlTest extends BaseCoreTest {
 	 * Tests the ddl drop mode.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testDdlDrop() {
@@ -53,7 +52,6 @@ public class DdlTest extends BaseCoreTest {
 	 * Tests the ddl drop mode.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testDdlUpdate() {

@@ -55,7 +55,6 @@ public class InheritenceCriteriaTest extends BaseCoreTest {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	@SuppressWarnings("rawtypes")
@@ -88,7 +87,6 @@ public class InheritenceCriteriaTest extends BaseCoreTest {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	@SuppressWarnings("rawtypes")

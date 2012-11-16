@@ -43,7 +43,6 @@ public abstract class TypeImpl<X> implements Type<X> {
 	 *            the java type of the type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public TypeImpl(MetamodelImpl metamodel, Class<X> javaType) {
 		super();
@@ -67,7 +66,6 @@ public abstract class TypeImpl<X> implements Type<X> {
 	 * @return the metamodel
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public final MetamodelImpl getMetamodel() {
 		return this.metamodel;

@@ -25,7 +25,6 @@ public class Student extends Person {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Student() {
 		super();
@@ -38,7 +37,6 @@ public class Student extends Person {
 	 *            the last name
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Student(String firstName, String lastName) {
 		super(firstName, lastName);
@@ -50,7 +48,6 @@ public class Student extends Person {
 	 * @return the enrolled of the Student
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public List<Course> getEnrolled() {
 		return this.enrolled;
@@ -62,7 +59,6 @@ public class Student extends Person {
 	 * @return the gpa of the Student
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Float getGpa() {
 		return this.gpa;
@@ -75,7 +71,6 @@ public class Student extends Person {
 	 *            the gpa to set for Student
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setGpa(Float gpa) {
 		this.gpa = gpa;

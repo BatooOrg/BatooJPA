@@ -109,7 +109,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 
 		/**
 		 * @since $version
-		 * @author hceylan
 		 */
 		private PaginationParamsOrder(boolean afterMainSql) {
 			this.afterMainSql = afterMainSql;
@@ -121,7 +120,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 		 * @return the if if the pagination params come after the main SQL, false otherwise
 		 * 
 		 * @since $version
-		 * @author hceylan
 		 */
 		public boolean isAfterMainSql() {
 			return this.afterMainSql;
@@ -142,7 +140,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public JdbcAdaptor() {
 		super();
@@ -160,7 +157,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return the casted expression
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String applyCast(String argument, Class<?> clazz) {
 		final String className = this.getCastClassName(clazz);
@@ -176,7 +172,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return the concat SQL fragment
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract String applyConcat(List<String> arguments);
 
@@ -188,7 +183,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return the sql fragment to escape
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract String applyLikeEscape(String escapePattern);
 
@@ -202,7 +196,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return the modified SQL
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract String applyLock(String sql, LockModeType lockMode);
 
@@ -218,7 +211,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return the modified SQL
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract String applyPagination(String sql, int startPosition, int maxResult);
 
@@ -234,7 +226,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return the sub string function
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String applySubStr(String innerFragment, String startFragment, String endFragment) {
 		return "SUBSTR(" + Joiner.on(", ").skipNulls().join(new Object[] { innerFragment, startFragment, endFragment }) + ")";
@@ -252,7 +243,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return the trim SQL fragment
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String applyTrim(Trimspec trimspec, String trimChar, String argument) {
 		final StringBuilder builder = new StringBuilder("TRIM(");
@@ -293,7 +283,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return the SQL to alter the table
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private String createAlterTableStatement(AbstractTable table, List<AbstractColumn> columnsToAdd) {
 		final List<String> ddlColumns = Lists.newArrayList();
@@ -317,7 +306,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return the BasicColumn Definition DDL For the column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract String createColumnDDL(AbstractColumn columnDefinition);
 
@@ -331,7 +319,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 *             thrown if there is repetitive column names with different DDL
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private String createCreateTableStatement(AbstractTable table) throws SQLException {
 		final Map<String, String> ddlColumns = Maps.newHashMap();
@@ -367,7 +354,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return the generated column fragment
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String createCreateTableStatement(AbstractTable table, Collection<String> ddlColumns, List<String> pkColumns) {
 		final String columns = Joiner.on(",\n\t").join(ddlColumns);
@@ -396,7 +382,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 *            the foreign key
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public synchronized void createForeignKey(DataSource datasource, ForeignKey foreignKey) {
 		final QueryRunner runner = new QueryRunner(datasource, this.isPmdBroken());
@@ -469,7 +454,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 *             throw in case index creation fails
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void createIndex(DataSource datasource, EntityTable table, String indexName, BasicColumn[] columns) throws SQLException {
 		final String columnNames = Joiner.on(", ").join(Lists.transform(Lists.newArrayList(columns), new Function<BasicColumn, String>() {
@@ -508,7 +492,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 *            the ddl mode
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void createOrUpdateTable(AbstractTable table, DataSource datasource, DDLMode ddlMode) {
 		try {
@@ -542,7 +525,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 *            the sequence to create
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract void createSequenceIfNecessary(DataSource datasource, SequenceGenerator sequence);
 
@@ -566,7 +548,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 *            the table generator
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public final void createTableGeneratorIfNecessary(DataSource datasource, TableGenerator table) {
 		try {
@@ -592,7 +573,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 *            the foreign keys
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void dropAllForeignKeys(DataSource datasource, Set<AbstractTable> tableSet) {
 		final AbstractTable[] tables = tableSet.toArray(new AbstractTable[tableSet.size()]);
@@ -679,7 +659,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 *             thrown if the SQL fails
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void dropAllSequences(DataSource datasource, Collection<SequenceGenerator> sequences) throws SQLException {
 		final QueryRunner runner = new QueryRunner(datasource, this.isPmdBroken());
@@ -705,7 +684,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 *             thrown if the SQL fails
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void dropAllTables(DataSource datasource, Collection<AbstractTable> tables) throws SQLException {
 		final QueryRunner runner = new QueryRunner(datasource, this.isPmdBroken());
@@ -741,7 +719,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 *             thrown if SQL fails
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void dropSequence(final QueryRunner runner, final SequenceGenerator sequence) throws SQLException {
 		runner.update("DROP SEQUENCE " + sequence.getQName());
@@ -757,7 +734,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @throws SQLException
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void dropTable(final QueryRunner runner, final AbstractTable table) throws SQLException {
 		runner.update("DROP TABLE " + table.getQName());
@@ -771,7 +747,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return the escaped name
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String escape(String name) {
 		if (name == null) {
@@ -793,7 +768,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return the converted DB type name
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected String getCastClassName(Class<?> clazz) {
 		if (clazz == String.class) {
@@ -811,7 +785,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return the sorted columns
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected Collection<AbstractColumn> getColumns(AbstractTable table) {
 		final List<AbstractColumn> columns = Lists.newArrayList(table.getColumns());
@@ -845,7 +818,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return the data type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected String getColumnType(AbstractColumn cd, int sqlType) {
 		switch (sqlType) {
@@ -888,7 +860,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * 
 	 * @return the current date literal.
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getCurrentDate() {
 		return "CURRENT_DATE";
@@ -899,7 +870,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * 
 	 * @return the current time literal.
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getCurrentTime() {
 		return "CURRENT_TIME";
@@ -910,7 +880,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * 
 	 * @return the current time stamp literal.
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getCurrentTimeStamp() {
 		return "CURRENT_TIMESTAMP";
@@ -920,7 +889,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected abstract String getDatabaseName();
 
@@ -932,7 +900,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return the date time function template for the type <code>type</code>
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getDateTimeFunctionTemplate(DateTimeFunctionType type) {
 		switch (type) {
@@ -977,7 +944,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return the SQL to drop the foreign key
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected String getDropForeignKeySql(String schema, String table, String foreignKey) {
 		final String qualifiedName = Joiner.on(".").skipNulls().join(schema, table);
@@ -991,7 +957,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return the insertBatchSize of the JdbcAdaptor
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public int getInsertBatchSize() {
 		return this.insertBatchSize;
@@ -1009,7 +974,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 *             thrown in case of an SQL error
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract long getNextSequence(DataSource datasource, String sequenceName) throws SQLException;
 
@@ -1021,7 +985,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return the {@link IdType} selected, the {@link Id} passed or null
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getNumericFunctionTemplate(NumericFunctionType type) {
 		switch (type) {
@@ -1042,7 +1005,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return the pagination params order for the adaptor
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract PaginationParamsOrder getPaginationParamsOrder();
 
@@ -1058,7 +1020,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return the priary key drop SQL
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected String getPkCreateSql(String schema, String table, Set<String> pkColumns) {
 		final String qualifiedName = Joiner.on(".").skipNulls().join(new String[] { schema, table });
@@ -1078,7 +1039,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return the priary key drop SQL
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected String getPkDropSql(String schema, String table, String pkName) {
 		final String qualifiedName = Joiner.on(".").skipNulls().join(new String[] { schema, table });
@@ -1092,7 +1052,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return the removeBatchSize of the JdbcAdaptor
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public int getRemoveBatchSize() {
 		return this.removeBatchSize;
@@ -1106,7 +1065,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return the SQL to select the last identity generated
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract String getSelectLastIdentitySql(BasicColumn identityColumn);
 
@@ -1182,7 +1140,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * 
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void importSql(ClassLoader classLoader, DataSource dataSource, String importSqlFileName) {
 		// no import sql
@@ -1276,7 +1233,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return true if the PMD is Broken for the adaptor, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean isPmdBroken() {
 		return true;
@@ -1311,7 +1267,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 *            the message
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void logRelaxed(SQLException e, String message) {
 		JdbcAdaptor.LOG.warn(message + " Check debug log for details: " + e.getMessage());
@@ -1324,7 +1279,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return true if pagination always needs the max results paramater, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract boolean paginationNeedsMaxResultsAlways();
 
@@ -1334,7 +1288,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return true if pagination always needs the start paramater, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract boolean paginationNeedsStartAlways();
 
@@ -1344,7 +1297,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return true if the paginated sql uses parameters instead of hard coded pagination variables, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean parameterizedPagination() {
 		return true;
@@ -1362,7 +1314,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 *             thrown in case of an SQL error
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected String qualified(String schema, String jdbcClassName) {
 		if (StringUtils.isBlank(schema)) {
@@ -1379,7 +1330,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 *            the insertBatchSize to set for JdbcAdaptor
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setInsertBatchSize(int insertBatchSize) {
 		this.insertBatchSize = insertBatchSize;
@@ -1392,7 +1342,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 *            the removeBatchSize to set for JdbcAdaptor
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setRemoveBatchSize(int removeBatchSize) {
 		this.removeBatchSize = removeBatchSize;
@@ -1411,7 +1360,6 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @return the {@link IdType} selected, the {@link Id} passed or null
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract IdType supports(GenerationType type);
 

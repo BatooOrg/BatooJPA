@@ -68,7 +68,6 @@ public class EmbeddedAttributePath<Z, X> extends ParentPath<Z, X> {
 	 *            the embedded mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EmbeddedAttributePath(ParentPath<?, Z> parent, EmbeddedMapping<? super Z, X> mapping) {
 		super(parent, mapping.getType().getJavaType());

@@ -38,7 +38,6 @@ public class Country implements Serializable {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Country() {
 		super();
@@ -51,7 +50,6 @@ public class Country implements Serializable {
 	 *            the name
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Country(Integer id, String name) {
 		super();

@@ -49,7 +49,6 @@ public class Customer {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Customer() {
 		super();
@@ -60,7 +59,6 @@ public class Customer {
 	 *            the name
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Customer(String name) {
 		super();

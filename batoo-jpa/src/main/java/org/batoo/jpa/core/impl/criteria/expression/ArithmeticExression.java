@@ -44,7 +44,6 @@ public class ArithmeticExression<N extends Number> extends AbstractExpression<N>
 	/**
 	 * The types of the arithmetic operations.
 	 * 
-	 * @author hceylan
 	 * @since $version
 	 */
 	@SuppressWarnings("javadoc")
@@ -82,7 +81,6 @@ public class ArithmeticExression<N extends Number> extends AbstractExpression<N>
 	 *            the right side expression
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public ArithmeticExression(ArithmeticOperation operation, Expression<? extends N> x, Expression<? extends N> y) {

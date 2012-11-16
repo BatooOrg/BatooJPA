@@ -45,7 +45,6 @@ public class Address2 {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Address2() {
 		super();
@@ -60,7 +59,6 @@ public class Address2 {
 	 *            the street
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Address2(Person person, String city, String street) {
 		super();
@@ -97,7 +95,6 @@ public class Address2 {
 	 * @return the person of the Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected Person getPerson() {
 		return this.person;
@@ -109,7 +106,6 @@ public class Address2 {
 	 * @return the street of the Address2
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected String getStreet() {
 		return this.street;
@@ -133,7 +129,6 @@ public class Address2 {
 	 *            the person to set for Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void setPerson(Person person) {
 		if (this.person != null) {
@@ -154,7 +149,6 @@ public class Address2 {
 	 *            the street to set for Address2
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void setStreet(String street) {
 		this.street = street;

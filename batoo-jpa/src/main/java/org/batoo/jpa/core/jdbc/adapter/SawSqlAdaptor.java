@@ -52,7 +52,6 @@ public class SawSqlAdaptor extends JdbcAdaptor {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public SawSqlAdaptor() {
 		super();

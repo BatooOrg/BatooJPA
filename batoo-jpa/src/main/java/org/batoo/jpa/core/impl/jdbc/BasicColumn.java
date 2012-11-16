@@ -59,7 +59,6 @@ public class BasicColumn extends AbstractColumn {
 	 *            the metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public BasicColumn(JdbcAdaptor jdbcAdaptor, BasicMapping<?, ?> mapping, int sqlType, ColumnMetadata metadata) {
 		super(mapping.getAttribute().getJavaType(), mapping.getIdType(), mapping.getAttribute().getTemporalType(), mapping.getAttribute().getEnumType(),
@@ -107,7 +106,6 @@ public class BasicColumn extends AbstractColumn {
 	 * @return the mapping of the BasicColumn
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Override
 	public BasicMapping<?, ?> getMapping() {
@@ -220,7 +218,6 @@ public class BasicColumn extends AbstractColumn {
 	 *            the owning table
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Override
 	public void setTable(AbstractTable table) {
@@ -238,7 +235,6 @@ public class BasicColumn extends AbstractColumn {
 	 *            the value to set
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Override
 	public void setValue(Object instance, Object value) {

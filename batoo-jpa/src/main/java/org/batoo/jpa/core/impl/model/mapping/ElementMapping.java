@@ -47,7 +47,6 @@ public class ElementMapping<X> extends ParentMapping<X, X> implements RootMappin
 	 *            the embeddable
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ElementMapping(ElementCollectionMapping<?, ?, X> mapping, EmbeddableTypeImpl<X> embeddable) {
 		super(null, null, embeddable.getJavaType(), null);
@@ -73,7 +72,6 @@ public class ElementMapping<X> extends ParentMapping<X, X> implements RootMappin
 	 * @return the collection table
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AbstractTable getCollectionTable() {
 		return this.mapping.getCollectionTable();
@@ -87,7 +85,6 @@ public class ElementMapping<X> extends ParentMapping<X, X> implements RootMappin
 	 * @return the mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Override
 	public Mapping<?, ?, ?> getMapping(String path) {

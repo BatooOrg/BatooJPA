@@ -91,7 +91,6 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 	 *            the result type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AbstractCriteriaQueryImpl(MetamodelImpl metamodel, Class<T> resultType) {
 		super(metamodel);
@@ -116,7 +115,6 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 	 * @return the selection
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected AbstractSelection<T> ensureSelection() {
 		if (this.selection == null) {
@@ -281,7 +279,6 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 	 * @return the restriction
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private String generateSqlRestriction() {
 		final String[] restrictions = new String[this.getRoots().size() + 1];
@@ -426,7 +423,6 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 	 * @return self
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AbstractCriteriaQueryImpl<T> internal() {
 		this.internal = true;
@@ -460,7 +456,6 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 	 *            the parameter to register
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void registerParameter(ParameterExpressionImpl<?> parameter) {
 		this.parameterOrder.add(parameter);
@@ -474,7 +469,6 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 	 * @return the modified query
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected AbstractCriteriaQueryImpl<T> select(Selection<? extends T> selection) {
 		this.selection = (AbstractSelection<T>) selection;
@@ -496,7 +490,6 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 	 *            the selections
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void updateResultClass(List<Selection<?>> selections) {
 		if (selections.size() == 1) {

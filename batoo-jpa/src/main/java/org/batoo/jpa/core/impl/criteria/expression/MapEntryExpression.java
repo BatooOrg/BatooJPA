@@ -52,7 +52,6 @@ public class MapEntryExpression<K, V> extends AbstractExpression<Entry<K, V>> {
 	 *            the java type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public MapEntryExpression(MapJoinImpl<?, K, V> mapJoin, Class<Entry<K, V>> javaType) {
 		super(javaType);

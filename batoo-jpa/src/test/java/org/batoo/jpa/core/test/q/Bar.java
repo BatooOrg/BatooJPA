@@ -47,7 +47,6 @@ public class Bar {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Bar() {
 		super();
@@ -59,7 +58,6 @@ public class Bar {
 	 * @return the foos of the Bar
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Set<BaseFoo> getFoos() {
 		return this.foos;
@@ -71,7 +69,6 @@ public class Bar {
 	 * @return the id of the Bar
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Integer getId() {
 		return this.id;

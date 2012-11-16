@@ -36,7 +36,6 @@ public class ManualIdTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#persist(Object)} then {@link EntityManager#find(Class, Object)} with identity value
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testIdentiy() {

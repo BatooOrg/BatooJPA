@@ -70,7 +70,6 @@ public abstract class AbstractColumn {
 	 *            if the column is id column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AbstractColumn(AbstractLocator locator, boolean id) {
 		super();
@@ -101,7 +100,6 @@ public abstract class AbstractColumn {
 	 *            the locator
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public AbstractColumn(Class<?> javaType, IdType idType, TemporalType temporalType, EnumType enumType, boolean lob, AbstractLocator locator) {
@@ -150,7 +148,6 @@ public abstract class AbstractColumn {
 	 * @return the converted value
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Object convertValue(Connection connection, final Object value) {
 		if (value == null) {
@@ -246,7 +243,6 @@ public abstract class AbstractColumn {
 	 * @return the converted value
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected Object convertValueForSet(Object value) {
 		if (value == null) {
@@ -278,7 +274,6 @@ public abstract class AbstractColumn {
 	 * @return the static definition of the column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract String getColumnDefinition();
 
@@ -288,7 +283,6 @@ public abstract class AbstractColumn {
 	 * @return the idType of the column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public IdType getIdType() {
 		return this.idType;
@@ -300,7 +294,6 @@ public abstract class AbstractColumn {
 	 * @return the length of the column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract int getLength();
 
@@ -310,7 +303,6 @@ public abstract class AbstractColumn {
 	 * @return the locator of the column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public final AbstractLocator getLocator() {
 		return this.locator;
@@ -322,7 +314,6 @@ public abstract class AbstractColumn {
 	 * @return the mapping of the BasicColumn
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract Mapping<?, ?, ?> getMapping();
 
@@ -332,7 +323,6 @@ public abstract class AbstractColumn {
 	 * @return the name of the column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract String getName();
 
@@ -342,7 +332,6 @@ public abstract class AbstractColumn {
 	 * @return the precision of the column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract int getPrecision();
 
@@ -352,7 +341,6 @@ public abstract class AbstractColumn {
 	 * @return the scale of the column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract int getScale();
 
@@ -362,7 +350,6 @@ public abstract class AbstractColumn {
 	 * @return the SQL Type of the column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract int getSqlType();
 
@@ -372,7 +359,6 @@ public abstract class AbstractColumn {
 	 * @return the table
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract AbstractTable getTable();
 
@@ -382,7 +368,6 @@ public abstract class AbstractColumn {
 	 * @return the table name of the column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract String getTableName();
 
@@ -397,7 +382,6 @@ public abstract class AbstractColumn {
 	 * @return the value
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract Object getValue(Connection connection, Object instance);
 
@@ -407,7 +391,6 @@ public abstract class AbstractColumn {
 	 * @return the insertable of the column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract boolean isInsertable();
 
@@ -417,7 +400,6 @@ public abstract class AbstractColumn {
 	 * @return true if the column is lob type, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean isLob() {
 		return this.lob;
@@ -429,7 +411,6 @@ public abstract class AbstractColumn {
 	 * @return the nullable of the column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract boolean isNullable();
 
@@ -439,7 +420,6 @@ public abstract class AbstractColumn {
 	 * @return true if the column is a primary key column false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean isPrimaryKey() {
 		return this.idType != null;
@@ -451,7 +431,6 @@ public abstract class AbstractColumn {
 	 * @return the unique of the column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract boolean isUnique();
 
@@ -461,7 +440,6 @@ public abstract class AbstractColumn {
 	 * @return the updatable of the column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract boolean isUpdatable();
 
@@ -544,7 +522,6 @@ public abstract class AbstractColumn {
 	 * Sets the column as id column.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setId() {
 		this.idType = IdType.MANUAL;
@@ -557,7 +534,6 @@ public abstract class AbstractColumn {
 	 *            the owning table
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract void setTable(AbstractTable table);
 
@@ -570,7 +546,6 @@ public abstract class AbstractColumn {
 	 *            the value to set
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract void setValue(Object instance, Object value);
 

@@ -71,7 +71,6 @@ public class ElementColumn extends AbstractColumn {
 	 *            the column metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ElementColumn(JdbcAdaptor jdbcAdaptor, ElementCollectionMapping<?, ?, ?> mapping, CollectionTable table, String name, Class<?> javaType,
 		EnumType enumType, TemporalType temporalType, boolean lob, ColumnMetadata metadata) {

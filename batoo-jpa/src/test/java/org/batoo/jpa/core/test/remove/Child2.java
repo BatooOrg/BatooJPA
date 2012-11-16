@@ -43,7 +43,6 @@ public class Child2 {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Child2() {
 		super();
@@ -56,7 +55,6 @@ public class Child2 {
 	 *            the value
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Child2(Parent parent, String value) {
 		super();
@@ -73,7 +71,6 @@ public class Child2 {
 	 * @return the id of the Child1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Integer getId() {
 		return this.id;
@@ -85,7 +82,6 @@ public class Child2 {
 	 * @return the value of the Child1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getValue() {
 		return this.value;
@@ -98,7 +94,6 @@ public class Child2 {
 	 *            the value to set for Child1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setValue(String value) {
 		this.value = value;
@@ -110,7 +105,6 @@ public class Child2 {
 	 * @return the parent of the Child2
 	 *
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Parent getParent() {
 		return parent;
@@ -122,7 +116,6 @@ public class Child2 {
 	 * @param parent the parent to set for Child2
 	 *
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setParent(Parent parent) {
 		this.parent = parent;

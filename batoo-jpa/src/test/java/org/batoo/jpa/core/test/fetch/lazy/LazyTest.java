@@ -71,7 +71,6 @@ public class LazyTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Before
 	public void prepareCountries() {
@@ -102,7 +101,6 @@ public class LazyTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)} person.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFind() {
@@ -128,7 +126,6 @@ public class LazyTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#persist(Object)} load address then person as lazy.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFindAddress() {
@@ -146,7 +143,6 @@ public class LazyTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)} person.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFindInSession() {
@@ -174,7 +170,6 @@ public class LazyTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)} person with phones as lazy many type association.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFindMany() {
@@ -193,7 +188,6 @@ public class LazyTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)} person with lazy OneToMany association.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFindOneToMany() {
@@ -222,7 +216,6 @@ public class LazyTest extends BaseCoreTest {
 	 * @throws Exception
 	 *             in case of an error
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test(expected = PersistenceException.class)
 	public void testLazyCollection() throws Exception {
@@ -250,7 +243,6 @@ public class LazyTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#persist(Object)} address which does not cascade to Parent. PersistenceException expected.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test(expected = PersistenceException.class)
 	public void testPersistAddress() {
@@ -263,7 +255,6 @@ public class LazyTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#persist(Object)} Parent which cascades to Child1.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testPersistPerson() {
@@ -280,7 +271,6 @@ public class LazyTest extends BaseCoreTest {
 	 * @throws Exception
 	 *             in case of an error
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testSerializePerson() throws Exception {

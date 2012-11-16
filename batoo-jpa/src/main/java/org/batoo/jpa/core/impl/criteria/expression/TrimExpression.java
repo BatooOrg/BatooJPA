@@ -54,7 +54,6 @@ public class TrimExpression extends AbstractExpression<String> {
 	 *            the inner expression
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public TrimExpression(Trimspec trimspec, Expression<Character> trimChar, Expression<String> inner) {
 		super(String.class);

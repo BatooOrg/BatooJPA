@@ -47,7 +47,6 @@ public class CacheStats implements Serializable {
 	 *            the name of the stats
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	/* package */CacheStats(String name) {
 		super();
@@ -62,7 +61,6 @@ public class CacheStats implements Serializable {
 	 *            the primary key
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	/* package */void evict(Object primaryKey) {
 		this.evicts++;
@@ -76,7 +74,6 @@ public class CacheStats implements Serializable {
 	 * @return the number of evicts
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public int evicts() {
 		return this.evicts;
@@ -89,7 +86,6 @@ public class CacheStats implements Serializable {
 	 *            the primary key
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	/* package */void hit(Object primaryKey) {
 		this.hits++;
@@ -103,7 +99,6 @@ public class CacheStats implements Serializable {
 	 * @return the number of hits
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public int hits() {
 		return this.hits;
@@ -117,7 +112,6 @@ public class CacheStats implements Serializable {
 	 * 
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	/* package */void miss(Object primaryKey) {
 		this.misses++;
@@ -131,7 +125,6 @@ public class CacheStats implements Serializable {
 	 * @return the number of misses
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public int misses() {
 		return this.misses;
@@ -144,7 +137,6 @@ public class CacheStats implements Serializable {
 	 *            the primary key
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	/* package */void put(Object primaryKey) {
 		this.puts++;
@@ -158,7 +150,6 @@ public class CacheStats implements Serializable {
 	 * @return the number of puts
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public int puts() {
 		return this.puts;
@@ -172,7 +163,6 @@ public class CacheStats implements Serializable {
 	 * 
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	/* package */void qhit(String sql) {
 		this.qhits++;
@@ -186,7 +176,6 @@ public class CacheStats implements Serializable {
 	 * @return the number of query hits
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public int qhits() {
 		return this.qhits;
@@ -200,7 +189,6 @@ public class CacheStats implements Serializable {
 	 * 
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	/* package */void qmiss(String sql) {
 		this.qmisses++;
@@ -214,7 +202,6 @@ public class CacheStats implements Serializable {
 	 * @return the number of query misses
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public int qmisses() {
 		return this.qmisses;

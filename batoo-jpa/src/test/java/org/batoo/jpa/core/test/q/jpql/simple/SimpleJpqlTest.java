@@ -106,7 +106,6 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Before
 	public void prepareCountries() {
@@ -123,7 +122,6 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test(expected = PersistenceException.class)
 	public void testAliasNotBound() {
@@ -134,7 +132,6 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testArtimeticOperands() {
@@ -186,7 +183,6 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testAssociation() {
@@ -204,7 +200,6 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testAssociationJoin() {
@@ -229,7 +224,6 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testBooleanExpression() {
@@ -251,7 +245,6 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testComparisonOperands() {
@@ -297,7 +290,6 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testConstructor() {
@@ -318,7 +310,6 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testDateExpression() {
@@ -368,7 +359,6 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFunction() {
@@ -394,7 +384,6 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testIndex() {
@@ -414,7 +403,6 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testLike() {
@@ -440,7 +428,6 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testNamedQuery() {
@@ -454,7 +441,6 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testNumericFunctions() {
@@ -481,7 +467,6 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testOrderBy() {
@@ -505,7 +490,6 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testPagination() {
@@ -519,7 +503,6 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testQuery() {
@@ -535,7 +518,6 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testRootJoin() {
@@ -560,7 +542,6 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testSimple() {
@@ -586,7 +567,6 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testStringExpression() {

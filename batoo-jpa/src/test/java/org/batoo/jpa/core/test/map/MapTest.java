@@ -55,7 +55,6 @@ public class MapTest extends BaseCoreTest {
 	 * Tests Maps with id attributes.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testMap() {
@@ -75,7 +74,6 @@ public class MapTest extends BaseCoreTest {
 	 * Tests Maps with attributes.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testMap2() {
@@ -95,7 +93,6 @@ public class MapTest extends BaseCoreTest {
 	 * Tests Maps with attributes.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testMap3() {
@@ -115,7 +112,6 @@ public class MapTest extends BaseCoreTest {
 	 * Tests Maps with attributes.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testMap4() {
@@ -141,7 +137,6 @@ public class MapTest extends BaseCoreTest {
 	 * Tests Maps with attributes.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testMap5() {

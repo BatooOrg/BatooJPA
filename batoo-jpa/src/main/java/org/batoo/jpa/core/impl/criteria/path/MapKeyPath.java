@@ -61,7 +61,6 @@ public class MapKeyPath<Z, X> extends ParentPath<Z, X> {
 	 *            the java type of the key
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public MapKeyPath(MapJoinImpl<Z, X, ?> mapJoin, Class<X> javaType) {
 		super(mapJoin.getParent(), javaType);

@@ -50,7 +50,6 @@ public class Person {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Person() {
 		super();
@@ -65,7 +64,6 @@ public class Person {
 	 *            the address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Person(Integer id, String name, Address address) {
 		super();

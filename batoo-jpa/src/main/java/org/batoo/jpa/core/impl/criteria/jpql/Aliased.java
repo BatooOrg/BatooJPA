@@ -36,7 +36,6 @@ public class Aliased {
 	 *            aliased tree
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Aliased(Tree aliased) {
 		super();
@@ -57,7 +56,6 @@ public class Aliased {
 	 * @return the alias of the Aliased
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected String getAlias() {
 		return this.alias;
@@ -69,7 +67,6 @@ public class Aliased {
 	 * @return the qualified of the Aliased
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected Qualified getQualified() {
 		return this.qualified;

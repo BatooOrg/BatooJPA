@@ -51,7 +51,6 @@ public class NullIfExpression<T> extends AbstractExpression<T> {
 	 *            the expression
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public NullIfExpression(Expression<? extends T> x, Expression<?> y) {

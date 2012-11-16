@@ -69,7 +69,6 @@ public class CacheImpl implements Cache {
 	 * @param cacheMode
 	 *            the cache mode
 	 * @since $version
-	 * @author hceylan
 	 */
 	public CacheImpl(EntityManagerFactoryImpl emf, SharedCacheMode cacheMode) {
 		super();
@@ -142,7 +141,6 @@ public class CacheImpl implements Cache {
 	 * @return the cached instance or <code>null</code>
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public CacheInstance get(ManagedId<?> id) {
 		final Class<?> clazz = id.getType().getRootMapping().getJavaType();
@@ -170,7 +168,6 @@ public class CacheImpl implements Cache {
 	 * @return the cached instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public List<CacheReference[]> get(String sql, Object[] parameters) {
 		final ResultListReference reference = new ResultListReference(sql, parameters);
@@ -192,7 +189,6 @@ public class CacheImpl implements Cache {
 	 * @return the cache mode of the cache
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public SharedCacheMode getCacheMode() {
 		return this.cacheMode;
@@ -206,7 +202,6 @@ public class CacheImpl implements Cache {
 	 * @return the cache retrieve mode
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public CacheRetrieveMode getCacheRetrieveMode(EntityTypeImpl<?> type) {
 		if (!this.on) {
@@ -226,7 +221,6 @@ public class CacheImpl implements Cache {
 	 * @return the cache store mode
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public CacheStoreMode getCacheStoreMode(EntityTypeImpl<?> type) {
 		if (!this.on) {
@@ -265,7 +259,6 @@ public class CacheImpl implements Cache {
 	 * @return the global cache stats
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public CacheStats getStats() {
 		return this.stats;
@@ -279,7 +272,6 @@ public class CacheImpl implements Cache {
 	 * @return the stats
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public CacheStats getStats(Class<?> clazz) {
 		CacheStats cacheStats = this.statsDelegate.get(clazz);
@@ -303,7 +295,6 @@ public class CacheImpl implements Cache {
 	 * @return true if the cache is on, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean isOn() {
 		return this.on;
@@ -313,11 +304,9 @@ public class CacheImpl implements Cache {
 	 * @param clazz
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private void lockEntityMap(Class<?> clazz) {
 		// TODO Auto-generated method stub
-
 	}
 
 	/**
@@ -327,7 +316,6 @@ public class CacheImpl implements Cache {
 	 *            the instance to put
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void put(ManagedInstance<?> instance) {
 		final Class<?> clazz = instance.getType().getRootType().getJavaType();
@@ -358,7 +346,6 @@ public class CacheImpl implements Cache {
 	 *            the results
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void put(String sql, Object[] parameters, List<?> results) {
 		final MetamodelImpl metamodel = this.emf.getMetamodel();
@@ -400,7 +387,6 @@ public class CacheImpl implements Cache {
 	 *            the mode or null to set
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setCacheRetrieveMode(CacheRetrieveMode mode) {
 		if (!this.on) {
@@ -419,7 +405,6 @@ public class CacheImpl implements Cache {
 	 *            the mode or null to set
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setCacheStoreMode(CacheStoreMode mode) {
 		if (!this.on) {
@@ -435,7 +420,6 @@ public class CacheImpl implements Cache {
 	 * @param clazz
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private void unlockEntityMap(Class<?> clazz) {
 		// TODO Auto-generated method stub

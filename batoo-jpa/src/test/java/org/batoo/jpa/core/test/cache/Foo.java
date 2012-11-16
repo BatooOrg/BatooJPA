@@ -54,7 +54,6 @@ public class Foo {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Foo() {
 		super();
@@ -65,7 +64,6 @@ public class Foo {
 	 *            the value
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Foo(String value) {
 		super();
@@ -78,7 +76,6 @@ public class Foo {
 	 * @return the bars of the Foo
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public List<Bar> getBars() {
 		return this.bars;
@@ -90,7 +87,6 @@ public class Foo {
 	 * @return the bars2 of the Foo
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public List<Bar2> getBars2() {
 		return this.bars2;
@@ -102,7 +98,6 @@ public class Foo {
 	 * @return the id of the Foo1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Integer getId() {
 		return this.id;
@@ -114,7 +109,6 @@ public class Foo {
 	 * @return the value of the Foo1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getValue() {
 		return this.value;
@@ -127,7 +121,6 @@ public class Foo {
 	 *            the value to set for Foo1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setValue(String value) {
 		this.value = value;

@@ -56,7 +56,6 @@ public class Person implements Serializable {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Person() {
 		super();
@@ -67,7 +66,6 @@ public class Person implements Serializable {
 	 *            the name
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Person(String name) {
 		super();

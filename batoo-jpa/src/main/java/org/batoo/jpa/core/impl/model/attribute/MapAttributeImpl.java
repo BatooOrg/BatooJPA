@@ -61,7 +61,6 @@ public class MapAttributeImpl<X, K, V> extends PluralAttributeImpl<X, Map<K, V>,
 	 * @param attributeType
 	 *            attribute type
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public MapAttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata, PersistentAttributeType attributeType) {

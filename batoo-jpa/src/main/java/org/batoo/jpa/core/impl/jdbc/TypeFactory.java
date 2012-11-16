@@ -48,7 +48,6 @@ public class TypeFactory {
 	 * @return the corresponding SQL Type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public static int getSqlType(Class<?> javaType, TemporalType temporal, EnumType enumType, boolean isLob) {
 		if (isLob) {

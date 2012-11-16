@@ -66,7 +66,6 @@ public class ElementCollectionCriteriaTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testCollection() {
@@ -95,7 +94,6 @@ public class ElementCollectionCriteriaTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	@SuppressWarnings("rawtypes")
@@ -129,7 +127,6 @@ public class ElementCollectionCriteriaTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testMapKey() {
@@ -156,7 +153,6 @@ public class ElementCollectionCriteriaTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testMapValues() {

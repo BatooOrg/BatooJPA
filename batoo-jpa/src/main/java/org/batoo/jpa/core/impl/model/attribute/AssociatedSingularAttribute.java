@@ -58,7 +58,6 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 	 *            the type of the attribute
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AssociatedSingularAttribute(ManagedTypeImpl<X> declaringType, PersistentAttributeType attributeType, AssociationAttributeMetadata metadata) {
 		super(declaringType, metadata);
@@ -85,7 +84,6 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 	 * @return the mapsId of the AssociatedSingularAttribute
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getMapsId() {
 		return this.mapsId;
@@ -146,7 +144,6 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 	 * @return true if the association is joined.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean isJoined() {
 		return this.joined;
@@ -167,7 +164,6 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 	 * @return true if the attribute is the owner, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean isOwner() {
 		return this.owner;

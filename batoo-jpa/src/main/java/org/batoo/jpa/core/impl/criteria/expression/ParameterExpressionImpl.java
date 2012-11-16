@@ -56,7 +56,6 @@ public class ParameterExpressionImpl<T> extends AbstractParameterExpressionImpl<
 	 *            the ordinal position of the parameter
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ParameterExpressionImpl(BaseQueryImpl<?> q, TypeImpl<T> type, Class<T> paramClass, int position) {
 		super(type, paramClass);
@@ -76,7 +75,6 @@ public class ParameterExpressionImpl<T> extends AbstractParameterExpressionImpl<
 	 *            the name of the parameter
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ParameterExpressionImpl(TypeImpl<T> type, Class<T> paramClass, String name) {
 		super(type, paramClass);

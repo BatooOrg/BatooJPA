@@ -42,7 +42,6 @@ public class NullExpression<T> extends AbstractExpression<T> {
 	 *            the class type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public NullExpression(Class<T> clazz) {
 		super(clazz);

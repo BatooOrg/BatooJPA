@@ -64,7 +64,6 @@ public abstract class BaseEntity {
 	 * @return the createdOn of the BaseEntity
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Date getCreatedOn() {
 		return this.createdOn;
@@ -74,7 +73,6 @@ public abstract class BaseEntity {
 	 * @return the display text
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Transient
 	@Access(AccessType.PROPERTY)
@@ -86,7 +84,6 @@ public abstract class BaseEntity {
 	 * @return the id of the BaseEntity
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Long getId() {
 		return this.id;
@@ -98,7 +95,6 @@ public abstract class BaseEntity {
 	 * @return the modifiedOn of the BaseEntity
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Date getModifiedOn() {
 		return this.modifiedOn;
@@ -120,7 +116,6 @@ public abstract class BaseEntity {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@PrePersist
 	public void initTimeStamps() {
@@ -138,7 +133,6 @@ public abstract class BaseEntity {
 	 *            the createdOn to set for BaseEntity
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setCreatedOn(Date createdOn) {
 		this.createdOn = createdOn;
@@ -151,7 +145,6 @@ public abstract class BaseEntity {
 	 *            the id to set for BaseEntity
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setId(Long id) {
 		this.id = id;
@@ -164,7 +157,6 @@ public abstract class BaseEntity {
 	 *            the modifiedOn to set for BaseEntity
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setModifiedOn(Date modifiedOn) {
 		this.modifiedOn = modifiedOn;

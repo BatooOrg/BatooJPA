@@ -114,7 +114,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 *            the entity
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public FetchParentImpl(EntityTypeImpl<X> entity) {
 		super();
@@ -128,7 +127,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 *            the mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public FetchParentImpl(JoinedMapping<? super Z, ?, X> mapping) {
 		super();
@@ -222,7 +220,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @return the restriction based on discrimination, <code>null</code>
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String generateDiscrimination(boolean noQualification) {
 		if ((this.entity.getRootType().getInheritanceType() == null) || (this.entity == this.entity.getRootType())) {
@@ -281,7 +278,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 *            the list of self joins
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void generateSqlJoins(AbstractCriteriaQueryImpl<?> query, final List<String> selfJoins) {
 		for (final Entry<SecondaryTable, String> e : this.tableAliases.entrySet()) {
@@ -303,7 +299,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 *            recurse to fetch children
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void generateSqlJoins(AbstractCriteriaQueryImpl<?> query, Map<Joinable, String> joins, boolean recurse) {
 		final List<String> selfJoins = Lists.newArrayList();
@@ -341,7 +336,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @return the generated SQL fragment
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected, boolean root) {
 		return this.generateSqlSelect(query, selected, root, MapSelectType.VALUE);
@@ -361,7 +355,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @return the generated SQL fragment
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected, boolean root, MapSelectType selectType) {
 		final List<String> selects = Lists.newArrayList();
@@ -529,7 +522,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @return the alias of the fetch
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private String getAlias(BaseQueryImpl<?> query) {
 		if (this.alias == null) {
@@ -601,7 +593,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 *             thrown in case of an underlying SQL Error
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	private <Y extends X> ManagedInstance<Y> getInstance(SessionImpl session, ResultSet row) throws SQLException {
@@ -664,7 +655,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @return the mapping of the fetch or <code>null</code> if the fetch is root
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public JoinedMapping<? super Z, ?, X> getMapping() {
 		return null;
@@ -694,7 +684,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @return the alias of the primary table
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getPrimaryTableAlias(BaseQueryImpl<?> query) {
 		if (this.primaryTableAlias == null) {
@@ -714,7 +703,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @return the SQL restriction in pairs of table alias and column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query, MapSelectType selectType) {
 		final List<String> restrictions = Lists.newArrayList();
@@ -745,7 +733,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @return the alias for the table
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Override
 	public String getTableAlias(BaseQueryImpl<?> query, AbstractTable table) {
@@ -774,7 +761,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 *             thrown in case of an underlying SQL Error
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public X handle(SessionImpl session, ResultSet row) throws SQLException {
@@ -795,7 +781,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 *             thrown in case of an underlying SQL Error
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EntryImpl<Object, ManagedInstance<?>> handle(SessionImpl session, ResultSet row, MapSelectType selectType) throws SQLException {
 		return this.handleFetch(session, row, selectType);
@@ -866,7 +851,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 *             thrown in case of an underlying SQL Error
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EntryImpl<Object, X> handleElementFetch(ResultSet row) throws SQLException {
 		return this.handleElementFetch(row, MapSelectType.VALUE);
@@ -884,7 +868,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 *             thrown in case of an underlying SQL Error
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EntryImpl<Object, X> handleElementFetch(ResultSet row, MapSelectType selectType) throws SQLException {
 		if ((selectType == MapSelectType.VALUE) || !this.mapping.isMap()) {
@@ -920,7 +903,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 *             thrown in case of an underlying SQL Error
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EntryImpl<Object, ManagedInstance<?>> handleFetch(SessionImpl session, ResultSet row, MapSelectType selectType) throws SQLException {
 		// if instance is null then break
@@ -977,7 +959,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @return true if the join should be ignored, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private boolean ignoreJoin(SingularAssociationMapping<?, ?> mapping) {
 		// if we are joined on this mapping then ignore
@@ -1038,7 +1019,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @return the fetch for the join
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public <Y> FetchImpl<X, Y> join(String attributeName, JoinType jt) {

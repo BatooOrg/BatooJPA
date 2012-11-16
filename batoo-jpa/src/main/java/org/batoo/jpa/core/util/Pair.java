@@ -45,7 +45,6 @@ public class Pair<F, S> {
 	 * @return the pair created
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public static <F, S> Pair<F, S> create(F first, S second) {
 		return new Pair<F, S>(first, second);
@@ -62,7 +61,6 @@ public class Pair<F, S> {
 	 *            the second
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Pair(F first, S second) {
 		super();

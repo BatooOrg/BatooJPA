@@ -42,7 +42,6 @@ public class ManageTest extends BaseCoreTest {
 	 * Tests that a basic type changed
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testAdditionsCommitted() {
@@ -68,7 +67,6 @@ public class ManageTest extends BaseCoreTest {
 	 * Tests that a basic type changed
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testAssociationsCommitted() {
@@ -103,7 +101,6 @@ public class ManageTest extends BaseCoreTest {
 	 * Tests that a basic type changed
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testLazyInitialize() {

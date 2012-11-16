@@ -39,7 +39,6 @@ public class Address {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Address() {
 		super();
@@ -52,7 +51,6 @@ public class Address {
 	 *            the city
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Address(Person person, String city) {
 		super();
@@ -102,7 +100,6 @@ public class Address {
 	 *            the id to set for Address
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setId(Integer id) {
 		this.id = id;

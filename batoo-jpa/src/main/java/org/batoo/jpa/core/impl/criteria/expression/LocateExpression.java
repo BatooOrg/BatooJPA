@@ -51,7 +51,6 @@ public class LocateExpression extends AbstractExpression<Integer> {
 	 *            the start index
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public LocateExpression(Expression<String> find, Expression<String> in, Expression<Integer> start) {
 		super(Integer.class);

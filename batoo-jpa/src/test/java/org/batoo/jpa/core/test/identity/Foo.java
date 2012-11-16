@@ -58,7 +58,6 @@ public class Foo {
 	 * @return the other of the Foo1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Foo getOther() {
 		return this.other;
@@ -81,7 +80,6 @@ public class Foo {
 	 *            the other to set for Foo1
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setOther(Foo other) {
 		this.other = other;

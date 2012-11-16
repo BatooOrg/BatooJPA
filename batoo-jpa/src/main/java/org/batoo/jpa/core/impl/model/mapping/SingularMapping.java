@@ -49,7 +49,6 @@ public interface SingularMapping<Z, X> {
 	 * @return false if all OK, true if if at least one entity needs to obtain identity from the database
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	boolean fillValue(EntityTypeImpl<?> type, ManagedInstance<?> managedInstance, Object instance);
 
@@ -61,7 +60,6 @@ public interface SingularMapping<Z, X> {
 	 * @return the mapping value of instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	X get(Object instance);
 
@@ -71,7 +69,6 @@ public interface SingularMapping<Z, X> {
 	 * @return the attribute of the mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	SingularAttributeImpl<? super Z, X> getAttribute();
 
@@ -84,7 +81,6 @@ public interface SingularMapping<Z, X> {
 	 *            the value to set
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	void set(Object instance, Object value);
 }

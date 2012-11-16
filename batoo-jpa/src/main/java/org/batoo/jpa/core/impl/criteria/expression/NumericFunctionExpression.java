@@ -55,7 +55,6 @@ public class NumericFunctionExpression<N extends Number> extends AbstractExpress
 	 *            the optional second parameter
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public NumericFunctionExpression(NumericFunctionType type, Expression<?> x, Expression<Integer> y) {

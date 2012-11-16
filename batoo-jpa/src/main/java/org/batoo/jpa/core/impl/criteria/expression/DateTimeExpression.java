@@ -50,7 +50,6 @@ public class DateTimeExpression extends AbstractExpression<Integer> {
 	 *            the first parameter
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public DateTimeExpression(DateTimeFunctionType type, Expression<?> x) {
 		super(Integer.class);

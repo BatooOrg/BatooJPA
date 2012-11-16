@@ -88,7 +88,6 @@ public class ComparisonExpression extends AbstractExpression<Boolean> {
 	 *            the right side expression
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ComparisonExpression(Comparison comparison, Expression<?> x, Expression<?> y) {
 		this(comparison, x, y, null);
@@ -105,7 +104,6 @@ public class ComparisonExpression extends AbstractExpression<Boolean> {
 	 *            the second right side expression
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ComparisonExpression(Comparison comparison, Expression<?> x, Expression<?> y, Expression<?> z) {
 		super(Boolean.class);

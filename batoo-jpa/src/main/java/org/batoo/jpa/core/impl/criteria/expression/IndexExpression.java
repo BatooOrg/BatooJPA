@@ -49,7 +49,6 @@ public class IndexExpression extends AbstractExpression<Integer> {
 	 *            the order column
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public IndexExpression(ListJoinImpl<?, ?> listJoin, OrderColumn orderColumn) {
 		super(Integer.class);

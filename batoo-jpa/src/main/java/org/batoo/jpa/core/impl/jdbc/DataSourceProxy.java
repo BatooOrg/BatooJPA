@@ -52,7 +52,6 @@ public class DataSourceProxy implements DataSource {
 	 *            the size of the jdbc fetch
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public DataSourceProxy(DataSource datasource, SqlLoggingType sqlLogging, long slowSqlThreshold, int jdbcFetchSize) {
 		super();
@@ -96,7 +95,6 @@ public class DataSourceProxy implements DataSource {
 	 * @return the delegate datasource
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public DataSource getDelegate() {
 		return this.datasource;

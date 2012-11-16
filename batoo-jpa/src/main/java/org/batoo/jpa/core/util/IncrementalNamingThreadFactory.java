@@ -37,7 +37,6 @@ public class IncrementalNamingThreadFactory implements ThreadFactory {
 	 *            the common name for the threads
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public IncrementalNamingThreadFactory(String name) {
 		super();

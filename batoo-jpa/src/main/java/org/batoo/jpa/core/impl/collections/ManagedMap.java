@@ -61,7 +61,6 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ManagedMap() {
 		super();
@@ -78,7 +77,6 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	 *            if the collection is lazy
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ManagedMap(PluralMapping<?, ?, V> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
 		super(mapping, managedInstance);
@@ -99,7 +97,6 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 	 *            the initial values
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ManagedMap(PluralMapping<?, ?, V> mapping, ManagedInstance<?> managedInstance, Map<? extends K, ? extends V> values) {
 		this(mapping, managedInstance, false);

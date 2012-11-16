@@ -64,7 +64,6 @@ public class RefreshTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Before
 	public void prepareCountries() {
@@ -77,7 +76,6 @@ public class RefreshTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)} person.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testRefresh() {

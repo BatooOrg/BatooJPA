@@ -51,7 +51,6 @@ public abstract class AbstractParameterExpressionImpl<T> extends AbstractExpress
 	 *            the class of the parameter
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AbstractParameterExpressionImpl(TypeImpl<T> type, Class<T> paramClass) {
 		super(paramClass);
@@ -66,7 +65,6 @@ public abstract class AbstractParameterExpressionImpl<T> extends AbstractExpress
 	 *            the query
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected abstract void ensureAlias(BaseQueryImpl<?> query);
 
@@ -77,7 +75,6 @@ public abstract class AbstractParameterExpressionImpl<T> extends AbstractExpress
 	 *            the metamodel
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void ensureTypeResolved(MetamodelImpl metamodel) {
 		if (this.type == null) {
@@ -113,7 +110,6 @@ public abstract class AbstractParameterExpressionImpl<T> extends AbstractExpress
 	 * @return the number of SQL parameters when expanded
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public int getExpandedCount(MetamodelImpl metamodelImpl) {
 		if (this.getJavaType() == Class.class) {
@@ -202,7 +198,6 @@ public abstract class AbstractParameterExpressionImpl<T> extends AbstractExpress
 	 *            the value to set to the parameter
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void setParameter(MetamodelImpl metamodel, Connection connection, Object[] parameters, MutableInt sqlIndex, Object value) {
 		// type parameter

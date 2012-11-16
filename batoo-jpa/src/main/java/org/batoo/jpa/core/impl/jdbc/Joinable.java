@@ -39,7 +39,6 @@ public class Joinable {
 	 *            the index
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Joinable(Object key, Object value, int index) {
 		super();
@@ -55,7 +54,6 @@ public class Joinable {
 	 * @return the index of the Joinable
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public int getIndex() {
 		return this.index;
@@ -67,7 +65,6 @@ public class Joinable {
 	 * @return the key of the Joinable
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Object getKey() {
 		return this.key;
@@ -79,7 +76,6 @@ public class Joinable {
 	 * @return the value of the Joinable
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Object getValue() {
 		return this.value;

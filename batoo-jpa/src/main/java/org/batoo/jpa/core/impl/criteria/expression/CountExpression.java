@@ -49,7 +49,6 @@ public class CountExpression extends AbstractExpression<Long> {
 	 *            if the count is distinct
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public CountExpression(Expression<?> inner, boolean distinct) {
 		super(Long.class);

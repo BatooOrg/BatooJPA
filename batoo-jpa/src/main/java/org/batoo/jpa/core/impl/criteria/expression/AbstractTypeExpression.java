@@ -45,7 +45,6 @@ public abstract class AbstractTypeExpression<T> extends AbstractExpression<Class
 	 *            the path
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public AbstractTypeExpression(AbstractPath<T> path) {
@@ -101,7 +100,6 @@ public abstract class AbstractTypeExpression<T> extends AbstractExpression<Class
 	 * @return the path of the type expression
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AbstractPath<?> getPath() {
 		return this.path;
@@ -116,7 +114,6 @@ public abstract class AbstractTypeExpression<T> extends AbstractExpression<Class
 	 * @throws SQLException
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected Object handle(ResultSet row) throws SQLException {
 		return row.getObject(this.alias);

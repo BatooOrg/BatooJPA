@@ -57,7 +57,6 @@ public class Dependent {
 	 *            the employee
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Dependent(DependentId id, Employee emp) {
 		super();

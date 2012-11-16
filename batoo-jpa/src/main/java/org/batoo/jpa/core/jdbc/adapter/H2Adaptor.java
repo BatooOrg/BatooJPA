@@ -49,7 +49,6 @@ public class H2Adaptor extends JdbcAdaptor {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public H2Adaptor() {
 		super();

@@ -112,7 +112,6 @@ public class ManagedInstance<X> {
 	 *            the instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ManagedInstance(EntityTypeImpl<X> type, SessionImpl session, X instance) {
 		super();
@@ -139,7 +138,6 @@ public class ManagedInstance<X> {
 	 *            the id of the instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ManagedInstance(EntityTypeImpl<X> type, SessionImpl session, X instance, ManagedId<? super X> id) {
 		this(type, session, instance);
@@ -156,7 +154,6 @@ public class ManagedInstance<X> {
 	 *            the entity manager
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void cascadeDetach(EntityManagerImpl entityManager) {
 		this.status = Status.DETACHED;
@@ -210,7 +207,6 @@ public class ManagedInstance<X> {
 	 * @return true if an implicit flush is required, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean cascadePersist(EntityManagerImpl entityManager, ArrayList<Object> processed) {
 		ManagedInstance.LOG.debug("Cascading persist on {0}", this);
@@ -283,7 +279,6 @@ public class ManagedInstance<X> {
 	 *            the entity manager
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void cascadeRemove(EntityManagerImpl entityManager) {
 		ManagedInstance.LOG.debug("Cascading remove on {0}", this);
@@ -331,7 +326,6 @@ public class ManagedInstance<X> {
 	 * Marks the instance as may have changed.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void changed() {
 		if (!this.changed && (this.collectionsChanged.size() == 0)) {
@@ -349,7 +343,6 @@ public class ManagedInstance<X> {
 	 * Checks that no association of the instance is transient
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void checkTransients() {
 		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsNotPersistable()) {
@@ -363,7 +356,6 @@ public class ManagedInstance<X> {
 	 * Only meaningful for external entities as their instances' are not enhanced.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void checkUpdated() {
 		// no snapshot, nothing to check
@@ -408,7 +400,6 @@ public class ManagedInstance<X> {
 	 *             thrown in case of an SQL error
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void checkVersion(Connection connection) throws SQLException {
 		// no optimistic lock, nothing to check
@@ -436,7 +427,6 @@ public class ManagedInstance<X> {
 	 * Enhances the collections of the managed instance.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void enhanceCollections() {
 		for (final PluralMapping<?, ?, ?> collection : this.type.getMappingsPlural()) {
@@ -470,7 +460,6 @@ public class ManagedInstance<X> {
 	 * @return false if all OK, true if if at least one entity needs to obtain identity from the database
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean fillIdValues() {
 		ManagedInstance.LOG.debug("Auto generating id values for {0}", this);
@@ -502,7 +491,6 @@ public class ManagedInstance<X> {
 	 *            the type of the callbacks
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void fireCallbacks(EntityListenerType type) {
 		EntityListenerType typeToFire = type;
@@ -531,7 +519,6 @@ public class ManagedInstance<X> {
 	 *             thrown if there is an underlying SQL Exception
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void flushAssociations(Connection connection, boolean removals, boolean force) throws SQLException {
 		if (!removals || (this.status != Status.NEW)) {
@@ -549,7 +536,6 @@ public class ManagedInstance<X> {
 	 * @return the id of the instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ManagedId<? super X> getId() {
 		if (this.id != null) {
@@ -575,7 +561,6 @@ public class ManagedInstance<X> {
 	 * @return the lock mode
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public LockModeType getLockMode() {
 		return this.lockMode;
@@ -618,7 +603,6 @@ public class ManagedInstance<X> {
 	 *            the entity manager
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void handleAdditions(EntityManagerImpl entityManager) {
 		ManagedInstance.LOG.debug("Inspecting additions for instance {0}", this);
@@ -639,7 +623,6 @@ public class ManagedInstance<X> {
 	 *            the entity manager
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void handleOrphans(EntityManagerImpl entityManager) {
 		ManagedInstance.LOG.debug("Inspecting orphans for instance {0}", this);
@@ -678,7 +661,6 @@ public class ManagedInstance<X> {
 	 * @return true if the instance has initial id, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean hasInitialId() {
 		return this.hasInitialId;
@@ -690,7 +672,6 @@ public class ManagedInstance<X> {
 	 * @return true if the instance has self update, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean hasSelfUpdate() {
 		if (!this.changed && (this.snapshot.size() == 0)) {
@@ -715,7 +696,6 @@ public class ManagedInstance<X> {
 	 *             thrown in case of an underlying SQL error
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void incrementVersion(Connection connection, boolean commit) throws SQLException {
 		if (!this.type.getRootType().hasVersionAttribute()) {
@@ -800,7 +780,6 @@ public class ManagedInstance<X> {
 	 * @return true if join is loaded, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean isJoinLoaded(String attributeName) {
 		final Mapping<?, ?, ?> mapping = this.type.getRootMapping().getMapping(attributeName);
@@ -822,7 +801,6 @@ public class ManagedInstance<X> {
 	 * @return true if the instance is loading, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean isLoading() {
 		return this.loading;
@@ -834,7 +812,6 @@ public class ManagedInstance<X> {
 	 * @return true if the instance is loading from the cache, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean isLoadingFromCache() {
 		return this.loadingFromCache;
@@ -846,7 +823,6 @@ public class ManagedInstance<X> {
 	 * @return true if the instance is refreshing, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean isRefreshing() {
 		return this.refreshing;
@@ -865,7 +841,6 @@ public class ManagedInstance<X> {
 	 *            registry of processed entities
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void mergeWith(EntityManagerImpl entityManager, X entity, MutableBoolean requiresFlush, IdentityHashMap<Object, Object> processed) {
 		this.snapshot();
@@ -885,7 +860,6 @@ public class ManagedInstance<X> {
 	 * Processes the associations.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void processJoinedMappings() {
 		ManagedInstance.LOG.debug("Post processing associations for instance {0}", this);
@@ -939,7 +913,6 @@ public class ManagedInstance<X> {
 	 *            the set of processed instances
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void refresh(EntityManagerImpl entityManager, Connection connection, LockModeType lockMode, Set<Object> processed) {
 		ManagedInstance.LOG.debug("Refeshing instance {0}", this);
@@ -955,7 +928,6 @@ public class ManagedInstance<X> {
 	 * Resets the change status of the instance.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void reset() {
 		ManagedInstance.LOG.trace("Reset instance {0}", this);
@@ -975,7 +947,6 @@ public class ManagedInstance<X> {
 	 *            the cache instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setCache(CacheInstance cacheInstance) {
 		this.cacheInstance = cacheInstance;
@@ -991,7 +962,6 @@ public class ManagedInstance<X> {
 	 *            the association that has changed
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setChanged(PluralMapping<?, ?, ?> association) {
 		if ((this.collectionsChanged.size() == 0) && !this.changed) {
@@ -1008,7 +978,6 @@ public class ManagedInstance<X> {
 	 *            the association
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setJoinLoaded(JoinedMapping<?, ?, ?> mapping) {
 		this.joinsLoaded.add(mapping.getPath());
@@ -1021,7 +990,6 @@ public class ManagedInstance<X> {
 	 *            loading to set
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setLoading(boolean loading) {
 		this.loading = loading;
@@ -1034,7 +1002,6 @@ public class ManagedInstance<X> {
 	 *            loading to set
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setLoadingFromCache(boolean loadingFromCache) {
 		this.loadingFromCache = loadingFromCache;
@@ -1044,7 +1011,6 @@ public class ManagedInstance<X> {
 	 * Sets the optimistic lock on
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setOptimisticLock() {
 		ManagedInstance.LOG.debug("Optimistic lock enabled for instance {0}", this);
@@ -1059,7 +1025,6 @@ public class ManagedInstance<X> {
 	 *            refreshing to set
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setRefreshing(boolean refreshing) {
 		this.refreshing = refreshing;
@@ -1086,7 +1051,6 @@ public class ManagedInstance<X> {
 	 * Creates a snapshot of the entity.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private void snapshot() {
 		ManagedInstance.LOG.trace("Snapshot generated for instance {0}", this);
@@ -1102,7 +1066,6 @@ public class ManagedInstance<X> {
 	 * Sorts the list associations.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void sortLists() {
 		for (final PluralMapping<?, ?, ?> mapping : this.type.getMappingsPluralSorted()) {
@@ -1130,7 +1093,6 @@ public class ManagedInstance<X> {
 	 * @return true if the collection was found in the cache, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public boolean tryLoadFromCache(PluralAssociationMapping<?, ?, ?> mapping) {
@@ -1153,7 +1115,6 @@ public class ManagedInstance<X> {
 	 *            the mapping to update
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void updateCollectionCache(PluralMapping<?, ?, ?> mapping) {
 		if (this.cacheInstance != null) {

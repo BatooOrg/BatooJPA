@@ -52,7 +52,6 @@ public final class DeploymentUnitTask implements Callable<Void>, Comparable<Depl
 	 *            the type of this task
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public DeploymentUnitTask(@SuppressWarnings("rawtypes") DeploymentManager manager, Object unit) {
 		super();

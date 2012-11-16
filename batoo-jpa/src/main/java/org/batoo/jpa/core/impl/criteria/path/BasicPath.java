@@ -56,7 +56,6 @@ public class BasicPath<X> extends AbstractPath<X> {
 	 *            the physical mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public BasicPath(ParentPath<?, ?> parent, BasicMapping<?, X> mapping) {
 		super(parent, mapping.getJavaType());

@@ -34,7 +34,6 @@ public class CaseJpqlTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testCase1() {
@@ -65,7 +64,6 @@ public class CaseJpqlTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testCase2() {
@@ -84,7 +82,6 @@ public class CaseJpqlTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testNullif() {

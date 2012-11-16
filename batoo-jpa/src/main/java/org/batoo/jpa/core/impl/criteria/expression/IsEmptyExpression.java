@@ -50,7 +50,6 @@ public class IsEmptyExpression extends AbstractExpression<Boolean> {
 	 *            if not empty
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public IsEmptyExpression(Expression<?> inner, boolean not) {
 		super(Boolean.class);

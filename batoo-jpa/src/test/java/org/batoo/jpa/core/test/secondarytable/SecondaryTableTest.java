@@ -58,7 +58,6 @@ public class SecondaryTableTest extends BaseCoreTest {
 	 *             thrown if underlying SQL fails
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testCreateTable() throws SQLException {
@@ -79,7 +78,6 @@ public class SecondaryTableTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)}
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFind() {
@@ -104,7 +102,6 @@ public class SecondaryTableTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)} with {@link SecondaryTables}
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFind2() {
@@ -129,7 +126,6 @@ public class SecondaryTableTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)} with one-many-one.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFindOneToManyToOne() {
@@ -154,7 +150,6 @@ public class SecondaryTableTest extends BaseCoreTest {
 	 *             thrown if underlying SQL fails
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testPersist() throws SQLException {
@@ -177,7 +172,6 @@ public class SecondaryTableTest extends BaseCoreTest {
 	 *             thrown if underlying SQL fails
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testPersistOneToManyToOne() throws SQLException {

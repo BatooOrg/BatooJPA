@@ -53,7 +53,6 @@ public class ListJoinImpl<Z, E> extends AbstractPluralJoin<Z, List<E>, E> implem
 	 *            the join type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ListJoinImpl(AbstractFrom<?, Z> parent, PluralMapping<? super Z, List<E>, E> mapping, JoinType jointType) {
 		super(parent, mapping, jointType);

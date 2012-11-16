@@ -45,7 +45,6 @@ public class EntityTransactionImpl implements EntityTransaction {
 	 *            the active connection
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EntityTransactionImpl(EntityManagerImpl entityManager, Connection connection) {
 		super();
@@ -58,7 +57,6 @@ public class EntityTransactionImpl implements EntityTransaction {
 	 * 
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private void assertValid() {
 		if (this.rollbackOnly) {

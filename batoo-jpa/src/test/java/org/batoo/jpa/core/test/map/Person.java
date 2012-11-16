@@ -59,7 +59,6 @@ public class Person {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Person() {
 		super();
@@ -70,7 +69,6 @@ public class Person {
 	 *            the name
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Person(String name) {
 		super();
@@ -84,7 +82,6 @@ public class Person {
 	 * @return the addresses1 of the Person
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Map<Integer, Address> getAddresses1() {
 		return this.addresses1;
@@ -96,7 +93,6 @@ public class Person {
 	 * @return the addresses2 of the Person
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected Map<String, Address> getAddresses2() {
 		return this.addresses2;
@@ -128,7 +124,6 @@ public class Person {
 	 * @return the phones of the Person
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected Map<PhoneId, Phone> getPhones() {
 		return this.phones;

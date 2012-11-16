@@ -52,7 +52,6 @@ public class EntityConstantExpression<T> extends AbstractParameterExpressionImpl
 	 *            the value
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public EntityConstantExpression(TypeImpl<T> type, T value) {
@@ -120,7 +119,6 @@ public class EntityConstantExpression<T> extends AbstractParameterExpressionImpl
 	 *            the index corresponding to expanded SQL parameter
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setParameter(MetamodelImpl metamodel, Connection connection, Object[] parameters, MutableInt sqlIndex) {
 		super.setParameter(metamodel, connection, parameters, sqlIndex, this.value);

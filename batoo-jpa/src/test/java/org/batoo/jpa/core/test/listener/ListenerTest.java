@@ -33,7 +33,6 @@ public class ListenerTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testListener() {
@@ -61,7 +60,6 @@ public class ListenerTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testListener2() {
@@ -89,7 +87,6 @@ public class ListenerTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testListener3() {

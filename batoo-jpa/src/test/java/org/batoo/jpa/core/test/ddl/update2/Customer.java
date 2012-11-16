@@ -51,7 +51,6 @@ public class Customer {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Customer() {
 		super();
@@ -63,7 +62,6 @@ public class Customer {
 	 * @return the addresses of the Customer
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public List<Address> getAddresses() {
 		return this.addresses;
@@ -75,7 +73,6 @@ public class Customer {
 	 * @return the id of the Customer
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Integer getId() {
 		return this.id;
@@ -87,7 +84,6 @@ public class Customer {
 	 * @return the name of the Customer
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getName() {
 		return this.name;
@@ -99,7 +95,6 @@ public class Customer {
 	 * @return the surname of the Customer
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getSurname() {
 		return this.surname;
@@ -111,7 +106,6 @@ public class Customer {
 	 * @return the title of the Customer
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getTitle() {
 		return this.title;
@@ -124,7 +118,6 @@ public class Customer {
 	 *            the name to set for Customer
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -137,7 +130,6 @@ public class Customer {
 	 *            the surname to set for Customer
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setSurname(String surname) {
 		this.surname = surname;
@@ -150,7 +142,6 @@ public class Customer {
 	 *            the title to set for Customer
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setTitle(String title) {
 		this.title = title;

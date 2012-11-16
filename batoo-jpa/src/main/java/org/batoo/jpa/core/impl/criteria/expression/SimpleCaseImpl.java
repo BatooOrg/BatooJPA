@@ -59,7 +59,6 @@ public class SimpleCaseImpl<C, R> extends AbstractExpression<R> implements Simpl
 	 *            the inner expression
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public SimpleCaseImpl(Expression<? extends C> inner) {
@@ -196,7 +195,6 @@ public class SimpleCaseImpl<C, R> extends AbstractExpression<R> implements Simpl
 	 * @return simple case expression
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public SimpleCaseImpl<C, R> when(AbstractExpression<C> condition, AbstractExpression<R> result) {
 		this.conditions.add(new Pair<Expression<C>, Expression<? extends R>>(condition, result));

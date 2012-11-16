@@ -44,7 +44,6 @@ public class ExistsExpression extends AbstractExpression<Boolean> {
 	 *            the sub query
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ExistsExpression(Subquery<?> subquery) {
 		super(Boolean.class);

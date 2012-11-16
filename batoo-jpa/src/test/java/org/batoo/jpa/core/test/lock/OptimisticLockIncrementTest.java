@@ -47,7 +47,6 @@ public class OptimisticLockIncrementTest extends BaseCoreTest {
 	 * Tests the optimistic lock.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test(expected = PersistenceException.class)
 	public void testOptimisticLockRemove() {
@@ -78,7 +77,6 @@ public class OptimisticLockIncrementTest extends BaseCoreTest {
 	 * Tests the optimistic lock.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test(expected = PersistenceException.class)
 	public void testOptimisticLockUpdate() {
@@ -109,7 +107,6 @@ public class OptimisticLockIncrementTest extends BaseCoreTest {
 	 * Tests the optimistic lock.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test(expected = PersistenceException.class)
 	public void testOptimisticLockUpdateChild() {
@@ -140,7 +137,6 @@ public class OptimisticLockIncrementTest extends BaseCoreTest {
 	 * Tests the optimistic lock.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test(expected = PersistenceException.class)
 	public void testOptimisticLockUpdateChildren() {

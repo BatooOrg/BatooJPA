@@ -110,7 +110,6 @@ public class EntityManagerImpl implements EntityManager {
 	 *            the JDBC adaptor
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public EntityManagerImpl(EntityManagerFactoryImpl entityManagerFactory, MetamodelImpl metamodel, DataSource datasource, Map<String, Object> properties,
 		JdbcAdaptor jdbcAdaptor) {
@@ -133,7 +132,6 @@ public class EntityManagerImpl implements EntityManager {
 	 * Checks if the entity manager is open.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void assertOpen() {
 		if (!this.open) {
@@ -149,7 +147,6 @@ public class EntityManagerImpl implements EntityManager {
 	 * Asserts that a transaction is active.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void assertTransaction() {
 		this.assertOpen();
@@ -174,7 +171,6 @@ public class EntityManagerImpl implements EntityManager {
 	 *            the type of the entity
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public <T> void cascadeMerge(EntityTypeImpl<T> type, T entity, MutableBoolean requiresFlush, IdentityHashMap<Object, Object> processed) {
 		for (final AssociationMapping<?, ?, ?> association : type.getAssociations()) {
@@ -237,7 +233,6 @@ public class EntityManagerImpl implements EntityManager {
 	 * Clears the transaction.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void clearTransaction() {
 		this.transaction = null;
@@ -266,7 +261,6 @@ public class EntityManagerImpl implements EntityManager {
 	 * Closes the database connection.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	protected void closeConnection() {
 		if (this.connection != null) {
@@ -283,7 +277,6 @@ public class EntityManagerImpl implements EntityManager {
 	 * Closes the connection if the connections is obtained from JTA managed datasource.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void closeConnectionIfNecessary() {
 	}
@@ -560,7 +553,6 @@ public class EntityManagerImpl implements EntityManager {
 	 * @return the connection
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Connection getConnection() {
 		// if the connection exists then simply return it
@@ -623,7 +615,6 @@ public class EntityManagerImpl implements EntityManager {
 	 * @return the JDBC adaptor
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public JdbcAdaptor getJdbcAdaptor() {
 		return this.jdbcAdaptor;
@@ -692,7 +683,6 @@ public class EntityManagerImpl implements EntityManager {
 	 * @return the session
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public SessionImpl getSession() {
 		return this.session;
@@ -721,7 +711,6 @@ public class EntityManagerImpl implements EntityManager {
 	 * @return true if the entity manager has an active transaction, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean hasActiveTransaction() {
 		return (this.transaction != null) && this.transaction.isActive();
@@ -733,7 +722,6 @@ public class EntityManagerImpl implements EntityManager {
 	 * @return true if the entity manager has a transaction which is marked for rollback, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public boolean hasTransactionMarkedForRollback() {
 		if (this.transaction != null) {
@@ -768,7 +756,6 @@ public class EntityManagerImpl implements EntityManager {
 	 *            the transaction to test the validity
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void isValid(EntityTransactionImpl transaction) {
 		if (this.transaction != transaction) {
@@ -795,7 +782,6 @@ public class EntityManagerImpl implements EntityManager {
 	 *            the properties
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void lock(ManagedInstance<?> instance, LockModeType lockMode, Map<String, Object> properties) {
 		// check optimistic lock is supported
@@ -875,7 +861,6 @@ public class EntityManagerImpl implements EntityManager {
 	 * @return true if an implicit flush is required, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> T mergeImpl(T entity, MutableBoolean requiresFlush, IdentityHashMap<Object, Object> processed, boolean cascade) {
@@ -994,7 +979,6 @@ public class EntityManagerImpl implements EntityManager {
 	 * @return true if an implicit flush is required, false otherwise
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> boolean persistImpl(T entity, ArrayList<Object> processed) {
@@ -1098,7 +1082,6 @@ public class EntityManagerImpl implements EntityManager {
 	 * @return the managed instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ManagedInstance<?> refreshImpl(Object entity, LockModeType lockMode, Set<Object> processed) {
 		if (entity == null) {
@@ -1178,7 +1161,6 @@ public class EntityManagerImpl implements EntityManager {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setRollbackOnly() {
 		this.rollbackOnly = true;

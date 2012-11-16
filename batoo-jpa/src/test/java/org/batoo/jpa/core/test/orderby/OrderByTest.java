@@ -52,7 +52,6 @@ public class OrderByTest extends BaseCoreTest {
 	 * Tests list is sorted
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testOrderBy1() {
@@ -79,7 +78,6 @@ public class OrderByTest extends BaseCoreTest {
 	 * Tests list is sorted
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testOrderBy2() {

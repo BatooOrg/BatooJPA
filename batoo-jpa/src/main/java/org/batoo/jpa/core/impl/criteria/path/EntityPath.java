@@ -76,7 +76,6 @@ public class EntityPath<Z, X> extends ParentPath<Z, X> implements Joinable {
 	 *            the entity
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public EntityPath(ParentPath<?, Z> parent, SingularAssociationMapping<?, Z> mapping, EntityTypeImpl<X> entity) {

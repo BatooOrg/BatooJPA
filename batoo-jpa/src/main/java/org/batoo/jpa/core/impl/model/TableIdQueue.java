@@ -58,7 +58,6 @@ public class TableIdQueue extends IdQueue {
 	 *            the table generator
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public TableIdQueue(JdbcAdaptor jdbcAdaptor, DataSource datasource, ExecutorService idExecuter, TableGenerator generator) {
 		super(idExecuter, generator.getName(), generator.getAllocationSize());
@@ -112,7 +111,6 @@ public class TableIdQueue extends IdQueue {
 	 * @return
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private String getUpdateSql() {
 		if (this.updateSql == null) {

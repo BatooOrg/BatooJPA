@@ -72,7 +72,6 @@ public class Person {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Person() {
 		super();
@@ -87,7 +86,6 @@ public class Person {
 	 *            the start date
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Person(String name, int age, Date startDate) {
 		super();
@@ -113,7 +111,6 @@ public class Person {
 	 * @return the age of the Person
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public int getAge() {
 		return this.age;
@@ -155,7 +152,6 @@ public class Person {
 	 * @return the startDate of the Person
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Date getStartDate() {
 		return this.startDate;
@@ -178,7 +174,6 @@ public class Person {
 	 *            the age to set for Person
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setAge(int age) {
 		this.age = age;
@@ -202,7 +197,6 @@ public class Person {
 	 *            the startDate to set for Person
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;

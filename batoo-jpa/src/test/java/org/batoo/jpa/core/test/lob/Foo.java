@@ -65,7 +65,6 @@ public class Foo {
 	 * @return the clob of the Foo
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getClob() {
 		return this.clob;
@@ -109,7 +108,6 @@ public class Foo {
 	 *            the clob to set for Foo
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setClob(String clob) {
 		this.clob = clob;

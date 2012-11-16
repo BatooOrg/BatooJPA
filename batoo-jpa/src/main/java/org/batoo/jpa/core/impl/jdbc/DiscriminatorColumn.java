@@ -40,7 +40,6 @@ public class DiscriminatorColumn extends AbstractColumn {
 	 * @return
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private static Class<?> getJavaType(DiscriminatorColumnMetadata metadata) {
 		if (metadata == null) {
@@ -71,7 +70,6 @@ public class DiscriminatorColumn extends AbstractColumn {
 	 *            the metadata
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public DiscriminatorColumn(EntityTypeImpl<?> entity, DiscriminatorColumnMetadata metadata) {
 		super(DiscriminatorColumn.getJavaType(metadata), null, null, null, false, metadata != null ? metadata.getLocator() : null);

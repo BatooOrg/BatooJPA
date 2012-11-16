@@ -44,7 +44,6 @@ public class FetchStrategyTest extends BaseCoreTest {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	@BeforeClass
 	public static void init() {
@@ -73,7 +72,6 @@ public class FetchStrategyTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Before
 	public void prepareCountries() {
@@ -90,7 +88,6 @@ public class FetchStrategyTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)} person.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFind() {

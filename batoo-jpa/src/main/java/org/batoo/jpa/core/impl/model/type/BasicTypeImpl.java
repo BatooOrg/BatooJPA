@@ -40,7 +40,6 @@ public final class BasicTypeImpl<X> extends TypeImpl<X> implements BasicType<X> 
 	 *            the java type of the type
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public BasicTypeImpl(MetamodelImpl metamodel, Class<X> javaType) {
 		super(metamodel, javaType);

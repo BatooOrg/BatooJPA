@@ -34,7 +34,6 @@ public class ElementCollectionTest2 extends BaseCoreTest {
 	 * Tests the element collections
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testElementCollection() {

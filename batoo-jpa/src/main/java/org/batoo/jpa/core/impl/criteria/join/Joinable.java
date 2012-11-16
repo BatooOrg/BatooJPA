@@ -36,7 +36,6 @@ public interface Joinable {
 	 * @return the entity of the joinable
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	EntityTypeImpl<?> getEntity();
 
@@ -52,7 +51,6 @@ public interface Joinable {
 	 * @return the alias for the table
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	String getTableAlias(BaseQueryImpl<?> query, AbstractTable table);
 }

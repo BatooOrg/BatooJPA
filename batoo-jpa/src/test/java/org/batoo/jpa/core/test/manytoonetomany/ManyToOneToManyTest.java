@@ -54,7 +54,6 @@ public class ManyToOneToManyTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)} person.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFind() {
@@ -73,7 +72,6 @@ public class ManyToOneToManyTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)} person.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFind2() {
@@ -93,7 +91,6 @@ public class ManyToOneToManyTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)} person.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFind3() {
@@ -113,7 +110,6 @@ public class ManyToOneToManyTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)} person that is in the session.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFindInSession() {
@@ -131,7 +127,6 @@ public class ManyToOneToManyTest extends BaseCoreTest {
 	 * 
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test(expected = PersistenceException.class)
 	public void testPersistAddress() {
@@ -147,7 +142,6 @@ public class ManyToOneToManyTest extends BaseCoreTest {
 	 *             ins case of an underlying SQL Exception
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testPersistPerson() throws SQLException {

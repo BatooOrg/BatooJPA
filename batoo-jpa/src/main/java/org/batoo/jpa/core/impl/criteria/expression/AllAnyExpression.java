@@ -50,7 +50,6 @@ public class AllAnyExpression<T> extends AbstractExpression<T> {
 	 *            the sub query
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public AllAnyExpression(boolean all, Subquery<T> subquery) {

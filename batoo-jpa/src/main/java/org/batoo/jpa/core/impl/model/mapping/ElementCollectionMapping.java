@@ -107,7 +107,6 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	 *            the attribute
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ElementCollectionMapping(ParentMapping<?, Z> parent, PluralAttributeImpl<? super Z, C, E> attribute) {
 		super(parent, attribute, attribute.getJavaType(), attribute.getName());
@@ -235,7 +234,6 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	 * @return the collection table
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public CollectionTable getCollectionTable() {
 		return this.collectionTable;
@@ -263,7 +261,6 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	 * @return the key mapping of the element collection mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public SingularMapping<? super E, ?> getKeyMapping() {
 		return this.keyMapping;
@@ -275,7 +272,6 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	 * @return the map key of the element collection mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getMapKey() {
 		return this.mapKey;
@@ -464,7 +460,6 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 	 *             thrown in case of a linkage error
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@SuppressWarnings("unchecked")
 	public void link() {

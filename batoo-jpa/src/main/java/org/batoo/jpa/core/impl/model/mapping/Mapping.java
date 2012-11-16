@@ -61,7 +61,6 @@ public abstract class Mapping<Z, X, Y> {
 	 *            the name of the mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Mapping(ParentMapping<?, Z> parent, AttributeImpl<? super Z, X> attribute, Class<X> javaType, String name) {
 		super();
@@ -105,7 +104,6 @@ public abstract class Mapping<Z, X, Y> {
 	 * @return the mapping value of instance
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public final X get(Object instance) {
 		if (instance == null) {
@@ -125,7 +123,6 @@ public abstract class Mapping<Z, X, Y> {
 	 * @return the attribute of the mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public abstract AttributeImpl<? super Z, X> getAttribute();
 
@@ -135,7 +132,6 @@ public abstract class Mapping<Z, X, Y> {
 	 * @return the id type of the mapping or <code>null</code>
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public IdType getIdType() {
 		return null;
@@ -147,7 +143,6 @@ public abstract class Mapping<Z, X, Y> {
 	 * @return the javaType of the mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Class<X> getJavaType() {
 		return this.javaType;
@@ -159,7 +154,6 @@ public abstract class Mapping<Z, X, Y> {
 	 * @return the name of the Mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getName() {
 		return this.name;
@@ -171,7 +165,6 @@ public abstract class Mapping<Z, X, Y> {
 	 * @return the parent of the mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public ParentMapping<?, Z> getParent() {
 		return this.parent;
@@ -183,7 +176,6 @@ public abstract class Mapping<Z, X, Y> {
 	 * @return the path of the mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public String getPath() {
 		return this.path;
@@ -195,7 +187,6 @@ public abstract class Mapping<Z, X, Y> {
 	 * @return the root of the mapping
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public RootMapping<?> getRoot() {
 		return this.parent.getRoot();
@@ -230,7 +221,6 @@ public abstract class Mapping<Z, X, Y> {
 	 *            the value to set
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public final void set(Object instance, Object value) {
 		if (!this.root) {

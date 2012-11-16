@@ -60,7 +60,6 @@ public final class Prioritizer {
 	 *            array of callbacks
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public static void sort(ArrayList<ManagedInstance<?>> updates, ArrayList<ManagedInstance<?>> removals, ManagedInstance<?>[] sortedUpdates,
 		ManagedInstance<?>[] sortedRemovals, CallbackAvailability callbackAvailability) {
@@ -175,7 +174,6 @@ public final class Prioritizer {
 	 * No instantiation.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	private Prioritizer() {
 		super();

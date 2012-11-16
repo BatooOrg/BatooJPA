@@ -41,7 +41,6 @@ public class EagerTest extends BaseCoreTest {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	@BeforeClass
 	public static void initCountries() {
@@ -66,7 +65,6 @@ public class EagerTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Before
 	public void prepareCountries() {
@@ -79,7 +77,6 @@ public class EagerTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)} person.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFind() {
@@ -105,7 +102,6 @@ public class EagerTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)} person that is in the session.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testFindInSession() {
@@ -126,7 +122,6 @@ public class EagerTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#persist(Object)} address which does not cascade to Parent. PersistenceException expected.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test(expected = PersistenceException.class)
 	public void testPersistAddress() {
@@ -139,7 +134,6 @@ public class EagerTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#persist(Object)} Parent which cascades to Child1.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testPersistPerson() {

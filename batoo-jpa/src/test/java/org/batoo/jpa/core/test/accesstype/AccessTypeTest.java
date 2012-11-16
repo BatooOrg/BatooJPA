@@ -31,7 +31,6 @@ public class AccessTypeTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public AccessTypeTest() {
 		super();
@@ -42,7 +41,6 @@ public class AccessTypeTest extends BaseCoreTest {
 	 * Tests deployment when then there is no explicit access type set.
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testAccessType() {

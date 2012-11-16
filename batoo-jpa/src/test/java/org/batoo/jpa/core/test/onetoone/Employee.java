@@ -44,7 +44,6 @@ public class Employee {
 
 	/**
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Employee() {
 		super();
@@ -55,7 +54,6 @@ public class Employee {
 	 *            the name
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Employee(String name) {
 		super();

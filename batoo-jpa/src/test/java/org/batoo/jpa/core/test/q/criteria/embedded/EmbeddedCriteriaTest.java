@@ -73,7 +73,6 @@ public class EmbeddedCriteriaTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Before
 	public void prepareCountries() {
@@ -89,7 +88,6 @@ public class EmbeddedCriteriaTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testEmbedded() {
@@ -120,7 +118,6 @@ public class EmbeddedCriteriaTest extends BaseCoreTest {
 	/**
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testEmbedded0() {

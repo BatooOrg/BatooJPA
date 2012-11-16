@@ -38,7 +38,6 @@ public class WrappedListIterator<E> extends WrappedIterator<E> implements ListIt
 	 *            the delegate
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public WrappedListIterator(ListIterator<E> delegate) {
 		super(delegate);

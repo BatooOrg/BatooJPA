@@ -34,7 +34,6 @@ public class ValidationTest extends BaseCoreTest {
 	 * Tests the validation persist
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test(expected = ConstraintViolationException.class)
 	public void testPersist() {
@@ -50,7 +49,6 @@ public class ValidationTest extends BaseCoreTest {
 	 * Tests the validation persist
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test(expected = ConstraintViolationException.class)
 	public void testRemove() {
@@ -80,7 +78,6 @@ public class ValidationTest extends BaseCoreTest {
 	 * Tests the validation persist
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testRemoveOk() {
@@ -109,7 +106,6 @@ public class ValidationTest extends BaseCoreTest {
 	 * Tests the validation persist
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test(expected = ConstraintViolationException.class)
 	public void testUpdate() {
@@ -138,7 +134,6 @@ public class ValidationTest extends BaseCoreTest {
 	 * Tests the validation persist
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	@Test
 	public void testUpdateOk() {

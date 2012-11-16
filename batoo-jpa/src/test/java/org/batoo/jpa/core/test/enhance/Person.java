@@ -39,7 +39,6 @@ public class Person {
 	 * @return the person
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public static Person create() {
 		return new Person();
@@ -498,7 +497,6 @@ public class Person {
 	 *             some exception
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public Object someBusinessMethod(boolean arg0, char arg1, byte arg2, short arg3, int arg4, long arg5, float arg6, double arg7, String arg8, Integer[] arg9,
 		long[] arg10) throws SQLException, MappingException {

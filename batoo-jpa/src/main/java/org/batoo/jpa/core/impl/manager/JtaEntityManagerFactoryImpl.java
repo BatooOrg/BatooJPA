@@ -56,7 +56,6 @@ public class JtaEntityManagerFactoryImpl extends EntityManagerFactoryImpl {
 	 *            the persistence parser
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public JtaEntityManagerFactoryImpl(String name, PersistenceParser parser) {
 		super(name, parser);
@@ -81,7 +80,6 @@ public class JtaEntityManagerFactoryImpl extends EntityManagerFactoryImpl {
 	 * @return the transaction manager
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public TransactionManager getTransactionManager() {
 		return this.transactionManager;

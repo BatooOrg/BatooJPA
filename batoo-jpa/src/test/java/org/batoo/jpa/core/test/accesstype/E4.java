@@ -39,7 +39,6 @@ public class E4 extends E {
 	 * @return the e1 of the E3
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public E1 getE1() {
 		return this.e1;
@@ -52,7 +51,6 @@ public class E4 extends E {
 	 *            the e1 to set for E3
 	 * 
 	 * @since $version
-	 * @author hceylan
 	 */
 	public void setE1(E1 e1) {
 		this.e1 = e1;
