@@ -20,6 +20,7 @@ package org.batoo.jpa.core.impl.model.mapping;
 
 import java.util.IdentityHashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -486,11 +487,13 @@ public abstract class AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> imple
 	 *            if an implicit flush is required
 	 * @param processed
 	 *            registry of processed entities
+	 * @param instances
+	 *            the persisted instances
 	 * 
 	 * @since 2.0.0
 	 */
 	public abstract void mergeWith(EntityManagerImpl entityManager, ManagedInstance<?> instance, Object entity, MutableBoolean requiresFlush,
-		IdentityHashMap<Object, Object> processed);
+		IdentityHashMap<Object, Object> processed, LinkedList<ManagedInstance<?>> instances);
 
 	/**
 	 * @param instance

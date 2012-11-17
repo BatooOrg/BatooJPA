@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.IdentityHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -583,13 +584,13 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 	@Override
 	@SuppressWarnings("unchecked")
 	public void mergeWith(EntityManagerImpl entityManager, ManagedInstance<?> instance, Object entity, MutableBoolean requiresFlush,
-		IdentityHashMap<Object, Object> processed) {
+		IdentityHashMap<Object, Object> processed, LinkedList<ManagedInstance<?>> instances) {
 		// get the managed collection
 		final ManagedCollection<E> collection = (ManagedCollection<E>) this.get(instance.getInstance());
 
 		// if initialized then merge with the new entities
 		if ((collection != null) && collection.isInitialized()) {
-			collection.mergeWith(entityManager, entity, requiresFlush, processed);
+			collection.mergeWith(entityManager, entity, requiresFlush, processed, instances);
 		}
 	}
 

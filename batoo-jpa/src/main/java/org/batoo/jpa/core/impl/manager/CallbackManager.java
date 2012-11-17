@@ -18,8 +18,17 @@
  */
 package org.batoo.jpa.core.impl.manager;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+
+import javax.persistence.PostLoad;
+import javax.persistence.PostPersist;
+import javax.persistence.PostRemove;
+import javax.persistence.PostUpdate;
+import javax.persistence.PrePersist;
+import javax.persistence.PreRemove;
+import javax.persistence.PreUpdate;
 
 import org.batoo.jpa.core.impl.manager.Callback.CallbackType;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
@@ -102,7 +111,6 @@ public class CallbackManager {
 		this.prePersist = this.getCallbacks(callbacks, EntityListenerType.PRE_PERSIST);
 		this.preRemove = this.getCallbacks(callbacks, EntityListenerType.PRE_REMOVE);
 		this.preUpdate = this.getCallbacks(callbacks, EntityListenerType.PRE_UPDATE);
-
 	}
 
 	/**
@@ -253,13 +261,66 @@ public class CallbackManager {
 					throw new MappingException("Cannot map listener", listenerMetadata.getLocator());
 				}
 
-				for (final CallbackMetadata callbackMetadata : listenerMetadata.getCallbacks()) {
-					this.linkCallback(callbackMap, new Callback(//
-						listenerMetadata.getLocator(), //
-						clazz, //
-						callbackMetadata.getName(), //
-						callbackMetadata.getType(), //
-						CallbackType.LISTENER));
+				// if no metadata then we should use the annotations
+				if ((listenerMetadata.getCallbacks() == null) || listenerMetadata.getCallbacks().isEmpty()) {
+					final Method[] methods = clazz.getDeclaredMethods();
+					for (final Method method : methods) {
+						if ((method.getParameterTypes().length == 1) && (method.getReturnType() == void.class)
+							&& (method.getParameterTypes()[0] == Object.class)) {
+
+							// PrePersist
+							if (method.getAnnotation(PrePersist.class) != null) {
+								this.linkCallback(callbackMap, new Callback(listenerMetadata.getLocator(), clazz, method.getName(),
+									EntityListenerType.PRE_PERSIST, CallbackType.LISTENER));
+							}
+
+							// PreUpdate
+							if (method.getAnnotation(PreUpdate.class) != null) {
+								this.linkCallback(callbackMap, new Callback(listenerMetadata.getLocator(), clazz, method.getName(),
+									EntityListenerType.PRE_UPDATE, CallbackType.LISTENER));
+							}
+
+							// PrePersist
+							if (method.getAnnotation(PreRemove.class) != null) {
+								this.linkCallback(callbackMap, new Callback(listenerMetadata.getLocator(), clazz, method.getName(),
+									EntityListenerType.PRE_REMOVE, CallbackType.LISTENER));
+							}
+
+							// PrePersist
+							if (method.getAnnotation(PostPersist.class) != null) {
+								this.linkCallback(callbackMap, new Callback(listenerMetadata.getLocator(), clazz, method.getName(),
+									EntityListenerType.POST_PERSIST, CallbackType.LISTENER));
+							}
+
+							// PrePersist
+							if (method.getAnnotation(PostLoad.class) != null) {
+								this.linkCallback(callbackMap, new Callback(listenerMetadata.getLocator(), clazz, method.getName(),
+									EntityListenerType.POST_LOAD, CallbackType.LISTENER));
+							}
+
+							// PrePersist
+							if (method.getAnnotation(PostUpdate.class) != null) {
+								this.linkCallback(callbackMap, new Callback(listenerMetadata.getLocator(), clazz, method.getName(),
+									EntityListenerType.POST_UPDATE, CallbackType.LISTENER));
+							}
+
+							// PrePersist
+							if (method.getAnnotation(PostRemove.class) != null) {
+								this.linkCallback(callbackMap, new Callback(listenerMetadata.getLocator(), clazz, method.getName(),
+									EntityListenerType.POST_REMOVE, CallbackType.LISTENER));
+							}
+						}
+					}
+				}
+				else {
+					for (final CallbackMetadata callbackMetadata : listenerMetadata.getCallbacks()) {
+						this.linkCallback(callbackMap, new Callback(//
+							listenerMetadata.getLocator(), //
+							clazz, //
+							callbackMetadata.getName(), //
+							callbackMetadata.getType(), //
+							CallbackType.LISTENER));
+					}
 				}
 			}
 		}

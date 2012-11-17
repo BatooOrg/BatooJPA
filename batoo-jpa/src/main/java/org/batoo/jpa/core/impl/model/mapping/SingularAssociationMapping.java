@@ -21,6 +21,7 @@ package org.batoo.jpa.core.impl.model.mapping;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.IdentityHashMap;
+import java.util.LinkedList;
 import java.util.Set;
 
 import javax.persistence.NoResultException;
@@ -306,9 +307,9 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 	 */
 	@Override
 	public void mergeWith(EntityManagerImpl entityManager, ManagedInstance<?> instance, Object entity, MutableBoolean requiresFlush,
-		IdentityHashMap<Object, Object> processed) {
+		IdentityHashMap<Object, Object> processed, LinkedList<ManagedInstance<?>> instances) {
 		// get the new value as merged
-		final X newEntity = entityManager.mergeImpl(this.get(entity), requiresFlush, processed, this.cascadesMerge());
+		final X newEntity = entityManager.mergeImpl(this.get(entity), requiresFlush, processed, instances, this.cascadesMerge());
 
 		// get the old value
 		final X oldEntity = this.get(instance.getInstance());

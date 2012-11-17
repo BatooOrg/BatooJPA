@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.IdentityHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -222,11 +223,14 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 *            if an implicit flush is required
 	 * @param processed
 	 *            registry of processed entities
+	 * @param instances
+	 *            the persisted instances
 	 * 
 	 * @since 2.0.0
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void mergeWith(EntityManagerImpl entityManager, Object instance, MutableBoolean requiresFlush, IdentityHashMap<Object, Object> processed) {
+	public void mergeWith(EntityManagerImpl entityManager, Object instance, MutableBoolean requiresFlush, IdentityHashMap<Object, Object> processed,
+		LinkedList<ManagedInstance<?>> instances) {
 		final ArrayList<E> mergedChildren = Lists.newArrayList();
 
 		final Object children = this.mapping.get(instance);
@@ -246,7 +250,7 @@ public abstract class ManagedCollection<E> implements Serializable {
 
 		// merge all the new children
 		for (final E child : collection) {
-			mergedChildren.add(entityManager.mergeImpl(child, requiresFlush, processed, this.mapping.cascadesMerge()));
+			mergedChildren.add(entityManager.mergeImpl(child, requiresFlush, processed, instances, this.mapping.cascadesMerge()));
 		}
 
 		// make a snapshot
@@ -320,7 +324,7 @@ public abstract class ManagedCollection<E> implements Serializable {
 	public void persistAdditions(EntityManagerImpl entityManager) {
 		final Collection<E> added = BatooUtils.subtract(this.getDelegate(), this.getSnapshot());
 		for (final E e : added) {
-			entityManager.persistImpl(e, Lists.newArrayList());
+			entityManager.persist(e);
 		}
 	}
 

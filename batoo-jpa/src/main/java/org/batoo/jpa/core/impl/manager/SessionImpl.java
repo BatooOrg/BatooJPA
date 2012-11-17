@@ -105,7 +105,7 @@ public class SessionImpl {
 
 		for (final ManagedInstance<?> instance : instances) {
 			if (instance.getStatus() == Status.REMOVED) {
-				instance.cascadeRemove(this.em);
+				instance.cascadeRemove(this.em, null, null);
 			}
 		}
 	}

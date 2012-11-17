@@ -19,7 +19,6 @@
 package org.batoo.jpa.core.test.inheritence.single;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 
 import junit.framework.Assert;
 
@@ -83,7 +82,6 @@ public class InheritanceTest extends BaseCoreTest {
 	 * 
 	 * @since 2.0.0
 	 */
-	@Test(expected = NoResultException.class)
 	public void testSimpleInheritance3() {
 		final FooExt1 foo = new FooExt1();
 		foo.setValue("Foo2");
@@ -94,7 +92,6 @@ public class InheritanceTest extends BaseCoreTest {
 
 		this.close();
 
-		this.find(FooExt11.class, foo.getKey());
+		Assert.assertNull(this.find(FooExt11.class, foo.getKey()));
 	}
-
 }

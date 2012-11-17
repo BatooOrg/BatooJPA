@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -97,6 +98,9 @@ public class ManagedInstance<X> {
 	private boolean hasInitialId;
 	private ManagedId<? super X> id;
 	private int h;
+
+	private boolean prePersistCalled;
+	private boolean preRemoveCalled;
 
 	/**
 	 * The current lock mode context.
@@ -204,11 +208,13 @@ public class ManagedInstance<X> {
 	 *            the entity manager
 	 * @param processed
 	 *            registry of processed entities
+	 * @param instances
+	 *            the managed instances
 	 * @return true if an implicit flush is required, false otherwise
 	 * 
 	 * @since 2.0.0
 	 */
-	public boolean cascadePersist(EntityManagerImpl entityManager, ArrayList<Object> processed) {
+	public boolean cascadePersist(EntityManagerImpl entityManager, ArrayList<Object> processed, LinkedList<ManagedInstance<?>> instances) {
 		ManagedInstance.LOG.debug("Cascading persist on {0}", this);
 
 		boolean requiresFlush = false;
@@ -226,7 +232,7 @@ public class ManagedInstance<X> {
 
 						// cascade to each element in the map
 						for (final Object element : map.values()) {
-							requiresFlush |= entityManager.persistImpl(element, processed);
+							requiresFlush |= entityManager.persistImpl(element, processed, instances);
 						}
 
 						break;
@@ -236,7 +242,7 @@ public class ManagedInstance<X> {
 
 						// cascade to each element in the list
 						for (int i = 0; i < list.size(); i++) {
-							requiresFlush |= entityManager.persistImpl(list.get(i), processed);
+							requiresFlush |= entityManager.persistImpl(list.get(i), processed, instances);
 						}
 
 						break;
@@ -248,12 +254,12 @@ public class ManagedInstance<X> {
 						if (collection instanceof List) {
 							final List<?> castedList = (List<?>) collection;
 							for (int i = 0; i < castedList.size(); i++) {
-								requiresFlush |= entityManager.persistImpl(castedList.get(i), processed);
+								requiresFlush |= entityManager.persistImpl(castedList.get(i), processed, instances);
 							}
 						}
 						else {
 							for (final Object element : collection) {
-								requiresFlush |= entityManager.persistImpl(element, processed);
+								requiresFlush |= entityManager.persistImpl(element, processed, instances);
 							}
 						}
 
@@ -264,7 +270,7 @@ public class ManagedInstance<X> {
 				final SingularAssociationMapping<?, ?> mapping = (SingularAssociationMapping<?, ?>) association;
 				final Object associate = mapping.get(this.instance);
 				if (associate != null) {
-					requiresFlush |= entityManager.persistImpl(associate, processed);
+					requiresFlush |= entityManager.persistImpl(associate, processed, instances);
 				}
 			}
 		}
@@ -277,10 +283,14 @@ public class ManagedInstance<X> {
 	 * 
 	 * @param entityManager
 	 *            the entity manager
+	 * @param processed
+	 *            registry of processed entities
+	 * @param instances
+	 *            the managed instances
 	 * 
 	 * @since 2.0.0
 	 */
-	public void cascadeRemove(EntityManagerImpl entityManager) {
+	public void cascadeRemove(EntityManagerImpl entityManager, ArrayList<Object> processed, LinkedList<ManagedInstance<?>> instances) {
 		ManagedInstance.LOG.debug("Cascading remove on {0}", this);
 
 		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsRemovable()) {
@@ -302,12 +312,12 @@ public class ManagedInstance<X> {
 				if (collection instanceof List) {
 					final List<?> list = (List<?>) collection;
 					for (int i = 0; i < list.size(); i++) {
-						entityManager.remove(list.get(i));
+						entityManager.removeImpl(list.get(i), processed, instances);
 					}
 				}
 				else {
 					for (final Object element : collection) {
-						entityManager.remove(element);
+						entityManager.removeImpl(element, processed, instances);
 					}
 				}
 			}
@@ -316,7 +326,7 @@ public class ManagedInstance<X> {
 				final Object associate = mapping.get(this.instance);
 
 				if (associate != null) {
-					entityManager.remove(associate);
+					entityManager.removeImpl(associate, processed, instances);
 				}
 			}
 		}
@@ -503,7 +513,24 @@ public class ManagedInstance<X> {
 			typeToFire = EntityListenerType.POST_PERSIST;
 		}
 
-		this.type.fireCallbacks(this.instance, typeToFire);
+		// safeguard single invocation for PrePersists
+		if (typeToFire == EntityListenerType.PRE_PERSIST) {
+			if (!this.prePersistCalled) {
+				this.prePersistCalled = true;
+
+				this.type.fireCallbacks(this.instance, typeToFire);
+			}
+		}
+		else if (typeToFire == EntityListenerType.PRE_REMOVE) {
+			if (!this.preRemoveCalled) {
+				this.preRemoveCalled = true;
+
+				this.type.fireCallbacks(this.instance, typeToFire);
+			}
+		}
+		else {
+			this.type.fireCallbacks(this.instance, typeToFire);
+		}
 	}
 
 	/**
@@ -839,10 +866,13 @@ public class ManagedInstance<X> {
 	 *            if an implicit flush is required
 	 * @param processed
 	 *            registry of processed entities
+	 * @param instances
+	 *            the persisted instances
 	 * 
 	 * @since 2.0.0
 	 */
-	public void mergeWith(EntityManagerImpl entityManager, X entity, MutableBoolean requiresFlush, IdentityHashMap<Object, Object> processed) {
+	public void mergeWith(EntityManagerImpl entityManager, X entity, MutableBoolean requiresFlush, IdentityHashMap<Object, Object> processed,
+		LinkedList<ManagedInstance<?>> instances) {
 		this.snapshot();
 
 		for (final BasicMapping<?, ?> mapping : this.type.getBasicMappings()) {
@@ -850,7 +880,7 @@ public class ManagedInstance<X> {
 		}
 
 		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociations()) {
-			association.mergeWith(entityManager, this, entity, requiresFlush, processed);
+			association.mergeWith(entityManager, this, entity, requiresFlush, processed, instances);
 		}
 
 		this.checkUpdated();
