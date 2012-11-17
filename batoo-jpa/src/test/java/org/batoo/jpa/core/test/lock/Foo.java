@@ -90,7 +90,7 @@ public class Foo {
 	 * 
 	 * @since 2.0.0
 	 */
-	public int getVersion() {
+	public Integer getVersion() {
 		return this.version;
 	}
 
@@ -114,7 +114,7 @@ public class Foo {
 	 * 
 	 * @since 2.0.0
 	 */
-	public void setVersion(int version) {
+	public void setVersion(Integer version) {
 		this.version = version;
 	}
 

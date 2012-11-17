@@ -25,6 +25,7 @@ import javax.persistence.metamodel.Attribute;
 import org.batoo.common.reflect.AbstractAccessor;
 import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.impl.metadata.attribute.AttributeMetadataImpl;
@@ -67,7 +68,6 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y> {
 	 * 
 	 * @since 2.0.0
 	 */
-	@SuppressWarnings("unchecked")
 	public AttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata) {
 		super();
 
@@ -77,10 +77,25 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y> {
 		this.declaringType = declaringType;
 		this.name = metadata.getName();
 		this.javaMember = ((AttributeMetadataImpl) metadata).getMember();
-		this.javaType = (Class<Y>) ReflectHelper.getMemberType(this.javaMember);
+		this.javaType = ReflectHelper.getActualType(declaringType.getJavaType(), this.name, ReflectHelper.getMemberType(this.javaMember));
 		this.metamodel = declaringType.getMetamodel();
 		this.accessor = ReflectHelper.getAccessor(this.javaMember);
 	}
+
+	/**
+	 * Clones the attribute.
+	 * <p>
+	 * This is used for cloning th attributes from Mapped Super Classes onto child types.
+	 * 
+	 * @param type
+	 *            the owner type
+	 * @return the new attribute
+	 * @param <Z>
+	 *            the new type
+	 * 
+	 * @since $version
+	 */
+	public abstract <Z extends X> AttributeImpl<Z, Y> clone(EntityTypeImpl<Z> type);
 
 	/**
 	 * Returns the attribute value of instance.

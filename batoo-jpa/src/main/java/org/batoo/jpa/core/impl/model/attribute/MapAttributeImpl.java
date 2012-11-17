@@ -30,6 +30,7 @@ import org.batoo.jpa.core.impl.collections.ManagedMap;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
@@ -78,6 +79,15 @@ public class MapAttributeImpl<X, K, V> extends PluralAttributeImpl<X, Map<K, V>,
 		else {
 			this.keyJavaType = ReflectHelper.getGenericType(this.getJavaMember(), 0);
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public <Z extends X> MapAttributeImpl<Z, K, V> clone(EntityTypeImpl<Z> type) {
+		return new MapAttributeImpl<Z, K, V>(type, this.getMetadata(), this.getPersistentAttributeType());
 	}
 
 	/**

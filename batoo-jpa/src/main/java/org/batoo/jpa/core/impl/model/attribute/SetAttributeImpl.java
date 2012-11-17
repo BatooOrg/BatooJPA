@@ -26,6 +26,7 @@ import javax.persistence.metamodel.SetAttribute;
 import org.batoo.jpa.core.impl.collections.ManagedSet;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
 
@@ -53,6 +54,15 @@ public class SetAttributeImpl<X, E> extends PluralAttributeImpl<X, Set<E>, E> im
 	 */
 	public SetAttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata, PersistentAttributeType attributeType) {
 		super(declaringType, metadata, attributeType, 0);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public <Z extends X> SetAttributeImpl<Z, E> clone(EntityTypeImpl<Z> type) {
+		return new SetAttributeImpl<Z, E>(type, this.getMetadata(), this.getPersistentAttributeType());
 	}
 
 	/**

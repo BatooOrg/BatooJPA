@@ -68,14 +68,16 @@ public class ForeignKey {
 	private AbstractTable table;
 
 	private String tableName;
+	private Mapping<?, ?, ?> mapping;
 
 	private OrderColumn orderColumn;
+
 	private FinalWrapper<String> singleChildSql;
-
 	private AbstractColumn[] singleChildRestrictions;
-	private FinalWrapper<String> allChildrenSql;
 
+	private FinalWrapper<String> allChildrenSql;
 	private AbstractColumn[] singleChildUpdates;
+
 	private JoinColumn[] allChildrenRestrictions;
 
 	/**
@@ -83,13 +85,15 @@ public class ForeignKey {
 	 * 
 	 * @param jdbcAdaptor
 	 *            the JDBC Adaptor
+	 * @param mapping
+	 *            the owner mapping
 	 * @param metadata
 	 *            the metadata for join column
 	 * 
 	 * @since 2.0.0
 	 */
-	public ForeignKey(JdbcAdaptor jdbcAdaptor, List<JoinColumnMetadata> metadata) {
-		this(jdbcAdaptor, metadata, false);
+	public ForeignKey(JdbcAdaptor jdbcAdaptor, Mapping<?, ?, ?> mapping, List<JoinColumnMetadata> metadata) {
+		this(jdbcAdaptor, mapping, metadata, false);
 	}
 
 	/**
@@ -97,6 +101,8 @@ public class ForeignKey {
 	 * 
 	 * @param jdbcAdaptor
 	 *            the JDBC Adaptor
+	 * @param mapping
+	 *            the owner mapping
 	 * @param metadata
 	 *            the metadata for join column
 	 * @param inverseOwner
@@ -104,10 +110,12 @@ public class ForeignKey {
 	 * 
 	 * @since 2.0.0
 	 */
-	public ForeignKey(JdbcAdaptor jdbcAdaptor, List<JoinColumnMetadata> metadata, boolean inverseOwner) {
+	public ForeignKey(JdbcAdaptor jdbcAdaptor, Mapping<?, ?, ?> mapping, List<JoinColumnMetadata> metadata, boolean inverseOwner) {
 		super();
 
 		this.jdbcAdaptor = jdbcAdaptor;
+		this.mapping = mapping;
+		this.mapping = mapping;
 		this.inverseOwner = inverseOwner;
 		this.readOnly = this.isReadOnly(metadata);
 
@@ -325,6 +333,17 @@ public class ForeignKey {
 	 */
 	public List<JoinColumn> getJoinColumns() {
 		return this.joinColumns;
+	}
+
+	/**
+	 * Returns the mapping of the ForeignKey.
+	 * 
+	 * @return the mapping of the ForeignKey
+	 * 
+	 * @since $version
+	 */
+	public Mapping<?, ?, ?> getMapping() {
+		return this.mapping;
 	}
 
 	/**

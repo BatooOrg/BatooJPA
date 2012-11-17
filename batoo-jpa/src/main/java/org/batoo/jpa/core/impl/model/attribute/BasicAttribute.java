@@ -224,6 +224,23 @@ public class BasicAttribute<X, T> extends SingularAttributeImpl<X, T> {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public <Z extends X> BasicAttribute<Z, T> clone(EntityTypeImpl<Z> type) {
+		if (this.version) {
+			return new BasicAttribute<Z, T>(type, (VersionAttributeMetadata) this.getMetadata());
+		}
+
+		if (this.idType != null) {
+			return new BasicAttribute<Z, T>(type, (IdAttributeMetadata) this.getMetadata());
+		}
+
+		return new BasicAttribute<Z, T>(type, (BasicAttributeMetadata) this.getMetadata());
+	}
+
+	/**
 	 * Fills the sequence / table generated value.
 	 * <p>
 	 * The operation returns false if at least one entity needs to obtain identity from the database.

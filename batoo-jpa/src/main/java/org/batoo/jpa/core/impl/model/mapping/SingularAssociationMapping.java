@@ -77,11 +77,11 @@ public class SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X
 
 		if (this.isOwner()) {
 			if (metadata.getJoinTable() != null) {
-				this.joinTable = new JoinTable((EntityTypeImpl<?>) this.getRoot().getType(), metadata.getJoinTable());
+				this.joinTable = new JoinTable((EntityTypeImpl<?>) attribute.getDeclaringType(), this, metadata.getJoinTable());
 				this.foreignKey = null;
 			}
 			else {
-				this.foreignKey = new ForeignKey(this.getAttribute().getMetamodel().getJdbcAdaptor(), metadata.getJoinColumns());
+				this.foreignKey = new ForeignKey(this.getAttribute().getMetamodel().getJdbcAdaptor(), this, metadata.getJoinColumns());
 				this.joinTable = null;
 			}
 		}

@@ -109,11 +109,11 @@ public class PluralAssociationMapping<Z, C, E> extends AssociationMapping<Z, C, 
 
 		if (this.isOwner()) {
 			if ((this.attribute.getPersistentAttributeType() == PersistentAttributeType.MANY_TO_MANY) || (metadata.getJoinColumns().size() == 0)) {
-				this.joinTable = new JoinTable((EntityTypeImpl<?>) this.getRoot().getType(), metadata.getJoinTable());
+				this.joinTable = new JoinTable((EntityTypeImpl<?>) attribute.getDeclaringType(), this, metadata.getJoinTable());
 				this.foreignKey = null;
 			}
 			else {
-				this.foreignKey = new ForeignKey(this.getAttribute().getMetamodel().getJdbcAdaptor(), metadata.getJoinColumns(), true);
+				this.foreignKey = new ForeignKey(this.getAttribute().getMetamodel().getJdbcAdaptor(), this, metadata.getJoinColumns(), true);
 				this.joinTable = null;
 			}
 		}

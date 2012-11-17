@@ -16,17 +16,9 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.core.test.mappedsuperclass;
+package org.batoo.jpa.core.test.generic;
 
-import java.util.List;
-
-import javax.persistence.AssociationOverride;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.JoinTable;
-import javax.persistence.OneToMany;
-
-import com.google.common.collect.Lists;
 
 /**
  * 
@@ -34,41 +26,78 @@ import com.google.common.collect.Lists;
  * @since 2.0.0
  */
 @Entity
-@AssociationOverride(joinTable = @JoinTable(name = "Bar_Quux"), name = "quuxes")
-public class Foo extends Bar {
+public class Foo extends AbstractPersistable<Long> {
 
 	private String fooValue;
 
-	@OneToMany(cascade = CascadeType.ALL)
-	@JoinTable(name = "FOO_FOOQUUEXES")
-	private final List<Quux> fooQuuxes = Lists.newArrayList();
-
 	/**
-	 * Returns the fooQuuxes.
 	 * 
-	 * @return the fooQuuxes
-	 * @since 2.0.0
+	 * @since $version
+	 * @author hceylan
 	 */
-	public List<Quux> getFooQuuxes() {
-		return this.fooQuuxes;
+	public Foo() {
+		super();
 	}
 
 	/**
-	 * Returns the fooValue.
+	 * @param fooValue
+	 *            the foo value
 	 * 
-	 * @return the fooValue
-	 * @since 2.0.0
+	 * @since $version
+	 * @author hceylan
+	 */
+	public Foo(String fooValue) {
+		super();
+		this.fooValue = fooValue;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!super.equals(obj)) {
+			return false;
+		}
+		if (!(obj instanceof Foo)) {
+			return false;
+		}
+		final Foo other = (Foo) obj;
+		if (this.fooValue == null) {
+			if (other.fooValue != null) {
+				return false;
+			}
+		}
+		else if (!this.fooValue.equals(other.fooValue)) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Returns the fooValue of the Foo.
+	 * 
+	 * @return the fooValue of the Foo
+	 * 
+	 * @since $version
+	 * @author hceylan
 	 */
 	public String getFooValue() {
 		return this.fooValue;
 	}
 
 	/**
-	 * Sets the fooValue.
+	 * Sets the fooValue of the Foo.
 	 * 
 	 * @param fooValue
-	 *            the fooValue to set
-	 * @since 2.0.0
+	 *            the fooValue to set for Foo
+	 * 
+	 * @since $version
+	 * @author hceylan
 	 */
 	public void setFooValue(String fooValue) {
 		this.fooValue = fooValue;

@@ -64,21 +64,25 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	private AbstractColumn[] removeColumns;
 	private JoinColumn[] removeAllColumns;
 	private MapKeyColumn keyColumn;
+	private final ElementCollectionMapping<?, ?, ?> mapping;
 
 	/**
 	 * @param entity
 	 *            the owner type
+	 * @param mapping
+	 *            the owner mapping
 	 * @param metadata
 	 *            the metadata
 	 * 
 	 * @since 2.0.0
 	 */
-	public CollectionTable(EntityTypeImpl<?> entity, CollectionTableMetadata metadata) {
+	public CollectionTable(EntityTypeImpl<?> entity, ElementCollectionMapping<?, ?, ?> mapping, CollectionTableMetadata metadata) {
 		super(metadata);
 
 		this.entity = entity;
+		this.mapping = mapping;
 		this.jdbcAdaptor = entity.getMetamodel().getJdbcAdaptor();
-		this.key = new ForeignKey(entity.getMetamodel().getJdbcAdaptor(), //
+		this.key = new ForeignKey(entity.getMetamodel().getJdbcAdaptor(), this.mapping, //
 			metadata != null ? metadata.getJoinColumns() : Collections.<JoinColumnMetadata> emptyList());
 	}
 
@@ -102,6 +106,17 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	 */
 	public MapKeyColumn getKeyColumn() {
 		return this.keyColumn;
+	}
+
+	/**
+	 * Returns the mapping of the CollectionTable.
+	 * 
+	 * @return the mapping of the CollectionTable
+	 * 
+	 * @since $version
+	 */
+	public ElementCollectionMapping<?, ?, ?> getMapping() {
+		return this.mapping;
 	}
 
 	/**
@@ -169,44 +184,6 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	}
 
 	/**
-	 * @param mapping
-	 *            the mapping
-	 * @param type
-	 *            the type of the collection
-	 * @param defaultName
-	 *            the default name
-	 * @param metadata
-	 *            the column metadata
-	 * @param lob
-	 *            if the column is a lob type
-	 * @param temporalType
-	 *            the temporal type
-	 * @param enumType
-	 *            the enum type
-	 * 
-	 * @since 2.0.0
-	 */
-	public void link(ElementCollectionMapping<?, ?, ?> mapping, TypeImpl<?> type, String defaultName, ColumnMetadata metadata, EnumType enumType,
-		TemporalType temporalType, boolean lob) {
-		if (StringUtils.isBlank(this.getName())) {
-			this.setName(this.entity.getName() + "_" + defaultName);
-		}
-
-		this.key.link(null, this.entity);
-		this.key.setTable(this);
-
-		this.elementColumn = new ElementColumn(this.entity.getMetamodel().getJdbcAdaptor(), //
-			mapping, //
-			this, //
-			(metadata == null) || StringUtils.isBlank(metadata.getName()) ? defaultName : metadata.getName(), //
-			type.getJavaType(), //
-			enumType, //
-			temporalType, //
-			lob, //
-			metadata);
-	}
-
-	/**
 	 * Links
 	 * 
 	 * @param type
@@ -225,6 +202,41 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 
 		this.key.link(null, this.entity);
 		this.key.setTable(this);
+	}
+
+	/**
+	 * @param type
+	 *            the type of the collection
+	 * @param defaultName
+	 *            the default name
+	 * @param metadata
+	 *            the column metadata
+	 * @param lob
+	 *            if the column is a lob type
+	 * @param temporalType
+	 *            the temporal type
+	 * @param enumType
+	 *            the enum type
+	 * 
+	 * @since 2.0.0
+	 */
+	public void link(TypeImpl<?> type, String defaultName, ColumnMetadata metadata, EnumType enumType, TemporalType temporalType, boolean lob) {
+		if (StringUtils.isBlank(this.getName())) {
+			this.setName(this.entity.getName() + "_" + defaultName);
+		}
+
+		this.key.link(null, this.entity);
+		this.key.setTable(this);
+
+		this.elementColumn = new ElementColumn(this.entity.getMetamodel().getJdbcAdaptor(), //
+			this.mapping, //
+			this, //
+			(metadata == null) || StringUtils.isBlank(metadata.getName()) ? defaultName : metadata.getName(), //
+			type.getJavaType(), //
+			enumType, //
+			temporalType, //
+			lob, //
+			metadata);
 	}
 
 	/**

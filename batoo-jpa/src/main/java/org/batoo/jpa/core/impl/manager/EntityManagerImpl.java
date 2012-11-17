@@ -841,8 +841,6 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public <T> T merge(T entity) {
-		this.assertTransaction();
-
 		final MutableBoolean requiresFlush = new MutableBoolean(false);
 		final T mergedEntity = this.mergeImpl(entity, requiresFlush, Maps.<Object, Object> newIdentityHashMap(), true);
 

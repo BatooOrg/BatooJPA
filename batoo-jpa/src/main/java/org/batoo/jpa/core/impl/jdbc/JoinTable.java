@@ -29,6 +29,7 @@ import javax.persistence.criteria.JoinType;
 
 import org.batoo.common.util.FinalWrapper;
 import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
+import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.impl.AbstractLocator;
@@ -65,20 +66,22 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 	/**
 	 * @param entity
 	 *            the owner entity
+	 * @param mapping
+	 *            the owner mapping
 	 * @param metadata
 	 *            the metadata
 	 * 
 	 * @since 2.0.0
 	 */
-	public JoinTable(EntityTypeImpl<?> entity, JoinTableMetadata metadata) {
+	public JoinTable(EntityTypeImpl<?> entity, AssociationMapping<?, ?, ?> mapping, JoinTableMetadata metadata) {
 		super(metadata);
 
 		this.entity = entity;
 
 		this.jdbcAdaptor = this.entity.getMetamodel().getJdbcAdaptor();
 
-		this.sourceKey = new ForeignKey(this.jdbcAdaptor, metadata != null ? metadata.getJoinColumns() : Collections.<JoinColumnMetadata> emptyList());
-		this.destinationKey = new ForeignKey(this.jdbcAdaptor, metadata != null ? metadata.getInverseJoinColumns()
+		this.sourceKey = new ForeignKey(this.jdbcAdaptor, mapping, metadata != null ? metadata.getJoinColumns() : Collections.<JoinColumnMetadata> emptyList());
+		this.destinationKey = new ForeignKey(this.jdbcAdaptor, mapping, metadata != null ? metadata.getInverseJoinColumns()
 			: Collections.<JoinColumnMetadata> emptyList());
 	}
 

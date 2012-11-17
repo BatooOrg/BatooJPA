@@ -116,7 +116,7 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 		this.attribute = attribute;
 		this.eager = metadata.getFetchType() == FetchType.EAGER;
 
-		this.collectionTable = new CollectionTable((EntityTypeImpl<?>) this.getRoot().getType(), metadata.getCollectionTable());
+		this.collectionTable = new CollectionTable((EntityTypeImpl<?>) attribute.getDeclaringType(), this, metadata.getCollectionTable());
 		this.column = metadata.getColumn();
 		this.enumType = metadata.getEnumType();
 		this.lob = metadata.isLob();
@@ -492,7 +492,7 @@ public class ElementCollectionMapping<Z, C, E> extends Mapping<Z, C, E> implemen
 			this.collectionTable.link((EmbeddableTypeImpl<E>) this.type, defaultName, this.rootMapping);
 		}
 		else {
-			this.collectionTable.link(this, this.type, defaultName, this.column, this.enumType, this.temporalType, this.lob);
+			this.collectionTable.link(this.type, defaultName, this.column, this.enumType, this.temporalType, this.lob);
 
 		}
 

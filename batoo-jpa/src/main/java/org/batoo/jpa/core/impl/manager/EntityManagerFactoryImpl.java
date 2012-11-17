@@ -157,6 +157,8 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 
 		LinkManager.perform(this.metamodel);
 
+		this.metamodel.checkTables();
+
 		// drop all tables if ddl mode is drop
 		if (this.ddlMode == DDLMode.DROP) {
 			this.metamodel.dropAllTables(this.dataSource);

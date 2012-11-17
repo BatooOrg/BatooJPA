@@ -81,7 +81,7 @@ public class Contact {
 	 * 
 	 * @since 2.0.0
 	 */
-	protected Phone getPhone() {
+	protected WorkPhone getPhone() {
 		return this.phone;
 	}
 

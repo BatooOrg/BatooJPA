@@ -195,10 +195,13 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	protected void addAttributes(ManagedTypeMetadata entityMetadata) {
 		if (this.supertype != null) {
-			for (final Attribute<?, ?> attribute : this.supertype.getAttributes()) {
+			for (Attribute<? super X, ?> attribute : this.supertype.getAttributes()) {
+				if ((attribute.getDeclaringType() instanceof MappedSuperclassTypeImpl) && (this instanceof EntityTypeImpl)) {
+					attribute = ((AttributeImpl<? super X, ?>) attribute).clone((EntityTypeImpl<X>) this);
+				}
+
 				this.addAttribute((AttributeImpl<? super X, ?>) attribute);
 			}
 

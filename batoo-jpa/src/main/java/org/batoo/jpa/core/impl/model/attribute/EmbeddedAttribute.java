@@ -24,6 +24,7 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
 import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
+import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.type.IdentifiableTypeImpl;
 import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
@@ -88,6 +89,15 @@ public class EmbeddedAttribute<X, T> extends SingularAttributeImpl<X, T> impleme
 
 		this.associationOverrides = metadata.getAssociationOverrides();
 		this.attributeOverrides = metadata.getAttributeOverrides();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public <Z extends X> EmbeddedAttribute<Z, T> clone(EntityTypeImpl<Z> type) {
+		return new EmbeddedAttribute<Z, T>(type, (EmbeddedIdAttributeMetadata) this.getMetadata());
 	}
 
 	/**

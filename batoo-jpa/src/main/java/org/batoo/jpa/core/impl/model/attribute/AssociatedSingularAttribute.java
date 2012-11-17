@@ -79,6 +79,15 @@ public class AssociatedSingularAttribute<X, T> extends SingularAttributeImpl<X, 
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public <Z extends X> AttributeImpl<Z, T> clone(EntityTypeImpl<Z> type) {
+		return new AssociatedSingularAttribute<Z, T>(type, this.attributeType, this.getMetadata());
+	}
+
+	/**
 	 * Returns the mapsId of the AssociatedSingularAttribute.
 	 * 
 	 * @return the mapsId of the AssociatedSingularAttribute

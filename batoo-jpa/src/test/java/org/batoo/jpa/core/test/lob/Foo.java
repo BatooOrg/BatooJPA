@@ -18,7 +18,6 @@
  */
 package org.batoo.jpa.core.test.lob;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Entity;
@@ -41,7 +40,7 @@ public class Foo {
 	private Integer key;
 
 	@Lob
-	private final HashSet<String> values = Sets.newHashSet();
+	private final Set<String> values = Sets.newHashSet();
 
 	@Lob
 	private String clob;

@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.impl.model;
 
 import java.io.Serializable;
+import java.lang.reflect.Member;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
@@ -48,9 +49,11 @@ import org.batoo.common.BatooException;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.jdbc.AbstractTable;
+import org.batoo.jpa.core.impl.jdbc.CollectionTable;
 import org.batoo.jpa.core.impl.jdbc.EntityTable;
 import org.batoo.jpa.core.impl.jdbc.ForeignKey;
 import org.batoo.jpa.core.impl.jdbc.JoinTable;
+import org.batoo.jpa.core.impl.jdbc.SecondaryTable;
 import org.batoo.jpa.core.impl.manager.CallbackAvailability;
 import org.batoo.jpa.core.impl.manager.CallbackManager;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
@@ -301,6 +304,22 @@ public class MetamodelImpl implements Metamodel {
 	}
 
 	/**
+	 * Check that the tables have unique names.
+	 * 
+	 * @since $version
+	 */
+	public void checkTables() {
+		final Map<String, AbstractTable> tableNames = Maps.newHashMap();
+		for (final AbstractTable table : this.getAllTables()) {
+			final AbstractTable existing = tableNames.put(table.getName(), table);
+
+			if (existing != null) {
+				throw new MappingException("Duplicate table names " + this.getTableDesc(existing) + ", " + this.getTableDesc(table));
+			}
+		}
+	}
+
+	/**
 	 * Creates of returns an existing {@link BasicTypeImpl} of <code>clazz</code>
 	 * 
 	 * @param clazz
@@ -331,42 +350,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @since 2.0.0
 	 */
 	public void dropAllTables(DataSource datasource) {
-		final Set<AbstractTable> tableSet = Sets.newHashSet();
-
-		for (final EntityTypeImpl<?> entity : this.entities.values()) {
-
-			// collect the entity tables
-			for (final EntityTable table : entity.getTables()) {
-				// if table belongs to parent then skip
-				if (table.getEntity() != entity) {
-					continue;
-				}
-
-				tableSet.add(table);
-			}
-
-			// collect the join tables
-			for (final AssociationMapping<?, ?, ?> mapping : entity.getAssociations()) {
-				final JoinTable table = mapping.getTable();
-
-				// skip not applicable tables
-				if ((table == null) || (table.getEntity() != entity)) {
-					continue;
-				}
-
-				tableSet.add(table);
-			}
-
-			// collect the join tables
-			for (final PluralMapping<?, ?, ?> mapping : entity.getMappingsPlural()) {
-				if (!mapping.isAssociation()) {
-					final AbstractTable table = (AbstractTable) mapping.getTable();
-					if (table != null) {
-						tableSet.add(table);
-					}
-				}
-			}
-		}
+		final Set<AbstractTable> tableSet = this.getAllTables();
 
 		try {
 			this.jdbcAdaptor.dropAllForeignKeys(datasource, tableSet);
@@ -426,6 +410,46 @@ public class MetamodelImpl implements Metamodel {
 	 */
 	public void fireCallbacks(Object instance, EntityListenerType type) {
 		this.callbackManager.fireCallbacks(instance, type);
+	}
+
+	private Set<AbstractTable> getAllTables() {
+		final Set<AbstractTable> tableSet = Sets.newHashSet();
+
+		for (final EntityTypeImpl<?> entity : this.entities.values()) {
+
+			// collect the entity tables
+			for (final EntityTable table : entity.getTables()) {
+				// if table belongs to parent then skip
+				if (table.getEntity() != entity) {
+					continue;
+				}
+
+				tableSet.add(table);
+			}
+
+			// collect the join tables
+			for (final AssociationMapping<?, ?, ?> mapping : entity.getAssociations()) {
+				final JoinTable table = mapping.getTable();
+
+				// skip not applicable tables
+				if ((table == null) || (table.getEntity() != entity)) {
+					continue;
+				}
+
+				tableSet.add(table);
+			}
+
+			// collect the join tables
+			for (final PluralMapping<?, ?, ?> mapping : entity.getMappingsPlural()) {
+				if (!mapping.isAssociation()) {
+					final AbstractTable table = (AbstractTable) mapping.getTable();
+					if (table != null) {
+						tableSet.add(table);
+					}
+				}
+			}
+		}
+		return tableSet;
 	}
 
 	/**
@@ -584,6 +608,36 @@ public class MetamodelImpl implements Metamodel {
 		catch (final InterruptedException e) {
 			throw new PersistenceException("Unable to retrieve next sequence " + generator + " in allowed " + MetamodelImpl.POLL_TIMEOUT + " seconds");
 		}
+	}
+
+	private String getTableDesc(AbstractTable table) {
+		if (table instanceof JoinTable) {
+			final JoinTable joinTable = (JoinTable) table;
+
+			final Member member = joinTable.getSourceKey().getMapping().getAttribute().getJavaMember();
+			final String memberDesc = member.getDeclaringClass() + "." + member.getName();
+
+			return "JoinTable[" + joinTable.getName() + " " + memberDesc + "]";
+		}
+
+		if (table instanceof CollectionTable) {
+			final CollectionTable collectionTable = (CollectionTable) table;
+
+			final Member member = collectionTable.getMapping().getAttribute().getJavaMember();
+			final String memberDesc = member.getDeclaringClass() + "." + member.getName();
+
+			return "CollectionTable[" + collectionTable.getName() + " " + memberDesc + "]";
+		}
+
+		if (table instanceof SecondaryTable) {
+			final SecondaryTable secondaryTable = (SecondaryTable) table;
+
+			return "SecondaryTable[" + secondaryTable.getName() + " " + secondaryTable.getEntity().getJavaType().getName() + "]";
+		}
+
+		final EntityTable entityTable = (SecondaryTable) table;
+
+		return "EntityTable[" + entityTable.getName() + " " + entityTable.getEntity().getJavaType().getName() + "]";
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
