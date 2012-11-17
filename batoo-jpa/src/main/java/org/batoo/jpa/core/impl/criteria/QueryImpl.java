@@ -630,6 +630,17 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	}
 
 	/**
+	 * Returns the JPQL that representing the query.
+	 * 
+	 * @return the JPQL that representing the query
+	 * 
+	 * @since $version
+	 */
+	public String getJpql() {
+		return this.q.getJpql();
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
