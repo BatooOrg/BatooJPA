@@ -115,7 +115,6 @@ public class ForeignKey {
 
 		this.jdbcAdaptor = jdbcAdaptor;
 		this.mapping = mapping;
-		this.mapping = mapping;
 		this.inverseOwner = inverseOwner;
 		this.readOnly = this.isReadOnly(metadata);
 

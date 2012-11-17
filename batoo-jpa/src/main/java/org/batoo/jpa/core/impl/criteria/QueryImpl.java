@@ -264,8 +264,6 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	private List<X> buildResultSet(CacheImpl cache, List<CacheReference[]> cachedResults) {
 		final MetamodelImpl metamodel = this.em.getMetamodel();
 
-		this.results = Lists.newArrayList();
-
 		for (int i = 0; i < cachedResults.size(); i++) {
 			final CacheReference[] references = cachedResults.get(i);
 			if (references.length == 1) {
@@ -355,7 +353,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 
 			resultSet = statement.executeQuery();
 
-			this.results = this.handle(resultSet);
+			this.handle(resultSet);
 		}
 		finally {
 			try {
@@ -438,6 +436,12 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 */
 	@Override
 	public int executeUpdate() {
+		// flush if specified
+		if (!this.q.isInternal() && this.em.hasActiveTransaction()
+			&& ((this.flushMode == FlushModeType.AUTO) || (this.em.getFlushMode() == FlushModeType.AUTO))) {
+			this.em.flush();
+		}
+
 		final Connection connection = this.em.getConnection();
 		final Object[] parameters = this.applyParameters(connection);
 
@@ -771,11 +775,6 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	}
 
 	private List<X> getResultListImpl() {
-		// if we already have the results then return the results
-		if (this.results != null) {
-			return this.results;
-		}
-
 		this.em.getSession().setLoadTracker();
 
 		final CacheImpl cache = this.emf.getCache();

@@ -408,7 +408,7 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 		while (resultSet.next()) {
 			final SessionImpl session = this.em.getSession();
 
-			final ManagedId<?> id = this.entity.getId(resultSet);
+			final ManagedId<?> id = this.entity.getId(session, resultSet);
 			if (id == null) {
 				continue;
 			}
@@ -524,6 +524,8 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 		boolean hasAnonymous = false;
 		int maxOrdinal = 0;
 
+		final boolean supportsOrdinalParams = this.em.getJdbcAdaptor().supportsOrdinalParams();
+
 		final StringBuilder sqlBuilder = new StringBuilder();
 
 		if (tree.getChildCount() > 1) {
@@ -537,10 +539,6 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 		final Tree statementTree = tree.getChild(0);
 
 		for (int i = 0; i < statementTree.getChildCount(); i++) {
-			if (i > 0) {
-				sqlBuilder.append(' ');
-			}
-
 			final Tree chunk = statementTree.getChild(i);
 
 			if (chunk.getType() == SqlParser.COLUMN) {
@@ -555,7 +553,12 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 					this.parameters.put(name, parameter);
 				}
 
-				sqlBuilder.append("?" + parameter.getPosition());
+				if (!supportsOrdinalParams) {
+					sqlBuilder.append(":p" + parameter.getPosition());
+				}
+				else {
+					sqlBuilder.append(":" + parameter.getPosition());
+				}
 			}
 			else if (chunk.getType() == SqlParser.QUESTION_MARK) {
 				// anonymous?
@@ -585,7 +588,12 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 
 					maxOrdinal = Math.max(maxOrdinal, ordinalNo);
 
-					sqlBuilder.append("?" + parameter.getPosition());
+					if (!supportsOrdinalParams) {
+						sqlBuilder.append(":p" + parameter.getPosition());
+					}
+					else {
+						sqlBuilder.append(":" + parameter.getPosition());
+					}
 				}
 			}
 			else {

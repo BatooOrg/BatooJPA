@@ -761,6 +761,10 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * @since 2.0.0
 	 */
 	public EntityTypeImpl<? extends X> getChildType(Object discriminatorValue) {
+		if (discriminatorValue.equals(this.discriminatorValue)) {
+			return this;
+		}
+
 		return this.children.get(discriminatorValue);
 	}
 

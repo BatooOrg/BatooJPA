@@ -223,7 +223,7 @@ public class JpqlQuery {
 		final RootImpl<?> r = (RootImpl<?>) q.from(entity);
 		this.putAlias(q, aliasedDef, aliased, r);
 
-		if (tree.getChildCount() == 2) {
+		if (deleteDef.getChildCount() == 2) {
 			q.where(this.constructJunction(cb, q, deleteDef.getChild(1)));
 		}
 

@@ -493,13 +493,22 @@ public class EntityManagerImpl implements EntityManager {
 					}
 				}
 				else {
+					if (instance.getStatus() == Status.REMOVED) {
+						return null;
+					}
+
 					this.lock(instance, lockMode, properties);
 
 					return instance.getInstance();
 				}
 			}
 
-			return type.performSelect(this, primaryKey, lockMode);
+			try {
+				return type.performSelect(this, primaryKey, lockMode);
+			}
+			catch (final NoResultException e) {
+				return null;
+			}
 		}
 		finally {
 			this.session.releaseLoadTracker();

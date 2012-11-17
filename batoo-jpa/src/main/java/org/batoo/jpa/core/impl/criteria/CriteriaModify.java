@@ -23,10 +23,13 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.EntityType;
 
+import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.PredicateImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+
+import com.google.common.base.Joiner;
 
 /**
  * Base class for for the update and delete criterias.
@@ -88,6 +91,30 @@ public abstract class CriteriaModify<T> extends BaseQueryImpl<T> {
 		}
 
 		return this.root = new RootImpl<T>((EntityTypeImpl<T>) entity);
+	}
+
+	/**
+	 * Returns the restriction for the query.
+	 * 
+	 * @return the restriction
+	 * 
+	 * @since 2.0.0
+	 */
+	protected String generateSqlRestriction() {
+		final String[] restrictions = new String[2];
+
+		if (this.getRestriction() != null) {
+			restrictions[0] = this.getRestriction().generateSqlRestriction(this);
+		}
+
+		restrictions[1] = this.getRoot().generateDiscrimination(false);
+
+		final String restriction = Joiner.on(") AND (").skipNulls().join(restrictions);
+		if (StringUtils.isBlank(restriction)) {
+			return null;
+		}
+
+		return "(" + restriction + ")";
 	}
 
 	/**

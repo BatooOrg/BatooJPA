@@ -323,6 +323,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	private String createCreateTableStatement(AbstractTable table) throws SQLException {
 		final Map<String, String> ddlColumns = Maps.newHashMap();
 		final List<String> pkColumns = Lists.newArrayList();
+		final List<String> uniqueColumns = Lists.newArrayList();
 
 		final Collection<AbstractColumn> columns = this.getColumns(table);
 
@@ -334,12 +335,16 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 			}
 			ddlColumns.put(column.getName(), columnDDL);
 
+			if (column.isUnique()) {
+				uniqueColumns.add(column.getName());
+			}
+
 			if (column.isPrimaryKey()) {
 				pkColumns.add(column.getName());
 			}
 		}
 
-		return this.createCreateTableStatement(table, ddlColumns.values(), pkColumns);
+		return this.createCreateTableStatement(table, ddlColumns.values(), pkColumns, uniqueColumns);
 	}
 
 	/**
@@ -351,11 +356,13 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 *            the DDL for the columns
 	 * @param pkColumns
 	 *            the list of primary key column names
+	 * @param uniqueColumns
+	 *            the list of columns that are unique
 	 * @return the generated column fragment
 	 * 
 	 * @since 2.0.0
 	 */
-	public String createCreateTableStatement(AbstractTable table, Collection<String> ddlColumns, List<String> pkColumns) {
+	public String createCreateTableStatement(AbstractTable table, Collection<String> ddlColumns, List<String> pkColumns, List<String> uniqueColumns) {
 		final String columns = Joiner.on(",\n\t").join(ddlColumns);
 		final String keys = Joiner.on(", ").join(pkColumns);
 
@@ -1364,6 +1371,17 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since 2.0.0
 	 */
 	public abstract IdType supports(GenerationType type);
+
+	/**
+	 * Returns if the database supports ordinal params i.e.: <code>select * from mytable field = ?1</code>.
+	 * 
+	 * @return true if the database supports ordinal params, false otherwise
+	 * 
+	 * @since $version
+	 */
+	public boolean supportsOrdinalParams() {
+		return true;
+	}
 
 	private void updateTable(DataSource datasource, AbstractTable table) {
 		final QueryRunner runner = new QueryRunner(datasource, this.isPmdBroken());

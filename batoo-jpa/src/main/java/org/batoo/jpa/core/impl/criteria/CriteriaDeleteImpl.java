@@ -77,27 +77,6 @@ public class CriteriaDeleteImpl<T> extends CriteriaModify<T> {
 	}
 
 	/**
-	 * Returns the restriction for the query.
-	 * 
-	 * @return the restriction
-	 * 
-	 * @since 2.0.0
-	 */
-	private String generateSqlRestriction() {
-		if ((this.getRestriction() == null) && (this.getRoot().getEntity().getRootType().getInheritanceType() == null)) {
-			return null;
-		}
-
-		final String sqlRestriction = this.getRestriction().generateSqlRestriction(this);
-
-		if (this.getRoot().getEntity().getRootType().getInheritanceType() == null) {
-			return sqlRestriction;
-		}
-
-		return "(" + sqlRestriction + ") AND (" + this.getRoot().generateDiscrimination(true) + ")";
-	}
-
-	/**
 	 * {@inheritDoc}
 	 * 
 	 */
