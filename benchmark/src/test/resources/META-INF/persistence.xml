@@ -52,8 +52,8 @@
 	
 		<properties>
 			<property name="hibernate.hbm2ddl.auto" value="create-drop" />
-			<property name="hibernate.connection.driver_class" value="org.apache.derby.jdbc.Driver40" />
-			<property name="hibernate.connection.url" value="jdbc:derby:memory:H;create=true" />
+			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:test" />
 			<property name="hibernate.connection.username" value="sa" />
 			<property name="hibernate.connection.password" value="" />
 			
@@ -79,8 +79,8 @@
 		<class>org.batoo.jpa.benchmark.Phone</class>
 		
 		<properties>
-			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.Driver40" />
-			<property name="javax.persistence.jdbc.url" value="jdbc:derby:memory:E;create=true" />
+			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:test" />
 			<property name="javax.persistence.jdbc.user" value="sa" />
 			<property name="javax.persistence.jdbc.password" value="" />
 			
