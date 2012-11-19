@@ -326,10 +326,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 			final String jdbcUser = (String) this.getProperty(JPASettings.JDBC_USER);
 			final String jdbcPassword = (String) this.getProperty(JPASettings.JDBC_PASSWORD);
 
-			final Integer statementsCacheSize = this.getProperty(BJPASettings.STATEMENT_CACHE_SIZE) != null ? //
-				Integer.valueOf((String) this.getProperty(BJPASettings.STATEMENT_CACHE_SIZE)) : //
-				BJPASettings.DEFAULT_STATEMENT_CACHE_SIZE;
-
 			final Integer maxConnections = this.getProperty(BJPASettings.MAX_CONNECTIONS) != null ? //
 				Integer.valueOf((String) this.getProperty(BJPASettings.MAX_CONNECTIONS)) : //
 				BJPASettings.DEFAULT_MAX_CONNECTIONS;
@@ -349,7 +345,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
 			// This is slow so always set it to 0
 			dataSource.setReleaseHelperThreads(0);
 
-			dataSource.setStatementsCacheSize(statementsCacheSize);
+			// dataSource.setStatementsCacheSize(statementsCacheSize);
 			dataSource.setMinConnectionsPerPartition(minConnections);
 			dataSource.setMaxConnectionsPerPartition(maxConnections);
 			dataSource.setDisableConnectionTracking(true);
