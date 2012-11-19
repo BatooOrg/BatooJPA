@@ -23,11 +23,11 @@ import javax.persistence.metamodel.EntityType;
 import org.batoo.common.BatooException;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
-import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
-import org.batoo.jpa.core.impl.model.mapping.ElementCollectionMapping;
-import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.mapping.AssociationMappingImpl;
+import org.batoo.jpa.core.impl.model.mapping.ElementCollectionMappingImpl;
+import org.batoo.jpa.core.impl.model.mapping.PluralMappingEx;
 
 /**
  * A Manager that performs the association linking operations.
@@ -95,17 +95,17 @@ public class LinkManager extends DeploymentManager<EntityTypeImpl<?>> {
 	public Void perform(EntityTypeImpl<?> entity) throws BatooException {
 		switch (this.phase) {
 			case LINK_ASSOCIATIONS:
-				for (final AssociationMapping<?, ?, ?> mapping : entity.getAssociations()) {
+				for (final AssociationMappingImpl<?, ?, ?> mapping : entity.getAssociations()) {
 					if (mapping.getRoot().getType() == entity) {
 						mapping.link();
 					}
 				}
 				break;
 			case LINK_ELEMENT_COLLECTIONS:
-				for (final PluralMapping<?, ?, ?> mapping : entity.getMappingsPlural()) {
+				for (final PluralMappingEx<?, ?, ?> mapping : entity.getMappingsPlural()) {
 					if (mapping.getRoot().getType() == entity) {
-						if (mapping instanceof ElementCollectionMapping) {
-							((ElementCollectionMapping<?, ?, ?>) mapping).link();
+						if (mapping instanceof ElementCollectionMappingImpl) {
+							((ElementCollectionMappingImpl<?, ?, ?>) mapping).link();
 						}
 					}
 				}

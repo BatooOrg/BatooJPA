@@ -18,7 +18,7 @@
  */
 package org.batoo.jpa.core.impl.instance;
 
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 
 /**
  * The managed id for the entity instances.

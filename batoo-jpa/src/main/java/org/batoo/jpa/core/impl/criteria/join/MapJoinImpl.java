@@ -37,7 +37,7 @@ import org.batoo.jpa.core.impl.criteria.path.MapKeyPath;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.MapAttributeImpl;
-import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralMappingEx;
 import org.batoo.jpa.core.util.Pair;
 
 /**
@@ -88,7 +88,7 @@ public class MapJoinImpl<Z, K, V> extends AbstractPluralJoin<Z, Map<K, V>, V> im
 	 * 
 	 * @since 2.0.0
 	 */
-	public MapJoinImpl(AbstractFrom<?, Z> parent, PluralMapping<? super Z, Map<K, V>, V> mapping, JoinType jointType) {
+	public MapJoinImpl(AbstractFrom<?, Z> parent, PluralMappingEx<? super Z, Map<K, V>, V> mapping, JoinType jointType) {
 		super(parent, mapping, jointType);
 	}
 

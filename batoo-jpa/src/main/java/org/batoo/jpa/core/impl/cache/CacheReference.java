@@ -20,8 +20,8 @@ package org.batoo.jpa.core.impl.cache;
 
 import java.io.Serializable;
 
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 /**
  * Reference to another cachable entity

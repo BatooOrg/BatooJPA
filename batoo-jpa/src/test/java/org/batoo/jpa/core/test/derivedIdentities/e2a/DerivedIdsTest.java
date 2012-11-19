@@ -26,9 +26,9 @@ import javax.sql.DataSource;
 
 import junit.framework.Assert;
 
-import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.test.BaseCoreTest;
 import org.batoo.jpa.core.test.ColumnNameListHandler;
+import org.batoo.jpa.jdbc.dbutils.QueryRunner;
 import org.junit.Test;
 
 /**

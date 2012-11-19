@@ -27,7 +27,7 @@ import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.mapping.Mapping;
+import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
 
 /**
  * 
@@ -50,7 +50,7 @@ public class MapExpression<M extends Map<K, V>, K, V> extends AbstractExpression
 	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
-	public MapExpression(Mapping<?, Map<K, V>, V> mapping) {
+	public MapExpression(AbstractMapping<?, Map<K, V>, V> mapping) {
 		super((Class<M>) mapping.getJavaType());
 	}
 

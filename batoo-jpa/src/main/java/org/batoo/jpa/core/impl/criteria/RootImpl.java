@@ -23,9 +23,9 @@ import javax.persistence.metamodel.EntityType;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
-import org.batoo.jpa.core.impl.jdbc.EntityTable;
-import org.batoo.jpa.core.impl.model.mapping.Mapping;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
+import org.batoo.jpa.jdbc.EntityTable;
 
 /**
  * A root type in the from clause. Query roots always reference entities.
@@ -91,14 +91,14 @@ public class RootImpl<X> extends AbstractFrom<X, X> implements Root<X> {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	protected <C, Y> Mapping<? super X, C, Y> getMapping(String name) {
-		final Mapping<? super X, ?, ?> child = this.entity.getRootMapping().getChild(name);
+	protected <C, Y> AbstractMapping<? super X, C, Y> getMapping(String name) {
+		final AbstractMapping<? super X, ?, ?> child = this.entity.getRootMapping().getChild(name);
 
 		if (child == null) {
 			throw this.cannotDereference(name);
 		}
 
-		return (Mapping<? super X, C, Y>) child;
+		return (AbstractMapping<? super X, C, Y>) child;
 	}
 
 	/**

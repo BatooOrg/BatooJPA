@@ -31,8 +31,8 @@ import javax.persistence.PreRemove;
 import javax.persistence.PreUpdate;
 
 import org.batoo.jpa.core.impl.manager.Callback.CallbackType;
+import org.batoo.jpa.core.impl.model.IdentifiableTypeImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
-import org.batoo.jpa.core.impl.model.type.IdentifiableTypeImpl;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.CallbackMetadata;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata;

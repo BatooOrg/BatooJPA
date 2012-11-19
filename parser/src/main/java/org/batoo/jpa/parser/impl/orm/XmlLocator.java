@@ -18,7 +18,7 @@
  */
 package org.batoo.jpa.parser.impl.orm;
 
-import org.batoo.jpa.parser.impl.AbstractLocator;
+import org.batoo.jpa.parser.AbstractLocator;
 import org.xml.sax.Locator;
 
 /**

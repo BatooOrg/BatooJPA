@@ -20,13 +20,13 @@ package org.batoo.jpa.core.impl.model.mapping;
 
 import java.util.Iterator;
 
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 
 import com.google.common.base.Splitter;
 
 /**
- * Mapping for the entities.
+ * AbstractMapping for the entities.
  * 
  * @param <X>
  *            the type of the entity
@@ -34,7 +34,7 @@ import com.google.common.base.Splitter;
  * @author hceylan
  * @since 2.0.0
  */
-public class EntityMapping<X> extends ParentMapping<X, X> implements RootMapping<X> {
+public class EntityMapping<X> extends AbstractParentMapping<X, X> implements RootMappingEx<X> {
 
 	private final EntityTypeImpl<X> entity;
 
@@ -81,12 +81,12 @@ public class EntityMapping<X> extends ParentMapping<X, X> implements RootMapping
 	 * 
 	 */
 	@Override
-	public Mapping<?, ?, ?> getMapping(String path) {
+	public AbstractMapping<?, ?, ?> getMapping(String path) {
 		final Iterator<String> segments = Splitter.on('.').split(path).iterator();
-		Mapping<?, ?, ?> mapping = this;
+		AbstractMapping<?, ?, ?> mapping = this;
 		while (segments.hasNext()) {
-			if (mapping instanceof ParentMapping) {
-				mapping = ((ParentMapping<?, ?>) mapping).getChild(segments.next());
+			if (mapping instanceof AbstractParentMapping) {
+				mapping = ((AbstractParentMapping<?, ?>) mapping).getChild(segments.next());
 
 				if (mapping == null) {
 					return null;
@@ -116,6 +116,15 @@ public class EntityMapping<X> extends ParentMapping<X, X> implements RootMapping
 	@Override
 	public EntityTypeImpl<X> getType() {
 		return this.entity;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public EntityTypeImpl<X> getTypeDescriptor() {
+		return this.getType();
 	}
 
 	/**

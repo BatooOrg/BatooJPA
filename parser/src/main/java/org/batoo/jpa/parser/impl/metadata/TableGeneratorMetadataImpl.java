@@ -23,7 +23,7 @@ import java.util.List;
 import javax.persistence.TableGenerator;
 import javax.persistence.UniqueConstraint;
 
-import org.batoo.jpa.parser.impl.AbstractLocator;
+import org.batoo.jpa.parser.AbstractLocator;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.UniqueConstraintMetadata;
 

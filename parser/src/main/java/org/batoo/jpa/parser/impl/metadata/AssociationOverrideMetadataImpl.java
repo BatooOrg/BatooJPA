@@ -23,7 +23,7 @@ import java.util.List;
 import javax.persistence.AssociationOverride;
 import javax.persistence.JoinColumn;
 
-import org.batoo.jpa.parser.impl.AbstractLocator;
+import org.batoo.jpa.parser.AbstractLocator;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;

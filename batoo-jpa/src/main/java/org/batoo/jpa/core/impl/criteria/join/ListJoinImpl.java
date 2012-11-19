@@ -26,8 +26,8 @@ import javax.persistence.criteria.ListJoin;
 import javax.persistence.metamodel.ListAttribute;
 
 import org.batoo.jpa.core.impl.criteria.expression.IndexExpression;
-import org.batoo.jpa.core.impl.jdbc.OrderColumn;
-import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralMappingEx;
+import org.batoo.jpa.jdbc.OrderColumn;
 
 /**
  * Implementation of {@link ListJoin}.
@@ -42,7 +42,7 @@ import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
  */
 public class ListJoinImpl<Z, E> extends AbstractPluralJoin<Z, List<E>, E> implements ListJoin<Z, E> {
 
-	private final PluralMapping<? super Z, List<E>, E> mapping;
+	private final PluralMappingEx<? super Z, List<E>, E> mapping;
 
 	/**
 	 * @param parent
@@ -54,7 +54,7 @@ public class ListJoinImpl<Z, E> extends AbstractPluralJoin<Z, List<E>, E> implem
 	 * 
 	 * @since 2.0.0
 	 */
-	public ListJoinImpl(AbstractFrom<?, Z> parent, PluralMapping<? super Z, List<E>, E> mapping, JoinType jointType) {
+	public ListJoinImpl(AbstractFrom<?, Z> parent, PluralMappingEx<? super Z, List<E>, E> mapping, JoinType jointType) {
 		super(parent, mapping, jointType);
 
 		this.mapping = mapping;

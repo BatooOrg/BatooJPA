@@ -25,9 +25,9 @@ import javax.persistence.metamodel.ListAttribute;
 
 import org.batoo.jpa.core.impl.collections.ManagedList;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
-import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
+import org.batoo.jpa.core.impl.model.mapping.PluralMappingEx;
 import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
 
 /**
@@ -79,7 +79,7 @@ public class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E>, E> 
 	 * 
 	 */
 	@Override
-	public List<E> newCollection(PluralMapping<?, List<E>, E> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
+	public List<E> newCollection(PluralMappingEx<?, List<E>, E> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
 		return new ManagedList<X, E>(mapping, managedInstance, lazy);
 	}
 
@@ -89,7 +89,7 @@ public class ListAttributeImpl<X, E> extends PluralAttributeImpl<X, List<E>, E> 
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<E> newCollection(PluralMapping<?, List<E>, E> mapping, ManagedInstance<?> managedInstance, Object values) {
+	public List<E> newCollection(PluralMappingEx<?, List<E>, E> mapping, ManagedInstance<?> managedInstance, Object values) {
 		return new ManagedList<X, E>(mapping, managedInstance, (Collection<? extends E>) values);
 	}
 }

@@ -26,9 +26,9 @@ import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.join.ListJoinImpl;
-import org.batoo.jpa.core.impl.jdbc.JoinTable;
-import org.batoo.jpa.core.impl.jdbc.OrderColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.jdbc.JoinTable;
+import org.batoo.jpa.jdbc.OrderColumn;
 
 /**
  * Expression for list join indices.

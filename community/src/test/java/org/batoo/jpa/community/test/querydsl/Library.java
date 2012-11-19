@@ -26,40 +26,43 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "library_")
 @Access(AccessType.PROPERTY)
+@SuppressWarnings("javadoc")
 public class Library implements Serializable {
 
-    private static final long serialVersionUID = 6360420736014459567L;
+	private static final long serialVersionUID = 6360420736014459567L;
 
-    private Long identity;
+	private Long identity;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long getIdentity() {
-        return identity;
-    }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if ((o == null) || (this.getClass() != o.getClass())) {
+			return false;
+		}
 
-    public void setIdentity(Long identity) {
-        this.identity = identity;
-    }
+		final Library library = (Library) o;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
+		if (this.identity != null ? !this.identity.equals(library.identity) : library.identity != null) {
+			return false;
+		}
 
-        Library library = (Library) o;
+		return true;
+	}
 
-        if (identity != null ? !identity.equals(library.identity)
-                : library.identity != null)
-            return false;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	public Long getIdentity() {
+		return this.identity;
+	}
 
-        return true;
-    }
+	@Override
+	public int hashCode() {
+		return this.identity != null ? this.identity.hashCode() : 0;
+	}
 
-    @Override
-    public int hashCode() {
-        return identity != null ? identity.hashCode() : 0;
-    }
+	public void setIdentity(Long identity) {
+		this.identity = identity;
+	}
 }

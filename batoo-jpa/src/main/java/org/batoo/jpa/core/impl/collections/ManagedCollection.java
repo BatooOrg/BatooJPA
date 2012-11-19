@@ -36,9 +36,9 @@ import org.batoo.jpa.core.impl.instance.Status;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
-import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
-import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
-import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
+import org.batoo.jpa.core.impl.model.mapping.AssociationMappingImpl;
+import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMappingImpl;
+import org.batoo.jpa.core.impl.model.mapping.PluralMappingEx;
 
 import com.google.common.collect.Lists;
 
@@ -55,8 +55,8 @@ public abstract class ManagedCollection<E> implements Serializable {
 
 	private transient boolean changed;
 	private final transient ManagedInstance<?> managedInstance;
-	private final transient PluralMapping<?, ?, E> mapping;
-	private transient AssociationMapping<?, ?, ?> inverse;
+	private final transient PluralMappingEx<?, ?, E> mapping;
+	private transient AssociationMappingImpl<?, ?, ?> inverse;
 	private final transient int insertBatchSize;
 
 	/**
@@ -82,15 +82,15 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 * 
 	 * @since 2.0.0
 	 */
-	public ManagedCollection(PluralMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance) {
+	public ManagedCollection(PluralMappingEx<?, ?, E> mapping, ManagedInstance<?> managedInstance) {
 		super();
 
 		this.mapping = mapping;
 		this.managedInstance = managedInstance;
 		this.insertBatchSize = this.managedInstance.getSession().getEntityManager().getJdbcAdaptor().getInsertBatchSize();
 
-		if (mapping instanceof PluralAssociationMapping) {
-			this.inverse = ((PluralAssociationMapping<?, ?, E>) mapping).getInverse();
+		if (mapping instanceof PluralAssociationMappingImpl) {
+			this.inverse = ((PluralAssociationMappingImpl<?, ?, E>) mapping).getInverse();
 		}
 	}
 
@@ -183,7 +183,7 @@ public abstract class ManagedCollection<E> implements Serializable {
 	 * 
 	 * @since 2.0.0
 	 */
-	protected PluralMapping<?, ?, E> getMapping() {
+	protected PluralMappingEx<?, ?, E> getMapping() {
 		return this.mapping;
 	}
 
@@ -261,8 +261,9 @@ public abstract class ManagedCollection<E> implements Serializable {
 
 		final SessionImpl session = entityManager.getSession();
 
-		final PluralAssociationMapping<?, ?, ?> inversePluralMapping = (this.inverse != null) && (this.inverse.getAttribute() instanceof PluralAttributeImpl) ? //
-			(PluralAssociationMapping<?, ?, ?>) this.inverse : null;
+		final PluralAssociationMappingImpl<?, ?, ?> inversePluralMapping = (this.inverse != null)
+			&& (this.inverse.getAttribute() instanceof PluralAttributeImpl) ? //
+			(PluralAssociationMappingImpl<?, ?, ?>) this.inverse : null;
 
 		// TODO needs to be overriden by ManagedMap
 		// add the new children

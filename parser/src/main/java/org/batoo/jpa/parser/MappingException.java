@@ -21,7 +21,6 @@ package org.batoo.jpa.parser;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.batoo.jpa.parser.impl.AbstractLocator;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicates;

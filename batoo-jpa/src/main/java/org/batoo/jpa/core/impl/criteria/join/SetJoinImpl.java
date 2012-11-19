@@ -24,7 +24,7 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.SetJoin;
 import javax.persistence.metamodel.SetAttribute;
 
-import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralMappingEx;
 
 /**
  * Implementation of {@link SetJoin}.
@@ -49,7 +49,7 @@ public class SetJoinImpl<Z, E> extends AbstractPluralJoin<Z, Set<E>, E> implemen
 	 * 
 	 * @since 2.0.0
 	 */
-	public SetJoinImpl(AbstractFrom<?, Z> parent, PluralMapping<? super Z, Set<E>, E> mapping, JoinType jointType) {
+	public SetJoinImpl(AbstractFrom<?, Z> parent, PluralMappingEx<? super Z, Set<E>, E> mapping, JoinType jointType) {
 		super(parent, mapping, jointType);
 	}
 

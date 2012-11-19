@@ -31,7 +31,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreRemove;
 import javax.persistence.PreUpdate;
 
-import org.batoo.jpa.parser.impl.AbstractLocator;
+import org.batoo.jpa.parser.AbstractLocator;
 import org.batoo.jpa.parser.metadata.CallbackMetadata;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata;
 import org.batoo.jpa.parser.metadata.type.IdentifiableTypeMetadata;

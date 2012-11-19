@@ -33,10 +33,10 @@ import org.batoo.jpa.core.impl.criteria.join.FetchParentImpl;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl.MapSelectType;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.model.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.attribute.MapAttributeImpl;
-import org.batoo.jpa.core.impl.model.mapping.ElementMapping;
-import org.batoo.jpa.core.impl.model.mapping.Mapping;
-import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
+import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
+import org.batoo.jpa.core.impl.model.mapping.ElementMappingImpl;
 
 /**
  * Path for Map join keys.
@@ -52,7 +52,7 @@ import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
 public class MapKeyPath<Z, X> extends ParentPath<Z, X> {
 
 	private final MapJoinImpl<?, X, ?> mapJoin;
-	private ElementMapping<X> elementMapping;
+	private ElementMappingImpl<X> elementMappingImpl;
 
 	/**
 	 * @param mapJoin
@@ -67,7 +67,7 @@ public class MapKeyPath<Z, X> extends ParentPath<Z, X> {
 
 		this.mapJoin = mapJoin;
 		if (this.mapJoin.getModel().getKeyType().getPersistenceType() == PersistenceType.EMBEDDABLE) {
-			this.elementMapping = new ElementMapping<X>(null, (EmbeddableTypeImpl<X>) this.mapJoin.getModel().getKeyType());
+			this.elementMappingImpl = new ElementMappingImpl<X>(null, (EmbeddableTypeImpl<X>) this.mapJoin.getModel().getKeyType());
 		}
 	}
 
@@ -117,12 +117,12 @@ public class MapKeyPath<Z, X> extends ParentPath<Z, X> {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	protected <C, Y> Mapping<? super X, C, Y> getMapping(String name) {
+	protected <C, Y> AbstractMapping<? super X, C, Y> getMapping(String name) {
 		if (this.mapJoin.getModel().getKeyType() instanceof EmbeddableTypeImpl) {
-			final Mapping<? super X, ?, ?> child = this.elementMapping.getChild(name);
+			final AbstractMapping<? super X, ?, ?> child = this.elementMappingImpl.getChild(name);
 
 			if (child != null) {
-				return (Mapping<? super X, C, Y>) child;
+				return (AbstractMapping<? super X, C, Y>) child;
 			}
 		}
 

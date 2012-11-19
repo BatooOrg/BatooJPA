@@ -20,7 +20,7 @@ package org.batoo.jpa.parser.impl.metadata;
 
 import javax.persistence.SequenceGenerator;
 
-import org.batoo.jpa.parser.impl.AbstractLocator;
+import org.batoo.jpa.parser.AbstractLocator;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
 
 /**

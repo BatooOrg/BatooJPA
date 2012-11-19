@@ -24,7 +24,7 @@ import javax.persistence.CollectionTable;
 import javax.persistence.JoinColumn;
 import javax.persistence.UniqueConstraint;
 
-import org.batoo.jpa.parser.impl.AbstractLocator;
+import org.batoo.jpa.parser.AbstractLocator;
 import org.batoo.jpa.parser.metadata.CollectionTableMetadata;
 import org.batoo.jpa.parser.metadata.JoinColumnMetadata;
 import org.batoo.jpa.parser.metadata.UniqueConstraintMetadata;

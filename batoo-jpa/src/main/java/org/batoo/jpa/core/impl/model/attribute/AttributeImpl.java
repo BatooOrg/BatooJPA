@@ -24,10 +24,10 @@ import javax.persistence.metamodel.Attribute;
 
 import org.batoo.common.reflect.AbstractAccessor;
 import org.batoo.common.reflect.ReflectHelper;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
-import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
-import org.batoo.jpa.parser.impl.AbstractLocator;
+import org.batoo.jpa.parser.AbstractLocator;
 import org.batoo.jpa.parser.impl.metadata.attribute.AttributeMetadataImpl;
 import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
 

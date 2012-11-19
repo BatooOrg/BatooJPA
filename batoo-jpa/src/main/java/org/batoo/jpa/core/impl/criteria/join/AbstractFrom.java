@@ -46,17 +46,17 @@ import org.batoo.jpa.core.impl.criteria.expression.EntityTypeExpression;
 import org.batoo.jpa.core.impl.criteria.expression.StaticTypeExpression;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl.MapSelectType;
 import org.batoo.jpa.core.impl.criteria.path.ParentPath;
-import org.batoo.jpa.core.impl.jdbc.AbstractTable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.TypeImpl;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
-import org.batoo.jpa.core.impl.model.mapping.ElementCollectionMapping;
-import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
+import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
+import org.batoo.jpa.core.impl.model.mapping.ElementCollectionMappingImpl;
+import org.batoo.jpa.core.impl.model.mapping.EmbeddedMappingImpl;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
-import org.batoo.jpa.core.impl.model.mapping.JoinedMapping.MappingType;
-import org.batoo.jpa.core.impl.model.mapping.Mapping;
-import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
-import org.batoo.jpa.core.impl.model.type.TypeImpl;
+import org.batoo.jpa.core.impl.model.mapping.PluralMappingEx;
+import org.batoo.jpa.jdbc.AbstractTable;
+import org.batoo.jpa.jdbc.mapping.MappingType;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -527,16 +527,16 @@ public abstract class AbstractFrom<Z, X> extends ParentPath<Z, X> implements Fro
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public <Y> AbstractJoin<X, Y> join(String attributeName, JoinType jt) {
-		Mapping<? super X, ?, ?> mapping = null;
+		AbstractMapping<? super X, ?, ?> mapping = null;
 
 		if (this.entity != null) {
 			mapping = this.entity.getRootMapping().getChild(attributeName);
 		}
 		else if (this.mapping.getMappingType() == MappingType.ELEMENT_COLLECTION) {
-			mapping = (Mapping<? super X, ?, ?>) ((ElementCollectionMapping<? super Z, ?, ?>) this.mapping).getMapping(attributeName);
+			mapping = (AbstractMapping<? super X, ?, ?>) ((ElementCollectionMappingImpl<? super Z, ?, ?>) this.mapping).getMapping(attributeName);
 		}
 		else if (this.mapping.getMappingType() == MappingType.EMBEDDABLE) {
-			mapping = (Mapping<? super X, ?, ?>) ((EmbeddedMapping<? super Z, ?>) this.mapping).getChild(attributeName);
+			mapping = (AbstractMapping<? super X, ?, ?>) ((EmbeddedMappingImpl<? super Z, ?>) this.mapping).getChild(attributeName);
 		}
 
 		AbstractJoin<X, Y> join = null;
@@ -552,16 +552,16 @@ public abstract class AbstractFrom<Z, X> extends ParentPath<Z, X> implements Fro
 
 				switch (attribute.getCollectionType()) {
 					case SET:
-						join = new SetJoinImpl<X, Y>(this, (PluralMapping<? super X, Set<Y>, Y>) joinedMapping, jt);
+						join = new SetJoinImpl<X, Y>(this, (PluralMappingEx<? super X, Set<Y>, Y>) joinedMapping, jt);
 						break;
 					case COLLECTION:
-						join = new CollectionJoinImpl<X, Y>(this, (PluralMapping<? super X, Collection<Y>, Y>) joinedMapping, jt);
+						join = new CollectionJoinImpl<X, Y>(this, (PluralMappingEx<? super X, Collection<Y>, Y>) joinedMapping, jt);
 						break;
 					case LIST:
-						join = new ListJoinImpl<X, Y>(this, (PluralMapping<? super X, List<Y>, Y>) joinedMapping, jt);
+						join = new ListJoinImpl<X, Y>(this, (PluralMappingEx<? super X, List<Y>, Y>) joinedMapping, jt);
 						break;
 					case MAP:
-						join = new MapJoinImpl(this, (PluralMapping<? super X, Map<?, Y>, Y>) joinedMapping, jt);
+						join = new MapJoinImpl(this, (PluralMappingEx<? super X, Map<?, Y>, Y>) joinedMapping, jt);
 				}
 			}
 		}

@@ -25,8 +25,8 @@ import java.util.Iterator;
 import javax.persistence.PersistenceException;
 
 import org.batoo.jpa.core.impl.manager.CallbackAvailability;
-import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.mapping.AssociationMappingImpl;
 
 import com.google.common.collect.Sets;
 
@@ -144,7 +144,7 @@ public final class Prioritizer {
 					final EntityTypeImpl<?> e2 = mi2.getType();
 					final Object i2 = mi2.getInstance();
 
-					for (final AssociationMapping<?, ?, ?> association : e1.getDependenciesFor(e2)) {
+					for (final AssociationMappingImpl<?, ?, ?> association : e1.getDependenciesFor(e2)) {
 						final Object dependent = forUpdates ? i1 : i2;
 						final Object dependency = forUpdates ? i2 : i1;
 						if (association.references(dependent, dependency)) {

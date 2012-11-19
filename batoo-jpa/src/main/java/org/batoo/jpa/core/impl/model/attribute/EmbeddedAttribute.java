@@ -22,11 +22,11 @@ import java.util.List;
 
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
-import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
-import org.batoo.jpa.core.impl.model.type.IdentifiableTypeImpl;
-import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
+import org.batoo.jpa.core.impl.model.EmbeddableTypeImpl;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.IdentifiableTypeImpl;
+import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
+import org.batoo.jpa.core.impl.model.mapping.SingularMappingEx;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.AttributeOverrideMetadata;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
@@ -36,7 +36,7 @@ import org.batoo.jpa.parser.metadata.attribute.EmbeddedIdAttributeMetadata;
 import com.google.common.collect.Lists;
 
 /**
- * Implementation of {@link SingularMapping} for embeddable attributes.
+ * Implementation of {@link SingularMappingEx} for embeddable attributes.
  * 
  * @param <X>
  *            The type containing the represented attribute

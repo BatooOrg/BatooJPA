@@ -25,12 +25,12 @@ import javax.persistence.metamodel.Type.PersistenceType;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
-import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
+import org.batoo.jpa.core.impl.model.EmbeddableTypeImpl;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.core.impl.model.TypeImpl;
 import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
-import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
-import org.batoo.jpa.core.impl.model.type.TypeImpl;
+import org.batoo.jpa.jdbc.AbstractColumn;
 
 /**
  * Type of criteria query parameter expressions.

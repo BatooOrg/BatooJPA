@@ -28,7 +28,7 @@ import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
-import org.batoo.jpa.core.impl.model.mapping.JoinedMapping.MappingType;
+import org.batoo.jpa.jdbc.mapping.MappingType;
 
 /**
  * Implementation of {@link Fetch}.

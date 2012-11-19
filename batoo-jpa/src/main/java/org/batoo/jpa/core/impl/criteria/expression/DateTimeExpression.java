@@ -29,6 +29,7 @@ import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.jdbc.DateTimeFunctionType;
 
 /**
  * The expression for numeric functions
@@ -66,7 +67,7 @@ public class DateTimeExpression extends AbstractExpression<Integer> {
 	public String generateJpqlRestriction(BaseQueryImpl<?> query) {
 		final String xExpr = this.x.generateJpqlRestriction(query);
 
-		return MessageFormat.format(this.type.jpqlFragment, xExpr);
+		return MessageFormat.format(this.type.getJpqlFragment(), xExpr);
 	}
 
 	/**

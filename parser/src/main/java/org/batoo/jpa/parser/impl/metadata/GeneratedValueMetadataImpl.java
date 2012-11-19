@@ -21,7 +21,7 @@ package org.batoo.jpa.parser.impl.metadata;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 
-import org.batoo.jpa.parser.impl.AbstractLocator;
+import org.batoo.jpa.parser.AbstractLocator;
 import org.batoo.jpa.parser.metadata.GeneratedValueMetadata;
 
 /**

@@ -49,14 +49,15 @@ import org.batoo.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.jdbc.BasicColumn;
-import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
-import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
-import org.batoo.jpa.core.impl.model.mapping.Mapping;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
+import org.batoo.jpa.core.impl.model.mapping.BasicMappingImpl;
+import org.batoo.jpa.core.impl.model.mapping.EmbeddedMappingImpl;
+import org.batoo.jpa.jdbc.BasicColumn;
+import org.batoo.jpa.jdbc.dbutils.QueryRunner;
+import org.batoo.jpa.jdbc.mapping.Mapping;
 import org.batoo.jpa.sql.SqlLexer;
 import org.batoo.jpa.sql.SqlParser;
 import org.batoo.jpa.sql.SqlParser.statements_return;
@@ -451,19 +452,19 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 
 		final Object instance = managedInstance.getInstance();
 
-		for (final Mapping<?, ?, ?> mapping : this.entity.getMappingsSingular()) {
+		for (final AbstractMapping<?, ?, ?> mapping : this.entity.getMappingsSingular()) {
 			this.initializeMapping(session, instance, row, mapping);
 		}
 	}
 
 	private void initializeMapping(SessionImpl session, Object instance, ResultSet row, Mapping<?, ?, ?> mapping) throws SQLException {
-		if (mapping instanceof BasicMapping) {
-			final BasicMapping<?, ?> basicMapping = (BasicMapping<?, ?>) mapping;
+		if (mapping instanceof BasicMappingImpl) {
+			final BasicMappingImpl<?, ?> basicMapping = (BasicMappingImpl<?, ?>) mapping;
 			final BasicColumn column = basicMapping.getColumn();
 			column.setValue(instance, row.getObject(column.getName()));
 		}
-		else if (mapping instanceof EmbeddedMapping) {
-			for (final Mapping<?, ?, ?> childMapping : ((EmbeddedMapping<?, ?>) mapping).getChildren()) {
+		else if (mapping instanceof EmbeddedMappingImpl) {
+			for (final Mapping<?, ?, ?> childMapping : ((EmbeddedMappingImpl<?, ?>) mapping).getChildren()) {
 				this.initializeMapping(session, instance, row, childMapping);
 			}
 		}

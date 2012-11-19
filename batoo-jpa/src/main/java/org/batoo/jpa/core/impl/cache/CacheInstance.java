@@ -32,13 +32,13 @@ import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
-import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
-import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
-import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
-import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
-import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.mapping.AssociationMappingImpl;
+import org.batoo.jpa.core.impl.model.mapping.BasicMappingImpl;
+import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMappingImpl;
+import org.batoo.jpa.core.impl.model.mapping.PluralMappingEx;
+import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMappingImpl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -76,13 +76,13 @@ public class CacheInstance implements Serializable {
 		final Object instance = managedInstance.getInstance();
 		final MetamodelImpl metamodel = managedInstance.getSession().getEntityManager().getMetamodel();
 
-		for (final BasicMapping<?, ?> mapping : type.getBasicMappings()) {
+		for (final BasicMappingImpl<?, ?> mapping : type.getBasicMappings()) {
 			this.basicMappings.put(mapping.getPath(), mapping.get(instance));
 		}
 
-		for (final AssociationMapping<?, ?, ?> mapping : type.getAssociations()) {
-			if (mapping instanceof PluralAssociationMapping) {
-				this.updateCollection(metamodel, cache, (PluralMapping<?, ?, ?>) mapping, instance);
+		for (final AssociationMappingImpl<?, ?, ?> mapping : type.getAssociations()) {
+			if (mapping instanceof PluralAssociationMappingImpl) {
+				this.updateCollection(metamodel, cache, (PluralMappingEx<?, ?, ?>) mapping, instance);
 			}
 			else {
 				final Object value = mapping.get(instance);
@@ -123,11 +123,11 @@ public class CacheInstance implements Serializable {
 		final EntityManagerImpl em = managedInstance.getSession().getEntityManager();
 		final MetamodelImpl metamodel = em.getMetamodel();
 
-		for (final BasicMapping<?, ?> mapping : type.getBasicMappings()) {
+		for (final BasicMappingImpl<?, ?> mapping : type.getBasicMappings()) {
 			mapping.set(instance, this.basicMappings.get(mapping.getPath()));
 		}
 
-		for (final SingularAssociationMapping<?, ?> mapping : type.getAssociationsSingular()) {
+		for (final SingularAssociationMappingImpl<?, ?> mapping : type.getAssociationsSingular()) {
 			final CacheReference reference = this.singularMappings.get(mapping.getPath());
 			if (reference != null) {
 				final EntityTypeImpl<?> entity = metamodel.entity(reference.getType());
@@ -148,7 +148,7 @@ public class CacheInstance implements Serializable {
 	 * @since 2.0.0
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Collection<?> getCollection(ManagedInstance<?> managedInstance, PluralAssociationMapping<?, ?, ?> mapping) {
+	public Collection<?> getCollection(ManagedInstance<?> managedInstance, PluralAssociationMappingImpl<?, ?, ?> mapping) {
 		final List<CacheReference> children = this.pluralMappings.get(mapping.getPath());
 
 		// if not null then fetch the references
@@ -161,7 +161,7 @@ public class CacheInstance implements Serializable {
 		final CacheImpl cache = entityManager.getEntityManagerFactory().getCache();
 		final Object instance = managedInstance.getInstance();
 
-		AssociationMapping<?, ?, ?> inverse = null;
+		AssociationMappingImpl<?, ?, ?> inverse = null;
 		if ((mapping.getInverse() != null) && (mapping.getInverse().getAttribute().getPersistentAttributeType() == PersistentAttributeType.MANY_TO_ONE)) {
 			inverse = mapping.getInverse();
 		}
@@ -210,7 +210,7 @@ public class CacheInstance implements Serializable {
 	 * 
 	 * @since 2.0.0
 	 */
-	private Collection<?> handleStale(CacheImpl cache, PluralMapping<?, ?, ?> mapping, ManagedInstance<?> managedInstance) {
+	private Collection<?> handleStale(CacheImpl cache, PluralMappingEx<?, ?, ?> mapping, ManagedInstance<?> managedInstance) {
 		this.pluralMappings.remove(mapping.getPath());
 		cache.put(managedInstance);
 
@@ -242,10 +242,10 @@ public class CacheInstance implements Serializable {
 	 * 
 	 * @since 2.0.0
 	 */
-	public boolean updateCollection(MetamodelImpl metamodel, CacheImpl cache, PluralMapping<?, ?, ?> mapping, Object instance) {
+	public boolean updateCollection(MetamodelImpl metamodel, CacheImpl cache, PluralMappingEx<?, ?, ?> mapping, Object instance) {
 		// if this is not a cachable type then skip
-		if (mapping.getType() instanceof EntityTypeImpl) {
-			final EntityTypeImpl<?> childType = (EntityTypeImpl<?>) mapping.getType();
+		if (mapping instanceof PluralAssociationMappingImpl) {
+			final EntityTypeImpl<?> childType = ((PluralAssociationMappingImpl<?, ?, ?>) mapping).getType();
 
 			if (cache.getCacheStoreMode(childType.getRootType()) == CacheStoreMode.BYPASS) {
 				return false;

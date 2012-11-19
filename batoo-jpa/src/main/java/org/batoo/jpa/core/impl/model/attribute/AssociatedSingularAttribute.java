@@ -21,15 +21,15 @@ package org.batoo.jpa.core.impl.model.attribute;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
-import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
+import org.batoo.jpa.core.impl.model.mapping.SingularMappingEx;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.OneToOneAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.OptionalAssociationAttributeMetadata;
 
 /**
- * Implementation of {@link SingularMapping} representing types of ManyToOne and OneToOne
+ * Implementation of {@link SingularMappingEx} representing types of ManyToOne and OneToOne
  * 
  * @param <X>
  *            The type containing the represented attribute

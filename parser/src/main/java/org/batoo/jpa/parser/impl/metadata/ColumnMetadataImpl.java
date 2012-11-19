@@ -22,7 +22,7 @@ import javax.persistence.Column;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.OrderColumn;
 
-import org.batoo.jpa.parser.impl.AbstractLocator;
+import org.batoo.jpa.parser.AbstractLocator;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 
 /**

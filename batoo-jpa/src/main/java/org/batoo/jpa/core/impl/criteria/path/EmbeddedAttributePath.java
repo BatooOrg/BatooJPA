@@ -33,14 +33,15 @@ import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.StaticTypeExpression;
 import org.batoo.jpa.core.impl.criteria.join.FetchParentImpl;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
-import org.batoo.jpa.core.impl.jdbc.BasicColumn;
-import org.batoo.jpa.core.impl.jdbc.JoinColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
-import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
-import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
-import org.batoo.jpa.core.impl.model.mapping.Mapping;
-import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
+import org.batoo.jpa.core.impl.model.mapping.BasicMappingImpl;
+import org.batoo.jpa.core.impl.model.mapping.EmbeddedMappingImpl;
+import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMappingImpl;
+import org.batoo.jpa.jdbc.BasicColumn;
+import org.batoo.jpa.jdbc.JoinColumn;
+import org.batoo.jpa.jdbc.mapping.Mapping;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -58,7 +59,7 @@ import com.google.common.collect.Lists;
  */
 public class EmbeddedAttributePath<Z, X> extends ParentPath<Z, X> {
 
-	private final EmbeddedMapping<? super Z, X> mapping;
+	private final EmbeddedMappingImpl<? super Z, X> mapping;
 	private final FetchParentImpl<Z, X> fetchRoot;
 
 	/**
@@ -69,7 +70,7 @@ public class EmbeddedAttributePath<Z, X> extends ParentPath<Z, X> {
 	 * 
 	 * @since 2.0.0
 	 */
-	public EmbeddedAttributePath(ParentPath<?, Z> parent, EmbeddedMapping<? super Z, X> mapping) {
+	public EmbeddedAttributePath(ParentPath<?, Z> parent, EmbeddedMappingImpl<? super Z, X> mapping) {
 		super(parent, mapping.getType().getJavaType());
 
 		this.fetchRoot = parent.getFetchRoot().fetch(mapping.getAttribute());
@@ -122,25 +123,25 @@ public class EmbeddedAttributePath<Z, X> extends ParentPath<Z, X> {
 		return Joiner.on(", ").join(fragments);
 	}
 
-	private void generateSqlSelect(AbstractCriteriaQueryImpl<?> query, final List<String> fragments, Mapping<?, ?, ?>[] mappings) {
-		for (final Mapping<?, ?, ?> mapping : mappings) {
-			if (mapping instanceof BasicMapping) {
-				final BasicColumn column = ((BasicMapping<?, ?>) mapping).getColumn();
+	private void generateSqlSelect(AbstractCriteriaQueryImpl<?> query, final List<String> fragments, AbstractMapping<?, ?, ?>[] mappings) {
+		for (final AbstractMapping<?, ?, ?> mapping : mappings) {
+			if (mapping instanceof BasicMappingImpl) {
+				final BasicColumn column = ((BasicMappingImpl<?, ?>) mapping).getColumn();
 
 				final String tableAlias = this.getRootPath().getTableAlias(query, column.getTable());
 				fragments.add(tableAlias + "." + column.getName());
 			}
 
-			if (mapping instanceof SingularAssociationMapping) {
-				final SingularAssociationMapping<?, ?> associationMapping = (SingularAssociationMapping<?, ?>) mapping;
+			if (mapping instanceof SingularAssociationMappingImpl) {
+				final SingularAssociationMappingImpl<?, ?> associationMapping = (SingularAssociationMappingImpl<?, ?>) mapping;
 				for (final JoinColumn column : associationMapping.getForeignKey().getJoinColumns()) {
 					final String tableAlias = this.getRootPath().getTableAlias(query, column.getTable());
 					fragments.add(tableAlias + "." + column.getName());
 				}
 			}
 
-			if (mapping instanceof EmbeddedMapping) {
-				final EmbeddedMapping<?, ?> embeddedMapping = (EmbeddedMapping<?, ?>) mapping;
+			if (mapping instanceof EmbeddedMappingImpl) {
+				final EmbeddedMappingImpl<?, ?> embeddedMapping = (EmbeddedMappingImpl<?, ?>) mapping;
 				this.generateSqlSelect(query, fragments, embeddedMapping.getSingularMappings());
 			}
 		}
@@ -161,14 +162,14 @@ public class EmbeddedAttributePath<Z, X> extends ParentPath<Z, X> {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	protected <C, Y> Mapping<? super X, C, Y> getMapping(String name) {
-		final Mapping<? super X, ?, ?> child = this.mapping.getChild(name);
+	protected <C, Y> AbstractMapping<? super X, C, Y> getMapping(String name) {
+		final AbstractMapping<? super X, ?, ?> child = this.mapping.getChild(name);
 
 		if (child == null) {
 			throw this.cannotDereference(name);
 		}
 
-		return (Mapping<? super X, C, Y>) child;
+		return (AbstractMapping<? super X, C, Y>) child;
 	}
 
 	/**
@@ -190,23 +191,23 @@ public class EmbeddedAttributePath<Z, X> extends ParentPath<Z, X> {
 
 		final Joinable rootPath = this.getRootPath();
 
-		final List<BasicMapping<?, ?>> mappings = Lists.newArrayList();
+		final List<BasicMappingImpl<?, ?>> mappings = Lists.newArrayList();
 
 		for (final Mapping<? super X, ?, ?> mapping : this.mapping.getChildren()) {
-			if (mapping instanceof BasicMapping) {
-				mappings.add((BasicMapping<?, ?>) mapping);
+			if (mapping instanceof BasicMappingImpl) {
+				mappings.add((BasicMappingImpl<?, ?>) mapping);
 			}
 		}
 
-		Collections.sort(mappings, new Comparator<BasicMapping<?, ?>>() {
+		Collections.sort(mappings, new Comparator<BasicMappingImpl<?, ?>>() {
 
 			@Override
-			public int compare(BasicMapping<?, ?> o1, BasicMapping<?, ?> o2) {
+			public int compare(BasicMappingImpl<?, ?> o1, BasicMappingImpl<?, ?> o2) {
 				return o1.getAttribute().getAttributeId().compareTo(o2.getAttribute().getAttributeId());
 			}
 		});
 
-		for (final BasicMapping<?, ?> mapping : mappings) {
+		for (final BasicMappingImpl<?, ?> mapping : mappings) {
 			final BasicColumn column = mapping.getColumn();
 			restrictions.add(rootPath.getTableAlias(query, column.getTable()) + "." + column.getName());
 		}

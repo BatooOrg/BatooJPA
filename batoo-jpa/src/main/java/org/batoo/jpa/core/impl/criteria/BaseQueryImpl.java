@@ -28,9 +28,9 @@ import javax.persistence.criteria.Selection;
 import org.batoo.common.util.FinalWrapper;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
-import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
-import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
+import org.batoo.jpa.jdbc.AbstractColumn;
+import org.batoo.jpa.jdbc.adapter.JdbcAdaptor;
 
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;

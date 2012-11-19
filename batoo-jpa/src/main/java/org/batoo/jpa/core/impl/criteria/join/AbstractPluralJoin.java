@@ -22,11 +22,11 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.PluralJoin;
 import javax.persistence.metamodel.Type.PersistenceType;
 
-import org.batoo.jpa.core.impl.model.mapping.ElementCollectionMapping;
+import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
+import org.batoo.jpa.core.impl.model.mapping.ElementCollectionMappingImpl;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
-import org.batoo.jpa.core.impl.model.mapping.JoinedMapping.MappingType;
-import org.batoo.jpa.core.impl.model.mapping.Mapping;
-import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMappingImpl;
+import org.batoo.jpa.jdbc.mapping.MappingType;
 
 /**
  * The implementation of {@link PluralJoin}.
@@ -63,23 +63,23 @@ public abstract class AbstractPluralJoin<Z, C, E> extends AbstractJoin<Z, E> imp
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	protected <CC, Y> Mapping<? super E, CC, Y> getMapping(String name) {
-		Mapping<? super E, ?, ?> child = null;
+	protected <CC, Y> AbstractMapping<? super E, CC, Y> getMapping(String name) {
+		AbstractMapping<? super E, ?, ?> child = null;
 
 		if (this.getMapping().getMappingType() == MappingType.ELEMENT_COLLECTION) {
-			final ElementCollectionMapping<? super Z, C, E> elementCollectionMapping = (ElementCollectionMapping<? super Z, C, E>) this.getMapping();
+			final ElementCollectionMappingImpl<? super Z, C, E> elementCollectionMapping = (ElementCollectionMappingImpl<? super Z, C, E>) this.getMapping();
 			if (elementCollectionMapping.getType().getPersistenceType() == PersistenceType.EMBEDDABLE) {
-				child = (Mapping<? super E, ?, ?>) elementCollectionMapping.getMapping(name);
+				child = (AbstractMapping<? super E, ?, ?>) elementCollectionMapping.getMapping(name);
 			}
 		}
 		else {
-			child = ((PluralAssociationMapping<? super Z, C, E>) this.getMapping()).getType().getRootMapping().getChild(name);
+			child = ((PluralAssociationMappingImpl<? super Z, C, E>) this.getMapping()).getType().getRootMapping().getChild(name);
 		}
 
 		if (child == null) {
 			throw this.cannotDereference(name);
 		}
 
-		return (Mapping<? super E, CC, Y>) child;
+		return (AbstractMapping<? super E, CC, Y>) child;
 	}
 }

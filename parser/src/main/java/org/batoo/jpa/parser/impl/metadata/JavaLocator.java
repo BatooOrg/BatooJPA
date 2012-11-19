@@ -21,7 +21,7 @@ package org.batoo.jpa.parser.impl.metadata;
 import java.lang.reflect.Member;
 
 import org.batoo.common.reflect.ReflectHelper;
-import org.batoo.jpa.parser.impl.AbstractLocator;
+import org.batoo.jpa.parser.AbstractLocator;
 
 /**
  * Locator for the java locations.

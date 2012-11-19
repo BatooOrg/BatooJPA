@@ -30,10 +30,10 @@ import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.expression.StaticTypeExpression;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
-import org.batoo.jpa.core.impl.jdbc.BasicColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
-import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
+import org.batoo.jpa.core.impl.model.mapping.BasicMappingImpl;
+import org.batoo.jpa.jdbc.BasicColumn;
 
 /**
  * Physical Attribute implementation of {@link Path}.
@@ -46,7 +46,7 @@ import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
  */
 public class BasicPath<X> extends AbstractPath<X> {
 
-	private final BasicMapping<?, X> mapping;
+	private final BasicMappingImpl<?, X> mapping;
 	private String fieldAlias;
 
 	/**
@@ -57,7 +57,7 @@ public class BasicPath<X> extends AbstractPath<X> {
 	 * 
 	 * @since 2.0.0
 	 */
-	public BasicPath(ParentPath<?, ?> parent, BasicMapping<?, X> mapping) {
+	public BasicPath(ParentPath<?, ?> parent, BasicMappingImpl<?, X> mapping) {
 		super(parent, mapping.getJavaType());
 
 		this.mapping = mapping;

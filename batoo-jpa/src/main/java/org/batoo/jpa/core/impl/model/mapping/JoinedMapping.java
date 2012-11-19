@@ -24,9 +24,11 @@ import java.sql.SQLException;
 import javax.persistence.criteria.JoinType;
 
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.jdbc.JoinableTable;
+import org.batoo.jpa.core.impl.model.TypeImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
-import org.batoo.jpa.core.impl.model.type.TypeImpl;
+import org.batoo.jpa.jdbc.JoinableTable;
+import org.batoo.jpa.jdbc.mapping.Mapping;
+import org.batoo.jpa.jdbc.mapping.MappingType;
 
 /**
  * Mapping that have a join or collection table
@@ -41,35 +43,7 @@ import org.batoo.jpa.core.impl.model.type.TypeImpl;
  * @author hceylan
  * @since 2.0.0
  */
-public interface JoinedMapping<Z, X, Y> {
-
-	/**
-	 * Type of the mapping
-	 * 
-	 * @author hceylan
-	 * @since 2.0.0
-	 */
-	public enum MappingType {
-		/**
-		 * Singular association
-		 */
-		SINGULAR_ASSOCIATION,
-
-		/**
-		 * Plural association
-		 */
-		PLURAL_ASSOCIATION,
-
-		/**
-		 * Element collection
-		 */
-		ELEMENT_COLLECTION,
-
-		/**
-		 * Embeddable mapping
-		 */
-		EMBEDDABLE
-	}
+public interface JoinedMapping<Z, X, Y> extends Mapping<Z, X, Y> {
 
 	/**
 	 * Extracts key from the value.
@@ -110,25 +84,7 @@ public interface JoinedMapping<Z, X, Y> {
 	AttributeImpl<? super Z, X> getAttribute();
 
 	/**
-	 * Returns the type of the mapping.
-	 * 
-	 * @return the type of the mapping
-	 * 
-	 * @since 2.0.0
-	 */
-	MappingType getMappingType();
-
-	/**
-	 * Returns the path of the mapping.
-	 * 
-	 * @return the path of the mapping
-	 * 
-	 * @since 2.0.0
-	 */
-	String getPath();
-
-	/**
-	 * Returns the table for the relation.
+	 * Returns the join table for the relation.
 	 * <p>
 	 * This is, for associations the JoinTable, for element collections the CollectionTable.
 	 * 
@@ -136,7 +92,16 @@ public interface JoinedMapping<Z, X, Y> {
 	 * 
 	 * @since 2.0.0
 	 */
-	JoinableTable getTable();
+	JoinableTable getJoinTable();
+
+	/**
+	 * Returns the type of the mapping.
+	 * 
+	 * @return the type of the mapping
+	 * 
+	 * @since 2.0.0
+	 */
+	MappingType getMappingType();
 
 	/**
 	 * Returns the bindable entity type.

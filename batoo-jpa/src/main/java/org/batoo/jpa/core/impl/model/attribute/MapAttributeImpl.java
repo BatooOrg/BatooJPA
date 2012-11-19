@@ -28,10 +28,10 @@ import org.apache.commons.lang.StringUtils;
 import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.collections.ManagedMap;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
-import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
-import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
+import org.batoo.jpa.core.impl.model.mapping.PluralMappingEx;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.PluralAttributeMetadata;
@@ -129,7 +129,7 @@ public class MapAttributeImpl<X, K, V> extends PluralAttributeImpl<X, Map<K, V>,
 	 * 
 	 */
 	@Override
-	public Map<K, V> newCollection(PluralMapping<?, Map<K, V>, V> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
+	public Map<K, V> newCollection(PluralMappingEx<?, Map<K, V>, V> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
 		return new ManagedMap<X, K, V>(mapping, managedInstance, lazy);
 	}
 
@@ -139,7 +139,7 @@ public class MapAttributeImpl<X, K, V> extends PluralAttributeImpl<X, Map<K, V>,
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public Map<K, V> newCollection(PluralMapping<?, Map<K, V>, V> mapping, ManagedInstance<?> managedInstance, Object values) {
+	public Map<K, V> newCollection(PluralMappingEx<?, Map<K, V>, V> mapping, ManagedInstance<?> managedInstance, Object values) {
 		return new ManagedMap<X, K, V>(mapping, managedInstance, (Map<? extends K, ? extends V>) values);
 	}
 }

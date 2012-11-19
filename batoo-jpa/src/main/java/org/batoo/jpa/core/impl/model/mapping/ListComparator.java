@@ -29,8 +29,9 @@ import org.apache.commons.lang.ObjectUtils;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
 import org.batoo.common.reflect.AbstractAccessor;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.util.Pair;
+import org.batoo.jpa.jdbc.mapping.SingularMapping;
 import org.batoo.jpa.parser.MappingException;
 
 import com.google.common.base.Splitter;
@@ -50,7 +51,7 @@ public class ListComparator<E> implements Comparator<E> {
 	private class ComparableMapping {
 
 		private final boolean ascending;
-		private final Mapping<?, ?, ?> mapping;
+		private final AbstractMapping<?, ?, ?> abstractMapping;
 
 		/**
 		 * @param ascending
@@ -60,21 +61,21 @@ public class ListComparator<E> implements Comparator<E> {
 		 * 
 		 * @since 2.0.0
 		 */
-		public ComparableMapping(boolean ascending, Mapping<?, ?, ?> mapping) {
+		public ComparableMapping(boolean ascending, AbstractMapping<?, ?, ?> mapping) {
 			super();
 			this.ascending = ascending;
-			this.mapping = mapping;
+			this.abstractMapping = mapping;
 		}
 
 		/**
-		 * Returns the mapping.
+		 * Returns the abstractMapping.
 		 * 
-		 * @return the mapping
+		 * @return the abstractMapping
 		 * 
 		 * @since 2.0.0
 		 */
-		protected Mapping<?, ?, ?> getMapping() {
-			return this.mapping;
+		protected AbstractMapping<?, ?, ?> getMapping() {
+			return this.abstractMapping;
 		}
 
 		/**
@@ -91,7 +92,7 @@ public class ListComparator<E> implements Comparator<E> {
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(ListComparator.class);
 
-	private final PluralMapping<?, ?, E> mapping;
+	private final PluralMappingEx<?, ?, E> mapping;
 	private final ArrayList<ComparableMapping> comparables = Lists.newArrayList();
 
 	/**
@@ -100,7 +101,7 @@ public class ListComparator<E> implements Comparator<E> {
 	 * 
 	 * @since 2.0.0
 	 */
-	public ListComparator(PluralMapping<?, ?, E> mapping) {
+	public ListComparator(PluralMappingEx<?, ?, E> mapping) {
 		super();
 
 		this.mapping = mapping;
@@ -143,10 +144,10 @@ public class ListComparator<E> implements Comparator<E> {
 	}
 
 	private void createComparable(SingularMapping<?, ?> idMapping) {
-		if (idMapping instanceof BasicMapping) {
-			this.comparables.add(new ComparableMapping(true, (Mapping<?, ?, ?>) idMapping));
+		if (idMapping instanceof BasicMappingImpl) {
+			this.comparables.add(new ComparableMapping(true, (AbstractMapping<?, ?, ?>) idMapping));
 		}
-		else if (idMapping instanceof SingularAssociationMapping) {
+		else if (idMapping instanceof SingularAssociationMappingImpl) {
 
 		}
 	}
@@ -160,12 +161,12 @@ public class ListComparator<E> implements Comparator<E> {
 		// order on id
 		if (this.mapping.getOrderBy().trim().length() == 0) {
 			if (this.mapping.isAssociation()) {
-				final EntityTypeImpl<E> type = ((PluralAssociationMapping<?, ?, E>) this.mapping).getType();
+				final EntityTypeImpl<E> type = ((PluralAssociationMappingImpl<?, ?, E>) this.mapping).getType();
 				if (type.hasSingleIdAttribute()) {
 					this.createComparable(type.getIdMapping());
 				}
 				else {
-					for (final Pair<SingularMapping<? super E, ?>, AbstractAccessor> pair : type.getIdMappings()) {
+					for (final Pair<SingularMapping<?, ?>, AbstractAccessor> pair : type.getIdMappings()) {
 						this.createComparable(pair.getFirst());
 					}
 				}
@@ -203,7 +204,7 @@ public class ListComparator<E> implements Comparator<E> {
 					throw new MappingException("Basic element collection must not have OrderBy value", this.mapping.getAttribute().getLocator());
 				}
 
-				final Mapping<?, ?, ?> mapping = this.mapping.getMapping(path);
+				final AbstractMapping<?, ?, ?> mapping = this.mapping.getMapping(path);
 				if (mapping == null) {
 					throw new MappingException("Sort property cannot be found: " + path, this.mapping.getAttribute().getLocator());
 				}

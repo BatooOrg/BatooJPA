@@ -28,10 +28,10 @@ import javax.sql.DataSource;
 
 import junit.framework.Assert;
 
-import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
-import org.batoo.jpa.core.impl.jdbc.dbutils.SingleValueHandler;
 import org.batoo.jpa.core.test.BaseCoreTest;
 import org.batoo.jpa.core.test.NullResultSetHandler;
+import org.batoo.jpa.jdbc.dbutils.QueryRunner;
+import org.batoo.jpa.jdbc.dbutils.SingleValueHandler;
 import org.junit.Test;
 
 /**

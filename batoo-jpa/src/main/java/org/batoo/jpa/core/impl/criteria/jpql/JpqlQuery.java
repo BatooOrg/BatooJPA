@@ -67,7 +67,6 @@ import org.batoo.jpa.core.impl.criteria.expression.CoalesceExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CollectionExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ConcatExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CountExpression;
-import org.batoo.jpa.core.impl.criteria.expression.DateTimeFunctionType;
 import org.batoo.jpa.core.impl.criteria.expression.ExistsExpression;
 import org.batoo.jpa.core.impl.criteria.expression.FunctionExpression;
 import org.batoo.jpa.core.impl.criteria.expression.MapExpression;
@@ -85,10 +84,11 @@ import org.batoo.jpa.core.impl.criteria.path.BasicPath;
 import org.batoo.jpa.core.impl.criteria.path.ParentPath;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
-import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.mapping.AssociationMappingImpl;
+import org.batoo.jpa.jdbc.DateTimeFunctionType;
 import org.batoo.jpa.jpql.JpqlLexer;
 import org.batoo.jpa.jpql.JpqlParser;
 import org.batoo.jpa.jpql.JpqlParser.ql_statement_return;
@@ -259,7 +259,7 @@ public class JpqlQuery {
 				this.constructJoins(cb, (AbstractCriteriaQueryImpl<?>) q, r, from.getChild(1));
 
 				if (from.getChild(from.getChildCount() - 1).getType() == JpqlParser.LALL_PROPERTIES) {
-					for (final AssociationMapping<?, ?, ?> association : entity.getAssociations()) {
+					for (final AssociationMappingImpl<?, ?, ?> association : entity.getAssociations()) {
 						if (!association.isEager()) {
 							final Iterator<String> pathIterator = Splitter.on(".").split(association.getPath()).iterator();
 

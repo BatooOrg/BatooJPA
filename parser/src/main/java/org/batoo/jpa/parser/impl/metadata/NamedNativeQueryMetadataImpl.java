@@ -23,7 +23,7 @@ import java.util.Map;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.QueryHint;
 
-import org.batoo.jpa.parser.impl.AbstractLocator;
+import org.batoo.jpa.parser.AbstractLocator;
 import org.batoo.jpa.parser.metadata.NamedNativeQueryMetadata;
 import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 

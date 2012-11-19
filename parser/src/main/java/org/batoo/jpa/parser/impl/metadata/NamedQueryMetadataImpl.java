@@ -24,7 +24,7 @@ import javax.persistence.LockModeType;
 import javax.persistence.NamedQuery;
 import javax.persistence.QueryHint;
 
-import org.batoo.jpa.parser.impl.AbstractLocator;
+import org.batoo.jpa.parser.AbstractLocator;
 import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 
 import com.google.common.collect.Maps;

@@ -23,9 +23,9 @@ import javax.sql.DataSource;
 import org.batoo.common.BatooException;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
-import org.batoo.jpa.core.jdbc.DDLMode;
+import org.batoo.jpa.jdbc.DDLMode;
 
 /**
  * A Manager that performs the DDL operations.

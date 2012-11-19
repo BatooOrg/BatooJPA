@@ -31,8 +31,8 @@ import javax.persistence.PersistenceException;
 import org.batoo.common.util.BatooUtils;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.jdbc.Joinable;
-import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralMappingEx;
+import org.batoo.jpa.jdbc.Joinable;
 
 import com.google.common.collect.Sets;
 
@@ -72,7 +72,7 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 * 
 	 * @since 2.0.0
 	 */
-	public ManagedSet(PluralMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
+	public ManagedSet(PluralMappingEx<?, ?, E> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
 		super(mapping, managedInstance);
 
 		this.delegate = Sets.newHashSet();
@@ -92,7 +92,7 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 	 * 
 	 * @since 2.0.0
 	 */
-	public ManagedSet(PluralMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
+	public ManagedSet(PluralMappingEx<?, ?, E> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
 		super(mapping, managedInstance);
 
 		this.delegate = Sets.newHashSet(values);
@@ -166,7 +166,7 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 		return false;
 	}
 
-	private void attachChildren(Connection connection, final ManagedInstance<?> instance, final PluralMapping<?, ?, E> mapping, Collection<E> children)
+	private void attachChildren(Connection connection, final ManagedInstance<?> instance, final PluralMappingEx<?, ?, E> mapping, Collection<E> children)
 		throws SQLException {
 		final int insertBatchSize = this.getInsertBatchSize();
 
@@ -247,7 +247,7 @@ public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
 		}
 
 		final ManagedInstance<?> managedInstance = this.getManagedInstance();
-		final PluralMapping<?, ?, E> mapping = this.getMapping();
+		final PluralMappingEx<?, ?, E> mapping = this.getMapping();
 
 		// forced creation of relations for the new entities
 		if (force) {

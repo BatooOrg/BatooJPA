@@ -24,8 +24,8 @@ import java.security.PrivilegedAction;
 
 import javax.persistence.PersistenceException;
 
+import org.batoo.jpa.parser.AbstractLocator;
 import org.batoo.jpa.parser.MappingException;
-import org.batoo.jpa.parser.impl.AbstractLocator;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
 
 /**

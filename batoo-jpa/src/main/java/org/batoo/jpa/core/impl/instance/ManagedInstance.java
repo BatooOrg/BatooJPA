@@ -46,18 +46,19 @@ import org.batoo.jpa.core.impl.cache.CacheInstance;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
-import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
-import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
-import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
+import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
+import org.batoo.jpa.core.impl.model.mapping.AssociationMappingImpl;
+import org.batoo.jpa.core.impl.model.mapping.BasicMappingImpl;
+import org.batoo.jpa.core.impl.model.mapping.EmbeddedMappingImpl;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
-import org.batoo.jpa.core.impl.model.mapping.Mapping;
-import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
-import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
-import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
-import org.batoo.jpa.core.impl.model.mapping.SingularMapping;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMappingImpl;
+import org.batoo.jpa.core.impl.model.mapping.PluralMappingEx;
+import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMappingImpl;
+import org.batoo.jpa.core.impl.model.mapping.SingularMappingEx;
 import org.batoo.jpa.core.util.Pair;
+import org.batoo.jpa.jdbc.mapping.SingularMapping;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
 
 import com.google.common.collect.Lists;
@@ -85,9 +86,9 @@ public class ManagedInstance<X> {
 	private boolean optimisticLock;
 	private LockModeType lockMode;
 
-	private final HashMap<Mapping<?, ?, ?>, Object> snapshot = Maps.newHashMap();
+	private final HashMap<AbstractMapping<?, ?, ?>, Object> snapshot = Maps.newHashMap();
 	private final HashSet<String> joinsLoaded;
-	private final ArrayList<PluralMapping<?, ?, ?>> collectionsChanged;
+	private final ArrayList<PluralMappingEx<?, ?, ?>> collectionsChanged;
 
 	private boolean loading;
 	private boolean loadingFromCache;
@@ -164,11 +165,11 @@ public class ManagedInstance<X> {
 
 		ManagedInstance.LOG.debug("Cascading detach on {0}", this);
 
-		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsDetachable()) {
+		for (final AssociationMappingImpl<?, ?, ?> association : this.type.getAssociationsDetachable()) {
 
 			// if the association a collection attribute then we will cascade to each element
-			if (association instanceof PluralAssociationMapping) {
-				final PluralAssociationMapping<?, ?, ?> mapping = (PluralAssociationMapping<?, ?, ?>) association;
+			if (association instanceof PluralAssociationMappingImpl) {
+				final PluralAssociationMappingImpl<?, ?, ?> mapping = (PluralAssociationMappingImpl<?, ?, ?>) association;
 
 				final Collection<?> collection;
 				if (mapping.getAttribute().getCollectionType() == CollectionType.MAP) {
@@ -193,7 +194,7 @@ public class ManagedInstance<X> {
 				}
 			}
 			else {
-				final SingularAssociationMapping<?, ?> mapping = (SingularAssociationMapping<?, ?>) association;
+				final SingularAssociationMappingImpl<?, ?> mapping = (SingularAssociationMappingImpl<?, ?>) association;
 				final Object associate = mapping.get(this.instance);
 
 				entityManager.detach(associate);
@@ -219,11 +220,11 @@ public class ManagedInstance<X> {
 
 		boolean requiresFlush = false;
 
-		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsPersistable()) {
+		for (final AssociationMappingImpl<?, ?, ?> association : this.type.getAssociationsPersistable()) {
 
 			// if the association a collection attribute then we will cascade to each element
-			if (association instanceof PluralAssociationMapping) {
-				final PluralAssociationMapping<?, ?, ?> mapping = (PluralAssociationMapping<?, ?, ?>) association;
+			if (association instanceof PluralAssociationMappingImpl) {
+				final PluralAssociationMappingImpl<?, ?, ?> mapping = (PluralAssociationMappingImpl<?, ?, ?>) association;
 
 				switch (mapping.getAttribute().getCollectionType()) {
 					case MAP:
@@ -267,7 +268,7 @@ public class ManagedInstance<X> {
 				}
 			}
 			else {
-				final SingularAssociationMapping<?, ?> mapping = (SingularAssociationMapping<?, ?>) association;
+				final SingularAssociationMappingImpl<?, ?> mapping = (SingularAssociationMappingImpl<?, ?>) association;
 				final Object associate = mapping.get(this.instance);
 				if (associate != null) {
 					requiresFlush |= entityManager.persistImpl(associate, processed, instances);
@@ -293,11 +294,11 @@ public class ManagedInstance<X> {
 	public void cascadeRemove(EntityManagerImpl entityManager, ArrayList<Object> processed, LinkedList<ManagedInstance<?>> instances) {
 		ManagedInstance.LOG.debug("Cascading remove on {0}", this);
 
-		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsRemovable()) {
+		for (final AssociationMappingImpl<?, ?, ?> association : this.type.getAssociationsRemovable()) {
 
 			// if the association a collection attribute then we will cascade to each element
-			if (association instanceof PluralAssociationMapping) {
-				final PluralAssociationMapping<?, ?, ?> mapping = (PluralAssociationMapping<?, ?, ?>) association;
+			if (association instanceof PluralAssociationMappingImpl) {
+				final PluralAssociationMappingImpl<?, ?, ?> mapping = (PluralAssociationMappingImpl<?, ?, ?>) association;
 
 				// extract the collection
 				final Collection<?> collection;
@@ -322,7 +323,7 @@ public class ManagedInstance<X> {
 				}
 			}
 			else {
-				final SingularAssociationMapping<?, ?> mapping = (SingularAssociationMapping<?, ?>) association;
+				final SingularAssociationMappingImpl<?, ?> mapping = (SingularAssociationMappingImpl<?, ?>) association;
 				final Object associate = mapping.get(this.instance);
 
 				if (associate != null) {
@@ -355,7 +356,7 @@ public class ManagedInstance<X> {
 	 * @since 2.0.0
 	 */
 	public void checkTransients() {
-		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociationsNotPersistable()) {
+		for (final AssociationMappingImpl<?, ?, ?> association : this.type.getAssociationsNotPersistable()) {
 			association.checkTransient(this);
 		}
 	}
@@ -380,7 +381,7 @@ public class ManagedInstance<X> {
 
 	private boolean checkUpdatedImpl() {
 		// iterate over old values
-		for (final Mapping<?, ?, ?> mapping : this.type.getMappingsSingular()) {
+		for (final AbstractMapping<?, ?, ?> mapping : this.type.getMappingsSingular()) {
 			final Object newValue = mapping.get(this.instance);
 			final Object oldValue = this.snapshot.get(mapping);
 
@@ -439,7 +440,7 @@ public class ManagedInstance<X> {
 	 * @since 2.0.0
 	 */
 	public void enhanceCollections() {
-		for (final PluralMapping<?, ?, ?> collection : this.type.getMappingsPlural()) {
+		for (final PluralMappingEx<?, ?, ?> collection : this.type.getMappingsPlural()) {
 			collection.enhance(this);
 		}
 	}
@@ -484,8 +485,8 @@ public class ManagedInstance<X> {
 			return this.type.getRootType().getIdMapping().fillValue(_type.getRootType(), this, this.instance);
 		}
 		else {
-			for (final Pair<SingularMapping<? super X, ?>, AbstractAccessor> mapping : _type.getIdMappings()) {
-				if (!mapping.getFirst().fillValue(_type.getRootType(), this, this.instance)) {
+			for (final Pair<SingularMapping<?, ?>, AbstractAccessor> mapping : _type.getIdMappings()) {
+				if (!((SingularMappingEx<?, ?>) mapping.getFirst()).fillValue(_type.getRootType(), this, this.instance)) {
 					return false;
 				}
 			}
@@ -635,10 +636,10 @@ public class ManagedInstance<X> {
 		ManagedInstance.LOG.debug("Inspecting additions for instance {0}", this);
 
 		for (int i = 0; i < this.collectionsChanged.size(); i++) {
-			final PluralMapping<?, ?, ?> collection = this.collectionsChanged.get(i);
+			final PluralMappingEx<?, ?, ?> collection = this.collectionsChanged.get(i);
 
-			if (collection instanceof PluralAssociationMapping) {
-				((PluralAssociationMapping<?, ?, ?>) collection).persistAdditions(entityManager, this);
+			if (collection instanceof PluralAssociationMappingImpl) {
+				((PluralAssociationMappingImpl<?, ?, ?>) collection).persistAdditions(entityManager, this);
 			}
 		}
 	}
@@ -655,9 +656,9 @@ public class ManagedInstance<X> {
 		ManagedInstance.LOG.debug("Inspecting orphans for instance {0}", this);
 
 		for (int i = 0; i < this.collectionsChanged.size(); i++) {
-			final PluralMapping<?, ?, ?> collection = this.collectionsChanged.get(i);
+			final PluralMappingEx<?, ?, ?> collection = this.collectionsChanged.get(i);
 			if (collection.isAssociation()) {
-				((PluralAssociationMapping<?, ?, ?>) collection).removeOrphans(entityManager, this);
+				((PluralAssociationMappingImpl<?, ?, ?>) collection).removeOrphans(entityManager, this);
 			}
 		}
 	}
@@ -809,13 +810,13 @@ public class ManagedInstance<X> {
 	 * @since 2.0.0
 	 */
 	public boolean isJoinLoaded(String attributeName) {
-		final Mapping<?, ?, ?> mapping = this.type.getRootMapping().getMapping(attributeName);
+		final AbstractMapping<?, ?, ?> mapping = this.type.getRootMapping().getMapping(attributeName);
 
-		if ((mapping instanceof BasicMapping) || (mapping instanceof EmbeddedMapping)) {
+		if ((mapping instanceof BasicMappingImpl) || (mapping instanceof EmbeddedMappingImpl)) {
 			return true;
 		}
 
-		if (((AssociationMapping<?, ?, ?>) mapping).isEager()) {
+		if (((AssociationMappingImpl<?, ?, ?>) mapping).isEager()) {
 			return true;
 		}
 
@@ -875,11 +876,11 @@ public class ManagedInstance<X> {
 		LinkedList<ManagedInstance<?>> instances) {
 		this.snapshot();
 
-		for (final BasicMapping<?, ?> mapping : this.type.getBasicMappings()) {
+		for (final BasicMappingImpl<?, ?> mapping : this.type.getBasicMappings()) {
 			mapping.set(this.instance, mapping.get(entity));
 		}
 
-		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociations()) {
+		for (final AssociationMappingImpl<?, ?, ?> association : this.type.getAssociations()) {
 			association.mergeWith(entityManager, this, entity, requiresFlush, processed, instances);
 		}
 
@@ -896,7 +897,7 @@ public class ManagedInstance<X> {
 
 		final HashSet<String> _joinsLoaded = this.joinsLoaded;
 
-		for (final PluralMapping<?, ?, ?> mapping : this.type.getMappingsPlural()) {
+		for (final PluralMappingEx<?, ?, ?> mapping : this.type.getMappingsPlural()) {
 			final HashSet<String> joinsLoaded2 = _joinsLoaded;
 			if (!joinsLoaded2.contains(mapping.getPath())) {
 				if (mapping.isEager()) {
@@ -911,7 +912,7 @@ public class ManagedInstance<X> {
 		final X _instance = this.instance;
 		final EntityManagerImpl entityManager = this.session.getEntityManager();
 
-		for (final SingularAssociationMapping<?, ?> mapping : this.type.getAssociationsSingular()) {
+		for (final SingularAssociationMappingImpl<?, ?> mapping : this.type.getAssociationsSingular()) {
 			if (mapping.isEager()) {
 				if (!_joinsLoaded.contains(mapping.getPath())) {
 					mapping.initialize(this);
@@ -949,7 +950,7 @@ public class ManagedInstance<X> {
 
 		this.type.performRefresh(connection, this, lockMode, processed);
 
-		for (final AssociationMapping<?, ?, ?> association : this.type.getAssociations()) {
+		for (final AssociationMappingImpl<?, ?, ?> association : this.type.getAssociations()) {
 			association.refresh(this, processed);
 		}
 	}
@@ -993,7 +994,7 @@ public class ManagedInstance<X> {
 	 * 
 	 * @since 2.0.0
 	 */
-	public void setChanged(PluralMapping<?, ?, ?> association) {
+	public void setChanged(PluralMappingEx<?, ?, ?> association) {
 		if ((this.collectionsChanged.size() == 0) && !this.changed) {
 			this.session.setChanged(this);
 		}
@@ -1086,7 +1087,7 @@ public class ManagedInstance<X> {
 		ManagedInstance.LOG.trace("Snapshot generated for instance {0}", this);
 
 		if (this.snapshot.size() == 0) {
-			for (final Mapping<?, ?, ?> mapping : this.type.getMappingsSingular()) {
+			for (final AbstractMapping<?, ?, ?> mapping : this.type.getMappingsSingular()) {
 				this.snapshot.put(mapping, mapping.get(this.instance));
 			}
 		}
@@ -1098,7 +1099,7 @@ public class ManagedInstance<X> {
 	 * @since 2.0.0
 	 */
 	public void sortLists() {
-		for (final PluralMapping<?, ?, ?> mapping : this.type.getMappingsPluralSorted()) {
+		for (final PluralMappingEx<?, ?, ?> mapping : this.type.getMappingsPluralSorted()) {
 			mapping.sortList(this.instance);
 		}
 	}
@@ -1125,7 +1126,7 @@ public class ManagedInstance<X> {
 	 * @since 2.0.0
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public boolean tryLoadFromCache(PluralAssociationMapping<?, ?, ?> mapping) {
+	public boolean tryLoadFromCache(PluralAssociationMappingImpl<?, ?, ?> mapping) {
 		if (this.cacheInstance != null) {
 			final Collection children = this.cacheInstance.getCollection(this, mapping);
 			if (children != null) {
@@ -1146,7 +1147,7 @@ public class ManagedInstance<X> {
 	 * 
 	 * @since 2.0.0
 	 */
-	public void updateCollectionCache(PluralMapping<?, ?, ?> mapping) {
+	public void updateCollectionCache(PluralMappingEx<?, ?, ?> mapping) {
 		if (this.cacheInstance != null) {
 			final EntityManagerFactoryImpl emf = this.session.getEntityManager().getEntityManagerFactory();
 			final CacheImpl cache = emf.getCache();

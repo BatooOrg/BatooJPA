@@ -30,7 +30,7 @@ import javax.transaction.Transaction;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
-import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
+import org.batoo.jpa.jdbc.adapter.JdbcAdaptor;
 
 /**
  * Entity Manager for JTA Environments.

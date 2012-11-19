@@ -32,16 +32,16 @@ import org.batoo.jpa.core.impl.criteria.expression.AbstractExpression;
 import org.batoo.jpa.core.impl.criteria.expression.CollectionExpression;
 import org.batoo.jpa.core.impl.criteria.expression.MapExpression;
 import org.batoo.jpa.core.impl.criteria.join.FetchParentImpl;
-import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.MapAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
-import org.batoo.jpa.core.impl.model.mapping.BasicMapping;
-import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
-import org.batoo.jpa.core.impl.model.mapping.Mapping;
-import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
+import org.batoo.jpa.core.impl.model.mapping.BasicMappingImpl;
+import org.batoo.jpa.core.impl.model.mapping.EmbeddedMappingImpl;
+import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMappingImpl;
+import org.batoo.jpa.jdbc.AbstractColumn;
 
 import com.google.common.collect.Maps;
 
@@ -97,15 +97,15 @@ public abstract class ParentPath<Z, X> extends AbstractPath<X> implements Path<X
 	@Override
 	@SuppressWarnings("unchecked")
 	public final <Y> AbstractPath<Y> get(SingularAttribute<? super X, Y> attribute) {
-		final Mapping<? super X, Y, Y> mapping = this.getMapping(attribute.getName());
+		final AbstractMapping<? super X, Y, Y> mapping = this.getMapping(attribute.getName());
 
 		switch (attribute.getPersistentAttributeType()) {
 			case EMBEDDED:
-				return new EmbeddedAttributePath<X, Y>(this, (EmbeddedMapping<? super X, Y>) mapping);
+				return new EmbeddedAttributePath<X, Y>(this, (EmbeddedMappingImpl<? super X, Y>) mapping);
 			case BASIC:
-				return new BasicPath<Y>(this, (BasicMapping<? super X, Y>) mapping);
+				return new BasicPath<Y>(this, (BasicMappingImpl<? super X, Y>) mapping);
 			default:
-				return new EntityPath<X, Y>(this, (SingularAssociationMapping<Z, X>) mapping, (EntityTypeImpl<Y>) attribute.getType());
+				return new EntityPath<X, Y>(this, (SingularAssociationMappingImpl<Z, X>) mapping, (EntityTypeImpl<Y>) attribute.getType());
 		}
 
 	}
@@ -123,7 +123,7 @@ public abstract class ParentPath<Z, X> extends AbstractPath<X> implements Path<X
 			return (AbstractPath<Y>) path;
 		}
 
-		final Mapping<? super X, ?, Y> mapping = this.getMapping(name);
+		final AbstractMapping<? super X, ?, Y> mapping = this.getMapping(name);
 		final AttributeImpl<? super X, Y> attribute = (AttributeImpl<? super X, Y>) mapping.getAttribute();
 
 		if (attribute.isCollection()) {
@@ -198,5 +198,5 @@ public abstract class ParentPath<Z, X> extends AbstractPath<X> implements Path<X
 	 * 
 	 * @since 2.0.0
 	 */
-	protected abstract <C, Y> Mapping<? super X, C, Y> getMapping(String name);
+	protected abstract <C, Y> AbstractMapping<? super X, C, Y> getMapping(String name);
 }

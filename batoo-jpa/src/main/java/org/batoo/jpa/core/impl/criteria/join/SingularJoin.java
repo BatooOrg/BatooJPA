@@ -22,11 +22,11 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
-import org.batoo.jpa.core.impl.model.mapping.EmbeddedMapping;
+import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
+import org.batoo.jpa.core.impl.model.mapping.EmbeddedMappingImpl;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
-import org.batoo.jpa.core.impl.model.mapping.JoinedMapping.MappingType;
-import org.batoo.jpa.core.impl.model.mapping.Mapping;
-import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
+import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMappingImpl;
+import org.batoo.jpa.jdbc.mapping.MappingType;
 
 /**
  * Joins for singular attributes.
@@ -61,21 +61,21 @@ public class SingularJoin<Z, X> extends AbstractJoin<Z, X> {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	protected <C, Y> Mapping<? super X, C, Y> getMapping(String name) {
-		Mapping<? super X, ?, ?> child = null;
+	protected <C, Y> AbstractMapping<? super X, C, Y> getMapping(String name) {
+		AbstractMapping<? super X, ?, ?> child = null;
 
 		if (this.getMapping().getMappingType() == MappingType.EMBEDDABLE) {
-			child = ((EmbeddedMapping<? super Z, X>) this.getMapping()).getChild(name);
+			child = ((EmbeddedMappingImpl<? super Z, X>) this.getMapping()).getChild(name);
 		}
 		else {
-			child = ((SingularAssociationMapping<? super Z, X>) this.getMapping()).getType().getRootMapping().getChild(name);
+			child = ((SingularAssociationMappingImpl<? super Z, X>) this.getMapping()).getType().getRootMapping().getChild(name);
 		}
 
 		if (child == null) {
 			throw this.cannotDereference(name);
 		}
 
-		return (Mapping<? super X, C, Y>) child;
+		return (AbstractMapping<? super X, C, Y>) child;
 	}
 
 	/**

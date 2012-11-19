@@ -41,8 +41,8 @@ import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.Prioritizer;
 import org.batoo.jpa.core.impl.instance.Status;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
 
 import com.google.common.collect.Lists;
@@ -202,7 +202,7 @@ public class SessionImpl {
 	 * @since 2.0.0
 	 */
 	private void doUpdates(Connection connection, final ManagedInstance<?>[] updates) throws SQLException {
-		final ManagedInstance<?>[] inserts = new ManagedInstance[this.insertBatchSize];
+		final ManagedInstance<?>[] managedInstances = new ManagedInstance[this.insertBatchSize];
 
 		int i = 0;
 
@@ -225,7 +225,7 @@ public class SessionImpl {
 					lastEntity = updates[i].getType();
 				}
 
-				inserts[batchSize] = updates[i];
+				managedInstances[batchSize] = updates[i];
 				batchSize++;
 				i++;
 				continue;
@@ -234,13 +234,13 @@ public class SessionImpl {
 			if (batchSize > 0) {
 				SessionImpl.LOG.debug("Batch insert is being performed for {0} with the size {1}", lastEntity.getName(), batchSize);
 
-				lastEntity.performInsert(connection, inserts, batchSize);
+				lastEntity.performInsert(connection, managedInstances, batchSize);
 			}
 			else {
 				final ManagedInstance<?> instance = updates[i];
 				if (instance.getStatus() == Status.NEW) {
-					inserts[0] = instance;
-					instance.getType().performInsert(connection, inserts, 1);
+					managedInstances[0] = instance;
+					instance.getType().performInsert(connection, managedInstances, 1);
 				}
 				else {
 					instance.getType().performUpdate(connection, instance);

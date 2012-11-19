@@ -18,7 +18,7 @@
  */
 package org.batoo.jpa.parser.metadata;
 
-import org.batoo.jpa.parser.impl.AbstractLocator;
+import org.batoo.jpa.parser.AbstractLocator;
 
 /**
  * The interface to obtain the location metadata.

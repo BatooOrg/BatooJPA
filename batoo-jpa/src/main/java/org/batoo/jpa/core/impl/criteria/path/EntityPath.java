@@ -37,14 +37,14 @@ import org.batoo.jpa.core.impl.criteria.join.FetchImpl;
 import org.batoo.jpa.core.impl.criteria.join.FetchParentImpl;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
 import org.batoo.jpa.core.impl.criteria.join.MapJoinImpl.MapSelectType;
-import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
-import org.batoo.jpa.core.impl.jdbc.AbstractTable;
-import org.batoo.jpa.core.impl.jdbc.ForeignKey;
-import org.batoo.jpa.core.impl.jdbc.JoinColumn;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.mapping.Mapping;
-import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMapping;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
+import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMappingImpl;
+import org.batoo.jpa.jdbc.AbstractColumn;
+import org.batoo.jpa.jdbc.AbstractTable;
+import org.batoo.jpa.jdbc.ForeignKey;
+import org.batoo.jpa.jdbc.JoinColumn;
 
 import com.google.common.collect.Lists;
 
@@ -61,7 +61,7 @@ import com.google.common.collect.Lists;
  */
 public class EntityPath<Z, X> extends ParentPath<Z, X> implements Joinable {
 
-	private final SingularAssociationMapping<?, Z> mapping;
+	private final SingularAssociationMappingImpl<?, Z> mapping;
 	private final String pathName;
 	private final EntityTypeImpl<X> entity;
 
@@ -78,7 +78,7 @@ public class EntityPath<Z, X> extends ParentPath<Z, X> implements Joinable {
 	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
-	public EntityPath(ParentPath<?, Z> parent, SingularAssociationMapping<?, Z> mapping, EntityTypeImpl<X> entity) {
+	public EntityPath(ParentPath<?, Z> parent, SingularAssociationMappingImpl<?, Z> mapping, EntityTypeImpl<X> entity) {
 		super(parent, entity.getJavaType());
 
 		this.mapping = mapping;
@@ -186,8 +186,8 @@ public class EntityPath<Z, X> extends ParentPath<Z, X> implements Joinable {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	protected <C, Y> Mapping<? super X, C, Y> getMapping(String name) {
-		final Mapping<? super X, C, Y> mapping = (Mapping<? super X, C, Y>) this.entity.getRootMapping().getChild(name);
+	protected <C, Y> AbstractMapping<? super X, C, Y> getMapping(String name) {
+		final AbstractMapping<? super X, C, Y> mapping = (AbstractMapping<? super X, C, Y>) this.entity.getRootMapping().getChild(name);
 
 		if (mapping == null) {
 			throw this.cannotDereference(name);

@@ -31,7 +31,7 @@ import javax.persistence.PersistenceException;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.StringUtils;
-import org.batoo.jpa.parser.impl.AbstractLocator;
+import org.batoo.jpa.parser.AbstractLocator;
 import org.batoo.jpa.parser.impl.metadata.JavaLocator;
 import org.batoo.jpa.parser.impl.metadata.attribute.AttributesMetadataImpl;
 import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;

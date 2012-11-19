@@ -360,5 +360,6 @@
 		<module>batoo-maven-plugin</module>
 		<module>community</module>
 		<module>batoo-jpa-spi</module>
+		<module>batoo-jdbc</module>
 	</modules>
 </project>

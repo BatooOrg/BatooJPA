@@ -24,9 +24,9 @@ import java.util.Set;
 import javax.persistence.criteria.ParameterExpression;
 
 import org.batoo.jpa.core.impl.criteria.expression.AbstractParameterExpressionImpl;
-import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
-import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
+import org.batoo.jpa.jdbc.AbstractColumn;
+import org.batoo.jpa.jdbc.adapter.JdbcAdaptor;
 
 /**
  * 

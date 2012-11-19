@@ -48,26 +48,23 @@ import javax.sql.DataSource;
 import org.batoo.common.BatooException;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
-import org.batoo.jpa.core.impl.jdbc.AbstractTable;
-import org.batoo.jpa.core.impl.jdbc.CollectionTable;
-import org.batoo.jpa.core.impl.jdbc.EntityTable;
-import org.batoo.jpa.core.impl.jdbc.ForeignKey;
-import org.batoo.jpa.core.impl.jdbc.JoinTable;
-import org.batoo.jpa.core.impl.jdbc.SecondaryTable;
 import org.batoo.jpa.core.impl.manager.CallbackAvailability;
 import org.batoo.jpa.core.impl.manager.CallbackManager;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
-import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
-import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
-import org.batoo.jpa.core.impl.model.type.BasicTypeImpl;
-import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
-import org.batoo.jpa.core.impl.model.type.IdentifiableTypeImpl;
-import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
-import org.batoo.jpa.core.impl.model.type.MappedSuperclassTypeImpl;
-import org.batoo.jpa.core.impl.model.type.TypeImpl;
-import org.batoo.jpa.core.jdbc.DDLMode;
-import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
+import org.batoo.jpa.core.impl.model.mapping.AssociationMappingImpl;
+import org.batoo.jpa.core.impl.model.mapping.PluralMappingEx;
+import org.batoo.jpa.jdbc.AbstractTable;
+import org.batoo.jpa.jdbc.CollectionTable;
+import org.batoo.jpa.jdbc.DDLMode;
+import org.batoo.jpa.jdbc.EntityTable;
+import org.batoo.jpa.jdbc.ForeignKey;
+import org.batoo.jpa.jdbc.JoinTable;
+import org.batoo.jpa.jdbc.SecondaryTable;
+import org.batoo.jpa.jdbc.adapter.JdbcAdaptor;
+import org.batoo.jpa.jdbc.generator.SequenceGenerator;
+import org.batoo.jpa.jdbc.generator.SequenceQueue;
+import org.batoo.jpa.jdbc.generator.TableGenerator;
+import org.batoo.jpa.jdbc.generator.TableIdQueue;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.metadata.MetadataImpl;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
@@ -239,7 +236,7 @@ public class MetamodelImpl implements Metamodel {
 				if (type instanceof EmbeddableMetadata) {
 					// make sure it extends a embeddable type
 					if ((parent != null) && !(parent instanceof EmbeddableTypeImpl)) {
-						throw new MappingException("Embeddables can only extend a other Embeddables.", type.getLocator(), parent.getLocator());
+						throw new MappingException("Embeddables can only extend other Embeddables.", type.getLocator(), parent.getLocator());
 					}
 
 					final EmbeddableTypeImpl embeddable = new EmbeddableTypeImpl(this, clazz, (EmbeddableMetadata) type);
@@ -428,8 +425,8 @@ public class MetamodelImpl implements Metamodel {
 			}
 
 			// collect the join tables
-			for (final AssociationMapping<?, ?, ?> mapping : entity.getAssociations()) {
-				final JoinTable table = mapping.getTable();
+			for (final AssociationMappingImpl<?, ?, ?> mapping : entity.getAssociations()) {
+				final JoinTable table = mapping.getJoinTable();
 
 				// skip not applicable tables
 				if ((table == null) || (table.getEntity() != entity)) {
@@ -440,9 +437,9 @@ public class MetamodelImpl implements Metamodel {
 			}
 
 			// collect the join tables
-			for (final PluralMapping<?, ?, ?> mapping : entity.getMappingsPlural()) {
+			for (final PluralMappingEx<?, ?, ?> mapping : entity.getMappingsPlural()) {
 				if (!mapping.isAssociation()) {
-					final AbstractTable table = (AbstractTable) mapping.getTable();
+					final AbstractTable table = (AbstractTable) mapping.getJoinTable();
 					if (table != null) {
 						tableSet.add(table);
 					}
@@ -614,7 +611,7 @@ public class MetamodelImpl implements Metamodel {
 		if (table instanceof JoinTable) {
 			final JoinTable joinTable = (JoinTable) table;
 
-			final Member member = joinTable.getSourceKey().getMapping().getAttribute().getJavaMember();
+			final Member member = joinTable.getSourceKey().getMapping().getJavaMember();
 			final String memberDesc = member.getDeclaringClass() + "." + member.getName();
 
 			return "JoinTable[" + joinTable.getName() + " " + memberDesc + "]";
@@ -623,7 +620,7 @@ public class MetamodelImpl implements Metamodel {
 		if (table instanceof CollectionTable) {
 			final CollectionTable collectionTable = (CollectionTable) table;
 
-			final Member member = collectionTable.getMapping().getAttribute().getJavaMember();
+			final Member member = collectionTable.getMapping().getJavaMember();
 			final String memberDesc = member.getDeclaringClass() + "." + member.getName();
 
 			return "CollectionTable[" + collectionTable.getName() + " " + memberDesc + "]";
@@ -714,8 +711,8 @@ public class MetamodelImpl implements Metamodel {
 			}
 		}
 
-		for (final AssociationMapping<?, ?, ?> mapping : entity.getAssociations()) {
-			final JoinTable table = mapping.getTable();
+		for (final AssociationMappingImpl<?, ?, ?> mapping : entity.getAssociations()) {
+			final JoinTable table = mapping.getJoinTable();
 			// skip not applicable join tables
 			if ((table == null) || (table.getEntity() != entity)) {
 				continue;
@@ -728,9 +725,9 @@ public class MetamodelImpl implements Metamodel {
 			}
 		}
 
-		for (final PluralMapping<?, ?, ?> mapping : entity.getMappingsPlural()) {
+		for (final PluralMappingEx<?, ?, ?> mapping : entity.getMappingsPlural()) {
 			if (!mapping.isAssociation()) {
-				final AbstractTable table = (AbstractTable) mapping.getTable();
+				final AbstractTable table = (AbstractTable) mapping.getJoinTable();
 				MetamodelImpl.LOG.info("Performing foreign key DDL operations for join table {0}, mode {1}", table.getQName(), ddlMode);
 
 				for (final ForeignKey foreignKey : table.getForeignKeys()) {
@@ -806,21 +803,21 @@ public class MetamodelImpl implements Metamodel {
 		}
 
 		// create the join tables
-		for (final AssociationMapping<?, ?, ?> mapping : entity.getAssociations()) {
-			final JoinTable table = mapping.getTable();
+		for (final AssociationMappingImpl<?, ?, ?> mapping : entity.getAssociations()) {
+			final JoinTable table = mapping.getJoinTable();
 
 			// skip not applicable tables
 			if ((table == null) || (table.getEntity() != entity)) {
 				continue;
 			}
 
-			this.jdbcAdaptor.createOrUpdateTable(mapping.getTable(), datasource, ddlMode);
+			this.jdbcAdaptor.createOrUpdateTable(mapping.getJoinTable(), datasource, ddlMode);
 		}
 
 		// create the join tables
-		for (final PluralMapping<?, ?, ?> mapping : entity.getMappingsPlural()) {
+		for (final PluralMappingEx<?, ?, ?> mapping : entity.getMappingsPlural()) {
 			if (!mapping.isAssociation()) {
-				final AbstractTable table = (AbstractTable) mapping.getTable();
+				final AbstractTable table = (AbstractTable) mapping.getJoinTable();
 
 				this.jdbcAdaptor.createOrUpdateTable(table, datasource, ddlMode);
 			}

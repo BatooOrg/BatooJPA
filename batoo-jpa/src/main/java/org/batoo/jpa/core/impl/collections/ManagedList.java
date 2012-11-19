@@ -33,9 +33,9 @@ import org.apache.commons.lang.ObjectUtils;
 import org.batoo.common.util.BatooUtils;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.jdbc.Joinable;
-import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
-import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMappingImpl;
+import org.batoo.jpa.core.impl.model.mapping.PluralMappingEx;
+import org.batoo.jpa.jdbc.Joinable;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -154,7 +154,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 * 
 	 * @since 2.0.0
 	 */
-	public ManagedList(PluralMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
+	public ManagedList(PluralMappingEx<?, ?, E> mapping, ManagedInstance<?> managedInstance, boolean lazy) {
 		super(mapping, managedInstance);
 
 		this.delegate = Lists.newArrayList();
@@ -174,7 +174,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 	 * 
 	 * @since 2.0.0
 	 */
-	public ManagedList(PluralMapping<?, ?, E> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
+	public ManagedList(PluralMappingEx<?, ?, E> mapping, ManagedInstance<?> managedInstance, Collection<? extends E> values) {
 		super(mapping, managedInstance);
 
 		this.delegate = Lists.newArrayList();
@@ -350,7 +350,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 		return false;
 	}
 
-	private void attachChildren(Connection connection, final ManagedInstance<?> instance, final PluralMapping<?, ?, E> mapping) throws SQLException {
+	private void attachChildren(Connection connection, final ManagedInstance<?> instance, final PluralMappingEx<?, ?, E> mapping) throws SQLException {
 		final int insertBatchSize = this.getInsertBatchSize();
 
 		final Joinable[] batch = new Joinable[insertBatchSize];
@@ -433,7 +433,7 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 
 		// for lists the index is maintained in the database
 		final ManagedInstance<?> instance = this.getManagedInstance();
-		final PluralMapping<?, ?, E> mapping = this.getMapping();
+		final PluralMappingEx<?, ?, E> mapping = this.getMapping();
 
 		// forced creation of relations for the new entities
 		if (force) {
@@ -518,10 +518,10 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 				throw new PersistenceException("No session to initialize the collection");
 			}
 
-			final PluralMapping<?, ?, E> mapping = this.getMapping();
+			final PluralMappingEx<?, ?, E> mapping = this.getMapping();
 
-			if (!(mapping instanceof PluralAssociationMapping) //
-				|| !managedInstance.tryLoadFromCache((PluralAssociationMapping<?, ?, ?>) mapping)) {
+			if (!(mapping instanceof PluralAssociationMappingImpl) //
+				|| !managedInstance.tryLoadFromCache((PluralAssociationMappingImpl<?, ?, ?>) mapping)) {
 				BatooUtils.addAll(mapping.loadCollection(managedInstance), this.delegate);
 
 				this.initialized = true;

@@ -24,7 +24,7 @@ import javax.persistence.criteria.CollectionJoin;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.metamodel.CollectionAttribute;
 
-import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
+import org.batoo.jpa.core.impl.model.mapping.PluralMappingEx;
 
 /**
  * Implementation of {@link CollectionJoin}.
@@ -49,7 +49,7 @@ public class CollectionJoinImpl<Z, E> extends AbstractPluralJoin<Z, Collection<E
 	 * 
 	 * @since 2.0.0
 	 */
-	public CollectionJoinImpl(AbstractFrom<?, Z> parent, PluralMapping<? super Z, Collection<E>, E> mapping, JoinType jointType) {
+	public CollectionJoinImpl(AbstractFrom<?, Z> parent, PluralMappingEx<? super Z, Collection<E>, E> mapping, JoinType jointType) {
 		super(parent, mapping, jointType);
 	}
 

@@ -29,7 +29,7 @@ import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.path.ParentPath;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.mapping.Mapping;
+import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
 
 /**
  * 
@@ -44,7 +44,7 @@ import org.batoo.jpa.core.impl.model.mapping.Mapping;
 public class CollectionExpression<C extends Collection<E>, E> extends AbstractExpression<C> {
 
 	private final ParentPath<?, ?> parentPath;
-	private final Mapping<?, Collection<E>, E> mapping;
+	private final AbstractMapping<?, Collection<E>, E> abstractMapping;
 
 	/**
 	 * @param parentPath
@@ -55,11 +55,11 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	 * @since 2.0.0
 	 */
 	@SuppressWarnings("unchecked")
-	public CollectionExpression(ParentPath<?, ?> parentPath, Mapping<?, Collection<E>, E> mapping) {
+	public CollectionExpression(ParentPath<?, ?> parentPath, AbstractMapping<?, Collection<E>, E> mapping) {
 		super((Class<C>) mapping.getJavaType());
 
 		this.parentPath = parentPath;
-		this.mapping = mapping;
+		this.abstractMapping = mapping;
 	}
 
 	/**
@@ -68,7 +68,7 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	 */
 	@Override
 	public String generateJpqlRestriction(BaseQueryImpl<?> query) {
-		return this.parentPath.generateJpqlRestriction(query) + "." + this.mapping.getAttribute().getName();
+		return this.parentPath.generateJpqlRestriction(query) + "." + this.abstractMapping.getAttribute().getName();
 	}
 
 	/**
@@ -90,14 +90,14 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	}
 
 	/**
-	 * Returns the mapping of the CollectionExpression.
+	 * Returns the abstractMapping of the CollectionExpression.
 	 * 
-	 * @return the mapping of the CollectionExpression
+	 * @return the abstractMapping of the CollectionExpression
 	 * 
 	 * @since 2.0.0
 	 */
-	public Mapping<?, Collection<E>, E> getMapping() {
-		return this.mapping;
+	public AbstractMapping<?, Collection<E>, E> getMapping() {
+		return this.abstractMapping;
 	}
 
 	/**
@@ -135,6 +135,6 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	 */
 	@Override
 	public String toString() {
-		return "CollectionExpression [parentPath=" + this.parentPath + ", mapping=" + this.mapping + "]";
+		return "CollectionExpression [parentPath=" + this.parentPath + ", abstractMapping=" + this.abstractMapping + "]";
 	}
 }

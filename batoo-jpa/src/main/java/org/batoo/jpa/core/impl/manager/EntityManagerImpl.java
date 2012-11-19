@@ -59,12 +59,12 @@ import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.instance.ManagedId;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.instance.Status;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
-import org.batoo.jpa.core.impl.model.mapping.AssociationMapping;
-import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMapping;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.mapping.AssociationMappingImpl;
+import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMappingImpl;
 import org.batoo.jpa.core.impl.nativeQuery.NativeQuery;
-import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor;
+import org.batoo.jpa.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
 
 import com.google.common.base.Joiner;
@@ -178,11 +178,11 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	public <T> void cascadeMerge(EntityTypeImpl<T> type, T entity, MutableBoolean requiresFlush, IdentityHashMap<Object, Object> processed,
 		LinkedList<ManagedInstance<?>> instances) {
-		for (final AssociationMapping<?, ?, ?> association : type.getAssociations()) {
+		for (final AssociationMappingImpl<?, ?, ?> association : type.getAssociations()) {
 
 			// if the association is a plural association
-			if (association instanceof PluralAssociationMapping) {
-				final PluralAssociationMapping<?, ?, ?> mapping = (PluralAssociationMapping<?, ?, ?>) association;
+			if (association instanceof PluralAssociationMappingImpl) {
+				final PluralAssociationMappingImpl<?, ?, ?> mapping = (PluralAssociationMappingImpl<?, ?, ?>) association;
 
 				Collection<?> children;
 				if (mapping.getAttribute().getCollectionType() == CollectionType.MAP) {

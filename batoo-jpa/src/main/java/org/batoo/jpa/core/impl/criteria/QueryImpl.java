@@ -58,14 +58,14 @@ import org.batoo.jpa.core.impl.criteria.expression.AbstractParameterExpressionIm
 import org.batoo.jpa.core.impl.criteria.expression.EntityConstantExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.jdbc.PreparedStatementProxy;
-import org.batoo.jpa.core.impl.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
-import org.batoo.jpa.core.jdbc.adapter.JdbcAdaptor.PaginationParamsOrder;
+import org.batoo.jpa.jdbc.PreparedStatementProxy;
+import org.batoo.jpa.jdbc.adapter.JdbcAdaptor.PaginationParamsOrder;
+import org.batoo.jpa.jdbc.dbutils.QueryRunner;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

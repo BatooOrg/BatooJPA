@@ -19,8 +19,8 @@
 package org.batoo.jpa.core.impl.criteria.join;
 
 import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
-import org.batoo.jpa.core.impl.jdbc.AbstractTable;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
+import org.batoo.jpa.jdbc.AbstractTable;
 
 /**
  * Interface for joinable types.

@@ -19,8 +19,8 @@
 package org.batoo.jpa.core.impl.criteria;
 
 import org.batoo.jpa.core.impl.criteria.expression.AbstractParameterExpressionImpl;
-import org.batoo.jpa.core.impl.jdbc.AbstractColumn;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.jdbc.AbstractColumn;
 
 /**
  * 

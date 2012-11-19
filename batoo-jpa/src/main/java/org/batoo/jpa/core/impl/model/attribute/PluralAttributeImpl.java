@@ -31,10 +31,10 @@ import javax.persistence.metamodel.PluralAttribute;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
+import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
-import org.batoo.jpa.core.impl.model.mapping.PluralMapping;
-import org.batoo.jpa.core.impl.model.type.ManagedTypeImpl;
-import org.batoo.jpa.core.impl.model.type.TypeImpl;
+import org.batoo.jpa.core.impl.model.TypeImpl;
+import org.batoo.jpa.core.impl.model.mapping.PluralMappingEx;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.metadata.attribute.AttributeMetadataImpl;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
@@ -228,7 +228,7 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 * 
 	 * @since 2.0.0
 	 */
-	public abstract C newCollection(PluralMapping<?, C, E> mapping, ManagedInstance<?> managedInstance, boolean lazy);
+	public abstract C newCollection(PluralMappingEx<?, C, E> mapping, ManagedInstance<?> managedInstance, boolean lazy);
 
 	/**
 	 * Creates a new managed collection to track changes.
@@ -243,7 +243,7 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	 * 
 	 * @since 2.0.0
 	 */
-	public abstract C newCollection(PluralMapping<?, C, E> mapping, ManagedInstance<?> managedInstance, Object values);
+	public abstract C newCollection(PluralMappingEx<?, C, E> mapping, ManagedInstance<?> managedInstance, Object values);
 
 	/**
 	 * {@inheritDoc}

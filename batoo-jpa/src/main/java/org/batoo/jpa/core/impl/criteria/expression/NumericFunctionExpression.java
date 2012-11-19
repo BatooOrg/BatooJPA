@@ -29,6 +29,7 @@ import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.jdbc.NumericFunctionType;
 
 /**
  * The expression for numeric functions
@@ -74,7 +75,7 @@ public class NumericFunctionExpression<N extends Number> extends AbstractExpress
 		final String xExpr = this.x.generateJpqlRestriction(query);
 		final String yExpr = this.y != null ? this.y.generateJpqlRestriction(query) : null;
 
-		return MessageFormat.format(this.type.jpqlFragment, xExpr, yExpr);
+		return MessageFormat.format(this.type.getJpqlFragment(), xExpr, yExpr);
 	}
 
 	/**

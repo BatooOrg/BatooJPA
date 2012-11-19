@@ -21,7 +21,7 @@ package org.batoo.jpa.parser.impl.metadata;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 
-import org.batoo.jpa.parser.impl.AbstractLocator;
+import org.batoo.jpa.parser.AbstractLocator;
 import org.batoo.jpa.parser.metadata.DiscriminatorColumnMetadata;
 
 /**

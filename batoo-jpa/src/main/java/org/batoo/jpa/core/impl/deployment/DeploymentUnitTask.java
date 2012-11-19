@@ -23,11 +23,11 @@ import java.util.concurrent.Callable;
 import javax.persistence.metamodel.ManagedType;
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.batoo.jpa.core.impl.model.EmbeddableTypeImpl;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.IdentifiableTypeImpl;
+import org.batoo.jpa.core.impl.model.MappedSuperclassTypeImpl;
 import org.batoo.jpa.core.impl.model.attribute.AssociatedSingularAttribute;
-import org.batoo.jpa.core.impl.model.type.EmbeddableTypeImpl;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
-import org.batoo.jpa.core.impl.model.type.IdentifiableTypeImpl;
-import org.batoo.jpa.core.impl.model.type.MappedSuperclassTypeImpl;
 import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 
 /**

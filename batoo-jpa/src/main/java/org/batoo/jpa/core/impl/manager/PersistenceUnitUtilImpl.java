@@ -23,7 +23,7 @@ import javax.persistence.PersistenceUnitUtil;
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
-import org.batoo.jpa.core.impl.model.type.EntityTypeImpl;
+import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 
 /**
  * Implementation of persistence unit util.
