@@ -201,7 +201,8 @@ public class BenchmarkTest {
 			boolean inDb = false;
 			for (int i = threadInfo.getStackTrace().length - 1; i >= 0; i--) {
 				final StackTraceElement stElement = threadInfo.getStackTrace()[i];
-				if (stElement.getClassName().startsWith("org.apache.derby") || stElement.getClassName().startsWith("com.mysql")) {
+				if (stElement.getClassName().startsWith("org.apache.derby") || stElement.getClassName().startsWith("com.mysql")
+					|| stElement.getClassName().startsWith("org.h2")) {
 					inDb = true;
 					break;
 				}
