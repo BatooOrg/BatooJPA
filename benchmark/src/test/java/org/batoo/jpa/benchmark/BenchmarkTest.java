@@ -58,7 +58,10 @@ import com.google.common.collect.Maps;
 public class BenchmarkTest {
 
 	// The number of tests to run
-	private static final int BENCHMARK_LENGTH = 2500;
+	private static final int BENCHMARK_LENGTH = 5000;
+
+	// The number of tests to run
+	private static final int WARM_UP_LENGTH = 1000;
 
 	// If the results should be summarized
 	private static final boolean SUMMARIZE = true;
@@ -73,11 +76,6 @@ public class BenchmarkTest {
 			DriverManager.getConnection("jdbc:mysql://localhost/test");
 		}
 		catch (final SQLException e) {}
-
-		if (BenchmarkTest.SUMMARIZE) {
-			System.out.println("Single Entity Operations  ====================================");
-			System.out.println("Prvdr | Total Time | JPA Time   | DB Time   | Name Of The Test");
-		}
 	}
 
 	/**
@@ -117,6 +115,18 @@ public class BenchmarkTest {
 
 			@Override
 			public void run() {
+				while (!BenchmarkTest.this.running) {
+					try {
+						Thread.sleep(1);
+					}
+					catch (final InterruptedException e) {}
+				}
+
+				if (BenchmarkTest.SUMMARIZE) {
+					System.out.println("Single Entity Operations  ====================================");
+					System.out.println("Prvdr | Total Time | JPA Time   | DB Time   | Name Of The Test");
+				}
+
 				while (BenchmarkTest.this.running) {
 					BenchmarkTest.this._measureSingleTime(id, mxBean);
 					try {
@@ -176,14 +186,9 @@ public class BenchmarkTest {
 
 			@Override
 			public void run() {
-				BenchmarkTest.this.running = true;
 				BenchmarkTest.this._measure(id);
 			}
 		}).start();
-
-		if (BenchmarkTest.SUMMARIZE) {
-			System.out.println("______________________________________________________________");
-		}
 	}
 
 	private void _measureSingleTime(long id, final ThreadMXBean mxBean) {
@@ -286,6 +291,11 @@ public class BenchmarkTest {
 				phone2.setPhoneNo("111 222-3344");
 				phone2.setPerson(person);
 				person.getPhones().add(phone2);
+
+				final Phone phone3 = new Phone();
+				phone3.setPhoneNo("111 222-3344");
+				phone3.setPerson(person);
+				person.getPhones().add(phone3);
 
 				persons[i].add(person);
 			}
@@ -406,7 +416,12 @@ public class BenchmarkTest {
 
 		this.close(em);
 
-		this.test(type, emf);
+		this.test(type, emf, BenchmarkTest.WARM_UP_LENGTH);
+
+		this.running = true;
+		this.test(type, emf, BenchmarkTest.BENCHMARK_LENGTH);
+
+		emf.close();
 	}
 
 	private void doUpdate(final EntityManagerFactory emf, final Person person) {
@@ -439,7 +454,7 @@ public class BenchmarkTest {
 		this.doRemove(emf, persons);
 	}
 
-	private void test(Type type, final EntityManagerFactory emf) {
+	private void test(Type type, final EntityManagerFactory emf, int length) {
 		this.type = type;
 
 		final CriteriaBuilder cb = emf.getCriteriaBuilder();
@@ -454,14 +469,7 @@ public class BenchmarkTest {
 		final ParameterExpression<Person> p = cb.parameter(Person.class);
 		cq.where(cb.equal(r, p));
 
-		while (!this.running) {
-			try {
-				Thread.sleep(1);
-			}
-			catch (final InterruptedException e) {}
-		}
-
-		for (int i = 0; i < BenchmarkTest.BENCHMARK_LENGTH; i++) {
+		for (int i = 0; i < length; i++) {
 			this.singleTest(emf, this.createPersons(), cq, p);
 		}
 	}

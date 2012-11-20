@@ -38,6 +38,10 @@
 			<property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:test" />
 			<property name="javax.persistence.jdbc.user" value="root" />
 			<property name="javax.persistence.jdbc.password" value="" />
+			
+			<!-- Batoo Logging -->
+<!-- 			<property name="org.batoo.jpa.sql_logging" value="STDOUT"/> -->
+			<property name="org.batoo.jdbc.max_fetch_join_depth" value="0"/>
 		</properties>
 
 	</persistence-unit>
@@ -87,6 +91,10 @@
 			<property name="eclipselink.cache.shared.default" value="false"/>
 			<property name="eclipselink.ddl-generation" value="create-tables" />
       		<property name="eclipselink.ddl-generation.output-mode" value="database" />
+      		
+      		<!-- EclipseLink logging -->
+<!-- 			<property name="eclipselink.logging.level.sql" value="FINE"/> -->
+<!-- 			<property name="eclipselink.logging.parameters" value="true"/> -->
 		</properties>
 	</persistence-unit>
 </persistence>

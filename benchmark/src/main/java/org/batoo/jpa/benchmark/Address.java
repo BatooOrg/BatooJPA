@@ -25,6 +25,9 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.TableGenerator;
 
+import org.batoo.jpa.annotations.FetchStrategy;
+import org.batoo.jpa.annotations.FetchStrategyType;
+
 /**
  * 
  * @author hceylan
@@ -39,9 +42,11 @@ public class Address {
 	private Integer id;
 
 	@ManyToOne
+	@FetchStrategy(strategy = FetchStrategyType.SELECT)
 	private Person person;
 
 	@ManyToOne
+	@FetchStrategy(strategy = FetchStrategyType.SELECT)
 	private Country country;
 
 	private String city;
