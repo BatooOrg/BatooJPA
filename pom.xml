@@ -340,18 +340,6 @@
 		</pluginManagement>
 	</build>
 
-	<profiles>
-		<profile>
-			<id>benchmark</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<modules>
-				<module>benchmark</module>
-			</modules>
-		</profile>
-	</profiles>
-
 	<modules>
 		<module>parser</module>
 		<module>jpql</module>
