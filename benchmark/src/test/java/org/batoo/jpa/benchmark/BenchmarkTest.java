@@ -64,7 +64,7 @@ public class BenchmarkTest {
 	/**
 	 * The number of tests to run
 	 */
-	private static final int BENCHMARK_LENGTH = 1000;
+	private static final int BENCHMARK_LENGTH = 100;
 
 	/**
 	 * If the results should be summarized
@@ -436,7 +436,7 @@ public class BenchmarkTest {
 			while (BenchmarkTest.this.isRunning()) {
 				try {
 					this.measureTimes(mxBean);
-					Thread.sleep(0, 10);
+					Thread.sleep(1);
 				}
 				catch (final InterruptedException e) {}
 			}
@@ -458,6 +458,14 @@ public class BenchmarkTest {
 	 * @since $version
 	 */
 	private long measureTime(long oldTime, ThreadInfo threadInfo, long newTime) {
+		final long timeDiff = Math.abs(newTime - oldTime);
+
+		if (timeDiff == 0) {
+			BenchmarkTest.LOG.info("How about that {0}", timeDiff);
+
+			return newTime;
+		}
+
 		TimeElement child = this.element;
 		boolean gotStart = false;
 		boolean last = false;
@@ -495,10 +503,6 @@ public class BenchmarkTest {
 				this.elements.put(key, child2 = new TimeElement(key));
 			}
 
-			final long timeDiff = newTime - oldTime;
-			if (timeDiff < 0) {
-				BenchmarkTest.LOG.info("How about that");
-			}
 			if (stElement.getClassName().startsWith("org.apache.derby") || stElement.getClassName().startsWith("com.mysql") || (i == 0)) {
 				child.addTime(timeDiff, true, inDb);
 				child2.addTime(timeDiff, true, inDb);

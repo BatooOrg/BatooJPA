@@ -57,17 +57,19 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	 *            the time used
 	 * @param self
 	 *            time used by self
-	 * @param inDerby
+	 * @param inDb
 	 *            time is in derby stack
 	 * 
 	 * @since 2.0.0
 	 */
-	public void addTime(long used, boolean self, boolean inDerby) {
+	public void addTime(long used, boolean self, boolean inDb) {
 		this.hits++;
 		this.time += used;
-		if (!inDerby) {
+
+		if (!inDb) {
 			this.timeWithoutDb += used;
 		}
+
 		if (self) {
 			this.selfHit++;
 			this.self += used;
