@@ -64,7 +64,7 @@ public class BenchmarkTest {
 	/**
 	 * The number of tests to run
 	 */
-	private static final int BENCHMARK_LENGTH = 100;
+	private static final int BENCHMARK_LENGTH = 5000;
 
 	/**
 	 * If the results should be summarized
@@ -74,7 +74,12 @@ public class BenchmarkTest {
 	/**
 	 * the number of worker thread to simulate concurrency
 	 */
-	private static final int THREAD_COUNT = Runtime.getRuntime().availableProcessors() * 2;
+	private static final int THREAD_COUNT = Runtime.getRuntime().availableProcessors() / 2;
+
+	/**
+	 * The max test time, the default is 30 mins.
+	 */
+	private static final long MAX_TEST_TIME = 30 * 60 * 1000;
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(BenchmarkTest.class);
 
@@ -175,8 +180,8 @@ public class BenchmarkTest {
 	}
 
 	private void doBenchmarkCriteria(final EntityManagerFactory emf, Person[][] people, CriteriaQuery<Address> cq, ParameterExpression<Person> p) {
-		for (final Person[] persons : people) {
-			for (final Person person : persons) {
+		for (int i = 0; i < (people.length / 2); i++) {
+			for (final Person person : people[i]) {
 				final EntityManager em = this.open(emf);
 
 				final TypedQuery<Address> q = em.createQuery(cq);
@@ -189,8 +194,8 @@ public class BenchmarkTest {
 	}
 
 	private void doBenchmarkFind(final EntityManagerFactory emf, Person[][] people) {
-		for (final Person[] persons : people) {
-			for (final Person person : persons) {
+		for (int i = 0; i < (people.length / 2); i++) {
+			for (final Person person : people[i]) {
 				final EntityManager em = this.open(emf);
 
 				final Person person2 = em.find(Person.class, person.getId());
@@ -202,8 +207,8 @@ public class BenchmarkTest {
 	}
 
 	private void doBenchmarkJpql(final EntityManagerFactory emf, final Person[][] people) {
-		for (final Person[] persons : people) {
-			for (final Person person : persons) {
+		for (int i = 0; i < (people.length / 2); i++) {
+			for (final Person person : people[i]) {
 				final EntityManager em = this.open(emf);
 
 				final TypedQuery<Address> q = em.createQuery(
@@ -272,7 +277,13 @@ public class BenchmarkTest {
 	}
 
 	private void doTest(Type type) {
+		BenchmarkTest.LOG.info("Deploying the persistence unit...");
+
 		final EntityManagerFactory emf = Persistence.createEntityManagerFactory(type.name().toLowerCase());
+
+		BenchmarkTest.LOG.info("Done deploying the persistence unit.");
+
+		BenchmarkTest.LOG.info("Deploying the persistence unit...");
 
 		final EntityManager em = this.open(emf);
 		this.country = new Country();
@@ -285,38 +296,34 @@ public class BenchmarkTest {
 		this.threadIds = new long[BenchmarkTest.THREAD_COUNT];
 		this.currentThreadTimes = new long[BenchmarkTest.THREAD_COUNT];
 
+		BenchmarkTest.LOG.info("Done preparing the countries");
+
+		BenchmarkTest.LOG.info("Running the warm up phase...");
 		LinkedBlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<Runnable>();
 		ExecutorService pool = this.createExecutor(workQueue);
-		try {
-			// warm mup
-			this.test(type, emf, workQueue, BenchmarkTest.BENCHMARK_LENGTH / 5);
-		}
-		finally {
-			try {
-				pool.shutdown();
-				pool.awaitTermination(60, TimeUnit.MINUTES);
-			}
-			catch (final InterruptedException e) {
-				throw new RuntimeException(e);
-			}
-		}
+
+		// warm mup
+		this.test(type, emf, workQueue, BenchmarkTest.BENCHMARK_LENGTH / 5);
+		this.waitUntilFinish(workQueue, pool);
+
+		BenchmarkTest.LOG.info("Done running warm up phase");
+
+		BenchmarkTest.LOG.info("Starting the benchmark with {0} threads, {1} iterations...", BenchmarkTest.THREAD_COUNT, BenchmarkTest.BENCHMARK_LENGTH);
 
 		workQueue = new LinkedBlockingQueue<Runnable>();
 		pool = this.createExecutor(workQueue);
-		try {
-			// for real
-			this.test(type, emf, workQueue, BenchmarkTest.BENCHMARK_LENGTH);
 
-			this.setRunning(true);
+		// for real
+		this.test(type, emf, workQueue, BenchmarkTest.BENCHMARK_LENGTH);
+		this.setRunning(true);
+		this.waitUntilFinish(workQueue, pool);
+
+		BenchmarkTest.LOG.info("Benchmark has been completed...");
+
+		try {
+			Thread.sleep(1000);
 		}
-		finally {
-			pool.shutdown();
-			try {
-				pool.awaitTermination(60, TimeUnit.MINUTES);
-				this.setRunning(false);
-			}
-			catch (final Exception e) {}
-		}
+		catch (final InterruptedException e) {}
 
 		emf.close();
 	}
@@ -329,6 +336,11 @@ public class BenchmarkTest {
 				this.doBenchmarkUpdate(em, em.find(Person.class, person.getId()));
 			}
 		}
+	}
+
+	private boolean isInDb(final StackTraceElement stElement) {
+		return stElement.getClassName().startsWith("org.apache.derby") || stElement.getClassName().startsWith("com.mysql")
+			|| stElement.getClassName().startsWith("org.h2") || stElement.getClassName().startsWith("org.hsqldb.");
 	}
 
 	private synchronized boolean isRunning() {
@@ -398,7 +410,7 @@ public class BenchmarkTest {
 			public void run() {
 				BenchmarkTest.this.measureTime();
 			}
-		});
+		}, "Profiler");
 
 		t.setDaemon(false);
 		t.start();
@@ -436,7 +448,8 @@ public class BenchmarkTest {
 			while (BenchmarkTest.this.isRunning()) {
 				try {
 					this.measureTimes(mxBean);
-					Thread.sleep(1);
+
+					Thread.sleep(0, 10);
 				}
 				catch (final InterruptedException e) {}
 			}
@@ -460,12 +473,6 @@ public class BenchmarkTest {
 	private long measureTime(long oldTime, ThreadInfo threadInfo, long newTime) {
 		final long timeDiff = Math.abs(newTime - oldTime);
 
-		if (timeDiff == 0) {
-			BenchmarkTest.LOG.info("How about that {0}", timeDiff);
-
-			return newTime;
-		}
-
 		TimeElement child = this.element;
 		boolean gotStart = false;
 		boolean last = false;
@@ -477,8 +484,7 @@ public class BenchmarkTest {
 
 		for (int i = threadInfo.getStackTrace().length - 1; i >= 0; i--) {
 			final StackTraceElement stElement = threadInfo.getStackTrace()[i];
-			if (stElement.getClassName().startsWith("org.apache.derby") || stElement.getClassName().startsWith("com.mysql")
-				|| stElement.getClassName().startsWith("org.h2") || stElement.getClassName().startsWith("org.hsqldb.")) {
+			if (this.isInDb(stElement)) {
 				inDb = true;
 				break;
 			}
@@ -503,7 +509,7 @@ public class BenchmarkTest {
 				this.elements.put(key, child2 = new TimeElement(key));
 			}
 
-			if (stElement.getClassName().startsWith("org.apache.derby") || stElement.getClassName().startsWith("com.mysql") || (i == 0)) {
+			if (this.isInDb(stElement) || (i == 0)) {
 				child.addTime(timeDiff, true, inDb);
 				child2.addTime(timeDiff, true, inDb);
 				last = true;
@@ -586,6 +592,30 @@ public class BenchmarkTest {
 					}
 				}
 			});
+		}
+	}
+
+	private void waitUntilFinish(LinkedBlockingQueue<Runnable> workQueue, ExecutorService pool) {
+		try {
+			final long started = System.currentTimeMillis();
+
+			while (!workQueue.isEmpty()) {
+				BenchmarkTest.LOG.info("{0} iterations to go...", workQueue.size());
+
+				if ((System.currentTimeMillis() - started) > BenchmarkTest.MAX_TEST_TIME) {
+					throw new IllegalStateException("Max allowed test time exceeded");
+				}
+
+				Thread.sleep(10000);
+			}
+
+			if (pool.awaitTermination(10, TimeUnit.SECONDS)) {
+				BenchmarkTest.LOG.warn("Forcefully shutting down the thread pool");
+				pool.shutdownNow();
+			}
+		}
+		catch (final InterruptedException e) {
+			throw new RuntimeException(e);
 		}
 	}
 }

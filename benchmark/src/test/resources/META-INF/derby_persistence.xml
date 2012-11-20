@@ -34,15 +34,16 @@
 		<properties>
 			<property name="org.batoo.jpa.ddl" value="DROP" />
 		
-			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
-			<property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:test" />
-			<property name="javax.persistence.jdbc.user" value="root" />
+			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.Driver40" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:derby:memory:B;create=true" />
+			<property name="javax.persistence.jdbc.user" value="sa" />
 			<property name="javax.persistence.jdbc.password" value="" />
 			
 			<!-- Batoo Logging -->
 <!-- 			<property name="org.batoo.jpa.sql_logging" value="STDOUT"/> -->
 			<property name="org.batoo.jdbc.max_fetch_join_depth" value="0"/>
 			<property name="org.batoo.jdbc.insert_batch_size" value="1"/>
+			
 		</properties>
 
 	</persistence-unit>
@@ -57,8 +58,8 @@
 	
 		<properties>
 			<property name="hibernate.hbm2ddl.auto" value="create-drop" />
-			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
-			<property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:test" />
+			<property name="hibernate.connection.driver_class" value="org.apache.derby.jdbc.Driver40" />
+			<property name="hibernate.connection.url" value="jdbc:derby:memory:H;create=true" />
 			<property name="hibernate.connection.username" value="sa" />
 			<property name="hibernate.connection.password" value="" />
 			
@@ -84,15 +85,14 @@
 		<class>org.batoo.jpa.benchmark.Phone</class>
 		
 		<properties>
-			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
-			<property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:test" />
+			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.Driver40" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:derby:memory:E;create=true" />
 			<property name="javax.persistence.jdbc.user" value="sa" />
 			<property name="javax.persistence.jdbc.password" value="" />
 			
 			<property name="eclipselink.cache.shared.default" value="false"/>
 			<property name="eclipselink.ddl-generation" value="create-tables" />
       		<property name="eclipselink.ddl-generation.output-mode" value="database" />
-      		
       		<!-- EclipseLink logging -->
       		<property name="eclipselink.logging.level" value="SEVERE"/>
 <!-- 			<property name="eclipselink.logging.level.sql" value="FINE"/> -->
