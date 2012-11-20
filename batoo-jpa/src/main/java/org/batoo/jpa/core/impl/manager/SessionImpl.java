@@ -62,7 +62,7 @@ public class SessionImpl {
 
 	private final EntityManagerImpl em;
 	private final MetamodelImpl metamodel;
-	private long sessionId;
+	private Object sessionId;
 
 	private final HashMap<ManagedId<?>, ManagedInstance<?>> repository = Maps.newHashMap();
 
@@ -95,10 +95,10 @@ public class SessionImpl {
 		this.removeBatchSize = this.em.getJdbcAdaptor().getRemoveBatchSize();
 
 		if (SessionImpl.LOG.isDebugEnabled()) {
-			this.sessionId = SessionImpl.nextSessionId++;
+			this.sessionId = "Session" + SessionImpl.nextSessionId++;
 		}
 		else {
-			this.sessionId = this.hashCode();
+			this.sessionId = this;
 		}
 	}
 
@@ -772,6 +772,6 @@ public class SessionImpl {
 	 */
 	@Override
 	public String toString() {
-		return "SessionImpl@" + this.sessionId + "";
+		return this.sessionId.toString();
 	}
 }
