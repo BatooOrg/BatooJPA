@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.LockModeType;
-import javax.persistence.PersistenceException;
 import javax.persistence.metamodel.Attribute.PersistentAttributeType;
 import javax.persistence.metamodel.PluralAttribute.CollectionType;
 
@@ -83,7 +82,6 @@ public class ManagedInstance<X> {
 	private final X instance;
 	private Status status;
 	private Status oldStatus;
-	private boolean optimisticLock;
 	private LockModeType lockMode;
 
 	private final HashMap<AbstractMapping<?, ?, ?>, Object> snapshot = Maps.newHashMap();
@@ -102,6 +100,8 @@ public class ManagedInstance<X> {
 
 	private boolean prePersistCalled;
 	private boolean preRemoveCalled;
+
+	private Object oldVersion;
 
 	/**
 	 * The current lock mode context.
@@ -403,38 +403,6 @@ public class ManagedInstance<X> {
 	}
 
 	/**
-	 * Checks the optimistic lock for the instance.
-	 * 
-	 * @param connection
-	 *            the connection
-	 * @throws SQLException
-	 *             thrown in case of an SQL error
-	 * 
-	 * @since 2.0.0
-	 */
-	public void checkVersion(Connection connection) throws SQLException {
-		// no optimistic lock, nothing to check
-		if (!this.optimisticLock) {
-			return;
-		}
-
-		ManagedInstance.LOG.debug("Optimistic lock on {0}", this);
-
-		final EntityTypeImpl<? super X> rootType = this.type.getRootType();
-		final Object currentVersion = rootType.getVersionAttribute().get(this.instance);
-		final Object expectedVersion = rootType.performSelectVersion(connection, this);
-
-		if (ObjectUtils.notEqual(currentVersion, expectedVersion)) {
-			ManagedInstance.LOG.debug("Optimistic lock matches on {0}: {1}", this, expectedVersion);
-
-			throw new PersistenceException("Entity was updated by a different transaction " + this.instance);
-		}
-		else {
-			ManagedInstance.LOG.debug("Optimistic lock mismatches on {0}, found {1}, expected {2}", this, expectedVersion);
-		}
-	}
-
-	/**
 	 * Enhances the collections of the managed instance.
 	 * 
 	 * @since 2.0.0
@@ -595,6 +563,17 @@ public class ManagedInstance<X> {
 	}
 
 	/**
+	 * Returns the old version of the instance.
+	 * 
+	 * @return the old version of the instance
+	 * 
+	 * @since $version
+	 */
+	public Object getOldVersion() {
+		return this.oldVersion;
+	}
+
+	/**
 	 * Returns the session.
 	 * 
 	 * @return the session
@@ -734,69 +713,86 @@ public class ManagedInstance<X> {
 
 		final BasicAttribute<? super X, ?> version = rootType.getVersionAttribute();
 
-		switch (this.type.getVersionType()) {
-			case SHORT:
-				final short shortValue = (short) (((Number) version.get(this.instance)).shortValue() + 1);
-				version.set(this.instance, shortValue);
+		if (this.oldVersion == null) {
+			switch (this.type.getVersionType()) {
+				case SHORT:
+					final short shortValue = (((Number) version.get(this.instance)).shortValue());
+					this.oldVersion = shortValue;
+					version.set(this.instance, shortValue + 1);
 
-				ManagedInstance.LOG.debug("Version upgraded instance: {0} - {1}", this, shortValue);
+					ManagedInstance.LOG.debug("Version upgraded instance: {0} - {1}", this, shortValue);
 
-				break;
-			case SHORT_OBJECT:
-				final Short shortObjValue = version.get(this.instance) == null ? 1 : //
-					Short.valueOf((short) (((Number) version.get(this.instance)).shortValue() + 1));
-				version.set(this.instance, shortObjValue);
+					break;
+				case SHORT_OBJECT:
+					final Short shortObjValue = version.get(this.instance) == null ? 0 : //
+						Short.valueOf((((Number) version.get(this.instance)).shortValue()));
+					this.oldVersion = shortObjValue;
 
-				ManagedInstance.LOG.debug("Version upgraded instance: {0} - {1}", this, shortObjValue);
+					version.set(this.instance, shortObjValue + 1);
 
-				break;
+					ManagedInstance.LOG.debug("Version upgraded instance: {0} - {1}", this, shortObjValue);
 
-			case INT:
-				final int intValue = (((Number) version.get(this.instance)).intValue() + 1);
-				version.set(this.instance, intValue);
+					break;
 
-				ManagedInstance.LOG.debug("Version upgraded instance: {0} - {1}", this, intValue);
+				case INT:
+					final int intValue = (((Number) version.get(this.instance)).intValue());
+					this.oldVersion = intValue;
 
-				break;
-			case INT_OBJECT:
-				final Integer intObjValue = version.get(this.instance) == null ? 1 : //
-					Integer.valueOf(((Number) version.get(this.instance)).intValue() + 1);
-				version.set(this.instance, intObjValue);
+					version.set(this.instance, intValue + 1);
 
-				ManagedInstance.LOG.debug("Version upgraded instance: {0} - {1}", this, intObjValue);
+					ManagedInstance.LOG.debug("Version upgraded instance: {0} - {1}", this, intValue);
 
-				break;
+					break;
+				case INT_OBJECT:
+					final Integer intObjValue = version.get(this.instance) == null ? 0 : //
+						Integer.valueOf(((Number) version.get(this.instance)).intValue());
+					this.oldVersion = intObjValue;
 
-			case LONG:
-				final long longValue = (((Number) version.get(this.instance)).longValue() + 1);
-				version.set(this.instance, longValue);
+					version.set(this.instance, intObjValue + 1);
 
-				ManagedInstance.LOG.debug("Version upgraded instance: {0} - {1}", this, longValue);
+					ManagedInstance.LOG.debug("Version upgraded instance: {0} - {1}", this, intObjValue);
 
-				break;
-			case LONG_OBJECT:
-				final Long longObjValue = version.get(this.instance) == null ? 1l : //
-					Long.valueOf((((Number) version.get(this.instance)).longValue() + 1));
-				version.set(this.instance, longObjValue);
+					break;
+				case LONG:
+					final long longValue = (((Number) version.get(this.instance)).longValue());
+					this.oldVersion = longValue;
 
-				ManagedInstance.LOG.debug("Version upgraded instance: {0} - {1}", this, longObjValue);
+					version.set(this.instance, longValue + 1);
 
-				break;
+					ManagedInstance.LOG.debug("Version upgraded instance: {0} - {1}", this, longValue);
 
-			case TIMESTAMP:
-				final Timestamp value = new Timestamp(System.currentTimeMillis());
-				version.set(this.instance, value);
+					break;
+				case LONG_OBJECT:
+					final Long longObjValue = version.get(this.instance) == null ? 0l : //
+						Long.valueOf((((Number) version.get(this.instance)).longValue()));
+					this.oldVersion = longObjValue;
 
-				ManagedInstance.LOG.debug("Version upgraded instance: {0} - {1}", this, value);
+					version.set(this.instance, longObjValue + 1);
+
+					ManagedInstance.LOG.debug("Version upgraded instance: {0} - {1}", this, longObjValue);
+
+					break;
+
+				case TIMESTAMP:
+					final Timestamp value = new Timestamp(System.currentTimeMillis());
+					this.oldVersion = version.get(this.instance);
+
+					version.set(this.instance, value);
+
+					ManagedInstance.LOG.debug("Version upgraded instance: {0} - {1}", this, value);
+			}
 		}
 
 		if (commit) {
-			rootType.performVersionUpdate(connection, this);
+			final Object newVersion = version.get(this.instance);
+			rootType.performVersionUpdate(connection, this, this.oldVersion, newVersion);
 
-			ManagedInstance.LOG.debug("Version committed instance: {0} - {1}", this);
+			ManagedInstance.LOG.debug("Version committed instance: {0} - {1} -> {2}", this, this.oldVersion, newVersion);
+
+			this.oldVersion = null;
 		}
 		else {
-			this.changed = true;
+			this.changed();
 		}
 	}
 
@@ -1036,17 +1032,6 @@ public class ManagedInstance<X> {
 	 */
 	public void setLoadingFromCache(boolean loadingFromCache) {
 		this.loadingFromCache = loadingFromCache;
-	}
-
-	/**
-	 * Sets the optimistic lock on
-	 * 
-	 * @since 2.0.0
-	 */
-	public void setOptimisticLock() {
-		ManagedInstance.LOG.debug("Optimistic lock enabled for instance {0}", this);
-
-		this.optimisticLock = true;
 	}
 
 	/**

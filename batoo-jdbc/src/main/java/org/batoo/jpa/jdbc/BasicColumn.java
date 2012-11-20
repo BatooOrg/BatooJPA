@@ -47,6 +47,7 @@ public class BasicColumn extends AbstractColumn {
 	private final boolean updatable;
 	private final BasicMapping<?, ?> mapping;
 	private final JdbcAdaptor jdbcAdaptor;
+	private final boolean version;
 
 	/**
 	 * @param jdbcAdaptor
@@ -78,6 +79,8 @@ public class BasicColumn extends AbstractColumn {
 		this.nullable = metadata != null ? metadata.isNullable() : true;
 		this.unique = metadata != null ? metadata.isUnique() : false;
 		this.updatable = metadata != null ? metadata.isUpdatable() : true;
+		this.version = this.mapping.isVersion();
+
 	}
 
 	/**
@@ -217,7 +220,7 @@ public class BasicColumn extends AbstractColumn {
 	 * @since $version
 	 */
 	public boolean isVersion() {
-		return this.mapping.isVersion();
+		return this.version;
 	}
 
 	/**

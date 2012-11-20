@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.naming.directory.BasicAttribute;
 import javax.persistence.InheritanceType;
 import javax.persistence.LockModeType;
 import javax.persistence.PersistenceException;
@@ -132,6 +133,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private CriteriaQueryImpl<X> selectCriteria;
 	private CriteriaQueryImpl<X> refreshCriteria;
 	private int dependencyCount;
+	private boolean canBatchRemoves;
 
 	private final HashMap<EntityTypeImpl<?>, AssociationMappingImpl<?, ?, ?>[]> dependencyMap = Maps.newHashMap();
 	private FinalWrapper<BasicMappingImpl<?, ?>[]> basicMappingImpls;
@@ -222,6 +224,22 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				this.idMap.put(singularAttribute.getMapsId(), singularAttribute);
 			}
 		}
+	}
+
+	/**
+	 * Returns if remove operation can be combined into a batch.
+	 * <p>
+	 * The remove operation can be combined into a batch provided:
+	 * <ul>
+	 * <li>the entity has no version attribute
+	 * <li>the entity has single basic id type.
+	 * 
+	 * @return <code>true</code> if remove operation can be combined into a batch, <code>false</code> otherwise
+	 * 
+	 * @since $version
+	 */
+	public boolean canBatchRemoves() {
+		return this.canBatchRemoves;
 	}
 
 	private ConstructorAccessor enhance() {
@@ -1777,6 +1795,8 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				((SecondaryTable) table).link();
 			}
 		}
+
+		this.canBatchRemoves = (this.getVersionAttribute() == null) && this.hasSingleIdAttribute() && (this.getIdMapping() instanceof BasicAttribute);
 	}
 
 	/**
@@ -1910,43 +1930,29 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	/**
-	 * Selects the version for the instance.
-	 * 
-	 * @param connection
-	 *            the connection to use
-	 * @param instance
-	 *            the managed instance to perform update for
-	 * @throws SQLException
-	 *             thrown in case of an SQL Error
-	 * @return returns the current version
-	 * 
-	 * @since 2.0.0
-	 */
-	public Object performSelectVersion(Connection connection, ManagedInstance<? extends X> instance) throws SQLException {
-		return this.getTables()[0].performSelectVersion(connection, instance.getInstance());
-	}
-
-	/**
 	 * Performs the update for the instance.
 	 * 
 	 * @param connection
 	 *            the connection to use
-	 * @param instance
+	 * @param managedInstance
 	 *            the managed instance to perform update for
 	 * @throws SQLException
 	 *             thrown in case of an SQL Error
 	 * 
 	 * @since 2.0.0
 	 */
-	public void performUpdate(Connection connection, ManagedInstance<?> instance) throws SQLException {
+	public void performUpdate(Connection connection, ManagedInstance<?> managedInstance) throws SQLException {
 		FinalWrapper<EntityTable[]> wrapper = this.updateTables;
+
+		final Object instance = managedInstance.getInstance();
+		final Object oldVersion = managedInstance.getOldVersion();
 
 		if (wrapper == null) {
 			synchronized (this) {
 				if (this.updateTables == null) {
 					final List<EntityTable> _updateTables = Lists.newArrayList(this.getTables());
 					for (final Iterator<EntityTable> i = _updateTables.iterator(); i.hasNext();) {
-						if (!i.next().performUpdateWithUpdatability(connection, this, instance.getInstance())) {
+						if (!i.next().performUpdateWithUpdatability(connection, this, managedInstance.getInstance(), oldVersion)) {
 							i.remove();
 						}
 					}
@@ -1957,9 +1963,10 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 				wrapper = this.updateTables;
 			}
 		}
-
-		for (final EntityTable table : wrapper.value) {
-			table.performUpdate(connection, this, instance.getInstance());
+		else {
+			for (final EntityTable table : wrapper.value) {
+				table.performUpdate(connection, this, instance, oldVersion);
+			}
 		}
 	}
 
@@ -1970,13 +1977,17 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 *            the connection to use
 	 * @param instance
 	 *            the managed instance to perform update for
+	 * @param oldVersion
+	 *            the old version value
+	 * @param newVersion
+	 *            the new version value
 	 * @throws SQLException
 	 *             thrown in case of an SQL Error
 	 * 
 	 * @since 2.0.0
 	 */
-	public void performVersionUpdate(Connection connection, ManagedInstance<? extends X> instance) throws SQLException {
-		this.getTables()[0].performVersionUpdate(connection, instance.getInstance());
+	public void performVersionUpdate(Connection connection, ManagedInstance<? extends X> instance, Object oldVersion, Object newVersion) throws SQLException {
+		this.getTables()[0].performVersionUpdate(connection, instance.getInstance(), oldVersion, newVersion);
 	}
 
 	/**

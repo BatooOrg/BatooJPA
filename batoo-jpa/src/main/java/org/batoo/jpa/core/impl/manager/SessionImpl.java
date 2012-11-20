@@ -58,8 +58,11 @@ public class SessionImpl {
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(SessionImpl.class);
 
+	private static volatile long nextSessionId = 1;
+
 	private final EntityManagerImpl em;
 	private final MetamodelImpl metamodel;
+	private long sessionId;
 
 	private final HashMap<ManagedId<?>, ManagedInstance<?>> repository = Maps.newHashMap();
 
@@ -90,6 +93,13 @@ public class SessionImpl {
 		this.metamodel = metamodel;
 		this.insertBatchSize = this.em.getJdbcAdaptor().getInsertBatchSize();
 		this.removeBatchSize = this.em.getJdbcAdaptor().getRemoveBatchSize();
+
+		if (SessionImpl.LOG.isDebugEnabled()) {
+			this.sessionId = SessionImpl.nextSessionId++;
+		}
+		else {
+			this.sessionId = this.hashCode();
+		}
 	}
 
 	/**
@@ -168,12 +178,17 @@ public class SessionImpl {
 			int batchSize = 0;
 			EntityTypeImpl<?> lastEntity = null;
 
+			int removeBatchSize = this.removeBatchSize;
+
 			// group upto INSERT_BATCH_SIZE and same type entities into a single batch
 			while ((i < removes.length) && //
-				(batchSize < this.removeBatchSize) && //
+				(batchSize < removeBatchSize) && //
 				((lastEntity == null) || (lastEntity == removes[i].getType()))) {
 
 				lastEntity = removes[i].getType();
+				if (!lastEntity.canBatchRemoves()) {
+					removeBatchSize = 1;
+				}
 
 				batch[batchSize] = removes[i];
 				batchSize++;
@@ -248,32 +263,6 @@ public class SessionImpl {
 
 				i++;
 			}
-		}
-	}
-
-	/**
-	 * Checks the versions for Optimistic locking on instances.
-	 * 
-	 * @param connection
-	 *            the connection
-	 * @param removals
-	 *            the removals
-	 * @param updates
-	 *            the updates
-	 * @throws SQLException
-	 *             thrown in case of an SQL error
-	 * 
-	 * @since 2.0.0
-	 */
-	private void doVersionChecks(Connection connection, ManagedInstance<?>[] removals, ManagedInstance<?>[] updates) throws SQLException {
-		SessionImpl.LOG.debug("Performing version checks on session {0}", this);
-
-		for (final ManagedInstance<?> instance : removals) {
-			instance.checkVersion(connection);
-		}
-
-		for (final ManagedInstance<?> instance : updates) {
-			instance.checkVersion(connection);
 		}
 	}
 
@@ -412,8 +401,6 @@ public class SessionImpl {
 
 		// fire callbacks
 		this.firePreCallbacks(sortedUpdates, sortedRemovals, callbackAvailability);
-
-		this.doVersionChecks(connection, sortedRemovals, sortedUpdates);
 
 		this.doVersionUpgrades(connection, sortedUpdates);
 
@@ -777,5 +764,14 @@ public class SessionImpl {
 		if (this.loadTracker == 1) {
 			SessionImpl.LOG.debug("Load tracker is triggered on session {0}", this);
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "SessionImpl@" + this.sessionId + "";
 	}
 }

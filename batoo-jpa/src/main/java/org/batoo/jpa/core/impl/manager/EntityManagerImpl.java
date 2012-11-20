@@ -452,10 +452,6 @@ public class EntityManagerImpl implements EntityManager {
 		// try to locate in the session
 		final EntityTypeImpl<T> type = this.metamodel.entity(entityClass);
 
-		if ((lockMode == null) && type.getRootType().hasVersionAttribute()) {
-			lockMode = LockModeType.OPTIMISTIC;
-		}
-
 		return this.findImpl(primaryKey, lockMode, properties, type);
 	}
 
@@ -818,17 +814,18 @@ public class EntityManagerImpl implements EntityManager {
 					+ instance.getType().getName());
 			}
 
-			instance.setOptimisticLock();
-		}
-
-		if (lockMode == LockModeType.OPTIMISTIC_FORCE_INCREMENT) {
-			this.assertTransaction();
-
 			try {
-				instance.incrementVersion(this.getConnection(), true);
+				if (lockMode == LockModeType.OPTIMISTIC_FORCE_INCREMENT) {
+					this.assertTransaction();
+
+					instance.incrementVersion(this.getConnection(), true);
+				}
+				else {
+					instance.incrementVersion(this.getConnection(), false);
+				}
 			}
 			catch (final SQLException e) {
-				throw new PersistenceException("Unable to update version", e);
+				throw new PersistenceException("Unabled to update the version", e);
 			}
 		}
 	}
@@ -973,9 +970,6 @@ public class EntityManagerImpl implements EntityManager {
 		instance.setStatus(Status.NEW);
 
 		instance.enhanceCollections();
-		if (type.getRootType().hasVersionAttribute()) {
-			instance.setOptimisticLock();
-		}
 
 		this.session.putExternal(instance);
 		processed.put(entity, instance.getInstance());
@@ -1063,9 +1057,6 @@ public class EntityManagerImpl implements EntityManager {
 		instance.setStatus(Status.NEW);
 
 		instance.enhanceCollections();
-		if (type.getRootType().hasVersionAttribute()) {
-			instance.setOptimisticLock();
-		}
 
 		boolean requiresFlush = !instance.fillIdValues();
 		this.session.putExternal(instance);

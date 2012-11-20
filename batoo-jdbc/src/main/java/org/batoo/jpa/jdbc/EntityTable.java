@@ -54,7 +54,6 @@ public class EntityTable extends AbstractTable {
 	private final Map<String, BasicColumn[]> indexes = Maps.newHashMap();
 
 	private final HashMap<Integer, String> removeSqlMap = Maps.newHashMap();
-	private AbstractColumn[] removeColumns;
 	private FinalWrapper<HashMap<AbstractColumn, String>> idColumns;
 
 	/**
@@ -211,26 +210,12 @@ public class EntityTable extends AbstractTable {
 				return sql;
 			}
 
-			this.removeColumns = new AbstractColumn[this.pkColumns.size()];
-			this.pkColumns.values().toArray(this.removeColumns);
-
 			String restriction;
-			if (this.pkColumns.size() > 1) {
-				final Collection<String> restrictions = Collections2.transform(this.pkColumns.values(), new Function<AbstractColumn, String>() {
-
-					@Override
-					public String apply(AbstractColumn input) {
-						return input.getName() + " = ?";
-					}
-				});
-				final String singleRestriction = Joiner.on(" AND ").join(restrictions);
-				restriction = StringUtils.repeat(singleRestriction, " OR ", size);
-			}
-			else if (size == 1) {
-				restriction = this.removeColumns[0].getName() + " = ?";
+			if (size == 1) {
+				restriction = this.getRestrictionSql(this.pkColumns);
 			}
 			else {
-				restriction = this.removeColumns[0].getName() + " IN (" + StringUtils.repeat("?", ", ", size) + ")";
+				restriction = this.pkColumns.values().iterator().next().getName() + " IN (" + StringUtils.repeat("?", ", ", size) + ")";
 			}
 
 			sql = "DELETE FROM " + this.getQName() + " WHERE " + restriction;
@@ -311,49 +296,21 @@ public class EntityTable extends AbstractTable {
 		final String removeSql = this.getRemoveSql(size);
 
 		// prepare the parameters
-		final Object[] params = new Object[size * this.removeColumns.length];
+		final AbstractColumn[] restrictionColumns = this.getRestrictionColumns();
+		final Object[] params = new Object[size * restrictionColumns.length];
 		for (int i = 0; i < size; i++) {
 			final Object instance = instances[i];
 
-			for (int j = 0; j < this.removeColumns.length; j++) {
-				final AbstractColumn column = this.removeColumns[j];
-				params[(i * this.removeColumns.length) + j] = column.getValue(connection, instance);
+			for (int j = 0; j < restrictionColumns.length; j++) {
+				final AbstractColumn column = restrictionColumns[j];
+				params[(i * restrictionColumns.length) + j] = column.getValue(connection, instance);
 			}
 		}
 
 		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor.isPmdBroken(), false);
-		runner.update(connection, removeSql, params);
-	}
-
-	/**
-	 * Selects the version from the table.
-	 * 
-	 * @param connection
-	 *            the connection to use
-	 * @param instance
-	 *            the instance to perform select for
-	 * @return the version
-	 * @throws SQLException
-	 *             thrown in case of underlying SQLException
-	 * 
-	 * @since 2.0.0
-	 */
-	public Object performSelectVersion(Connection connection, Object instance) throws SQLException {
-		// Do not inline, generation of the update SQL will initialize the insertColumns!
-		final String updateSql = this.getSelectVersionSql(this.pkColumns);
-		final AbstractColumn[] selectVersionColumns = this.getSelectVersionColumns();
-
-		// prepare the parameters
-		final Object[] params = new Object[selectVersionColumns.length];
-		for (int i = 0; i < selectVersionColumns.length; i++) {
-			final AbstractColumn column = selectVersionColumns[i];
-			params[i] = column.getValue(connection, instance);
+		if (size != runner.update(connection, removeSql, params)) {
+			throw new OptimisticLockFailedException();
 		}
-
-		// execute the insert
-		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor.isPmdBroken(), false);
-
-		return runner.query(connection, updateSql, new SingleValueHandler<Object>(), params);
 	}
 
 	/**
@@ -365,33 +322,48 @@ public class EntityTable extends AbstractTable {
 	 *            the entity type of the instance
 	 * @param instance
 	 *            the instance to perform update for
+	 * @param oldVersion
+	 *            the old version value
 	 * @throws SQLException
 	 *             thrown in case of underlying SQLException
 	 * 
 	 * @since 2.0.0
 	 */
-	public void performUpdate(Connection connection, EntityTypeDescriptor type, Object instance) throws SQLException {
+	public void performUpdate(Connection connection, EntityTypeDescriptor type, Object instance, Object oldVersion) throws SQLException {
 		// Do not inline, generation of the update SQL will initialize the insertColumns!
 		final String updateSql = this.getUpdateSql(type, this.pkColumns);
 		final AbstractColumn[] updateColumns = this.getUpdateColumns(type);
+		final AbstractColumn[] restrictionColumns = this.getRestrictionColumns();
 
 		boolean hasLob = false;
+		int nextParamNo = 0;
+
 		// prepare the parameters
-		final Object[] params = new Object[updateColumns.length];
-		for (int i = 0; i < updateColumns.length; i++) {
-			final AbstractColumn column = updateColumns[i];
-			params[i] = column.getValue(connection, instance);
+		final Object[] params = new Object[updateColumns.length + restrictionColumns.length];
+		for (final AbstractColumn column : updateColumns) {
+			params[nextParamNo++] = column.getValue(connection, instance);
 
 			hasLob |= column.isLob();
 		}
 
+		for (final AbstractColumn column : restrictionColumns) {
+			if (column.isVersion()) {
+				params[nextParamNo++] = oldVersion;
+			}
+			else {
+				params[nextParamNo++] = column.getValue(connection, instance);
+			}
+		}
+
 		// execute the insert
 		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor.isPmdBroken(), hasLob);
-		runner.update(connection, updateSql, params);
+		if (1 != runner.update(connection, updateSql, params)) {
+			throw new OptimisticLockFailedException();
+		}
 	}
 
 	/**
-	 * Performs update to the table for the managed instance or joins. In addition checks if the table participate in update.
+	 * Performs update to the table for the managed instance or joins. In addition checks if the table participates in update.
 	 * 
 	 * @param connection
 	 *            the connection to use
@@ -399,37 +371,49 @@ public class EntityTable extends AbstractTable {
 	 *            the entity type of the instance
 	 * @param instance
 	 *            the instance to perform update for
+	 * @param oldVersion
+	 *            the old version value
 	 * @return returns true if the table is updatable
 	 * @throws SQLException
 	 *             thrown in case of underlying SQLException
 	 * 
 	 * @since 2.0.0
 	 */
-	public boolean performUpdateWithUpdatability(Connection connection, EntityTypeDescriptor type, Object instance) throws SQLException {
+	public boolean performUpdateWithUpdatability(Connection connection, EntityTypeDescriptor type, Object instance, Object oldVersion) throws SQLException {
 		// Do not inline, generation of the update SQL will initialize the insertColumns!
 		final String updateSql = this.getUpdateSql(type, this.pkColumns);
 		final AbstractColumn[] updateColumns = this.getUpdateColumns(type);
+		final AbstractColumn[] restrictionColumns = this.getRestrictionColumns();
 
+		if (updateColumns.length == 0) {
+			return false;
+		}
+
+		int nextParam = 0;
 		boolean hasLob = false;
 
 		// prepare the parameters
-		final Object[] params = new Object[updateColumns.length];
-		for (int i = 0; i < updateColumns.length; i++) {
-			final AbstractColumn column = updateColumns[i];
-
-			// if the first column is primary key then the table is not updatable
-			if ((i == 0) && column.isPrimaryKey()) {
-				return false;
-			}
-
-			params[i] = column.getValue(connection, instance);
+		final Object[] params = new Object[updateColumns.length + restrictionColumns.length];
+		for (final AbstractColumn column : updateColumns) {
+			params[nextParam++] = column.getValue(connection, instance);
 
 			hasLob |= column.isLob();
 		}
 
+		for (final AbstractColumn column : restrictionColumns) {
+			if (column.isVersion()) {
+				params[nextParam++] = oldVersion;
+			}
+			else {
+				params[nextParam++] = column.getValue(connection, instance);
+			}
+		}
+
 		// execute the insert
 		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor.isPmdBroken(), hasLob);
-		runner.update(connection, updateSql, params);
+		if (1 != runner.update(connection, updateSql, params)) {
+			throw new OptimisticLockFailedException();
+		}
 
 		return true;
 	}
@@ -441,25 +425,34 @@ public class EntityTable extends AbstractTable {
 	 *            the connection to use
 	 * @param instance
 	 *            the instance to perform version update for
+	 * @param oldVersion
+	 *            the old version value
+	 * @param newVersion
+	 *            the new version value
 	 * @throws SQLException
 	 *             thrown in case of underlying SQLException
 	 * 
 	 * @since 2.0.0
 	 */
-	public void performVersionUpdate(Connection connection, Object instance) throws SQLException {
+	public void performVersionUpdate(Connection connection, Object instance, Object oldVersion, Object newVersion) throws SQLException {
 		// Do not inline, generation of the update SQL will initialize the insertColumns!
 		final String updateSql = this.getVersionUpdateSql(this.pkColumns);
-		final AbstractColumn[] versionUpdateColumns = this.getVersionUpdateColumns();
+		final AbstractColumn[] restrictionColumns = this.getRestrictionColumns();
 
 		// prepare the parameters
-		final Object[] params = new Object[versionUpdateColumns.length];
-		for (int i = 0; i < versionUpdateColumns.length; i++) {
-			final AbstractColumn column = versionUpdateColumns[i];
+		final Object[] params = new Object[restrictionColumns.length];
+
+		params[0] = newVersion;
+		for (int i = 1; i < (restrictionColumns.length - 1); i++) {
+			final AbstractColumn column = restrictionColumns[i];
 			params[i] = column.getValue(connection, instance);
 		}
+		params[params.length - 1] = oldVersion;
 
 		// execute the update
-		new QueryRunner(this.jdbcAdaptor.isPmdBroken(), false).update(connection, updateSql, params);
+		if (1 != new QueryRunner(this.jdbcAdaptor.isPmdBroken(), false).update(connection, updateSql, params)) {
+			throw new OptimisticLockFailedException();
+		}
 	}
 
 	/**

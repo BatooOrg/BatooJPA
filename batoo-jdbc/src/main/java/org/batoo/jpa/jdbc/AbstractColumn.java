@@ -139,7 +139,7 @@ public abstract class AbstractColumn implements Column {
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public Object convertValue(Connection connection, final Object value) {
@@ -263,14 +263,14 @@ public abstract class AbstractColumn implements Column {
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public abstract String getColumnDefinition();
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public IdType getIdType() {
@@ -279,14 +279,14 @@ public abstract class AbstractColumn implements Column {
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public abstract int getLength();
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public final AbstractLocator getLocator() {
@@ -295,70 +295,70 @@ public abstract class AbstractColumn implements Column {
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public abstract Mapping<?, ?, ?> getMapping();
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public abstract String getName();
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public abstract int getPrecision();
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public abstract int getScale();
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public abstract int getSqlType();
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public abstract AbstractTable getTable();
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public abstract String getTableName();
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public abstract Object getValue(Connection connection, Object instance);
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public abstract boolean isInsertable();
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public boolean isLob() {
@@ -367,14 +367,14 @@ public abstract class AbstractColumn implements Column {
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public abstract boolean isNullable();
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public boolean isPrimaryKey() {
@@ -383,17 +383,28 @@ public abstract class AbstractColumn implements Column {
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public abstract boolean isUnique();
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public abstract boolean isUpdatable();
+
+	/**
+	 * Returns if the column is a version column.
+	 * 
+	 * @return <code>true</code> if the column is a version column, <code>false</code> otherwise
+	 * 
+	 * @since $version
+	 */
+	public boolean isVersion() {
+		return false;
+	}
 
 	private Object readLob(Object value) {
 		try {
@@ -471,7 +482,7 @@ public abstract class AbstractColumn implements Column {
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public void setId() {
@@ -480,14 +491,14 @@ public abstract class AbstractColumn implements Column {
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public abstract void setTable(AbstractTable table);
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 */
 	@Override
 	public abstract void setValue(Object instance, Object value);

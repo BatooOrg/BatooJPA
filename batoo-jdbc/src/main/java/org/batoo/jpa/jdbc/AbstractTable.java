@@ -58,6 +58,7 @@ public abstract class AbstractTable {
 	private final Map<String, AbstractColumn> columnMap = Maps.newHashMap();
 	private final Map<String, String[]> uniqueConstraints = Maps.newHashMap();
 	private final List<ForeignKey> foreignKeys = Lists.newArrayList();
+	private BasicColumn versionColumn;
 
 	private final HashMap<String, String> insertSqlMap = Maps.newHashMap();
 	private final HashMap<EntityTypeDescriptor, String> updateSqlMap = Maps.newHashMap();
@@ -67,10 +68,12 @@ public abstract class AbstractTable {
 	private FinalWrapper<AbstractColumn[]> columns;
 
 	private AbstractColumn[] updateColumns;
-	private AbstractColumn[] versionUpdateColumns;
 	private AbstractColumn[] selectVersionColumns;
 	private final Map<String, AbstractColumn[]> insertColumnsMap = Maps.newHashMap();
 	private final Map<EntityTypeDescriptor, AbstractColumn[]> updateColumnsMap = Maps.newHashMap();
+
+	private FinalWrapper<String> restrictionSql;
+	private AbstractColumn[] restrictionColumns;
 
 	/**
 	 * @param defaultName
@@ -121,6 +124,14 @@ public abstract class AbstractTable {
 	 * @since 2.0.0
 	 */
 	public void addColumn(AbstractColumn column) {
+		if ((column instanceof BasicColumn) && ((BasicColumn) column).isVersion()) {
+			if (this.versionColumn != null) {
+				throw new MappingException("There can be only one version column", this.versionColumn.getLocator(), column.getLocator());
+			}
+
+			this.versionColumn = (BasicColumn) column;
+		}
+
 		final AbstractColumn existing = this.columnMap.get(column.getName());
 
 		if (existing != null) {
@@ -274,25 +285,14 @@ public abstract class AbstractTable {
 			}
 		});
 
-		final Collection<String> restrictions = Collections2.transform(pkColumns.values(), new Function<AbstractColumn, String>() {
-
-			@Override
-			public String apply(AbstractColumn input) {
-				updateColumns.add(input);
-
-				return input.getName() + " = ?";
-			}
-		});
-
 		final String columnNamesStr = Joiner.on(", ").skipNulls().join(columnNames);
-		final String restrictionStr = Joiner.on(" AND ").join(restrictions);
 
 		// UPDATE SCHEMA.TABLE SET
 		// (COL [, COL]*)
 		// WHERE ID = ? [, ID = ?]*)
 		sql = "UPDATE " + this.getQName() + " SET"//
 			+ "\n" + columnNamesStr //
-			+ "\nWHERE " + restrictionStr;
+			+ "\nWHERE " + this.getRestrictionSql(pkColumns);
 
 		if (type != null) {
 			this.updateSqlMap.put(type, sql);
@@ -461,6 +461,60 @@ public abstract class AbstractTable {
 	}
 
 	/**
+	 * Returns the restriction columns of the table.
+	 * 
+	 * @return the restriction columns of the table
+	 * 
+	 * @since $version
+	 */
+	public AbstractColumn[] getRestrictionColumns() {
+		return this.restrictionColumns;
+	}
+
+	/**
+	 * Returns the restriction SQL fragment.
+	 * 
+	 * @param pkColumns
+	 *            the primary key column
+	 * @return the restriction SQL fragment
+	 * 
+	 * @since $version
+	 */
+	protected String getRestrictionSql(Map<String, AbstractColumn> pkColumns) {
+		FinalWrapper<String> wrapper = this.restrictionSql;
+
+		if (wrapper == null) {
+			synchronized (this) {
+				if (this.restrictionSql == null) {
+
+					final List<AbstractColumn> _restrictionColumns = Lists.newArrayList();
+					_restrictionColumns.addAll(pkColumns.values());
+
+					String _restrictionSql = Joiner.on(" AND ").join(Collections2.transform(pkColumns.values(), new Function<AbstractColumn, String>() {
+
+						@Override
+						public String apply(AbstractColumn input) {
+							return input.getName() + " = ?";
+						}
+					}));
+
+					if (this.versionColumn != null) {
+						_restrictionColumns.add(this.versionColumn);
+						_restrictionSql += " AND " + this.versionColumn.getName() + " = ?";
+					}
+
+					this.restrictionColumns = _restrictionColumns.toArray(new AbstractColumn[_restrictionColumns.size()]);
+					this.restrictionSql = new FinalWrapper<String>(_restrictionSql);
+				}
+
+				wrapper = this.restrictionSql;
+			}
+		}
+
+		return this.restrictionSql.value;
+	}
+
+	/**
 	 * Returns the schema.
 	 * 
 	 * @return the schema
@@ -597,17 +651,6 @@ public abstract class AbstractTable {
 	}
 
 	/**
-	 * Returns the version update columns.
-	 * 
-	 * @return the version update columns
-	 * 
-	 * @since 2.0.0
-	 */
-	public AbstractColumn[] getVersionUpdateColumns() {
-		return this.versionUpdateColumns;
-	}
-
-	/**
 	 * Returns the version update statement for the table specifically.
 	 * 
 	 * @param pkColumns
@@ -622,38 +665,13 @@ public abstract class AbstractTable {
 		if (wrapper == null) {
 			synchronized (this) {
 				if (this.versionUpdateSql == null) {
-
-					final List<AbstractColumn> versionUpdateColumns = Lists.newArrayList();
-
-					for (final AbstractColumn column : this.getColumns()) {
-						if ((column instanceof BasicColumn) && ((BasicColumn) column).isVersion()) {
-							versionUpdateColumns.add(column);
-
-							break;
-						}
-					}
-
-					final Collection<String> restrictions = Collections2.transform(pkColumns.values(), new Function<AbstractColumn, String>() {
-
-						@Override
-						public String apply(AbstractColumn input) {
-							versionUpdateColumns.add(input);
-
-							return input.getName() + " = ?";
-						}
-					});
-
-					final String columnNamesStr = versionUpdateColumns.get(0).getName() + " = ?";
-					final String restrictionStr = Joiner.on(" AND ").join(restrictions);
-
 					// UPDATE SCHEMA.TABLE SET
-					// (COL [, COL]*)
+					// VERSION = ?
 					// VALUES (PARAM [, PARAM]*)
+					// WHERE ID = ? [AND ID = ?]* AND VERSION = ?
 					this.versionUpdateSql = new FinalWrapper<String>("UPDATE " + this.getQName() + " SET"//
-						+ "\n" + columnNamesStr //
-						+ "\nWHERE " + restrictionStr);
-
-					this.versionUpdateColumns = versionUpdateColumns.toArray(new AbstractColumn[versionUpdateColumns.size()]);
+						+ "\n" + this.versionColumn.getName() + " = ?" //
+						+ "\nWHERE " + this.getRestrictionSql(pkColumns));
 				}
 
 				wrapper = this.versionUpdateSql;
