@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.mutable.MutableLong;
 
 import com.google.common.collect.Lists;
 
@@ -39,7 +40,7 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	private final String key;
 	private int hits;
 	private int selfHit;
-	private long timeWithoutDerby;
+	private long timeWithoutDb;
 
 	/**
 	 * @param key
@@ -65,7 +66,7 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 		this.hits++;
 		this.time += used;
 		if (!inDerby) {
-			this.timeWithoutDerby += used;
+			this.timeWithoutDb += used;
 		}
 		if (self) {
 			this.selfHit++;
@@ -87,25 +88,42 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	 * 
 	 * @param type
 	 *            the benchmark type
+	 * @param jpaTotalTime
+	 *            the toal JPA time
+	 * @param dbTotalTime
+	 *            the total DB time
+	 * @param fullSummary
+	 *            if only number should be printed
 	 * 
 	 * @since 2.0.0
 	 */
-	public void dump0(Type type) {
+	public void dump0(Type type, MutableLong dbTotalTime, MutableLong jpaTotalTime, boolean fullSummary) {
 		final int nameStart = this.key.indexOf("doBenchmark");
 
 		if (nameStart > -1) {
-			System.out.println(//
-			type.name() + //
-				" | " + String.format("%010d", this.time / 1000000) + //
-				" | " + String.format("%010d", this.timeWithoutDerby / 1000000) + //
-				" | " + String.format("%010d", (this.time - this.timeWithoutDerby) / 1000000) + //
-				" | " + this.key.substring(nameStart + 11) + " Test");
+			final long dbTime = this.timeWithoutDb / 1000000;
+			final long jpaTime = (this.time - this.timeWithoutDb) / 1000000;
+
+			dbTotalTime.add(dbTime);
+			jpaTotalTime.add(jpaTime);
+
+			if (fullSummary) {
+				System.out.println(//
+				String.format("%08d", dbTime) + //
+					" \t" + String.format("%08d", jpaTime));
+			}
+			else {
+				System.out.println(//
+				this.key.substring(nameStart + 11) + " Test" + //
+					" \t" + String.format("%08d", dbTime) + //
+					" \t" + String.format("%08d", jpaTime));
+			}
 		}
 
 		final List<TimeElement> children = Lists.newArrayList(this.values());
 		Collections.sort(children);
 		for (final TimeElement child : children) {
-			child.dump0(type);
+			child.dump0(type, dbTotalTime, jpaTotalTime, fullSummary);
 		}
 	}
 
@@ -119,7 +137,7 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 	 * @since 2.0.0
 	 */
 	public int dump1(int rowNo, int depth) {
-		if ((depth > 0) && (this.timeWithoutDerby > 10000000)) {
+		if ((depth > 0) && (this.timeWithoutDb > 10000000)) {
 			rowNo++;
 			final String tabs = StringUtils.repeat(" ", depth);
 			System.out.println(String.format("%010d", rowNo) + //
@@ -127,7 +145,7 @@ public class TimeElement extends HashMap<String, TimeElement> implements Compara
 				" " + String.format("%010d", this.hits) + //
 				" " + String.format("%010d", this.selfHit) + //
 				" " + String.format("%010d", this.time / 1000000) + //
-				" " + String.format("%010d", this.timeWithoutDerby / 1000000) + //
+				" " + String.format("%010d", this.timeWithoutDb / 1000000) + //
 				" " + String.format("%010d", this.self / 1000000) + //
 				tabs + this.key);
 		}

@@ -34,9 +34,9 @@
 		<properties>
 			<property name="org.batoo.jpa.ddl" value="DROP" />
 		
-			<property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver" />
-			<property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:mem:benchmark" />
-			<property name="javax.persistence.jdbc.user" value="sa" />
+			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:test" />
+			<property name="javax.persistence.jdbc.user" value="root" />
 			<property name="javax.persistence.jdbc.password" value="" />
 			
 			<!-- Batoo Logging -->
@@ -57,8 +57,8 @@
 	
 		<properties>
 			<property name="hibernate.hbm2ddl.auto" value="create-drop" />
-			<property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbc.jdbcDriver" />
-			<property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:mem:benchmark" />
+			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:test" />
 			<property name="hibernate.connection.username" value="sa" />
 			<property name="hibernate.connection.password" value="" />
 			
@@ -84,8 +84,8 @@
 		<class>org.batoo.jpa.benchmark.Phone</class>
 		
 		<properties>
-			<property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbc.jdbcDriver" />
-			<property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:mem:benchmark" />
+			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:test" />
 			<property name="javax.persistence.jdbc.user" value="sa" />
 			<property name="javax.persistence.jdbc.password" value="" />
 			
