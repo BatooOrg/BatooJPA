@@ -300,8 +300,22 @@ simple_cond_expression options { backtrack=true; } :
     ;
 
 between_expression :
+	BETWEEN between_expression_arithmetic
+	| between_expression_string
+	| between_expression_date
+	;
+    
+between_expression_arithmetic :
     arithmetic_expression (NOT)? BETWEEN arithmetic_expression AND arithmetic_expression
         -> ^(BETWEEN arithmetic_expression arithmetic_expression arithmetic_expression (NOT)?);
+
+between_expression_string :
+    string_expression (NOT)? BETWEEN string_expression AND string_expression
+        -> ^(BETWEEN string_expression string_expression string_expression (NOT)?);
+    
+between_expression_date :
+    datetime_expression (NOT)? BETWEEN datetime_expression AND datetime_expression
+        -> ^(BETWEEN datetime_expression datetime_expression datetime_expression (NOT)?);
     
 like_expression :
     string_expression (NOT)? LIKE string_expression (ESCAPE STRING_LITERAL)?
