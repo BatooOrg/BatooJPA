@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.core.impl.manager;
 
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -78,7 +79,7 @@ import com.jolbox.bonecp.BoneCP;
  * @author hceylan
  * @since 2.0.0
  */
-public class EntityManagerFactoryImpl implements EntityManagerFactory {
+public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializable {
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(EntityManagerFactoryImpl.class);
 

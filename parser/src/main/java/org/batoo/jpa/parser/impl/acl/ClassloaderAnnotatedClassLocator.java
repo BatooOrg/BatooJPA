@@ -78,7 +78,8 @@ public class ClassloaderAnnotatedClassLocator extends BaseAnnotatedClassLocator 
 			if (FilenameUtils.isExtension(path, "class")) {
 				final String normalizedPath = FilenameUtils.separatorsToUnix(FilenameUtils.normalize(path));
 
-				String className = normalizedPath.substring(root.length() + 1).replaceAll("/", ".");
+				final int rootLength = FilenameUtils.normalizeNoEndSeparator(root).length();
+				String className = normalizedPath.substring(rootLength + 1).replaceAll("/", ".");
 				className = StringUtils.left(className, className.length() - 6);
 
 				final Class<?> clazz = this.isPersistentClass(cl, className);
