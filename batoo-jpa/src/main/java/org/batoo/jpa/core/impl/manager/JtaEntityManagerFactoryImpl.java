@@ -20,9 +20,11 @@ package org.batoo.jpa.core.impl.manager;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 import javax.transaction.TransactionManager;
 
@@ -81,6 +83,17 @@ public class JtaEntityManagerFactoryImpl extends EntityManagerFactoryImpl {
 	 */
 	@Override
 	public EntityManagerImpl createEntityManager() {
+		this.assertOpen();
+
+		return new JtaEntityManagerImpl(this, this.getMetamodel(), this.getDatasource(), Collections.<String, Object> emptyMap(), this.getJdbcAdaptor());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public EntityManager createEntityManager(Map<String, Object> map) {
 		this.assertOpen();
 
 		return new JtaEntityManagerImpl(this, this.getMetamodel(), this.getDatasource(), Collections.<String, Object> emptyMap(), this.getJdbcAdaptor());
