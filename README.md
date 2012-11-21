@@ -51,6 +51,8 @@ Bato JPA has been tested with the following platforms:
 - JBoss AS 6.1.0.Final
 - JBoss AS 7.1.1.Final
 - GlassFish 3.1.2.1
+- Apache TomEE 5.0
+- Apache Tomcat 7.0.x
 
 
 ## BUILDING ##
