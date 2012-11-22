@@ -52,7 +52,6 @@ import com.google.common.collect.Lists;
 public class CollectionTable extends AbstractTable implements JoinableTable {
 
 	private final JdbcAdaptor jdbcAdaptor;
-	private final EntityTypeDescriptor entity;
 	private final ForeignKey key;
 
 	private OrderColumn orderColumn;
@@ -69,8 +68,6 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	/**
 	 * @param jdbcAdaptor
 	 *            the JDBC adaptor
-	 * @param entity
-	 *            the owner type
 	 * @param mapping
 	 *            the owner mapping
 	 * @param metadata
@@ -78,11 +75,10 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	 * 
 	 * @since 2.0.0
 	 */
-	public CollectionTable(JdbcAdaptor jdbcAdaptor, EntityTypeDescriptor entity, ElementCollectionMapping<?, ?, ?> mapping, CollectionTableMetadata metadata) {
+	public CollectionTable(JdbcAdaptor jdbcAdaptor, ElementCollectionMapping<?, ?, ?> mapping, CollectionTableMetadata metadata) {
 		super(metadata);
 
 		this.jdbcAdaptor = jdbcAdaptor;
-		this.entity = entity;
 		this.mapping = mapping;
 		this.key = new ForeignKey(this.jdbcAdaptor, this.mapping, //
 			metadata != null ? metadata.getJoinColumns() : Collections.<JoinColumnMetadata> emptyList());
@@ -186,8 +182,10 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	}
 
 	/**
-	 * Links
+	 * Links the collection table.
 	 * 
+	 * @param entity
+	 *            the entity
 	 * @param type
 	 *            the type of the collection
 	 * @param defaultName
@@ -197,16 +195,20 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	 * 
 	 * @since 2.0.0
 	 */
-	public void link(EmbeddableTypeDescriptor type, String defaultName, RootMapping<?> elementMapping) {
+	public void link(EntityTypeDescriptor entity, EmbeddableTypeDescriptor type, String defaultName, RootMapping<?> elementMapping) {
 		if (StringUtils.isBlank(this.getName())) {
 			this.setName(defaultName);
 		}
 
-		this.key.link(null, this.entity);
+		this.key.link(null, entity);
 		this.key.setTable(this);
 	}
 
 	/**
+	 * Links the collection table.
+	 * 
+	 * @param entity
+	 *            the root entity
 	 * @param type
 	 *            the type of the collection
 	 * @param defaultName
@@ -222,12 +224,13 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	 * 
 	 * @since 2.0.0
 	 */
-	public void link(TypeDescriptor type, String defaultName, ColumnMetadata metadata, EnumType enumType, TemporalType temporalType, boolean lob) {
+	public void link(EntityTypeDescriptor entity, TypeDescriptor type, String defaultName, ColumnMetadata metadata, EnumType enumType,
+		TemporalType temporalType, boolean lob) {
 		if (StringUtils.isBlank(this.getName())) {
-			this.setName(this.entity.getName() + "_" + defaultName);
+			this.setName(entity.getName() + "_" + defaultName);
 		}
 
-		this.key.link(null, this.entity);
+		this.key.link(null, entity);
 		this.key.setTable(this);
 
 		this.elementColumn = new ElementColumn(this.jdbcAdaptor, //

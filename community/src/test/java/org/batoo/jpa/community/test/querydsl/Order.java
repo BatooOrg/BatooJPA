@@ -19,6 +19,7 @@ import java.util.List;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -43,7 +44,12 @@ public class Order {
 
 	@OneToMany
 	@Index(name = "_index")
-	List<Item> items, lineItems;
+	List<Item> items;
+
+	@OneToMany
+	@Index(name = "_index2")
+	@JoinTable(name = "LineItems")
+	List<Item> lineItems;
 
 	boolean paid;
 }

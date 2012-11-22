@@ -58,6 +58,7 @@ import org.batoo.jpa.jdbc.JoinableTable;
 import org.batoo.jpa.jdbc.OrderColumn;
 import org.batoo.jpa.jdbc.mapping.ElementCollectionMapping;
 import org.batoo.jpa.jdbc.mapping.MappingType;
+import org.batoo.jpa.jdbc.model.EntityTypeDescriptor;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.ElementCollectionAttributeMetadata;
@@ -118,8 +119,7 @@ public class ElementCollectionMappingImpl<Z, C, E> extends AbstractMapping<Z, C,
 		this.attribute = attribute;
 		this.eager = metadata.getFetchType() == FetchType.EAGER;
 
-		this.collectionTable = new CollectionTable(attribute.getMetamodel().getJdbcAdaptor(), (EntityTypeImpl<?>) attribute.getDeclaringType(), this,
-			metadata.getCollectionTable());
+		this.collectionTable = new CollectionTable(attribute.getMetamodel().getJdbcAdaptor(), this, metadata.getCollectionTable());
 		this.column = metadata.getColumn();
 		this.enumType = metadata.getEnumType();
 		this.lob = metadata.isLob();
@@ -259,6 +259,15 @@ public class ElementCollectionMappingImpl<Z, C, E> extends AbstractMapping<Z, C,
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public JoinableTable getJoinTable() {
+		return this.collectionTable;
+	}
+
+	/**
 	 * Returns the key mapping of the element collection mapping.
 	 * 
 	 * @return the key mapping of the element collection mapping
@@ -389,15 +398,6 @@ public class ElementCollectionMappingImpl<Z, C, E> extends AbstractMapping<Z, C,
 	 * 
 	 */
 	@Override
-	public JoinableTable getJoinTable() {
-		return this.collectionTable;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
 	public TypeImpl<E> getType() {
 		return this.type;
 	}
@@ -492,10 +492,12 @@ public class ElementCollectionMappingImpl<Z, C, E> extends AbstractMapping<Z, C,
 
 		final String defaultName = this.getAttribute().getName();
 		if (this.type.getPersistenceType() == PersistenceType.EMBEDDABLE) {
-			this.collectionTable.link((EmbeddableTypeImpl<E>) this.type, defaultName, this.rootMapping);
+			this.collectionTable.link((EntityTypeDescriptor) this.getRoot().getTypeDescriptor(), (EmbeddableTypeImpl<E>) this.type, defaultName,
+				this.rootMapping);
 		}
 		else {
-			this.collectionTable.link(this.type, defaultName, this.column, this.enumType, this.temporalType, this.lob);
+			this.collectionTable.link((EntityTypeDescriptor) this.getRoot().getTypeDescriptor(), this.type, defaultName, this.column, this.enumType,
+				this.temporalType, this.lob);
 
 		}
 
