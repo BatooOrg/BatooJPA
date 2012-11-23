@@ -102,7 +102,7 @@ public class FetchTest extends BaseCoreTest {
 		this.commit();
 
 		TypedQuery<Integer> q;
-		q = this.cq("select e.id from Employee e where exists (select m.id from Manager m where e.manager = m) order by e.id", Integer.class);
+		q = this.cq("select e.id from Employee e where exists (select m from Manager m where e.manager = m) order by e.id", Integer.class);
 		Assert.assertEquals("[1, 2, 4]", q.getResultList().toString());
 
 		q = this.cq("select e.id from Employee e where not exists (select m.id from Manager m where e.manager = m)", Integer.class);
