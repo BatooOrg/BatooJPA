@@ -26,6 +26,7 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 /**
  * 
@@ -55,6 +56,7 @@ public class Customer implements Serializable {
 	@Column(name = "C_LAST")
 	private String lastName;
 
+	@Version
 	@Column(name = "C_VERSION")
 	private int version = 0;
 
