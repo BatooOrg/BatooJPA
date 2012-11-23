@@ -140,9 +140,9 @@ public class EntityManagerImpl implements EntityManager {
 			throw new IllegalStateException("EntityManager has been previously closed");
 		}
 
-		if (this.rollbackOnly) {
-			throw new IllegalStateException("EntityManager previously encountered an exception.");
-		}
+		// if (this.rollbackOnly) {
+		// throw new IllegalStateException("EntityManager previously encountered an exception.");
+		// }
 	}
 
 	/**

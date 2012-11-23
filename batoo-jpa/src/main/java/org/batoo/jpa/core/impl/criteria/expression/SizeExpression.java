@@ -20,9 +20,9 @@ package org.batoo.jpa.core.impl.criteria.expression;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.LinkedList;
 
 import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Root;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
@@ -30,8 +30,13 @@ import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.SubqueryImpl;
+import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
 import org.batoo.jpa.core.impl.criteria.join.Joinable;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
+import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
+import org.batoo.jpa.core.impl.model.mapping.EntityMapping;
+
+import com.google.common.collect.Lists;
 
 /**
  * Expression for size operations.
@@ -107,10 +112,21 @@ public class SizeExpression<C> extends AbstractExpression<Integer> {
 
 		final SubqueryImpl<Long> s = query.subquery(Long.class);
 
-		final Root<?> r = s.from(rp.getEntity());
-		r.join(this.collection.getMapping().getAttribute().getName());
+		final LinkedList<AbstractMapping<?, ?, ?>> chain = Lists.newLinkedList();
 
-		s.where(cb.equal(r, (AbstractExpression<?>) rp));
+		AbstractMapping<?, ?, ?> mapping = this.collection.getMapping();
+		while (!(mapping instanceof EntityMapping)) {
+			chain.addFirst(mapping);
+
+			mapping = mapping.getParent();
+		}
+
+		AbstractFrom<?, ?> from = s.from(rp.getEntity());
+		for (final AbstractMapping<?, ?, ?> chainMember : chain) {
+			from = from.join(chainMember.getName());
+		}
+
+		s.where(cb.equal(from, (AbstractExpression<?>) rp));
 
 		s.select(cb.count(cb.literal(1)));
 

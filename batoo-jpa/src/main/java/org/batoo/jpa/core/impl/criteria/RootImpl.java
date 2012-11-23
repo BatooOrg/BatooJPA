@@ -109,4 +109,13 @@ public class RootImpl<X> extends AbstractFrom<X, X> implements Root<X> {
 	public EntityType<X> getModel() {
 		return this.entity;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "RootImpl [entity=" + this.entity + "]";
+	}
 }

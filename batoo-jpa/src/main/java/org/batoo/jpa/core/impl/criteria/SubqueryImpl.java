@@ -182,7 +182,7 @@ public class SubqueryImpl<T> extends AbstractExpression<T> implements Subquery<T
 	 * 
 	 */
 	@Override
-	public <X> Root<X> from(EntityType<X> entity) {
+	public <X> RootImpl<X> from(EntityType<X> entity) {
 		return this.query.from(entity);
 	}
 
