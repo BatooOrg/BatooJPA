@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.impl.deployment;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -156,7 +157,7 @@ public abstract class DeploymentManager<X> {
 	private final List<ManagedType<?>> types = Lists.newArrayList();
 	private final Collection<NamedQueryMetadata> namedQueries = Lists.newArrayList();
 
-	private final Set<TypeImpl<?>> performed = Sets.newHashSet();
+	private final Set<TypeImpl<?>> performed = Collections.synchronizedSet(Sets.<TypeImpl<?>> newHashSet());
 	private final ThreadPoolExecutor executer;
 	private final Context context;
 
@@ -251,11 +252,11 @@ public abstract class DeploymentManager<X> {
 	 * @since 2.0.0
 	 */
 	public boolean hasPerformed(TypeImpl<?> type) {
-		if (!this.types.contains(type)) {
+		if (type == null) {
 			return true;
 		}
 
-		if (type == null) {
+		if (!this.types.contains(type)) {
 			return true;
 		}
 
