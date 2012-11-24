@@ -85,6 +85,17 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 	private final List<ParameterExpressionImpl<?>> parameterOrder = Lists.newArrayList();
 
 	/**
+	 * 
+	 * @param metamodel
+	 *            the metamodel
+	 * 
+	 * @since $version
+	 */
+	public AbstractCriteriaQueryImpl(MetamodelImpl metamodel) {
+		super(metamodel);
+	}
+
+	/**
 	 * @param metamodel
 	 *            the metamodel
 	 * @param resultType
@@ -96,6 +107,19 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 		super(metamodel);
 
 		this.resultType = resultType;
+	}
+
+	/**
+	 * 
+	 * @param metamodel
+	 *            the metamodel
+	 * @param qlString
+	 *            the JPQL query
+	 * 
+	 * @since $version
+	 */
+	public AbstractCriteriaQueryImpl(MetamodelImpl metamodel, String qlString) {
+		super(metamodel, qlString);
 	}
 
 	/**

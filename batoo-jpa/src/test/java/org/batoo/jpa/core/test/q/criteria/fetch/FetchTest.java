@@ -231,7 +231,7 @@ public class FetchTest extends BaseCoreTest {
 
 		this.commit();
 
-		Assert.assertEquals((Integer) 2, this.cq("select size(m.employees) from Manager m where size(m.employees) = 2", Integer.class).getSingleResult());
+		Assert.assertEquals(2, this.cq("select size(m.employees) from Manager m where size(m.employees) = 2", Number.class).getSingleResult());
 	}
 
 	/**

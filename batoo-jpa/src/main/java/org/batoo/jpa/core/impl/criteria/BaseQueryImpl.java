@@ -74,6 +74,18 @@ public abstract class BaseQueryImpl<T> implements BaseQuery<T> {
 	}
 
 	/**
+	 * @param metamodel
+	 *            the metamodel
+	 * @param qlString
+	 *            the JPQL query
+	 * 
+	 * @since 2.0.0
+	 */
+	public BaseQueryImpl(MetamodelImpl metamodel, String qlString) {
+		this.metamodel = metamodel;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */

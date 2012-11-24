@@ -44,6 +44,7 @@ import org.batoo.jpa.core.impl.model.TypeImpl;
 public class ParameterExpressionImpl<T> extends AbstractParameterExpressionImpl<T> implements ParameterExpression<T> {
 
 	private Integer position;
+	private String alias;
 
 	/**
 	 * @param q
@@ -134,7 +135,13 @@ public class ParameterExpressionImpl<T> extends AbstractParameterExpressionImpl<
 	public String generateSqlSelect(AbstractCriteriaQueryImpl<?> query, boolean selected) {
 		this.ensureAlias(query);
 
-		return null;
+		this.alias = query.getAlias((AbstractExpression<T>) this);
+
+		if (selected) {
+			return this.getSqlRestrictionFragments(query)[0] + " AS " + this.alias;
+		}
+
+		return this.getSqlRestrictionFragments(query)[0];
 	}
 
 	/**
@@ -184,5 +191,14 @@ public class ParameterExpressionImpl<T> extends AbstractParameterExpressionImpl<
 	@Override
 	public void setParameter(MetamodelImpl metamodel, Connection connections, Object[] parameters, MutableInt sqlIndex, Object value) {
 		super.setParameter(metamodel, connections, parameters, sqlIndex, value);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "ParameterExpressionImpl [position=" + this.position + ", name=" + this.getName() + "]";
 	}
 }

@@ -324,4 +324,13 @@ public class H2Adaptor extends JdbcAdaptor {
 				return IdType.SEQUENCE;
 		}
 	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean supportsNamedParams() {
+		return false;
+	}
 }

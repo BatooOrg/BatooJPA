@@ -526,6 +526,7 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 		int maxOrdinal = 0;
 
 		final boolean supportsOrdinalParams = this.em.getJdbcAdaptor().supportsOrdinalParams();
+		final boolean supportsNamedParams = this.em.getJdbcAdaptor().supportsNamedParams();
 
 		final StringBuilder sqlBuilder = new StringBuilder();
 
@@ -556,6 +557,9 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 
 				if (!supportsOrdinalParams) {
 					sqlBuilder.append(":p" + parameter.getPosition());
+				}
+				else if (!supportsNamedParams) {
+					sqlBuilder.append("?" + parameter.getPosition());
 				}
 				else {
 					sqlBuilder.append(":" + parameter.getPosition());
@@ -591,6 +595,9 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 
 					if (!supportsOrdinalParams) {
 						sqlBuilder.append(":p" + parameter.getPosition());
+					}
+					else if (!supportsNamedParams) {
+						sqlBuilder.append("?" + parameter.getPosition());
 					}
 					else {
 						sqlBuilder.append(":" + parameter.getPosition());

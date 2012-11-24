@@ -57,6 +57,20 @@ public abstract class CriteriaModify<T> extends BaseQueryImpl<T> {
 	}
 
 	/**
+	 * @param metamodel
+	 *            the matamodel
+	 * @param qlString
+	 *            the JPQL query
+	 * 
+	 * @since $version
+	 */
+	public CriteriaModify(MetamodelImpl metamodel, String qlString) {
+		super(metamodel);
+
+		this.jpql = qlString;
+	}
+
+	/**
 	 * Create and add a query root corresponding to the entity that is the target of the delete. A CriteriaDelete object has a single root,
 	 * the object that is being deleted.
 	 * 

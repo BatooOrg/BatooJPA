@@ -212,7 +212,7 @@ public class JpqlQuery {
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private CriteriaDeleteImpl constructDeleteQuery(CriteriaBuilderImpl cb, CommonTree tree) {
-		final CriteriaDeleteImpl q = new CriteriaDeleteImpl(this.metamodel);
+		final CriteriaDeleteImpl q = new CriteriaDeleteImpl(this.metamodel, this.qlString);
 
 		final Tree deleteDef = tree.getChild(0);
 
@@ -452,19 +452,45 @@ public class JpqlQuery {
 	 *            the criteria builder
 	 * @param q
 	 *            the query
+	 * @param selections
+	 *            the selections
 	 * @param orderBy
 	 *            the order by definitions
 	 * 
 	 * @since 2.0.0
 	 */
-	private void constructOrder(CriteriaBuilderImpl cb, CriteriaQueryImpl<?> q, Tree orderBy) {
+	private void constructOrder(CriteriaBuilderImpl cb, CriteriaQueryImpl<?> q, List<Selection<?>> selections, Tree orderBy) {
 		final List<Order> orders = Lists.newArrayList();
 
 		for (int i = 0; i < orderBy.getChildCount(); i++) {
 			final Tree orderByItem = orderBy.getChild(i);
-			final Order order = orderByItem.getChildCount() == 2 ? //
-				cb.desc(this.getExpression(cb, q, orderByItem.getChild(0), null)) : //
-				cb.asc(this.getExpression(cb, q, orderByItem.getChild(0), null));
+			final Tree orderItem = orderByItem.getChild(0);
+
+			Order order = null;
+
+			if (orderItem.getType() == JpqlParser.ID) {
+				final String alias = orderItem.getText();
+				for (final Selection<?> selection : selections) {
+					if (alias.equals(selection.getAlias())) {
+						order = orderByItem.getChildCount() == 2 ? //
+							cb.desc((Expression<?>) selection) : //
+							cb.asc((Expression<?>) selection);
+
+						break;
+					}
+				}
+
+				if (order == null) {
+					throw new PersistenceException("Alias is not bound: " + alias);
+				}
+			}
+			else {
+
+				order = orderByItem.getChildCount() == 2 ? //
+					cb.desc(this.getExpression(cb, q, orderItem, null)) : //
+					cb.asc(this.getExpression(cb, q, orderByItem.getChild(0), null));
+
+			}
 
 			orders.add(order);
 		}
@@ -518,7 +544,7 @@ public class JpqlQuery {
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private CriteriaQueryImpl constructSelectQuery(CriteriaBuilderImpl cb, CommonTree tree) {
-		final CriteriaQueryImpl q = new CriteriaQueryImpl(this.metamodel);
+		final CriteriaQueryImpl q = new CriteriaQueryImpl(this.metamodel, this.qlString);
 
 		this.constructFrom(cb, q, tree.getChild(1));
 
@@ -562,7 +588,7 @@ public class JpqlQuery {
 
 			// order by fragment
 			if (child.getType() == JpqlParser.LORDER) {
-				this.constructOrder(cb, q, child);
+				this.constructOrder(cb, q, selections, child);
 			}
 
 			i++;
@@ -696,7 +722,7 @@ public class JpqlQuery {
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private CriteriaUpdateImpl<?> constructUpdateQuery(CriteriaBuilderImpl cb, CommonTree tree) {
-		final CriteriaUpdateImpl<?> q = new CriteriaUpdateImpl(this.metamodel);
+		final CriteriaUpdateImpl<?> q = new CriteriaUpdateImpl(this.metamodel, this.qlString);
 
 		final Tree updateDef = tree.getChild(0);
 

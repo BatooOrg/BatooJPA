@@ -44,7 +44,7 @@ import com.google.common.collect.Lists;
  */
 public class CriteriaQueryImpl<T> extends AbstractCriteriaQueryImpl<T> implements CriteriaQuery<T> {
 
-	private final ArrayList<OrderImpl> orderList = Lists.newArrayList();;
+	private final ArrayList<OrderImpl> orderList = Lists.newArrayList();
 
 	/**
 	 * @param metamodel
@@ -53,7 +53,7 @@ public class CriteriaQueryImpl<T> extends AbstractCriteriaQueryImpl<T> implement
 	 * @since 2.0.0
 	 */
 	public CriteriaQueryImpl(MetamodelImpl metamodel) {
-		super(metamodel, null);
+		super(metamodel);
 	}
 
 	/**
@@ -66,6 +66,18 @@ public class CriteriaQueryImpl<T> extends AbstractCriteriaQueryImpl<T> implement
 	 */
 	public CriteriaQueryImpl(MetamodelImpl metamodel, Class<T> resultType) {
 		super(metamodel, resultType);
+	}
+
+	/**
+	 * @param metamodel
+	 *            the metamodel
+	 * @param qlString
+	 *            the qlstring
+	 * 
+	 * @since $version
+	 */
+	public CriteriaQueryImpl(MetamodelImpl metamodel, String qlString) {
+		super(metamodel, qlString);
 	}
 
 	/**

@@ -1227,6 +1227,17 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	public abstract IdType supports(GenerationType type);
 
 	/**
+	 * Returns if the database supports named params i.e.: <code>select * from mytable field = :p1</code>.
+	 * 
+	 * @return true if the database supports named params, false otherwise
+	 * 
+	 * @since $version
+	 */
+	public boolean supportsNamedParams() {
+		return true;
+	}
+
+	/**
 	 * Returns if the database supports ordinal params i.e.: <code>select * from mytable field = ?1</code>.
 	 * 
 	 * @return true if the database supports ordinal params, false otherwise

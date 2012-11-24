@@ -59,6 +59,18 @@ public class CriteriaUpdateImpl<T> extends CriteriaModify<T> {
 	}
 
 	/**
+	 * @param metamodel
+	 *            the metamodel
+	 * @param qlString
+	 *            the JPQL query
+	 * 
+	 * @since $version
+	 */
+	public CriteriaUpdateImpl(MetamodelImpl metamodel, String qlString) {
+		super(metamodel, qlString);
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */

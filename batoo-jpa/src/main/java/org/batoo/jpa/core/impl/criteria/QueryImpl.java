@@ -299,7 +299,8 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 			return this.results;
 		}
 		catch (final SQLException e) {
-			QueryImpl.LOG.error(e, "Query failed" + QueryImpl.LOG.lazyBoxed(this.sql, parameters));
+			QueryImpl.LOG.error(e, "Query failed{0}{1}", QueryImpl.LOG.lazyBoxed(this.getJpql(), this.parameters.entrySet().toArray()),
+				QueryImpl.LOG.lazyBoxed(this.sql, parameters));
 
 			this.em.setRollbackOnly();
 
@@ -473,7 +474,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	private String expandParams(String _sql, Map<Integer, Integer> repeat) {
 		final StringBuffer outSql = new StringBuffer();
 
-		final int sqlIndex = 0;
+		int sqlIndex = 0;
 		int i = 0;
 		boolean inQuot = false;
 
@@ -500,8 +501,12 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 						outSql.append(", ?");
 						left--;
 					}
+
+					sqlIndex += repeatCount;
 				}
 				else {
+					sqlIndex++;
+
 					outSql.append('?');
 				}
 			}
