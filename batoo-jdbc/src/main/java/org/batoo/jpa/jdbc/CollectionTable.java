@@ -85,6 +85,17 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	}
 
 	/**
+	 * Returns the element column of the collection table.
+	 * 
+	 * @return the element column of the collection table
+	 * 
+	 * @since $version
+	 */
+	public ElementColumn getElementColumn() {
+		return this.elementColumn;
+	}
+
+	/**
 	 * Returns the key.
 	 * 
 	 * @return the key

@@ -15,7 +15,6 @@
 package org.batoo.jpa.community.test.querydsl;
 
 import org.batoo.jpa.community.test.BaseCoreTest;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -24,7 +23,6 @@ import org.junit.Test;
  * @author hceylan
  * @since 2.0.0
  */
-@Ignore
 public class QueryDSLTest extends BaseCoreTest {
 
 	/**
@@ -82,9 +80,11 @@ public class QueryDSLTest extends BaseCoreTest {
 		// "from Employee employee\n" + //
 		// "where employee.lastName = ?1 and ?2 member of employee.jobFunctions").getResultList();
 
-		this.cq("select bookVersion\n" + //
-			"from BookVersion bookVersion\n" + //
-			"  inner join bookVersion.definition.bookMarks as bookMark\n" + //
-			"where size(bookVersion.definition.bookMarks) = ?1 and (bookMark.page = ?2 or bookMark.page = ?3)");
+		this.cq("select employee\n" + //
+			"from Employee employee\n" + //
+			"where exists (select employeecb36b\n" + //
+			"from Employee employeecb36b\n" + //
+			"  inner join employeecb36b.jobFunctions as employee_jobFunctions35bef\n" + //
+			"where employeecb36b = employee and employee_jobFunctions35bef in ?1)");
 	}
 }

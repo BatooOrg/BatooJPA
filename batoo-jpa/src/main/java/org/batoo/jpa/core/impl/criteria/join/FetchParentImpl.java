@@ -61,6 +61,7 @@ import org.batoo.jpa.jdbc.AbstractColumn;
 import org.batoo.jpa.jdbc.AbstractTable;
 import org.batoo.jpa.jdbc.CollectionTable;
 import org.batoo.jpa.jdbc.DiscriminatorColumn;
+import org.batoo.jpa.jdbc.ElementColumn;
 import org.batoo.jpa.jdbc.EntityTable;
 import org.batoo.jpa.jdbc.JoinColumn;
 import org.batoo.jpa.jdbc.SecondaryTable;
@@ -717,6 +718,14 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 					restrictions.add(column.getName());
 				}
 			}
+		}
+
+		if (this.mapping instanceof ElementCollectionMappingImpl) {
+			final ElementCollectionMappingImpl<?, ?, ?> elementCollectionMapping = (ElementCollectionMappingImpl<?, ?, ?>) this.mapping;
+			final CollectionTable collectionTable = elementCollectionMapping.getCollectionTable();
+			final ElementColumn elementColumn = collectionTable.getElementColumn();
+
+			restrictions.add(this.getPrimaryTableAlias(query) + "." + elementColumn.getName());
 		}
 
 		return restrictions.toArray(new String[restrictions.size()]);

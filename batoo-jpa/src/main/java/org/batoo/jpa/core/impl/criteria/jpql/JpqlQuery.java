@@ -48,7 +48,6 @@ import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
-import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.AbstractSelection;
 import org.batoo.jpa.core.impl.criteria.BaseQuery;
 import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
@@ -254,9 +253,9 @@ public class JpqlQuery {
 				final RootImpl<Object> r = (RootImpl<Object>) q.from(entity);
 				r.alias(fromDef.getAlias());
 
-				this.putAlias((BaseQueryImpl<?>) q, from, fromDef, r);
+				this.putAlias((BaseQuery<?>) q, from, fromDef, r);
 
-				this.constructJoins(cb, (AbstractCriteriaQueryImpl<?>) q, r, from.getChild(1));
+				this.constructJoins(cb, q, r, from.getChild(1));
 
 				if (from.getChild(from.getChildCount() - 1).getType() == JpqlParser.LALL_PROPERTIES) {
 					for (final AssociationMappingImpl<?, ?, ?> association : entity.getAssociations()) {
@@ -348,7 +347,7 @@ public class JpqlQuery {
 	 * 
 	 * @since 2.0.0
 	 */
-	private void constructJoins(CriteriaBuilderImpl cb, AbstractCriteriaQueryImpl<?> q, RootImpl<Object> r, Tree joins) {
+	private void constructJoins(CriteriaBuilderImpl cb, AbstractQuery<?> q, RootImpl<Object> r, Tree joins) {
 		for (int i = 0; i < joins.getChildCount(); i++) {
 			final Tree join = joins.getChild(i);
 
@@ -394,7 +393,7 @@ public class JpqlQuery {
 
 				parent.alias(aliased.getAlias());
 
-				this.putAlias(q, join.getChild(1), aliased, parent);
+				this.putAlias((BaseQuery<?>) q, join.getChild(1), aliased, parent);
 			}
 		}
 	}
@@ -964,6 +963,10 @@ public class JpqlQuery {
 				|| (inDefs.getType() == JpqlParser.Ordinal_Parameter)//
 				|| (inDefs.getType() == JpqlParser.Question_Sign)) {
 				return (AbstractExpression<X>) left.in(this.getExpression(cb, q, inDefs, left.getJavaType()));
+			}
+
+			if (inDefs.getType() == JpqlParser.ID) {
+				this.getAliased(q, inDefs.getText());
 			}
 
 			if (inDefs.getType() == JpqlParser.ST_SUBQUERY) {

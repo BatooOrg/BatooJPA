@@ -420,8 +420,8 @@ enum_primary :
 enum_literal: ID;
 
 in_expression :
-  	(state_field_path_expression | input_parameter) (NOT)? IN (input_parameter | (Left_Paren (subquery | in_items) Right_Paren))
-  		-> ^(ST_IN state_field_path_expression? input_parameter? (NOT)? in_items? subquery?);
+  	(state_field_path_expression | input_parameter | ID) (NOT)? IN (input_parameter | (Left_Paren (subquery | in_items) Right_Paren))
+  		-> ^(ST_IN state_field_path_expression? ID? input_parameter? (NOT)? in_items? subquery?);
 
 in_items :
 	in_item (Comma in_item)*
@@ -500,11 +500,15 @@ simple_select_clause :
   	SELECT^ (DISTINCT)? scalar_expression;
 
 subquery_from_clause :
-    FROM subselect_ID_declaration (Comma subselect_ID_declaration)*
-        -> ^(LFROM subselect_ID_declaration (subselect_ID_declaration)*);  
+    FROM subselect_identification_variable_declaration (Comma subselect_identification_variable_declaration)*
+        -> ^(LFROM subselect_identification_variable_declaration (subselect_identification_variable_declaration)*);  
 
-subselect_ID_declaration :
+subselect_identification_variable_declaration :
   ID_declaration
-  | faliased_qid
+  | derived_path_expression
   | collection_member_declaration
   ;
+
+derived_path_expression :
+	faliased_qid (join)*
+	-> ^(ST_FROM faliased_qid ^(LJOINS (join)*));
