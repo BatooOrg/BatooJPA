@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2012 - Batoo Software ve Consultancy Ltd.
- * 
+ *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
  * Lesser General Public License, as published by the Free Software Foundation.
@@ -30,7 +30,7 @@ import org.junit.Test;
 
 /**
  * @author hceylan
- * 
+ *
  * @since 2.0.0
  */
 public class OptimisticLockTest extends BaseCoreTest {
@@ -48,9 +48,54 @@ public class OptimisticLockTest extends BaseCoreTest {
 		return foo;
 	}
 
+	public void testOptimisticLock() {
+		final Foo foo = this.newFoo(false);
+
+		// Test insert
+		final EntityManager em1 = this.emf().createEntityManager();
+		try {
+			final EntityTransaction tx1 = em1.getTransaction();
+
+			tx1.begin();
+			em1.persist(foo);
+			tx1.commit();
+		}
+		finally {
+			em1.close();
+		}
+
+		// Test update
+		final EntityManager em2 = this.emf().createEntityManager();
+		try {
+			final Foo foo2 = em2.find(Foo.class, foo.getId());
+			final EntityTransaction tx2 = em2.getTransaction();
+
+			tx2.begin();
+			foo2.setValue("test2");
+			tx2.commit();
+		}
+		finally {
+			em2.close();
+		}
+
+		// Test remove
+		final EntityManager em3 = this.emf().createEntityManager();
+		try {
+			final Foo foo3 = em3.find(Foo.class, foo.getId());
+			final EntityTransaction tx3 = em3.getTransaction();
+
+			tx3.begin();
+			em3.remove(foo3);
+			tx3.commit();
+		}
+		finally {
+			em3.close();
+		}
+	}
+
 	/**
 	 * Tests the optimistic lock.
-	 * 
+	 *
 	 * @since 2.0.0
 	 */
 	@Test(expected = PersistenceException.class)
@@ -81,7 +126,7 @@ public class OptimisticLockTest extends BaseCoreTest {
 
 	/**
 	 * Tests the optimistic lock.
-	 * 
+	 *
 	 * @since 2.0.0
 	 */
 	@Test(expected = PersistenceException.class)
@@ -120,7 +165,7 @@ public class OptimisticLockTest extends BaseCoreTest {
 
 	/**
 	 * Tests the optimistic lock.
-	 * 
+	 *
 	 * @since 2.0.0
 	 */
 	@Test(expected = PersistenceException.class)
@@ -150,7 +195,7 @@ public class OptimisticLockTest extends BaseCoreTest {
 
 	/**
 	 * Tests the optimistic lock.
-	 * 
+	 *
 	 * @since 2.0.0
 	 */
 	@Test(expected = PersistenceException.class)
@@ -180,7 +225,7 @@ public class OptimisticLockTest extends BaseCoreTest {
 
 	/**
 	 * Tests the optimistic lock.
-	 * 
+	 *
 	 * @since 2.0.0
 	 */
 	@Test(expected = PersistenceException.class)
