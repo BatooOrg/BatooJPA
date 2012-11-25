@@ -36,7 +36,7 @@ import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.core.impl.model.attribute.EmbeddedAttribute;
 import org.batoo.jpa.core.impl.model.attribute.SingularAttributeImpl;
-import org.batoo.jpa.core.impl.model.attribute.VersionType;
+import org.batoo.jpa.jdbc.VersionType;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
 import org.batoo.jpa.parser.metadata.attribute.AttributesMetadata;
@@ -72,7 +72,6 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 	private final ConstructorAccessor idConstructor;
 
 	private BasicAttribute<X, ?> declaredVersionAttribute;
-
 	private BasicAttribute<? super X, ?> versionAttribute;
 	private VersionType versionType;
 	private final CallbackManager callbackManager;

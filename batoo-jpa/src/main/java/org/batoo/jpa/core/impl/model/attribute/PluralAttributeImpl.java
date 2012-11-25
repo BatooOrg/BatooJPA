@@ -99,7 +99,7 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 	}
 
 	private final Class<E> bindableJavaType;
-	private final javax.persistence.metamodel.Attribute.PersistentAttributeType attributeType;
+	private final PersistentAttributeType attributeType;
 	private final boolean association;
 	private TypeImpl<E> type;
 
