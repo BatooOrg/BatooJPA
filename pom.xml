@@ -202,11 +202,6 @@
 				<version>2.1</version>
 			</dependency>
 			<dependency>
-				<groupId>commons-pool</groupId>
-				<artifactId>commons-pool</artifactId>
-				<version>1.6</version>
-			</dependency>
-			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-proxy</artifactId>
 				<version>1.0</version>
@@ -233,6 +228,11 @@
 				<groupId>hsqldb</groupId>
 				<artifactId>hsqldb</artifactId>
 				<version>1.8.0.10</version>
+			</dependency>
+			<dependency>
+				<groupId>net.sourceforge.jtds</groupId>
+				<artifactId>jtds</artifactId>
+				<version>1.2.7</version>
 			</dependency>
 			<dependency>
 				<groupId>postgresql</groupId>

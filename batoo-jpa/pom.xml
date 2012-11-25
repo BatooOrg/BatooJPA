@@ -209,10 +209,6 @@
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>commons-pool</groupId>
-			<artifactId>commons-pool</artifactId>
-		</dependency>
 
 		<!-- Test -->
 		<dependency>
@@ -255,7 +251,7 @@
 		<dependency>
 			<groupId>net.sourceforge.jtds</groupId>
 			<artifactId>jtds</artifactId>
-			<version>1.2.7</version>
+			<scope>test</scope>
 		</dependency>
 		<!--  Open only for testing
 		<dependency>
