@@ -75,7 +75,7 @@ public class PersistenceParserImpl implements PersistenceParser {
 		super();
 
 		this.puInfo = puInfo;
-		this.provider = null;
+		this.provider = puInfo.getPersistenceProviderClassName();
 
 		if (puInfo.getProperties() != null) {
 			for (final Entry<Object, Object> entry : puInfo.getProperties().entrySet()) {
