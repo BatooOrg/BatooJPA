@@ -33,7 +33,6 @@ import org.apache.commons.lang.ObjectUtils;
 import org.batoo.common.util.BatooUtils;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMappingImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralMappingEx;
 import org.batoo.jpa.jdbc.Joinable;
 
@@ -520,17 +519,12 @@ public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
 
 			final PluralMappingEx<?, ?, E> mapping = this.getMapping();
 
-			if (!(mapping instanceof PluralAssociationMappingImpl) //
-				|| !managedInstance.tryLoadFromCache((PluralAssociationMappingImpl<?, ?, ?>) mapping)) {
-				BatooUtils.addAll(mapping.loadCollection(managedInstance), this.delegate);
+			BatooUtils.addAll(mapping.loadCollection(managedInstance), this.delegate);
 
-				this.initialized = true;
+			this.initialized = true;
 
-				if (this.getMapping().getOrderBy() != null) {
-					mapping.sortList(managedInstance.getInstance());
-				}
-
-				managedInstance.updateCollectionCache(mapping);
+			if (this.getMapping().getOrderBy() != null) {
+				mapping.sortList(managedInstance.getInstance());
 			}
 
 			this.initialized = true;

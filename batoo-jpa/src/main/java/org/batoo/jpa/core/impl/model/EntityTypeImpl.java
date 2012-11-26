@@ -126,7 +126,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	private FinalWrapper<EntityTable[]> updateTables;
 	private FinalWrapper<EntityTable[]> allTables;
 	private final HashMap<String, AssociatedSingularAttribute<? super X, ?>> idMap = Maps.newHashMap();
-	private final boolean cachable;
 
 	private final ConstructorAccessor constructor;
 
@@ -195,8 +194,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		this.entityMapping = new EntityMapping<X>(this);
 		this.linkMappings();
 		this.initIndexes();
-
-		this.cachable = this.getCachable(metamodel.getEntityManagerFactory(), metadata);
 
 		if (metadata.getTableGenerator() != null) {
 			metamodel.addTableGenerator(metadata.getTableGenerator());
@@ -748,28 +745,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	@Override
 	public BindableType getBindableType() {
 		return BindableType.ENTITY_TYPE;
-	}
-
-	private boolean getCachable(EntityManagerFactoryImpl emf, EntityMetadata metadata) {
-		switch (emf.getCache().getCacheMode()) {
-			case ALL:
-				return true;
-			case DISABLE_SELECTIVE:
-				if ((metadata.getCacheable() != null) && !metadata.getCacheable().booleanValue()) {
-					return false;
-				}
-
-				return true;
-			case UNSPECIFIED:
-			case ENABLE_SELECTIVE:
-				if ((metadata.getCacheable() != null) && metadata.getCacheable().booleanValue()) {
-					return true;
-				}
-
-				return false;
-			default:
-				return false;
-		}
 	}
 
 	/**
@@ -1697,17 +1672,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 			final SecondaryTable secondaryTable = new SecondaryTable(this.getMetamodel().getJdbcAdaptor(), this, secondaryTableMetadata);
 			this.tableMap.put(secondaryTableMetadata.getName(), secondaryTable);
 		}
-	}
-
-	/**
-	 * Returns if the entity is cachable.
-	 * 
-	 * @return true if the entity is cachable, false otherwise
-	 * 
-	 * @since 2.0.0
-	 */
-	public boolean isCachable() {
-		return this.cachable;
 	}
 
 	/**

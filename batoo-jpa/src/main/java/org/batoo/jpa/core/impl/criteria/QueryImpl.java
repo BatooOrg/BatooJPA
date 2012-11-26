@@ -33,8 +33,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.persistence.CacheRetrieveMode;
-import javax.persistence.CacheStoreMode;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
@@ -51,9 +49,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
-import org.batoo.jpa.JPASettings;
-import org.batoo.jpa.core.impl.cache.CacheImpl;
-import org.batoo.jpa.core.impl.cache.CacheReference;
 import org.batoo.jpa.core.impl.criteria.expression.AbstractParameterExpressionImpl;
 import org.batoo.jpa.core.impl.criteria.expression.EntityConstantExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
@@ -61,7 +56,6 @@ import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.jdbc.PreparedStatementProxy;
 import org.batoo.jpa.jdbc.adapter.JdbcAdaptor.PaginationParamsOrder;
@@ -260,41 +254,9 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 		return parameters;
 	}
 
-	@SuppressWarnings("unchecked")
-	private List<X> buildResultSet(CacheImpl cache, List<CacheReference[]> cachedResults) {
-		final MetamodelImpl metamodel = this.em.getMetamodel();
-
-		for (int i = 0; i < cachedResults.size(); i++) {
-			final CacheReference[] references = cachedResults.get(i);
-			if (references.length == 1) {
-				final EntityTypeImpl<?> childType = metamodel.entity(references[0].getType());
-				final X instance = (X) this.em.find(childType.getJavaType(), references[0].getId());
-
-				this.results.add(instance);
-			}
-			else {
-				final Object[] instanceArray = new Object[references.length];
-				for (int j = 0; j < references.length; j++) {
-
-					final EntityTypeImpl<?> childType = metamodel.entity(references[0].getType());
-					instanceArray[j] = this.em.find(childType.getJavaType(), references[0].getId());
-
-				}
-
-				this.results.add((X) instanceArray);
-			}
-		}
-
-		return this.results;
-	}
-
-	private List<X> buildResultSet(Connection connection, final Object[] parameters, CacheStoreMode cacheStoreMode) {
+	private List<X> buildResultSet(Connection connection, final Object[] parameters) {
 		try {
 			this.buildResultSetImpl(connection, parameters);
-
-			if (((cacheStoreMode == CacheStoreMode.REFRESH) || (cacheStoreMode == CacheStoreMode.USE)) && (this.q instanceof CriteriaQueryImpl)) {
-				this.emf.getCache().put(this.sql, parameters, this.results);
-			}
 
 			return this.results;
 		}
@@ -782,18 +744,6 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	private List<X> getResultListImpl() {
 		this.em.getSession().setLoadTracker();
 
-		final CacheImpl cache = this.emf.getCache();
-
-		final CacheRetrieveMode cacheRetrieveMode = (CacheRetrieveMode) this.hints.get(JPASettings.SHARED_CACHE_RETRIEVE_MODE);
-		if (cacheRetrieveMode != null) {
-			cache.setCacheRetrieveMode(cacheRetrieveMode);
-		}
-
-		final CacheStoreMode cacheStoreMode = (CacheStoreMode) this.hints.get(JPASettings.SHARED_CACHE_STORE_MODE);
-		if (cacheStoreMode != null) {
-			cache.setCacheStoreMode(cacheStoreMode);
-		}
-
 		final Connection connection = this.em.getConnection();
 		try {
 			final LockModeType lockMode = this.getLockMode();
@@ -805,32 +755,12 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 
 			final Object[] parameters = this.applyParameters(connection);
 
-			if ((cacheRetrieveMode == CacheRetrieveMode.USE) && !hasLock && (this.q instanceof CriteriaQueryImpl)) {
-				final CriteriaQueryImpl<X> cq = (CriteriaQueryImpl<X>) this.q;
-				if (cq.getSelection().isEntityList()) {
-					final List<CacheReference[]> cachedResults = cache.get(this.sql, parameters);
-
-					if (cachedResults != null) {
-						return this.buildResultSet(cache, cachedResults);
-					}
-				}
-			}
-
-			return this.buildResultSet(connection, parameters, cacheStoreMode);
-
+			return this.buildResultSet(connection, parameters);
 		}
 		finally {
 			this.em.closeConnectionIfNecessary();
 
 			this.em.getSession().releaseLoadTracker();
-
-			if (cacheRetrieveMode != null) {
-				cache.setCacheRetrieveMode(null);
-			}
-
-			if (cacheStoreMode != null) {
-				cache.setCacheStoreMode(null);
-			}
 		}
 	}
 
