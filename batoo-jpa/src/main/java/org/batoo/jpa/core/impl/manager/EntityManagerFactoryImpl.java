@@ -31,6 +31,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.Cache;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.LockModeType;
@@ -49,7 +50,6 @@ import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
 import org.batoo.jpa.BJPASettings;
 import org.batoo.jpa.JPASettings;
-import org.batoo.jpa.core.impl.cache.CacheImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.criteria.jpql.JpqlQuery;
@@ -90,8 +90,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 	private final DDLMode ddlMode;
 
 	private final DataSourceProxy dataSource;
-
-	private final CacheImpl cache;
 
 	private final JdbcAdaptor jdbcAdaptor;
 	private final Map<String, Object> properties = Maps.newHashMap();
@@ -150,7 +148,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 
 		this.dataSource = this.createDatasource(parser);
 
-		this.cache = new CacheImpl(this, parser.getSharedCacheMode());
 		this.ddlMode = this.readDdlMode();
 
 		this.jdbcAdaptor = this.createJdbcAdaptor();
@@ -455,8 +452,8 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 	 * 
 	 */
 	@Override
-	public CacheImpl getCache() {
-		return this.cache;
+	public Cache getCache() {
+		return null;
 	}
 
 	/**

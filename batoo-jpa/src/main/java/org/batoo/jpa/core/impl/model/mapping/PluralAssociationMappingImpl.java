@@ -39,7 +39,6 @@ import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.common.reflect.AbstractAccessor;
 import org.batoo.common.util.BatooUtils;
 import org.batoo.common.util.FinalWrapper;
-import org.batoo.jpa.core.impl.cache.CacheInstance;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.collections.ManagedList;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
@@ -61,8 +60,6 @@ import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.PluralAttributeMetadata;
-
-import com.google.common.collect.Lists;
 
 /**
  * 
@@ -522,22 +519,10 @@ public class PluralAssociationMappingImpl<Z, C, E> extends AssociationMappingImp
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public Collection<? extends E> loadCollection(ManagedInstance<?> managedInstance) {
 		final EntityManagerImpl em = managedInstance.getSession().getEntityManager();
 
 		List<E> children = null;
-
-		// try to load from the cache
-		if (this.type.isCachable()) {
-			final CacheInstance cacheInstance = em.getEntityManagerFactory().getCache().get(managedInstance.getId());
-
-			final Collection<E> collection = (Collection<E>) cacheInstance.getCollection(managedInstance, this);
-			if (collection != null) {
-				children = Lists.newArrayList();
-				BatooUtils.addAll(collection, children);
-			}
-		}
 
 		final Object instance = managedInstance.getInstance();
 
@@ -548,9 +533,6 @@ public class PluralAssociationMappingImpl<Z, C, E> extends AssociationMappingImp
 			q.setParameter(1, instance);
 
 			children = q.getResultList();
-			if (this.type.isCachable()) {
-
-			}
 		}
 
 		if ((this.getInverse() != null) && (this.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_MANY)) {

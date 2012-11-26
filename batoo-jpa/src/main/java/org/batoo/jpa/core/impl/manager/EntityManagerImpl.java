@@ -28,8 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.persistence.CacheRetrieveMode;
-import javax.persistence.CacheStoreMode;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
@@ -48,7 +46,6 @@ import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
-import org.batoo.jpa.JPASettings;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaDeleteImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
@@ -479,22 +476,6 @@ public class EntityManagerImpl implements EntityManager {
 	}
 
 	private <T> T findImpl(Object primaryKey, LockModeType lockMode, Map<String, Object> properties, final EntityTypeImpl<T> type) {
-		CacheRetrieveMode cacheRetrieveMode = null;
-		if (properties != null) {
-			cacheRetrieveMode = (CacheRetrieveMode) properties.get(JPASettings.SHARED_CACHE_RETRIEVE_MODE);
-			if (cacheRetrieveMode != null) {
-				this.emf.getCache().setCacheRetrieveMode(cacheRetrieveMode);
-			}
-		}
-
-		CacheStoreMode cacheStoreMode = null;
-		if (properties != null) {
-			cacheStoreMode = (CacheStoreMode) properties.get(JPASettings.SHARED_CACHE_STORE_MODE);
-			if (cacheStoreMode != null) {
-				this.emf.getCache().setCacheStoreMode(cacheStoreMode);
-			}
-		}
-
 		this.session.setLoadTracker();
 
 		try {
@@ -529,14 +510,6 @@ public class EntityManagerImpl implements EntityManager {
 		}
 		finally {
 			this.session.releaseLoadTracker();
-
-			if (cacheRetrieveMode != null) {
-				this.emf.getCache().setCacheRetrieveMode(null);
-			}
-
-			if (cacheStoreMode != null) {
-				this.emf.getCache().setCacheStoreMode(null);
-			}
 		}
 	}
 
@@ -1167,7 +1140,7 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public void remove(Object entity) {
-		this.assertTransaction();
+		this.assertOpen();
 
 		final LinkedList<ManagedInstance<?>> removedInstances = Lists.newLinkedList();
 
