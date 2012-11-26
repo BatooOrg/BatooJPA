@@ -46,7 +46,6 @@ public class MappedSuperclassTypeImpl<X> extends IdentifiableTypeImpl<X> impleme
 	 * @since 2.0.0
 	 */
 	public MappedSuperclassTypeImpl(MetamodelImpl metamodel, MappedSuperclassTypeImpl<? super X> parent, Class<X> javaType, MappedSuperclassMetadata metadata) {
-
 		super(metamodel, parent, javaType, metadata);
 
 		this.addAttributes(metadata);

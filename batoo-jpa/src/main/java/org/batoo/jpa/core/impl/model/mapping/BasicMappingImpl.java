@@ -93,7 +93,6 @@ public class BasicMappingImpl<Z, X> extends AbstractMapping<Z, X, X> implements 
 		else {
 			this.column.setTable(((ElementMappingImpl<?>) this.getRoot()).getCollectionTable());
 		}
-
 	}
 
 	/**

@@ -23,6 +23,7 @@ import java.util.Iterator;
 import org.batoo.jpa.core.impl.model.EmbeddableTypeImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
 import org.batoo.jpa.jdbc.AbstractTable;
+import org.batoo.jpa.jdbc.mapping.RootMapping;
 
 import com.google.common.base.Splitter;
 
@@ -35,7 +36,7 @@ import com.google.common.base.Splitter;
  * @author hceylan
  * @since 2.0.0
  */
-public class ElementMappingImpl<X> extends AbstractParentMapping<X, X> implements RootMappingEx<X> {
+public class ElementMappingImpl<X> extends AbstractParentMapping<X, X> implements RootMapping<X> {
 
 	private final EmbeddableTypeImpl<X> embeddable;
 	private final ElementCollectionMappingImpl<?, ?, X> mapping;
@@ -49,7 +50,7 @@ public class ElementMappingImpl<X> extends AbstractParentMapping<X, X> implement
 	 * @since 2.0.0
 	 */
 	public ElementMappingImpl(ElementCollectionMappingImpl<?, ?, X> mapping, EmbeddableTypeImpl<X> embeddable) {
-		super(null, null, embeddable.getJavaType(), null);
+		super(null, null, embeddable.getJavaType(), embeddable.getName());
 
 		this.mapping = mapping;
 		this.embeddable = embeddable;
@@ -78,13 +79,8 @@ public class ElementMappingImpl<X> extends AbstractParentMapping<X, X> implement
 	}
 
 	/**
-	 * Returns the mapping corresponding to the path.
+	 * {@inheritDoc}
 	 * 
-	 * @param path
-	 *            the path of the mapping
-	 * @return the mapping
-	 * 
-	 * @since 2.0.0
 	 */
 	@Override
 	public AbstractMapping<?, ?, ?> getMapping(String path) {
@@ -113,7 +109,7 @@ public class ElementMappingImpl<X> extends AbstractParentMapping<X, X> implement
 	 * 
 	 */
 	@Override
-	public RootMappingEx<?> getRoot() {
+	public RootMapping<?> getRoot() {
 		return this;
 	}
 

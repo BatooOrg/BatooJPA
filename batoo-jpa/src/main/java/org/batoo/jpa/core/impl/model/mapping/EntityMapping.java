@@ -22,6 +22,7 @@ import java.util.Iterator;
 
 import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
+import org.batoo.jpa.jdbc.mapping.RootMapping;
 
 import com.google.common.base.Splitter;
 
@@ -34,7 +35,7 @@ import com.google.common.base.Splitter;
  * @author hceylan
  * @since 2.0.0
  */
-public class EntityMapping<X> extends AbstractParentMapping<X, X> implements RootMappingEx<X> {
+public class EntityMapping<X> extends AbstractParentMapping<X, X> implements RootMapping<X> {
 
 	private final EntityTypeImpl<X> entity;
 

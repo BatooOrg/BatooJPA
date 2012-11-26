@@ -185,7 +185,7 @@ public abstract class AbstractMapping<Z, X, Y> implements Mapping<Z, X, Y> {
 	 * 
 	 */
 	@Override
-	public RootMappingEx<?> getRoot() {
+	public RootMapping<?> getRoot() {
 		return this.parent.getRoot();
 	}
 

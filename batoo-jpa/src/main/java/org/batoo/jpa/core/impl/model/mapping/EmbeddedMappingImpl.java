@@ -36,6 +36,7 @@ import org.batoo.jpa.jdbc.JoinableTable;
 import org.batoo.jpa.jdbc.mapping.EmbeddedMapping;
 import org.batoo.jpa.jdbc.mapping.Mapping;
 import org.batoo.jpa.jdbc.mapping.MappingType;
+import org.batoo.jpa.jdbc.mapping.RootMapping;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
 import org.batoo.jpa.parser.metadata.ColumnMetadata;
@@ -218,7 +219,7 @@ public class EmbeddedMappingImpl<Z, X> extends AbstractParentMapping<Z, X> imple
 	 * 
 	 */
 	@Override
-	public RootMappingEx<?> getRoot() {
+	public RootMapping<?> getRoot() {
 		return this.getParent().getRoot();
 	}
 

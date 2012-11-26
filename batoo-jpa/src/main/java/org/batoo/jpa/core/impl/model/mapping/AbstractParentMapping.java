@@ -170,34 +170,6 @@ public abstract class AbstractParentMapping<Z, X> extends AbstractMapping<Z, X, 
 	}
 
 	/**
-	 * Creates a basic mapping for the attribute.
-	 * 
-	 * @param attribute
-	 *            the attribute
-	 * @param <Y>
-	 *            the type of the attribute
-	 * 
-	 * @since 2.0.0
-	 */
-	private <Y> void createBasicMapping(BasicAttribute<? super X, Y> attribute) {
-		this.children.put(attribute.getName(), new BasicMappingImpl<X, Y>(this, attribute));
-	}
-
-	/**
-	 * Creates an element collection mapping for the attribute.
-	 * 
-	 * @param attribute
-	 *            the attribute
-	 * @param <Y>
-	 *            the type of the attribute
-	 * 
-	 * @since 2.0.0
-	 */
-	private <C, E> void createElementCollectionMapping(PluralAttributeImpl<? super X, C, E> attribute) {
-		this.children.put(attribute.getName(), new ElementCollectionMappingImpl<X, C, E>(this, attribute));
-	}
-
-	/**
 	 * Creates an embedded mapping for the attribute.
 	 * 
 	 * @param attribute
@@ -215,22 +187,25 @@ public abstract class AbstractParentMapping<Z, X> extends AbstractMapping<Z, X, 
 		mapping.createMappings();
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void createMapping(final Attribute<? super X, ?> attribute) {
 		switch (attribute.getPersistentAttributeType()) {
 			case BASIC:
-				this.createBasicMapping((BasicAttribute<? super X, ?>) attribute);
+				this.children.put(((BasicAttribute<? super X, ?>) attribute).getName(), new BasicMappingImpl(this, (BasicAttribute<? super X, ?>) attribute));
 				break;
 			case ELEMENT_COLLECTION:
-				this.createElementCollectionMapping((PluralAttributeImpl<? super X, ?, ?>) attribute);
+				this.children.put(((PluralAttributeImpl<? super X, ?, ?>) attribute).getName(), new ElementCollectionMappingImpl(this,
+					(PluralAttributeImpl) attribute));
 				break;
 			case ONE_TO_ONE:
 			case MANY_TO_ONE:
-				this.createSingularAssociationMapping((AssociatedSingularAttribute<? super X, ?>) attribute);
+				this.children.put(((AssociatedSingularAttribute<? super X, ?>) attribute).getName(), new SingularAssociationMappingImpl(this,
+					(AssociatedSingularAttribute) attribute));
 				break;
 			case MANY_TO_MANY:
 			case ONE_TO_MANY:
-				this.createPluralAssociationMapping((PluralAttributeImpl<? super X, ?, ?>) attribute);
+				this.children.put(((PluralAttributeImpl<? super X, ?, ?>) attribute).getName(), new PluralAssociationMappingImpl(this,
+					(PluralAttributeImpl) attribute));
 				break;
 			case EMBEDDED:
 				this.createEmbeddedMapping((EmbeddedAttribute<? super X, ?>) attribute);
@@ -263,34 +238,6 @@ public abstract class AbstractParentMapping<Z, X> extends AbstractMapping<Z, X, 
 
 			this.createMapping(attribute);
 		}
-	}
-
-	/**
-	 * Creates a plural association mapping for the attribute.
-	 * 
-	 * @param attribute
-	 *            the attribute
-	 * @param <Y>
-	 *            the type of the attribute
-	 * 
-	 * @since 2.0.0
-	 */
-	private <C, E> void createPluralAssociationMapping(PluralAttributeImpl<? super X, C, E> attribute) {
-		this.children.put(attribute.getName(), new PluralAssociationMappingImpl<X, C, E>(this, attribute));
-	}
-
-	/**
-	 * Creates a singular association mapping for the attribute.
-	 * 
-	 * @param attribute
-	 *            the attribute
-	 * @param <Y>
-	 *            the type of the attribute
-	 * 
-	 * @since 2.0.0
-	 */
-	private <Y> void createSingularAssociationMapping(AssociatedSingularAttribute<? super X, Y> attribute) {
-		this.children.put(attribute.getName(), new SingularAssociationMappingImpl<X, Y>(this, attribute));
 	}
 
 	/**

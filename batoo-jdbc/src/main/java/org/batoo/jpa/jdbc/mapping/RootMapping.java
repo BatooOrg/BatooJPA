@@ -54,6 +54,15 @@ public interface RootMapping<X> {
 	Mapping<?, ?, ?> getMapping(String path);
 
 	/**
+	 * Returns the root type of the mapping.
+	 * 
+	 * @return the root type of the mapping
+	 * 
+	 * @since 2.0.1
+	 */
+	ManagedTypeDescriptor getType();
+
+	/**
 	 * Returns the entity descriptor of the mapping
 	 * 
 	 * @return the entiy descriptor of the mapping

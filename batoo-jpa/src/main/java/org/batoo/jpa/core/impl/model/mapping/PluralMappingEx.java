@@ -144,13 +144,6 @@ public interface PluralMappingEx<Z, C, E> extends JoinedMapping<Z, C, E>, Plural
 	OrderColumn getOrderColumn();
 
 	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	RootMappingEx<?> getRoot();
-
-	/**
 	 * Loads the collection eagerly.
 	 * 
 	 * @param instance
