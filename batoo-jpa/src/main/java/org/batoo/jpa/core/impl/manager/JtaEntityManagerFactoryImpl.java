@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.core.impl.manager;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
@@ -125,15 +127,35 @@ public class JtaEntityManagerFactoryImpl extends EntityManagerFactoryImpl {
 			final String className = i.next();
 			final String methodName = i.next();
 
+			Class<?> clazz = null;
 			try {
-				final Class<?> clazz = Class.forName(className);
-
-				return (TransactionManager) clazz.getMethod(methodName).invoke(clazz.newInstance());
+				clazz = Thread.currentThread().getContextClassLoader().loadClass(className);
 			}
-			catch (final Exception e) {}
+			catch (final Throwable e) {
+				if (JtaEntityManagerFactoryImpl.LOG.isTraceEnabled()) {
+					JtaEntityManagerFactoryImpl.LOG.trace(e, "TransactionManager lookup class cannot be found {0}", className);
+				}
+				else {
+					JtaEntityManagerFactoryImpl.LOG.debug("TransactionManager lookup class cannot be found {0}", className);
+				}
+
+				continue;
+			}
+
+			try {
+				final Method method = clazz.getMethod(methodName);
+
+				final Object instance = Modifier.isStatic(method.getModifiers()) ? null : clazz.newInstance();
+
+				return (TransactionManager) method.invoke(instance);
+			}
+			catch (final Exception e) {
+				JtaEntityManagerFactoryImpl.LOG.warn("TransactionManager lookup class found but cannot get the transaction manager via reflection {0}",
+					className);
+			}
 		}
 
-		throw new PersistenceException("Unable to locate the transa ction manager");
+		throw new PersistenceException("Unable to locate the transaction manager");
 	}
 
 	private TransactionManager lookupTransactionManager(String jndiName) {
