@@ -31,38 +31,20 @@ import org.apache.openejb.junit.ApplicationComposer;
 import org.apache.openejb.junit.Configuration;
 import org.apache.openejb.junit.Module;
 import org.batoo.jpa.core.BatooPersistenceProvider;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+@Ignore
 @RunWith(ApplicationComposer.class)
 @SuppressWarnings("javadoc")
 public class TestIssue108 {
-
-	private ClassLoader oldContextClassLoader;
 
 	@PersistenceContext
 	EntityManager em;
 
 	@EJB
 	Manager mgr;
-
-	@Before
-	public void _setup() {
-		final Thread currentThread = Thread.currentThread();
-
-		if (this.oldContextClassLoader != null) {
-			currentThread.setContextClassLoader(this.oldContextClassLoader);
-		}
-
-		this.oldContextClassLoader = currentThread.getContextClassLoader();
-	}
-
-	@After
-	public void _tearDown() {
-		Thread.currentThread().setContextClassLoader(this.oldContextClassLoader);
-	}
 
 	@Module
 	public EnterpriseBean bean() {
@@ -85,6 +67,7 @@ public class TestIssue108 {
 	@Test
 	public void go() {
 		this.mgr.persist();
+
 		this.em.createQuery("select e from Batoo e").getSingleResult();
 	}
 
