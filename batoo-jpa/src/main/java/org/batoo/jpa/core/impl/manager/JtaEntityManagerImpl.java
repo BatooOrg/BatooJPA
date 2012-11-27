@@ -155,11 +155,9 @@ public class JtaEntityManagerImpl extends EntityManagerImpl {
 	 */
 	@Override
 	public void joinTransaction() {
-		if (this.jtaTransaction != null) {
+		if ((this.jtaTransaction != null) || !this.isOpen()) {
 			return;
 		}
-
-		this.assertOpen();
 
 		try {
 			this.jtaTransaction = this.emf.getTransactionManager().getTransaction();
