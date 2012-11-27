@@ -200,5 +200,4 @@ public class JtaEntityManagerImpl extends EntityManagerImpl {
 			}
 		}
 	}
-
 }
