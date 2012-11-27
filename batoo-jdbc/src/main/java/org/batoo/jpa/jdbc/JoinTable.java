@@ -268,7 +268,7 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 			}
 		}
 
-		new QueryRunner(this.jdbcAdaptor.isPmdBroken(), false).update(connection, insertSql, params);
+		new QueryRunner(this.jdbcAdaptor, false).update(connection, insertSql, params);
 	}
 
 	/**
@@ -290,7 +290,7 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 			params[i++] = destinationRemoveColumn.getValue(connection, destination);
 		}
 
-		new QueryRunner(this.jdbcAdaptor.isPmdBroken(), false).update(connection, removeSql, params);
+		new QueryRunner(this.jdbcAdaptor, false).update(connection, removeSql, params);
 	}
 
 	/**
@@ -308,7 +308,7 @@ public class JoinTable extends AbstractTable implements JoinableTable {
 			params[i++] = sourceRemoveColumn.getValue(connection, source);
 		}
 
-		new QueryRunner(this.jdbcAdaptor.isPmdBroken(), false).update(connection, removeAllSql, params);
+		new QueryRunner(this.jdbcAdaptor, false).update(connection, removeAllSql, params);
 	}
 
 	/**

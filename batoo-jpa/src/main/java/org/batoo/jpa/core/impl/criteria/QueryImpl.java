@@ -449,7 +449,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 		try {
 			this.em.assertTransaction();
 
-			return new QueryRunner(this.em.getJdbcAdaptor().isPmdBroken(), false).update(connection, this.sql, parameters);
+			return new QueryRunner(this.em.getJdbcAdaptor(), false).update(connection, this.sql, parameters);
 		}
 		catch (final SQLException e) {
 			QueryImpl.LOG.error(e, "Query failed" + QueryImpl.LOG.lazyBoxed(this.sql, parameters));

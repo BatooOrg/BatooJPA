@@ -291,7 +291,7 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 			}
 		}
 
-		new QueryRunner(this.jdbcAdaptor.isPmdBroken(), hasLob).update(connection, insertSql, params);
+		new QueryRunner(this.jdbcAdaptor, hasLob).update(connection, insertSql, params);
 	}
 
 	/**
@@ -323,7 +323,7 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 			hasLob |= column.isLob();
 		}
 
-		new QueryRunner(this.jdbcAdaptor.isPmdBroken(), hasLob).update(connection, removeSql, params);
+		new QueryRunner(this.jdbcAdaptor, hasLob).update(connection, removeSql, params);
 	}
 
 	/**
@@ -341,7 +341,7 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 			params[i++] = sourceRemoveColumn.getValue(connection, source);
 		}
 
-		new QueryRunner(this.jdbcAdaptor.isPmdBroken(), false).update(connection, removeAllSql, params);
+		new QueryRunner(this.jdbcAdaptor, false).update(connection, removeAllSql, params);
 	}
 
 	/**

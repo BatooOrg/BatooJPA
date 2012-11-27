@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.ParameterMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -1098,7 +1099,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since 2.0.0
 	 */
 	public boolean isPmdBroken() {
-		return true;
+		return false;
 	}
 
 	private void loadReservedWords() throws MappingException {
@@ -1134,6 +1135,35 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	protected void logRelaxed(SQLException e, String message) {
 		JdbcAdaptor.LOG.warn(message + " Check debug log for details: " + e.getMessage());
 		JdbcAdaptor.LOG.debug(e, message);
+	}
+
+	/**
+	 * Returns if the JDBC adaptor modifies parameters.
+	 * 
+	 * @return true if the JDBC adaptor modifies parameters, false otherwise
+	 * 
+	 * @since $version
+	 */
+	public boolean modifiesParameters() {
+		return false;
+	}
+
+	/**
+	 * Modifies the parameters.
+	 * <p>
+	 * The default implementation does nothing.
+	 * <p>
+	 * Individual adaptors are free to modify.
+	 * 
+	 * @param pmd
+	 *            the statement's parameter metadata
+	 * @param params
+	 *            the parameters to modify
+	 * 
+	 * @since $version
+	 */
+	public void modifyParameters(ParameterMetaData pmd, Object[] params) {
+		// noop
 	}
 
 	/**

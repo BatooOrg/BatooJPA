@@ -170,10 +170,10 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 					parameters[i] = this.getParameterValue(i);
 				}
 
-				return new QueryRunner(this.em.getJdbcAdaptor().isPmdBroken(), false).update(this.query, parameters);
+				return new QueryRunner(this.em.getJdbcAdaptor(), false).update(this.query, parameters);
 			}
 
-			return new QueryRunner(this.em.getJdbcAdaptor().isPmdBroken(), false).update(this.query);
+			return new QueryRunner(this.em.getJdbcAdaptor(), false).update(this.query);
 
 		}
 		catch (final SQLException e) {
@@ -332,8 +332,7 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 			}
 
 			try {
-				return this.results = new QueryRunner(this.em.getJdbcAdaptor().isPmdBroken(), false).query(this.em.getConnection(), this.query, this,
-					paramValues);
+				return this.results = new QueryRunner(this.em.getJdbcAdaptor(), false).query(this.em.getConnection(), this.query, this, paramValues);
 			}
 			catch (final SQLException e) {
 				throw new PersistenceException("Native query execution failed!", e);

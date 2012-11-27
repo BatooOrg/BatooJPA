@@ -267,12 +267,12 @@ public class EntityTable extends AbstractTable {
 			}
 		}
 
-		new QueryRunner(this.jdbcAdaptor.isPmdBroken(), hasLob).update(connection, insertSql, params);
+		new QueryRunner(this.jdbcAdaptor, hasLob).update(connection, insertSql, params);
 
 		// if there is an identity column, extract the identity and set it back to the instance
 		if (this.identityColumn != null) {
 			final String selectLastIdSql = this.jdbcAdaptor.getSelectLastIdentitySql(this.identityColumn);
-			final Number id = new QueryRunner(this.jdbcAdaptor.isPmdBroken(), false).query(connection, selectLastIdSql, new SingleValueHandler<Number>());
+			final Number id = new QueryRunner(this.jdbcAdaptor, false).query(connection, selectLastIdSql, new SingleValueHandler<Number>());
 
 			this.identityColumn.setValue(instances[0], id);
 		}
@@ -307,7 +307,7 @@ public class EntityTable extends AbstractTable {
 			}
 		}
 
-		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor.isPmdBroken(), false);
+		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor, false);
 		if (size != runner.update(connection, removeSql, params)) {
 			throw new OptimisticLockFailedException();
 		}
@@ -356,7 +356,7 @@ public class EntityTable extends AbstractTable {
 		}
 
 		// execute the insert
-		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor.isPmdBroken(), hasLob);
+		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor, hasLob);
 		if (1 != runner.update(connection, updateSql, params)) {
 			throw new OptimisticLockFailedException();
 		}
@@ -410,7 +410,7 @@ public class EntityTable extends AbstractTable {
 		}
 
 		// execute the insert
-		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor.isPmdBroken(), hasLob);
+		final QueryRunner runner = new QueryRunner(this.jdbcAdaptor, hasLob);
 		if (1 != runner.update(connection, updateSql, params)) {
 			throw new OptimisticLockFailedException();
 		}
@@ -450,7 +450,7 @@ public class EntityTable extends AbstractTable {
 		params[params.length - 1] = oldVersion;
 
 		// execute the update
-		if (1 != new QueryRunner(this.jdbcAdaptor.isPmdBroken(), false).update(connection, updateSql, params)) {
+		if (1 != new QueryRunner(this.jdbcAdaptor, false).update(connection, updateSql, params)) {
 			throw new OptimisticLockFailedException();
 		}
 	}

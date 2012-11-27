@@ -33,6 +33,7 @@ import javax.sql.DataSource;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.batoo.jpa.jdbc.PreparedStatementProxy;
+import org.batoo.jpa.jdbc.adapter.JdbcAdaptor;
 
 /**
  * Executes SQL queries with pluggable strategies for handling <code>ResultSet</code>s. This class is thread safe.
@@ -46,6 +47,7 @@ public class QueryRunner {
 	private final boolean hasLob;
 	private final DataSource datasource;
 
+	private JdbcAdaptor jdbcAdaptor;
 	private boolean pmdKnownBroken = false;
 	private ParameterMetaData pmd;
 
@@ -108,6 +110,23 @@ public class QueryRunner {
 	}
 
 	/**
+	 * Constructor for QueryRunner, allows workaround for Oracle drivers
+	 * 
+	 * @param jdbcAdaptor
+	 *            the JDBC adaptor
+	 * @param hasLob
+	 *            if the query has lob parameters
+	 */
+	public QueryRunner(JdbcAdaptor jdbcAdaptor, boolean hasLob) {
+		super();
+
+		this.jdbcAdaptor = jdbcAdaptor;
+		this.pmdKnownBroken = jdbcAdaptor.isPmdBroken();
+		this.hasLob = hasLob;
+		this.datasource = null;
+	}
+
+	/**
 	 * Throws a new exception with a more informative error message.
 	 * 
 	 * @param cause
@@ -156,17 +175,30 @@ public class QueryRunner {
 	 *             if a database access error occurs
 	 */
 	private void fillStatement(PreparedStatement statement, Object... params) throws SQLException {
-		if (this.pmdKnownBroken) {
+		// use local variable for performance
+		boolean pmdKnownBroken = this.pmdKnownBroken;
+		ParameterMetaData pmd = this.pmd;
+		final boolean hasLob = this.hasLob;
+
+		if (pmdKnownBroken) {
 			((PreparedStatementProxy) statement).setParamCount(params.length);
+		}
+
+		// if the jdbc adaptor wants to modify the parameters we let it do it its own way
+		final JdbcAdaptor jdbcAdaptor = this.jdbcAdaptor;
+		if ((jdbcAdaptor != null) && jdbcAdaptor.modifiesParameters()) {
+			pmd = this.pmd = statement.getParameterMetaData();
+
+			jdbcAdaptor.modifyParameters(pmd, params);
 		}
 
 		for (int i = 0; i < params.length; i++) {
 			final Object param = params[i];
 			if (param != null) {
-				if (this.hasLob && (param instanceof Clob)) {
+				if (hasLob && (param instanceof Clob)) {
 					statement.setClob(i + 1, (Clob) param);
 				}
-				else if (this.hasLob && (param instanceof Blob)) {
+				else if (hasLob && (param instanceof Blob)) {
 					statement.setBlob(i + 1, (Blob) param);
 				}
 				else {
@@ -174,19 +206,19 @@ public class QueryRunner {
 				}
 			}
 			else {
-				if (!this.pmdKnownBroken && (this.pmd == null)) {
-					this.pmd = statement.getParameterMetaData();
+				if (!pmdKnownBroken && (pmd == null)) {
+					pmd = this.pmd = statement.getParameterMetaData();
 				}
 
-				// VARCHAR works with many drivers regardless of the actual column type. Oddly, NULL and OTHER don't work with Oracle's
-				// drivers.
+				// VARCHAR works with many drivers regardless of the actual column type.
+				// Oddly, NULL and OTHER don't work with Oracle's drivers.
 				int sqlType = Types.VARCHAR;
-				if (!this.pmdKnownBroken) {
+				if (!pmdKnownBroken) {
 					try {
-						sqlType = this.pmd.getParameterType(i + 1);
+						sqlType = pmd.getParameterType(i + 1);
 					}
 					catch (final SQLException e) {
-						this.pmdKnownBroken = true;
+						pmdKnownBroken = this.pmdKnownBroken = true;
 					}
 				}
 

@@ -18,6 +18,7 @@
  */
 package org.batoo.jpa.jdbc.adapter;
 
+import java.sql.ParameterMetaData;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -193,6 +194,34 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	@Override
 	public String getSelectLastIdentitySql(BasicColumn identityColumn) {
 		return "VALUES IDENTITY_VAL_LOCAL()";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean modifiesParameters() {
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void modifyParameters(ParameterMetaData metadata, Object[] params) {
+		for (int i = 0; i < params.length; i++) {
+			final Object param = params[i];
+
+			if (param == null) {
+				continue;
+			}
+
+			if (param instanceof Character) {
+				params[i] = ((Character) param).toString();
+			}
+		}
 	}
 
 	/**
