@@ -48,11 +48,13 @@ import org.junit.runner.Description;
  * @author hceylan
  * @since 2.0.0
  */
-public abstract class BaseCoreTest { // extends BaseTest {
+public abstract class BaseCoreTest {
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(BaseCoreTest.class);
 
 	private static final String DEFAULT = "default";
+
+	private boolean noDatasource;
 
 	/**
 	 * Rule to get Persistence XML File name.
@@ -78,6 +80,8 @@ public abstract class BaseCoreTest { // extends BaseTest {
 					BaseCoreTest.this.persistenceUnitName = persistenceContext.unitName();
 				}
 			}
+
+			BaseCoreTest.this.noDatasource = description.getAnnotation(NoDatasource.class) != null;
 		}
 	};
 
@@ -86,6 +90,8 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	private ClassLoader oldContextClassLoader;
 	private EntityManagerImpl em;
 	private EntityTransaction tx;
+
+	private String testMode;
 
 	/**
 	 * Begins transaction.
@@ -422,17 +428,21 @@ public abstract class BaseCoreTest { // extends BaseTest {
 	 */
 	@Before
 	public void setup() throws SQLException {
-		if (System.getProperty("testMode") == null) {
-			System.setProperty("testMode", "hsql");
-			System.setProperty("javax.persistence.jdbc.driver", "org.hsqldb.jdbcDriver");
-			System.setProperty("javax.persistence.jdbc.url", "jdbc:hsqldb:mem:test");
-			System.setProperty("javax.persistence.jdbc.user", "sa");
-			System.setProperty("javax.persistence.jdbc.password", "");
+		if (this.testMode == null) {
+			this.testMode = System.getProperty("testMode");
+
+			if (!this.noDatasource) {
+				this.testMode = "hsql";
+				System.setProperty("testMode", this.testMode);
+
+				System.setProperty("javax.persistence.jdbc.driver", "org.hsqldb.jdbcDriver");
+				System.setProperty("javax.persistence.jdbc.url", "jdbc:hsqldb:mem:test");
+				System.setProperty("javax.persistence.jdbc.user", "sa");
+				System.setProperty("javax.persistence.jdbc.password", "");
+			}
 		}
 
-		final String testMode = System.getProperty("testMode");
-
-		if ("mssql".equals(testMode)) {
+		if ("mssql".equals(this.testMode)) {
 			final String username = System.getProperty("javax.persistence.jdbc.user");
 			final String password = System.getProperty("javax.persistence.jdbc.password");
 			final Connection connection = DriverManager.getConnection(System.getProperty("javax.persistence.jdbc.url"), username, password);
@@ -448,7 +458,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 			}
 		}
 
-		if ("oracle".equals(testMode)) {
+		if ("oracle".equals(this.testMode)) {
 			final String username = System.getProperty("javax.persistence.jdbc.user");
 			final String password = System.getProperty("javax.persistence.jdbc.password");
 			final Connection connection = DriverManager.getConnection(System.getProperty("javax.persistence.jdbc.url"), username, password);
