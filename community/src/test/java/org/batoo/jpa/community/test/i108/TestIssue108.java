@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.community.test.i108;
 
+import java.util.Properties;
+
 import javax.ejb.EJB;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -26,6 +28,7 @@ import org.apache.openejb.jee.EnterpriseBean;
 import org.apache.openejb.jee.SingletonBean;
 import org.apache.openejb.jee.jpa.unit.PersistenceUnit;
 import org.apache.openejb.junit.ApplicationComposer;
+import org.apache.openejb.junit.Configuration;
 import org.apache.openejb.junit.Module;
 import org.batoo.jpa.core.BatooPersistenceProvider;
 import org.junit.After;
@@ -64,6 +67,19 @@ public class TestIssue108 {
 	@Module
 	public EnterpriseBean bean() {
 		return new SingletonBean(Manager.class).localBean();
+	}
+
+	@Configuration
+	public Properties config() {
+		return new Properties() {
+			{
+				this.setProperty("ds", "new://Resource?type=DataSource");
+				this.setProperty("ds.JdbcUrl", "jdbc:hsqldb:mem:test");
+				this.setProperty("ds.JdbcDriver", "org.hsqldb.jdbcDriver");
+				this.setProperty("ds.UserName", "sa");
+				this.setProperty("ds.Password", "");
+			}
+		};
 	}
 
 	@Test
