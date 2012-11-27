@@ -463,6 +463,10 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public PredicateImpl equal(Expression<?> x, Object y) {
+		if (y instanceof Expression) {
+			return this.equal(x, (Expression<?>) y);
+		}
+
 		return new PredicateImpl(new ComparisonExpression(Comparison.EQUAL, x, this.createConstant(y)));
 	}
 
