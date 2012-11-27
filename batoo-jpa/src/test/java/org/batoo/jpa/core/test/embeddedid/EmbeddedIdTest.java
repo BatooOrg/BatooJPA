@@ -60,9 +60,13 @@ public class EmbeddedIdTest extends BaseCoreTest {
 
 		this.close();
 
+		this.begin();
+
 		final Foo foo3 = this.find(Foo.class, foo1.getId());
 		final Foo foo4 = this.find(Foo.class, foo1.getId());
 		Assert.assertEquals(foo1.getId(), foo3.getId());
 		Assert.assertSame(foo4, foo3);
+
+		this.rollback();
 	}
 }

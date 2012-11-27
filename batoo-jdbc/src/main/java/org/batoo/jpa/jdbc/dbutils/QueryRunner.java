@@ -183,6 +183,9 @@ public class QueryRunner {
 		if (pmdKnownBroken) {
 			((PreparedStatementProxy) statement).setParamCount(params.length);
 		}
+		else {
+			((PreparedStatementProxy) statement).setParamCount(-1);
+		}
 
 		// if the jdbc adaptor wants to modify the parameters we let it do it its own way
 		final JdbcAdaptor jdbcAdaptor = this.jdbcAdaptor;

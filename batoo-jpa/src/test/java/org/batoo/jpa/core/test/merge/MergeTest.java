@@ -271,7 +271,7 @@ public class MergeTest extends BaseCoreTest {
 
 		this.commit();
 
-		Assert.assertTrue(Arrays.equals(new int[] { 0, 2, 2, 2 }, this.getCounts2()));
+		Assert.assertEquals(Arrays.toString(new int[] { 0, 2, 2, 2 }), Arrays.toString(this.getCounts2()));
 	}
 
 	/**
@@ -288,12 +288,14 @@ public class MergeTest extends BaseCoreTest {
 		Parent parent = this.createParent(1);
 		Child2 child = parent.getChildren2().get(0);
 		parent.getChildren2().clear();
+		child = this.merge(child);
 		parent = this.merge(parent);
 
 		this.commit();
 
 		this.close();
 		child = this.find(Child2.class, child.getId());
+		child.setParent(null);
 		Assert.assertNull(child.getParent());
 
 		Assert.assertTrue(Arrays.equals(new int[] { 2, 2, 2, 2 }, this.getCounts2()));

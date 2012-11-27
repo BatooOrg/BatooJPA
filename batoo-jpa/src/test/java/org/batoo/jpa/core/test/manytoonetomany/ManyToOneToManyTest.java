@@ -119,7 +119,7 @@ public class ManyToOneToManyTest extends BaseCoreTest {
 		this.commit();
 
 		final Person person2 = this.find(Person.class, person.getId());
-		Assert.assertSame(person, person2);
+		Assert.assertNotSame(person, person2);
 	}
 
 	/**

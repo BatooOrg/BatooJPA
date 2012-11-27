@@ -72,6 +72,33 @@ public class Person {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof Person)) {
+			return false;
+		}
+		final Person other = (Person) obj;
+		if (this.id == null) {
+			if (other.id != null) {
+				return false;
+			}
+		}
+		else if (!this.id.equals(other.id)) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
 	 * Returns the addresses.
 	 * 
 	 * @return the addresses
@@ -110,6 +137,18 @@ public class Person {
 	 */
 	public List<Phone> getPhones() {
 		return this.phones;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = (prime * result) + ((this.id == null) ? 0 : this.id.hashCode());
+		return result;
 	}
 
 	/**

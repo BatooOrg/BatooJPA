@@ -73,7 +73,7 @@ public class ManyToOneTest extends BaseCoreTest {
 		final Person person = this.person();
 		this.persist(person);
 
-		this.commit();
+		this.flush();
 
 		final Person person2 = this.find(Person.class, person.getId());
 		Assert.assertSame(person, person2);

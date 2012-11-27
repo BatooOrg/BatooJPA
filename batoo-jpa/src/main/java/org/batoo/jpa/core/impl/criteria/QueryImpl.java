@@ -820,9 +820,9 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 
 		}
 		finally {
-			this.em.closeConnectionIfNecessary();
-
 			this.em.getSession().releaseLoadTracker();
+
+			this.em.closeConnectionIfNecessary();
 
 			if (cacheRetrieveMode != null) {
 				cache.setCacheRetrieveMode(null);

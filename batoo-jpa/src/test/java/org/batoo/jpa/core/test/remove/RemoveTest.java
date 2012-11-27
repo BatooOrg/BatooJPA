@@ -119,15 +119,16 @@ public class RemoveTest extends BaseCoreTest {
 	public void testOrphanPersistCommitThenRemove() {
 		this.persist(this.createParent());
 
-		final Parent parent = this.createParent();
+		Parent parent = this.createParent();
 		this.persist(parent);
 		this.commit();
 
+		parent = this.merge(parent);
 		this.remove(parent);
 
 		this.commit();
 
-		Assert.assertTrue(Arrays.equals(new int[] { 2, 2, 4, 2 }, this.getCounts()));
+		Assert.assertEquals(Arrays.toString(new int[] { 2, 2, 4, 2 }), Arrays.toString(this.getCounts()));
 	}
 
 	/**
@@ -145,7 +146,7 @@ public class RemoveTest extends BaseCoreTest {
 
 		this.commit();
 
-		Assert.assertTrue(Arrays.equals(new int[] { 2, 2, 4, 2 }, this.getCounts()));
+		Assert.assertEquals(Arrays.toString(new int[] { 2, 2, 4, 2 }), Arrays.toString(this.getCounts()));
 	}
 
 	/**
@@ -165,7 +166,7 @@ public class RemoveTest extends BaseCoreTest {
 
 		this.commit();
 
-		Assert.assertTrue(Arrays.equals(new int[] { 0, 2, 2, 0 }, this.getCounts()));
+		Assert.assertEquals(Arrays.toString(new int[] { 0, 2, 2, 0 }), Arrays.toString(this.getCounts()));
 	}
 
 	/**
@@ -175,12 +176,12 @@ public class RemoveTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testOrphanRemovalPersist() {
-		final Parent parent = this.createParent();
+		Parent parent = this.createParent();
 		this.persist(parent);
 
 		this.commit();
 
-		this.begin();
+		parent = this.merge(parent);
 
 		parent.getChildren1().clear();
 		parent.getChildren2().clear();
@@ -189,7 +190,7 @@ public class RemoveTest extends BaseCoreTest {
 
 		this.commit();
 
-		Assert.assertTrue(Arrays.equals(new int[] { 0, 2, 2, 0 }, this.getCounts()));
+		Assert.assertEquals(Arrays.toString(new int[] { 0, 2, 2, 0 }), Arrays.toString(this.getCounts()));
 	}
 
 	/**
@@ -206,6 +207,6 @@ public class RemoveTest extends BaseCoreTest {
 
 		this.commit();
 
-		Assert.assertTrue(Arrays.equals(new int[] { 0, 0, 2, 0 }, this.getCounts()));
+		Assert.assertEquals(Arrays.toString(new int[] { 0, 0, 2, 0 }), Arrays.toString(this.getCounts()));
 	}
 }

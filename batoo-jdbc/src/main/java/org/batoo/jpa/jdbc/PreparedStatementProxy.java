@@ -1044,9 +1044,16 @@ public class PreparedStatementProxy implements PreparedStatement {
 	 * 
 	 * @param count
 	 *            the number of the parameters
+	 * @throws SQLException
+	 *             in case of an sql error
 	 */
-	public void setParamCount(int count) {
-		this.parameters = new Object[count];
+	public void setParamCount(int count) throws SQLException {
+		if (count >= 0) {
+			this.parameters = new Object[count];
+		}
+		else if (PreparedStatementProxy.LOG.isDebugEnabled()) {
+			this.getParameterMetaData();
+		}
 	}
 
 	/**

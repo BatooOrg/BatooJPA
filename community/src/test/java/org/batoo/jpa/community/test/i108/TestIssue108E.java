@@ -34,10 +34,15 @@ import org.batoo.jpa.core.BatooPersistenceProvider;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-//@Ignore
+/**
+ * The extended version of the test
+ * 
+ * @author hceylan
+ * @since $version
+ */
 @RunWith(ApplicationComposer.class)
 @SuppressWarnings("javadoc")
-public class TestIssue108 {
+public class TestIssue108E {
 
 	@PersistenceContext
 	EntityManager em;

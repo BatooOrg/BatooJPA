@@ -591,10 +591,18 @@ public class PluralAssociationMappingImpl<Z, C, E> extends AssociationMappingImp
 		// get the managed collection
 		final ManagedCollection<E> collection = (ManagedCollection<E>) this.get(instance.getInstance());
 
-		// if initialized then merge with the new entities
-		if ((collection != null) && collection.isInitialized()) {
-			collection.mergeWith(entityManager, entity, requiresFlush, processed, instances);
+		// if the entity we are merging has an un initialized managed collection then no need to merge
+		final Object newCollection = this.get(entity);
+		if ((newCollection instanceof ManagedCollection) && !((ManagedCollection<E>) newCollection).isInitialized()) {
+			return;
 		}
+
+		// if initialized then merge with the new entities
+		if ((collection != null) && !collection.isInitialized()) {
+			collection.initialize();
+		}
+
+		collection.mergeWith(entityManager, entity, requiresFlush, processed, instances);
 	}
 
 	/**
