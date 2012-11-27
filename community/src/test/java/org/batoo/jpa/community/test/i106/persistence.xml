@@ -18,7 +18,6 @@
 	Boston, MA  02110-1301  USA
 
  -->
-<!-- @author barreiro -->
 <persistence xmlns="http://java.sun.com/xml/ns/persistence"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
@@ -27,8 +26,9 @@
 	<persistence-unit name="default">
 		<provider>org.batoo.jpa.core.BatooPersistenceProvider</provider>
 		
-		<class>org.batoo.jpa.community.test.i106.Foo</class>
-		<class>org.batoo.jpa.community.test.i106.Bar</class>
+		<class>org.batoo.jpa.community.test.i106.Orders</class>
+		<class>org.batoo.jpa.community.test.i106.OrderCustomerLeader</class>
+		<class>org.batoo.jpa.community.test.i106.OrderCustomerLeaderPK</class>
 						
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>		
 		<properties>

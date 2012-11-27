@@ -33,14 +33,13 @@ public class TestIssue106 extends BaseCoreTest {
 
 	@Test
 	public void testIssue103() {
-		Foo foo = new Foo();
-		this.persist(foo);
+		Orders order = new Orders();
+		this.persist(order);
 
 		this.commit();
 		this.close();
 
-		foo = this.find(Foo.class, foo.getId());
-		Assert.assertNotNull(foo.getBars());
-		Assert.assertNotNull(foo.getBars2());
+		order = this.find(Orders.class, order.getOrderId());
+		Assert.assertNotNull(order.getOrderCustomerLeaders());
 	}
 }
