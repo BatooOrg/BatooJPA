@@ -21,8 +21,6 @@ package org.batoo.jpa.community.test.i108;
 import java.util.Properties;
 
 import javax.ejb.EJB;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 import org.apache.openejb.jee.EnterpriseBean;
 import org.apache.openejb.jee.SingletonBean;
@@ -31,19 +29,16 @@ import org.apache.openejb.junit.ApplicationComposer;
 import org.apache.openejb.junit.Configuration;
 import org.apache.openejb.junit.Module;
 import org.batoo.jpa.core.BatooPersistenceProvider;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-//@Ignore
 @RunWith(ApplicationComposer.class)
 @SuppressWarnings("javadoc")
 public class TestIssue108 {
 
-	@PersistenceContext
-	EntityManager em;
-
 	@EJB
-	Manager mgr;
+	private Manager mgr;
 
 	@Module
 	public EnterpriseBean bean() {
@@ -65,9 +60,7 @@ public class TestIssue108 {
 
 	@Test
 	public void go() {
-		this.mgr.persist();
-
-		this.em.createQuery("select e from Batoo e").getSingleResult();
+		Assert.assertNotSame(this.mgr.persist(), this.mgr.find());
 	}
 
 	@Module
