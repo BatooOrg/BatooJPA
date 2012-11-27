@@ -588,7 +588,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 				int sqlType = Types.VARCHAR;
 				if (!this.pmdBroken) {
 					try {
-						sqlType = pmd.getParameterType(index++ + 1);
+						sqlType = pmd.getParameterType(index + 1);
 					}
 					catch (final SQLException e) {
 						this.pmdBroken = true;
