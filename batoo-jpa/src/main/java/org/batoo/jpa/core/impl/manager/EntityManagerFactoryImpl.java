@@ -308,7 +308,9 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 			throw new IllegalArgumentException("Illegal value " + this.getProperty(BJPASettings.FETCH_SIZE) + " for " + BJPASettings.FETCH_SIZE);
 		}
 
-		return new DataSourceProxy(this.createDatasource0(parser), sqlLogging, slowSqlThreshold, jdbcFetchSize);
+		final boolean external = (parser.getJtaDataSource() != null) || (parser.getNonJtaDataSource() != null);
+
+		return new DataSourceProxy(this.createDatasource0(parser), external, sqlLogging, slowSqlThreshold, jdbcFetchSize);
 	}
 
 	private DataSource createDatasource0(PersistenceParser parser) {

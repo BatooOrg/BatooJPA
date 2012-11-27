@@ -19,6 +19,7 @@
 package org.batoo.jpa.jdbc;
 
 import java.io.PrintWriter;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
@@ -26,6 +27,8 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
+import org.batoo.common.log.BLogger;
+import org.batoo.common.log.BLoggerFactory;
 import org.batoo.jpa.jdbc.PreparedStatementProxy.SqlLoggingType;
 
 /**
@@ -36,14 +39,19 @@ import org.batoo.jpa.jdbc.PreparedStatementProxy.SqlLoggingType;
  */
 public class DataSourceProxy implements DataSource {
 
+	private static final BLogger LOG = BLoggerFactory.getLogger(DataSourceProxy.class);
+
+	private final DataSource datasource;
+	private final boolean external;
 	private final SqlLoggingType sqlLogging;
 	private final long slowSqlThreshold;
 	private final int jdbcFetchSize;
-	private final DataSource datasource;
 
 	/**
 	 * @param datasource
 	 *            the original datasource
+	 * @param external
+	 *            if the original datasource is external
 	 * @param slowSqlThreshold
 	 *            the time to decide if SQL is deemed as slow
 	 * @param sqlLogging
@@ -53,10 +61,11 @@ public class DataSourceProxy implements DataSource {
 	 * 
 	 * @since 2.0.0
 	 */
-	public DataSourceProxy(DataSource datasource, SqlLoggingType sqlLogging, long slowSqlThreshold, int jdbcFetchSize) {
+	public DataSourceProxy(DataSource datasource, boolean external, SqlLoggingType sqlLogging, long slowSqlThreshold, int jdbcFetchSize) {
 		super();
 
 		this.datasource = datasource;
+		this.external = external;
 		this.sqlLogging = sqlLogging;
 		this.slowSqlThreshold = slowSqlThreshold;
 		this.jdbcFetchSize = jdbcFetchSize;
@@ -64,10 +73,20 @@ public class DataSourceProxy implements DataSource {
 
 	/**
 	 * Closes the resource local datasource.
+	 * 
 	 */
 	public void close() {
-		if (this.datasource instanceof BoneCPDataSource) {
-			((BoneCPDataSource) this.datasource).close();
+		if (!this.external) {
+			try {
+				// close the datasource via reflection
+				final Method closeMethod = this.datasource.getClass().getMethod("close");
+				if (closeMethod != null) {
+					closeMethod.invoke(this.datasource);
+				}
+			}
+			catch (final Exception e) {
+				DataSourceProxy.LOG.error(e, "Cannot close() the internal datasource");
+			}
 		}
 	}
 
