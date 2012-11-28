@@ -164,7 +164,7 @@ public class JoinColumn extends AbstractColumn {
 	 * @since 2.0.0
 	 */
 	public JoinColumn(JdbcAdaptor jdbcAdaptor, PrimaryKeyJoinColumnMetadata metadata, SecondaryTable table, AbstractColumn referencedColumn) {
-		super(metadata != null ? metadata.getLocator() : null, false);
+		super(metadata != null ? metadata.getLocator() : null, true);
 
 		this.jdbcAdaptor = jdbcAdaptor;
 		this.tableName = table.getName();

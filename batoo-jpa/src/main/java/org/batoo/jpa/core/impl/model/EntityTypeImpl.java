@@ -1857,8 +1857,14 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 		}
 
 		for (final EntityTable table : this.getTables()) {
+			if (table == this.primaryTable) {
+				continue;
+			}
+
 			table.performRemove(connection, instances, size);
 		}
+
+		this.primaryTable.performRemove(connection, instances, size);
 	}
 
 	/**

@@ -192,4 +192,46 @@ public class SecondaryTableTest extends BaseCoreTest {
 		Assert.assertEquals(3,
 			new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM AddressExtra", new SingleValueHandler<Number>()).intValue());
 	}
+
+	/**
+	 * Tests to update
+	 * 
+	 * @throws SQLException
+	 *             thrown if underlying SQL fails
+	 * 
+	 * @since 2.0.0
+	 */
+	@Test
+	public void testRemove() throws SQLException {
+		Foo foo = new Foo();
+		this.persist(foo);
+
+		this.commit();
+
+		this.begin();
+		foo = this.find(Foo.class, foo.getKey());
+		this.remove(foo);
+		this.commit();
+	}
+
+	/**
+	 * Tests to update
+	 * 
+	 * @throws SQLException
+	 *             thrown if underlying SQL fails
+	 * 
+	 * @since 2.0.0
+	 */
+	@Test
+	public void testUpdate() throws SQLException {
+		Foo foo = new Foo();
+		this.persist(foo);
+
+		this.commit();
+
+		this.begin();
+		foo = this.find(Foo.class, foo.getKey());
+		foo.setValue1("111");
+		this.commit();
+	}
 }
