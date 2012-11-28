@@ -1,5 +1,9 @@
 /*
- * Copyright (c) 2012 - Batoo Software Software Foundation.
+ * Copyright (c) 2012 - Batoo Software ve Consultancy Ltd.
+ * 
+ * This copyrighted material is made available to anyone wishing to use, modify,
+ * copy, or redistribute it subject to the terms and conditions of the GNU
+ * Lesser General Public License, as published by the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
@@ -12,23 +16,25 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.community.test.querydsl;
+package org.batoo.jpa.community.test.i107;
+
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.OneToMany;
 
 /**
- * The Class Foo.
+ * 
+ * @author hceylan
+ * @since $version
  */
 @Entity
-@Table(name = "bar_")
-public class Bar {
-	@Temporal(TemporalType.DATE)
-	java.util.Date date;
+public class Foo {
 
 	@Id
-	int id;
+	private Integer id;
+
+	@OneToMany(mappedBy = "foo")
+	private List<Bar> bars;
 }

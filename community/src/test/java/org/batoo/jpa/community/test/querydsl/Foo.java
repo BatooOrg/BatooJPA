@@ -26,7 +26,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 /**
- * The Class Foo.
+ * The Class Bar.
  */
 @Entity
 @Table(name = "foo_")

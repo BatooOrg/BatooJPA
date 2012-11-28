@@ -117,7 +117,7 @@ public class CollectionExpression<C extends Collection<E>, E> extends AbstractEx
 	 */
 	@Override
 	public String[] getSqlRestrictionFragments(BaseQueryImpl<?> query) {
-		throw new PersistenceException("Collection paths cannot be restricted");
+		throw new PersistenceException("Collection paths cannot be restricted: " + this);
 	}
 
 	/**

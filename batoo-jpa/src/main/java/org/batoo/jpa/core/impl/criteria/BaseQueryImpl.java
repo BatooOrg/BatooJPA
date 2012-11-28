@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.PersistenceException;
 import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Selection;
 
@@ -231,7 +232,25 @@ public abstract class BaseQueryImpl<T> implements BaseQuery<T> {
 		if (wrapper == null) {
 			synchronized (this) {
 				if (this.sql == null) {
-					this.sql = new FinalWrapper<String>(this.generateSql());
+					try {
+						this.sql = new FinalWrapper<String>(this.generateSql());
+					}
+					catch (final Exception e) {
+						String jpql = null;
+
+						try {
+							jpql = this.getJpql();
+
+							throw new PersistenceException("Cannot generate query for: " + jpql, e);
+						}
+						catch (final Exception e2) {}
+
+						if (e instanceof RuntimeException) {
+							throw (RuntimeException) e;
+						}
+
+						throw new PersistenceException("Cannot generate SQL for query", e);
+					}
 				}
 
 				wrapper = this.sql;
