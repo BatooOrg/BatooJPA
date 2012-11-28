@@ -140,9 +140,9 @@ public class JtaEntityManagerImpl extends EntityManagerImpl {
 		return this.jtaTransaction != null;
 	}
 
-	private boolean isTransactionInState(int statusActive) {
+	private boolean isTransactionInState(int status) {
 		try {
-			return (this.jtaTransaction != null) && (this.jtaTransaction.getStatus() == javax.transaction.Status.STATUS_ACTIVE);
+			return (this.jtaTransaction != null) && (this.jtaTransaction.getStatus() == status);
 		}
 		catch (final SystemException e) {
 			throw new PersistenceException("Cannot check transaction status", e);
