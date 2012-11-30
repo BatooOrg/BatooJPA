@@ -25,7 +25,6 @@ import java.util.Map.Entry;
 
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.ListJoin;
 import javax.persistence.criteria.MapJoin;
 import javax.persistence.criteria.Path;
 
@@ -41,7 +40,7 @@ import org.batoo.jpa.core.impl.model.mapping.PluralMappingEx;
 import org.batoo.jpa.core.util.Pair;
 
 /**
- * Implementation of {@link ListJoin}.
+ * Implementation of {@link MapJoin}.
  * 
  * @param <Z>
  *            the source type
