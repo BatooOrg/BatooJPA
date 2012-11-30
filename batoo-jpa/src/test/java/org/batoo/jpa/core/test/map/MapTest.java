@@ -21,7 +21,6 @@ package org.batoo.jpa.core.test.map;
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -142,7 +141,6 @@ public class MapTest extends BaseCoreTest {
 	 * @since 2.0.0
 	 */
 	@Test
-	@Ignore
 	public void testMap5() {
 		final Person person = this.person();
 		this.persist(person);
@@ -150,15 +148,11 @@ public class MapTest extends BaseCoreTest {
 		this.commit();
 		this.close();
 
-		Person person2 = this.find(Person.class, person.getId());
-		this.begin();
-		person2 = this.merge(person2);
-		person2.getPhones().clear();
-		this.commit();
-
-		person2 = this.find(Person.class, person.getId());
+		final Person person2 = this.find(Person.class, person.getId());
 
 		Assert.assertEquals(person.getName(), person2.getName());
-		Assert.assertEquals(0, person2.getPhones().size());
+		Assert.assertEquals(3, person2.getAddresses2().size());
+		Assert.assertEquals("Istanbul", person2.getAddresses2().get("Istanbul").getCity());
+
 	}
 }

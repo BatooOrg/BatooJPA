@@ -61,6 +61,8 @@ import org.batoo.jpa.parser.metadata.ColumnMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.PluralAttributeMetadata;
 
+import com.google.common.collect.Maps;
+
 /**
  * 
  * @param <Z>
@@ -556,10 +558,18 @@ public class PluralAssociationMappingImpl<Z, C, E> extends AssociationMappingImp
 	 * {@inheritDoc}
 	 * 
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public <K> Map<? extends K, ? extends E> loadMap(ManagedInstance<?> instance) {
-		// TODO Auto-generated method stub
-		return null;
+	public <K> Map<? extends K, ? extends E> loadMap(ManagedInstance<?> managedInstance) {
+
+		final Collection<? extends E> children = this.loadCollection(managedInstance);
+
+		final Map<K, E> childrenMap = Maps.newHashMap();
+
+		for (final E child : children) {
+			childrenMap.put((K) this.extractKey(child), child);
+		}
+		return childrenMap;
 	}
 
 	/**

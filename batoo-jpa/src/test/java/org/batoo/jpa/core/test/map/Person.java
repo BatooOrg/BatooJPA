@@ -52,7 +52,7 @@ public class Person {
 	@MapKey(name = "city")
 	private final Map<String, Address> addresses2 = Maps.newHashMap();
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "person")
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY, mappedBy = "person")
 	private final Map<PhoneId, Phone> phones = Maps.newHashMap();
 
 	private String name;
