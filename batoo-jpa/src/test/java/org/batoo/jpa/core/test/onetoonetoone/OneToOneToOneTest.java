@@ -63,8 +63,7 @@ public class OneToOneToOneTest extends BaseCoreTest {
 		this.commit();
 
 		final Employee person2 = this.find(Employee.class, person.getId());
-		Assert.assertEquals(person, person2);
-		Assert.assertNotSame(person, person2);
+		Assert.assertSame(person, person2);
 	}
 
 	/**

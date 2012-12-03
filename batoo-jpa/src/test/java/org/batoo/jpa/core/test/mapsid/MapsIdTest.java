@@ -71,8 +71,7 @@ public class MapsIdTest extends BaseCoreTest {
 		this.commit();
 
 		final Person person2 = this.find(Person.class, person.getId());
-		Assert.assertEquals(person, person2);
-		Assert.assertNotSame(person, person2);
+		Assert.assertSame(person, person2);
 	}
 
 	/**

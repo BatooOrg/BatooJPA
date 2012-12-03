@@ -241,8 +241,6 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	public void clearTransaction() {
 		this.transaction = null;
-
-		this.detachAllIfNotTransactionScoped();
 	}
 
 	/**
@@ -418,17 +416,6 @@ public class EntityManagerImpl implements EntityManager {
 		final ManagedInstance<?> instance = this.session.remove(entity);
 		if (instance != null) {
 			instance.cascadeDetach(this);
-		}
-	}
-
-	/**
-	 * Detaches all the entities if there is no transaction in progress.
-	 * 
-	 * @since $version
-	 */
-	public void detachAllIfNotTransactionScoped() {
-		if ((this.transaction == null) || !this.transaction.isActive()) {
-			this.clear();
 		}
 	}
 

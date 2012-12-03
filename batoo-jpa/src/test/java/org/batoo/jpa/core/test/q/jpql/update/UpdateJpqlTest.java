@@ -92,4 +92,17 @@ public class UpdateJpqlTest extends BaseCoreTest {
 
 		this.commit();
 	}
+
+	/**
+	 * 
+	 * @since 2.0.0
+	 */
+	@Test
+	public void testUpdate2() {
+		this.begin();
+
+		this.cu("update Country c set name = :name where c = :code").setParameter("code", UpdateJpqlTest.TR).setParameter("name", "TURKEY").executeUpdate();
+
+		this.commit();
+	}
 }

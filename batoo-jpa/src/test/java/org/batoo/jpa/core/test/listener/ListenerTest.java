@@ -116,7 +116,7 @@ public class ListenerTest extends BaseCoreTest {
 		this.remove(foo);
 		this.commit();
 
-		Assert.assertEquals("listener1PostLoadlistener1PreRemovelistener1PostRemove", foo.getValue());
-		Assert.assertEquals("masterPostLoadmasterPreRemovemasterPostRemove", foo.getParentValue());
+		Assert.assertEquals("listener1PostLoadlistener1PreUpdatelistener1PostUpdatelistener1PreRemovelistener1PostRemove", foo.getValue());
+		Assert.assertEquals("masterPostLoadmasterPreUpdatemasterPostUpdatemasterPreRemovemasterPostRemove", foo.getParentValue());
 	}
 }

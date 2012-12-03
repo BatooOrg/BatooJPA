@@ -73,8 +73,6 @@ public class SessionImpl {
 	private final int insertBatchSize;
 	private final int removeBatchSize;
 
-	private int sessionTracker;
-
 	/**
 	 * @param entityManager
 	 *            the owner entity manager
@@ -649,13 +647,6 @@ public class SessionImpl {
 			for (final ManagedInstance<?> instance : entitiesLoaded) {
 				instance.fireCallbacks(EntityListenerType.POST_LOAD);
 			}
-
-			this.sessionTracker--;
-			if (this.sessionTracker == 0) {
-				SessionImpl.LOG.debug("Session tracker released on session {0}", this);
-
-				this.em.detachAllIfNotTransactionScoped();
-			}
 		}
 	}
 
@@ -706,14 +697,9 @@ public class SessionImpl {
 	 */
 	public void setLoadTracker() {
 		this.loadTracker++;
-		this.sessionTracker++;
 
 		if (this.loadTracker == 1) {
 			SessionImpl.LOG.debug("Load tracker is triggered on session {0}", this);
-		}
-
-		if (this.sessionTracker == 1) {
-			SessionImpl.LOG.debug("Session tracker is triggered on session {0}", this);
 		}
 	}
 
