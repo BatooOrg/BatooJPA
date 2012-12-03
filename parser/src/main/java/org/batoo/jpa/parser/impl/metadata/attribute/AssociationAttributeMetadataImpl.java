@@ -289,7 +289,7 @@ public class AssociationAttributeMetadataImpl extends AttributeMetadataImpl impl
 	}
 
 	/**
-	 * Handles the {@link MapKeyEnumerated} annotation.
+	 * Handles the {@link MapKeyColumn} annotation.
 	 * 
 	 * @param member
 	 *            the member
