@@ -18,6 +18,10 @@
  */
 package org.batoo.jpa.core.test.q;
 
+import java.util.Date;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -33,6 +37,10 @@ public class Country {
 	private String code;
 
 	private String name;
+
+	@Basic
+	@Column(name = "lastActivity", nullable = true)
+	private Date lastActivity;
 
 	/**
 	 * @since 2.0.0
@@ -68,6 +76,17 @@ public class Country {
 	}
 
 	/**
+	 * Returns the lastActivity of the Country.
+	 * 
+	 * @return the lastActivity of the Country
+	 * 
+	 * @since $version
+	 */
+	public java.util.Date getLastActivity() {
+		return this.lastActivity;
+	}
+
+	/**
 	 * Returns the name.
 	 * 
 	 * @return the name
@@ -75,6 +94,18 @@ public class Country {
 	 */
 	public String getName() {
 		return this.name;
+	}
+
+	/**
+	 * Sets the lastActivity of the Country.
+	 * 
+	 * @param lastActivity
+	 *            the lastActivity to set for Country
+	 * 
+	 * @since $version
+	 */
+	public void setLastActivity(java.util.Date lastActivity) {
+		this.lastActivity = lastActivity;
 	}
 
 	/**

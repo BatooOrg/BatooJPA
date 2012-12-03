@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.core.test.q.jpql.update;
 
+import java.util.Date;
+
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
@@ -102,6 +104,19 @@ public class UpdateJpqlTest extends BaseCoreTest {
 		this.begin();
 
 		this.cu("update Country c set name = :name where c = :code").setParameter("code", UpdateJpqlTest.TR).setParameter("name", "TURKEY").executeUpdate();
+
+		this.commit();
+	}
+
+	/**
+	 * 
+	 * @since 2.0.0
+	 */
+	@Test
+	public void testUpdate3() {
+		this.begin();
+
+		this.cu("update Country c set lastActivity = :date where c = :code").setParameter("code", UpdateJpqlTest.TR).setParameter("date", new Date()).executeUpdate();
 
 		this.commit();
 	}
