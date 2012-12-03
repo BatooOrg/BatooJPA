@@ -46,6 +46,7 @@ import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
+import org.apache.commons.lang.StringUtils;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
 import org.batoo.jpa.core.impl.criteria.AbstractSelection;
@@ -78,6 +79,7 @@ import org.batoo.jpa.core.impl.criteria.expression.SubstringExpression;
 import org.batoo.jpa.core.impl.criteria.expression.TrimExpression;
 import org.batoo.jpa.core.impl.criteria.join.AbstractFrom;
 import org.batoo.jpa.core.impl.criteria.join.ListJoinImpl;
+import org.batoo.jpa.core.impl.criteria.join.SingularJoin;
 import org.batoo.jpa.core.impl.criteria.path.AbstractPath;
 import org.batoo.jpa.core.impl.criteria.path.BasicPath;
 import org.batoo.jpa.core.impl.criteria.path.ParentPath;
@@ -732,14 +734,48 @@ public class JpqlQuery {
 		final RootImpl<?> r = (RootImpl<?>) q.from(entity);
 		this.putAlias(q, aliasedDef, aliased, r);
 
+		if (StringUtils.isNotBlank(aliased.getAlias())) {
+			r.alias(aliased.getAlias());
+		}
+
 		final Tree setDefs = updateDef.getChild(1);
 		for (int i = 0; i < setDefs.getChildCount(); i++) {
 			final Tree setDef = setDefs.getChild(i);
 
-			final BasicPath left = (BasicPath) this.getExpression(cb, q, setDef.getChild(0), null);
-			final AbstractExpression right = this.getExpression(cb, q, setDef.getChild(1), left.getJavaType());
+			final Tree leftDef = setDef.getChild(0);
+			final Tree rightDef = setDef.getChild(1);
 
-			q.set(left, right);
+			AbstractExpression left = null;
+
+			if (leftDef.getType() == JpqlParser.LQUALIFIED) {
+				for (int j = 0; j < leftDef.getChildCount(); j++) {
+					final Tree child = leftDef.getChild(j);
+					if ((left == null) && child.getText().equals(r.getAlias())) {
+						left = r;
+					}
+					else if (left == null) {
+						left = r.getExpression(child.getText());
+					}
+					else if (left instanceof SingularJoin) {
+						left = ((SingularJoin<?, ?>) left).getExpression(child.getText());
+					}
+					else if (left instanceof RootImpl) {
+						left = ((RootImpl<?>) left).getExpression(child.getText());
+					}
+					else {
+						throw new PersistenceException("cannot dereference: " + leftDef.getText());
+					}
+				}
+			}
+
+			if (left instanceof BasicPath) {
+				final AbstractExpression right = this.getExpression(cb, q, rightDef, left.getJavaType());
+
+				q.set((BasicPath<?>) left, right);
+			}
+			else {
+				throw new PersistenceException("Path does not resolve to a state field: " + leftDef.getText());
+			}
 		}
 
 		if (updateDef.getChildCount() == 3) {

@@ -77,7 +77,7 @@ update_clause :
         -> ^(ST_UPDATE update_item update_item*);
 
 update_item :
-    state_field_path_expression Equals_Operator^ new_value;
+    qid Equals_Operator^ new_value;
 
 delete_statement :
     DELETE^ FROM! aliased_qid (where_clause)?;
