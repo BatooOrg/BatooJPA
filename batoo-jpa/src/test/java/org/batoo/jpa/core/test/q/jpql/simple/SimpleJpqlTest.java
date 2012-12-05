@@ -254,7 +254,9 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		this.close();
 
-		TypedQuery<Person> q = this.cq("select p from Person p where p.age > :age", Person.class).setParameter("age", 40);
+		TypedQuery<Person> q;
+
+		q = this.cq("select p from Person p where p.age > :age", Person.class).setParameter("age", 40);
 		Assert.assertEquals(0, q.getResultList().size());
 
 		q = this.cq("select p from Person p where p.age < :age", Person.class).setParameter("age", 40);
@@ -285,6 +287,10 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		Assert.assertEquals(2, q.getResultList().size());
 
 		q = this.cq("select p from Person p where p.age in (:p1, :p2)", Person.class).setParameter("p1", 35).setParameter("p2", 45);
+		Assert.assertEquals(1, q.getResultList().size());
+
+		q = this.cq("select p from Person p where (p.age < 10 or p.age > :age1) and (p.age > 100 or p.age < :age2)", Person.class).setParameter("age1", 36).setParameter(
+			"age2", 50);
 		Assert.assertEquals(1, q.getResultList().size());
 	}
 
@@ -354,6 +360,40 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		final TypedQuery<Timestamp> q4 = this.cq("select current_timestamp from Person p", Timestamp.class);
 		Assert.assertEquals(2, q4.getResultList().size());
+	}
+
+	/**
+	 * 
+	 * @since 2.0.0
+	 */
+	@Test
+	public void testDateExpression2() {
+		final GregorianCalendar day1 = new GregorianCalendar();
+
+		final Person person1 = new Person("person1", 35, day1.getTime());
+		person1.setValidTo(day1.getTime());
+
+		day1.add(Calendar.DAY_OF_YEAR, 10);
+
+		final Person person2 = new Person("person2", 45, day1.getTime());
+		person2.setValidTo(day1.getTime());
+
+		final GregorianCalendar day2 = new GregorianCalendar();
+		day2.add(Calendar.DAY_OF_YEAR, 1);
+
+		this.persist(person1);
+		this.persist(person2);
+		this.commit();
+
+		this.close();
+
+		TypedQuery<Person> q;
+
+		q = this.cq("SELECT bean FROM Person bean where (bean.validFrom is null or bean.validFrom <= :now) and (bean.validTo is null or bean.validTo >= :now)",
+			Person.class).setParameter("now", day2.getTime(), TemporalType.DATE);
+
+		Assert.assertEquals(1, q.getResultList().size());
+
 	}
 
 	/**
