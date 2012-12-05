@@ -177,7 +177,7 @@ public class PredicateImpl extends BooleanExpression implements Predicate {
 			return "NOT (" + predicates + ")";
 		}
 
-		return predicates;
+		return "(" + predicates + ")";
 	}
 
 	/**
