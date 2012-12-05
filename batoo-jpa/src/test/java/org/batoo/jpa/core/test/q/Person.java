@@ -70,6 +70,12 @@ public class Person {
 	@Temporal(TemporalType.DATE)
 	private Date startDate;
 
+	@Temporal(TemporalType.DATE)
+	private Date validFrom;
+
+	@Temporal(TemporalType.DATE)
+	private Date validTo;
+
 	/**
 	 * @since 2.0.0
 	 */
@@ -158,6 +164,26 @@ public class Person {
 	}
 
 	/**
+	 * 
+	 * @return the validFrom
+	 * 
+	 * @since $version
+	 */
+	public Date getValidFrom() {
+		return this.validFrom;
+	}
+
+	/**
+	 * 
+	 * @return the validTo
+	 * 
+	 * @since $version
+	 */
+	public Date getValidTo() {
+		return this.validTo;
+	}
+
+	/**
 	 * Returns the workPhones.
 	 * 
 	 * @return the workPhones
@@ -200,5 +226,27 @@ public class Person {
 	 */
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
+	}
+
+	/**
+	 * 
+	 * @param validFrom
+	 *            the validFrom to set
+	 * 
+	 * @since $version
+	 */
+	public void setValidFrom(Date validFrom) {
+		this.validFrom = validFrom;
+	}
+
+	/**
+	 * 
+	 * @param validTo
+	 *            the validTo to set
+	 * 
+	 * @since $version
+	 */
+	public void setValidTo(Date validTo) {
+		this.validTo = validTo;
 	}
 }
