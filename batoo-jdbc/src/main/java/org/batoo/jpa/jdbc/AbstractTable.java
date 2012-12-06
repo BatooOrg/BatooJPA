@@ -143,6 +143,11 @@ public abstract class AbstractTable {
 
 				return;
 			}
+			
+			// Allow read-only access to columns already defined 
+			if (!column.isInsertable() && !column.isUpdatable()) {
+				return;
+			}
 
 			throw new MappingException("Duplicate column names " + column.getName() + " on table " + this.name, column.getLocator(), existing.getLocator());
 		}
