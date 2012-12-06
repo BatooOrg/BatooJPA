@@ -130,6 +130,10 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 			}
 
 			if (basicAttribute.isVersion()) {
+				if (basicAttribute == this.versionAttribute) {
+					return; // Inheritance. The version attribute is already set
+				}
+
 				if (this.versionAttribute != null) {
 					throw new MappingException("Multiple version attributes not supported.", this.versionAttribute.getLocator(), attribute.getLocator());
 				}
