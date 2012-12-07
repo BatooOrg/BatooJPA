@@ -692,6 +692,16 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 		return parameters;
 	}
 
+	private List<ParameterExpressionImpl<?>> getParametersWithName(String name) {
+		final List<ParameterExpressionImpl<?>> list = Lists.newArrayList();
+		for (final Entry<ParameterExpressionImpl<?>, Object> entry : this.parameters.entrySet()) {
+			if (name.equals(entry.getKey().getAlias())) {
+				list.add(entry.getKey());
+			}
+		}
+		return list;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * 
@@ -993,7 +1003,10 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 */
 	@Override
 	public TypedQuery<X> setParameter(String name, Calendar value, TemporalType temporalType) {
-		return this.setParameter(this.getParameter(name, Calendar.class), value, temporalType);
+		for (final ParameterExpressionImpl<?> param : getParametersWithName(name)) {
+			this.setParameter((Parameter<Calendar>) param, value, temporalType);
+		}
+		return this;
 	}
 
 	/**
@@ -1002,7 +1015,10 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 */
 	@Override
 	public TypedQuery<X> setParameter(String name, Date value, TemporalType temporalType) {
-		return this.setParameter(this.getParameter(name, Date.class), value, temporalType);
+		for (final ParameterExpressionImpl<?> param : getParametersWithName(name)) {
+			this.setParameter((Parameter<Date>) param, value, temporalType);
+		}
+		return this;
 	}
 
 	/**
@@ -1011,7 +1027,10 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 */
 	@Override
 	public TypedQuery<X> setParameter(String name, Object value) {
-		return this.putParam(this.getParameter(name), value);
+		for (final ParameterExpressionImpl<?> param : getParametersWithName(name)) {
+			this.putParam(param, value);
+		}
+		return this;
 	}
 
 	/**
