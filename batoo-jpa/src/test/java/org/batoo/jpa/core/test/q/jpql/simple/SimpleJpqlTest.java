@@ -390,7 +390,8 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		TypedQuery<Person> q;
 
 		q = this.cq("SELECT bean FROM Person bean where (bean.validFrom is null or bean.validFrom <= :now) and (bean.validTo is null or bean.validTo >= :now)",
-			Person.class).setParameter("now", day2.getTime(), TemporalType.DATE);
+			Person.class);
+		q.setParameter("now", day2.getTime(), TemporalType.DATE);
 
 		Assert.assertEquals(1, q.getResultList().size());
 

@@ -46,6 +46,8 @@ public class ParameterExpressionImpl<T> extends AbstractParameterExpressionImpl<
 	private Integer position;
 	private String alias;
 
+	private boolean named = false;
+
 	/**
 	 * @param q
 	 *            the query
@@ -91,6 +93,10 @@ public class ParameterExpressionImpl<T> extends AbstractParameterExpressionImpl<
 	 */
 	@Override
 	protected void ensureAlias(BaseQueryImpl<?> query) {
+		if ((this.position == null) && !StringUtils.isBlank(this.getAlias())) {
+			this.named = true;
+		}
+
 		if ((this.position == null)) {
 			this.position = query.getAlias(this);
 
@@ -150,7 +156,7 @@ public class ParameterExpressionImpl<T> extends AbstractParameterExpressionImpl<
 	 */
 	@Override
 	public String getName() {
-		return this.getAlias();
+		return this.named ? this.getAlias() : null;
 	}
 
 	/**
@@ -169,7 +175,7 @@ public class ParameterExpressionImpl<T> extends AbstractParameterExpressionImpl<
 	 */
 	@Override
 	public Integer getPosition() {
-		return this.position;
+		return this.named ? null : this.position;
 	}
 
 	/**
