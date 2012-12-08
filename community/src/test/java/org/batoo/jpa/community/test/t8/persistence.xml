@@ -1,7 +1,7 @@
-<!-- 
+<!--
 
 	Copyright (c) 2012 - Batoo Software ve Consultancy Ltd.
- 
+
 	This copyrighted material is made available to anyone wishing to use, modify,
 	copy, or redistribute it subject to the terms and conditions of the GNU
 	Lesser General Public License, as published by the Free Software Foundation.
@@ -26,10 +26,11 @@
 
 	<persistence-unit name="default">
 		<provider>org.batoo.jpa.core.BatooPersistenceProvider</provider>
-		
+
 		<class>org.batoo.jpa.community.test.t8.Customer</class>
-						
-		<exclude-unlisted-classes>true</exclude-unlisted-classes>		
+		<class>org.batoo.jpa.community.test.t8.ValuedCustomer</class>
+
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
 			<property name="org.batoo.jpa.ddl" value="DROP" />
 		</properties>

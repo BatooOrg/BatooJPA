@@ -633,7 +633,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		}
 		// inheritance is in place then locate the correct child type
 		else {
-			final Object discriminatorValue = row.getObject(this.discriminatorAlias);
+			final String discriminatorValue = row.getObject(this.discriminatorAlias).toString();
 
 			// check if we have a legal discriminator value
 			final EntityTypeImpl<Y> effectiveType = (EntityTypeImpl<Y>) this.entity.getChildType(discriminatorValue);
