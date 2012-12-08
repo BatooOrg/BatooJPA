@@ -115,6 +115,7 @@ public class JpqlQuery {
 	private final BaseQuery<?> q;
 
 	private final Map<BaseQuery<?>, Map<String, AbstractFrom<?, ?>>> aliasMap = Maps.newHashMap();
+	private final Map<String, ParameterExpressionImpl<?>> namedParamMap = Maps.newHashMap();
 	private HashMap<String, Object> hints;
 
 	private LockModeType lockMode;
@@ -1065,7 +1066,18 @@ public class JpqlQuery {
 		}
 
 		if (exprDef.getType() == JpqlParser.Named_Parameter) {
-			return cb.parameter(javaType, exprDef.getText().substring(1));
+			final String paramName = exprDef.getText().substring(1);
+
+			ParameterExpressionImpl<?> expr = this.namedParamMap.get(paramName);
+			if (expr != null) {
+				return (AbstractExpression<X>) expr;
+			}
+
+			expr = cb.parameter(javaType, paramName);
+			this.namedParamMap.put(paramName, expr);
+
+			return (AbstractExpression<X>) expr;
+
 		}
 
 		if ((exprDef.getType() == JpqlParser.Ordinal_Parameter) //

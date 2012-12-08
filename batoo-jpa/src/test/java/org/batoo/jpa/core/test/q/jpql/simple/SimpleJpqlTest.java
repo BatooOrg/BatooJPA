@@ -367,40 +367,6 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	 * @since 2.0.0
 	 */
 	@Test
-	public void testDateExpression2() {
-		final GregorianCalendar day1 = new GregorianCalendar();
-
-		final Person person1 = new Person("person1", 35, day1.getTime());
-		person1.setValidTo(day1.getTime());
-
-		day1.add(Calendar.DAY_OF_YEAR, 10);
-
-		final Person person2 = new Person("person2", 45, day1.getTime());
-		person2.setValidTo(day1.getTime());
-
-		final GregorianCalendar day2 = new GregorianCalendar();
-		day2.add(Calendar.DAY_OF_YEAR, 1);
-
-		this.persist(person1);
-		this.persist(person2);
-		this.commit();
-
-		this.close();
-
-		TypedQuery<Person> q;
-
-		q = this.cq("SELECT bean FROM Person bean where (bean.validFrom is null or bean.validFrom <= :now) and (bean.validTo is null or bean.validTo >= :now)",
-			Person.class).setParameter("now", day2.getTime(), TemporalType.DATE);
-
-		Assert.assertEquals(1, q.getResultList().size());
-
-	}
-
-	/**
-	 * 
-	 * @since 2.0.0
-	 */
-	@Test
 	public void testFunction() {
 		final String testMode = System.getProperty("testMode");
 		// oracle doesn't have pi function
@@ -553,6 +519,52 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		this.close();
 
 		Assert.assertEquals(75, ((Number) this.cq("select sum(p.age) from Person p").getSingleResult()).intValue());
+	}
+
+	/**
+	 * 
+	 * 
+	 * @since $version
+	 */
+	@Test
+	public void testReusedParams() {
+		final GregorianCalendar day1 = new GregorianCalendar();
+
+		final Person person1 = new Person("person1", 35, day1.getTime());
+		person1.setValidTo(day1.getTime());
+
+		day1.add(Calendar.DAY_OF_YEAR, 10);
+
+		final Person person2 = new Person("person2", 45, day1.getTime());
+		person2.setValidTo(day1.getTime());
+
+		final GregorianCalendar day2 = new GregorianCalendar();
+		day2.add(Calendar.DAY_OF_YEAR, 1);
+
+		this.persist(person1);
+		this.persist(person2);
+		this.commit();
+
+		this.close();
+
+		TypedQuery<Person> q = this.cq("SELECT p FROM Person p " + //
+			"where (p.validFrom is null or p.validFrom <= :now) and (p.validTo is null or p.validTo >= :now)", Person.class)//
+		.setParameter("now", day2.getTime(), TemporalType.DATE);
+
+		Assert.assertEquals(1, q.getResultList().size());
+
+		q = this.cq("SELECT p FROM Person p " + //
+			"where (p.validFrom is null or p.validFrom <= ?1) and (p.validTo is null or p.validTo >= ?1)", Person.class)//
+		.setParameter(1, day2.getTime(), TemporalType.DATE);
+
+		Assert.assertEquals(1, q.getResultList().size());
+
+		q = this.cq("SELECT p FROM Person p " + //
+			"where (p.validFrom is null or p.validFrom <= ?1) and (p.validTo is null or p.validTo >= ?2)", Person.class)//
+		.setParameter(1, day2.getTime(), TemporalType.DATE) //
+		.setParameter(2, day1.getTime(), TemporalType.DATE);
+
+		Assert.assertEquals(1, q.getResultList().size());
 	}
 
 	/**
