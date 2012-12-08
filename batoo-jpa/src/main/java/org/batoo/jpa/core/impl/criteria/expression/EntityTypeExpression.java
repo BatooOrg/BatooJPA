@@ -77,7 +77,7 @@ public class EntityTypeExpression<T> extends AbstractTypeExpression<T> {
 			this.entity = session.getEntityManager().getMetamodel().entity(this.getPath().getJavaType()).getRootType();
 		}
 
-		final Object discriminatorValue = this.handle(row);
+		final String discriminatorValue = this.handle(row).toString();
 		return (Class<? extends T>) this.entity.getChildType(discriminatorValue).getJavaType();
 	}
 }
