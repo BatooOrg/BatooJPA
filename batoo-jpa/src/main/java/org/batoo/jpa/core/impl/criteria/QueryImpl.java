@@ -1011,6 +1011,13 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 */
 	@Override
 	public TypedQuery<X> setParameter(String name, Object value) {
+		if (value instanceof Date) {
+			return this.setParameter(name, (Date) value, TemporalType.TIMESTAMP);
+		}
+		if (value instanceof Calendar) {
+			return this.setParameter(name, (Calendar) value, TemporalType.TIMESTAMP);
+		}
+		
 		return this.putParam(this.getParameter(name), value);
 	}
 
