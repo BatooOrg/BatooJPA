@@ -552,12 +552,14 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		.setParameter("now", day2.getTime(), TemporalType.DATE);
 
 		Assert.assertEquals(1, q.getResultList().size());
+		Assert.assertNull(q.getParameter("now").getPosition());
 
 		q = this.cq("SELECT p FROM Person p " + //
 			"where (p.validFrom is null or p.validFrom <= ?1) and (p.validTo is null or p.validTo >= ?1)", Person.class)//
 		.setParameter(1, day2.getTime(), TemporalType.DATE);
 
 		Assert.assertEquals(1, q.getResultList().size());
+		Assert.assertNull(q.getParameter(1).getName());
 
 		q = this.cq("SELECT p FROM Person p " + //
 			"where (p.validFrom is null or p.validFrom <= ?1) and (p.validTo is null or p.validTo >= ?2)", Person.class)//
