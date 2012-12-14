@@ -57,6 +57,7 @@ import org.batoo.jpa.core.impl.deployment.DdlManager;
 import org.batoo.jpa.core.impl.deployment.LinkManager;
 import org.batoo.jpa.core.impl.deployment.NamedQueriesManager;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
+import org.batoo.jpa.jdbc.AbstractDataSource;
 import org.batoo.jpa.jdbc.BoneCPDataSource;
 import org.batoo.jpa.jdbc.DDLMode;
 import org.batoo.jpa.jdbc.DataSourceProxy;
@@ -109,6 +110,8 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 
 	private boolean open;
 
+	private AbstractDataSource dataSourcePool;
+
 	/**
 	 * @param name
 	 *            the name of the entity manager factory
@@ -146,7 +149,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 			throw new IllegalArgumentException("Illegal value " + this.getProperty(BJPASettings.SQL_LOGGING) + " for " + BJPASettings.SQL_LOGGING);
 		}
 
-		this.dataSource = this.createDatasource(parser);
+		this.dataSource = this.createDatasource(name, parser);
 
 		this.ddlMode = this.readDdlMode();
 
@@ -271,7 +274,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 		this.open = false;
 	}
 
-	private DataSourceProxy createDatasource(PersistenceParser parser) {
+	private DataSourceProxy createDatasource(String persistanceUnitName, PersistenceParser parser) {
 		SqlLoggingType sqlLogging;
 		long slowSqlThreshold;
 		int jdbcFetchSize;
@@ -305,20 +308,30 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 			throw new IllegalArgumentException("Illegal value " + this.getProperty(BJPASettings.FETCH_SIZE) + " for " + BJPASettings.FETCH_SIZE);
 		}
 
-		final boolean external = (parser.getJtaDataSource() != null) || (parser.getNonJtaDataSource() != null);
-
-		return new DataSourceProxy(this.createDatasource0(parser), external, sqlLogging, slowSqlThreshold, jdbcFetchSize);
+		if (this.getProperty(BJPASettings.DATASOURCE_POOL) != null) {
+			final String poolClassName = (String) this.getProperty(BJPASettings.DATASOURCE_POOL);
+			final String hintName = (String) this.getProperty(BJPASettings.DATASOURCE_NAME);
+			try {
+				final Object newInstance = this.classloader.loadClass(poolClassName).newInstance();
+				if (newInstance instanceof AbstractDataSource) {
+					this.dataSourcePool = (AbstractDataSource) newInstance;
+				}
+				else {
+					throw new IllegalArgumentException("Illegal value " + this.getProperty(BJPASettings.DATASOURCE_POOL) + " for "
+						+ BJPASettings.DATASOURCE_POOL + " Please provide a datasource pool implementation extending org.batoo.jpa.jdbc.AbstractDataSourcePool");
+				}
+			}
+			catch (final Exception e) {
+				throw new IllegalArgumentException("Class not found: " + this.getProperty(BJPASettings.DATASOURCE_POOL));
+			}
+			finally {
+				this.dataSourcePool.open(persistanceUnitName, hintName);
+			}
+		}
+		return this.createDatasourceProxy(parser, sqlLogging, slowSqlThreshold, jdbcFetchSize);
 	}
 
 	private DataSource createDatasource0(PersistenceParser parser) {
-		if (parser.getJtaDataSource() != null) {
-			return parser.getJtaDataSource();
-		}
-
-		if (parser.getNonJtaDataSource() != null) {
-			return parser.getNonJtaDataSource();
-		}
-
 		try {
 			// read the properties
 			final String jdbcDriver = (String) this.getProperty(JPASettings.JDBC_DRIVER);
@@ -359,6 +372,21 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 		catch (final Exception e) {
 			throw new IllegalArgumentException("Illegal values for datasource settings!");
 		}
+	}
+
+	private DataSourceProxy createDatasourceProxy(PersistenceParser parser, SqlLoggingType sqlLogging, long slowSqlThreshold, int jdbcFetchSize) {
+		final boolean external = (parser.getJtaDataSource() != null) || (parser.getNonJtaDataSource() != null);
+		if (parser.getJtaDataSource() != null) {
+			return new DataSourceProxy(parser.getNonJtaDataSource(), external, sqlLogging, slowSqlThreshold, jdbcFetchSize);
+		}
+		if (parser.getNonJtaDataSource() != null) {
+			return new DataSourceProxy(parser.getJtaDataSource(), external, sqlLogging, slowSqlThreshold, jdbcFetchSize);
+		}
+
+		if (this.dataSourcePool != null) {
+			return new DataSourceProxy(this.dataSourcePool, external, sqlLogging, slowSqlThreshold, jdbcFetchSize);
+		}
+		return new DataSourceProxy(this.createDatasource0(parser), external, sqlLogging, slowSqlThreshold, jdbcFetchSize);
 	}
 
 	/**
