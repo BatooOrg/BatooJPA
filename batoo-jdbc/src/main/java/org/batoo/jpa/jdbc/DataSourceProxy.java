@@ -46,6 +46,32 @@ public class DataSourceProxy implements DataSource {
 	private final SqlLoggingType sqlLogging;
 	private final long slowSqlThreshold;
 	private final int jdbcFetchSize;
+	private final boolean externalPoolDS;
+
+	/**
+	 * @param datasource
+	 *            the custom datasource
+	 * @param external
+	 *            if the original datasource is external
+	 * @param slowSqlThreshold
+	 *            the time to decide if SQL is deemed as slow
+	 * @param sqlLogging
+	 *            the sql logging type
+	 * @param jdbcFetchSize
+	 *            the size of the jdbc fetch
+	 * 
+	 * @since 2.0.0
+	 */
+	public DataSourceProxy(AbstractDataSource datasource, boolean external, SqlLoggingType sqlLogging, long slowSqlThreshold, int jdbcFetchSize) {
+		super();
+
+		this.datasource = datasource;
+		this.external = external;
+		this.sqlLogging = sqlLogging;
+		this.slowSqlThreshold = slowSqlThreshold;
+		this.jdbcFetchSize = jdbcFetchSize;
+		this.externalPoolDS = true;
+	}
 
 	/**
 	 * @param datasource
@@ -69,6 +95,7 @@ public class DataSourceProxy implements DataSource {
 		this.sqlLogging = sqlLogging;
 		this.slowSqlThreshold = slowSqlThreshold;
 		this.jdbcFetchSize = jdbcFetchSize;
+		this.externalPoolDS = false;
 	}
 
 	/**
@@ -76,7 +103,7 @@ public class DataSourceProxy implements DataSource {
 	 * 
 	 */
 	public void close() {
-		if (!this.external) {
+		if (!this.external && !this.externalPoolDS) {
 			try {
 				// close the datasource via reflection
 				final Method closeMethod = this.datasource.getClass().getMethod("close");
@@ -87,6 +114,9 @@ public class DataSourceProxy implements DataSource {
 			catch (final Exception e) {
 				DataSourceProxy.LOG.error(e, "Cannot close() the internal datasource");
 			}
+		}
+		else if (this.externalPoolDS) {
+			((AbstractDataSource) this.datasource).close();
 		}
 	}
 
@@ -105,7 +135,7 @@ public class DataSourceProxy implements DataSource {
 	 */
 	@Override
 	public Connection getConnection(String username, String password) throws SQLException {
-		return new ConnectionProxy(this.datasource.getConnection(username, password), this.slowSqlThreshold, this.sqlLogging, this.jdbcFetchSize);
+		throw new UnsupportedOperationException("not supported");
 	}
 
 	/**
