@@ -49,9 +49,20 @@ public class ConnectionProxy implements Connection {
 
 	private final Connection connection;
 
+	private final AbstractDataSource dataSourcePool;
+
 	private final long slowSqlThreshold;
 	private final SqlLoggingType sqlLogging;
 	private final int jdbcFetchSize;
+
+	public ConnectionProxy(AbstractDataSource dataSourcePool, Connection connection, long slowSqlThreshold, SqlLoggingType sqlLogging, int jdbcFetchSize) {
+		super();
+		this.dataSourcePool = dataSourcePool;
+		this.connection = connection;
+		this.slowSqlThreshold = slowSqlThreshold;
+		this.sqlLogging = sqlLogging;
+		this.jdbcFetchSize = jdbcFetchSize;
+	}
 
 	/**
 	 * @param connection
@@ -68,6 +79,7 @@ public class ConnectionProxy implements Connection {
 	public ConnectionProxy(Connection connection, long slowSqlThreshold, SqlLoggingType sqlLogging, int jdbcFetchSize) {
 		super();
 
+		this.dataSourcePool = null;
 		this.connection = connection;
 		this.slowSqlThreshold = slowSqlThreshold;
 		this.sqlLogging = sqlLogging;
@@ -98,7 +110,12 @@ public class ConnectionProxy implements Connection {
 	 */
 	@Override
 	public void close() throws SQLException {
-		this.connection.close();
+		if (this.dataSourcePool != null) {
+			this.dataSourcePool.releaseConnection(this.connection);
+		}
+		else {
+			this.connection.close();
+		}
 	}
 
 	/**

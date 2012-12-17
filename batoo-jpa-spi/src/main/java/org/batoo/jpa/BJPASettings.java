@@ -128,4 +128,14 @@ public interface BJPASettings {
 	 * The name of the sql to execute to import the initial data.
 	 */
 	String IMPORT_SQL = "org.batoo.jdbc.import_sql";
+
+	/**
+	 * Pluggable DataSource implementation
+	 */
+	String DATASOURCE_POOL = "org.batoo.jdbc.datasource.pool";
+
+	/**
+	 * Hint for the the pluggable data source
+	 */
+	String DATASOURCE_NAME = "org.batoo.jdbc.datasource.name";
 }
