@@ -377,10 +377,10 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 	private DataSourceProxy createDatasourceProxy(PersistenceParser parser, SqlLoggingType sqlLogging, long slowSqlThreshold, int jdbcFetchSize) {
 		final boolean external = (parser.getJtaDataSource() != null) || (parser.getNonJtaDataSource() != null);
 		if (parser.getJtaDataSource() != null) {
-			return new DataSourceProxy(parser.getNonJtaDataSource(), external, sqlLogging, slowSqlThreshold, jdbcFetchSize);
+			return new DataSourceProxy(parser.getJtaDataSource(), external, sqlLogging, slowSqlThreshold, jdbcFetchSize);
 		}
 		if (parser.getNonJtaDataSource() != null) {
-			return new DataSourceProxy(parser.getJtaDataSource(), external, sqlLogging, slowSqlThreshold, jdbcFetchSize);
+			return new DataSourceProxy(parser.getNonJtaDataSource(), external, sqlLogging, slowSqlThreshold, jdbcFetchSize);
 		}
 
 		if (this.dataSourcePool != null) {
