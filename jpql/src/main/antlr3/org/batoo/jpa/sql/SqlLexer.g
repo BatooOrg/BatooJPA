@@ -56,10 +56,6 @@ FLOAT :
 	'0'..'9'+ '.' '0'..'9'+ 
 	;
 
-ID :
-	'a'..'z' | 'A'..'Z' | '_' ('a'..'z' | 'A'..'Z' | '0'..'9' | '_')*
-	; 
-
 PUNCTUATION :
 	',' | '+' | '-' | '*' | '/' | '^' | '||' | '|' | '&' | '@' | '(' | ')' | '<' | '>' | '.' | '!'
 	;
@@ -106,6 +102,7 @@ WORD :
 		| MULTI_LINE_COMMENT_START
 		| SPACE | TAB | CR | LF
 		| QUOT_1 | QUOT_2 | QUOT_3)
-			~(SPACE | TAB | CR | LF | SEMI_COLUMN | QUOT_1 | QUOT_2 | QUOT_3 | PUNCTUATION)*
+			~(SPACE | TAB | CR | LF | SEMI_COLUMN | QUOT_1 | QUOT_2 | QUOT_3 | PUNCTUATION)+
 	;
+
 	

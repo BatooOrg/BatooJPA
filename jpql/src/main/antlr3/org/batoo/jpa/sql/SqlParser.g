@@ -57,8 +57,8 @@ ordinal_param :
 	-> ^(QUESTION_MARK NUMBER?);
 
 name_param :
-	COLUMN ID
-	-> ^(COLUMN ID);
+	COLUMN WORD
+	-> ^(COLUMN WORD);
 
 white_space :
 	SPACE 
