@@ -433,7 +433,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 		if (System.getProperty("testMode") == null) {
 			System.setProperty("testMode", "h2");
 			System.setProperty("javax.persistence.jdbc.driver", "org.h2.Driver");
-			System.setProperty("javax.persistence.jdbc.url", "jdbc:h2:mem:test");
+			System.setProperty("javax.persistence.jdbc.url", "jdbc:h2:mem:test;ALIAS_COLUMN_NAME=TRUE");
 
 			System.setProperty("javax.persistence.jdbc.user", "root");
 			System.setProperty("javax.persistence.jdbc.password", "");

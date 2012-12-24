@@ -16,22 +16,49 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.parser.metadata;
+package org.batoo.jpa.core.test.q;
 
 /**
- * The definition for unique constraints.
  * 
- * @author hceylan
- * @since 2.0.0
+ * @author asimarslan
+ * @since $version
  */
-public interface UniqueConstraintMetadata extends BindableMetadata {
+public class ItemPk {
+
+	private Long id;
+
+	private String name;
+
+	public ItemPk() {
+		super();
+	}
 
 	/**
-	 * Returns the list column names that make up the unique constraint.
 	 * 
-	 * @return the list of columns names that make up the unique constraint
-	 * 
-	 * @since 2.0.0
+	 * @param id
+	 * @param name
+	 * @since $version
 	 */
-	String[] getColumnNames();
+	public ItemPk(Long id, String name) {
+		super();
+		this.id = id;
+		this.name = name;
+	}
+
+	public Long getId() {
+		return this.id;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 }

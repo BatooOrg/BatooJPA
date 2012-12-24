@@ -38,10 +38,6 @@ import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 
-import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.tree.CommonTree;
-import org.antlr.runtime.tree.Tree;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.lang.NotImplementedException;
 import org.batoo.common.log.BLogger;
@@ -55,14 +51,18 @@ import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMappingImpl;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMappingImpl;
+import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMappingImpl;
+import org.batoo.jpa.core.impl.model.mapping.SingularMappingEx;
+import org.batoo.jpa.jdbc.AbstractColumn;
 import org.batoo.jpa.jdbc.BasicColumn;
 import org.batoo.jpa.jdbc.dbutils.QueryRunner;
-import org.batoo.jpa.jdbc.mapping.Mapping;
-import org.batoo.jpa.sql.SqlLexer;
-import org.batoo.jpa.sql.SqlParser;
-import org.batoo.jpa.sql.SqlParser.statements_return;
+import org.batoo.jpa.parser.metadata.ColumnResultMetadata;
+import org.batoo.jpa.parser.metadata.EntityResultMetadata;
+import org.batoo.jpa.parser.metadata.FieldResultMetadata;
+import org.batoo.jpa.parser.metadata.SqlResultSetMappingMetadata;
 
-import com.google.common.base.Joiner;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -71,9 +71,58 @@ import com.google.common.collect.Sets;
  * The implementation of the native query interface.
  * 
  * @author hceylan
+ * @author asimarslan
  * @since 2.0.0
  */
 public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
+
+	/**
+	 * Model class for fieldResult mapping for high perf iteration on sql resultsets
+	 * 
+	 * @author asimarslan
+	 * @since $version
+	 */
+	private static class IdModel {
+
+		public static final String DEFAULT_EMBEDDED_ID = "__pk__";
+		public static final String DEFAULT_ID = "__id__";
+
+		public static IdModel merge(IdModel idModel, String embeddedId, String id, String column) {
+			idModel = idModel != null ? idModel : new IdModel();
+			idModel.merge(embeddedId, id, column);
+			return idModel;
+		}
+
+		HashMap<String, Object> idMap = Maps.newHashMap();
+
+		String embeddedId;
+
+		private IdModel() {
+			super();
+		}
+
+		public String getEmbeddedId() {
+			return this.embeddedId;
+		}
+
+		public HashMap<String, Object> getIdMap() {
+			return this.idMap;
+		}
+
+		private void merge(String embeddedId, String id, String column) {
+			this.embeddedId = embeddedId;
+			this.idMap.put(id, column);
+		}
+
+		@Override
+		public String toString() {
+			if (this.idMap.values().size() == 1) {
+				return this.idMap.values().iterator().next().toString();
+			}
+			return null;
+		}
+
+	}
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(NativeQuery.class);
 
@@ -84,14 +133,18 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	private FlushModeType flushMode;
 	private int maxResults;
 	private int firstResult;
-	private EntityTypeImpl<?> entity;
 
-	private final HashMap<String, NativeParameter<?>> parameters = Maps.newHashMap();
-
-	private final Map<String, Object> hints = Maps.newHashMap();
+	private final HashMap<Integer, NativeParameter<?>> parameters = Maps.newHashMap();
 	private final HashMap<NativeParameter<?>, Object> parameterValues = Maps.newHashMap();
 
+	private final Map<String, Object> hints = Maps.newHashMap();
+
 	private List<?> results;
+
+	final SqlResultSetMappingMetadata sqlResultSetMapping;
+
+	// Map of entity-name, map of fied-name, column-name
+	private final HashMap<String, HashMap<String, Object>> fieldMap = Maps.newHashMap();
 
 	/**
 	 * @param entityManager
@@ -101,12 +154,13 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 * 
 	 * @since 2.0.0
 	 */
-	public NativeQuery(EntityManagerImpl entityManager, String query) {
+	public NativeQuery(EntityManagerImpl entityManager, String sqlString) {
 		super();
 
 		this.em = entityManager;
-		this.query = this.parseParameters(query);
+		this.query = sqlString;
 		this.resultClass = null;
+		this.sqlResultSetMapping = null;
 	}
 
 	/**
@@ -123,8 +177,54 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 		super();
 
 		this.em = entityManager;
-		this.query = this.parseParameters(sqlString);
+		this.query = sqlString;
 		this.resultClass = resultClass;
+		this.sqlResultSetMapping = null;
+	}
+
+	/**
+	 * 
+	 * @param entityManagerImpl
+	 * @param sqlString
+	 * @param resultSetMapping
+	 * @since $version
+	 */
+	public NativeQuery(EntityManagerImpl entityManager, String sqlString, String resultSetMapping) {
+		super();
+
+		this.em = entityManager;
+		this.query = sqlString;
+		this.resultClass = null;
+
+		this.sqlResultSetMapping = this.em.getMetamodel().getSqlResultSetMapping(resultSetMapping);
+		if (this.sqlResultSetMapping == null) {
+			throw new PersistenceException("SqlResultSetMapping does not exist! : " + resultSetMapping);
+		}
+		else {
+			for (final EntityResultMetadata entityResultMetadata : this.sqlResultSetMapping.getEntities()) {
+				final HashMap<String, Object> _fieldModelMap = Maps.newHashMap();
+
+				for (final FieldResultMetadata field : entityResultMetadata.getFields()) {
+					final String[] split;
+					if (field.getName().contains(".")) {
+						split = field.getName().split("\\.");
+					}
+					else {
+						split = new String[] { field.getName(), IdModel.DEFAULT_EMBEDDED_ID, IdModel.DEFAULT_ID };
+					}
+
+					final String attr = split[0];
+					final String embId = split.length > 2 ? split[split.length - 2] : IdModel.DEFAULT_EMBEDDED_ID;
+					final String id = split.length > 1 ? split[split.length - 1] : IdModel.DEFAULT_ID;
+
+					_fieldModelMap.put(attr, IdModel.merge((IdModel) _fieldModelMap.get(attr), embId, id, field.getColumn()));
+
+				}
+				this.fieldMap.put(entityResultMetadata.getEntityClass(), _fieldModelMap);
+			}
+
+		}
+
 	}
 
 	private Object convertTemporal(TemporalType temporalType, Calendar value) {
@@ -209,6 +309,37 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	}
 
 	/**
+	 * Transforms the column names for idField Map using a field,column-name map
+	 * 
+	 * @return
+	 * @param idFields
+	 * @param _fieldMap
+	 * @since $version
+	 */
+	private HashMap<AbstractColumn, String> getIdFieldTransformed(HashMap<AbstractColumn, String> idFields, HashMap<String, Object> fieldIdMap) {
+		if (fieldIdMap == null) {
+			return idFields;
+		}
+		final HashMap<AbstractColumn, String> idFieldsMod = Maps.newHashMap();
+		final BiMap<String, AbstractColumn> inverse = HashBiMap.create(idFields).inverse();
+		for (final String field : idFields.values()) {
+			final AbstractColumn column = inverse.get(field);
+			final String _field = column.getMapping().getName();
+
+			final Object colmVal = fieldIdMap.get(_field);
+
+			if (colmVal != null && colmVal.toString() != null) {
+				idFieldsMod.put(column, colmVal.toString());
+			}
+			else {
+				idFieldsMod.put(column, _field);
+			}
+
+		}
+		return idFieldsMod;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -232,7 +363,7 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 */
 	@Override
 	public NativeParameter<?> getParameter(int position) {
-		return this.parameters.get(Integer.toString(position));
+		return this.parameters.get(position);
 	}
 
 	/**
@@ -250,7 +381,8 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 */
 	@Override
 	public NativeParameter<?> getParameter(String name) {
-		return this.parameters.get(name);
+		// JSR-317 3.8.15 >> The use of named parameters is not defined for native queries.
+		throw new NotImplementedException("Native queries do not support named parameters.");
 	}
 
 	/**
@@ -259,7 +391,19 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 */
 	@Override
 	public <T> Parameter<T> getParameter(String name, Class<T> type) {
-		throw new NotImplementedException("Native queries do not define parameter types. Use getParameter(String)");
+		// JSR-317 3.8.15 >> The use of named parameters is not defined for native queries.
+		throw new NotImplementedException("Native queries do not support named parameters.");
+	}
+
+	@SuppressWarnings("rawtypes")
+	private NativeParameter<?> getParameter0(int position) {
+		final NativeParameter<?> parameter = this.getParameter(position);
+		if (parameter != null) {
+			return this.parameters.get(position);
+		}
+		else {
+			return this.parameters.put(position, new NativeParameter(position));
+		}
 	}
 
 	/**
@@ -302,7 +446,8 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 */
 	@Override
 	public Object getParameterValue(String name) {
-		return this.parameterValues.get(this.parameters.get(name));
+		// JSR-317 3.8.15 >> The use of named parameters is not defined for native queries.
+		throw new NotImplementedException("Native queries do not support named parameters.");
 	}
 
 	/**
@@ -322,9 +467,6 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 		this.em.getSession().setLoadTracker();
 
 		try {
-			if (this.resultClass != null) {
-				this.entity = this.em.getMetamodel().entity(this.resultClass);
-			}
 
 			final Object[] paramValues = new Object[this.parameters.size()];
 			for (int i = 0; i < paramValues.length; i++) {
@@ -368,18 +510,18 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 */
 	@Override
 	public List<Object> handle(ResultSet resultSet) throws SQLException {
-		// designated return type
-		if (this.resultClass != null) {
-			if (this.entity != null) {
-				return this.handleAsEntityList(resultSet);
-			}
-
-			// DTO types
-			return this.handleAsResultClass(resultSet);
+		if (this.sqlResultSetMapping != null) {
+			return this.handleWithSqlResultSetMapping(resultSet);
 		}
+		else if (this.resultClass != null) {// designated return type
+			return this.handleWithResultClass(resultSet);
+		}
+		// last option return query as scalar
+		return handleAsScalar(resultSet);
+	}
 
+	private List<Object> handleAsScalar(ResultSet resultSet) throws SQLException {
 		// handle as scalar or scalar array
-
 		final ArrayList<Object> results = Lists.newArrayList();
 
 		final int columnCount = resultSet.getMetaData().getColumnCount();
@@ -398,73 +540,214 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 
 			results.add(result);
 		}
-
 		return results;
 	}
 
-	private List<Object> handleAsEntityList(ResultSet resultSet) throws SQLException {
-		final ArrayList<Object> results = Lists.newArrayList();
+	private ManagedInstance<?> handleInstance(ResultSet row, EntityTypeImpl<?> entityType, String discriminatorColumn, HashMap<String, Object> fieldMap)
+		throws SQLException {
+		final SessionImpl session = this.em.getSession();
 
-		while (resultSet.next()) {
-			final SessionImpl session = this.em.getSession();
+		// get the id of for the instance
+		final ManagedId<?> managedId = entityType.getId(session, row, this.getIdFieldTransformed(entityType.getPrimaryTable().getIdFields(), fieldMap));
 
-			final ManagedId<?> id = this.entity.getId(session, resultSet);
-			if (id == null) {
-				continue;
-			}
-
-			// look for it in the session
-			final ManagedInstance<?> instance = session.get(id);
-
-			// if found then return it
-			if (instance != null) {
-				// if it is a new instance simply return it
-				if (!(instance.getInstance() instanceof EnhancedInstance)) {
-					results.add(instance.getInstance());
-					continue;
-				}
-
-				final EnhancedInstance enhancedInstance = (EnhancedInstance) instance.getInstance();
-
-				// if it is a lazy instance mark as loading and initialize
-				if (!enhancedInstance.__enhanced__$$__isInitialized()) {
-					this.initializeInstance(session, resultSet, instance);
-
-					session.lazyInstanceLoading(instance);
-					enhancedInstance.__enhanced__$$__setInitialized();
-				}
-
-				results.add(instance.getInstance());
-			}
+		if (managedId == null) {
+			return null;
 		}
 
-		return results;
+		// look for it in the session
+		ManagedInstance<?> instance = session.get(managedId);
+
+		// if found then return it
+		if (instance != null) {
+			// if it is a new instance simply return it
+			if (!(instance.getInstance() instanceof EnhancedInstance)) {
+				return instance;
+			}
+
+			final EnhancedInstance enhancedInstance = (EnhancedInstance) instance.getInstance();
+
+			// if it is a lazy instance mark as loading and initialize
+			if (!enhancedInstance.__enhanced__$$__isInitialized()) {
+				this.initializeInstance(session, row, instance, entityType, fieldMap);
+
+				session.lazyInstanceLoading(instance);
+				enhancedInstance.__enhanced__$$__setInitialized();
+			}
+
+			return instance;
+		}
+
+		// if no inheritance then initialize and return
+		if (entityType.getInheritanceType() == null) {
+			instance = entityType.getManagedInstanceById(session, (ManagedId) managedId, false);
+		}
+		// inheritance is in place then locate the correct child type
+		else {
+			discriminatorColumn = (discriminatorColumn == null) ? entityType.getDiscriminatorColumn().getName() : discriminatorColumn;
+
+			final String discriminatorValue = row.getObject(discriminatorColumn).toString();
+
+			// check if we have a legal discriminator value
+			final EntityTypeImpl<?> effectiveType = entityType.getChildType(discriminatorValue);
+			if (effectiveType == null) {
+				throw new IllegalArgumentException("Discriminator " + discriminatorValue + " not found in the type " + entityType.getName());
+			}
+
+			// initialize and return
+			instance = effectiveType.getManagedInstanceById(session, (ManagedId) managedId, false);
+		}
+
+		this.initializeInstance(session, row, instance, entityType, fieldMap);
+		session.put(instance);
+
+		return instance;
 	}
 
-	private List<Object> handleAsResultClass(ResultSet resultSet) {
-		// TODO Auto-generated method stub
-		return null;
+	/**
+	 * result set handler for a given resultClass
+	 * 
+	 * @return result
+	 * @param resultSet
+	 * @throws SQLException
+	 * @since $version
+	 */
+	private List<Object> handleWithResultClass(ResultSet resultSet) throws SQLException {
+		final ArrayList<Object> result = Lists.newArrayList();
+
+		final EntityTypeImpl<?> entityType = this.em.getMetamodel().entity(this.resultClass);
+		if (entityType == null) {
+			throw new PersistenceException("Entity Class is not managed :" + this.resultClass);
+		}
+
+		while (resultSet.next()) {// for each row
+			final ManagedInstance<?> managedInstance = this.handleInstance(resultSet, entityType, null, null);
+
+			if (managedInstance != null) {
+				result.add(managedInstance.getInstance());
+			}
+			else {
+				result.add(null);
+			}
+		}
+		return result;
 	}
 
-	private void initializeInstance(SessionImpl session, ResultSet row, ManagedInstance<?> managedInstance) throws SQLException {
+	/**
+	 * result set handler for SqlResultSetMapping annotation data
+	 * 
+	 * @return result
+	 * @param resultSet
+	 * @throws SQLException
+	 * @since $version
+	 */
+	private List<Object> handleWithSqlResultSetMapping(ResultSet resultSet) throws SQLException {
+		final ArrayList<Object> result = Lists.newArrayList();
+		final ArrayList<Object> resultRow = Lists.newArrayList();
+
+		while (resultSet.next()) {// for each row
+			for (final EntityResultMetadata entityResultMetadata : this.sqlResultSetMapping.getEntities()) {
+				final EntityTypeImpl<?> entityType = this.em.getMetamodel().entity(entityResultMetadata.getEntityClass());
+
+				if (entityType == null) {
+					throw new PersistenceException("Entity Class is not managed :" + entityResultMetadata.getEntityClass());
+				}
+
+				final HashMap<String, Object> _fieldMap = this.fieldMap.get(entityType.getJavaType().getName());
+
+				final ManagedInstance<?> managedInstance = this.handleInstance(resultSet, entityType, entityResultMetadata.getDiscriminatorColumn(), _fieldMap);
+
+				if (managedInstance != null) {
+					resultRow.add(managedInstance.getInstance());
+				}
+				else {
+					resultRow.add(null);
+				}
+			}
+			for (final ColumnResultMetadata columnResultMetadata : this.sqlResultSetMapping.getColumns()) {
+				resultRow.add(resultSet.getObject(columnResultMetadata.getName()));
+			}
+			if (resultRow.size() > 1) {
+				result.add(resultRow.toArray());
+			}
+			else {
+				result.add(resultRow.get(0));
+			}
+			resultRow.clear();
+		}
+		return result;
+	}
+
+	/**
+	 * initialize the managedInstance with sql row data and fieldResult Mapping
+	 * 
+	 * @param session
+	 * @param row
+	 *            Sql data row
+	 * @param managedInstance
+	 * @param entityType
+	 * @param fieldMap
+	 *            fieldResult Mapping data
+	 * @throws SQLException
+	 * @since $version
+	 */
+	private void initializeInstance(SessionImpl session, ResultSet row, ManagedInstance<?> managedInstance, EntityTypeImpl<?> entityType,
+		HashMap<String, Object> fieldMap) throws SQLException {
 		managedInstance.setLoading(true);
 
 		final Object instance = managedInstance.getInstance();
+		for (final AbstractMapping<?, ?, ?> mapping : entityType.getMappingsSingular()) {
 
-		for (final AbstractMapping<?, ?, ?> mapping : this.entity.getMappingsSingular()) {
-			this.initializeMapping(session, instance, row, mapping);
-		}
-	}
+			if (mapping instanceof BasicMappingImpl) {
+				final BasicMappingImpl<?, ?> basicMapping = (BasicMappingImpl<?, ?>) mapping;
+				final BasicColumn column = basicMapping.getColumn();
 
-	private void initializeMapping(SessionImpl session, Object instance, ResultSet row, Mapping<?, ?, ?> mapping) throws SQLException {
-		if (mapping instanceof BasicMappingImpl) {
-			final BasicMappingImpl<?, ?> basicMapping = (BasicMappingImpl<?, ?>) mapping;
-			final BasicColumn column = basicMapping.getColumn();
-			column.setValue(instance, row.getObject(column.getName()));
-		}
-		else if (mapping instanceof EmbeddedMappingImpl) {
-			for (final Mapping<?, ?, ?> childMapping : ((EmbeddedMappingImpl<?, ?>) mapping).getChildren()) {
-				this.initializeMapping(session, instance, row, childMapping);
+				final String colName = (fieldMap != null && fieldMap.get(basicMapping.getName()) != null) ? //
+					fieldMap.get(basicMapping.getName()).toString() : column.getName();
+
+				column.setValue(instance, row.getObject(colName));
+			}
+			else if (mapping instanceof SingularAssociationMappingImpl) {
+				final SingularAssociationMappingImpl<?, ?> singularAssociationMapping = (SingularAssociationMappingImpl<?, ?>) mapping;
+				final EntityTypeImpl<?> singularChildType = ((SingularAssociationMappingImpl<?, ?>) mapping).getType();
+
+				final HashMap<String, Object> _parentFieldMap = this.fieldMap.get(singularAssociationMapping.getParent().getJavaType().getName());
+
+				final SingularMappingEx<?, ?> idMapping = singularChildType.getIdMapping();
+
+				if (singularChildType.hasSingleIdAttribute() && idMapping instanceof BasicMappingImpl) {
+
+					final Object colnameTemp = (_parentFieldMap != null) ? _parentFieldMap.get(singularAssociationMapping.getName()) : null;
+
+					final String colname = colnameTemp == null ? ((BasicMappingImpl) idMapping).getColumn().getName() : colnameTemp.toString();
+
+					final Object _id = row.getObject(colname);
+
+					if (_id != null) {
+						final Object reference = session.getEntityManager().getReference(singularChildType.getJavaType(), _id);
+						mapping.set(instance, reference);
+						managedInstance.setJoinLoaded(singularAssociationMapping);
+					}
+				}
+				else {
+					final IdModel idModel = (IdModel) _parentFieldMap.get(singularAssociationMapping.getName());
+					final HashMap<String, Object> _parentIdFieldMap = idModel.getIdMap();
+
+					if (idMapping instanceof EmbeddedMappingImpl) {
+						// TODO should we test embeddedId attr name, or just waste of cpu???
+						final String embeddedIdName = ((EmbeddedMappingImpl) idMapping).getAttribute().getName();
+						final String embeddedId = idModel.getEmbeddedId();
+						if (!embeddedIdName.equals(embeddedId)) {
+							// wrong fieldMapping conf just return
+							return;
+						}
+					}
+					final ManagedInstance<?> handleInstance = this.handleInstance(row, singularChildType, null, _parentIdFieldMap);
+
+					mapping.set(instance, handleInstance.getInstance());
+					managedInstance.setJoinLoaded(singularAssociationMapping);
+
+					session.lazyInstanceLoading(handleInstance);
+				}
 			}
 		}
 	}
@@ -476,158 +759,6 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	@Override
 	public boolean isBound(Parameter<?> param) {
 		return this.getParameterValue(param) != null;
-	}
-
-	private CommonTree parse(String query) {
-		try {
-			final SqlLexer lexer = new SqlLexer(new ANTLRStringStream(query));
-			final CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-			final SqlParser parser = new SqlParser(tokenStream);
-
-			final statements_return statements = parser.statements();
-			final CommonTree tree = (CommonTree) statements.getTree();
-
-			final List<String> errors = parser.getErrors();
-			if (errors.size() > 0) {
-				final String errorMsg = Joiner.on("\n\t").join(errors);
-
-				NativeQuery.LOG.error("Cannot parse query: {0}", //
-					NativeQuery.LOG.boxed(query, //
-						new Object[] { "\n\t" + errorMsg, "\n\n" + tree.toStringTree() + "\n" }));
-
-				throw new PersistenceException("Cannot parse the query:\n " + errorMsg + ".\n" + query);
-			}
-
-			return tree;
-		}
-		catch (final PersistenceException e) {
-			throw e;
-		}
-		catch (final Exception e) {
-			throw new PersistenceException("Cannot parse the query:\n " + e.getMessage() + ".\n" + query, e);
-		}
-	}
-
-	/**
-	 * Parses the parameters.
-	 * 
-	 * @param query
-	 *            the original query
-	 * 
-	 * @since 2.0.0
-	 */
-	private String parseParameters(String query) {
-		final CommonTree tree = this.parse(query);
-
-		boolean hasNamed = false;
-		boolean hasOrdinal = false;
-		boolean hasAnonymous = false;
-		int maxOrdinal = 0;
-
-		final boolean supportsOrdinalParams = this.em.getJdbcAdaptor().supportsOrdinalParams();
-		final boolean supportsNamedParams = this.em.getJdbcAdaptor().supportsNamedParams();
-
-		final StringBuilder sqlBuilder = new StringBuilder();
-
-		if (tree.getChildCount() > 1) {
-			throw new PersistenceException("Multi-statement native queries not supported");
-		}
-
-		if (tree.getChildCount() == 0) {
-			throw new PersistenceException("Null query passed");
-		}
-
-		final Tree statementTree = tree.getChild(0);
-
-		for (int i = 0; i < statementTree.getChildCount(); i++) {
-			final Tree chunk = statementTree.getChild(i);
-
-			if (chunk.getType() == SqlParser.COLUMN) {
-				hasNamed = true;
-
-				final String name = chunk.getChild(0).getText();
-
-				NativeParameter<?> parameter = this.parameters.get(name);
-
-				if (parameter == null) {
-					parameter = new NativeParameter<Object>(name, maxOrdinal++);
-					this.parameters.put(name, parameter);
-				}
-
-				if (!supportsOrdinalParams) {
-					sqlBuilder.append(":p" + parameter.getPosition());
-				}
-				else if (!supportsNamedParams) {
-					sqlBuilder.append("?" + parameter.getPosition());
-				}
-				else {
-					sqlBuilder.append(":" + parameter.getPosition());
-				}
-			}
-			else if (chunk.getType() == SqlParser.QUESTION_MARK) {
-				// anonymous?
-				if (chunk.getChildCount() == 0) {
-					hasAnonymous = true;
-
-					final NativeParameter<?> parameter = new NativeParameter<Object>(maxOrdinal++);
-					final String name = Integer.toString(maxOrdinal);
-					this.parameters.put(name, parameter);
-				}
-				else {
-					hasOrdinal = true;
-
-					final int ordinalNo = Integer.parseInt(chunk.getChild(0).getText());
-					if (ordinalNo <= 0) {
-						throw new PersistenceException("Invalid ordinal number for parameter: " + ordinalNo + " in query: " + this.query);
-					}
-
-					final String name = Integer.toString(ordinalNo);
-
-					NativeParameter<?> parameter = this.parameters.get(name);
-
-					if (parameter == null) {
-						parameter = new NativeParameter<Object>(ordinalNo);
-						this.parameters.put(name, parameter);
-					}
-
-					maxOrdinal = Math.max(maxOrdinal, ordinalNo);
-
-					if (!supportsOrdinalParams) {
-						sqlBuilder.append(":p" + parameter.getPosition());
-					}
-					else if (!supportsNamedParams) {
-						sqlBuilder.append("?" + parameter.getPosition());
-					}
-					else {
-						sqlBuilder.append(":" + parameter.getPosition());
-					}
-				}
-			}
-			else {
-				sqlBuilder.append(chunk.getText());
-			}
-		}
-
-		int types = 0;
-		if (hasAnonymous) {
-			types++;
-		}
-		if (hasNamed) {
-			types++;
-		}
-		if (hasOrdinal) {
-			types++;
-		}
-
-		if (types > 1) {
-			throw new PersistenceException("Mix of ordinal, named and anonymous parameters are not allowed in SQL queries: " + this.query);
-		}
-
-		if (this.parameters.size() != maxOrdinal) {
-			throw new PersistenceException("Query defines ordinal parameter " + maxOrdinal + " but does not define " + maxOrdinal + " parameters");
-		}
-
-		return sqlBuilder.toString();
 	}
 
 	/**
@@ -689,7 +820,7 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 */
 	@Override
 	public NativeQuery setParameter(int position, Calendar value, TemporalType temporalType) {
-		this.parameterValues.put(this.getParameter(position), this.convertTemporal(temporalType, value));
+		this.parameterValues.put(this.getParameter0(position), this.convertTemporal(temporalType, value));
 
 		return this;
 	}
@@ -700,7 +831,7 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 */
 	@Override
 	public NativeQuery setParameter(int position, Date value, TemporalType temporalType) {
-		this.parameterValues.put(this.getParameter(position), this.convertTemporal(temporalType, value));
+		this.parameterValues.put(this.getParameter0(position), this.convertTemporal(temporalType, value));
 
 		return this;
 	}
@@ -711,7 +842,7 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 */
 	@Override
 	public NativeQuery setParameter(int position, Object value) {
-		this.parameterValues.put(this.getParameter(position), value);
+		this.parameterValues.put(this.getParameter0(position), value);
 
 		return this;
 	}
@@ -722,7 +853,7 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 */
 	@Override
 	public NativeQuery setParameter(Parameter<Calendar> param, Calendar value, TemporalType temporalType) {
-		this.parameterValues.put((NativeParameter<?>) param, this.convertTemporal(temporalType, value));
+		this.parameterValues.put(this.getParameter0(param.getPosition()), this.convertTemporal(temporalType, value));
 
 		return this;
 
@@ -734,7 +865,7 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 */
 	@Override
 	public NativeQuery setParameter(Parameter<Date> param, Date value, TemporalType temporalType) {
-		this.parameterValues.put((NativeParameter<?>) param, this.convertTemporal(temporalType, value));
+		this.parameterValues.put(this.getParameter0(param.getPosition()), this.convertTemporal(temporalType, value));
 
 		return this;
 	}
@@ -745,7 +876,7 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 */
 	@Override
 	public <T> NativeQuery setParameter(Parameter<T> param, T value) {
-		this.parameterValues.put((NativeParameter<?>) param, value);
+		this.parameterValues.put(this.getParameter0(param.getPosition()), value);
 
 		return this;
 	}
@@ -756,9 +887,8 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 */
 	@Override
 	public NativeQuery setParameter(String name, Calendar value, TemporalType temporalType) {
-		this.parameterValues.put(this.getParameter(name), this.convertTemporal(temporalType, value));
-
-		return this;
+		// JSR-317 3.8.15 >> The use of named parameters is not defined for native queries.
+		throw new NotImplementedException("Native queries do not support named parameters.");
 	}
 
 	/**
@@ -767,9 +897,8 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 */
 	@Override
 	public NativeQuery setParameter(String name, Date value, TemporalType temporalType) {
-		this.parameterValues.put(this.getParameter(name), this.convertTemporal(temporalType, value));
-
-		return this;
+		// JSR-317 3.8.15 >> The use of named parameters is not defined for native queries.
+		throw new NotImplementedException("Native queries do not support named parameters.");
 	}
 
 	/**
@@ -778,9 +907,8 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 */
 	@Override
 	public NativeQuery setParameter(String name, Object value) {
-		this.parameterValues.put(this.getParameter(name), value);
-
-		return this;
+		// JSR-317 3.8.15 >> The use of named parameters is not defined for native queries.
+		throw new NotImplementedException("Native queries do not support named parameters.");
 	}
 
 	/**

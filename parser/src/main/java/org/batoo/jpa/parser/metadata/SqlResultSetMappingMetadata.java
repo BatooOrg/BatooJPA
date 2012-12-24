@@ -18,20 +18,30 @@
  */
 package org.batoo.jpa.parser.metadata;
 
+import java.util.List;
+
 /**
- * The definition for unique constraints.
+ * Metadata for SqlResultSetMapping
  * 
- * @author hceylan
- * @since 2.0.0
+ * @author asimarslan
+ * @since $version
  */
-public interface UniqueConstraintMetadata extends BindableMetadata {
+public interface SqlResultSetMappingMetadata extends BindableMetadata {
 
 	/**
-	 * Returns the list column names that make up the unique constraint.
+	 * Specifies the result set mapping to scalar values
 	 * 
-	 * @return the list of columns names that make up the unique constraint
-	 * 
-	 * @since 2.0.0
+	 * @return ColumnResultMetadata
+	 * @since $version
 	 */
-	String[] getColumnNames();
+	List<ColumnResultMetadata> getColumns();
+
+	/**
+	 * Specifies the result set mapping to entities.
+	 * 
+	 * @return EntityResultMetadata
+	 * @since $version
+	 */
+	List<EntityResultMetadata> getEntities();
+
 }

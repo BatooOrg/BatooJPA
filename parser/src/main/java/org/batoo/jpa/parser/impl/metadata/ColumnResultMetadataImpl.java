@@ -16,22 +16,51 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.parser.metadata;
+package org.batoo.jpa.parser.impl.metadata;
+
+import javax.persistence.ColumnResult;
+
+import org.batoo.jpa.parser.AbstractLocator;
+import org.batoo.jpa.parser.metadata.ColumnResultMetadata;
 
 /**
- * The definition for unique constraints.
  * 
- * @author hceylan
- * @since 2.0.0
+ * @author asimarslan
+ * @since $version
  */
-public interface UniqueConstraintMetadata extends BindableMetadata {
+public class ColumnResultMetadataImpl implements ColumnResultMetadata {
+	private final AbstractLocator locator;
+	private final String name;
 
 	/**
-	 * Returns the list column names that make up the unique constraint.
 	 * 
-	 * @return the list of columns names that make up the unique constraint
-	 * 
-	 * @since 2.0.0
+	 * @param locator
+	 * @param columnResult
+	 * @since $version
 	 */
-	String[] getColumnNames();
+	public ColumnResultMetadataImpl(AbstractLocator locator, ColumnResult annotation) {
+		super();
+
+		this.name = annotation.name();
+		this.locator = locator;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public AbstractLocator getLocator() {
+		return this.locator;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getName() {
+		return this.name;
+	}
+
 }
