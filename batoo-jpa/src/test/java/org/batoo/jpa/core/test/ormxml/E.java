@@ -33,7 +33,7 @@ import javax.persistence.MappedSuperclass;
 public class E {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "userGen")
 	private Long id;
 
 	/**

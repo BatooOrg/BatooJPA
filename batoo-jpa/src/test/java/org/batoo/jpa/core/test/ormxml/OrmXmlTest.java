@@ -20,6 +20,9 @@ package org.batoo.jpa.core.test.ormxml;
 
 import java.sql.SQLException;
 
+import javax.persistence.EntityManager;
+import javax.sql.DataSource;
+
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
@@ -33,6 +36,28 @@ import org.junit.Test;
  * @since 2.0.0
  */
 public class OrmXmlTest extends BaseCoreTest {
+
+	/**
+	 * Tests to {@link EntityManager#find(Class, Object)}
+	 * 
+	 * @throws SQLException
+	 * 
+	 * @since 2.0.0
+	 */
+	@Test
+	public void testFind() throws SQLException {
+		this.persist(new E4("test-E1"));
+		this.persist(new E4("test-E2"));
+
+		this.commit();
+		this.close();
+
+		Assert.assertEquals(2,
+			new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM E4", new SingleValueHandler<Number>()).intValue());
+
+		// final E1 e = this.find(E1.class, e1.getId());
+		// Assert.assertEquals(e.getId(), e1.getId());
+	}
 
 	/**
 	 * Tests that the orm.xml is processed.

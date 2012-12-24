@@ -20,6 +20,14 @@
  -->
 <entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd" version="2.0">
+	<table-generator name="userGen" 
+                 allocation-size="1000"
+                 initial-value="1"
+                 table="t7_sequence"
+                 pk-column-name="GEN_NAME"
+                 pk-column-value="USER_SEQ"
+                 value-column-name="GEN_VALUE"/>
+
 	<entity class="org.batoo.jpa.core.test.ormxml.E1">
 		<table name="binaryfile" />
 	</entity>
@@ -29,4 +37,6 @@
 	<entity class="org.batoo.jpa.core.test.ormxml.E3">
 		<table name="cachedpdf" />
 	</entity>
+	
+                 
 </entity-mappings>
