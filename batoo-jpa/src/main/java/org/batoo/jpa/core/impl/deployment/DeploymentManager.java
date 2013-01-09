@@ -20,12 +20,13 @@ package org.batoo.jpa.core.impl.deployment;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
-import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -39,6 +40,7 @@ import org.batoo.jpa.core.impl.model.TypeImpl;
 import org.batoo.jpa.core.util.IncrementalNamingThreadFactory;
 import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -150,6 +152,15 @@ public abstract class DeploymentManager<X> {
 			result = (prime * result) + ((this.task == null) ? 0 : this.task.hashCode());
 			return result;
 		}
+
+		/**
+		 * {@inheritDoc}
+		 * 
+		 */
+		@Override
+		public String toString() {
+			return "DeploymentUnitFuture [task=" + this.task + "]";
+		}
 	}
 
 	private final BLogger log;
@@ -196,12 +207,9 @@ public abstract class DeploymentManager<X> {
 		}
 
 		final int nThreads = Runtime.getRuntime().availableProcessors() * 2;
-		this.executer = new ThreadPoolExecutor(nThreads, nThreads, 0L, TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>(),
+		this.executer = new ThreadPoolExecutor(nThreads, nThreads, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(),
 			new IncrementalNamingThreadFactory(name)) {
-			/**
-			 * {@inheritDoc}
-			 * 
-			 */
+
 			@Override
 			protected <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
 				return (RunnableFuture<T>) new DeploymentUnitFuture((DeploymentUnitTask) callable);
@@ -281,8 +289,39 @@ public abstract class DeploymentManager<X> {
 			}
 		}
 		else {
-			for (final ManagedType<?> type : this.types) {
-				futures.add(this.executer.submit(new DeploymentUnitTask(this, type)));
+			final List<DeploymentUnitTask> unSortedTasks = Lists.newArrayList(Lists.transform(this.types, new Function<ManagedType<?>, DeploymentUnitTask>() {
+
+				@Override
+				public DeploymentUnitTask apply(ManagedType<?> type) {
+					return new DeploymentUnitTask(DeploymentManager.this, type);
+				}
+			}));
+
+			final List<DeploymentUnitTask> sortedTasks = Lists.newArrayList();
+
+			while (unSortedTasks.size() > 0) {
+				for (final Iterator<DeploymentUnitTask> i = unSortedTasks.iterator(); i.hasNext();) {
+					final DeploymentUnitTask task = i.next();
+
+					boolean hasDependency = false;
+					for (final DeploymentUnitTask other : unSortedTasks) {
+						if (task.compareTo(other) > 0) {
+							hasDependency = true;
+							break;
+						}
+					}
+
+					if (!hasDependency) {
+						i.remove();
+						sortedTasks.add(task);
+
+						break;
+					}
+				}
+			}
+
+			for (final DeploymentUnitTask task : sortedTasks) {
+				futures.add(this.executer.submit(task));
 			}
 		}
 
