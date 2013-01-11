@@ -48,7 +48,7 @@ public class InPredicate<T> extends PredicateImpl implements In<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	public InPredicate(Expression<? extends T> inner) {
-		super(new InExpression((AbstractExpression<? extends T>) inner, new Expression[] {}));
+		super(new InExpression((AbstractExpression<? extends T>) inner, new Expression[] {}, false));
 
 		this.inner = (Expression<T>) inner;
 		this.inExpr = (InExpression) this.getExpressions().get(0);
