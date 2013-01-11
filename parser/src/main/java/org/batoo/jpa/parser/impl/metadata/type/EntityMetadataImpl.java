@@ -40,6 +40,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.SecondaryTable;
 import javax.persistence.SecondaryTables;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.SqlResultSetMapping;
+import javax.persistence.SqlResultSetMappings;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 
@@ -54,6 +56,7 @@ import org.batoo.jpa.parser.impl.metadata.NamedNativeQueryMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.NamedQueryMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.SecondaryTableMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.SequenceGeneratorMetadataImpl;
+import org.batoo.jpa.parser.impl.metadata.SqlResultSetMappingMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.TableGeneratorMetadataImpl;
 import org.batoo.jpa.parser.impl.metadata.TableMetadataImpl;
 import org.batoo.jpa.parser.metadata.AssociationMetadata;
@@ -64,6 +67,7 @@ import org.batoo.jpa.parser.metadata.NamedNativeQueryMetadata;
 import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
+import org.batoo.jpa.parser.metadata.SqlResultSetMappingMetadata;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableMetadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
@@ -89,6 +93,7 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	private final List<AttributeOverrideMetadata> attributeOverrides = Lists.newArrayList();
 	private final List<NamedQueryMetadata> namedQueries = Lists.newArrayList();
 	private final List<NamedNativeQueryMetadata> namedNativeQueries = Lists.newArrayList();
+	private final List<SqlResultSetMappingMetadata> sqlResultSetMappings = Lists.newArrayList();
 	private final List<IndexMetadata> indexes = Lists.newArrayList();
 	private InheritanceType inheritanceType;
 	private DiscriminatorColumnMetadata discriminatorColumn;
@@ -133,6 +138,9 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 		// handle named queries
 		this.handleNamedQuery(metadata, parsed);
 		this.handleNamedNativeQuery(metadata, parsed);
+		this.handleSqlResultSetMappings(metadata, parsed);
+
+		// handle index
 		this.handleIndexes(metadata, parsed);
 	}
 
@@ -242,6 +250,15 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	@Override
 	public SequenceGeneratorMetadata getSequenceGenerator() {
 		return this.sequenceGenerator;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public List<SqlResultSetMappingMetadata> getSqlResultSetMappings() {
+		return this.sqlResultSetMappings;
 	}
 
 	/**
@@ -613,6 +630,36 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 		}
 
 		return null;
+	}
+
+	/**
+	 * Handles Sql ResultSet Mapping for Native queries
+	 * 
+	 * @param metadata
+	 * @param parsed
+	 * @since $version
+	 */
+	private void handleSqlResultSetMappings(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
+		if ((metadata != null) && (metadata.getSqlResultSetMappings() != null)) {
+			this.sqlResultSetMappings.addAll(metadata.getSqlResultSetMappings());
+		}
+
+		final SqlResultSetMappings sqlResultSetMappings = this.getClazz().getAnnotation(SqlResultSetMappings.class);
+		if ((sqlResultSetMappings != null) && (sqlResultSetMappings.value().length > 0)) {
+			parsed.add(SqlResultSetMappings.class);
+
+			for (final SqlResultSetMapping sqlResultSetMapping : sqlResultSetMappings.value()) {
+				this.sqlResultSetMappings.add(new SqlResultSetMappingMetadataImpl(this.getLocator(), sqlResultSetMapping));
+			}
+		}
+		else {
+			final SqlResultSetMapping annotation = this.getClazz().getAnnotation(SqlResultSetMapping.class);
+			if (annotation != null) {
+				parsed.add(SqlResultSetMapping.class);
+
+				this.sqlResultSetMappings.add(new SqlResultSetMappingMetadataImpl(this.getLocator(), annotation));
+			}
+		}
 	}
 
 	/**

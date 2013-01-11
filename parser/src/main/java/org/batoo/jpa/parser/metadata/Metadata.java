@@ -114,6 +114,15 @@ public interface Metadata {
 	List<SequenceGeneratorMetadata> getSequenceGenerators();
 
 	/**
+	 * Returns the list of SqlResultSetMappingMetadata
+	 * 
+	 * @return the list of SqlResultSetMappingMetadata
+	 * 
+	 * @since $version
+	 */
+	List<SqlResultSetMappingMetadata> getSqlResultSetMapping();
+
+	/**
 	 * Returns the list of table generators.
 	 * 
 	 * @return the list of table generators

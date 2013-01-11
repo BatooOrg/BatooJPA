@@ -18,20 +18,38 @@
  */
 package org.batoo.jpa.parser.metadata;
 
+import java.util.List;
+
+
 /**
- * The definition for unique constraints.
  * 
- * @author hceylan
- * @since 2.0.0
+ * @author asimarslan
+ * @since $version
  */
-public interface UniqueConstraintMetadata extends BindableMetadata {
+public interface EntityResultMetadata extends LocatableMatadata {
 
 	/**
-	 * Returns the list column names that make up the unique constraint.
+	 * Specifies the column name (or alias) of the column in the SELECT list that is used to determine the type of the entity instance.
 	 * 
-	 * @return the list of columns names that make up the unique constraint
-	 * 
-	 * @since 2.0.0
+	 * @return DiscriminatorColumn
+	 * @since $version
 	 */
-	String[] getColumnNames();
+	String getDiscriminatorColumn();
+
+	/**
+	 * The class of the result.
+	 * 
+	 * @return The class of the result
+	 * @since $version
+	 */
+	String getEntityClass();
+
+	/**
+	 * Maps the columns specified in the SELECT list of the query to the properties or fields of the entity class.
+	 * 
+	 * @return FieldResultMetadata 's
+	 * @since $version
+	 */
+	List<FieldResultMetadata> getFields();
+
 }
