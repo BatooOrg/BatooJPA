@@ -36,10 +36,7 @@ import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
 import org.batoo.jpa.core.test.q.Address;
-import org.batoo.jpa.core.test.q.Bar;
-import org.batoo.jpa.core.test.q.BaseFoo;
 import org.batoo.jpa.core.test.q.Country;
-import org.batoo.jpa.core.test.q.Foo;
 import org.batoo.jpa.core.test.q.HomePhone;
 import org.batoo.jpa.core.test.q.Person;
 import org.batoo.jpa.core.test.q.SimpleCity;
@@ -396,6 +393,36 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 	/**
 	 * 
+	 * @since $version
+	 */
+	@Test
+	public void testIn() {
+		final List<String> codeList = Lists.newArrayList(SimpleJpqlTest.TR.getCode(), SimpleJpqlTest.UK.getCode());
+		final Set<String> codeSet = Sets.newHashSet(SimpleJpqlTest.TR.getCode(), SimpleJpqlTest.UK.getCode());
+
+		final String[] codeArr = { SimpleJpqlTest.TR.getCode(), SimpleJpqlTest.UK.getCode() };
+
+		TypedQuery<Country> q = this.cq("select c from Country c where c.code in ('TR', 'UK')", Country.class);
+		Assert.assertEquals(2, q.getResultList().size());
+
+		q = this.cq("select c from Country c where c.code not in (:codeList)", Country.class).setParameter("codeList", codeList);
+		Assert.assertEquals(2, q.getResultList().size());
+
+		q = this.cq("select c from Country c where c.code not in ('TR')", Country.class);
+		Assert.assertEquals(3, q.getResultList().size());
+
+		q = this.cq("select c from Country c where c.code in (:codeList)", Country.class).setParameter("codeList", codeList);
+		Assert.assertEquals(2, q.getResultList().size());
+
+		q = this.cq("select c from Country c where c.code in (:codeSet)", Country.class).setParameter("codeSet", codeSet);
+		Assert.assertEquals(2, q.getResultList().size());
+
+		q = this.cq("select c from Country c where c.code in (:codeArr)", Country.class).setParameter("codeArr", codeArr);
+		Assert.assertEquals(2, q.getResultList().size());
+	}
+
+	/**
+	 * 
 	 * @since 2.0.0
 	 */
 	@Test
@@ -438,47 +465,6 @@ public class SimpleJpqlTest extends BaseCoreTest {
 		Assert.assertEquals(1, q.getResultList().size());
 	}
 
-	/**
-	 * 
-	 * @since $version
-	 * @author mdpinar
-	 */
-	@Test
-	public void testIn() {
-		List<String> codeList = Lists.newArrayList(
-										SimpleJpqlTest.TR.getCode(), 
-										SimpleJpqlTest.UK.getCode()
-								);
-		Set<String> codeSet = Sets.newHashSet(
-										SimpleJpqlTest.TR.getCode(), 
-										SimpleJpqlTest.UK.getCode()
-								);
-
-		String[] codeArr = {
-								SimpleJpqlTest.TR.getCode(), 
-								SimpleJpqlTest.UK.getCode()
-							};
-		
-		TypedQuery<Country> q = this.cq("select c from Country c where c.code in ('TR', 'UK')", Country.class);
-		Assert.assertEquals(2, q.getResultList().size());
-		
-		q = this.cq("select c from Country c where c.code not in (:codeList)", Country.class).setParameter("codeList", codeList);
-		Assert.assertEquals(4, q.getResultList().size());
-
-		q = this.cq("select c from Country c where c.code not in ('TR')", Country.class);
-		Assert.assertEquals(3, q.getResultList().size());
-		
-		q = this.cq("select c from Country c where c.code in (:codeList)", Country.class).setParameter("codeList", codeList);
-		Assert.assertEquals(2, q.getResultList().size());
-		
-		q = this.cq("select c from Country c where c.code in (:codeSet)", Country.class).setParameter("codeSet", codeSet);
-		Assert.assertEquals(2, q.getResultList().size());
-		
-		q = this.cq("select c from Country c where c.code in (:codeArr)", Country.class).setParameter("codeArr", codeArr);
-		Assert.assertEquals(2, q.getResultList().size());
-	}
-	
-	
 	/**
 	 * 
 	 * @since 2.0.0

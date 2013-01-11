@@ -421,7 +421,7 @@ enum_literal: ID;
 
 in_expression :
   	(state_field_path_expression | input_parameter | ID) (NOT)? IN (input_parameter | (Left_Paren (subquery | in_items) Right_Paren))
-  		-> ^(ST_IN state_field_path_expression? ID? input_parameter? (NOT)? in_items? subquery?);
+  		-> ^(ST_IN state_field_path_expression? ID? input_parameter? in_items? subquery? (NOT)?);
 
 in_items :
 	in_item (Comma in_item)*
