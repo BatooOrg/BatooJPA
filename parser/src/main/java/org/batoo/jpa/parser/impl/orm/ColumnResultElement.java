@@ -16,22 +16,48 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.parser.metadata;
+package org.batoo.jpa.parser.impl.orm;
+
+import java.util.Map;
+
+import org.batoo.jpa.parser.metadata.ColumnResultMetadata;
 
 /**
- * The definition for unique constraints.
+ * Element for <code>column-result</code>
  * 
- * @author hceylan
- * @since 2.0.0
+ * @author asimarslan
+ * @since $version
  */
-public interface UniqueConstraintMetadata extends BindableMetadata {
+public class ColumnResultElement extends ChildElement implements ColumnResultMetadata {
+
+	private String name;
 
 	/**
-	 * Returns the list column names that make up the unique constraint.
 	 * 
-	 * @return the list of columns names that make up the unique constraint
-	 * 
-	 * @since 2.0.0
+	 * @param parent
+	 * @param attributes
+	 * @since $version
 	 */
-	String[] getColumnNames();
+	public ColumnResultElement(ParentElement parent, Map<String, String> attributes) {
+		super(parent, attributes);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	protected void generate() {
+		this.name = this.getAttribute(ElementConstants.ATTR_NAME, ElementConstants.EMPTY);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public String getName() {
+		return this.name;
+	}
+
 }

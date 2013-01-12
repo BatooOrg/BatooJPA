@@ -19,19 +19,10 @@
 package org.batoo.jpa.parser.metadata;
 
 /**
- * The definition for unique constraints.
  * 
- * @author hceylan
- * @since 2.0.0
+ * @author asimarslan
+ * @since $version
  */
-public interface UniqueConstraintMetadata extends BindableMetadata {
+public interface ColumnResultMetadata extends BindableMetadata {
 
-	/**
-	 * Returns the list column names that make up the unique constraint.
-	 * 
-	 * @return the list of columns names that make up the unique constraint
-	 * 
-	 * @since 2.0.0
-	 */
-	String[] getColumnNames();
 }

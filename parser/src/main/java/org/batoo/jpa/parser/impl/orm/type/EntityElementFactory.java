@@ -49,6 +49,7 @@ import org.batoo.jpa.parser.metadata.NamedNativeQueryMetadata;
 import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
+import org.batoo.jpa.parser.metadata.SqlResultSetMappingMetadata;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableMetadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
@@ -85,6 +86,7 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 	private final List<CallbackMetadata> callbacks = Lists.newArrayList();
 	private final List<NamedQueryMetadata> namedQueries = Lists.newArrayList();
 	private final List<NamedNativeQueryMetadata> namedNativeQueries = Lists.newArrayList();
+	private final List<SqlResultSetMappingMetadata> sqlResultSetMappings = Lists.newArrayList();
 
 	/**
 	 * Constructor for ORM File parsing
@@ -120,7 +122,8 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 			ElementConstants.ELEMENT_EXCLUDE_DEFAULT_LISTENERS, //
 			ElementConstants.ELEMENT_EXCLUDE_SUPERCLASS_LISTENERS, //
 			ElementConstants.ELEMENT_NAMED_QUERY, //
-			ElementConstants.ELEMENT_NAMED_NATIVE_QUERY);
+			ElementConstants.ELEMENT_NAMED_NATIVE_QUERY,//
+			ElementConstants.ELEMENT_SQL_RESULT_SET_MAPPING);
 	}
 
 	/**
@@ -321,6 +324,15 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 	 * 
 	 */
 	@Override
+	public List<SqlResultSetMappingMetadata> getSqlResultSetMappings() {
+		return this.sqlResultSetMappings;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public TableMetadata getTable() {
 		return this.table;
 	}
@@ -406,6 +418,10 @@ public class EntityElementFactory extends ParentElement implements EntityMetadat
 
 		if (child instanceof NamedNativeQueryMetadata) {
 			this.namedNativeQueries.add((NamedNativeQueryMetadata) child);
+		}
+
+		if (child instanceof SqlResultSetMappingMetadata) {
+			this.sqlResultSetMappings.add((SqlResultSetMappingMetadata) child);
 		}
 	}
 

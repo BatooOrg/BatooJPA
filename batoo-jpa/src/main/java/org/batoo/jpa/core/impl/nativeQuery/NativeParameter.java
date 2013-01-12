@@ -33,8 +33,6 @@ import org.apache.commons.lang.NotImplementedException;
  */
 public class NativeParameter<T> implements Parameter<T> {
 
-	private final String name;
-
 	private final Integer position;
 
 	/**
@@ -44,21 +42,7 @@ public class NativeParameter<T> implements Parameter<T> {
 	 * @since 2.0.0
 	 */
 	public NativeParameter(Integer position) {
-		this(null, position);
-	}
-
-	/**
-	 * @param name
-	 *            the name of the parameter
-	 * @param position
-	 *            the ordinal number of the parameter
-	 * 
-	 * @since 2.0.0
-	 */
-	public NativeParameter(String name, Integer position) {
 		super();
-
-		this.name = name;
 		this.position = position;
 	}
 
@@ -71,7 +55,8 @@ public class NativeParameter<T> implements Parameter<T> {
 	 */
 	@Override
 	public String getName() {
-		return this.name;
+		// JSR-317 3.8.15 >> The use of named parameters is not defined for native queries.
+		throw new NotImplementedException("Native queries do not support named parameters.");
 	}
 
 	/**

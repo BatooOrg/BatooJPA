@@ -68,8 +68,10 @@ import org.batoo.jpa.jdbc.generator.TableIdQueue;
 import org.batoo.jpa.parser.MappingException;
 import org.batoo.jpa.parser.impl.metadata.MetadataImpl;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
+import org.batoo.jpa.parser.metadata.NamedNativeQueryMetadata;
 import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
+import org.batoo.jpa.parser.metadata.SqlResultSetMappingMetadata;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.type.EmbeddableMetadata;
 import org.batoo.jpa.parser.metadata.type.EntityMetadata;
@@ -120,6 +122,8 @@ public class MetamodelImpl implements Metamodel {
 	private final Map<Class<?>, EntityTypeImpl<?>> entities = Maps.newHashMap();
 	private final Map<String, EntityTypeImpl<?>> entitiesByName = Maps.newHashMap();
 	private final Map<String, NamedQueryMetadata> namedQueries = Maps.newHashMap();
+	private final Map<String, NamedNativeQueryMetadata> namedNativeQueries = Maps.newHashMap();
+	private final Map<String, SqlResultSetMappingMetadata> sqlResultSetMappings = Maps.newHashMap();
 
 	private final CallbackManager callbackManager;
 
@@ -249,10 +253,34 @@ public class MetamodelImpl implements Metamodel {
 
 		this.callbackManager = new CallbackManager(metadata.getEntityListeners());
 
+		this.addSequenceGenerators(metadata.getSequenceGenerators());
+		this.addTableGenerators(metadata.getTableGenerators());
+
 		this.addNamedQueries(metadata.getNamedQueries());
+		this.addNamedNativeQueries(metadata.getNamedNativeQueries());
+		this.addSqlResultSetMappings(metadata.getSqlResultSetMapping());
+
+		// TODO do we need this part
 		for (final ManagedTypeMetadata entity : entities) {
 			if (entity instanceof EntityMetadata) {
 				this.addNamedQueries(((EntityMetadata) entity).getNamedQueries());
+			}
+		}
+
+	}
+
+	/**
+	 * Adds the named native queries to the metamodel
+	 * 
+	 * @param namedNativeQueries
+	 * @since $version
+	 */
+	private void addNamedNativeQueries(List<NamedNativeQueryMetadata> namedNativeQueries) {
+		for (final NamedNativeQueryMetadata namedNativeQuery : namedNativeQueries) {
+			final NamedNativeQueryMetadata existing = this.namedNativeQueries.put(namedNativeQuery.getName(), namedNativeQuery);
+			if (existing != null) {
+				throw new MappingException("Duplicate named native query with the name: " + namedNativeQuery.getName(), existing.getLocator(),
+					namedNativeQuery.getLocator());
 			}
 		}
 	}
@@ -283,11 +311,42 @@ public class MetamodelImpl implements Metamodel {
 	 */
 	public synchronized void addSequenceGenerator(SequenceGeneratorMetadata metadata) {
 		final SequenceGenerator sequenceGenerator = new SequenceGenerator(metadata);
-		this.sequenceGenerators.put(sequenceGenerator.getName(), sequenceGenerator);
+		final SequenceGenerator existing = this.sequenceGenerators.put(sequenceGenerator.getName(), sequenceGenerator);
+		// if (existing != null) {
+		// throw new MappingException("Duplicate SequenceGenerator with the name: " + sequenceGenerator.getName(), existing.getLocator(),
+		// sequenceGenerator.getLocator());
+		// }
 	}
 
 	/**
-	 * Adds the sequence generator to the metamodel
+	 * Adds the sequence generators to the metamodel
+	 * 
+	 * @param sequenceGeneratorMetadatas
+	 * @since $version
+	 */
+	private void addSequenceGenerators(List<SequenceGeneratorMetadata> sequenceGeneratorMetadatas) {
+		for (final SequenceGeneratorMetadata sequenceGeneratorMetadata : sequenceGeneratorMetadatas) {
+			this.addSequenceGenerator(sequenceGeneratorMetadata);
+		}
+	}
+
+	/**
+	 * 
+	 * @param sqlResultSetMapping
+	 * @since $version
+	 */
+	private void addSqlResultSetMappings(List<SqlResultSetMappingMetadata> sqlResultSetMappings) {
+		for (final SqlResultSetMappingMetadata sqlResultSetMappingMetadata : sqlResultSetMappings) {
+			final SqlResultSetMappingMetadata existing = this.sqlResultSetMappings.put(sqlResultSetMappingMetadata.getName(), sqlResultSetMappingMetadata);
+			if (existing != null) {
+				throw new MappingException("Duplicate sqlResultSetMapping with the name: " + sqlResultSetMappingMetadata.getName(), existing.getLocator(),
+					sqlResultSetMappingMetadata.getLocator());
+			}
+		}
+	}
+
+	/**
+	 * Adds the table generator to the metamodel
 	 * 
 	 * @param metadata
 	 *            the generator metadata
@@ -296,8 +355,23 @@ public class MetamodelImpl implements Metamodel {
 	 */
 	public synchronized void addTableGenerator(TableGeneratorMetadata metadata) {
 		final TableGenerator tableGenerator = new TableGenerator(metadata);
+		final TableGenerator existing = this.tableGenerators.put(tableGenerator.getName(), tableGenerator);
+		// if (existing != null) {
+		// throw new MappingException("Duplicate tableGenerator with the name: " + tableGenerator.getName(), existing.getLocator(),
+		// tableGenerator.getLocator());
+		// }
+	}
 
-		this.tableGenerators.put(tableGenerator.getName(), tableGenerator);
+	/**
+	 * Adds the table generators to the metamodel
+	 * 
+	 * @param metadatas
+	 * @since $version
+	 */
+	private void addTableGenerators(List<TableGeneratorMetadata> metadatas) {
+		for (final TableGeneratorMetadata tableGeneratorMetadata : metadatas) {
+			this.addTableGenerator(tableGeneratorMetadata);
+		}
 	}
 
 	/**
@@ -605,6 +679,17 @@ public class MetamodelImpl implements Metamodel {
 		catch (final InterruptedException e) {
 			throw new PersistenceException("Unable to retrieve next sequence " + generator + " in allowed " + MetamodelImpl.POLL_TIMEOUT + " seconds");
 		}
+	}
+
+	/**
+	 * return the ResultSetMapping with name if exists otherwise null
+	 * 
+	 * @param resultSetMapping
+	 * @return SqlResultSetMappingMetadata
+	 * @since $version
+	 */
+	public SqlResultSetMappingMetadata getSqlResultSetMapping(String resultSetMapping) {
+		return this.sqlResultSetMappings.get(resultSetMapping);
 	}
 
 	private String getTableDesc(AbstractTable table) {

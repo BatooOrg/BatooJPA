@@ -85,6 +85,10 @@ public class ElementConstants {
 	protected static final String ELEMENT_MAP_KEY_TEMPORAL = "map-key-temporal";
 	protected static final String ELEMENT_NAMED_QUERY = "named-query";
 	protected static final String ELEMENT_NAMED_NATIVE_QUERY = "named-native-query";
+	protected static final String ELEMENT_SQL_RESULT_SET_MAPPING = "sql-result-set-mapping";
+	protected static final String ELEMENT_COLUMN_RESULT = "column-result";
+	protected static final String ELEMENT_FIELD_RESULT = "field-result";
+	protected static final String ELEMENT_ENTITY_RESULT = "entity-result";
 	protected static final String ELEMENT_QUERY = "query";
 	protected static final String ELEMENT_ORDER_BY = "order-by";
 	protected static final String ELEMENT_ORDER_COLUMN = "order-column";
@@ -119,6 +123,9 @@ public class ElementConstants {
 	protected static final String ATTR_VALUE = "value";
 	protected static final String ATTR_RESULT_CLASS = "result-class";
 	protected static final String ATTR_RESULT_SET_MAPPING = "result-set-mapping";
+	protected static final String ATTR_COLUMN = "column";
+	public static final String ATTR_DISCRIMINATOR_COLUMN = "discriminator-column";
+	public static final String ATTR_ENTITY_CLASS = "entity-class";
 
 	/**
 	 * Column Attribute names.

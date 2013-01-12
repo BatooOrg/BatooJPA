@@ -31,6 +31,7 @@ import org.batoo.jpa.parser.metadata.NamedNativeQueryMetadata;
 import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 import org.batoo.jpa.parser.metadata.SecondaryTableMetadata;
 import org.batoo.jpa.parser.metadata.SequenceGeneratorMetadata;
+import org.batoo.jpa.parser.metadata.SqlResultSetMappingMetadata;
 import org.batoo.jpa.parser.metadata.TableGeneratorMetadata;
 import org.batoo.jpa.parser.metadata.TableMetadata;
 
@@ -140,6 +141,15 @@ public interface EntityMetadata extends IdentifiableTypeMetadata, BindableMetada
 	 * @since 2.0.0
 	 */
 	SequenceGeneratorMetadata getSequenceGenerator();
+
+	/**
+	 * Returns the list of SqlResultSetMappingMetadata
+	 * 
+	 * @return the list of SqlResultSetMappingMetadata
+	 * 
+	 * @since $version
+	 */
+	List<SqlResultSetMappingMetadata> getSqlResultSetMappings();
 
 	/**
 	 * Returns the table of the entity.
