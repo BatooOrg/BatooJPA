@@ -46,22 +46,27 @@ public class InExpression extends AbstractExpression<Boolean> {
 	private final AbstractExpression<?> inner;
 	private final ArrayList<AbstractExpression<?>> values = Lists.newArrayList();
 	private String alias;
+	private final boolean not;
 
 	/**
 	 * @param inner
 	 *            the inner expression
 	 * @param values
 	 *            the values
+	 * @param not
+	 *            true if not
 	 * 
 	 * @since 2.0.0
 	 */
-	public InExpression(AbstractExpression<?> inner, Expression<?>[] values) {
+	public InExpression(AbstractExpression<?> inner, Expression<?>[] values, boolean not) {
 		super(Boolean.class);
 
 		this.inner = inner;
 		for (final Expression<?> expression : values) {
 			this.values.add((AbstractExpression<?>) expression);
 		}
+		this.not = not;
+
 	}
 
 	/**
@@ -69,10 +74,12 @@ public class InExpression extends AbstractExpression<Boolean> {
 	 *            the inner expression
 	 * @param values
 	 *            the values
+	 * @param not
+	 *            true if not
 	 * 
 	 * @since 2.0.0
 	 */
-	public InExpression(Expression<?> inner, Collection<?> values) {
+	public InExpression(Expression<?> inner, Collection<?> values, boolean not) {
 		super(Boolean.class);
 
 		this.inner = (AbstractExpression<?>) inner;
@@ -84,6 +91,7 @@ public class InExpression extends AbstractExpression<Boolean> {
 				this.values.add(new EntityConstantExpression<Object>(null, value));
 			}
 		}
+		this.not = not;
 	}
 
 	/**
@@ -111,6 +119,10 @@ public class InExpression extends AbstractExpression<Boolean> {
 				return input.generateJpqlRestriction(query);
 			}
 		}));
+
+		if (this.not) {
+			return this.inner.generateJpqlRestriction(query) + " not in (" + values + ")";
+		}
 
 		return this.inner.generateJpqlRestriction(query) + " in (" + values + ")";
 	}
@@ -159,6 +171,9 @@ public class InExpression extends AbstractExpression<Boolean> {
 			}
 		}));
 
+		if (this.not) {
+			return new String[] { inner + " NOT IN (" + values + ")" };
+		}
 		return new String[] { inner + " IN (" + values + ")" };
 	}
 

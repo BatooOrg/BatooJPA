@@ -985,6 +985,8 @@ public class JpqlQuery {
 		}
 
 		if (exprDef.getType() == JpqlParser.ST_IN) {
+			final boolean notIn = exprDef.getChildCount() > 2 && exprDef.getChild(2).getType() == JpqlParser.NOT;
+
 			AbstractExpression<X> left = null;
 
 			if ((exprDef.getChild(0).getType() != JpqlParser.Named_Parameter) //
@@ -999,7 +1001,9 @@ public class JpqlQuery {
 			if ((inDefs.getType() == JpqlParser.Named_Parameter) //
 				|| (inDefs.getType() == JpqlParser.Ordinal_Parameter)//
 				|| (inDefs.getType() == JpqlParser.Question_Sign)) {
-				return (AbstractExpression<X>) left.in(this.getExpression(cb, q, inDefs, left.getJavaType()));
+				return notIn ? //
+					(AbstractExpression<X>) left.notIn(this.getExpression(cb, q, inDefs, left.getJavaType()))//
+					: (AbstractExpression<X>) left.in(this.getExpression(cb, q, inDefs, left.getJavaType()));
 			}
 
 			if (inDefs.getType() == JpqlParser.ID) {
@@ -1009,7 +1013,9 @@ public class JpqlQuery {
 			if (inDefs.getType() == JpqlParser.ST_SUBQUERY) {
 				final SubqueryImpl<? extends X> subquery = this.constructSubquery(cb, q, inDefs, left.getJavaType());
 
-				return (AbstractExpression<X>) left.in(subquery);
+				return notIn ? //
+					(AbstractExpression<X>) left.notIn(subquery) : //
+					(AbstractExpression<X>) left.in(subquery);
 			}
 			else {
 				for (int i = 0; i < inDefs.getChildCount(); i++) {
@@ -1021,7 +1027,9 @@ public class JpqlQuery {
 				left = (AbstractExpression<X>) this.getExpression(cb, q, exprDef.getChild(0), expressions.get(0).getJavaType());
 			}
 
-			return (AbstractExpression<X>) left.in(expressions);
+			return notIn ? //
+				(AbstractExpression<X>) left.notIn(expressions) : //
+				(AbstractExpression<X>) left.in(expressions);
 		}
 
 		if (exprDef.getType() == JpqlParser.ST_NULL) {
