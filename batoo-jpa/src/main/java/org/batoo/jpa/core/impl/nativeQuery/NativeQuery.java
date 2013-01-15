@@ -50,11 +50,10 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.mapping.AbstractMapping;
 import org.batoo.jpa.core.impl.model.mapping.BasicMappingImpl;
-import org.batoo.jpa.core.impl.model.mapping.EmbeddedMappingImpl;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMappingImpl;
-import org.batoo.jpa.core.impl.model.mapping.SingularMappingEx;
 import org.batoo.jpa.jdbc.AbstractColumn;
 import org.batoo.jpa.jdbc.BasicColumn;
+import org.batoo.jpa.jdbc.JoinColumn;
 import org.batoo.jpa.jdbc.dbutils.QueryRunner;
 import org.batoo.jpa.parser.metadata.ColumnResultMetadata;
 import org.batoo.jpa.parser.metadata.EntityResultMetadata;
@@ -77,7 +76,7 @@ import com.google.common.collect.Sets;
 public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 
 	/**
-	 * Model class for fieldResult mapping for high perf iteration on sql resultsets
+	 * Model class for fieldResult mapping for high performance iteration on SQL result sets
 	 * 
 	 * @author asimarslan
 	 * @since $version
@@ -101,6 +100,7 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 			super();
 		}
 
+		@SuppressWarnings("unused")
 		public String getEmbeddedId() {
 			return this.embeddedId;
 		}
@@ -116,7 +116,7 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 
 		@Override
 		public String toString() {
-			if (this.idMap.values().size() == 1) {
+			if (this.idMap.size() == 1) {
 				return this.idMap.values().iterator().next().toString();
 			}
 			return null;
@@ -143,13 +143,15 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 
 	final SqlResultSetMappingMetadata sqlResultSetMapping;
 
+	final ArrayList<String> entityList = Lists.newArrayList();
+
 	// Map of entity-name, map of fied-name, column-name
-	private final HashMap<String, HashMap<String, Object>> fieldMap = Maps.newHashMap();
+	private final HashMap<Integer, HashMap<String, Object>> fieldMap = Maps.newHashMap();
 
 	/**
 	 * @param entityManager
 	 *            the entity manager
-	 * @param query
+	 * @param sqlString
 	 *            the native SQL query
 	 * 
 	 * @since 2.0.0
@@ -183,11 +185,14 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	}
 
 	/**
-	 * 
-	 * @param entityManagerImpl
+	 * @param entityManager
+	 *            the entity manager
 	 * @param sqlString
+	 *            the native SQL query
 	 * @param resultSetMapping
-	 * @since $version
+	 *            the resultSetMapping
+	 * 
+	 * @since 2.0.0
 	 */
 	public NativeQuery(EntityManagerImpl entityManager, String sqlString, String resultSetMapping) {
 		super();
@@ -220,7 +225,8 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 					_fieldModelMap.put(attr, IdModel.merge((IdModel) _fieldModelMap.get(attr), embId, id, field.getColumn()));
 
 				}
-				this.fieldMap.put(entityResultMetadata.getEntityClass(), _fieldModelMap);
+				this.entityList.add(entityResultMetadata.getEntityClass());
+				this.fieldMap.put(this.entityList.size() - 1, _fieldModelMap);
 			}
 
 		}
@@ -279,6 +285,32 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 		catch (final SQLException e) {
 			throw new PersistenceException("Native query execution has failed!", e);
 		}
+	}
+
+	/**
+	 * 
+	 * @param session
+	 * @param row
+	 * @param mapping
+	 * @param session
+	 * @param row
+	 * @return
+	 * @throws SQLException
+	 * @since $version
+	 */
+	private HashMap<AbstractColumn, String> getAssociatedId(SingularAssociationMappingImpl<?, ?> mapping, HashMap<String, Object> _parentFieldMap)
+		throws SQLException {
+		final HashMap<AbstractColumn, String> translatedIdFields = Maps.newHashMap();
+		for (final JoinColumn joinColumn : mapping.getForeignKey().getJoinColumns()) {
+			final String name = joinColumn.getReferencedColumn().getMapping().getName();
+			final Object colnameTemp = (_parentFieldMap != null) ? _parentFieldMap.get(name) : null;
+			final String colname = colnameTemp == null ? joinColumn.getName() : colnameTemp.toString();
+
+			translatedIdFields.put(joinColumn.getReferencedColumn(), colname);
+		}
+		return translatedIdFields;
+		// return mapping.getType().getId(session, row, translatedIdFields);
+
 	}
 
 	/**
@@ -513,7 +545,7 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 		if (this.sqlResultSetMapping != null) {
 			return this.handleWithSqlResultSetMapping(resultSet);
 		}
-		else if (this.resultClass != null) {// designated return type
+		if (this.resultClass != null) {// designated return type
 			return this.handleWithResultClass(resultSet);
 		}
 		// last option return query as scalar
@@ -543,20 +575,19 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 		return results;
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private ManagedInstance<?> handleInstance(ResultSet row, EntityTypeImpl<?> entityType, String discriminatorColumn, HashMap<String, Object> fieldMap)
 		throws SQLException {
 		final SessionImpl session = this.em.getSession();
 
 		// get the id of for the instance
 		final ManagedId<?> managedId = entityType.getId(session, row, this.getIdFieldTransformed(entityType.getPrimaryTable().getIdFields(), fieldMap));
-
 		if (managedId == null) {
 			return null;
 		}
 
 		// look for it in the session
 		ManagedInstance<?> instance = session.get(managedId);
-
 		// if found then return it
 		if (instance != null) {
 			// if it is a new instance simply return it
@@ -573,7 +604,6 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 				session.lazyInstanceLoading(instance);
 				enhancedInstance.__enhanced__$$__setInitialized();
 			}
-
 			return instance;
 		}
 
@@ -642,20 +672,19 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 */
 	private List<Object> handleWithSqlResultSetMapping(ResultSet resultSet) throws SQLException {
 		final ArrayList<Object> result = Lists.newArrayList();
-		final ArrayList<Object> resultRow = Lists.newArrayList();
+		final List<EntityResultMetadata> entities = this.sqlResultSetMapping.getEntities();
 
 		while (resultSet.next()) {// for each row
-			for (final EntityResultMetadata entityResultMetadata : this.sqlResultSetMapping.getEntities()) {
+			final ArrayList<Object> resultRow = Lists.newArrayList();
+			for (int i = 0; i < entities.size(); i++) {
+				final EntityResultMetadata entityResultMetadata = entities.get(i);
 				final EntityTypeImpl<?> entityType = this.em.getMetamodel().entity(entityResultMetadata.getEntityClass());
-
 				if (entityType == null) {
 					throw new PersistenceException("Entity Class is not managed :" + entityResultMetadata.getEntityClass());
 				}
 
-				final HashMap<String, Object> _fieldMap = this.fieldMap.get(entityType.getJavaType().getName());
-
+				final HashMap<String, Object> _fieldMap = this.fieldMap.get(i);
 				final ManagedInstance<?> managedInstance = this.handleInstance(resultSet, entityType, entityResultMetadata.getDiscriminatorColumn(), _fieldMap);
-
 				if (managedInstance != null) {
 					resultRow.add(managedInstance.getInstance());
 				}
@@ -672,7 +701,6 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 			else {
 				result.add(resultRow.get(0));
 			}
-			resultRow.clear();
 		}
 		return result;
 	}
@@ -695,6 +723,7 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 		managedInstance.setLoading(true);
 
 		final Object instance = managedInstance.getInstance();
+		// initialize all singular mappings
 		for (final AbstractMapping<?, ?, ?> mapping : entityType.getMappingsSingular()) {
 
 			if (mapping instanceof BasicMappingImpl) {
@@ -706,47 +735,44 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 
 				column.setValue(instance, row.getObject(colName));
 			}
-			else if (mapping instanceof SingularAssociationMappingImpl) {
-				final SingularAssociationMappingImpl<?, ?> singularAssociationMapping = (SingularAssociationMappingImpl<?, ?>) mapping;
-				final EntityTypeImpl<?> singularChildType = ((SingularAssociationMappingImpl<?, ?>) mapping).getType();
+			if (mapping instanceof SingularAssociationMappingImpl) {
+				final SingularAssociationMappingImpl<?, ?> saMapping = (SingularAssociationMappingImpl<?, ?>) mapping;
 
-				final HashMap<String, Object> _parentFieldMap = this.fieldMap.get(singularAssociationMapping.getParent().getJavaType().getName());
-
-				final SingularMappingEx<?, ?> idMapping = singularChildType.getIdMapping();
-
-				if (singularChildType.hasSingleIdAttribute() && idMapping instanceof BasicMappingImpl) {
-
-					final Object colnameTemp = (_parentFieldMap != null) ? _parentFieldMap.get(singularAssociationMapping.getName()) : null;
-
-					final String colname = colnameTemp == null ? ((BasicMappingImpl) idMapping).getColumn().getName() : colnameTemp.toString();
-
-					final Object _id = row.getObject(colname);
-
-					if (_id != null) {
-						final Object reference = session.getEntityManager().getReference(singularChildType.getJavaType(), _id);
-						mapping.set(instance, reference);
-						managedInstance.setJoinLoaded(singularAssociationMapping);
+				HashMap<String, Object> _parentFieldMap = fieldMap;
+				if (fieldMap != null && fieldMap.get(saMapping.getName()) instanceof IdModel) {
+					final IdModel idModel = (IdModel) fieldMap.get(saMapping.getName());
+					if (idModel.getIdMap().size() > 1) {
+						_parentFieldMap = idModel.getIdMap();
 					}
 				}
-				else {
-					final IdModel idModel = (IdModel) _parentFieldMap.get(singularAssociationMapping.getName());
-					final HashMap<String, Object> _parentIdFieldMap = idModel.getIdMap();
 
-					if (idMapping instanceof EmbeddedMappingImpl) {
-						// TODO should we test embeddedId attr name, or just waste of cpu???
-						final String embeddedIdName = ((EmbeddedMappingImpl) idMapping).getAttribute().getName();
-						final String embeddedId = idModel.getEmbeddedId();
-						if (!embeddedIdName.equals(embeddedId)) {
-							// wrong fieldMapping conf just return
-							return;
+				// loop on join column and set their value using the result set, but we are mapping correct column name from fieldResult
+				for (final JoinColumn joinColumn : saMapping.getForeignKey().getJoinColumns()) {
+					final String name = joinColumn.getReferencedColumn().getMapping().getName();
+					final Object colnameTemp = (_parentFieldMap != null) ? _parentFieldMap.get(name) : null;
+					final String colname = colnameTemp == null ? joinColumn.getName() : colnameTemp.toString();
+
+					try {
+						final Object _id = row.getObject(colname);
+						if (_id != null) {
+							joinColumn.setValue(instance, _id);
 						}
 					}
-					final ManagedInstance<?> handleInstance = this.handleInstance(row, singularChildType, null, _parentIdFieldMap);
+					catch (final SQLException e) {
+						LOG.debug("column not found with name: {0}", colname);
+					}
+				}
 
-					mapping.set(instance, handleInstance.getInstance());
-					managedInstance.setJoinLoaded(singularAssociationMapping);
+				final EntityTypeImpl<?> _childType = saMapping.getType();
+				final HashMap<AbstractColumn, String> translatedIdFields = getAssociatedId(saMapping, _parentFieldMap);
 
-					session.lazyInstanceLoading(handleInstance);
+				final ManagedId<?> managedId = saMapping.getType().getId(session, row, translatedIdFields);
+				if (managedId != null && managedId.getId() != null) {
+					final Object reference = session.getEntityManager().getReference(_childType.getJavaType(), managedId.getId());
+					if (reference != null) {
+						saMapping.set(instance, reference);
+						managedInstance.setJoinLoaded(saMapping);
+					}
 				}
 			}
 		}

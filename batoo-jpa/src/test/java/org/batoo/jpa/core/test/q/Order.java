@@ -41,6 +41,7 @@ import javax.persistence.TableGenerator;
 @SqlResultSetMappings({ @SqlResultSetMapping(name = "WidgetOrderResults", entities = @EntityResult(entityClass = Order.class)),//
 
 	@SqlResultSetMapping(name = "OrderItemResults", entities = { @EntityResult(entityClass = Order.class), @EntityResult(entityClass = Item.class) }),//
+	@SqlResultSetMapping(name = "ItemResults", entities = @EntityResult(entityClass = Item.class)),//
 
 	@SqlResultSetMapping(name = "OrderItemResults2", entities = { //
 		@EntityResult(entityClass = Order.class, fields = {//
