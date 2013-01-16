@@ -18,84 +18,89 @@
  */
 package org.batoo.jpa.core.test.embeddedid;
 
-import javax.persistence.EmbeddedId;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.TableGenerator;
 
 /**
  * 
- * @author hceylan
- * @since 2.0.0
+ * @author asimarslan
+ * @since $version
  */
 @Entity
-public class Foo {
+@TableGenerator(name = "bar_id", allocationSize = 100)
+public class Bar {
 
-	@EmbeddedId
-	private FooPk id;
+	@Id
+	@GeneratedValue(generator = "bar_id", strategy = GenerationType.TABLE)
+	private long id;
 
-	private String value;
+	@ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+	private Foo foo;
 
 	/**
 	 * 
 	 * @since $version
 	 */
-	public Foo() {
+	public Bar() {
 		super();
 	}
 
 	/**
 	 * 
 	 * @param id
-	 *            the id to set
-	 * @param value
-	 *            the value to set
+	 *            id
+	 * @param foo
+	 *            foo
 	 * @since $version
 	 */
-	public Foo(FooPk id, String value) {
+	public Bar(long id, Foo foo) {
 		super();
 		this.id = id;
-		this.value = value;
+		this.foo = foo;
 	}
 
 	/**
-	 * Returns the id.
 	 * 
-	 * @return the id
-	 * @since 2.0.0
+	 * @return Foo
+	 * @since $version
 	 */
-	public FooPk getId() {
+	public Foo getFoo() {
+		return this.foo;
+	}
+
+	/**
+	 * 
+	 * @return id
+	 * @since $version
+	 */
+	public long getId() {
 		return this.id;
 	}
 
 	/**
-	 * Returns the value.
 	 * 
-	 * @return the value
-	 * @since 2.0.0
+	 * @param foo
+	 *            foo
+	 * @since $version
 	 */
-	public String getValue() {
-		return this.value;
+	public void setFoo(Foo foo) {
+		this.foo = foo;
 	}
 
 	/**
-	 * Sets the id.
 	 * 
 	 * @param id
-	 *            the id to set
-	 * @since 2.0.0
+	 *            id
+	 * @since $version
 	 */
-	public void setId(FooPk id) {
+	public void setId(long id) {
 		this.id = id;
-	}
-
-	/**
-	 * Sets the value.
-	 * 
-	 * @param value
-	 *            the value to set
-	 * @since 2.0.0
-	 */
-	public void setValue(String value) {
-		this.value = value;
 	}
 
 }

@@ -39,19 +39,12 @@ public class EmbeddedIdTest extends BaseCoreTest {
 	 */
 	@Test
 	public void testEmbeddedId() {
-		final Foo foo1 = new Foo();
-		final FooPk pk1 = new FooPk();
-		pk1.setStrKey("key1");
-		pk1.setIntKey(1);
-		foo1.setId(pk1);
-		foo1.setValue("Foo2");
 
-		final Foo foo2 = new Foo();
-		final FooPk pk2 = new FooPk();
-		pk2.setStrKey("key1");
-		pk2.setIntKey(2);
-		foo2.setId(pk2);
-		foo2.setValue("Foo2");
+		final FooPk fooPk1 = new FooPk("key1", 1);
+		final Foo foo1 = new Foo(fooPk1, "Foo1");
+
+		final FooPk fooPk2 = new FooPk("key2", 2);
+		final Foo foo2 = new Foo(fooPk2, "Foo2");
 
 		this.persist(foo1);
 		this.persist(foo2);
@@ -68,5 +61,31 @@ public class EmbeddedIdTest extends BaseCoreTest {
 		Assert.assertSame(foo4, foo3);
 
 		this.rollback();
+	}
+
+	/**
+	 * Test embeddedId in a MonyToOne relation
+	 * 
+	 * @since $version
+	 */
+	@Test
+	public void testEmbeddedIdManyToOne() {
+		final FooPk fooPk = new FooPk("key1", 1);
+		final Foo foo = new Foo(fooPk, "Foo");
+
+		final Bar bar = new Bar(1l, foo);
+
+		this.persist(bar);
+
+		this.commit();
+		this.close();
+
+		final Bar bar2 = this.cq("select o from Bar o", Bar.class).getSingleResult();
+
+		Assert.assertEquals(1, bar2.getId());
+		Assert.assertEquals("Foo", bar2.getFoo().getValue());
+		Assert.assertEquals("key1", bar2.getFoo().getId().getStrKey());
+		Assert.assertEquals(1, bar2.getFoo().getId().getIntKey().intValue());
+
 	}
 }
