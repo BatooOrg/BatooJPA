@@ -31,6 +31,16 @@ public class FooPk {
 	private String strKey;
 	private Integer intKey;
 
+	public FooPk() {
+		super();
+	}
+
+	public FooPk(String strKey, Integer intKey) {
+		super();
+		this.strKey = strKey;
+		this.intKey = intKey;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * 
