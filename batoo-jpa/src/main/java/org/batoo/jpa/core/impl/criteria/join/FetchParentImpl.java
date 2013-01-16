@@ -56,7 +56,6 @@ import org.batoo.jpa.core.impl.model.mapping.ElementCollectionMappingImpl;
 import org.batoo.jpa.core.impl.model.mapping.EmbeddedMappingImpl;
 import org.batoo.jpa.core.impl.model.mapping.JoinedMapping;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMappingImpl;
-import org.batoo.jpa.core.impl.model.mapping.SingularMappingEx;
 import org.batoo.jpa.jdbc.AbstractColumn;
 import org.batoo.jpa.jdbc.AbstractTable;
 import org.batoo.jpa.jdbc.CollectionTable;
@@ -533,33 +532,40 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		return this.alias;
 	}
 
-	// FIXME implement the same login for embedded and composite id temporarily we return null
-	private Object getAssociateId(ResultSet row, EntityTypeImpl<?> entity, SingularAssociationMappingImpl<?, ?> mapping) throws SQLException {
-		if (entity.hasSingleIdAttribute()) {
-			final SingularMappingEx<?, ?> idMapping = this.entity.getIdMapping();
-			if (idMapping instanceof BasicMappingImpl) {
-				final JoinColumn column = mapping.getForeignKey().getJoinColumns().get(0);
+	/**
+	 * creates a managed Id using joinColumns instead of Id Columns
+	 * 
+	 * @param session
+	 * @param row
+	 *            Sql result row
+	 * @param mapping
+	 *            the singular mapping
+	 * @return managedId
+	 * 
+	 * @throws SQLException
+	 * @since $version
+	 */
+	private ManagedId<?> getAssociatedId(SessionImpl session, ResultSet row, SingularAssociationMappingImpl<?, ?> mapping) throws SQLException {
+		final HashMap<AbstractColumn, String> translatedIdFields = Maps.newHashMap();
+		for (final JoinColumn joinColumn : mapping.getForeignKey().getJoinColumns()) {
 
-				String field = null;
+			String field = null;
 
-				if (!column.isVirtual()) {
-					field = this.joinFields.get(column);
-				}
-				else {
-					final AbstractColumn masterColumn = column.getMasterColumn();
-					for (int i = 0; i < this.columns.length; i++) {
-						if (this.columns[i] == masterColumn) {
-							field = this.fields[i];
-							break;
-						}
+			if (!joinColumn.isVirtual()) {
+				field = this.joinFields.get(joinColumn);
+			}
+			else {
+				final AbstractColumn masterColumn = joinColumn.getMasterColumn();
+				for (int i = 0; i < this.columns.length; i++) {
+					if (this.columns[i] == masterColumn) {
+						field = this.fields[i];
+						break;
 					}
 				}
-
-				return row.getObject(field);
 			}
+			translatedIdFields.put(joinColumn.getReferencedColumn(), field);
 		}
-
-		return null;
+		return mapping.getType().getId(session, row, translatedIdFields);
 	}
 
 	/**
@@ -995,15 +1001,17 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			this.columns[i].setValue(instance, row.getObject(this.fields[i]));
 		}
 
-		for (final SingularAssociationMappingImpl<?, ?> mapping : this.singularJoins) {
-			final EntityTypeImpl<?> type = mapping.getType();
-			final Object id = this.getAssociateId(row, type, mapping);
+		// initializing the singular joins
+		for (final SingularAssociationMappingImpl<?, ?> _mapping : this.singularJoins) {
+			final EntityTypeImpl<?> _type = _mapping.getType();
 
-			if (id != null) {
-				final Object reference = session.getEntityManager().getReference(type.getJavaType(), id);
-				mapping.set(instance, reference);
+			final ManagedId<?> managedId = getAssociatedId(session, row, _mapping);
 
-				managedInstance.setJoinLoaded(mapping);
+			if (managedId != null && managedId.getId() != null) {
+				final Object reference = session.getEntityManager().getReference(_type.getJavaType(), managedId.getId());
+				_mapping.set(instance, reference);
+
+				managedInstance.setJoinLoaded(_mapping);
 			}
 		}
 
