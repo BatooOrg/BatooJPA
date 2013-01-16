@@ -29,6 +29,7 @@
 		<class>org.batoo.jpa.core.test.ormxml.E1</class>
 		<class>org.batoo.jpa.core.test.ormxml.E2</class>
 		<class>org.batoo.jpa.core.test.ormxml.E3</class>
+		<class>org.batoo.jpa.core.test.ormxml.E4</class>
 		
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>

@@ -16,44 +16,57 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.core.test.tablegenerator;
+package org.batoo.jpa.core.test.ormxml;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.TableGenerator;
 
 /**
+ * 
  * 
  * @author hceylan
  * @since 2.0.0
  */
 @Entity
-@TableGenerator(name = "addressGen", table = "ID_GEN", pkColumnName = "GEN_KEY", valueColumnName = "GEN_VALUE", pkColumnValue = "ADDR_ID")
-public class Foo {
+public class E4 {
 
 	@Id
-	@TableGenerator(name = "CUST_GEN", allocationSize = 1000)
-	@GeneratedValue(strategy = GenerationType.TABLE, generator = "addressGen")
-	private Integer id;
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "userGen")
+	private Long id;
 
 	private String value;
 
 	/**
-	 * Returns the id.
 	 * 
-	 * @return the id
 	 * @since 2.0.0
 	 */
-	public Integer getId() {
+	public E4() {
+		super();
+	}
+
+	public E4(String value) {
+		super();
+		this.value = value;
+	}
+
+	/**
+	 * Returns the id of the E.
+	 * 
+	 * @return the id of the E
+	 * 
+	 * @since 2.0.0
+	 */
+	public Long getId() {
 		return this.id;
 	}
 
 	/**
-	 * Returns the value.
+	 * Returns the value of the E1.
 	 * 
-	 * @return the value
+	 * @return the value of the E1
+	 * 
 	 * @since 2.0.0
 	 */
 	public String getValue() {
@@ -61,10 +74,23 @@ public class Foo {
 	}
 
 	/**
-	 * Sets the value.
+	 * Sets the id of the E.
+	 * 
+	 * @param id
+	 *            the id to set for E
+	 * 
+	 * @since 2.0.0
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	/**
+	 * Sets the value of the E1.
 	 * 
 	 * @param value
-	 *            the value to set
+	 *            the value to set for E1
+	 * 
 	 * @since 2.0.0
 	 */
 	public void setValue(String value) {

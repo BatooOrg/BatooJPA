@@ -27,7 +27,7 @@ import javax.persistence.Entity;
  * @since 2.0.0
  */
 @Entity
-public class E3 extends E {
+public class E3 {
 
 	private String value;
 
