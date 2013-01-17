@@ -39,6 +39,11 @@ public class E1 extends E {
 		super();
 	}
 
+	public E1(String value) {
+		super();
+		this.value = value;
+	}
+
 	/**
 	 * Returns the value of the E1.
 	 * 

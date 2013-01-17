@@ -94,7 +94,7 @@ public class ElementConstants {
 	protected static final String ELEMENT_ORDER_COLUMN = "order-column";
 	protected static final String ELEMENT_PRIMARY_KEY_JOIN_COLUMN = "primary-key-join-column";
 	protected static final String ELEMENT_SEQUENCE_GENERATOR = "sequence-generator";
-	protected static final String ELEMENT_TABLE_GENERATOR = "sequence-generator";
+	protected static final String ELEMENT_TABLE_GENERATOR = "table-generator";
 	protected static final String ELEMENT_TEMPORAL = "temporal";
 	protected static final String ELEMENT_TRANSIENT = "transient";
 	protected static final String ELEMENT_UNIQUE_CONSTRAINT = "unique-constraint";

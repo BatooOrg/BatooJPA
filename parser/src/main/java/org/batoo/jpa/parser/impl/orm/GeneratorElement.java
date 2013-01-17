@@ -68,7 +68,7 @@ public abstract class GeneratorElement extends ParentElement implements Generato
 	 */
 	@Override
 	protected void generate() {
-		this.name = this.getAttribute(ATTR_GENERATOR, EMPTY);
+		this.name = this.getAttribute(ATTR_NAME, EMPTY);
 		this.catalog = this.getAttribute(ATTR_CATALOG, EMPTY);
 		this.schema = this.getAttribute(ATTR_SCHEMA, EMPTY);
 		this.allocationSize = this.getAttribute(ATTR_ALLOCATION_SIZE, 50);

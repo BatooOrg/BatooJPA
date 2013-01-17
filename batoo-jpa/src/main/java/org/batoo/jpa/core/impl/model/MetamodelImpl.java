@@ -311,11 +311,7 @@ public class MetamodelImpl implements Metamodel {
 	 */
 	public synchronized void addSequenceGenerator(SequenceGeneratorMetadata metadata) {
 		final SequenceGenerator sequenceGenerator = new SequenceGenerator(metadata);
-		final SequenceGenerator existing = this.sequenceGenerators.put(sequenceGenerator.getName(), sequenceGenerator);
-		// if (existing != null) {
-		// throw new MappingException("Duplicate SequenceGenerator with the name: " + sequenceGenerator.getName(), existing.getLocator(),
-		// sequenceGenerator.getLocator());
-		// }
+		this.sequenceGenerators.put(sequenceGenerator.getName(), sequenceGenerator);
 	}
 
 	/**
@@ -355,11 +351,7 @@ public class MetamodelImpl implements Metamodel {
 	 */
 	public synchronized void addTableGenerator(TableGeneratorMetadata metadata) {
 		final TableGenerator tableGenerator = new TableGenerator(metadata);
-		final TableGenerator existing = this.tableGenerators.put(tableGenerator.getName(), tableGenerator);
-		// if (existing != null) {
-		// throw new MappingException("Duplicate tableGenerator with the name: " + tableGenerator.getName(), existing.getLocator(),
-		// tableGenerator.getLocator());
-		// }
+		this.tableGenerators.put(tableGenerator.getName(), tableGenerator);
 	}
 
 	/**
