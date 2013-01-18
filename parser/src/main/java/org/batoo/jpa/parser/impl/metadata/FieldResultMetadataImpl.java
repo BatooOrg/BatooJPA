@@ -37,7 +37,9 @@ public class FieldResultMetadataImpl implements FieldResultMetadata {
 	/**
 	 * 
 	 * @param locator
-	 * @param field
+	 *            the java locator
+	 * @param annotation
+	 *            the annotation
 	 * @since $version
 	 */
 	public FieldResultMetadataImpl(AbstractLocator locator, FieldResult annotation) {

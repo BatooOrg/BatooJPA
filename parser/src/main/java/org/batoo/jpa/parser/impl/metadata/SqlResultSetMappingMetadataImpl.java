@@ -32,7 +32,7 @@ import org.batoo.jpa.parser.metadata.SqlResultSetMappingMetadata;
 import com.google.common.collect.Lists;
 
 /**
- * Implemention of {@link SqlResultSetMappingMetadata}
+ * Implementation of {@link SqlResultSetMappingMetadata}
  * 
  * @author asimarslan
  * @since $version
@@ -48,7 +48,9 @@ public class SqlResultSetMappingMetadataImpl implements SqlResultSetMappingMetad
 	/**
 	 * 
 	 * @param locator
+	 *            the java locator
 	 * @param annotation
+	 *            the annotation
 	 * @since $version
 	 */
 	public SqlResultSetMappingMetadataImpl(AbstractLocator locator, SqlResultSetMapping annotation) {

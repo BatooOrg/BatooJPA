@@ -28,6 +28,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.SqlResultSetMapping;
 import javax.persistence.SqlResultSetMappings;
 import javax.persistence.Table;
@@ -83,6 +85,16 @@ import javax.persistence.TableGenerator;
 			@EntityResult(entityClass = Item3.class) })
 
 })
+@NamedNativeQueries({
+
+	@NamedNativeQuery(
+		name = "namedNativeQuery1",
+		query = "SELECT o.id,  o.quantity, o.item_id,  i.id, 'itemX' as name, i.description  FROM ORDER_T o, Item i WHERE (o.quantity > ?) AND (o.item_id = i.id)",
+		resultSetMapping = "OrderItemResults"),
+	@NamedNativeQuery(
+		name = "namedNativeQuery2",
+		query = "SELECT o.id,  49 as quantity,  o.item_id, i.id, 'itemX' as name, i.description FROM ORDER_T o, Item i WHERE (o.quantity > ?) AND (o.item_id = i.id)",
+		resultClass = Order.class) })
 @Entity
 @TableGenerator(name = "order_id", allocationSize = 100)
 @Table(name = "ORDER_T")

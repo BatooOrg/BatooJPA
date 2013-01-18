@@ -46,7 +46,9 @@ public class EntityResultMetadataImpl implements EntityResultMetadata {
 	/**
 	 * 
 	 * @param locator
-	 * @param entityResult
+	 *            the java locator
+	 * @param annotation
+	 *            the annotation
 	 * @since $version
 	 */
 	public EntityResultMetadataImpl(AbstractLocator locator, EntityResult annotation) {

@@ -128,11 +128,11 @@ public class MetamodelImpl implements Metamodel {
 	private final CallbackManager callbackManager;
 
 	private final Map<String, SequenceGenerator> sequenceGenerators = Maps.newHashMap();
+
 	private final Map<String, TableGenerator> tableGenerators = Maps.newHashMap();
-
 	private final Map<String, SequenceQueue> sequenceQueues = Maps.newHashMap();
-	private final Map<String, TableIdQueue> tableIdQueues = Maps.newHashMap();
 
+	private final Map<String, TableIdQueue> tableIdQueues = Maps.newHashMap();
 	private ThreadPoolExecutor idGeneratorExecuter;
 
 	/**
@@ -277,11 +277,10 @@ public class MetamodelImpl implements Metamodel {
 	 */
 	private void addNamedNativeQueries(List<NamedNativeQueryMetadata> namedNativeQueries) {
 		for (final NamedNativeQueryMetadata namedNativeQuery : namedNativeQueries) {
-			final NamedNativeQueryMetadata existing = this.namedNativeQueries.put(namedNativeQuery.getName(), namedNativeQuery);
-			if (existing != null) {
-				throw new MappingException("Duplicate named native query with the name: " + namedNativeQuery.getName(), existing.getLocator(),
-					namedNativeQuery.getLocator());
+			if (this.namedQueries.containsKey(namedNativeQuery.getName()) || this.namedNativeQueries.containsKey(namedNativeQuery.getName())) {
+				throw new MappingException("Duplicate named native query with the name: " + namedNativeQuery.getName(), namedNativeQuery.getLocator());
 			}
+			this.namedNativeQueries.put(namedNativeQuery.getName(), namedNativeQuery);
 		}
 	}
 
@@ -294,10 +293,10 @@ public class MetamodelImpl implements Metamodel {
 	 */
 	private void addNamedQueries(List<NamedQueryMetadata> namedQueries) {
 		for (final NamedQueryMetadata namedQuery : namedQueries) {
-			final NamedQueryMetadata existing = this.namedQueries.put(namedQuery.getName(), namedQuery);
-			if (existing != null) {
-				throw new MappingException("Duplicate named query with the name: " + namedQuery.getName(), existing.getLocator(), namedQuery.getLocator());
+			if (this.namedQueries.containsKey(namedQuery.getName()) || this.namedNativeQueries.containsKey(namedQuery.getName())) {
+				throw new MappingException("Duplicate named query with the name: " + namedQuery.getName(), namedQuery.getLocator());
 			}
+			this.namedQueries.put(namedQuery.getName(), namedQuery);
 		}
 	}
 
@@ -627,6 +626,17 @@ public class MetamodelImpl implements Metamodel {
 	}
 
 	/**
+	 * Returns the named native queries
+	 * 
+	 * @return the named native queries
+	 * 
+	 * @since $version
+	 */
+	public Map<String, NamedNativeQueryMetadata> getNamedNativeQueries() {
+		return this.namedNativeQueries;
+	}
+
+	/**
 	 * Returns the set of named queries.
 	 * 
 	 * @return the set of named queries
@@ -677,6 +687,7 @@ public class MetamodelImpl implements Metamodel {
 	 * return the ResultSetMapping with name if exists otherwise null
 	 * 
 	 * @param resultSetMapping
+	 *            the resultSetMapping
 	 * @return SqlResultSetMappingMetadata
 	 * @since $version
 	 */
