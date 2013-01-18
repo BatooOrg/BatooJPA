@@ -41,6 +41,7 @@ import javax.persistence.TableGenerator;
 @SqlResultSetMappings({ @SqlResultSetMapping(name = "WidgetOrderResults", entities = @EntityResult(entityClass = Order.class)),//
 
 	@SqlResultSetMapping(name = "OrderItemResults", entities = { @EntityResult(entityClass = Order.class), @EntityResult(entityClass = Item.class) }),//
+	@SqlResultSetMapping(name = "ItemResults", entities = @EntityResult(entityClass = Item.class)),//
 
 	@SqlResultSetMapping(name = "OrderItemResults2", entities = { //
 		@EntityResult(entityClass = Order.class, fields = {//
@@ -85,6 +86,7 @@ import javax.persistence.TableGenerator;
 @Entity
 @TableGenerator(name = "order_id", allocationSize = 100)
 @Table(name = "ORDER_T")
+@SuppressWarnings("javadoc")
 public class Order {
 
 	@Id

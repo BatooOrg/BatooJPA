@@ -816,7 +816,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		if (_mapping.getMappingType() == MappingType.PLURAL_ASSOCIATION) {
 			// if it is a plural association then we will test if we processed the child
 			// if it is a one-to-many mapping and has an inverse then set the inverses
-			if (((ManagedCollection<?>) _mapping.get(instance)).addChild(pair) && (_mapping.getInverse() != null) && //
+			if (_mapping.get(instance) != null && ((ManagedCollection<?>) _mapping.get(instance)).addChild(pair) && (_mapping.getInverse() != null) && //
 				(_mapping.getAttribute().getPersistentAttributeType() == PersistentAttributeType.ONE_TO_MANY)) {
 				_mapping.getInverse().set(child.getInstance(), instance);
 				child.setJoinLoaded(_mapping.getInverse());

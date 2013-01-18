@@ -19,68 +19,65 @@
 package org.batoo.jpa.core.test.q;
 
 import javax.persistence.CascadeType;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.EntityResult;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.FieldResult;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
+import javax.persistence.SqlResultSetMapping;
+import javax.persistence.SqlResultSetMappings;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 
 /**
  * 
- * @author asimarslan
+ * @author tolgagokmen
  * @since $version
  */
+@SqlResultSetMappings({ @SqlResultSetMapping(name = "OrderItemResultsDisc4", entities = { //
+	@EntityResult(entityClass = Order4.class,//
+		discriminatorColumn = "discol",//
+		fields = {//
+		@FieldResult(name = "id", column = "order_id"),//
+			@FieldResult(name = "quantity", column = "order_quantity"),//
+			@FieldResult(name = "item", column = "order_item") }),//
+		@EntityResult(entityClass = Item4.class) }),//
+
+})
 @Entity
 @TableGenerator(name = "order_id", allocationSize = 100)
-@Table(name = "ORDER2")
+@Table(name = "ORDER4")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "DISC", discriminatorType = DiscriminatorType.STRING, length = 20)
+@DiscriminatorValue("ORDER")
 @SuppressWarnings("javadoc")
-public class Order2 {
-
-	@Id
-	@GeneratedValue(generator = "order_id", strategy = GenerationType.TABLE)
-	private Long id;
-
-	private Integer quantity;
+public class Order4 extends OrderBase {
 
 	@ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-	private Item2 item;
+	protected Item4 item;
 
-	public Order2() {
+	public Order4() {
 		super();
 	}
 
-	public Order2(Integer quantity, Item2 item) {
+	public Order4(Integer quantity, Item4 item) {
 		super();
 		this.quantity = quantity;
 		this.item = item;
 
 	}
 
-	public Long getId() {
-		return this.id;
-	}
-
-	public Item2 getItem() {
+	public Item4 getItem() {
 		return this.item;
 	}
 
-	public Integer getQuantity() {
-		return this.quantity;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public void setItem(Item2 item) {
+	public void setItem(Item4 item) {
 		this.item = item;
-	}
-
-	public void setQuantity(Integer quantity) {
-		this.quantity = quantity;
 	}
 
 }

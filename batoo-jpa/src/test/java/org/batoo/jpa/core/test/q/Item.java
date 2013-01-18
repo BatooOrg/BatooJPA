@@ -35,6 +35,7 @@ import javax.persistence.TableGenerator;
  */
 @Entity
 @TableGenerator(name = "item_id", allocationSize = 100)
+@SuppressWarnings("javadoc")
 public class Item {
 
 	@Id
@@ -46,7 +47,7 @@ public class Item {
 	private String description;
 
 	@OneToMany(mappedBy = "item", fetch = FetchType.EAGER)
-	public List<Order> orders;
+	private List<Order> orders;
 
 	public Item() {
 		super();
