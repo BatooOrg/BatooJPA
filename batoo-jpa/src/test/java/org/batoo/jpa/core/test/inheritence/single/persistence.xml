@@ -26,6 +26,7 @@
 	<persistence-unit name="default">
 		<provider>org.batoo.jpa.core.BatooPersistenceProvider</provider>
 		
+		<class>org.batoo.jpa.core.test.inheritence.single.Bar</class>
 		<class>org.batoo.jpa.core.test.inheritence.single.Foo</class>
 		<class>org.batoo.jpa.core.test.inheritence.single.FooExt1</class>
 		<class>org.batoo.jpa.core.test.inheritence.single.FooExt11</class>
