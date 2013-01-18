@@ -33,6 +33,8 @@
 		<class>org.batoo.jpa.core.test.q.Order3</class>
 		<class>org.batoo.jpa.core.test.q.Item3</class>
 		<class>org.batoo.jpa.core.test.q.Item3Pk</class>
+		<class>org.batoo.jpa.core.test.q.Order4</class>
+		<class>org.batoo.jpa.core.test.q.Item4</class>
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
 			<property name="org.batoo.jpa.ddl" value="DROP" />
