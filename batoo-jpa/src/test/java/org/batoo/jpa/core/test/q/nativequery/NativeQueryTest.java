@@ -245,6 +245,72 @@ public class NativeQueryTest extends BaseCoreTest {
 	}
 
 	/**
+	 * test Simple named native query
+	 * 
+	 * @since $version
+	 */
+	@Test
+	public void testNamedNativeQuery() {
+		final Item i1 = new Item("item1", "the item 1.");
+
+		final Order o1 = new Order(30, i1);
+
+		this.persist(o1);
+
+		this.commit();
+		this.close();
+
+		final Query q = this.em().createNamedQuery("namedNativeQuery1").setParameter(0, 5);
+
+		Assert.assertEquals(1, q.getResultList().size());
+
+	}
+
+	/**
+	 * Simple single entity named native query test
+	 * 
+	 * @since $version
+	 */
+	@Test
+	public void testNamedNativeQuery2() {
+		final Item i1 = new Item("item1", "the item 1.");
+
+		final Order o1 = new Order(20, i1);
+
+		this.persist(o1);
+
+		this.commit();
+		this.close();
+
+		final Query q = this.em().createNamedQuery("namedNativeQuery2").setParameter(0, 5);
+
+		Assert.assertEquals(1, q.getResultList().size());
+
+	}
+
+	/**
+	 * test Simple named native query in orm.xml
+	 * 
+	 * @since $version
+	 */
+	@Test
+	public void testNamedNativeQuery3() {
+		final Item i1 = new Item("item1", "the item 1.");
+
+		final Order o1 = new Order(30, i1);
+
+		this.persist(o1);
+
+		this.commit();
+		this.close();
+
+		final Query q = this.em().createNamedQuery("namedNativeQuery3").setParameter(0, 5);
+
+		Assert.assertEquals(1, q.getResultList().size());
+
+	}
+
+	/**
 	 * Simple Multi entity native query test
 	 * 
 	 * @since $version
