@@ -23,6 +23,7 @@ import javax.persistence.EntityManager;
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -127,5 +128,31 @@ public class SimpleInheritanceTest extends BaseCoreTest {
 		Assert.assertEquals(foo.getValue(), foo2.getValue());
 		Assert.assertEquals(foo.getValueExt1(), foo2.getValueExt1());
 		Assert.assertEquals(foo.getValueExt11(), foo2.getValueExt11());
+	}
+
+	/**
+	 * Test inheritance of mappedSuperClass
+	 * 
+	 * @since $version
+	 */
+	@Test
+	@Ignore
+	public void testSimpleInheritance4() {
+		final Foo foo = new Foo("Foo");
+
+		final Bar bar = new Bar(1, foo);
+
+		this.persist(bar);
+
+		this.commit();
+
+		this.close();
+
+		final Bar bar2 = this.find(Bar.class, 1l);
+
+		Assert.assertEquals(1, bar2.getId());
+		Assert.assertEquals(1, bar2.getFoo().getKey().intValue());
+		Assert.assertEquals("Foo", bar2.getFoo().getValue());
+
 	}
 }
