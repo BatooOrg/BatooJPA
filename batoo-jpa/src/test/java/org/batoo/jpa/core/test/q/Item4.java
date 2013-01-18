@@ -18,66 +18,51 @@
  */
 package org.batoo.jpa.core.test.q;
 
-import javax.persistence.Embeddable;
+import java.util.List;
+
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.TableGenerator;
 
 /**
  * 
- * @author asimarslan
+ * @author tolgagokmen
  * @since $version
  */
-@Embeddable
+@Entity
+@TableGenerator(name = "item_id", allocationSize = 100)
+@Table(name = "Item4")
 @SuppressWarnings("javadoc")
-public class Item3Pk {
+public class Item4 {
 
+	@Id
+	@GeneratedValue(generator = "item_id", strategy = GenerationType.TABLE)
 	private Long id;
 
 	private String name;
 
-	public Item3Pk() {
+	private String description;
+
+	@OneToMany(mappedBy = "item", fetch = FetchType.EAGER)
+	public List<Order4> orders;
+
+	public Item4() {
 		super();
 	}
 
-	/**
-	 * 
-	 * @param id
-	 * @param name
-	 * @since $version
-	 */
-	public Item3Pk(Long id, String name) {
+	public Item4(String name, String description) {
 		super();
-		this.id = id;
 		this.name = name;
+		this.description = description;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof Item3Pk)) {
-			return false;
-		}
-		final Item3Pk other = (Item3Pk) obj;
-		if (this.id == null) {
-			if (other.id != null) {
-				return false;
-			}
-		}
-		else if (!this.id.equals(other.id)) {
-			return false;
-		}
-		if (this.name == null) {
-			if (other.name != null) {
-				return false;
-			}
-		}
-		else if (!this.name.equals(other.name)) {
-			return false;
-		}
-		return true;
+	public String getDescription() {
+		return this.description;
 	}
 
 	public Long getId() {
@@ -88,13 +73,12 @@ public class Item3Pk {
 		return this.name;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((this.id == null) ? 0 : this.id.hashCode());
-		result = prime * result + ((this.name == null) ? 0 : this.name.hashCode());
-		return result;
+	public List<Order4> getOrders() {
+		return this.orders;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public void setId(Long id) {
@@ -103,6 +87,10 @@ public class Item3Pk {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public void setOrders(List<Order4> orders) {
+		this.orders = orders;
 	}
 
 }
