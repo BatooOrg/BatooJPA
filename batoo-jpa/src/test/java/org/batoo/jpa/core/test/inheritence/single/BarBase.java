@@ -16,60 +16,41 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.core.test.ormxml;
+package org.batoo.jpa.core.test.inheritence.single;
 
-import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
 
 /**
  * 
- * 
- * @author hceylan
- * @since 2.0.0
+ * @author asimarslan
+ * @since $version
  */
-@Entity
-public class E1 extends E {
+@MappedSuperclass
+@SuppressWarnings("javadoc")
+public class BarBase {
 
-	private String value;
+	@Id
+	@GeneratedValue(generator = "bar_id", strategy = GenerationType.TABLE)
+	protected long id;
 
-	/**
-	 * 
-	 * @since 2.0.0
-	 */
-	public E1() {
+	public BarBase() {
 		super();
 	}
 
-	/**
-	 * 
-	 * @param value
-	 *            value
-	 * @since $version
-	 */
-	public E1(String value) {
+	public BarBase(long id) {
 		super();
-		this.value = value;
+		this.id = id;
 	}
 
-	/**
-	 * Returns the value of the E1.
-	 * 
-	 * @return the value of the E1
-	 * 
-	 * @since 2.0.0
-	 */
-	public String getValue() {
-		return this.value;
+	public long getId() {
+		return this.id;
 	}
 
-	/**
-	 * Sets the value of the E1.
-	 * 
-	 * @param value
-	 *            the value to set for E1
-	 * 
-	 * @since 2.0.0
-	 */
-	public void setValue(String value) {
-		this.value = value;
+	public void setId(long id) {
+		this.id = id;
 	}
+
 }

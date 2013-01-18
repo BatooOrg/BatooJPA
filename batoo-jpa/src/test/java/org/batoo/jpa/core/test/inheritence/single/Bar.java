@@ -18,77 +18,48 @@
  */
 package org.batoo.jpa.core.test.inheritence.single;
 
+import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.ManyToOne;
+import javax.persistence.TableGenerator;
 
 /**
  * 
- * @author hceylan
- * @since 2.0.0
+ * @author asimarslan
+ * @since $version
  */
 @Entity
-@Inheritance
-@DiscriminatorColumn
-public class Foo {
+@TableGenerator(name = "bar_id", allocationSize = 100)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "DISC", discriminatorType = DiscriminatorType.STRING, length = 20)
+@DiscriminatorValue("BAR")
+@SuppressWarnings("javadoc")
+public class Bar extends BarBase {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer key;
+	@ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+	protected Foo foo;
 
-	private String value;
-
-	/**
-	 * 
-	 * @since $version
-	 */
-	public Foo() {
+	public Bar() {
 		super();
 	}
 
-	/**
-	 * 
-	 * @param value
-	 *            value
-	 * @since $version
-	 */
-	public Foo(String value) {
-		super();
-		this.value = value;
+	public Bar(long id, Foo foo) {
+		super(id);
+		this.foo = foo;
 	}
 
-	/**
-	 * Returns the key.
-	 * 
-	 * @return the key
-	 * @since 2.0.0
-	 */
-	public Integer getKey() {
-		return this.key;
+	public Foo getFoo() {
+		return this.foo;
 	}
 
-	/**
-	 * Returns the value.
-	 * 
-	 * @return the value
-	 * @since 2.0.0
-	 */
-	public String getValue() {
-		return this.value;
-	}
-
-	/**
-	 * Sets the value.
-	 * 
-	 * @param value
-	 *            the value to set
-	 * @since 2.0.0
-	 */
-	public void setValue(String value) {
-		this.value = value;
+	public void setFoo(Foo foo) {
+		this.foo = foo;
 	}
 
 }

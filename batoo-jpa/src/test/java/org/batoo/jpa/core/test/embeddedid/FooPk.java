@@ -31,10 +31,22 @@ public class FooPk {
 	private String strKey;
 	private Integer intKey;
 
+	/**
+	 * 
+	 * @since $version
+	 */
 	public FooPk() {
 		super();
 	}
 
+	/**
+	 * 
+	 * @param strKey
+	 *            strKey
+	 * @param intKey
+	 *            intKey
+	 * @since $version
+	 */
 	public FooPk(String strKey, Integer intKey) {
 		super();
 		this.strKey = strKey;

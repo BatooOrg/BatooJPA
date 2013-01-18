@@ -41,6 +41,7 @@ public class OrmXmlTest extends BaseCoreTest {
 	 * Tests to {@link EntityManager#find(Class, Object)}
 	 * 
 	 * @throws SQLException
+	 *             thrown in case of an error
 	 * 
 	 * @since 2.0.0
 	 */
@@ -55,8 +56,6 @@ public class OrmXmlTest extends BaseCoreTest {
 		Assert.assertEquals(2,
 			new QueryRunner(this.em().unwrap(DataSource.class)).query("SELECT COUNT(*) FROM E4", new SingleValueHandler<Number>()).intValue());
 
-		// final E1 e = this.find(E1.class, e1.getId());
-		// Assert.assertEquals(e.getId(), e1.getId());
 	}
 
 	/**

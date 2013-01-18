@@ -46,6 +46,12 @@ public class E4 {
 		super();
 	}
 
+	/**
+	 * 
+	 * @param value
+	 *            value
+	 * @since $version
+	 */
 	public E4(String value) {
 		super();
 		this.value = value;
