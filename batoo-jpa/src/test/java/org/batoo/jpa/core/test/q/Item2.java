@@ -35,6 +35,7 @@ import javax.persistence.Table;
 @Entity
 @IdClass(ItemPk.class)
 @Table(name = "Item2")
+@SuppressWarnings("javadoc")
 public class Item2 {
 
 	@Id

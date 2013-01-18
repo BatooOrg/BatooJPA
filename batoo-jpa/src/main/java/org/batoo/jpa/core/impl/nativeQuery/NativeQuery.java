@@ -301,6 +301,7 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	private HashMap<AbstractColumn, String> getAssociatedId(SingularAssociationMappingImpl<?, ?> mapping, HashMap<String, Object> _parentFieldMap)
 		throws SQLException {
 		final HashMap<AbstractColumn, String> translatedIdFields = Maps.newHashMap();
+
 		for (final JoinColumn joinColumn : mapping.getForeignKey().getJoinColumns()) {
 			final String name = joinColumn.getReferencedColumn().getMapping().getName();
 			final Object colnameTemp = (_parentFieldMap != null) ? _parentFieldMap.get(name) : null;
@@ -309,8 +310,6 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 			translatedIdFields.put(joinColumn.getReferencedColumn(), colname);
 		}
 		return translatedIdFields;
-		// return mapping.getType().getId(session, row, translatedIdFields);
-
 	}
 
 	/**

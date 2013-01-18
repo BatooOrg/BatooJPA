@@ -23,6 +23,7 @@ package org.batoo.jpa.core.test.q;
  * @author asimarslan
  * @since $version
  */
+@SuppressWarnings("javadoc")
 public class ItemPk {
 
 	private Long id;

@@ -33,6 +33,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "Item3")
+@SuppressWarnings("javadoc")
 public class Item3 {
 
 	@EmbeddedId

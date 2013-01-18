@@ -36,6 +36,7 @@ import javax.persistence.TableGenerator;
 @Entity
 @TableGenerator(name = "order_id", allocationSize = 100)
 @Table(name = "ORDER2")
+@SuppressWarnings("javadoc")
 public class Order2 {
 
 	@Id

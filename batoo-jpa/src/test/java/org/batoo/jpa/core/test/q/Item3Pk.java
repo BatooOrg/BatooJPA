@@ -26,6 +26,7 @@ import javax.persistence.Embeddable;
  * @since $version
  */
 @Embeddable
+@SuppressWarnings("javadoc")
 public class Item3Pk {
 
 	private Long id;

@@ -86,6 +86,7 @@ import javax.persistence.TableGenerator;
 @Entity
 @TableGenerator(name = "order_id", allocationSize = 100)
 @Table(name = "ORDER_T")
+@SuppressWarnings("javadoc")
 public class Order {
 
 	@Id

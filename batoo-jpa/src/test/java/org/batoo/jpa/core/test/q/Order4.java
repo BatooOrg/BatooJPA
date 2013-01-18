@@ -18,14 +18,17 @@
  */
 package org.batoo.jpa.core.test.q;
 
+import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.EntityResult;
+import javax.persistence.FetchType;
 import javax.persistence.FieldResult;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.ManyToOne;
 import javax.persistence.SqlResultSetMapping;
 import javax.persistence.SqlResultSetMappings;
 import javax.persistence.Table;
@@ -52,7 +55,11 @@ import javax.persistence.TableGenerator;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "DISC", discriminatorType = DiscriminatorType.STRING, length = 20)
 @DiscriminatorValue("ORDER")
+@SuppressWarnings("javadoc")
 public class Order4 extends OrderBase {
+
+	@ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+	protected Item4 item;
 
 	public Order4() {
 		super();
@@ -63,6 +70,14 @@ public class Order4 extends OrderBase {
 		this.quantity = quantity;
 		this.item = item;
 
+	}
+
+	public Item4 getItem() {
+		return this.item;
+	}
+
+	public void setItem(Item4 item) {
+		this.item = item;
 	}
 
 }
