@@ -35,7 +35,9 @@ public class ColumnResultMetadataImpl implements ColumnResultMetadata {
 	/**
 	 * 
 	 * @param locator
-	 * @param columnResult
+	 *            the java locator
+	 * @param annotation
+	 *            the annotation
 	 * @since $version
 	 */
 	public ColumnResultMetadataImpl(AbstractLocator locator, ColumnResult annotation) {

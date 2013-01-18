@@ -45,6 +45,7 @@ import javax.validation.ConstraintViolationException;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
+import org.batoo.common.util.StringUtils;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaDeleteImpl;
 import org.batoo.jpa.core.impl.criteria.CriteriaQueryImpl;
@@ -62,6 +63,7 @@ import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMappingImpl;
 import org.batoo.jpa.core.impl.nativeQuery.NativeQuery;
 import org.batoo.jpa.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
+import org.batoo.jpa.parser.metadata.NamedNativeQueryMetadata;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -304,6 +306,16 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public Query createNamedQuery(String name) {
+		final NamedNativeQueryMetadata metadata = this.metamodel.getNamedNativeQueries().get(name);
+
+		if (!StringUtils.isBlank(metadata.getResultClass()) && !metadata.getResultClass().equals("void")) {
+			return this.createNativeQuery(metadata.getQuery(), this.metamodel.entity(metadata.getResultClass()).getJavaType());
+		}
+
+		if (!StringUtils.isBlank(metadata.getResultSetMapping())) {
+			return this.createNativeQuery(metadata.getQuery(), metadata.getResultSetMapping());
+		}
+
 		return this.createNamedQuery(name, Object.class);
 	}
 
