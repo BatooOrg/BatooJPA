@@ -197,7 +197,7 @@ public class QueryRunner {
 
 		for (int i = 0; i < params.length; i++) {
 			final Object param = params[i];
-			if (param != null) {
+			if (param != null && param != Void.TYPE) {
 				if (hasLob && (param instanceof Clob)) {
 					statement.setClob(i + 1, (Clob) param);
 				}
@@ -224,8 +224,9 @@ public class QueryRunner {
 						pmdKnownBroken = this.pmdKnownBroken = true;
 					}
 				}
-
-				statement.setNull(i + 1, sqlType);
+				if (param != Void.TYPE) {
+					statement.setNull(i + 1, sqlType);
+				}
 			}
 		}
 	}

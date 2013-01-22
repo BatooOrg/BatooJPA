@@ -529,6 +529,26 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 	/**
 	 * 
+	 * @since $version
+	 */
+	@Test(expected = java.lang.IllegalArgumentException.class)
+	public void testOrderedParameters() {
+		this.persist(this.person(15));
+		this.persist(this.person(35));
+		this.commit();
+
+		this.close();
+
+		TypedQuery<Person> q = this.cq("select p from Person p where p.age = ?", Person.class).setParameter(1, 15);
+		Assert.assertEquals(15, q.getSingleResult().getAge());
+
+		q = this.cq("select p from Person p where p.age = ?1 or p.age = ?2", Person.class).setParameter(2, 15);
+		Assert.assertEquals(15, q.getSingleResult().getAge());
+
+	}
+
+	/**
+	 * 
 	 * @since 2.0.0
 	 */
 	@Test

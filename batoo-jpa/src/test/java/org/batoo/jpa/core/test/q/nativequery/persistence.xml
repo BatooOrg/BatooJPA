@@ -34,6 +34,7 @@
 		<class>org.batoo.jpa.core.test.q.Item3</class>
 		<class>org.batoo.jpa.core.test.q.Item3Pk</class>
 		<class>org.batoo.jpa.core.test.q.Order4</class>
+		<class>org.batoo.jpa.core.test.q.OrderBase</class>
 		<class>org.batoo.jpa.core.test.q.Item4</class>
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
