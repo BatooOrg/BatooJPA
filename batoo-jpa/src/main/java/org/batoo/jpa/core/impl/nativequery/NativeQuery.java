@@ -16,7 +16,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.core.impl.nativeQuery;
+package org.batoo.jpa.core.impl.nativequery;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -428,13 +428,10 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 
 	@SuppressWarnings("rawtypes")
 	private NativeParameter<?> getParameter0(int position) {
-		final NativeParameter<?> parameter = this.getParameter(position);
-		if (parameter != null) {
-			return this.parameters.get(position);
+		if (this.getParameter(position) == null) {
+			this.parameters.put(position, new NativeParameter(position));
 		}
-		else {
-			return this.parameters.put(position, new NativeParameter(position));
-		}
+		return this.parameters.get(position);
 	}
 
 	/**
@@ -499,9 +496,22 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 
 		try {
 
-			final Object[] paramValues = new Object[this.parameters.size()];
+			// max of parameter index
+			int max = 1;
+			for (final int i : this.parameters.keySet()) {
+				max = i > max ? i : max;
+			}
+			// // init with void
+			final Object[] paramValues = new Object[max];
 			for (int i = 0; i < paramValues.length; i++) {
-				paramValues[i] = this.getParameterValue(i + 1);
+				paramValues[i] = Void.TYPE;
+			}
+
+			// fill with real values
+			for (int i = 0; i < paramValues.length; i++) {
+				if (this.getParameter(i + 1) != null) {
+					paramValues[i] = this.getParameterValue(i + 1);
+				}
 			}
 
 			try {
@@ -867,7 +877,8 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 */
 	@Override
 	public NativeQuery setParameter(int position, Object value) {
-		this.parameterValues.put(this.getParameter0(position), value);
+		final NativeParameter<?> parameter0 = this.getParameter0(position);
+		this.parameterValues.put(parameter0, value);
 
 		return this;
 	}

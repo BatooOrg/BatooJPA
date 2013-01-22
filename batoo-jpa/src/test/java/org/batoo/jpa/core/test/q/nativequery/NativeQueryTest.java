@@ -33,7 +33,6 @@ import org.batoo.jpa.core.test.q.Order2;
 import org.batoo.jpa.core.test.q.Order3;
 import org.batoo.jpa.core.test.q.Order4;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -95,7 +94,6 @@ public class NativeQueryTest extends BaseCoreTest {
 	 * @since $version
 	 */
 	@Test
-	@Ignore
 	public void testDiscriminatorValue() {
 		final Item4 i4 = new Item4("item4", "the item 4.");
 
@@ -129,7 +127,7 @@ public class NativeQueryTest extends BaseCoreTest {
 			final Item4 item = (Item4) row[1];
 			Assert.assertTrue(this.em().contains(item));
 
-			Assert.assertEquals(2, item.getOrders().size());
+			Assert.assertEquals(1, item.getOrders().size());
 
 			Assert.assertEquals(item, order.getItem());
 
@@ -260,7 +258,7 @@ public class NativeQueryTest extends BaseCoreTest {
 		this.commit();
 		this.close();
 
-		final Query q = this.em().createNamedQuery("namedNativeQuery1").setParameter(0, 5);
+		final Query q = this.em().createNamedQuery("namedNativeQuery1").setParameter(1, 5);
 
 		Assert.assertEquals(1, q.getResultList().size());
 
@@ -282,7 +280,7 @@ public class NativeQueryTest extends BaseCoreTest {
 		this.commit();
 		this.close();
 
-		final Query q = this.em().createNamedQuery("namedNativeQuery2").setParameter(0, 5);
+		final Query q = this.em().createNamedQuery("namedNativeQuery2").setParameter(1, 5);
 
 		Assert.assertEquals(1, q.getResultList().size());
 
@@ -304,7 +302,7 @@ public class NativeQueryTest extends BaseCoreTest {
 		this.commit();
 		this.close();
 
-		final Query q = this.em().createNamedQuery("namedNativeQuery3").setParameter(0, 5);
+		final Query q = this.em().createNamedQuery("namedNativeQuery3").setParameter(1, 5);
 
 		Assert.assertEquals(1, q.getResultList().size());
 
@@ -383,7 +381,7 @@ public class NativeQueryTest extends BaseCoreTest {
 				+ "o.item_id, "//
 				+ "i.id, 'itemX' as name, i.description " //
 				+ "FROM ORDER_T o, Item i "//
-				+ "WHERE (o.quantity > ?) AND (o.item_id = i.id)", "OrderItemResults").setParameter(0, 5);
+				+ "WHERE (o.quantity > ?) AND (o.item_id = i.id)", "OrderItemResults").setParameter(1, 5);
 
 		final List<?> resultList = q.getResultList();
 
@@ -420,7 +418,7 @@ public class NativeQueryTest extends BaseCoreTest {
 	 * 
 	 * @since $version
 	 */
-	@Test
+	@Test(expected = javax.persistence.PersistenceException.class)
 	public void testSingleEntityWithParameters() {
 		final Item i1 = new Item("item1", "the item 1.");
 
@@ -437,7 +435,9 @@ public class NativeQueryTest extends BaseCoreTest {
 				+ "o.item_id, "//
 				+ "i.id, 'itemX' as name, i.description " //
 				+ "FROM ORDER_T o, Item i "//
-				+ "WHERE (o.quantity > ?) AND (o.item_id = i.id)", Order.class).setParameter(0, 5);
+				+ "WHERE (o.quantity > ? OR o.quantity > ?) AND (o.item_id = i.id)", Order.class)//
+		// .setParameter(1, 5)//
+		.setParameter(2, 5);
 
 		final List<?> resultList = q.getResultList();
 
