@@ -23,7 +23,7 @@
  * questions.
  */
 
-package org.batoo.jpa.core.impl.nativeQuery;
+package org.batoo.jpa.core.impl.nativequery;
 
 import java.io.IOException;
 import java.io.Reader;

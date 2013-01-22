@@ -60,7 +60,7 @@ import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.mapping.AssociationMappingImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMappingImpl;
-import org.batoo.jpa.core.impl.nativeQuery.NativeQuery;
+import org.batoo.jpa.core.impl.nativequery.NativeQuery;
 import org.batoo.jpa.jdbc.adapter.JdbcAdaptor;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
 import org.batoo.jpa.parser.metadata.NamedNativeQueryMetadata;

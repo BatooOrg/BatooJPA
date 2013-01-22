@@ -16,7 +16,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.core.impl.nativeQuery;
+package org.batoo.jpa.core.impl.nativequery;
 
 import javax.persistence.Parameter;
 

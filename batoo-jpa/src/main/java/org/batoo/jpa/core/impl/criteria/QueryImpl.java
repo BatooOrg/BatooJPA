@@ -118,13 +118,20 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 		this.sql = this.q.getSql();
 
 		for (final ParameterExpression<?> p : this.q.getParameters()) {
-			this.parameters.put((ParameterExpressionImpl<?>) p, null);
+			this.parameters.put((ParameterExpressionImpl<?>) p, Void.TYPE);
 		}
 
 		this.pmdBroken = entityManager.getJdbcAdaptor().isPmdBroken();
 	}
 
 	private Object[] applyParameters(Connection connection) {
+		// are all params set
+		for (final ParameterExpressionImpl<?> param : this.parameters.keySet()) {
+			if (this.parameters.get(param) == Void.TYPE) {
+				throw new IllegalArgumentException("Parameter not set: " + param.getPosition());
+			}
+		}
+
 		if ((this.startPosition != 0) || (this.maxResult != Integer.MAX_VALUE)) {
 			QueryImpl.LOG.debug("Rows restricted to {0} / {1}", this.startPosition, this.maxResult);
 
@@ -1017,7 +1024,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 		if (value instanceof Calendar) {
 			return this.setParameter(name, (Calendar) value, TemporalType.TIMESTAMP);
 		}
-		
+
 		return this.putParam(this.getParameter(name), value);
 	}
 
