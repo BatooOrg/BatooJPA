@@ -259,14 +259,6 @@ public class MetamodelImpl implements Metamodel {
 		this.addNamedQueries(metadata.getNamedQueries());
 		this.addNamedNativeQueries(metadata.getNamedNativeQueries());
 		this.addSqlResultSetMappings(metadata.getSqlResultSetMapping());
-
-		// TODO do we need this part
-		for (final ManagedTypeMetadata entity : entities) {
-			if (entity instanceof EntityMetadata) {
-				this.addNamedQueries(((EntityMetadata) entity).getNamedQueries());
-			}
-		}
-
 	}
 
 	/**
