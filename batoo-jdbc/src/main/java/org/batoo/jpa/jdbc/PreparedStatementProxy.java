@@ -687,7 +687,11 @@ public class PreparedStatementProxy implements PreparedStatement {
 	 */
 	@Override
 	public void setBinaryStream(int parameterIndex, InputStream x) throws SQLException {
-		this.throwNotImplemented();
+		if ((this.debug || (this.sqlStream != null)) && (this.parameters != null)) {
+			this.parameters[parameterIndex - 1] = "[BLOB]";
+		}
+
+		this.statement.setBinaryStream(parameterIndex, x);
 	}
 
 	/**
@@ -772,7 +776,11 @@ public class PreparedStatementProxy implements PreparedStatement {
 	 */
 	@Override
 	public void setCharacterStream(int parameterIndex, Reader reader) throws SQLException {
-		this.throwNotImplemented();
+		if ((this.debug || (this.sqlStream != null)) && (this.parameters != null)) {
+			this.parameters[parameterIndex - 1] = "[BLOB]";
+		}
+
+		this.statement.setCharacterStream(parameterIndex, reader);
 	}
 
 	/**

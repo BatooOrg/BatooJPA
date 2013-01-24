@@ -34,6 +34,7 @@ import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.batoo.jpa.jdbc.PreparedStatementProxy;
 import org.batoo.jpa.jdbc.adapter.JdbcAdaptor;
+import org.batoo.jpa.jdbc.adapter.OracleAdaptor;
 
 /**
  * Executes SQL queries with pluggable strategies for handling <code>ResultSet</code>s. This class is thread safe.
@@ -197,12 +198,22 @@ public class QueryRunner {
 
 		for (int i = 0; i < params.length; i++) {
 			final Object param = params[i];
-			if (param != null && param != Void.TYPE) {
+			if ((param != null) && (param != Void.TYPE)) {
 				if (hasLob && (param instanceof Clob)) {
-					statement.setClob(i + 1, (Clob) param);
+					if (this.jdbcAdaptor instanceof OracleAdaptor) {
+						statement.setCharacterStream(i + 1, ((Clob) param).getCharacterStream());
+					}
+					else {
+						statement.setClob(i + 1, (Clob) param);
+					}
 				}
 				else if (hasLob && (param instanceof Blob)) {
-					statement.setBlob(i + 1, (Blob) param);
+					if (this.jdbcAdaptor instanceof OracleAdaptor) {
+						statement.setBinaryStream(i + 1, ((Blob) param).getBinaryStream());
+					}
+					else {
+						statement.setBlob(i + 1, (Blob) param);
+					}
 				}
 				else {
 					statement.setObject(i + 1, param);

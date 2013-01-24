@@ -183,9 +183,9 @@ public class OracleAdaptor extends JdbcAdaptor {
 	protected String getColumnType(AbstractColumn cd, int sqlType) {
 		switch (sqlType) {
 			case Types.BLOB:
-				return "BLOB(" + cd.getLength() + ")";
+				return "BLOB";
 			case Types.CLOB:
-				return "NCLOB(" + cd.getLength() + ")";
+				return "NCLOB";
 			case Types.VARCHAR:
 				return "VARCHAR(" + cd.getLength() + ")";
 			case Types.TIME:
