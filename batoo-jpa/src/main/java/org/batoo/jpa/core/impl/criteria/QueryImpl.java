@@ -1043,7 +1043,12 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 
 		final int columnCount = this.md.getColumnCount();
 		for (int i = 0; i < columnCount; i++) {
-			data[i] = rs.getObject(i + 1);
+			try {
+				data[i] = rs.getObject(i + 1);
+			}
+			catch (final Exception e) {
+				data[i] = "[N/A]";
+			}
 		}
 
 		this.data.add(data);
