@@ -308,11 +308,11 @@ public class EntityManagerImpl implements EntityManager {
 	public Query createNamedQuery(String name) {
 		final NamedNativeQueryMetadata metadata = this.metamodel.getNamedNativeQueries().get(name);
 
-		if (!StringUtils.isBlank(metadata.getResultClass()) && !metadata.getResultClass().equals("void")) {
+		if ((metadata != null) && !StringUtils.isBlank(metadata.getResultClass()) && !metadata.getResultClass().equals("void")) {
 			return this.createNativeQuery(metadata.getQuery(), this.metamodel.entity(metadata.getResultClass()).getJavaType());
 		}
 
-		if (!StringUtils.isBlank(metadata.getResultSetMapping())) {
+		if ((metadata != null) && !StringUtils.isBlank(metadata.getResultSetMapping())) {
 			return this.createNativeQuery(metadata.getQuery(), metadata.getResultSetMapping());
 		}
 
