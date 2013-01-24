@@ -157,7 +157,7 @@ public class NativeQueryTest extends BaseCoreTest {
 				+ "o.item_id AS order_item_id, " //
 				+ "o.item_name AS order_item_name, "//
 				+ "i.id, i.name, i.description " //
-				+ "FROM Order3 o, Item3 i "//
+				+ "FROM ORDER3 o, Item3 i "//
 				+ "WHERE (o.quantity > 25) AND (o.item_id = i.id) AND (o.item_name = i.name)", "OrderItemEmbeddedIdResults");
 
 		final List<?> resultList = q.getResultList();
@@ -210,7 +210,7 @@ public class NativeQueryTest extends BaseCoreTest {
 				+ "o.item_id AS order_item_id, " //
 				+ "o.item_name AS order_item_name, "//
 				+ "i.id, i.name, i.description " //
-				+ "FROM Order2 o, Item2 i "//
+				+ "FROM ORDER2 o, Item2 i "//
 				+ "WHERE (o.quantity > 25) AND (o.item_id = i.id) AND (o.item_name = i.name)", "OrderItemResultsIdClass");
 
 		final List<?> resultList = q.getResultList();
