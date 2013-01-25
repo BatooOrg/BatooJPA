@@ -359,9 +359,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 			dataSource.setUsername(jdbcUser);
 			dataSource.setPassword(jdbcPassword);
 
-			// This is slow so always set it to 0
-			dataSource.setReleaseHelperThreads(0);
-
 			dataSource.setStatementsCacheSize(statementsCacheSize);
 			dataSource.setMinConnectionsPerPartition(minConnections);
 			dataSource.setMaxConnectionsPerPartition(maxConnections);

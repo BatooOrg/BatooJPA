@@ -55,8 +55,24 @@ public class ConnectionProxy implements Connection {
 	private final SqlLoggingType sqlLogging;
 	private final int jdbcFetchSize;
 
+	/**
+	 * 
+	 * @param dataSourcePool
+	 *            the datasource pool
+	 * @param connection
+	 *            the connection
+	 * @param slowSqlThreshold
+	 *            the time to decide if SQL is deemed as slow
+	 * @param sqlLogging
+	 *            the sql logging type
+	 * @param jdbcFetchSize
+	 *            the size of the jdbc fetch
+	 * 
+	 * @since 2.0.0
+	 */
 	public ConnectionProxy(AbstractDataSource dataSourcePool, Connection connection, long slowSqlThreshold, SqlLoggingType sqlLogging, int jdbcFetchSize) {
 		super();
+
 		this.dataSourcePool = dataSourcePool;
 		this.connection = connection;
 		this.slowSqlThreshold = slowSqlThreshold;

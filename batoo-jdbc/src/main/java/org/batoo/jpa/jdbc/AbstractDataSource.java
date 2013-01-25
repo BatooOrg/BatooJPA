@@ -49,7 +49,10 @@ public abstract class AbstractDataSource implements DataSource {
 	 * initialize the underlining implementation
 	 * 
 	 * @param persistanceUnitName
+	 *            the name of the persistence unit
 	 * @param hintName
+	 *            the hint to be passed
+	 * 
 	 * @since $version
 	 */
 
@@ -59,6 +62,8 @@ public abstract class AbstractDataSource implements DataSource {
 	 * release the connection
 	 * 
 	 * @param connection
+	 *            the connection
+	 * 
 	 * @since $version
 	 */
 	public abstract void releaseConnection(Connection connection);

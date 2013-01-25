@@ -92,7 +92,6 @@ public class EntityManagerImpl implements EntityManager {
 
 	private Connection connection;
 	private EntityTransactionImpl transaction;
-	private boolean rollbackOnly;
 
 	private FlushModeType flushMode;
 	private boolean inFlush;
@@ -1224,8 +1223,6 @@ public class EntityManagerImpl implements EntityManager {
 	 * @since 2.0.0
 	 */
 	public void setRollbackOnly() {
-		this.rollbackOnly = true;
-
 		if (this.transaction != null) {
 			this.transaction.setRollbackOnly();
 		}

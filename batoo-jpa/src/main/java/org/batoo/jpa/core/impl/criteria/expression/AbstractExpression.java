@@ -165,19 +165,55 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 		return new PredicateImpl(new IsNullExpression(false, this));
 	}
 
+	/**
+	 * The <code>not</code> version of {@link #in(Collection)}.
+	 * 
+	 * @param values
+	 *            the values
+	 * @return the predicate created
+	 * 
+	 * @since $version
+	 */
 	public PredicateImpl notIn(Collection<?> values) {
 		return new PredicateImpl(new InExpression(this, values, true));
 	}
 
+	/**
+	 * The <code>not</code> version of {@link #in(Expression...)}.
+	 * 
+	 * @param values
+	 *            the values
+	 * @return the predicate created
+	 * 
+	 * @since $version
+	 */
 	public PredicateImpl notIn(Expression<?>... values) {
 		return new PredicateImpl(new InExpression(this, values, true));
 	}
 
+	/**
+	 * The <code>not</code> version of {@link #in(Expression)}.
+	 * 
+	 * @param values
+	 *            the values
+	 * @return the predicate created
+	 * 
+	 * @since $version
+	 */
 	public PredicateImpl notIn(Expression<Collection<?>> values) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/**
+	 * The <code>not</code> version of {@link #in(Object...)}.
+	 * 
+	 * @param values
+	 *            the values
+	 * @return the predicate created
+	 * 
+	 * @since $version
+	 */
 	public PredicateImpl notIn(Object... values) {
 		return new PredicateImpl(new InExpression(this, Lists.newArrayList(values), true));
 	}

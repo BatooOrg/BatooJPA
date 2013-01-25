@@ -53,7 +53,6 @@ import org.batoo.jpa.core.impl.criteria.expression.AbstractParameterExpressionIm
 import org.batoo.jpa.core.impl.criteria.expression.EntityConstantExpression;
 import org.batoo.jpa.core.impl.criteria.expression.ParameterExpressionImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
-import org.batoo.jpa.core.impl.manager.EntityManagerFactoryImpl;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
@@ -79,7 +78,6 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(QueryImpl.class);
 
-	private final EntityManagerFactoryImpl emf;
 	private final EntityManagerImpl em;
 	private final BaseQuery<X> q;
 	private String sql;
@@ -112,7 +110,6 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	public QueryImpl(BaseQuery<X> q, EntityManagerImpl entityManager) {
 		super();
 
-		this.emf = entityManager.getEntityManagerFactory();
 		this.em = entityManager;
 		this.q = q;
 		this.sql = this.q.getSql();
