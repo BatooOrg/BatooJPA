@@ -276,6 +276,16 @@ public class MsSqlAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
+	protected String getDropForeignKeySql(String schema, String table, String foreignKey) {
+		final String qualifiedName = Joiner.on(".").skipNulls().join(schema, table);
+		return "ALTER TABLE " + qualifiedName + " DROP CONSTRAINT " + foreignKey;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public long getNextSequence(DataSource datasource, String sequenceName) throws SQLException {
 		throw new UnsupportedOperationException("MSSQL does not support sequences");
 	}
@@ -366,10 +376,10 @@ public class MsSqlAdaptor extends JdbcAdaptor {
 	 */
 	@Override
 	public IdType supports(GenerationType type) {
-		if ((type == GenerationType.TABLE) || (type == GenerationType.SEQUENCE)) {
-			return IdType.TABLE;
+		if (type == GenerationType.IDENTITY) {
+			return IdType.IDENTITY;
 		}
 
-		return IdType.IDENTITY;
+		return IdType.TABLE;
 	}
 }
