@@ -343,10 +343,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 				Integer.valueOf((String) this.getProperty(BJPASettings.STATEMENT_CACHE_SIZE)) : //
 				BJPASettings.DEFAULT_STATEMENT_CACHE_SIZE;
 
-			final Integer maxConnections = this.getProperty(BJPASettings.MAX_CONNECTIONS) != null ? //
-				Integer.valueOf((String) this.getProperty(BJPASettings.MAX_CONNECTIONS)) : //
-				BJPASettings.DEFAULT_MAX_CONNECTIONS;
-
 			final Integer minConnections = this.getProperty(BJPASettings.MIN_CONNECTIONS) != null ? //
 				Integer.valueOf((String) this.getProperty(BJPASettings.MIN_CONNECTIONS)) : //
 				BJPASettings.DEFAULT_MIN_CONNECTIONS;
@@ -361,8 +357,11 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 
 			dataSource.setStatementsCacheSize(statementsCacheSize);
 			dataSource.setMinConnectionsPerPartition(minConnections);
-			dataSource.setMaxConnectionsPerPartition(maxConnections);
+			dataSource.setMaxConnectionsPerPartition(5);
 			dataSource.setDisableConnectionTracking(true);
+			
+			// This is slow so always set it to 0
+			dataSource.setReleaseHelperThreads(0);
 
 			return dataSource;
 		}

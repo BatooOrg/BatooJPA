@@ -108,6 +108,7 @@ public class QueryRunner {
 
 		this.hasLob = false;
 		this.datasource = datasource;
+		this.pmdKnownBroken = pmdKnownBroken;
 	}
 
 	/**
