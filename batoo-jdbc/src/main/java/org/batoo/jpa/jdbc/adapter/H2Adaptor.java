@@ -290,6 +290,15 @@ public class H2Adaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
+	protected boolean isForeignKeyHasDefaultIndex() {
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public boolean paginationNeedsMaxResultsAlways() {
 		return true;
 	}
