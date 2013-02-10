@@ -339,7 +339,25 @@ public class MsSqlAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
+	protected boolean isForeignKeyHasDefaultIndex() {
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public boolean isPmdBroken() {
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	protected boolean isTableRequiredPrimaryKey() {
 		return true;
 	}
 

@@ -305,6 +305,15 @@ public class HsqlAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
+	protected boolean isForeignKeyHasDefaultIndex() {
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public boolean paginationNeedsMaxResultsAlways() {
 		return true;
 	}

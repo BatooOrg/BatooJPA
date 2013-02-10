@@ -294,6 +294,15 @@ public class OracleAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
+	protected boolean isForeignKeyHasDefaultIndex() {
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public boolean paginationNeedsMaxResultsAlways() {
 		return true;
 	}
