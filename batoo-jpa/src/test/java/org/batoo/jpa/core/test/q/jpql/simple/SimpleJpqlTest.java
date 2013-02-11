@@ -733,4 +733,18 @@ public class SimpleJpqlTest extends BaseCoreTest {
 			Assert.assertEquals("a", q2.getSingleResult());
 		}
 	}
+
+	/**
+	 * 
+	 * @since 2.0.0
+	 */
+	@Test
+	public void testTrueInJpql() {
+		this.persist(this.person());
+		this.commit();
+
+		this.close();
+
+		Assert.assertEquals(1, this.cq("select p from Person p where p.manager = false", Person.class).getResultList().size());
+	}
 }

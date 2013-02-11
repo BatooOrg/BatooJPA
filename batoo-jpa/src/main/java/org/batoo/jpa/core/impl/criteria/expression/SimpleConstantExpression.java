@@ -96,6 +96,9 @@ public class SimpleConstantExpression<T> extends AbstractExpression<T> {
 		if (Number.class.isAssignableFrom(this.getJavaType())) {
 			return new String[] { this.value.toString() };
 		}
+		else if (Boolean.class == this.getJavaType()) {
+			return new String[] { this.value.toString() };
+		}
 		else {
 			return new String[] { "'" + this.value.toString() + "'" };
 		}

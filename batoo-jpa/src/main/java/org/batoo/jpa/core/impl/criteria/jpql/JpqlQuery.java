@@ -985,7 +985,7 @@ public class JpqlQuery {
 		}
 
 		if (exprDef.getType() == JpqlParser.ST_IN) {
-			final boolean notIn = exprDef.getChildCount() > 2 && exprDef.getChild(2).getType() == JpqlParser.NOT;
+			final boolean notIn = (exprDef.getChildCount() > 2) && (exprDef.getChild(2).getType() == JpqlParser.NOT);
 
 			AbstractExpression<X> left = null;
 
@@ -1553,6 +1553,13 @@ public class JpqlQuery {
 			}
 
 			return (AbstractExpression<X>) cb.cast(left, clazz);
+		}
+
+		if (exprDef.getType() == JpqlParser.TRUE) {
+			return (AbstractExpression<X>) new SimpleConstantExpression<Boolean>(null, Boolean.TRUE);
+		}
+		if (exprDef.getType() == JpqlParser.FALSE) {
+			return (AbstractExpression<X>) new SimpleConstantExpression<Boolean>(null, Boolean.FALSE);
 		}
 
 		throw new PersistenceException("Unhandled expression: " + exprDef.toStringTree() + ", line " + exprDef.getLine() + ":"

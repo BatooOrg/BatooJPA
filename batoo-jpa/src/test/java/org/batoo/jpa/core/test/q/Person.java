@@ -76,6 +76,8 @@ public class Person {
 	@Temporal(TemporalType.DATE)
 	private Date validTo;
 
+	private boolean manager;
+
 	/**
 	 * @since 2.0.0
 	 */
@@ -194,6 +196,17 @@ public class Person {
 	}
 
 	/**
+	 * Returns the manager of the Person.
+	 * 
+	 * @return the manager of the Person
+	 * 
+	 * @since $version
+	 */
+	public boolean isManager() {
+		return this.manager;
+	}
+
+	/**
 	 * Sets the age of the Person.
 	 * 
 	 * @param age
@@ -203,6 +216,18 @@ public class Person {
 	 */
 	public void setAge(int age) {
 		this.age = age;
+	}
+
+	/**
+	 * Sets the manager of the Person.
+	 * 
+	 * @param manager
+	 *            the manager to set for Person
+	 * 
+	 * @since $version
+	 */
+	public void setManager(boolean manager) {
+		this.manager = manager;
 	}
 
 	/**
