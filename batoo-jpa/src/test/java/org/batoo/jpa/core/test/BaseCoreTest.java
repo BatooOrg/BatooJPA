@@ -469,6 +469,47 @@ public abstract class BaseCoreTest { // extends BaseTest {
 			}
 
 		}
+		if ("mssql".equals(testMode)) {
+
+			final String username = System.getProperty("javax.persistence.jdbc.user");
+			final String password = System.getProperty("javax.persistence.jdbc.password");
+			final Connection connection = DriverManager.getConnection(System.getProperty("javax.persistence.jdbc.url"), username, password);
+			final String dropConstraintSQL = //
+			"SELECT " + //
+				"'ALTER TABLE ' + OBJECT_NAME(parent_object_id) + " + //
+				"' DROP CONSTRAINT ' + name " + //
+				"FROM sys.foreign_keys " + //
+				"WHERE referenced_object_id = object_id('";
+			try {
+				final QueryRunner qr = new QueryRunner(false, false);
+				final List<Object[]> tables = qr.query(connection, "select * from sys.Tables", new ArrayListHandler());
+				// first drop all constraints
+				for (final Object[] table : tables) {
+					try {
+						qr.query(connection, dropConstraintSQL + table[0] + "')", new NullResultSetHandler());
+					}
+					catch (final Exception e) {
+						LOG.debug(e.getMessage());
+					}
+				}
+
+				connection.commit();
+
+				for (final Object[] table : tables) {
+					try {
+						qr.update(connection, "DROP TABLE " + table[0]);
+					}
+					catch (final Exception e) {
+						LOG.debug(e.getMessage());
+					}
+				}
+				connection.commit();
+			}
+			finally {
+				connection.close();
+			}
+
+		}
 
 		if (!this.lazySetup()) {
 			this.emf = this.setupEmf();
@@ -533,6 +574,7 @@ public abstract class BaseCoreTest { // extends BaseTest {
 
 				qr.update(em.getConnection(), "drop database test");
 				qr.update(em.getConnection(), "create database test");
+
 			}
 			else if ("hsql".equals(testMode)) {
 				final EntityManagerImpl em = this.em();

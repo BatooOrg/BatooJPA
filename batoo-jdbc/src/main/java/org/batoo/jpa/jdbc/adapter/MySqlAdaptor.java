@@ -219,6 +219,15 @@ public class MySqlAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
+	protected boolean isForeignKeyHasDefaultIndex() {
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public boolean paginationNeedsMaxResultsAlways() {
 		return false;
 	}

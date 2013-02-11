@@ -201,6 +201,15 @@ public class DerbyAdaptor extends JdbcAdaptor {
 	 * 
 	 */
 	@Override
+	protected boolean isForeignKeyHasDefaultIndex() {
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
 	public boolean modifiesParameters() {
 		return true;
 	}
