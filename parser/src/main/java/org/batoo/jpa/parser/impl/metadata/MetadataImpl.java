@@ -107,6 +107,42 @@ public class MetadataImpl implements Metadata {
 	}
 
 	/**
+	 * Walks up the hierarchy to add the mapped super classes.
+	 * 
+	 * @param classloader
+	 * @param entities
+	 * @return
+	 * 
+	 * @since $version
+	 */
+	private ArrayList<String> checkParentClasses(ClassLoader classloader, Set<String> entities) {
+		final ArrayList<String> managedClasses = Lists.newArrayList(entities);
+
+		for (final String className : entities) {
+			try {
+				Class<?> clazz = classloader.loadClass(className);
+				while (true) {
+					clazz = clazz.getSuperclass();
+
+					if ((clazz.getAnnotation(Entity.class) != null) || (clazz.getAnnotation(MappedSuperclass.class) != null)) {
+						if (!managedClasses.contains(clazz.getName())) {
+							managedClasses.add(clazz.getName());
+						}
+					}
+					else {
+						break;
+					}
+				}
+			}
+			catch (final ClassNotFoundException e) {
+				throw new PersistenceException("Cannot load persistence class " + className + " referenced by orm mapping files");
+			}
+		}
+
+		return managedClasses;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -249,7 +285,8 @@ public class MetadataImpl implements Metadata {
 	 */
 	public void parse(final ClassLoader classloader) {
 		// sort the emanage classes by inheritence
-		final ArrayList<String> managedClasses = Lists.newArrayList(this.entityMap.keySet());
+		final ArrayList<String> managedClasses = this.checkParentClasses(classloader, this.entityMap.keySet());
+
 		Collections.sort(managedClasses, new Comparator<String>() {
 
 			@Override
