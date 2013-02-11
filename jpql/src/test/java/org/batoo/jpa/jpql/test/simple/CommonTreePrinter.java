@@ -1,4 +1,4 @@
-package org.batoo.jpa.jpql.test.sql;
+package org.batoo.jpa.jpql.test.simple;
 
 import org.antlr.runtime.tree.Tree;
 

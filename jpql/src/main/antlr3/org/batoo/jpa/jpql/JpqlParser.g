@@ -167,8 +167,21 @@ state_field_path_expression :
     ;
 
 simple_state_field_path_expression :
-    ID Period qid
-        -> ^(ST_PARENTED ID qid);
+    ID Period qqid
+        -> ^(ST_PARENTED ID qqid);
+
+qqid :
+    id_or_reserved_word ( Period id_or_reserved_word)*
+        -> ^(LQUALIFIED id_or_reserved_word (id_or_reserved_word)*);
+        	
+id_or_reserved_word :
+	ID | ABS | ALL | AND | ANY | AS | ASC | AVG | BETWEEN | BIT_LENGTH | BOTH | BY | BYTE | CASE | CAST | CHAR_LENGTH | CHARACTER_LENGTH | CLASS 
+	| COALESCE | CONCAT | COUNT | CURRENT_DATE | CURRENT_TIME | CURRENT_TIMESTAMP | DAY | DAYOFMONTH | DAYOFWEEK | DAYOFYEAR | DELETE | DESC
+	| DISTINCT | DOUBLE | ELSE | EMPTY | END | ENTRY | ESCAPE | EXISTS | FALSE | FETCH | FLOAT | FUNC | FROM | GROUP | HAVING | HOUR | IN 
+	| INDEX | INNER | IS | INT | INTEGER | JOIN | KEY | LEADING | LEFT | LENGTH | LIKE | LOCATE | LONG | LOWER | MAX | MEMBER | MIN | MINUTE 
+	| MOD | MONTH | NEW | NOT | NULLIF | NULL | OBJECT | OF | OR | ORDER | OUTER | POSITION | PROPERTIES | SECOND | SELECT | SET | SHORT | SIZE 
+	| SOME | SQRT | STRING | SUBSTRING | SUM | THEN | TRAILING | TRIM | TRUE | TYPE | UNKNOWN | UPDATE | UPPER | VALUE | VARCHAR | WEEK | WHEN 
+	| WHERE | YEAR;
 
 cast_state_field_path_expression :
 	CAST^ Left_Paren! simple_state_field_path_expression AS! (BYTE | SHORT | INT | INTEGER | LONG | FLOAT | DOUBLE | STRING | VARCHAR) Right_Paren!;

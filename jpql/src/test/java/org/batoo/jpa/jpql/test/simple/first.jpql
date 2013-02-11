@@ -1,7 +1,1 @@
-select
-p from Person p
-	join fetch p.addresses
-	join fetch p.addresses.country
-	left join p.addresses a 
-	inner join p.addresses a2
-where p.name = ?
+select p.key.order from P p

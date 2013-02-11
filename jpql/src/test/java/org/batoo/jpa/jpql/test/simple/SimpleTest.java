@@ -30,7 +30,6 @@ import org.batoo.common.log.BLoggerFactory;
 import org.batoo.jpa.jpql.JpqlLexer;
 import org.batoo.jpa.jpql.JpqlParser;
 import org.batoo.jpa.jpql.JpqlParser.ql_statement_return;
-import org.batoo.jpa.jpql.test.sql.CommonTreePrinter;
 import org.junit.Test;
 
 import com.google.common.base.Joiner;
