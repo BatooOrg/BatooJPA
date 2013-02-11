@@ -34,6 +34,7 @@ public class Enhanced implements EnhancedInstance {
 	private static final long serialVersionUID = 1L;
 
 	private boolean __enhanced_$$__initialized;
+	private boolean __enhanced_$$__internal;
 	private transient final Object __enhanced_$$__id;
 	private transient final Class<?> __enhanced_$$__type;
 	private transient final SessionImpl __enhanced_$$__session;
@@ -71,6 +72,15 @@ public class Enhanced implements EnhancedInstance {
 		this.__enhanced_$$__initialized = true;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 */
+	@Override
+	public void __enhanced__$$__setInternalCall(boolean internal) {
+		this.__enhanced_$$__internal = internal;
+	}
+
 	@Override
 	public void __enhanced__$$__setManagedInstance(ManagedInstance<?> instance) {
 		this.__enhanced__$$__managedInstance = instance;
@@ -78,6 +88,10 @@ public class Enhanced implements EnhancedInstance {
 
 	@SuppressWarnings("unused")
 	private void __enhanced_$$__check() {
+		if (this.__enhanced_$$__internal) {
+			return;
+		}
+
 		if (!this.__enhanced_$$__initialized) {
 			if (this.__enhanced_$$__session == null) {
 				throw new PersistenceException("No session to initialize the instance");

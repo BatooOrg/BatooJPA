@@ -20,13 +20,15 @@ package org.batoo.jpa.core.impl.instance;
 
 import java.io.Serializable;
 
+import org.batoo.common.reflect.InternalInstance;
+
 /**
  * Interface implemented by enhanced managed instances.
  * 
  * @author hceylan
  * @since 2.0.0
  */
-public interface EnhancedInstance extends Serializable {
+public interface EnhancedInstance extends Serializable, InternalInstance {
 
 	/**
 	 * Returns the managed instance of the instance.
