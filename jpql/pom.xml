@@ -51,7 +51,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.batoo.common</groupId>
+			<groupId>org.batoo.jpa</groupId>
 			<artifactId>batoo-common</artifactId>
 			<scope>test</scope>
 		</dependency>
