@@ -50,11 +50,22 @@
 				<role>Architect</role>
 			</roles>
 		</developer>
+		<developer>
+			<id>asimarslan</id>
+			<name>Asim Arslan</name>
+			<organization>batoo.org</organization>
+			<email>arslanasim@gmail.com</email>
+			<url>http://www.asimarslan.com</url>
+			<organizationUrl>http://www.batoo.org</organizationUrl>
+			<roles>
+				<role>Developer</role>
+			</roles>
+		</developer>
 	</developers>
 
 	<organization>
 		<name>Batoo Software &amp; Consultancy</name>
-		<url>http://www.batoo.jp</url>
+		<url>http://www.batoo.org</url>
 	</organization>
 
 	<inceptionYear>2012</inceptionYear>
@@ -99,14 +110,43 @@
 				<artifactId>persistence-api</artifactId>
 				<version>2.0</version>
 			</dependency>
-			
-			<!-- Batoo Projects -->
+		
 			<dependency>
-				<groupId>org.batoo.common</groupId>
-				<artifactId>batoo-common</artifactId>
-				<version>1.0.3-SNAPSHOT</version>
+				<groupId>org.batoo.jpa</groupId>
+				<artifactId>parser</artifactId>
+				<version>${project.version}</version>
 			</dependency>
-
+			<dependency>
+				<groupId>org.batoo.jpa</groupId>
+				<artifactId>jpql</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.batoo.jpa</groupId>
+				<artifactId>batoo-jpa</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.batoo.jpa</groupId>
+				<artifactId>batoo-annotations</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.batoo.jpa</groupId>
+				<artifactId>batoo-jpa-spi</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.batoo.jpa</groupId>
+				<artifactId>batoo-jdbc</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.batoo.jpa</groupId>
+				<artifactId>batoo-common</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			
 			<!-- Validation -->
 			<dependency>
 				<groupId>javax.validation</groupId>
@@ -346,8 +386,9 @@
 		<module>batoo-jpa</module>
 		<module>batoo-annotations</module>
 		<module>batoo-maven-plugin</module>
-		<module>community</module>
+<!-- 		<module>community</module> -->
 		<module>batoo-jpa-spi</module>
 		<module>batoo-jdbc</module>
+		<module>batoo-common</module>
 	</modules>
 </project>
