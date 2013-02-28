@@ -1,4 +1,4 @@
-[![Build Status](https://secure.travis-ci.org/BatooOrg/BatooJPA.png)](http://travis-ci.org/BatooOrg/BatooJPA) Welcome to Batoo JPA - [http://batoo.jp](http://batoo.jp)
+[![Build Status](https://secure.travis-ci.org/BatooOrg/BatooJPA.png)](http://travis-ci.org/BatooOrg/BatooJPA) Welcome to Batoo JPA - [http://batoo.org](http://batoo.org)
 ___
 # FASTEST JPA IMPLEMENTATION #
 
