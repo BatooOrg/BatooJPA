@@ -63,10 +63,10 @@ public class FetchTest extends BaseCoreTest {
 		TypedQuery<Integer> q;
 
 		q = this.cq("select m.id from Manager m where m.employees is empty", Integer.class);
-		Assert.assertEquals(qaManager.getId(), q.getSingleResult());
+		Assert.assertEquals(qaManager2.getId(), q.getSingleResult());
 
 		q = this.cq("select m.id from Manager m where m.employees is not empty", Integer.class);
-		Assert.assertEquals(qaManager2.getId(), q.getSingleResult());
+		Assert.assertEquals(qaManager.getId(), q.getSingleResult());
 	}
 
 	/**
