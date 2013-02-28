@@ -99,7 +99,7 @@ public class IsEmptyExpression extends AbstractExpression<Boolean> {
 		final Root<?> r = s.from(rp.getEntity());
 		r.join(this.inner.getMapping().getAttribute().getName());
 
-		final PredicateImpl p = this.not ? cb.exists(s).not() : cb.exists(s);
+		final PredicateImpl p = this.not ? cb.exists(s) : cb.exists(s).not();
 		s.where(cb.equal(r, (AbstractExpression<?>) rp));
 
 		s.select(cb.literal(1));

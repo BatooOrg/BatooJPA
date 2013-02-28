@@ -367,6 +367,31 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	}
 
 	/**
+	 * Tests for is empty and is not
+	 * 
+	 * @since $version
+	 */
+	@Test
+	public void testEmpty() {
+		this.persist(this.person(35, new Date()));
+		this.persist(new Person("ali", 35, new Date()));
+		this.persist(new Person("osman", 35, new Date()));
+		this.commit();
+
+		this.close();
+
+		TypedQuery<Person> q;
+		q = this.cq("select p from Person p where p.addresses IS EMPTY", Person.class);
+
+		Assert.assertEquals(2, q.getResultList().size());
+
+		q = this.cq("select p from Person p where p.addresses IS NOT EMPTY", Person.class);
+
+		Assert.assertEquals(1, q.getResultList().size());
+
+	}
+
+	/**
 	 * 
 	 * @since 2.0.0
 	 */
