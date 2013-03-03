@@ -31,6 +31,8 @@
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
 			<property name="org.batoo.jpa.ddl" value="DROP" />
+			<!--org.batoo.jpa.sql_logging :: NONE | STDOUT | STDERR -->
+			<property name="org.batoo.jpa.sql_logging" value="NONE" />
 		</properties>
 
 	</persistence-unit>
