@@ -660,7 +660,9 @@ public class SessionImpl {
 	 * @since 2.0.0
 	 */
 	public ManagedInstance<?> remove(Object entity) {
-		final EntityTypeImpl<?> type = this.metamodel.entity(entity.getClass());
+		Class<? extends Object> clazz = (entity instanceof EnhancedInstance) ? clazz = entity.getClass().getSuperclass() : entity.getClass();
+
+		final EntityTypeImpl<?> type = this.metamodel.entity(clazz);
 		final ManagedId<?> instanceId = type.getId(entity);
 
 		final ManagedInstance<?> instance = this.repository.get(instanceId);

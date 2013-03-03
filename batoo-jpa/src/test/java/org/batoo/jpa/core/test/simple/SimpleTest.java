@@ -102,6 +102,31 @@ public class SimpleTest extends BaseCoreTest {
 	}
 
 	/**
+	 * Test for find entity then detach it
+	 * 
+	 * @since $version
+	 */
+	@Test
+	public void testDetachAfterFind() {
+		final Foo foo = this.newFoo();
+		this.persist(foo);
+
+		this.commit();
+
+		this.close();
+
+		this.begin();
+
+		final Foo foo2 = this.find(Foo.class, foo.getId());
+		Assert.assertEquals(foo.getId(), foo2.getId());
+
+		this.detach(foo2);
+		this.close();
+
+		Assert.assertFalse(this.em().contains(foo2));
+	}
+
+	/**
 	 * Tests {@link EntityManager#detach(Object)} then {@link EntityTransaction#commit()}.
 	 * 
 	 * @throws SQLException

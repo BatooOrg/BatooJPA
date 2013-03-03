@@ -19,10 +19,10 @@
 package org.batoo.jpa.core.test.manytoone;
 
 import static javax.persistence.CascadeType.PERSIST;
-import static javax.persistence.FetchType.LAZY;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -45,8 +45,12 @@ public class Person {
 	private String name;
 
 	@JoinColumn(name = "address_id")
-	@ManyToOne(cascade = PERSIST, fetch = LAZY)
+	@ManyToOne(cascade = PERSIST, fetch = FetchType.EAGER)
 	private Address homeAddress; // (addressId)
+
+	@JoinColumn(name = "work_address_id")
+	@ManyToOne(cascade = {}, fetch = FetchType.EAGER)
+	private Address workAddress; // (addressId)
 
 	/**
 	 * @since 2.0.0
@@ -90,6 +94,16 @@ public class Person {
 	}
 
 	/**
+	 * 
+	 * @return the workAddress
+	 * 
+	 * @since $version
+	 */
+	public Address getWorkAddress() {
+		return this.workAddress;
+	}
+
+	/**
 	 * Set the homeAddress without adding this Account instance on the passed homeAddress If you want to preserve referential integrity we
 	 * recommend to use instead the corresponding adder method provided by {@link Address}
 	 * 
@@ -114,5 +128,16 @@ public class Person {
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	/**
+	 * 
+	 * @param workAddress
+	 *            the workAddress to set
+	 * 
+	 * @since $version
+	 */
+	public void setWorkAddress(Address workAddress) {
+		this.workAddress = workAddress;
 	}
 }
