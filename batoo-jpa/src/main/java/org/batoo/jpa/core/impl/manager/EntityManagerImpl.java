@@ -421,6 +421,10 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@Override
 	public void detach(Object entity) {
+		if (entity == null) {
+			return;
+		}
+
 		this.assertOpen();
 
 		final ManagedInstance<?> instance = this.session.remove(entity);
@@ -1006,6 +1010,10 @@ public class EntityManagerImpl implements EntityManager {
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> boolean persistImpl(T entity, ArrayList<Object> processed, LinkedList<ManagedInstance<?>> instances) {
+		if (entity == null) {
+			return false;
+		}
+
 		if (processed.contains(entity)) {
 			return false;
 		}
@@ -1035,7 +1043,9 @@ public class EntityManagerImpl implements EntityManager {
 			}
 		}
 
-		final EntityTypeImpl<T> type = (EntityTypeImpl<T>) this.metamodel.entity(entity.getClass());
+		final Class<T> clazz = (Class<T>) (entity instanceof EnhancedInstance ? entity.getClass().getSuperclass() : entity.getClass());
+
+		final EntityTypeImpl<T> type = this.metamodel.entity(clazz);
 		final ManagedInstance<T> instance = type.getManagedInstance(this.session, entity);
 
 		instance.setStatus(Status.NEW);

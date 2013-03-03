@@ -47,6 +47,66 @@ public class ManyToOneTest extends BaseCoreTest {
 	}
 
 	/**
+	 * tests for cascade operation PERSIST
+	 * 
+	 * @since $version
+	 */
+	@Test
+	public void testCascade() {
+		final Person person = this.person();
+		this.persist(person);
+
+		this.commit();
+		this.close();
+
+		this.begin();
+
+		final Person person2 = this.find(Person.class, person.getId());
+
+		final Address a2 = new Address("ankara");
+		a2.setId(2);
+
+		person2.setWorkAddress(a2);
+
+		this.persist(person2);
+
+		this.commit();
+		this.close();
+
+		final Person person3 = this.find(Person.class, person.getId());
+
+		Assert.assertEquals(person.getHomeAddress().getCity(), person3.getWorkAddress().getCity());
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 */
+	@Test
+	public void testCascade2() {
+		final Address address = new Address("Istanbul");
+		this.persist(address);
+		this.commit();
+		this.close();
+
+		final Person person = new Person("Ceylan");
+
+		final Address address2 = new Address("Ankara");
+		address2.setId(address.getId());
+
+		person.setWorkAddress(address2);
+
+		this.persist(person);
+
+		this.commit();
+		this.close();
+
+		final Person person2 = this.find(Person.class, person.getId());
+
+		Assert.assertEquals(address.getCity(), person2.getWorkAddress().getCity());
+	}
+
+	/**
 	 * Tests to {@link EntityManager#find(Class, Object)} person.
 	 * 
 	 * @since 2.0.0
