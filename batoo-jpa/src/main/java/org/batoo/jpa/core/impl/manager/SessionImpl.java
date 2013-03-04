@@ -410,8 +410,8 @@ public class SessionImpl {
 			instance.flushAssociations(connection, true, false);
 		}
 
-		this.doRemoves(connection, sortedRemovals);
 		this.doUpdates(connection, sortedUpdates);
+		this.doRemoves(connection, sortedRemovals);
 
 		for (final ManagedInstance<?> instance : sortedUpdates) {
 			instance.checkTransients();
