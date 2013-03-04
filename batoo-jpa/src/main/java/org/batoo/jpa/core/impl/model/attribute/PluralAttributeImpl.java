@@ -124,7 +124,7 @@ public abstract class PluralAttributeImpl<X, C, E> extends AttributeImpl<X, C> i
 
 		if ((metadata instanceof AssociationAttributeMetadata) && StringUtils.isNotBlank(((AssociationAttributeMetadata) metadata).getTargetEntity())) {
 			try {
-				this.bindableJavaType = (Class<E>) Class.forName(((AssociationAttributeMetadata) metadata).getTargetEntity());
+				this.bindableJavaType = (Class<E>) declaringType.getMetamodel().getEntityManagerFactory().getClassloader().loadClass(((AssociationAttributeMetadata) metadata).getTargetEntity());
 			}
 			catch (final ClassNotFoundException e) {
 				throw new MappingException("Target enttity class not found", metadata.getLocator());
