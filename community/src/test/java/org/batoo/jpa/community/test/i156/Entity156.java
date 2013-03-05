@@ -29,7 +29,7 @@ public class Entity156 {
 	@Version
 	@Column(nullable = false)
 	protected Long timeStamp = null;
-	
+
 	@Basic
 	@Column(nullable = false)
 	private String code;
@@ -40,4 +40,89 @@ public class Entity156 {
 	@MapKeyColumn(name = "LOCALE", nullable = false)
 	@Column(name = "TRANSLATION", nullable = false)
 	private Map<FieldLocale, String> name;
+
+	/**
+	 * 
+	 * @return the code
+	 * 
+	 * @since $version
+	 */
+	public String getCode() {
+		return this.code;
+	}
+
+	/**
+	 * 
+	 * @return the id
+	 * 
+	 * @since $version
+	 */
+	public Long getId() {
+		return this.id;
+	}
+
+	/**
+	 * 
+	 * @return the name
+	 * 
+	 * @since $version
+	 */
+	public Map<FieldLocale, String> getName() {
+		return this.name;
+	}
+
+	/**
+	 * 
+	 * @return the timeStamp
+	 * 
+	 * @since $version
+	 */
+	public Long getTimeStamp() {
+		return this.timeStamp;
+	}
+
+	/**
+	 * 
+	 * @param code
+	 *            the code to set
+	 * 
+	 * @since $version
+	 */
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	/**
+	 * 
+	 * @param id
+	 *            the id to set
+	 * 
+	 * @since $version
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	/**
+	 * 
+	 * @param name
+	 *            the name to set
+	 * 
+	 * @since $version
+	 */
+	public void setName(Map<FieldLocale, String> name) {
+		this.name = name;
+	}
+
+	/**
+	 * 
+	 * @param timeStamp
+	 *            the timeStamp to set
+	 * 
+	 * @since $version
+	 */
+	public void setTimeStamp(Long timeStamp) {
+		this.timeStamp = timeStamp;
+	}
+
 }

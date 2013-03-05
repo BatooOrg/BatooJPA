@@ -29,6 +29,7 @@
 		<class>org.batoo.jpa.core.test.elementcollection.Foo</class>
 		<class>org.batoo.jpa.core.test.elementcollection.Foo2</class>
 		<class>org.batoo.jpa.core.test.elementcollection.Foo3</class>
+		<class>org.batoo.jpa.core.test.elementcollection.Foo4</class>
 		<class>org.batoo.jpa.core.test.elementcollection.Bar3</class>
 		
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
