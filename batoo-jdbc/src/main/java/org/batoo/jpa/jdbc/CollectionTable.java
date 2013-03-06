@@ -275,7 +275,7 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 					params[paramIndex++] = batch[i].getIndex();
 				}
 				else if (column == this.keyColumn) {
-					params[paramIndex++] = batch[i].getKey();
+					params[paramIndex++] = this.keyColumn.getValue(connection, batch[i].getKey());
 				}
 				else if (this.elementColumn == column) {
 					params[paramIndex++] = this.elementColumn.getValue(connection, batch[i].getValue());
@@ -311,7 +311,7 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 				params[i++] = column.getValue(connection, destination);
 			}
 			else if (column == this.keyColumn) {
-				params[i++] = key;
+				params[i++] = this.keyColumn.getValue(connection, key);;
 			}
 			else if (column instanceof JoinColumn) {
 				params[i++] = column.getValue(connection, source);

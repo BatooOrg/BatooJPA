@@ -57,5 +57,8 @@ public class ElementCollectionTest2 extends BaseCoreTest {
 		foo = this.find(Foo2.class, foo.getKey());
 		Assert.assertEquals(foo.getKey(), foo.getKey());
 		Assert.assertEquals(3, foo.getImages().size());
+
+		Assert.assertNull(foo.getImages().get("photo1"));
+		Assert.assertEquals("~/home/photos/photo4.jpg", foo.getImages().get("photo4"));
 	}
 }

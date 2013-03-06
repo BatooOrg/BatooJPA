@@ -30,6 +30,8 @@ import org.junit.Test;
  */
 public class MapTest extends BaseCoreTest {
 
+	// TODO add tests for enum keys
+
 	private Person person() {
 		final Person person = new Person("Ceylan");
 

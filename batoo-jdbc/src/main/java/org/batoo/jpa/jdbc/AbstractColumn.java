@@ -237,7 +237,7 @@ public abstract class AbstractColumn implements Column {
 	 * 
 	 * @since 2.0.0
 	 */
-	protected Object convertValueForSet(Object value) {
+	public Object convertValueForSet(Object value) {
 		if (value == null) {
 			return null;
 		}

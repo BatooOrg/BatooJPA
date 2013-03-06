@@ -21,6 +21,7 @@ package org.batoo.jpa.parser.impl.metadata.attribute;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.AttributeOverride;
@@ -381,7 +382,11 @@ public class ElementCollectionAttributeMetadataImpl extends AttributeMetadataImp
 			return annotation.value();
 		}
 
-		final Class<Object> type = ReflectHelper.getGenericType(member, 0);
+		final Class<?> memberType = ReflectHelper.getMemberType(member);
+
+		final int index = (memberType == Map.class) ? 1 : 0;
+
+		final Class<Object> type = ReflectHelper.getGenericType(member, index);
 
 		return type.isEnum() ? EnumType.ORDINAL : null;
 	}

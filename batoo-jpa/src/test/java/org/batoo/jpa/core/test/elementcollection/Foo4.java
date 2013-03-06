@@ -24,41 +24,34 @@ import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyColumn;
+import javax.persistence.MapKeyEnumerated;
 
 import com.google.common.collect.Maps;
 
 /**
  * 
- * @author hceylan
- * @since 2.0.0
+ * @author asimarslan
+ * @since $version
  */
 @Entity
-public class Foo2 {
+public class Foo4 {
 
 	@Id
 	@GeneratedValue
 	private Integer key;
 
 	@ElementCollection
-	@MapKeyColumn(name = "IMAGE_NAME")
-	@Column(name = "IMAGE_FILENAME")
-	@CollectionTable(name = "IMAGE_MAPPING", joinColumns = @JoinColumn(name = "ID"))
-	private final Map<String, String> images = Maps.newHashMap();
-
-	/**
-	 * Returns the images of the Foo2.
-	 * 
-	 * @return the images of the Foo2
-	 * 
-	 * @since 2.0.0
-	 */
-	protected Map<String, String> getImages() {
-		return this.images;
-	}
+	// (fetch = FetchType.EAGER)
+	@MapKeyColumn(name = "LOCALEE", nullable = false)
+	@MapKeyEnumerated(EnumType.STRING)
+	@Column(name = "TRANSLATIONN", nullable = false)
+	@CollectionTable(name = "FOO4_NAME", joinColumns = @JoinColumn(name = "ID"))
+	private final Map<FieldLocale, String> textMap = Maps.newHashMap();
 
 	/**
 	 * Returns the key of the Foo2.
@@ -69,5 +62,15 @@ public class Foo2 {
 	 */
 	protected Integer getKey() {
 		return this.key;
+	}
+
+	/**
+	 * 
+	 * @return the textMap
+	 * 
+	 * @since $version
+	 */
+	public Map<FieldLocale, String> getTextMap() {
+		return this.textMap;
 	}
 }

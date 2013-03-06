@@ -108,6 +108,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	private AbstractColumn[] columns;
 	private String[] fields;
 	private String keyColumnAlias;
+	private AbstractColumn keyColumn;
 
 	/**
 	 * @param entity
@@ -394,9 +395,9 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			}
 
 			// if we are selecting only values and the there is a key column, we are only interested in value columns
-			if ((selectType == MapSelectType.VALUE) && (table.getKeyColumn() == column)) {
-				continue;
-			}
+			// if ((selectType == MapSelectType.VALUE) && (table.getKeyColumn() == column)) {
+			// continue;
+			// }
 
 			final String fieldAlias = tableAlias + "_F" + query.getFieldAlias(tableAlias, column);
 			final String field = Joiner.on(".").skipNulls().join(tableAlias, column.getName());
@@ -834,9 +835,16 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked" })
 	private X handleElement(ResultSet row) throws SQLException {
 		if (this.type.getPersistenceType() == PersistenceType.BASIC) {
+			if (this.type.getJavaType().isEnum()) {
+				for (final AbstractColumn ac : this.columns) {
+					if (ac instanceof ElementColumn) {
+						return (X) ac.convertValueForSet(row.getObject(this.fields[0]));
+					}
+				}
+			}
 			return (X) row.getObject(this.fields[0]);
 		}
 
@@ -849,9 +857,8 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	}
 
 	private void handleElementCollectionFetch(ResultSet row, Object instance, FetchImpl<X, ?> fetch) throws SQLException {
-		final EntryImpl<Object, ?> child = fetch.handleElementFetch(row, MapSelectType.ENTRY);
-
 		final ElementCollectionMappingImpl<? super X, ?, ?> _mapping = (ElementCollectionMappingImpl<? super X, ?, ?>) fetch.getMapping();
+		final EntryImpl<Object, ?> child = fetch.handleElementFetch(row, MapSelectType.ENTRY);
 
 		// if it is a plural association then we will test if we processed the child
 		((ManagedCollection<?>) _mapping.get(instance)).addElement(child);
@@ -891,11 +898,22 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		}
 
 		if (this.keyColumnAlias != null) {
+
+			if (this.keyColumn == null) {
+				final ElementCollectionMappingImpl<? super X, ?, ?> _mapping = (ElementCollectionMappingImpl<? super X, ?, ?>) this.mapping;
+				if (_mapping.getCollectionTable() != null) {
+					this.keyColumn = _mapping.getCollectionTable().getKeyColumn();
+				}
+			}
+
+			final Object object = (this.keyColumn != null) ? this.keyColumn.convertValueForSet(row.getObject(this.keyColumnAlias))
+				: row.getObject(this.keyColumnAlias);
 			if (selectType == MapSelectType.KEY) {
-				return new EntryImpl<Object, X>(row.getObject(this.keyColumnAlias), null);
+
+				return new EntryImpl<Object, X>(object, null);
 			}
 			else {
-				return new EntryImpl<Object, X>(row.getObject(this.keyColumnAlias), this.handleElement(row));
+				return new EntryImpl<Object, X>(object, this.handleElement(row));
 			}
 		}
 
