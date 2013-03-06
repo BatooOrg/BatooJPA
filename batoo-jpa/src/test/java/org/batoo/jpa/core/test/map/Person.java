@@ -40,6 +40,13 @@ import com.google.common.collect.Maps;
 @Entity
 public class Person {
 
+	// public enum KeyEnum {
+	// key1,
+	// key2,
+	// key3,
+	// key4;
+	// }
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Integer id;
@@ -54,6 +61,12 @@ public class Person {
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY, mappedBy = "person")
 	private final Map<PhoneId, Phone> phones = Maps.newHashMap();
+
+	// @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	// @JoinTable(name = "Person_Address3")
+	// @MapKey(name = "city")
+	// @MapKeyEnumerated(EnumType.STRING)
+	// private final Map<KeyEnum, Address> addresses3 = Maps.newHashMap();
 
 	private String name;
 

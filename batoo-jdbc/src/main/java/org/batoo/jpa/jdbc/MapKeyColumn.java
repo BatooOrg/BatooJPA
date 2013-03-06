@@ -62,7 +62,7 @@ public class MapKeyColumn extends AbstractColumn {
 	 * @since 2.0.0
 	 */
 	public MapKeyColumn(AbstractTable table, ColumnMetadata metadata, String name, TemporalType temporalType, EnumType enumType, Class<?> javaType) {
-		super(metadata != null ? metadata.getLocator() : null, false);
+		super(javaType, null, temporalType, enumType, false, metadata != null ? metadata.getLocator() : null);
 
 		this.sqlType = TypeFactory.getSqlType(javaType, temporalType, enumType, false);
 		this.table = table;
@@ -163,8 +163,8 @@ public class MapKeyColumn extends AbstractColumn {
 	 * 
 	 */
 	@Override
-	public Object getValue(Connection connection, Object instance) {
-		return null;
+	public Object getValue(Connection connection, Object value) {
+		return this.convertValue(connection, value);
 	}
 
 	/**
