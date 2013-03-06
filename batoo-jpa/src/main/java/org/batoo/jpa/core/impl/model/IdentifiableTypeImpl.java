@@ -206,10 +206,6 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 
 				this.addAttribute((AttributeImpl<? super X, ?>) attribute);
 			}
-
-			if (this.supertype.versionAttribute != null) {
-				this.addAttribute(this.supertype.versionAttribute);
-			}
 		}
 
 		super.addAttributes(entityMetadata);
