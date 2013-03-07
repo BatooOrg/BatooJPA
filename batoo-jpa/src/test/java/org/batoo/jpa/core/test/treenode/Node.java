@@ -37,28 +37,28 @@ import com.google.common.collect.Lists;
  * @since 2.0.1
  */
 @Entity
+@SuppressWarnings("javadoc")
 public class Node {
-    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	Long id;
 
-    @Column
-    Integer myValue;
+	@Column
+	Integer myValue;
 
+	@ManyToOne
+	private Node parent;
 
-    @ManyToOne
-    private Node parent;
+	@OneToMany(mappedBy = "parent", cascade = { CascadeType.ALL })
+	private List<Node> children = Lists.newArrayList();
 
-    @OneToMany(mappedBy="parent", cascade = {CascadeType.ALL})
-    private List<Node> children = Lists.newArrayList();
-
-
-    /**
+	/**
 	 * @since 2.0.1
 	 */
 	public Node() {
 		super();
 	}
-	
+
 	/**
 	 * @param myValue
 	 * 
@@ -68,7 +68,7 @@ public class Node {
 		super();
 		this.myValue = myValue;
 	}
-	
+
 	/**
 	 * @param myValue
 	 * @param parent
@@ -80,78 +80,77 @@ public class Node {
 		this.myValue = myValue;
 		this.setParent(parent);
 	}
-	
+
+	/**
+	 * Returns the children
+	 * 
+	 * @return the children
+	 * @since 2.0.1
+	 */
+	public List<Node> getChildren() {
+		return this.children;
+	}
+
 	/**
 	 * Returns the id.
 	 * 
 	 * @return the id
 	 * @since 2.0.1
 	 */
-    public Long getId() {
-        return this.id;
-    }
+	public Long getId() {
+		return this.id;
+	}
 
-    /**
-     * Returns the myValue
-     * 
-     * @return the myValue
-     * @since 2.0.1
-     */
-    public Integer getMyValue() {
-        return myValue;
-    }
+	/**
+	 * Returns the myValue
+	 * 
+	 * @return the myValue
+	 * @since 2.0.1
+	 */
+	public Integer getMyValue() {
+		return this.myValue;
+	}
 
-    /**
-     * Returns the parent
-     * 
-     * @return the parent
-     * @since 2.0.1
-     */
-    public Node getParent() {
-        return parent;
-    }
-    
-    /**
-     * Returns the children
-     * 
-     * @return the children
-     * @since 2.0.1
-     */
-    public List<Node> getChildren() {
-        return children;
-    }
-    
-    /**
-     * Sets the myValue.
-     * 
-     * @param myValue
-     * 
-     * @since 2.0.1
-     */
-    public void setMyValue(Integer myValue) {
-        this.myValue = myValue;
-    }
-    
-    /**
+	/**
+	 * Returns the parent
+	 * 
+	 * @return the parent
+	 * @since 2.0.1
+	 */
+	public Node getParent() {
+		return this.parent;
+	}
+
+	/**
+	 * Sets the children
+	 * 
+	 * @param children
+	 * 
+	 * @since 2.0.1
+	 */
+	public void setChildren(List<Node> children) {
+		this.children = children;
+	}
+
+	/**
+	 * Sets the myValue.
+	 * 
+	 * @param myValue
+	 * 
+	 * @since 2.0.1
+	 */
+	public void setMyValue(Integer myValue) {
+		this.myValue = myValue;
+	}
+
+	/**
 	 * Sets the parent.
 	 * 
 	 * @param parent
 	 *            the parent to set
 	 * @since 2.0.1
 	 */
-    public void setParent(Node parent) {
-        this.parent = parent;
-    }
-
-    
-    /**
-     * Sets the children
-     * 
-     * @param children
-     * 
-     * @since 2.0.1
-     */
-    public void setChildren(List<Node> children) {
-        this.children = children;
-    }
+	public void setParent(Node parent) {
+		this.parent = parent;
+	}
 }

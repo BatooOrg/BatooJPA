@@ -23,7 +23,6 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -73,7 +72,6 @@ public class ElementCollectionTest4 extends BaseCoreTest {
 	 * @since 2.0.0
 	 */
 	@Test
-	@Ignore
 	public void testElementCollectionWithRemove() {
 		final Foo4 foo = new Foo4();
 

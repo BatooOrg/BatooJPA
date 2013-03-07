@@ -183,7 +183,7 @@ public class ManagedInstance<X> {
 						entityManager.detach(list.get(i));
 					}
 				}
-				else {
+				else if (collection != null) {
 					for (final Object element : collection) {
 						entityManager.detach(element);
 					}
@@ -254,7 +254,7 @@ public class ManagedInstance<X> {
 								requiresFlush |= entityManager.persistImpl(castedList.get(i), processed, instances);
 							}
 						}
-						else {
+						else if (collection != null) {
 							for (final Object element : collection) {
 								requiresFlush |= entityManager.persistImpl(element, processed, instances);
 							}
@@ -312,7 +312,7 @@ public class ManagedInstance<X> {
 						entityManager.removeImpl(list.get(i), processed, instances);
 					}
 				}
-				else if (collection instanceof Iterable) {
+				else if (collection != null) {
 					for (final Object element : collection) {
 						entityManager.removeImpl(element, processed, instances);
 					}

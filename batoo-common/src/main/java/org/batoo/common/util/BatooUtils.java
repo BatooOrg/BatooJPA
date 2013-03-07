@@ -20,10 +20,12 @@ package org.batoo.common.util;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * 
@@ -129,6 +131,29 @@ public class BatooUtils {
 		}
 
 		return list;
+	}
+
+	/**
+	 * 
+	 * @param <X>
+	 *            type of key
+	 * @param <Y>
+	 *            type of value
+	 * @param a
+	 *            first map
+	 * @param b
+	 *            second map
+	 * @return the subtracted map
+	 * @since $version
+	 */
+	public static <X, Y> Map<X, Y> subtract(final Map<X, Y> a, final Map<X, Y> b) {
+		final Map<X, Y> map = Maps.newHashMap();
+		for (final X key : a.keySet()) {
+			if (!(b.containsKey(key) && b.get(key).equals(a.get(key)))) {
+				map.put(key, b.get(key));
+			}
+		}
+		return map;
 	}
 
 	/**
