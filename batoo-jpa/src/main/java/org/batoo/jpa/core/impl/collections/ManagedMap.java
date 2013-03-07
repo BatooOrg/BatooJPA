@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -237,16 +236,17 @@ public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, 
 
 		if (removals) {
 			// delete the removals
-			final List<K> childrenRemoved = BatooUtils.subtract(this.snapshot.keySet(), this.delegate.keySet());
-			for (int i = 0; i < childrenRemoved.size(); i++) {
-				final K key = childrenRemoved.get(i);
+			final Map<K, V> childrenRemoved = BatooUtils.subtract(this.snapshot, this.delegate);
+
+			for (final K key : childrenRemoved.keySet()) {
 				mapping.detach(connection, instance, key, this.snapshot.get(key));
 			}
 		}
 		else {
 			// create the additions
-			final Collection<K> childrenAdded = BatooUtils.subtract(this.delegate.keySet(), this.snapshot.keySet());
-			this.attachChildren(connection, instance, mapping, childrenAdded);
+			final Map<K, V> childrenAdded = BatooUtils.subtract(this.delegate, this.snapshot);
+
+			this.attachChildren(connection, instance, mapping, childrenAdded.keySet());
 		}
 	}
 
