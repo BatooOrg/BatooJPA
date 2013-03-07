@@ -838,12 +838,8 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	@SuppressWarnings({ "unchecked" })
 	private X handleElement(ResultSet row) throws SQLException {
 		if (this.type.getPersistenceType() == PersistenceType.BASIC) {
-			if (this.type.getJavaType().isEnum()) {
-				for (final AbstractColumn ac : this.columns) {
-					if (ac instanceof ElementColumn) {
-						return (X) ac.convertValueForSet(row.getObject(this.fields[0]));
-					}
-				}
+			if (this.type.getJavaType().isEnum() && this.columns.length == 1) {
+				return (X) this.columns[0].convertValueForSet(row.getObject(this.fields[0]));
 			}
 			return (X) row.getObject(this.fields[0]);
 		}
@@ -898,7 +894,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 		}
 
 		if (this.keyColumnAlias != null) {
-
 			if (this.keyColumn == null) {
 				final ElementCollectionMappingImpl<? super X, ?, ?> _mapping = (ElementCollectionMappingImpl<? super X, ?, ?>) this.mapping;
 				if (_mapping.getCollectionTable() != null) {
@@ -909,7 +904,6 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 			final Object object = (this.keyColumn != null) ? this.keyColumn.convertValueForSet(row.getObject(this.keyColumnAlias))
 				: row.getObject(this.keyColumnAlias);
 			if (selectType == MapSelectType.KEY) {
-
 				return new EntryImpl<Object, X>(object, null);
 			}
 			else {
