@@ -312,7 +312,7 @@ public class ManagedInstance<X> {
 						entityManager.removeImpl(list.get(i), processed, instances);
 					}
 				}
-				else {
+				else if (collection instanceof Iterable) {
 					for (final Object element : collection) {
 						entityManager.removeImpl(element, processed, instances);
 					}
