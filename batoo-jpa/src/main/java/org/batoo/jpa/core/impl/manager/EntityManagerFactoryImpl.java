@@ -175,6 +175,10 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 
 		NamedQueriesManager.perform(this.metamodel, this.criteriaBuilder);
 
+		// lets init static metamodel class if exist
+		this.metamodel.initStaticMetamodels();
+		//
+
 		this.persistenceUtil = new PersistenceUnitUtilImpl(this);
 
 		this.jdbcAdaptor.importSql(this.classloader, this.dataSource, (String) this.getProperties().get(BJPASettings.IMPORT_SQL));
@@ -359,7 +363,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 			dataSource.setMinConnectionsPerPartition(minConnections);
 			dataSource.setMaxConnectionsPerPartition(5);
 			dataSource.setDisableConnectionTracking(true);
-			
+
 			// This is slow so always set it to 0
 			dataSource.setReleaseHelperThreads(0);
 
