@@ -19,6 +19,7 @@
 package org.batoo.jpa.core.impl.model;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.sql.SQLException;
 import java.util.Collection;
@@ -37,12 +38,13 @@ import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PersistenceException;
+import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.EmbeddableType;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.IdentifiableType;
 import javax.persistence.metamodel.ManagedType;
-import javax.persistence.metamodel.MappedSuperclassType;
 import javax.persistence.metamodel.Metamodel;
+import javax.persistence.metamodel.StaticMetamodel;
 import javax.sql.DataSource;
 
 import org.batoo.common.BatooException;
@@ -117,8 +119,8 @@ public class MetamodelImpl implements Metamodel {
 	private final JdbcAdaptor jdbcAdaptor;
 
 	private final Map<Class<?>, BasicTypeImpl<?>> basics = Maps.newHashMap();
-	private final Map<Class<?>, MappedSuperclassType<?>> mappedSuperclasses = Maps.newHashMap();
-	private final Map<Class<?>, EmbeddableType<?>> embeddables = Maps.newHashMap();
+	private final Map<Class<?>, MappedSuperclassTypeImpl<?>> mappedSuperclasses = Maps.newHashMap();
+	private final Map<Class<?>, EmbeddableTypeImpl<?>> embeddables = Maps.newHashMap();
 	private final Map<Class<?>, EntityTypeImpl<?>> entities = Maps.newHashMap();
 	private final Map<String, EntityTypeImpl<?>> entitiesByName = Maps.newHashMap();
 	private final Map<String, NamedQueryMetadata> namedQueries = Maps.newHashMap();
@@ -523,7 +525,9 @@ public class MetamodelImpl implements Metamodel {
 	 */
 	@Override
 	public Set<EmbeddableType<?>> getEmbeddables() {
-		return Sets.newHashSet(this.embeddables.values());
+		final Set<EmbeddableType<?>> set = Sets.newHashSet();
+		set.addAll(this.embeddables.values());
+		return set;
 	}
 
 	/**
@@ -715,6 +719,61 @@ public class MetamodelImpl implements Metamodel {
 		final EntityTable entityTable = (SecondaryTable) table;
 
 		return "EntityTable[" + entityTable.getName() + " " + entityTable.getEntity().getJavaType().getName() + "]";
+	}
+
+	/**
+	 * 
+	 * @param type
+	 * @param clazz
+	 * @since $version
+	 */
+	private void initStaticMetamodel(ManagedTypeImpl<?> type, Class<?> clazz) {
+		for (final Attribute<?, ?> attribute : type.getAttributes()) {
+			// if (attribute instanceof SingularAttribute<?, ?>) {
+			try {
+				final Field declaredField = clazz.getDeclaredField(attribute.getName());
+
+				declaredField.set(null, attribute);
+			}
+			catch (final NoSuchFieldException e) {
+				LOG.debug("StaticMetamodel class has a missing field : {0}", attribute.getName());
+			}
+			catch (final SecurityException e) {
+				LOG.debug(e.getMessage());
+			}
+			catch (final IllegalArgumentException e) {
+				LOG.debug(e.getMessage());
+			}
+			catch (final IllegalAccessException e) {
+				LOG.debug(e.getMessage());
+			}
+			// }
+
+		}
+
+	}
+
+	/**
+	 * initialize static metamodel classes
+	 * 
+	 * @since $version
+	 */
+	public void initStaticMetamodels() {
+		for (final ManagedType<?> type : this.getManagedTypes()) {
+			final Class<?> entityClass = type.getJavaType();
+			final String staticMetamodelClassName = entityClass.getName() + "_";
+			try {
+				final Class<?> clazz = this.emf.getClassloader().loadClass(staticMetamodelClassName);
+				if (clazz.isAnnotationPresent(StaticMetamodel.class)) {
+					initStaticMetamodel((ManagedTypeImpl<?>) type, clazz);
+				}
+			}
+			catch (final ClassNotFoundException e) {
+				LOG.debug("StaticMetamodel not present for {0}", staticMetamodelClassName);
+			}
+
+		}
+
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
