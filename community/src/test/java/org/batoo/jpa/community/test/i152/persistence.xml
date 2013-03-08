@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+	version="2.0">
+
+	<persistence-unit name="default">
+		<provider>org.batoo.jpa.core.BatooPersistenceProvider</provider>
+		
+		<class>org.batoo.jpa.community.test.i152.Kid</class>
+		<class>org.batoo.jpa.community.test.i152.Mother</class>
+						
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>		
+		<properties>
+			<property name="org.batoo.jpa.ddl" value="DROP" />
+ 			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.Driver40"/>		
+			<property name="javax.persistence.jdbc.url" value="jdbc:derby:memory:test;create=true"/>
+			<property name="javax.persistence.jdbc.user" value="root"/>
+			<property name="javax.persistence.jdbc.password" value=""/>
+		</properties>
+
+	</persistence-unit>
+</persistence>
