@@ -21,8 +21,10 @@ package org.batoo.jpa.core.impl.manager;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -64,7 +66,7 @@ public class SessionImpl {
 
 	private final ArrayList<ManagedInstance<?>> newEntities = Lists.newArrayList();
 	private final ArrayList<ManagedInstance<?>> externalEntities = Lists.newArrayList();
-	private final HashSet<ManagedInstance<?>> changedEntities = Sets.newHashSet();
+	private final Set<ManagedInstance<?>> changedEntities = Collections.newSetFromMap(new IdentityHashMap<ManagedInstance<?>, Boolean>());
 
 	private List<ManagedInstance<?>> entitiesLoading = Lists.newArrayList();
 
