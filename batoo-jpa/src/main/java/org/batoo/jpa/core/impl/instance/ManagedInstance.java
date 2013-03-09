@@ -29,6 +29,7 @@ import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.LockModeType;
@@ -648,14 +649,7 @@ public class ManagedInstance<X> {
 			return this.h;
 		}
 
-		final Object id = this.getId();
-
-		final int prime = 31;
-		final int result = 1;
-
-		this.h = (prime * result) + this.type.getRootType().getName().hashCode();
-
-		return this.h = (prime * result) + id.hashCode();
+		return this.h = org.batoo.common.util.ObjectUtils.hash(this.type.getRootType().getName(), id);
 	}
 
 	/**
