@@ -16,7 +16,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.core.test.enhance;
+package org.batoo.jpa.core.test.enhance.simple;
 
 import java.sql.SQLException;
 

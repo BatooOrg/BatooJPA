@@ -126,7 +126,7 @@ public final class Enhancer {
 			for (final Method method : currentClass.getDeclaredMethods()) {
 				int modifiers = method.getModifiers();
 
-				if (Modifier.isStatic(modifiers) || Modifier.isPrivate(modifiers) || method.isSynthetic() || method.isBridge()) {
+				if (Modifier.isAbstract(modifiers) || Modifier.isStatic(modifiers) || Modifier.isPrivate(modifiers) || method.isSynthetic() || method.isBridge()) {
 					continue;
 				}
 				
