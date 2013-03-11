@@ -648,14 +648,14 @@ public class ManagedInstance<X> {
 			return this.h;
 		}
 
-		final Object id = this.getId();
+		final ManagedId<? super X> _id = this.getId();
 
 		final int prime = 31;
-		final int result = 1;
+		int result = 1;;
+		result = (prime * result) + this.type.getRootType().getName().hashCode();
+		result = prime * result + ((_id == null) ? 0 : _id.hashCode());
 
-		this.h = (prime * result) + this.type.getRootType().getName().hashCode();
-
-		return this.h = (prime * result) + id.hashCode();
+		return this.h = result;
 	}
 
 	/**
