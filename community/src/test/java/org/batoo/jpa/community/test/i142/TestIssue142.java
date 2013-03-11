@@ -27,7 +27,7 @@ import org.junit.Test;
  * 
  * @author hceylan
  */
-@SuppressWarnings({ "serial", "javadoc" })
+@SuppressWarnings("javadoc")
 public class TestIssue142 extends BaseCoreTest {
 
 	@Test

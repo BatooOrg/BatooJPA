@@ -16,22 +16,36 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.community.test.i157;
+package org.batoo.jpa.core.test.enhance.abstractclass;
 
-import org.batoo.jpa.community.test.BaseCoreTest;
-import org.batoo.jpa.community.test.NoDatasource;
-import org.junit.Test;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
 
 /**
- * Test abstract class test cases
  * 
- * @since $version
+ * @author ylemoigne
+ * @since 2.0.1
  */
+@Entity
 @SuppressWarnings("javadoc")
-public class TestIssue157 extends BaseCoreTest {
+public abstract class AbstractEntity extends TopMappedSuperClass {
 
-	@Test
-	@NoDatasource
-	public void test() {
+	@Basic
+	@Column(nullable = false)
+	private String myAbstractProperty;
+
+	public AbstractEntity() {
+		super();
+	}
+
+	public abstract String getFoo();
+
+	public String getMyAbstractProperty() {
+		return this.myAbstractProperty;
+	}
+
+	public void setMyAbstractProperty(String myAbstractProperty) {
+		this.myAbstractProperty = myAbstractProperty;
 	}
 }

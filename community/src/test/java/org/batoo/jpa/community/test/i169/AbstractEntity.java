@@ -16,29 +16,36 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.community.test.i157;
+package org.batoo.jpa.community.test.i169;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Version;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.Table;
 
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "CONCRETE_TYPE", discriminatorType = DiscriminatorType.STRING, length = 50)
+@Table(name = "AbstractEntity")
 @SuppressWarnings("javadoc")
-@MappedSuperclass
-public class TopMappedSuperClass {
-
+public abstract class AbstractEntity {
 	@Id
 	@Column(name = "ID", nullable = false)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	protected Long id = null;
 
-	@Version
+	@Basic
 	@Column(nullable = false)
-	protected Long timeStamp = null;
+	private String myAbstractProperty;
 
-	public TopMappedSuperClass() {
+	public AbstractEntity() {
 		super();
 	}
 
@@ -46,16 +53,18 @@ public class TopMappedSuperClass {
 		return this.id;
 	}
 
-	public Long getTimeStamp() {
-		return this.timeStamp;
+	public String getMyAbstractProperty() {
+		return this.myAbstractProperty;
 	}
+
+	abstract public String getMyConcreteProperty();
 
 	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public void setTimeStamp(Long timeStamp) {
-		this.timeStamp = timeStamp;
+	public void setMyAbstractProperty(String myAbstractProperty) {
+		this.myAbstractProperty = myAbstractProperty;
 	}
 
 }

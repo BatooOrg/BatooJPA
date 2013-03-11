@@ -16,22 +16,36 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.community.test.i157;
+package org.batoo.jpa.community.test.i169;
 
-import org.batoo.jpa.community.test.BaseCoreTest;
-import org.batoo.jpa.community.test.NoDatasource;
-import org.junit.Test;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
-/**
- * Test abstract class test cases
- * 
- * @since $version
- */
+@Entity
+@Table
+@DiscriminatorValue("ConcreteEntity")
 @SuppressWarnings("javadoc")
-public class TestIssue157 extends BaseCoreTest {
+public class ConcreteEntity extends AbstractEntity {
 
-	@Test
-	@NoDatasource
-	public void test() {
+	@Basic
+	@Column(nullable = false)
+	private String myConcreteProperty;
+
+	public ConcreteEntity() {
+		super();
 	}
+
+	public ConcreteEntity(String myAbstractProperty, String myConcreteProperty) {
+		setMyAbstractProperty(myAbstractProperty);
+		this.myConcreteProperty = myConcreteProperty;
+	}
+
+	@Override
+	public String getMyConcreteProperty() {
+		return this.myConcreteProperty;
+	}
+
 }
