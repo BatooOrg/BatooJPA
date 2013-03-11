@@ -16,22 +16,51 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.community.test.i157;
+package org.batoo.jpa.core.test.enhance.abstractclass;
 
-import org.batoo.jpa.community.test.BaseCoreTest;
-import org.batoo.jpa.community.test.NoDatasource;
-import org.junit.Test;
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Version;
 
 /**
- * Test abstract class test cases
  * 
+ * @author ylemoigne
  * @since $version
  */
+@MappedSuperclass
 @SuppressWarnings("javadoc")
-public class TestIssue157 extends BaseCoreTest {
+public class TopMappedSuperClass {
 
-	@Test
-	@NoDatasource
-	public void test() {
+	@Id
+	@Column(name = "ID", nullable = false)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	protected Long id = null;
+
+	@Version
+	@Column(nullable = false)
+	protected Long timeStamp = null;
+
+	public TopMappedSuperClass() {
+		super();
 	}
+
+	public Long getId() {
+		return this.id;
+	}
+
+	public Long getTimeStamp() {
+		return this.timeStamp;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setTimeStamp(Long timeStamp) {
+		this.timeStamp = timeStamp;
+	}
+
 }

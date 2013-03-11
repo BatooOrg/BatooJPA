@@ -21,7 +21,6 @@ package org.batoo.jpa.core.impl.model;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -241,10 +240,6 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	}
 
 	private ConstructorAccessor enhance() {
-		if(Modifier.isAbstract(getJavaType().getModifiers())){
-			return null;
-		}
-		
 		try {
 			final Class<X> enhancedClass = Enhancer.enhance(this);
 			final Constructor<X> constructor = enhancedClass.getConstructor(Class.class, // type
