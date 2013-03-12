@@ -16,7 +16,7 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.community.test.calendarTemporalField;
+package org.batoo.jpa.core.test.temporaltype;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -31,10 +31,16 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+/**
+ * 
+ * @author ylemoigne
+ * @since $version
+ */
 @Entity
 @Table
 @SuppressWarnings("javadoc")
-public class CalendarTemporalFieldEntity {
+public class TemporalFieldEntity {
+
 	@Id
 	@Column(name = "ID", nullable = false)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,7 +54,7 @@ public class CalendarTemporalFieldEntity {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date date;
 
-	public CalendarTemporalFieldEntity() {
+	public TemporalFieldEntity() {
 		super();
 	}
 

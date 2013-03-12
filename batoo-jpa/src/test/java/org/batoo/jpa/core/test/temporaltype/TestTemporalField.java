@@ -16,30 +16,31 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.community.test.calendarTemporalField;
+package org.batoo.jpa.core.test.temporaltype;
 
 import static org.junit.Assert.assertEquals;
 
 import java.util.Calendar;
 
-import org.batoo.jpa.community.test.BaseCoreTest;
-import org.batoo.jpa.community.test.NoDatasource;
+import org.batoo.jpa.core.test.BaseCoreTest;
 import org.junit.Test;
 
 /**
- * Test for the issue calendarTemporalField
+ * Test for the issue calendar Temporal Field
  * 
  * @author ylemoigne
  * @since $version
  */
-@SuppressWarnings("javadoc")
-public class TestCalendarTemporalField extends BaseCoreTest {
+public class TestTemporalField extends BaseCoreTest {
+
+	/**
+	 * Test for temporal Calendar and date type
+	 */
 	@Test
-	@NoDatasource
-	public void test() {
+	public void testTemporal() {
 		final Calendar testStartInstant = Calendar.getInstance();
 
-		final CalendarTemporalFieldEntity mainEntity = new CalendarTemporalFieldEntity();
+		final TemporalFieldEntity mainEntity = new TemporalFieldEntity();
 		mainEntity.setCalendar(testStartInstant);
 
 		mainEntity.setDate(testStartInstant.getTime());
@@ -49,7 +50,7 @@ public class TestCalendarTemporalField extends BaseCoreTest {
 
 		this.close();
 
-		final CalendarTemporalFieldEntity mainEntityReloaded = find(CalendarTemporalFieldEntity.class, mainEntity.getId());
+		final TemporalFieldEntity mainEntityReloaded = find(TemporalFieldEntity.class, mainEntity.getId());
 		assertEquals(mainEntity.getId(), mainEntityReloaded.getId());
 		assertEquals(testStartInstant.getTime(), mainEntityReloaded.getDate());
 		assertEquals(testStartInstant, mainEntityReloaded.getCalendar());
