@@ -242,6 +242,29 @@ public abstract class AbstractColumn implements Column {
 			return null;
 		}
 
+		if (this.temporalType != null) {
+			if (this.javaType == Calendar.class) {
+				final Calendar calendarValue = Calendar.getInstance();
+				switch (this.temporalType) {
+					case DATE:
+						if (value instanceof java.sql.Date) {
+							calendarValue.setTime((java.sql.Date) value);
+							return calendarValue;
+						}
+					case TIME:
+						if (value instanceof java.sql.Time) {
+							calendarValue.setTime((java.sql.Time) value);
+							return calendarValue;
+						}
+					case TIMESTAMP:
+						if (value instanceof java.sql.Timestamp) {
+							calendarValue.setTime((java.sql.Timestamp) value);
+							return calendarValue;
+						}
+				}
+			}
+		}
+
 		if (this.enumType != null) {
 			if (this.enumType == EnumType.ORDINAL) {
 				value = this.values[((Number) value).shortValue()];
