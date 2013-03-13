@@ -423,9 +423,10 @@ public class ManagedInstance<X> {
 			return false;
 		}
 
+		final ManagedId<? super X> thisId = this.getId();
 		final ManagedInstance<?> other = (ManagedInstance<?>) obj;
 
-		return this.getId().equals(other.getId());
+		return (thisId != null) && thisId.equals(other.getId());
 	}
 
 	/**
