@@ -338,7 +338,7 @@ public class ForeignKey {
 	 * 
 	 * @return the mapping of the ForeignKey
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public Mapping<?, ?, ?> getMapping() {
 		return this.mapping;

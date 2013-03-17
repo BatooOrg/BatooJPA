@@ -56,7 +56,7 @@ public enum NumericFunctionType {
 	 * 
 	 * @return the jpql fragment of the function type
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public String getJpqlFragment() {
 		return this.jpqlFragment;

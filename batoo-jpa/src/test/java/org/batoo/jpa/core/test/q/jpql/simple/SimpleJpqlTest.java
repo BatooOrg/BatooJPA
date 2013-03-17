@@ -369,7 +369,7 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	/**
 	 * Tests for is empty and is not
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@Test
 	public void testEmpty() {
@@ -418,7 +418,7 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@Test
 	public void testIn() {
@@ -554,7 +554,7 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@Test(expected = java.lang.IllegalArgumentException.class)
 	public void testOrderedParameters() {
@@ -603,7 +603,7 @@ public class SimpleJpqlTest extends BaseCoreTest {
 	/**
 	 * 
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@Test
 	public void testReusedParams() {

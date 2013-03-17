@@ -33,7 +33,7 @@ public class FooPk {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public FooPk() {
 		super();
@@ -45,7 +45,7 @@ public class FooPk {
 	 *            strKey
 	 * @param intKey
 	 *            intKey
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public FooPk(String strKey, Integer intKey) {
 		super();

@@ -28,7 +28,7 @@ import org.batoo.common.BatooException;
  * Accessor implementation of {@link AbstractAccessor} for the members of {@link Field}s.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public class FieldAccessor extends AbstractAccessor {
 
@@ -64,7 +64,7 @@ public class FieldAccessor extends AbstractAccessor {
 	 * @param field
 	 *            the field to access
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public FieldAccessor(Field field) {
 		super();
@@ -109,7 +109,7 @@ public class FieldAccessor extends AbstractAccessor {
 	/**
 	 * @return
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	private PrimitiveType getPrimitiveType() {
 		final Class<?> type = this.field.getType();

@@ -46,7 +46,7 @@ public class NativeQueryTest extends BaseCoreTest {
 	/**
 	 * test for column mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@Test
 	public void testColumnMappingNativeQuery() {
@@ -91,7 +91,7 @@ public class NativeQueryTest extends BaseCoreTest {
 	/**
 	 * Test for DiscriminatorValue
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@Test
 	public void testDiscriminatorValue() {
@@ -138,7 +138,7 @@ public class NativeQueryTest extends BaseCoreTest {
 	/**
 	 * test for embeddedId attribute in native query
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@Test
 	public void testEmbeddedIdNativeQuery() {
@@ -191,7 +191,7 @@ public class NativeQueryTest extends BaseCoreTest {
 	/**
 	 * test for attribute with IdClass in native query
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@Test
 	public void testIdClassNativeQuery() {
@@ -245,7 +245,7 @@ public class NativeQueryTest extends BaseCoreTest {
 	/**
 	 * test Simple named native query
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@Test
 	public void testNamedNativeQuery() {
@@ -267,7 +267,7 @@ public class NativeQueryTest extends BaseCoreTest {
 	/**
 	 * Simple single entity named native query test
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@Test
 	public void testNamedNativeQuery2() {
@@ -289,7 +289,7 @@ public class NativeQueryTest extends BaseCoreTest {
 	/**
 	 * test Simple named native query in orm.xml
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@Test
 	public void testNamedNativeQuery3() {
@@ -311,7 +311,7 @@ public class NativeQueryTest extends BaseCoreTest {
 	/**
 	 * Simple Multi entity native query test
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@Test
 	public void testSimpleMultipleSelect() {
@@ -362,7 +362,7 @@ public class NativeQueryTest extends BaseCoreTest {
 	/**
 	 * test Simple Multi entity native query
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@Test
 	public void testSimpleMultiSelectWithParameters() {
@@ -416,7 +416,7 @@ public class NativeQueryTest extends BaseCoreTest {
 	/**
 	 * Simple single entity native query test
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@Test(expected = javax.persistence.PersistenceException.class)
 	public void testSingleEntityWithParameters() {

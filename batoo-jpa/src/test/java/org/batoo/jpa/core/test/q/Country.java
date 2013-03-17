@@ -80,7 +80,7 @@ public class Country {
 	 * 
 	 * @return the lastActivity of the Country
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public java.util.Date getLastActivity() {
 		return this.lastActivity;
@@ -102,7 +102,7 @@ public class Country {
 	 * @param lastActivity
 	 *            the lastActivity to set for Country
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public void setLastActivity(java.util.Date lastActivity) {
 		this.lastActivity = lastActivity;

@@ -30,7 +30,7 @@ import javax.persistence.Table;
 /**
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.1
  */
 @Entity
 @IdClass(ItemPk.class)

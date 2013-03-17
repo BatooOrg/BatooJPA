@@ -637,7 +637,7 @@ public class EntityMetadataImpl extends IdentifiableMetadataImpl implements Enti
 	 * 
 	 * @param metadata
 	 * @param parsed
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	private void handleSqlResultSetMappings(EntityMetadata metadata, Set<Class<? extends Annotation>> parsed) {
 		if ((metadata != null) && (metadata.getSqlResultSetMappings() != null)) {

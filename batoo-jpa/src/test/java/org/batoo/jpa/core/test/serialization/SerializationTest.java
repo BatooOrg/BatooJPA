@@ -37,7 +37,7 @@ import org.junit.Test;
  * 
  * @author asimarslan
  * @author ylemoigne
- * @since $version
+ * @since 2.0.1
  */
 public class SerializationTest extends BaseCoreTest {
 
@@ -98,7 +98,7 @@ public class SerializationTest extends BaseCoreTest {
 	 * 
 	 * @throws IOException
 	 * @throws ClassNotFoundException
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@Test
 	public void testSerialization() throws IOException, ClassNotFoundException {

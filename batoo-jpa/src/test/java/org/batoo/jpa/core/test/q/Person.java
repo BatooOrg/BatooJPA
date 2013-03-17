@@ -169,7 +169,7 @@ public class Person {
 	 * 
 	 * @return the validFrom
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public Date getValidFrom() {
 		return this.validFrom;
@@ -179,7 +179,7 @@ public class Person {
 	 * 
 	 * @return the validTo
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public Date getValidTo() {
 		return this.validTo;
@@ -200,7 +200,7 @@ public class Person {
 	 * 
 	 * @return the manager of the Person
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public boolean isManager() {
 		return this.manager;
@@ -224,7 +224,7 @@ public class Person {
 	 * @param manager
 	 *            the manager to set for Person
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public void setManager(boolean manager) {
 		this.manager = manager;
@@ -258,7 +258,7 @@ public class Person {
 	 * @param validFrom
 	 *            the validFrom to set
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public void setValidFrom(Date validFrom) {
 		this.validFrom = validFrom;
@@ -269,7 +269,7 @@ public class Person {
 	 * @param validTo
 	 *            the validTo to set
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public void setValidTo(Date validTo) {
 		this.validTo = validTo;

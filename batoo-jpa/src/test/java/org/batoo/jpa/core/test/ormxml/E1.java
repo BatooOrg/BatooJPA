@@ -43,7 +43,7 @@ public class E1 extends E {
 	 * 
 	 * @param value
 	 *            value
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public E1(String value) {
 		super();

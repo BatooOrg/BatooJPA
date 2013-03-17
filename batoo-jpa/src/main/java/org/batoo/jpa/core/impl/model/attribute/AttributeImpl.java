@@ -93,7 +93,7 @@ public abstract class AttributeImpl<X, Y> implements Attribute<X, Y> {
 	 * @param <Z>
 	 *            the new type
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public abstract <Z extends X> AttributeImpl<Z, Y> clone(EntityTypeImpl<Z> type);
 

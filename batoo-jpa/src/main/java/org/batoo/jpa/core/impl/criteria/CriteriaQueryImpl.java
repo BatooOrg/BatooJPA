@@ -74,7 +74,7 @@ public class CriteriaQueryImpl<T> extends AbstractCriteriaQueryImpl<T> implement
 	 * @param qlString
 	 *            the qlstring
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public CriteriaQueryImpl(MetamodelImpl metamodel, String qlString) {
 		super(metamodel, qlString);

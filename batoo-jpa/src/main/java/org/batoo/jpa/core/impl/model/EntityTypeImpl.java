@@ -233,7 +233,7 @@ public class EntityTypeImpl<X> extends IdentifiableTypeImpl<X> implements Entity
 	 * 
 	 * @return <code>true</code> if remove operation can be combined into a batch, <code>false</code> otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public boolean canBatchRemoves() {
 		return this.canBatchRemoves;

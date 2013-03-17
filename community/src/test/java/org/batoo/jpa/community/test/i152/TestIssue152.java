@@ -28,7 +28,7 @@ import org.junit.Test;
  * test for issue 152
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.1
  */
 @SuppressWarnings("javadoc")
 public class TestIssue152 extends BaseCoreTest {

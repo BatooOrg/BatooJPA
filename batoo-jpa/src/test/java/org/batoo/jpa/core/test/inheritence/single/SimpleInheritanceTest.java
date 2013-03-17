@@ -133,7 +133,7 @@ public class SimpleInheritanceTest extends BaseCoreTest {
 	/**
 	 * Test inheritance of mappedSuperClass
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@Test
 	@Ignore

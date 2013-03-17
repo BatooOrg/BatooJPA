@@ -31,7 +31,7 @@ import com.google.common.collect.Lists;
  * Element for <code>sql-result-set-mapping</code>
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.1
  */
 public class SqlResultSetMappingElement extends ParentElement implements SqlResultSetMappingMetadata {
 
@@ -45,7 +45,7 @@ public class SqlResultSetMappingElement extends ParentElement implements SqlResu
 	 * @param parent
 	 * @param attributes
 	 * @param expectedChildElements
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public SqlResultSetMappingElement(ParentElement parent, Map<String, String> attributes, String... expectedChildElements) {
 		super(parent, attributes, ParentElement.join(expectedChildElements, //

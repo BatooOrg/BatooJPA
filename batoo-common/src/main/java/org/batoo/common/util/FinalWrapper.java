@@ -25,7 +25,7 @@ package org.batoo.common.util;
  *            The type of the wrapper
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public class FinalWrapper<T> {
 
@@ -38,7 +38,7 @@ public class FinalWrapper<T> {
 	 * @param value
 	 *            the wrapped value
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public FinalWrapper(T value) {
 		this.value = value;

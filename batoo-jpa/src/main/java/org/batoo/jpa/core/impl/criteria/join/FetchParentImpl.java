@@ -544,7 +544,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	 * @return managedId
 	 * 
 	 * @throws SQLException
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	private ManagedId<?> getAssociatedId(SessionImpl session, ResultSet row, SingularAssociationMappingImpl<?, ?> mapping) throws SQLException {
 		final HashMap<AbstractColumn, String> translatedIdFields = Maps.newHashMap();

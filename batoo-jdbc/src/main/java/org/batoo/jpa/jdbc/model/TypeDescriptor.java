@@ -22,7 +22,7 @@ package org.batoo.jpa.jdbc.model;
  * The base type descriptor
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public interface TypeDescriptor {
 
@@ -31,7 +31,7 @@ public interface TypeDescriptor {
 	 * 
 	 * @return the java type of the persistent type
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	Class<?> getJavaType();
 }

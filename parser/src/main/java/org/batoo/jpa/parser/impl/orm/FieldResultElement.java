@@ -26,7 +26,7 @@ import org.batoo.jpa.parser.metadata.FieldResultMetadata;
  * Element <code>field-result</code>
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.1
  */
 public class FieldResultElement extends ChildElement implements FieldResultMetadata {
 
@@ -38,7 +38,7 @@ public class FieldResultElement extends ChildElement implements FieldResultMetad
 	 * 
 	 * @param parent
 	 * @param attributes
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public FieldResultElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);

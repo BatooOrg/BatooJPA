@@ -31,7 +31,7 @@ import javax.persistence.TableGenerator;
 /**
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.1
  */
 @Entity
 @TableGenerator(name = "order_id", allocationSize = 100)

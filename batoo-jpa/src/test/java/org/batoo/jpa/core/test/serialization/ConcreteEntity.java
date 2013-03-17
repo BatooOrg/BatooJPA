@@ -31,7 +31,7 @@ import javax.persistence.Table;
 /**
  * 
  * @author ylemoigne
- * @since $version
+ * @since 2.0.1
  */
 @Entity
 @Table

@@ -29,7 +29,7 @@ import java.util.Map;
  * @param <V>
  *            The value of the key
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public interface MultiValueMap<K, V> extends Map<K, List<V>> {
 

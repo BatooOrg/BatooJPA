@@ -423,7 +423,7 @@ public abstract class AbstractColumn implements Column {
 	 * 
 	 * @return <code>true</code> if the column is a version column, <code>false</code> otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public boolean isVersion() {
 		return false;

@@ -27,7 +27,7 @@ import java.util.Collection;
  *            the destination type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public interface ParentMapping<Z, X> extends Mapping<Z, X, X> {
 

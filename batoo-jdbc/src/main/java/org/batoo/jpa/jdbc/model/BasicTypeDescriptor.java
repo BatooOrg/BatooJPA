@@ -22,7 +22,7 @@ package org.batoo.jpa.jdbc.model;
  * Descriptor for basic types.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public interface BasicTypeDescriptor extends TypeDescriptor {
 

@@ -49,7 +49,7 @@ import java.util.Map;
  * The original code is based on org.springframework.util.Assert
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public abstract class Assert {
 

@@ -564,7 +564,7 @@ public class ManagedInstance<X> {
 	 * 
 	 * @return the old version of the instance
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public Object getOldVersion() {
 		return this.oldVersion;

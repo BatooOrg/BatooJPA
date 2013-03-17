@@ -36,7 +36,7 @@ import com.google.common.collect.Maps;
 /**
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.1
  */
 @Entity
 public class Foo4 {
@@ -68,7 +68,7 @@ public class Foo4 {
 	 * 
 	 * @return the textMap
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public Map<FieldLocale, String> getTextMap() {
 		return this.textMap;

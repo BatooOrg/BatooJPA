@@ -24,7 +24,7 @@ import javax.persistence.MappedSuperclass;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 @MappedSuperclass
 public class BaseEntity {
@@ -33,7 +33,7 @@ public class BaseEntity {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public BaseEntity() {
 		super();

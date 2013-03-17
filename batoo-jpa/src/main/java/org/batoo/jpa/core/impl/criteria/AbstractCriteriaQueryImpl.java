@@ -89,7 +89,7 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 	 * @param metamodel
 	 *            the metamodel
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public AbstractCriteriaQueryImpl(MetamodelImpl metamodel) {
 		super(metamodel);
@@ -116,7 +116,7 @@ public abstract class AbstractCriteriaQueryImpl<T> extends BaseQueryImpl<T> impl
 	 * @param qlString
 	 *            the JPQL query
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public AbstractCriteriaQueryImpl(MetamodelImpl metamodel, String qlString) {
 		super(metamodel, qlString);

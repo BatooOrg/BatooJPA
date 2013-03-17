@@ -26,7 +26,7 @@ import javax.persistence.MappedSuperclass;
 /**
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.1
  */
 @MappedSuperclass
 @SuppressWarnings("javadoc")

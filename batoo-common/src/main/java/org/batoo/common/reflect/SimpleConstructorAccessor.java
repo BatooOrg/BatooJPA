@@ -25,7 +25,7 @@ import java.lang.reflect.InvocationTargetException;
  * Constructor accessor for non-sun java environments.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public class SimpleConstructorAccessor extends ConstructorAccessor {
 
@@ -35,7 +35,7 @@ public class SimpleConstructorAccessor extends ConstructorAccessor {
 	 * @param constructor
 	 *            the constructor
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public SimpleConstructorAccessor(Constructor<?> constructor) {
 		super();
