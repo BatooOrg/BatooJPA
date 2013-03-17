@@ -38,7 +38,7 @@ import javax.persistence.TableGenerator;
 /**
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.1
  */
 @SqlResultSetMappings({ @SqlResultSetMapping(name = "WidgetOrderResults", entities = @EntityResult(entityClass = Order.class)),//
 

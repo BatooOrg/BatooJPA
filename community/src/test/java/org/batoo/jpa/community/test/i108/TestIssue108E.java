@@ -38,7 +38,7 @@ import org.junit.runner.RunWith;
  * The extended version of the test
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 @RunWith(ApplicationComposer.class)
 @SuppressWarnings("javadoc")

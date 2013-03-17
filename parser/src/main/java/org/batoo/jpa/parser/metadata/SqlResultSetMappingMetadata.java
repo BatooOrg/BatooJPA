@@ -24,7 +24,7 @@ import java.util.List;
  * Metadata for SqlResultSetMapping
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.1
  */
 public interface SqlResultSetMappingMetadata extends BindableMetadata {
 
@@ -32,7 +32,7 @@ public interface SqlResultSetMappingMetadata extends BindableMetadata {
 	 * Specifies the result set mapping to scalar values
 	 * 
 	 * @return ColumnResultMetadata
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	List<ColumnResultMetadata> getColumns();
 
@@ -40,7 +40,7 @@ public interface SqlResultSetMappingMetadata extends BindableMetadata {
 	 * Specifies the result set mapping to entities.
 	 * 
 	 * @return EntityResultMetadata
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	List<EntityResultMetadata> getEntities();
 

@@ -27,7 +27,7 @@ import javax.persistence.Id;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 @Entity
 public class ReservedWordEntity {
@@ -43,7 +43,7 @@ public class ReservedWordEntity {
 	 * 
 	 * @return the id of the ReservedWordEntity
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public Integer getId() {
 		return this.id;
@@ -54,7 +54,7 @@ public class ReservedWordEntity {
 	 * 
 	 * @return the order of the ReservedWordEntity
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public int getOrder() {
 		return this.order;
@@ -66,7 +66,7 @@ public class ReservedWordEntity {
 	 * @param id
 	 *            the id to set for ReservedWordEntity
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public void setId(Integer id) {
 		this.id = id;
@@ -78,7 +78,7 @@ public class ReservedWordEntity {
 	 * @param order
 	 *            the order to set for ReservedWordEntity
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public void setOrder(int order) {
 		this.order = order;

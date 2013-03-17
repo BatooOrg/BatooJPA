@@ -34,7 +34,7 @@ import org.joda.time.DateTime;
  * 
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 @Entity
 public class MyEntity {
@@ -48,7 +48,7 @@ public class MyEntity {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public MyEntity() {
 		super();
@@ -96,7 +96,7 @@ public class MyEntity {
 	 * 
 	 * @return the date
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@Access(AccessType.PROPERTY)
 	public Date getDate() {
@@ -108,7 +108,7 @@ public class MyEntity {
 	 * 
 	 * @return the id of the MyEntity
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public Integer getId() {
 		return this.id;
@@ -133,7 +133,7 @@ public class MyEntity {
 	 * @param date
 	 *            the date to set
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public void setDate(Date date) {
 		this.someDate = new DateTime(date);
@@ -145,7 +145,7 @@ public class MyEntity {
 	 * @param id
 	 *            the id to set for MyEntity
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public void setId(Integer id) {
 		this.id = id;

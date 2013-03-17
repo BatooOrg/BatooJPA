@@ -71,7 +71,7 @@ public abstract class ManagedCollection<E> implements Serializable {
 		this.inverse = null;
 		this.changed = false;
 
-		this.insertBatchSize = this.managedInstance.getSession().getEntityManager().getJdbcAdaptor().getInsertBatchSize();
+		this.insertBatchSize = 1;
 	}
 
 	/**

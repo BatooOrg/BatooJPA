@@ -88,7 +88,7 @@ public class BLoggerImpl implements BLogger {
 	 * @param logger
 	 *            the wrapped logger
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public BLoggerImpl(Logger logger) {
 		this.logger = logger;
@@ -453,7 +453,7 @@ public class BLoggerImpl implements BLogger {
 	 *            the block to box
 	 * @return the object
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@Override
 	public Object lazyBoxed(final Object block) {
@@ -469,7 +469,7 @@ public class BLoggerImpl implements BLogger {
 	 *            the array of parameters
 	 * @return the object
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@Override
 	public Object lazyBoxed(final Object block, final Object[] parameters) {

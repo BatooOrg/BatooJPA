@@ -49,7 +49,7 @@ public class ManyToOneTest extends BaseCoreTest {
 	/**
 	 * tests for cascade operation PERSIST
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@Test
 	public void testCascade() {
@@ -80,7 +80,7 @@ public class ManyToOneTest extends BaseCoreTest {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@Test
 	public void testCascade2() {

@@ -24,7 +24,7 @@ import javax.persistence.EntityManager;
  * 
  *
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public interface BatooEntityManager extends EntityManager {
 

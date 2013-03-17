@@ -30,7 +30,7 @@ import org.junit.Test;
  * Test for the issue calendarTemporalField
  * 
  * @author ylemoigne
- * @since $version
+ * @since 2.0.1
  */
 @SuppressWarnings("javadoc")
 public class TestCalendarTemporalField extends BaseCoreTest {

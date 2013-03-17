@@ -26,7 +26,7 @@ import javax.persistence.Id;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 @Entity
 public class Foo {
@@ -42,7 +42,7 @@ public class Foo {
 	 * 
 	 * @return the id
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public Integer getId() {
 		return this.id;
@@ -52,7 +52,7 @@ public class Foo {
 	 * 
 	 * @return the lastActivity
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public java.util.Date getLastActivity() {
 		return this.lastActivity;
@@ -63,7 +63,7 @@ public class Foo {
 	 * @param id
 	 *            the id to set
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public void setId(Integer id) {
 		this.id = id;
@@ -74,7 +74,7 @@ public class Foo {
 	 * @param lastActivity
 	 *            the lastActivity to set
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public void setLastActivity(java.util.Date lastActivity) {
 		this.lastActivity = lastActivity;

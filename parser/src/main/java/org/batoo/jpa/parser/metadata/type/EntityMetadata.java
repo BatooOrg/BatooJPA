@@ -147,7 +147,7 @@ public interface EntityMetadata extends IdentifiableTypeMetadata, BindableMetada
 	 * 
 	 * @return the list of SqlResultSetMappingMetadata
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	List<SqlResultSetMappingMetadata> getSqlResultSetMappings();
 

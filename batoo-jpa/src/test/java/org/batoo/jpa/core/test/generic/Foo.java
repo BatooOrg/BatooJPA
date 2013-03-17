@@ -32,7 +32,7 @@ public class Foo extends AbstractPersistable<Long> {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 * @author hceylan
 	 */
 	public Foo() {
@@ -43,7 +43,7 @@ public class Foo extends AbstractPersistable<Long> {
 	 * @param fooValue
 	 *            the foo value
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 * @author hceylan
 	 */
 	public Foo(String fooValue) {
@@ -83,7 +83,7 @@ public class Foo extends AbstractPersistable<Long> {
 	 * 
 	 * @return the fooValue of the Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 * @author hceylan
 	 */
 	public String getFooValue() {
@@ -96,7 +96,7 @@ public class Foo extends AbstractPersistable<Long> {
 	 * @param fooValue
 	 *            the fooValue to set for Foo
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 * @author hceylan
 	 */
 	public void setFooValue(String fooValue) {

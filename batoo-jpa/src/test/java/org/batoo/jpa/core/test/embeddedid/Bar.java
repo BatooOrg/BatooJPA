@@ -30,7 +30,7 @@ import javax.persistence.TableGenerator;
 /**
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.1
  */
 @Entity
 @TableGenerator(name = "bar_id", allocationSize = 100)
@@ -45,7 +45,7 @@ public class Bar {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public Bar() {
 		super();
@@ -57,7 +57,7 @@ public class Bar {
 	 *            id
 	 * @param foo
 	 *            foo
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public Bar(long id, Foo foo) {
 		super();
@@ -68,7 +68,7 @@ public class Bar {
 	/**
 	 * 
 	 * @return Foo
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public Foo getFoo() {
 		return this.foo;
@@ -77,7 +77,7 @@ public class Bar {
 	/**
 	 * 
 	 * @return id
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public long getId() {
 		return this.id;
@@ -87,7 +87,7 @@ public class Bar {
 	 * 
 	 * @param foo
 	 *            foo
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public void setFoo(Foo foo) {
 		this.foo = foo;
@@ -97,7 +97,7 @@ public class Bar {
 	 * 
 	 * @param id
 	 *            id
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public void setId(long id) {
 		this.id = id;

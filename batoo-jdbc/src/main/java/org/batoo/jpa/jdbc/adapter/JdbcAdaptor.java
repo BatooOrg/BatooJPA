@@ -1108,7 +1108,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * Underlining DB creates an index for foreign Keys
 	 * 
 	 * @return db creates index
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	protected abstract boolean isForeignKeyHasDefaultIndex();
 
@@ -1127,7 +1127,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * DB forces a primary key or not
 	 * 
 	 * @return is Primary Key required
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	protected boolean isTableRequiredPrimaryKey() {
 		return false;
@@ -1173,7 +1173,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * 
 	 * @return true if the JDBC adaptor modifies parameters, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public boolean modifiesParameters() {
 		return false;
@@ -1191,7 +1191,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @param params
 	 *            the parameters to modify
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public void modifyParameters(ParameterMetaData pmd, Object[] params) {
 		// noop
@@ -1292,7 +1292,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * 
 	 * @return true if the database supports named params, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public boolean supportsNamedParams() {
 		return true;
@@ -1303,7 +1303,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * 
 	 * @return true if the database supports ordinal params, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public boolean supportsOrdinalParams() {
 		return true;

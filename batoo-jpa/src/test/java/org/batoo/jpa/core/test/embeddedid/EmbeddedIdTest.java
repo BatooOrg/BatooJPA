@@ -66,7 +66,7 @@ public class EmbeddedIdTest extends BaseCoreTest {
 	/**
 	 * Test embeddedId in a MonyToOne relation
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@Test
 	public void testEmbeddedIdManyToOne() {

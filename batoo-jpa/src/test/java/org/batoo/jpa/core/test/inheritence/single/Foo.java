@@ -43,7 +43,7 @@ public class Foo {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public Foo() {
 		super();
@@ -53,7 +53,7 @@ public class Foo {
 	 * 
 	 * @param value
 	 *            value
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public Foo(String value) {
 		super();

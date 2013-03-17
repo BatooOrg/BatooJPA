@@ -22,7 +22,7 @@ package org.batoo.jpa.parser.metadata;
 /**
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.1
  */
 public interface FieldResultMetadata extends BindableMetadata {
 
@@ -30,7 +30,7 @@ public interface FieldResultMetadata extends BindableMetadata {
 	 * Name of the column in the SELECT clause - i.e., column aliases, if applicable.
 	 * 
 	 * @return column
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	String getColumn();
 

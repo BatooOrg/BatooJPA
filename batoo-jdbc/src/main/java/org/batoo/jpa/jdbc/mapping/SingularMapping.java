@@ -29,7 +29,7 @@ import org.batoo.jpa.jdbc.IdType;
  *            the destination type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public interface SingularMapping<Z, X> extends Mapping<Z, X, X> {
 
@@ -47,7 +47,7 @@ public interface SingularMapping<Z, X> extends Mapping<Z, X, X> {
 	 * 
 	 * @return <code>true</code> if the mapping corresponds to an id field, <code>false</code> otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	boolean isId();
 }

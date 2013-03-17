@@ -26,7 +26,7 @@ import org.batoo.common.BatooException;
  * Accessor implementation of {@link AbstractAccessor} for the members of properties.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public class PropertyAccessor extends AbstractAccessor {
 
@@ -38,7 +38,7 @@ public class PropertyAccessor extends AbstractAccessor {
 	 * 
 	 * @param descriptor
 	 *            the property descriptor
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public PropertyAccessor(PropertyDescriptor descriptor) {
 		super();

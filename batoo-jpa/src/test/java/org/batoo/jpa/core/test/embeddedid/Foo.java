@@ -36,7 +36,7 @@ public class Foo {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public Foo() {
 		super();
@@ -48,7 +48,7 @@ public class Foo {
 	 *            the id to set
 	 * @param value
 	 *            the value to set
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public Foo(FooPk id, String value) {
 		super();

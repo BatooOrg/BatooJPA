@@ -120,7 +120,7 @@ public abstract class AbstractMapping<Z, X, Y> implements Mapping<Z, X, Y> {
 	 * 
 	 * @return the attribute of the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public AttributeImpl<? super Z, X> getAttribute() {
 		return this.attribute;
@@ -203,7 +203,7 @@ public abstract class AbstractMapping<Z, X, Y> implements Mapping<Z, X, Y> {
 	 * 
 	 * @return <code>true</code> if the mapping is a collection mapping, <code>false</code> otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@Override
 	public boolean isCollection() {

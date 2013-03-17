@@ -25,7 +25,7 @@ import javax.persistence.ManyToOne;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 @Entity
 public class Bar {

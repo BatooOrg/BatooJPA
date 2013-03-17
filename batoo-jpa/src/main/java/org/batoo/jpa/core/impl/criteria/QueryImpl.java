@@ -609,7 +609,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 * 
 	 * @return the JPQL that representing the query
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public String getJpql() {
 		return this.q.getJpql();

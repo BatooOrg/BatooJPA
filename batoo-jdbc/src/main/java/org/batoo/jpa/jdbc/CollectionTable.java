@@ -89,7 +89,7 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	 * 
 	 * @return the element column of the collection table
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public ElementColumn getElementColumn() {
 		return this.elementColumn;
@@ -122,7 +122,7 @@ public class CollectionTable extends AbstractTable implements JoinableTable {
 	 * 
 	 * @return the mapping of the collection table
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public ElementCollectionMapping<?, ?, ?> getMapping() {
 		return this.mapping;

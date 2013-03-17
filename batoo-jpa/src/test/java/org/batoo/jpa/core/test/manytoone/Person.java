@@ -97,7 +97,7 @@ public class Person {
 	 * 
 	 * @return the workAddress
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public Address getWorkAddress() {
 		return this.workAddress;
@@ -135,7 +135,7 @@ public class Person {
 	 * @param workAddress
 	 *            the workAddress to set
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public void setWorkAddress(Address workAddress) {
 		this.workAddress = workAddress;

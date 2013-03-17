@@ -25,13 +25,13 @@ package org.batoo.common.collections;
  *            the element type of the list
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public abstract class AbstractListListener<E> {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public AbstractListListener() {
 		super();
@@ -41,7 +41,7 @@ public abstract class AbstractListListener<E> {
 	 * 
 	 * Element added to the list.
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public void elementAdded(E e) {
 	}
@@ -50,7 +50,7 @@ public abstract class AbstractListListener<E> {
 	 * 
 	 * Element removed from the list.
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public void elementRemoved(E e) {
 	}

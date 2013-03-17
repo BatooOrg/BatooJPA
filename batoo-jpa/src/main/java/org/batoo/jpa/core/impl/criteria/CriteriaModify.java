@@ -62,7 +62,7 @@ public abstract class CriteriaModify<T> extends BaseQueryImpl<T> {
 	 * @param qlString
 	 *            the JPQL query
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public CriteriaModify(MetamodelImpl metamodel, String qlString) {
 		super(metamodel);

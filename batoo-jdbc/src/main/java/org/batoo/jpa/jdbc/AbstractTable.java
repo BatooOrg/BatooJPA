@@ -470,7 +470,7 @@ public abstract class AbstractTable {
 	 * 
 	 * @return the restriction columns of the table
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public AbstractColumn[] getRestrictionColumns() {
 		return this.restrictionColumns;
@@ -483,7 +483,7 @@ public abstract class AbstractTable {
 	 *            the primary key column
 	 * @return the restriction SQL fragment
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	protected String getRestrictionSql(Map<String, AbstractColumn> pkColumns) {
 		FinalWrapper<String> wrapper = this.restrictionSql;

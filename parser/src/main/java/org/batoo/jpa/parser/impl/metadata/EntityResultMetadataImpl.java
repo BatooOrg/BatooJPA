@@ -32,7 +32,7 @@ import com.google.common.collect.Lists;
 /**
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.1
  */
 public class EntityResultMetadataImpl implements EntityResultMetadata {
 
@@ -49,7 +49,7 @@ public class EntityResultMetadataImpl implements EntityResultMetadata {
 	 *            the java locator
 	 * @param annotation
 	 *            the annotation
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public EntityResultMetadataImpl(AbstractLocator locator, EntityResult annotation) {
 		super();

@@ -28,7 +28,7 @@ import org.batoo.jpa.jdbc.mapping.SingularMapping;
  * The descriptor interface for JPA and Batoo DB entities.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public interface EntityTypeDescriptor extends ManagedTypeDescriptor {
 
@@ -37,7 +37,7 @@ public interface EntityTypeDescriptor extends ManagedTypeDescriptor {
 	 * 
 	 * @return the discriminator value of the entity
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	Object getDiscriminatorValue();
 
@@ -55,7 +55,7 @@ public interface EntityTypeDescriptor extends ManagedTypeDescriptor {
 	 * 
 	 * @return the id mapping of the entity
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	SingularMapping<?, ?> getIdMapping();
 
@@ -73,7 +73,7 @@ public interface EntityTypeDescriptor extends ManagedTypeDescriptor {
 	 * 
 	 * @return the name of the entity
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	String getName();
 
@@ -82,7 +82,7 @@ public interface EntityTypeDescriptor extends ManagedTypeDescriptor {
 	 * 
 	 * @return the primary table of the entity
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	EntityTable getPrimaryTable();
 
@@ -104,7 +104,7 @@ public interface EntityTypeDescriptor extends ManagedTypeDescriptor {
 	 * 
 	 * @return <code>true</code> if the entity has single id mapping, <code>false</code> otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	boolean hasSingleIdAttribute();
 }

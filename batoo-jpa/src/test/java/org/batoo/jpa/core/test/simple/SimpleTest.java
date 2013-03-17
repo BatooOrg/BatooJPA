@@ -104,7 +104,7 @@ public class SimpleTest extends BaseCoreTest {
 	/**
 	 * Test for find entity then detach it
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@Test
 	public void testDetachAfterFind() {

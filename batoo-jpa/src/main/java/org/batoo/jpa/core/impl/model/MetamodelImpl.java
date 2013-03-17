@@ -267,7 +267,7 @@ public class MetamodelImpl implements Metamodel {
 	 * Adds the named native queries to the metamodel
 	 * 
 	 * @param namedNativeQueries
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	private void addNamedNativeQueries(List<NamedNativeQueryMetadata> namedNativeQueries) {
 		for (final NamedNativeQueryMetadata namedNativeQuery : namedNativeQueries) {
@@ -311,7 +311,7 @@ public class MetamodelImpl implements Metamodel {
 	 * Adds the sequence generators to the metamodel
 	 * 
 	 * @param sequenceGeneratorMetadatas
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	private void addSequenceGenerators(List<SequenceGeneratorMetadata> sequenceGeneratorMetadatas) {
 		for (final SequenceGeneratorMetadata sequenceGeneratorMetadata : sequenceGeneratorMetadatas) {
@@ -322,7 +322,7 @@ public class MetamodelImpl implements Metamodel {
 	/**
 	 * 
 	 * @param sqlResultSetMapping
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	private void addSqlResultSetMappings(List<SqlResultSetMappingMetadata> sqlResultSetMappings) {
 		for (final SqlResultSetMappingMetadata sqlResultSetMappingMetadata : sqlResultSetMappings) {
@@ -351,7 +351,7 @@ public class MetamodelImpl implements Metamodel {
 	 * Adds the table generators to the metamodel
 	 * 
 	 * @param metadatas
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	private void addTableGenerators(List<TableGeneratorMetadata> metadatas) {
 		for (final TableGeneratorMetadata tableGeneratorMetadata : metadatas) {
@@ -362,7 +362,7 @@ public class MetamodelImpl implements Metamodel {
 	/**
 	 * Check that the tables have unique names.
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public void checkTables() {
 		final Map<String, AbstractTable> tableNames = Maps.newHashMap();
@@ -626,7 +626,7 @@ public class MetamodelImpl implements Metamodel {
 	 * 
 	 * @return the named native queries
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public Map<String, NamedNativeQueryMetadata> getNamedNativeQueries() {
 		return this.namedNativeQueries;
@@ -685,7 +685,7 @@ public class MetamodelImpl implements Metamodel {
 	 * @param resultSetMapping
 	 *            the resultSetMapping
 	 * @return SqlResultSetMappingMetadata
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public SqlResultSetMappingMetadata getSqlResultSetMapping(String resultSetMapping) {
 		return this.sqlResultSetMappings.get(resultSetMapping);
@@ -725,7 +725,7 @@ public class MetamodelImpl implements Metamodel {
 	 * 
 	 * @param type
 	 * @param clazz
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	private void initStaticMetamodel(ManagedTypeImpl<?> type, Class<?> clazz) {
 		for (final Attribute<?, ?> attribute : type.getAttributes()) {
@@ -756,7 +756,7 @@ public class MetamodelImpl implements Metamodel {
 	/**
 	 * initialize static metamodel classes
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public void initStaticMetamodels() {
 		for (final ManagedType<?> type : this.getManagedTypes()) {

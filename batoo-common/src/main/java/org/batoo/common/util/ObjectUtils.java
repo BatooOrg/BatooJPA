@@ -32,7 +32,7 @@ import java.util.Arrays;
  * The original code is based on org.springframework.util.ObjectUtils
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  * @see org.apache.commons.lang.ObjectUtils
  */
 public abstract class ObjectUtils {

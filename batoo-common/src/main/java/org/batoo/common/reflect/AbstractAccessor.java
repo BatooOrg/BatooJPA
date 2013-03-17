@@ -22,7 +22,7 @@ package org.batoo.common.reflect;
  * Abstract definition of accessors.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public abstract class AbstractAccessor {
 
@@ -33,7 +33,7 @@ public abstract class AbstractAccessor {
 	 *            the instance of which the member value to return
 	 * @return the value of the member
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public abstract Object get(Object instance);
 
@@ -45,7 +45,7 @@ public abstract class AbstractAccessor {
 	 * @param value
 	 *            the value to set
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public abstract void set(Object instance, Object value);
 }

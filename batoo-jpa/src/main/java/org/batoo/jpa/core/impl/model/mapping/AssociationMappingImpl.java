@@ -412,7 +412,7 @@ public abstract class AssociationMappingImpl<Z, X, Y> extends AbstractMapping<Z,
 	 * 
 	 * @return the associate type of the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@Override
 	public abstract EntityTypeImpl<Y> getType();

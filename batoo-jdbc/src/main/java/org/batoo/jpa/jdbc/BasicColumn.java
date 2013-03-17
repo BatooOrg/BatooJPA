@@ -217,7 +217,7 @@ public class BasicColumn extends AbstractColumn {
 	 * 
 	 * @return <code>true</code> if the column is a version column, <code>false</code> otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public boolean isVersion() {
 		return this.version;
