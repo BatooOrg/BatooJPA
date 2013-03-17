@@ -35,7 +35,7 @@ public class Customer extends BaseEntity {
 	 * 
 	 * @return the id of the Customer
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public int getId() {
 		return this.id;
@@ -46,7 +46,7 @@ public class Customer extends BaseEntity {
 	 * 
 	 * @return the name of the Customer
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public String getName() {
 		return this.name;
@@ -58,7 +58,7 @@ public class Customer extends BaseEntity {
 	 * @param id
 	 *            the id to set for Customer
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public void setId(int id) {
 		this.id = id;
@@ -70,7 +70,7 @@ public class Customer extends BaseEntity {
 	 * @param name
 	 *            the name to set for Customer
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public void setName(String name) {
 		this.name = name;

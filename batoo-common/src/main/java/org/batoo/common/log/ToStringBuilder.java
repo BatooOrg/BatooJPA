@@ -31,7 +31,7 @@ import org.apache.commons.lang.builder.ToStringStyle;
  * Extended version of {@link ReflectionToStringBuilder} to further style and inline the children elements.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public class ToStringBuilder extends ReflectionToStringBuilder {
 
@@ -39,7 +39,7 @@ public class ToStringBuilder extends ReflectionToStringBuilder {
 	 * The detail level
 	 * 
 	 * @author hceylan
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public enum DetailLevel {
 		/**
@@ -212,7 +212,7 @@ public class ToStringBuilder extends ReflectionToStringBuilder {
 	 * @param level
 	 *            the detail level to set
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public static void setDetailLevel(DetailLevel level) {
 		ToStringBuilder.level.set(level);
@@ -222,7 +222,7 @@ public class ToStringBuilder extends ReflectionToStringBuilder {
 	 * @param object
 	 *            the instance
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public ToStringBuilder(Object object) {
 		super(object, ToStringBuilder.getStyle(ToStringBuilder.level.get()));
@@ -234,7 +234,7 @@ public class ToStringBuilder extends ReflectionToStringBuilder {
 	 * @param level
 	 *            the static detail level
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public ToStringBuilder(Object object, DetailLevel level) {
 		super(object, ToStringBuilder.getStyle(level));
@@ -247,7 +247,7 @@ public class ToStringBuilder extends ReflectionToStringBuilder {
 	 *            The excludeFieldNames to excluding from toString or <code>null</code>.
 	 * @return <code>this</code>
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public ToStringBuilder excludeFieldNames(String... fieldNames) {
 		super.setExcludeFieldNames(fieldNames);

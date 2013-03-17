@@ -26,7 +26,7 @@ import org.batoo.jpa.parser.metadata.ColumnResultMetadata;
 /**
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.1
  */
 public class ColumnResultMetadataImpl implements ColumnResultMetadata {
 	private final AbstractLocator locator;
@@ -38,7 +38,7 @@ public class ColumnResultMetadataImpl implements ColumnResultMetadata {
 	 *            the java locator
 	 * @param annotation
 	 *            the annotation
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public ColumnResultMetadataImpl(AbstractLocator locator, ColumnResult annotation) {
 		super();

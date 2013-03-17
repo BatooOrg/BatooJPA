@@ -29,6 +29,6 @@ package org.batoo.jpa.jdbc.mapping;
  *            the element type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public interface PluralMapping<Z, C, E> extends Mapping<Z, C, E> {}

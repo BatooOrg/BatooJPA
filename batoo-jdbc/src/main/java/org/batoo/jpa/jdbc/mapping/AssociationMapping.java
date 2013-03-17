@@ -32,7 +32,7 @@ import org.batoo.jpa.jdbc.JoinableTable;
  *            the attribute type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public interface AssociationMapping<Z, X, Y> extends Mapping<Z, X, Y> {
 

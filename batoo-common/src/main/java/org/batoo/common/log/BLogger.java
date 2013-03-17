@@ -20,7 +20,7 @@ package org.batoo.common.log;
 
 /**
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public interface BLogger {
 
@@ -31,7 +31,7 @@ public interface BLogger {
 	 *            the block to box
 	 * @return the object
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	Object boxed(String block);
 
@@ -44,7 +44,7 @@ public interface BLogger {
 	 *            the parameters
 	 * @return the object
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	Object boxed(String block, Object[] parameters);
 
@@ -271,7 +271,7 @@ public interface BLogger {
 	 *            the block to box
 	 * @return the object
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	Object lazyBoxed(final Object block);
 
@@ -284,7 +284,7 @@ public interface BLogger {
 	 *            of parameters
 	 * @return the object
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	Object lazyBoxed(final Object block, final Object[] parameters);
 

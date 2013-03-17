@@ -67,7 +67,7 @@ public interface RootMapping<X> {
 	 * 
 	 * @return the entiy descriptor of the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	ManagedTypeDescriptor getTypeDescriptor();
 

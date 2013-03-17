@@ -21,7 +21,7 @@ package org.batoo.jpa.core.test.q;
 /**
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.1
  */
 @SuppressWarnings("javadoc")
 public class ItemPk {
@@ -38,7 +38,7 @@ public class ItemPk {
 	 * 
 	 * @param id
 	 * @param name
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public ItemPk(Long id, String name) {
 		super();

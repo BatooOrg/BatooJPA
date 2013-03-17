@@ -27,14 +27,14 @@ import javax.sql.DataSource;
  * Abstract class for implementing pluggable data source
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.1
  */
 public abstract class AbstractDataSource implements DataSource {
 
 	/**
 	 * finalize the underlining implementation
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public abstract void close();
 
@@ -53,7 +53,7 @@ public abstract class AbstractDataSource implements DataSource {
 	 * @param hintName
 	 *            the hint to be passed
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 
 	public abstract void open(String persistanceUnitName, String hintName);
@@ -64,7 +64,7 @@ public abstract class AbstractDataSource implements DataSource {
 	 * @param connection
 	 *            the connection
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public abstract void releaseConnection(Connection connection);
 

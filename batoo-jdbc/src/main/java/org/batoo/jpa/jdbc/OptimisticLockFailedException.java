@@ -24,13 +24,13 @@ import javax.persistence.PersistenceException;
  * The exception thrown when the optimistic lock fails.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public class OptimisticLockFailedException extends PersistenceException {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public OptimisticLockFailedException() {
 		super("Row was updated or deleted by a different transaction");

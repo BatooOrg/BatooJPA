@@ -32,7 +32,7 @@ import javax.persistence.TableGenerator;
 /**
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.1
  */
 @Entity
 @TableGenerator(name = "bar_id", allocationSize = 100)

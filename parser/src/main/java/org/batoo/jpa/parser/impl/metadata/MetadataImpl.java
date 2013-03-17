@@ -113,7 +113,7 @@ public class MetadataImpl implements Metadata {
 	 * @param entities
 	 * @return
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	private ArrayList<String> checkParentClasses(ClassLoader classloader, Set<String> entities) {
 		final ArrayList<String> managedClasses = Lists.newArrayList(entities);

@@ -24,7 +24,7 @@ import java.lang.reflect.InvocationTargetException;
  * Constructor accessor for sun java environents.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 @SuppressWarnings("restriction")
 public class SunConstructorAccessor extends ConstructorAccessor {
@@ -35,7 +35,7 @@ public class SunConstructorAccessor extends ConstructorAccessor {
 	 * @param constructor
 	 *            the constructor
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public SunConstructorAccessor(Object constructor) {
 		this.constructor = (sun.reflect.ConstructorAccessor) constructor;

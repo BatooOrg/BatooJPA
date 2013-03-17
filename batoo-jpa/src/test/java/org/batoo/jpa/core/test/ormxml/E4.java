@@ -50,7 +50,7 @@ public class E4 {
 	 * 
 	 * @param value
 	 *            value
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public E4(String value) {
 		super();

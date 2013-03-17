@@ -30,7 +30,7 @@ import com.google.common.collect.Maps;
 /**
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public class BatooUtils {
 
@@ -41,7 +41,7 @@ public class BatooUtils {
 	 *            the name
 	 * @return the acronym
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public static String acronym(String name) {
 		final StringBuilder builder = new StringBuilder();
@@ -68,7 +68,7 @@ public class BatooUtils {
 	 * @param <E>
 	 *            the type of the collections
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public static <E> void addAll(Collection<? extends E> source, Collection<E> target) {
 		if (source instanceof List) {
@@ -89,7 +89,7 @@ public class BatooUtils {
 	 *            string to indent
 	 * @return the indented string
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public static String indent(String str) {
 		if (StringUtils.isBlank(str)) {
@@ -106,7 +106,7 @@ public class BatooUtils {
 	 *            the string to convert
 	 * @return the converted string
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public static String lower(String string) {
 		return string != null ? string.toLowerCase() : null;
@@ -121,7 +121,7 @@ public class BatooUtils {
 	 * @param <X>
 	 *            the type of the collecions
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public static <X> List<X> subtract(final Collection<X> a, final Collection<X> b) {
 		final List<X> list = Lists.newArrayList(a);
@@ -144,7 +144,7 @@ public class BatooUtils {
 	 * @param b
 	 *            second map
 	 * @return the subtracted map
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public static <X, Y> Map<X, Y> subtract(final Map<X, Y> a, final Map<X, Y> b) {
 		final Map<X, Y> map = Maps.newHashMap();
@@ -163,7 +163,7 @@ public class BatooUtils {
 	 *            string to indent
 	 * @return the indented string
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public static String tree(String str) {
 		if (StringUtils.isBlank(str)) {
@@ -180,7 +180,7 @@ public class BatooUtils {
 	 *            the string to convert
 	 * @return the converted string
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public static String upper(String string) {
 		return string != null ? string.toUpperCase() : null;

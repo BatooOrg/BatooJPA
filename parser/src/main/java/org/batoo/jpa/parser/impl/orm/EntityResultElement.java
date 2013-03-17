@@ -30,7 +30,7 @@ import com.google.common.collect.Lists;
  * Element for <code>entity-result</code>
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.1
  */
 public class EntityResultElement extends ParentElement implements EntityResultMetadata {
 
@@ -44,7 +44,7 @@ public class EntityResultElement extends ParentElement implements EntityResultMe
 	 * @param parent
 	 * @param attributes
 	 * @param expectedChildElements
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public EntityResultElement(ParentElement parent, Map<String, String> attributes, String... expectedChildElements) {
 		super(parent, attributes, ParentElement.join(expectedChildElements, //

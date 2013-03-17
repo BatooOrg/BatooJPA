@@ -29,7 +29,7 @@ import org.junit.Test;
  * Test for the issue calendar Temporal Field
  * 
  * @author ylemoigne
- * @since $version
+ * @since 2.0.1
  */
 public class TestTemporalField extends BaseCoreTest {
 

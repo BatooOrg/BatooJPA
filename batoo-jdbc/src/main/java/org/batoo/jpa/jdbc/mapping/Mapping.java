@@ -33,7 +33,7 @@ import org.batoo.jpa.parser.AbstractLocator;
  *            the attribute type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public interface Mapping<Z, X, Y> {
 
@@ -53,7 +53,7 @@ public interface Mapping<Z, X, Y> {
 	 * 
 	 * @return the java member of the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	Member getJavaMember();
 
@@ -71,7 +71,7 @@ public interface Mapping<Z, X, Y> {
 	 * 
 	 * @return the locator of the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	AbstractLocator getLocator();
 
@@ -116,7 +116,7 @@ public interface Mapping<Z, X, Y> {
 	 * 
 	 * @return <code>true</code> if the mapping is a collection mapping, <code>false</code> otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	boolean isCollection();
 

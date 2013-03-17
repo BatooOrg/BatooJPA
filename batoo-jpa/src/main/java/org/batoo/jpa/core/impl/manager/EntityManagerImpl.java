@@ -367,7 +367,7 @@ public class EntityManagerImpl implements EntityManager {
 	 *            the delete criteria query
 	 * @return the query for delete operation
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Query createQuery(CriteriaDeleteImpl<?> deleteQuery) {
@@ -390,7 +390,7 @@ public class EntityManagerImpl implements EntityManager {
 	 *            the upate criteria query
 	 * @return query for the update operation
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Query createQuery(CriteriaUpdateImpl<?> updateQuery) {

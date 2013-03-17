@@ -33,7 +33,7 @@ import org.batoo.jpa.parser.metadata.ColumnTransformerMetadata;
  *            the destination type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public interface BasicMapping<Z, X> extends SingularMapping<Z, X> {
 
@@ -42,7 +42,7 @@ public interface BasicMapping<Z, X> extends SingularMapping<Z, X> {
 	 * 
 	 * @return the column of the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	BasicColumn getColumn();
 
@@ -51,7 +51,7 @@ public interface BasicMapping<Z, X> extends SingularMapping<Z, X> {
 	 * 
 	 * @return the column transformer of the mapping
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	ColumnTransformerMetadata getColumnTransformer();
 
@@ -60,7 +60,7 @@ public interface BasicMapping<Z, X> extends SingularMapping<Z, X> {
 	 * 
 	 * @return the enum type of the mapping or <code>null</code>
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	EnumType getEnumType();
 
@@ -69,7 +69,7 @@ public interface BasicMapping<Z, X> extends SingularMapping<Z, X> {
 	 * 
 	 * @return the temporal type of the mapping, <code>null</code>
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	TemporalType getTemporalType();
 
@@ -78,7 +78,7 @@ public interface BasicMapping<Z, X> extends SingularMapping<Z, X> {
 	 * 
 	 * @return <code>true</code> if the mapping is lob type, <code>false</code> otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	boolean isLob();
 
@@ -87,7 +87,7 @@ public interface BasicMapping<Z, X> extends SingularMapping<Z, X> {
 	 * 
 	 * @return <code>true</code> if the column is a version column, <code>false</code> otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	boolean isVersion();
 }

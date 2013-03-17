@@ -79,7 +79,7 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 * Model class for fieldResult mapping for high performance iteration on SQL result sets
 	 * 
 	 * @author asimarslan
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	private static class IdModel {
 
@@ -296,7 +296,7 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 * @param row
 	 * @return
 	 * @throws SQLException
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	private HashMap<AbstractColumn, String> getAssociatedId(SingularAssociationMappingImpl<?, ?> mapping, HashMap<String, Object> _parentFieldMap)
 		throws SQLException {
@@ -345,7 +345,7 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 * @return
 	 * @param idFields
 	 * @param _fieldMap
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	private HashMap<AbstractColumn, String> getIdFieldTransformed(HashMap<AbstractColumn, String> idFields, HashMap<String, Object> fieldIdMap) {
 		if (fieldIdMap == null) {
@@ -648,7 +648,7 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 * @return result
 	 * @param resultSet
 	 * @throws SQLException
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	private List<Object> handleWithResultClass(ResultSet resultSet) throws SQLException {
 		final ArrayList<Object> result = Lists.newArrayList();
@@ -677,7 +677,7 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 * @return result
 	 * @param resultSet
 	 * @throws SQLException
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	private List<Object> handleWithSqlResultSetMapping(ResultSet resultSet) throws SQLException {
 		final ArrayList<Object> result = Lists.newArrayList();
@@ -725,7 +725,7 @@ public class NativeQuery implements Query, ResultSetHandler<List<Object>> {
 	 * @param fieldMap
 	 *            fieldResult Mapping data
 	 * @throws SQLException
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	private void initializeInstance(SessionImpl session, ResultSet row, ManagedInstance<?> managedInstance, EntityTypeImpl<?> entityType,
 		HashMap<String, Object> fieldMap) throws SQLException {

@@ -37,7 +37,7 @@ import javax.persistence.TableGenerator;
 /**
  * 
  * @author tolgagokmen
- * @since $version
+ * @since 2.0.1
  */
 @SqlResultSetMappings({ @SqlResultSetMapping(name = "OrderItemResultsDisc4", entities = { //
 	@EntityResult(entityClass = Order4.class,//

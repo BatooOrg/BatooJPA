@@ -64,7 +64,7 @@ public class CriteriaUpdateImpl<T> extends CriteriaModify<T> {
 	 * @param qlString
 	 *            the JPQL query
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public CriteriaUpdateImpl(MetamodelImpl metamodel, String qlString) {
 		super(metamodel, qlString);

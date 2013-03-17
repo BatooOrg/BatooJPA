@@ -26,7 +26,7 @@ import org.batoo.jpa.parser.metadata.ColumnResultMetadata;
  * Element for <code>column-result</code>
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.1
  */
 public class ColumnResultElement extends ChildElement implements ColumnResultMetadata {
 
@@ -36,7 +36,7 @@ public class ColumnResultElement extends ChildElement implements ColumnResultMet
 	 * 
 	 * @param parent
 	 * @param attributes
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public ColumnResultElement(ParentElement parent, Map<String, String> attributes) {
 		super(parent, attributes);

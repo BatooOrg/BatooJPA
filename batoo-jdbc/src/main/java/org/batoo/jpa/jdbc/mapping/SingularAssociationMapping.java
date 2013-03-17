@@ -27,7 +27,7 @@ package org.batoo.jpa.jdbc.mapping;
  *            the destination type
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public interface SingularAssociationMapping<Z, X> extends AssociationMapping<Z, X, X>, SingularMapping<Z, X> {
 

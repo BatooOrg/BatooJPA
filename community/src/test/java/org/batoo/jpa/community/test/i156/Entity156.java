@@ -45,7 +45,7 @@ public class Entity156 {
 	 * 
 	 * @return the code
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public String getCode() {
 		return this.code;
@@ -55,7 +55,7 @@ public class Entity156 {
 	 * 
 	 * @return the id
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public Long getId() {
 		return this.id;
@@ -65,7 +65,7 @@ public class Entity156 {
 	 * 
 	 * @return the name
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public Map<FieldLocale, String> getName() {
 		return this.name;
@@ -75,7 +75,7 @@ public class Entity156 {
 	 * 
 	 * @return the timeStamp
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public Long getTimeStamp() {
 		return this.timeStamp;
@@ -86,7 +86,7 @@ public class Entity156 {
 	 * @param code
 	 *            the code to set
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public void setCode(String code) {
 		this.code = code;
@@ -97,7 +97,7 @@ public class Entity156 {
 	 * @param id
 	 *            the id to set
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public void setId(Long id) {
 		this.id = id;
@@ -108,7 +108,7 @@ public class Entity156 {
 	 * @param name
 	 *            the name to set
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public void setName(Map<FieldLocale, String> name) {
 		this.name = name;
@@ -119,7 +119,7 @@ public class Entity156 {
 	 * @param timeStamp
 	 *            the timeStamp to set
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public void setTimeStamp(Long timeStamp) {
 		this.timeStamp = timeStamp;

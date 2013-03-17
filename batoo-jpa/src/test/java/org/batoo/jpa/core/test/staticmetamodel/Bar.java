@@ -33,7 +33,7 @@ import com.google.common.collect.Sets;
 /**
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.1
  */
 @Entity
 @SuppressWarnings("javadoc")

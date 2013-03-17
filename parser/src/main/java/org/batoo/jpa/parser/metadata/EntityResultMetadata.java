@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.1
  */
 public interface EntityResultMetadata extends LocatableMatadata {
 
@@ -32,7 +32,7 @@ public interface EntityResultMetadata extends LocatableMatadata {
 	 * Specifies the column name (or alias) of the column in the SELECT list that is used to determine the type of the entity instance.
 	 * 
 	 * @return DiscriminatorColumn
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	String getDiscriminatorColumn();
 
@@ -40,7 +40,7 @@ public interface EntityResultMetadata extends LocatableMatadata {
 	 * The class of the result.
 	 * 
 	 * @return The class of the result
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	String getEntityClass();
 
@@ -48,7 +48,7 @@ public interface EntityResultMetadata extends LocatableMatadata {
 	 * Maps the columns specified in the SELECT list of the query to the properties or fields of the entity class.
 	 * 
 	 * @return FieldResultMetadata 's
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	List<FieldResultMetadata> getFields();
 

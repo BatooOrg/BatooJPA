@@ -26,7 +26,7 @@ import java.security.PrivilegedAction;
  * Accessor implementation of {@link AbstractAccessor} for the members of {@link Field}s.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public class UnsafeFieldAccessor extends AbstractAccessor {
 
@@ -64,7 +64,7 @@ public class UnsafeFieldAccessor extends AbstractAccessor {
 	 * @param field
 	 *            the field to access
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@SuppressWarnings("restriction")
 	public UnsafeFieldAccessor(Field field) {
@@ -128,7 +128,7 @@ public class UnsafeFieldAccessor extends AbstractAccessor {
 	/**
 	 * @return
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	private PrimitiveType getPrimitiveType() {
 		final Class<?> type = this.field.getType();

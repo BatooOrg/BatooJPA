@@ -26,7 +26,7 @@ import org.batoo.jpa.parser.metadata.FieldResultMetadata;
 /**
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.1
  */
 public class FieldResultMetadataImpl implements FieldResultMetadata {
 
@@ -40,7 +40,7 @@ public class FieldResultMetadataImpl implements FieldResultMetadata {
 	 *            the java locator
 	 * @param annotation
 	 *            the annotation
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public FieldResultMetadataImpl(AbstractLocator locator, FieldResult annotation) {
 		super();

@@ -35,7 +35,7 @@ import com.google.common.collect.Lists;
  * Implementation of {@link SqlResultSetMappingMetadata}
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.1
  */
 public class SqlResultSetMappingMetadataImpl implements SqlResultSetMappingMetadata {
 
@@ -51,7 +51,7 @@ public class SqlResultSetMappingMetadataImpl implements SqlResultSetMappingMetad
 	 *            the java locator
 	 * @param annotation
 	 *            the annotation
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public SqlResultSetMappingMetadataImpl(AbstractLocator locator, SqlResultSetMapping annotation) {
 		super();

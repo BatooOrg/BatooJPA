@@ -29,7 +29,7 @@ import org.junit.Test;
  * Test for the issue 169
  * 
  * @author ylemoigne
- * @since $version
+ * @since 2.0.1
  */
 @SuppressWarnings("javadoc")
 public class TestI169 extends BaseCoreTest {

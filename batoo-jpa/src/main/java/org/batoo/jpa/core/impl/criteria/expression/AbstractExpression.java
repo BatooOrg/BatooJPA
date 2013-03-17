@@ -172,7 +172,7 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 *            the values
 	 * @return the predicate created
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public PredicateImpl notIn(Collection<?> values) {
 		return new PredicateImpl(new InExpression(this, values, true));
@@ -185,7 +185,7 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 *            the values
 	 * @return the predicate created
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public PredicateImpl notIn(Expression<?>... values) {
 		return new PredicateImpl(new InExpression(this, values, true));
@@ -198,7 +198,7 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 *            the values
 	 * @return the predicate created
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public PredicateImpl notIn(Expression<Collection<?>> values) {
 		// TODO Auto-generated method stub
@@ -212,7 +212,7 @@ public abstract class AbstractExpression<T> extends AbstractSelection<T> impleme
 	 *            the values
 	 * @return the predicate created
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public PredicateImpl notIn(Object... values) {
 		return new PredicateImpl(new InExpression(this, Lists.newArrayList(values), true));

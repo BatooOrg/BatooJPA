@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
  * The annotation to indicate to framework that the datasource should not be modified.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 @Target({ METHOD })
 @Retention(RUNTIME)

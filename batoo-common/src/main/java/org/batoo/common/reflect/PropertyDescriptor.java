@@ -26,7 +26,7 @@ import org.apache.commons.lang.StringUtils;
  * A Simple property desciptor.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public class PropertyDescriptor {
 
@@ -45,7 +45,7 @@ public class PropertyDescriptor {
 	 * @param reader
 	 *            the reader method
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public PropertyDescriptor(Class<?> clazz, String name, Method reader) {
 		super();
@@ -61,7 +61,7 @@ public class PropertyDescriptor {
 	 * 
 	 * @return the name of the PropertyDescriptor
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public String getName() {
 		return this.name;
@@ -72,7 +72,7 @@ public class PropertyDescriptor {
 	 * 
 	 * @return the reader of the PropertyDescriptor
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public Method getReader() {
 		return this.reader;
@@ -83,7 +83,7 @@ public class PropertyDescriptor {
 	 * 
 	 * @return the writer of the PropertyDescriptor
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public Method getWriter() {
 		return this.writer;

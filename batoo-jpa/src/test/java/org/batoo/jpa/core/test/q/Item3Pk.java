@@ -23,7 +23,7 @@ import javax.persistence.Embeddable;
 /**
  * 
  * @author asimarslan
- * @since $version
+ * @since 2.0.1
  */
 @Embeddable
 @SuppressWarnings("javadoc")
@@ -41,7 +41,7 @@ public class Item3Pk {
 	 * 
 	 * @param id
 	 * @param name
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public Item3Pk(Long id, String name) {
 		super();

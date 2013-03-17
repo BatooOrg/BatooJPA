@@ -22,7 +22,7 @@ package org.batoo.common;
  * Base exceptions thrown by Batoo JPA.
  * 
  * @author hceylan
- * @since $version
+ * @since 2.0.1
  */
 public class BatooException extends RuntimeException {
 
@@ -30,7 +30,7 @@ public class BatooException extends RuntimeException {
 
 	/**
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public BatooException() {
 		super();
@@ -40,7 +40,7 @@ public class BatooException extends RuntimeException {
 	 * @param message
 	 *            the detail message. The detail message is saved for later retrieval by the {@link #getMessage()} method.
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public BatooException(String message) {
 		super(message);
@@ -53,7 +53,7 @@ public class BatooException extends RuntimeException {
 	 *            the cause (which is saved for later retrieval by the {@link #getCause()} method). (A <tt>null</tt> value is permitted, and
 	 *            indicates that the cause is nonexistent or unknown.)
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public BatooException(String message, Throwable cause) {
 		super(message, cause);
@@ -64,7 +64,7 @@ public class BatooException extends RuntimeException {
 	 *            the cause (which is saved for later retrieval by the {@link #getCause()} method). (A <tt>null</tt> value is permitted, and
 	 *            indicates that the cause is nonexistent or unknown.)
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public BatooException(Throwable cause) {
 		super(cause);

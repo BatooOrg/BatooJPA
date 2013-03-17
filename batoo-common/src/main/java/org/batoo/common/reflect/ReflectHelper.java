@@ -50,7 +50,7 @@ import com.google.common.collect.Sets;
 /**
  * @author hceylan
  * 
- * @since $version
+ * @since 2.0.1
  */
 @SuppressWarnings("restriction")
 public class ReflectHelper {
@@ -83,7 +83,7 @@ public class ReflectHelper {
 	 *            the number type
 	 * @return the converted number value
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public static Number convertNumber(Number value, Class<?> numberType) {
 		if (value == null) {
@@ -136,7 +136,7 @@ public class ReflectHelper {
 	 *            the original constructor
 	 * @return the constructor accessor
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public static ConstructorAccessor createConstructor(Constructor<?> constructor) {
 		try {
@@ -181,7 +181,7 @@ public class ReflectHelper {
 	 *            the member to qualify
 	 * @return the qualified name for the member
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public static String createMemberName(Member member) {
 		return member.getDeclaringClass().getName() + "." + member.getName();
@@ -194,7 +194,7 @@ public class ReflectHelper {
 	 *            the java member
 	 * @return the accessor
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public static AbstractAccessor getAccessor(Member javaMember) {
 		if (javaMember instanceof Field) {
@@ -237,7 +237,7 @@ public class ReflectHelper {
 	 * @param <T>
 	 *            the xpected type
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> Class<T> getActualType(Class<?> clazz, String attributeName, Class<?> originalType) {
@@ -264,7 +264,7 @@ public class ReflectHelper {
 	 * @param <A>
 	 *            the class of annotation
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public static <A extends Annotation> A getAnnotation(final Member member, final Class<A> annotation) {
 		if (member instanceof Field) {
@@ -294,7 +294,7 @@ public class ReflectHelper {
 	 * @param <X>
 	 *            the type of the class
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	@SuppressWarnings("unchecked")
 	public static <X> Class<X> getGenericType(Member member, int index) {
@@ -329,7 +329,7 @@ public class ReflectHelper {
 	 *            the member
 	 * @return the <code>member</code>'s type as java class
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public static Class<?> getMemberType(Member member) {
 		if (member instanceof Field) {
@@ -346,7 +346,7 @@ public class ReflectHelper {
 	 *            the class
 	 * @return the property descriptors
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public static PropertyDescriptor[] getProperties(Class<?> clazz) {
 		final List<PropertyDescriptor> properties = Lists.newArrayList();
@@ -456,7 +456,7 @@ public class ReflectHelper {
 	 *            the type to check if it is collection
 	 * @return true if the <code>type</code> is a collection type, false otherwise
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public static boolean isCollection(Class<?> type) {
 		return (List.class == type) || (Collection.class == type) || (Set.class == type) || (Map.class == type);
@@ -470,7 +470,7 @@ public class ReflectHelper {
 	 * @param accessible
 	 *            true to set accessible, false to make it not accessible
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public static void setAccessible(final Member member, final boolean accessible) {
 		AccessController.doPrivileged(new PrivilegedAction<Void>() {
@@ -504,7 +504,7 @@ public class ReflectHelper {
 	 * @param annotations
 	 *            the set of annotations allowed
 	 * 
-	 * @since $version
+	 * @since 2.0.1
 	 */
 	public static void warnAnnotations(BLogger logger, Member member, final Set<Class<? extends Annotation>> annotations) {
 		final Set<Annotation> existing;

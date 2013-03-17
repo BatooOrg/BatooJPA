@@ -25,7 +25,7 @@ import org.junit.Test;
 /**
  * Test abstract class test cases
  * 
- * @since $version
+ * @since 2.0.1
  */
 @SuppressWarnings("javadoc")
 public class TestIssue157 extends BaseCoreTest {
