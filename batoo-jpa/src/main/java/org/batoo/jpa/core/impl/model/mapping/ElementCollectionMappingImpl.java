@@ -513,8 +513,11 @@ public class ElementCollectionMappingImpl<Z, C, E> extends AbstractMapping<Z, C,
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public void load(ManagedInstance<?> instance) {
-		this.setCollection(instance, this.loadCollection(instance));
+		final ManagedCollection<E> collection = (ManagedCollection<E>) this.attribute.newCollection(this, instance, true);
+		collection.initialize();
+		this.set(instance.getInstance(), collection);
 	}
 
 	/**
@@ -550,20 +553,6 @@ public class ElementCollectionMappingImpl<Z, C, E> extends AbstractMapping<Z, C,
 		}
 
 		return resultMap;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public void setCollection(ManagedInstance<?> instance, Collection<? extends E> children) {
-		final ManagedCollection<E> collection = (ManagedCollection<E>) this.attribute.newCollection(this, instance, false);
-
-		BatooUtils.addAll(children, collection.getDelegate());
-
-		this.set(instance.getInstance(), collection);
 	}
 
 	/**
