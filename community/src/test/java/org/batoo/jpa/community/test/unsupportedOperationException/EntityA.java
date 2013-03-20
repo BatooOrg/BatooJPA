@@ -16,10 +16,11 @@
  * 51 Franklin Street, Fifth Floor
  * Boston, MA  02110-1301  USA
  */
-package org.batoo.jpa.core.test.elementcollection;
+package org.batoo.jpa.community.test.unsupportedOperationException;
 
 import java.util.Map;
 
+import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -27,50 +28,49 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.MapKeyEnumerated;
 
-import com.google.common.collect.Maps;
-
-/**
- * 
- * @author asimarslan
- * @since 2.0.1
- */
 @Entity
-public class Foo4 {
-
+@SuppressWarnings("javadoc")
+public class EntityA {
 	@Id
-	@GeneratedValue
-	private Integer key;
+	@Column(name = "ID", nullable = false)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private final Long id = null;
+
+	@ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.MERGE }, targetEntity = EntityB.class)
+	@JoinColumn(name = "ID_ENTITYB", referencedColumnName = "ID")
+	private EntityB entityB;
 
 	@ElementCollection(fetch = FetchType.EAGER)
-	@MapKeyColumn(name = "LOCALEE", nullable = false)
+	@CollectionTable(name = "ENTITYA_NAME", joinColumns = @JoinColumn(name = "ID"))
 	@MapKeyEnumerated(EnumType.STRING)
-	@Column(name = "TRANSLATIONN", nullable = false)
-	@CollectionTable(name = "FOO4_NAME", joinColumns = @JoinColumn(name = "ID"))
-	private final Map<FieldLocale, String> textMap = Maps.newHashMap();
+	@MapKeyColumn(name = "LOCALE", nullable = false)
+	@Column(name = "TRANSLATION", nullable = false)
+	private Map<FieldLocale, String> name;
 
-	/**
-	 * Returns the key of the Foo2.
-	 * 
-	 * @return the key of the Foo2
-	 * 
-	 * @since 2.0.0
-	 */
-	protected Integer getKey() {
-		return this.key;
+	public EntityB getEntityB() {
+		return this.entityB;
 	}
 
-	/**
-	 * 
-	 * @return the textMap
-	 * 
-	 * @since 2.0.1
-	 */
-	public Map<FieldLocale, String> getTextMap() {
-		return this.textMap;
+	public Map<FieldLocale, String> getName() {
+		return this.name;
+	}
+
+	public void setEntityB(EntityB entityB) {
+		this.entityB = entityB;
+	}
+
+	public void setName(Map<FieldLocale, String> name) {
+		this.name = name;
+	}
+
+	public Long getId() {
+		return id;
 	}
 }

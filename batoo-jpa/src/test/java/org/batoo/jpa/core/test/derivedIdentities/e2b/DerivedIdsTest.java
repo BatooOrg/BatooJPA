@@ -36,7 +36,6 @@ import org.junit.Test;
  * @author asimarslan
  * @since 2.0.0
  */
-// FIXME: Temporarily ignored
 public class DerivedIdsTest extends BaseCoreTest {
 
 	/**

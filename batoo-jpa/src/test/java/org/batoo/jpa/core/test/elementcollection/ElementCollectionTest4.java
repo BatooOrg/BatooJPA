@@ -67,6 +67,40 @@ public class ElementCollectionTest4 extends BaseCoreTest {
 	}
 
 	/**
+	 * Tests the element collections with jpql
+	 * 
+	 * @since 2.0.0
+	 */
+	@Test
+	public void testElementCollectionWithQuery() {
+		final Foo4 foo = new Foo4();
+
+		foo.getTextMap().put(FieldLocale.TR, "Merhaba");
+		foo.getTextMap().put(FieldLocale.FR, "Bonjour");
+		foo.getTextMap().put(FieldLocale.EN, "Hello");
+		this.persist(foo);
+
+		this.commit();
+		this.close();
+
+		final Foo4 foo2 = (Foo4) this.cq("select f from Foo4 f").getSingleResult();
+
+		Assert.assertEquals(foo.getKey(), foo2.getKey());
+		final Map<FieldLocale, String> textMap = foo2.getTextMap();
+
+		for (final Object fl : textMap.keySet()) {
+			Assert.assertTrue(fl instanceof FieldLocale);
+		}
+
+		Assert.assertEquals(3, textMap.size());
+
+		Assert.assertEquals("Merhaba", textMap.get(FieldLocale.TR));
+		Assert.assertEquals("Hello", textMap.get(FieldLocale.EN));
+		Assert.assertEquals("Bonjour", textMap.get(FieldLocale.FR));
+
+	}
+
+	/**
 	 * Tests the element collections
 	 * 
 	 * @since 2.0.0
