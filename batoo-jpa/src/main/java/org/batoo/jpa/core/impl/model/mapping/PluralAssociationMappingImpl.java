@@ -37,7 +37,6 @@ import javax.persistence.metamodel.PluralAttribute.CollectionType;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.common.reflect.AbstractAccessor;
-import org.batoo.common.util.BatooUtils;
 import org.batoo.common.util.FinalWrapper;
 import org.batoo.jpa.core.impl.collections.ManagedCollection;
 import org.batoo.jpa.core.impl.collections.ManagedList;
@@ -512,8 +511,11 @@ public class PluralAssociationMappingImpl<Z, C, E> extends AssociationMappingImp
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public void load(ManagedInstance<?> instance) {
-		this.setCollection(instance, this.loadCollection(instance));
+		final ManagedCollection<E> collection = (ManagedCollection<E>) this.attribute.newCollection(this, instance, true);
+		collection.initialize();
+		this.set(instance.getInstance(), collection);
 	}
 
 	/**
@@ -690,20 +692,6 @@ public class PluralAssociationMappingImpl<Z, C, E> extends AssociationMappingImp
 			final ManagedCollection<E> collection = (ManagedCollection<E>) this.get(instance.getInstance());
 			collection.removeOrphans(entityManager);
 		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public void setCollection(ManagedInstance<?> instance, Collection<? extends E> children) {
-		final ManagedCollection<E> collection = (ManagedCollection<E>) this.attribute.newCollection(this, instance, false);
-
-		BatooUtils.addAll(children, collection.getDelegate());
-
-		this.set(instance.getInstance(), collection);
 	}
 
 	/**

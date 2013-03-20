@@ -177,18 +177,6 @@ public interface PluralMappingEx<Z, C, E> extends JoinedMapping<Z, C, E>, Plural
 	<K> Map<? extends K, ? extends E> loadMap(ManagedInstance<?> instance);
 
 	/**
-	 * Sets the collection manually for the mapping.
-	 * 
-	 * @param instance
-	 *            the managed instance
-	 * @param children
-	 *            the collection of children
-	 * 
-	 * @since 2.0.0
-	 */
-	public void setCollection(ManagedInstance<?> instance, Collection<? extends E> children);
-
-	/**
 	 * Sets the lazy instance for the collection
 	 * 
 	 * @param instance

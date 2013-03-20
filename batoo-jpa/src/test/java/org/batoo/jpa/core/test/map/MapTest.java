@@ -18,6 +18,8 @@
  */
 package org.batoo.jpa.core.test.map;
 
+import javax.persistence.Query;
+
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
@@ -67,6 +69,7 @@ public class MapTest extends BaseCoreTest {
 		this.close();
 
 		final Person person2 = this.find(Person.class, person.getId());
+
 		Assert.assertEquals(person.getName(), person2.getName());
 		Assert.assertEquals(person.getAddresses1().size(), person2.getAddresses1().size());
 		Assert.assertEquals(new Integer(1), person.getAddresses1().get(1).getId());
@@ -156,5 +159,27 @@ public class MapTest extends BaseCoreTest {
 		Assert.assertEquals(3, person2.getAddresses2().size());
 		Assert.assertEquals("Istanbul", person2.getAddresses2().get("Istanbul").getCity());
 
+	}
+
+	/**
+	 * Tests Maps with query.
+	 * 
+	 * @since 2.0.0
+	 */
+	@Test
+	public void testMapQuery() {
+		final Person person = this.person();
+		this.persist(person);
+
+		this.commit();
+		this.close();
+
+		final Query cq = this.cq("select p from Person p");
+
+		final Person person2 = (Person) cq.getSingleResult();
+
+		Assert.assertEquals(person.getName(), person2.getName());
+		Assert.assertEquals(person.getAddresses1().size(), person2.getAddresses1().size());
+		Assert.assertEquals(new Integer(1), person.getAddresses1().get(1).getId());
 	}
 }
