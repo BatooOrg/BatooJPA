@@ -341,7 +341,7 @@ public class SimpleJpqlTest extends BaseCoreTest {
 
 		TypedQuery<Person> q;
 
-		q = this.cq("select p from Person p where p.startDate > :start", Person.class).setParameter("start", start1.getTime(), TemporalType.DATE);
+		q = this.cq("select p from Person p where p.startDate = :start", Person.class).setParameter("start", start1.getTime(), TemporalType.DATE);
 		Assert.assertEquals(1, q.getResultList().size());
 
 		q = this.cq("select p from Person p where p.startDate < :start", Person.class).setParameter("start", start2.getTime(), TemporalType.DATE);

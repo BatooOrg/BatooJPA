@@ -57,6 +57,7 @@ import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.jdbc.PreparedStatementProxy;
+import org.batoo.jpa.jdbc.ValueConverter;
 import org.batoo.jpa.jdbc.adapter.JdbcAdaptor.PaginationParamsOrder;
 import org.batoo.jpa.jdbc.dbutils.QueryRunner;
 
@@ -954,14 +955,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 */
 	@Override
 	public TypedQuery<X> setParameter(Parameter<Calendar> param, Calendar value, TemporalType temporalType) {
-		switch (temporalType) {
-			case DATE:
-				return this.putParam(param, new java.sql.Date(value.getTimeInMillis()));
-			case TIME:
-				return this.putParam(param, new java.sql.Time(value.getTimeInMillis()));
-			default:
-				return this.putParam(param, new java.sql.Timestamp(value.getTimeInMillis()));
-		}
+		return this.putParam(param, ValueConverter.toJdbc(value, Calendar.class, temporalType, null, false));
 	}
 
 	/**
@@ -970,14 +964,7 @@ public class QueryImpl<X> implements TypedQuery<X>, Query {
 	 */
 	@Override
 	public TypedQuery<X> setParameter(Parameter<Date> param, Date value, TemporalType temporalType) {
-		switch (temporalType) {
-			case DATE:
-				return this.putParam(param, new java.sql.Date(value.getTime()));
-			case TIME:
-				return this.putParam(param, new java.sql.Time(value.getTime()));
-			default:
-				return this.putParam(param, new java.sql.Timestamp(value.getTime()));
-		}
+		return this.putParam(param, ValueConverter.toJdbc(value, Date.class, temporalType, null, false));
 	}
 
 	/**
