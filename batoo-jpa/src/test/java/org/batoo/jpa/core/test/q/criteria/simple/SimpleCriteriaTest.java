@@ -21,6 +21,7 @@ package org.batoo.jpa.core.test.q.criteria.simple;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -72,13 +73,17 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 	private static Country USA = new Country(SimpleCriteriaTest.COUNTRY_CODE_USA, SimpleCriteriaTest.COUNTRY_USA);
 	private static Country UK = new Country(SimpleCriteriaTest.COUNTRY_CODE_UK, SimpleCriteriaTest.COUNTRY_UK);
 
-	private Person person() {
+	private GregorianCalendar getStartDate() {
 		final GregorianCalendar start = new GregorianCalendar();
 		start.set(Calendar.YEAR, 2000);
 		start.set(Calendar.MONTH, 12);
 		start.set(Calendar.DAY_OF_MONTH, 31);
+		return start;
+	}
 
-		final Person person = new Person("Ceylan", 38, start.getTime());
+	private Person person() {
+
+		final Person person = new Person("Ceylan", 38, getStartDate().getTime());
 
 		new Address(person, SimpleCriteriaTest.CITY_ISTANBUL, SimpleCriteriaTest.TR, true);
 		new Address(person, SimpleCriteriaTest.CITY_NEW_YORK, SimpleCriteriaTest.USA, false);
@@ -252,6 +257,31 @@ public class SimpleCriteriaTest extends BaseCoreTest {
 		Assert.assertEquals(
 			"[SimpleCity [city=Istanbul, country=Turkey], SimpleCity [city=London, country=United Kingdom], SimpleCity [city=New York, country=United States of America]]",
 			resultList.toString());
+	}
+
+	/**
+	 * 
+	 * @since $version
+	 */
+	@Test
+	public void testDateExpression() {
+		this.persist(this.person());
+		this.commit();
+
+		this.close();
+
+		final CriteriaBuilderImpl cb = this.em().getCriteriaBuilder();
+		final CriteriaQueryImpl<Person> cq = cb.createQuery(Person.class);
+
+		final RootImpl<Person> r = cq.from(Person.class);
+
+		cq.where(cb.equal(r.<Date> get("startDate"), getStartDate().getTime()));
+
+		cq.select(r);
+
+		final List<Person> resultList = this.em().createQuery(cq).getResultList();
+
+		Assert.assertEquals(1, resultList.size());
 	}
 
 	/**
