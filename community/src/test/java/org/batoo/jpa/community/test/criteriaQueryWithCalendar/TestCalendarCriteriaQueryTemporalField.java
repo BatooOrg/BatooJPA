@@ -24,6 +24,7 @@ import java.util.Calendar;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.batoo.jpa.community.test.BaseCoreTest;
@@ -56,7 +57,8 @@ public class TestCalendarCriteriaQueryTemporalField extends BaseCoreTest {
 		CriteriaBuilder cBuilder = em().getCriteriaBuilder();
 		CriteriaQuery<CalendarTemporalFieldEntity> query = cBuilder.createQuery(CalendarTemporalFieldEntity.class);
 		Root<CalendarTemporalFieldEntity> root = query.from(CalendarTemporalFieldEntity.class);
-		query.where(cBuilder.equal(root.get(CalendarTemporalFieldEntity_.calendar), testStartInstant));
+		Predicate equal = cBuilder.equal(root.get(CalendarTemporalFieldEntity_.calendar), testStartInstant);
+		query.where(equal);
 		query.select(root);
 		final CalendarTemporalFieldEntity mainEntityReloaded = em().createQuery(query).getSingleResult();
 		
@@ -83,7 +85,8 @@ public class TestCalendarCriteriaQueryTemporalField extends BaseCoreTest {
 		CriteriaBuilder cBuilder = em().getCriteriaBuilder();
 		CriteriaQuery<CalendarTemporalFieldEntity> query = cBuilder.createQuery(CalendarTemporalFieldEntity.class);
 		Root<CalendarTemporalFieldEntity> root = query.from(CalendarTemporalFieldEntity.class);
-		query.where(cBuilder.equal(root.get(CalendarTemporalFieldEntity_.date), testStartInstant.getTime()));
+		Predicate equal = cBuilder.equal(root.get(CalendarTemporalFieldEntity_.date), testStartInstant.getTime());
+		query.where(equal);
 		query.select(root);
 		final CalendarTemporalFieldEntity mainEntityReloaded = em().createQuery(query).getSingleResult();
 		

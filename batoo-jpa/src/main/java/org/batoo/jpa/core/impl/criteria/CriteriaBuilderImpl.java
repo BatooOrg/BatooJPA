@@ -75,11 +75,14 @@ import org.batoo.jpa.core.impl.criteria.expression.SimpleConstantExpression;
 import org.batoo.jpa.core.impl.criteria.expression.SizeExpression;
 import org.batoo.jpa.core.impl.criteria.expression.SubstringExpression;
 import org.batoo.jpa.core.impl.criteria.expression.TrimExpression;
+import org.batoo.jpa.core.impl.criteria.path.BasicPath;
 import org.batoo.jpa.core.impl.instance.EnhancedInstance;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.TypeImpl;
+import org.batoo.jpa.core.impl.model.attribute.BasicAttribute;
 import org.batoo.jpa.jdbc.DateTimeFunctionType;
 import org.batoo.jpa.jdbc.NumericFunctionType;
+import org.batoo.jpa.jdbc.ValueConverter;
 
 /**
  * Used to construct criteria queries, compound selections, expressions, predicates, orderings.
@@ -192,8 +195,29 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <Y extends Comparable<? super Y>> PredicateImpl between(Expression<? extends Y> v, Y x, Y y) {
-		return new PredicateImpl(new ComparisonExpression(Comparison.BETWEEN, v, this.createConstant(x), this.createConstant(y)));
+		if (x instanceof Expression && y instanceof Expression) {
+			return this.between(v, (Expression<? extends Y>) x, (Expression<? extends Y>) y);
+		}
+
+		final AbstractExpression<Y> constExpX;
+		final AbstractExpression<Y> constExpY;
+		if (v instanceof BasicPath) {
+			final BasicAttribute<?, ?> model = ((BasicPath<?>) v).getModel();
+			final Y toJdbcX = (Y) ValueConverter.toJdbc(x, model.getJavaType(), model.getTemporalType(), model.getEnumType(), model.isLob());
+			constExpX = this.createConstant(toJdbcX, model.getJavaType());
+
+			final Y toJdbcY = (Y) ValueConverter.toJdbc(y, model.getJavaType(), model.getTemporalType(), model.getEnumType(), model.isLob());
+			constExpY = this.createConstant(toJdbcY, model.getJavaType());
+
+		}
+		else {
+			constExpX = this.createConstant(x);
+			constExpY = this.createConstant(y);
+		}
+
+		return new PredicateImpl(new ComparisonExpression(Comparison.BETWEEN, v, constExpX, constExpY));
 	}
 
 	/**
@@ -334,6 +358,20 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 		return type.getPersistenceType() == PersistenceType.BASIC ? new SimpleConstantExpression<X>(type, x) : new EntityConstantExpression<X>(type, x);
 	}
 
+	@SuppressWarnings("unchecked")
+	private <X> AbstractExpression<X> createConstant(X x, Class<?> clazz) {
+		if (x == null) {
+			throw new NullPointerException("Constant expression cannot be null");
+		}
+
+		final TypeImpl<X> type = (TypeImpl<X>) this.metamodel.type(clazz);
+		if ((type == null) || (type.getPersistenceType() == PersistenceType.MAPPED_SUPERCLASS)) {
+			throw new IllegalArgumentException("Cannot locate a type for the constant class: " + x);
+		}
+
+		return type.getPersistenceType() == PersistenceType.BASIC ? new SimpleConstantExpression<X>(type, x) : new EntityConstantExpression<X>(type, x);
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * 
@@ -467,7 +505,17 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 			return this.equal(x, (Expression<?>) y);
 		}
 
-		return new PredicateImpl(new ComparisonExpression(Comparison.EQUAL, x, this.createConstant(y)));
+		final AbstractExpression<Object> constExp;
+		if (x instanceof BasicPath) {
+			final BasicAttribute<?, ?> model = ((BasicPath<?>) x).getModel();
+			final Object toJdbc = ValueConverter.toJdbc(y, model.getJavaType(), model.getTemporalType(), model.getEnumType(), model.isLob());
+			constExp = this.createConstant(toJdbc, model.getJavaType());
+		}
+		else {
+			constExp = this.createConstant(y);
+		}
+
+		return new PredicateImpl(new ComparisonExpression(Comparison.EQUAL, x, constExp));
 	}
 
 	/**
@@ -530,8 +578,23 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <Y extends Comparable<? super Y>> PredicateImpl greaterThan(Expression<? extends Y> x, Y y) {
-		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER, x, this.createConstant(y)));
+		if (y instanceof Expression) {
+			return this.greaterThan(x, (Expression<? extends Y>) y);
+		}
+
+		final AbstractExpression<Y> constExp;
+		if (x instanceof BasicPath) {
+			final BasicAttribute<?, ?> model = ((BasicPath<?>) x).getModel();
+			final Y toJdbc = (Y) ValueConverter.toJdbc(y, model.getJavaType(), model.getTemporalType(), model.getEnumType(), model.isLob());
+			constExp = this.createConstant(toJdbc, model.getJavaType());
+		}
+		else {
+			constExp = this.createConstant(y);
+		}
+
+		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER, x, constExp));
 	}
 
 	/**
@@ -548,8 +611,23 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <Y extends Comparable<? super Y>> PredicateImpl greaterThanOrEqualTo(Expression<? extends Y> x, Y y) {
-		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER_OR_EQUAL, x, this.createConstant(y)));
+		if (y instanceof Expression) {
+			return this.greaterThanOrEqualTo(x, (Expression<? extends Y>) y);
+		}
+
+		final AbstractExpression<Y> constExp;
+		if (x instanceof BasicPath) {
+			final BasicAttribute<?, ?> model = ((BasicPath<?>) x).getModel();
+			final Y toJdbc = (Y) ValueConverter.toJdbc(y, model.getJavaType(), model.getTemporalType(), model.getEnumType(), model.isLob());
+			constExp = this.createConstant(toJdbc, model.getJavaType());
+		}
+		else {
+			constExp = this.createConstant(y);
+		}
+
+		return new PredicateImpl(new ComparisonExpression(Comparison.GREATER_OR_EQUAL, x, constExp));
 	}
 
 	/**
@@ -737,8 +815,23 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <Y extends Comparable<? super Y>> PredicateImpl lessThan(Expression<? extends Y> x, Y y) {
-		return new PredicateImpl(new ComparisonExpression(Comparison.LESS, x, this.createConstant(y)));
+		if (y instanceof Expression) {
+			return this.greaterThan(x, (Expression<? extends Y>) y);
+		}
+
+		final AbstractExpression<Y> constExp;
+		if (x instanceof BasicPath) {
+			final BasicAttribute<?, ?> model = ((BasicPath<?>) x).getModel();
+			final Y toJdbc = (Y) ValueConverter.toJdbc(y, model.getJavaType(), model.getTemporalType(), model.getEnumType(), model.isLob());
+			constExp = this.createConstant(toJdbc, model.getJavaType());
+		}
+		else {
+			constExp = this.createConstant(y);
+		}
+
+		return new PredicateImpl(new ComparisonExpression(Comparison.LESS, x, constExp));
 	}
 
 	/**
@@ -755,8 +848,23 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <Y extends Comparable<? super Y>> Predicate lessThanOrEqualTo(Expression<? extends Y> x, Y y) {
-		return new PredicateImpl(new ComparisonExpression(Comparison.LESS_OR_EQUAL, x, this.createConstant(y)));
+		if (y instanceof Expression) {
+			return this.lessThanOrEqualTo(x, (Expression<? extends Y>) y);
+		}
+
+		final AbstractExpression<Y> constExp;
+		if (x instanceof BasicPath) {
+			final BasicAttribute<?, ?> model = ((BasicPath<?>) x).getModel();
+			final Y toJdbc = (Y) ValueConverter.toJdbc(y, model.getJavaType(), model.getTemporalType(), model.getEnumType(), model.isLob());
+			constExp = this.createConstant(toJdbc, model.getJavaType());
+		}
+		else {
+			constExp = this.createConstant(y);
+		}
+
+		return new PredicateImpl(new ComparisonExpression(Comparison.LESS_OR_EQUAL, x, constExp));
 	}
 
 	/**
@@ -966,7 +1074,21 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 */
 	@Override
 	public PredicateImpl notEqual(Expression<?> x, Object y) {
-		return new PredicateImpl(new ComparisonExpression(Comparison.NOT_EQUAL, x, this.createConstant(y)));
+		if (y instanceof Expression) {
+			return this.notEqual(x, (Expression<?>) y);
+		}
+
+		final AbstractExpression<Object> constExp;
+		if (x instanceof BasicPath) {
+			final BasicAttribute<?, ?> model = ((BasicPath<?>) x).getModel();
+			final Object toJdbc = ValueConverter.toJdbc(y, model.getJavaType(), model.getTemporalType(), model.getEnumType(), model.isLob());
+			constExp = this.createConstant(toJdbc, model.getJavaType());
+		}
+		else {
+			constExp = this.createConstant(y);
+		}
+
+		return new PredicateImpl(new ComparisonExpression(Comparison.NOT_EQUAL, x, constExp));
 	}
 
 	/**
@@ -1038,8 +1160,22 @@ public class CriteriaBuilderImpl implements CriteriaBuilder {
 	 * 
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public <Y> Expression<Y> nullif(Expression<Y> x, Y y) {
-		return new NullIfExpression<Y>(x, this.createConstant(y));
+		if (y instanceof Expression) {
+			return this.nullif(x, (Expression<Y>) y);
+		}
+
+		final AbstractExpression<Y> constExp;
+		if (x instanceof BasicPath) {
+			final BasicAttribute<?, ?> model = ((BasicPath<?>) x).getModel();
+			final Y toJdbc = (Y) ValueConverter.toJdbc(y, model.getJavaType(), model.getTemporalType(), model.getEnumType(), model.isLob());
+			constExp = this.createConstant(toJdbc, model.getJavaType());
+		}
+		else {
+			constExp = this.createConstant(y);
+		}
+		return new NullIfExpression<Y>(x, constExp);
 	}
 
 	/**

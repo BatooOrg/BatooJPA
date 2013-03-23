@@ -18,27 +18,12 @@
  */
 package org.batoo.jpa.jdbc;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.CharArrayWriter;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.StringWriter;
 import java.lang.reflect.Method;
-import java.sql.Blob;
-import java.sql.Clob;
 import java.sql.Connection;
-import java.util.Calendar;
-import java.util.Date;
 
 import javax.persistence.EnumType;
-import javax.persistence.PersistenceException;
 import javax.persistence.TemporalType;
-import javax.sql.rowset.serial.SerialBlob;
-import javax.sql.rowset.serial.SerialClob;
 
-import org.apache.commons.io.IOUtils;
-import org.batoo.common.reflect.ReflectHelper;
 import org.batoo.jpa.jdbc.mapping.Mapping;
 import org.batoo.jpa.parser.AbstractLocator;
 import org.batoo.jpa.parser.MappingException;
@@ -58,7 +43,6 @@ public abstract class AbstractColumn implements Column {
 	private final boolean lob;
 	private final AbstractLocator locator;
 
-	private final Class<?> numberType;
 	private final Enum<?>[] values;
 	private final Method method;
 
@@ -81,7 +65,6 @@ public abstract class AbstractColumn implements Column {
 		this.lob = false;
 		this.values = null;
 		this.method = null;
-		this.numberType = null;
 	}
 
 	/**
@@ -112,8 +95,6 @@ public abstract class AbstractColumn implements Column {
 		this.lob = lob;
 		this.locator = locator;
 
-		this.numberType = Number.class.isAssignableFrom(javaType) ? javaType : null;
-
 		if (this.enumType != null) {
 			Class<Enum<?>> enumJavaType;
 			enumJavaType = (Class<Enum<?>>) javaType;
@@ -143,89 +124,7 @@ public abstract class AbstractColumn implements Column {
 	 */
 	@Override
 	public Object convertValue(Connection connection, final Object value) {
-		if (value == null) {
-			return null;
-		}
-
-		if (this.temporalType != null) {
-			switch (this.temporalType) {
-				case DATE:
-					if (value instanceof java.sql.Date) {
-						return value;
-					}
-
-					if (value instanceof Date) {
-						return new java.sql.Date(((Date) value).getTime());
-					}
-
-					return new java.sql.Date(((Calendar) value).getTimeInMillis());
-				case TIME:
-					if (value instanceof java.sql.Time) {
-						return value;
-					}
-
-					if (value instanceof Date) {
-						return new java.sql.Time(((Date) value).getTime());
-					}
-
-					return new java.sql.Time(((Calendar) value).getTimeInMillis());
-				case TIMESTAMP:
-					if (value instanceof java.sql.Timestamp) {
-						return value;
-					}
-
-					if (value instanceof Date) {
-						return new java.sql.Timestamp(((Date) value).getTime());
-					}
-
-					return new java.sql.Timestamp(((Calendar) value).getTimeInMillis());
-			}
-		}
-
-		if (this.numberType != null) {
-			return ReflectHelper.convertNumber((Number) value, this.numberType);
-		}
-
-		if (this.enumType != null) {
-			final Enum<?> enumValue = (Enum<?>) value;
-			if (this.enumType == EnumType.ORDINAL) {
-				return enumValue.ordinal();
-			}
-
-			return enumValue.name();
-		}
-
-		if (this.lob) {
-			try {
-				if (this.javaType == String.class) {
-					return new SerialClob(((String) value).toCharArray());
-				}
-				else if (this.javaType == char[].class) {
-					return new SerialClob((char[]) value);
-				}
-				else if (this.javaType == byte[].class) {
-					return new SerialBlob((byte[]) value);
-				}
-				else {
-					final ByteArrayOutputStream os = new ByteArrayOutputStream();
-					final ObjectOutputStream oos = new ObjectOutputStream(os);
-					try {
-						oos.writeObject(value);
-					}
-					finally {
-						oos.close();
-					}
-
-					return new SerialBlob(os.toByteArray());
-				}
-			}
-			catch (final Exception e) {
-				throw new PersistenceException("Cannot set parameter", e);
-			}
-		}
-		else {
-			return value;
-		}
+		return ValueConverter.toJdbc(value, this.javaType, this.temporalType, this.enumType, this.lob);
 	}
 
 	/**
@@ -238,50 +137,7 @@ public abstract class AbstractColumn implements Column {
 	 * @since 2.0.0
 	 */
 	public Object convertValueForSet(Object value) {
-		if (value == null) {
-			return null;
-		}
-
-		if (this.temporalType != null) {
-			if (this.javaType == Calendar.class) {
-				final Calendar calendarValue = Calendar.getInstance();
-				switch (this.temporalType) {
-					case DATE:
-						if (value instanceof java.sql.Date) {
-							calendarValue.setTime((java.sql.Date) value);
-							return calendarValue;
-						}
-					case TIME:
-						if (value instanceof java.sql.Time) {
-							calendarValue.setTime((java.sql.Time) value);
-							return calendarValue;
-						}
-					case TIMESTAMP:
-						if (value instanceof java.sql.Timestamp) {
-							calendarValue.setTime((java.sql.Timestamp) value);
-							return calendarValue;
-						}
-				}
-			}
-		}
-
-		if (this.enumType != null) {
-			if (this.enumType == EnumType.ORDINAL) {
-				value = this.values[((Number) value).shortValue()];
-			}
-			else {
-				try {
-					value = this.method.invoke(null, value);
-				}
-				catch (final Exception e) {}
-			}
-		}
-
-		if (this.lob) {
-			value = this.readLob(value);
-		}
-
-		return value;
+		return ValueConverter.fromJdbc(value, this.javaType, this.temporalType, this.enumType, this.values, this.method, this.lob);
 	}
 
 	/**
@@ -427,80 +283,6 @@ public abstract class AbstractColumn implements Column {
 	 */
 	public boolean isVersion() {
 		return false;
-	}
-
-	private Object readLob(Object value) {
-		try {
-			if (value instanceof Clob) {
-				final Clob clob = (Clob) value;
-
-				if (this.javaType == String.class) {
-					final StringWriter w = new StringWriter();
-					IOUtils.copy(clob.getAsciiStream(), w);
-					value = w.toString();
-				}
-				else {
-					final CharArrayWriter w = new CharArrayWriter((int) clob.length());
-					IOUtils.copy(clob.getCharacterStream(), w);
-					value = w.toCharArray();
-				}
-			}
-			else if (value instanceof byte[]) {
-				if (this.javaType == String.class) {
-					final StringWriter w = new StringWriter();
-					IOUtils.copy(new ByteArrayInputStream((byte[]) value), w);
-					value = w.toString();
-				}
-				else if (this.javaType == char[].class) {
-					final byte[] byteArray = (byte[]) value;
-
-					final char[] charArray = new char[byteArray.length];
-
-					for (int i = 0; i < charArray.length; i++) {
-						charArray[i] = (char) byteArray[i];
-					}
-
-					value = charArray;
-				}
-				else if (this.javaType != byte[].class) {
-					final ObjectInputStream is = new ObjectInputStream(new ByteArrayInputStream((byte[]) value));
-					try {
-						return is.readObject();
-					}
-					finally {
-						is.close();
-					}
-				}
-			}
-			else if (value instanceof String) {
-				return value;
-			}
-			else {
-				final Blob blob = (Blob) value;
-
-				if (this.javaType == byte[].class) {
-					final ByteArrayOutputStream os = new ByteArrayOutputStream();
-
-					IOUtils.copy(blob.getBinaryStream(), os);
-
-					value = os.toByteArray();
-				}
-				else {
-
-					final ObjectInputStream is = new ObjectInputStream(blob.getBinaryStream());
-					try {
-						value = is.readObject();
-					}
-					finally {
-						is.close();
-					}
-				}
-			}
-			return value;
-		}
-		catch (final Exception e) {
-			throw new PersistenceException("Cannot read sql data", e);
-		}
 	}
 
 	/**
