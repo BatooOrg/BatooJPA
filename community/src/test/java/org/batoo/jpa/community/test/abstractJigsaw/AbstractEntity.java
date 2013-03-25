@@ -33,6 +33,11 @@ import javax.persistence.Table;
 @Table(name = "AbstractEntity")
 @SuppressWarnings("javadoc")
 public abstract class AbstractEntity extends TopMappedSuperClass {
+	public abstract static class AbstractEntityUnwrapper implements TopMappedSuperClass.IUnwrapper {
+		@Override
+		public abstract AbstractEntity unwrap();
+	}
+
 	@Basic
 	@Column(nullable = false)
 	private String myAbstractProperty;
@@ -41,6 +46,7 @@ public abstract class AbstractEntity extends TopMappedSuperClass {
 		super();
 	}
 
+	@Override
 	public Long getId() {
 		return this.id;
 	}
@@ -51,6 +57,7 @@ public abstract class AbstractEntity extends TopMappedSuperClass {
 
 	abstract public String getMyConcreteProperty();
 
+	@Override
 	public void setId(Long id) {
 		this.id = id;
 	}
@@ -61,9 +68,4 @@ public abstract class AbstractEntity extends TopMappedSuperClass {
 
 	@Override
 	public abstract AbstractEntityUnwrapper unwrapper();
-
-	public abstract static class AbstractEntityUnwrapper implements TopMappedSuperClass.IUnwrapper {
-		@Override
-		public abstract AbstractEntity unwrap();
-	}
 }

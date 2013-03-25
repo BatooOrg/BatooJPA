@@ -49,6 +49,8 @@ public class TestAbstractJigsaw extends BaseCoreTest {
 
 		final EntityPointToAbstractEntity mainEntityReloaded = find(EntityPointToAbstractEntity.class, mainEntity.getId());
 		assertEquals(mainEntity.getId(), mainEntityReloaded.getId());
-		assertThat(mainEntityReloaded.getAbstractEntity().unwrapper().unwrap(), instanceOf(ConcreteEntity.class));
+		final AbstractEntity abstractEntity = mainEntityReloaded.getAbstractEntity();
+		final AbstractEntity unwrap = abstractEntity.unwrapper().unwrap();
+		assertThat(unwrap, instanceOf(ConcreteEntity.class));
 	}
 }

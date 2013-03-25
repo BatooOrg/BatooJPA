@@ -30,6 +30,19 @@ import javax.persistence.Table;
 @SuppressWarnings("javadoc")
 public class ConcreteEntity extends AbstractEntity {
 
+	public static class Unwrapper extends AbstractEntity.AbstractEntityUnwrapper {
+		private final ConcreteEntity _bo;
+
+		public Unwrapper(ConcreteEntity bo) {
+			this._bo = bo;
+		}
+
+		@Override
+		public ConcreteEntity unwrap() {
+			return this._bo;
+		}
+	}
+
 	@Basic
 	@Column(nullable = false)
 	private String myConcreteProperty;
@@ -47,23 +60,10 @@ public class ConcreteEntity extends AbstractEntity {
 	public String getMyConcreteProperty() {
 		return this.myConcreteProperty;
 	}
-	
+
+	@Override
 	public Unwrapper unwrapper() {
 		return new Unwrapper(this);
 	}
-
-	public static class Unwrapper extends AbstractEntity.AbstractEntityUnwrapper {
-		private ConcreteEntity _bo;
-
-		public Unwrapper(ConcreteEntity bo) {
-			_bo = bo;
-		}
-
-		@Override
-		public ConcreteEntity unwrap() {
-			return _bo;
-		}
-	}
-
 
 }

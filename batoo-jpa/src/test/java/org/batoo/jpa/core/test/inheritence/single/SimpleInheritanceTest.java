@@ -23,7 +23,6 @@ import javax.persistence.EntityManager;
 import junit.framework.Assert;
 
 import org.batoo.jpa.core.test.BaseCoreTest;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -136,9 +135,10 @@ public class SimpleInheritanceTest extends BaseCoreTest {
 	 * @since 2.0.1
 	 */
 	@Test
-	@Ignore
 	public void testSimpleInheritance4() {
-		final Foo foo = new Foo("Foo");
+		final FooExt11 foo = new FooExt11();
+		foo.setValue("FooExt11 Value");
+		foo.setValueExt1("ValueExt1");
 
 		final Bar bar = new Bar(1, foo);
 
@@ -152,7 +152,8 @@ public class SimpleInheritanceTest extends BaseCoreTest {
 
 		Assert.assertEquals(1, bar2.getId());
 		Assert.assertEquals(1, bar2.getFoo().getKey().intValue());
-		Assert.assertEquals("Foo", bar2.getFoo().getValue());
-
+		Assert.assertEquals("FooExt11 Value", bar2.getFoo().getValue());
+		Assert.assertEquals(FooExt11.class, bar2.getFoo().getClass().getSuperclass());
 	}
+
 }

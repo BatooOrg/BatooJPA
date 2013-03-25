@@ -29,6 +29,10 @@ import javax.persistence.Version;
 @MappedSuperclass
 public abstract class TopMappedSuperClass {
 
+	public interface IUnwrapper {
+		TopMappedSuperClass unwrap();
+	}
+
 	@Id
 	@Column(name = "ID", nullable = false)
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,10 +60,6 @@ public abstract class TopMappedSuperClass {
 
 	public void setTimeStamp(Long timeStamp) {
 		this.timeStamp = timeStamp;
-	}
-
-	public interface IUnwrapper {
-		TopMappedSuperClass unwrap();
 	};
 
 	public abstract IUnwrapper unwrapper();
