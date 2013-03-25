@@ -570,6 +570,16 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 	}
 
 	/**
+	 * 
+	 * @return the discriminatorAlias
+	 * 
+	 * @since 2.0.1
+	 */
+	public String getDiscriminatorAlias() {
+		return this.discriminatorAlias;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * 
 	 */
@@ -1015,12 +1025,29 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 
 		// initializing the singular joins
 		for (final SingularAssociationMappingImpl<?, ?> _mapping : this.singularJoins) {
+
+			// HANDLE INHERITANCE / DISCRIMINATOR VALUE
 			final EntityTypeImpl<?> _type = _mapping.getType();
+			final EntityTypeImpl<?> effectiveType;
+			if (_type.getInheritanceType() == null) {
+				effectiveType = _mapping.getType();
+			}
+			else {
+				final FetchImpl<X, ?> fetchImpl = this.fetches.get(_mapping);
+				final String discriminatorValue = row.getObject(fetchImpl.getDiscriminatorAlias()).toString();
+
+				// check if we have a legal discriminator value
+				effectiveType = _type.getChildType(discriminatorValue);
+				if (effectiveType == null) {
+					throw new IllegalArgumentException("Discriminator " + discriminatorValue + " not found in the type " + _type.getName());
+				}
+			}
+			// ////////////
 
 			final ManagedId<?> managedId = getAssociatedId(session, row, _mapping);
 
 			if (managedId != null && managedId.getId() != null) {
-				final Object reference = session.getEntityManager().getReference(_type.getJavaType(), managedId.getId());
+				final Object reference = session.getEntityManager().getReference(effectiveType.getJavaType(), managedId.getId());
 				_mapping.set(instance, reference);
 
 				managedInstance.setJoinLoaded(_mapping);
