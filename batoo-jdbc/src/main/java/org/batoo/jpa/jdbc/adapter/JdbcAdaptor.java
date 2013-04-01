@@ -160,7 +160,8 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 		final List<String> ddlColumns = Lists.newArrayList();
 
 		for (final AbstractColumn column : columnsToAdd) {
-			ddlColumns.add("ADD COLUMN " + this.createColumnDDL(column));
+			final String columnDef = "ADD COLUMN " + this.createColumnDefinition(column);
+			ddlColumns.add(columnDef);
 		}
 
 		final StringBuilder statement = new StringBuilder();
@@ -171,7 +172,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	}
 
 	/**
-	 * Creates the BasicColumn Definition DDL For the column.
+	 * Creates(generates) the BasicColumn Definition DDL for the column.
 	 * 
 	 * @param columnDefinition
 	 *            the column definition to create the DDL from
@@ -180,6 +181,20 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 	 * @since 2.0.0
 	 */
 	public abstract String createColumnDDL(AbstractColumn columnDefinition);
+
+	/**
+	 * Creates column definition DDL for the column using the columnDefinition parameter.
+	 * 
+	 * @param column
+	 * @return column definition DDL
+	 * @since 2.0.1
+	 */
+	private String createColumnDefinition(AbstractColumn column) {
+		return (StringUtils.isBlank(column.getColumnDefinition()) ? // check column definition
+			this.createColumnDDL(column) : // column definition is blank so generate one
+			column.getName() + " " + column.getColumnDefinition()// use the column definition
+		);
+	}
 
 	/**
 	 * Returns the SQL to create the table.
@@ -200,7 +215,7 @@ public abstract class JdbcAdaptor extends AbstractJdbcAdaptor {
 		final Collection<AbstractColumn> columns = this.getColumns(table);
 
 		for (final AbstractColumn column : columns) {
-			final String columnDDL = this.createColumnDDL(column);
+			final String columnDDL = this.createColumnDefinition(column);
 			final String existingColumnDDL = ddlColumns.get(column.getName());
 			if ((existingColumnDDL != null) && !existingColumnDDL.equals(columnDDL)) {
 				throw new SQLException("Table " + table.getName() + " has two columns with same name '" + column.getName() + "' but different DDL");

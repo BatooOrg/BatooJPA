@@ -36,6 +36,7 @@ public class Country {
 	@Id
 	private String code;
 
+	@Column(name = "NAME", columnDefinition = "VARCHAR(100)")
 	private String name;
 
 	@Basic
