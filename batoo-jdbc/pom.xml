@@ -1,125 +1,102 @@
 <!-- 
 
-	Copyright (c) 2012 - Batoo Software ve Consultancy Ltd.
+    Copyright (c) 2012 - Batoo Software ve Consultancy Ltd.
  
-	This copyrighted material is made available to anyone wishing to use, modify,
-	copy, or redistribute it subject to the terms and conditions of the GNU
-	Lesser General Public License, as published by the Free Software Foundation.
+    This copyrighted material is made available to anyone wishing to use, modify,
+    copy, or redistribute it subject to the terms and conditions of the GNU
+    Lesser General Public License, as published by the Free Software Foundation.
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-	or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
-	for more details.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+    for more details.
 
-	You should have received a copy of the GNU Lesser General Public License
-	along with this distribution; if not, write to:
-	Free Software Foundation, Inc.
-	51 Franklin Street, Fifth Floor
-	Boston, MA  02110-1301  USA
+    You should have received a copy of the GNU Lesser General Public License
+    along with this distribution; if not, write to:
+    Free Software Foundation, Inc.
+    51 Franklin Street, Fifth Floor
+    Boston, MA  02110-1301  USA
 
  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<artifactId>parent</artifactId>
-		<groupId>org.batoo.jpa</groupId>
-		<version>2.0.1.0-SNAPSHOT</version>
-	</parent>
-	
-	<packaging>bundle</packaging>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>parent</artifactId>
+        <groupId>org.batoo.jpa</groupId>
+        <version>2.0.1.0-SNAPSHOT</version>
+    </parent>
+    
+    <artifactId>batoo-jdbc</artifactId>
+    <name>Batoo Persistence JDBC</name>
 
-	<artifactId>batoo-jdbc</artifactId>
-	<name>Batoo Persistence JDBC</name>
+    <build>
+        <testResources>
+            <testResource>
+                <directory>${project.basedir}/src/test/java</directory>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                </excludes>
+            </testResource>
+            <testResource>
+                <directory>${project.basedir}/src/test/resources</directory>
+            </testResource>
+        </testResources>
 
-	<build>
-		<testResources>
-			<testResource>
-				<directory>${project.basedir}/src/test/java</directory>
-				<excludes>
-					<exclude>**/*.java</exclude>
-				</excludes>
-			</testResource>
-			<testResource>
-				<directory>${project.basedir}/src/test/resources</directory>
-			</testResource>
-		</testResources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>2.2</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar-no-fork</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+        </plugins>
+    </build>
 
+    <dependencies>
+        <!-- Internal -->
+        <dependency>
+            <groupId>org.batoo.jpa</groupId>
+            <artifactId>batoo-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.batoo.jpa</groupId>
+            <artifactId>parser</artifactId>
+        </dependency>
 
-			<plugin>
-		        <groupId>org.apache.felix</groupId>
-		        <artifactId>maven-bundle-plugin</artifactId>
-		        <extensions>true</extensions>
-		        <configuration>
-		            <instructions>
-		                <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
-		                <Bundle-Name>${project.artifactId}</Bundle-Name>
-		                <Bundle-Version>${project.version}</Bundle-Version>
-		                <Export-Package>
-		                    org.batoo.jpa.*
-		                </Export-Package>
-		                <Import-Package>                            
-                    		com.jolbox.bonecp;resolution:=optional,
-                    		* 
-		                </Import-Package>
-		            </instructions>
-		        </configuration>
-		    </plugin>
+        <!-- BoneCP -->
+        <dependency>
+            <groupId>com.jolbox</groupId>
+            <artifactId>bonecp</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
-		</plugins>
-	</build>
+        <!-- Utils -->
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-dbutils</groupId>
+            <artifactId>commons-dbutils</artifactId>
+        </dependency>
 
-	<dependencies>
-		<!-- Internal -->
-		<dependency>
-			<groupId>org.batoo.jpa</groupId>
-			<artifactId>batoo-common</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.batoo.jpa</groupId>
-			<artifactId>parser</artifactId>
-		</dependency>
-
-		<!-- BoneCP -->
-		<dependency>
-			<groupId>com.jolbox</groupId>
-			<artifactId>bonecp</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-		<!-- Utils -->
-		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-dbutils</groupId>
-			<artifactId>commons-dbutils</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-		</dependency>
-		
-		<!-- MySql -->
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        
+        <!-- MySql -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+    </dependencies>
 </project>

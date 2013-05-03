@@ -1,318 +1,317 @@
 <!-- 
 
-	Copyright (c) 2012 - Batoo Software ve Consultancy Ltd.
+    Copyright (c) 2012 - Batoo Software ve Consultancy Ltd.
  
-	This copyrighted material is made available to anyone wishing to use, modify,
-	copy, or redistribute it subject to the terms and conditions of the GNU
-	Lesser General Public License, as published by the Free Software Foundation.
+    This copyrighted material is made available to anyone wishing to use, modify,
+    copy, or redistribute it subject to the terms and conditions of the GNU
+    Lesser General Public License, as published by the Free Software Foundation.
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-	or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
-	for more details.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+    for more details.
 
-	You should have received a copy of the GNU Lesser General Public License
-	along with this distribution; if not, write to:
-	Free Software Foundation, Inc.
-	51 Franklin Street, Fifth Floor
-	Boston, MA  02110-1301  USA
+    You should have received a copy of the GNU Lesser General Public License
+    along with this distribution; if not, write to:
+    Free Software Foundation, Inc.
+    51 Franklin Street, Fifth Floor
+    Boston, MA  02110-1301  USA
 
  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<artifactId>parent</artifactId>
-		<groupId>org.batoo.jpa</groupId>
-		<version>2.0.1.0-SNAPSHOT</version>
-	</parent>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>parent</artifactId>
+        <groupId>org.batoo.jpa</groupId>
+        <version>2.0.1.0-SNAPSHOT</version>
+    </parent>
 
-	<packaging>bundle</packaging>
+    <packaging>bundle</packaging>
 
-	<artifactId>batoo-jpa</artifactId>
-	<name>Batoo Persistence Core</name>
+    <artifactId>batoo-jpa</artifactId>
+    <name>Batoo Persistence Core</name>
 
-	<build>
-		<testResources>
-			<testResource>
-				<directory>src/test/java</directory>
-			</testResource>
-			<testResource>
-				<directory>src/test/resources</directory>
-				<includes>
-					<include>**/**</include>
-				</includes>
-			</testResource>
-		</testResources>
+    <build>
+        <testResources>
+            <testResource>
+                <directory>src/test/java</directory>
+            </testResource>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <includes>
+                    <include>**/**</include>
+                </includes>
+            </testResource>
+        </testResources>
 
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>2.2</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar-no-fork</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>1.7.1</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<createSourcesJar>true</createSourcesJar>
-							<artifactSet>
-								<includes>
-									<include>org.batoo.common:*</include>
-									<include>org.batoo.jpa:*</include>
-								</includes>
-								<excludes>
-									<exclude>*:persistence-api</exclude>
-								</excludes>
-							</artifactSet>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>1.7.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createSourcesJar>true</createSourcesJar>
+                            <artifactSet>
+                                <includes>
+                                    <include>org.batoo.common:*</include>
+                                    <include>org.batoo.jpa:*</include>
+                                </includes>
+                                <excludes>
+                                    <exclude>*:persistence-api</exclude>
+                                </excludes>
+                            </artifactSet>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<plugin>
-		        <groupId>org.apache.felix</groupId>
-		        <artifactId>maven-bundle-plugin</artifactId>
-		        <extensions>true</extensions>
-		        <configuration>
-		            <instructions>
-		                <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
-		                <Bundle-Name>${project.artifactId}</Bundle-Name>
-		                <Bundle-Version>${project.version}</Bundle-Version>
-		                <Export-Package>
-		                    org.batoo.jpa.*
-		                </Export-Package>
-		                <Import-Package>                            
-                    		com.jolbox.bonecp;resolution:=optional,
-                    		!org.batoo.common,
-        					!org.batoo.common.log,
-        					!org.batoo.common.reflect,
-        					!org.batoo.common.util,
-        					*
-		                </Import-Package>
-		            </instructions>
-		        </configuration>
-		    </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <Bundle-Version>${project.version}</Bundle-Version>
+                        <Export-Package>
+                            org.batoo.*
+                        </Export-Package>
+                        <Import-Package>                            
+                            com.jolbox.bonecp;resolution:=optional,
+                            org.objectweb.asm.*;version=3.3,
+                            !org.batoo.*,
+                            !sun.*,
+                            *
+                        </Import-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
 
-		</plugins>
-	</build>
+        </plugins>
+    </build>
 
-	<dependencies>
-		<!-- Internal Dependencies -->
-		<dependency>
-			<groupId>org.batoo.jpa</groupId>
-			<artifactId>persistence-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.batoo.jpa</groupId>
-			<artifactId>batoo-jdbc</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.batoo.jpa</groupId>
-			<artifactId>batoo-jpa-spi</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.batoo.jpa</groupId>
-			<artifactId>batoo-annotations</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.batoo.jpa</groupId>
-			<artifactId>parser</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.batoo.jpa</groupId>
-			<artifactId>jpql</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.batoo.jpa</groupId>
-			<artifactId>batoo-common</artifactId>
-		</dependency>
+    <dependencies>
+        <!-- Internal Dependencies -->
+        <dependency>
+            <groupId>org.batoo.jpa</groupId>
+            <artifactId>persistence-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.batoo.jpa</groupId>
+            <artifactId>batoo-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.batoo.jpa</groupId>
+            <artifactId>batoo-jpa-spi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.batoo.jpa</groupId>
+            <artifactId>batoo-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.batoo.jpa</groupId>
+            <artifactId>parser</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.batoo.jpa</groupId>
+            <artifactId>jpql</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.batoo.jpa</groupId>
+            <artifactId>batoo-common</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>javax.transaction</groupId>
-			<artifactId>jta</artifactId>
-			<version>1.1</version>
-			<scope>provided</scope>
-		</dependency>
+        <dependency>
+            <groupId>javax.transaction</groupId>
+            <artifactId>jta</artifactId>
+            <version>1.1</version>
+            <scope>provided</scope>
+        </dependency>
 
-		<!-- Validation -->
-		<dependency>
-			<groupId>javax.validation</groupId>
-			<artifactId>validation-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
+        <!-- Validation -->
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
-		<!-- ANTLR -->
-		<dependency>
-			<groupId>org.antlr</groupId>
-			<artifactId>antlr-runtime</artifactId>
-			<exclusions>
-				<exclusion>
-					<artifactId>stringtemplate</artifactId>
-					<groupId>org.antlr</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>antlr</artifactId>
-					<groupId>antlr</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+        <!-- ANTLR -->
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr-runtime</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>stringtemplate</artifactId>
+                    <groupId>org.antlr</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>antlr</artifactId>
+                    <groupId>antlr</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-		<!-- BoneCP -->
-		<dependency>
-			<groupId>com.jolbox</groupId>
-			<artifactId>bonecp</artifactId>
-			<scope>provided</scope>
-		</dependency>
+        <!-- BoneCP -->
+        <dependency>
+            <groupId>com.jolbox</groupId>
+            <artifactId>bonecp</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
-		<!-- ASM -->
-		<dependency>
-			<groupId>asm</groupId>
-			<artifactId>asm</artifactId>
-		</dependency>
+        <!-- ASM -->
+        <dependency>
+            <groupId>asm</groupId>
+            <artifactId>asm</artifactId>
+        </dependency>
 
-		<!-- JAXB -->
-		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.xml</groupId>
-			<artifactId>jaxb-impl</artifactId>
-			<scope>provided</scope>
-		</dependency>
+        <!-- JAXB -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
-		<!-- Logging -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
+        <!-- Logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
 
-		<!-- Utils -->
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<exclusions>
-				<exclusion>
-					<artifactId>jsr305</artifactId>
-					<groupId>com.google.code.findbugs</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+        <!-- Utils -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jsr305</artifactId>
+                    <groupId>com.google.code.findbugs</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-		<dependency>
-			<groupId>commons-dbutils</groupId>
-			<artifactId>commons-dbutils</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>commons-dbutils</groupId>
+            <artifactId>commons-dbutils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+        </dependency>
 
-		<!-- Test -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<scope>test</scope>
-		</dependency>
+        <!-- Test -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-		<dependency>
-			<groupId>org.apache.bval</groupId>
-			<artifactId>bval-jsr303</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.bval</groupId>
-			<artifactId>bval-core</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.apache.bval</groupId>
+            <artifactId>bval-jsr303</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.bval</groupId>
+            <artifactId>bval-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>hsqldb</groupId>
-			<artifactId>hsqldb</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jtds</groupId>
-			<artifactId>jtds</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<!--  Open only for testing
-		<dependency>
-			<groupId>com.microsoft.sqlserver</groupId>
-			<artifactId>sqljdbc4</artifactId>
-			<version>3.0</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.oracle</groupId>
-			<artifactId>ojdbc16</artifactId>
-			<version>11.2.0.3</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>sybase.jdbc.sqlanywhere</groupId>
-			<artifactId>sajdbc</artifactId>
-			<version>12.0.0</version>
-			<scope>test</scope>
-		</dependency>
-		-->
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.derby</groupId>
-			<artifactId>derby</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>commons-beanutils</groupId>
-			<artifactId>commons-beanutils</artifactId>
-			<scope>test</scope>
-		</dependency>
-		
-	</dependencies>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.jtds</groupId>
+            <artifactId>jtds</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!--  Open only for testing
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>sqljdbc4</artifactId>
+            <version>3.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc16</artifactId>
+            <version>11.2.0.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>sybase.jdbc.sqlanywhere</groupId>
+            <artifactId>sajdbc</artifactId>
+            <version>12.0.0</version>
+            <scope>test</scope>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+    </dependencies>
 </project>
