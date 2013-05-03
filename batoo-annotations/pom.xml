@@ -26,6 +26,8 @@
 		<version>2.0.1.0-SNAPSHOT</version>
 	</parent>
 
+	<packaging>bundle</packaging>
+	
 	<artifactId>batoo-annotations</artifactId>
 	<name>Batoo Persistence Annotations</name>
 
@@ -56,6 +58,27 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<plugin>
+		        <groupId>org.apache.felix</groupId>
+		        <artifactId>maven-bundle-plugin</artifactId>
+		        <extensions>true</extensions>
+		        <configuration>
+		            <instructions>
+		                <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+		                <Bundle-Name>${project.artifactId}</Bundle-Name>
+		                <Bundle-Version>${project.version}</Bundle-Version>
+		                <Export-Package>
+		                    org.batoo.jpa.*
+		                </Export-Package>		                
+		                <Import-Package>                            
+                    		com.jolbox.bonecp;resolution:=optional,
+                    		* 
+		                </Import-Package>
+		            </instructions>
+		        </configuration>
+		    </plugin>
+
 		</plugins>
 	</build>
 </project>
