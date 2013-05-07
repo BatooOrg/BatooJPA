@@ -26,6 +26,8 @@
 		<version>2.0.1.0-SNAPSHOT</version>
 	</parent>
 
+	<packaging>bundle</packaging>
+
 	<artifactId>batoo-jpa</artifactId>
 	<name>Batoo Persistence Core</name>
 
@@ -82,6 +84,31 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+						<Bundle-Name>${project.artifactId}</Bundle-Name>
+						<Bundle-Version>${project.version}</Bundle-Version>
+						<Bundle-Activator>org.batoo.jpa.core.osgi.PersistenceActivator</Bundle-Activator>
+						<Export-Package>
+							org.batoo.*
+						</Export-Package>
+						<Import-Package>
+							com.jolbox.bonecp;resolution:=optional,
+							org.objectweb.asm.*;version=3.3,
+							!org.batoo.*,
+							!sun.*,
+							*
+						</Import-Package>
+					</instructions>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</build>
 
@@ -286,6 +313,13 @@
 			<artifactId>commons-beanutils</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<version>4.3.0</version>
+			<scope>provided</scope>
+		</dependency>
+
 	</dependencies>
 </project>
