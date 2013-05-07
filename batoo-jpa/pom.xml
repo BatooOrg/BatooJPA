@@ -94,6 +94,7 @@
                         <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Bundle-Version>${project.version}</Bundle-Version>
+                        <Bundle-Activator>org.batoo.jpa.core.osgi.PersistenceActivator</Bundle-Activator>
                         <Export-Package>
                             org.batoo.*
                         </Export-Package>
@@ -311,6 +312,13 @@
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <version>4.3.0</version>
+            <scope>provided</scope>
         </dependency>
         
     </dependencies>
