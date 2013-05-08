@@ -297,7 +297,7 @@ public class SingularAssociationMappingImpl<Z, X> extends AssociationMappingImpl
 	@Override
 	public void link() throws MappingException {
 		final MetamodelImpl metamodel = this.getAttribute().getMetamodel();
-		this.type = metamodel.entity(this.attribute.getJavaType());
+		this.type = metamodel.entity(this.attribute.getBindableJavaType());
 
 		if (!this.isOwner()) {
 			this.inverse = (AssociationMappingImpl<?, ?, ?>) this.type.getRootMapping().getMapping(this.getMappedBy());
