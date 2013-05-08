@@ -25,6 +25,7 @@ import javax.persistence.AccessType;
 
 import org.batoo.common.log.ToStringBuilder;
 import org.batoo.jpa.parser.AbstractLocator;
+import org.batoo.jpa.parser.MemberLocator;
 import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
 
 /**
@@ -61,7 +62,7 @@ public class AttributeMetadataImpl implements AttributeMetadata {
 	 * @since 2.0.0
 	 */
 	public AttributeMetadataImpl(Member member, String name) {
-		this(member, name, member instanceof Field ? AccessType.FIELD : AccessType.PROPERTY, null);
+		this(member, name, member instanceof Field ? AccessType.FIELD : AccessType.PROPERTY, new MemberLocator(member));
 	}
 
 	private AttributeMetadataImpl(Member member, String name, AccessType access, AbstractLocator locator) {
