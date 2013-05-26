@@ -24,8 +24,8 @@ import org.apache.commons.lang.StringUtils;
 import org.batoo.jpa.core.impl.model.ManagedTypeImpl;
 import org.batoo.jpa.core.impl.model.mapping.SingularMappingEx;
 import org.batoo.jpa.parser.MappingException;
-import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
 import org.batoo.jpa.parser.metadata.attribute.AssociationAttributeMetadata;
+import org.batoo.jpa.parser.metadata.attribute.AttributeMetadata;
 
 /**
  * Implementation of {@link SingularMappingEx}.
@@ -49,15 +49,17 @@ public abstract class SingularAttributeImpl<X, T> extends AttributeImpl<X, T> im
 	 * 
 	 * @since 2.0.0
 	 */
+	@SuppressWarnings("unchecked")
 	public SingularAttributeImpl(ManagedTypeImpl<X> declaringType, AttributeMetadata metadata) {
 		super(declaringType, metadata);
 
 		if (metadata instanceof AssociationAttributeMetadata && StringUtils.isNotBlank(((AssociationAttributeMetadata) metadata).getTargetEntity())) {
 			try {
-				this.bindableJavaType = (Class<T>) declaringType.getMetamodel().getEntityManagerFactory().getClassloader().loadClass(((AssociationAttributeMetadata) metadata).getTargetEntity());
+				final ClassLoader classloader = declaringType.getMetamodel().getEntityManagerFactory().getClassloader();
+				this.bindableJavaType = (Class<T>) classloader.loadClass(((AssociationAttributeMetadata) metadata).getTargetEntity());
 			}
 			catch (final ClassNotFoundException e) {
-				throw new MappingException("Target enttity class not found", metadata.getLocator());
+				throw new MappingException("Target entity class not found", metadata.getLocator());
 			}
 		}
 		else {
