@@ -43,9 +43,29 @@ public class DdlTest extends BaseCoreTest {
 	 * @since 2.0.0
 	 */
 	@Test
-	public void testDdlDrop() {
+	public void testDdlTEST0_Drop() {
 		this.setupEmf().close();
 		this.setupEmf().close();
+	}
+
+	/**
+	 * Tests the ddl create mode.
+	 * 
+	 * @since 2.0.0
+	 */
+	@Test
+	public void testDdlTEST1_Create() {
+		this.setupEmf("create").close();
+	}
+
+	/**
+	 * Tests the ddl none mode.
+	 * 
+	 * @since 2.0.0
+	 */
+	@Test
+	public void testDdlTEST2_None() {
+		this.setupEmf("none").close();
 	}
 
 	/**
@@ -54,7 +74,7 @@ public class DdlTest extends BaseCoreTest {
 	 * @since 2.0.0
 	 */
 	@Test
-	public void testDdlUpdate() {
+	public void testDdlTEST3_Update() {
 		this.setupEmf("update1").close();
 		this.setupEmf("update2").close();
 	}

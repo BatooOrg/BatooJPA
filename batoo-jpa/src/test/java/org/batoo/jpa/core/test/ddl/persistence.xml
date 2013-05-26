@@ -36,9 +36,45 @@
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
 			<property name="org.batoo.jpa.ddl" value="DROP" />
+			<property name="org.batoo.jpa.dropOnClose" value="true"/>
 		</properties>
 
 	</persistence-unit>
+
+	<persistence-unit name="create">
+		<provider>org.batoo.jpa.core.BatooPersistenceProvider</provider>
+		
+		<class>org.batoo.jpa.core.test.q.Person2</class>
+		<class>org.batoo.jpa.core.test.q.Address2</class>
+		<class>org.batoo.jpa.core.test.q.Country</class>
+		<class>org.batoo.jpa.core.test.q.Contact</class>
+		<class>org.batoo.jpa.core.test.q.Phone</class>
+		<class>org.batoo.jpa.core.test.q.WorkPhone</class>
+		
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
+		<properties>
+			<property name="org.batoo.jpa.ddl" value="CREATE" />
+		</properties>
+
+	</persistence-unit>
+
+	<persistence-unit name="none">
+		<provider>org.batoo.jpa.core.BatooPersistenceProvider</provider>
+		
+		<class>org.batoo.jpa.core.test.q.Person2</class>
+		<class>org.batoo.jpa.core.test.q.Address2</class>
+		<class>org.batoo.jpa.core.test.q.Country</class>
+		<class>org.batoo.jpa.core.test.q.Contact</class>
+		<class>org.batoo.jpa.core.test.q.Phone</class>
+		<class>org.batoo.jpa.core.test.q.WorkPhone</class>
+		
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
+		<properties>
+			<property name="org.batoo.jpa.ddl" value="NONE" />
+		</properties>
+
+	</persistence-unit>
+
 
 	<persistence-unit name="update1">
 		<provider>org.batoo.jpa.core.BatooPersistenceProvider</provider>

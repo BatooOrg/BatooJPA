@@ -887,6 +887,10 @@ public class MetamodelImpl implements Metamodel {
 	 * @since 2.0.0
 	 */
 	public void performSequencesDdl(DataSource datasource, DDLMode ddlMode) {
+		if ((ddlMode == DDLMode.NONE)) {
+			return;
+		}
+
 		for (final SequenceGenerator sequenceGenerator : this.sequenceGenerators.values()) {
 			MetamodelImpl.LOG.info("Performing DDL operations for sequence generators for {0}, mode {1}", sequenceGenerator.getName(), ddlMode);
 
@@ -905,6 +909,10 @@ public class MetamodelImpl implements Metamodel {
 	 * @since 2.0.0
 	 */
 	public void performTableGeneratorsDdl(DataSource datasource, DDLMode ddlMode) {
+		if ((ddlMode == DDLMode.NONE)) {
+			return;
+		}
+
 		for (final TableGenerator tableGenerator : this.tableGenerators.values()) {
 			MetamodelImpl.LOG.info("Performing DDL operations for sequence generators for mode table {1}, mode {0}", tableGenerator.getName(), ddlMode);
 
