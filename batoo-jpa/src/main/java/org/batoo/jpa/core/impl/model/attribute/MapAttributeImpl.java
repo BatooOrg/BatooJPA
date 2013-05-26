@@ -70,10 +70,11 @@ public class MapAttributeImpl<X, K, V> extends PluralAttributeImpl<X, Map<K, V>,
 		final PluralAttributeMetadata pluralAttributeMetadata = (PluralAttributeMetadata) metadata;
 		if (StringUtils.isNotBlank(pluralAttributeMetadata.getMapKeyClassName())) {
 			try {
-				this.keyJavaType = (Class<K>) declaringType.getMetamodel().getEntityManagerFactory().getClassloader().loadClass(pluralAttributeMetadata.getMapKeyClassName());
+				final ClassLoader classloader = declaringType.getMetamodel().getEntityManagerFactory().getClassloader();
+				this.keyJavaType = (Class<K>) classloader.loadClass(pluralAttributeMetadata.getMapKeyClassName());
 			}
 			catch (final ClassNotFoundException e) {
-				throw new MappingException("Target enttity class not found", metadata.getLocator());
+				throw new MappingException("Target entity class not found", metadata.getLocator());
 			}
 		}
 		else {
