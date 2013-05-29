@@ -1,4 +1,13 @@
 language: java
-jdk:
-  - openjdk7
-  - oraclejdk7
+before_install: "git clone -b travis `git config --get remote.origin.url` target/travis"
+script: "mvn deploy --settings target/travis/settings.xml"
+
+# whitelist
+branches:
+  only:
+    - master
+
+env: 
+  global: 
+  - secure: "qg8W3K6LEvcLbYcRlztT9G/cxaK/JNrTb+5Ono7On3XXyutzHvQMIRAsC2IQ2TKNKt59OSUKCYBsvZgloW/N3TviIMOR72YnJ4KSlGoiBCVc9gQYz8ekD76PyqxPInbrNWasXuz0u/AJJfM/Pc3FzBlRn325G9azyF0w1ywsKOE="
+  - secure: "fyR3GVt63qJvAZJ+zkE2c0w2PkhRW6sd3yyCh2DKYFfU5GXOlHel2D6Y5Pqnm7lwVJJf8fOkOjO//xvyS1tEPjXSkSKyROznOJ8heJL0lVQ1lBLQLtwemwn6kr5FlugHlUQQik9/C6oGFrm3YMsj3L9KH9S9ioGr+oaicMrTaSE="
