@@ -42,13 +42,6 @@
 		<developer>
 			<id>hceylan</id>
 			<name>Hasan Ceylan</name>
-			<organization>batoo.org</organization>
-			<email>heylan@batoo.org</email>
-			<url>http://blog.batoo.org</url>
-			<organizationUrl>http://www.batoo.org</organizationUrl>
-			<roles>
-				<role>Architect</role>
-			</roles>
 		</developer>
 		<developer>
 			<id>asimarslan</id>
@@ -57,9 +50,6 @@
 			<email>arslanasim@gmail.com</email>
 			<url>http://www.asimarslan.com</url>
 			<organizationUrl>http://www.batoo.org</organizationUrl>
-			<roles>
-				<role>Developer</role>
-			</roles>
 		</developer>
 	</developers>
 
@@ -88,7 +78,7 @@
 		<notifiers>
 			<notifier>
 				<configuration>
-					<address>dev@batoo.org</address>
+					<address>aarslan@batoo.org</address>
 				</configuration>
 			</notifier>
 		</notifiers>
