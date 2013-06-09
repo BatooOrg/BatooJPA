@@ -20,6 +20,8 @@ package org.batoo.jpa.core.impl.model.mapping;
 
 import java.lang.reflect.Member;
 
+import javax.persistence.metamodel.Bindable;
+
 import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.attribute.AttributeImpl;
@@ -67,7 +69,7 @@ public abstract class AbstractMapping<Z, X, Y> implements Mapping<Z, X, Y> {
 	public AbstractMapping(AbstractParentMapping<?, Z> parent, AttributeImpl<? super Z, X> attribute, Class<X> javaType, String name) {
 		super();
 
-		this.javaType = javaType;
+		this.javaType = attribute instanceof Bindable ? ((Bindable) attribute).getBindableJavaType() : javaType;
 		this.parent = parent;
 		this.attribute = attribute;
 		this.name = name;

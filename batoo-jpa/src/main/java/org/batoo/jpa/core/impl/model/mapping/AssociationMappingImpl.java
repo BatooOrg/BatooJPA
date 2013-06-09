@@ -397,7 +397,7 @@ public abstract class AssociationMappingImpl<Z, X, Y> extends AbstractMapping<Z,
 
 			final EntityTypeImpl<Y> entity = metamodel.entity(bindableType);
 
-			this.ownerSelect = this.isOwner() || isOwnerSelectType();
+			this.ownerSelect = this.isOwner() || PersistentAttributeType.MANY_TO_MANY == getAttribute().getPersistentAttributeType();
 			if (this.ownerSelect) {
 				return this.generateOwnerSelectCriteria(metamodel, cb, bindableType, entity);
 			}
@@ -457,12 +457,6 @@ public abstract class AssociationMappingImpl<Z, X, Y> extends AbstractMapping<Z,
 	 */
 	protected boolean isOwnerSelect() {
 		return this.ownerSelect;
-	}
-
-	protected boolean isOwnerSelectType() {
-		final PersistentAttributeType pat = getAttribute().getPersistentAttributeType();
-
-		return pat == PersistentAttributeType.MANY_TO_MANY || pat == PersistentAttributeType.ONE_TO_MANY;
 	}
 
 	/**
