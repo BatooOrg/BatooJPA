@@ -43,6 +43,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 
+import org.batoo.common.BatooVersion;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
 import org.batoo.common.log.ToStringBuilder;
@@ -86,6 +87,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 	 * @since 2.0.0
 	 */
 	private abstract class AttributesParser<A extends AttributeMetadata> extends ArrayList<A> {
+		private static final long serialVersionUID = BatooVersion.SERIAL_VERSION_UID;
 
 		private final Map<String, Member> memberMap;
 		private final List<A> metadatas;
@@ -419,6 +421,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 		final List<BasicAttributeMetadata> list = this.metadata != null ? this.metadata.getBasics() : null;
 
 		return new AttributesParser<BasicAttributeMetadata>(this.memberMap, list, null) {
+			private static final long serialVersionUID = BatooVersion.SERIAL_VERSION_UID;
 
 			@Override
 			protected BasicAttributeMetadata
@@ -444,6 +447,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 		final List<ElementCollectionAttributeMetadata> list = this.metadata != null ? this.metadata.getElementCollections() : null;
 
 		return new AttributesParser<ElementCollectionAttributeMetadata>(this.memberMap, list, ElementCollection.class) {
+			private static final long serialVersionUID = BatooVersion.SERIAL_VERSION_UID;
 
 			@Override
 			protected ElementCollectionAttributeMetadata parseAttribute(String name, Member member, ElementCollectionAttributeMetadata metadata,
@@ -471,6 +475,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 		final List<EmbeddedIdAttributeMetadata> list = this.metadata != null ? this.metadata.getEmbeddedIds() : null;
 
 		return new AttributesParser<EmbeddedIdAttributeMetadata>(this.memberMap, list, EmbeddedId.class) {
+			private static final long serialVersionUID = BatooVersion.SERIAL_VERSION_UID;
 
 			@Override
 			protected EmbeddedIdAttributeMetadata parseAttribute(String name, Member member, EmbeddedIdAttributeMetadata metadata,
@@ -496,6 +501,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 		final List<EmbeddedAttributeMetadata> list = this.metadata != null ? this.metadata.getEmbeddeds() : null;
 
 		return new AttributesParser<EmbeddedAttributeMetadata>(this.memberMap, list, Embedded.class) {
+			private static final long serialVersionUID = BatooVersion.SERIAL_VERSION_UID;
 
 			@Override
 			protected EmbeddedAttributeMetadata parseAttribute(String name, Member member, EmbeddedAttributeMetadata metadata,
@@ -521,6 +527,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 		final List<IdAttributeMetadata> list = this.metadata != null ? this.metadata.getIds() : null;
 
 		return new AttributesParser<IdAttributeMetadata>(this.memberMap, list, Id.class) {
+			private static final long serialVersionUID = BatooVersion.SERIAL_VERSION_UID;
 
 			@Override
 			protected IdAttributeMetadata parseAttribute(String name, Member member, IdAttributeMetadata metadata, Set<Class<? extends Annotation>> parsed) {
@@ -545,6 +552,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 		final List<ManyToManyAttributeMetadata> list = this.metadata != null ? this.metadata.getManyToManies() : null;
 
 		return new AttributesParser<ManyToManyAttributeMetadata>(this.memberMap, list, ManyToMany.class) {
+			private static final long serialVersionUID = BatooVersion.SERIAL_VERSION_UID;
 
 			@Override
 			protected ManyToManyAttributeMetadata parseAttribute(String name, Member member, ManyToManyAttributeMetadata metadata,
@@ -572,6 +580,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 		final List<ManyToOneAttributeMetadata> list = this.metadata != null ? this.metadata.getManyToOnes() : null;
 
 		return new AttributesParser<ManyToOneAttributeMetadata>(this.memberMap, list, ManyToOne.class) {
+			private static final long serialVersionUID = BatooVersion.SERIAL_VERSION_UID;
 
 			@Override
 			protected ManyToOneAttributeMetadata parseAttribute(String name, Member member, ManyToOneAttributeMetadata metadata,
@@ -599,6 +608,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 		final List<OneToManyAttributeMetadata> list = this.metadata != null ? this.metadata.getOneToManies() : null;
 
 		return new AttributesParser<OneToManyAttributeMetadata>(this.memberMap, list, OneToMany.class) {
+			private static final long serialVersionUID = BatooVersion.SERIAL_VERSION_UID;
 
 			@Override
 			protected OneToManyAttributeMetadata parseAttribute(String name, Member member, OneToManyAttributeMetadata metadata,
@@ -626,6 +636,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 		final List<OneToOneAttributeMetadata> list = this.metadata != null ? this.metadata.getOneToOnes() : null;
 
 		return new AttributesParser<OneToOneAttributeMetadata>(this.memberMap, list, OneToOne.class) {
+			private static final long serialVersionUID = BatooVersion.SERIAL_VERSION_UID;
 
 			@Override
 			protected OneToOneAttributeMetadata parseAttribute(String name, Member member, OneToOneAttributeMetadata metadata,
@@ -653,6 +664,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 		final List<TransientAttributeMetadata> list = this.metadata != null ? this.metadata.getTransients() : null;
 
 		return new AttributesParser<TransientAttributeMetadata>(this.memberMap, list, Transient.class) {
+			private static final long serialVersionUID = BatooVersion.SERIAL_VERSION_UID;
 
 			@Override
 			protected TransientAttributeMetadata parseAttribute(String name, Member member, TransientAttributeMetadata metadata,
@@ -678,6 +690,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 		final List<VersionAttributeMetadata> list = this.metadata != null ? this.metadata.getVersions() : null;
 
 		return new AttributesParser<VersionAttributeMetadata>(this.memberMap, list, Version.class) {
+			private static final long serialVersionUID = BatooVersion.SERIAL_VERSION_UID;
 
 			@Override
 			protected VersionAttributeMetadata parseAttribute(String name, Member member, VersionAttributeMetadata metadata,

@@ -40,6 +40,8 @@ import javax.persistence.TemporalType;
 @Table
 @SuppressWarnings("javadoc")
 public class EntityB extends TopMappedSuperClass {
+	private static final long serialVersionUID = 1L;
+
 	@Basic
 	@Column(nullable = false)
 	private String code;

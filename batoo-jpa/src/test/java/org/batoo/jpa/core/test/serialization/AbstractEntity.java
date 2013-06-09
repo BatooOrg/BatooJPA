@@ -34,6 +34,8 @@ import javax.persistence.TemporalType;
 @Entity
 @SuppressWarnings("javadoc")
 public abstract class AbstractEntity extends TopMappedSuperClass {
+	private static final long serialVersionUID = 1L;
+
 	@Basic
 	@Column(nullable = false)
 	private String myAbstractProperty;

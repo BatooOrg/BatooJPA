@@ -38,6 +38,7 @@ import com.google.common.collect.Lists;
  */
 @Entity
 public class Person implements Serializable {
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)

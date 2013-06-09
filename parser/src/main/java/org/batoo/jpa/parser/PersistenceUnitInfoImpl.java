@@ -123,7 +123,7 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	}
 
 	private boolean createExcludeUnlistedProperties(final PersistenceUnit pu) {
-		return pu.getExcludeUnlistedClasses() != null ? pu.getExcludeUnlistedClasses() : !this.managedClassNames.isEmpty();
+		return pu.isExcludeUnlistedClasses() != null ? pu.isExcludeUnlistedClasses() : !this.managedClassNames.isEmpty();
 	}
 
 	private List<URL> createJarFiles(PersistenceUnit pu) {

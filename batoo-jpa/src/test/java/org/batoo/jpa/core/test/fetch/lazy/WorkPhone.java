@@ -27,6 +27,7 @@ import javax.persistence.Entity;
  */
 @Entity
 public class WorkPhone extends Phone {
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * 

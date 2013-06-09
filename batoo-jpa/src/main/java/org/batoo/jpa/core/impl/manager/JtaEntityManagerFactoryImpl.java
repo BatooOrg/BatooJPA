@@ -30,6 +30,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 import javax.transaction.TransactionManager;
 
+import org.batoo.common.BatooVersion;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
 import org.batoo.jpa.parser.PersistenceParser;
@@ -43,6 +44,7 @@ import com.google.common.base.Splitter;
  * @since 2.0.0
  */
 public class JtaEntityManagerFactoryImpl extends EntityManagerFactoryImpl {
+	private static final long serialVersionUID = BatooVersion.SERIAL_VERSION_UID;
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(JtaEntityManagerFactoryImpl.class);
 

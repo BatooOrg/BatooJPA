@@ -905,6 +905,7 @@ public class FetchParentImpl<Z, X> implements FetchParent<Z, X>, Joinable {
 
 		if (this.keyColumnAlias != null) {
 			if (this.keyColumn == null) {
+				@SuppressWarnings("unchecked")
 				final ElementCollectionMappingImpl<? super X, ?, ?> _mapping = (ElementCollectionMappingImpl<? super X, ?, ?>) this.mapping;
 				if (_mapping.getCollectionTable() != null) {
 					this.keyColumn = _mapping.getCollectionTable().getKeyColumn();

@@ -118,8 +118,10 @@ public class SerializationTest extends BaseCoreTest {
 		final ObjectInputStream ois = new ObjectInputStream(pis);
 
 		oos.writeObject(entity);
+		oos.close();
 
 		final CompositeEntity transportedEntity = (CompositeEntity) ois.readObject();
+		ois.close();
 
 		Assert.assertEquals(entity.getId(), transportedEntity.getId());
 		Assert.assertEquals(entity.getTimeStamp(), transportedEntity.getTimeStamp());

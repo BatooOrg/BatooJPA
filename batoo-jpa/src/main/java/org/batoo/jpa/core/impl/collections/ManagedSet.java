@@ -28,6 +28,7 @@ import java.util.Set;
 
 import javax.persistence.PersistenceException;
 
+import org.batoo.common.BatooVersion;
 import org.batoo.common.util.BatooUtils;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
@@ -46,6 +47,7 @@ import com.google.common.collect.Sets;
  * @since 2.0.0
  */
 public class ManagedSet<X, E> extends ManagedCollection<E> implements Set<E> {
+	private static final long serialVersionUID = BatooVersion.SERIAL_VERSION_UID;
 
 	private HashSet<E> delegate;
 	private transient HashSet<E> snapshot;

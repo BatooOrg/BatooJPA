@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.mutable.MutableBoolean;
+import org.batoo.common.BatooVersion;
 import org.batoo.common.util.BatooUtils;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
@@ -52,6 +53,7 @@ import com.google.common.collect.Lists;
  * @since 2.0.0
  */
 public abstract class ManagedCollection<E> implements Serializable {
+	private static final long serialVersionUID = BatooVersion.SERIAL_VERSION_UID;
 
 	private transient boolean changed;
 	private final transient ManagedInstance<?> managedInstance;
@@ -265,7 +267,7 @@ public abstract class ManagedCollection<E> implements Serializable {
 			&& (this.inverse.getAttribute() instanceof PluralAttributeImpl) ? //
 			(PluralAssociationMappingImpl<?, ?, ?>) this.inverse : null;
 
-		// TODO needs to be overriden by ManagedMap
+		// TODO needs to be overridden by ManagedMap
 		// add the new children
 		for (int i = 0; i < mergedChildren.size(); i++) {
 			final E child = mergedChildren.get(i);

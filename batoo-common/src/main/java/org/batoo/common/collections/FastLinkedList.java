@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 
+import org.batoo.common.BatooVersion;
+
 /**
  * Doubly-linked list implementation that avoids interfaces.
  * <p>
@@ -41,6 +43,7 @@ import java.util.Queue;
  * @author hceylan
  */
 public class FastLinkedList<E> extends AbstractSequentialList<E> implements List<E>, Deque<E>, Cloneable, Serializable {
+	private static final long serialVersionUID = BatooVersion.SERIAL_VERSION_UID;
 
 	static class FastLinkedListNode<E> {
 		E item;

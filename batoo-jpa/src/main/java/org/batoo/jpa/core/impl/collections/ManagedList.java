@@ -30,6 +30,7 @@ import java.util.ListIterator;
 import javax.persistence.PersistenceException;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.batoo.common.BatooVersion;
 import org.batoo.common.util.BatooUtils;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
@@ -50,6 +51,7 @@ import com.google.common.collect.Sets;
  * @since 2.0.0
  */
 public class ManagedList<X, E> extends ManagedCollection<E> implements List<E> {
+	private static final long serialVersionUID = BatooVersion.SERIAL_VERSION_UID;
 
 	/**
 	 * 
