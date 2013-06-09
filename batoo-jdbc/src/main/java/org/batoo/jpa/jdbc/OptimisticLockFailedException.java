@@ -20,6 +20,8 @@ package org.batoo.jpa.jdbc;
 
 import javax.persistence.PersistenceException;
 
+import org.batoo.common.BatooVersion;
+
 /**
  * The exception thrown when the optimistic lock fails.
  * 
@@ -27,6 +29,7 @@ import javax.persistence.PersistenceException;
  * @since 2.0.1
  */
 public class OptimisticLockFailedException extends PersistenceException {
+	private static final long serialVersionUID = BatooVersion.SERIAL_VERSION_UID;
 
 	/**
 	 * 

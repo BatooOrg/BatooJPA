@@ -27,6 +27,7 @@ import javax.persistence.Entity;
  */
 @Entity
 public class Foo extends AbstractPersistable<Long> {
+	private static final long serialVersionUID = 1L;
 
 	private String fooValue;
 

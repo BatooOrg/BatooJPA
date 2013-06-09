@@ -46,6 +46,7 @@ import javax.validation.groups.Default;
 
 import org.apache.commons.lang.StringUtils;
 import org.batoo.common.BatooException;
+import org.batoo.common.BatooVersion;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
 import org.batoo.jpa.BJPASettings;
@@ -81,6 +82,7 @@ import com.jolbox.bonecp.BoneCP;
  * @since 2.0.0
  */
 public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializable {
+	private static final long serialVersionUID = BatooVersion.SERIAL_VERSION_UID;
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(EntityManagerFactoryImpl.class);
 

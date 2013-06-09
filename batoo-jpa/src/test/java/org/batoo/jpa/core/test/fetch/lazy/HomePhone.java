@@ -29,6 +29,7 @@ import javax.persistence.ManyToOne;
  */
 @Entity
 public class HomePhone extends Phone {
+	private static final long serialVersionUID = 1L;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Person person;

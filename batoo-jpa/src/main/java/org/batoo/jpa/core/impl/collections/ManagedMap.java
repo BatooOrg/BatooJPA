@@ -29,6 +29,7 @@ import java.util.Set;
 
 import javax.persistence.PersistenceException;
 
+import org.batoo.common.BatooVersion;
 import org.batoo.common.util.BatooUtils;
 import org.batoo.jpa.core.impl.criteria.EntryImpl;
 import org.batoo.jpa.core.impl.instance.ManagedInstance;
@@ -51,6 +52,7 @@ import com.google.common.collect.Maps;
  * @since 2.0.0
  */
 public class ManagedMap<X, K, V> extends ManagedCollection<V> implements Map<K, V> {
+	private static final long serialVersionUID = BatooVersion.SERIAL_VERSION_UID;
 
 	private HashMap<K, V> delegate;
 	private HashMap<K, V> snapshot;

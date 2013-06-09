@@ -37,6 +37,7 @@ import javax.persistence.Table;
 @Table
 @SuppressWarnings("javadoc")
 public class ConcreteEntity extends AbstractEntity {
+	private static final long serialVersionUID = 1L;
 
 	@Basic
 	@Column(nullable = false)
