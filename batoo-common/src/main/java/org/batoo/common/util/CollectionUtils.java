@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.batoo.common.BatooVersion;
+
 /**
  * Miscellaneous collection utility methods. Mainly for internal use within the framework.
  * 
@@ -74,6 +76,7 @@ public abstract class CollectionUtils {
 	 * Adapts a Map to the MultiValueMap contract.
 	 */
 	private static class MultiValueMapAdapter<K, V> implements MultiValueMap<K, V>, Serializable {
+		private static final long serialVersionUID = BatooVersion.SERIAL_VERSION_UID;
 
 		private final Map<K, List<V>> map;
 

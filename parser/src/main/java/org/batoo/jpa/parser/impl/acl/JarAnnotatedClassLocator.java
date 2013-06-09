@@ -86,8 +86,9 @@ public class JarAnnotatedClassLocator extends BaseAnnotatedClassLocator {
 					classes.add(clazz);
 				}
 			}
-
 		}
+		
+		jarFile.close();
 
 		return classes;
 	}

@@ -32,9 +32,7 @@ import org.osgi.framework.ServiceRegistration;
  */
 @SuppressWarnings("rawtypes")
 public class PersistenceActivator implements BundleActivator {
-
-	private static BundleContext context = null;
-	private static ServiceRegistration serviceReg = null;
+	private ServiceRegistration serviceReg;
 
 	public PersistenceActivator() {
 		super();
@@ -46,14 +44,12 @@ public class PersistenceActivator implements BundleActivator {
 	 */
 	@Override
 	public void start(BundleContext context) throws Exception {
-		PersistenceActivator.context = context;
-
 		final Hashtable<String, String> props = new Hashtable<String, String>();
 		props.put("javax.persistence.provider", org.batoo.jpa.core.BatooPersistenceProvider.class.getName());
 		props.put("javax.persistence.spi.PersistenceProvider", org.batoo.jpa.core.BatooPersistenceProvider.class.getName());
 		props.put("javax.persistence.PersistenceProvider", org.batoo.jpa.core.BatooPersistenceProvider.class.getName());
 
-		PersistenceActivator.serviceReg = context.registerService("javax.persistence.spi.PersistenceProvider",
+		serviceReg = context.registerService("javax.persistence.spi.PersistenceProvider",
 			new org.batoo.jpa.core.BatooPersistenceProvider(), props);
 	}
 
@@ -63,11 +59,9 @@ public class PersistenceActivator implements BundleActivator {
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		if (PersistenceActivator.serviceReg != null) {
-			PersistenceActivator.serviceReg.unregister();
-			PersistenceActivator.serviceReg = null;
+		if (null != serviceReg) {
+			serviceReg.unregister();
+			serviceReg = null;
 		}
-
-		PersistenceActivator.context = null;
 	}
 }

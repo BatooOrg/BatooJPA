@@ -38,6 +38,7 @@ import javax.persistence.UniqueConstraint;
 @Table
 @SuppressWarnings("javadoc")
 public class CompositeEntity extends TopMappedSuperClass {
+	private static final long serialVersionUID = 1L;
 
 	@Basic
 	@Column(nullable = false)
