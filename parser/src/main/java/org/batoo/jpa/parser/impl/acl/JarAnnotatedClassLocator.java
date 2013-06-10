@@ -19,6 +19,7 @@
 package org.batoo.jpa.parser.impl.acl;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Set;
@@ -65,8 +66,8 @@ public class JarAnnotatedClassLocator extends BaseAnnotatedClassLocator {
 		super();
 	}
 
-	private Set<Class<?>> findClasses(PersistenceUnitInfo persistenceUnitInfo, URL url, final Set<Class<?>> classes) throws IOException {
-		final JarFile jarFile = new JarFile(url.getFile());
+	private Set<Class<?>> findClasses(PersistenceUnitInfo persistenceUnitInfo, URL url, final Set<Class<?>> classes) throws IOException, URISyntaxException {
+		final JarFile jarFile = new JarFile(url.toURI().getPath());
 
 		final Enumeration<JarEntry> entries = jarFile.entries();
 		while (entries.hasMoreElements()) {
@@ -90,6 +91,8 @@ public class JarAnnotatedClassLocator extends BaseAnnotatedClassLocator {
 		
 		jarFile.close();
 
+		jarFile.close();
+
 		return classes;
 	}
 
@@ -106,8 +109,11 @@ public class JarAnnotatedClassLocator extends BaseAnnotatedClassLocator {
 
 			return this.findClasses(persistenceUnitInfo, url, classes);
 		}
+		catch (final URISyntaxException e) {
+			throw new PersistenceException("Unable to read JAR url: " + url, e);
+		}
 		catch (final IOException e) {
-			throw new PersistenceException("Unable to read JAR url: " + url);
+			throw new PersistenceException("Unable to read JAR url: " + url, e);
 		}
 		finally {
 			JarAnnotatedClassLocator.LOG.info("Found persistent classes {0}", classes.toString());
