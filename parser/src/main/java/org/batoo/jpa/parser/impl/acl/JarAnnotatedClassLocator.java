@@ -93,6 +93,8 @@ public class JarAnnotatedClassLocator extends BaseAnnotatedClassLocator {
 
 		jarFile.close();
 
+		jarFile.close();
+
 		return classes;
 	}
 
