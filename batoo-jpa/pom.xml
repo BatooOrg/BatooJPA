@@ -101,7 +101,7 @@
 						</Export-Package>
 						<Import-Package>
 							com.jolbox.bonecp;resolution:=optional,
-							org.objectweb.asm.*;version=3.3,
+							org.objectweb.asm.*;version="[3.3,4)",
 							!org.batoo.*,
 							!sun.*,
 							*
