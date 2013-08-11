@@ -7,7 +7,7 @@ Batoo JPA is the fastest JPA Implementation by far.
 It is 10 ~ 20 times faster then the leading JPA providers.
 
 ## LICENSE ##
-Copyright (c) 2012 - Batoo Software ve Consultancy Ltd.
+Copyright (c) 2012-2013, Batu Alp Ceylan
 
 This copyrighted material is made available to anyone wishing to use, modify,
 copy, or redistribute it subject to the terms and conditions of the GNU
@@ -71,47 +71,4 @@ Note: The initial build may take a long time.
 
 ## BENCHMARK ##
 
-During normal build the the benchmark can also be run. Add `-Pbenchmark` to maven profiles.
-
-The output of benchmark results can be found in 
-/benchmark/target/surefire-reports/org.batoo.jpa.benchmark.BenchmarkTest-output.txt
-
-
-## DEVELOPMENT ##
-
-Current development platform is Eclipse 3.7.2
-
-The Eclipse Dependencies:
-
-- EGit / JGit
-- M2Eclipse
-
-Several Eclipse resource files:
-
-- Run configs are in `etc/ide/eclipse/run_configs`
-- `cleanup.xml` -> Code cleanup profile
-- `codetemplates.xml` - Code templates profile
-- `dictionary.txt` - The custom spell checker dictionary
-- `formatter.xml` - The source formatter
-- `templates.xml` - The custom Java templates
-
-There are 4 lunch shortcuts to benchmark Batoo JPA:
-
-- Benchmark - Batoo.launch
-- Benchmark - EclipseLink.launch
-- Benchmark - Hibernate.launch
-- Benchmark.launch
-
-There are 5 unit tests lunch shortcuts to test Batoo JPA:
-
-- test-derby.launch
-- test-h2.launch
-- test-hsql.launch
-- test-mysql.launch
-- test-mssql.launch
-- test-oracle.launch
-- test-pgsql.launch
-- test-saw.launch
-
-
-**Do not forget to send pull requests...**
+You can use [BatooJPABenchmark](https://github.com/BatooOrg/BatooJPABenchmark) for benchmarking.

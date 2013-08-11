@@ -59,32 +59,6 @@
 			</plugin>
 
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>1.7.1</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<createSourcesJar>true</createSourcesJar>
-							<artifactSet>
-								<includes>
-									<include>org.batoo.common:*</include>
-									<include>org.batoo.jpa:*</include>
-								</includes>
-								<excludes>
-									<exclude>*:persistence-api</exclude>
-								</excludes>
-							</artifactSet>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
 				<version>2.3.7</version>
@@ -109,39 +83,16 @@
 				</configuration>
 			</plugin>
 
-		</plugins>
-	</build>
 
-	<dependencies>
+        </plugins>
+    </build>
+
+    <dependencies>
 		<!-- Internal Dependencies -->
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>persistence-api</artifactId>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.batoo.jpa</groupId>
-			<artifactId>batoo-jdbc</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.batoo.jpa</groupId>
-			<artifactId>batoo-jpa-spi</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.batoo.jpa</groupId>
-			<artifactId>batoo-annotations</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.batoo.jpa</groupId>
-			<artifactId>parser</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.batoo.jpa</groupId>
-			<artifactId>jpql</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.batoo.jpa</groupId>
-			<artifactId>batoo-common</artifactId>
 		</dependency>
 
 		<dependency>
@@ -217,7 +168,15 @@
 			</exclusions>
 		</dependency>
 
-		<dependency>
+        <!-- JBoss SPI -->
+        <dependency>
+            <groupId>org.jboss.as</groupId>
+            <artifactId>jboss-as-jpa-spi</artifactId>
+            <version>7.1.1.Final</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
 			<groupId>commons-dbutils</groupId>
 			<artifactId>commons-dbutils</artifactId>
 		</dependency>
@@ -322,4 +281,62 @@
 		</dependency>
 
 	</dependencies>
+    <profiles>
+        <profile>
+            <id>generate-parser</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.antlr</groupId>
+                        <artifactId>antlr3-maven-plugin</artifactId>
+                        <version>3.4</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>antlr</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>jaxb2-maven-plugin</artifactId>
+                        <version>1.5</version>
+                        <configuration>
+                            <bindingDirectory>${project.basedir}/src/main/resources/xjb</bindingDirectory>
+                            <bindingFiles>spec.xjb</bindingFiles>
+                            <schemaDirectory>${project.basedir}/src/main/resources/xsd</schemaDirectory>
+                            <schemaFiles>persistence_2_0.xsd</schemaFiles>
+                            <extension>true</extension>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>xjc</id>
+                                <goals>
+                                    <goal>xjc</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>run-test</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration combine.self="override">
+                            <skip>false</skip>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+    </profiles>
 </project>

@@ -51,6 +51,10 @@ import org.junit.runner.Description;
  */
 public abstract class BaseCoreTest {
 
+    static{
+        System.setProperty("batoojpa.state","boot-community-test");
+    }
+
 	private static final BLogger LOG = BLoggerFactory.getLogger(BaseCoreTest.class);
 
 	private static final String DEFAULT = "default";

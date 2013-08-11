@@ -54,7 +54,7 @@ import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMappingImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralMappingEx;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMappingImpl;
 import org.batoo.jpa.core.impl.model.mapping.SingularMappingEx;
-import org.batoo.jpa.core.util.Pair;
+import org.batoo.common.util.Pair;
 import org.batoo.jpa.jdbc.mapping.SingularMapping;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
 

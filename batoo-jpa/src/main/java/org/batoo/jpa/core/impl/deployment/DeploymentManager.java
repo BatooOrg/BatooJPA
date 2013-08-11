@@ -38,7 +38,7 @@ import org.batoo.common.BatooException;
 import org.batoo.common.log.BLogger;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
 import org.batoo.jpa.core.impl.model.TypeImpl;
-import org.batoo.jpa.core.util.IncrementalNamingThreadFactory;
+import org.batoo.common.util.IncrementalNamingThreadFactory;
 import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 
 import com.google.common.base.Function;

@@ -26,6 +26,6 @@
 
 	<artifactId>persistence-api</artifactId>
 	<name>Batoo Persistence API</name>
-	<version>2.0</version>
+	<version>${jpa.spec.version}</version>
 	
 </project>

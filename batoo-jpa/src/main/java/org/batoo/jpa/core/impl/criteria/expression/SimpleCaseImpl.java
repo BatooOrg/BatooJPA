@@ -31,7 +31,7 @@ import org.batoo.jpa.core.impl.criteria.AbstractCriteriaQueryImpl;
 import org.batoo.jpa.core.impl.criteria.BaseQueryImpl;
 import org.batoo.jpa.core.impl.criteria.QueryImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
-import org.batoo.jpa.core.util.Pair;
+import org.batoo.common.util.Pair;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;

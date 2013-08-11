@@ -31,7 +31,7 @@ import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
 import org.batoo.common.reflect.AbstractAccessor;
 import org.batoo.jpa.core.impl.model.EntityTypeImpl;
-import org.batoo.jpa.core.util.Pair;
+import org.batoo.common.util.Pair;
 import org.batoo.jpa.jdbc.mapping.SingularMapping;
 import org.batoo.jpa.parser.MappingException;
 

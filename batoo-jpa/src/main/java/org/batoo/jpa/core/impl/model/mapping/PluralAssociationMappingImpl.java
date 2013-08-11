@@ -48,7 +48,7 @@ import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.EntityTypeImpl;
 import org.batoo.jpa.core.impl.model.attribute.MapAttributeImpl;
 import org.batoo.jpa.core.impl.model.attribute.PluralAttributeImpl;
-import org.batoo.jpa.core.util.Pair;
+import org.batoo.common.util.Pair;
 import org.batoo.jpa.jdbc.ForeignKey;
 import org.batoo.jpa.jdbc.JoinTable;
 import org.batoo.jpa.jdbc.Joinable;

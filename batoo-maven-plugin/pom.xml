@@ -35,22 +35,6 @@
 			<groupId>org.batoo.jpa</groupId>
 			<artifactId>batoo-jpa</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.batoo.jpa</groupId>
-			<artifactId>batoo-annotations</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.batoo.jpa</groupId>
-			<artifactId>jpql</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.batoo.jpa</groupId>
-			<artifactId>parser</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.batoo.jpa</groupId>
-			<artifactId>batoo-common</artifactId>
-		</dependency>
 
 		<dependency>
 			<groupId>org.batoo.jpa</groupId>

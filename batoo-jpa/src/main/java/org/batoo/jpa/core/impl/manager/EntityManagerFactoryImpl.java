@@ -22,15 +22,7 @@ package org.batoo.jpa.core.impl.manager;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.persistence.Cache;
 import javax.persistence.EntityManager;
@@ -50,6 +42,7 @@ import org.batoo.common.BatooException;
 import org.batoo.common.BatooVersion;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
+import org.batoo.common.util.BatooUtils;
 import org.batoo.jpa.BJPASettings;
 import org.batoo.jpa.JPASettings;
 import org.batoo.jpa.core.impl.criteria.CriteriaBuilderImpl;
@@ -186,6 +179,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 
 		this.jdbcAdaptor.importSql(this.classloader, this.dataSource, (String) this.getProperties().get(BJPASettings.IMPORT_SQL));
 
+        BatooUtils.gaBoot(this.properties);
 		this.open = true;
 	}
 
@@ -748,9 +742,11 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 				this.properties.put((String) key, System.getProperties().get(key));
 			}
 		}
-
 		this.properties.putAll(parser.getProperties());
-	}
+
+        //load runtime-properties, version, build etc
+        this.properties.putAll(BatooUtils.loadRuntimeProperties());
+    }
 
 	private DDLMode readDdlMode() {
 		final String ddlMode = (String) this.getProperty(BJPASettings.DDL);

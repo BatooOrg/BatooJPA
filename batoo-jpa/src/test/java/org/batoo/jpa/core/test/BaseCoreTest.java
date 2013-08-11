@@ -56,7 +56,13 @@ public abstract class BaseCoreTest { // extends BaseTest {
 
 	private static final String DEFAULT = "default";
 
-	/**
+    static{
+        System.setProperty("batoojpa.state","boot-dev-test");
+    }
+
+
+
+    /**
 	 * Rule to get Persistence XML File name.
 	 * 
 	 * @since 2.0.0

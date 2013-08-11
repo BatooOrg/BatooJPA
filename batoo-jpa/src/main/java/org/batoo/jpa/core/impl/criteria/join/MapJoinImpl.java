@@ -38,7 +38,7 @@ import org.batoo.jpa.core.impl.instance.ManagedInstance;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.attribute.MapAttributeImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralMappingEx;
-import org.batoo.jpa.core.util.Pair;
+import org.batoo.common.util.Pair;
 
 /**
  * Implementation of {@link MapJoin}.
