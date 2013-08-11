@@ -1,23 +1,22 @@
-<!-- 
+<!--
+  ~ Copyright (c) 2012-2013, Batu Alp Ceylan
+  ~
+  ~ This copyrighted material is made available to anyone wishing to use, modify,
+  ~ copy, or redistribute it subject to the terms and conditions of the GNU
+  ~ Lesser General Public License, as published by the Free Software Foundation.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+  ~ or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+  ~ for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this distribution; if not, write to:
+  ~ Free Software Foundation, Inc.
+  ~ 51 Franklin Street, Fifth Floor
+  ~ Boston, MA  02110-1301  USA
+  -->
 
-	Copyright (c) 2012 - Batoo Software ve Consultancy Ltd.
- 
-	This copyrighted material is made available to anyone wishing to use, modify,
-	copy, or redistribute it subject to the terms and conditions of the GNU
-	Lesser General Public License, as published by the Free Software Foundation.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-	or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
-	for more details.
-
-	You should have received a copy of the GNU Lesser General Public License
-	along with this distribution; if not, write to:
-	Free Software Foundation, Inc.
-	51 Franklin Street, Fifth Floor
-	Boston, MA  02110-1301  USA
-
- -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -28,7 +27,7 @@
 	</parent>
 
 	<groupId>org.batoo.jpa</groupId>
-	<artifactId>parent</artifactId>
+	<artifactId>batoo-jpa-parent</artifactId>
 	<version>2.0.1.2-SNAPSHOT</version>
 
 	<packaging>pom</packaging>
@@ -36,7 +35,7 @@
 	<name>Batoo Persistence Parent</name>
 	<description>The fastest JPA 2.0 Implementation</description>
 
-	<url>http://batoo.jp</url>
+	<url>http://batoo.org</url>
 
 	<developers>
 		<developer>
@@ -54,7 +53,7 @@
 	</developers>
 
 	<organization>
-		<name>Batoo Software &amp; Consultancy</name>
+		<name>Batoo</name>
 		<url>http://www.batoo.org</url>
 	</organization>
 
@@ -358,14 +357,38 @@
 					</configuration>
 				</plugin>
 
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-surefire-plugin</artifactId>
-					<configuration>
-						<redirectTestOutputToFile>true</redirectTestOutputToFile>
-						<failIfNoTests>false</failIfNoTests>
-					</configuration>
-				</plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <skip>true</skip>
+                        <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                        <failIfNoTests>false</failIfNoTests>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>surefire-it</id>
+                            <phase>integration-test</phase>
+                            <goals>
+                                <goal>test</goal>
+                            </goals>
+                            <configuration>
+                                <skip>false</skip>
+                                <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                                <failIfNoTests>false</failIfNoTests>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+				<!--<plugin>-->
+					<!--<groupId>org.apache.maven.plugins</groupId>-->
+					<!--<artifactId>maven-surefire-plugin</artifactId>-->
+					<!--<configuration>-->
+						<!--<redirectTestOutputToFile>true</redirectTestOutputToFile>-->
+						<!--<failIfNoTests>false</failIfNoTests>-->
+					<!--</configuration>-->
+				<!--</plugin>-->
 
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
                 only. It has no influence on the Maven build itself. -->
@@ -403,9 +426,10 @@
 		<module>batoo-jpa</module>
 		<module>batoo-annotations</module>
 		<module>batoo-maven-plugin</module>
-<!-- 		<module>community</module> -->
+ 		<module>community</module>
 		<module>batoo-jpa-spi</module>
 		<module>batoo-jdbc</module>
 		<module>batoo-common</module>
+        <module>persistence-api</module>
 	</modules>
 </project>

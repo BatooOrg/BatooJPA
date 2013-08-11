@@ -3,3 +3,7 @@
 .settings
 target
 *.log
+*.iml
+.idea/
+.DS_Store
+.directory

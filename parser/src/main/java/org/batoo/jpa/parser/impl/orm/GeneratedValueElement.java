@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2012 - Batoo Software ve Consultancy Ltd.
- * 
+ * Copyright (c) 2012-2013, Batu Alp Ceylan
+ *
  * This copyrighted material is made available to anyone wishing to use, modify,
  * copy, or redistribute it subject to the terms and conditions of the GNU
  * Lesser General Public License, as published by the Free Software Foundation.
