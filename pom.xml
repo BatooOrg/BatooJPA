@@ -423,6 +423,6 @@
 		<module>batoo-jpa</module>
 		<module>batoo-maven-plugin</module>
  		<!--<module>community</module>-->
-        <module>persistence-api</module>
+        <!--<module>persistence-api</module>-->
 	</modules>
 </project>
