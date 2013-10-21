@@ -717,7 +717,7 @@ public class MetamodelImpl implements Metamodel {
 			return "SecondaryTable[" + secondaryTable.getName() + " " + secondaryTable.getEntity().getJavaType().getName() + "]";
 		}
 
-		final EntityTable entityTable = (SecondaryTable) table;
+		final EntityTable entityTable = (EntityTable) table;
 
 		return "EntityTable[" + entityTable.getName() + " " + entityTable.getEntity().getJavaType().getName() + "]";
 	}
