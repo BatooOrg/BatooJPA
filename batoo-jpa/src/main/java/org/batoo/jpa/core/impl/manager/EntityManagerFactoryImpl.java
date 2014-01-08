@@ -326,7 +326,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 				throw new IllegalArgumentException("Class not found: " + this.getProperty(BJPASettings.DATASOURCE_POOL));
 			}
 			finally {
-				this.dataSourcePool.open(persistanceUnitName, hintName);
+				this.dataSourcePool.open(persistanceUnitName, hintName, getProperties());
 			}
 		}
 		return this.createDatasourceProxy(parser, sqlLogging, slowSqlThreshold, jdbcFetchSize);
