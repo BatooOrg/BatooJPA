@@ -19,6 +19,12 @@
 
 package org.batoo.jpa.jdbc;
 
+import javax.naming.Context;
+import javax.naming.Name;
+import javax.naming.RefAddr;
+import javax.naming.Reference;
+import javax.naming.spi.ObjectFactory;
+import javax.sql.DataSource;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -26,26 +32,19 @@ import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 
-import javax.naming.Context;
-import javax.naming.Name;
-import javax.naming.RefAddr;
-import javax.naming.Reference;
-import javax.naming.spi.ObjectFactory;
-import javax.sql.DataSource;
-
-import org.batoo.common.util.FinalWrapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Function;
-import com.google.common.collect.MapMaker;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.jolbox.bonecp.BoneCP;
 import com.jolbox.bonecp.BoneCPConfig;
 import com.jolbox.bonecp.PoolUtil;
 import com.jolbox.bonecp.UsernamePassword;
+import org.batoo.common.util.FinalWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DataSource for use with LazyConnection Provider etc.
@@ -73,20 +72,16 @@ public class BoneCPDataSource extends BoneCPConfig implements DataSource, Object
 	 * Constructs (and caches) a datasource on the fly based on the given username/password.
 	 */
 	@SuppressWarnings("deprecation")
-	private transient final Map<UsernamePassword, BoneCPDataSource> multiDataSource = new MapMaker().makeComputingMap(new Function<UsernamePassword, BoneCPDataSource>() {
+	private transient final LoadingCache<UsernamePassword, BoneCPDataSource> multiDataSource = CacheBuilder.newBuilder().build(new CacheLoader<UsernamePassword, BoneCPDataSource>() {
+        @Override
+        public BoneCPDataSource load(UsernamePassword key) {
+            BoneCPDataSource ds = new BoneCPDataSource(BoneCPDataSource.this.getConfig());
+            ds.setUsername(key.getUsername());
+            ds.setPassword(key.getPassword());
 
-		@Override
-		public BoneCPDataSource apply(UsernamePassword key) {
-			BoneCPDataSource ds = null;
-			ds = new BoneCPDataSource(BoneCPDataSource.this.getConfig());
-
-			ds.setUsername(key.getUsername());
-			ds.setPassword(key.getPassword());
-
-			return ds;
-		}
-
-	});
+            return ds;
+        }
+    });
 
 	/**
 	 * Default empty constructor.
@@ -164,8 +159,12 @@ public class BoneCPDataSource extends BoneCPConfig implements DataSource, Object
 	 */
 	@Override
 	public Connection getConnection(String username, String password) throws SQLException {
-		return this.multiDataSource.get(new UsernamePassword(username, password)).getConnection();
-	}
+        try {
+            return this.multiDataSource.get(new UsernamePassword(username, password)).getConnection();
+        } catch (ExecutionException e) {
+            throw new SQLException(e);
+        }
+    }
 
 	/**
 	 * Gets driver class set in config.
