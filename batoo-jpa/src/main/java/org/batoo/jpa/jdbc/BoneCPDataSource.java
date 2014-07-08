@@ -71,7 +71,6 @@ public class BoneCPDataSource extends BoneCPConfig implements DataSource, Object
 	/**
 	 * Constructs (and caches) a datasource on the fly based on the given username/password.
 	 */
-	@SuppressWarnings("deprecation")
 	private transient final LoadingCache<UsernamePassword, BoneCPDataSource> multiDataSource = CacheBuilder.newBuilder().build(new CacheLoader<UsernamePassword, BoneCPDataSource>() {
         @Override
         public BoneCPDataSource load(UsernamePassword key) {
