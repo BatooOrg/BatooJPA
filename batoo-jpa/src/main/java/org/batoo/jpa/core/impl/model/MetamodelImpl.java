@@ -322,7 +322,7 @@ public class MetamodelImpl implements Metamodel {
 
 	/**
 	 * 
-	 * @param sqlResultSetMapping
+	 * @param sqlResultSetMappings
 	 * @since 2.0.1
 	 */
 	private void addSqlResultSetMappings(List<SqlResultSetMappingMetadata> sqlResultSetMappings) {
@@ -366,14 +366,19 @@ public class MetamodelImpl implements Metamodel {
 	 * @since 2.0.1
 	 */
 	public void checkTables() {
-		final Map<String, AbstractTable> tableNames = Maps.newHashMap();
+		final Map<String, AbstractTable> entityTableNames = Maps.newHashMap();
+		final Map<String, AbstractTable> joinTableNames = Maps.newHashMap();
 		for (final AbstractTable table : this.getAllTables()) {
-			final AbstractTable existing = tableNames.put(table.getName(), table);
-
-			if (existing != null) {
-				throw new MappingException("Duplicate table names " + this.getTableDesc(existing) + ", " + this.getTableDesc(table));
-			}
-		}
+            final AbstractTable existing;
+            if(table instanceof EntityTable){
+                existing = entityTableNames.put(table.getName(), table);
+            }else {
+                existing = joinTableNames.put(table.getName(), table);
+            }
+            if (existing != null) {
+                throw new MappingException("Duplicate table names " + this.getTableDesc(existing) + ", " + this.getTableDesc(table));
+            }
+        }
 	}
 
 	/**
@@ -717,7 +722,7 @@ public class MetamodelImpl implements Metamodel {
 			return "SecondaryTable[" + secondaryTable.getName() + " " + secondaryTable.getEntity().getJavaType().getName() + "]";
 		}
 
-		final EntityTable entityTable = (SecondaryTable) table;
+		final EntityTable entityTable = (EntityTable) table;
 
 		return "EntityTable[" + entityTable.getName() + " " + entityTable.getEntity().getJavaType().getName() + "]";
 	}
