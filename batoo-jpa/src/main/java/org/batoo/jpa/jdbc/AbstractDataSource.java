@@ -20,6 +20,7 @@ package org.batoo.jpa.jdbc;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -55,8 +56,7 @@ public abstract class AbstractDataSource implements DataSource {
 	 * 
 	 * @since 2.0.1
 	 */
-
-	public abstract void open(String persistanceUnitName, String hintName);
+	public abstract void open(String persistanceUnitName, String hintName, Map<String, Object> properties);
 
 	/**
 	 * release the connection

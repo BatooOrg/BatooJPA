@@ -22,7 +22,7 @@
 	<parent>
 		<artifactId>batoo-jpa-parent</artifactId>
 		<groupId>org.batoo.jpa</groupId>
-		<version>2.0.1.3_1-SNAPSHOT</version>        
+		<version>${project.parent.version}</version>
         <relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -290,7 +290,7 @@
                     <plugin>
                         <groupId>org.antlr</groupId>
                         <artifactId>antlr3-maven-plugin</artifactId>
-                        <version>3.4</version>
+                        <version>3.5.2/version>
                         <executions>
                             <execution>
                                 <goals>
@@ -302,7 +302,7 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>jaxb2-maven-plugin</artifactId>
-                        <version>1.5</version>
+                        <version>1.6</version>
                         <configuration>
                             <bindingDirectory>${project.basedir}/src/main/resources/xjb</bindingDirectory>
                             <bindingFiles>spec.xjb</bindingFiles>

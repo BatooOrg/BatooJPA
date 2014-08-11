@@ -37,11 +37,11 @@ import org.codehaus.plexus.util.FileUtils;
 
 /**
  * Generates the enhanced classes.
- * 
+ *
  * @goal enhance
  * @phase process-classes
  * @requiresDependencyResolution compile
- * 
+ *
  * @author hceylan
  * @since 2.0.0
  */
@@ -50,15 +50,15 @@ public class BatooEnhancerMojo extends AbstractMojo {
 
 	/**
 	 * File location for the persistence classes.
-	 * 
-	 * @parameter expression="${batoojpa.classes}" default-value="${project.build.outputDirectory}"
+	 *
+	 * @parameter property="batoojpa.classes" default-value="project.build.outputDirectory"
 	 * @required
 	 */
 	protected File classes;
 
 	/**
 	 * Classpath elements to use for enhancement.
-	 * 
+	 *
 	 * @parameter default-value="${project.compileClasspathElements}"
 	 * @required
 	 * @readonly
@@ -67,21 +67,21 @@ public class BatooEnhancerMojo extends AbstractMojo {
 
 	/**
 	 * Comma seperated representation of excludes.
-	 * 
+	 *
 	 * @parameter default-value="";
 	 */
 	private String excludes;
 
 	/**
 	 * Comma seperated representation of includes.
-	 * 
+	 *
 	 * @parameter default-value="**\/*.class"
 	 */
 	private String includes;
 
 	/**
 	 * The maven project.
-	 * 
+	 *
 	 * @parameter default-value="${project}"
 	 * @required
 	 * @readonly
@@ -90,14 +90,14 @@ public class BatooEnhancerMojo extends AbstractMojo {
 
 	/**
 	 * Skip the exeution.
-	 * 
+	 *
 	 * @parameter default-value="false"
 	 */
 	private boolean skip;
 
 	/**
 	 * {@inheritDoc}
-	 * 
+	 *
 	 * @see org.apache.maven.plugin.Mojo#execute()
 	 */
 	@Override
@@ -145,9 +145,9 @@ public class BatooEnhancerMojo extends AbstractMojo {
 
 	/**
 	 * This will prepare the current ClassLoader and add all jars and local classpaths (e.g. target/classes) needed by the OpenJPA task.
-	 * 
+	 *
 	 * @return the class loader
-	 * 
+	 *
 	 * @throws MojoExecutionException
 	 *             on any error inside the mojo
 	 */
@@ -171,7 +171,7 @@ public class BatooEnhancerMojo extends AbstractMojo {
 
 	/**
 	 * Locates and returns a list of class files found under specified class directory.
-	 * 
+	 *
 	 * @return list of class files.
 	 * @throws MojoExecutionException
 	 *             if there was an error scanning class file resources.
@@ -191,7 +191,7 @@ public class BatooEnhancerMojo extends AbstractMojo {
 
 	/**
 	 * Returns File location for the persistence classes.
-	 * 
+	 *
 	 * @return File location for the persistence classes
 	 */
 	private File getEntityClasses() {
@@ -200,9 +200,9 @@ public class BatooEnhancerMojo extends AbstractMojo {
 
 	/**
 	 * Returns if the execution should be skipped.
-	 * 
+	 *
 	 * @return true if the execution should be skipped, flase otherwise
-	 * 
+	 *
 	 * @since 2.0.0
 	 */
 	private boolean skipMojo() {
