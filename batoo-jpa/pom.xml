@@ -30,6 +30,11 @@
 	<artifactId>batoo-jpa</artifactId>
 	<name>Batoo Persistence Core</name>
 
+    <properties>
+        <!-- needed for checkstyle/findbugs -->
+        <main.basedir>${project.parent.basedir}</main.basedir>
+    </properties>
+
 	<build>
 		<testResources>
 			<testResource>
@@ -130,6 +135,12 @@
 			<groupId>com.jolbox</groupId>
 			<artifactId>bonecp</artifactId>
 			<scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
 		</dependency>
 
 		<!-- ASM -->
@@ -282,47 +293,6 @@
 
 	</dependencies>
     <profiles>
-        <profile>
-            <id>generate-parser</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.antlr</groupId>
-                        <artifactId>antlr3-maven-plugin</artifactId>
-                        <version>3.4</version>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>antlr</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>jaxb2-maven-plugin</artifactId>
-                        <version>1.5</version>
-                        <configuration>
-                            <bindingDirectory>${project.basedir}/src/main/resources/xjb</bindingDirectory>
-                            <bindingFiles>spec.xjb</bindingFiles>
-                            <schemaDirectory>${project.basedir}/src/main/resources/xsd</schemaDirectory>
-                            <schemaFiles>persistence_2_0.xsd</schemaFiles>
-                            <extension>true</extension>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>xjc</id>
-                                <goals>
-                                    <goal>xjc</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                </plugins>
-            </build>
-        </profile>
-
         <profile>
             <id>run-test</id>
             <build>
