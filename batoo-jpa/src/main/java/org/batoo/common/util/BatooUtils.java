@@ -21,7 +21,13 @@ package org.batoo.common.util;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Random;
+import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -177,9 +183,12 @@ public class BatooUtils {
 	 */
 	public static <X, Y> Map<X, Y> subtract(final Map<X, Y> a, final Map<X, Y> b) {
 		final Map<X, Y> map = Maps.newHashMap();
-		for (final X key : a.keySet()) {
-			if (!(b.containsKey(key) && b.get(key).equals(a.get(key)))) {
-				map.put(key, b.get(key));
+		for(Map.Entry<X, Y> entryA : a.entrySet()) {
+			final X key = entryA.getKey();
+			final Y valueA = entryA.getValue();
+			final Y valueB = b.get(key);
+			if (!(b.containsKey(key) && valueB.equals(valueA))) {
+				map.put(key, valueB);
 			}
 		}
 		return map;

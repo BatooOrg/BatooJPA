@@ -22,7 +22,15 @@ package org.batoo.jpa.core.impl.manager;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.Cache;
 import javax.persistence.EntityManager;
@@ -348,6 +356,10 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 				Integer.valueOf((String) this.getProperty(BJPASettings.MIN_CONNECTIONS)) : //
 				BJPASettings.DEFAULT_MIN_CONNECTIONS;
 
+			final Integer maxConnections = this.getProperty(BJPASettings.MAX_CONNECTIONS) != null ? //
+				Integer.valueOf((String) this.getProperty(BJPASettings.MAX_CONNECTIONS)) : //
+				BJPASettings.DEFAULT_MAX_CONNECTIONS;
+
 			// create the datasource
 			final BoneCPDataSource dataSource = new BoneCPDataSource();
 
@@ -358,15 +370,14 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 
 			dataSource.setStatementsCacheSize(statementsCacheSize);
 			dataSource.setMinConnectionsPerPartition(minConnections);
-			dataSource.setMaxConnectionsPerPartition(5);
+			dataSource.setMaxConnectionsPerPartition(maxConnections);
 			dataSource.setDisableConnectionTracking(true);
 
 			// This is slow so always set it to 0
 			dataSource.setReleaseHelperThreads(0);
 
 			return dataSource;
-		}
-		catch (final Exception e) {
+		} catch (final Exception e) {
 			throw new IllegalArgumentException("Illegal values for datasource settings!");
 		}
 	}
