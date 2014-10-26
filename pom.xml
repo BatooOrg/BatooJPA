@@ -408,7 +408,12 @@
                 <module>batoo-jpql</module>
             </modules>
         </profile>
-
+        <profile>
+            <id>more-tests</id>
+            <modules>
+                <module>batoo-community-tests</module>
+            </modules>
+        </profile>
         <profile>
             <id>checkstyle</id>
             <build>
@@ -472,7 +477,7 @@
     </profiles>
 	<modules>
 		<module>batoo-jpa</module>
-        <module>batoo-community-tests</module>
+        <!--<module>batoo-community-tests</module>-->
         <!--<module>batoo-maven-plugin</module>-->
         <!--<module>persistence-api</module>-->
 	</modules>
