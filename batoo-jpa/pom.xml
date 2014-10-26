@@ -23,7 +23,8 @@
 		<artifactId>batoo-jpa-parent</artifactId>
 		<groupId>org.batoo.jpa</groupId>
 		<version>2.0.1.3-SNAPSHOT</version>
-	</parent>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
 
 	<packaging>bundle</packaging>
 

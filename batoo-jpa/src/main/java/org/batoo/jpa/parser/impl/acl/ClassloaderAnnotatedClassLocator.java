@@ -71,7 +71,8 @@ public class ClassloaderAnnotatedClassLocator extends BaseAnnotatedClassLocator 
 			ClassloaderAnnotatedClassLocator.LOG.debug("Processing directory {0}", path);
 
 			for (final String child : file.list()) {
-				this.findClasses(cl, classes, root, path + "/" + child);
+				final String childPath = path + ( path.endsWith("/") ? child: "/" + child);
+				this.findClasses(cl, classes, root, childPath);
 			}
 		}
 		else {

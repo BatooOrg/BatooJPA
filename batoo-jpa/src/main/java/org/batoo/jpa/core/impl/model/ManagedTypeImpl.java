@@ -131,7 +131,10 @@ public abstract class ManagedTypeImpl<X> extends TypeImpl<X> implements ManagedT
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected void addAttributes(ManagedTypeMetadata typeMetadata) {
 		final AttributesMetadata attributesMetadata = typeMetadata.getAttributes();
-
+		if(attributesMetadata == null) {
+			//No attributes defined
+			return;
+		}
 		// basic attributes
 		for (final BasicAttributeMetadata metadata : attributesMetadata.getBasics()) {
 			this.addAttribute(new BasicAttribute(this, metadata));
