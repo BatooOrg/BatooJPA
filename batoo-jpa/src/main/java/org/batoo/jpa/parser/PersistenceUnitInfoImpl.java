@@ -243,7 +243,7 @@ public class PersistenceUnitInfoImpl implements PersistenceUnitInfo {
 	 * Finds and returns the persistence unit.
 	 * 
 	 * @param puName
-	 * @param persistenceXmlUrl
+	 * @param url the URL pointing persistence.xml
 	 * @return the persistence unit
 	 * 
 	 * @since 2.0.0

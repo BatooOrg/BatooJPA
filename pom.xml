@@ -84,17 +84,19 @@
 	</ciManagement>
 
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<warnOnDependencyChange>true</warnOnDependencyChange>
-		<logDependencyChanges>true</logDependencyChanges>
-		<overwriteChangedDependencies>true</overwriteChangedDependencies>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <main.basedir>${project.basedir}</main.basedir>
         <maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
         <timestamp>${maven.build.timestamp}</timestamp>
+        <target.dir>target</target.dir>
+        <jdk.version>1.6</jdk.version>
+        <warnOnDependencyChange>true</warnOnDependencyChange>
+        <logDependencyChanges>true</logDependencyChanges>
+        <overwriteChangedDependencies>true</overwriteChangedDependencies>
         <jpa.spec.version>2.0</jpa.spec.version>
         <findbugs.maven.plugin.version>2.5.5</findbugs.maven.plugin.version>
         <checkstyle.maven.plugin.version>2.12</checkstyle.maven.plugin.version>
-        <main.basedir>${project.basedir}</main.basedir>
     </properties>
 
 	<dependencyManagement>
@@ -331,7 +333,20 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
-		</plugins>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <version>${findbugs.maven.plugin.version}</version>
+                <configuration>
+                    <findbugsXmlOutput>true</findbugsXmlOutput>
+                    <xmlOutput>true</xmlOutput>
+                </configuration>
+            </plugin>
+
+        </plugins>
+
+
 		<pluginManagement>
 			<plugins>
                 <plugin>

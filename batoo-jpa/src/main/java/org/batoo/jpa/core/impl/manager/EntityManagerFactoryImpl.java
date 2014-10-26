@@ -19,11 +19,32 @@
 
 package org.batoo.jpa.core.impl.manager;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.jolbox.bonecp.BoneCP;
+import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+import javax.persistence.Cache;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.LockModeType;
+import javax.persistence.PersistenceException;
+import javax.persistence.PersistenceUnitUtil;
+import javax.persistence.Query;
+import javax.sql.DataSource;
+import javax.validation.Validation;
+import javax.validation.ValidationException;
+import javax.validation.ValidatorFactory;
+import javax.validation.groups.Default;
+
 import org.apache.commons.lang.StringUtils;
 import org.batoo.common.BatooException;
 import org.batoo.common.BatooVersion;
@@ -50,30 +71,11 @@ import org.batoo.jpa.parser.AbstractLocator;
 import org.batoo.jpa.parser.PersistenceParser;
 import org.batoo.jpa.parser.metadata.NamedQueryMetadata;
 
-import javax.persistence.Cache;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.LockModeType;
-import javax.persistence.PersistenceException;
-import javax.persistence.PersistenceUnitUtil;
-import javax.persistence.Query;
-import javax.sql.DataSource;
-import javax.validation.Validation;
-import javax.validation.ValidationException;
-import javax.validation.ValidatorFactory;
-import javax.validation.groups.Default;
-import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.jolbox.bonecp.BoneCP;
 
 /**
  * Implementation of {@link EntityManagerFactory}.

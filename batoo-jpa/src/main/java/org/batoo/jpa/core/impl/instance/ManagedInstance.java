@@ -41,6 +41,7 @@ import org.apache.commons.lang.mutable.MutableBoolean;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
 import org.batoo.common.reflect.AbstractAccessor;
+import org.batoo.common.util.Pair;
 import org.batoo.jpa.core.impl.manager.EntityManagerImpl;
 import org.batoo.jpa.core.impl.manager.SessionImpl;
 import org.batoo.jpa.core.impl.model.EntityTypeImpl;
@@ -54,7 +55,6 @@ import org.batoo.jpa.core.impl.model.mapping.PluralAssociationMappingImpl;
 import org.batoo.jpa.core.impl.model.mapping.PluralMappingEx;
 import org.batoo.jpa.core.impl.model.mapping.SingularAssociationMappingImpl;
 import org.batoo.jpa.core.impl.model.mapping.SingularMappingEx;
-import org.batoo.common.util.Pair;
 import org.batoo.jpa.jdbc.mapping.SingularMapping;
 import org.batoo.jpa.parser.metadata.EntityListenerMetadata.EntityListenerType;
 
@@ -103,7 +103,7 @@ public class ManagedInstance<X> {
 	/**
 	 * The current lock mode context.
 	 */
-	public static ThreadLocal<LockModeType> LOCK_CONTEXT = new ThreadLocal<LockModeType>();
+	public static final ThreadLocal<LockModeType> LOCK_CONTEXT = new ThreadLocal<LockModeType>();
 
 	/**
 	 * @param type
