@@ -126,8 +126,6 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 		 *            the name of the attribute
 		 * @param member
 		 *            the member
-		 * @param parseDefault
-		 *            true if by default the member should be parsed
 		 * @param metadata
 		 *            the optional ORM Metadata
 		 * @param parsed
@@ -143,8 +141,7 @@ public class AttributesMetadataImpl implements AttributesMetadata {
 			final Set<Class<? extends Annotation>> parsed = Sets.<Class<? extends Annotation>> newHashSet();
 
 			// if the ORM Attributes is null or empty then nothing interesting here
-			if (this.metadatas != null) {
-
+			if (this.metadatas != null && !this.metadatas.isEmpty()) {
 				// process the list of attributes defined by ORM Mapping
 				for (final AttributeMetadata attribute : this.metadatas) {
 					final Member member = this.memberMap.remove(attribute.getName());

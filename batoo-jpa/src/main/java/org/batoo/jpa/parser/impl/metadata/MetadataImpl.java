@@ -284,7 +284,7 @@ public class MetadataImpl implements Metadata {
 	 * @since 2.0.0
 	 */
 	public void parse(final ClassLoader classloader) {
-		// sort the emanage classes by inheritence
+		// sort the managed classes by inheritence
 		final ArrayList<String> managedClasses = this.checkParentClasses(classloader, this.entityMap.keySet());
 
 		Collections.sort(managedClasses, new Comparator<String>() {
@@ -363,6 +363,9 @@ public class MetadataImpl implements Metadata {
 					}
 					else if (metadata instanceof MappedSuperclassMetadata) {
 						this.entityMap.put(className, new MappedSuperclassMetadataImpl(clazz, (MappedSuperclassMetadata) metadata, parentAccessType));
+					}
+					else if(metadata instanceof EmbeddableMetadata) {
+						this.entityMap.put(className, new EmbeddableMetadataImpl(clazz, (EmbeddableMetadata) metadata));
 					}
 				}
 			}

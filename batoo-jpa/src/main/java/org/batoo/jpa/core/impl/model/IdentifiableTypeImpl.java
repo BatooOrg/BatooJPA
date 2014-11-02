@@ -156,7 +156,7 @@ public abstract class IdentifiableTypeImpl<X> extends ManagedTypeImpl<X> impleme
 				}
 
 				if (this.idAttributes.size() > 0) {
-					throw new MappingException("Embbeded id attributes cannot be combined with other id attributes.", //
+					throw new MappingException("Embedded id attributes cannot be combined with other id attributes.", //
 						attribute.getLocator(), this.idAttributes.values().iterator().next().getLocator());
 				}
 

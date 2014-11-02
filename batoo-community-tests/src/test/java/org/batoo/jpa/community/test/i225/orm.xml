@@ -17,9 +17,9 @@
   ~ Boston, MA  02110-1301  USA
   -->
 <entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                 xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd" version="2.0">
+				 xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_2_0.xsd" version="2.0">
 
-    <entity class="org.batoo.jpa.community.test.i225.EntityWithEmbeddedId" metadata-complete="false"/>
-    <embeddable class="org.batoo.jpa.community.test.i225.RegularEmbeddedId" metadata-complete="false"/>
+	<entity class="org.batoo.jpa.community.test.i225.EntityWithEmbeddedId"/>
+	<embeddable class="org.batoo.jpa.community.test.i225.RegularEmbeddedId"/>
 
 </entity-mappings>
