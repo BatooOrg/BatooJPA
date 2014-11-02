@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.persistence.PersistenceException;
 import javax.validation.ConstraintViolation;
@@ -55,11 +56,11 @@ public class SessionImpl {
 
 	private static final BLogger LOG = BLoggerFactory.getLogger(SessionImpl.class);
 
-	private static volatile long nextSessionId = 1;
+	private static AtomicLong nextSessionId = new AtomicLong(1);
 
 	private final EntityManagerImpl em;
 	private final MetamodelImpl metamodel;
-	private Object sessionId;
+	private final long sessionId;
 
 	private final HashMap<ManagedId<?>, ManagedInstance<?>> repository = Maps.newHashMap();
 
@@ -89,13 +90,7 @@ public class SessionImpl {
 		this.metamodel = metamodel;
 		this.insertBatchSize = this.em.getJdbcAdaptor().getInsertBatchSize();
 		this.removeBatchSize = this.em.getJdbcAdaptor().getRemoveBatchSize();
-
-		if (SessionImpl.LOG.isDebugEnabled()) {
-			this.sessionId = "Session" + SessionImpl.nextSessionId++;
-		}
-		else {
-			this.sessionId = this;
-		}
+		this.sessionId =  SessionImpl.nextSessionId.incrementAndGet();
 	}
 
 	/**
@@ -314,9 +309,9 @@ public class SessionImpl {
 	/**
 	 * Fires the pre callbacks.
 	 * 
-	 * @param updates
+	 * @param sortedUpdates
 	 *            the list of updates
-	 * @param removals
+	 * @param sortedRemovals
 	 *            the list of removals
 	 * @param callbackAvailability
 	 *            the callback availability
@@ -712,6 +707,6 @@ public class SessionImpl {
 	 */
 	@Override
 	public String toString() {
-		return this.sessionId.toString();
+		return "Session[id:" + this.sessionId + "]";
 	}
 }
