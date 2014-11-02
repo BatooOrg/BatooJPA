@@ -36,9 +36,9 @@ public interface BJPASettings {
 	String DROP_ON_CLOSE = "org.batoo.jpa.dropOnClose";
 
 	/**
-	 * Boolean value, indicating how the sql statements should be printed, NONE | STDOUT | STDERR.
+	 * String value, indicating how the sql statements should be printed, NONE | STDOUT | STDERR.
 	 * <p>
-	 * If you have a logging infrastructor, prefer org.batoo.jpa.SQL for logging.
+	 * If you have a logging infrastructure, prefer org.batoo.jpa.SQL for logging.
 	 */
 	String SQL_LOGGING = "org.batoo.jpa.sql_logging";
 
@@ -133,6 +133,8 @@ public interface BJPASettings {
 	 * Pluggable DataSource implementation
 	 */
 	String DATASOURCE_POOL = "org.batoo.jdbc.datasource.pool";
+
+	String DEFAULT_DATASOURCE_POOL = "org.batoo.jpa.jdbc.datasource.HikariCPDataSource";
 
 	/**
 	 * Hint for the the pluggable data source

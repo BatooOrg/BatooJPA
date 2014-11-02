@@ -38,6 +38,7 @@ import java.util.Properties;
 import java.util.concurrent.Executor;
 
 import org.batoo.jpa.jdbc.PreparedStatementProxy.SqlLoggingType;
+import org.batoo.jpa.jdbc.datasource.AbstractDataSource;
 
 /**
  * Proxy class to proxy connections. Main purpose is to cache and wrap the prepared statements.

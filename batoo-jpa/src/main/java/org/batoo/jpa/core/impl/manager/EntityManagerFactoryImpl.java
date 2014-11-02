@@ -60,8 +60,7 @@ import org.batoo.jpa.core.impl.deployment.DdlManager;
 import org.batoo.jpa.core.impl.deployment.LinkManager;
 import org.batoo.jpa.core.impl.deployment.NamedQueriesManager;
 import org.batoo.jpa.core.impl.model.MetamodelImpl;
-import org.batoo.jpa.jdbc.AbstractDataSource;
-import org.batoo.jpa.jdbc.BoneCPDataSource;
+import org.batoo.jpa.jdbc.datasource.AbstractDataSource;
 import org.batoo.jpa.jdbc.DDLMode;
 import org.batoo.jpa.jdbc.DataSourceProxy;
 import org.batoo.jpa.jdbc.PreparedStatementProxy.SqlLoggingType;
@@ -75,7 +74,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.jolbox.bonecp.BoneCP;
 
 /**
  * Implementation of {@link EntityManagerFactory}.
@@ -283,7 +281,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 		this.open = false;
 	}
 
-	private DataSourceProxy createDatasource(String persistanceUnitName, PersistenceParser parser) {
+	private DataSourceProxy createDatasource(String persistenceUnitName, PersistenceParser parser) {
 		SqlLoggingType sqlLogging;
 		long slowSqlThreshold;
 		int jdbcFetchSize;
@@ -311,75 +309,31 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 			jdbcFetchSize = this.getProperty(BJPASettings.FETCH_SIZE) != null ? //
 				Integer.valueOf((String) this.getProperty(BJPASettings.FETCH_SIZE)) : //
 				BJPASettings.DEFAULT_FETCH_SIZE;
-
 		}
 		catch (final Exception e) {
 			throw new IllegalArgumentException("Illegal value " + this.getProperty(BJPASettings.FETCH_SIZE) + " for " + BJPASettings.FETCH_SIZE);
 		}
 
-		if (this.getProperty(BJPASettings.DATASOURCE_POOL) != null) {
-			final String poolClassName = (String) this.getProperty(BJPASettings.DATASOURCE_POOL);
-			final String hintName = (String) this.getProperty(BJPASettings.DATASOURCE_NAME);
-			try {
-				final Object newInstance = this.classloader.loadClass(poolClassName).newInstance();
-				if (newInstance instanceof AbstractDataSource) {
-					this.dataSourcePool = (AbstractDataSource) newInstance;
-				}
-				else {
-					throw new IllegalArgumentException("Illegal value " + this.getProperty(BJPASettings.DATASOURCE_POOL) + " for "
-						+ BJPASettings.DATASOURCE_POOL + " Please provide a datasource pool implementation extending org.batoo.jpa.jdbc.AbstractDataSourcePool");
-				}
-			}
-			catch (final Exception e) {
-				throw new IllegalArgumentException("Class not found: " + this.getProperty(BJPASettings.DATASOURCE_POOL));
-			}
-			finally {
-				this.dataSourcePool.open(persistanceUnitName, hintName);
-			}
-		}
-		return this.createDatasourceProxy(parser, sqlLogging, slowSqlThreshold, jdbcFetchSize);
-	}
-
-	private DataSource createDatasource0(PersistenceParser parser) {
+		String dataSourcePool = (String) this.getProperty(BJPASettings.DATASOURCE_POOL);
+		final String poolClassName = dataSourcePool != null ?  dataSourcePool : BJPASettings.DEFAULT_DATASOURCE_POOL;
 		try {
-			// read the properties
-			final String jdbcDriver = (String) this.getProperty(JPASettings.JDBC_DRIVER);
-			final String jdbcUrl = (String) this.getProperty(JPASettings.JDBC_URL);
-			final String jdbcUser = (String) this.getProperty(JPASettings.JDBC_USER);
-			final String jdbcPassword = (String) this.getProperty(JPASettings.JDBC_PASSWORD);
-
-			final Integer statementsCacheSize = this.getProperty(BJPASettings.STATEMENT_CACHE_SIZE) != null ? //
-				Integer.valueOf((String) this.getProperty(BJPASettings.STATEMENT_CACHE_SIZE)) : //
-				BJPASettings.DEFAULT_STATEMENT_CACHE_SIZE;
-
-			final Integer minConnections = this.getProperty(BJPASettings.MIN_CONNECTIONS) != null ? //
-				Integer.valueOf((String) this.getProperty(BJPASettings.MIN_CONNECTIONS)) : //
-				BJPASettings.DEFAULT_MIN_CONNECTIONS;
-
-			final Integer maxConnections = this.getProperty(BJPASettings.MAX_CONNECTIONS) != null ? //
-				Integer.valueOf((String) this.getProperty(BJPASettings.MAX_CONNECTIONS)) : //
-				BJPASettings.DEFAULT_MAX_CONNECTIONS;
-
-			// create the datasource
-			final BoneCPDataSource dataSource = new BoneCPDataSource();
-
-			dataSource.setDriverClass(jdbcDriver);
-			dataSource.setJdbcUrl(jdbcUrl);
-			dataSource.setUsername(jdbcUser);
-			dataSource.setPassword(jdbcPassword);
-
-			dataSource.setStatementsCacheSize(statementsCacheSize);
-			dataSource.setMinConnectionsPerPartition(minConnections);
-			dataSource.setMaxConnectionsPerPartition(maxConnections);
-			dataSource.setDisableConnectionTracking(true);
-
-			// This is slow so always set it to 0
-			dataSource.setReleaseHelperThreads(0);
-
-			return dataSource;
-		} catch (final Exception e) {
-			throw new IllegalArgumentException("Illegal values for datasource settings!");
+			final Object newInstance = this.classloader.loadClass(poolClassName).newInstance();
+			if (newInstance instanceof AbstractDataSource) {
+				this.dataSourcePool = (AbstractDataSource) newInstance;
+			}
+			else {
+				throw new IllegalArgumentException("Illegal value " + dataSourcePool + " for "	+ BJPASettings.DATASOURCE_POOL +
+					" Please provide a datasource pool implementation extending org.batoo.jpa.jdbc.datasource.AbstractDataSourcePool");
+			}
 		}
+		catch (final Exception e) {
+			throw new IllegalArgumentException("Class not found: " + dataSourcePool);
+		}
+		finally {
+			this.dataSourcePool.open(persistenceUnitName, getProperties());
+		}
+
+		return this.createDatasourceProxy(parser, sqlLogging, slowSqlThreshold, jdbcFetchSize);
 	}
 
 	private DataSourceProxy createDatasourceProxy(PersistenceParser parser, SqlLoggingType sqlLogging, long slowSqlThreshold, int jdbcFetchSize) {
@@ -390,11 +344,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 		if (parser.getNonJtaDataSource() != null) {
 			return new DataSourceProxy(parser.getNonJtaDataSource(), external, sqlLogging, slowSqlThreshold, jdbcFetchSize);
 		}
-
-		if (this.dataSourcePool != null) {
-			return new DataSourceProxy(this.dataSourcePool, external, sqlLogging, slowSqlThreshold, jdbcFetchSize);
-		}
-		return new DataSourceProxy(this.createDatasource0(parser), external, sqlLogging, slowSqlThreshold, jdbcFetchSize);
+		return new DataSourceProxy(this.dataSourcePool, external, sqlLogging, slowSqlThreshold, jdbcFetchSize);
 	}
 
 	/**
@@ -780,6 +730,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 			return (T) this;
 		}
 
+/*
 		if ((clazz == BoneCPDataSource.class) && (this.dataSource.getDelegate() instanceof BoneCPDataSource)) {
 			return (T) this.dataSource.getDelegate();
 		}
@@ -787,6 +738,7 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 		if ((clazz == BoneCP.class) && (this.dataSource.getDelegate() instanceof BoneCP)) {
 			return (T) this.dataSource.getDelegate();
 		}
+*/
 
 		return null;
 	}

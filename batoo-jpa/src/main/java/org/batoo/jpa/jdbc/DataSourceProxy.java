@@ -30,6 +30,7 @@ import javax.sql.DataSource;
 import org.batoo.common.log.BLogger;
 import org.batoo.common.log.BLoggerFactory;
 import org.batoo.jpa.jdbc.PreparedStatementProxy.SqlLoggingType;
+import org.batoo.jpa.jdbc.datasource.AbstractDataSource;
 
 /**
  * Proxy class to proxy datasources. Main purpose is to cache and wrap the prepared statements.

@@ -130,20 +130,14 @@
 			</exclusions>
 		</dependency>
 
-		<!-- BoneCP -->
-		<dependency>
-			<groupId>com.jolbox</groupId>
-			<artifactId>bonecp</artifactId>
-			<scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-            </exclusions>
-		</dependency>
+		<!-- HikariCP -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP-java6</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
-		<!-- ASM -->
+        <!-- ASM -->
 		<dependency>
 			<groupId>asm</groupId>
 			<artifactId>asm</artifactId>

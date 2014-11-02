@@ -146,13 +146,12 @@
 				<version>3.4</version>
 			</dependency>
 
-			<!-- BoneCP -->
-			<dependency>
-				<groupId>com.jolbox</groupId>
-				<artifactId>bonecp</artifactId>
-				<version>0.7.1.RELEASE</version>
-			</dependency>
-
+            <!--HikariCP-->
+            <dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP-java6</artifactId>
+                <version>2.1.0</version>
+            </dependency>
 			<!-- ASM -->
 			<dependency>
 				<groupId>asm</groupId>
