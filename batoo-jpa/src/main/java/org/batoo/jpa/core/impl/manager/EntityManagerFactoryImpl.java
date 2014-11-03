@@ -729,17 +729,6 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory, Serializa
 		if (clazz == EntityManagerFactoryImpl.class) {
 			return (T) this;
 		}
-
-/*
-		if ((clazz == BoneCPDataSource.class) && (this.dataSource.getDelegate() instanceof BoneCPDataSource)) {
-			return (T) this.dataSource.getDelegate();
-		}
-
-		if ((clazz == BoneCP.class) && (this.dataSource.getDelegate() instanceof BoneCP)) {
-			return (T) this.dataSource.getDelegate();
-		}
-*/
-
 		return null;
 	}
 }
