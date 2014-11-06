@@ -44,7 +44,7 @@ Batoo JPA has been tested with the following databases:
 - Oracle
 - Sybase SQLAnyWhere
 
-Bato JPA has been tested with the following platforms:
+Batoo JPA has been tested with the following platforms:
 
 - Java SE 1.6
 - Java SE 1.7
