@@ -1,11 +1,13 @@
 language: java
 before_install: "git clone -b travis `git config --get remote.origin.url` target/travis"
-script: "mvn deploy --settings target/travis/settings.xml"
+script: 
+  - '[ "${TRAVIS_PULL_REQUEST}" = "true" ] && "mvn install --settings target/travis/settings.xml"
+  - '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && "mvn deploy --settings target/travis/settings.xml"
 
 # whitelist
 branches:
   only:
-    - master
+  - master
 
 env: 
   global: 
