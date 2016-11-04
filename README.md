@@ -1,10 +1,10 @@
+
 [![Build Status](https://secure.travis-ci.org/BatooOrg/BatooJPA.png)](http://travis-ci.org/BatooOrg/BatooJPA) Welcome to Batoo JPA - [http://batoo.org](http://batoo.org)
 ___
-# FASTEST JPA IMPLEMENTATION #
+# Batoo JPA 2.0 Spec Implementation #
 
-Batoo JPA is the fastest JPA Implementation by far.
+**Deprecated - This project is not maintained anymore!!!** 
 
-It is 10 ~ 20 times faster then the leading JPA providers.
 
 ## LICENSE ##
 Copyright (c) 2012-2013, Batu Alp Ceylan
